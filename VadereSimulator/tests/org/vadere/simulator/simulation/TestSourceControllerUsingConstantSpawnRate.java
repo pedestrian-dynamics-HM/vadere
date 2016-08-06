@@ -29,11 +29,11 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	protected AttributesSource attributesSource;
 	protected long randomSeed = 0;
 
-	public void initialize(double startTime, double endTime, int spawnNumber,
-			double spawnDelay, boolean useFreeSpaceOnly, Class<? extends RealDistribution> distributionClass) {
+	public void initialize(double startTime, double endTime, int spawnNumber, double spawnDelay,
+			boolean useFreeSpaceOnly, Class<? extends RealDistribution> distributionClass, int maxSpawnNumberTotal) {
 
-		String json = generateSourceAttributesJson(startTime, endTime,
-				spawnNumber, spawnDelay, String.valueOf(spawnDelay), useFreeSpaceOnly, distributionClass.getName());
+		String json = generateSourceAttributesJson(startTime, endTime, spawnNumber, spawnDelay,
+				String.valueOf(spawnDelay), useFreeSpaceOnly, distributionClass.getName(), maxSpawnNumberTotal);
 		attributesSource = IOUtils.getGson().fromJson(json, AttributesSource.class);
 		attributesPedestrian = new AttributesAgent();
 
@@ -59,17 +59,19 @@ public class TestSourceControllerUsingConstantSpawnRate {
 
 	private void initializeDefault(double startTime, double endTime, int spawnNumber,
 			double spawnDelay) {
+		final int noMaxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay,
-				false, ConstantDistribution.class);
+				false, ConstantDistribution.class, noMaxSpawnNumberTotal);
 	}
 
 	private static String generateSourceAttributesJson(double startTime, double endTime,
 			int spawnNumber, double spawnDelay, String distributionParams, boolean useFreeSpaceOnly,
-			String distributionClassName) {
+			String distributionClassName, int maxSpawnNumberTotal) {
 		return "{\"shape\": {\"type\": \"POLYGON\",\"points\": ["
 				+ "{\"x\": 0.0,\"y\": 0.0},{\"x\": 0.1,\"y\": 0},{\"x\": 0.1,\"y\": 0.1},{\"x\": 0,\"y\": 0.1}]},"
 				+ "\"spawnDelay\": " + spawnDelay
 				+ ",\"spawnNumber\":  " + spawnNumber
+				+ ",\"maxSpawnNumberTotal\":  " + maxSpawnNumberTotal
 				+ ",\"interSpawnTimeDistribution\": \"" + distributionClassName + "\""
 				+ ",\"distributionParameters\": [" + distributionParams + "]"
 				+ ",\"startTime\": " + startTime
@@ -165,7 +167,8 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 0;
 		int spawnNumber = 100;
 		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, true, ConstantDistribution.class);
+		int noMaxSpawnNumberTotal = 0;
+		initialize(startTime, endTime, spawnNumber, spawnDelay, true, ConstantDistribution.class, noMaxSpawnNumberTotal);
 
 		for (double simTimeInSec = 0; simTimeInSec < 1000; simTimeInSec += 1.0) {
 			sourceController.update(simTimeInSec);

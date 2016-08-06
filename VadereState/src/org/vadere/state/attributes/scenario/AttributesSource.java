@@ -24,9 +24,13 @@ public class AttributesSource extends Attributes {
 
 	private int spawnNumber = 1;
 
+	/** Maximum number of spawned elements. 0 -> no maximum number. */
+	private int maxSpawnNumberTotal = 0;
+
 	private double startTime = 0;
 	/** endTime == startTime means one single spawn event. */
 	private double endTime = 0;
+	
 	/**
 	 * The pedestrians are spawned at random positions rather than from the top
 	 * left corner downwards.
@@ -110,6 +114,19 @@ public class AttributesSource extends Attributes {
 	/** If end time equals start time, exactly one single spawn event will be triggered. */
 	public double getEndTime() {
 		return endTime;
+	}
+
+	/**
+	 * Maximum number of spawned elements. The number 0 means there is no
+	 * maximum.
+	 * 
+	 * This attribute can be used together with non-constant distributions. For
+	 * example, consider an exponential distribution. The times of events are
+	 * random. How to ensure, that exactly 10 elements are spawned? Solution:
+	 * Set the {@link endTime} to 1e9 this attribute to 10.
+	 */
+	public int getMaxSpawnNumberTotal() {
+		return maxSpawnNumberTotal;
 	}
 
 	public boolean isSpawnAtRandomPositions() {
