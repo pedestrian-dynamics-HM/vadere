@@ -58,20 +58,20 @@ Follow the installation instructions above. Go to the project directory and run 
 
 - *File* > *Import* > *Maven* > *Existing Maven Projects*
 - choose `pom.xml` as *Root Directory* and click *Finish*
-- open *VadereGui* > *src* > *projectview* > `VadereApplication`
+- open *VadereGui* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
 
 ### IntelliJ IDEA
 
 - on the welcome-screen select *Import Project* 
 - select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
-- open *VadereGui* > *src* > *projectview* > `VadereApplication`
+- open *VadereGui* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
 - click the *run*-icon next to the `main` method
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
 
 ## Contribution
 
-Please see [Contribution guidelines](CONTRIBUTION.md). The document defines guidelines for coding style and commit messages.
+Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
 
 ## Release History
 
@@ -88,7 +88,7 @@ Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob
 ## License
 
 This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
-For more information: http://www.gnu.org/licenses/lgpl.html
+More information: http://www.gnu.org/licenses/lgpl.html
 
 
 

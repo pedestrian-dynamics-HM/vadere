@@ -14,7 +14,7 @@ Basic rules:
 
 For source code formatting, we use an adapted version of
 [Google's Coding style guide](https://google.github.io/styleguide/javaguide.html).
-Please check the [README in this repository](/vadere/styleguide)
+Please check the [README in this repository](https://gitlab.lrz.de/vadere/styleguide)
 for the style guide and for how to import the style settings into your IDE.
 
 Commit style guide
