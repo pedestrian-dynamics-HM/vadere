@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "scenario": "<scenario></scenario>",
+      "name": "testname1",
+      "outputProcessors": [],
+      "attributes": "<attributes></attributes>",
+      "version": "0.2"
+    },
+    {
+      "scenario": "<scenario></scenario>",
+      "name": "testname2",
+      "outputProcessors": [],
+      "attributes": "<attributes></attributes>",
+      "version": "0.2"
+    },
+    {
+      "scenario": "<scenario></scenario>",
+      "name": "testname3",
+      "outputProcessors": [],
+      "attributes": "<attributes></attributes>",
+      "version": "0.2"
+    }
+  ],
+  "name": "testprojectname",
+  "version": "0.1"
+}

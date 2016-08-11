@@ -1,0 +1,18 @@
+<test version="0.2">
+<header>
+<name>testname</name>
+</header>
+<OutputProcessors>
+<IOutputProcessor>
+<ProcessorType>MEAN_VELOCITY_PER_SECOND</ProcessorType>
+<ProcessorOutputType>NONE</ProcessorOutputType>
+<ProcessorTimingType>POSTPROCESSOR</ProcessorTimingType>
+<ProcessorVariables>&lt;variables&gt;
+&lt;textvar1&gt;textcontent&lt;/textvar1&gt;
+&lt;/variables&gt;
+</ProcessorVariables>
+</IOutputProcessor>
+</OutputProcessors>
+<AttributeFile>&lt;attributes&gt;&lt;/attributes&gt;</AttributeFile>
+<ScenarioFile>&lt;topography&gt;&lt;/topography&gt;</ScenarioFile>
+</test>

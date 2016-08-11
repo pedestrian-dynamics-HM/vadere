@@ -1,0 +1,154 @@
+package org.vadere.simulator.models.potential.timeCostFunction;
+
+import org.vadere.simulator.models.density.IGaussianFilter;
+import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
+import org.vadere.simulator.models.queuing.QueueingGamePedestrian;
+import org.vadere.state.attributes.models.AttributesTimeCost;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.types.PedestrianAttitudeType;
+import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.potential.timecost.UnitTimeCostFunction;
+
+/**
+ * The TimeCostFunctionFactory creates the TimeCostFunctions with the currently
+ * availible configurations. The Decorator-Pattern is used for the
+ * TimeCostFunctions. So you can combine different TimeCostFunctions!
+ * 
+ * UNIT: static potential field, with F=1
+ * 
+ * NAVIGATION: time cost funtions which takes the density, measured by the
+ * gaussian function, in count. The higher the density the higher is the
+ * repulsion effect. The obstacle and the pedestrian density influences this
+ * chraracteristics.
+ * 
+ * QUEUING: time cost funtions which takes the density, measured by the gaussian
+ * function, in count. The higher the pedestrian density the higher is the
+ * gravity. The obstacle density still has an repulsion effect.
+ * 
+ * 
+ */
+public class TimeCostFunctionFactory {
+	/**
+	 * Construct the TimeCostFunction-Decoration (combination of different time
+	 * cost function), based on the attributes.
+	 * 
+	 * @param timeCostAttributes
+	 *        the attribute that is significant for the time cost function
+	 *        combinations and for their configurations
+	 * @param topography
+	 *        the floor of the potential field generator that uses this time
+	 *        cost function
+	 * @param targetId
+	 *        the target id of the potential field generator target body
+	 * @param scale
+	 *        the scale (this should be equals to 1/gridresoulution)
+	 * @return the TimeCostFunction-Decoration based on the attributes.
+	 */
+	public static ITimeCostFunction create(
+			final AttributesTimeCost timeCostAttributes,
+			final AttributesAgent attributesPedestrian,
+			final Topography topography, final int targetId, final double scale) {
+
+		switch (timeCostAttributes.getType()) {
+			case UNIT:
+				return new UnitTimeCostFunction();
+			case NAVIGATION: {
+				ITimeCostFunction timeCostObstacle = create(timeCostAttributes, topography, scale);
+
+				IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create(
+						topography,
+						timeCostAttributes,
+						attributesPedestrian,
+						targetId);
+
+				IGaussianFilter filter = IGaussianFilter.create(
+						topography.getBounds(),
+						topography.getElements(Pedestrian.class),
+						scale,
+						timeCostAttributes.getStandardDerivation(),
+						attributesPedestrian,
+						loadingStrategy);
+
+				return new TimeCostPedestrianDensity(timeCostObstacle, filter);
+			}
+			case NAVIGATION_GAME: {
+				ITimeCostFunction timeCostObstacle = create(timeCostAttributes, topography, scale);
+
+				IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create(
+						topography,
+						timeCostAttributes,
+						attributesPedestrian,
+						targetId);
+
+				loadingStrategy = IPedestrianLoadingStrategy.create(
+						loadingStrategy,
+						p -> p.getModelPedestrian(QueueingGamePedestrian.class)
+								.getAttituteType() == PedestrianAttitudeType.COMPETITIVE);
+
+				IGaussianFilter filter = IGaussianFilter.create(
+						topography.getBounds(),
+						topography.getElements(Pedestrian.class),
+						scale,
+						timeCostAttributes.getStandardDerivation(),
+						attributesPedestrian,
+						loadingStrategy);
+
+				return new TimeCostPedestrianDensity(timeCostObstacle, filter);
+			}
+			case QUEUEING: {
+				ITimeCostFunction timeCostObstacle = create(timeCostAttributes, topography, scale);
+				IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create();
+				IGaussianFilter filter = IGaussianFilter.create(
+						topography.getBounds(),
+						topography.getElements(Pedestrian.class),
+						scale,
+						timeCostAttributes.getStandardDerivation(),
+						attributesPedestrian,
+						loadingStrategy);
+
+				return new TimeCostPedestrianDensityQueuing(timeCostObstacle, timeCostAttributes, filter);
+			}
+			case QUEUEING_GAME: {
+				ITimeCostFunction timeCostObstacle = create(timeCostAttributes, topography, scale);
+				IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create(
+						IPedestrianLoadingStrategy.create(),
+						p -> p.getModelPedestrian(QueueingGamePedestrian.class)
+								.getAttituteType() == PedestrianAttitudeType.GENTLE);
+				IGaussianFilter filter = IGaussianFilter.create(
+						topography.getBounds(),
+						topography.getElements(Pedestrian.class),
+						scale,
+						timeCostAttributes.getStandardDerivation(),
+						attributesPedestrian,
+						loadingStrategy);
+
+				return new TimeCostPedestrianDensityQueuing(timeCostObstacle, timeCostAttributes, filter);
+			}
+			case OBSTACLES: {
+				return create(timeCostAttributes, topography, scale);
+			}
+			default: {
+				throw new IllegalArgumentException(timeCostAttributes.getType()
+						+ " - no such time-cost function exists!");
+			}
+		}
+	}
+
+	private static TimeCostObstacleDensity create(
+			final AttributesTimeCost timeCostAttributes,
+			final Topography topography, final double scale) {
+		IGaussianFilter obstacleFilter = IGaussianFilter.create(
+				topography,
+				scale,
+				timeCostAttributes.getStandardDerivation());
+
+		TimeCostObstacleDensity timeCostObstacle = new TimeCostObstacleDensity(
+				new UnitTimeCostFunction(),
+				timeCostAttributes.getObstacleDensityWeight(),
+				obstacleFilter);
+
+		return timeCostObstacle;
+	}
+}

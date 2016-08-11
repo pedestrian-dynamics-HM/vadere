@@ -1,0 +1,467 @@
+{
+  "name" : "Neues_Szenario",
+  "description" : "",
+  "release" : "0.1",
+  "topographyhash" : "ac1cfdef557c6e70025958f499627fc593ed9269",
+  "attributeshash" : "146a0a64e733fed65c5ac9559aea5e52866289b0",
+  "processWriters" : [ ],
+  "vadere" : {
+    "mainModel" : "org.vadere.simulator.models.ovm.OptimalVelocityModel",
+    "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesOVM" : {
+        "attributesODEIntegrator" : {
+          "solverType" : "DORMAND_PRINCE_45",
+          "stepSizeMin" : 1.0E-4,
+          "stepSizeMax" : 1.0,
+          "toleranceAbsolute" : 1.0E-5,
+          "toleranceRelative" : 1.0E-4
+        },
+        "sensitivity" : 5.0,
+        "sightDistance" : 10.0,
+        "sightDistanceFactor" : 1.0,
+        "firstDistanceRandom" : {
+          "x" : 5.0,
+          "y" : 15.0
+        },
+        "ignoreOtherCars" : false
+      },
+      "org.vadere.state.attributes.scenario.AttributesCar" : {
+        "id" : -1,
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 0.0134,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.0,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0,
+        "length" : 0.02,
+        "width" : 0.01,
+        "direction" : {
+          "x" : 1.0,
+          "y" : 0.0
+        }
+      }
+    },
+    "attributesSimulation" : {
+      "finishTime" : 120.0,
+      "simTimeStepLength" : 0.1,
+      "realTimeSimTimeRatio" : 0.1,
+      "writeSimulationData" : true,
+      "visualizationEnabled" : true,
+      "printFPS" : false,
+      "needsBoundary" : false,
+      "digitsPerCoordinate" : 2,
+      "useRandomSeed" : true,
+      "randomSeed" : 1
+    },
+    "topography" : {
+      "attributes" : {
+        "bounds" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 20.0,
+          "height" : 20.0
+        },
+        "boundingBoxWidth" : 0.5,
+        "bounded" : true
+      },
+      "obstacles" : [ ],
+      "stairs" : [ ],
+      "targets" : [ {
+        "id" : 1,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.9,
+          "y" : 9.95,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 20.0,
+        "waitingTimeYellowPhase" : 5.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.95,
+          "y" : 9.9,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 3,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 10.05,
+          "y" : 9.9,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 20.0,
+        "waitingTimeYellowPhase" : 5.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : true,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 4,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 10.1,
+          "y" : 9.95,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 5,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 10.1,
+          "y" : 10.05,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 20.0,
+        "waitingTimeYellowPhase" : 5.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 6,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 10.05,
+          "y" : 10.1,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 7,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.95,
+          "y" : 10.1,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 20.0,
+        "waitingTimeYellowPhase" : 5.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : true,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 8,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.9,
+          "y" : 10.05,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 9,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.995,
+          "y" : 9.98,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 10,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.995,
+          "y" : 10.01,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 20,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 10.05,
+          "y" : 11.14,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 30,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 8.86,
+          "y" : 10.05,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 40,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 9.95,
+          "y" : 8.86,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 50,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 11.14,
+          "y" : 9.95,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 11,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 8.9,
+          "y" : 9.95,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : 0.1065277778
+      }, {
+        "id" : 12,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 10.05,
+          "y" : 8.9,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : 0.1065277778
+      }, {
+        "id" : 13,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 11.1,
+          "y" : 10.05,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : 0.1065277778
+      }, {
+        "id" : 14,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 9.95,
+          "y" : 11.1,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.4,
+        "startingWithRedLight" : false,
+        "nextSpeed" : 0.1065277778
+      } ],
+      "sources" : [ {
+        "id" : -1,
+        "shape" : {
+          "x" : 8.86,
+          "y" : 9.95,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "spawnDelay" : 1.0,
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "useFreeSpaceOnly" : false,
+        "targetIds" : [ 11, 1, 4, 50 ],
+        "dynamicElementType" : "CAR"
+      }, {
+        "id" : -1,
+        "shape" : {
+          "x" : 10.05,
+          "y" : 8.86,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "spawnDelay" : 1.0,
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "useFreeSpaceOnly" : false,
+        "targetIds" : [ 12, 3, 6, 20 ],
+        "dynamicElementType" : "CAR"
+      }, {
+        "id" : -1,
+        "shape" : {
+          "x" : 11.14,
+          "y" : 10.05,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "spawnDelay" : 1.0,
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "useFreeSpaceOnly" : false,
+        "targetIds" : [ 13, 5, 8, 30 ],
+        "dynamicElementType" : "CAR"
+      }, {
+        "id" : -1,
+        "shape" : {
+          "x" : 9.95,
+          "y" : 11.14,
+          "width" : 0.03,
+          "height" : 0.03,
+          "type" : "RECTANGLE"
+        },
+        "spawnDelay" : 1.0,
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "useFreeSpaceOnly" : false,
+        "targetIds" : [ 14, 7, 2, 40 ],
+        "dynamicElementType" : "CAR"
+      } ],
+      "dynamicElements" : [ ],
+      "attributesPedestrian" : {
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0
+      },
+      "attributesCar" : null
+    }
+  }
+}

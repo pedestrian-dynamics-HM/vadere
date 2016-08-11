@@ -1,0 +1,72 @@
+package org.vadere.util.io.filewatcher;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+public class LockFileHandler {
+
+	public enum LockInfo {
+		Created, Deleted, Both, Error
+	}
+
+	private static Logger logger = LogManager.getLogger(LockFileHandler.class);
+
+	private WatchDir dirWatcher = null;
+	private File lockFile = null;
+	private File lockDir = null;
+	private static String notADirectiory = "Lock path is not a directory";
+	private static String lockFileName = "lock.lck";
+	private FileChannel channel = null;
+	private FileLock lock = null;
+
+	public LockFileHandler(String lockFilePath) throws Exception {
+
+		lockDir = new File(lockFilePath);
+
+		if (!lockDir.isDirectory()) {
+
+			throw new Exception(notADirectiory);
+		}
+
+		lockFile = new File(lockFilePath + File.separator + lockFileName);
+		lockFile.createNewFile();
+		dirWatcher = new WatchDir(lockDir.toPath(), false);
+	}
+
+	public void waitForLockDelete() throws IOException {
+		while (true) {
+			LockInfo info = dirWatcher.processEvents();
+
+
+			if (info == LockInfo.Deleted || info == LockInfo.Both) {
+				break;
+			}
+		}
+	}
+
+	public void waitForLockCreate() throws IOException {
+		while (true) {
+
+			LockInfo info = dirWatcher.processEvents();
+
+			if (info == LockInfo.Created || info == LockInfo.Both) {
+				break;
+			}
+		}
+	}
+
+	public void writeLock() throws IOException {
+
+		lockFile.createNewFile();
+	}
+
+	public void deleteLock() throws IOException {
+		lockFile.delete();
+	}
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<project version="0.1">
+<header>
+<name>testprojectname</name>
+</header>
+<tests>
+<test version="0.2">
+<header>
+<name>testname1</name>
+</header>
+<OutputProcessors>
+</OutputProcessors>
+<AttributeFile>&lt;attributes&gt;&lt;/attributes&gt;</AttributeFile>
+<ScenarioFile>&lt;topography&gt;&lt;/topography&gt;</ScenarioFile>
+</test>
+<test version="0.2">
+<header>
+<name>testname2</name>
+</header>
+<OutputProcessors>
+</OutputProcessors>
+<AttributeFile>&lt;attributes&gt;&lt;/attributes&gt;</AttributeFile>
+<ScenarioFile>&lt;topography&gt;&lt;/topography&gt;</ScenarioFile>
+</test>
+<test version="0.2">
+<header>
+<name>testname3</name>
+</header>
+<OutputProcessors>
+</OutputProcessors>
+<AttributeFile>&lt;attributes&gt;&lt;/attributes&gt;</AttributeFile>
+<ScenarioFile>&lt;topography&gt;&lt;/topography&gt;</ScenarioFile>
+</test>
+</tests>
+</project>

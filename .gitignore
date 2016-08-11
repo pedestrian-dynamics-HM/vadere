@@ -1,0 +1,35 @@
+#builds, log/preferences files
+target/
+*.out
+*.preferences.xml
+
+#IntelliJ
+.idea/
+*.iml
+
+#Eclipse
+.settings/
+.metadata/
+.classpath
+.project
+
+#package specific
+VadereGui/*.png
+VadereGui/*.svg
+VadereGui/*.mov
+VadereUtils/testreports/*.txt
+VadereSimulator/resources/current_commit_hash.txt
+
+#model test output
+VadereModelTests/TestOSM/output/*
+VadereModelTests/TestSFM/output/*
+VadereModelTests/TestGNM/output/*
+VadereModelTests/TestOVM/output/*
+VadereModelTests/TestOSM/processed output/*
+VadereModelTests/TestSFM/processed output/*
+VadereModelTests/TestGNM/processed output/*
+VadereModelTests/TestOVM/processed output/*
+
+#deprecated: can potentially be removed
+bin/
+VadereGui/output/
