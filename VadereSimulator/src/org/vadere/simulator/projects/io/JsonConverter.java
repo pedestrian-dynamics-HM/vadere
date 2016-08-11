@@ -1,13 +1,13 @@
 package org.vadere.simulator.projects.io;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonElement;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
@@ -16,55 +16,22 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
+import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
+import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
+import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.attributes.scenario.AttributesStairs;
-import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.attributes.scenario.AttributesTeleporter;
-import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Stairs;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.attributes.scenario.*;
+import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonElement;
+import java.io.IOException;
+import java.util.*;
 
 public abstract class JsonConverter {
 
@@ -241,6 +208,78 @@ public abstract class JsonConverter {
 		public VCircle newVCircle() {
 			return new VCircle(center, radius);
 		}
+	}
+
+	private static class ProcessorStore {
+		String type;
+		int id;
+	}
+
+	private static class OutputFileStore {
+		String type;
+		String filename;
+		List<Integer> processors;
+	}
+
+	public static List<Processor<?, ?>> deserializeProcessors(String json) throws IOException {
+		List<Processor<?, ?>> processors = new ArrayList<>();
+		JsonNode rootNode = mapper.readTree(json);
+
+		ArrayNode processorsNode = (ArrayNode) rootNode.get("processors");
+		DynamicClassInstantiator<Processor<?, ?>> instantiator = new DynamicClassInstantiator<Processor<?, ?>>();
+
+		for (JsonNode processorNode : processorsNode) {
+			ProcessorStore processorStore = mapper.treeToValue(processorNode, ProcessorStore.class);
+			Processor<?, ?> processor = instantiator.createObject(processorStore.type);
+			processor.setId(processorStore.id);
+
+			processors.add(processor);
+		}
+
+		return processors;
+	}
+
+	public static List<AttributesProcessor> deserializeAttributesProcessor(String json)
+			throws IOException, ClassNotFoundException {
+		List<AttributesProcessor> attributes = new ArrayList<>();
+		JsonNode rootNode = mapper.readTree(json);
+
+		DynamicClassInstantiator<AttributesProcessor> instantiator = new DynamicClassInstantiator<>();
+		Iterator<String> it = rootNode.fieldNames();
+		while (it.hasNext()) {
+			String fieldName = it.next();
+
+			if (!fieldName.contains("Attributes"))
+				continue;
+
+			JsonNode attributeNode = rootNode.get(fieldName);
+			AttributesProcessor attribute = mapper.treeToValue(attributeNode, instantiator.getClassFromName(fieldName));
+			attributes.add(attribute);
+		}
+
+		return attributes;
+	}
+
+	public static List<OutputFile<?>> deserializeOutputFiles(
+			String json) throws IOException {
+		List<OutputFile<?>> files = new ArrayList<>();
+		JsonNode rootNode = mapper.readTree(json);
+
+		ArrayNode filesNode = (ArrayNode) rootNode.get("files");
+		DynamicClassInstantiator<OutputFile<?>> instantiator =
+				new DynamicClassInstantiator<>();
+
+		for (JsonNode fileNode : filesNode) {
+			OutputFileStore writerStore = mapper.treeToValue(fileNode, OutputFileStore.class);
+			OutputFile<?> file =
+					instantiator.createObject(writerStore.type);
+			file.setFileName(writerStore.filename);
+			file.setProcessorIds(writerStore.processors);
+
+			files.add(file);
+		}
+
+		return files;
 	}
 
 	public static ScenarioRunManager deserializeScenarioRunManager(String json) throws IOException {
