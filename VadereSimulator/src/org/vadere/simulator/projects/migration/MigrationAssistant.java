@@ -88,7 +88,7 @@ public class MigrationAssistant {
 					legacyedCount++;
 				}
 			} catch (MigrationException e) {
-				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION);
+				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION, !isScenario);
 				log.append(
 						"! --> Can't migrate the scenario to latest version, removed it from the directory ("
 								+ e.getMessage() + ")\n" +
@@ -158,17 +158,23 @@ public class MigrationAssistant {
 			incident.resolve(graph, log);
 
 		if (legacyDir != null) {
-			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION);
+			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION, false);
 		}
 		IOUtils.writeTextFile(scenarioFilePath.toString(), JsonConverter.serializeJsonNode(node));
 		return true;
 	}
 
-	private static void moveFileAddExtension(Path scenarioFilePath, Path legacyDir, String additionalExtension)
-			throws IOException {
-		IOUtils.createDirectoryIfNotExisting(legacyDir);
-		Files.move(scenarioFilePath, legacyDir.resolve(scenarioFilePath.getFileName() + "." + additionalExtension),
-				StandardCopyOption.REPLACE_EXISTING); // ensure potential existing files aren't overwritten?
+	private static void moveFileAddExtension(Path scenarioFilePath, Path legacyDir, String additionalExtension, boolean moveOutputFolder) throws IOException {
+		Path source = scenarioFilePath;
+		Path target = legacyDir.resolve(source.getFileName() + "." + additionalExtension);
+
+		if (moveOutputFolder) {
+			source = source.getParent();
+			target = Paths.get(legacyDir.toAbsolutePath() + "." + additionalExtension);
+		}
+
+		IOUtils.createDirectoryIfNotExisting(target);
+		Files.move(source, target, StandardCopyOption.REPLACE_EXISTING); // ensure potential existing files aren't overwritten?
 	}
 
 	private static String getTimestamp() {
