@@ -19,9 +19,7 @@ import java.util.Scanner;
 public class HashGenerator {
 
 	private static Logger logger = LogManager.getLogger(HashGenerator.class);
-
-	//private static final String PATH_TO_COMMIT_HASH = System.getProperty("user.dir") + "/version-control/current_commit_hash.txt";
-
+	
 	public static String topographyHash(Topography topography) {
 		String json = null;
 		try {
