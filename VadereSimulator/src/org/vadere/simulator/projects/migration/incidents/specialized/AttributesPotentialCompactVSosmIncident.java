@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.migration.incidents.specialized;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.models.potential.PotentialFieldObstacleCompact;
@@ -32,6 +33,8 @@ public class AttributesPotentialCompactVSosmIncident extends Incident {
 
 		if (AttributesOSM_node != null) {
 
+			JsonNode AttributesOSM_JsonNode = AttributesOSM_node.getJsonNode();
+
 			Graph.Node AttributesPotentialCompact_node = graph.getNodeByPath(path("vadere", "attributesModel", AttributesPotentialCompact.class.getName()));
 			Graph.Node AttributesPotentialOSM_node = graph.getNodeByPath(path("vadere", "attributesModel", AttributesPotentialOSM.class.getName()));
 
@@ -39,18 +42,36 @@ public class AttributesPotentialCompactVSosmIncident extends Incident {
 				throw new MigrationException(this, "Both AttributesPotentialCompact and AttributesPotentialOSM are present, that is not allowed.");
 			}
 
+			int changeCount = 0; // only create a log entry if actually something changed, in other incidents this is done via applies(), but this seems to laborious here
+
 			if (AttributesPotentialCompact_node != null) {
-				((ObjectNode) AttributesOSM_node.getJsonNode()).put("pedestrianPotentialModel", PotentialFieldPedestrianCompact.class.getName());
-				((ObjectNode) AttributesOSM_node.getJsonNode()).put("obstaclePotentialModel", PotentialFieldObstacleCompact.class.getName());
-				log.append("\t- AttributesOSM: since AttributesPotentialCompact is present, set [pedestrianPotentialModel] to PotentialFieldPedestrianCompact " +
-						"and [obstaclePotentialModel] to PotentialFieldObstacleCompact" + "\n");
+				String new_pedestrianPotentialModel_value = PotentialFieldPedestrianCompact.class.getName();
+				changeCount += AttributesOSM_JsonNode.get("pedestrianPotentialModel").asText().equals(new_pedestrianPotentialModel_value) ? 0 : 1;
+				((ObjectNode) AttributesOSM_JsonNode).put("pedestrianPotentialModel", new_pedestrianPotentialModel_value);
+
+				String new_obstaclePotentialModel_value = PotentialFieldObstacleCompact.class.getName();
+				changeCount += AttributesOSM_JsonNode.get("obstaclePotentialModel").asText().equals(new_obstaclePotentialModel_value) ? 0 : 1;
+				((ObjectNode) AttributesOSM_JsonNode).put("obstaclePotentialModel", new_obstaclePotentialModel_value);
+
+				if (changeCount > 0) {
+					log.append("\t- AttributesOSM: since AttributesPotentialCompact is present, set [pedestrianPotentialModel] to PotentialFieldPedestrianCompact " +
+							"and [obstaclePotentialModel] to PotentialFieldObstacleCompact" + "\n");
+				}
 			}
 
 			if (AttributesPotentialOSM_node != null) {
-				((ObjectNode) AttributesOSM_node.getJsonNode()).put("pedestrianPotentialModel", PotentialFieldPedestrianOSM.class.getName());
-				((ObjectNode) AttributesOSM_node.getJsonNode()).put("obstaclePotentialModel", PotentialFieldObstacleOSM.class.getName());
-				log.append("\t- AttributesOSM: since AttributesPotentialOSM is present, set [pedestrianPotentialModel] to PotentialFieldPedestrianOSM " +
-						"and [obstaclePotentialModel] to PotentialFieldObstacleOSM" + "\n");
+				String new_pedestrianPotentialModel_value = PotentialFieldPedestrianOSM.class.getName();
+				changeCount += AttributesOSM_JsonNode.get("pedestrianPotentialModel").asText().equals(new_pedestrianPotentialModel_value) ? 0 : 1;
+				((ObjectNode) AttributesOSM_JsonNode).put("pedestrianPotentialModel", new_pedestrianPotentialModel_value);
+
+				String new_obstaclePotentialModel_value = PotentialFieldObstacleOSM.class.getName();
+				changeCount += AttributesOSM_JsonNode.get("obstaclePotentialModel").asText().equals(new_obstaclePotentialModel_value) ? 0 : 1;
+				((ObjectNode) AttributesOSM_JsonNode).put("obstaclePotentialModel", new_obstaclePotentialModel_value);
+
+				if (changeCount > 0) {
+					log.append("\t- AttributesOSM: since AttributesPotentialOSM is present, set [pedestrianPotentialModel] to PotentialFieldPedestrianOSM " +
+							"and [obstaclePotentialModel] to PotentialFieldObstacleOSM" + "\n");
+				}
 			}
 		}
 	}
