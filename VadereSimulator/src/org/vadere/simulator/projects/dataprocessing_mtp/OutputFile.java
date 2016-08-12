@@ -36,13 +36,14 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	public void init(final ProcessorFactory factory) {
-		processorIds.forEach(pid -> processors.add((Processor<K, ?>) factory.getProcessor(pid)));
+		processorIds.forEach(pid -> this.processors.add((Processor<K, ?>) factory.getProcessor(pid)));
 	}
 
 	public void write() {
 		// Print header
-		this.out.println(this.keyHeader
-				+ this.processors.stream().map(p -> p.getHeader()).reduce("", (s1, s2) -> s1 + " " + s2));
+		this.out.println((this.keyHeader
+				+ " "
+				+ this.processors.stream().map(p -> p.getHeader()).reduce("", (s1, s2) -> s1 + " " + s2).trim()).trim());
 
 		this.processors.stream().flatMap(p -> p.getKeys().stream()).distinct().sorted()
 				.forEach(key -> printRow(key, this.processors));
@@ -51,11 +52,9 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	private void printRow(final K key, final List<Processor<K, ?>> ps) {
-		this.out.print(this.toString(key));
-
-		ps.forEach(p -> this.out.print(" " + p.toString(key)));
-
-		this.out.println();
+		this.out.println((this.toString(key)
+				+ " "
+				+ ps.stream().map(p -> p.toString(key)).reduce("", (s1, s2) -> s1 + " " + s2).trim()).trim());
 	}
 
 	public String toString(K key) {
