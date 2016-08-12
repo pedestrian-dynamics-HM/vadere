@@ -45,6 +45,7 @@ public class CLConvolution {
 		for (int i = 0; i < output.length; i++) {
 			output[i] = outPtr.get(i);
 		}
+		outPtr.release();
 
 		return output;
 	}
@@ -72,6 +73,7 @@ public class CLConvolution {
 		for (int i = 0; i < output.length; i++) {
 			output[i] = outPtr.get(i);
 		}
+		outPtr.release();
 		return output;
 	}
 
@@ -93,6 +95,7 @@ public class CLConvolution {
 		for (int i = 0; i < output.length; i++) {
 			output[i] = outPtr.get(i);
 		}
+		outPtr.release();
 		return output;
 	}
 
@@ -115,6 +118,7 @@ public class CLConvolution {
 		for (int i = 0; i < output.length; i++) {
 			output[i] = outPtr.get(i);
 		}
+		outPtr.release();
 		return output;
 	}
 
