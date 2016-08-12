@@ -7,17 +7,24 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing.writer.Writer;
+import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
+import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
+import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
+import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorFactory;
+import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.types.DynamicElementType;
 
-import java.util.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class Simulation {
 
@@ -149,9 +156,22 @@ public class Simulation {
 	 * Starts simulation and runs main loop until stopSimulation flag is set.
 	 */
 	public void run() {
+		List<OutputFile<?>> writers = null;
+		ProcessorFactory factory2 = null;
 
 		try {
+			String json = new String(Files.readAllBytes(Paths.get("procs.json")));
+
+			List<AttributesProcessor> attributesProcessor = JsonConverter.deserializeAttributesProcessor(json);
+			List<Processor<?, ?>> processors = JsonConverter.deserializeProcessors(json);
+			writers = JsonConverter.deserializeOutputFiles(json);
+
+			ProcessorFactory factory = new ProcessorFactory(processors, attributesProcessor);
+			factory2 = factory;
+			writers.forEach(writer -> writer.init(factory));
+
 			preLoop();
+			factory.preLoop(this.simulationState);
 
 			while (runSimulation) {
 				synchronized (this) {
@@ -178,29 +198,41 @@ public class Simulation {
 
 				updateWriters(simTimeInSec);
 
+				factory.update(this.simulationState);
+
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
 				}
 
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
-					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(),
-							runTimeInSec + startTimeInSec - simTimeInSec);
+					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {
 					runSimulation = false;
 				}
 
+
+				//remove comment to fasten simulation for evacuation simulations
+				//if (topography.getElements(Pedestrian.class).size() == 0){
+				//	runSimulation = false;
+				//}
 
 				if (Thread.interrupted()) {
 					runSimulation = false;
 					logger.info("Simulation interrupted.");
 				}
 			}
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			// this is necessary to free the resources (files), the SimulationWriter and processors
-			// are writing in!
+		}
+		catch (IOException | ClassNotFoundException e) {
+			//throw e;
+			int i = 2;
+		}
+		finally {
+			// this is necessary to free the resources (files), the SimulationWriter and processors are writing in!
 			postLoop();
+
+			factory2.postLoop(this.simulationState);
+
+			writers.forEach(writer -> writer.write());
 		}
 	}
 
