@@ -1,0 +1,2 @@
+#!/bin/sh
+exec Documentation/version-control/git-hook-vadere-software
