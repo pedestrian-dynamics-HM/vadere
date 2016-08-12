@@ -1,2 +1,2 @@
 #!/bin/sh
-exec version-control/git-hook-vadere-software
+exec Documentation/version-control/git-hook-vadere-software
