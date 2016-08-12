@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import java.util.Collection;
-
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.state.scenario.Pedestrian;
+
+import java.util.Collection;
 
 public class PedestrianSourceIdProcessor extends Processor<PedestrianIdDataKey, Integer> {
 
@@ -20,6 +20,6 @@ public class PedestrianSourceIdProcessor extends Processor<PedestrianIdDataKey, 
 
 	@Override
 	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
-		// TODO [priority=medium] [task=check] is initialization needed?
+		// No initialization needed
 	}
 }
