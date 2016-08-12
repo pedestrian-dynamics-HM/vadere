@@ -11,6 +11,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -38,17 +39,61 @@ public class HashGenerator {
 		return hash;
 	}
 
+	public static boolean isCommitHashAvailable() {
+		InputStream in = HashGenerator.class.getResourceAsStream("/current_commit_hash.txt");
+		boolean result = in != null;
+		if(result) {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
 	public static String commitHash() {
-		Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_commit_hash.txt"));
-		String commithash = scanner.next();
-		scanner.close();
+		InputStream in = HashGenerator.class.getResourceAsStream("/current_commit_hash.txt");
+		String commithash = "";
+
+		if(in != null) {
+			Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_commit_hash.txt"));
+			if(scanner.hasNext()) {
+				commithash = scanner.next();
+			}
+			else {
+				logger.warn("no commit hash in resource.");
+			}
+			scanner.close();
+		}
+		else {
+			commithash = "warning: no commit hash";
+			logger.warn("no commit hash. This will cause the scenario output file to be not uniquely assignable to a software version.");
+		}
+
 		return commithash;
 	}
 
 	public static String releaseNumber() {
-		Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_release_number.txt"));
-		String releaseNumber = scanner.next();
-		scanner.close();
+		InputStream in = HashGenerator.class.getResourceAsStream("/current_release_number.txt");
+		String releaseNumber = "";
+		if(in != null) {
+			Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_release_number.txt"));
+			releaseNumber = scanner.next();
+			if(scanner.hasNext()) {
+				releaseNumber = scanner.next();
+			}
+			else {
+				logger.warn("no release number in resource.");
+			}
+			scanner.close();
+		}
+		else {
+			releaseNumber = "warning: no release number";
+			logger.warn("no release number. This will cause the project files to be not uniquely assignable to a software release version.");
+		}
+
+
 		return releaseNumber;
 	}
 

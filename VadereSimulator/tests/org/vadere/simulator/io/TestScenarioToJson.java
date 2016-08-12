@@ -3,6 +3,7 @@ package org.vadere.simulator.io;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.io.JsonSerializerTopography;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
@@ -13,13 +14,15 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.io.IOUtils;
 
 import com.google.gson.JsonElement;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public class TestScenarioToJson {
 	private static final AttributesTopography attributesTopography = new AttributesTopography();
-	private static final String scenarioJson = "{\"attributes\":{\"finishTime\":500.0"
-			+ ",\"bounds\":{"
+	private static final String scenarioJson = "{\"attributes\":{\"bounds\":{"
 			+ "\"x\":" + attributesTopography.getBounds().getX()
 			+ ",\"y\":" + attributesTopography.getBounds().getY()
 			+ ",\"width\":" + attributesTopography.getBounds().getWidth()
@@ -48,12 +51,11 @@ public class TestScenarioToJson {
 	}
 
 	@Test
-	public void testScenarioToJson() {
-		/*
-		 * JsonElement jsonElement = JsonSerializerTopography.topographyToJson(scenario);
-		 * String actualJson = IOUtils.toJson(jsonElement);
-		 * Assert.assertEquals("Scenario json is not correct.", scenarioJson, actualJson);
-		 */
+	public void testScenarioToJson() throws JsonProcessingException {
+
+	/*	String jsonString = JsonConverter.serializeTopography(scenario);
+		Assert.assertEquals("Scenario json is not correct.", scenarioJson, jsonString);
+	*/
 	}
 
 	@Test
