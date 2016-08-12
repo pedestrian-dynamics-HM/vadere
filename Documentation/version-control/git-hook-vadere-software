@@ -1,2 +1,2 @@
 #!/bin/sh
-exec git log -1 --format=format:"%H" > ../../VadereSimulator/resources/current_commit_hash.txt
+exec git log -1 --format=format:"%H" > VadereSimulator/resources/current_commit_hash.txt
