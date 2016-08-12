@@ -543,8 +543,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				new ActionCloneScenario(Messages.getString("ProjectView.mntmClone.text"), model)));
 		scenarioListPopupMenu.add(new JMenuItem(
 				new ActionRenameScenario(Messages.getString("ProjectView.mntmRename.text"), model)));
-		scenarioListPopupMenu.add(new JMenuItem(
-				new ActionConvertScenarioToWMP(Messages.getString("ProjectView.mntmConvertToWMP.text"), model)));
+		/*scenarioListPopupMenu.add(new JMenuItem(
+				new ActionConvertScenarioToWMP(Messages.getString("ProjectView.mntmConvertToWMP.text"), model)));*/
 
 		JPopupMenu scenarioListPopupMenuMultiSelect = new JPopupMenu();
 		scenarioListPopupMenuMultiSelect.add(new JMenuItem(addScenarioAction));
