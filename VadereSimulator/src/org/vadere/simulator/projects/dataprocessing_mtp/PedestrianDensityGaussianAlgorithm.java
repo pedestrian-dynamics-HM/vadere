@@ -2,8 +2,6 @@ package org.vadere.simulator.projects.dataprocessing_mtp;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.density.IGaussianFilter;
-import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class PedestrianDensityGaussianAlgorithm extends PedestrianDensityAlgorithm {
@@ -32,35 +30,37 @@ public class PedestrianDensityGaussianAlgorithm extends PedestrianDensityAlgorit
 
 	@Override
 	public double getDensity(final VPoint pos, final SimulationState state) {
-		if (state.getStep() > this.lastStep) {
-			// obstacle will not change so we do it once.
-			if (!this.filteredObstacles && this.isObstacleDensity) {
-				this.obstacleFilter = IGaussianFilter.create(
-						state.getTopography(),
-						this.scale,
-						this.standDev);
-				this.obstacleFilter.filterImage();
-				this.filteredObstacles = true;
-			}
+//		if (state.getStep() > this.lastStep) {
+//			// obstacle will not change so we do it once.
+//			if (!this.filteredObstacles && this.isObstacleDensity) {
+//				this.obstacleFilter = IGaussianFilter.create(
+//						state.getTopography(),
+//						this.scale,
+//						this.standDev);
+//				this.obstacleFilter.filterImage();
+//				this.filteredObstacles = true;
+//			}
+//
+//			this.pedestrianFilter = IGaussianFilter.create(
+//					state.getTopography().getBounds(),
+//					state.getTopography().getElements(Pedestrian.class),
+//					this.scale,
+//					this.standDev,
+//					state.getTopography().getAttributesPedestrian(),
+//					IPedestrianLoadingStrategy.create());
+//			this.pedestrianFilter.filterImage();
+//
+//			this.lastStep = state.getStep();
+//		}
+//
+//		double density = 0.0;
+//		if (this.isObstacleDensity)
+//			density = this.obstacleFilter.getFilteredValue(pos.x, pos.y);
+//
+//		density += this.pedestrianFilter.getFilteredValue(pos.x, pos.y);
+//
+//		return density;
 
-			this.pedestrianFilter = IGaussianFilter.create(
-					state.getTopography().getBounds(),
-					state.getTopography().getElements(Pedestrian.class),
-					this.scale,
-					this.standDev,
-					state.getTopography().getAttributesPedestrian(),
-					IPedestrianLoadingStrategy.create());
-			this.pedestrianFilter.filterImage();
-
-			this.lastStep = state.getStep();
-		}
-
-		double density = 0.0;
-		if (this.isObstacleDensity)
-			density = this.obstacleFilter.getFilteredValue(pos.x, pos.y);
-
-		density += this.pedestrianFilter.getFilteredValue(pos.x, pos.y);
-
-		return density;
+		return 0.0; // TODO: uncomment above but wait until Bene fixed the OpenCL bug
 	}
 }
