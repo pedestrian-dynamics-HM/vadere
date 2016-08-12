@@ -45,11 +45,12 @@ public class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	private Double getVelocity(int timeStep, double currentSimTime, int pedId) {
-		if (timeStep <= 1)
+		TimestepPedestrianIdDataKey keyBefore = new TimestepPedestrianIdDataKey(timeStep - this.backSteps > 0 ? timeStep - this.backSteps : 1, pedId);
+
+		if (timeStep <= 1 || !this.pedPosProc.hasValue(keyBefore))
 			return 0.0; // For performance
 
-		VPoint posBefore = this.pedPosProc.getValue(
-				new TimestepPedestrianIdDataKey(timeStep - this.backSteps > 0 ? timeStep - this.backSteps : 1, pedId));
+		VPoint posBefore = this.pedPosProc.getValue(keyBefore);
 		VPoint posNow = this.pedPosProc.getValue(new TimestepPedestrianIdDataKey(timeStep, pedId));
 
 		return posNow.subtract(posBefore).scalarMultiply(1 / (currentSimTime - this.lastSimTimes.getFirst()))
