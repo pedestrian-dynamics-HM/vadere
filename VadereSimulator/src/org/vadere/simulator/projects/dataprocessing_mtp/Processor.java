@@ -1,10 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import org.vadere.simulator.control.SimulationState;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.vadere.simulator.control.SimulationState;
 
 public abstract class Processor<K extends Comparable<K>, V> {
 	private int id;
@@ -46,7 +47,11 @@ public abstract class Processor<K extends Comparable<K>, V> {
 	}
 
 	public Set<K> getKeys() {
-		return this.column.keySet();
+		return this.getColumn().keySet();
+	}
+
+	public Collection<V> getValues() {
+		return this.getColumn().values();
 	}
 
 	public boolean hasValue(K key) {
@@ -61,6 +66,8 @@ public abstract class Processor<K extends Comparable<K>, V> {
 		this.column.put(key, value);
 	}
 
+	public void preLoop(final SimulationState state) { }
+
 	protected abstract void doUpdate(final SimulationState state);
 
 	public final void update(final SimulationState state) {
@@ -71,6 +78,8 @@ public abstract class Processor<K extends Comparable<K>, V> {
 			this.lastStep = step;
 		}
 	}
+
+	public void postLoop(final SimulationState state) { }
 
 	abstract void init(final AttributesProcessor attributes, final ProcessorFactory factory);
 
