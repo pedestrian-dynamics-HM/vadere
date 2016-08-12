@@ -19,7 +19,7 @@ public class PedestrianStartTimeProcessor extends Processor<PedestrianIdDataKey,
 
 	@Override
 	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
-		// TODO [priority=medium] [task=check] is initialization needed?
+		// No initialization needed
 	}
 
 	private void update(PedestrianIdDataKey pedIdKey, double startTime) {
