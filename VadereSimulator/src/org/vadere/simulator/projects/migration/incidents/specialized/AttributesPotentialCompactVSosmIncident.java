@@ -32,43 +32,32 @@ public class AttributesPotentialCompactVSosmIncident extends Incident {
 		Graph.Node AttributesOSM_node = graph.getNodeByPath(path("vadere", "attributesModel", AttributesOSM.class.getName()));
 
 		if (AttributesOSM_node != null) {
-
 			JsonNode AttributesOSM_JsonNode = AttributesOSM_node.getJsonNode();
 
 			Graph.Node AttributesPotentialCompact_node = graph.getNodeByPath(path("vadere", "attributesModel", AttributesPotentialCompact.class.getName()));
 			Graph.Node AttributesPotentialOSM_node = graph.getNodeByPath(path("vadere", "attributesModel", AttributesPotentialOSM.class.getName()));
 
 			if (AttributesPotentialCompact_node != null && AttributesPotentialOSM_node != null) {
-				throw new MigrationException(this, "Both AttributesPotentialCompact and AttributesPotentialOSM are present, that is not allowed.");
+				throw new MigrationException(this, "[AttributesPotentialCompact] and [AttributesPotentialOSM] are both present, that is not allowed.");
 			}
 
-			int changeCount = 0; // only create a log entry if actually something changed, in other incidents this is done via applies(), but this seems to laborious here
+			String beforeChange = AttributesOSM_JsonNode.toString();
 
 			if (AttributesPotentialCompact_node != null) {
-				String new_pedestrianPotentialModel_value = PotentialFieldPedestrianCompact.class.getName();
-				changeCount += AttributesOSM_JsonNode.get("pedestrianPotentialModel").asText().equals(new_pedestrianPotentialModel_value) ? 0 : 1;
-				((ObjectNode) AttributesOSM_JsonNode).put("pedestrianPotentialModel", new_pedestrianPotentialModel_value);
+				((ObjectNode) AttributesOSM_JsonNode).put("pedestrianPotentialModel", PotentialFieldPedestrianCompact.class.getName());
+				((ObjectNode) AttributesOSM_JsonNode).put("obstaclePotentialModel", PotentialFieldObstacleCompact.class.getName());
 
-				String new_obstaclePotentialModel_value = PotentialFieldObstacleCompact.class.getName();
-				changeCount += AttributesOSM_JsonNode.get("obstaclePotentialModel").asText().equals(new_obstaclePotentialModel_value) ? 0 : 1;
-				((ObjectNode) AttributesOSM_JsonNode).put("obstaclePotentialModel", new_obstaclePotentialModel_value);
-
-				if (changeCount > 0) {
+				if (!beforeChange.equals(AttributesOSM_JsonNode.toString())) {
 					log.append("\t- AttributesOSM: since AttributesPotentialCompact is present, set [pedestrianPotentialModel] to PotentialFieldPedestrianCompact " +
 							"and [obstaclePotentialModel] to PotentialFieldObstacleCompact" + "\n");
 				}
 			}
 
 			if (AttributesPotentialOSM_node != null) {
-				String new_pedestrianPotentialModel_value = PotentialFieldPedestrianOSM.class.getName();
-				changeCount += AttributesOSM_JsonNode.get("pedestrianPotentialModel").asText().equals(new_pedestrianPotentialModel_value) ? 0 : 1;
-				((ObjectNode) AttributesOSM_JsonNode).put("pedestrianPotentialModel", new_pedestrianPotentialModel_value);
+				((ObjectNode) AttributesOSM_JsonNode).put("pedestrianPotentialModel", PotentialFieldPedestrianOSM.class.getName());
+				((ObjectNode) AttributesOSM_JsonNode).put("obstaclePotentialModel", PotentialFieldObstacleOSM.class.getName());
 
-				String new_obstaclePotentialModel_value = PotentialFieldObstacleOSM.class.getName();
-				changeCount += AttributesOSM_JsonNode.get("obstaclePotentialModel").asText().equals(new_obstaclePotentialModel_value) ? 0 : 1;
-				((ObjectNode) AttributesOSM_JsonNode).put("obstaclePotentialModel", new_obstaclePotentialModel_value);
-
-				if (changeCount > 0) {
+				if (!beforeChange.equals(AttributesOSM_JsonNode.toString())) {
 					log.append("\t- AttributesOSM: since AttributesPotentialOSM is present, set [pedestrianPotentialModel] to PotentialFieldPedestrianOSM " +
 							"and [obstaclePotentialModel] to PotentialFieldObstacleOSM" + "\n");
 				}
