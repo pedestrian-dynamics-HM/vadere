@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.Graph;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incidents.Incident;
-import org.vadere.state.scenario.ConstantDistribution;
+import org.vadere.state.attributes.scenario.AttributesSource;
 
 import static org.vadere.simulator.projects.migration.IncidentDatabase.path;
 
@@ -30,7 +30,7 @@ public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 
 					double spawnDelay = source.get("spawnDelay").asDouble();
 
-					if (source.get("interSpawnTimeDistribution").asText().equals(ConstantDistribution.class.getName()) && spawnDelay != -1.0) {
+					if (source.get("interSpawnTimeDistribution").asText().equals(AttributesSource.CONSTANT_DISTRIBUTION) && spawnDelay != -1.0) {
 						((ObjectNode) source).set("distributionParameters", JsonConverter.toJsonNode(new Double[] {spawnDelay}));
 					}
 
