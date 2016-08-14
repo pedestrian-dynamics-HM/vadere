@@ -22,10 +22,10 @@ public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 	@Override
 	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
 
-		Graph.Node sources_node = graph.getNodeByPath(path("vadere", "topography", "sources"));// null-check topography as well? must exit always, no?
+		Graph.Node sourcesNode = graph.getNodeByPath(path("vadere", "topography", "sources"));// null-check topography as well? must exit always, no?
 
-		if (sources_node != null) {
-			for (JsonNode source : sources_node.getJsonNode()) {
+		if (sourcesNode != null) {
+			for (JsonNode source : sourcesNode.getJsonNode()) {
 				if (source.has("spawnDelay")) {
 
 					double spawnDelay = source.get("spawnDelay").asDouble();
