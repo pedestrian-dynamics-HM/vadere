@@ -41,7 +41,7 @@ Run `git clone https://gitlab.lrz.de/vadere/vadere`. Go to the project directory
 
 ### Run Application
 
-After building the application, you can start VADERE by running `java -jar VADEREGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
+After building the application, you can start VADERE by running `java -jar VadereGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
 
 ## Usage Example
 
@@ -61,13 +61,13 @@ Follow the installation instructions above. Go to the project directory and run 
 
 - *File* > *Import* > *Maven* > *Existing Maven Projects*
 - choose `pom.xml` as *Root Directory* and click *Finish*
-- open *VADEREGui (gui)* > *src* > *org.vadere.gui.projectview* > `VADEREApplication`
+- open *Vaderegui (gui)* > *src* > *org.vadere.gui.projectview* > `Vadereapplication`
 
 ### IntelliJ IDEA
 
 - on the welcome-screen select *Import Project*
 - select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
-- open *VADEREGui (gui)* > *src* > *org.vadere.gui.projectview* > `VADEREApplication`
+- open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
 - click the *run*-icon next to the `main` method
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
