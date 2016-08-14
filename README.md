@@ -8,7 +8,10 @@ VADERE is an open source framework for the simulation of microscopic pedestrian 
 
 This software runs on OS X, Windows, and Linux.
 
-VADERE has been developed at the Munich University of Applied Sciences at the department for Computer Science and Mathematics. However, we welcome contributions from external sources.
+VADERE has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
+research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
+[department for Computer Science and Mathematics](http://cs.hm.edu/).
+However, we welcome contributions from external sources.
 
 ## Installation
 
