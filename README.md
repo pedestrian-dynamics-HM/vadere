@@ -1,14 +1,14 @@
-![Vadere](vadere.png "Vadere")
+![VADERE](vadere.png "VADERE")
 
 ---
 
-# Vadere
+# VADERE
 
-Vadere is an open source framework for the simulation of microscopic pedestrian dynamics. In addition to this core domain, other systems including cars and granular flow can be introduced into the framework. Vadere provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of simulation models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies.
+VADERE is an open source framework for the simulation of microscopic pedestrian dynamics. In addition to this core domain, other systems including cars and granular flow can be introduced into the framework. VADERE provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of simulation models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies.
 
-This software runs on OS X, Windows, and Linux. 
+This software runs on OS X, Windows, and Linux.
 
-Vadere has been developed at the Munich University of Applied Sciences at the department for Computer Science and Mathematics. However, we welcome contributions from external sources.
+VADERE has been developed at the Munich University of Applied Sciences at the department for Computer Science and Mathematics. However, we welcome contributions from external sources.
 
 ## Installation
 
@@ -38,14 +38,14 @@ Run `git clone https://gitlab.lrz.de/vadere/vadere`. Go to the project directory
 
 ### Run Application
 
-After building the application, you can start Vadere by running `java -jar VadereGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
+After building the application, you can start VADERE by running `java -jar VADEREGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
 
-## Usage Example 
+## Usage Example
 
 With the following steps, you can start a scenario of the [ExampleProject](Documentation/Examples/ExampleProject):
 
-- start Vadere 
-- *Project* > *Open* 
+- start VADERE
+- *Project* > *Open*
 - choose `vadere.project` and click *open*
 - select the scenario on the left and press *run selected scenario*
 
@@ -58,13 +58,13 @@ Follow the installation instructions above. Go to the project directory and run 
 
 - *File* > *Import* > *Maven* > *Existing Maven Projects*
 - choose `pom.xml` as *Root Directory* and click *Finish*
-- open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
+- open *VADEREGui (gui)* > *src* > *org.vadere.gui.projectview* > `VADEREApplication`
 
 ### IntelliJ IDEA
 
-- on the welcome-screen select *Import Project* 
+- on the welcome-screen select *Import Project*
 - select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
-- open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
+- open *VADEREGui (gui)* > *src* > *org.vadere.gui.projectview* > `VADEREApplication`
 - click the *run*-icon next to the `main` method
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
