@@ -2,7 +2,7 @@
 	"files": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
 		"filename": "test_ts_pid.txt",
-		"processors": [ 1, 2, 3, 5 ]
+		"processors": [ 1, 2, 3, 5, 13 ]
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianIdOutputFile",
 		"filename": "test_pid.txt",
@@ -52,6 +52,9 @@
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.EvacuationTimeProcessor",
 		"id": 12
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianFlowProcessor",
+		"id": 13
 	} ],
 	"org.vadere.simulator.projects.dataprocessing_mtp.AttributesVelocityProcessor": {
 		"processorId": 2,
@@ -110,5 +113,10 @@
 	"org.vadere.simulator.projects.dataprocessing_mtp.AttributesEvacuationTimeProcessor": {
 		"processorId": 12,
 		"pedestrianEvacuationTimeProcessorId": 10
+	},
+	"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianFlowProcessor": {
+		"processorId": 13,
+		"pedestrianVelocityProcessorId": 2,
+		"pedestrianDensityProcessorId": 3
 	}
 }
