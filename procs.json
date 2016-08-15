@@ -2,7 +2,7 @@
 	"files": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
 		"filename": "test_ts_pid.txt",
-		"processors": [ 1, 2, 3, 5, 13 ]
+		"processors": [ 1, 2, 3, 5, 13, 14 ]
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianIdOutputFile",
 		"filename": "test_pid.txt",
@@ -55,6 +55,9 @@
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianFlowProcessor",
 		"id": 13
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianOverlapProcessor",
+		"id": 14
 	} ],
 	"org.vadere.simulator.projects.dataprocessing_mtp.AttributesVelocityProcessor": {
 		"processorId": 2,
@@ -118,5 +121,9 @@
 		"processorId": 13,
 		"pedestrianVelocityProcessorId": 2,
 		"pedestrianDensityProcessorId": 3
+	},
+	"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianOverlapProcessor": {
+    "processorId": 14,
+		"pedRadius": 0.21
 	}
 }
