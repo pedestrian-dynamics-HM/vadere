@@ -6,7 +6,7 @@ public class PedestrianDensityCountingProcessor extends PedestrianDensityProcess
 	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
 		AttributesPedestrianDensityCountingProcessor attDensCountProc =
 				(AttributesPedestrianDensityCountingProcessor) attributes;
-		this.setAlgorithm(new PedestrianDensityCountingAlgorithm(attDensCountProc.getRadius()));
+		this.setAlgorithm(new PointDensityCountingAlgorithm(attDensCountProc.getRadius()));
 
 		super.init(attributes, factory);
 	}

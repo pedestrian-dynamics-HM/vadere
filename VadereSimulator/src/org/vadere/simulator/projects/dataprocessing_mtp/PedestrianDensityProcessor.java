@@ -5,9 +5,9 @@ import org.vadere.state.scenario.Pedestrian;
 
 public abstract class PedestrianDensityProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
-	private IPedestrianDensityAlgorithm densAlg;
+	private IPointDensityAlgorithm densAlg;
 
-	protected void setAlgorithm(IPedestrianDensityAlgorithm densAlg) {
+	protected void setAlgorithm(IPointDensityAlgorithm densAlg) {
 		this.densAlg = densAlg;
 		this.setHeader(this.densAlg.getName().toLowerCase() + "-density");
 	}

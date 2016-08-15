@@ -4,11 +4,11 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class PedestrianDensityCountingAlgorithm extends PedestrianDensityAlgorithm {
+public class PointDensityCountingAlgorithm extends PointDensityAlgorithm {
 	private double radius;
 	private double circArea;
 
-	public PedestrianDensityCountingAlgorithm(double radius) {
+	public PointDensityCountingAlgorithm(double radius) {
 		super("Counting");
 
 		this.radius = radius;

@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-public abstract class PedestrianDensityAlgorithm implements IPedestrianDensityAlgorithm {
+public abstract class PointDensityAlgorithm implements IPointDensityAlgorithm {
 	private String name;
 
-	protected PedestrianDensityAlgorithm(String name) {
+	protected PointDensityAlgorithm(String name) {
 		this.name = name;
 	}
 

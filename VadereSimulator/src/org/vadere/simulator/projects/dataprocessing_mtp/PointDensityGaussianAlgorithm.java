@@ -4,7 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class PedestrianDensityGaussianAlgorithm extends PedestrianDensityAlgorithm {
+public class PointDensityGaussianAlgorithm extends PointDensityAlgorithm {
 	private double scale;
 	private double standDev;
 	private boolean isObstacleDensity;
@@ -16,7 +16,7 @@ public class PedestrianDensityGaussianAlgorithm extends PedestrianDensityAlgorit
 
 	private int lastStep;
 
-	public PedestrianDensityGaussianAlgorithm(double scale, double standDev, boolean isObstacleDensity) {
+	public PointDensityGaussianAlgorithm(double scale, double standDev, boolean isObstacleDensity) {
 		super("Gaussian" + scale);
 
 		this.scale = scale;

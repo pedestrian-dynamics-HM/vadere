@@ -6,7 +6,7 @@ public class PedestrianDensityGaussianProcessor extends PedestrianDensityProcess
 	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
 		AttributesPedestrianDensityGaussianProcessor attDensGauss =
 				(AttributesPedestrianDensityGaussianProcessor) attributes;
-		this.setAlgorithm(new PedestrianDensityGaussianAlgorithm(attDensGauss.getScale(), attDensGauss.getStandardDerivation(),
+		this.setAlgorithm(new PointDensityGaussianAlgorithm(attDensGauss.getScale(), attDensGauss.getStandardDerivation(),
 				attDensGauss.isObstacleDensity()));
 
 		super.init(attributes, factory);
