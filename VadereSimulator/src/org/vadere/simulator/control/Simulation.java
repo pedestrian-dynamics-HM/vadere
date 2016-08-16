@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing.writer.Writer;
@@ -64,10 +65,12 @@ public class Simulation {
 	private SimulationState simulationState;
 	private ScenarioStore scenarioStore;
 	private String name;
+	private Model model;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 			List<PassiveCallback> passiveCallbacks, List<ProcessorWriter> processorWriter, Random random) {
 		this.name = name;
+		this.model = mainModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.attributesSimulation;
 		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
@@ -166,7 +169,7 @@ public class Simulation {
 			List<Processor<?, ?>> processors = JsonConverter.deserializeProcessors(json);
 			writers = JsonConverter.deserializeOutputFiles(json);
 
-			ProcessorManager factory = new ProcessorManager(processors, attributesProcessor);
+			ProcessorManager factory = new ProcessorManager(processors, attributesProcessor, this.model);
 			factory2 = factory;
 			writers.forEach(writer -> writer.init(factory));
 

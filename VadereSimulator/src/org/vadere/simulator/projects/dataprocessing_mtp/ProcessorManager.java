@@ -1,16 +1,20 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.models.Model;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ProcessorManager {
+	private Model model;
 	private Map<Integer, Processor<?, ?>> processorMap;
 	private Map<Integer, AttributesProcessor> attributesMap;
 
-	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor) {
+	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, Model model) {
+		this.model = model;
+
 		this.attributesMap = new HashMap<>();
 		for (AttributesProcessor att : attributesProcessor)
 			this.attributesMap.put(att.getProcessorId(), att);
@@ -24,6 +28,10 @@ public class ProcessorManager {
 
 	public Processor<?, ?> getProcessor(int id) {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
+	}
+
+	public Model getModel() {
+		return this.model;
 	}
 
 	public void preLoop(final SimulationState state) {
