@@ -35,7 +35,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 		this.processors.clear();
 	}
 
-	public void init(final ProcessorFactory factory) {
+	public void init(final ProcessorManager factory) {
 		processorIds.forEach(pid -> this.processors.add((Processor<K, ?>) factory.getProcessor(pid)));
 	}
 

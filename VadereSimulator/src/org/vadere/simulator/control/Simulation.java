@@ -10,7 +10,7 @@ import org.vadere.simulator.projects.dataprocessing.writer.Writer;
 import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
 import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
 import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
-import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorFactory;
+import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -157,7 +157,7 @@ public class Simulation {
 	 */
 	public void run() {
 		List<OutputFile<?>> writers = null;
-		ProcessorFactory factory2 = null;
+		ProcessorManager factory2 = null;
 
 		try {
 			String json = new String(Files.readAllBytes(Paths.get("procs.json")));
@@ -166,7 +166,7 @@ public class Simulation {
 			List<Processor<?, ?>> processors = JsonConverter.deserializeProcessors(json);
 			writers = JsonConverter.deserializeOutputFiles(json);
 
-			ProcessorFactory factory = new ProcessorFactory(processors, attributesProcessor);
+			ProcessorManager factory = new ProcessorManager(processors, attributesProcessor);
 			factory2 = factory;
 			writers.forEach(writer -> writer.init(factory));
 

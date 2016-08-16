@@ -32,7 +32,7 @@ public class ChooseProcessorTypeDialog extends JDialog {
 	private void setProcText(final String simpleProcName) {
 		// Processor proc;
 		// proc =
-		// ProcessorFactory.getInstance().createProcessor(ProcessorFactory.getInstance().toProcessorType(simpleProcName));
+		// ProcessorManager.getInstance().createProcessor(ProcessorManager.getInstance().toProcessorType(simpleProcName));
 		txtpnProcessordescription.setText("missing description");
 
 	}

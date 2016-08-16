@@ -20,7 +20,7 @@ public class PedestrianOverlapProcessor extends Processor<TimestepPedestrianIdDa
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
         AttributesPedestrianOverlapProcessor att = (AttributesPedestrianOverlapProcessor) attributes;
 
         this.pedRadius = att.getPedRadius();

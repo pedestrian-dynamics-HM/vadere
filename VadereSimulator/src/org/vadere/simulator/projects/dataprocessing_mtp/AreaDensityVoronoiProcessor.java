@@ -1,10 +1,8 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import org.vadere.state.attributes.processors.AttributesDensityVoronoiProcessor;
-
 public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
         super.init(attributes, factory);
 
         AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) attributes;

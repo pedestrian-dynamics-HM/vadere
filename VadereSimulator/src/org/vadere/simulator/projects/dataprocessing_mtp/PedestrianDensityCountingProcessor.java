@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.dataprocessing_mtp;
 public class PedestrianDensityCountingProcessor extends PedestrianDensityProcessor {
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+	void init(final AttributesProcessor attributes, final ProcessorManager factory) {
 		AttributesPedestrianDensityCountingProcessor attDensCountProc =
 				(AttributesPedestrianDensityCountingProcessor) attributes;
 		this.setAlgorithm(new PointDensityCountingAlgorithm(attDensCountProc.getRadius()));

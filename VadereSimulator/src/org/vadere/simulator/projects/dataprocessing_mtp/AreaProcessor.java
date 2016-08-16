@@ -6,7 +6,7 @@ public abstract class AreaProcessor<V> extends Processor<TimestepDataKey, V> {
     private VRectangle measurementArea;
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
         AttributesAreaProcessor att = (AttributesAreaProcessor) attributes;
         this.measurementArea = att.getMeasurementArea();
     }

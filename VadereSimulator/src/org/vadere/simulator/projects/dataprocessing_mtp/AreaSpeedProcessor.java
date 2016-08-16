@@ -41,7 +41,7 @@ public class AreaSpeedProcessor extends AreaProcessor<Double> {
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
         AttributesAreaSpeedProcessor att = (AttributesAreaSpeedProcessor) attributes;
         this.pedPosProc = (PedestrianPositionProcessor) factory.getProcessor(att.getPedestrianPositionProcessorId());
         this.pedVelProc = (PedestrianVelocityProcessor) factory.getProcessor(att.getPedestrianVelocityProcessorId());

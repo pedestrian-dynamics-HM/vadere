@@ -30,7 +30,7 @@ public class EvacuationTimeProcessor extends Processor<NoDataKey, Double> {
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
         AttributesEvacuationTimeProcessor att = (AttributesEvacuationTimeProcessor) attributes;
         this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) factory.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
     }

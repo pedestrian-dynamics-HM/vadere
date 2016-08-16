@@ -19,7 +19,7 @@ public class PedestrianSourceIdProcessor extends Processor<PedestrianIdDataKey, 
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+	void init(final AttributesProcessor attributes, final ProcessorManager factory) {
 		// No initialization needed
 	}
 }

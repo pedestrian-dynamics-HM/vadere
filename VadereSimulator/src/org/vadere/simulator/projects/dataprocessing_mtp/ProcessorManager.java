@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProcessorFactory {
+public class ProcessorManager {
 	private Map<Integer, Processor<?, ?>> processorMap;
 	private Map<Integer, AttributesProcessor> attributesMap;
 
-	public ProcessorFactory(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor) {
+	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor) {
 		this.attributesMap = new HashMap<>();
 		for (AttributesProcessor att : attributesProcessor)
 			this.attributesMap.put(att.getProcessorId(), att);

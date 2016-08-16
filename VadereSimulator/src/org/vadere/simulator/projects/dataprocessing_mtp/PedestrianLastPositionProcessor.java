@@ -22,7 +22,7 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+	void init(final AttributesProcessor attributes, final ProcessorManager factory) {
 		AttributesPedestrianLastPositionProcessor attLastPosProc =
 				(AttributesPedestrianLastPositionProcessor) attributes;
 		this.pedPosProc =

@@ -21,7 +21,7 @@ public class PedestrianEndTimeProcessor extends Processor<PedestrianIdDataKey, D
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorFactory factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
         // No initialization needed
     }
 
