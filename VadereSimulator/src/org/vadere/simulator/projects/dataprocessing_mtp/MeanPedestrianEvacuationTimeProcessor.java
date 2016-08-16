@@ -18,9 +18,9 @@ public class MeanPedestrianEvacuationTimeProcessor extends Processor<NoDataKey, 
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesMeanPedestrianEvacuationTimeProcessor att = (AttributesMeanPedestrianEvacuationTimeProcessor) attributes;
-        this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) factory.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
+        this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
     }
 
     @Override

@@ -32,7 +32,7 @@ public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager factory) {}
+	void init(final AttributesProcessor attributes, final ProcessorManager manager) {}
 
 	@Override
 	public String toString(TimestepPedestrianIdDataKey key) {

@@ -29,10 +29,10 @@ public class PedestrianFlowProcessor extends Processor<TimestepPedestrianIdDataK
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesPedestrianFlowProcessor att = (AttributesPedestrianFlowProcessor) attributes;
 
-        this.pedVelProc = (PedestrianVelocityProcessor) factory.getProcessor(att.getPedestrianVelocityProcessorId());
-        this.pedDensProc = (PedestrianDensityProcessor) factory.getProcessor(att.getPedestrianDensityProcessorId());
+        this.pedVelProc = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+        this.pedDensProc = (PedestrianDensityProcessor) manager.getProcessor(att.getPedestrianDensityProcessorId());
     }
 }

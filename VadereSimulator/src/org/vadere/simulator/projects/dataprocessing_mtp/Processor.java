@@ -81,7 +81,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	public void postLoop(final SimulationState state) { }
 
-	abstract void init(final AttributesProcessor attributes, final ProcessorManager factory);
+	abstract void init(final AttributesProcessor attributes, final ProcessorManager manager);
 
 	public String toString(K key) {
 		return this.hasValue(key) ? this.getValue(key).toString() : "NaN";

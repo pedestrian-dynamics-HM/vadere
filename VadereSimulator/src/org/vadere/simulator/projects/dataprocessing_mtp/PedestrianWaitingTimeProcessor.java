@@ -36,7 +36,7 @@ public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKe
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager factory) {
+    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) attributes;
         this.waitingArea = att.getWaitingArea();
     }

@@ -36,11 +36,11 @@ public class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager factory) {
+	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		AttributesVelocityProcessor attVelProc = (AttributesVelocityProcessor) attributes;
 
 		this.pedPosProc =
-				(PedestrianPositionProcessor) factory.getProcessor(attVelProc.getPedestrianPositionProcessorId());
+				(PedestrianPositionProcessor) manager.getProcessor(attVelProc.getPedestrianPositionProcessorId());
 		this.backSteps = attVelProc.getBackSteps();
 	}
 

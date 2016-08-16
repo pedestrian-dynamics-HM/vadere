@@ -22,10 +22,10 @@ public abstract class PedestrianDensityProcessor extends Processor<TimestepPedes
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager factory) {
+	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		AttributesPedestrianDensityProcessor attDensProc = (AttributesPedestrianDensityProcessor) attributes;
 
 		this.pedPosProc =
-				(PedestrianPositionProcessor) factory.getProcessor(attDensProc.getPedestrianPositionProcessorId());
+				(PedestrianPositionProcessor) manager.getProcessor(attDensProc.getPedestrianPositionProcessorId());
 	}
 }

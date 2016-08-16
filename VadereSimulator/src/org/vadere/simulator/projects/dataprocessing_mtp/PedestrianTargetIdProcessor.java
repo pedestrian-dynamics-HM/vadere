@@ -20,7 +20,7 @@ public class PedestrianTargetIdProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager factory) {
+	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		// No initialization needed
 	}
 }
