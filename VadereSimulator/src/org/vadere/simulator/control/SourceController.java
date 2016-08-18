@@ -169,7 +169,7 @@ public class SourceController {
 	private void useDistributionSpawnAlgorithm(double simTimeInSec) {
 		if (!isSourceFinished(simTimeInSec)) {
 			if (hasNextEvent()) {
-				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
+				processNextEventWhenItIsTime(simTimeInSec);
 			}
 			tryToSpawnOutstandingDynamicElements();
 		}
@@ -186,27 +186,30 @@ public class SourceController {
 		return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
 	}
 
-	private void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
+	private void processNextEventWhenItIsTime(double simTimeInSec) {
 		if (simTimeInSec >= timeOfNextEvent) {
-			dynamicElementsToCreate += sourceAttributes.getSpawnNumber();
-
-			if (isSourceWithOneSingleSpawnEvent()) {
-				timeOfNextEvent = null;
-				return;
-			}
-
-			// sample() could yield negative results. but that is a problem of the distribution.
-			timeOfNextEvent += distribution.sample();
-
-			if (isAfterSourceEndTime(timeOfNextEvent)) {
-				timeOfNextEvent = null;
-				return;
-			}
-
-			// If timeOfNextEvent still behind current time -> call this function recursively
-			// (condition is checked above)
 			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 		}
+	}
+
+	private void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
+		dynamicElementsToCreate += sourceAttributes.getSpawnNumber();
+
+		if (isSourceWithOneSingleSpawnEvent()) {
+			timeOfNextEvent = null;
+			return;
+		}
+
+		// sample() could yield negative results. but that is a problem of the distribution.
+		timeOfNextEvent += distribution.sample();
+
+		if (isAfterSourceEndTime(timeOfNextEvent)) {
+			timeOfNextEvent = null;
+			return;
+		}
+
+		// If timeOfNextEvent still behind current time -> start an (indirect) recursion
+		processNextEventWhenItIsTime(simTimeInSec);
 	}
 
 	private boolean hasNextEvent() {
