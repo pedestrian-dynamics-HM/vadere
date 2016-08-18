@@ -169,12 +169,12 @@ public class Simulation {
 			List<Processor<?, ?>> processors = JsonConverter.deserializeProcessors(json);
 			writers = JsonConverter.deserializeOutputFiles(json);
 
-			ProcessorManager factory = new ProcessorManager(processors, attributesProcessor, this.model);
-			factory2 = factory;
-			writers.forEach(writer -> writer.init(factory));
+			ProcessorManager manager = new ProcessorManager(processors, attributesProcessor, this.model);
+			factory2 = manager;
+			writers.forEach(writer -> writer.init(manager));
 
 			preLoop();
-			factory.preLoop(this.simulationState);
+			manager.preLoop(this.simulationState);
 
 			while (runSimulation) {
 				synchronized (this) {
@@ -201,7 +201,7 @@ public class Simulation {
 
 				updateWriters(simTimeInSec);
 
-				factory.update(this.simulationState);
+				manager.update(this.simulationState);
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
