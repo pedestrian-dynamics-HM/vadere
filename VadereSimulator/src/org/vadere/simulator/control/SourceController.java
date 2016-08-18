@@ -203,7 +203,7 @@ public class SourceController {
 				return;
 			}
 
-			// if still timeOfNextEvent still behind current time -> call this function recursively
+			// If timeOfNextEvent still behind current time -> call this function recursively
 			// (condition is checked above)
 			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 		}
