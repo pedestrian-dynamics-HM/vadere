@@ -127,7 +127,7 @@ public class SourceController {
 		 */
 		for (VPoint position : positions) {
 			if (isPositionWorkingForSpawn(position)) {
-				create(position);
+				addNewAgentToScenario(position);
 				++dynamicElementsCreated;
 			}
 		}
@@ -220,7 +220,7 @@ public class SourceController {
 	private void tryToSpawnOutstandingDynamicElements() {
 		for (VPoint position : getDynamicElementPositions(dynamicElementsToCreate)) {
 			if (isPositionWorkingForSpawn(position)) {
-				create(position);
+				addNewAgentToScenario(position);
 				dynamicElementsToCreate--;
 				dynamicElementsCreatedTotal++;
 			}
@@ -231,22 +231,8 @@ public class SourceController {
 	 * note that most models create their own pedestrians and ignore the attributes given here.
 	 * the source is mostly used to set the position and target ids, not the attributes.
 	 */
-	protected DynamicElement create(final VPoint position) {
-		Agent newElement = null;
-
-		switch (this.source.getAttributes().getDynamicElementType()) {
-			case PEDESTRIAN:
-				newElement = (Pedestrian) dynamicElementFactory.createElement(position, 0, Pedestrian.class);
-				break;
-
-			case CAR:
-				newElement = (Car) dynamicElementFactory.createElement(position, 0, Car.class);
-				break;
-
-			default:
-				throw new IllegalArgumentException("The source of the controller has the wrong element type: "
-						+ this.source.getAttributes().getDynamicElementType());
-		}
+	protected DynamicElement addNewAgentToScenario(final VPoint position) {
+		Agent newElement = (Agent) createDynamicElement(position);
 
 		// TODO [priority=high] [task=refactoring] this is bad programming. Why is the target list added later?
 		// What if Pedestrian does something with the target list before it is stored?
@@ -258,10 +244,21 @@ public class SourceController {
 			newElement.setTargets(new LinkedList<>(source.getAttributes().getTargetIds()));
 		}
 
-		// TODO [priority=high] [task=refactoring] why do we need to add this HERE, and not in the calling method?
 		topography.addElement(newElement);
 
 		return newElement;
+	}
+
+	private DynamicElement createDynamicElement(final VPoint position) {
+		switch (this.source.getAttributes().getDynamicElementType()) {
+			case PEDESTRIAN:
+				return dynamicElementFactory.createElement(position, 0, Pedestrian.class);
+			case CAR:
+				return dynamicElementFactory.createElement(position, 0, Car.class);
+			default:
+				throw new IllegalArgumentException("The controller's source has an unsupported element type: "
+						+ this.source.getAttributes().getDynamicElementType());
+		}
 	}
 
 	private LinkedList<VPoint> getDynamicElementPositions(int numDynamicElements) {
