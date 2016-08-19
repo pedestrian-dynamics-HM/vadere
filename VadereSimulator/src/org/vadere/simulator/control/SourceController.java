@@ -154,9 +154,6 @@ public class SourceController {
 		if (attributesDynamicElement instanceof AttributesAgent) {
 			return new VCircle(((AttributesAgent) attributesDynamicElement).getRadius());
 		}
-		if (attributesDynamicElement instanceof AttributesCar) {
-			return new VCircle(((AttributesCar) attributesDynamicElement).getRadius());
-		}
 
 		return new VCircle(0.2);
 	}
