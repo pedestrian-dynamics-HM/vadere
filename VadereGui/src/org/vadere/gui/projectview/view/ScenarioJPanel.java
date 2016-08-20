@@ -174,6 +174,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		*/
 
 		outputView = new TextView("/" + IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		outputView.setText("");
 
 		try {
 			// TODO add more templates and make a loop here
@@ -186,7 +187,16 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 			processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					outputView.setText(templateJson);
+					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
+							Messages.getString("Tab.Model.confirmLoadTemplate.text"),
+							Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+							JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						try {
+							outputView.setText(templateJson);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
 				}
 			}));
 
