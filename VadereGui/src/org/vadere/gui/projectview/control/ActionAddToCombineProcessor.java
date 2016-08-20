@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 // unused!
+@Deprecated
 public class ActionAddToCombineProcessor extends AbstractAction {
 
 	private static final long serialVersionUID = 6484255913225706069L;

@@ -11,6 +11,7 @@ import org.vadere.state.attributes.processors.AttributesWriter;
 
 import java.awt.event.ActionEvent;
 
+@Deprecated
 public class ActionCreateProcessor extends AbstractAction {
 
 	private static final long serialVersionUID = 4844916448893626628L;

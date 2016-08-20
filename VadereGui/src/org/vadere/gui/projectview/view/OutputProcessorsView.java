@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * 
  * 
  */
+@Deprecated
 public class OutputProcessorsView extends JPanel {
 	private Logger logger = LogManager.getLogger(getClass());
 
