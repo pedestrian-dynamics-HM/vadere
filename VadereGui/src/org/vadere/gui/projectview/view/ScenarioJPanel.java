@@ -26,32 +26,32 @@ import java.io.IOException;
 
 
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
-	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
 
+	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
 	private static final long serialVersionUID = 7217609523783631174L;
 
-	private TextView topographyFileView;
-	private OutputProcessorsView outputProcessorsView;
 	private JTabbedPane tabbedPane;
 	private final JFrame owner;
 	private final JLabel scenarioName;
 
-	private TextView attributesModelView; // Model tab
+	// tabs
 	private TextView attributesSimulationView; // Simulation tab
+	private TextView attributesModelView; // Model tab
+	private TextView topographyFileView; // Topography tab
+	private OutputProcessorsView outputProcessorsView; // Output processors tab
+	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
+	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
-	private boolean initialized;
+	// during simulation-run, only this is shown instead of the tabs above:
+	private final OnlineVisualization onlineVisualization;
 
 	private JPanel visualizationCard;
-	private final OnlineVisualization onlineVisualization;
 
 	private String visualizationCardName = "visualization";
 	private String editCardName = "edit";
 
-	private final PostvisualizationWindow postVisualizationView;
-
-	private TopographyWindow topographyCreatorView;
-
 	private ScenarioRunManager scenario;
+	private boolean initialized;
 
 	private static String activeJsonParsingErrorMsg = null;
 
