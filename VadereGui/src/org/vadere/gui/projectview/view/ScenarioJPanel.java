@@ -45,8 +45,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	// during simulation-run, only this is shown instead of the tabs above:
 	private final OnlineVisualization onlineVisualization;
 
-	private JPanel visualizationCard;
-
 	private String visualizationCardName = "visualization";
 	private String editCardName = "edit";
 
@@ -56,7 +54,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	public ScenarioJPanel(JFrame owner, JLabel scenarioName) {
+	ScenarioJPanel(JFrame owner, JLabel scenarioName) {
 		this.owner = owner;
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
@@ -172,7 +170,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputProcessorsView, null);
 
 		// online visualization card...
-		visualizationCard = new JPanel();
+		JPanel visualizationCard = new JPanel();
 
 		visualizationCard.setBorder(new EmptyBorder(5, 5, 5, 5));
 		visualizationCard.setLayout(new BorderLayout(0, 0));
