@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 public enum AttributeType {
-	SIMULATION, MODEL, PEDESTRIAN, CAR, TOPOGRAPHY;
+	SIMULATION, MODEL, PEDESTRIAN, CAR, TOPOGRAPHY, OUTPUTPROCESSOR;
 
 	public final static String simulationAttributes = "simulation attributes";
 	public final static String modelAttributes = "panelModel attributes";

@@ -13,6 +13,7 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -38,7 +39,8 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
-	private OutputProcessorsView outputProcessorsView; // Output processors tab
+	private TextView outputView; // new Output tab
+	//private OutputProcessorsView outputProcessorsView; // old Output processors tab
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
@@ -160,6 +162,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), null, topographyFileView, null);
 
+		/*
 		try {
 			outputProcessorsView = new OutputProcessorsView(owner);
 		} catch (IOException e) {
@@ -168,7 +171,12 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputProcessorsView, null);
+		*/
 
+		outputView = new TextView("/" + IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputView, null);
+
+		
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 
@@ -247,8 +255,11 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		this.topographyFileView.isEditable(isEditable);
 		this.topographyFileView.setVadereScenario(scenario);
 
-		this.outputProcessorsView.isEditable(isEditable);
-		this.outputProcessorsView.setScenario(scenario);
+		//this.outputProcessorsView.isEditable(isEditable);
+		//this.outputProcessorsView.setScenario(scenario);
+
+		this.outputView.isEditable(isEditable);
+		this.outputView.setVadereScenario(scenario);
 	}
 
 	private void setTopography(Topography topography) {
