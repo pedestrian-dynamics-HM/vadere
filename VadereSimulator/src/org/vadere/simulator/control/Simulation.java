@@ -44,6 +44,7 @@ public class Simulation {
 	private List<ActiveCallback> activeCallbacks;
 
 	private List<ProcessorWriter> processorWriter;
+	private ProcessorManager processorManager;
 
 	private boolean runSimulation = false;
 	private boolean paused = false;
@@ -68,7 +69,7 @@ public class Simulation {
 	private Model model;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-			List<PassiveCallback> passiveCallbacks, List<ProcessorWriter> processorWriter, Random random) {
+			List<PassiveCallback> passiveCallbacks, List<ProcessorWriter> processorWriter, Random random, ProcessorManager processorManager) {
 		this.name = name;
 		this.model = mainModel;
 		this.scenarioStore = scenarioStore;
@@ -88,6 +89,7 @@ public class Simulation {
 		this.dynamicElementFactory = mainModel;
 
 		this.processorWriter = processorWriter;
+		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
 
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
@@ -159,22 +161,28 @@ public class Simulation {
 	 * Starts simulation and runs main loop until stopSimulation flag is set.
 	 */
 	public void run() {
-		List<OutputFile<?>> writers = null;
+		//List<OutputFile<?>> writers = null;
 		ProcessorManager factory2 = null;
 
 		try {
-			String json = new String(Files.readAllBytes(Paths.get("procs.json")));
+			/*String json = new String(Files.readAllBytes(Paths.get("procs.json")));
 
 			List<AttributesProcessor> attributesProcessor = JsonConverter.deserializeAttributesProcessor(json);
 			List<Processor<?, ?>> processors = JsonConverter.deserializeProcessors(json);
 			writers = JsonConverter.deserializeOutputFiles(json);
 
+
 			ProcessorManager manager = new ProcessorManager(processors, attributesProcessor, this.model);
-			factory2 = manager;
-			writers.forEach(writer -> writer.init(manager));
+			factory2 = manager;*/
+
+/*
+			factory2 = processorManager;
+			processorManager.setModel(this.model);
+			processorManager.initWriters();*/
 
 			preLoop();
-			manager.preLoop(this.simulationState);
+			//manager.preLoop(this.simulationState);
+			//processorManager.preLoop(this.simulationState);
 
 			while (runSimulation) {
 				synchronized (this) {
@@ -201,7 +209,8 @@ public class Simulation {
 
 				updateWriters(simTimeInSec);
 
-				manager.update(this.simulationState);
+				//manager.update(this.simulationState);
+				//processorManager.update(this.simulationState);
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
@@ -225,17 +234,13 @@ public class Simulation {
 				}
 			}
 		}
-		catch (IOException | ClassNotFoundException e) {
-			//throw e;
-			int i = 2;
-		}
 		finally {
 			// this is necessary to free the resources (files), the SimulationWriter and processors are writing in!
 			postLoop();
 
-			factory2.postLoop(this.simulationState);
+			//factory2.postLoop(this.simulationState);
 
-			writers.forEach(writer -> writer.write());
+			//processorManager.getWriters().forEach(writer -> writer.write());
 		}
 	}
 

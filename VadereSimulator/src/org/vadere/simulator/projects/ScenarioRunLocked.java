@@ -99,7 +99,7 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 					modelBuilder.createModelAndRandom();
 					simulation = new Simulation(modelBuilder.getModel(), currentTime, getName(),
 							scenarioStore, passiveCallbacks, writers,
-							modelBuilder.getRandom());
+							modelBuilder.getRandom(), thisVadere.getProcessorManager());
 				} else {
 					currentTime = simulation.getCurrentTime();
 					// restart timer of the simulation

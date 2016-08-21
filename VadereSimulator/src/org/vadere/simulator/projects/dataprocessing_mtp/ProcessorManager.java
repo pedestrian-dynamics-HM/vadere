@@ -8,13 +8,25 @@ import java.util.List;
 import java.util.Map;
 
 public class ProcessorManager {
+
 	private Model model;
 	private Map<Integer, Processor<?, ?>> processorMap;
 	private Map<Integer, AttributesProcessor> attributesMap;
 
-	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, Model model) {
-		this.model = model;
+	private List<OutputFile<?>> writers;
 
+
+	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<OutputFile<?>> writers) {
+		this(processors, attributesProcessor);
+		this.writers = writers;
+	}
+
+	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, Model model) {
+		this(processors, attributesProcessor);
+		this.model = model;
+	}
+
+	private ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor) {
 		this.attributesMap = new HashMap<>();
 		for (AttributesProcessor att : attributesProcessor)
 			this.attributesMap.put(att.getProcessorId(), att);
@@ -26,8 +38,20 @@ public class ProcessorManager {
 		processors.forEach(proc -> proc.init(this.attributesMap.get(proc.getId()), this));
 	}
 
+	public void setModel(Model model) {
+		this.model = model;
+	}
+
+	public void initWriters() {
+		writers.forEach(writer -> writer.init(this));
+	}
+
 	public Processor<?, ?> getProcessor(int id) {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
+	}
+
+	public List<OutputFile<?>> getWriters() {
+		return writers;
 	}
 
 	public Model getModel() {
@@ -45,4 +69,5 @@ public class ProcessorManager {
 	public void postLoop(final SimulationState state) {
 		this.processorMap.values().forEach(proc -> proc.postLoop(state));
 	}
+
 }

@@ -19,6 +19,7 @@ import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
 import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
 import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
+import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
@@ -221,6 +222,60 @@ public abstract class JsonConverter {
 		List<Integer> processors;
 	}
 
+	public static ProcessorManager deserializeOutputProcessors(String json) throws IOException {
+
+		JsonNode node;
+		if (json.isEmpty()) {
+			node = mapper.createObjectNode();
+		} else {
+			node = mapper.readTree(json);
+		}
+
+		ArrayNode filesArrayNode = (ArrayNode) node.get("files");
+		ArrayNode processorsArrayNode = (ArrayNode) node.get("processors");
+		JsonNode attributesNode = node.get("attributes");
+
+		// part 1: files
+		List<OutputFile<?>> writers = new ArrayList<>();
+		if (filesArrayNode != null) {
+			DynamicClassInstantiator<OutputFile<?>> instantiator1 = new DynamicClassInstantiator<>();
+			for (JsonNode fileNode : filesArrayNode) {
+				OutputFileStore writerStore = mapper.treeToValue(fileNode, OutputFileStore.class);
+				OutputFile<?> file = instantiator1.createObject(writerStore.type);
+				file.setFileName(writerStore.filename);
+				file.setProcessorIds(writerStore.processors);
+				writers.add(file);
+			}
+		}
+
+		// part 2: processors
+		List<Processor<?, ?>> processors = new ArrayList<>();
+		if (processorsArrayNode != null) {
+			DynamicClassInstantiator<Processor<?, ?>> instantiator2 = new DynamicClassInstantiator<>();
+			for (JsonNode processorNode : processorsArrayNode) {
+				ProcessorStore processorStore = mapper.treeToValue(processorNode, ProcessorStore.class);
+				Processor<?, ?> processor = instantiator2.createObject(processorStore.type);
+				processor.setId(processorStore.id);
+				processors.add(processor);
+			}
+		}
+
+		// part 3: attributes
+		List<AttributesProcessor> attributes = new ArrayList<>();
+		if (attributesNode != null) {
+			DynamicClassInstantiator<AttributesProcessor> instantiator3 = new DynamicClassInstantiator<>();
+			Iterator<String> it = attributesNode.fieldNames();
+			while (it.hasNext()) {
+				String fieldName = it.next();
+				JsonNode attributeNode = attributesNode.get(fieldName);
+				AttributesProcessor attribute = mapper.treeToValue(attributeNode, instantiator3.getClassFromName(fieldName));
+				attributes.add(attribute);
+			}
+		}
+
+		return new ProcessorManager(processors, attributes, writers);
+	}
+
 	public static List<Processor<?, ?>> deserializeProcessors(String json) throws IOException {
 		List<Processor<?, ?>> processors = new ArrayList<>();
 		JsonNode rootNode = mapper.readTree(json);
@@ -300,9 +355,14 @@ public abstract class JsonConverter {
 		String description = rootNode.get("description").asText();
 		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, am, as, to);
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
-		scenarioRunManager.removeAllWriters();
-		ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())
-				.forEach(writer -> scenarioRunManager.addWriter(writer));
+
+		//String json = node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).asText();
+		//scenarioRunManager.setOutputProcessors(deserializeOutputProcessors(json));
+
+		//scenarioRunManager.removeAllWriters();
+		//ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())
+		//		.forEach(writer -> scenarioRunManager.addWriter(writer));
+
 		if (scenarioRunManager.getTopography() == null)
 			logger.error("Loading topography failed."); // migrated from GSON, not sure if still necessary
 		return scenarioRunManager;
@@ -448,10 +508,16 @@ public abstract class JsonConverter {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
-		rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME,
-				serializeProcessorWriters(scenarioRunManager.getAllWriters()));
+		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(scenarioRunManager.getAllWriters()));
+		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, processorManagerToNode(scenarioRunManager));
 		rootNode.set("vadere", serializeVadereNode(scenarioStore));
 		return rootNode;
+	}
+
+	private static JsonNode processorManagerToNode(ScenarioRunManager srm) throws IOException {
+		//JsonNode node = mapper.readTree(srm.getOutputProcessorsJson());
+		// TODO do proper serialization instead of storing the original json
+		return null;
 	}
 
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {

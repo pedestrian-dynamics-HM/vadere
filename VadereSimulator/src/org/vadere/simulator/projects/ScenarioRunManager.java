@@ -21,6 +21,7 @@ import org.vadere.simulator.projects.dataprocessing.processors.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.processors.PedestrianPositionProcessor;
 import org.vadere.simulator.projects.dataprocessing.processors.SnapshotOutputProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
+import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -47,6 +48,7 @@ public class ScenarioRunManager implements Runnable {
 	private List<ModelTest> modelTests;
 	protected final List<PassiveCallback> passiveCallbacks;
 	protected List<ProcessorWriter> writers;
+	protected ProcessorManager processorManager;
 
 	private ScenarioFinishedListener finishedListener;
 	protected Simulation simulation;
@@ -54,6 +56,7 @@ public class ScenarioRunManager implements Runnable {
 	private boolean simpleOutputProcessorName = false;
 
 	private String savedStateSerialized;
+
 
 	public ScenarioRunManager(final String name) {
 		this(name, new ScenarioStore(name));
@@ -113,7 +116,7 @@ public class ScenarioRunManager implements Runnable {
 			final Random random = modelBuilder.getRandom();
 
 			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, writers, random);
+			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, writers, random, processorManager);
 			simulation.run();
 		} catch (Exception e) {
 			scenarioFailed = true;
@@ -380,4 +383,13 @@ public class ScenarioRunManager implements Runnable {
 		}
 		return null;
 	}
+
+	public ProcessorManager getProcessorManager() {
+		return processorManager;
+	}
+
+	public void setOutputProcessors(ProcessorManager processorManager) {
+		this.processorManager = processorManager;
+	}
+
 }
