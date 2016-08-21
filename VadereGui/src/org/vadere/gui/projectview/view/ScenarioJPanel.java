@@ -24,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
@@ -36,6 +38,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private final JLabel scenarioName;
 
 	// tabs
+	private List<JMenu> menusInTabs = new ArrayList<>();
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
@@ -104,6 +107,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
+		menusInTabs.add(mnPresetMenu);
 		ModelPresets.getPresets().forEach(
 				modelDefinition -> mnPresetMenu.add(new JMenuItem(new AbstractAction(modelDefinition.getMainModel()) {
 					private static final long serialVersionUID = 1L;
@@ -123,9 +127,9 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 					}
 				})));
 
-
 		JMenu mnAttributesMenu = new JMenu(Messages.getString("Tab.Model.addAttributesMenu.title"));
 		presetMenuBar.add(mnAttributesMenu);
+		menusInTabs.add(mnAttributesMenu);
 		ClassFinder.getAttributesNames().forEach(
 				attributesClassName -> mnAttributesMenu.add(new JMenuItem(new AbstractAction(attributesClassName) {
 					@Override
@@ -141,6 +145,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
+		menusInTabs.add(mnModelNameMenu);
 		ClassFinder.getMainModelNames()
 				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className + " (MainModel)") {
 					@Override
@@ -183,6 +188,8 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 			JMenuBar processorsMenuBar = new JMenuBar();
 			JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+			processorsMenuBar.add(processorsMenu);
+			menusInTabs.add(processorsMenu);
 
 			processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
 				@Override
@@ -200,7 +207,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 				}
 			}));
 
-			processorsMenuBar.add(processorsMenu);
 			outputView.getPanelTop().add(processorsMenuBar, 0);
 
 		} catch (IOException e) {
@@ -249,6 +255,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 
 		if (isEditable) {
+			menusInTabs.forEach(menu -> menu.setEnabled(true));
 			try {
 				int index = tabbedPane.getSelectedIndex();
 				if (topographyCreatorView != null && tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
@@ -265,6 +272,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 				logger.error(e.getLocalizedMessage());
 			}
 		} else {
+			menusInTabs.forEach(menu -> menu.setEnabled(false));
 			boolean topoWasSelected = false;
 			if (tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
 				topoWasSelected = tabbedPane.getSelectedComponent().equals(topographyCreatorView);
