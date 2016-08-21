@@ -222,15 +222,18 @@ public abstract class JsonConverter {
 		List<Integer> processors;
 	}
 
-	public static ProcessorManager deserializeProcessorManager(String json) throws IOException {
 
+	public static ProcessorManager deserializeProcessorManager(String json) throws IOException {
 		JsonNode node;
 		if (json.isEmpty()) {
 			node = mapper.createObjectNode();
 		} else {
 			node = mapper.readTree(json);
 		}
+		return deserializeProcessorManagerFromNode(node);
+	}
 
+	public static ProcessorManager deserializeProcessorManagerFromNode(JsonNode node) throws IOException {
 		ArrayNode filesArrayNode = (ArrayNode) node.get("files");
 		ArrayNode processorsArrayNode = (ArrayNode) node.get("processors");
 		JsonNode attributesNode = node.get("attributes");
@@ -384,8 +387,7 @@ public abstract class JsonConverter {
 	}
 
 	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processors
-	public static ScenarioRunManager deserializeScenarioRunMangerFromNode(JsonNode node)
-			throws JsonProcessingException {
+	public static ScenarioRunManager deserializeScenarioRunMangerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
 		JsonNode vadereNode = rootNode.get("vadere");
@@ -398,12 +400,11 @@ public abstract class JsonConverter {
 		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, am, as, to);
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
 
-		//String json = node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).asText();
-		//scenarioRunManager.setProcessorManager(deserializeProcessorManager(json));
-
 		//scenarioRunManager.removeAllWriters();
 		//ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())
 		//		.forEach(writer -> scenarioRunManager.addWriter(writer));
+
+		scenarioRunManager.setProcessorManager(deserializeProcessorManagerFromNode(rootNode.get("processWriters")));
 
 		if (scenarioRunManager.getTopography() == null)
 			logger.error("Loading topography failed."); // migrated from GSON, not sure if still necessary
