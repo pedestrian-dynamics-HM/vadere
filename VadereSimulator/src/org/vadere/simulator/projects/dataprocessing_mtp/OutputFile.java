@@ -60,4 +60,13 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	public String toString(K key) {
 		return key.toString();
 	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public List<Integer> getProcessorIds() {
+		return processorIds;
+	}
+
 }

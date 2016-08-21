@@ -276,6 +276,48 @@ public abstract class JsonConverter {
 		return new ProcessorManager(processors, attributes, writers);
 	}
 
+	public static String serializeProcessorManager(ProcessorManager processorManager) throws JsonProcessingException {
+		return writer.writeValueAsString(serializeProcessorManagerToNode(processorManager));
+	}
+
+	private static JsonNode serializeProcessorManagerToNode(ProcessorManager processorManager) {
+		ObjectNode main = mapper.createObjectNode();
+
+		ArrayNode filesArrayNode = mapper.createArrayNode();
+		ArrayNode processorsArrayNode = mapper.createArrayNode();
+		ObjectNode attributesNode = mapper.createObjectNode();
+
+		if (processorManager != null) {
+			// part 1: files
+			processorManager.getWriters().forEach(writer -> {
+				ObjectNode node = mapper.createObjectNode();
+				node.put("type", writer.getClass().getName());
+				node.put("filename", writer.getFileName());
+				node.set("processors", mapper.convertValue(writer.getProcessorIds(), JsonNode.class));
+				filesArrayNode.add(node);
+			});
+
+			// part 2: processors
+			processorManager.getProcessorMap().keySet().forEach(processorId -> {
+				ObjectNode node = mapper.createObjectNode();
+				node.put("type", processorManager.getProcessor(processorId).getClass().getName());
+				node.put("id", processorId);
+				processorsArrayNode.add(node);
+			});
+
+			// part 3: attributes
+			processorManager.getAttributesMap().keySet().forEach(processorId -> {
+				AttributesProcessor attributeProcessor = processorManager.getAttributesMap().get(processorId);
+				attributesNode.set(attributeProcessor.getClass().getName(), mapper.convertValue(attributeProcessor, JsonNode.class));
+			});
+		}
+
+		main.set("files", filesArrayNode);
+		main.set("processors", processorsArrayNode);
+		main.set("attributes", attributesNode);
+		return main;
+	}
+
 	public static List<Processor<?, ?>> deserializeProcessors(String json) throws IOException {
 		List<Processor<?, ?>> processors = new ArrayList<>();
 		JsonNode rootNode = mapper.readTree(json);
@@ -509,7 +551,7 @@ public abstract class JsonConverter {
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
 		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(scenarioRunManager.getAllWriters()));
-		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, processorManagerToNode(scenarioRunManager));
+		rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorManagerToNode(scenarioRunManager.getProcessorManager()));
 		rootNode.set("vadere", serializeVadereNode(scenarioStore));
 		return rootNode;
 	}

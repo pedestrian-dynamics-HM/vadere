@@ -217,7 +217,7 @@ public class TextView extends JPanel {
 						.setText(JsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
 				break;
 			case OUTPUTPROCESSOR:
-				this.txtrTextfiletextarea.setText("{}"); // TODO
+				this.txtrTextfiletextarea.setText(JsonConverter.serializeProcessorManager(scenario.getProcessorManager()));
 				break;
 
 			case TOPOGRAPHY:
