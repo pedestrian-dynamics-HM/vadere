@@ -388,7 +388,7 @@ public class ScenarioRunManager implements Runnable {
 		return processorManager;
 	}
 
-	public void setOutputProcessors(ProcessorManager processorManager) {
+	public void setProcessorManager(ProcessorManager processorManager) {
 		this.processorManager = processorManager;
 	}
 

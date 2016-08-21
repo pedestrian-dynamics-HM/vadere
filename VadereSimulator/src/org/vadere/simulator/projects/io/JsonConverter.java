@@ -222,7 +222,7 @@ public abstract class JsonConverter {
 		List<Integer> processors;
 	}
 
-	public static ProcessorManager deserializeOutputProcessors(String json) throws IOException {
+	public static ProcessorManager deserializeProcessorManager(String json) throws IOException {
 
 		JsonNode node;
 		if (json.isEmpty()) {
@@ -357,7 +357,7 @@ public abstract class JsonConverter {
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
 
 		//String json = node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).asText();
-		//scenarioRunManager.setOutputProcessors(deserializeOutputProcessors(json));
+		//scenarioRunManager.setProcessorManager(deserializeProcessorManager(json));
 
 		//scenarioRunManager.removeAllWriters();
 		//ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())

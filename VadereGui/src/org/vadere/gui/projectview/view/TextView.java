@@ -174,7 +174,7 @@ public class TextView extends JPanel {
 										.setAttributesSimulation(JsonConverter.deserializeAttributesSimulation(json));
 								break;
 							case OUTPUTPROCESSOR:
-								currentScenario.setOutputProcessors(JsonConverter.deserializeOutputProcessors(json));
+								currentScenario.setProcessorManager(JsonConverter.deserializeProcessorManager(json));
 
 								break;
 							case TOPOGRAPHY:
