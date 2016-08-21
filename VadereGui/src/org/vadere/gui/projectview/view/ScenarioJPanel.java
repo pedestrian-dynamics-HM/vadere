@@ -179,7 +179,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		*/
 
 		outputView = new TextView("/" + IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
-		outputView.setText("");
 
 		try {
 			// TODO add more templates and make a loop here

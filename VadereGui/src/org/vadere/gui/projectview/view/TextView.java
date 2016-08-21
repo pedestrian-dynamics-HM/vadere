@@ -174,8 +174,7 @@ public class TextView extends JPanel {
 										.setAttributesSimulation(JsonConverter.deserializeAttributesSimulation(json));
 								break;
 							case OUTPUTPROCESSOR:
-
-								// TODO
+								currentScenario.setOutputProcessors(JsonConverter.deserializeOutputProcessors(json));
 
 								break;
 							case TOPOGRAPHY:
@@ -217,6 +216,10 @@ public class TextView extends JPanel {
 				this.txtrTextfiletextarea
 						.setText(JsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
 				break;
+			case OUTPUTPROCESSOR:
+				this.txtrTextfiletextarea.setText("{}"); // TODO
+				break;
+
 			case TOPOGRAPHY:
 				Topography topography = scenario.getTopography().clone();
 				topography.removeBoundary();
