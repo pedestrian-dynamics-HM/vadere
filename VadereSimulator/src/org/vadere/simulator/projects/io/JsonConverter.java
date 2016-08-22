@@ -271,15 +271,15 @@ public abstract class JsonConverter {
 	}
 
 	public static ProcessorManager deserializeProcessorManagerFromNode(JsonNode node) throws IOException {
-		ArrayNode filesArrayNode = (ArrayNode) node.get("logfiles");
+		ArrayNode logFilesArrayNode = (ArrayNode) node.get("logfiles");
 		ArrayNode processorsArrayNode = (ArrayNode) node.get("processors");
 		JsonNode attributesNode = node.get("attributes");
 
 		// part 1: log files
 		List<LogFile<?>> logFiles = new ArrayList<>();
-		if (filesArrayNode != null) {
+		if (logFilesArrayNode != null) {
 			DynamicClassInstantiator<LogFile<?>> instantiator1 = new DynamicClassInstantiator<>();
-			for (JsonNode fileNode : filesArrayNode) {
+			for (JsonNode fileNode : logFilesArrayNode) {
 				LogFileStore writerStore = mapper.treeToValue(fileNode, LogFileStore.class);
 				LogFile<?> file = instantiator1.createObject(writerStore.type);
 				file.setFileName(writerStore.filename);
@@ -323,7 +323,7 @@ public abstract class JsonConverter {
 	private static JsonNode serializeProcessorManagerToNode(ProcessorManager processorManager) {
 		ObjectNode main = mapper.createObjectNode();
 
-		ArrayNode filesArrayNode = mapper.createArrayNode();
+		ArrayNode logFilesArrayNode = mapper.createArrayNode();
 		ArrayNode processorsArrayNode = mapper.createArrayNode();
 		ObjectNode attributesNode = mapper.createObjectNode();
 
@@ -334,7 +334,7 @@ public abstract class JsonConverter {
 				node.put("type", logfile.getClass().getName());
 				node.put("filename", logfile.getFileName());
 				node.set("processors", mapper.convertValue(logfile.getProcessorIds(), JsonNode.class));
-				filesArrayNode.add(node);
+				logFilesArrayNode.add(node);
 			});
 
 			// part 2: processors
@@ -352,79 +352,18 @@ public abstract class JsonConverter {
 			});
 		}
 
-		main.set("logfiles", filesArrayNode);
+		main.set("logfiles", logFilesArrayNode);
 		main.set("processors", processorsArrayNode);
 		main.set("attributes", attributesNode);
 		return main;
 	}
 
-	public static List<Processor<?, ?>> deserializeProcessors(String json) throws IOException {
-		List<Processor<?, ?>> processors = new ArrayList<>();
-		JsonNode rootNode = mapper.readTree(json);
-
-		ArrayNode processorsNode = (ArrayNode) rootNode.get("processors");
-		DynamicClassInstantiator<Processor<?, ?>> instantiator = new DynamicClassInstantiator<Processor<?, ?>>();
-
-		for (JsonNode processorNode : processorsNode) {
-			ProcessorStore processorStore = mapper.treeToValue(processorNode, ProcessorStore.class);
-			Processor<?, ?> processor = instantiator.createObject(processorStore.type);
-			processor.setId(processorStore.id);
-
-			processors.add(processor);
-		}
-
-		return processors;
-	}
-
-	public static List<AttributesProcessor> deserializeAttributesProcessor(String json)
-			throws IOException, ClassNotFoundException {
-		List<AttributesProcessor> attributes = new ArrayList<>();
-		JsonNode rootNode = mapper.readTree(json);
-
-		DynamicClassInstantiator<AttributesProcessor> instantiator = new DynamicClassInstantiator<>();
-		Iterator<String> it = rootNode.fieldNames();
-		while (it.hasNext()) {
-			String fieldName = it.next();
-
-			if (!fieldName.contains("Attributes"))
-				continue;
-
-			JsonNode attributeNode = rootNode.get(fieldName);
-			AttributesProcessor attribute = mapper.treeToValue(attributeNode, instantiator.getClassFromName(fieldName));
-			attributes.add(attribute);
-		}
-
-		return attributes;
-	}
-
-	public static List<LogFile<?>> deserializeOutputFiles(
-			String json) throws IOException {
-		List<LogFile<?>> files = new ArrayList<>();
-		JsonNode rootNode = mapper.readTree(json);
-
-		ArrayNode filesNode = (ArrayNode) rootNode.get("files");
-		DynamicClassInstantiator<LogFile<?>> instantiator =
-				new DynamicClassInstantiator<>();
-
-		for (JsonNode fileNode : filesNode) {
-			LogFileStore writerStore = mapper.treeToValue(fileNode, LogFileStore.class);
-			LogFile<?> file =
-					instantiator.createObject(writerStore.type);
-			file.setFileName(writerStore.filename);
-			file.setProcessorIds(writerStore.processors);
-
-			files.add(file);
-		}
-
-		return files;
-	}
-
 	public static ScenarioRunManager deserializeScenarioRunManager(String json) throws IOException {
-		return deserializeScenarioRunMangerFromNode(mapper.readTree(json));
+		return deserializeScenarioRunManagerFromNode(mapper.readTree(json));
 	}
 
 	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processors
-	public static ScenarioRunManager deserializeScenarioRunMangerFromNode(JsonNode node) throws IOException {
+	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
 		JsonNode vadereNode = rootNode.get("vadere");
@@ -754,7 +693,7 @@ public abstract class JsonConverter {
 
 	public static ScenarioRunManager cloneScenarioRunManager(ScenarioRunManager original) throws IOException {
 		JsonNode clone = serializeScenarioRunManagerToNode(original, false);
-		return deserializeScenarioRunMangerFromNode(clone);
+		return deserializeScenarioRunManagerFromNode(clone);
 	}
 
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
