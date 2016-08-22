@@ -328,17 +328,17 @@ public abstract class JsonConverter {
 		ObjectNode attributesNode = mapper.createObjectNode();
 
 		if (processorManager != null) {
-			// part 1: files
-			processorManager.getLogFiles().forEach(writer -> {
+			// part 1: logfiles
+			processorManager.getLogFiles().forEach(logfile -> {
 				ObjectNode node = mapper.createObjectNode();
-				node.put("type", writer.getClass().getName());
-				node.put("filename", writer.getFileName());
-				node.set("processors", mapper.convertValue(writer.getProcessorIds(), JsonNode.class));
+				node.put("type", logfile.getClass().getName());
+				node.put("filename", logfile.getFileName());
+				node.set("processors", mapper.convertValue(logfile.getProcessorIds(), JsonNode.class));
 				filesArrayNode.add(node);
 			});
 
 			// part 2: processors
-			processorManager.getProcessorMap().keySet().forEach(processorId -> {
+			processorManager.getProcessorIds().forEach(processorId -> {
 				ObjectNode node = mapper.createObjectNode();
 				node.put("type", processorManager.getProcessor(processorId).getClass().getName());
 				node.put("id", processorId);
@@ -346,13 +346,13 @@ public abstract class JsonConverter {
 			});
 
 			// part 3: attributes
-			processorManager.getAttributesMap().keySet().forEach(processorId -> {
-				AttributesProcessor attributeProcessor = processorManager.getAttributesMap().get(processorId);
+			processorManager.getAttributesProcessorIds().forEach(processorId -> {
+				AttributesProcessor attributeProcessor = processorManager.getAttributes(processorId);
 				attributesNode.set(attributeProcessor.getClass().getName(), mapper.convertValue(attributeProcessor, JsonNode.class));
 			});
 		}
 
-		main.set("files", filesArrayNode);
+		main.set("logfiles", filesArrayNode);
 		main.set("processors", processorsArrayNode);
 		main.set("attributes", attributesNode);
 		return main;

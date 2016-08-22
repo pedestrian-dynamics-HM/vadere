@@ -6,6 +6,7 @@ import org.vadere.simulator.models.Model;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProcessorManager {
 
@@ -61,12 +62,15 @@ public class ProcessorManager {
 		this.processorMap.values().forEach(proc -> proc.postLoop(state));
 	}
 
-	public Map<Integer, AttributesProcessor> getAttributesMap() {
-		return attributesMap;
+	public Set<Integer> getProcessorIds() {
+		return this.processorMap.keySet();
 	}
 
-	public Map<Integer, Processor<?, ?>> getProcessorMap() {
-		return processorMap;
+	public Set<Integer> getAttributesProcessorIds() {
+		return this.attributesMap.keySet();
 	}
 
+	public AttributesProcessor getAttributes(int processorId) {
+		return this.attributesMap.get(processorId);
+	}
 }
