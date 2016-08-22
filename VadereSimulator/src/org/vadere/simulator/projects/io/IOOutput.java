@@ -1,5 +1,14 @@
 package org.vadere.simulator.projects.io;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.VadereProject;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.simulation.Step;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.reflection.VadereClassNotFoundException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,16 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.VadereProject;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.simulation.Step;
-import org.vadere.util.io.IOUtils;
-import org.vadere.util.reflection.VadereClassNotFoundException;
 
 /**
  * This IOUtility class provides all methods to load, delete, list, clean output directories.
@@ -208,10 +207,10 @@ public abstract class IOOutput {
 	private static boolean isValidOutputDirectory(final VadereProject project, final File directory,
 			final ScenarioRunManager scenario) {
 		Optional<ScenarioRunManager> optionalVadere = readOutputFile(project, directory);
-		return directory.isDirectory() && optionalVadere.isPresent() && euqalHash(optionalVadere.get(), scenario);
+		return directory.isDirectory() && optionalVadere.isPresent() && equalHash(optionalVadere.get(), scenario);
 	}
 
-	private static boolean euqalHash(final ScenarioRunManager scenario1, ScenarioRunManager scenario2) {
+	private static boolean equalHash(final ScenarioRunManager scenario1, ScenarioRunManager scenario2) {
 		return HashGenerator.attributesHash(scenario1.getScenarioStore())
 				.equals(HashGenerator.attributesHash(scenario2.getScenarioStore()))
 				&& HashGenerator.topographyHash(scenario1.getTopography())
