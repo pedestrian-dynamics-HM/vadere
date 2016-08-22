@@ -8,20 +8,13 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing.writer.Writer;
-import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
-import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
-import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
 import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,7 +156,7 @@ public class Simulation {
 	public void run() {
 		try {
 			processorManager.setModel(this.model);
-			processorManager.initWriters();
+			processorManager.initLogFiles();
 
 			preLoop();
 			processorManager.preLoop(this.simulationState);
@@ -220,7 +213,7 @@ public class Simulation {
 			postLoop();
 
 			processorManager.postLoop(this.simulationState);
-			processorManager.getWriters().forEach(writer -> writer.write());
+			processorManager.getLogFiles().forEach(writer -> writer.write());
 		}
 	}
 

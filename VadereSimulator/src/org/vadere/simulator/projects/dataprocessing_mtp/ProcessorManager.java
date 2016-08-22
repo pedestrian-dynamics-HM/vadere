@@ -13,20 +13,11 @@ public class ProcessorManager {
 	private Map<Integer, Processor<?, ?>> processorMap;
 	private Map<Integer, AttributesProcessor> attributesMap;
 
-	private List<OutputFile<?>> writers;
+	private List<LogFile<?>> logFiles;
 
+	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<LogFile<?>> logFiles) {
+		this.logFiles = logFiles;
 
-	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<OutputFile<?>> writers) {
-		this(processors, attributesProcessor);
-		this.writers = writers;
-	}
-
-	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, Model model) {
-		this(processors, attributesProcessor);
-		this.model = model;
-	}
-
-	private ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor) {
 		this.attributesMap = new LinkedHashMap<>();
 		for (AttributesProcessor att : attributesProcessor)
 			this.attributesMap.put(att.getProcessorId(), att);
@@ -42,16 +33,16 @@ public class ProcessorManager {
 		this.model = model;
 	}
 
-	public void initWriters() {
-		writers.forEach(writer -> writer.init(this));
+	public void initLogFiles() {
+		logFiles.forEach(logfile -> logfile.init(this));
 	}
 
 	public Processor<?, ?> getProcessor(int id) {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
 	}
 
-	public List<OutputFile<?>> getWriters() {
-		return writers;
+	public List<LogFile<?>> getLogFiles() {
+		return logFiles;
 	}
 
 	public Model getModel() {

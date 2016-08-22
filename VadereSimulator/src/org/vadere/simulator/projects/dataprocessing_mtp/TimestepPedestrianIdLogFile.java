@@ -1,8 +1,8 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-public class TimestepPedestrianIdOutputFile extends OutputFile<TimestepPedestrianIdDataKey> {
+public class TimestepPedestrianIdLogFile extends LogFile<TimestepPedestrianIdDataKey> {
 
-	public TimestepPedestrianIdOutputFile() {
+	public TimestepPedestrianIdLogFile() {
 		this.setKeyHeader(TimestepPedestrianIdDataKey.getHeader());
 	}
 

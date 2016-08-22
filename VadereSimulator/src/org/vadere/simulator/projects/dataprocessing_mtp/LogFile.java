@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class OutputFile<K extends Comparable<K>> {
+public abstract class LogFile<K extends Comparable<K>> {
 	private String keyHeader;
 
 	private String fileName;
@@ -13,7 +13,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	private List<Integer> processorIds;
 	private List<Processor<K, ?>> processors;
 
-	OutputFile() {
+	LogFile() {
 		this.processors = new ArrayList<>();
 	}
 

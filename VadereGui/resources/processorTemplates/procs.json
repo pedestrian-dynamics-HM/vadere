@@ -1,5 +1,5 @@
 {
-	"files": [ {
+	"logfiles": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
 		"filename": "test_ts_pid.txt",
 		"processors": [ 1, 2, 3, 5, 13, 14, 17 ]

@@ -1,13 +1,25 @@
 package org.vadere.simulator.projects.io;
 
+import com.google.gson.JsonElement;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonElement;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
@@ -17,22 +29,47 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
-import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
+import org.vadere.simulator.projects.dataprocessing_mtp.LogFile;
 import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
 import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.attributes.scenario.*;
-import org.vadere.state.scenario.*;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.scenario.AttributesStairs;
+import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.attributes.scenario.AttributesTeleporter;
+import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.Car;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Teleporter;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
-import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class JsonConverter {
 
@@ -216,7 +253,7 @@ public abstract class JsonConverter {
 		int id;
 	}
 
-	private static class OutputFileStore {
+	private static class LogFileStore {
 		String type;
 		String filename;
 		List<Integer> processors;
@@ -234,20 +271,20 @@ public abstract class JsonConverter {
 	}
 
 	public static ProcessorManager deserializeProcessorManagerFromNode(JsonNode node) throws IOException {
-		ArrayNode filesArrayNode = (ArrayNode) node.get("files");
+		ArrayNode filesArrayNode = (ArrayNode) node.get("logfiles");
 		ArrayNode processorsArrayNode = (ArrayNode) node.get("processors");
 		JsonNode attributesNode = node.get("attributes");
 
-		// part 1: files
-		List<OutputFile<?>> writers = new ArrayList<>();
+		// part 1: log files
+		List<LogFile<?>> logFiles = new ArrayList<>();
 		if (filesArrayNode != null) {
-			DynamicClassInstantiator<OutputFile<?>> instantiator1 = new DynamicClassInstantiator<>();
+			DynamicClassInstantiator<LogFile<?>> instantiator1 = new DynamicClassInstantiator<>();
 			for (JsonNode fileNode : filesArrayNode) {
-				OutputFileStore writerStore = mapper.treeToValue(fileNode, OutputFileStore.class);
-				OutputFile<?> file = instantiator1.createObject(writerStore.type);
+				LogFileStore writerStore = mapper.treeToValue(fileNode, LogFileStore.class);
+				LogFile<?> file = instantiator1.createObject(writerStore.type);
 				file.setFileName(writerStore.filename);
 				file.setProcessorIds(writerStore.processors);
-				writers.add(file);
+				logFiles.add(file);
 			}
 		}
 
@@ -276,7 +313,7 @@ public abstract class JsonConverter {
 			}
 		}
 
-		return new ProcessorManager(processors, attributes, writers);
+		return new ProcessorManager(processors, attributes, logFiles);
 	}
 
 	public static String serializeProcessorManager(ProcessorManager processorManager) throws JsonProcessingException {
@@ -292,7 +329,7 @@ public abstract class JsonConverter {
 
 		if (processorManager != null) {
 			// part 1: files
-			processorManager.getWriters().forEach(writer -> {
+			processorManager.getLogFiles().forEach(writer -> {
 				ObjectNode node = mapper.createObjectNode();
 				node.put("type", writer.getClass().getName());
 				node.put("filename", writer.getFileName());
@@ -360,18 +397,18 @@ public abstract class JsonConverter {
 		return attributes;
 	}
 
-	public static List<OutputFile<?>> deserializeOutputFiles(
+	public static List<LogFile<?>> deserializeOutputFiles(
 			String json) throws IOException {
-		List<OutputFile<?>> files = new ArrayList<>();
+		List<LogFile<?>> files = new ArrayList<>();
 		JsonNode rootNode = mapper.readTree(json);
 
 		ArrayNode filesNode = (ArrayNode) rootNode.get("files");
-		DynamicClassInstantiator<OutputFile<?>> instantiator =
+		DynamicClassInstantiator<LogFile<?>> instantiator =
 				new DynamicClassInstantiator<>();
 
 		for (JsonNode fileNode : filesNode) {
-			OutputFileStore writerStore = mapper.treeToValue(fileNode, OutputFileStore.class);
-			OutputFile<?> file =
+			LogFileStore writerStore = mapper.treeToValue(fileNode, LogFileStore.class);
+			LogFile<?> file =
 					instantiator.createObject(writerStore.type);
 			file.setFileName(writerStore.filename);
 			file.setProcessorIds(writerStore.processors);
