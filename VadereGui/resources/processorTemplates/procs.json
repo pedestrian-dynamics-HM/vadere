@@ -1,19 +1,19 @@
 {
 	"logfiles": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdLogFile",
-		"filename": "test_ts_pid.txt",
+		"filename": "log_ts_pid.txt",
 		"processors": [ 1, 2, 3, 5, 13, 14, 17 ]
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianIdLogFile",
-		"filename": "test_pid.txt",
+		"filename": "log_pid.txt",
 		"processors": [ 4, 8, 9, 10, 15, 16 ]
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepLogFile",
-		"filename": "test_ts.txt",
+		"filename": "log_ts.txt",
 		"processors": [ 6, 7 ]
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.NoDataKeyLogFile",
-		"filename": "test_nokey.txt",
+		"filename": "log_nokey.txt",
 		"processors": [ 11, 12 ]
 	}],
 	"processors": [ {
