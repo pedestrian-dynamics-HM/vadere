@@ -1,16 +1,5 @@
 package org.vadere.simulator.projects;
 
-import difflib.DiffUtils;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
@@ -31,6 +20,22 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+import difflib.DiffUtils;
 
 /**
  * Receives an object of type ScenarioStore, manages a scenario and runs the simulation.
@@ -329,6 +334,9 @@ public class ScenarioRunManager implements Runnable {
 				}
 				writers.add(writer);
 			}
+
+			// New processors
+			this.processorManager.setLogPath(this.processorOutputPath.toString());
 		}
 	}
 

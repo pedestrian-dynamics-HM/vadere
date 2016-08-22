@@ -21,13 +21,22 @@ public abstract class LogFile<K extends Comparable<K>> {
 		this.keyHeader = keyHeader;
 	}
 
-	public void setFileName(final String fileName) throws FileNotFoundException {
+	public void setFileName(final String fileName) {
 		this.fileName = fileName;
 
 		if (this.out != null)
 			this.out.close();
 
-		this.out = new PrintWriter(fileName);
+		try {
+			File file = new File(this.fileName);
+
+			if (!file.exists())
+				file.createNewFile();
+
+			this.out = new PrintWriter(new FileWriter(file, true));
+		} catch (IOException ex) {
+			this.out = null;
+		}
 	}
 
 	public void setProcessorIds(final List<Integer> processorIds) {

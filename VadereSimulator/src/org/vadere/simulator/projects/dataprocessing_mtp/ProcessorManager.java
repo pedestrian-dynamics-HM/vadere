@@ -2,7 +2,10 @@ package org.vadere.simulator.projects.dataprocessing_mtp;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
+import org.vadere.util.io.IOUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,5 +75,10 @@ public class ProcessorManager {
 
 	public AttributesProcessor getAttributes(int processorId) {
 		return this.attributesMap.get(processorId);
+	}
+
+	public void setLogPath(String directory) {
+		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
+		this.logFiles.forEach(logfile -> logfile.setFileName(IOUtils.getPath(directory, String.format("%s_%s", dateString, logfile.getFileName())).toString()));
 	}
 }
