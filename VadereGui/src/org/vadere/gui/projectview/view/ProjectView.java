@@ -1,9 +1,49 @@
 package org.vadere.gui.projectview.view;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.gui.projectview.control.ActionAddScenario;
+import org.vadere.gui.projectview.control.ActionCloneScenario;
+import org.vadere.gui.projectview.control.ActionCloseApplication;
+import org.vadere.gui.projectview.control.ActionCreateProject;
+import org.vadere.gui.projectview.control.ActionDeleteOutputDirectories;
+import org.vadere.gui.projectview.control.ActionDeleteScenarios;
+import org.vadere.gui.projectview.control.ActionEditScenarioDescription;
+import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
+import org.vadere.gui.projectview.control.ActionInterruptScenarios;
+import org.vadere.gui.projectview.control.ActionLoadProject;
+import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionOutputToScenario;
+import org.vadere.gui.projectview.control.ActionPauseScenario;
+import org.vadere.gui.projectview.control.ActionRenameOutputFile;
+import org.vadere.gui.projectview.control.ActionRenameProject;
+import org.vadere.gui.projectview.control.ActionRenameScenario;
+import org.vadere.gui.projectview.control.ActionRunAllScenarios;
+import org.vadere.gui.projectview.control.ActionRunOutput;
+import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
+import org.vadere.gui.projectview.control.ActionSaveAsProject;
+import org.vadere.gui.projectview.control.ActionSaveProject;
+import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
+import org.vadere.gui.projectview.control.ActionShowAboutDialog;
+import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
+import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.model.ProjectViewModel;
+import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
+import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
+import org.vadere.gui.projectview.model.VadereScenarioTableModel.VadereDisplay;
+import org.vadere.gui.projectview.model.VadereState;
+import org.vadere.gui.projectview.utils.TableSelectionListener;
+import org.vadere.simulator.projects.ProjectFinishedListener;
+import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.SingleScenarioFinishedListener;
+import org.vadere.simulator.projects.VadereProject;
+import org.vadere.simulator.projects.io.IOOutput;
+import org.vadere.util.io.IOUtils;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -16,28 +56,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.Preferences;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.postvisualization.control.Player;
-import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.gui.projectview.control.*;
-import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.gui.projectview.model.VadereState;
-import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
-import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
-import org.vadere.gui.projectview.model.VadereScenarioTableModel.VadereDisplay;
-import org.vadere.gui.projectview.utils.TableSelectionListener;
-import org.vadere.gui.topographycreator.view.JLabelObserver;
-import org.vadere.simulator.projects.ProjectFinishedListener;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.SingleScenarioFinishedListener;
-import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.util.io.IOUtils;
 
 /**
  * Main view of the Vadere GUI.
@@ -90,10 +112,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		setScenariosRunning(false);
 		progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
 		scenarioJPanel.showEditScenario();
-		selectCurrentSceanrioRunManager();
+		selectCurrentScenarioRunManager();
 	}
 
-	private void selectCurrentSceanrioRunManager() {
+	private void selectCurrentScenarioRunManager() {
 		int index = model.getProject().getScenarioIndexByName(model.getProject().getCurrentScenario());
 
 		if(index != -1) {
@@ -143,7 +165,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	public void scenarioInterrupted(final ScenarioRunManager scenario, final int scenariosLeft) {
 		replace(scenario, VadereState.INTERRUPTED);
 		setScenariosRunning(false);
-		selectCurrentSceanrioRunManager();
+		selectCurrentScenarioRunManager();
 		logger.info(String.format("all running scenarios interrupted"));
 	}
 
