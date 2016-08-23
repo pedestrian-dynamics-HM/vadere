@@ -182,8 +182,8 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		try {
 			// TODO add more templates and make a loop here
-			String templateFileName = "procs.json";
-			String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/processorTemplates/" + templateFileName), "UTF-8");
+			String templateFileName = "log_default.json";
+			String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/logTemplates/" + templateFileName), "UTF-8");
 
 			JMenuBar processorsMenuBar = new JMenuBar();
 			JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
