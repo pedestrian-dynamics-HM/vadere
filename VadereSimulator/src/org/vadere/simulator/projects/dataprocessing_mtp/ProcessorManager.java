@@ -46,7 +46,7 @@ public class ProcessorManager {
 	}
 
 	public List<LogFile<?>> getLogFiles() {
-		return logFiles;
+		return this.logFiles;
 	}
 
 	public Model getModel() {
