@@ -6,9 +6,7 @@ import java.util.List;
 
 public abstract class LogFile<K extends Comparable<K>> {
 	private String keyHeader;
-
 	private String fileName;
-	private PrintWriter out;
 
 	private List<Integer> processorIds;
 	private List<Processor<K, ?>> processors;
@@ -23,20 +21,6 @@ public abstract class LogFile<K extends Comparable<K>> {
 
 	public void setFileName(final String fileName) {
 		this.fileName = fileName;
-
-		if (this.out != null)
-			this.out.close();
-
-		try {
-			File file = new File(this.fileName);
-
-			if (!file.exists())
-				file.createNewFile();
-
-			this.out = new PrintWriter(new FileWriter(file, true));
-		} catch (IOException ex) {
-			this.out = null;
-		}
 	}
 
 	public void setProcessorIds(final List<Integer> processorIds) {
@@ -49,19 +33,30 @@ public abstract class LogFile<K extends Comparable<K>> {
 	}
 
 	public void write() {
-		// Print header
-		this.out.println((this.keyHeader
-				+ " "
-				+ this.processors.stream().map(p -> p.getHeader()).reduce("", (s1, s2) -> s1 + " " + s2).trim()).trim());
+	    try {
+            File file = new File(this.fileName);
 
-		this.processors.stream().flatMap(p -> p.getKeys().stream()).distinct().sorted()
-				.forEach(key -> printRow(key, this.processors));
+            if (!file.exists())
+                file.createNewFile();
 
-		this.out.flush();
+            try (PrintWriter out = new PrintWriter(new FileWriter(file), true)) {
+                // Print header
+                out.println((this.keyHeader
+                        + " "
+                        + this.processors.stream().map(p -> p.getHeader()).reduce("", (s1, s2) -> s1 + " " + s2).trim()).trim());
+
+                this.processors.stream().flatMap(p -> p.getKeys().stream()).distinct().sorted()
+                        .forEach(key -> printRow(out, key, this.processors));
+
+                out.flush();
+            }
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
 	}
 
-	private void printRow(final K key, final List<Processor<K, ?>> ps) {
-		this.out.println((this.toString(key)
+	private void printRow(PrintWriter out, final K key, final List<Processor<K, ?>> ps) {
+		out.println((this.toString(key)
 				+ " "
 				+ ps.stream().map(p -> p.toString(key)).reduce("", (s1, s2) -> s1 + " " + s2).trim()).trim());
 	}
