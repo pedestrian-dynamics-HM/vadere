@@ -81,4 +81,8 @@ public class ProcessorManager {
 		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
 		this.logFiles.forEach(logfile -> logfile.setFileName(IOUtils.getPath(directory, String.format("%s_%s", dateString, logfile.getFileName())).toString()));
 	}
+
+	public void writeLog() {
+        this.logFiles.forEach(logfile -> logfile.write());
+    }
 }

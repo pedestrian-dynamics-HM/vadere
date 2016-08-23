@@ -178,7 +178,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputProcessorsView, null);
 		*/
 
-		outputView = new TextView("/" + IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		outputView = new TextView("/" + IOUtils.LOG_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
 		try {
 			// TODO add more templates and make a loop here

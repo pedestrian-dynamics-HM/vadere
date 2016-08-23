@@ -1,14 +1,19 @@
 package org.vadere.util.io;
 
-import com.google.gson.*;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonParseException;
 
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +24,10 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Contains utilities for input and output.
@@ -41,7 +49,7 @@ public class IOUtils {
 
 	public static final String CORRUPT_DIR = "corrupt";
 
-	public static final String OUTPUTPROCESSOR_OUTPUT_DIR = "processed output";
+	public static final String LOG_DIR = "log";
 
 	public static final String VADERE_PROJECT_FILENAME = "vadere.project";
 

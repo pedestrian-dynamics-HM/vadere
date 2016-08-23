@@ -38,7 +38,7 @@ public class ActionRunOutput extends AbstractAction {
 				OfflineSimulation offlineSimulation = new OfflineSimulation(
 						IOOutput.readTrajectories(outputBundle.getProject(), vadere, directoryName),
 						vadere, model.getProject().getOutputDir()
-								.resolveSibling(IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR));
+								.resolveSibling(IOUtils.LOG_DIR));
 				offlineSimulation.run();
 			} catch (IOException e1) {
 				logger.error("Could not run offline simulation (simulate output):"

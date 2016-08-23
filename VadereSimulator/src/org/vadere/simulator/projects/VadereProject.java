@@ -75,7 +75,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	public void runScenarios(final Collection<ScenarioRunManager> scenariosRMsToRun) {
 		for (ScenarioRunManager scenarioRM : scenariosRMsToRun) {
 			scenarioRM.setOutputPaths(outputDirectory,
-					outputDirectory.resolveSibling(IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR));
+					outputDirectory.resolveSibling(IOUtils.LOG_DIR));
 		}
 
 		// TODO [priority=normal] [task=bugfix] this is a bug: scenariosLeft may be overwritten even if there are still scenarios in it
