@@ -7,7 +7,7 @@ public class TimestepPedestrianIdLogFile extends LogFile<TimestepPedestrianIdDat
 	}
 
 	@Override
-	public String toString(TimestepPedestrianIdDataKey key) {
-		return key.getTimestep() + " " + key.getPedestrianId();
+	public String toString(final TimestepPedestrianIdDataKey key) {
+		return key.getTimestep() + LogFile.SEPARATOR.toString() + key.getPedestrianId();
 	}
 }

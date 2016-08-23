@@ -5,5 +5,4 @@ public class PedestrianIdLogFile extends LogFile<PedestrianIdDataKey> {
 	public PedestrianIdLogFile() {
 		this.setKeyHeader(PedestrianIdDataKey.getHeader());
 	}
-
 }

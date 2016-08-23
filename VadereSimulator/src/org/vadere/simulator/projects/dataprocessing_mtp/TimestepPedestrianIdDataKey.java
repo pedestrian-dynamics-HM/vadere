@@ -21,6 +21,6 @@ public class TimestepPedestrianIdDataKey extends DataKey<Pair<Integer, Integer>>
 	}
 
 	public static String getHeader() {
-		return TimestepDataKey.getHeader() + " " + PedestrianIdDataKey.getHeader();
+		return TimestepDataKey.getHeader() + LogFile.SEPARATOR + PedestrianIdDataKey.getHeader();
 	}
 }

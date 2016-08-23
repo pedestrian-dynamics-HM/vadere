@@ -1,15 +1,15 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import java.util.Map;
-
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.Map;
 
 public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataKey, VPoint> {
 	private PedestrianPositionProcessor pedPosProc;
 
 	public PedestrianLastPositionProcessor() {
-		super("lastx lasty");
+		super("lastx" + LogFile.SEPARATOR +"lasty");
 	}
 
 	@Override
@@ -33,6 +33,6 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	public String toString(PedestrianIdDataKey key) {
 		VPoint pos = this.getValue(key);
 
-		return pos.x + " " + pos.y;
+		return pos.x + LogFile.SEPARATOR.toString() + pos.y;
 	}
 }
