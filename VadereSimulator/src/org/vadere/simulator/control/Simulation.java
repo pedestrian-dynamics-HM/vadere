@@ -213,7 +213,8 @@ public class Simulation {
 			postLoop();
 
 			processorManager.postLoop(this.simulationState);
-			processorManager.getLogFiles().forEach(writer -> writer.write());
+			processorManager.writeLog();
+			this.logger.info("Logged all processors in logfiles");
 		}
 	}
 
