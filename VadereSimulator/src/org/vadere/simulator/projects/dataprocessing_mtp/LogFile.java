@@ -43,7 +43,7 @@ public abstract class LogFile<K extends Comparable<K>> {
             if (!file.exists())
                 file.createNewFile();
 
-            try (PrintWriter out = new PrintWriter(new FileWriter(file), true)) {
+            try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
                 // Print header
                 out.println(StringUtils.substringBeforeLast((this.keyHeader.isEmpty() ? "" : this.keyHeader + SEPARATOR)
                         + this.processors.stream().map(p -> p.getHeader() + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
