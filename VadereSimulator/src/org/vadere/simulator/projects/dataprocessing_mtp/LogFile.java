@@ -2,25 +2,26 @@ package org.vadere.simulator.projects.dataprocessing_mtp;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class LogFile<K extends Comparable<K>> {
-	private String keyHeader;
+	private String[] keyHeaders;
 	private String fileName;
 
 	private List<Integer> processorIds;
 	private List<Processor<K, ?>> processors;
 
-    public static Character SEPARATOR = ' ';
+    private static Character SEPARATOR = ' ';
 
-	LogFile() {
+	LogFile(final String... keyHeaders) {
+		this.keyHeaders = keyHeaders;
 		this.processors = new ArrayList<>();
-	}
-
-	protected void setKeyHeader(final String keyHeader) {
-		this.keyHeader = keyHeader;
 	}
 
 	public void setFileName(final String fileName) {
@@ -45,8 +46,11 @@ public abstract class LogFile<K extends Comparable<K>> {
 
             try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
                 // Print header
-                out.println(StringUtils.substringBeforeLast((this.keyHeader.isEmpty() ? "" : this.keyHeader + SEPARATOR)
-                        + this.processors.stream().map(p -> p.getHeader() + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
+                out.println(StringUtils.substringBeforeLast(
+                		(this.keyHeaders == null || this.keyHeaders.length == 0
+							? ""
+							: String.join(SEPARATOR.toString(), this.keyHeaders) + SEPARATOR)
+						+ this.processors.stream().map(p -> String.join(SEPARATOR.toString(), p.getHeaders()) + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
 
                 this.processors.stream().flatMap(p -> p.getKeys().stream()).distinct().sorted()
                         .forEach(key -> printRow(out, key, this.processors));
@@ -59,12 +63,15 @@ public abstract class LogFile<K extends Comparable<K>> {
 	}
 
 	private void printRow(PrintWriter out, final K key, final List<Processor<K, ?>> ps) {
-		out.println(StringUtils.substringBeforeLast((this.toString(key).isEmpty() ? "" : this.toString(key) + SEPARATOR)
-				+ ps.stream().map(p -> p.toString(key) + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
+		out.println(StringUtils.substringBeforeLast(
+				(this.toString() == null || this.toStrings(key).length == 0
+					? ""
+					: String.join(SEPARATOR.toString(), String.join(SEPARATOR.toString(), this.toStrings(key)) + SEPARATOR))
+				+ ps.stream().map(p -> String.join(SEPARATOR.toString(), p.toStrings(key)) + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
 	}
 
-	public String toString(K key) {
-		return key.toString();
+	public String[] toStrings(K key) {
+		return new String[] { key.toString() };
 	}
 
 	public String getFileName() {

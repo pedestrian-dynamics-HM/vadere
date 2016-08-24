@@ -9,7 +9,7 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	private PedestrianPositionProcessor pedPosProc;
 
 	public PedestrianLastPositionProcessor() {
-		super("lastx" + LogFile.SEPARATOR +"lasty");
+		super("lastx", "lasty");
 	}
 
 	@Override
@@ -30,9 +30,9 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	}
 
 	@Override
-	public String toString(PedestrianIdDataKey key) {
+	public String[] toStrings(PedestrianIdDataKey key) {
 		VPoint pos = this.getValue(key);
 
-		return pos.x + LogFile.SEPARATOR.toString() + pos.y;
+		return new String[] { Double.toString(pos.x), Double.toString(pos.y) };
 	}
 }

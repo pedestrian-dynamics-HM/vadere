@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdDataKey, VPoint> {
 
 	public PedestrianPositionProcessor() {
-		super("x" + LogFile.SEPARATOR + "y");
+		super("x", "y");
 	}
 
 	public Map<PedestrianIdDataKey, VPoint> getPositions(TimestepDataKey timestepKey) {
@@ -35,9 +35,9 @@ public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdD
 	void init(final AttributesProcessor attributes, final ProcessorManager manager) {}
 
 	@Override
-	public String toString(TimestepPedestrianIdDataKey key) {
+	public String[] toStrings(TimestepPedestrianIdDataKey key) {
 		VPoint p = this.getValue(key);
 
-		return p.x + LogFile.SEPARATOR.toString() + p.y;
+		return new String[] { Double.toString(p.x), Double.toString(p.y) };
 	}
 }

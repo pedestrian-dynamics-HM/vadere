@@ -10,17 +10,17 @@ import java.util.Set;
 public abstract class Processor<K extends Comparable<K>, V> {
 	private int id;
 
-	private String header;
+	private String[] headers;
 	private Map<K, V> column;
 
 	private int lastStep;
 
 	protected Processor() {
-		this("");
+		this(new String[] { });
 	}
 
-	protected Processor(final String header) {
-		this.setHeader(header);
+	protected Processor(final String... headers) {
+		this.headers = headers;
 		this.column = new HashMap<>();
 
 		this.lastStep = 0;
@@ -38,12 +38,12 @@ public abstract class Processor<K extends Comparable<K>, V> {
 		this.id = id;
 	}
 
-	public String getHeader() {
-		return this.header;
+	public String[] getHeaders() {
+		return this.headers;
 	}
 
-	public void setHeader(String header) {
-		this.header = header;
+	public void setHeader(final String header) {
+		this.headers = new String[] { header };
 	}
 
 	public Set<K> getKeys() {
@@ -83,7 +83,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	abstract void init(final AttributesProcessor attributes, final ProcessorManager manager);
 
-	public String toString(K key) {
-		return this.hasValue(key) ? this.getValue(key).toString() : "NaN";
+	public String[] toStrings(K key) {
+		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NaN" };
 	}
 }

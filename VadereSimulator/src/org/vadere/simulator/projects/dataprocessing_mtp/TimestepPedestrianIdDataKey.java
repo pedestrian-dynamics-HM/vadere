@@ -20,7 +20,7 @@ public class TimestepPedestrianIdDataKey extends DataKey<Pair<Integer, Integer>>
 		return this.getKey().compareTo(o.getKey());
 	}
 
-	public static String getHeader() {
-		return TimestepDataKey.getHeader() + LogFile.SEPARATOR + PedestrianIdDataKey.getHeader();
+	public static String[] getHeaders() {
+		return new String[] { TimestepDataKey.getHeader(), PedestrianIdDataKey.getHeader() };
 	}
 }

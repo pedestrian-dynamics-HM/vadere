@@ -19,8 +19,4 @@ public final class NoDataKey extends DataKey<Integer> implements Comparable<NoDa
 
         return NoDataKey.key;
     }
-
-    public static String getHeader() {
-        return "";
-    }
 }

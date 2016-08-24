@@ -3,11 +3,11 @@ package org.vadere.simulator.projects.dataprocessing_mtp;
 public class TimestepPedestrianIdLogFile extends LogFile<TimestepPedestrianIdDataKey> {
 
 	public TimestepPedestrianIdLogFile() {
-		this.setKeyHeader(TimestepPedestrianIdDataKey.getHeader());
+		super(TimestepPedestrianIdDataKey.getHeaders());
 	}
 
 	@Override
-	public String toString(final TimestepPedestrianIdDataKey key) {
-		return key.getTimestep() + LogFile.SEPARATOR.toString() + key.getPedestrianId();
+	public String[] toStrings(final TimestepPedestrianIdDataKey key) {
+		return new String[] { Integer.toString(key.getTimestep()), Integer.toString(key.getPedestrianId()) };
 	}
 }
