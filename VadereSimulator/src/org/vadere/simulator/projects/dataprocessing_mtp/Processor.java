@@ -54,7 +54,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 		return this.getColumn().values();
 	}
 
-	public boolean hasValue(K key) {
+	public boolean hasValue(final K key) {
 		return this.column.containsKey(key);
 	}
 
@@ -83,7 +83,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	abstract void init(final AttributesProcessor attributes, final ProcessorManager manager);
 
-	public String[] toStrings(K key) {
+	public String[] toStrings(final K key) {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NaN" };
 	}
 }

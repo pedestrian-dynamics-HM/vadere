@@ -30,7 +30,7 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	}
 
 	@Override
-	public String[] toStrings(PedestrianIdDataKey key) {
+	public String[] toStrings(final PedestrianIdDataKey key) {
 		VPoint pos = this.getValue(key);
 
 		return new String[] { Double.toString(pos.x), Double.toString(pos.y) };
