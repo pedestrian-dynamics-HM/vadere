@@ -10,7 +10,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LogFile<K extends Comparable<K>> {
+public abstract class OutputFile<K extends Comparable<K>> {
 	private String[] keyHeaders;
 	private String fileName;
 
@@ -19,7 +19,7 @@ public abstract class LogFile<K extends Comparable<K>> {
 
     private static Character SEPARATOR = ' ';
 
-	LogFile(final String... keyHeaders) {
+	OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
 		this.processors = new ArrayList<>();
 	}

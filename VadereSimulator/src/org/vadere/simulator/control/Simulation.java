@@ -156,7 +156,7 @@ public class Simulation {
 	public void run() {
 		try {
 			processorManager.setModel(this.model);
-			processorManager.initLogFiles();
+			processorManager.initOutputFiles();
 
 			preLoop();
 			processorManager.preLoop(this.simulationState);
@@ -213,7 +213,7 @@ public class Simulation {
 			postLoop();
 
 			processorManager.postLoop(this.simulationState);
-			processorManager.writeLog();
+			processorManager.writeOutput();
 			this.logger.info("Logged all processors in logfiles");
 		}
 	}

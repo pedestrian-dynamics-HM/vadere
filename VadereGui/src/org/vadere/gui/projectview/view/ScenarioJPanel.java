@@ -178,12 +178,12 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputProcessorsView, null);
 		*/
 
-		outputView = new TextView("/" + IOUtils.LOG_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		outputView = new TextView("/" + IOUtils.DATAPROCESSING_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
 		try {
 			// TODO add more templates and make a loop here
-			String templateFileName = "log_default.json";
-			String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/logTemplates/" + templateFileName), "UTF-8");
+			String templateFileName = "output_default.json";
+			String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
 
 			JMenuBar processorsMenuBar = new JMenuBar();
 			JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));

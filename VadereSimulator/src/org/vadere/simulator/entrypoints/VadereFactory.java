@@ -64,7 +64,7 @@ public class VadereFactory {
 		ScenarioRunManager v = IOVadere.fromJson(json);
 
 		Path outPath = Paths.get(projectdirectory, IOUtils.OUTPUT_DIR);
-		Path outProcessorPath = Paths.get(projectdirectory, IOUtils.LOG_DIR);
+		Path outProcessorPath = Paths.get(projectdirectory, IOUtils.DATAPROCESSING_DIR);
 		if (!Files.exists(outPath))
 			Files.createDirectories(outPath);
 		if (!Files.exists(outProcessorPath))

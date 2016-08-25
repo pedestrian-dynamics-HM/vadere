@@ -29,7 +29,7 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
-import org.vadere.simulator.projects.dataprocessing_mtp.LogFile;
+import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
 import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
 import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.state.attributes.Attributes;
@@ -253,7 +253,7 @@ public abstract class JsonConverter {
 		int id;
 	}
 
-	private static class LogFileStore {
+	private static class OutputFileStore {
 		String type;
 		String filename;
 		List<Integer> processors;
@@ -271,20 +271,20 @@ public abstract class JsonConverter {
 	}
 
 	public static ProcessorManager deserializeProcessorManagerFromNode(JsonNode node) throws IOException {
-		ArrayNode logFilesArrayNode = (ArrayNode) node.get("logfiles");
+		ArrayNode outputFilesArrayNode = (ArrayNode) node.get("files");
 		ArrayNode processorsArrayNode = (ArrayNode) node.get("processors");
 		JsonNode attributesNode = node.get("attributes");
 
-		// part 1: log files
-		List<LogFile<?>> logFiles = new ArrayList<>();
-		if (logFilesArrayNode != null) {
-			DynamicClassInstantiator<LogFile<?>> instantiator1 = new DynamicClassInstantiator<>();
-			for (JsonNode fileNode : logFilesArrayNode) {
-				LogFileStore writerStore = mapper.treeToValue(fileNode, LogFileStore.class);
-				LogFile<?> file = instantiator1.createObject(writerStore.type);
+		// part 1: output files
+		List<OutputFile<?>> outputFiles = new ArrayList<>();
+		if (outputFilesArrayNode != null) {
+			DynamicClassInstantiator<OutputFile<?>> instantiator1 = new DynamicClassInstantiator<>();
+			for (JsonNode fileNode : outputFilesArrayNode) {
+				OutputFileStore writerStore = mapper.treeToValue(fileNode, OutputFileStore.class);
+				OutputFile<?> file = instantiator1.createObject(writerStore.type);
 				file.setFileName(writerStore.filename);
 				file.setProcessorIds(writerStore.processors);
-				logFiles.add(file);
+				outputFiles.add(file);
 			}
 		}
 
@@ -313,7 +313,7 @@ public abstract class JsonConverter {
 			}
 		}
 
-		return new ProcessorManager(processors, attributes, logFiles);
+		return new ProcessorManager(processors, attributes, outputFiles);
 	}
 
 	public static String serializeProcessorManager(ProcessorManager processorManager) throws JsonProcessingException {
@@ -323,18 +323,18 @@ public abstract class JsonConverter {
 	private static JsonNode serializeProcessorManagerToNode(ProcessorManager processorManager) {
 		ObjectNode main = mapper.createObjectNode();
 
-		ArrayNode logFilesArrayNode = mapper.createArrayNode();
+		ArrayNode outputFilesArrayNode = mapper.createArrayNode();
 		ArrayNode processorsArrayNode = mapper.createArrayNode();
 		ObjectNode attributesNode = mapper.createObjectNode();
 
 		if (processorManager != null) {
-			// part 1: logfiles
-			processorManager.getLogFiles().forEach(logfile -> {
+			// part 1: output files
+			processorManager.getOutputFiles().forEach(file -> {
 				ObjectNode node = mapper.createObjectNode();
-				node.put("type", logfile.getClass().getName());
-				node.put("filename", logfile.getFileName());
-				node.set("processors", mapper.convertValue(logfile.getProcessorIds(), JsonNode.class));
-				logFilesArrayNode.add(node);
+				node.put("type", file.getClass().getName());
+				node.put("filename", file.getFileName());
+				node.set("processors", mapper.convertValue(file.getProcessorIds(), JsonNode.class));
+				outputFilesArrayNode.add(node);
 			});
 
 			// part 2: processors
@@ -352,7 +352,7 @@ public abstract class JsonConverter {
 			});
 		}
 
-		main.set("logfiles", logFilesArrayNode);
+		main.set("files", outputFilesArrayNode);
 		main.set("processors", processorsArrayNode);
 		main.set("attributes", attributesNode);
 		return main;

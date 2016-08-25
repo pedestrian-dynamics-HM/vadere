@@ -17,10 +17,10 @@ public class ProcessorManager {
 	private Map<Integer, Processor<?, ?>> processorMap;
 	private Map<Integer, AttributesProcessor> attributesMap;
 
-	private List<LogFile<?>> logFiles;
+	private List<OutputFile<?>> outputFiles;
 
-	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<LogFile<?>> logFiles) {
-		this.logFiles = logFiles;
+	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<OutputFile<?>> outputFiles) {
+		this.outputFiles = outputFiles;
 
 		this.attributesMap = new LinkedHashMap<>();
 		for (AttributesProcessor att : attributesProcessor)
@@ -37,16 +37,16 @@ public class ProcessorManager {
 		this.model = model;
 	}
 
-	public void initLogFiles() {
-		logFiles.forEach(logfile -> logfile.init(this));
+	public void initOutputFiles() {
+		outputFiles.forEach(file -> file.init(this));
 	}
 
 	public Processor<?, ?> getProcessor(int id) {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
 	}
 
-	public List<LogFile<?>> getLogFiles() {
-		return this.logFiles;
+	public List<OutputFile<?>> getOutputFiles() {
+		return this.outputFiles;
 	}
 
 	public Model getModel() {
@@ -77,12 +77,12 @@ public class ProcessorManager {
 		return this.attributesMap.get(processorId);
 	}
 
-	public void setLogPath(String directory) {
+	public void setOutputPath(String directory) {
 		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
-		this.logFiles.forEach(logfile -> logfile.setFileName(IOUtils.getPath(directory, String.format("%s_%s", dateString, logfile.getFileName())).toString()));
+		this.outputFiles.forEach(file -> file.setFileName(IOUtils.getPath(directory, String.format("%s_%s", dateString, file.getFileName())).toString()));
 	}
 
-	public void writeLog() {
-        this.logFiles.forEach(logfile -> logfile.write());
+	public void writeOutput() {
+        this.outputFiles.forEach(file -> file.write());
     }
 }

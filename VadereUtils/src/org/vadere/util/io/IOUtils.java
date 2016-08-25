@@ -49,7 +49,7 @@ public class IOUtils {
 
 	public static final String CORRUPT_DIR = "corrupt";
 
-	public static final String LOG_DIR = "log";
+	public static final String DATAPROCESSING_DIR = "data processing";
 
 	public static final String VADERE_PROJECT_FILENAME = "vadere.project";
 

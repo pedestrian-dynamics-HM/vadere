@@ -78,7 +78,7 @@ public class ScenarioRunManager implements Runnable {
 		this.writers = new LinkedList<>();
 		this.scenarioStore = store;
 		this.outputPath = Paths.get(IOUtils.OUTPUT_DIR); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
-		this.processorOutputPath = Paths.get(IOUtils.LOG_DIR);
+		this.processorOutputPath = Paths.get(IOUtils.DATAPROCESSING_DIR);
 		saveChanges();
 	}
 
@@ -336,7 +336,7 @@ public class ScenarioRunManager implements Runnable {
 			}
 
 			// New processors
-			this.processorManager.setLogPath(this.processorOutputPath.toString());
+			this.processorManager.setOutputPath(this.processorOutputPath.toString());
 		}
 	}
 

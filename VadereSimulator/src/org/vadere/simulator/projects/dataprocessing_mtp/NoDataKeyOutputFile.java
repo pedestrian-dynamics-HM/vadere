@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-public class NoDataKeyLogFile extends LogFile<NoDataKey> {
-    public NoDataKeyLogFile() {
+public class NoDataKeyOutputFile extends OutputFile<NoDataKey> {
+    public NoDataKeyOutputFile() {
         super(new String[] { });
     }
 
