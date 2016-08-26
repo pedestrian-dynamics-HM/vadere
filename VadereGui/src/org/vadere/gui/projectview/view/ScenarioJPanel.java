@@ -7,25 +7,28 @@ import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.utils.ClassFinder;
+import org.vadere.gui.projectview.utils.ClassRenderer;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
@@ -213,6 +216,39 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputView, null);
+
+		// Test for processor GUI
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		ClassFinder.getOutputFileClasses().forEach(opclass -> {
+			panel.add(new JLabel(opclass.getSimpleName()));
+			ClassFinder.getProcessorClasses(((ParameterizedType) opclass.getGenericSuperclass()).getActualTypeArguments()[0])
+					.forEach(procclass -> panel.add(new JLabel("- " + procclass.getSimpleName())));
+		});
+
+		List<Class<? extends OutputFile>> classes = ClassFinder.getOutputFileClasses();
+		JComboBox<Class> cbOutputTypes = new JComboBox<>(classes.toArray(new Class[classes.size()]));
+		cbOutputTypes.setRenderer(new ClassRenderer());
+		panel.add(cbOutputTypes);
+
+		JComboBox<Class> cbProcessorTypes = new JComboBox<>();
+		cbProcessorTypes.setRenderer(cbOutputTypes.getRenderer());
+
+		cbOutputTypes.addItemListener(e -> {
+			if(e.getStateChange() != ItemEvent.SELECTED)
+				return;
+
+			cbProcessorTypes.removeAllItems();
+
+			Class cOutput = (Class) e.getItem();
+			ClassFinder.getProcessorClasses(((ParameterizedType) cOutput.getGenericSuperclass()).getActualTypeArguments()[0]).forEach(c -> cbProcessorTypes.addItem(c));
+		});
+		cbOutputTypes.setSelectedIndex(1);
+		cbOutputTypes.setSelectedIndex(0);
+
+		panel.add(cbProcessorTypes);
+
+		tabbedPane.addTab("Test", null, panel, null);
 
 		
 		// online visualization card...

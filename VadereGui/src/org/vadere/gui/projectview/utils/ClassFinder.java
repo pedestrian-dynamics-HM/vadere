@@ -1,16 +1,23 @@
 package org.vadere.gui.projectview.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
+import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClassFinder {
 
@@ -29,6 +36,42 @@ public class ClassFinder {
 		List<String> modelNames = getClassNamesWithTagInPackage(Model.class.getPackage().getName(), Model.class);
 		modelNames.removeAll(getMainModelNames());
 		return modelNames;
+	}
+
+	// all output file classes
+	public static List<Class<? extends OutputFile>> getOutputFileClasses() {
+		List<Class<? extends OutputFile>> classList = null;
+
+		try {
+			Class<? extends OutputFile>[] classes = getClasses(Processor.class.getPackage().getName());
+			classList = Arrays.stream(classes)
+					.filter(c -> c.getSimpleName().endsWith("File") && !Modifier.isAbstract(c.getModifiers()))
+					.collect(Collectors.toList());
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+
+		return classList;
+	}
+
+	public static List<Class<? extends Processor>> getProcessorClasses(Type keyType) {
+		List<Class<? extends Processor>> procs = null;
+
+		try {
+			Class<? extends Processor>[] classes = getClasses(Processor.class.getPackage().getName());
+
+			procs = Arrays.stream(classes)
+					.filter(c -> {
+						String name = c.getSimpleName();
+						return name.endsWith("Processor") && !name.startsWith("Attributes") && !Modifier.isAbstract(c.getModifiers());
+					})
+					.filter(c -> (findGenericProcessorSuperclass(c)).getActualTypeArguments()[0].equals(keyType))
+					.collect(Collectors.toList());
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+
+		return procs;
 	}
 
 	private static List<String> getClassNamesWithTagInPackage(String packageName, Class classTag) {
@@ -108,4 +151,16 @@ public class ClassFinder {
 		return classes;
 	}
 
+	private static ParameterizedType findGenericProcessorSuperclass(Class<? extends Processor> c) {
+		Class superclass = c;
+
+		while (!superclass.equals(Object.class)) {
+			if(superclass.getSuperclass().equals(Processor.class))
+				return (ParameterizedType) superclass.getGenericSuperclass();
+
+			superclass = superclass.getSuperclass();
+		}
+
+		return null;
+	}
 }
