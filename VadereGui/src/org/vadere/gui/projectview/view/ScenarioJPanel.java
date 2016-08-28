@@ -86,7 +86,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		editCard.add(tabbedPane, BorderLayout.CENTER);
 
-		tabbedPane.addChangeListener(e -> {
+		tabbedPane.addChangeListener(e -> { // TODO what's happening here? can this be simplified?
 			int index = tabbedPane.getSelectedIndex();
 			if (index >= 0 && topographyFileView != null
 					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.Topography.title"))
