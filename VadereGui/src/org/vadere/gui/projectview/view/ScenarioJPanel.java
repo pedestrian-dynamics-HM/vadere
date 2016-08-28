@@ -322,20 +322,20 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 			postVisualizationView.repaint(); // force a repaint, otherwise it sometimes only repaints when the mouse moves from the output table to the postvis-view
 		}
 
-		this.attributesModelView.isEditable(isEditable);
 		this.attributesModelView.setVadereScenario(scenario);
+		this.attributesModelView.isEditable(isEditable);
 
-		this.attributesSimulationView.isEditable(isEditable);
 		this.attributesSimulationView.setVadereScenario(scenario);
+		this.attributesSimulationView.isEditable(isEditable);
 
-		this.topographyFileView.isEditable(isEditable);
 		this.topographyFileView.setVadereScenario(scenario);
+		this.topographyFileView.isEditable(isEditable);
 
-		//this.outputProcessorsView.isEditable(isEditable);
 		//this.outputProcessorsView.setScenario(scenario);
+		//this.outputProcessorsView.isEditable(isEditable);
 
-		this.outputView.isEditable(isEditable);
 		this.outputView.setVadereScenario(scenario);
+		this.outputView.isEditable(isEditable);
 	}
 
 	private void setTopography(Topography topography) {

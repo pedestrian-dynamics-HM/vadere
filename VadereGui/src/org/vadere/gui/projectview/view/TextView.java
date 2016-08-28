@@ -51,6 +51,8 @@ public class TextView extends JPanel {
 
 	private boolean isEditable;
 
+	private DocumentListener documentListener;
+
 
 	private JTextArea txtrTextfiletextarea;
 	private ActionListener saveToFileActionListener = new ActionListener() {
@@ -139,7 +141,7 @@ public class TextView extends JPanel {
 		scrollPane.setViewportView(txtrTextfiletextarea);
 		txtrTextfiletextarea.setText(Messages.getString("TextFileView.txtrTextfiletextarea.text"));
 
-		txtrTextfiletextarea.getDocument().addDocumentListener(new DocumentListener() {
+		documentListener = new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				setScenarioContent();
@@ -191,7 +193,7 @@ public class TextView extends JPanel {
 					}
 				}
 			}
-		});
+		};
 
 		this.attributeType = attributeType;
 		jsonValidIndicator.setValid();
@@ -236,8 +238,10 @@ public class TextView extends JPanel {
 		txtrTextfiletextarea.setEnabled(isEditable);
 		if (isEditable) {
 			txtrTextfiletextarea.setBackground(Color.WHITE);
+			txtrTextfiletextarea.getDocument().addDocumentListener(documentListener);
 		} else {
 			txtrTextfiletextarea.setBackground(Color.LIGHT_GRAY);
+			txtrTextfiletextarea.getDocument().removeDocumentListener(documentListener);
 		}
 	}
 
