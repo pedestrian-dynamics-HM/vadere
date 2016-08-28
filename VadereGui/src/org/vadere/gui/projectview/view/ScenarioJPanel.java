@@ -46,7 +46,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
 	private TextView outputView; // new Output tab
-	//private OutputProcessorsView outputProcessorsView; // old Output processors tab
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
@@ -169,17 +168,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), null, topographyFileView, null);
-
-		/*
-		try {
-			outputProcessorsView = new OutputProcessorsView(owner);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getLocalizedMessage());
-		}
-
-		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputProcessorsView, null);
-		*/
 
 		outputView = new TextView("/" + IOUtils.DATAPROCESSING_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
@@ -330,9 +318,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		this.topographyFileView.setVadereScenario(scenario);
 		this.topographyFileView.isEditable(isEditable);
-
-		//this.outputProcessorsView.setScenario(scenario);
-		//this.outputProcessorsView.isEditable(isEditable);
 
 		this.outputView.setVadereScenario(scenario);
 		this.outputView.isEditable(isEditable);
