@@ -123,7 +123,7 @@ public class TrainModel {
 		leftDoors = findSources(leftDoorsRect);
 		rightDoors = findSources(rightDoorsRect);
 
-		Collection<Pedestrian> pedestrians = getPedestrians(topography);
+		Collection<Pedestrian> pedestrians = getPedestrians();
 		// sit persons on seats
 		for (Pedestrian p : pedestrians) {
 			for (Seat s : seats) {
@@ -151,7 +151,7 @@ public class TrainModel {
 				.collect(Collectors.toList());
 	}
 
-	public static List<Pedestrian> getPedestrians(Topography topography) {
+	public List<Pedestrian> getPedestrians() {
 		return new ArrayList<>(topography.getElements(Pedestrian.class));
 	}
 

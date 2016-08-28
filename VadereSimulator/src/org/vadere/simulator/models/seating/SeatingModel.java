@@ -47,7 +47,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	public void update(double simTimeInSec) {
 		final Random r = new Random();
 		final int seatCount = trainModel.getSeats().size();
-		TrainModel.getPedestrians(topography).stream()
+		trainModel.getPedestrians().stream()
 				.filter(p -> p.getTargets().isEmpty())
 				.forEach(p -> p.getTargets().add(r.nextInt(seatCount)));
 	}
