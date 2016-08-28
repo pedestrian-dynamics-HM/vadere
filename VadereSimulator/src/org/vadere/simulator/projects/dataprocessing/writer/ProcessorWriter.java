@@ -10,7 +10,6 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.processors.Processor;
-import org.vadere.simulator.projects.io.JsonSerializerProcessor;
 import org.vadere.state.attributes.processors.AttributesWriter;
 import org.vadere.util.data.Table;
 import org.vadere.util.io.IOUtils;
@@ -186,7 +185,6 @@ public class ProcessorWriter extends AbstractProcessorWriter {
 		Map<String, Object> store = new HashMap<>();
 		store.put("columnNames", this.columnNames);
 		store.put("formatString", this.formatString);
-		store.put("processor", JsonSerializerProcessor.toJsonElement(getProcessor()));
 		store.put("attributes", attributes);
 		return IOUtils.getGson().toJsonTree(store);
 	}
@@ -200,43 +198,4 @@ public class ProcessorWriter extends AbstractProcessorWriter {
 		return jsonArray;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	public static ProcessorWriter fromJson(final JsonElement jsonEl) {
-		Map<String, Object> store = new HashMap<>();
-		store = new Gson().fromJson(jsonEl.toString(), Map.class);
-		AttributesWriter attributes =
-				IOUtils.getGson().fromJson(IOUtils.toJson(store.get("attributes")), AttributesWriter.class);
-		String columnFormat = IOUtils.getGson().fromJson(IOUtils.toJson(store.get("formatString")), String.class);
-		List<String> columnNames = IOUtils.getGson().fromJson(IOUtils.toJson(store.get("columnNames")), List.class);
-		Processor processor = JsonSerializerProcessor.toProcessorFromJson(IOUtils.toJson(store.get("processor")));
-		ProcessorWriter writer = new ProcessorWriter(processor, attributes);
-		writer.formatString = columnFormat;
-
-		if (columnNames == null) {
-			writer.columnNames = null;
-		} else {
-			writer.columnNames = columnNames.toArray(new String[] {});
-		}
-		return writer;
-	}
-
-	@Deprecated
-	public static List<ProcessorWriter> fromJsonList(final String json) {
-		List<ProcessorWriter> writerList = new ArrayList<>();
-		JsonElement jsonElement = new Gson().fromJson(json, JsonElement.class);
-
-		if (jsonElement instanceof JsonArray) {
-			JsonArray array = (JsonArray) jsonElement;
-			for (int index = 0; index < array.size(); index++) {
-				try {
-					writerList.add(ProcessorWriter.fromJson(array.get(index)));
-				} catch (Exception e) {
-					Logger.getLogger(ProcessorWriter.class).error(e);
-				}
-			}
-		}
-
-		return writerList;
-	}
 }
