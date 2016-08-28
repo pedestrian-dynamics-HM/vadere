@@ -18,6 +18,7 @@ import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
+import org.vadere.simulator.models.SubModelBuilder;
 import org.vadere.simulator.models.groups.CentroidGroupModel;
 import org.vadere.simulator.models.groups.CentroidGroupPotential;
 import org.vadere.simulator.models.groups.CentroidGroupSpeedAdjuster;
@@ -140,14 +141,10 @@ public class OptimalStepsModel implements MainModel {
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 
-		for (String submodelName : attributesOSM.getSubmodels()) {
-			final DynamicClassInstantiator<Model> modelInstantiator = new DynamicClassInstantiator<>();
-			final Model submodel = modelInstantiator.createObject(submodelName);
-			submodel.initialize(modelAttributesList, topography, attributesPedestrian, random);
-			if (submodel instanceof ActiveCallback) {
-				activeCallbacks.add((ActiveCallback) submodel);
-			}
-		}
+		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
+				attributesPedestrian, random);
+		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
+		subModelBuilder.addSubModelsToActiveCallbacks(activeCallbacks);
 
 		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());

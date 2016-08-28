@@ -9,6 +9,8 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 /**
  * This class encapsulates the creation of MainModel.
  * 
+ * For creation of submodels, see {@link SubModelBuilder}! The SubModelBuilder
+ * should be used in the {@link MainModel#initialize} method.
  */
 public class ModelBuilder {
 
