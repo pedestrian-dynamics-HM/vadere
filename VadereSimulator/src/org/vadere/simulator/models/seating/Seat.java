@@ -5,9 +5,11 @@ import org.vadere.state.scenario.Target;
 
 public class Seat {
 
-	Target associatedTarget;
-	Pedestrian sittingPerson;
-	Integer sittingPersonId;
+	private Target associatedTarget;
+	private Pedestrian sittingPerson;
+
+	// TODO is this used?
+	private Integer sittingPersonId;
 
 	public Seat(Target associatedTarget) {
 		this.associatedTarget = associatedTarget;
