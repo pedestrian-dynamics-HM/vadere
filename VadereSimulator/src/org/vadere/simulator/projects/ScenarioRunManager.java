@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.ModelBuilder;
+import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.processors.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.processors.PedestrianPositionProcessor;
 import org.vadere.simulator.projects.dataprocessing.processors.SnapshotOutputProcessor;
@@ -107,7 +107,7 @@ public class ScenarioRunManager implements Runnable {
 			// prepare processors and simulation data writer
 			prepareOutput();
 
-			ModelBuilder modelBuilder = new ModelBuilder(scenarioStore);
+			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 			modelBuilder.createModelAndRandom();
 			final MainModel mainModel = modelBuilder.getModel();
 			final Random random = modelBuilder.getRandom();

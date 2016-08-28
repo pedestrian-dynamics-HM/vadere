@@ -5,7 +5,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.models.ModelBuilder;
+import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.processors.*;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.state.attributes.processors.AttributesWriter;
@@ -95,7 +95,7 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 
 				double currentTime = 0;
 				if (simulation == null) {
-					ModelBuilder modelBuilder = new ModelBuilder(scenarioStore);
+					MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 					modelBuilder.createModelAndRandom();
 					simulation = new Simulation(modelBuilder.getModel(), currentTime, getName(),
 							scenarioStore, passiveCallbacks, writers,

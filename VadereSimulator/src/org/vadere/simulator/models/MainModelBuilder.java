@@ -12,13 +12,13 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
  * For creation of submodels, see {@link SubModelBuilder}! The SubModelBuilder
  * should be used in the {@link MainModel#initialize} method.
  */
-public class ModelBuilder {
+public class MainModelBuilder {
 
 	private ScenarioStore scenarioStore;
 	private MainModel model;
 	private Random random;
 
-	public ModelBuilder(ScenarioStore scenarioStore) {
+	public MainModelBuilder(ScenarioStore scenarioStore) {
 		this.scenarioStore = scenarioStore;
 	}
 
