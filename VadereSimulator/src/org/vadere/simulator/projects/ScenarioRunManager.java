@@ -61,6 +61,7 @@ public class ScenarioRunManager implements Runnable {
 	private boolean simpleOutputProcessorName = false;
 
 	private String savedStateSerialized;
+	private String currentStateSerialized;
 
 
 	public ScenarioRunManager(final String name) {
@@ -87,7 +88,11 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public boolean hasUnsavedChanges() {
-		return !savedStateSerialized.equals(JsonConverter.serializeScenarioRunManager(this));
+		return !savedStateSerialized.equals(currentStateSerialized);
+	}
+
+	public void updateCurrentStateSerialized() {
+		currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
 	}
 
 	public String getDiff() {

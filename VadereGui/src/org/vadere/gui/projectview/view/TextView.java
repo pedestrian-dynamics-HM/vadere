@@ -181,6 +181,7 @@ public class TextView extends JPanel {
 								currentScenario.setTopography(JsonConverter.deserializeTopography(json));
 								break;
 						}
+						currentScenario.updateCurrentStateSerialized();
 						ScenarioJPanel.removeJsonParsingErrorMsg();
 						ProjectView.getMainWindow().refreshScenarioNames();
 						jsonValidIndicator.setValid();

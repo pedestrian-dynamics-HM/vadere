@@ -24,6 +24,7 @@ import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.ScenarioJPanel;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
+import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.Pedestrian;
@@ -142,6 +143,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 					ScenarioJPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();
 					jsonValidIndicator.setValid();
+					((TopographyCreatorModel) panelModel).getScenario().updateCurrentStateSerialized(); // casting should be safe her because in the other two modes (onlineVis and postVis), updateModel() won't be called because it's set to uneditable
 				} catch (IOException e) {
 					ScenarioJPanel.setActiveJsonParsingErrorMsg("TOPOGRAPHY CREATOR tab:\n" + e.getMessage()); // add name of scenario element?
 					jsonValidIndicator.setInvalid();
