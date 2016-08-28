@@ -381,6 +381,7 @@ public abstract class JsonConverter {
 		//		.forEach(writer -> scenarioRunManager.addWriter(writer));
 
 		scenarioRunManager.setProcessorManager(deserializeProcessorManagerFromNode(rootNode.get("processWriters")));
+		scenarioRunManager.saveChanges();
 
 		if (scenarioRunManager.getTopography() == null)
 			logger.error("Loading topography failed."); // migrated from GSON, not sure if still necessary
