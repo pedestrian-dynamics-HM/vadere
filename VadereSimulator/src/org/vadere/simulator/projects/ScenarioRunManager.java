@@ -371,12 +371,22 @@ public class ScenarioRunManager implements Runnable {
 		return scenarioStore.name + (hasUnsavedChanges() ? "*" : "");
 	}
 
-	public void discardChanges() { // is this done properly this way? Could replace the whole ScenarioRunManager in VadereProject (but keep the Id) alternatively
+	public void discardChanges() {
 		try {
 			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
+			// not all necessary! only the ones that could have changed
 			this.processorWriters = srm.processorWriters;
 			this.writers = srm.writers;
 			this.scenarioStore = srm.scenarioStore;
+			this.outputPath = srm.outputPath;
+			this.processorOutputPath = srm.processorOutputPath;
+			this.processorManager = srm.processorManager;
+			this.modelTests = srm.modelTests;
+			this.finishedListener = srm.finishedListener;
+			this.simulation = srm.simulation;
+			this.scenarioFailed = srm.scenarioFailed;
+			this.simpleOutputProcessorName = srm.simpleOutputProcessorName;
+			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
 		} catch (IOException | VadereClassNotFoundException e) {
 			e.printStackTrace();
 		}
