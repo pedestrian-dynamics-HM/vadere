@@ -5,12 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.simulator.projects.io.JsonSerializerTopography;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.io.IOUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.JsonElement;
 
 /**
  * IO-Class to write a Topography to a certain stream.
