@@ -209,6 +209,22 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		assertEquals(maxSpawnNumberTotal, countPedestrians());
 	}
 
+	@Test
+	public void testMaxSpawnNumberTotalWithLargeEndTimeAndSpawnNumberGreater1() {
+		boolean useFreeSpaceOnly = false;
+		double startTime = 1;
+		double endTime = 100;
+		int spawnNumber = 5;
+		double spawnDelay = 1;
+		int maxSpawnNumberTotal = 4; // <-- exhausted!
+		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
+		
+		doUpdates(50, 0, 200);
+		
+		assertEquals(maxSpawnNumberTotal, countPedestrians());
+	}
+
 	private void doUpdates(int number, double startTime, double endTimeExclusive) {
 		double timeStep = (endTimeExclusive - startTime) / number;
 		for (double t = startTime; t < endTimeExclusive + 1; t += timeStep) {

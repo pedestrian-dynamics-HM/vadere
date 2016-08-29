@@ -227,7 +227,7 @@ public class SourceController {
 
 	private void tryToSpawnOutstandingDynamicElements() {
 		for (VPoint position : getDynamicElementPositions(dynamicElementsToCreate)) {
-			if (isPositionWorkingForSpawn(position)) {
+			if (!isMaximumNumberOfSpawnedElementsReached() && isPositionWorkingForSpawn(position)) {
 				create(position);
 				dynamicElementsToCreate--;
 				dynamicElementsCreatedTotal++;
