@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.apache.commons.math3.distribution.ConstantRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Test;
-import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -119,7 +118,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double spawnDelay = 1;
 		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, maxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		doUpdates(100, startTime, endTime + 1);
 
@@ -143,7 +142,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double spawnDelay = 1;
 		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, maxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		doUpdates(100, 0, endTime + 1);
 
