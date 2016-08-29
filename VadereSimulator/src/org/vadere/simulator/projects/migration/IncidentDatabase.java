@@ -12,47 +12,53 @@ public class IncidentDatabase {
 
 	private IncidentDatabase() {
 
-		// - - - - - - - - - - - - 0 ("not a release") to 1 ("0.1") - - - - - - - - - - - -
+		List<Incident> incidents;
 
-		List<Incident> version0to1 = new ArrayList<>();
-		versionIncidents.put(0, version0to1);
+		// - - - - - - - - - - - - "not a release" to "0.1" - - - - - - - - - - - -
 
-		version0to1.add(new RelocationIncident(
+		incidents = new ArrayList<>();
+		versionIncidents.put(0, incidents);
+
+		incidents.add(new RelocationIncident(
 				"finishTime",
 				path("vadere", "topography", "attributes"),
 				path("vadere", "attributesSimulation")));
 
-		version0to1.add(new RelocationIncident(
+		incidents.add(new RelocationIncident(
 				"attributesPedestrian",
 				path("vadere"),
 				path("vadere", "topography")));
 
-		version0to1.add(new DeletionIncident(
+		incidents.add(new DeletionIncident(
 				path("vadere", "topography", "pedestrians")));
 
-		version0to1.add(new RenameInArrayIncident(
+		incidents.add(new RenameInArrayIncident(
 				path("vadere", "topography", "dynamicElements"),
 				"nextTargetListPosition",
 				"nextTargetListIndex"));
 
-		LookupTables.version0to1_ModelRenaming.forEach((oldName, newName) -> version0to1.add(new RenameIncident(
-				path("vadere", "attributesModel", oldName),
-				newName)));
+		for (String oldName : LookupTables.version0to1_ModelRenaming.keySet()) {
+			String newName = LookupTables.version0to1_ModelRenaming.get(oldName);
+			incidents.add(new RenameIncident(
+					path("vadere", "attributesModel", oldName), newName));
+		}
 
-		version0to1.add(new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
+		incidents.add(new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
 				path("vadere"),
 				JsonConverter.MAIN_MODEL_KEY,
 				path("vadere", "attributesModel")));
 
-		version0to1.add(new AddTextNodeIncident(
+		incidents.add(new AddTextNodeIncident(
 				path(),
 				"description", ""));
 
-		version0to1.add(new AttributesPotentialCompactVSosmIncident());
+		incidents.add(new AttributesPotentialCompactVSosmIncident());
 
-		// - - - - - - - - - - - - 1 ("0.1") to 2 (?) - - - - - - - - - - - -
-		// List<Incident> version1to2 = new ArrayList<>();
-		// versionIncidents.put(1, version1to2);
+		// - - - - - - - - - - - - "0.1" to "?" - - - - - - - - - - - -
+
+		incidents = new ArrayList<>();
+		versionIncidents.put(1, incidents);
+
 		// ...
 	}
 
