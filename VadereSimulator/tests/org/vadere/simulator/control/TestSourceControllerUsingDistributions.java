@@ -25,9 +25,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = 2;
 		int spawnNumber = 1;
 		double spawnDelay = 1;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class, noMaxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		sourceController.update(0);
 		pedestrianCountEquals(0);
@@ -44,9 +44,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = 2;
 		int spawnNumber = 1;
 		double spawnDelay = 1;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class, noMaxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		sourceController.update(1);
 		pedestrianCountEquals(1);
@@ -63,9 +63,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = startTime; // only one single spawn event
 		int spawnNumber = 1;
 		double spawnDelay = 1;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class, noMaxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		sourceController.update(0);
 		pedestrianCountEquals(0);
@@ -81,9 +81,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = 2;
 		int spawnNumber = 10;
 		double spawnDelay = 1;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class, noMaxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		sourceController.update(1);
 		pedestrianCountEquals(10);
@@ -97,9 +97,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = 1;
 		int spawnNumber = 1;
 		double spawnDelay = 0.3;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class, noMaxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 
 		// per update only one "spawn action" is performed.
 		// if the spawn rate is higher than the update time increment, spawns will get lost.
@@ -117,9 +117,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = 1;
 		int spawnNumber = 100;
 		double spawnDelay = 1;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, noMaxSpawnNumberTotal);
+				ConstantDistribution.class, maxSpawnNumberTotal);
 
 		doUpdates(100, startTime, endTime + 1);
 
@@ -141,9 +141,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double endTime = 1;
 		int spawnNumber = 100;
 		double spawnDelay = 1;
-		int noMaxSpawnNumberTotal = 0;
+		int maxSpawnNumberTotal = 0;
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, noMaxSpawnNumberTotal);
+				ConstantDistribution.class, maxSpawnNumberTotal);
 
 		doUpdates(100, 0, endTime + 1);
 
