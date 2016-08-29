@@ -12,6 +12,7 @@ import org.vadere.state.scenario.Pedestrian;
 
 public class LogEventWriter extends ProcessorWriter {
 	
+	// These fields come from the enum LogEventType from the SeatingDataCollection app project:
 	private static final String INITIALIZATION_END_EVENT = "INITIALIZATION_END";
 	private static final String SIT_DOWN_EVENT = "SIT_DOWN";
 	
