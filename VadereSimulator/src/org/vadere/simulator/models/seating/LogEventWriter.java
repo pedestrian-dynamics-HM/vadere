@@ -29,8 +29,13 @@ public class LogEventWriter extends ProcessorWriter {
 	@Override
 	public void preLoop(SimulationState state) {
 		super.preLoop(state);
-		trainModel = new TrainModel(state.getTopography());
+
+		// TODO implement
+//		final SeatingModel seatingModel = (SeatingModel) state.getMainModel();
+//		trainModel = seatingModel.getTrainModel();
+
 		time = LocalTime.now();
+
 		writeInitialSitDownEvents();
 		writeInitializationEndEvent();
 	}

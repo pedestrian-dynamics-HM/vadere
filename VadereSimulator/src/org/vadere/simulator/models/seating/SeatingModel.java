@@ -59,4 +59,8 @@ public class SeatingModel implements ActiveCallback, Model {
 		this.trainModel = new TrainModel(topography);
 	}
 
+	public TrainModel getTrainModel() {
+		return trainModel;
+	}
+
 }
