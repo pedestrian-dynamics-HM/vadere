@@ -17,8 +17,6 @@ public class AttributesSource extends Attributes {
 
 	/** Shape and position. */
 	private VShape shape = null;
-	@Deprecated
-	private double spawnDelay = -1; // see getSpawnDelay()
 	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;
 	private List<Double> distributionParameters = Arrays.asList(new Double[] {1.0});
 
@@ -63,22 +61,6 @@ public class AttributesSource extends Attributes {
 	}
 
 	// Getters...
-
-	/**
-	 * Still used for constant spawn time algorithm. This property will be deleted in favor of
-	 * <code>distributionParameters</code>.
-	 * 
-	 * @deprecated Use {@link #getDistributionParameters()} instead.
-	 */
-	@Deprecated
-	public double getSpawnDelay() {
-		// use spawn delay from distribution parameter list if possible
-		if (interSpawnTimeDistribution.equals(CONSTANT_DISTRIBUTION)
-				&& spawnDelay == -1) {
-			return distributionParameters.get(0);
-		}
-		return spawnDelay;
-	}
 
 	/**
 	 * Class name of distribution for inter-spawn times. The name must point to a subclass of
