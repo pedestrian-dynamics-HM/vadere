@@ -1,4 +1,4 @@
-package org.vadere.simulator.simulation;
+package org.vadere.simulator.control;
 
 import static org.junit.Assert.assertEquals;
 
