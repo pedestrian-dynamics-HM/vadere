@@ -1,7 +1,6 @@
 package org.vadere.simulator.projects.migration.incidents.specialized;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.vadere.simulator.projects.migration.IncidentDatabase.path;
 
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.Graph;
@@ -9,7 +8,8 @@ import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.state.attributes.scenario.AttributesSource;
 
-import static org.vadere.simulator.projects.migration.IncidentDatabase.path;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
@@ -22,19 +22,25 @@ public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 	@Override
 	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
 
-		Graph.Node sourcesNode = graph.getNodeByPath(path("vadere", "topography", "sources"));// null-check topography as well? must exit always, no?
+		Graph.Node sourcesNode = graph.getNodeByPath(path("vadere", "topography", "sources"));
 
 		if (sourcesNode != null) {
 			for (JsonNode source : sourcesNode.getJsonNode()) {
 				if (source.has("spawnDelay")) {
 
-					double spawnDelay = source.get("spawnDelay").asDouble();
+					final double spawnDelay = source.get("spawnDelay").asDouble();
+					final ObjectNode s = (ObjectNode) source;
 
-					if (source.get("interSpawnTimeDistribution").asText().equals(AttributesSource.CONSTANT_DISTRIBUTION) && spawnDelay != -1.0) {
-						((ObjectNode) source).set("distributionParameters", JsonConverter.toJsonNode(new Double[] {spawnDelay}));
+					// If spawn delay is set AND constant spawn rate algorithm is used:
+					// copy spawn delay to distribution parameters
+					if (spawnDelay != -1.0 &&
+							source.get("interSpawnTimeDistribution").asText()
+							.equals(AttributesSource.CONSTANT_DISTRIBUTION)) {
+
+						s.set("distributionParameters", JsonConverter.toJsonNode(new Double[] {spawnDelay}));
 					}
 
-					((ObjectNode) source).remove("spawnDelay");
+					s.remove("spawnDelay");
 				}
 			}
 		}
