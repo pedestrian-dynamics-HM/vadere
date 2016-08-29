@@ -123,7 +123,7 @@ public class AttributesSource extends Attributes {
 	 * This attribute can be used together with non-constant distributions. For
 	 * example, consider an exponential distribution. The times of events are
 	 * random. How to ensure, that exactly 10 elements are spawned? Solution:
-	 * Set the {@link endTime} to 1e9 this attribute to 10.
+	 * Set the {@link endTime} to 1e9 and this attribute to 10.
 	 */
 	public int getMaxSpawnNumberTotal() {
 		return maxSpawnNumberTotal;
