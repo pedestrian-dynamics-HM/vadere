@@ -166,7 +166,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double spawnDelay = 1;
 		int maxSpawnNumberTotal = 0; // <-- maximum not set
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, maxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 		
 		sourceController.update(1);
 		sourceController.update(2);
@@ -184,7 +184,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double spawnDelay = 1;
 		int maxSpawnNumberTotal = 4; // <-- not exhausted
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, maxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 		
 		sourceController.update(1);
 		sourceController.update(2);
@@ -202,11 +202,11 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double spawnDelay = 1;
 		int maxSpawnNumberTotal = 4; // <-- exhausted!
 		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class, maxSpawnNumberTotal);
+				ConstantTestDistribution.class, maxSpawnNumberTotal);
 		
 		doUpdates(50, 0, 200);
 		
-		assertEquals(4, countPedestrians());
+		assertEquals(maxSpawnNumberTotal, countPedestrians());
 	}
 
 	private void doUpdates(int number, double startTime, double endTimeExclusive) {
