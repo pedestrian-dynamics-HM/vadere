@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
@@ -136,6 +137,23 @@ public class TrainModel {
 
 	}
 
+	public int getNumberOfEntranceAreas() {
+		return numberOfEntranceAreas;
+	}
+
+	public List<SeatGroup> getSeatGroups() {
+		return Collections.unmodifiableList(seatGroups);
+	}
+
+	public List<Seat> getSeats() {
+		return Collections.unmodifiableList(seats);
+	}
+
+	/** Return a new list of all pedestrians in the scenario. */
+	public List<Pedestrian> getPedestrians() {
+		return new ArrayList<>(topography.getElements(Pedestrian.class));
+	}
+
 	private List<Target> findTargets(Rectangle2D box) {
 		return findScenarioElement(topography.getTargets(), box);
 	}
@@ -149,10 +167,6 @@ public class TrainModel {
 				.filter(new ScenarioElementInRectPredicate(box))
 				.sorted(scenarioElementComperatorX)
 				.collect(Collectors.toList());
-	}
-
-	public List<Pedestrian> getPedestrians() {
-		return new ArrayList<>(topography.getElements(Pedestrian.class));
 	}
 
 	private void initialize(int numberOfEntranceAreas) {
@@ -177,18 +191,6 @@ public class TrainModel {
 		return new Rectangle2D.Double(
 				topography.getBounds().getMinX(), y,
 				topography.getBounds().getWidth(), height);
-	}
-
-	public int getNumberOfEntranceAreas() {
-		return numberOfEntranceAreas;
-	}
-
-	public List<SeatGroup> getSeatGroups() {
-		return seatGroups;
-	}
-
-	public List<Seat> getSeats() {
-		return seats;
 	}
 
 }
