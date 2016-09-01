@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.vadere.simulator.control.SimulationState;
 
@@ -21,7 +21,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	protected Processor(final String... headers) {
 		this.headers = headers;
-		this.column = new HashMap<>();
+		this.column = new TreeMap<>();
 
 		this.lastStep = 0;
 	}
