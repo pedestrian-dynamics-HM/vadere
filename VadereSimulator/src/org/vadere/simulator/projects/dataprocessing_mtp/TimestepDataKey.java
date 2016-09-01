@@ -1,15 +1,14 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import org.jetbrains.annotations.NotNull;
-
-public class TimestepDataKey extends DataKey<Integer> implements Comparable<TimestepDataKey> {
-    public TimestepDataKey(int timeStep) {
-        super(timeStep);
+public class TimestepDataKey implements Comparable<TimestepDataKey> {
+	private final int timestep;
+    public TimestepDataKey(int timestep) {
+    	this.timestep = timestep;
     }
 
     @Override
     public int compareTo(final TimestepDataKey o) {
-        return this.getKey().compareTo(o.getKey());
+        return Integer.compare(timestep, o.timestep);
     }
 
     public static String getHeader() {

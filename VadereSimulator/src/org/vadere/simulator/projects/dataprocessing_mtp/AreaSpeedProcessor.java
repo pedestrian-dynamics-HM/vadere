@@ -1,10 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import java.util.Map;
+
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-
-import java.util.Map;
 
 public class AreaSpeedProcessor extends AreaProcessor<Double> {
     private PedestrianPositionProcessor pedPosProc;
@@ -21,18 +20,17 @@ public class AreaSpeedProcessor extends AreaProcessor<Double> {
         this.pedPosProc.update(state);
         this.pedVelProc.update(state);
 
-        VRectangle measurementArea = this.getMeasurementArea();
         Map<PedestrianIdDataKey, VPoint> positionMap = this.pedPosProc.getPositions(new TimestepDataKey(step));
 
         int pedCount = 0;
         double sumVelocities = 0.0;
 
         for (Map.Entry<PedestrianIdDataKey, VPoint> entry : positionMap.entrySet()) {
-            PedestrianIdDataKey pedId = entry.getKey();
-            VPoint pos = entry.getValue();
+            final int pedId = entry.getKey().getPedestrianId();
+            final VPoint pos = entry.getValue();
 
-            if (this.getMeasurementArea().contains(pos)) {
-                sumVelocities += this.pedVelProc.getValue(new TimestepPedestrianIdDataKey(step, pedId.getKey()));
+            if (getMeasurementArea().contains(pos)) {
+                sumVelocities += this.pedVelProc.getValue(new TimestepPedestrianIdDataKey(step, pedId));
                 pedCount++;
             }
         }

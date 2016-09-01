@@ -1,23 +1,29 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import org.apache.commons.lang3.tuple.Pair;
+public class TimestepPedestrianIdDataKey implements Comparable<TimestepPedestrianIdDataKey> {
+	private final int timestep;
+	private final int pedestrianId;
 
-public class TimestepPedestrianIdDataKey extends DataKey<Pair<Integer, Integer>>
-		implements Comparable<TimestepPedestrianIdDataKey> {
-	public TimestepPedestrianIdDataKey(final Integer timestep, final Integer pedId) {
-		super(Pair.of(timestep, pedId));
+	public TimestepPedestrianIdDataKey(int timestep, int pedestrianId) {
+		this.timestep = timestep;
+		this.pedestrianId = pedestrianId;
 	}
 
 	public Integer getTimestep() {
-		return this.getKey().getLeft();
+		return timestep;
 	}
 
 	public Integer getPedestrianId() {
-		return this.getKey().getRight();
+		return pedestrianId;
 	}
 
+	@Override
 	public int compareTo(TimestepPedestrianIdDataKey o) {
-		return this.getKey().compareTo(o.getKey());
+		int result = Integer.compare(timestep, o.timestep);
+		if (result == 0) {
+			return Integer.compare(pedestrianId, o.pedestrianId);
+		}
+		return result;
 	}
 
 	public static String[] getHeaders() {

@@ -1,11 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import org.vadere.simulator.control.SimulationState;
-import org.vadere.util.geometry.shapes.VPoint;
-
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.vadere.simulator.control.SimulationState;
+import org.vadere.util.geometry.shapes.VPoint;
 
 public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdDataKey, VPoint> {
 
@@ -14,7 +14,8 @@ public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	public Map<PedestrianIdDataKey, VPoint> getPositions(TimestepDataKey timestepKey) {
-		return this.getColumn().entrySet().stream().filter(e -> e.getKey().getTimestep() == timestepKey.getKey())
+		return this.getColumn().entrySet().stream()
+				.filter(e -> e.getKey().equals(timestepKey))
 				.collect(Collectors.toMap(e -> new PedestrianIdDataKey(e.getKey().getPedestrianId()), e -> e.getValue()));
 	}
 
