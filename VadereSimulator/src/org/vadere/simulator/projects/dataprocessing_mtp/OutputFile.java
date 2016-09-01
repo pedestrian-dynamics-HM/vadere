@@ -56,7 +56,8 @@ public abstract class OutputFile<K extends Comparable<K>> {
 							: String.join(SEPARATOR.toString(), this.keyHeaders) + SEPARATOR)
 						+ this.processors.stream().map(p -> String.join(SEPARATOR.toString(), p.getHeaders()) + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
 
-                this.processors.stream().flatMap(p -> p.getKeys().stream()).distinct()
+                this.processors.stream().flatMap(p -> p.getKeys().stream())
+                		.distinct().sorted()
                         .forEach(key -> printRow(out, key));
 
                 out.flush();

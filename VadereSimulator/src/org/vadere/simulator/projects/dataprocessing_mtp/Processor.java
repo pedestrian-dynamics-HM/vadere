@@ -21,7 +21,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	protected Processor(final String... headers) {
 		this.headers = headers;
-		this.column = new TreeMap<>();
+		this.column = new TreeMap<>(); // TreeMap to avoid sorting data later
 
 		this.lastStep = 0;
 	}
