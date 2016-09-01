@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -64,11 +66,14 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	private void printRow(final PrintWriter out, final K key) {
-		out.println(StringUtils.substringBeforeLast(
-				(this.toStrings(key).length == 0
-					? ""
-					: String.join(SEPARATOR, String.join(SEPARATOR, this.toStrings(key)) + SEPARATOR))
-				+ processors.stream().map(p -> String.join(SEPARATOR, p.toStrings(key)) + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR));
+		final List<String> fields = Arrays.asList(toStrings(key));
+
+		final List<String> processorFields = processors.stream()
+				.flatMap(p -> Arrays.stream(p.toStrings(key)))
+				.collect(Collectors.toList());
+		fields.addAll(processorFields);
+
+		out.println(String.join(SEPARATOR, fields));
 	}
 
 	/** Return the column headers as string or the empty array. */
