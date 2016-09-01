@@ -39,17 +39,14 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	public void write() {
-	    try {
+		try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
+			printHeader(out);
 
-            try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
-				printHeader(out);
+			this.processors.stream().flatMap(p -> p.getKeys().stream())
+					.distinct().sorted()
+					.forEach(key -> printRow(out, key));
 
-                this.processors.stream().flatMap(p -> p.getKeys().stream())
-                		.distinct().sorted()
-                        .forEach(key -> printRow(out, key));
-
-                out.flush();
-            }
+			out.flush();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
