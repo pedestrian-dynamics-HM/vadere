@@ -1,6 +1,5 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,8 +9,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 
 public abstract class OutputFile<K extends Comparable<K>> {
 	private String[] keyHeaders;
@@ -43,18 +40,9 @@ public abstract class OutputFile<K extends Comparable<K>> {
 
 	public void write() {
 	    try {
-            File file = new File(this.fileName);
 
-            if (!file.exists())
-                file.createNewFile();
-
-            try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
-                // Print header
-                out.println(StringUtils.substringBeforeLast(
-                		(this.keyHeaders == null || this.keyHeaders.length == 0
-							? ""
-							: String.join(SEPARATOR.toString(), this.keyHeaders) + SEPARATOR)
-						+ this.processors.stream().map(p -> String.join(SEPARATOR.toString(), p.getHeaders()) + SEPARATOR).reduce("", (s1, s2) -> s1 + s2), SEPARATOR.toString()));
+            try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
+				printHeader(out);
 
                 this.processors.stream().flatMap(p -> p.getKeys().stream())
                 		.distinct().sorted()
@@ -67,6 +55,16 @@ public abstract class OutputFile<K extends Comparable<K>> {
         }
 	}
 
+	private void printHeader(PrintWriter out) {
+		final List<String> fieldHeaders = new LinkedList<>(Arrays.asList(keyHeaders));
+
+		final List<String> processorFieldHeaders = processors.stream()
+				.flatMap(p -> Arrays.stream(p.getHeaders()))
+				.collect(Collectors.toList());
+		fieldHeaders.addAll(processorFieldHeaders);
+		writeLine(out, fieldHeaders);
+	}
+
 	private void printRow(final PrintWriter out, final K key) {
 		final List<String> fields = new LinkedList<>(Arrays.asList(toStrings(key)));
 
@@ -75,6 +73,10 @@ public abstract class OutputFile<K extends Comparable<K>> {
 				.collect(Collectors.toList());
 		fields.addAll(processorFields);
 
+		writeLine(out, fields);
+	}
+
+	private void writeLine(PrintWriter out, final List<String> fields) {
 		out.println(String.join(SEPARATOR, fields));
 	}
 
