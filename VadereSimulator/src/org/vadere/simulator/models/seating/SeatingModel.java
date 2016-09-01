@@ -1,8 +1,6 @@
 package org.vadere.simulator.models.seating;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -14,7 +12,6 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.Table;
 
 import com.vividsolutions.jts.math.MathUtil;
 
@@ -32,11 +29,6 @@ public class SeatingModel implements ActiveCallback, Model {
 	private TrainModel trainModel;
 	private Topography topography;
 	private Random random;
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		return new HashMap<>();
-	}
 
 	@Override
 	public void preLoop(double simTimeInSec) {
