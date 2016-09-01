@@ -1,11 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import java.util.Collection;
+
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.state.scenario.Pedestrian;
-
-import java.util.Collection;
 
 public class PedestrianOSMStrideLengthProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
     private OptimalStepsModel osm;
@@ -24,7 +24,7 @@ public class PedestrianOSMStrideLengthProcessor extends Processor<TimestepPedest
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         Model model = manager.getModel();
         if (model instanceof OptimalStepsModel)
             this.osm = (OptimalStepsModel) model;

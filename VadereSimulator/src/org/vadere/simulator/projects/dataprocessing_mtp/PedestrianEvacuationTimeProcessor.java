@@ -27,7 +27,7 @@ public class PedestrianEvacuationTimeProcessor extends Processor<PedestrianIdDat
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		AttributesPedestrianEvacuationTimeProcessor att = (AttributesPedestrianEvacuationTimeProcessor) attributes;
 		this.pedStTimeProc = (PedestrianStartTimeProcessor) manager.getProcessor(att.getPedestrianStartTimeProcessorId());
 	}

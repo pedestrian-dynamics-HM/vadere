@@ -22,7 +22,7 @@ public abstract class PedestrianDensityProcessor extends Processor<TimestepPedes
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		AttributesPedestrianDensityProcessor attDensProc = (AttributesPedestrianDensityProcessor) attributes;
 
 		this.pedPosProc =

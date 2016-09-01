@@ -18,7 +18,7 @@ public class PedestrianStartTimeProcessor extends Processor<PedestrianIdDataKey,
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		// No initialization needed
 	}
 

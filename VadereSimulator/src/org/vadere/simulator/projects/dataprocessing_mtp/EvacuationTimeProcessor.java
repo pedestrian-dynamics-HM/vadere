@@ -1,10 +1,10 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import org.vadere.simulator.control.SimulationState;
-import org.vadere.state.scenario.Pedestrian;
-
 import java.util.Collection;
 import java.util.Collections;
+
+import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.scenario.Pedestrian;
 
 public class EvacuationTimeProcessor extends Processor<NoDataKey, Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
@@ -30,7 +30,7 @@ public class EvacuationTimeProcessor extends Processor<NoDataKey, Double> {
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesEvacuationTimeProcessor att = (AttributesEvacuationTimeProcessor) attributes;
         this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
     }

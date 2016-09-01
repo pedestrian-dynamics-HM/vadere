@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import org.vadere.simulator.control.SimulationState;
-
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.vadere.simulator.control.SimulationState;
 
 public class PedestrianFlowProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
     private PedestrianVelocityProcessor pedVelProc;
@@ -29,7 +29,7 @@ public class PedestrianFlowProcessor extends Processor<TimestepPedestrianIdDataK
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesPedestrianFlowProcessor att = (AttributesPedestrianFlowProcessor) attributes;
 
         this.pedVelProc = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());

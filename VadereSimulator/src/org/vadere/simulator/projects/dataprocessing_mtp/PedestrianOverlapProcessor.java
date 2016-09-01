@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import java.util.Map;
+
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.util.geometry.shapes.VPoint;
-
-import java.util.Map;
 
 public class PedestrianOverlapProcessor extends Processor<TimestepPedestrianIdDataKey, Integer> {
     private double pedRadius;
@@ -20,7 +20,7 @@ public class PedestrianOverlapProcessor extends Processor<TimestepPedestrianIdDa
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesPedestrianOverlapProcessor att = (AttributesPedestrianOverlapProcessor) attributes;
 
         this.pedRadius = att.getPedRadius();

@@ -1,10 +1,10 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import java.util.Map;
+
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-
-import java.util.Map;
 
 public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKey, Double> {
     private double lastSimTime;
@@ -36,7 +36,7 @@ public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKe
     }
 
     @Override
-    void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
         AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) attributes;
         this.waitingArea = att.getWaitingArea();
     }

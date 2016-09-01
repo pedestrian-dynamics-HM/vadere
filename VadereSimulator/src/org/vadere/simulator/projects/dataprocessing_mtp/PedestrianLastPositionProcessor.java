@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import java.util.Map;
+
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.util.geometry.shapes.VPoint;
-
-import java.util.Map;
 
 public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataKey, VPoint> {
 	private PedestrianPositionProcessor pedPosProc;
@@ -22,7 +22,7 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		AttributesPedestrianLastPositionProcessor attLastPosProc =
 				(AttributesPedestrianLastPositionProcessor) attributes;
 		this.pedPosProc =

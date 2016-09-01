@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
-import java.util.*;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 
 import org.vadere.simulator.control.SimulationState;
@@ -36,7 +36,7 @@ public class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
 		AttributesVelocityProcessor attVelProc = (AttributesVelocityProcessor) attributes;
 
 		this.pedPosProc =
