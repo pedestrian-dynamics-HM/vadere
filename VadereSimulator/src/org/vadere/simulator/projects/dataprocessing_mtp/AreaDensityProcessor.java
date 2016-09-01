@@ -12,6 +12,6 @@ public abstract class AreaDensityProcessor extends AreaProcessor<Double> {
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        this.setValue(new TimestepDataKey(state.getStep()), this.densAlg.getDensity(state));
+        this.addValue(new TimestepDataKey(state.getStep()), this.densAlg.getDensity(state));
     }
 }

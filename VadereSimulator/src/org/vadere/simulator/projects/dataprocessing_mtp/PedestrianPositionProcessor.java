@@ -28,7 +28,7 @@ public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdD
 			Integer pedId = entry.getKey();
 			VPoint pos = entry.getValue();
 
-			this.setValue(new TimestepPedestrianIdDataKey(timeStep, pedId), pos);
+			this.addValue(new TimestepPedestrianIdDataKey(timeStep, pedId), pos);
 		}
 	}
 

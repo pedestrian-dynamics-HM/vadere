@@ -27,6 +27,6 @@ public class PedestrianEndTimeProcessor extends Processor<PedestrianIdDataKey, D
 
     private void setValues(Collection<Pedestrian> peds, double value) {
         peds.stream().map(ped -> new PedestrianIdDataKey(ped.getId()))
-                .forEach(key -> this.setValue(key, value));
+                .forEach(key -> this.addValue(key, value));
     }
 }

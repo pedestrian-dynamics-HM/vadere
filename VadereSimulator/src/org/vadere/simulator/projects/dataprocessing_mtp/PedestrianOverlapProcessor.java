@@ -16,7 +16,7 @@ public class PedestrianOverlapProcessor extends Processor<TimestepPedestrianIdDa
     protected void doUpdate(final SimulationState state) {
         Map<Integer, VPoint> pedPosMap = state.getPedestrainPositionMap();
 
-        pedPosMap.entrySet().forEach(entry -> this.setValue(new TimestepPedestrianIdDataKey(state.getStep(), entry.getKey()), this.calculateOverlaps(pedPosMap, entry.getValue())));
+        pedPosMap.entrySet().forEach(entry -> this.addValue(new TimestepPedestrianIdDataKey(state.getStep(), entry.getKey()), this.calculateOverlaps(pedPosMap, entry.getValue())));
     }
 
     @Override

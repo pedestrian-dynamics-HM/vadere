@@ -15,7 +15,7 @@ public class PedestrianSourceIdProcessor extends Processor<PedestrianIdDataKey, 
 	public void doUpdate(final SimulationState state) {
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 
-		peds.forEach(p -> this.setValue(new PedestrianIdDataKey(p.getId()), -1));
+		peds.forEach(p -> this.addValue(new PedestrianIdDataKey(p.getId()), -1));
 	}
 
 	@Override

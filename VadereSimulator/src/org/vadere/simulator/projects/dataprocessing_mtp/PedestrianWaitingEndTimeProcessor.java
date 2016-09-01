@@ -23,7 +23,7 @@ public class PedestrianWaitingEndTimeProcessor extends Processor<PedestrianIdDat
 
             if (this.waitingArea.contains(pos)) {
                 PedestrianIdDataKey key = new PedestrianIdDataKey(pedId);
-                this.setValue(key, state.getSimTimeInSec());
+                this.addValue(key, state.getSimTimeInSec());
             }
         }
     }

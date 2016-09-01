@@ -24,7 +24,7 @@ public class EvacuationTimeProcessor extends Processor<NoDataKey, Double> {
 
         Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 
-        this.setValue(NoDataKey.key(), this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
+        this.addValue(NoDataKey.key(), this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
                 ? Double.NaN
                 : Collections.max(this.pedEvacTimeProc.getValues()));
     }

@@ -32,7 +32,7 @@ public class MeanPedestrianEvacuationTimeProcessor extends Processor<NoDataKey, 
                 .collect(Collectors.toList());
         int count = nonNans.size();
 
-        this.setValue(NoDataKey.key(), count > 0
+        this.addValue(NoDataKey.key(), count > 0
                 ? nonNans.stream().reduce(0.0, (val1, val2) -> val1 + val2) / count
                 : Double.NaN);
     }

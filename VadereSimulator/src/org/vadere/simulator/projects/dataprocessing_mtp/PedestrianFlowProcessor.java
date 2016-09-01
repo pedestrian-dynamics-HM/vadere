@@ -24,7 +24,7 @@ public class PedestrianFlowProcessor extends Processor<TimestepPedestrianIdDataK
             double velocity = this.pedVelProc.getValue(key);
             double density = this.pedDensProc.getValue(key);
 
-            this.setValue(key, velocity * density);
+            this.addValue(key, velocity * density);
         }
     }
 

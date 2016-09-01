@@ -62,7 +62,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 		return column.get(key);
 	}
 
-	protected void setValue(final K key, final V value) {
+	protected void addValue(final K key, final V value) {
 		this.column.put(key, value);
 	}
 
