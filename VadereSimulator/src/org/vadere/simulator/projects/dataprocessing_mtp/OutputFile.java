@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	private void printRow(final PrintWriter out, final K key) {
-		final List<String> fields = Arrays.asList(toStrings(key));
+		final List<String> fields = new LinkedList<>(Arrays.asList(toStrings(key)));
 
 		final List<String> processorFields = processors.stream()
 				.flatMap(p -> Arrays.stream(p.toStrings(key)))
