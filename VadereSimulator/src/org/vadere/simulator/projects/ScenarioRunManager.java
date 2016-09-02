@@ -10,6 +10,7 @@ import org.vadere.simulator.projects.dataprocessing.processors.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.processors.PedestrianPositionProcessor;
 import org.vadere.simulator.projects.dataprocessing.processors.SnapshotOutputProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
+import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -53,6 +54,8 @@ public class ScenarioRunManager implements Runnable {
 	private List<ModelTest> modelTests;
 	protected final List<PassiveCallback> passiveCallbacks;
 	protected List<ProcessorWriter> writers;
+
+	private DataProcessingJsonManager dataProcessingJsonManager;
 	protected ProcessorManager processorManager;
 
 	private ScenarioFinishedListener finishedListener;
@@ -157,6 +160,8 @@ public class ScenarioRunManager implements Runnable {
 
 		logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
 		scenarioStore.topography.reset();
+
+		this.processorManager = this.dataProcessingJsonManager.createProcessorManager();
 	}
 
 	public void setScenarioFailed(final boolean scenarioFailed) {
@@ -407,12 +412,11 @@ public class ScenarioRunManager implements Runnable {
 		return null;
 	}
 
-	public ProcessorManager getProcessorManager() {
-		return processorManager;
+	public DataProcessingJsonManager getDataProcessingJsonManager() {
+		return this.dataProcessingJsonManager;
 	}
 
-	public void setProcessorManager(ProcessorManager processorManager) {
-		this.processorManager = processorManager;
+	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {
+		this.dataProcessingJsonManager = manager;
 	}
-
 }

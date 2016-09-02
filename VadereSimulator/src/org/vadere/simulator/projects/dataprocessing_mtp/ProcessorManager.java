@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ProcessorManager {
 
@@ -45,10 +44,6 @@ public class ProcessorManager {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
 	}
 
-	public List<OutputFile<?>> getOutputFiles() {
-		return this.outputFiles;
-	}
-
 	public Model getModel() {
 		return this.model;
 	}
@@ -63,14 +58,6 @@ public class ProcessorManager {
 
 	public void postLoop(final SimulationState state) {
 		this.processorMap.values().forEach(proc -> proc.postLoop(state));
-	}
-
-	public Set<Integer> getProcessorIds() {
-		return this.processorMap.keySet();
-	}
-
-	public Set<Integer> getAttributesProcessorIds() {
-		return this.attributesMap.keySet();
 	}
 
 	public AttributesProcessor getAttributes(int processorId) {

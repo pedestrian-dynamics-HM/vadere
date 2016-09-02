@@ -10,22 +10,24 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.prefs.Preferences;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Shows text like the JSON formatted attributes.
@@ -172,12 +174,10 @@ public class TextView extends JPanel {
 								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
 								break;
 							case SIMULATION:
-								currentScenario
-										.setAttributesSimulation(JsonConverter.deserializeAttributesSimulation(json));
+								currentScenario.setAttributesSimulation(JsonConverter.deserializeAttributesSimulation(json));
 								break;
 							case OUTPUTPROCESSOR:
-								currentScenario.setProcessorManager(JsonConverter.deserializeProcessorManager(json));
-
+								currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
 								break;
 							case TOPOGRAPHY:
 								currentScenario.setTopography(JsonConverter.deserializeTopography(json));
@@ -220,7 +220,7 @@ public class TextView extends JPanel {
 						.setText(JsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
 				break;
 			case OUTPUTPROCESSOR:
-				this.txtrTextfiletextarea.setText(JsonConverter.serializeProcessorManager(scenario.getProcessorManager()));
+				this.txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 				break;
 
 			case TOPOGRAPHY:
