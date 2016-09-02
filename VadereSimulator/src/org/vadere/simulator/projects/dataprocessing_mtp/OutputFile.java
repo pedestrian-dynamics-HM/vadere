@@ -60,11 +60,12 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	private void printRow(final PrintWriter out, final K key) {
+		@SuppressWarnings("unchecked")
 		final List<String> fields = composeLine(toStrings(key), p -> Arrays.stream(p.toStrings(key)));
 		writeLine(out, fields);
 	}
 
-	private List<String> composeLine(String[] keyFieldArray, Function<Processor, Stream<String>> valueFields) {
+	private List<String> composeLine(String[] keyFieldArray, @SuppressWarnings("rawtypes") Function<Processor, Stream<String>> valueFields) {
 		final List<String> fields = new LinkedList<>(Arrays.asList(keyFieldArray));
 
 		final List<String> processorFields = processors.stream()
