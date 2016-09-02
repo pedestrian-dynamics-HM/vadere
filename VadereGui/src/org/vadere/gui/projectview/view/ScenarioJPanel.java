@@ -1,5 +1,30 @@
 package org.vadere.gui.projectview.view;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.beans.IntrospectionException;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
@@ -12,23 +37,9 @@ import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.beans.IntrospectionException;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
@@ -214,7 +225,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 					.forEach(procclass -> panel.add(new JLabel("- " + procclass.getSimpleName())));
 		});
 
-		List<Class<? extends OutputFile>> classes = ClassFinder.getOutputFileClasses();
+		List<Class<?>> classes = ClassFinder.getOutputFileClasses();
 		JComboBox<Class> cbOutputTypes = new JComboBox<>(classes.toArray(new Class[classes.size()]));
 		cbOutputTypes.setRenderer(new ClassRenderer());
 		panel.add(cbOutputTypes);

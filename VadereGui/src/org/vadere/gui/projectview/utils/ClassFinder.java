@@ -1,12 +1,5 @@
 package org.vadere.gui.projectview.utils;
 
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
-import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesOSM;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -14,10 +7,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesOSM;
 
 public class ClassFinder {
 
@@ -39,28 +37,26 @@ public class ClassFinder {
 	}
 
 	// all output file classes
-	public static List<Class<? extends OutputFile>> getOutputFileClasses() {
-		List<Class<? extends OutputFile>> classList = null;
-
+	public static List<Class<?>> getOutputFileClasses() {
 		try {
-			Class<? extends OutputFile>[] classes = getClasses(Processor.class.getPackage().getName());
-			classList = Arrays.stream(classes)
+			// TODO use findSubclassesInPackage and get rid of the try/catch in this method
+			List<Class<?>> classes = getClasses(Processor.class.getPackage().getName()); // TODO why Processor's and not OutputFile's package?
+			return classes.stream()
 					.filter(c -> c.getSimpleName().endsWith("File") && !Modifier.isAbstract(c.getModifiers()))
 					.collect(Collectors.toList());
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
 
-		return classList;
+		// TODO better return empty list, it's simpler to handle from the UI
+		return null;
 	}
 
-	public static List<Class<? extends Processor>> getProcessorClasses(Type keyType) {
-		List<Class<? extends Processor>> procs = null;
-
+	public static List<Class<?>> getProcessorClasses(Type keyType) {
 		try {
-			Class<? extends Processor>[] classes = getClasses(Processor.class.getPackage().getName());
-
-			procs = Arrays.stream(classes)
+			// TODO use findSubclassesInPackage and get rid of the try/catch in this method
+			List<Class<?>> classes = getClasses(Processor.class.getPackage().getName());
+			return classes.stream()
 					.filter(c -> {
 						String name = c.getSimpleName();
 						return name.endsWith("Processor") && !name.startsWith("Attributes") && !Modifier.isAbstract(c.getModifiers());
@@ -71,31 +67,32 @@ public class ClassFinder {
 			e.printStackTrace();
 		}
 
-		return procs;
+		// TODO better return empty list, it's simpler to handle from the UI
+		return null;
 	}
 
-	private static List<String> getClassNamesWithTagInPackage(String packageName, Class classTag) {
-		List<String> classNames = new ArrayList<>();
+	private static List<String> getClassNamesWithTagInPackage(String packageName, Class<?> baseClassOrInterface) {
+		return findSubclassesInPackage(packageName, baseClassOrInterface).stream()
+				.map(Class::getName)
+				.collect(Collectors.toList());
+	}
+
+	private static List<Class<?>> findSubclassesInPackage(String packageName, Class<?> baseClassOrInterface) {
 		try {
-			for (Class cls : getClasses(packageName)) {
-				if (!cls.isInterface() && classTag.isAssignableFrom(cls)) {
-					String name = cls.getName();
-					if (isNotAnInnerClass(name)) {
-						classNames.add(name);
-					}
-				}
-			}
+			return getClasses(packageName).stream()
+					.filter(c -> !c.isInterface()
+							&& baseClassOrInterface.isAssignableFrom(c) 
+							&& isNotAnInnerClass(c))
+					.collect(Collectors.toList());
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-		return classNames;
+		return new ArrayList<>();
 	}
 
-
-	private static boolean isNotAnInnerClass(String name) {
-		return !name.contains("$");
+	private static boolean isNotAnInnerClass(Class<?> clazz) {
+		return !clazz.getName().contains("$");
 	}
-
 
 	// below via https://dzone.com/articles/get-all-classes-within-package
 
@@ -108,7 +105,7 @@ public class ClassFinder {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+	private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		assert classLoader != null;
 		String path = packageName.replace('.', '/');
@@ -118,11 +115,11 @@ public class ClassFinder {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
 		}
-		ArrayList<Class> classes = new ArrayList<>();
+		ArrayList<Class<?>> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
-		return classes.toArray(new Class[classes.size()]);
+		return classes;
 	}
 
 	/**
@@ -133,8 +130,8 @@ public class ClassFinder {
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 */
-	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<>();
+	private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
 		if (!directory.exists()) {
 			return classes;
 		}
@@ -151,8 +148,8 @@ public class ClassFinder {
 		return classes;
 	}
 
-	private static ParameterizedType findGenericProcessorSuperclass(Class<? extends Processor> c) {
-		Class superclass = c;
+	private static ParameterizedType findGenericProcessorSuperclass(Class<?> c) {
+		Class<?> superclass = c;
 
 		while (!superclass.equals(Object.class)) {
 			if(superclass.getSuperclass().equals(Processor.class))
