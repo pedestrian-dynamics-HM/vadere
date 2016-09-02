@@ -226,11 +226,11 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		});
 
 		List<Class<?>> classes = ClassFinder.getOutputFileClasses();
-		JComboBox<Class> cbOutputTypes = new JComboBox<>(classes.toArray(new Class[classes.size()]));
+		JComboBox<Class<?>> cbOutputTypes = new JComboBox<>(classes.toArray(new Class[classes.size()]));
 		cbOutputTypes.setRenderer(new ClassRenderer());
 		panel.add(cbOutputTypes);
 
-		JComboBox<Class> cbProcessorTypes = new JComboBox<>();
+		JComboBox<Class<?>> cbProcessorTypes = new JComboBox<>();
 		cbProcessorTypes.setRenderer(cbOutputTypes.getRenderer());
 
 		cbOutputTypes.addItemListener(e -> {
@@ -239,7 +239,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 			cbProcessorTypes.removeAllItems();
 
-			Class cOutput = (Class) e.getItem();
+			Class<?> cOutput = (Class<?>) e.getItem();
 			ClassFinder.getProcessorClasses(((ParameterizedType) cOutput.getGenericSuperclass()).getActualTypeArguments()[0]).forEach(c -> cbProcessorTypes.addItem(c));
 		});
 		cbOutputTypes.setSelectedIndex(1);
