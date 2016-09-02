@@ -31,15 +31,6 @@ public class TimestepPedestrianIdDataKey implements Comparable<TimestepPedestria
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + pedestrianId;
-		result = prime * result + timestep;
-		return result;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
