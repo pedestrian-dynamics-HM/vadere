@@ -62,6 +62,8 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		initialize(builder);
 
 		sourceController.update(0);
+		sourceController.update(1);
+		sourceController.update(2);
 
 		assertEquals("wrong pedestrian number", 1, countPedestrians());
 	}
