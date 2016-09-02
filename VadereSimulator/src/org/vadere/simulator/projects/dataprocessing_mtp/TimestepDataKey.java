@@ -36,4 +36,9 @@ public class TimestepDataKey implements Comparable<TimestepDataKey> {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return Integer.toString(this.timestep);
+	}
 }

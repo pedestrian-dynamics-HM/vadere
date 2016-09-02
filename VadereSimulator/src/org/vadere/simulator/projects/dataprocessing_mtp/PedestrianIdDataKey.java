@@ -42,4 +42,8 @@ public class PedestrianIdDataKey implements Comparable<PedestrianIdDataKey> {
 		return Integer.compare(pedestrianId, o.pedestrianId);
 	}
 
+	@Override
+	public String toString() {
+		return Integer.toString(this.pedestrianId);
+	}
 }
