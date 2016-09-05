@@ -1,5 +1,12 @@
 package org.vadere.gui.projectview.utils;
 
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
+import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesOSM;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -10,12 +17,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesOSM;
 
 public class ClassFinder {
 
@@ -38,37 +39,17 @@ public class ClassFinder {
 
 	// all output file classes
 	public static List<Class<?>> getOutputFileClasses() {
-		try {
-			// TODO use findSubclassesInPackage and get rid of the try/catch in this method
-			List<Class<?>> classes = getClasses(Processor.class.getPackage().getName()); // TODO why Processor's and not OutputFile's package?
-			return classes.stream()
-					.filter(c -> c.getSimpleName().endsWith("File") && !Modifier.isAbstract(c.getModifiers()))
-					.collect(Collectors.toList());
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-		}
-
-		// TODO better return empty list, it's simpler to handle from the UI
-		return null;
+		return findSubclassesInPackage(OutputFile.class.getPackage().getName(), OutputFile.class)
+				.stream().filter(cfile -> !Modifier.isAbstract(cfile.getModifiers()))
+				.collect(Collectors.toList());
 	}
 
 	public static List<Class<?>> getProcessorClasses(Type keyType) {
-		try {
-			// TODO use findSubclassesInPackage and get rid of the try/catch in this method
-			List<Class<?>> classes = getClasses(Processor.class.getPackage().getName());
-			return classes.stream()
-					.filter(c -> {
-						String name = c.getSimpleName();
-						return name.endsWith("Processor") && !name.startsWith("Attributes") && !Modifier.isAbstract(c.getModifiers());
-					})
-					.filter(c -> (findGenericProcessorSuperclass(c)).getActualTypeArguments()[0].equals(keyType))
-					.collect(Collectors.toList());
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-		}
-
-		// TODO better return empty list, it's simpler to handle from the UI
-		return null;
+		return findSubclassesInPackage(Processor.class.getPackage().getName(), Processor.class)
+				.stream()
+				.filter(cproc -> !Modifier.isAbstract(cproc.getModifiers()))
+				.filter(cproc -> findGenericProcessorSuperclass(cproc).getActualTypeArguments()[0].equals(keyType))
+				.collect(Collectors.toList());
 	}
 
 	private static List<String> getClassNamesWithTagInPackage(String packageName, Class<?> baseClassOrInterface) {
