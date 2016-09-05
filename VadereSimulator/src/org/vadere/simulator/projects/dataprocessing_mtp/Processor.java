@@ -11,7 +11,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 	private int id;
 
 	private String[] headers;
-	private Map<K, V> column;
+	private Map<K, V> data;
 
 	private int lastStep;
 
@@ -21,13 +21,13 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	protected Processor(final String... headers) {
 		this.headers = headers;
-		this.column = new TreeMap<>(); // TreeMap to avoid sorting data later
+		this.data = new TreeMap<>(); // TreeMap to avoid sorting data later
 
 		this.lastStep = 0;
 	}
 
 	protected Map<K, V> getData() {
-		return this.column;
+		return this.data;
 	}
 
 	public int getId() {
@@ -55,15 +55,15 @@ public abstract class Processor<K extends Comparable<K>, V> {
 	}
 
 	public boolean hasValue(final K key) {
-		return this.column.containsKey(key);
+		return this.data.containsKey(key);
 	}
 
 	public V getValue(final K key) {
-		return column.get(key);
+		return data.get(key);
 	}
 
 	protected void addValue(final K key, final V value) {
-		this.column.put(key, value);
+		this.data.put(key, value);
 	}
 
 	public void preLoop(final SimulationState state) { }
