@@ -19,7 +19,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	private List<Integer> processorIds;
 	private List<Processor<K, ?>> processors;
 
-    private static String SEPARATOR = " ";
+    private String separator;
 
 	OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
@@ -33,6 +33,14 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	public void setProcessorIds(final List<Integer> processorIds) {
 		this.processorIds = processorIds;
 		this.processors.clear();
+	}
+
+	public String getSeparator() {
+		return this.separator;
+	}
+
+	public void setSeparator(final String separator) {
+		this.separator = separator;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -76,7 +84,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 	
 	private void writeLine(PrintWriter out, final List<String> fields) {
-		out.println(String.join(SEPARATOR, fields));
+		out.println(String.join(this.separator, fields));
 	}
 
 	/** Return the column headers as string or the empty array. */

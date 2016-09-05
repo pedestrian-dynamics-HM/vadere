@@ -25,11 +25,14 @@ public class DataProcessingJsonManager {
     private static final String TYPE_KEY = "type";
     private static final String FILENAME_KEY = "filename";
     private static final String FILE_PROCESSORS_KEY = "processors";
+    private static final String SEPARATOR_KEY = "separator";
 
     public static final String PROCESSORS_KEY = "processors";
     private static final String PROCESSORID_KEY = "id";
 
     public static final String ATTRIBUTES_KEY = "attributes";
+
+    private static final String DEFAULT_SEPARATOR = " ";
 
     private static ObjectMapper mapper;
     public static ObjectWriter writer;
@@ -51,6 +54,21 @@ public class DataProcessingJsonManager {
         String type;
         String filename;
         List<Integer> processors;
+        private String separator;
+
+        public OutputFileStore() {
+            this.separator = DEFAULT_SEPARATOR;
+        }
+
+        public String getSeparator() {
+            return this.separator;
+        }
+
+        public void setSeparator(String separator) {
+            if (separator != null) {
+                this.separator = separator;
+            }
+        }
     }
 
     static {
@@ -75,6 +93,7 @@ public class DataProcessingJsonManager {
         OutputFile<?> file = outputFileInstantiator.createObject(fileStore.type);
         file.setFileName(fileStore.filename);
         file.setProcessorIds(fileStore.processors);
+        file.setSeparator(fileStore.getSeparator());
         this.outputFiles.add(file);
     }
 
@@ -94,6 +113,11 @@ public class DataProcessingJsonManager {
         node.put(TYPE_KEY, outputFile.getClass().getName());
         node.put(FILENAME_KEY, outputFile.getFileName());
         node.set(FILE_PROCESSORS_KEY, mapper.convertValue(outputFile.getProcessorIds(), JsonNode.class));
+
+        final String separator = outputFile.getSeparator();
+        if (separator != DEFAULT_SEPARATOR) {
+            node.put(SEPARATOR_KEY, separator);
+        }
 
         return node;
     }

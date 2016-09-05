@@ -2,7 +2,8 @@
 	"files": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
 		"filename": "output_ts_pid.txt",
-		"processors": [ 1, 2, 3, 5, 13, 14, 17 ]
+		"processors": [ 1, 2, 3, 5, 13, 14, 17 ],
+		"separator": ";"
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianIdOutputFile",
 		"filename": "output_pid.txt",
