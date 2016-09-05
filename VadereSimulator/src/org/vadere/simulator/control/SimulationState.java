@@ -1,13 +1,19 @@
 package org.vadere.simulator.control;
 
-import java.util.*;
-
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
+import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class SimulationState {
 	private final Topography topography;
@@ -18,12 +24,15 @@ public class SimulationState {
 	private final int step;
 	private final String name;
 	private final List<ProcessorWriter> processorWriter;
+	private ProcessorManager processorManager;
 
 	protected SimulationState(final String name,
-			final Topography topography,
-			final ScenarioStore scenarioStore,
-			final List<ProcessorWriter> processorWriter,
-			final double simTimeInSec, final int step) {
+							  final Topography topography,
+							  final ScenarioStore scenarioStore,
+							  final List<ProcessorWriter> processorWriter,
+							  final double simTimeInSec,
+							  final int step,
+							  final ProcessorManager processorManager) {
 		this.name = name;
 		this.processorWriter = processorWriter;
 		this.topography = topography;
@@ -32,6 +41,7 @@ public class SimulationState {
 		this.pedestrianPositionMap = new HashMap<>();
 		this.outputGeneratorMap = new HashMap<>();
 		this.scenarioStore = scenarioStore;
+		this.processorManager = processorManager;
 
 		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
 			pedestrianPositionMap.put(pedestrian.getId(), pedestrian.getPosition());
@@ -44,8 +54,9 @@ public class SimulationState {
 	protected SimulationState(final String name,
 			final Topography topography,
 			final ScenarioStore scenarioStore,
-			final double simTimeInSec, final int step) {
-		this(name, topography, scenarioStore, new ArrayList<>(), simTimeInSec, step);
+			final double simTimeInSec, final int step,
+							  final ProcessorManager processorManager) {
+		this(name, topography, scenarioStore, new ArrayList<>(), simTimeInSec, step, processorManager);
 	}
 
 	@Deprecated
@@ -122,4 +133,7 @@ public class SimulationState {
 		return name;
 	}
 
+	public ProcessorManager getProcessorManager() {
+		return this.processorManager;
+	}
 }

@@ -1,5 +1,8 @@
 package org.vadere.simulator.projects.dataprocessing_mtp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.util.io.IOUtils;
@@ -11,14 +14,17 @@ import java.util.List;
 import java.util.Map;
 
 public class ProcessorManager {
+	private DataProcessingJsonManager jsonManager;
 
 	private Model model;
+
 	private Map<Integer, Processor<?, ?>> processorMap;
 	private Map<Integer, AttributesProcessor> attributesMap;
-
 	private List<OutputFile<?>> outputFiles;
 
-	public ProcessorManager(List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<OutputFile<?>> outputFiles) {
+	public ProcessorManager(DataProcessingJsonManager jsonManager, List<Processor<?, ?>> processors, List<AttributesProcessor> attributesProcessor, List<OutputFile<?>> outputFiles) {
+		this.jsonManager = jsonManager;
+
 		this.outputFiles = outputFiles;
 
 		this.attributesMap = new LinkedHashMap<>();
@@ -72,4 +78,8 @@ public class ProcessorManager {
 	public void writeOutput() {
         this.outputFiles.forEach(file -> file.write());
     }
+
+    public JsonNode serializeToNode() throws JsonProcessingException {
+    	return this.jsonManager.serializeToNode();
+	}
 }

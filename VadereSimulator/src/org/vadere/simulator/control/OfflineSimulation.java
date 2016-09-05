@@ -1,15 +1,5 @@
 package org.vadere.simulator.control;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunManager;
@@ -19,6 +9,16 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.io.IOUtils;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class OfflineSimulation {
 
@@ -66,7 +66,7 @@ public class OfflineSimulation {
 				.map(t -> t.getAgent(step))
 				.filter(opt -> opt.isPresent()).forEach(opt -> topography.addElement(opt.get()));
 		return new SimulationState(vadere.getName(), topography, vadere.getScenarioStore(), vadere.getAllWriters(),
-				step.getSimTimeInSec().orElse(Double.NaN), step.getStepNumber());
+				step.getSimTimeInSec().orElse(Double.NaN), step.getStepNumber(), vadere.getProcessorManager());
 	}
 
 	private void prepareOutput() {

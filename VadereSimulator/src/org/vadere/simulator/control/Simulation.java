@@ -128,10 +128,12 @@ public class Simulation {
 		for (PassiveCallback c : passiveCallbacks) {
 			c.preLoop(simTimeInSec);
 		}
+
+		processorManager.preLoop(this.simulationState);
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step);
+		simulationState = new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step, this.processorManager);
 		for (ActiveCallback ac : activeCallbacks) {
 			// ActiveCallbacks must also be Models in this case
 			simulationState.registerOutputGenerator(ac.getClass(), ac);
@@ -148,6 +150,8 @@ public class Simulation {
 		for (Writer writer : processorWriter) {
 			writer.postLoop(simulationState);
 		}
+
+		processorManager.postLoop(this.simulationState);
 	}
 
 	/**
@@ -159,7 +163,6 @@ public class Simulation {
 			processorManager.initOutputFiles();
 
 			preLoop();
-			processorManager.preLoop(this.simulationState);
 
 			while (runSimulation) {
 				synchronized (this) {
@@ -212,7 +215,6 @@ public class Simulation {
 			// this is necessary to free the resources (files), the SimulationWriter and processors are writing in!
 			postLoop();
 
-			processorManager.postLoop(this.simulationState);
 			processorManager.writeOutput();
 			this.logger.info("Logged all processors in logfiles");
 		}
@@ -220,7 +222,7 @@ public class Simulation {
 
 	private SimulationState initialSimulationState() {
 		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, processorWriter, simTimeInSec, step);
+				new SimulationState(name, topography.clone(), scenarioStore, processorWriter, simTimeInSec, step, this.processorManager);
 
 		for (ActiveCallback ac : activeCallbacks) {
 			// ActiveCallbacks must also be Models in this case
@@ -233,7 +235,7 @@ public class Simulation {
 	private void updateWriters(double simTimeInSec) {
 
 		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step);
+				new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step, this.processorManager);
 		simulationState.setOutputGeneratorMap(this.simulationState.getOutputGeneratorMap());
 		this.simulationState = simulationState;
 

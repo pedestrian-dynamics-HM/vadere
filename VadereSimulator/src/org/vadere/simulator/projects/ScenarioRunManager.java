@@ -412,6 +412,10 @@ public class ScenarioRunManager implements Runnable {
 		return null;
 	}
 
+	public ProcessorManager getProcessorManager() {
+		return this.processorManager;
+	}
+
 	public DataProcessingJsonManager getDataProcessingJsonManager() {
 		return this.dataProcessingJsonManager;
 	}

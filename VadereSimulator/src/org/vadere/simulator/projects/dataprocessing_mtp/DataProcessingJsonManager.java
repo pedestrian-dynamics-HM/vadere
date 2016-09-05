@@ -210,6 +210,6 @@ public class DataProcessingJsonManager {
     }
 
     public ProcessorManager createProcessorManager() {
-        return new ProcessorManager(this.processors, this.attributes, this.outputFiles);
+        return new ProcessorManager(this, this.processors, this.attributes, this.outputFiles);
     }
 }
