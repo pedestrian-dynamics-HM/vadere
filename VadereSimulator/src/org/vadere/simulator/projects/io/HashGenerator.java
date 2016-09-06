@@ -55,7 +55,7 @@ public class HashGenerator {
 		String commithash = "";
 
 		if(in != null) {
-			Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_commit_hash.txt"));
+			Scanner scanner = new Scanner(in);
 			if(scanner.hasNext()) {
 				commithash = scanner.next();
 			}
@@ -76,8 +76,7 @@ public class HashGenerator {
 		InputStream in = HashGenerator.class.getResourceAsStream("/current_release_number.txt");
 		String releaseNumber = "";
 		if(in != null) {
-			Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_release_number.txt"));
-			releaseNumber = scanner.next();
+			Scanner scanner = new Scanner(in);
 			if(scanner.hasNext()) {
 				releaseNumber = scanner.next();
 			}
