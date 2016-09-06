@@ -63,7 +63,8 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	}
 
 	private void printHeader(PrintWriter out) {
-		if (keyHeaders.length > 0) {
+		// Print headers only if the line is not empty, i.e. the keyHeaders and/or processor headers are given
+		if (keyHeaders.length + this.processors.stream().map(p -> p.getHeaders().length).reduce(0, (x,y) -> x+y) > 0) {
 			final List<String> fieldHeaders = composeLine(keyHeaders, p -> Arrays.stream(p.getHeaders()));
 			writeLine(out, fieldHeaders);
 		}

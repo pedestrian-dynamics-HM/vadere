@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.io.JsonConverter;
 
 public class SnapshotProcessor extends Processor<NoDataKey, String> {
     public SnapshotProcessor() {
-        super("");
+        super(new String[] { });
     }
 
     @Override
