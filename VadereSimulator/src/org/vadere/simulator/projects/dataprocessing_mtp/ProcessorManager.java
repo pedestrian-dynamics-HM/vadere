@@ -7,8 +7,6 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.util.io.IOUtils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +69,7 @@ public class ProcessorManager {
 	}
 
 	public void setOutputPath(String directory) {
-		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
-		this.outputFiles.forEach(file -> file.setFileName(IOUtils.getPath(directory, String.format("%s_%s", dateString, file.getFileName())).toString()));
+		this.outputFiles.forEach(file -> file.setFileName(IOUtils.getPath(directory, String.format("%s", file.getFileName())).toString()));
 	}
 
 	public void writeOutput() {

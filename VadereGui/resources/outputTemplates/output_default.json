@@ -18,8 +18,12 @@
 		"processors": [ 11, 12 ]
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.NoDataKeyOutputFile",
-		"filename": "scenario_snapshot.txt",
-		"processors": [18]
+		"filename": "snapshot.scenario",
+		"processors": [ 18 ]
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
+		"filename": "test.trajectories",
+		"processors": [ 1, 19 ]
 	} ],
 	"processors": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianPositionProcessor",
@@ -75,6 +79,12 @@
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing_mtp.SnapshotProcessor",
 		"id": 18
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianTargetIdProcessor",
+		"id": 19
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianSourceIdProcessor",
+		"id": 20
 	} ],
 	"attributes": {
 		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesVelocityProcessor": {

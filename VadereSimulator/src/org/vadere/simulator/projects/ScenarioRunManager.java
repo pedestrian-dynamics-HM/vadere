@@ -7,27 +7,20 @@ import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.ModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.processors.ModelTest;
-import org.vadere.simulator.projects.dataprocessing.processors.PedestrianPositionProcessor;
-import org.vadere.simulator.projects.dataprocessing.processors.SnapshotOutputProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.processors.AttributesPedestrianPositionProcessor;
-import org.vadere.state.attributes.processors.AttributesWriter;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,8 +74,8 @@ public class ScenarioRunManager implements Runnable {
 		this.modelTests = new LinkedList<>();
 		this.writers = new LinkedList<>();
 		this.scenarioStore = store;
-		this.outputPath = Paths.get(IOUtils.OUTPUT_DIR); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
-		this.processorOutputPath = Paths.get(IOUtils.DATAPROCESSING_DIR);
+
+		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR), Paths.get(IOUtils.DATAPROCESSING_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
@@ -243,8 +236,8 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void setOutputPaths(final Path outputPath, final Path processedOutputPath) {
-		this.outputPath = outputPath;
-		this.processorOutputPath = processedOutputPath;
+		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
+		this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
 	}
 
 	public void setName(String name) {
@@ -296,58 +289,7 @@ public class ScenarioRunManager implements Runnable {
 
 	// Output stuff...
 	private void prepareOutput() {
-		if (getAttributesSimulation().isWriteSimulationData()) {
-			DateFormat format = new SimpleDateFormat(IOUtils.DATE_FORMAT);
-
-			writers.clear();
-			int writerCounter = 0; // needed to distinguish writers with the same name
-			String dateString = format.format(new Date());
-			String dirName = String.format("%s_%s", this.getName(), dateString);
-
-			ProcessorWriter snapshotWriter = new ProcessorWriter(new SnapshotOutputProcessor(), new AttributesWriter());
-			ProcessorWriter trajectoryWriter = new ProcessorWriter(
-					new PedestrianPositionProcessor(new AttributesPedestrianPositionProcessor(true)),
-					new AttributesWriter());
-			String snapshotFileName =
-					String.format("%s%s", getName(), snapshotWriter.getProcessor().getFileExtension());
-			snapshotFileName = IOUtils.getPath(outputPath.resolve(dirName).toString(), snapshotFileName).toString();
-			String trajectoyFileName =
-					String.format("%s%s", getName(), trajectoryWriter.getProcessor().getFileExtension());
-			trajectoyFileName = IOUtils.getPath(outputPath.resolve(dirName).toString(), trajectoyFileName).toString();
-			try {
-				snapshotWriter.setOutputStream(new FileOutputStream(snapshotFileName, false));
-				snapshotWriter.setWriteHeader(false);
-				trajectoryWriter.setOutputStream(new FileOutputStream(trajectoyFileName, false));
-				trajectoryWriter.setWriteHeader(true);
-				writers.add(snapshotWriter);
-				writers.add(trajectoryWriter);
-			} catch (IOException e) {
-				logger.error(e);
-			}
-
-			for (ProcessorWriter writer : processorWriters) {
-				Path processorOutputPath = null;
-				processorOutputPath = this.processorOutputPath;
-
-				String filename;
-				if (simpleOutputProcessorName) {
-					filename = String.format("%s%s", this.getName(), writer.getProcessor().getFileExtension());
-				} else {
-					filename = String.format("%s_%s_%d_%s%s", this.getName(), writer.getProcessor().getName(),
-							(writerCounter++), dateString, writer.getProcessor().getFileExtension());
-				}
-				String procFileName = IOUtils.getPath(processorOutputPath.toString(), filename).toString();
-				try {
-					writer.setOutputStream(new FileOutputStream(procFileName, false));
-				} catch (FileNotFoundException e) {
-					logger.error(e);
-				}
-				writers.add(writer);
-			}
-
-			// New processors
-			this.processorManager.setOutputPath(this.processorOutputPath.toString());
-		}
+		this.processorManager.setOutputPath(this.outputPath.toString());
 	}
 
 	@Override
