@@ -41,7 +41,6 @@ public class ScenarioRunManager implements Runnable {
 
 	protected ScenarioStore scenarioStore;
 	protected Path outputPath;
-	private Path processorOutputPath;
 
 	private List<ProcessorWriter> processorWriters;
 	private List<ModelTest> modelTests;
@@ -298,7 +297,6 @@ public class ScenarioRunManager implements Runnable {
 		try {
 			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
 			clonedScenario.outputPath = outputPath;
-			clonedScenario.processorOutputPath = processorOutputPath;
 		} catch (IOException | VadereClassNotFoundException e) {
 			logger.error(e);
 		}
@@ -326,7 +324,6 @@ public class ScenarioRunManager implements Runnable {
 			this.writers = srm.writers;
 			this.scenarioStore = srm.scenarioStore;
 			this.outputPath = srm.outputPath;
-			this.processorOutputPath = srm.processorOutputPath;
 			this.processorManager = srm.processorManager;
 			this.modelTests = srm.modelTests;
 			this.finishedListener = srm.finishedListener;
