@@ -1,30 +1,5 @@
 package org.vadere.gui.projectview.view;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.beans.IntrospectionException;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
@@ -40,6 +15,19 @@ import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.beans.IntrospectionException;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
@@ -180,7 +168,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), null, topographyFileView, null);
 
-		outputView = new TextView("/" + IOUtils.DATAPROCESSING_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		outputView = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
 		try {
 			// TODO add more templates and make a loop here

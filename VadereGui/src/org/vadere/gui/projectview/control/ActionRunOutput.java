@@ -7,11 +7,11 @@ import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.simulator.control.OfflineSimulation;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.util.io.IOUtils;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+
+import javax.swing.*;
 
 public class ActionRunOutput extends AbstractAction {
 
@@ -37,8 +37,7 @@ public class ActionRunOutput extends AbstractAction {
 						IOOutput.readScenarioRunManager(outputBundle.getProject(), directoryName);
 				OfflineSimulation offlineSimulation = new OfflineSimulation(
 						IOOutput.readTrajectories(outputBundle.getProject(), vadere, directoryName),
-						vadere, model.getProject().getOutputDir()
-								.resolveSibling(IOUtils.DATAPROCESSING_DIR));
+						vadere, model.getProject().getOutputDir());
 				offlineSimulation.run();
 			} catch (IOException e1) {
 				logger.error("Could not run offline simulation (simulate output):"

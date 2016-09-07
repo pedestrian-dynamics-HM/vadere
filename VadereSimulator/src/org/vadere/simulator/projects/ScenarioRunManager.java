@@ -74,7 +74,7 @@ public class ScenarioRunManager implements Runnable {
 		this.writers = new LinkedList<>();
 		this.scenarioStore = store;
 
-		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR), Paths.get(IOUtils.DATAPROCESSING_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
@@ -234,7 +234,7 @@ public class ScenarioRunManager implements Runnable {
 		return this.processorWriters;
 	}
 
-	public void setOutputPaths(final Path outputPath, final Path processedOutputPath) {
+	public void setOutputPaths(final Path outputPath) {
 		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
 		this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
 	}
