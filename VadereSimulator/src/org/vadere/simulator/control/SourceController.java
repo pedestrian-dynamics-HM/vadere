@@ -187,7 +187,8 @@ public class SourceController {
 
 	private boolean isMaximumNumberOfSpawnedElementsReached() {
 		final int maxNumber = sourceAttributes.getMaxSpawnNumberTotal();
-		return maxNumber != 0 && dynamicElementsCreatedTotal >= maxNumber;
+		return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
+				&& dynamicElementsCreatedTotal >= maxNumber;
 	}
 
 	private boolean isSourceWithOneSingleSpawnEvent() {

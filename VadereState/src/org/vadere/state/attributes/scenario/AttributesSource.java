@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.VShape;
 public class AttributesSource extends Attributes {
 
 	public static final String CONSTANT_DISTRIBUTION = ConstantDistribution.class.getName();
+	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
 
 	private int id;
 
@@ -24,8 +25,8 @@ public class AttributesSource extends Attributes {
 
 	private int spawnNumber = 1;
 
-	/** Maximum number of spawned elements. 0 -> no maximum number. */
-	private int maxSpawnNumberTotal = 0;
+	/** Maximum number of spawned elements. {@link #NO_MAX_SPAWN_NUMBER_TOTAL} -> no maximum number. */
+	private int maxSpawnNumberTotal = NO_MAX_SPAWN_NUMBER_TOTAL;
 
 	private double startTime = 0;
 	/** endTime == startTime means one single spawn event. */
@@ -117,8 +118,8 @@ public class AttributesSource extends Attributes {
 	}
 
 	/**
-	 * Maximum number of spawned elements. The number 0 means there is no
-	 * maximum.
+	 * Maximum number of spawned elements. The number
+	 * {@link #NO_MAX_SPAWN_NUMBER_TOTAL} means there is no maximum.
 	 * 
 	 * This attribute can be used together with non-constant distributions. For
 	 * example, consider an exponential distribution. The times of events are
