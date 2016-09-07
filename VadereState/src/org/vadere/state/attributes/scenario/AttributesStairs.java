@@ -60,42 +60,4 @@ public class AttributesStairs extends Attributes {
 		return upwardDirection;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		result = prime * result + ((shape == null) ? 0 : shape.hashCode());
-		result = prime * result + treadCount;
-		result = prime * result
-				+ ((upwardDirection == null) ? 0 : upwardDirection.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof AttributesStairs))
-			return false;
-		AttributesStairs other = (AttributesStairs) obj;
-		if (id != other.id)
-			return false;
-		if (shape == null) {
-			if (other.shape != null)
-				return false;
-		} else if (!shape.equals(other.shape))
-			return false;
-		if (treadCount != other.treadCount)
-			return false;
-		if (upwardDirection == null) {
-			if (other.upwardDirection != null)
-				return false;
-		} else if (!upwardDirection.equals(other.upwardDirection))
-			return false;
-		return true;
-	}
-
 }
