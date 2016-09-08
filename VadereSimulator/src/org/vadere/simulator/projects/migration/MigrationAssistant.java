@@ -61,6 +61,12 @@ public class MigrationAssistant {
 
 	private static Logger logger = LogManager.getLogger(MigrationAssistant.class);
 
+	private static boolean reapplyLatestMigrationFlag = false;
+
+	public static void setReapplyLatestMigrationFlag() {
+		reapplyLatestMigrationFlag = true;
+	}
+
 	public static void analyzeSingleScenario(Path path) {
 		// TODO [priority=high] [task=implement] for runs initiated not from GUI... where to hook in?
 	}
@@ -155,7 +161,12 @@ public class MigrationAssistant {
 						"is a valid release, update the version-list in MigrationAssistant accordingly");
 			}
 			if (version == Version.latest()) {
-				return false;
+				if (reapplyLatestMigrationFlag) {
+					version = Version.values()[Version.values().length - 2];
+					reapplyLatestMigrationFlag = false;
+				} else {
+					return false;
+				}
 			}
 		}
 

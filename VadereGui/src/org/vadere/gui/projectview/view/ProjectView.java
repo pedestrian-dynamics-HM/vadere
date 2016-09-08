@@ -38,6 +38,7 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOOutput;
+import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.util.io.IOUtils;
 
 /**
@@ -395,6 +396,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction("Reapply latest version-migration") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				MigrationAssistant.setReapplyLatestMigrationFlag();
 				ActionLoadProject.loadProjectByPath(model, model.getCurrentProjectPath());
 			}
 		});
