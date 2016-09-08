@@ -18,7 +18,7 @@ public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKe
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        Map<Integer, VPoint> pedPosMap = state.getPedestrainPositionMap();
+        Map<Integer, VPoint> pedPosMap = state.getPedestrianPositionMap();
 
         double dt = state.getSimTimeInSec() - this.lastSimTime;
 

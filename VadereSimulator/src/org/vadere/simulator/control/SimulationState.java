@@ -93,7 +93,7 @@ public class SimulationState {
 		return pedestrianPositionMap.values();
 	}
 
-	public Map<Integer, VPoint> getPedestrainPositionMap() {
+	public Map<Integer, VPoint> getPedestrianPositionMap() {
 		return pedestrianPositionMap;
 	}
 

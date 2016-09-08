@@ -15,7 +15,7 @@ public class PedestrianWaitingEndTimeProcessor extends Processor<PedestrianIdDat
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        Map<Integer, VPoint> pedPosMap = state.getPedestrainPositionMap();
+        Map<Integer, VPoint> pedPosMap = state.getPedestrianPositionMap();
 
         for (Map.Entry<Integer, VPoint> entry : pedPosMap.entrySet()) {
             int pedId = entry.getKey();

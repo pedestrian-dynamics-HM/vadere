@@ -22,7 +22,7 @@ public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdD
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		Integer timeStep = state.getStep();
-		Map<Integer, VPoint> pedPosMap = state.getPedestrainPositionMap();
+		Map<Integer, VPoint> pedPosMap = state.getPedestrianPositionMap();
 
 		for (Entry<Integer, VPoint> entry : pedPosMap.entrySet()) {
 			Integer pedId = entry.getKey();
