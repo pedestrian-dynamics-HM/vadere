@@ -22,6 +22,7 @@ import javax.swing.event.ListSelectionEvent;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.postvisualization.control.ActionOpenFile;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.*;
@@ -390,6 +391,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			mntmGermanLocale.setSelected(true);
 		else
 			mntmEnglishLocale.setSelected(true);
+
+		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction("Reapply latest version-migration") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ActionLoadProject.loadProjectByPath(model, model.getCurrentProjectPath());
+			}
+		});
+		mnHelp.add(mntmReapplyMigration);
 	}
 
 	private void setAcceleratorFromLocalizedShortcut(Action action, String localizedShortcutKey) {
