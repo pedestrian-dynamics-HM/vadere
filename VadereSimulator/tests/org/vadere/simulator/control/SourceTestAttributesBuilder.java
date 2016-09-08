@@ -12,10 +12,9 @@ public class SourceTestAttributesBuilder {
 	private double startTime = 1;
 	private double endTime = 2;
 	private int spawnNumber = 1;
-	private double spawnDelay = 1;
 	private boolean useFreeSpaceOnly = false;
 	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
-	private double[] distributionParams = new double[] { spawnDelay };
+	private double[] distributionParams = new double[] { 1 };
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
 	
 	public AttributesSource getResult() {
@@ -44,8 +43,7 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setSpawnDelay(double spawnDelay) {
-		this.spawnDelay = spawnDelay;
+	public SourceTestAttributesBuilder setSpawnIntervalForConstantDistribution(double spawnDelay) {
 		this.distributionParams = new double[] {spawnDelay};
 		return this;
 	}
@@ -71,7 +69,6 @@ public class SourceTestAttributesBuilder {
 				+ ",{\"x\": 0.1,\"y\": 0}"
 				+ ",{\"x\": 0.1,\"y\": 0.1}"
 				+ ",{\"x\": 0,\"y\": 0.1}]}"
-				+ ",\"spawnDelay\": " + spawnDelay
 				+ ",\"spawnNumber\":  " + spawnNumber
 				+ ",\"maxSpawnNumberTotal\":  " + maxSpawnNumberTotal
 				+ ",\"interSpawnTimeDistribution\": \"" + distributionClass.getName() + "\""

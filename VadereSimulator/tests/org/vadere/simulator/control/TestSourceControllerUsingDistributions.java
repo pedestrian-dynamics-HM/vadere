@@ -78,7 +78,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	public void testSpawnRateGreaterThanUpdateRate() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(1)
-				.setSpawnDelay(0.3);
+				.setSpawnIntervalForConstantDistribution(0.3);
 		initialize(builder);
 
 		// per update only one "spawn action" is performed.

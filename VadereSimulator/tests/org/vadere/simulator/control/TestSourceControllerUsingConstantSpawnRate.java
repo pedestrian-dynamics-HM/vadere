@@ -77,7 +77,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
-				.setSpawnDelay(10);
+				.setSpawnIntervalForConstantDistribution(10);
 		initialize(builder);
 
 		sourceController.update(startTime);
@@ -98,7 +98,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
-				.setSpawnDelay(5);
+				.setSpawnIntervalForConstantDistribution(5);
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < endTime * 2; simTimeInSec += 1.0) {
@@ -117,7 +117,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 1.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
-				.setSpawnDelay(0.1);
+				.setSpawnIntervalForConstantDistribution(0.1);
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < endTime * 2; simTimeInSec += 1.0) {
