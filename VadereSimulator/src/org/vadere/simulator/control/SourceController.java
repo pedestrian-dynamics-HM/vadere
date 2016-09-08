@@ -113,10 +113,19 @@ public class SourceController {
 	}
 
 	private boolean isSourceFinished(double simTimeInSec) {
+		if (isMaximumNumberOfSpawnedElementsReached()) {
+			return true;
+		}
 		if (isSourceWithOneSingleSpawnEvent()) {
 			return dynamicElementsCreatedTotal == sourceAttributes.getSpawnNumber();
 		}
 		return isAfterSourceEndTime(simTimeInSec) && dynamicElementsToCreate == 0;
+	}
+
+	private boolean isMaximumNumberOfSpawnedElementsReached() {
+		final int maxNumber = sourceAttributes.getMaxSpawnNumberTotal();
+		return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
+				&& dynamicElementsCreatedTotal >= maxNumber;
 	}
 
 	private boolean isSourceWithOneSingleSpawnEvent() {
@@ -156,7 +165,7 @@ public class SourceController {
 
 	private void tryToSpawnOutstandingDynamicElements() {
 		for (VPoint position : getDynamicElementPositions(dynamicElementsToCreate)) {
-			if (isPositionWorkingForSpawn(position)) {
+			if (!isMaximumNumberOfSpawnedElementsReached() && isPositionWorkingForSpawn(position)) {
 				create(position);
 				dynamicElementsToCreate--;
 				dynamicElementsCreatedTotal++;
