@@ -4,6 +4,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesPedestrianFlowProcessor;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 
 public class PedestrianFlowProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
     private PedestrianVelocityProcessor pedVelProc;

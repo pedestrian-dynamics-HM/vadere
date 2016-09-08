@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 
 import java.util.Collection;
 import java.util.Map;

@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing;
 import java.util.Collection;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 public class PedestrianTargetIdProcessor extends Processor<TimestepPedestrianIdDataKey, Integer> {

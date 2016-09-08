@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;

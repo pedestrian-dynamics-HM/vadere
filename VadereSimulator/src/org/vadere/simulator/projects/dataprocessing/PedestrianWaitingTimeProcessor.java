@@ -3,6 +3,8 @@ package org.vadere.simulator.projects.dataprocessing;
 import java.util.Map;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesPedestrianWaitingTimeProcessor;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 

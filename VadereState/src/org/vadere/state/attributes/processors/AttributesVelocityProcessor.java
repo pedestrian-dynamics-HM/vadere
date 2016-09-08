@@ -1,24 +1,22 @@
 package org.vadere.state.attributes.processors;
 
-import org.vadere.state.attributes.Attributes;
-
-public class AttributesVelocityProcessor extends Attributes {
-
-	private double maxAcceptedVelocity = 3.0;
-
+public class AttributesVelocityProcessor extends AttributesProcessor {
+	private int pedestrianPositionProcessorId;
 	private int backSteps = 1;
 
-	private boolean onlyXDirection = false;
+	public int getPedestrianPositionProcessorId() {
+		return this.pedestrianPositionProcessorId;
+	}
 
-	public double getMaxAcceptedVelocity() {
-		return maxAcceptedVelocity;
+	public void setPedestrianPositionProcessorId(int pedestrianPositionProcessorId) {
+		this.pedestrianPositionProcessorId = pedestrianPositionProcessorId;
 	}
 
 	public int getBackSteps() {
-		return backSteps;
+		return this.backSteps;
 	}
 
-	public boolean isOnlyXDirection() {
-		return onlyXDirection;
+	public void setBackSteps(int backSteps) {
+		this.backSteps = backSteps;
 	}
 }

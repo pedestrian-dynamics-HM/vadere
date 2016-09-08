@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 public class PedestrianOSMStrideLengthProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {

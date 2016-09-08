@@ -1,4 +1,4 @@
-package org.vadere.simulator.projects.dataprocessing;
+package org.vadere.state.attributes.processors;
 
 public class AttributesPedestrianLastPositionProcessor extends AttributesProcessor {
 	private int pedestrianPositionProcessorId;

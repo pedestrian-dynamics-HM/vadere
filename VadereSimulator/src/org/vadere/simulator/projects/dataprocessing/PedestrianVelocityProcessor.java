@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.stream.Stream;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesProcessor;
+import org.vadere.state.attributes.processors.AttributesVelocityProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 

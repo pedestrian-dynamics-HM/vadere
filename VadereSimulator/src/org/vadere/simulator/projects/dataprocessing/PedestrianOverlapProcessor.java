@@ -3,6 +3,8 @@ package org.vadere.simulator.projects.dataprocessing;
 import java.util.Map;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesPedestrianOverlapProcessor;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class PedestrianOverlapProcessor extends Processor<TimestepPedestrianIdDataKey, Integer> {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.util.io.IOUtils;
 
 import java.util.LinkedHashMap;

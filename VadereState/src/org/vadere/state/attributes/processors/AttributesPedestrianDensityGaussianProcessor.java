@@ -1,4 +1,4 @@
-package org.vadere.simulator.projects.dataprocessing;
+package org.vadere.state.attributes.processors;
 
 public class AttributesPedestrianDensityGaussianProcessor extends AttributesPedestrianDensityProcessor {
 	private double scale = 10;

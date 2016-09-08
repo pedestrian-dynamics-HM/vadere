@@ -1,5 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing;
 
+import org.vadere.state.attributes.processors.AttributesProcessor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

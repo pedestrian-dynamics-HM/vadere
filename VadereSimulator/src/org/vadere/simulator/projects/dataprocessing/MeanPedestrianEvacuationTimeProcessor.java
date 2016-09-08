@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.state.attributes.processors.AttributesMeanPedestrianEvacuationTimeProcessor;
+import org.vadere.state.attributes.processors.AttributesProcessor;
 
 public class MeanPedestrianEvacuationTimeProcessor extends Processor<NoDataKey, Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;

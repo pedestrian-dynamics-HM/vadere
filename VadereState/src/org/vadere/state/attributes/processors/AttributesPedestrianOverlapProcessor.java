@@ -1,4 +1,4 @@
-package org.vadere.simulator.projects.dataprocessing;
+package org.vadere.state.attributes.processors;
 
 public class AttributesPedestrianOverlapProcessor extends AttributesProcessor {
     private double pedRadius = 0.2;
