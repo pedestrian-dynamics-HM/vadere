@@ -13,7 +13,6 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.scenario.DistributionFactory;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -72,69 +71,7 @@ public class SourceController {
 	}
 
 	public void update(double simTimeInSec) {
-		// both spawn algorithms should be equivalent for constant distributions.
-		// the new algorithm passes all tests of the old one.
-
-		if (distribution instanceof ConstantDistribution) {
-			useSpawnDelayAlgorithm(simTimeInSec);
-		} else {
-			// new generic spawn algorithm using distributions
-			useDistributionSpawnAlgorithm(simTimeInSec);
-		}
-	}
-
-	/**
-	 * Update computes the elapsed time since the last time sample
-	 * exceeds/matches the interval and for the case that the current simulation
-	 * time is in the range of startTimeInSec and endTimeInSec, the specified
-	 * number of pedestrians are created and PedestrianAddListeners are
-	 * notified. Each pedestrian target is requested to observe the pedestrian
-	 * position and notify its PedestrianRemoveListeners when the pedestrian
-	 * arrives at the target.
-	 * 
-	 * This is the older algorithm that only works for constant inter-spawn times.
-	 */
-	private void useSpawnDelayAlgorithm(double simTimeInSec) {
-
-		double elapsedTimeSinceStart = simTimeInSec
-				- this.source.getAttributes().getStartTime();
-
-		int dynamicElementsCreated = 0;
-		int numSpawnIntervals = (int) Math.max(1,
-				(elapsedTimeSinceStart / sourceAttributes.getSpawnDelay()) + 1);
-		int maxSpawnIntervals = (int) ((sourceAttributes.getEndTime() - sourceAttributes
-				.getStartTime()) / sourceAttributes.getSpawnDelay()) + 1;
-
-		numSpawnIntervals = Math.min(maxSpawnIntervals, numSpawnIntervals);
-
-		if (elapsedTimeSinceStart < 0) {
-			dynamicElementsToCreate = 0;
-		} else {
-			dynamicElementsToCreate = sourceAttributes.getSpawnNumber()
-					* numSpawnIntervals - dynamicElementsCreatedTotal;
-		}
-
-		if (dynamicElementsCreatedTotal >= maxSpawnIntervals
-				* sourceAttributes.getSpawnNumber()) {
-			return;
-		}
-
-		LinkedList<VPoint> positions = getDynamicElementPositions(dynamicElementsToCreate);
-
-		/*
-		 * Run through all positions and create for each position a DynamicElement
-		 * if allowed.
-		 */
-		for (VPoint position : positions) {
-			if (isPositionWorkingForSpawn(position)) {
-				create(position);
-				++dynamicElementsCreated;
-			}
-		}
-
-		dynamicElementsToCreate -= dynamicElementsCreated;
-		dynamicElementsCreatedTotal += dynamicElementsCreated;
-
+		useDistributionSpawnAlgorithm(simTimeInSec);
 	}
 
 	private boolean isPositionWorkingForSpawn(VPoint position) {
