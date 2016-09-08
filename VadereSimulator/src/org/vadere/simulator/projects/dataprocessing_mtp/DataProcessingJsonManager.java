@@ -21,6 +21,8 @@ public class DataProcessingJsonManager {
     //TODO Change to 'dataprocessing'
     public static final String DATAPROCCESSING_KEY = "processWriters";
 
+    public static final String TRAJECTORIES_FILENAME = "postvis.trajectories";
+
     public static final String FILES_KEY = "files";
     private static final String TYPE_KEY = "type";
     private static final String FILENAME_KEY = "filename";
@@ -32,7 +34,7 @@ public class DataProcessingJsonManager {
 
     public static final String ATTRIBUTES_KEY = "attributes";
 
-    private static final String DEFAULT_SEPARATOR = " ";
+    public static final String DEFAULT_SEPARATOR = " ";
 
     private static ObjectMapper mapper;
     public static ObjectWriter writer;
@@ -45,32 +47,6 @@ public class DataProcessingJsonManager {
     private List<Processor<?, ?>> processors;
     private List<AttributesProcessor> attributes;
 
-    private static class ProcessorStore {
-        String type;
-        int id;
-    }
-
-    private static class OutputFileStore {
-        String type;
-        String filename;
-        List<Integer> processors;
-        private String separator;
-
-        public OutputFileStore() {
-            this.separator = DEFAULT_SEPARATOR;
-        }
-
-        public String getSeparator() {
-            return this.separator;
-        }
-
-        public void setSeparator(String separator) {
-            if (separator != null) {
-                this.separator = separator;
-            }
-        }
-    }
-
     static {
         mapper = JsonConverter.getMapper();
         writer = mapper.writerWithDefaultPrettyPrinter();
@@ -80,7 +56,7 @@ public class DataProcessingJsonManager {
         attributesInstantiator = new DynamicClassInstantiator<>();
     }
 
-    private DataProcessingJsonManager() {
+    public DataProcessingJsonManager() {
         this.outputFiles = new ArrayList<>();
         this.processors = new ArrayList<>();
         this.attributes = new ArrayList<>();
@@ -88,18 +64,18 @@ public class DataProcessingJsonManager {
 
     public void addOutputFile(final OutputFileStore fileStore) {
         // If fileName already exists, change it by removing and readding
-        this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.filename)).collect(Collectors.toList()));
+        this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.getFilename())).collect(Collectors.toList()));
 
-        OutputFile<?> file = outputFileInstantiator.createObject(fileStore.type);
-        file.setFileName(fileStore.filename);
-        file.setProcessorIds(fileStore.processors);
+        OutputFile<?> file = outputFileInstantiator.createObject(fileStore.getType());
+        file.setFileName(fileStore.getFilename());
+        file.setProcessorIds(fileStore.getProcessors());
         file.setSeparator(fileStore.getSeparator());
         this.outputFiles.add(file);
     }
 
     public void addProcessor(final ProcessorStore processorStore) {
-        Processor<?, ?> processor = processorInstantiator.createObject(processorStore.type);
-        processor.setId(processorStore.id);
+        Processor<?, ?> processor = processorInstantiator.createObject(processorStore.getType());
+        processor.setId(processorStore.getId());
         this.processors.add(processor);
     }
 
@@ -168,13 +144,30 @@ public class DataProcessingJsonManager {
         return main;
     }
 
-    public static DataProcessingJsonManager deserialize(String json) throws IOException {
-        JsonNode node = json.isEmpty() ? mapper.createObjectNode() : mapper.readTree(json);
+    public static DataProcessingJsonManager createDefault() {
+        try {
+            return deserializeFromNode(mapper.convertValue(OutputPresets.getOutputDefinition(), JsonNode.class));
+        }
+        catch (JsonProcessingException ex) {
+            ex.printStackTrace();
+        }
 
-        return deserializeFromNode(node);
+        return null;
     }
 
-    public static DataProcessingJsonManager deserializeFromNode(JsonNode node) throws IOException {
+    public static DataProcessingJsonManager deserialize(String json) {
+        try {
+            JsonNode node = json.isEmpty() ? mapper.createObjectNode() : mapper.readTree(json);
+            return deserializeFromNode(node);
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static DataProcessingJsonManager deserializeFromNode(JsonNode node) throws JsonProcessingException {
         DataProcessingJsonManager manager = new DataProcessingJsonManager();
 
         ArrayNode outputFilesArrayNode = (ArrayNode) node.get(FILES_KEY);

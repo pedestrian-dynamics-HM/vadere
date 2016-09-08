@@ -19,6 +19,7 @@ import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -74,7 +75,10 @@ public class ScenarioRunManager implements Runnable {
 		this.writers = new LinkedList<>();
 		this.scenarioStore = store;
 
+		this.dataProcessingJsonManager = new DataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+
+		this.saveChanges();
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
@@ -114,6 +118,10 @@ public class ScenarioRunManager implements Runnable {
 		try {
 			// prepare processors and simulation data writer
 			prepareOutput();
+
+			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
+				out.println(JsonConverter.serializeScenarioRunManager(this, true));
+			}
 
 			ModelBuilder modelBuilder = new ModelBuilder(scenarioStore);
 			modelBuilder.createModelAndRandom();
