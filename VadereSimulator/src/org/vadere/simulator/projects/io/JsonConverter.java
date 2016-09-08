@@ -573,7 +573,7 @@ public abstract class JsonConverter {
 	public static String serializeSimulationStateSnapshot(final SimulationState state, boolean commitHashIncluded) throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
 		serializeMeta(node, commitHashIncluded, state.getScenarioStore());
-		node.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, state.getProcessorManager().serializeToNode());
+		node.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, state.getProcessorManager().serializeToNode());
 		node.set("vadere", serializeVadereNode(state.getScenarioStore()));
 		return writer.writeValueAsString(node);
 	}
