@@ -22,8 +22,33 @@ import org.vadere.util.io.IOUtils;
 
 public class MigrationAssistant {
 
-	private static final List<String> versions = Arrays.asList("not a release", "0.1"); // put somewhere more central?
-	public static final String latestVersion = versions.get(versions.size() - 1);
+	public enum Version {
+		UNDEFINED("undefined"),
+		NOT_A_RELEASE("not a release"),
+		V0_1("0.1");
+
+		private String label;
+
+		Version(String label) {
+			this.label = label;
+		}
+
+		public String label() {
+			return label;
+		}
+
+		static Version fromString(String versionStr) {
+			for (Version v : values()) {
+				if (v.label.equals(versionStr))
+					return v;
+			}
+			return null;
+		}
+
+		public static Version latest() {
+			return values()[values().length - 1];
+		}
+	}
 
 	public static final String INCIDENT_ORDER_ERROR = "An incident that was found applicable couldn't be resolved. " +
 			"That means, that a previously resolved incident rendered this one no longer applicable. " +
@@ -120,30 +145,30 @@ public class MigrationAssistant {
 
 		log.append("\n>> analyzing JSON tree of scenario <" + outputScenarioParentFolderName + node.get("name").asText() + ">\n");
 
-		String releaseVersion = "undefined";
-		int releaseVersionIndex = 0;
+		Version version = Version.UNDEFINED;
 
 		if (node.get("release") != null) {
-			releaseVersion = node.get("release").asText();
-			if (releaseVersion.equals(latestVersion))
+			version = Version.fromString(node.get("release").asText());
+			if (version == null) {
+				throw new MigrationException("release version " + node.get("release").asText() + " is unknown. If this " +
+						"is a valid release, update the version-list in MigrationAssistant accordingly");
+			}
+			if (version == Version.latest()) {
 				return false;
-
-			releaseVersionIndex = versions.indexOf(releaseVersion);
-			if (releaseVersionIndex == -1)
-				throw new MigrationException("release version " + releaseVersion
-						+ " is unknown - if this is actually a valid release, update the version-list in MigrationAssistant accordingly");
+			}
 		}
 
 		// 1. collect possible incidents
 
 		List<Incident> possibleIncidents = new ArrayList<>();
-		for (int version = releaseVersionIndex; version < versions.size() - 1; version++) {
-			log.append("  > checking possible incidents from version \"" + versions.get(version) + "\" to version \""
-					+ versions.get(version + 1) + "\"\n");
-			possibleIncidents.addAll(IncidentDatabase.getInstance().getPossibleIncidentsFor(version));
+		for (int versionIndex = version.ordinal(); versionIndex < Version.latest().ordinal(); versionIndex ++) {
+			Version ver = Version.values()[versionIndex];
+			log.append("  > checking possible incidents from version \"" + ver.label() + "\" to version \""
+					+ Version.values()[versionIndex + 1].label() + "\"\n");
+			possibleIncidents.addAll(IncidentDatabase.getInstance().getPossibleIncidentsFor(ver));
 		}
 		possibleIncidents.add(new ExceptionIncident(node));
-		possibleIncidents.add(new VersionBumpIncident(node, releaseVersion));
+		possibleIncidents.add(new VersionBumpIncident(node, version));
 
 		// 2. filter those out that don't apply
 

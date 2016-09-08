@@ -5,65 +5,64 @@ import java.util.*;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.incidents.*;
 import org.vadere.simulator.projects.migration.incidents.specialized.AttributesPotentialCompactVSosmIncident;
+import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
 
 public class IncidentDatabase {
 
-	private Map<Integer, List<Incident>> versionIncidents = new LinkedHashMap<>();
+	private Map<Version, List<Incident>> incidents = new LinkedHashMap<>();
 
 	private IncidentDatabase() {
 
-		List<Incident> incidents;
-
 		// - - - - - - - - - - - - "not a release" to "0.1" - - - - - - - - - - - -
 
-		incidents = new ArrayList<>();
-		versionIncidents.put(0, incidents);
+		incidents.put(Version.NOT_A_RELEASE, new ArrayList<>());
 
-		incidents.add(new RelocationIncident(
+		incidents.get(Version.NOT_A_RELEASE).add(new RelocationIncident(
 				"finishTime",
 				path("vadere", "topography", "attributes"),
 				path("vadere", "attributesSimulation")));
 
-		incidents.add(new RelocationIncident(
+		incidents.get(Version.NOT_A_RELEASE).add(new RelocationIncident(
 				"attributesPedestrian",
 				path("vadere"),
 				path("vadere", "topography")));
 
-		incidents.add(new DeletionIncident(
+		incidents.get(Version.NOT_A_RELEASE).add(new DeletionIncident(
 				path("vadere", "topography", "pedestrians")));
 
-		incidents.add(new RenameInArrayIncident(
+		incidents.get(Version.NOT_A_RELEASE).add(new RenameInArrayIncident(
 				path("vadere", "topography", "dynamicElements"),
 				"nextTargetListPosition",
 				"nextTargetListIndex"));
 
 		for (String oldName : LookupTables.version0to1_ModelRenaming.keySet()) {
 			String newName = LookupTables.version0to1_ModelRenaming.get(oldName);
-			incidents.add(new RenameIncident(
+			incidents.get(Version.NOT_A_RELEASE).add(new RenameIncident(
 					path("vadere", "attributesModel", oldName), newName));
 		}
 
-		incidents.add(new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
+		incidents.get(Version.NOT_A_RELEASE).add(new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
 				path("vadere"),
 				JsonConverter.MAIN_MODEL_KEY,
 				path("vadere", "attributesModel")));
 
-		incidents.add(new AddTextNodeIncident(
+		incidents.get(Version.NOT_A_RELEASE).add(new AddTextNodeIncident(
 				path(),
 				"description", ""));
 
-		incidents.add(new AttributesPotentialCompactVSosmIncident());
+		incidents.get(Version.NOT_A_RELEASE).add(new AttributesPotentialCompactVSosmIncident());
 
 		// - - - - - - - - - - - - "0.1" to "?" - - - - - - - - - - - -
 
-		incidents = new ArrayList<>();
-		versionIncidents.put(1, incidents);
-
-		// ...
+		//incidents.put(Version.V0_1, new ArrayList<>());
+		//incidents.get(Version.V0_1).add(...
 	}
 
-	public List<Incident> getPossibleIncidentsFor(int version) {
-		return versionIncidents.get(version);
+	public List<Incident> getPossibleIncidentsFor(Version version) {
+		if (incidents.containsKey(version)) {
+			return incidents.get(version);
+		}
+		return new ArrayList<>();
 	}
 
 	public static List<String> path(String... entries) {

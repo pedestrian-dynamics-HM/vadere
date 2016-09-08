@@ -105,7 +105,7 @@ public class ActionLoadProject extends AbstractAction {
 						String message =
 								"The migration assistant analyzed the " + total + " scenarios in the scenarios and output " +
 										"directories of this project and attempted to upgrade them to the latest version "
-										+ MigrationAssistant.latestVersion + ".\n" +
+										+ MigrationAssistant.Version.latest().label() + ".\n" +
 										"Log-files have been created in legacy/scenarios and legacy/output.\n\n";
 
 						if (untouched > 0)
