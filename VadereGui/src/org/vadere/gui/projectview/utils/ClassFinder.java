@@ -2,8 +2,8 @@ package org.vadere.gui.projectview.utils;
 
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
-import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
+import org.vadere.simulator.projects.dataprocessing.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.Processor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 

@@ -1,17 +1,14 @@
 package org.vadere.simulator.control;
 
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,18 +20,15 @@ public class SimulationState {
 	private final ScenarioStore scenarioStore;
 	private final int step;
 	private final String name;
-	private final List<ProcessorWriter> processorWriter;
 	private ProcessorManager processorManager;
 
 	protected SimulationState(final String name,
 							  final Topography topography,
 							  final ScenarioStore scenarioStore,
-							  final List<ProcessorWriter> processorWriter,
 							  final double simTimeInSec,
 							  final int step,
 							  final ProcessorManager processorManager) {
 		this.name = name;
-		this.processorWriter = processorWriter;
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
 		this.step = step;
@@ -51,14 +45,6 @@ public class SimulationState {
 		}
 	}
 
-	protected SimulationState(final String name,
-			final Topography topography,
-			final ScenarioStore scenarioStore,
-			final double simTimeInSec, final int step,
-							  final ProcessorManager processorManager) {
-		this(name, topography, scenarioStore, new ArrayList<>(), simTimeInSec, step, processorManager);
-	}
-
 	@Deprecated
 	public SimulationState(final Map<Integer, VPoint> pedestrianPositionMap, final Topography topography,
 			final double simTimeInSec, final int step) {
@@ -69,7 +55,6 @@ public class SimulationState {
 		this.outputGeneratorMap = new HashMap<>();
 		this.pedestrianPositionMap = pedestrianPositionMap;
 		this.scenarioStore = null;
-		this.processorWriter = new ArrayList<>();
 	}
 
 	protected void registerOutputGenerator(final Class<? extends ActiveCallback> modelType,
@@ -87,11 +72,6 @@ public class SimulationState {
 	}
 
 	// public access to getters
-
-
-	public List<ProcessorWriter> getProcessorWriter() {
-		return processorWriter;
-	}
 
 	public Topography getTopography() {
 		return topography;

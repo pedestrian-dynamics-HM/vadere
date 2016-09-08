@@ -10,7 +10,7 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.scenario.Topography;

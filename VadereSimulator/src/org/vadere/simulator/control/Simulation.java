@@ -6,9 +6,7 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.simulator.projects.dataprocessing.writer.Writer;
-import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Source;
@@ -36,7 +34,6 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private List<ActiveCallback> activeCallbacks;
 
-	private List<ProcessorWriter> processorWriter;
 	private ProcessorManager processorManager;
 
 	private boolean runSimulation = false;
@@ -62,7 +59,7 @@ public class Simulation {
 	private Model model;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-			List<PassiveCallback> passiveCallbacks, List<ProcessorWriter> processorWriter, Random random, ProcessorManager processorManager) {
+			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
 		this.name = name;
 		this.model = mainModel;
 		this.scenarioStore = scenarioStore;
@@ -81,7 +78,6 @@ public class Simulation {
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
 
-		this.processorWriter = processorWriter;
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
 
@@ -121,10 +117,6 @@ public class Simulation {
 			ac.preLoop(simTimeInSec);
 		}
 
-		for (Writer ac : processorWriter) {
-			ac.preLoop(simulationState);
-		}
-
 		for (PassiveCallback c : passiveCallbacks) {
 			c.preLoop(simTimeInSec);
 		}
@@ -133,7 +125,7 @@ public class Simulation {
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step, this.processorManager);
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
 		for (ActiveCallback ac : activeCallbacks) {
 			// ActiveCallbacks must also be Models in this case
 			simulationState.registerOutputGenerator(ac.getClass(), ac);
@@ -145,10 +137,6 @@ public class Simulation {
 
 		for (PassiveCallback c : passiveCallbacks) {
 			c.postLoop(simTimeInSec);
-		}
-
-		for (Writer writer : processorWriter) {
-			writer.postLoop(simulationState);
 		}
 
 		processorManager.postLoop(this.simulationState);
@@ -222,7 +210,7 @@ public class Simulation {
 
 	private SimulationState initialSimulationState() {
 		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, processorWriter, simTimeInSec, step, this.processorManager);
+				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, this.processorManager);
 
 		for (ActiveCallback ac : activeCallbacks) {
 			// ActiveCallbacks must also be Models in this case
@@ -235,22 +223,9 @@ public class Simulation {
 	private void updateWriters(double simTimeInSec) {
 
 		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step, this.processorManager);
+				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
 		simulationState.setOutputGeneratorMap(this.simulationState.getOutputGeneratorMap());
 		this.simulationState = simulationState;
-
-		for (Writer ac : processorWriter) {
-			ac.update(this.simulationState);
-		}
-
-	}
-
-	public void resetWriters(List<ProcessorWriter> writers) {
-		if (!runSimulation) {
-			this.processorWriter = writers;
-		} else {
-			logger.error("Cannot reset writers when simulation is running.");
-		}
 	}
 
 	private void updateActiveCallbacks(double simTimeInSec) {

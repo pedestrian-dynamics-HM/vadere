@@ -1,103 +1,103 @@
 {
 	"files": [ {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
+		"type": "org.vadere.simulator.projects.dataprocessing.TimestepPedestrianIdOutputFile",
 		"filename": "output_ts_pid.txt",
 		"processors": [ 1, 2, 3, 5, 13, 14, 17 ],
 		"separator": ";"
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianIdOutputFile",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianIdOutputFile",
 		"filename": "output_pid.txt",
 		"processors": [ 4, 8, 9, 10, 15, 16 ]
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepOutputFile",
+		"type": "org.vadere.simulator.projects.dataprocessing.TimestepOutputFile",
 		"filename": "output_ts.txt",
 		"processors": [ 6, 7 ]
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.NoDataKeyOutputFile",
+		"type": "org.vadere.simulator.projects.dataprocessing.NoDataKeyOutputFile",
 		"filename": "output_nokey.txt",
 		"processors": [ 11, 12 ]
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.TimestepPedestrianIdOutputFile",
+		"type": "org.vadere.simulator.projects.dataprocessing.TimestepPedestrianIdOutputFile",
 		"filename": "postvis.trajectories",
 		"processors": [ 1, 18 ]
 	} ],
 	"processors": [ {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianPositionProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianPositionProcessor",
 		"id": 1
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianVelocityProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianVelocityProcessor",
 		"id": 2
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianDensityCountingProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianDensityCountingProcessor",
 		"id": 3
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianLastPositionProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianLastPositionProcessor",
 		"id": 4
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianDensityGaussianProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianDensityGaussianProcessor",
 		"id": 5
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.AreaDensityVoronoiProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.AreaDensityVoronoiProcessor",
 		"id": 6
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.AreaSpeedProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.AreaSpeedProcessor",
 		"id": 7
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianStartTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianStartTimeProcessor",
 		"id": 8
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianEndTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianEndTimeProcessor",
 		"id": 9
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianEvacuationTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianEvacuationTimeProcessor",
 		"id": 10
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.MeanPedestrianEvacuationTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.MeanPedestrianEvacuationTimeProcessor",
 		"id": 11
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.EvacuationTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.EvacuationTimeProcessor",
 		"id": 12
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianFlowProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianFlowProcessor",
 		"id": 13
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianOverlapProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianOverlapProcessor",
 		"id": 14
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianWaitingTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianWaitingTimeProcessor",
 		"id": 15
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianWaitingEndTimeProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianWaitingEndTimeProcessor",
 		"id": 16
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianOSMStrideLengthProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianOSMStrideLengthProcessor",
 		"id": 17
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianTargetIdProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianTargetIdProcessor",
 		"id": 18
 	}, {
-		"type": "org.vadere.simulator.projects.dataprocessing_mtp.PedestrianSourceIdProcessor",
+		"type": "org.vadere.simulator.projects.dataprocessing.PedestrianSourceIdProcessor",
 		"id": 19
 	} ],
 	"attributes": {
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesVelocityProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesVelocityProcessor": {
 			"processorId": 2,
 			"pedestrianPositionProcessorId": 1
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianDensityCountingProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianDensityCountingProcessor": {
 			"processorId": 3,
 			"pedestrianPositionProcessorId": 1,
 			"radius": 1.5
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianLastPositionProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianLastPositionProcessor": {
 			"processorId": 4,
 			"pedestrianPositionProcessorId": 1
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianDensityGaussianProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianDensityGaussianProcessor": {
 			"processorId": 5,
 			"pedestrianPositionProcessorId": 1
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesAreaDensityVoronoiProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesAreaDensityVoronoiProcessor": {
 			"processorId": 6,
 			"measurementArea": {
 				"x" : 5.0,
@@ -114,7 +114,7 @@
 				"type" : "RECTANGLE"
 			}
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesAreaSpeedProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesAreaSpeedProcessor": {
 			"processorId": 7,
 			"measurementArea": {
 				"x" : 5.0,
@@ -126,28 +126,28 @@
 			"pedestrianPositionProcessorId": 1,
 			"pedestrianVelocityProcessorId": 2
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianEvacuationTimeProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianEvacuationTimeProcessor": {
 			"processorId": 10,
 			"pedestrianStartTimeProcessorId": 8
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesMeanPedestrianEvacuationTimeProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesMeanPedestrianEvacuationTimeProcessor": {
 			"processorId": 11,
 			"pedestrianEvacuationTimeProcessorId": 10
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesEvacuationTimeProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesEvacuationTimeProcessor": {
 			"processorId": 12,
 			"pedestrianEvacuationTimeProcessorId": 10
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianFlowProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianFlowProcessor": {
 			"processorId": 13,
 			"pedestrianVelocityProcessorId": 2,
 			"pedestrianDensityProcessorId": 3
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianOverlapProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianOverlapProcessor": {
 	    "processorId": 14,
 			"pedRadius": 0.21
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianWaitingTimeProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianWaitingTimeProcessor": {
 			"processorId": 15,
 			"waitingArea": {
 				"x" : 5.0,
@@ -157,7 +157,7 @@
 				"type" : "RECTANGLE"
 			}
 		},
-		"org.vadere.simulator.projects.dataprocessing_mtp.AttributesPedestrianWaitingEndTimeProcessor": {
+		"org.vadere.simulator.projects.dataprocessing.AttributesPedestrianWaitingEndTimeProcessor": {
 			"processorId": 16,
 			"waitingArea": {
 				"x" : 5.0,

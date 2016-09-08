@@ -4,12 +4,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+
+import javax.swing.*;
 
 public class ActionCloneScenario extends AbstractAction {
 

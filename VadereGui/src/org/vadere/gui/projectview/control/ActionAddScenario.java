@@ -4,7 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.scenario.Topography;
 
 import java.io.IOException;

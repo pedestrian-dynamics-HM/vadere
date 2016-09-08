@@ -6,9 +6,8 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.VadereScenarioTableModel;
 import org.vadere.gui.projectview.model.VadereState;
-import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.ProjectWriter;
 
 import javax.swing.*;
 import java.awt.*;

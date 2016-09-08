@@ -6,10 +6,9 @@ import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.ModelBuilder;
-import org.vadere.simulator.projects.dataprocessing.processors.ModelTest;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing_mtp.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.ModelTest;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -43,10 +42,8 @@ public class ScenarioRunManager implements Runnable {
 	protected ScenarioStore scenarioStore;
 	protected Path outputPath;
 
-	private List<ProcessorWriter> processorWriters;
 	private List<ModelTest> modelTests;
 	protected final List<PassiveCallback> passiveCallbacks;
-	protected List<ProcessorWriter> writers;
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
 	protected ProcessorManager processorManager;
@@ -70,9 +67,7 @@ public class ScenarioRunManager implements Runnable {
 
 	public ScenarioRunManager(final String name, final ScenarioStore store) {
 		this.passiveCallbacks = new LinkedList<>();
-		this.processorWriters = new LinkedList<>();
 		this.modelTests = new LinkedList<>();
-		this.writers = new LinkedList<>();
 		this.scenarioStore = store;
 
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
@@ -129,7 +124,7 @@ public class ScenarioRunManager implements Runnable {
 			final Random random = modelBuilder.getRandom();
 
 			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, writers, random, processorManager);
+			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
 			simulation.run();
 		} catch (Exception e) {
 			scenarioFailed = true;
@@ -213,33 +208,6 @@ public class ScenarioRunManager implements Runnable {
 
 	public void addPassiveCallback(final PassiveCallback pc) {
 		this.passiveCallbacks.add(pc);
-	}
-
-	public void addWriter(final ProcessorWriter writer) {
-		processorWriters.add(writer);
-		if (writer.getProcessor() instanceof ModelTest)
-			modelTests.add((ModelTest) writer.getProcessor());
-	}
-
-	public void removeWriter(final ProcessorWriter writer) {
-		processorWriters.remove(writer);
-		if (writer instanceof ModelTest)
-			modelTests.remove(writer.getProcessor());
-	}
-
-	public void removeAllWriters() {
-		processorWriters.clear();
-		modelTests.clear();
-	}
-
-	public void setProcessWriters(final List<ProcessorWriter> writers) {
-		this.processorWriters.clear();
-		for (ProcessorWriter writer : writers)
-			addWriter(writer);
-	}
-
-	public List<ProcessorWriter> getAllWriters() {
-		return this.processorWriters;
 	}
 
 	public void setOutputPaths(final Path outputPath) {
@@ -328,8 +296,6 @@ public class ScenarioRunManager implements Runnable {
 		try {
 			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
-			this.processorWriters = srm.processorWriters;
-			this.writers = srm.writers;
 			this.scenarioStore = srm.scenarioStore;
 			this.outputPath = srm.outputPath;
 			this.processorManager = srm.processorManager;

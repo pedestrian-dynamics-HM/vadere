@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.control;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;

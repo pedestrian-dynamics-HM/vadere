@@ -6,9 +6,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.ModelBuilder;
-import org.vadere.simulator.projects.dataprocessing.processors.*;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.state.attributes.processors.AttributesWriter;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -16,11 +13,19 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.filewatcher.LockFileHandler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Can be used to start Vadere in [lock] mode.
@@ -98,8 +103,7 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 					ModelBuilder modelBuilder = new ModelBuilder(scenarioStore);
 					modelBuilder.createModelAndRandom();
 					simulation = new Simulation(modelBuilder.getModel(), currentTime, getName(),
-							scenarioStore, passiveCallbacks, writers,
-							modelBuilder.getRandom(), thisVadere.processorManager);
+							scenarioStore, passiveCallbacks, modelBuilder.getRandom(), thisVadere.processorManager);
 				} else {
 					currentTime = simulation.getCurrentTime();
 					// restart timer of the simulation
@@ -258,39 +262,6 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 	 * @throws FileNotFoundException
 	 */
 	private void prepareLockOutput(Simulation simulation) throws FileNotFoundException {
-
-		List<ProcessorWriter> writers = new LinkedList<>();
-
-		AbstractProcessor proc = null;
-		if (this.outputAll) {
-			// the writer of the output file that is continuously generated
-			List<ForEachPedestrianPositionProcessor> processorList = new LinkedList<>();
-			processorList.add(new PedestrianPositionProcessor()); // enable x,y
-			processorList.add(new PedestrianVelocityProcessor()); // enable dx,dy,speed
-
-			proc = new CombineProcessor(processorList);
-		} else {
-			// the writer of the output file that is continuously generated
-			List<AbstractProcessor> processorList = new LinkedList<>();
-			processorList.add(new PedestrianLastPositionProcessor());
-			processorList.add(new PedestrianAttributesProcessor());
-			proc = new CombinePostLoopProcessor(processorList);
-		}
-
-		ProcessorWriter writerOut = new ProcessorWriter(proc, new AttributesWriter());
-		writerOut.setColumnFormat(this.outputFormat, this.outputVariables.split(","));
-		writerOut.setWriteHeader(false);
-		writerOut.setOutputStream(new FileOutputStream(outputPath.toFile(), true));
-		writers.add(writerOut);
-
-		// the writer of the time step file that is written after each simulation
-		ProcessorWriter writerTSF = new ProcessorWriter(proc, new AttributesWriter());
-		writerTSF.setColumnFormat(this.tsfFormat, this.tsfVariables.split(","));
-		writerTSF.setWriteHeader(false);
-		writerTSF.setOutputStream(new FileOutputStream(Paths.get(timeStepFile).toFile(), false));
-		writers.add(writerTSF);
-
-		simulation.resetWriters(writers);
 	}
 
 }

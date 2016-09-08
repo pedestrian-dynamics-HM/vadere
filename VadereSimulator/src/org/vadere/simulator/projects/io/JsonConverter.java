@@ -28,8 +28,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.simulator.projects.dataprocessing_mtp.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
@@ -442,16 +441,6 @@ public abstract class JsonConverter {
 		node.put("attributeshash", HashGenerator.attributesHash(scenarioStore));
 	}
 
-	@Deprecated
-	private static JsonNode serializeProcessorWriters(List<ProcessorWriter> writers) {
-		try {
-			return jsonElementToJsonNode(ProcessorWriter.toJson(writers));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	// temporary, until GSON is finally completely gone, only used for serializing OutputProcessors
 	private static JsonNode jsonElementToJsonNode(JsonElement jsonElement) throws IOException {
 		return mapper.readValue(jsonElement.toString(), JsonNode.class);
@@ -559,14 +548,6 @@ public abstract class JsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
-		return writer.writeValueAsString(node);
-	}
-
-	public static String serializeSimulationStateSnapshot(ScenarioStore scenarioStore, List<ProcessorWriter> writers, boolean commitHashIncluded) throws JsonProcessingException {
-		ObjectNode node = mapper.createObjectNode();
-		serializeMeta(node, commitHashIncluded, scenarioStore);
-		node.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(writers));
-		node.set("vadere", serializeVadereNode(scenarioStore));
 		return writer.writeValueAsString(node);
 	}
 
