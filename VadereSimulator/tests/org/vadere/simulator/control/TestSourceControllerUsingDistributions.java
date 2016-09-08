@@ -1,12 +1,11 @@
-package org.vadere.simulator.simulation;
+package org.vadere.simulator.control;
 
-import org.apache.commons.math3.random.RandomGenerator;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.commons.math3.distribution.ConstantRealDistribution;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Test;
-import org.vadere.state.scenario.ConstantDistribution;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -22,12 +21,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 
 	@Test
 	public void testStartTime() {
-		double startTime = 1;
-		double endTime = 2;
-		int spawnNumber = 1;
-		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setDistributionClass(ConstantTestDistribution.class);
+		initialize(builder);
 
 		sourceController.update(0);
 		pedestrianCountEquals(0);
@@ -40,12 +36,8 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 
 	@Test
 	public void testEndTime() {
-		double startTime = 1;
-		double endTime = 2;
-		int spawnNumber = 1;
-		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder();
+		initialize(builder);
 
 		sourceController.update(1);
 		pedestrianCountEquals(1);
@@ -58,12 +50,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 
 	@Test
 	public void testOneTimeSpawn() {
-		double startTime = 1;
-		double endTime = startTime; // only one single spawn event
-		int spawnNumber = 1;
-		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setOneTimeSpawn(1);
+		initialize(builder);
 
 		sourceController.update(0);
 		pedestrianCountEquals(0);
@@ -75,12 +64,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 
 	@Test
 	public void testSpawnNumber() {
-		double startTime = 1;
-		double endTime = 2;
-		int spawnNumber = 10;
-		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setSpawnNumber(10);
+		initialize(builder);
 
 		sourceController.update(1);
 		pedestrianCountEquals(10);
@@ -90,12 +76,10 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 
 	@Test
 	public void testSpawnRateGreaterThanUpdateRate() {
-		double startTime = 0;
-		double endTime = 1;
-		int spawnNumber = 1;
-		double spawnDelay = 0.3;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, false,
-				ConstantTestDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setStartTime(0).setEndTime(1)
+				.setSpawnIntervalForConstantDistribution(0.3);
+		initialize(builder);
 
 		// per update only one "spawn action" is performed.
 		// if the spawn rate is higher than the update time increment, spawns will get lost.
@@ -108,13 +92,14 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	@Test
 	public void testUseFreeSpaceOnly() {
 		// expected: not stop spawning before all pedestrians are created (even after end time)
-		boolean useFreeSpaceOnly = true;
 		double startTime = 0;
 		double endTime = 1;
 		int spawnNumber = 100;
-		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setStartTime(startTime).setEndTime(endTime)
+				.setSpawnNumber(100)
+				.setUseFreeSpaceOnly(true);
+		initialize(builder);
 
 		doUpdates(100, startTime, endTime + 1);
 
@@ -131,13 +116,14 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	public void testUseFreeSpaceOnlyWithSingleSpawnEvent() {
 		// works also with sources that have startTime == endTime?
 		// expected: not stop spawning before all pedestrians are created (even after end time)
-		boolean useFreeSpaceOnly = true;
 		double startTime = 1;
-		double endTime = 1;
+		double endTime = startTime;
 		int spawnNumber = 100;
-		double spawnDelay = 1;
-		initialize(startTime, endTime, spawnNumber, spawnDelay, useFreeSpaceOnly,
-				ConstantDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setOneTimeSpawn(startTime)
+				.setSpawnNumber(100)
+				.setUseFreeSpaceOnly(true);
+		initialize(builder);
 
 		doUpdates(100, 0, endTime + 1);
 
@@ -150,6 +136,73 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		// now, all pedestrians should have been created
 		assertEquals(spawnNumber, countPedestrians());
 
+	}
+	
+	@Test
+	public void testMaxSpawnNumberTotalSetTo0() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setMaxSpawnNumberTotal(0); // <-- max 0 -> spawn no peds at all
+		initialize(builder);
+		
+		sourceController.update(1);
+		sourceController.update(2);
+		sourceController.update(3);
+		
+		assertEquals(0, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalNotSet() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL); // <-- maximum not set
+		initialize(builder);
+		
+		sourceController.update(1);
+		sourceController.update(2);
+		sourceController.update(3);
+		
+		assertEquals(2, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalWithSmallEndTime() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setMaxSpawnNumberTotal(4); // <-- not exhausted
+		initialize(builder);
+		
+		sourceController.update(1);
+		sourceController.update(2);
+		sourceController.update(3);
+		
+		assertEquals(2, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalWithLargeEndTime() {
+		double endTime = 100;
+		int maxSpawnNumberTotal = 4;
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setEndTime(endTime)
+				.setMaxSpawnNumberTotal(maxSpawnNumberTotal); // <-- exhausted!
+		initialize(builder);
+		
+		doUpdates(50, 0, 200);
+		
+		assertEquals(maxSpawnNumberTotal, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalWithLargeEndTimeAndSpawnNumberGreater1() {
+		int maxSpawnNumberTotal = 4; // <-- exhausted!
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setEndTime(100)
+				.setSpawnNumber(5)
+				.setMaxSpawnNumberTotal(maxSpawnNumberTotal);
+		initialize(builder);
+		
+		doUpdates(50, 0, 200);
+		
+		assertEquals(maxSpawnNumberTotal, countPedestrians());
 	}
 
 	private void doUpdates(int number, double startTime, double endTimeExclusive) {
@@ -177,5 +230,5 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	private void pedestrianCountEquals(int expected) {
 		assertEquals(expected, countPedestrians());
 	}
-
+	
 }

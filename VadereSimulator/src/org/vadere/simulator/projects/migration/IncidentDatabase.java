@@ -1,11 +1,22 @@
 package org.vadere.simulator.projects.migration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.simulator.projects.migration.incidents.*;
-import org.vadere.simulator.projects.migration.incidents.specialized.AttributesPotentialCompactVSosmIncident;
 import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
+import org.vadere.simulator.projects.migration.incidents.AddTextNodeIncident;
+import org.vadere.simulator.projects.migration.incidents.DeletionIncident;
+import org.vadere.simulator.projects.migration.incidents.Incident;
+import org.vadere.simulator.projects.migration.incidents.MissingMainModelIncident;
+import org.vadere.simulator.projects.migration.incidents.RelocationIncident;
+import org.vadere.simulator.projects.migration.incidents.RenameInArrayIncident;
+import org.vadere.simulator.projects.migration.incidents.RenameIncident;
+import org.vadere.simulator.projects.migration.incidents.specialized.AttributesPotentialCompactVSosmIncident;
+import org.vadere.simulator.projects.migration.incidents.specialized.MoveSpawnDelayIntoDistributionParametersIncident;
 
 public class IncidentDatabase {
 
@@ -57,7 +68,8 @@ public class IncidentDatabase {
 				path(),
 				"description", ""));
 
-		incidents.get(Version.NOT_A_RELEASE).add(new AttributesPotentialCompactVSosmIncident());
+		incidents.get(Version.NOT_A_RELEASE).add(new AttributesPotentialCompactVSosmIncident()); // requested by Bene
+		incidents.get(Version.NOT_A_RELEASE).add(new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
 		// - - - - - - - - - - - - "0.1" to "?" - - - - - - - - - - - -
 
