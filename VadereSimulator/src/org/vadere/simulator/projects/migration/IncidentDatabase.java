@@ -13,6 +13,13 @@ public class IncidentDatabase {
 
 	private IncidentDatabase() {
 
+		/*
+		A list of incidents always marks the possible incidents from one version to another.
+		The key in the Map represents the departure-version. An incident that's added to the
+		Version.NOT_A_RELEASE list for instance, get's checked for applicability when making
+		the migration <from> Version.NOT_A_RELEASE <to> Version.V0_1
+		 */
+
 		// - - - - - - - - - - - - "not a release" to "0.1" - - - - - - - - - - - -
 
 		incidents.put(Version.NOT_A_RELEASE, new ArrayList<>());

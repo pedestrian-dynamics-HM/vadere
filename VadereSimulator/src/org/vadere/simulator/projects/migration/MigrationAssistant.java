@@ -22,6 +22,7 @@ import org.vadere.util.io.IOUtils;
 
 public class MigrationAssistant {
 
+	// versions in strict order from oldest to newest
 	public enum Version {
 		UNDEFINED("undefined"),
 		NOT_A_RELEASE("not a release"),
