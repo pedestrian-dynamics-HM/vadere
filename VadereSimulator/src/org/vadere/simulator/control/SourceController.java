@@ -8,7 +8,6 @@ import java.util.Random;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Agent;
@@ -91,9 +90,6 @@ public class SourceController {
 		if (attributesDynamicElement instanceof AttributesAgent) {
 			return new VCircle(((AttributesAgent) attributesDynamicElement).getRadius());
 		}
-		if (attributesDynamicElement instanceof AttributesCar) {
-			return new VCircle(((AttributesCar) attributesDynamicElement).getRadius());
-		}
 
 		return new VCircle(0.2);
 	}
@@ -106,7 +102,7 @@ public class SourceController {
 	private void useDistributionSpawnAlgorithm(double simTimeInSec) {
 		if (!isSourceFinished(simTimeInSec)) {
 			if (hasNextEvent()) {
-				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
+				processNextEventWhenItIsTime(simTimeInSec);
 			}
 			tryToSpawnOutstandingDynamicElements();
 		}
@@ -132,27 +128,30 @@ public class SourceController {
 		return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
 	}
 
-	private void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
+	private void processNextEventWhenItIsTime(double simTimeInSec) {
 		if (simTimeInSec >= timeOfNextEvent) {
-			dynamicElementsToCreate += sourceAttributes.getSpawnNumber();
-
-			if (isSourceWithOneSingleSpawnEvent()) {
-				timeOfNextEvent = null;
-				return;
-			}
-
-			// sample() could yield negative results. but that is a problem of the distribution.
-			timeOfNextEvent += distribution.sample();
-
-			if (isAfterSourceEndTime(timeOfNextEvent)) {
-				timeOfNextEvent = null;
-				return;
-			}
-
-			// if still timeOfNextEvent still behind current time -> call this function recursively
-			// (condition is checked above)
 			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 		}
+	}
+
+	private void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
+		dynamicElementsToCreate += sourceAttributes.getSpawnNumber();
+
+		if (isSourceWithOneSingleSpawnEvent()) {
+			timeOfNextEvent = null;
+			return;
+		}
+
+		// sample() could yield negative results. but that is a problem of the distribution.
+		timeOfNextEvent += distribution.sample();
+
+		if (isAfterSourceEndTime(timeOfNextEvent)) {
+			timeOfNextEvent = null;
+			return;
+		}
+
+		// If timeOfNextEvent still behind current time -> start an (indirect) recursion
+		processNextEventWhenItIsTime(simTimeInSec);
 	}
 
 	private boolean hasNextEvent() {
@@ -166,7 +165,7 @@ public class SourceController {
 	private void tryToSpawnOutstandingDynamicElements() {
 		for (VPoint position : getDynamicElementPositions(dynamicElementsToCreate)) {
 			if (!isMaximumNumberOfSpawnedElementsReached() && isPositionWorkingForSpawn(position)) {
-				create(position);
+				addNewAgentToScenario(position);
 				dynamicElementsToCreate--;
 				dynamicElementsCreatedTotal++;
 			}
@@ -177,22 +176,8 @@ public class SourceController {
 	 * note that most models create their own pedestrians and ignore the attributes given here.
 	 * the source is mostly used to set the position and target ids, not the attributes.
 	 */
-	protected DynamicElement create(final VPoint position) {
-		Agent newElement = null;
-
-		switch (this.source.getAttributes().getDynamicElementType()) {
-			case PEDESTRIAN:
-				newElement = (Pedestrian) dynamicElementFactory.createElement(position, 0, Pedestrian.class);
-				break;
-
-			case CAR:
-				newElement = (Car) dynamicElementFactory.createElement(position, 0, Car.class);
-				break;
-
-			default:
-				throw new IllegalArgumentException("The source of the controller has the wrong element type: "
-						+ this.source.getAttributes().getDynamicElementType());
-		}
+	protected DynamicElement addNewAgentToScenario(final VPoint position) {
+		Agent newElement = (Agent) createDynamicElement(position);
 
 		// TODO [priority=high] [task=refactoring] this is bad programming. Why is the target list added later?
 		// What if Pedestrian does something with the target list before it is stored?
@@ -204,10 +189,21 @@ public class SourceController {
 			newElement.setTargets(new LinkedList<>(source.getAttributes().getTargetIds()));
 		}
 
-		// TODO [priority=high] [task=refactoring] why do we need to add this HERE, and not in the calling method?
 		topography.addElement(newElement);
 
 		return newElement;
+	}
+
+	private DynamicElement createDynamicElement(final VPoint position) {
+		switch (this.source.getAttributes().getDynamicElementType()) {
+			case PEDESTRIAN:
+				return dynamicElementFactory.createElement(position, 0, Pedestrian.class);
+			case CAR:
+				return dynamicElementFactory.createElement(position, 0, Car.class);
+			default:
+				throw new IllegalArgumentException("The controller's source has an unsupported element type: "
+						+ this.source.getAttributes().getDynamicElementType());
+		}
 	}
 
 	private LinkedList<VPoint> getDynamicElementPositions(int numDynamicElements) {
