@@ -231,7 +231,7 @@ public class IOUtils {
 	}
 
 	/**
-	 * Reads all text of a given file and stores it in a string.
+	 * Reads all text of a given file and store it in a string.
 	 * 
 	 * @param filePath
 	 * @return

@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.vadere.simulator.projects.dataprocessing.outputfiles.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.processors.Processor;
-import org.vadere.simulator.projects.dataprocessing.stores.OutputFileStore;
-import org.vadere.simulator.projects.dataprocessing.stores.ProcessorStore;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.processor.Processor;
+import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
+import org.vadere.simulator.projects.dataprocessing.store.ProcessorStore;
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.state.attributes.processors.AttributesProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
@@ -132,7 +132,7 @@ public class DataProcessingJsonManager {
             outputFilesArrayNode.add(serializeOutputFile(file));
         });
 
-        // part 2: processors
+        // part 2: processor
         this.processors.forEach(proc -> {
             processorsArrayNode.add(serializeProcessor(proc));
         });
@@ -186,7 +186,7 @@ public class DataProcessingJsonManager {
                 manager.addOutputFile(fileStore);
             }
 
-        // part 2: processors
+        // part 2: processor
         if (processorsArrayNode != null)
             for (JsonNode processorNode : processorsArrayNode) {
                 ProcessorStore processorStore = mapper.treeToValue(processorNode, ProcessorStore.class);

@@ -54,7 +54,7 @@ public class OptimalStepsModel implements MainModel {
 
 	/**
 	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processors.
+	 * by the processor.
 	 */
 	private Map<String, Table> outputTables;
 

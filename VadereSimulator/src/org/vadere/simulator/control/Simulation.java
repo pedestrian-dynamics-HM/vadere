@@ -200,11 +200,11 @@ public class Simulation {
 			}
 		}
 		finally {
-			// this is necessary to free the resources (files), the SimulationWriter and processors are writing in!
+			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
 			processorManager.writeOutput();
-			this.logger.info("Logged all processors in logfiles");
+			this.logger.info("Logged all processor in logfiles");
 		}
 	}
 

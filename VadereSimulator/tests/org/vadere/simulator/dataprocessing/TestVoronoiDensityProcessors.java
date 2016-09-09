@@ -6,9 +6,9 @@
 //import org.mockito.invocation.InvocationOnMock;
 //import org.mockito.stubbing.Answer;
 //import org.vadere.simulator.control.SimulationState;
-//import org.vadere.simulator.projects.dataprocessing.processors.*;
+//import org.vadere.simulator.projects.dataprocessing.processor.*;
 //import org.vadere.state.attributes.AttributesBuilder;
-//import org.vadere.state.attributes.processors.AttributesDensityVoronoiProcessor;
+//import org.vadere.state.attributes.processor.AttributesDensityVoronoiProcessor;
 //import org.vadere.state.attributes.scenario.AttributesAgent;
 //import org.vadere.state.scenario.Agent;
 //import org.vadere.state.scenario.Pedestrian;

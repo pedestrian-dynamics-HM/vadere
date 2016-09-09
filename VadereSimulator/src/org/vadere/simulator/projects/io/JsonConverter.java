@@ -253,7 +253,7 @@ public abstract class JsonConverter {
 		return deserializeScenarioRunManagerFromNode(mapper.readTree(json));
 	}
 
-	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processors
+	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processor
 	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
@@ -413,7 +413,7 @@ public abstract class JsonConverter {
 		return writer.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}
 
-	// TODO [priority=medium] [task=deprecation] remove deprecated call. This call is required to serialize the output processors
+	// TODO [priority=medium] [task=deprecation] remove deprecated call. This call is required to serialize the output processor
 	public static JsonNode serializeScenarioRunManagerToNode(ScenarioRunManager scenarioRunManager,
 			boolean commitHashIncluded) throws IOException {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();

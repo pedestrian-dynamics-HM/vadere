@@ -5,7 +5,7 @@
 //import org.vadere.simulator.projects.ScenarioRunManager;
 //import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 //import org.vadere.simulator.projects.io.JsonConverter;
-//import org.vadere.state.attributes.processors.AttributesWriter;
+//import org.vadere.state.attributes.processor.AttributesWriter;
 //
 //import java.io.IOException;
 //import java.util.LinkedList;
@@ -67,7 +67,7 @@
 //		assertEquals(clone.getName(), "cloned test");
 //		assertEquals(testInstance.getName(), testName);
 //
-//		// set output processors and check them
+//		// set output processor and check them
 //		clone.setProcessWriters(new LinkedList<ProcessorWriter>());
 //		assertEquals(0, clone.getAllWriters().size());
 //		assertEquals(1, testInstance.getAllWriters().size());

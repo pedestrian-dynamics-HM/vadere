@@ -111,7 +111,7 @@ public class ScenarioRunManager implements Runnable {
 		doBeforeSimulation();
 
 		try {
-			// prepare processors and simulation data writer
+			// prepare processor and simulation data writer
 			prepareOutput();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
@@ -144,7 +144,7 @@ public class ScenarioRunManager implements Runnable {
 		this.passiveCallbacks.clear();
 
 		logger.info(String.format("Scenario finished."));
-		logger.info(String.format("Running output processors, if any..."));
+		logger.info(String.format("Running output processor, if any..."));
 		logger.info(String.format("Done running scenario '%s': '%s'", this.getName(),
 				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
 	}
