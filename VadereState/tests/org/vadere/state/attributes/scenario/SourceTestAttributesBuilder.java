@@ -1,9 +1,8 @@
-package org.vadere.simulator.control;
+package org.vadere.state.attributes.scenario;
 
 import java.util.Arrays;
 
 import org.apache.commons.math3.distribution.RealDistribution;
-import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.util.io.IOUtils;
 
@@ -63,6 +62,11 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
+	public SourceTestAttributesBuilder setDistributionParameters(double[] params) {
+		distributionParams = params;
+		return this;
+	}
+
 	private String generateSourceAttributesJson() {
 		return "{\"shape\": {\"type\": \"POLYGON\",\"points\":"
 				+ "[{\"x\": 0.0,\"y\": 0.0}"
@@ -79,4 +83,5 @@ public class SourceTestAttributesBuilder {
 				+ ",\"useFreeSpaceOnly\": " + useFreeSpaceOnly
 				+ ",\"targetIds\": [1]}";
 	}
+
 }

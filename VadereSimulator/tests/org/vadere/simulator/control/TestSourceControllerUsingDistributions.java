@@ -6,6 +6,7 @@ import org.apache.commons.math3.distribution.ConstantRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
