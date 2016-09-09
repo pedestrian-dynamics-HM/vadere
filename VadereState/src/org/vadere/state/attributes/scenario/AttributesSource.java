@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class AttributesSource extends Attributes {
 	/** Shape and position. */
 	private VShape shape = null;
 	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;
-	private List<Double> distributionParameters = Arrays.asList(new Double[] {1.0});
+	private List<Double> distributionParameters = Collections.singletonList(1.0);
 
 	private int spawnNumber = 1;
 
