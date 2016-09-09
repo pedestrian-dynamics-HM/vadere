@@ -7,6 +7,10 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.vadere.simulator.projects.dataprocessing.outputfiles.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.processors.Processor;
+import org.vadere.simulator.projects.dataprocessing.stores.OutputFileStore;
+import org.vadere.simulator.projects.dataprocessing.stores.ProcessorStore;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.processors.AttributesProcessor;
 import org.vadere.util.reflection.DynamicClassInstantiator;

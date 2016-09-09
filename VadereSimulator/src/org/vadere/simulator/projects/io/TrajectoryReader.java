@@ -4,6 +4,7 @@ import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.dataprocessing.processors.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * A TrajectoryReader is the counterpart of the
- * {@link org.vadere.simulator.projects.dataprocessing.PedestrianPositionProcessor}.
+ * {@link PedestrianPositionProcessor}.
  * 
  *
  *         This reader trys to generate a {@link java.util.stream.Stream< scenario.Pedestrian >} by
