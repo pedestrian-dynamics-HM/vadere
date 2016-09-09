@@ -24,7 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -170,31 +172,34 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		outputView = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
+		JMenuBar processorsMenuBar = new JMenuBar();
+		JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+		processorsMenuBar.add(processorsMenu);
+		menusInTabs.add(processorsMenu);
+
 		try {
-			// TODO add more templates and make a loop here
-			String templateFileName = "output_default.json";
-			String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
+			File[] templateFiles = new File(this.getClass().getResource("/outputTemplates/").getPath()).listFiles();
 
-			JMenuBar processorsMenuBar = new JMenuBar();
-			JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
-			processorsMenuBar.add(processorsMenu);
-			menusInTabs.add(processorsMenu);
+			for (File templateFile : Arrays.stream(templateFiles).filter(f -> f.isFile()).collect(Collectors.toList())) {
+				String templateFileName = templateFile.getName();
+				String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
 
-			processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-							Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-							Messages.getString("Tab.Model.confirmLoadTemplate.title"),
-							JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-						try {
-							outputView.setText(templateJson);
-						} catch (Exception e1) {
-							e1.printStackTrace();
+				processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
+								Messages.getString("Tab.Model.confirmLoadTemplate.text"),
+								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							try {
+								outputView.setText(templateJson);
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
 						}
 					}
-				}
-			}));
+				}));
+			}
 
 			outputView.getPanelTop().add(processorsMenuBar, 0);
 
