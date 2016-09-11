@@ -13,7 +13,10 @@ public class DataProcessingView extends JPanel {
 	private static Logger logger = LogManager.getLogger(DataProcessingView.class);
 
 	private JTable filesTable;
+	private DefaultTableModel filesTableModel;
 	private JTable processorsTable;
+	private DefaultTableModel processorsTableModel;
+
 	private ScenarioRunManager currentScenario;
 	private boolean isEditable;
 
@@ -22,9 +25,15 @@ public class DataProcessingView extends JPanel {
 		GridLayout gridLayout = new GridLayout(2, 2);
 		setLayout(gridLayout);
 
-		DefaultTableModel filesTableModel = new DefaultTableModel(new String[] {"Files"}, 0);
+		filesTableModel = new DefaultTableModel(new String[] {"Files"}, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		filesTableModel.addRow(new String[] {"test.txt"});
 		filesTable = new JTable(filesTableModel);
+
 		JPanel filesPanel = new JPanel();
 		filesPanel.add(new JLabel("Files:"));
 		filesPanel.add(filesTable);
@@ -34,7 +43,7 @@ public class DataProcessingView extends JPanel {
 		filesDetailsPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 		add(filesDetailsPanel);
 
-		DefaultTableModel processorsTableModel = new DefaultTableModel(new String[] {"ID", "Name"}, 0);
+		processorsTableModel = new DefaultTableModel(new String[] {"ID", "Name"}, 0);
 		processorsTableModel.addRow(new String[] {"0", "PedestrianPositionProcessor"});
 		processorsTable = new JTable(processorsTableModel);
 		JPanel processorsPanel = new JPanel();
@@ -49,6 +58,9 @@ public class DataProcessingView extends JPanel {
 
 	public void setVadereScenario(ScenarioRunManager scenario) {
 		this.currentScenario = scenario;
+
+		scenario.getDataProcessingJsonManager().getOutputFiles()
+				.forEach(outputFile -> filesTableModel.addRow(new String[] {outputFile.getFileName()}));
 	}
 
 	public void isEditable(boolean isEditable) {

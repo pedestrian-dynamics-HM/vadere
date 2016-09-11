@@ -77,6 +77,10 @@ public class DataProcessingJsonManager {
         this.dataProcessors = new ArrayList<>();
     }
 
+    public List<OutputFile<?>> getOutputFiles() {
+        return outputFiles;
+    }
+
     public void addOutputFile(final OutputFileStore fileStore) {
         // If fileName already exists, change it by removing and readding
         this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.getFilename())).collect(Collectors.toList()));
