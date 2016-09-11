@@ -102,7 +102,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		attributesSimulationView =
 				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);
-		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), null, attributesSimulationView, null);
+		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), attributesSimulationView);
 
 		attributesModelView = new TextView("/attributes", "default_directory_attributes", AttributeType.MODEL);
 
@@ -165,10 +165,10 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 				})));
 
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftest position instead of the rightest
-		tabbedPane.addTab(Messages.getString("Tab.Model.title"), null, attributesModelView, null);
+		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
-		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), null, topographyFileView, null);
+		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 
 		outputView = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
@@ -207,7 +207,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 			e.printStackTrace();
 		}
 
-		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputView, null);
+		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), outputView);
 
 		// Test for processor GUI
 		JPanel panel = new JPanel();
@@ -240,7 +240,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		panel.add(cbProcessorTypes);
 
-		tabbedPane.addTab("Test", null, panel, null);
+		tabbedPane.addTab("Test", panel);
 
 		
 		// online visualization card...
