@@ -47,6 +47,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
 	private TextView outputView; // new Output tab
+	private DataProcessingView dataProcessingGUIview;
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
@@ -208,6 +209,9 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), outputView);
+
+		dataProcessingGUIview = new DataProcessingView();
+		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
 
 		// Test for processor GUI
 		JPanel panel = new JPanel();
