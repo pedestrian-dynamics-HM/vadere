@@ -393,11 +393,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		else
 			mntmEnglishLocale.setSelected(true);
 
-		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction("Reapply latest version-migration") {
+		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmReapplyMigration.text")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				MigrationAssistant.setReapplyLatestMigrationFlag();
-				ActionLoadProject.loadProjectByPath(model, model.getCurrentProjectPath());
+				(new ActionLoadProject(Messages.getString("ProjectView.mntmLoadTestProject.text"), model)).loadProject(true);
 			}
 		});
 		mnHelp.add(mntmReapplyMigration);

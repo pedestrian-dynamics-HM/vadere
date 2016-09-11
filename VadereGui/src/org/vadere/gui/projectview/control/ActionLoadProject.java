@@ -31,6 +31,10 @@ public class ActionLoadProject extends AbstractAction {
 
 	@Override
 	public void actionPerformed(final ActionEvent event) {
+		loadProject(false);
+	}
+
+	public void loadProject(boolean isRemigrationLoading) {
 		try {
 			// 1. ask for save project if it has changed
 			if (!ActionAbstractSaveProject.askSaveUnlessUserCancels(model)) {
@@ -41,6 +45,11 @@ public class ActionLoadProject extends AbstractAction {
 			String projectFilePath = VDialogManager.loadProjectDialog();
 
 			if (projectFilePath != null) {
+
+				if (isRemigrationLoading) {
+					MigrationAssistant.setReapplyLatestMigrationFlag();
+				}
+
 				// 3. load project
 				loadProjectByPath(model, projectFilePath);
 			} else {
