@@ -2,6 +2,7 @@ package org.vadere.gui.projectview.view;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.projects.ScenarioRunManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +14,8 @@ public class DataProcessingView extends JPanel {
 
 	private JTable filesTable;
 	private JTable processorsTable;
+	private ScenarioRunManager currentScenario;
+	private boolean isEditable;
 
 
 	public DataProcessingView() {
@@ -42,6 +45,14 @@ public class DataProcessingView extends JPanel {
 		JPanel processorsDetailsPanel = new JPanel();
 		processorsDetailsPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
 		add(processorsDetailsPanel);
+	}
+
+	public void setVadereScenario(ScenarioRunManager scenario) {
+		this.currentScenario = scenario;
+	}
+
+	public void isEditable(boolean isEditable) {
+		this.isEditable = isEditable;
 	}
 
 }
