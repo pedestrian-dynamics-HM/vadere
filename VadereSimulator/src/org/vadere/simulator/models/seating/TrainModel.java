@@ -149,6 +149,11 @@ public class TrainModel {
 		return Collections.unmodifiableList(seats);
 	}
 
+	/** Return an unmodifiable list of interim destinations. */
+	public List<Target> getInterimDestinations() {
+		return Collections.unmodifiableList(interimDestinations);
+	}
+
 	/** Return a new list of all pedestrians in the scenario. */
 	public Collection<Pedestrian> getPedestrians() {
 		return new ArrayList<>(topography.getElements(Pedestrian.class));
