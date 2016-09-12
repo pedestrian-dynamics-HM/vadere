@@ -23,7 +23,6 @@ import com.vividsolutions.jts.math.MathUtil;
  * 
  * To enable this model, add this model's class name to the main model's submodel list and
  * load a train topography.
- * 
  *
  */
 public class SeatingModel implements ActiveCallback, Model {

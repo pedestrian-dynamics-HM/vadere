@@ -1,7 +1,6 @@
 package org.vadere.util.math;
 
 import java.awt.Point;
-import java.awt.geom.Arc2D;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
@@ -442,4 +441,9 @@ public class MathUtil {
 		}
 		return complex;
 	}
+
+	public static double clamp(double val, double min, double max) {
+		return Math.max(min, Math.min(max, val));
+	}
+
 }
