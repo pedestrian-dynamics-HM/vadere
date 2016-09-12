@@ -4,7 +4,6 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 public abstract class PedestrianDensityProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
@@ -26,8 +25,8 @@ public abstract class PedestrianDensityProcessor extends Processor<TimestepPedes
 	}
 
 	@Override
-	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
-		AttributesPedestrianDensityProcessor attDensProc = (AttributesPedestrianDensityProcessor) attributes;
+	public void init(final ProcessorManager manager) {
+		AttributesPedestrianDensityProcessor attDensProc = (AttributesPedestrianDensityProcessor) this.getAttributes();
 
 		this.pedPosProc =
 				(PedestrianPositionProcessor) manager.getProcessor(attDensProc.getPedestrianPositionProcessorId());

@@ -1,15 +1,14 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import java.util.Map;
-
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
 import org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.Map;
 
 public class AreaSpeedProcessor extends AreaProcessor<Double> {
     private PedestrianPositionProcessor pedPosProc;
@@ -45,11 +44,11 @@ public class AreaSpeedProcessor extends AreaProcessor<Double> {
     }
 
     @Override
-    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
-        AttributesAreaSpeedProcessor att = (AttributesAreaSpeedProcessor) attributes;
+    public void init(final ProcessorManager manager) {
+        AttributesAreaSpeedProcessor att = (AttributesAreaSpeedProcessor) this.getAttributes();
         this.pedPosProc = (PedestrianPositionProcessor) manager.getProcessor(att.getPedestrianPositionProcessorId());
         this.pedVelProc = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
 
-        super.init(attributes, manager);
+        super.init(manager);
     }
 }

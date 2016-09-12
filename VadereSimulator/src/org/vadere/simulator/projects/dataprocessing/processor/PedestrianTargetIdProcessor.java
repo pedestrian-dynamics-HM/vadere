@@ -1,12 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import java.util.Collection;
-
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
+
+import java.util.Collection;
 
 public class PedestrianTargetIdProcessor extends Processor<TimestepPedestrianIdDataKey, Integer> {
 
@@ -23,7 +22,7 @@ public class PedestrianTargetIdProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final ProcessorManager manager) {
 		// No initialization needed
 	}
 }

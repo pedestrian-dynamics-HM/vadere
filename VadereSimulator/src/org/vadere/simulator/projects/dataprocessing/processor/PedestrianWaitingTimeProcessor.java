@@ -1,14 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import java.util.Map;
-
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+
+import java.util.Map;
 
 public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKey, Double> {
     private double lastSimTime;
@@ -40,8 +39,8 @@ public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKe
     }
 
     @Override
-    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
-        AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) attributes;
+    public void init(final ProcessorManager manager) {
+        AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) this.getAttributes();
         this.waitingArea = att.getWaitingArea();
     }
 }

@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 public abstract class Processor<K extends Comparable<K>, V> {
 	private int id;
+	private AttributesProcessor attributes;
 
 	private String[] headers;
 	private Map<K, V> data;
@@ -38,6 +39,14 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public AttributesProcessor getAttributes() {
+		return this.attributes;
+	}
+
+	public void setAttributes(AttributesProcessor attributes) {
+		this.attributes = attributes;
 	}
 
 	public String[] getHeaders() {
@@ -83,7 +92,7 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	public void postLoop(final SimulationState state) { }
 
-	public abstract void init(final AttributesProcessor attributes, final ProcessorManager manager);
+	public abstract void init(final ProcessorManager manager);
 
 	public String[] toStrings(final K key) {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NaN" };

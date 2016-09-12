@@ -1,15 +1,14 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import java.util.LinkedList;
-import java.util.stream.Stream;
-
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.attributes.processor.AttributesVelocityProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.LinkedList;
+import java.util.stream.Stream;
 
 public class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
@@ -40,8 +39,8 @@ public class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
-		AttributesVelocityProcessor attVelProc = (AttributesVelocityProcessor) attributes;
+	public void init(final ProcessorManager manager) {
+		AttributesVelocityProcessor attVelProc = (AttributesVelocityProcessor) getAttributes();
 
 		this.pedPosProc =
 				(PedestrianPositionProcessor) manager.getProcessor(attVelProc.getPedestrianPositionProcessorId());

@@ -1,11 +1,10 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
@@ -38,7 +37,7 @@ public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdD
 	}
 
 	@Override
-	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {}
+	public void init(final ProcessorManager manager) {}
 
 	@Override
 	public String[] toStrings(TimestepPedestrianIdDataKey key) {

@@ -1,14 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import java.util.Map;
-
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.Map;
 
 public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataKey, VPoint> {
 	private PedestrianPositionProcessor pedPosProc;
@@ -27,9 +26,9 @@ public class PedestrianLastPositionProcessor extends Processor<PedestrianIdDataK
 	}
 
 	@Override
-	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final ProcessorManager manager) {
 		AttributesPedestrianLastPositionProcessor attLastPosProc =
-				(AttributesPedestrianLastPositionProcessor) attributes;
+				(AttributesPedestrianLastPositionProcessor) this.getAttributes();
 		this.pedPosProc =
 				(PedestrianPositionProcessor) manager.getProcessor(attLastPosProc.getPedestrianPositionProcessorId());
 	}

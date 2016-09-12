@@ -1,12 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import java.util.Set;
-
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.state.scenario.Pedestrian;
+
+import java.util.Set;
 
 public class PedestrianStartTimeProcessor extends Processor<PedestrianIdDataKey, Double> {
 
@@ -21,7 +20,7 @@ public class PedestrianStartTimeProcessor extends Processor<PedestrianIdDataKey,
 	}
 
 	@Override
-	public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
+	public void init(final ProcessorManager manager) {
 		// No initialization needed
 	}
 

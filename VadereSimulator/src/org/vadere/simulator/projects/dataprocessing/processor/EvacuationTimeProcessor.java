@@ -1,14 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
+import org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor;
+import org.vadere.state.scenario.Pedestrian;
+
 import java.util.Collection;
 import java.util.Collections;
-
-import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
-import org.vadere.state.scenario.Pedestrian;
 
 public class EvacuationTimeProcessor extends Processor<NoDataKey, Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
@@ -34,8 +33,8 @@ public class EvacuationTimeProcessor extends Processor<NoDataKey, Double> {
     }
 
     @Override
-    public void init(final AttributesProcessor attributes, final ProcessorManager manager) {
-        AttributesEvacuationTimeProcessor att = (AttributesEvacuationTimeProcessor) attributes;
+    public void init(final ProcessorManager manager) {
+        AttributesEvacuationTimeProcessor att = (AttributesEvacuationTimeProcessor) this.getAttributes();
         this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
     }
 }
