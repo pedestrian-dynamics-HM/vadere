@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-public class AttributesVelocityProcessor extends AttributesProcessor {
+public class AttributesPedestrianVelocityProcessor extends AttributesProcessor {
 	private int pedestrianPositionProcessorId;
 	private int backSteps = 1;
 

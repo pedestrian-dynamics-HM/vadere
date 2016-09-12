@@ -27,7 +27,7 @@
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",
 		"id": 2,
-		"attributesType": "org.vadere.state.attributes.processor.AttributesVelocityProcessor",
+		"attributesType": "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
 		"attributes": {
 			"pedestrianPositionProcessorId": 1
 		}
