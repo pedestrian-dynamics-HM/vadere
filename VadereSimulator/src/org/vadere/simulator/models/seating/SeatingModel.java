@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.DoubleStream;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
@@ -119,6 +120,31 @@ public class SeatingModel implements ActiveCallback, Model {
 					"Seat group is already full. This method should not have been called!",
 					personsSitting));
 		}
+	}
+	
+	/**
+	 * Return a random ordinal in range from 0 to <code>propabilities.length</code> (exclusive).
+	 * The probability for a specific ordinal comes from the corresponding probability passed as parameter.
+	 */
+	public int sampleOrdinal(double... probabilities) {
+		final double sum = DoubleStream.of(probabilities).sum();
+		if (sum != 1.0) {
+			throw new IllegalArgumentException("Sum of probabilities must be 1.");
+		}
+		
+		final double val = random.nextDouble();
+		
+		double accumulatedProbability = 0;
+		for (int i = 0; i < probabilities.length; i++) {
+			accumulatedProbability += probabilities[i];
+			if (val < accumulatedProbability) {
+				return i;
+			}
+		}
+		
+		// usually the following should not be executed;
+		// but in case of floating point accuracy problems:
+		return probabilities.length - 1;
 	}
 
 }
