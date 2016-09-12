@@ -29,9 +29,10 @@ import com.vividsolutions.jts.math.MathUtil;
 public class SeatingModel implements ActiveCallback, Model {
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);
-
+	
 	private TrainModel trainModel;
 	private Topography topography;
+	private Random random;
 
 	@Override
 	public Map<String, Table> getOutputTables() {
@@ -50,11 +51,10 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	@Override
 	public void update(double simTimeInSec) {
-		final Random r = new Random();
 		final int seatCount = trainModel.getSeats().size();
 		trainModel.getPedestrians().stream()
 				.filter(p -> p.getTargets().isEmpty())
-				.forEach(p -> p.getTargets().add(r.nextInt(seatCount)));
+				.forEach(p -> p.getTargets().add(random.nextInt(seatCount)));
 	}
 
 	@Override
@@ -62,6 +62,7 @@ public class SeatingModel implements ActiveCallback, Model {
 			AttributesAgent attributesPedestrian, Random random) {
 		this.topography = topography;
 		this.trainModel = new TrainModel(topography);
+		this.random = random;
 	}
 
 	public TrainModel getTrainModel() {
