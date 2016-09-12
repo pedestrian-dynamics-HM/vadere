@@ -150,7 +150,7 @@ public class TrainModel {
 	}
 
 	/** Return a new list of all pedestrians in the scenario. */
-	public List<Pedestrian> getPedestrians() {
+	public Collection<Pedestrian> getPedestrians() {
 		return new ArrayList<>(topography.getElements(Pedestrian.class));
 	}
 
