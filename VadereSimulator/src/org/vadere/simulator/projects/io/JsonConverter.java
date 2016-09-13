@@ -1,37 +1,72 @@
 package org.vadere.simulator.projects.io;
 
+import com.google.gson.JsonElement;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonElement;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.simulator.projects.dataprocessing_mtp.AttributesProcessor;
-import org.vadere.simulator.projects.dataprocessing_mtp.OutputFile;
-import org.vadere.simulator.projects.dataprocessing_mtp.Processor;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.attributes.scenario.*;
-import org.vadere.state.scenario.*;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.scenario.AttributesStairs;
+import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.attributes.scenario.AttributesTeleporter;
+import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.Car;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Teleporter;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
-import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class JsonConverter {
 
@@ -135,6 +170,10 @@ public abstract class JsonConverter {
 		mapper.registerModule(sm);
 	}
 
+	public static ObjectMapper getMapper() {
+		return mapper;
+	}
+
 	// - - - - DESERIALIZING - - - -
 
 	public static JsonNode deserializeToNode(String dev) throws IOException {
@@ -210,85 +249,12 @@ public abstract class JsonConverter {
 		}
 	}
 
-	private static class ProcessorStore {
-		String type;
-		int id;
-	}
-
-	private static class OutputFileStore {
-		String type;
-		String filename;
-		List<Integer> processors;
-	}
-
-	public static List<Processor<?, ?>> deserializeProcessors(String json) throws IOException {
-		List<Processor<?, ?>> processors = new ArrayList<>();
-		JsonNode rootNode = mapper.readTree(json);
-
-		ArrayNode processorsNode = (ArrayNode) rootNode.get("processors");
-		DynamicClassInstantiator<Processor<?, ?>> instantiator = new DynamicClassInstantiator<Processor<?, ?>>();
-
-		for (JsonNode processorNode : processorsNode) {
-			ProcessorStore processorStore = mapper.treeToValue(processorNode, ProcessorStore.class);
-			Processor<?, ?> processor = instantiator.createObject(processorStore.type);
-			processor.setId(processorStore.id);
-
-			processors.add(processor);
-		}
-
-		return processors;
-	}
-
-	public static List<AttributesProcessor> deserializeAttributesProcessor(String json)
-			throws IOException, ClassNotFoundException {
-		List<AttributesProcessor> attributes = new ArrayList<>();
-		JsonNode rootNode = mapper.readTree(json);
-
-		DynamicClassInstantiator<AttributesProcessor> instantiator = new DynamicClassInstantiator<>();
-		Iterator<String> it = rootNode.fieldNames();
-		while (it.hasNext()) {
-			String fieldName = it.next();
-
-			if (!fieldName.contains("Attributes"))
-				continue;
-
-			JsonNode attributeNode = rootNode.get(fieldName);
-			AttributesProcessor attribute = mapper.treeToValue(attributeNode, instantiator.getClassFromName(fieldName));
-			attributes.add(attribute);
-		}
-
-		return attributes;
-	}
-
-	public static List<OutputFile<?>> deserializeOutputFiles(
-			String json) throws IOException {
-		List<OutputFile<?>> files = new ArrayList<>();
-		JsonNode rootNode = mapper.readTree(json);
-
-		ArrayNode filesNode = (ArrayNode) rootNode.get("files");
-		DynamicClassInstantiator<OutputFile<?>> instantiator =
-				new DynamicClassInstantiator<>();
-
-		for (JsonNode fileNode : filesNode) {
-			OutputFileStore writerStore = mapper.treeToValue(fileNode, OutputFileStore.class);
-			OutputFile<?> file =
-					instantiator.createObject(writerStore.type);
-			file.setFileName(writerStore.filename);
-			file.setProcessorIds(writerStore.processors);
-
-			files.add(file);
-		}
-
-		return files;
-	}
-
 	public static ScenarioRunManager deserializeScenarioRunManager(String json) throws IOException {
-		return deserializeScenarioRunMangerFromNode(mapper.readTree(json));
+		return deserializeScenarioRunManagerFromNode(mapper.readTree(json));
 	}
 
-	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processors
-	public static ScenarioRunManager deserializeScenarioRunMangerFromNode(JsonNode node)
-			throws JsonProcessingException {
+	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processor
+	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
 		JsonNode vadereNode = rootNode.get("vadere");
@@ -300,9 +266,14 @@ public abstract class JsonConverter {
 		String description = rootNode.get("description").asText();
 		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, am, as, to);
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
-		scenarioRunManager.removeAllWriters();
-		ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())
-				.forEach(writer -> scenarioRunManager.addWriter(writer));
+
+		//scenarioRunManager.removeAllWriters();
+		//ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())
+		//		.forEach(writer -> scenarioRunManager.addWriter(writer));
+
+		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
+		scenarioRunManager.saveChanges();
+
 		if (scenarioRunManager.getTopography() == null)
 			logger.error("Loading topography failed."); // migrated from GSON, not sure if still necessary
 		return scenarioRunManager;
@@ -442,16 +413,22 @@ public abstract class JsonConverter {
 		return writer.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}
 
-	// TODO [priority=medium] [task=deprecation] remove deprecated call. This call is required to serialize the output processors
+	// TODO [priority=medium] [task=deprecation] remove deprecated call. This call is required to serialize the output processor
 	public static JsonNode serializeScenarioRunManagerToNode(ScenarioRunManager scenarioRunManager,
 			boolean commitHashIncluded) throws IOException {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
-		rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME,
-				serializeProcessorWriters(scenarioRunManager.getAllWriters()));
+		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(scenarioRunManager.getAllWriters()));
+		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenarioRunManager.getDataProcessingJsonManager().serializeToNode());
 		rootNode.set("vadere", serializeVadereNode(scenarioStore));
 		return rootNode;
+	}
+
+	private static JsonNode processorManagerToNode(ScenarioRunManager srm) throws IOException {
+		//JsonNode node = mapper.readTree(srm.getOutputProcessorsJson());
+		// TODO do proper serialization instead of storing the original json
+		return null;
 	}
 
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {
@@ -462,16 +439,6 @@ public abstract class JsonConverter {
 			node.put("commithash", HashGenerator.commitHash());
 		node.put("topographyhash", HashGenerator.topographyHash(scenarioStore.topography));
 		node.put("attributeshash", HashGenerator.attributesHash(scenarioStore));
-	}
-
-	@Deprecated
-	private static JsonNode serializeProcessorWriters(List<ProcessorWriter> writers) {
-		try {
-			return jsonElementToJsonNode(ProcessorWriter.toJson(writers));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	// temporary, until GSON is finally completely gone, only used for serializing OutputProcessors
@@ -584,11 +551,11 @@ public abstract class JsonConverter {
 		return writer.writeValueAsString(node);
 	}
 
-	public static String serializeSimulationStateSnapshot(ScenarioStore scenarioStore, List<ProcessorWriter> writers, boolean commitHashIncluded) throws JsonProcessingException {
+	public static String serializeSimulationStateSnapshot(final SimulationState state, boolean commitHashIncluded) throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
-		serializeMeta(node, commitHashIncluded, scenarioStore);
-		node.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(writers));
-		node.set("vadere", serializeVadereNode(scenarioStore));
+		serializeMeta(node, commitHashIncluded, state.getScenarioStore());
+		node.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, state.getProcessorManager().serializeToNode());
+		node.set("vadere", serializeVadereNode(state.getScenarioStore()));
 		return writer.writeValueAsString(node);
 	}
 
@@ -608,7 +575,7 @@ public abstract class JsonConverter {
 
 	public static ScenarioRunManager cloneScenarioRunManager(ScenarioRunManager original) throws IOException {
 		JsonNode clone = serializeScenarioRunManagerToNode(original, false);
-		return deserializeScenarioRunMangerFromNode(clone);
+		return deserializeScenarioRunManagerFromNode(clone);
 	}
 
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {

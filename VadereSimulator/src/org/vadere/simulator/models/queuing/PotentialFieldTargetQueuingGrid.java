@@ -1,13 +1,5 @@
 package org.vadere.simulator.models.queuing;
 
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
@@ -23,13 +15,20 @@ import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
+
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, DynamicElementRemoveListener<Pedestrian>,
 		DynamicElementAddListener<Pedestrian> {
@@ -258,11 +257,6 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 		// logger.info("prob: " + prob + ", expexted value (sec): " + expectedValue);
 		boolean result = random.nextDouble() <= prob;
 		return result;
-	}
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	@Override

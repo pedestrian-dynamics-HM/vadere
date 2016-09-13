@@ -11,7 +11,7 @@ import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.projectview.view.VTable;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.io.IOOutput;
 
 import javax.swing.*;

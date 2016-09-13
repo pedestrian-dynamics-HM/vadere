@@ -3,7 +3,7 @@ package org.vadere.state.simulation;
 import java.util.Optional;
 
 /**
- * Java Bean that stores the stepNumber and the simulation time in seconds of a specific time step.
+ * Java Bean that store the stepNumber and the simulation time in seconds of a specific time step.
  *
  */
 public class Step implements Comparable<Step> {

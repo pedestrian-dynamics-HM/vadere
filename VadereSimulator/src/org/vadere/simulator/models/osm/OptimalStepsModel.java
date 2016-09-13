@@ -1,19 +1,5 @@
 package org.vadere.simulator.models.osm;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -36,28 +22,29 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.ListUtils;
-import org.vadere.util.reflection.DynamicClassInstantiator;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class OptimalStepsModel implements MainModel {
-
-	/**
-	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processors.
-	 */
-	private Map<String, Table> outputTables;
 
 	/**
 	 * Compares the time of the next possible move.
@@ -109,7 +96,6 @@ public class OptimalStepsModel implements MainModel {
 		this.stepCircleOptimizer = stepCircleOptimizer;
 		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = speedAdjusters;
-		this.outputTables = new HashMap<>();
 
 		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN) {
 			this.pedestrianEventsQueue = new PriorityQueue<>(100,
@@ -128,7 +114,6 @@ public class OptimalStepsModel implements MainModel {
 
 	public OptimalStepsModel() {
 		this.pedestrianIdCounter = 0;
-		this.outputTables = new HashMap<>();
 		this.speedAdjusters = new LinkedList<>();
 	}
 
@@ -282,35 +267,6 @@ public class OptimalStepsModel implements MainModel {
 
 			this.lastSimTimeInSec = simTimeInSec;
 		}
-	}
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		outputTables.clear();
-
-		List<PedestrianOSM> pedestrians = ListUtils.select(
-				topography.getElements(Pedestrian.class), PedestrianOSM.class);
-		for (PedestrianOSM pedestrian : pedestrians) {
-
-			List<Double>[] pedStrides = pedestrian.getStrides();
-			if (pedStrides.length > 0 && !pedStrides[0].isEmpty()) {
-
-				Table strides = new Table("strideLength", "strideTime");
-
-				for (int i = 0; i < pedStrides[0].size(); i++) {
-					strides.addRow();
-					strides.addColumnEntry("strideLength", pedStrides[0].get(i));
-					strides.addColumnEntry("strideTime", pedStrides[1].get(i));
-				}
-
-				outputTables.put(String.valueOf(pedestrian.getId()), strides);
-			}
-
-			pedestrian.clearStrides();
-
-		}
-
-		return outputTables;
 	}
 
 	private void parallelCall(double timeStepInSec) {

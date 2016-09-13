@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.scenario.Topography;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class ActionAddScenario extends ActionAbstractAddScenario {
 	@Override
 	protected ScenarioRunManager generateVadere(final String name) throws IOException {
 		ScenarioRunManager newScenario = new ScenarioRunManager(name);
+		newScenario.setDataProcessingJsonManager(DataProcessingJsonManager.createDefault());
 		if (topography != null) {
 			newScenario.setTopography(topography);
 			logger.info("set topography to scenario");

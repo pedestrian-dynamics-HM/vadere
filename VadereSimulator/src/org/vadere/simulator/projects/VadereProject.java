@@ -3,12 +3,20 @@ package org.vadere.simulator.projects;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.util.io.IOUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -74,8 +82,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	 */
 	public void runScenarios(final Collection<ScenarioRunManager> scenariosRMsToRun) {
 		for (ScenarioRunManager scenarioRM : scenariosRMsToRun) {
-			scenarioRM.setOutputPaths(outputDirectory,
-					outputDirectory.resolveSibling(IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR));
+			scenarioRM.setOutputPaths(outputDirectory);
 		}
 
 		// TODO [priority=normal] [task=bugfix] this is a bug: scenariosLeft may be overwritten even if there are still scenarios in it

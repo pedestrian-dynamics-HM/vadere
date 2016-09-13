@@ -8,7 +8,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesBuilder;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -43,18 +42,6 @@ public class VadereBuilder {
 	public ScenarioRunManager build() {
 		store.topography = scenario.getTopography();
 		return scenario;
-	}
-
-	public void addProcessorWriter(final ProcessorWriter writer) {
-		scenario.addWriter(writer);
-	}
-
-	public void removeAllWriters() {
-		scenario.setProcessWriters(new LinkedList<ProcessorWriter>());
-	}
-
-	public void removeWriter(final ProcessorWriter writer) {
-		scenario.removeWriter(writer);
 	}
 
 	/**

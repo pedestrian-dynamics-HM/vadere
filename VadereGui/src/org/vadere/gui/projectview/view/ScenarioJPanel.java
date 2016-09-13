@@ -7,56 +7,62 @@ import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.utils.ClassFinder;
+import org.vadere.gui.projectview.utils.ClassRenderer;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.io.IOUtils;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.beans.IntrospectionException;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.event.ActionEvent;
-import java.beans.IntrospectionException;
-import java.io.File;
-import java.io.IOException;
-
 
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
-	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
 
+	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
 	private static final long serialVersionUID = 7217609523783631174L;
 
-	private TextView topographyFileView;
-	private OutputProcessorsView outputProcessorsView;
 	private JTabbedPane tabbedPane;
 	private final JFrame owner;
 	private final JLabel scenarioName;
 
-	private TextView attributesModelView; // Model tab
+	// tabs
+	private List<JMenu> menusInTabs = new ArrayList<>();
 	private TextView attributesSimulationView; // Simulation tab
+	private TextView attributesModelView; // Model tab
+	private TextView topographyFileView; // Topography tab
+	private TextView outputView; // new Output tab
+	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
+	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
-	private boolean initialized;
-
-	private JPanel visualizationCard;
+	// during simulation-run, only this is shown instead of the tabs above:
 	private final OnlineVisualization onlineVisualization;
 
 	private String visualizationCardName = "visualization";
 	private String editCardName = "edit";
 
-	private final PostvisualizationWindow postVisualizationView;
-
-	private TopographyWindow topographyCreatorView;
-
 	private ScenarioRunManager scenario;
+	private boolean initialized;
 
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	public ScenarioJPanel(JFrame owner, JLabel scenarioName) {
+	ScenarioJPanel(JFrame owner, JLabel scenarioName) {
 		this.owner = owner;
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
@@ -80,7 +86,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		editCard.add(tabbedPane, BorderLayout.CENTER);
 
-		tabbedPane.addChangeListener(e -> {
+		tabbedPane.addChangeListener(e -> { // TODO what's happening here? can this be simplified?
 			int index = tabbedPane.getSelectedIndex();
 			if (index >= 0 && topographyFileView != null
 					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.Topography.title"))
@@ -104,6 +110,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
+		menusInTabs.add(mnPresetMenu);
 		ModelPresets.getPresets().forEach(
 				modelDefinition -> mnPresetMenu.add(new JMenuItem(new AbstractAction(modelDefinition.getMainModel()) {
 					private static final long serialVersionUID = 1L;
@@ -123,9 +130,9 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 					}
 				})));
 
-
 		JMenu mnAttributesMenu = new JMenu(Messages.getString("Tab.Model.addAttributesMenu.title"));
 		presetMenuBar.add(mnAttributesMenu);
+		menusInTabs.add(mnAttributesMenu);
 		ClassFinder.getAttributesNames().forEach(
 				attributesClassName -> mnAttributesMenu.add(new JMenuItem(new AbstractAction(attributesClassName) {
 					@Override
@@ -141,6 +148,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
+		menusInTabs.add(mnModelNameMenu);
 		ClassFinder.getMainModelNames()
 				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className + " (MainModel)") {
 					@Override
@@ -162,17 +170,81 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), null, topographyFileView, null);
 
+		outputView = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+
+		JMenuBar processorsMenuBar = new JMenuBar();
+		JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+		processorsMenuBar.add(processorsMenu);
+		menusInTabs.add(processorsMenu);
+
 		try {
-			outputProcessorsView = new OutputProcessorsView(owner);
+			File[] templateFiles = new File(this.getClass().getResource("/outputTemplates/").getPath()).listFiles();
+
+			for (File templateFile : Arrays.stream(templateFiles).filter(f -> f.isFile()).collect(Collectors.toList())) {
+				String templateFileName = templateFile.getName();
+				String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
+
+				processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
+								Messages.getString("Tab.Model.confirmLoadTemplate.text"),
+								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							try {
+								outputView.setText(templateJson);
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}));
+			}
+
+			outputView.getPanelTop().add(processorsMenuBar, 0);
+
 		} catch (IOException e) {
 			e.printStackTrace();
-			logger.error(e.getLocalizedMessage());
 		}
 
-		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputProcessorsView, null);
+		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputView, null);
 
+		// Test for processor GUI
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		ClassFinder.getOutputFileClasses().forEach(opclass -> {
+			panel.add(new JLabel(opclass.getSimpleName()));
+			ClassFinder.getProcessorClasses(((ParameterizedType) opclass.getGenericSuperclass()).getActualTypeArguments()[0])
+					.forEach(procclass -> panel.add(new JLabel("- " + procclass.getSimpleName())));
+		});
+
+		List<Class<?>> classes = ClassFinder.getOutputFileClasses();
+		JComboBox<Class<?>> cbOutputTypes = new JComboBox<>(classes.toArray(new Class[classes.size()]));
+		cbOutputTypes.setRenderer(new ClassRenderer());
+		panel.add(cbOutputTypes);
+
+		JComboBox<Class<?>> cbProcessorTypes = new JComboBox<>();
+		cbProcessorTypes.setRenderer(cbOutputTypes.getRenderer());
+
+		cbOutputTypes.addItemListener(e -> {
+			if(e.getStateChange() != ItemEvent.SELECTED)
+				return;
+
+			cbProcessorTypes.removeAllItems();
+
+			Class<?> cOutput = (Class<?>) e.getItem();
+			ClassFinder.getProcessorClasses(((ParameterizedType) cOutput.getGenericSuperclass()).getActualTypeArguments()[0]).forEach(c -> cbProcessorTypes.addItem(c));
+		});
+		cbOutputTypes.setSelectedIndex(1);
+		cbOutputTypes.setSelectedIndex(0);
+
+		panel.add(cbProcessorTypes);
+
+		tabbedPane.addTab("Test", null, panel, null);
+
+		
 		// online visualization card...
-		visualizationCard = new JPanel();
+		JPanel visualizationCard = new JPanel();
 
 		visualizationCard.setBorder(new EmptyBorder(5, 5, 5, 5));
 		visualizationCard.setLayout(new BorderLayout(0, 0));
@@ -210,6 +282,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 
 		if (isEditable) {
+			menusInTabs.forEach(menu -> menu.setEnabled(true));
 			try {
 				int index = tabbedPane.getSelectedIndex();
 				if (topographyCreatorView != null && tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
@@ -226,6 +299,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 				logger.error(e.getLocalizedMessage());
 			}
 		} else {
+			menusInTabs.forEach(menu -> menu.setEnabled(false));
 			boolean topoWasSelected = false;
 			if (tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
 				topoWasSelected = tabbedPane.getSelectedComponent().equals(topographyCreatorView);
@@ -240,17 +314,17 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 			postVisualizationView.repaint(); // force a repaint, otherwise it sometimes only repaints when the mouse moves from the output table to the postvis-view
 		}
 
-		this.attributesModelView.isEditable(isEditable);
 		this.attributesModelView.setVadereScenario(scenario);
+		this.attributesModelView.isEditable(isEditable);
 
-		this.attributesSimulationView.isEditable(isEditable);
 		this.attributesSimulationView.setVadereScenario(scenario);
+		this.attributesSimulationView.isEditable(isEditable);
 
-		this.topographyFileView.isEditable(isEditable);
 		this.topographyFileView.setVadereScenario(scenario);
+		this.topographyFileView.isEditable(isEditable);
 
-		this.outputProcessorsView.isEditable(isEditable);
-		this.outputProcessorsView.setScenario(scenario);
+		this.outputView.setVadereScenario(scenario);
+		this.outputView.isEditable(isEditable);
 	}
 
 	private void setTopography(Topography topography) {

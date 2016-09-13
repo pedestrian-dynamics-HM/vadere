@@ -95,6 +95,10 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		this.addObserver(scenarioObserver);
 	}
 
+	public ScenarioRunManager getScenario() {
+		return scenario;
+	}
+
 	@Override
 	public Topography getTopography() {
 		return topographyBuilder.build();

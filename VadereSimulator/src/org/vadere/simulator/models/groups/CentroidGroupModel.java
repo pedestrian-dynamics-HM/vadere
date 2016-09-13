@@ -1,11 +1,5 @@
 package org.vadere.simulator.models.groups;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
@@ -17,11 +11,17 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.Table;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+
 public class CentroidGroupModel implements GroupModel, ActiveCallback {
 
 	/**
 	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processors.
+	 * by the processor.
 	 */
 	private Map<String, Table> outputTables;
 
@@ -103,11 +103,6 @@ public class CentroidGroupModel implements GroupModel, ActiveCallback {
 	@Override
 	public void update(final double simTimeInSec) {}
 
-	@Override
-	public Map<String, Table> getOutputTables() {
-		return outputTables;
-	}
-	
 	public AttributesCGM getAttributesCGM() {
 		return attributesCGM;
 	}

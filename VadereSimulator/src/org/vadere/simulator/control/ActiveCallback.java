@@ -8,7 +8,7 @@ package org.vadere.simulator.control;
  *
  *
  */
-public interface ActiveCallback extends OutputGenerator {
+public interface ActiveCallback {
 
 	void preLoop(final double simTimeInSec);
 

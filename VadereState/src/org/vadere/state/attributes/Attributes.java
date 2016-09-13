@@ -8,7 +8,7 @@ import com.google.gson.JsonElement;
 /**
  * Abstract class for all static simulation attributes. Provides reflection
  * based methods to convert the fields and values of the Attributes classes from
- * and to key-value stores.
+ * and to key-value store.
  * 
  * 
  */

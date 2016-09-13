@@ -6,7 +6,7 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.ActionLoadProject;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;

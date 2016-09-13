@@ -4,9 +4,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
-import org.vadere.simulator.projects.dataprocessing.writer.Writer;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Source;
@@ -34,7 +34,7 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private List<ActiveCallback> activeCallbacks;
 
-	private List<ProcessorWriter> processorWriter;
+	private ProcessorManager processorManager;
 
 	private boolean runSimulation = false;
 	private boolean paused = false;
@@ -56,10 +56,12 @@ public class Simulation {
 	private SimulationState simulationState;
 	private ScenarioStore scenarioStore;
 	private String name;
+	private Model model;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-			List<PassiveCallback> passiveCallbacks, List<ProcessorWriter> processorWriter, Random random) {
+			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
 		this.name = name;
+		this.model = mainModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.attributesSimulation;
 		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
@@ -76,7 +78,7 @@ public class Simulation {
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
 
-		this.processorWriter = processorWriter;
+		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
 
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
@@ -115,21 +117,15 @@ public class Simulation {
 			ac.preLoop(simTimeInSec);
 		}
 
-		for (Writer ac : processorWriter) {
-			ac.preLoop(simulationState);
-		}
-
 		for (PassiveCallback c : passiveCallbacks) {
 			c.preLoop(simTimeInSec);
 		}
+
+		processorManager.preLoop(this.simulationState);
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step);
-		for (ActiveCallback ac : activeCallbacks) {
-			// ActiveCallbacks must also be Models in this case
-			simulationState.registerOutputGenerator(ac.getClass(), ac);
-		}
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
 
 		for (ActiveCallback ac : activeCallbacks) {
 			ac.postLoop(simTimeInSec);
@@ -139,17 +135,17 @@ public class Simulation {
 			c.postLoop(simTimeInSec);
 		}
 
-		for (Writer writer : processorWriter) {
-			writer.postLoop(simulationState);
-		}
+		processorManager.postLoop(this.simulationState);
 	}
 
 	/**
 	 * Starts simulation and runs main loop until stopSimulation flag is set.
 	 */
 	public void run() {
-
 		try {
+			processorManager.setModel(this.model);
+			processorManager.initOutputFiles();
+
 			preLoop();
 
 			while (runSimulation) {
@@ -174,43 +170,43 @@ public class Simulation {
 				}
 
 				updateActiveCallbacks(simTimeInSec);
-
 				updateWriters(simTimeInSec);
+				processorManager.update(this.simulationState);
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
 				}
 
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
-					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(),
-							runTimeInSec + startTimeInSec - simTimeInSec);
+					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {
 					runSimulation = false;
 				}
 
+
+				//remove comment to fasten simulation for evacuation simulations
+				//if (topography.getElements(Pedestrian.class).size() == 0){
+				//	runSimulation = false;
+				//}
 
 				if (Thread.interrupted()) {
 					runSimulation = false;
 					logger.info("Simulation interrupted.");
 				}
 			}
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			// this is necessary to free the resources (files), the SimulationWriter and processors
-			// are writing in!
+		}
+		finally {
+			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
+
+			processorManager.writeOutput();
+			this.logger.info("Logged all processor in logfiles");
 		}
 	}
 
 	private SimulationState initialSimulationState() {
 		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, processorWriter, simTimeInSec, step);
-
-		for (ActiveCallback ac : activeCallbacks) {
-			// ActiveCallbacks must also be Models in this case
-			state.registerOutputGenerator(ac.getClass(), ac);
-		}
+				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, this.processorManager);
 
 		return state;
 	}
@@ -218,22 +214,9 @@ public class Simulation {
 	private void updateWriters(double simTimeInSec) {
 
 		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, processorWriter, simTimeInSec, step);
-		simulationState.setOutputGeneratorMap(this.simulationState.getOutputGeneratorMap());
+				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
+
 		this.simulationState = simulationState;
-
-		for (Writer ac : processorWriter) {
-			ac.update(this.simulationState);
-		}
-
-	}
-
-	public void resetWriters(List<ProcessorWriter> writers) {
-		if (!runSimulation) {
-			this.processorWriter = writers;
-		} else {
-			logger.error("Cannot reset writers when simulation is running.");
-		}
 	}
 
 	private void updateActiveCallbacks(double simTimeInSec) {

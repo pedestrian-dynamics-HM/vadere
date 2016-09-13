@@ -112,7 +112,7 @@ public class VadereConsole {
 						" and Vadere waits for its deletion again.");
 
 		modesGroup.addArgument("-op", "--out-path")
-				.help("NOT in [lock] mode! Path to the output folder where VADERE stores additional results of the simulation.");
+				.help("NOT in [lock] mode! Path to the output folder where VADERE store additional results of the simulation.");
 
 		modesGroup.addArgument("-mtv").type(Boolean.class).action(Arguments.storeTrue())
 				.help("Initializes the [lock] mode. Needs three strings: 1. path to folder where the lock.lck file is created, 2. path to time step file, 3. path to output file.");
@@ -121,7 +121,7 @@ public class VadereConsole {
 		// .help("Path to the output file where VADERE appends results of the simulation.");
 
 		// parser.addArgument("-tsf", "--time-step-file")
-		// .help("Path to the time step file where VADERE stores and reads intermediate results.");
+		// .help("Path to the time step file where VADERE store and reads intermediate results.");
 
 		// parser.addArgument("-l","--lock")
 		// .help("Path to the .lock files folder.");

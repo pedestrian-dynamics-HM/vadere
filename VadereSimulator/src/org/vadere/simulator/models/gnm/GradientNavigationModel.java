@@ -1,18 +1,9 @@
 package org.vadere.simulator.models.gnm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
-import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
@@ -20,16 +11,22 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 import org.vadere.util.potential.gradients.GradientProvider;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private AttributesGNM attributes;
@@ -152,11 +149,6 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 				potentialFieldPedestrian, topography);
 
 		super.update(simTimeInSec);
-	}
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		return new HashMap<>();
 	}
 
 	@Override

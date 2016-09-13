@@ -1,35 +1,35 @@
 package org.vadere.simulator.projects;
 
-import difflib.DiffUtils;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
-import org.vadere.simulator.projects.dataprocessing.processors.ModelTest;
-import org.vadere.simulator.projects.dataprocessing.processors.PedestrianPositionProcessor;
-import org.vadere.simulator.projects.dataprocessing.processors.SnapshotOutputProcessor;
-import org.vadere.simulator.projects.dataprocessing.writer.ProcessorWriter;
+import org.vadere.simulator.projects.dataprocessing.ModelTest;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.processors.AttributesPedestrianPositionProcessor;
-import org.vadere.state.attributes.processors.AttributesWriter;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+import difflib.DiffUtils;
 
 /**
  * Receives an object of type ScenarioStore, manages a scenario and runs the simulation.
@@ -41,12 +41,12 @@ public class ScenarioRunManager implements Runnable {
 
 	protected ScenarioStore scenarioStore;
 	protected Path outputPath;
-	private Path processorOutputPath;
 
-	private List<ProcessorWriter> processorWriters;
 	private List<ModelTest> modelTests;
 	protected final List<PassiveCallback> passiveCallbacks;
-	protected List<ProcessorWriter> writers;
+
+	private DataProcessingJsonManager dataProcessingJsonManager;
+	protected ProcessorManager processorManager;
 
 	private ScenarioFinishedListener finishedListener;
 	protected Simulation simulation;
@@ -54,6 +54,8 @@ public class ScenarioRunManager implements Runnable {
 	private boolean simpleOutputProcessorName = false;
 
 	private String savedStateSerialized;
+	private String currentStateSerialized;
+
 
 	public ScenarioRunManager(final String name) {
 		this(name, new ScenarioStore(name));
@@ -65,21 +67,26 @@ public class ScenarioRunManager implements Runnable {
 
 	public ScenarioRunManager(final String name, final ScenarioStore store) {
 		this.passiveCallbacks = new LinkedList<>();
-		this.processorWriters = new LinkedList<>();
 		this.modelTests = new LinkedList<>();
-		this.writers = new LinkedList<>();
 		this.scenarioStore = store;
-		this.outputPath = Paths.get(IOUtils.OUTPUT_DIR); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
-		this.processorOutputPath = Paths.get(IOUtils.OUTPUTPROCESSOR_OUTPUT_DIR);
-		saveChanges();
+
+		this.dataProcessingJsonManager = new DataProcessingJsonManager();
+		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+
+		this.saveChanges();
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
 		savedStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		currentStateSerialized = savedStateSerialized;
 	}
 
 	public boolean hasUnsavedChanges() {
-		return !savedStateSerialized.equals(JsonConverter.serializeScenarioRunManager(this));
+		return !savedStateSerialized.equals(currentStateSerialized);
+	}
+
+	public void updateCurrentStateSerialized() {
+		currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
 	}
 
 	public String getDiff() {
@@ -104,8 +111,12 @@ public class ScenarioRunManager implements Runnable {
 		doBeforeSimulation();
 
 		try {
-			// prepare processors and simulation data writer
+			// prepare processor and simulation data writer
 			prepareOutput();
+
+			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
+				out.println(JsonConverter.serializeScenarioRunManager(this, true));
+			}
 
 			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 			modelBuilder.createModelAndRandom();
@@ -113,7 +124,7 @@ public class ScenarioRunManager implements Runnable {
 			final Random random = modelBuilder.getRandom();
 
 			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, writers, random);
+			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
 			simulation.run();
 		} catch (Exception e) {
 			scenarioFailed = true;
@@ -133,7 +144,7 @@ public class ScenarioRunManager implements Runnable {
 		this.passiveCallbacks.clear();
 
 		logger.info(String.format("Scenario finished."));
-		logger.info(String.format("Running output processors, if any..."));
+		logger.info(String.format("Running output processor, if any..."));
 		logger.info(String.format("Done running scenario '%s': '%s'", this.getName(),
 				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
 	}
@@ -144,6 +155,8 @@ public class ScenarioRunManager implements Runnable {
 
 		logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
 		scenarioStore.topography.reset();
+
+		this.processorManager = this.dataProcessingJsonManager.createProcessorManager();
 	}
 
 	public void setScenarioFailed(final boolean scenarioFailed) {
@@ -197,36 +210,9 @@ public class ScenarioRunManager implements Runnable {
 		this.passiveCallbacks.add(pc);
 	}
 
-	public void addWriter(final ProcessorWriter writer) {
-		processorWriters.add(writer);
-		if (writer.getProcessor() instanceof ModelTest)
-			modelTests.add((ModelTest) writer.getProcessor());
-	}
-
-	public void removeWriter(final ProcessorWriter writer) {
-		processorWriters.remove(writer);
-		if (writer instanceof ModelTest)
-			modelTests.remove(writer.getProcessor());
-	}
-
-	public void removeAllWriters() {
-		processorWriters.clear();
-		modelTests.clear();
-	}
-
-	public void setProcessWriters(final List<ProcessorWriter> writers) {
-		this.processorWriters.clear();
-		for (ProcessorWriter writer : writers)
-			addWriter(writer);
-	}
-
-	public List<ProcessorWriter> getAllWriters() {
-		return this.processorWriters;
-	}
-
-	public void setOutputPaths(final Path outputPath, final Path processedOutputPath) {
-		this.outputPath = outputPath;
-		this.processorOutputPath = processedOutputPath;
+	public void setOutputPaths(final Path outputPath) {
+		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
+		this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
 	}
 
 	public void setName(String name) {
@@ -278,55 +264,7 @@ public class ScenarioRunManager implements Runnable {
 
 	// Output stuff...
 	private void prepareOutput() {
-		if (getAttributesSimulation().isWriteSimulationData()) {
-			DateFormat format = new SimpleDateFormat(IOUtils.DATE_FORMAT);
-
-			writers.clear();
-			int writerCounter = 0; // needed to distinguish writers with the same name
-			String dateString = format.format(new Date());
-			String dirName = String.format("%s_%s", this.getName(), dateString);
-
-			ProcessorWriter snapshotWriter = new ProcessorWriter(new SnapshotOutputProcessor(), new AttributesWriter());
-			ProcessorWriter trajectoryWriter = new ProcessorWriter(
-					new PedestrianPositionProcessor(new AttributesPedestrianPositionProcessor(true)),
-					new AttributesWriter());
-			String snapshotFileName =
-					String.format("%s%s", getName(), snapshotWriter.getProcessor().getFileExtension());
-			snapshotFileName = IOUtils.getPath(outputPath.resolve(dirName).toString(), snapshotFileName).toString();
-			String trajectoyFileName =
-					String.format("%s%s", getName(), trajectoryWriter.getProcessor().getFileExtension());
-			trajectoyFileName = IOUtils.getPath(outputPath.resolve(dirName).toString(), trajectoyFileName).toString();
-			try {
-				snapshotWriter.setOutputStream(new FileOutputStream(snapshotFileName, false));
-				snapshotWriter.setWriteHeader(false);
-				trajectoryWriter.setOutputStream(new FileOutputStream(trajectoyFileName, false));
-				trajectoryWriter.setWriteHeader(true);
-				writers.add(snapshotWriter);
-				writers.add(trajectoryWriter);
-			} catch (IOException e) {
-				logger.error(e);
-			}
-
-			for (ProcessorWriter writer : processorWriters) {
-				Path processorOutputPath = null;
-				processorOutputPath = this.processorOutputPath;
-
-				String filename;
-				if (simpleOutputProcessorName) {
-					filename = String.format("%s%s", this.getName(), writer.getProcessor().getFileExtension());
-				} else {
-					filename = String.format("%s_%s_%d_%s%s", this.getName(), writer.getProcessor().getName(),
-							(writerCounter++), dateString, writer.getProcessor().getFileExtension());
-				}
-				String procFileName = IOUtils.getPath(processorOutputPath.toString(), filename).toString();
-				try {
-					writer.setOutputStream(new FileOutputStream(procFileName, false));
-				} catch (FileNotFoundException e) {
-					logger.error(e);
-				}
-				writers.add(writer);
-			}
-		}
+		this.processorManager.setOutputPath(this.outputPath.toString());
 	}
 
 	@Override
@@ -335,7 +273,6 @@ public class ScenarioRunManager implements Runnable {
 		try {
 			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
 			clonedScenario.outputPath = outputPath;
-			clonedScenario.processorOutputPath = processorOutputPath;
 		} catch (IOException | VadereClassNotFoundException e) {
 			logger.error(e);
 		}
@@ -355,12 +292,19 @@ public class ScenarioRunManager implements Runnable {
 		return scenarioStore.name + (hasUnsavedChanges() ? "*" : "");
 	}
 
-	public void discardChanges() { // is this done properly this way? Could replace the whole ScenarioRunManager in VadereProject (but keep the Id) alternatively
+	public void discardChanges() {
 		try {
 			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
-			this.processorWriters = srm.processorWriters;
-			this.writers = srm.writers;
+			// not all necessary! only the ones that could have changed
 			this.scenarioStore = srm.scenarioStore;
+			this.outputPath = srm.outputPath;
+			this.processorManager = srm.processorManager;
+			this.modelTests = srm.modelTests;
+			this.finishedListener = srm.finishedListener;
+			this.simulation = srm.simulation;
+			this.scenarioFailed = srm.scenarioFailed;
+			this.simpleOutputProcessorName = srm.simpleOutputProcessorName;
+			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
 		} catch (IOException | VadereClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -379,5 +323,17 @@ public class ScenarioRunManager implements Runnable {
 			return scenarioStore.name + ": no mainModel is set";
 		}
 		return null;
+	}
+
+	public ProcessorManager getProcessorManager() {
+		return this.processorManager;
+	}
+
+	public DataProcessingJsonManager getDataProcessingJsonManager() {
+		return this.dataProcessingJsonManager;
+	}
+
+	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {
+		this.dataProcessingJsonManager = manager;
 	}
 }
