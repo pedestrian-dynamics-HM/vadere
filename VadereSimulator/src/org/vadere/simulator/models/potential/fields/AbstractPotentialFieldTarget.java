@@ -1,12 +1,5 @@
 package org.vadere.simulator.models.potential.fields;
 
-import java.awt.Point;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -15,12 +8,17 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellGridConverter;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGrid {
 
@@ -29,12 +27,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	private Topography topography;
 	private boolean wasUpdated;
 	private static Logger logger = LogManager.getLogger(AbstractPotentialFieldTarget.class);
-
-	/**
-	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processor.
-	 */
-	private Map<String, Table> outputTables;
 
 	/**
 	 * Stores all potential fields which represent the observation area. The key
@@ -47,7 +39,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		this.topography = topography;
 		this.wasUpdated = false;
 		this.targetPotentialFields = new HashMap<>();
-		this.outputTables = new HashMap<>();
 	}
 
 	/**
@@ -240,21 +231,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		}
 
 		return map;
-	}
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		if (wasUpdated() || outputTables.isEmpty()) {
-			outputTables.clear();
-			List<Target> list = topography.getTargets();
-			list.stream().filter(t -> targetPotentialFields.containsKey(t.getId())).forEach(target -> {
-				PotentialFieldAndInitializer potentialfieldAndInitializer = targetPotentialFields.get(target.getId());
-				Table potentialFieldTable =
-						new CellGridConverter(potentialfieldAndInitializer.eikonalSolver.getPotentialField()).toTable();
-				outputTables.put(String.valueOf(target.getId()), potentialFieldTable);
-			});
-		}
-		return outputTables;
 	}
 
 	protected Optional<PotentialFieldAndInitializer> getPotentialFieldAndInitializer(final int targetId) {

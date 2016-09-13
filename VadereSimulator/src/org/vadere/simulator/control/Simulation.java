@@ -126,10 +126,6 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
-		for (ActiveCallback ac : activeCallbacks) {
-			// ActiveCallbacks must also be Models in this case
-			simulationState.registerOutputGenerator(ac.getClass(), ac);
-		}
 
 		for (ActiveCallback ac : activeCallbacks) {
 			ac.postLoop(simTimeInSec);
@@ -212,11 +208,6 @@ public class Simulation {
 		SimulationState state =
 				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, this.processorManager);
 
-		for (ActiveCallback ac : activeCallbacks) {
-			// ActiveCallbacks must also be Models in this case
-			state.registerOutputGenerator(ac.getClass(), ac);
-		}
-
 		return state;
 	}
 
@@ -224,7 +215,7 @@ public class Simulation {
 
 		SimulationState simulationState =
 				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
-		simulationState.setOutputGeneratorMap(this.simulationState.getOutputGeneratorMap());
+
 		this.simulationState = simulationState;
 	}
 

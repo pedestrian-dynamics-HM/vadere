@@ -23,6 +23,36 @@ public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPe
         Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
         // TODO: if osm != null then compute stridelength
         peds.forEach(ped -> this.addValue(new TimestepPedestrianIdDataKey(state.getStep(), ped.getId()), this.osm == null ? Double.NaN : 0.0));
+
+        // TODO Use this comment from the old implementation for this implementation
+//        @Override
+//        public Map<String, Table> getOutputTables() {
+//            outputTables.clear();
+//
+//            List<PedestrianOSM> pedestrians = ListUtils.select(
+//                    topography.getElements(Pedestrian.class), PedestrianOSM.class);
+//            for (PedestrianOSM pedestrian : pedestrians) {
+//
+//                List<Double>[] pedStrides = pedestrian.getStrides();
+//                if (pedStrides.length > 0 && !pedStrides[0].isEmpty()) {
+//
+//                    Table strides = new Table("strideLength", "strideTime");
+//
+//                    for (int i = 0; i < pedStrides[0].size(); i++) {
+//                        strides.addRow();
+//                        strides.addColumnEntry("strideLength", pedStrides[0].get(i));
+//                        strides.addColumnEntry("strideTime", pedStrides[1].get(i));
+//                    }
+//
+//                    outputTables.put(String.valueOf(pedestrian.getId()), strides);
+//                }
+//
+//                pedestrian.clearStrides();
+//
+//            }
+//
+//            return outputTables;
+//        }
     }
 
     @Override
