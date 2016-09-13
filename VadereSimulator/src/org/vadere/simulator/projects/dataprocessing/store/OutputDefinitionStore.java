@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class OutputDefinitionStore {
     private List<OutputFileStore> files;
-    private List<ProcessorStore> processors;
+    private List<DataProcessorStore> processors;
     private Map<String, AttributesProcessor> attributes;
 
     public OutputDefinitionStore() {
@@ -20,7 +20,7 @@ public class OutputDefinitionStore {
         this.files.add(file);
     }
 
-    public void addProcessor(ProcessorStore processor) {
+    public void addProcessor(DataProcessorStore processor) {
         this.processors.add(processor);
     }
 

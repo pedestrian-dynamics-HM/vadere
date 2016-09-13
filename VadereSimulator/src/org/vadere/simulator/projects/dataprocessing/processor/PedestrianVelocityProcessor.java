@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-public class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
+public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
 	private int backSteps;
 

@@ -7,7 +7,7 @@ import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
 
-public class PedestrianSourceIdProcessor extends Processor<PedestrianIdDataKey, Integer> {
+public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdDataKey, Integer> {
 
 	public PedestrianSourceIdProcessor() {
 		super("sid");

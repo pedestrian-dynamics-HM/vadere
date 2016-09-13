@@ -2,13 +2,13 @@ package org.vadere.simulator.projects.dataprocessing.store;
 
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
-public class ProcessorStore {
+public class DataProcessorStore {
     private String type;
     private int id;
     private String attributesType;
     private AttributesProcessor attributes;
 
-    public ProcessorStore() {
+    public DataProcessorStore() {
         this.type = "";
         this.id = 0;
         this.attributesType = "";

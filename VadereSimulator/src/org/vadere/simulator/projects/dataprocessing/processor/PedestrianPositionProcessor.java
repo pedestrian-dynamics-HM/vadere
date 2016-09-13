@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class PedestrianPositionProcessor extends Processor<TimestepPedestrianIdDataKey, VPoint> {
+public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestrianIdDataKey, VPoint> {
 
 	public PedestrianPositionProcessor() {
 		super("x", "y");

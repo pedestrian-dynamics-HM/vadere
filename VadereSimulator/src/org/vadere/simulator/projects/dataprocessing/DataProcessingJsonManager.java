@@ -12,9 +12,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.processor.Processor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
-import org.vadere.simulator.projects.dataprocessing.store.ProcessorStore;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.reflection.DynamicClassInstantiator;
@@ -48,19 +48,19 @@ public class DataProcessingJsonManager {
     public static ObjectWriter writer;
 
     private static final DynamicClassInstantiator<OutputFile<?>> outputFileInstantiator;
-    private static final DynamicClassInstantiator<Processor<?, ?>> processorInstantiator;
+    private static final DynamicClassInstantiator<DataProcessor<?, ?>> processorInstantiator;
 
     private List<OutputFile<?>> outputFiles;
-    private List<Processor<?, ?>> processors;
+    private List<DataProcessor<?, ?>> dataProcessors;
 
     static {
         mapper = JsonConverter.getMapper();
         writer = mapper.writerWithDefaultPrettyPrinter();
 
         SimpleModule sm = new SimpleModule();
-        sm.addDeserializer(ProcessorStore.class, new JsonDeserializer<ProcessorStore>() {
+        sm.addDeserializer(DataProcessorStore.class, new JsonDeserializer<DataProcessorStore>() {
             @Override
-            public ProcessorStore deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+            public DataProcessorStore deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
 
 
                 return null;
@@ -74,7 +74,7 @@ public class DataProcessingJsonManager {
 
     public DataProcessingJsonManager() {
         this.outputFiles = new ArrayList<>();
-        this.processors = new ArrayList<>();
+        this.dataProcessors = new ArrayList<>();
     }
 
     public void addOutputFile(final OutputFileStore fileStore) {
@@ -88,11 +88,11 @@ public class DataProcessingJsonManager {
         this.outputFiles.add(file);
     }
 
-    public void addProcessor(final ProcessorStore processorStore) {
-        Processor<?, ?> processor = processorInstantiator.createObject(processorStore.getType());
-        processor.setId(processorStore.getId());
-        processor.setAttributes(processorStore.getAttributes());
-        this.processors.add(processor);
+    public void addProcessor(final DataProcessorStore dataProcessorStore) {
+        DataProcessor<?, ?> dataProcessor = processorInstantiator.createObject(dataProcessorStore.getType());
+        dataProcessor.setId(dataProcessorStore.getId());
+        dataProcessor.setAttributes(dataProcessorStore.getAttributes());
+        this.dataProcessors.add(dataProcessor);
     }
 
     private static JsonNode serializeOutputFile(final OutputFile outputFile) {
@@ -110,17 +110,17 @@ public class DataProcessingJsonManager {
         return node;
     }
 
-    private static JsonNode serializeProcessor(final Processor processor) {
+    private static JsonNode serializeProcessor(final DataProcessor dataProcessor) {
         ObjectNode node = mapper.createObjectNode();
 
-        node.put(TYPE_KEY, processor.getClass().getName());
-        node.put(PROCESSORID_KEY, processor.getId());
+        node.put(TYPE_KEY, dataProcessor.getClass().getName());
+        node.put(PROCESSORID_KEY, dataProcessor.getId());
 
-        if (processor.getAttributes() != null) {
-            node.put(ATTRIBUTESTYPE_KEY, processor.getAttributes().getClass().getName());
+        if (dataProcessor.getAttributes() != null) {
+            node.put(ATTRIBUTESTYPE_KEY, dataProcessor.getAttributes().getClass().getName());
 
-            if (!processor.getAttributes().getClass().equals(AttributesProcessor.class)) {
-                node.set(ATTRIBUTES_KEY, mapper.convertValue(processor.getAttributes(), JsonNode.class));
+            if (!dataProcessor.getAttributes().getClass().equals(AttributesProcessor.class)) {
+                node.set(ATTRIBUTES_KEY, mapper.convertValue(dataProcessor.getAttributes(), JsonNode.class));
             }
         }
 
@@ -143,7 +143,7 @@ public class DataProcessingJsonManager {
         });
 
         // part 2: processor
-        this.processors.forEach(proc -> {
+        this.dataProcessors.forEach(proc -> {
             processorsArrayNode.add(serializeProcessor(proc));
         });
 
@@ -192,15 +192,15 @@ public class DataProcessingJsonManager {
         // part 2: processor
         if (processorsArrayNode != null)
             for (JsonNode processorNode : processorsArrayNode) {
-                ProcessorStore processorStore = deserializeProcessorStore(processorNode);
-                manager.addProcessor(processorStore);
+                DataProcessorStore dataProcessorStore = deserializeProcessorStore(processorNode);
+                manager.addProcessor(dataProcessorStore);
             }
 
         return manager;
     }
 
-    private static ProcessorStore deserializeProcessorStore(JsonNode node) {
-        ProcessorStore store = new ProcessorStore();
+    private static DataProcessorStore deserializeProcessorStore(JsonNode node) {
+        DataProcessorStore store = new DataProcessorStore();
 
         store.setType(node.get(TYPE_KEY).asText());
         store.setId(node.get(PROCESSORID_KEY).asInt());
@@ -221,6 +221,6 @@ public class DataProcessingJsonManager {
     }
 
     public ProcessorManager createProcessorManager() {
-        return new ProcessorManager(this, this.processors, this.outputFiles);
+        return new ProcessorManager(this, this.dataProcessors, this.outputFiles);
     }
 }

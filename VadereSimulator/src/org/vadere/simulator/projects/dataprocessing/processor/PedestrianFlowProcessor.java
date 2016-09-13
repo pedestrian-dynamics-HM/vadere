@@ -8,7 +8,7 @@ import org.vadere.state.attributes.processor.AttributesPedestrianFlowProcessor;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PedestrianFlowProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
+public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
     private PedestrianVelocityProcessor pedVelProc;
     private PedestrianDensityProcessor pedDensProc;
 

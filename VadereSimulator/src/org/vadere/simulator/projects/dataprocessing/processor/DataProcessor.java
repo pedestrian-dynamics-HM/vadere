@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public abstract class Processor<K extends Comparable<K>, V> {
+public abstract class DataProcessor<K extends Comparable<K>, V> {
 	private int id;
 	private AttributesProcessor attributes;
 
@@ -18,11 +18,11 @@ public abstract class Processor<K extends Comparable<K>, V> {
 
 	private int lastStep;
 
-	protected Processor() {
+	protected DataProcessor() {
 		this(new String[] { });
 	}
 
-	protected Processor(final String... headers) {
+	protected DataProcessor(final String... headers) {
 		this.headers = headers;
 		this.data = new TreeMap<>(); // TreeMap to avoid sorting data later
 

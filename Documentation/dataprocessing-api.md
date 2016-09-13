@@ -2,7 +2,7 @@
 
 ## Using
 
-Every data is computed by a __processor__. A processor has to have a certain __key__ (K) and a certain __value__ (V). Only processors with the same key can be put together into an __output file__. The processor's key indicates the type of data computed.
+Every data is computed by a __processor__. A dataProcessor has to have a certain __key__ (K) and a certain __value__ (V). Only dataProcessors with the same key can be put together into an __output file__. The dataProcessor's key indicates the type of data computed.
 
 There are already some predefined key classes:
 
@@ -11,13 +11,13 @@ There are already some predefined key classes:
 	3. TimestepPedestrianIdDataKey
 	(4. NoDataKey)
 
-__Example__: The class _PedestrianPositionProcessor_ is responsible for "computing" and storing the positions of each pedestrian at every point in time meaning that the corresponding key type is the _TimestepPedestrianIdDataKey_. So, the PedestrianPositionProcessor can be combined with other processors whose data is identified by the same key type (e.g. _PedestrianVelocityProcessor_). The value type is _VPoint_.
+__Example__: The class _PedestrianPositionProcessor_ is responsible for "computing" and storing the positions of each pedestrian at every point in time meaning that the corresponding key type is the _TimestepPedestrianIdDataKey_. So, the PedestrianPositionProcessor can be combined with other dataProcessors whose data is identified by the same key type (e.g. _PedestrianVelocityProcessor_). The value type is _VPoint_.
 
 __Example__: The class _PedestrianEvacuationTimeProcessor_ computes the evacuation time for every pedestrian. A certain evacuation time can be associated with a pedestrian. So, the key type in this case is the _PedestrianIdDataKey_. The value type is _double_.
 
 The key type _NoDataKey_ is constructed for scenario wide data with no specific identification needed (e.g. (mean) evacutation time).
 
-Every output file can only store processor data of exactly one key type, i.e. there is for example no possibility to store data from a PedestrianPositionProcessor and a PedestrianEvacuationTimeProcessor in one file.
+Every output file can only store dataProcessor data of exactly one key type, i.e. there is for example no possibility to store data from a PedestrianPositionProcessor and a PedestrianEvacuationTimeProcessor in one file.
 
 For each key, there exists a corresponding output file type:
 
@@ -34,12 +34,12 @@ The data processing's JSON structure is:
 	"files": [ {
     	"type": (output file type),
         "filename": (filename),
-        "processors": [ (processor ids) ],
+        "dataProcessors": [ (dataProcessor ids) ],
         "separator": (separator's sign in output file, optional, default is space)
     }, ... ],
-    "processors": [ {
-    	"type": (processor type),
-        "id": (processor's id),
+    "dataProcessors": [ {
+    	"type": (dataProcessor type),
+        "id": (dataProcessor's id),
         "attributesType": (attributes' type, optional),
         "attributes": {
         	(attribute name): (attribute name),
@@ -55,23 +55,23 @@ An example for a short data processing definition is:
   "files": [ {
     "type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
     "filename": "output_ts_pid.txt",
-    "processors": [ 1, 2, 3 ],
+    "dataProcessors": [ 1, 2, 3 ],
     "separator": ";"
   } ],
-  "processors": [ {
-    "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+  "dataProcessors": [ {
+    "type": "org.vadere.simulator.projects.dataprocessing.dataProcessor.PedestrianPositionProcessor",
     "id": 1
   }, {
-    "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",
+    "type": "org.vadere.simulator.projects.dataprocessing.dataProcessor.PedestrianVelocityProcessor",
     "id": 2,
-    "attributesType": "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
+    "attributesType": "org.vadere.state.attributes.dataProcessor.AttributesPedestrianVelocityProcessor",
     "attributes": {
       "pedestrianPositionProcessorId": 1
     }
   }, {
-    "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
+    "type": "org.vadere.simulator.projects.dataprocessing.dataProcessor.PedestrianDensityCountingProcessor",
     "id": 3,
-    "attributesType": "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
+    "attributesType": "org.vadere.state.attributes.dataProcessor.AttributesPedestrianDensityCountingProcessor",
     "attributes": {
       "pedestrianPositionProcessorId": 1,
       "radius": 1.5
@@ -80,7 +80,7 @@ An example for a short data processing definition is:
 }
 ```
 
-As you can see in this example, there is a possibility to use a processor's data as source for a new computation. That means that data does not have to be computed multiple times. Here, the velocity processor uses positions from the positions processor to calculate the velocity.
+As you can see in this example, there is a possibility to use a dataProcessor's data as source for a new computation. That means that data does not have to be computed multiple times. Here, the velocity dataProcessor uses positions from the positions dataProcessor to calculate the velocity.
 
 The output file is saved in the projects' output' folder of the scenario run (with a timestamp), e.g. in _output/RiMEA-4_2016-09-12_12-36-40.341_.
 
@@ -91,11 +91,11 @@ There are two important base classes:
 	1. OutputFile<K>
 	2. Processor<K,V>
 
-Common functionality for every output file, and every processor respectively, is located in these abstract classes.
+Common functionality for every output file, and every dataProcessor respectively, is located in these abstract classes.
 
-### Creating a new processor
+### Creating a new dataProcessor
 
-If you want to create a new processor, you have to inherit from the _Processor_ base class and simultaneously specify the key (K) and value (V) type. Let us say, you want to count the amount of pedestrians currently located in the scenario. Since the amount of pedestrian is only timestep dependent, you have to choose the _TimestepDataKey_ as the suitable key type. The value type in this case is _int_. The class definition would look something like:
+If you want to create a new dataProcessor, you have to inherit from the _Processor_ base class and simultaneously specify the key (K) and value (V) type. Let us say, you want to count the amount of pedestrians currently located in the scenario. Since the amount of pedestrian is only timestep dependent, you have to choose the _TimestepDataKey_ as the suitable key type. The value type in this case is _int_. The class definition would look something like:
 
 ```java
 class AmountPedestriansProcessor extends Processor<TimestepDataKey, Integer> { ... }
@@ -121,7 +121,7 @@ protected abstract void doUpdate(final SimulationState state) {
 }
 ```
 
-The _init_ method is called when the scenario is loading its processors. It can be used for getting necessary attributes/parameters for the processor's computation. The corresponding attributes, defined in JSON, can be accessed via the _getAttributes_ method of the base class. In the case of our example, there is no initialization needed, which results in an empty implementation. But in case of the velocity processor, a possible implementation can look like:
+The _init_ method is called when the scenario is loading its dataProcessors. It can be used for getting necessary attributes/parameters for the dataProcessor's computation. The corresponding attributes, defined in JSON, can be accessed via the _getAttributes_ method of the base class. In the case of our example, there is no initialization needed, which results in an empty implementation. But in case of the velocity dataProcessor, a possible implementation can look like:
 
 ```java
 class PedestrianVelocityProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {

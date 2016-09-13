@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.utils;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.processor.Processor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 
@@ -45,7 +45,7 @@ public class ClassFinder {
 	}
 
 	public static List<Class<?>> getProcessorClasses(Type keyType) {
-		return findSubclassesInPackage(Processor.class.getPackage().getName(), Processor.class)
+		return findSubclassesInPackage(DataProcessor.class.getPackage().getName(), DataProcessor.class)
 				.stream()
 				.filter(cproc -> !Modifier.isAbstract(cproc.getModifiers()))
 				.filter(cproc -> findGenericProcessorSuperclass(cproc).getActualTypeArguments()[0].equals(keyType))
@@ -133,7 +133,7 @@ public class ClassFinder {
 		Class<?> superclass = c;
 
 		while (!superclass.equals(Object.class)) {
-			if(superclass.getSuperclass().equals(Processor.class))
+			if(superclass.getSuperclass().equals(DataProcessor.class))
 				return (ParameterizedType) superclass.getGenericSuperclass();
 
 			superclass = superclass.getSuperclass();

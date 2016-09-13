@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.processor.Processor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,13 +20,13 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	private String fileName;
 
 	private List<Integer> processorIds;
-	private List<Processor<K, ?>> processors;
+	private List<DataProcessor<K, ?>> dataProcessors;
 
     private String separator;
 
 	OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
-		this.processors = new ArrayList<>();
+		this.dataProcessors = new ArrayList<>();
 	}
 
 	public void setFileName(final String fileName) {
@@ -35,7 +35,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 
 	public void setProcessorIds(final List<Integer> processorIds) {
 		this.processorIds = processorIds;
-		this.processors.clear();
+		this.dataProcessors.clear();
 	}
 
 	public String getSeparator() {
@@ -48,14 +48,14 @@ public abstract class OutputFile<K extends Comparable<K>> {
 
 	@SuppressWarnings("unchecked")
 	public void init(final ProcessorManager manager) {
-		processorIds.forEach(pid -> this.processors.add((Processor<K, ?>) manager.getProcessor(pid)));
+		processorIds.forEach(pid -> this.dataProcessors.add((DataProcessor<K, ?>) manager.getProcessor(pid)));
 	}
 
 	public void write() {
 		try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
 			printHeader(out);
 
-			this.processors.stream().flatMap(p -> p.getKeys().stream())
+			this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
 					.distinct().sorted()
 					.forEach(key -> printRow(out, key));
 
@@ -76,10 +76,10 @@ public abstract class OutputFile<K extends Comparable<K>> {
 		writeLine(out, fields);
 	}
 
-	private List<String> composeLine(String[] keyFieldArray, @SuppressWarnings("rawtypes") Function<Processor, Stream<String>> valueFields) {
+	private List<String> composeLine(String[] keyFieldArray, @SuppressWarnings("rawtypes") Function<DataProcessor, Stream<String>> valueFields) {
 		final List<String> fields = new LinkedList<>(Arrays.asList(keyFieldArray));
 
-		final List<String> processorFields = processors.stream()
+		final List<String> processorFields = dataProcessors.stream()
 				.flatMap(valueFields)
 				.collect(Collectors.toList());
 		fields.addAll(processorFields);

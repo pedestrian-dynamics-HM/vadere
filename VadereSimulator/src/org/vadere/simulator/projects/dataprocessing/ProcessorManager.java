@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.processor.Processor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.util.io.IOUtils;
 
 import java.util.LinkedHashMap;
@@ -18,19 +18,19 @@ public class ProcessorManager {
 
 	private Model model;
 
-	private Map<Integer, Processor<?, ?>> processorMap;
+	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
 
-	public ProcessorManager(DataProcessingJsonManager jsonManager, List<Processor<?, ?>> processors, List<OutputFile<?>> outputFiles) {
+	public ProcessorManager(DataProcessingJsonManager jsonManager, List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles) {
 		this.jsonManager = jsonManager;
 
 		this.outputFiles = outputFiles;
 
 		this.processorMap = new LinkedHashMap<>();
-		for (Processor<?, ?> proc : processors)
+		for (DataProcessor<?, ?> proc : dataProcessors)
 			this.processorMap.put(proc.getId(), proc);
 
-		processors.forEach(proc -> proc.init(this));
+		dataProcessors.forEach(proc -> proc.init(this));
 	}
 
 	public void setModel(Model model) {
@@ -41,7 +41,7 @@ public class ProcessorManager {
 		outputFiles.forEach(file -> file.init(this));
 	}
 
-	public Processor<?, ?> getProcessor(int id) {
+	public DataProcessor<?, ?> getProcessor(int id) {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
 	}
 

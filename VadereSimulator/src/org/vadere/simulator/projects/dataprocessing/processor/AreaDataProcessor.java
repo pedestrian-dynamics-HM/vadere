@@ -5,7 +5,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
 import org.vadere.state.attributes.processor.AttributesAreaProcessor;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-public abstract class AreaProcessor<V> extends Processor<TimestepDataKey, V> {
+public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepDataKey, V> {
     private VRectangle measurementArea;
 
     @Override

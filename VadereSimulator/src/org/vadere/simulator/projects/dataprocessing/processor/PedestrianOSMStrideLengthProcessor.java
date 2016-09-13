@@ -9,7 +9,7 @@ import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
 
-public class PedestrianOSMStrideLengthProcessor extends Processor<TimestepPedestrianIdDataKey, Double> {
+public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
     private OptimalStepsModel osm;
 
     public PedestrianOSMStrideLengthProcessor() {

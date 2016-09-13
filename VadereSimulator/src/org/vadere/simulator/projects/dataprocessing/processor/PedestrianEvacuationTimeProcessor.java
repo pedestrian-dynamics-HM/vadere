@@ -6,7 +6,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
-public class PedestrianEvacuationTimeProcessor extends Processor<PedestrianIdDataKey, Double> {
+public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
 	private PedestrianStartTimeProcessor pedStTimeProc;
 
 	public PedestrianEvacuationTimeProcessor() {

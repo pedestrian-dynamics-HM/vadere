@@ -9,7 +9,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Map;
 
-public class PedestrianWaitingTimeProcessor extends Processor<PedestrianIdDataKey, Double> {
+public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
     private double lastSimTime;
     private VRectangle waitingArea;
 

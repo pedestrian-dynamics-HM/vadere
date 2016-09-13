@@ -11,7 +11,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "attributes" : {
         "maxEvacuationTime" : 140.0,
         "maxEvacuationTimeMean" : 140.0,

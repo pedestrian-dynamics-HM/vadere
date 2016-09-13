@@ -7,7 +7,7 @@ import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Set;
 
-public class PedestrianStartTimeProcessor extends Processor<PedestrianIdDataKey, Double> {
+public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
 
 	public PedestrianStartTimeProcessor() {
 		super("tstart");
