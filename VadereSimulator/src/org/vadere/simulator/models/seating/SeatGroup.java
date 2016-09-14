@@ -28,4 +28,18 @@ public class SeatGroup {
 		return trainModel.getSeats().set(this.index * 4 + index, seat);
 	}
 
+	public int getIndex() {
+		return index;
+	}
+	
+	public int getPersonCount() {
+		int count = 0;
+		for (int i = 0; i < 4; i++) {
+			if (getSeat(i).getSittingPerson() != null) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 }

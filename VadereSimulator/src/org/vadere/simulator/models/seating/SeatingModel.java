@@ -1,14 +1,22 @@
 package org.vadere.simulator.models.seating;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -26,9 +34,12 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);
 	
+	private AttributesSeating attributes;
 	private TrainModel trainModel;
 	private Topography topography;
 	private Random random;
+	/** Used for distributions from Apache Commons Math. */
+	private RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
 
 	@Override
 	public void preLoop(double simTimeInSec) {
@@ -51,6 +62,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
+		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
 		this.topography = topography;
 		this.trainModel = new TrainModel(topography);
 		this.random = random;
@@ -76,13 +88,43 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 	
 	public int chooseSeatGroup(int compartmentIndex) {
-		// TODO
-		// get list of seat groups
-		// get number of persons sitting there
-		// choose according to some results of the study
-		return new Random().nextInt(5);
+		final List<SeatGroup> seatGroups = trainModel.getCompartment(compartmentIndex).getSeatGroups();
+		final List<Pair<Boolean, Double>> valuesAndProbabilities = attributes.getSeatGroupChoice();
+		final EnumeratedDistribution<Boolean> distribution = new EnumeratedDistribution<>(rng, valuesAndProbabilities);
+		final List<SeatGroup> chosenSeatGroup = chooseFromSeatGroupsRecursively(seatGroups, distribution);
+		return chosenSeatGroup.get(0).getIndex(); // TODO wrong kind of index
 	}
 	
+	private List<SeatGroup> chooseFromSeatGroupsRecursively(List<SeatGroup> seatGroups,
+			EnumeratedDistribution<Boolean> distribution) {
+
+		final IntStream seatGroupPersonCounts = seatGroups.stream().mapToInt(SeatGroup::getPersonCount);
+
+		if (seatGroupPersonCounts.distinct().count() == 1) {
+			return Collections.singletonList(drawRandomElement(seatGroups));
+		}
+
+		final int minPersonCount = seatGroupPersonCounts
+				.reduce(Integer::min).getAsInt();
+
+		if (distribution.sample()) {
+			// choice for seat group with minimal number of other passengers
+			final List<SeatGroup> minSeatGroups = seatGroups.stream()
+					.filter(sg -> sg.getPersonCount() == minPersonCount)
+					.collect(Collectors.toList());
+			return chooseFromSeatGroupsRecursively(minSeatGroups, distribution);
+		} else {
+			final List<SeatGroup> otherSeatGroups = seatGroups.stream()
+					.filter(sg -> sg.getPersonCount() != minPersonCount)
+					.collect(Collectors.toList());
+			return chooseFromSeatGroupsRecursively(otherSeatGroups, distribution);
+		}
+	}
+
+	private <T> T drawRandomElement(List<T> list) {
+		return list.get(random.nextInt(list.size()));
+	}
+
 	public int chooseSeat(int seatGroupIndex) {
 		final int personsSitting = 1; // TODO count persons sitting in seat group
 		switch (personsSitting) {

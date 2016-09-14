@@ -158,6 +158,10 @@ public class TrainModel {
 	public Collection<Pedestrian> getPedestrians() {
 		return new ArrayList<>(topography.getElements(Pedestrian.class));
 	}
+	
+	public Compartment getCompartment(int index) {
+		return new Compartment(this, index);
+	}
 
 	private List<Target> findTargets(Rectangle2D box) {
 		return findScenarioElement(topography.getTargets(), box);
