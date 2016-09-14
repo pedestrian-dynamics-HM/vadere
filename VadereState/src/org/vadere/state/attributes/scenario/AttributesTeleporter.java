@@ -20,42 +20,4 @@ public class AttributesTeleporter extends Attributes {
 		return position;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((position == null) ? 0 : position.hashCode());
-		result = prime * result + ((shift == null) ? 0 : shift.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof AttributesTeleporter)) {
-			return false;
-		}
-		AttributesTeleporter other = (AttributesTeleporter) obj;
-		if (position == null) {
-			if (other.position != null) {
-				return false;
-			}
-		} else if (!position.equals(other.position)) {
-			return false;
-		}
-		if (shift == null) {
-			if (other.shift != null) {
-				return false;
-			}
-		} else if (!shift.equals(other.shift)) {
-			return false;
-		}
-		return true;
-	}
-
 }
