@@ -30,4 +30,12 @@ public class Seat {
 	public Target getAssociatedTarget() {
 		return associatedTarget;
 	}
+	
+	public boolean isOccupied() {
+		return sittingPerson != null;
+	}
+	
+	public boolean isAvailable() {
+		return !isOccupied();
+	}
 }

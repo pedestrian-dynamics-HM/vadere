@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -17,6 +18,9 @@ import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
+import org.vadere.state.attributes.models.seating.SeatFacingDirection;
+import org.vadere.state.attributes.models.seating.SeatRelativePosition;
+import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -31,6 +35,8 @@ import com.vividsolutions.jts.math.MathUtil;
  *
  */
 public class SeatingModel implements ActiveCallback, Model {
+
+	private static final int[] SEAT_INDEXES = new int[] {0, 1, 2, 3};
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);
 	
@@ -125,33 +131,60 @@ public class SeatingModel implements ActiveCallback, Model {
 		return list.get(random.nextInt(list.size()));
 	}
 
-	public int chooseSeat(int seatGroupIndex) {
-		final int personsSitting = 1; // TODO count persons sitting in seat group
+	public Seat chooseSeat(SeatGroup seatGroup) {
+		final int personsSitting = seatGroup.getPersonCount();
 		switch (personsSitting) {
 		case 0:
-			// TODO choose according to data
-			return 0;
+			return chooseSeat0(seatGroup);
 
 		case 1:
-			// TODO choose according to data
-			return 0;
+			return chooseSeat1(seatGroup);
 
 		case 2:
-			// TODO choose according to data
-			// ignore features of persons
-			// look at direction and side
-			return 0;
+			return chooseSeat2(seatGroup);
 
 		case 3:
-			// TODO choose the seat left
-			return 0;
+			return chooseSeat3(seatGroup);
 
 		default:
 			assert personsSitting == 4;
-			throw new RuntimeException(String.format(
-					"Seat group is already full. This method should not have been called!",
-					personsSitting));
+			throw new RuntimeException("Seat group is already full. This method should not have been called!");
 		}
+	}
+
+	private Seat chooseSeat0(SeatGroup seatGroup) {
+		final double[] probabilities = attributes.getSeatChoice0();
+		final EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(rng, SEAT_INDEXES, probabilities);
+		return seatGroup.getSeat(distribution.sample());
+	}
+
+	private Seat chooseSeat1(final SeatGroup seatGroup) {
+		final EnumeratedDistribution<SeatRelativePosition> distribution = new EnumeratedDistribution<>(rng, attributes.getSeatChoice1());
+		final SeatRelativePosition relativePosition = distribution.sample();
+		return seatGroup.seatRelativeTo(seatGroup.getTheOccupiedSeat(), relativePosition);
+	}
+
+	private Seat chooseSeat2(final SeatGroup seatGroup) {
+		if (seatGroup.onlySideChoice()) {
+			// choice only between window/aisle
+			final EnumeratedDistribution<SeatSide> distribution = new EnumeratedDistribution<>(rng, attributes.getSeatChoice2Side());
+			SeatSide side = distribution.sample();
+			return seatGroup.availableSeatAtSide(side);
+
+		} else if (seatGroup.onlyFacingDirectionChoice()) {
+			// choice only between forward/backward
+			final EnumeratedDistribution<SeatFacingDirection> distribution = new EnumeratedDistribution<>(rng, attributes.getSeatChoice2FacingDirection());
+			SeatFacingDirection facingDirection = distribution.sample();
+			return seatGroup.availableSeatAtFacingDirection(facingDirection);
+
+		} else {
+			// choice between both window/aisle and forward/backward
+			return seatGroup.getTheTwoAvailableSeats().get(random.nextInt(2));
+		}
+	}
+
+	private Seat chooseSeat3(final SeatGroup seatGroup) {
+		return seatGroup.getTheAvailableSeat();
 	}
 
 }

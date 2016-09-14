@@ -145,6 +145,14 @@ public class TrainModel {
 		return Collections.unmodifiableList(seatGroups);
 	}
 
+	/**
+	 * 
+	 * @param seatGroupIndex The seat group's overall index. Not within-compartment index.
+	 */
+	public SeatGroup getSeatGroup(int seatGroupIndex) {
+		return seatGroups.get(seatGroupIndex);
+	}
+
 	public List<Seat> getSeats() {
 		return Collections.unmodifiableList(seats);
 	}
