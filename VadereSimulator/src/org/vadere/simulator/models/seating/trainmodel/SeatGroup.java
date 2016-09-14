@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.vadere.state.attributes.models.seating.SeatFacingDirection;
+import org.vadere.state.attributes.models.seating.SeatRelativePosition;
+import org.vadere.state.attributes.models.seating.SeatSide;
+
 public class SeatGroup {
 
 	private TrainModel trainModel;
@@ -95,6 +99,21 @@ public class SeatGroup {
 
 	private boolean isSeatAvailable(int index) {
 		return getSeat(index).getSittingPerson() == null;
+	}
+
+	public Seat seatRelativeTo(Object theOccupiedSeat, SeatRelativePosition relativePosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Seat availableSeatAtSide(SeatSide side) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Seat availableSeatAtFacingDirection(SeatFacingDirection facingDirection) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
