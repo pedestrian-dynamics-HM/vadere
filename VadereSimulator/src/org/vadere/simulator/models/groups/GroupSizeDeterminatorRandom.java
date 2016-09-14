@@ -26,7 +26,7 @@ public class GroupSizeDeterminatorRandom implements GroupSizeDeterminator {
 			probabilities[i] = fractions.get(i) / sum;
 		}
 
-		this.random = new Random();
+		this.random = random;
 	}
 
 	@Override
