@@ -39,7 +39,7 @@ import com.vividsolutions.jts.math.MathUtil;
  */
 public class SeatingModel implements ActiveCallback, Model {
 
-	private static final int[] SEAT_INDEXES = new int[] {0, 1, 2, 3};
+	private static final int[] SEAT_INDEXES = {0, 1, 2, 3};
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);
 	
