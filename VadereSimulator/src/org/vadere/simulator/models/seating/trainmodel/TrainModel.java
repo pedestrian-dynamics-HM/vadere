@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.seating;
+package org.vadere.simulator.models.seating.trainmodel;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

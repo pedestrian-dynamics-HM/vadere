@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.seating;
+package org.vadere.simulator.models.seating.trainmodel;
 
 import java.util.ArrayList;
 import java.util.List;

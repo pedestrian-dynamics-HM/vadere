@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.seating;
+package org.vadere.simulator.models.seating.trainmodel;
 
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;

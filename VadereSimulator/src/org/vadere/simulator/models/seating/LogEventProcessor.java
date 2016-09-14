@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.models.seating.trainmodel.Seat;
+import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
