@@ -15,8 +15,8 @@ import org.vadere.state.scenario.TrainGeometry;
  */
 public class AttributesSeating extends Attributes {
 
-	/** The train geometry used to generate the scenario with Traingen. */
-	private String trainGeometryClassName = TrainGeometry.class.getName();
+	/** The train geometry class name used to generate the scenario with Traingen. */
+	private String trainGeometry = TrainGeometry.class.getName();
 	
 	/**
 	 * Choices with probabilities for the seat group. <code>true</code> is
@@ -33,8 +33,8 @@ public class AttributesSeating extends Attributes {
 
 	private List<Pair<SeatFacingDirection, Double>> seatChoice2FacingDirection;
 
-	public String getTrainGeometryClassName() {
-		return trainGeometryClassName;
+	public String getTrainGeometry() {
+		return trainGeometry;
 	}
 
 	public List<Pair<Boolean, Double>> getSeatGroupChoice() {

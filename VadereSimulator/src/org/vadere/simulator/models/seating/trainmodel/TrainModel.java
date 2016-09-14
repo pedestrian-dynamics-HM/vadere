@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.vadere.state.scenario.Et423Geometry;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Source;
@@ -55,6 +54,7 @@ public class TrainModel {
 	private List<SeatGroup> seatGroups;
 
 	private Topography topography;
+	private TrainGeometry trainGeometry;
 
 	private final Comparator<ScenarioElement> scenarioElementComperatorX = new Comparator<ScenarioElement>() {
 		@Override
@@ -65,11 +65,9 @@ public class TrainModel {
 		}
 	};
 
-	public TrainModel(Topography topography) {
+	public TrainModel(Topography topography, TrainGeometry trainGeometry) {
 		this.topography = topography;
-
-		// Assuming that the train scenario is generated using the S-Bahn geometry
-		final TrainGeometry trainGeometry = new Et423Geometry(); // FIXME geometry should not be hardcoded; but how can the SeatingModel know the geometry?
+		this.trainGeometry = trainGeometry;
 
 		final Rectangle2D leftmostCompartment = trainGeometry.getCompartmentRect(0);
 		final double rectHeight = trainGeometry.getBenchWidth() / 2;

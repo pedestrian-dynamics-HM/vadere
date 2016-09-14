@@ -27,6 +27,8 @@ import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.TrainGeometry;
+import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import com.vividsolutions.jts.math.MathUtil;
 
@@ -73,7 +75,10 @@ public class SeatingModel implements ActiveCallback, Model {
 			AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
 		this.topography = topography;
-		this.trainModel = new TrainModel(topography);
+		
+		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();
+		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
+		this.trainModel = new TrainModel(topography, trainGeometry);
 		this.random = random;
 	}
 
