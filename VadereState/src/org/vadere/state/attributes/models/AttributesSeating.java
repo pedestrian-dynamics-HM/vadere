@@ -7,7 +7,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
-import org.vadere.state.scenario.TrainGeometry;
+import org.vadere.state.scenario.Et423Geometry;
 
 /**
  * Parameters for the seating model.
@@ -16,7 +16,7 @@ import org.vadere.state.scenario.TrainGeometry;
 public class AttributesSeating extends Attributes {
 
 	/** The train geometry class name used to generate the scenario with Traingen. */
-	private String trainGeometry = TrainGeometry.class.getName();
+	private String trainGeometry = Et423Geometry.class.getName();
 	
 	/**
 	 * Choices with probabilities for the seat group. <code>true</code> is
