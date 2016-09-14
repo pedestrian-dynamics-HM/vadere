@@ -30,7 +30,7 @@ public class GroupSizeDeterminatorRandom implements GroupSizeDeterminator {
 	}
 
 	@Override
-	public int getGroupSize() {
+	public int nextGroupSize() {
 		int result = 1;
 
 		double rand = random.nextDouble();

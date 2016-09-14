@@ -39,7 +39,7 @@ public class CentroidGroupFactory implements GroupFactory {
 
 	private void createNewGroup() {
 		currentGroup = groupCollection.getNewGroup(groupSizeDeterminator
-				.getGroupSize());
+				.nextGroupSize());
 	}
 
 	@Override

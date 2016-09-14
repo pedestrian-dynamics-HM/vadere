@@ -40,11 +40,11 @@ public class GroupSizeDeterminatorSequence implements GroupSizeDeterminator {
 	}
 
 	@Override
-	public int getGroupSize() {
+	public int nextGroupSize() {
 		int result;
 
 		if (finiteSequence && times < 1) {
-			result = subsequentGroupSize.getGroupSize();
+			result = subsequentGroupSize.nextGroupSize();
 		} else {
 			result = groupSizeSequence.get(offset);
 
