@@ -34,7 +34,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 
     private String separator;
 
-	OutputFile(final String... keyHeaders) {
+	protected OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
 		this.dataProcessors = new ArrayList<>();
 	}
