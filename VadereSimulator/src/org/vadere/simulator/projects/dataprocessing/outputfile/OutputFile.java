@@ -23,8 +23,6 @@ import java.util.stream.Stream;
  *
  * @param <K> key type
  *
- * @author Mario Teixeira Parente
- * @author Jakob Schuettl
  */
 
 public abstract class OutputFile<K extends Comparable<K>> {

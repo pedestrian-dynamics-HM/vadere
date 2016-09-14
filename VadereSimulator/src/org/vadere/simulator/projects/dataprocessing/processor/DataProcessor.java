@@ -27,7 +27,6 @@ import java.util.TreeMap;
  * @param <K> key type
  * @param <V> value type
  *
- * @author Mario Teixeira Parente
  */
 
 public abstract class DataProcessor<K extends Comparable<K>, V> {
