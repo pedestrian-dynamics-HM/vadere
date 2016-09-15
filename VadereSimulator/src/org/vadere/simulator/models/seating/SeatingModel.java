@@ -66,13 +66,12 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	@Override
 	public void update(double simTimeInSec) {
-		final int seatCount = trainModel.getSeats().size();
 		final Collection<Pedestrian> pedestrians = trainModel.getPedestrians();
 		
 		// choose compartment for those peds without a target
 		pedestrians.stream()
 				.filter(p -> p.getTargets().isEmpty())
-				.forEach(p -> p.getTargets().add(random.nextInt(seatCount)));
+				.forEach(this::assignCompartmentTarget);
 		
 		// choose seat group and seat for those peds that wait at an interim target
 		pedestrians.stream()
@@ -85,6 +84,12 @@ public class SeatingModel implements ActiveCallback, Model {
 		final SeatGroup seatGroup = chooseSeatGroup(compartment);
 		final Seat seat = chooseSeat(seatGroup);
 		p.addTarget(seat.getAssociatedTarget());
+	}
+	
+	private void assignCompartmentTarget(Pedestrian p) {
+		final int entranceAreaIndex = 0;
+		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
+		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
 	}
 
 	@Override
@@ -103,7 +108,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		return trainModel;
 	}
 
-	public int chooseCompartment(Pedestrian person, int entranceAreaIndex) {
+	public Compartment chooseCompartment(Pedestrian person, int entranceAreaIndex) {
 		// entrance areas:    0   1   2   3
 		// compartments:    0   1   2   3   4
 		// left- and rightmost compartments are "half compartments"
@@ -115,7 +120,8 @@ public class SeatingModel implements ActiveCallback, Model {
 		final RealDistribution distribution = new NormalDistribution(distributionMean, distributionSd);
 
 		final double value = MathUtil.clamp(distribution.sample(), 0, entranceAreaCount);
-		return (int) Math.round(value);
+		final int compartmentIndex = (int) Math.round(value);
+		return trainModel.getCompartment(compartmentIndex);
 	}
 	
 	public SeatGroup chooseSeatGroup(Compartment compartment) {

@@ -19,13 +19,11 @@ import org.vadere.state.scenario.TrainGeometry;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
- * Indexes of seat groups start at the front of the train on the left side (in travel direction).
+ * The front of the train is on the right side. Indexes increase from the train's front to rear.
+ * Indexes of seat groups start at the front of the train on the left side (in driving direction).
  * Indexes of seats in a seat group start at the front side left. Both indexes increase from left to
  * right line-by-line.
  * 
- * Warning: Currently it only works with train scenarios that are generated using the Et423Geometry!
- * 
- *
  */
 public class TrainModel {
 
@@ -115,7 +113,15 @@ public class TrainModel {
 
 		Rectangle2D longAisle = createFilterRect(leftmostCompartment.getMinY() + trainGeometry.getBenchWidth(),
 				trainGeometry.getAisleWidth());
-		interimDestinations = findTargets(longAisle);
+
+		// Sort interim target by x coordinate. Right-most target must be the first in the list.
+		interimDestinations = findTargets(longAisle).stream()
+				.sorted((a, b) -> Double.compare(b.getShape().getBounds().getX(), a.getShape().getBounds().getX()))
+				.collect(Collectors.toList());
+		if (interimDestinations.isEmpty()) {
+			throw new IllegalArgumentException(
+					"This model depends on interim targets. Please create a train scenario with interim destinations.");
+		}
 
 		Rectangle2D leftDoorsRect = createFilterRect(leftmostCompartment.getMinY() - 0.5, 1);
 		Rectangle2D rightDoorsRect = createFilterRect(leftmostCompartment.getMaxY() - 0.5, 1);
@@ -217,8 +223,8 @@ public class TrainModel {
 	}
 
 	private Compartment getCompartment(Target target) {
-		// TODO Auto-generated method stub
-		return null;
+		final int index = interimDestinations.indexOf(target);
+		return getCompartment(index / 2); // TODO depending on whether there are half-compartments with interim targets
 	}
 
 }
