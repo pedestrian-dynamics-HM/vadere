@@ -9,20 +9,47 @@ public class Compartment {
 
 	private TrainModel trainModel;
 	private int index;
+	private List<SeatGroup> seatGroups;
 
 	public Compartment(TrainModel trainModel, int index) {
 		this.trainModel = trainModel;
 		this.index = index;
+
+		seatGroups = new ArrayList<>(4);
+		if (index == 0) {
+			addFirstHalfCompartment();
+		} else if (index == trainModel.getNumberOfEntranceAreas()) {
+			addLastHalfCompartment();
+		} else {
+			addNormalCompartment();
+		}
+	}
+
+	private void addNormalCompartment() {
+		final int startSeatGroupIndex = index * 4 - 2;
+		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex));
+		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex + 1));
+		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex + 2));
+		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex + 3));
 	}
 	
+	private void addFirstHalfCompartment() {
+		seatGroups.add(null);
+		seatGroups.add(null);
+		seatGroups.add(trainModel.getSeatGroup(0));
+		seatGroups.add(trainModel.getSeatGroup(1));
+	}
+
+	private void addLastHalfCompartment() {
+		final int n = trainModel.getSeatGroups().size();
+		seatGroups.add(trainModel.getSeatGroup(n - 2));
+		seatGroups.add(trainModel.getSeatGroup(n - 1));
+		seatGroups.add(null);
+		seatGroups.add(null);
+	}
+
 	public List<SeatGroup> getSeatGroups() {
-		List<SeatGroup> result = new ArrayList<>(4);
-		final int startSeatGroupIndex = index * 4;
-		result.add(trainModel.getSeatGroups().get(startSeatGroupIndex));
-		result.add(trainModel.getSeatGroups().get(startSeatGroupIndex + 1));
-		result.add(trainModel.getSeatGroups().get(startSeatGroupIndex + 2));
-		result.add(trainModel.getSeatGroups().get(startSeatGroupIndex + 3));
-		return result;
+		return seatGroups;
 	}
 
 	public Target getInterimTargetCloserTo(int entranceAreaIndex) {
