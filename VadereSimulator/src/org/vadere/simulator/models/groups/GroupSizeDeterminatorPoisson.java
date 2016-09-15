@@ -25,7 +25,7 @@ public class GroupSizeDeterminatorPoisson implements GroupSizeDeterminator {
 	}
 
 	@Override
-	public int getGroupSize() {
+	public int nextGroupSize() {
 		int x = 0;
 		double t = 0.0;
 

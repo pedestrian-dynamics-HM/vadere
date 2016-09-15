@@ -3,48 +3,35 @@ package org.vadere.simulator.models.groups;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
+
 public class GroupSizeDeterminatorRandom implements GroupSizeDeterminator {
 
-	private double[] probabilities;
-	private final Random random;
+	private EnumeratedIntegerDistribution distribution;
 
 	public GroupSizeDeterminatorRandom(List<Double> fractions, Random random) {
+		final RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
+		
+		// The EnumeratedIntegerDistribution works with fractions.
+		// We don't have to normalize them to probabilities.
+		// See unit test TestEnumeratedDistribution.
 
-		probabilities = new double[fractions.size()];
-		double sum = 0;
-
-		for (double i : fractions) {
-			sum += i;
-		}
-
-		if (sum == 0) {
-			throw new IllegalArgumentException(
-					"Sum of group size fractions must not be 0.");
-		}
+		final int[] groupSizeValues = new int[fractions.size()];
+		final double[] probabilities = new double[fractions.size()];
 
 		for (int i = 0; i < fractions.size(); i++) {
-			probabilities[i] = fractions.get(i) / sum;
+			groupSizeValues[i] = i + 1;
+			probabilities[i] = fractions.get(i);
 		}
-
-		this.random = new Random();
+		
+		distribution = new EnumeratedIntegerDistribution(rng, groupSizeValues, probabilities);
 	}
 
 	@Override
-	public int getGroupSize() {
-		int result = 1;
-
-		double rand = random.nextDouble();
-		double sum = 0;
-
-		for (double prob : probabilities) {
-			sum += prob;
-			if (rand <= sum) {
-				break;
-			} else {
-				result++;
-			}
-		}
-		return result;
+	public int nextGroupSize() {
+		return distribution.sample();
 	}
 
 }
