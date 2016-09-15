@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.seating;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -16,6 +17,7 @@ import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
@@ -65,9 +67,24 @@ public class SeatingModel implements ActiveCallback, Model {
 	@Override
 	public void update(double simTimeInSec) {
 		final int seatCount = trainModel.getSeats().size();
-		trainModel.getPedestrians().stream()
+		final Collection<Pedestrian> pedestrians = trainModel.getPedestrians();
+		
+		// choose compartment for those peds without a target
+		pedestrians.stream()
 				.filter(p -> p.getTargets().isEmpty())
 				.forEach(p -> p.getTargets().add(random.nextInt(seatCount)));
+		
+		// choose seat group and seat for those peds that wait at an interim target
+		pedestrians.stream()
+				.filter(p -> !p.getTargets().isEmpty() && !p.hasNextTarget())
+				.forEach(this::assignSeatTarget);
+	}
+	
+	private void assignSeatTarget(Pedestrian p) {
+		final Compartment compartment = trainModel.getCompartment(p);
+		final SeatGroup seatGroup = chooseSeatGroup(compartment);
+		final Seat seat = chooseSeat(seatGroup);
+		p.addTarget(seat.getAssociatedTarget());
 	}
 
 	@Override
@@ -101,12 +118,12 @@ public class SeatingModel implements ActiveCallback, Model {
 		return (int) Math.round(value);
 	}
 	
-	public int chooseSeatGroup(int compartmentIndex) {
-		final List<SeatGroup> seatGroups = trainModel.getCompartment(compartmentIndex).getSeatGroups();
+	public SeatGroup chooseSeatGroup(Compartment compartment) {
+		final List<SeatGroup> seatGroups = compartment.getSeatGroups();
 		final List<Pair<Boolean, Double>> valuesAndProbabilities = attributes.getSeatGroupChoice();
 		final EnumeratedDistribution<Boolean> distribution = new EnumeratedDistribution<>(rng, valuesAndProbabilities);
 		final List<SeatGroup> chosenSeatGroup = chooseFromSeatGroupsRecursively(seatGroups, distribution);
-		return chosenSeatGroup.get(0).getIndex(); // TODO wrong kind of index
+		return chosenSeatGroup.get(0);
 	}
 	
 	private List<SeatGroup> chooseFromSeatGroupsRecursively(List<SeatGroup> seatGroups,

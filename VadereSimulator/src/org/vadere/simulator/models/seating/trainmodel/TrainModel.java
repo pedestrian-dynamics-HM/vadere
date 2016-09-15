@@ -208,4 +208,17 @@ public class TrainModel {
 				topography.getBounds().getWidth(), height);
 	}
 
+	/** Return the compartment containing p's latest target. */
+	public Compartment getCompartment(Pedestrian p) {
+		final List<Integer> targetIds = p.getTargets();
+		final int targetId = targetIds.get(targetIds.size() - 1);
+		final Target target = topography.getTarget(targetId);
+		return getCompartment(target);
+	}
+
+	private Compartment getCompartment(Target target) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
