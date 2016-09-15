@@ -52,7 +52,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	private Topography topography;
 	private Random random;
 	/** Used for distributions from Apache Commons Math. */
-	private RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
+	private RandomGenerator rng;
 
 	@Override
 	public void preLoop(double simTimeInSec) {
@@ -102,6 +102,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
 		this.trainModel = new TrainModel(topography, trainGeometry);
 		this.random = random;
+		this.rng = new JDKRandomGenerator(random.nextInt());
 	}
 
 	public TrainModel getTrainModel() {
