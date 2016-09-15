@@ -88,6 +88,8 @@ public class MigrationAssistant {
 			}
 		}
 
+		reapplyLatestMigrationFlag = false;
+
 		return stats;
 	}
 
@@ -163,7 +165,6 @@ public class MigrationAssistant {
 			if (version == Version.latest()) {
 				if (reapplyLatestMigrationFlag) {
 					version = Version.values()[Version.values().length - 2];
-					reapplyLatestMigrationFlag = false;
 				} else {
 					return false;
 				}
