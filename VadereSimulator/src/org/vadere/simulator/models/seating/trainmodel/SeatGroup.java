@@ -21,12 +21,16 @@ public class SeatGroup {
 
 	public SeatGroup getNeighborSeatGroup() {
 		int neighborIndex;
-		if (index % 2 == 0) { // even -> left row
+		if (isInLeftRow()) {
 			neighborIndex = index + 1;
 		} else {
 			neighborIndex = index - 1;
 		}
 		return trainModel.getSeatGroups().get(neighborIndex);
+	}
+
+	private boolean isInLeftRow() {
+		return index % 2 == 0; // even -> left row
 	}
 
 	public Seat getSeat(int index) {
@@ -50,7 +54,7 @@ public class SeatGroup {
 		return getAvailableSeats().findAny().get();
 	}
 
-	public Object getTheOccupiedSeat() {
+	public Seat getTheOccupiedSeat() {
 		checkPersonCount(1);
 		return getOccupiedSeats().findAny().get();
 	}
@@ -101,19 +105,75 @@ public class SeatGroup {
 		return getSeat(index).getSittingPerson() == null;
 	}
 
-	public Seat seatRelativeTo(Object theOccupiedSeat, SeatRelativePosition relativePosition) {
-		// TODO Auto-generated method stub
-		return null;
+	public Seat seatRelativeTo(Seat theOccupiedSeat, SeatRelativePosition relativePosition) {
+		for (int i = 0; i < 4; i++) {
+			if (getSeat(i) == theOccupiedSeat) {
+				switch (relativePosition) {
+				case NEXT:
+					return getSeatNextTo(i);
+				case ACROSS:
+					return getSeatAccrossFrom(i);
+				case DIAGONAL:
+					return getSeatDiagonallyOppositeTo(i);
+				}
+			}
+		}
+		throw new IllegalArgumentException("Supplied occupied seat is not part of this seat group.");
+	}
+
+	private Seat getSeatDiagonallyOppositeTo(int i) {
+		return getSeat(3 - i);
+	}
+
+	private Seat getSeatAccrossFrom(int i) {
+		return getSeat((i + 2) % 4);
+	}
+
+	private Seat getSeatNextTo(int i) {
+		final int[] diagonalOpposites = { 1, 0, 3, 2 };
+		return getSeat(diagonalOpposites[i]);
 	}
 
 	public Seat availableSeatAtSide(SeatSide side) {
-		// TODO Auto-generated method stub
-		return null;
+		int[] indexes;
+
+		if (isInLeftRow()) {
+			if (side == SeatSide.WINDOW) {
+				indexes = new int[] {0, 2};
+			} else {
+				indexes = new int[] {1, 3};
+			}
+		} else {
+			if (side == SeatSide.WINDOW) {
+				indexes = new int[] {1, 3};
+			} else {
+				indexes = new int[] {0, 2};
+			}
+		}
+
+		for (int i : indexes) {
+			if (isSeatAvailable(i)) {
+				return getSeat(i);
+			}
+		}
+		throw new IllegalStateException("This method must only be called when there is a seat available at side " + side);
 	}
 
 	public Seat availableSeatAtFacingDirection(SeatFacingDirection facingDirection) {
-		// TODO Auto-generated method stub
-		return null;
+		int[] indexes;
+
+		if (facingDirection == SeatFacingDirection.FORWARD) {
+			indexes = new int[] {2, 3};
+		} else {
+			indexes = new int[] {0, 1};
+		}
+
+		for (int i : indexes) {
+			if (isSeatAvailable(i)) {
+				return getSeat(i);
+			}
+		}
+		throw new IllegalStateException("This method must only be called when there is a seat available with facing direction" + facingDirection);
 	}
 
 }
