@@ -90,11 +90,6 @@ public class IOUtils {
 
 	/**
 	 * Prints a given string to a file with a given name.
-	 * 
-	 * @param filename
-	 * @param data
-	 * @throws IOException
-	 *         if something goes wrong with the file.
 	 */
 	public static void printDataFile(Path filename, String data)
 			throws IOException {
@@ -201,14 +196,7 @@ public class IOUtils {
 		return Preferences.userNodeForPackage(cls);
 	}
 
-	/**
-	 * Saves a given preference to file.
-	 * 
-	 * @param preferencesfilename
-	 * @param prefs
-	 * @throws IOException
-	 * @throws BackingStoreException
-	 */
+	/** Saves a given preference to file. */
 	public static void saveUserPreferences(String preferencesfilename,
 			Preferences prefs) throws IOException, BackingStoreException {
 		try (FileOutputStream fos = new FileOutputStream(preferencesfilename)) {
@@ -218,13 +206,7 @@ public class IOUtils {
 		}
 	}
 
-	/**
-	 * Writes a given string to a given file.
-	 * 
-	 * @param filepath
-	 * @param text
-	 * @throws IOException
-	 */
+	/** Writes a given string to a given file. */
 	public static void writeTextFile(String filepath, String text) throws IOException {
 		Files.deleteIfExists(Paths.get(filepath));
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
@@ -232,13 +214,7 @@ public class IOUtils {
 		}
 	}
 
-	/**
-	 * Reads all text of a given file and store it in a string.
-	 * 
-	 * @param filePath
-	 * @return
-	 * @throws IOException
-	 */
+	/** Reads all text of a given file and store it in a string. */
 	public static String readTextFile(Path filePath) throws IOException {
 		List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
 		StringBuilder sb = new StringBuilder();
@@ -258,10 +234,6 @@ public class IOUtils {
 	/**
 	 * Runs file selector with given title using given subdirectory. If the
 	 * subdirectory is not an absolute path, it is combined with user.dir.
-	 * 
-	 * @param title
-	 * @param subdir
-	 * @return
 	 */
 	public static String chooseFile(String title, String subdir,
 			FileFilter filter) {
@@ -329,34 +301,19 @@ public class IOUtils {
 		return chooseFileSave(title, subdir, filter);
 	}
 
-	/**
-	 * Shows an error box with given message and title.
-	 * 
-	 * @param infoMessage
-	 * @param title
-	 */
+	/** Shows an error box with given message and title. */
 	public static void errorBox(String infoMessage, String title) {
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
 				JOptionPane.ERROR_MESSAGE);
 	}
 
-	/**
-	 * Shows an warn box with given message and title.
-	 *
-	 * @param infoMessage
-	 * @param title
-	 */
+	/** Shows an warn box with given message and title. */
 	public static void warnBox(String infoMessage, String title) {
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
 				JOptionPane.WARNING_MESSAGE);
 	}
 
-	/**
-	 * Shows an info box with given message and title.
-	 *
-	 * @param infoMessage
-	 * @param title
-	 */
+	/** Shows an info box with given message and title. */
 	public static void infoBox(String infoMessage, String title) {
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
 				JOptionPane.INFORMATION_MESSAGE);
@@ -365,10 +322,6 @@ public class IOUtils {
 	/**
 	 * Opens a yes-no-cancel message box and returns its result (as
 	 * JOptionPane.OPTION, i.e. int)
-	 * 
-	 * @param infoMessage
-	 * @param title
-	 * @return
 	 */
 	public static int chooseYesNoCancel(String infoMessage, String title) {
 		return JOptionPane.showConfirmDialog(null, infoMessage, title,
