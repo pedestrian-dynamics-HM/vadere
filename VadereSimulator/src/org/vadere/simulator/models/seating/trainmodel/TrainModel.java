@@ -198,7 +198,7 @@ public class TrainModel {
 		seats = Arrays.asList(new Seat[numberOfSeats]);
 		seatGroups = new ArrayList<>(numberOfSeatGroups);
 		for (int i = 0; i < numberOfSeatGroups; i++) {
-			seatGroups.add(new SeatGroup(this, i));
+			seatGroups.add(new SeatGroup(this, seats, i));
 		}
 	}
 
