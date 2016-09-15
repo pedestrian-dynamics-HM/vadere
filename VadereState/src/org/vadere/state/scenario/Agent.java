@@ -212,4 +212,5 @@ public abstract class Agent implements DynamicElement {
 	public void setFreeFlowSpeed(double freeFlowSpeed) {
 		this.freeFlowSpeed = freeFlowSpeed;
 	}
+
 }
