@@ -8,9 +8,6 @@ public class Seat {
 	private Target associatedTarget;
 	private Pedestrian sittingPerson;
 
-	// TODO is this used?
-	private Integer sittingPersonId;
-
 	public Seat(Target associatedTarget) {
 		this.associatedTarget = associatedTarget;
 	}
@@ -21,10 +18,6 @@ public class Seat {
 
 	public void setSittingPerson(Pedestrian sittingPerson) {
 		this.sittingPerson = sittingPerson;
-	}
-
-	public void setSittingPersonId(Integer sittingPersonId) {
-		this.sittingPersonId = sittingPersonId;
 	}
 
 	public Target getAssociatedTarget() {
