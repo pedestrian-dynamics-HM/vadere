@@ -1,12 +1,19 @@
 package org.vadere.util.io;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonParseException;
+
+import org.vadere.util.geometry.shapes.VShape;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,18 +25,9 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.vadere.util.geometry.shapes.VShape;
-
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonParseException;
 
 /**
  * Contains utilities for input and output.
@@ -374,19 +372,4 @@ public class IOUtils {
 		return JOptionPane.showConfirmDialog(null, infoMessage, title,
 				JOptionPane.YES_NO_CANCEL_OPTION);
 	}
-
-	public static Path getPath(final String stringPath, final String fileName) {
-		try {
-			final Path path = Paths.get(stringPath);
-			Files.createDirectories(path); // TODO it does not make sense to create the same directory for every output file
-
-			final Path fullPath = Paths.get(stringPath, fileName);
-			Files.createFile(fullPath); // TODO it probably does not make sense to create files in advance
-
-			return path;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
 }

@@ -19,6 +19,7 @@ import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -264,6 +265,14 @@ public class ScenarioRunManager implements Runnable {
 
 	// Output stuff...
 	private void prepareOutput() {
+        try {
+            // Create output directory
+            Files.createDirectories(this.outputPath);
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
 		this.processorManager.setOutputPath(this.outputPath.toString());
 	}
 
