@@ -112,7 +112,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	public Compartment chooseCompartment(Pedestrian person, int entranceAreaIndex) {
 		// entrance areas:    0   1   2   3
 		// compartments:    0   1   2   3   4
-		// left- and rightmost compartments are "half compartments"
+		// left- and rightmost compartments are "half-compartments"
 
 		final int entranceAreaCount = trainModel.getNumberOfEntranceAreas();
 
