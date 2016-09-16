@@ -21,16 +21,6 @@ public class SeatGroup {
 		this.index = index;
 	}
 
-	public SeatGroup getNeighborSeatGroup() {
-		int neighborIndex;
-		if (isInLeftRow()) {
-			neighborIndex = index + 1;
-		} else {
-			neighborIndex = index - 1;
-		}
-		return trainModel.getSeatGroups().get(neighborIndex);
-	}
-
 	private boolean isInLeftRow() {
 		return index % 2 == 0; // even -> left row
 	}
