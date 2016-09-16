@@ -42,7 +42,7 @@ public class TestSeatingModel {
 		
 		// because of normal distribution, the percentage of people going left
 		// or right respectively should be about 50/50
-		assertTrue(Math.abs(leftCounter - rightCounter) / nTrials < 0.05);
+		assertTrue(Math.abs(leftCounter - rightCounter) / nTrials < 0.06);
 	}
 	
 }
