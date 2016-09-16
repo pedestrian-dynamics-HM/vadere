@@ -114,7 +114,7 @@ public class ScenarioRunManager implements Runnable {
 
 		try {
 			// prepare processor and simulation data writer
-			prepareOutput();
+			createAndSetOutputDirectory();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 				out.println(JsonConverter.serializeScenarioRunManager(this, true));
@@ -265,17 +265,14 @@ public class ScenarioRunManager implements Runnable {
 
 
 	// Output stuff...
-	private void prepareOutput() {
-        try {
-            // Create output directory
-            Files.createDirectories(this.outputPath);
-        }
-        catch (IOException ex) {
-            ex.printStackTrace();
+	private void createAndSetOutputDirectory() {
+		try {
+			// Create output directory
+			Files.createDirectories(outputPath);
+			processorManager.setOutputPath(outputPath.toString());
+		} catch (IOException ex) {
 			throw new UncheckedIOException(ex);
-        }
-
-		this.processorManager.setOutputPath(this.outputPath.toString());
+		}
 	}
 
 	@Override
