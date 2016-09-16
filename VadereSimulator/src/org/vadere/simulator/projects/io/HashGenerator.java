@@ -49,16 +49,7 @@ public class HashGenerator {
 	}
 
 	public static String commitHash() {
-		String commithash = null;
-
-		InputStream in = HashGenerator.class.getResourceAsStream("/current_commit_hash.txt");
-		if (in != null) {
-			try (final Scanner scanner = new Scanner(in)) {
-				if (scanner.hasNext()) {
-					commithash = scanner.next();
-				}
-			}
-		}
+		String commithash = getFirstStringTokenFromResource("/current_commit_hash.txt");
 
 		if (commithash == null) {
 			commithash = "warning: no commit hash";
@@ -69,16 +60,7 @@ public class HashGenerator {
 	}
 
 	public static String releaseNumber() {
-		String releaseNumber = null;
-
-		final InputStream in = HashGenerator.class.getResourceAsStream("/current_release_number.txt");
-		if (in != null) {
-			try (final Scanner scanner = new Scanner(in)) {
-				if (scanner.hasNext()) {
-					releaseNumber = scanner.next();
-				}
-			}
-		}
+		String releaseNumber = getFirstStringTokenFromResource("/current_release_number.txt");
 		
 		if (releaseNumber == null) {
 			releaseNumber = "warning: no release number";
@@ -86,6 +68,18 @@ public class HashGenerator {
 		}
 
 		return releaseNumber;
+	}
+
+	private static String getFirstStringTokenFromResource(String resource) {
+		final InputStream in = HashGenerator.class.getResourceAsStream(resource);
+		if (in != null) {
+			try (final Scanner scanner = new Scanner(in)) {
+				if (scanner.hasNext()) {
+					return scanner.next();
+				}
+			}
+		}
+		return null;
 	}
 
 	private static String topography2Json(final Topography topography) throws JsonProcessingException {
