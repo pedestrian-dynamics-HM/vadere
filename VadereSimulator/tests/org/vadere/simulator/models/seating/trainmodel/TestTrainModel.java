@@ -36,12 +36,16 @@ public class TestTrainModel {
 		trainModel = createTestTrainModel();
 	}
 
-	static TrainModel createTestTrainModel() {
+	public static TrainModel createTestTrainModel() {
+		final Topography topography = createTestTopography();
+		return new TrainModel(topography, new Et423Geometry());
+	}
+
+	public static Topography createTestTopography() {
 		try {
 			@SuppressWarnings("resource")
 			final String json = new Scanner(TestTrainModel.class.getResourceAsStream("/data/test-train-topography.json"), "UTF-8").useDelimiter("\\A").next();
-			final Topography topography = JsonConverter.deserializeTopography(json);
-			return new TrainModel(topography, new Et423Geometry());
+			return JsonConverter.deserializeTopography(json);
 		} catch (IOException | TextOutOfNodeException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

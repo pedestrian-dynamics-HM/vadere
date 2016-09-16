@@ -91,4 +91,8 @@ public class Compartment {
 		return index == 0;
 	}
 
+	public int getIndex() {
+		return index;
+	}
+
 }
