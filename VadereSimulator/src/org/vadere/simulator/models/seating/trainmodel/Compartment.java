@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.vadere.state.scenario.Target;
 
+/**
+ * The first and the last compartments are half-compartments.
+ */
 public class Compartment {
 
 	private TrainModel trainModel;
@@ -48,6 +51,9 @@ public class Compartment {
 		seatGroups.add(null);
 	}
 
+	/**
+	 * For half-compartments, the first and the last seat groups respectively are set to null.
+	 */
 	public List<SeatGroup> getSeatGroups() {
 		return seatGroups;
 	}
