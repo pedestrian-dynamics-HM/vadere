@@ -11,12 +11,10 @@ import org.vadere.state.attributes.models.seating.SeatSide;
 
 public class SeatGroup {
 
-	private TrainModel trainModel;
 	private List<Seat> seats;
 	private int index;
 
-	public SeatGroup(TrainModel trainModel, List<Seat> seats, int index) {
-		this.trainModel = trainModel;
+	public SeatGroup(List<Seat> seats, int index) {
 		this.seats = seats;
 		this.index = index;
 	}
