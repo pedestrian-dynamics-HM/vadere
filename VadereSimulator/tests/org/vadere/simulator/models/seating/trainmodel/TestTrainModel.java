@@ -22,6 +22,7 @@ public class TestTrainModel {
 	private static final int nInterimDestinations = nCompartments * 3 - 4; // includes 2 targets from half-compartments
 	private static final int nSeatGroups = nCompartments * 4 - 4;
 	private static final int nSeats = nSeatGroups * 4;
+	private static final int nPersons = 10;
 
 	private TrainModel trainModel;
 
@@ -44,7 +45,7 @@ public class TestTrainModel {
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
-//		assertEquals(10, trainModel.getPedestrians().size());
+		assertEquals(nPersons, trainModel.getPedestrians().size());
 	}
 	
 	@Test
@@ -88,6 +89,28 @@ public class TestTrainModel {
 		assertTrue(c.getSeatGroups().get(3) == trainModel.getSeatGroup(1));
 
 		assertTrue(c.getSeatGroups().get(2).getSeat(0) == trainModel.getSeats().get(0));
+		
+		for (int i = 0; i < nEntranceAreas; i++) {
+			assertEquals(trainModel.getInterimDestinations().get(0),
+					c.getInterimTargetCloserTo(i));
+		}
+	}
+
+	@Test
+	public void testFirstNormalCompartment() {
+		final Compartment c = trainModel.getCompartment(1);
+		assertTrue(c.getSeatGroups().get(0) == trainModel.getSeatGroup(2));
+		assertTrue(c.getSeatGroups().get(1) == trainModel.getSeatGroup(3));
+		assertTrue(c.getSeatGroups().get(2) == trainModel.getSeatGroup(4));
+		assertTrue(c.getSeatGroups().get(3) == trainModel.getSeatGroup(5));
+
+		assertTrue(c.getSeatGroups().get(0).getSeat(0) == trainModel.getSeats().get(8));
+		
+		assertEquals(trainModel.getInterimDestinations().get(1), c.getInterimTargetCloserTo(0));
+		for (int i = 1; i < nEntranceAreas; i++) {
+			assertEquals(trainModel.getInterimDestinations().get(3),
+					c.getInterimTargetCloserTo(i));
+		}
 	}
 
 	@Test
@@ -99,6 +122,11 @@ public class TestTrainModel {
 		assertTrue(c.getSeatGroups().get(3) == null);
 		
 		assertTrue(c.getSeatGroups().get(1).getSeat(3) == trainModel.getSeats().get(nSeats - 1));
+		
+		for (int i = 0; i < nEntranceAreas; i++) {
+			assertEquals(trainModel.getInterimDestinations().get(nInterimDestinations - 1),
+					c.getInterimTargetCloserTo(i));
+		}
 	}
 
 	private void checkSize(int expected, Collection<?> actualCollection) {

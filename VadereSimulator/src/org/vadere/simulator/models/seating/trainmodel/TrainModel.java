@@ -227,4 +227,11 @@ public class TrainModel {
 		return getCompartment(index / 2); // TODO depending on whether there are half-compartments with interim targets
 	}
 
+	void checkEntranceAreaIndexRange(int entranceAreaIndex) {
+		if (entranceAreaIndex < 0 || entranceAreaIndex >= numberOfEntranceAreas) {
+			throw new IllegalArgumentException(
+					"Entrance area index must be in range 0 to less than " + numberOfEntranceAreas);
+		}
+	}
+
 }

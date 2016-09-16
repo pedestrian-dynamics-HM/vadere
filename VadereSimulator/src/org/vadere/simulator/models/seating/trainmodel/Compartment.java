@@ -19,9 +19,9 @@ public class Compartment {
 		this.index = index;
 
 		seatGroups = new ArrayList<>(4);
-		if (index == 0) {
+		if (isFirstHalfCompartment()) {
 			addFirstHalfCompartment();
-		} else if (index == trainModel.getNumberOfEntranceAreas()) {
+		} else if (isLastHalfCompartment()) {
 			addLastHalfCompartment();
 		} else {
 			addNormalCompartment();
@@ -59,17 +59,36 @@ public class Compartment {
 	}
 
 	public Target getInterimTargetCloserTo(int entranceAreaIndex) {
-		// entrance areas:    0   1   2   3
-		// compartments:    0   1   2   3   4
-		// interim targets:0 1 2 3 4 5 6 7 8 9
-		final int interimTargetStartIndex = index * 2;
+		// entrance areas:     0   1   2   3
+		// compartments:     0   1   2   3   4
+		// interim targets:  0  123 456 489  .
+		
+		trainModel.checkEntranceAreaIndexRange(entranceAreaIndex);
+		
+		final List<Target> interimTargets = trainModel.getInterimDestinations();
+		
+		if (isFirstHalfCompartment()) {
+			return interimTargets.get(0);
+		} else if (isLastHalfCompartment()) {
+			return interimTargets.get(interimTargets.size() - 1);
+		}
+		
+		final int interimTargetStartIndex = index * 3 - 2;
 		if (index <= entranceAreaIndex) {
 			// use interim target with higher number
-			return trainModel.getInterimDestinations().get(interimTargetStartIndex + 1);
+			return interimTargets.get(interimTargetStartIndex + 2);
 		} else {
 			// use interim target with smaller number
-			return trainModel.getInterimDestinations().get(interimTargetStartIndex);
+			return interimTargets.get(interimTargetStartIndex);
 		}
+	}
+
+	private boolean isLastHalfCompartment() {
+		return index == trainModel.getNumberOfEntranceAreas();
+	}
+
+	private boolean isFirstHalfCompartment() {
+		return index == 0;
 	}
 
 }
