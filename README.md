@@ -78,7 +78,7 @@ Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guid
 
 ## Release History
 
-0.1	initial release of the software as open source
+ - 0.1 - initial release of the software as open source (2016-08-05)
 
 
 ## Contributors
