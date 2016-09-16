@@ -49,14 +49,14 @@ public class HashGenerator {
 	}
 
 	public static String commitHash() {
-		String commithash = getFirstStringTokenFromResource("/current_commit_hash.txt");
+		String commitHash = getFirstStringTokenFromResource("/current_commit_hash.txt");
 
-		if (commithash == null) {
-			commithash = "warning: no commit hash";
+		if (commitHash == null) {
+			commitHash = "warning: no commit hash";
 			logger.warn("No commit hash found. The project will not contain a hash of the software source code.");
 		}
 
-		return commithash;
+		return commitHash;
 	}
 
 	public static String releaseNumber() {
