@@ -19,6 +19,7 @@ public class TestEnumeratedDistribution {
 	private static final int[] TEST_DATA = { 0, 1 };
 	private static final int SAMPLE_COUNT = 1000;
 
+	// WARNING: this is a statistical test. in case of failure, just run it again.
 	@Test
 	public void testEnumeratedIntegerDistributionWithFractions() {
 		EnumeratedIntegerDistribution d = new EnumeratedIntegerDistribution(TEST_DATA, TEST_FRACTIONS);
@@ -28,6 +29,7 @@ public class TestEnumeratedDistribution {
 		assertEquals(0.75, (double) Collections.frequency(result, 1) / SAMPLE_COUNT, 0.05);
 	}
 
+	// WARNING: this is a statistical test. in case of failure, just run it again.
 	@Test
 	public void testEnumeratedDistributionWithFractions() {
 		List<Pair<Integer, Double>> list = new ArrayList<>(2);
