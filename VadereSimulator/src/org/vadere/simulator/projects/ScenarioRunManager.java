@@ -19,6 +19,7 @@ import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -271,6 +272,7 @@ public class ScenarioRunManager implements Runnable {
         }
         catch (IOException ex) {
             ex.printStackTrace();
+			throw new UncheckedIOException(ex);
         }
 
 		this.processorManager.setOutputPath(this.outputPath.toString());
