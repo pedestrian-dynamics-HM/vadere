@@ -6,14 +6,17 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Random;
 import java.util.Scanner;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.io.TextOutOfNodeException;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Et423Geometry;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
@@ -30,11 +33,15 @@ public class TestTrainModel {
 
 	@Before
 	public void setUp() {
+		trainModel = createTestTrainModel();
+	}
+
+	static TrainModel createTestTrainModel() {
 		try {
 			@SuppressWarnings("resource")
 			final String json = new Scanner(TestTrainModel.class.getResourceAsStream("/data/test-train-topography.json"), "UTF-8").useDelimiter("\\A").next();
 			final Topography topography = JsonConverter.deserializeTopography(json);
-			trainModel = new TrainModel(topography, new Et423Geometry());
+			return new TrainModel(topography, new Et423Geometry());
 		} catch (IOException | TextOutOfNodeException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
@@ -158,6 +165,10 @@ public class TestTrainModel {
 
 	private void checkSize(int expected, Collection<?> actualCollection) {
 		assertEquals(expected, actualCollection.size());
+	}
+
+	public static Pedestrian createTestPedestrian() {
+		return new Pedestrian(new AttributesAgent(), new Random());
 	}
 
 }
