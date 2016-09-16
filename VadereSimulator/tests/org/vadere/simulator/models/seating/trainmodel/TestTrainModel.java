@@ -12,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.io.TextOutOfNodeException;
+import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Et423Geometry;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
 public class TestTrainModel {
@@ -127,6 +129,31 @@ public class TestTrainModel {
 			assertEquals(trainModel.getInterimDestinations().get(nInterimDestinations - 1),
 					c.getInterimTargetCloserTo(i));
 		}
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetCompartmentWithInvalidTarget() {
+		trainModel.getCompartment(new Target(new AttributesTarget()));
+	}
+
+	@Test
+	public void testGetCompartmentByTarget() {
+		assertEquals(trainModel.getCompartment(0), trainModel.getCompartment(0));
+		assertEquals(trainModel.getCompartment(0), getCompartmentByInterimTargetIndex(0));
+
+		assertEquals(trainModel.getCompartment(1), getCompartmentByInterimTargetIndex(1));
+		assertEquals(trainModel.getCompartment(1), getCompartmentByInterimTargetIndex(3));
+		assertEquals(trainModel.getCompartment(2), getCompartmentByInterimTargetIndex(4));
+
+		assertEquals(trainModel.getCompartment(nCompartments - 3), getCompartmentByInterimTargetIndex(nInterimDestinations - 5));
+		assertEquals(trainModel.getCompartment(nCompartments - 2), getCompartmentByInterimTargetIndex(nInterimDestinations - 4));
+		assertEquals(trainModel.getCompartment(nCompartments - 2), getCompartmentByInterimTargetIndex(nInterimDestinations - 2));
+
+		assertEquals(trainModel.getCompartment(nCompartments - 1), getCompartmentByInterimTargetIndex(nInterimDestinations - 1));
+	}
+
+	private Compartment getCompartmentByInterimTargetIndex(int index) {
+		return trainModel.getCompartment(trainModel.getInterimDestinations().get(index));
 	}
 
 	private void checkSize(int expected, Collection<?> actualCollection) {

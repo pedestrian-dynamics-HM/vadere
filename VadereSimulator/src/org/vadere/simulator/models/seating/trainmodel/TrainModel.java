@@ -49,6 +49,7 @@ public class TrainModel {
 	private List<Source> leftDoors;
 	private List<Source> rightDoors;
 
+	private List<Compartment> compartments;
 	private List<SeatGroup> seatGroups;
 
 	private Topography topography;
@@ -141,6 +142,24 @@ public class TrainModel {
 
 	}
 
+	private void initialize(int numberOfEntranceAreas) {
+		this.numberOfEntranceAreas = numberOfEntranceAreas;
+		final int numberOfCompartments = numberOfEntranceAreas + 1;
+		final int numberOfSeatGroups = 4 * numberOfEntranceAreas;
+		final int numberOfSeats = 4 * numberOfSeatGroups;
+
+		seats = Arrays.asList(new Seat[numberOfSeats]);
+		seatGroups = new ArrayList<>(numberOfSeatGroups);
+		for (int i = 0; i < numberOfSeatGroups; i++) {
+			seatGroups.add(new SeatGroup(this, seats, i));
+		}
+		
+		compartments = new ArrayList<>(numberOfCompartments);
+		for (int i = 0; i < numberOfCompartments; i++) {
+			compartments.add(new Compartment(this, i));
+		}
+	}
+
 	public int getNumberOfEntranceAreas() {
 		return numberOfEntranceAreas;
 	}
@@ -172,7 +191,7 @@ public class TrainModel {
 	}
 	
 	public Compartment getCompartment(int index) {
-		return new Compartment(this, index);
+		return compartments.get(index);
 	}
 
 	private List<Target> findTargets(Rectangle2D box) {
@@ -188,18 +207,6 @@ public class TrainModel {
 				.filter(new ScenarioElementInRectPredicate(box))
 				.sorted(scenarioElementComperatorX)
 				.collect(Collectors.toList());
-	}
-
-	private void initialize(int numberOfEntranceAreas) {
-		this.numberOfEntranceAreas = numberOfEntranceAreas;
-		final int numberOfSeatGroups = 4 * numberOfEntranceAreas;
-		final int numberOfSeats = 4 * numberOfSeatGroups;
-
-		seats = Arrays.asList(new Seat[numberOfSeats]);
-		seatGroups = new ArrayList<>(numberOfSeatGroups);
-		for (int i = 0; i < numberOfSeatGroups; i++) {
-			seatGroups.add(new SeatGroup(this, seats, i));
-		}
 	}
 
 	private void makeSeat(List<List<Target>> longRows, int seatGroupIndex, int indexInSeatGroup, int longRowIndex,
@@ -222,9 +229,13 @@ public class TrainModel {
 		return getCompartment(target);
 	}
 
-	private Compartment getCompartment(Target target) {
+	Compartment getCompartment(Target target) {
 		final int index = interimDestinations.indexOf(target);
-		return getCompartment(index / 2); // TODO depending on whether there are half-compartments with interim targets
+		if (index == -1) {
+			throw new IllegalArgumentException("Given target is not an interim target.");
+		}
+		System.out.println("index of interim target: " + index + "; index of compartment: " + (index + 2) / 3);
+		return getCompartment((index + 2) / 3);
 	}
 
 	void checkEntranceAreaIndexRange(int entranceAreaIndex) {
