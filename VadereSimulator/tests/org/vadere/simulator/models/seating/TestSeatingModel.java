@@ -28,7 +28,7 @@ public class TestSeatingModel {
 		int leftCounter = 0;
 		int rightCounter = 0;
 		for (int i = 0; i < nTrials; i++) {
-			int enterIndex = 2;
+			int enterIndex = 4;
 			final Compartment compartment = model.chooseCompartment(null, enterIndex);
 			final int compartmentIndex = compartment.getIndex();
 			assertTrue(compartmentIndex >= 0);
