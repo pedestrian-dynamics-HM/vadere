@@ -1,12 +1,15 @@
 package org.vadere.state.attributes.models;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.util.Pair;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
+import org.vadere.state.attributes.models.seating.ValueWithProbabilityFraction;
 import org.vadere.state.scenario.Et423Geometry;
 
 /**
@@ -20,18 +23,18 @@ public class AttributesSeating extends Attributes {
 	
 	/**
 	 * Choices with probabilities for the seat group. <code>true</code> is
-	 * choosing a seat group with the least number of other pessengers.
+	 * choosing a seat group with the least number of other passengers.
 	 */
-	private List<Pair<Boolean, Double>> seatGroupChoice;
+	private List<ValueWithProbabilityFraction<Boolean>> seatGroupChoice;
 
 	/** Probabilities for seat indexes 0 to 3. */
 	private double[] seatChoice0;
 
-	private List<Pair<SeatRelativePosition, Double>> seatChoice1;
+	private List<ValueWithProbabilityFraction<SeatRelativePosition>> seatChoice1;
 
-	private List<Pair<SeatSide, Double>> seatChoice2Side;
+	private List<ValueWithProbabilityFraction<SeatSide>> seatChoice2Side;
 
-	private List<Pair<SeatFacingDirection, Double>> seatChoice2FacingDirection;
+	private List<ValueWithProbabilityFraction<SeatFacingDirection>> seatChoice2FacingDirection;
 	
 	{
 		// initialize fields with values from data collection
@@ -43,7 +46,7 @@ public class AttributesSeating extends Attributes {
 	}
 
 	public List<Pair<Boolean, Double>> getSeatGroupChoice() {
-		return seatGroupChoice;
+		return toPairListForEnumeratedDistribution(seatGroupChoice);
 	}
 
 	public double[] getSeatChoice0() {
@@ -51,15 +54,20 @@ public class AttributesSeating extends Attributes {
 	}
 
 	public List<Pair<SeatRelativePosition, Double>> getSeatChoice1() {
-		return seatChoice1; // TODO fix name
+		return toPairListForEnumeratedDistribution(seatChoice1); // TODO fix name
 	}
 
 	public List<Pair<SeatSide, Double>> getSeatChoice2Side() {
-		return seatChoice2Side; // TODO fix name
+		return toPairListForEnumeratedDistribution(seatChoice2Side); // TODO fix name
 	}
 
 	public List<Pair<SeatFacingDirection, Double>> getSeatChoice2FacingDirection() {
-		return seatChoice2FacingDirection; // TODO fix name
+		return toPairListForEnumeratedDistribution(seatChoice2FacingDirection); // TODO fix name
+	}
+	
+	public static <T> List<Pair<T, Double>> toPairListForEnumeratedDistribution(
+			List<ValueWithProbabilityFraction<T>> list) {
+		return list.stream().map(ValueWithProbabilityFraction::toPair).collect(Collectors.toList());
 	}
 
 }
