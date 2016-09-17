@@ -4,21 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Random;
-import java.util.Scanner;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.simulator.projects.io.TextOutOfNodeException;
+import org.vadere.simulator.models.seating.TestTopographyAndModelBuilder;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.scenario.Et423Geometry;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
 
 public class TestTrainModel {
 	
@@ -33,26 +27,10 @@ public class TestTrainModel {
 
 	@Before
 	public void setUp() {
-		trainModel = createTestTrainModel();
+		trainModel = new TestTopographyAndModelBuilder().getTrainModel();
 	}
 
-	public static TrainModel createTestTrainModel() {
-		final Topography topography = createTestTopography();
-		return new TrainModel(topography, new Et423Geometry());
-	}
-
-	public static Topography createTestTopography() {
-		try {
-			@SuppressWarnings("resource")
-			final String json = new Scanner(TestTrainModel.class.getResourceAsStream("/data/test-train-topography.json"), "UTF-8").useDelimiter("\\A").next();
-			return JsonConverter.deserializeTopography(json);
-		} catch (IOException | TextOutOfNodeException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Test
+		@Test
 	public void testBasicModelProperties() {
 		assertEquals(nEntranceAreas, trainModel.getNumberOfEntranceAreas());
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());

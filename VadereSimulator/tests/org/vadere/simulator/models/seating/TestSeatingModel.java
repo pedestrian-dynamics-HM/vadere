@@ -2,27 +2,24 @@ package org.vadere.simulator.models.seating;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
-import org.vadere.simulator.models.seating.trainmodel.TestTrainModel;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesSeating;
-import org.vadere.state.scenario.Topography;
 
 public class TestSeatingModel {
+	
+	private SeatingModel model;
+	
+	@Before
+	public void setUp() {
+		model = new TestTopographyAndModelBuilder().getSeatingModel();
+
+	}
 
 	// WARNING: this is a statistical test. in case of failure, just run again.
 	@Test
 	public void testChooseCompartment() {
-		final Topography topography = TestTrainModel.createTestTopography();
-		final int entranceAreaCount = 12;
-		final SeatingModel model = new SeatingModel();
-		final List<Attributes> attributes = Collections.singletonList(new AttributesSeating());
-		model.initialize(attributes, topography, null, new Random());
+		final int entranceAreaCount = 12; // from test topography
 		
 		double nTrials = 1000;
 		int leftCounter = 0;
@@ -43,6 +40,10 @@ public class TestSeatingModel {
 		// because of normal distribution, the percentage of people going left
 		// or right respectively should be about 50/50
 		assertTrue(Math.abs(leftCounter - rightCounter) / nTrials < 0.06);
+	}
+	
+	@Test
+	public void testChooseSeatGroup() {
 	}
 	
 }

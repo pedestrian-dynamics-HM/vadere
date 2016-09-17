@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.models.seating.TestTopographyAndModelBuilder;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
@@ -21,7 +22,7 @@ public class TestSeatGroup {
 
 	@Before
 	public void setUp() {
-		trainModel = TestTrainModel.createTestTrainModel();
+		trainModel = new TestTopographyAndModelBuilder().getTrainModel();
 		aSeatGroup = trainModel.getSeatGroup(0);
 		aPerson = TestTrainModel.createTestPedestrian();
 	}

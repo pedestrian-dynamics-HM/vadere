@@ -67,6 +67,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	@Override
 	public void update(double simTimeInSec) {
 		final Collection<Pedestrian> pedestrians = trainModel.getPedestrians();
+//		if (true) return; // for testing
 		
 		// choose compartment for those peds without a target
 		pedestrians.stream()
