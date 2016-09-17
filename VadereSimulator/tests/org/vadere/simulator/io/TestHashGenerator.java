@@ -8,6 +8,8 @@ public class TestHashGenerator {
 
 	@Test
 	public void testIsCommitHashFileInstalled() {
-		assertTrue("missing commit hash file", HashGenerator.isCommitHashAvailable());
+		assertTrue(
+				"Missing or empty commit hash file. You can install a git hook to auto-create this file. See Documentation/version-control/.",
+				HashGenerator.isCommitHashAvailable());
 	}
 }

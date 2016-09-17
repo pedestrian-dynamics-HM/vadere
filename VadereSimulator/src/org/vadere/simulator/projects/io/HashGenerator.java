@@ -8,7 +8,6 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +17,9 @@ public class HashGenerator {
 
 	private static Logger logger = LogManager.getLogger(HashGenerator.class);
 	
+	private static final String CURRENT_RELEASE_NUMBER_RESOURCE = "/current_release_number.txt";
+	private static final String CURRENT_COMMIT_HASH_RESOURCE = "/current_commit_hash.txt";
+
 	public static String topographyHash(Topography topography) {
 		String json = null;
 		try {
@@ -36,20 +38,11 @@ public class HashGenerator {
 	}
 
 	public static boolean isCommitHashAvailable() {
-		InputStream in = HashGenerator.class.getResourceAsStream("/current_commit_hash.txt");
-		boolean result = in != null;
-		if(result) {
-			try {
-				in.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
+		return getFirstStringTokenFromResource(CURRENT_COMMIT_HASH_RESOURCE) != null;
 	}
 
 	public static String commitHash() {
-		String commitHash = getFirstStringTokenFromResource("/current_commit_hash.txt");
+		String commitHash = getFirstStringTokenFromResource(CURRENT_COMMIT_HASH_RESOURCE);
 
 		if (commitHash == null) {
 			commitHash = "warning: no commit hash";
@@ -60,7 +53,7 @@ public class HashGenerator {
 	}
 
 	public static String releaseNumber() {
-		String releaseNumber = getFirstStringTokenFromResource("/current_release_number.txt");
+		String releaseNumber = getFirstStringTokenFromResource(CURRENT_RELEASE_NUMBER_RESOURCE);
 		
 		if (releaseNumber == null) {
 			releaseNumber = "warning: no release number";
