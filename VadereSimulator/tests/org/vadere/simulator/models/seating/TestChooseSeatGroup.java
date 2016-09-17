@@ -16,7 +16,7 @@ import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 
-public class TestSeatingModel {
+public class TestChooseSeatGroup {
 	
 	private SeatingModel model;
 	private TrainModel trainModel;
@@ -27,32 +27,6 @@ public class TestSeatingModel {
 		trainModel = model.getTrainModel();
 	}
 
-	// WARNING: this is a statistical test. in case of failure, just run again.
-	@Test
-	public void testChooseCompartment() {
-		final int entranceAreaCount = trainModel.getEntranceAreaCount();
-		
-		int nTrials = 1000;
-		int leftCounter = 0;
-		int rightCounter = 0;
-		for (int i = 0; i < nTrials; i++) {
-			int enterIndex = 4;
-			final Compartment compartment = model.chooseCompartment(null, enterIndex);
-			final int compartmentIndex = compartment.getIndex();
-			assertTrue(compartmentIndex >= 0);
-			assertTrue(compartmentIndex <= entranceAreaCount);
-			if (compartmentIndex <= enterIndex) {
-				leftCounter++;
-			} else {
-				rightCounter++;
-			}
-		}
-		
-		// because of normal distribution, the percentage of people going left
-		// or right respectively should be about 50/50
-		assertTrue(Math.abs(leftCounter - rightCounter) / nTrials < 0.06);
-	}
-	
 	@Test(expected=IllegalStateException.class)
 	public void testChooseSeatGroupBetween4FullOnes() {
 		final Compartment compartment = trainModel.getCompartment(11);
@@ -78,7 +52,7 @@ public class TestSeatingModel {
 		assert compartment.getPersonCount() == 6;
 		
 		final int nTrials = 1000;
-		final TallySheet tallySheet = runChooseSeatGroup(compartment, nTrials);
+		final TallySheet<Integer> tallySheet = runChooseSeatGroup(compartment, nTrials);
 		
 		List<Integer> sortedKeys = tallySheet.getKeys().stream()
 				.sorted().collect(Collectors.toList());
@@ -103,7 +77,7 @@ public class TestSeatingModel {
 		assert compartment.getPersonCount() == 10;
 		
 		final int nTrials = 1000;
-		final TallySheet tallySheet = runChooseSeatGroup(compartment, nTrials);
+		final TallySheet<Integer> tallySheet = runChooseSeatGroup(compartment, nTrials);
 		
 		List<Integer> sortedKeys = tallySheet.getKeys().stream()
 				.sorted().collect(Collectors.toList());
@@ -125,7 +99,7 @@ public class TestSeatingModel {
 				personCountForEachSeatGroup, personCountForEachSeatGroup);
 		
 		final int nTrials = 1000;
-		final TallySheet tallySheet = runChooseSeatGroup(compartment, nTrials);
+		final TallySheet<Integer> tallySheet = runChooseSeatGroup(compartment, nTrials);
 		
 		for (Integer key : tallySheet.getKeys()) {
 			assertEquals(0.25, (double) tallySheet.getCount(key) / nTrials, 0.06);
@@ -156,8 +130,8 @@ public class TestSeatingModel {
 		return ps;
 	}
 
-	private TallySheet runChooseSeatGroup(final Compartment compartment, final int nTrials) {
-		final TallySheet tallySheet = new TallySheet();
+	private TallySheet<Integer> runChooseSeatGroup(final Compartment compartment, final int nTrials) {
+		final TallySheet<Integer> tallySheet = new TallySheet<>();
 		for (int i = 0; i < nTrials; i++) {
 			final SeatGroup sg = model.chooseSeatGroup(compartment);
 			tallySheet.addOneTo(sg.getIndex());
@@ -169,7 +143,6 @@ public class TestSeatingModel {
 		for (int i = 0; i < 4; i++) {
 			sitDownNewPerson(compartment.getSeatGroups().get(i), numbers[i]);
 		}
-		
 	}
 
 	private void sitDownNewPerson(SeatGroup seatGroup, int number) {

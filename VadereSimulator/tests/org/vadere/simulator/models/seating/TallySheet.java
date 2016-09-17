@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class TallySheet {
-	private Map<Integer, Integer> map = new HashMap<>();
+public class TallySheet<T> {
+	private Map<T, Integer> map = new HashMap<>();
 
-	public void addOneTo(int key) {
+	public void addOneTo(T key) {
 		if (map.containsKey(key)) {
 			map.put(key, map.get(key) + 1);
 		} else {
@@ -15,7 +15,7 @@ public class TallySheet {
 		}
 	}
 	
-	public int getCount(int key) {
+	public int getCount(T key) {
 		Integer result = map.get(key);
 		if (result == null) {
 			return 0;
@@ -23,7 +23,7 @@ public class TallySheet {
 		return result;
 	}
 	
-	public Set<Integer> getKeys() {
+	public Set<T> getKeys() {
 		return map.keySet();
 	}
 

@@ -85,7 +85,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 	
 	private void assignCompartmentTarget(Pedestrian p) {
-		final int entranceAreaIndex = 0;
+		final int entranceAreaIndex = 5; // TODO get entrance area where person spawned
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
 		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
 	}
@@ -189,7 +189,7 @@ public class SeatingModel implements ActiveCallback, Model {
 
 		default:
 			assert personsSitting == 4;
-			throw new RuntimeException("Seat group is already full. This method should not have been called!");
+			throw new IllegalStateException("Seat group is already full. This method should not have been called!");
 		}
 	}
 
