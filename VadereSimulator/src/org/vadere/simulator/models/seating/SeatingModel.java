@@ -115,7 +115,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		final int entranceAreaCount = trainModel.getEntranceAreaCount();
 
 		final double distributionMean = entranceAreaIndex + 0.5;
-		final double distributionSd = entranceAreaCount / 6.0;
+		final double distributionSd = entranceAreaCount / 3.0;
 		final RealDistribution distribution = new NormalDistribution(distributionMean, distributionSd);
 
 		final double value = MathUtil.clamp(distribution.sample(), 0, entranceAreaCount);
