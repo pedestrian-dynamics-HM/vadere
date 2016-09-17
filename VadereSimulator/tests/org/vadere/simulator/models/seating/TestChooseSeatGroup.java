@@ -15,6 +15,7 @@ import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.data.TallySheet;
 
 public class TestChooseSeatGroup {
 	

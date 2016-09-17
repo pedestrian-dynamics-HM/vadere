@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.seating;
+package org.vadere.util.data;
 
 import java.util.HashMap;
 import java.util.Map;
