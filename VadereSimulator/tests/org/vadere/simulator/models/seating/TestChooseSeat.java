@@ -55,14 +55,19 @@ public class TestChooseSeat {
 	@StatisticalTestCase
 	@Test
 	public void testChooseSeat1() {
-		final int nTrials = 1000;
-		fillSeatGroup(seatGroup, 0);
-		TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
+		final int[] diagonallyOppositeSeatIndexes = { 3, 2, 1, 0 };
+		for (int i = 0; i < 4; i++) {
+			final int nTrials = 1000;
+			clearSeatGroup(seatGroup);
+			fillSeatGroup(seatGroup, i);
 
-		final Seat diagonallyOppositeSeat = seatGroup.getSeat(3);
-		Map<SeatRelativePosition, Double> map = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice1());
-		assertEquals(map.get(SeatRelativePosition.DIAGONAL),
-				(double) tallySheet.getCount(diagonallyOppositeSeat) / nTrials, 0.05);
+			final TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
+
+			final Seat diagonallyOppositeSeat = seatGroup.getSeat(diagonallyOppositeSeatIndexes[i]);
+			Map<SeatRelativePosition, Double> map = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice1());
+			assertEquals(map.get(SeatRelativePosition.DIAGONAL),
+					(double) tallySheet.getCount(diagonallyOppositeSeat) / nTrials, 0.05);
+		}
 	}
 
 	private TallySheet<Seat> runChooseSeat(final int nTrials) {
