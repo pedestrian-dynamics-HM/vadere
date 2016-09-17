@@ -14,6 +14,10 @@ public class SeatGroup {
 	private List<Seat> seats;
 	private int index;
 
+	/**
+	 * @param seats list of all seats in the train.
+	 * @param index absolute index, not the index within a compartment!
+	 */
 	public SeatGroup(List<Seat> seats, int index) {
 		this.seats = seats;
 		this.index = index;

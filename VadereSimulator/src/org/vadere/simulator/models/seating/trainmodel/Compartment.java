@@ -95,4 +95,8 @@ public class Compartment {
 		return index;
 	}
 
+	public int getPersonCount() {
+		return getSeatGroups().stream().mapToInt(SeatGroup::getPersonCount).sum();
+	}
+
 }

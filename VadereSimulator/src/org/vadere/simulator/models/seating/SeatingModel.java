@@ -1,12 +1,9 @@
 package org.vadere.simulator.models.seating;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -127,39 +124,44 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 	
 	public SeatGroup chooseSeatGroup(Compartment compartment) {
-		final List<SeatGroup> seatGroups = compartment.getSeatGroups();
 		final List<Pair<Boolean, Double>> valuesAndProbabilities = attributes.getSeatGroupChoice();
 		final EnumeratedDistribution<Boolean> distribution = new EnumeratedDistribution<>(rng, valuesAndProbabilities);
-		final List<SeatGroup> chosenSeatGroup = chooseFromSeatGroupsRecursively(seatGroups, distribution);
-		return chosenSeatGroup.get(0);
+		
+		List<SeatGroup> seatGroups = compartment.getSeatGroups();
+		
+		while (seatGroups.size() > 1) {
+			final int minPersonCount = getSeatGroupMinPersonCount(seatGroups);
+
+			if (allSeatGroupPersonCountsEquals(seatGroups)) {
+				return drawRandomElement(seatGroups);
+			}
+
+			if (distribution.sample()) {
+				// choice for seat group with minimal number of other passengers
+				final List<SeatGroup> minSeatGroups = seatGroups.stream()
+						.filter(sg -> sg.getPersonCount() == minPersonCount)
+						.collect(Collectors.toList());
+				return drawRandomElement(minSeatGroups);
+			} else {
+				seatGroups = seatGroups.stream()
+						.filter(sg -> sg.getPersonCount() != minPersonCount)
+						.collect(Collectors.toList());
+			}
+		}
+		
+		return seatGroups.get(0);
+	}
+
+	private boolean allSeatGroupPersonCountsEquals(List<SeatGroup> result) {
+		return result.stream().mapToInt(SeatGroup::getPersonCount).distinct().count() == 1;
+	}
+
+	private int getSeatGroupMinPersonCount(List<SeatGroup> result) {
+		return result.stream()
+				.mapToInt(SeatGroup::getPersonCount)
+				.min().getAsInt();
 	}
 	
-	private List<SeatGroup> chooseFromSeatGroupsRecursively(List<SeatGroup> seatGroups,
-			EnumeratedDistribution<Boolean> distribution) {
-
-		final IntStream seatGroupPersonCounts = seatGroups.stream().mapToInt(SeatGroup::getPersonCount);
-
-		if (seatGroupPersonCounts.distinct().count() == 1) {
-			return Collections.singletonList(drawRandomElement(seatGroups));
-		}
-
-		final int minPersonCount = seatGroupPersonCounts
-				.reduce(Integer::min).getAsInt();
-
-		if (distribution.sample()) {
-			// choice for seat group with minimal number of other passengers
-			final List<SeatGroup> minSeatGroups = seatGroups.stream()
-					.filter(sg -> sg.getPersonCount() == minPersonCount)
-					.collect(Collectors.toList());
-			return chooseFromSeatGroupsRecursively(minSeatGroups, distribution);
-		} else {
-			final List<SeatGroup> otherSeatGroups = seatGroups.stream()
-					.filter(sg -> sg.getPersonCount() != minPersonCount)
-					.collect(Collectors.toList());
-			return chooseFromSeatGroupsRecursively(otherSeatGroups, distribution);
-		}
-	}
-
 	private <T> T drawRandomElement(List<T> list) {
 		return list.get(random.nextInt(list.size()));
 	}
