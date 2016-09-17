@@ -127,7 +127,13 @@ public class SeatingModel implements ActiveCallback, Model {
 		final List<Pair<Boolean, Double>> valuesAndProbabilities = attributes.getSeatGroupChoice();
 		final EnumeratedDistribution<Boolean> distribution = new EnumeratedDistribution<>(rng, valuesAndProbabilities);
 		
-		List<SeatGroup> seatGroups = compartment.getSeatGroups();
+		List<SeatGroup> seatGroups = compartment.getSeatGroups().stream()
+				.filter(sg -> sg.getPersonCount() < 4)
+				.collect(Collectors.toList());
+
+		if (seatGroups.isEmpty()) {
+			throw new IllegalStateException("No seats available in given compartment.");
+		}
 		
 		while (seatGroups.size() > 1) {
 			final int minPersonCount = getSeatGroupMinPersonCount(seatGroups);

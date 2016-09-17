@@ -53,11 +53,26 @@ public class TestSeatingModel {
 		assertTrue(Math.abs(leftCounter - rightCounter) / nTrials < 0.06);
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void testChooseSeatGroupBetween4FullOnes() {
+		final Compartment compartment = trainModel.getCompartment(11);
+		fillCompartment(compartment, 4, 4, 4, 4);
+		runChooseSeatGroup(compartment, 1);
+	}
+	
 	// WARNING: this is a statistical test. in case of failure, just run again.
 	@Test
-	public void testChooseSeatGroupBetween4EmptyOnes() {
+	public void testChooseSeatGroupBetween4WithEqualCounts() {
+		for (int n = 0; n < 4; n++) {
+			testChooseSeatGroupBetween4(n);
+		}
+	}
+
+	public void testChooseSeatGroupBetween4(int personCountForEachSeatGroup) {
 		final Compartment compartment = trainModel.getCompartment(11);
-		assert compartment.getPersonCount() == 0;
+		clearCompartment(compartment);
+		fillCompartment(compartment, personCountForEachSeatGroup, personCountForEachSeatGroup,
+				personCountForEachSeatGroup, personCountForEachSeatGroup);
 		
 		final int nTrials = 1000;
 		final TallySheet tallySheet = runChooseSeatGroup(compartment, nTrials);
@@ -65,9 +80,16 @@ public class TestSeatingModel {
 		for (Integer key : tallySheet.getKeys()) {
 			assertEquals(0.25, (double) tallySheet.getCount(key) / nTrials, 0.05);
 		}
-		
 	}
 	
+	private void clearCompartment(Compartment compartment) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				compartment.getSeatGroups().get(i).getSeat(j).setSittingPerson(null);
+			}
+		}
+	}
+
 	// WARNING: this is a statistical test. in case of failure, just run again.
 	@Test
 	public void testChooseSeatGroupBetween0123() {
@@ -83,6 +105,17 @@ public class TestSeatingModel {
 		List<Integer> sortedKeys = tallySheet.getKeys().stream()
 				.sorted().collect(Collectors.toList());
 
+		double[] ps = getSeatGroupPersonCountProbabilities();
+
+		for (int i = 0; i < 4; i++) {
+			final Integer key = sortedKeys.get(i);
+//			System.out.println(i + " " + key + " " + ps[i]);
+			assertEquals(ps[i], (double) tallySheet.getCount(key) / nTrials, 0.05);
+		}
+		
+	}
+
+	private double[] getSeatGroupPersonCountProbabilities() {
 		final List<Pair<Boolean, Double>> probabilities = new AttributesSeating().getSeatGroupChoice();
 		final Pair<Boolean, Double> pair = probabilities.get(0);
 		assert pair.getFirst() == true;
@@ -95,13 +128,7 @@ public class TestSeatingModel {
 		p1 /= sum;
 		p2 /= sum;
 		double[] ps = { p1, p2, p2*p2, p2*p2*p2 };
-
-		for (int i = 0; i < 4; i++) {
-			final Integer key = sortedKeys.get(i);
-//			System.out.println(i + " " + key + " " + ps[i]);
-			assertEquals(ps[i], (double) tallySheet.getCount(key) / nTrials, 0.05);
-		}
-		
+		return ps;
 	}
 
 	private TallySheet runChooseSeatGroup(final Compartment compartment, final int nTrials) {
