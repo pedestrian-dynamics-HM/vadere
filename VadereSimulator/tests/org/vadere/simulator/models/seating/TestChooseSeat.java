@@ -12,6 +12,7 @@ import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.TallySheet;
+import org.vadere.util.test.StatisticalTestCase;
 
 public class TestChooseSeat {
 	
@@ -33,7 +34,7 @@ public class TestChooseSeat {
 		model.chooseSeat(seatGroup);
 	}
 	
-	// WARNING: this is a statistical test. in case of failure, just run again.
+	@StatisticalTestCase
 	@Test
 	public void testChooseSeat0() {
 		final int nTrials = 1000;

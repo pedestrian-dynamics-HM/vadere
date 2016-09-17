@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
+import org.vadere.util.test.StatisticalTestCase;
 
 public class TestChooseCompartment {
 	
@@ -18,7 +19,7 @@ public class TestChooseCompartment {
 		trainModel = model.getTrainModel();
 	}
 
-	// WARNING: this is a statistical test. in case of failure, just run again.
+	@StatisticalTestCase
 	@Test
 	public void testChooseCompartment() {
 		final int entranceAreaCount = trainModel.getEntranceAreaCount();
