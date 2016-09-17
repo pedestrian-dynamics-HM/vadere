@@ -3,10 +3,10 @@ package org.vadere.simulator.models.seating;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
@@ -16,6 +16,7 @@ import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.TallySheet;
+import org.vadere.util.test.FractionProbabilityNormalization;
 import org.vadere.util.test.StatisticalTestCase;
 
 public class TestChooseSeatGroup {
@@ -117,17 +118,11 @@ public class TestChooseSeatGroup {
 	}
 
 	private double[] getSeatGroupPersonCountProbabilities() {
-		final List<Pair<Boolean, Double>> probabilities = new AttributesSeating().getSeatGroupChoice();
-		final Pair<Boolean, Double> pair = probabilities.get(0);
-		assert pair.getFirst() == true;
-		final Pair<Boolean, Double> otherPair = probabilities.get(1);
-		assert otherPair.getFirst() == false;
+		final Map<Boolean, Double> probabilities = FractionProbabilityNormalization
+				.normalize(new AttributesSeating().getSeatGroupChoice());
 
-		double p1 = pair.getSecond();
-		double p2 = otherPair.getSecond();
-		final double sum = p1 + p2;
-		p1 /= sum;
-		p2 /= sum;
+		double p1 = probabilities.get(true);
+		double p2 = probabilities.get(false);
 		double[] ps = { p1, p2, p2*p2, p2*p2*p2 };
 		return ps;
 	}

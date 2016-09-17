@@ -25,5 +25,19 @@ public class FractionProbabilityNormalization {
 
 		return map;
 	}
+	
+	public static double[] normalize(double[] fractions) {
+		double sum = 0;
+		for (double d : fractions) {
+			sum += d;
+		}
+		
+		double[] result = new double[fractions.length];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = fractions[i] / sum;
+		}
+		
+		return result;
+	}
 
 }

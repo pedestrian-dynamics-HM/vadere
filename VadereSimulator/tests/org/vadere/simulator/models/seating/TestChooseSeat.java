@@ -44,15 +44,11 @@ public class TestChooseSeat {
 		final int nTrials = 1000;
 		TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
 
-		final double[] fractions = new AttributesSeating().getSeatChoice0();
-		double sum = 0;
-		for (double d : fractions) {
-			sum += d;
-		}
+		final double[] probabilities = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice0());
 		
 		for (int i = 0; i < tallySheet.getKeys().size(); i++) {
 			Seat s = seatGroup.getSeat(i);
-			assertEquals(fractions[i] / sum, (double) tallySheet.getCount(s) / nTrials, 0.05);
+			assertEquals(probabilities[i], (double) tallySheet.getCount(s) / nTrials, 0.05);
 		}
 	}
 
