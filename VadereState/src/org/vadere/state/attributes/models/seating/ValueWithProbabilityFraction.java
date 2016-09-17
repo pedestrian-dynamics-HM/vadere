@@ -25,5 +25,5 @@ public class ValueWithProbabilityFraction<T> {
 	public Pair<T, Double> toPair() {
 		return new Pair<>(value, fraction);
 	}
-
+	
 }

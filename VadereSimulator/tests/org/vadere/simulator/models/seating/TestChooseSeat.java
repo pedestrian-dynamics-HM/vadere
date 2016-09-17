@@ -2,16 +2,20 @@ package org.vadere.simulator.models.seating;
 
 import static org.junit.Assert.*;
 
+import java.util.Map;
 import java.util.Random;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.state.attributes.models.AttributesSeating;
+import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.TallySheet;
+import org.vadere.util.test.FractionProbabilityNormalization;
 import org.vadere.util.test.StatisticalTestCase;
 
 public class TestChooseSeat {
@@ -30,7 +34,7 @@ public class TestChooseSeat {
 
 	@Test(expected=IllegalStateException.class)
 	public void testChooseSeatInFullSeatGroup() {
-		fillSeatGroup(seatGroup, true, true, true, true);
+		fillSeatGroup(seatGroup, 0, 1, 2, 3);
 		model.chooseSeat(seatGroup);
 	}
 	
@@ -38,10 +42,7 @@ public class TestChooseSeat {
 	@Test
 	public void testChooseSeat0() {
 		final int nTrials = 1000;
-		TallySheet<Seat> tallySheet = new TallySheet<>();
-		for (int i = 0; i < nTrials; i++) {
-			tallySheet.addOneTo(model.chooseSeat(seatGroup));
-		}
+		TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
 
 		final double[] fractions = new AttributesSeating().getSeatChoice0();
 		double sum = 0;
@@ -55,17 +56,37 @@ public class TestChooseSeat {
 		}
 	}
 
+	@StatisticalTestCase
+	@Test
+	public void testChooseSeat1() {
+		final int nTrials = 1000;
+		fillSeatGroup(seatGroup, 0);
+		TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
+
+		final Seat diagonallyOppositeSeat = seatGroup.getSeat(3);
+		Map<SeatRelativePosition, Double> map = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice1());
+		assertEquals(map.get(SeatRelativePosition.DIAGONAL),
+				(double) tallySheet.getCount(diagonallyOppositeSeat) / nTrials, 0.05);
+	}
+
+	private TallySheet<Seat> runChooseSeat(final int nTrials) {
+		TallySheet<Seat> tallySheet = new TallySheet<>();
+		for (int i = 0; i < nTrials; i++) {
+			tallySheet.addOneTo(model.chooseSeat(seatGroup));
+		}
+		return tallySheet;
+	}
+	
 	private void clearSeatGroup(SeatGroup sg) {
 		for (int i = 0; i < 4; i++) {
 			sg.getSeat(i).setSittingPerson(null);
 		}
 	}
 
-	private void fillSeatGroup(SeatGroup seatGroup, boolean... seats) {
-		for (int i = 0; i < seats.length; i++) {
-			if (seats[i]) {
-				seatGroup.getSeat(i).setSittingPerson(new Pedestrian(new AttributesAgent(), new Random()));
-			}
+	private void fillSeatGroup(SeatGroup seatGroup, int... seatsWithPersons) {
+		for (int i : seatsWithPersons) {
+			seatGroup.getSeat(i).setSittingPerson(new Pedestrian(new AttributesAgent(), new Random()));
 		}
 	}
+	
 }

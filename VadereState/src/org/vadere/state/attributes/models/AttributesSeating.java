@@ -44,7 +44,12 @@ public class AttributesSeating extends Attributes {
 		seatGroupChoice.add(new ValueWithProbabilityFraction<>(true,  64.0));
 		seatGroupChoice.add(new ValueWithProbabilityFraction<>(false, 11.0));
 		
-		seatChoice0 = new double[] { 2, 1, 14, 5};
+		seatChoice0 = new double[] { 2, 1, 14, 5 };
+		
+		seatChoice1 = new ArrayList<>(3);
+		seatChoice1.add(new ValueWithProbabilityFraction<>(SeatRelativePosition.DIAGONAL, 31));
+		seatChoice1.add(new ValueWithProbabilityFraction<>(SeatRelativePosition.ACROSS, 8));
+		seatChoice1.add(new ValueWithProbabilityFraction<>(SeatRelativePosition.NEXT, 3));
 		
 	}
 
