@@ -5,21 +5,23 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
+import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 
 public class TestSeatingModel {
 	
 	private SeatingModel model;
+	private TrainModel trainModel;
 	
 	@Before
 	public void setUp() {
 		model = new TestTopographyAndModelBuilder().getSeatingModel();
-
+		trainModel = model.getTrainModel();
 	}
 
 	// WARNING: this is a statistical test. in case of failure, just run again.
 	@Test
 	public void testChooseCompartment() {
-		final int entranceAreaCount = 12; // from test topography
+		final int entranceAreaCount = trainModel.getEntranceAreaCount();
 		
 		double nTrials = 1000;
 		int leftCounter = 0;

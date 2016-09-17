@@ -115,7 +115,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		// compartments:    0   1   2   3   4
 		// left- and rightmost compartments are "half-compartments"
 
-		final int entranceAreaCount = trainModel.getNumberOfEntranceAreas();
+		final int entranceAreaCount = trainModel.getEntranceAreaCount();
 
 		final double distributionMean = entranceAreaIndex + 0.5;
 		final double distributionSd = entranceAreaCount / 6.0;

@@ -160,7 +160,7 @@ public class TrainModel {
 		}
 	}
 
-	public int getNumberOfEntranceAreas() {
+	public int getEntranceAreaCount() {
 		return numberOfEntranceAreas;
 	}
 

@@ -84,7 +84,7 @@ public class Compartment {
 	}
 
 	private boolean isLastHalfCompartment() {
-		return index == trainModel.getNumberOfEntranceAreas();
+		return index == trainModel.getEntranceAreaCount();
 	}
 
 	private boolean isFirstHalfCompartment() {

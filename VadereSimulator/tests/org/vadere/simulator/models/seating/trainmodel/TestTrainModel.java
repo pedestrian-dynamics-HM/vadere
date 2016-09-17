@@ -32,7 +32,7 @@ public class TestTrainModel {
 
 		@Test
 	public void testBasicModelProperties() {
-		assertEquals(nEntranceAreas, trainModel.getNumberOfEntranceAreas());
+		assertEquals(nEntranceAreas, trainModel.getEntranceAreaCount());
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
