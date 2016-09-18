@@ -137,7 +137,7 @@ public class Topography {
 		// TODO [priority=medium] [task=refactoring] this is needed for the SimulationDataWriter. Refactor in the process of refactoring the Writer.
 		if (DynamicElement.class.isAssignableFrom(elementType)) {
 
-			DynamicElementContainer result = new DynamicElementContainer<DynamicElement>(this.getBounds(), CELL_SIZE);
+			DynamicElementContainer result = new DynamicElementContainer<>(this.getBounds(), CELL_SIZE);
 			for (Pedestrian ped : pedestrians.getElements()) {
 				result.addElement(ped);
 			}
