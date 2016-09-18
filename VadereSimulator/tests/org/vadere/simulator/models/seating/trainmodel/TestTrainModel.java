@@ -21,7 +21,7 @@ public class TestTrainModel {
 	private static final int nInterimDestinations = nCompartments * 3 - 4; // includes 2 targets from half-compartments
 	private static final int nSeatGroups = nCompartments * 4 - 4;
 	private static final int nSeats = nSeatGroups * 4;
-	private static final int nPersons = 10;
+	private static final int nPersons = 0;
 
 	private TrainModel trainModel;
 
@@ -36,8 +36,7 @@ public class TestTrainModel {
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
-//		assertEquals(nPersons, trainModel.getPedestrians().size());
-		// TODO persons are not recognized; that's a problem of Topography!
+		assertEquals(nPersons, trainModel.getPedestrians().size());
 	}
 	
 	@Test
