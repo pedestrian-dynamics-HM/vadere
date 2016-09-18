@@ -19,9 +19,6 @@ public class TestStairs {
 	private AttributesStairs attributes2;
 	private Stairs stairs2;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@Before
 	public void setUp() throws Exception {
 		attributesStore1 =
