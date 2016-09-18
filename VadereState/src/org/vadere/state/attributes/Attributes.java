@@ -36,5 +36,4 @@ public abstract class Attributes {
 		}
 	}
 
-	// public abstract Attributes clone();
 }

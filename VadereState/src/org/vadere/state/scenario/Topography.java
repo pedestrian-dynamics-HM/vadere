@@ -111,10 +111,7 @@ public class Topography {
 	}
 
 	/**
-	 * Returns a List containing Targets with the specific id. This List maybe empty.
-	 * 
-	 * @param targetId
-	 * @return
+	 * Returns a list containing Targets with the specific id. This list may be empty.
 	 */
 	public List<Target> getTargets(final int targetId) {
 		return getTargets().stream().filter(t -> t.getId() == targetId).collect(Collectors.toList());
@@ -221,12 +218,6 @@ public class Topography {
 		this.teleporter = teleporter;
 	}
 
-	/*
-	 * public double getFinishTime() {
-	 * return attributes.getFinishTime();
-	 * }
-	 */
-
 	public <T extends DynamicElement> void addInitialElement(T element) {
 		((DynamicElementContainer<T>) this.getContainer(element.getClass())).addInitialElement(element);
 	}
@@ -277,8 +268,6 @@ public class Topography {
 	 * Adds a given obstacle to the list of obstacles as well as the list of boundary obstacles.
 	 * This way, the boundary can both be treated like normal obstacles, but can also be removed for
 	 * writing the topography to file.
-	 * 
-	 * @param obstacle
 	 */
 	public void addBoundary(Obstacle obstacle) {
 		this.addObstacle(obstacle);
