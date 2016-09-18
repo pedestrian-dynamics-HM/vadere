@@ -1,17 +1,22 @@
 package org.vadere.simulator.entrypoints;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunLocked;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.util.io.IOUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Locale;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentGroup;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 /**
  * Provides the possibility to start VADERE in console mode.
@@ -43,10 +48,6 @@ public class VadereConsole {
 		String outputFile = ns.getString("output-file");
 		String lockDirectory = ns.getString("lock-folder");
 		String timeStepFile = ns.getString("time-step-file");
-		String outputFormat = ns.getString("output_format");
-		String outputVariables = ns.getString("output_variables");
-		String tsfFormat = ns.getString("tsf_format");
-		String tsfVariables = ns.getString("tsf_variables");
 		Boolean outputAll = ns.getBoolean("all");
 
 		if ((lockDirectory == null || outputFile == null || timeStepFile == null) && projectDirectory == null) {
@@ -74,8 +75,6 @@ public class VadereConsole {
 						scenarioFilePath, vadereName);
 
 				vadereJava.setWaitOnLockData(lockDirectory, timeStepFile, outputAll);
-				vadereJava.setOutputFormat(outputFormat, outputVariables);
-				vadereJava.setTSFFormat(tsfFormat, tsfVariables);
 
 				vadereJava.run();
 			} else {

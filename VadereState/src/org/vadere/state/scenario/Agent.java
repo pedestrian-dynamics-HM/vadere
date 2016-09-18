@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -103,15 +102,6 @@ public abstract class Agent implements DynamicElement {
 	public int getId() {
 		return attributes.getId();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see scenario.ScenarioElement#getType()
-	 */
-	@Override
-	public abstract ScenarioElementType getType();
-
 
 	@Override
 	public abstract Agent clone();
@@ -222,4 +212,5 @@ public abstract class Agent implements DynamicElement {
 	public void setFreeFlowSpeed(double freeFlowSpeed) {
 		this.freeFlowSpeed = freeFlowSpeed;
 	}
+
 }
