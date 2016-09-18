@@ -3,6 +3,8 @@ package org.vadere.gui.projectview.view;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -27,16 +29,18 @@ public class DataProcessingView extends JPanel {
 
 		// set up table models
 
-		filesTableModel = new DefaultTableModel(new String[] {"Files"}, 0) {
+		filesTableModel = new DefaultTableModel(new OutputFile[] {null}, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
-		filesTableModel.addRow(new String[] {"test.txt"});
-
-		processorsTableModel = new DefaultTableModel(new String[] {"ID", "Name"}, 0);
-		processorsTableModel.addRow(new String[] {"0", "PedestrianPositionProcessor"});
+		processorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 
 		// top left in 2x2 grid
 
@@ -63,7 +67,6 @@ public class DataProcessingView extends JPanel {
 		processorsLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		processorsPanel.add(processorsLabel);
 		processorsTable = new JTable(processorsTableModel);
-		processorsTable.getColumnModel().getColumn(0).setMaxWidth(40);
 		processorsTable.setAlignmentX(Component.LEFT_ALIGNMENT);
 		processorsPanel.add(processorsTable);
 		add(processorsPanel);
@@ -78,7 +81,10 @@ public class DataProcessingView extends JPanel {
 		this.currentScenario = scenario;
 
 		scenario.getDataProcessingJsonManager().getOutputFiles()
-				.forEach(outputFile -> filesTableModel.addRow(new String[] {outputFile.getFileName()}));
+				.forEach(outputFile -> filesTableModel.addRow(new OutputFile[] {outputFile}));
+
+		scenario.getDataProcessingJsonManager().getDataProcessors()
+				.forEach(dataProcessor -> processorsTableModel.addRow(new DataProcessor[] {dataProcessor}));
 	}
 
 	public void isEditable(boolean isEditable) {

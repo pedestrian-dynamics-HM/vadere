@@ -102,4 +102,9 @@ public abstract class OutputFile<K extends Comparable<K>> {
 	public List<Integer> getProcessorIds() {
 		return processorIds;
 	}
+
+	@Override
+	public String toString() {
+		return fileName;
+	}
 }

@@ -97,4 +97,9 @@ public abstract class DataProcessor<K extends Comparable<K>, V> {
 	public String[] toStrings(final K key) {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NaN" };
 	}
+	
+	@Override
+	public String toString() {
+		return id + ": " + getClass().getSimpleName();
+	}
 }
