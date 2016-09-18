@@ -50,7 +50,6 @@ public class ScenarioRunManager implements Runnable {
 
 	private ScenarioFinishedListener finishedListener;
 	protected Simulation simulation;
-	private boolean scenarioFailed = false;
 	private boolean simpleOutputProcessorName = false;
 
 	private String savedStateSerialized;
@@ -106,11 +105,16 @@ public class ScenarioRunManager implements Runnable {
 		return null;
 	}
 
+	/**
+	 * This method runs a simulation. It must not catch any exceptions! The
+	 * caller (i.e. the calling thread) should catch exceptions and call
+	 * {@link #simulationFailed(Throwable)}.
+	 */
 	@Override
 	public void run() {
-		doBeforeSimulation();
-
 		try {
+			doBeforeSimulation();
+
 			// prepare processor and simulation data writer
 			prepareOutput();
 
@@ -126,15 +130,19 @@ public class ScenarioRunManager implements Runnable {
 			// Run simulation main loop from start time = 0 seconds
 			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
 			simulation.run();
+
 		} catch (Exception e) {
-			scenarioFailed = true;
-			if (finishedListener != null)
-				this.finishedListener.scenarioRunThrewException(this, new Throwable(e));
-			e.printStackTrace();
-			logger.error(e);
+			throw new RuntimeException("Simulation failed.", e);
 		} finally {
 			doAfterSimulation();
 		}
+	}
+	
+	public void simulationFailed(Throwable e) {
+			e.printStackTrace();
+			logger.error(e);
+			if (finishedListener != null)
+				finishedListener.scenarioRunThrewException(this, new Throwable(e));
 	}
 
 	protected void doAfterSimulation() {
@@ -159,17 +167,9 @@ public class ScenarioRunManager implements Runnable {
 		this.processorManager = this.dataProcessingJsonManager.createProcessorManager();
 	}
 
-	public void setScenarioFailed(final boolean scenarioFailed) {
-		this.scenarioFailed = scenarioFailed;
-	}
-
 	// Getter...
 	public boolean isRunning() {
 		return simulation != null && simulation.isRunning();
-	}
-
-	public boolean isScenarioFailed() {
-		return scenarioFailed;
 	}
 
 	public String getName() {
@@ -302,7 +302,6 @@ public class ScenarioRunManager implements Runnable {
 			this.modelTests = srm.modelTests;
 			this.finishedListener = srm.finishedListener;
 			this.simulation = srm.simulation;
-			this.scenarioFailed = srm.scenarioFailed;
 			this.simpleOutputProcessorName = srm.simpleOutputProcessorName;
 			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
 		} catch (IOException | VadereClassNotFoundException e) {

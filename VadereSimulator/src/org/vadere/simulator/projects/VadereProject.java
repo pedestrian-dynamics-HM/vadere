@@ -96,12 +96,10 @@ public class VadereProject implements ScenarioFinishedListener {
 		currentScenario = prepareNextScenario();
 		currentScenarioThread = new Thread(currentScenario);
 
-		currentScenarioThread.setUncaughtExceptionHandler(
-				(t, ex) -> {
-					currentScenario.setScenarioFailed(true);
-					singleScenarioFinishedListener
-							.forEach(l -> l.error(currentScenario, scenariosLeft.size(), ex));
-				});
+		currentScenarioThread.setUncaughtExceptionHandler((t, ex) -> {
+			currentScenario.simulationFailed(ex);
+			singleScenarioFinishedListener.forEach(l -> l.error(currentScenario, scenariosLeft.size(), ex));
+		});
 		currentScenarioThread.start();
 	}
 
