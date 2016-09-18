@@ -1,8 +1,6 @@
 package org.vadere.simulator.projects.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.JsonElement;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -10,7 +8,6 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +17,9 @@ public class HashGenerator {
 
 	private static Logger logger = LogManager.getLogger(HashGenerator.class);
 	
+	private static final String CURRENT_RELEASE_NUMBER_RESOURCE = "/current_release_number.txt";
+	private static final String CURRENT_COMMIT_HASH_RESOURCE = "/current_commit_hash.txt";
+
 	public static String topographyHash(Topography topography) {
 		String json = null;
 		try {
@@ -38,61 +38,41 @@ public class HashGenerator {
 	}
 
 	public static boolean isCommitHashAvailable() {
-		InputStream in = HashGenerator.class.getResourceAsStream("/current_commit_hash.txt");
-		boolean result = in != null;
-		if(result) {
-			try {
-				in.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
+		return getFirstStringTokenFromResource(CURRENT_COMMIT_HASH_RESOURCE) != null;
 	}
 
 	public static String commitHash() {
-		InputStream in = HashGenerator.class.getResourceAsStream("/current_commit_hash.txt");
-		String commithash = "";
+		String commitHash = getFirstStringTokenFromResource(CURRENT_COMMIT_HASH_RESOURCE);
 
-		if(in != null) {
-			Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_commit_hash.txt"));
-			if(scanner.hasNext()) {
-				commithash = scanner.next();
-			}
-			else {
-				logger.warn("no commit hash in resource.");
-			}
-			scanner.close();
-		}
-		else {
-			commithash = "warning: no commit hash";
-			logger.warn("no commit hash. This will cause the scenario output file to be not uniquely assignable to a software version.");
+		if (commitHash == null) {
+			commitHash = "warning: no commit hash";
+			logger.warn("No commit hash found. The project will not contain a hash of the software source code.");
 		}
 
-		return commithash;
+		return commitHash;
 	}
 
 	public static String releaseNumber() {
-		InputStream in = HashGenerator.class.getResourceAsStream("/current_release_number.txt");
-		String releaseNumber = "";
-		if(in != null) {
-			Scanner scanner = new Scanner(HashGenerator.class.getResourceAsStream("/current_release_number.txt"));
-			releaseNumber = scanner.next();
-			if(scanner.hasNext()) {
-				releaseNumber = scanner.next();
-			}
-			else {
-				logger.warn("no release number in resource.");
-			}
-			scanner.close();
-		}
-		else {
+		String releaseNumber = getFirstStringTokenFromResource(CURRENT_RELEASE_NUMBER_RESOURCE);
+		
+		if (releaseNumber == null) {
 			releaseNumber = "warning: no release number";
-			logger.warn("no release number. This will cause the project files to be not uniquely assignable to a software release version.");
+			logger.warn("No release number found. The project will not contain software release version.");
 		}
-
 
 		return releaseNumber;
+	}
+
+	private static String getFirstStringTokenFromResource(String resource) {
+		final InputStream in = HashGenerator.class.getResourceAsStream(resource);
+		if (in != null) {
+			try (final Scanner scanner = new Scanner(in)) {
+				if (scanner.hasNext()) {
+					return scanner.next();
+				}
+			}
+		}
+		return null;
 	}
 
 	private static String topography2Json(final Topography topography) throws JsonProcessingException {
