@@ -118,7 +118,7 @@ public class DataProcessingJsonManager {
         return node;
     }
 
-    private static JsonNode serializeProcessor(final DataProcessor dataProcessor) {
+    public static JsonNode serializeProcessor(final DataProcessor dataProcessor) {
         ObjectNode node = mapper.createObjectNode();
 
         node.put(TYPE_KEY, dataProcessor.getClass().getName());

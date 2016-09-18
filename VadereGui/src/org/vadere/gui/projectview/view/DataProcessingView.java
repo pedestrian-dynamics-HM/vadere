@@ -2,19 +2,26 @@ package org.vadere.gui.projectview.view;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.io.JsonConverter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -48,8 +55,8 @@ public class DataProcessingView extends JPanel {
 		filesTable = new JTable(filesTableModel);
 		filesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		filesTable.getSelectionModel().addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
-				handleOutputFileSelected((OutputFile) filesTableModel.getValueAt(e.getFirstIndex(), 0));
+			if (e.getValueIsAdjusting()) {
+				handleOutputFileSelected((OutputFile) filesTableModel.getValueAt(filesTable.getSelectedRow(), 0));
 			}
 		});
 
@@ -62,8 +69,8 @@ public class DataProcessingView extends JPanel {
 		processorsTable = new JTable(processorsTableModel);
 		processorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		processorsTable.getSelectionModel().addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
-				handleDataProcessorSelected((DataProcessor) processorsTable.getValueAt(e.getFirstIndex(), 0));
+			if (e.getValueIsAdjusting()) {
+				handleDataProcessorSelected((DataProcessor) processorsTable.getValueAt(processorsTable.getSelectedRow(), 0));
 			}
 		});
 
@@ -97,7 +104,8 @@ public class DataProcessingView extends JPanel {
 		// bottom right in 2x2 grid
 
 		processorsDetailsPanel = new JPanel();
-		processorsDetailsPanel.setLayout(new BoxLayout(processorsDetailsPanel, BoxLayout.Y_AXIS));
+		processorsDetailsPanel.setLayout(new GridBagLayout());
+		processorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		add(processorsDetailsPanel);
 	}
 
@@ -139,13 +147,10 @@ public class DataProcessingView extends JPanel {
 		c.anchor = GridBagConstraints.WEST; // alignment
 		c.ipady = 15; // y-gap between components
 
-		JLabel label = new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>");
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		filesDetailsPanel.add(label, c);
+		filesDetailsPanel.add(new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>"), c);
 
 		c.gridx = 0;
 		c.gridy = 1;
@@ -183,7 +188,31 @@ public class DataProcessingView extends JPanel {
 	}
 
 	private void handleDataProcessorSelected(DataProcessor dataProcessor) {
-		// TODO
+		processorsDetailsPanel.removeAll();
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.ipady = 15;
+
+		c.gridx = 0;
+		c.gridy = 0;
+		processorsDetailsPanel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
+
+		RSyntaxTextArea attributesTextArea = new RSyntaxTextArea();
+		attributesTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+		InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
+		try {
+			Theme syntaxTheme = Theme.load(in);
+			syntaxTheme.apply(attributesTextArea);
+			attributesTextArea.setText(JsonConverter.serializeJsonNode(DataProcessingJsonManager.serializeProcessor(dataProcessor)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		c.gridx = 0;
+		c.gridy = 1;
+		processorsDetailsPanel.add(attributesTextArea, c);
+
+		revalidate();
 	}
 
 }
