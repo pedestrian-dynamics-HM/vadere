@@ -30,7 +30,7 @@ public class TestCompartment {
 
 	private void sitDownPerson(Compartment c, int seatGroupIndex, int seatIndex) {
 		// not for half-compartments!
-		c.getSeatGroups().get(seatGroupIndex).getSeat(seatIndex)
+		c.getSeat(seatGroupIndex, seatIndex)
 				.setSittingPerson(new Pedestrian(new AttributesAgent(), new Random()));
 		
 	}

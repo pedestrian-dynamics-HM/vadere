@@ -112,7 +112,7 @@ public class TestChooseSeatGroup {
 	private void clearCompartment(Compartment compartment) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				compartment.getSeatGroups().get(i).getSeat(j).setSittingPerson(null);
+				compartment.getSeat(i, j).setSittingPerson(null);
 			}
 		}
 	}
@@ -138,7 +138,7 @@ public class TestChooseSeatGroup {
 
 	private void fillCompartment(Compartment compartment, int... numbers) {
 		for (int i = 0; i < 4; i++) {
-			sitDownNewPerson(compartment.getSeatGroups().get(i), numbers[i]);
+			sitDownNewPerson(compartment.getSeatGroup(i), numbers[i]);
 		}
 	}
 

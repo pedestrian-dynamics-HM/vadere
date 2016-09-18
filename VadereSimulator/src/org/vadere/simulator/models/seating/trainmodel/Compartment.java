@@ -28,6 +28,15 @@ public class Compartment {
 		}
 	}
 
+
+	public SeatGroup getSeatGroup(int seatGroupIndex) {
+		return seatGroups.get(seatGroupIndex);
+	}
+
+	public Seat getSeat(int seatGroupIndex, int seatIndex) {
+		return getSeatGroup(seatGroupIndex).getSeat(seatIndex);
+	}
+
 	private void addNormalCompartment() {
 		final int startSeatGroupIndex = index * 4 - 2;
 		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex));
@@ -97,10 +106,6 @@ public class Compartment {
 
 	public int getPersonCount() {
 		return getSeatGroups().stream().mapToInt(SeatGroup::getPersonCount).sum();
-	}
-
-	public SeatGroup getSeatGroup(int seatGroupIndex) {
-		return seatGroups.get(seatGroupIndex);
 	}
 
 }
