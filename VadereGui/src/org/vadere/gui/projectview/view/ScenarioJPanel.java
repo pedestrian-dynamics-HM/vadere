@@ -213,40 +213,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		dataProcessingGUIview = new DataProcessingView();
 		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
 
-		// Test for processor GUI
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		ClassFinder.getOutputFileClasses().forEach(opclass -> {
-			panel.add(new JLabel(opclass.getSimpleName()));
-			ClassFinder.getProcessorClasses(((ParameterizedType) opclass.getGenericSuperclass()).getActualTypeArguments()[0])
-					.forEach(procclass -> panel.add(new JLabel("- " + procclass.getSimpleName())));
-		});
-
-		List<Class<?>> classes = ClassFinder.getOutputFileClasses();
-		JComboBox<Class<?>> cbOutputTypes = new JComboBox<>(classes.toArray(new Class[classes.size()]));
-		cbOutputTypes.setRenderer(new ClassRenderer());
-		panel.add(cbOutputTypes);
-
-		JComboBox<Class<?>> cbProcessorTypes = new JComboBox<>();
-		cbProcessorTypes.setRenderer(cbOutputTypes.getRenderer());
-
-		cbOutputTypes.addItemListener(e -> {
-			if(e.getStateChange() != ItemEvent.SELECTED)
-				return;
-
-			cbProcessorTypes.removeAllItems();
-
-			Class<?> cOutput = (Class<?>) e.getItem();
-			ClassFinder.getProcessorClasses(((ParameterizedType) cOutput.getGenericSuperclass()).getActualTypeArguments()[0]).forEach(c -> cbProcessorTypes.addItem(c));
-		});
-		cbOutputTypes.setSelectedIndex(1);
-		cbOutputTypes.setSelectedIndex(0);
-
-		panel.add(cbProcessorTypes);
-
-		tabbedPane.addTab("Test", panel);
-
-		
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 
