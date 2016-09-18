@@ -38,6 +38,11 @@ public class DataProcessingView extends JPanel {
 		};
 		filesTable = new JTable(filesTableModel);
 		filesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		filesTable.getSelectionModel().addListSelectionListener(e -> {
+			if (!e.getValueIsAdjusting()) {
+				handleOutputFileSelected((OutputFile) filesTableModel.getValueAt(e.getFirstIndex(), 0));
+			}
+		});
 
 		processorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
 			@Override
@@ -47,6 +52,11 @@ public class DataProcessingView extends JPanel {
 		};
 		processorsTable = new JTable(processorsTableModel);
 		processorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		processorsTable.getSelectionModel().addListSelectionListener(e -> {
+			if (!e.getValueIsAdjusting()) {
+				handleDataProcessorSelected((DataProcessor) processorsTable.getValueAt(e.getFirstIndex(), 0));
+			}
+		});
 
 		// top left in 2x2 grid
 
@@ -108,6 +118,14 @@ public class DataProcessingView extends JPanel {
 
 	public void isEditable(boolean isEditable) {
 		this.isEditable = isEditable;
+	}
+
+	private void handleOutputFileSelected(OutputFile outputFile) {
+		// TODO
+	}
+
+	private void handleDataProcessorSelected(DataProcessor dataProcessor) {
+		// TODO
 	}
 
 }
