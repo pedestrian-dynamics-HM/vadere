@@ -37,9 +37,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	private List<Seat> emptySeats;
 
 	public LogEventProcessor() {
-		// $ head -n1 seating-data/data/LOG_EVENT.csv
-		// (without "ID" column because it comes from IdDataKey)
-		super("EVENT_TYPE","EXTRA_INT","EXTRA_STRING","PERSON","SEAT","SURVEY","TIME");
+		super(LogEventEntry.getHeaders());
 	}
 
 	@Override
