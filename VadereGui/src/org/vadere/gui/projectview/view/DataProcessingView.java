@@ -37,6 +37,8 @@ public class DataProcessingView extends JPanel {
 			}
 		};
 		filesTable = new JTable(filesTableModel);
+		filesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		processorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -44,6 +46,7 @@ public class DataProcessingView extends JPanel {
 			}
 		};
 		processorsTable = new JTable(processorsTableModel);
+		processorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// top left in 2x2 grid
 
