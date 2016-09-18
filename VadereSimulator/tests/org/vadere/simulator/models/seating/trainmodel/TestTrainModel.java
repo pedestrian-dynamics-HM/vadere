@@ -142,6 +142,26 @@ public class TestTrainModel {
 		assertEquals(trainModel.getCompartment(nCompartments - 1), getCompartmentByInterimTargetIndex(nInterimDestinations - 1));
 	}
 
+	@Test
+	public void testGetCompartmentByPedestrian() {
+		Pedestrian p = createTestPedestrian();
+		p.addTarget(trainModel.getInterimDestinations().get(0));
+		assertEquals(trainModel.getCompartment(p), getCompartmentByInterimTargetIndex(0));
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testGetCompartmentByPedestrianNoTargets() {
+		Pedestrian p = createTestPedestrian();
+		trainModel.getCompartment(p);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetCompartmentByPedestrianWrongLastTarget() {
+		Pedestrian p = createTestPedestrian();
+		p.addTarget(trainModel.getSeatGroup(0).getSeat(0).getAssociatedTarget());
+		trainModel.getCompartment(p);
+	}
+
 	private Compartment getCompartmentByInterimTargetIndex(int index) {
 		return trainModel.getCompartment(trainModel.getInterimDestinations().get(index));
 	}
