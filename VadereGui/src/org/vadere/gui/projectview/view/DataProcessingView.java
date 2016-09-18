@@ -9,6 +9,7 @@ import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class DataProcessingView extends JPanel {
 
@@ -35,24 +36,24 @@ public class DataProcessingView extends JPanel {
 				return false;
 			}
 		};
+		filesTable = new JTable(filesTableModel);
 		processorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
+		processorsTable = new JTable(processorsTableModel);
 
 		// top left in 2x2 grid
 
-		JPanel filesPanel = new JPanel();
-		filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
-		JLabel filesLabel = new JLabel("<html><b>Files</b></html>");
-		filesLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		filesPanel.add(filesLabel);
-		filesTable = new JTable(filesTableModel);
-		filesTable.setAlignmentX(Component.LEFT_ALIGNMENT);
-		filesPanel.add(filesTable);
-		add(filesPanel);
+		JButton addFileBtn = new JButton(new AbstractAction("Add file") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO
+			}
+		});
+		add(buildPanel("Files", filesTable, addFileBtn));
 
 		// top right in 2x2 grid
 
@@ -61,20 +62,35 @@ public class DataProcessingView extends JPanel {
 
 		// bottom left in 2x2 grid
 
-		JPanel processorsPanel = new JPanel();
-		processorsPanel.setLayout(new BoxLayout(processorsPanel, BoxLayout.PAGE_AXIS));
-		JLabel processorsLabel = new JLabel("<html><b>Processors</b></html>");
-		processorsLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		processorsPanel.add(processorsLabel);
-		processorsTable = new JTable(processorsTableModel);
-		processorsTable.setAlignmentX(Component.LEFT_ALIGNMENT);
-		processorsPanel.add(processorsTable);
-		add(processorsPanel);
+		JButton addProcessorBtn = new JButton(new AbstractAction("Add processor") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO
+			}
+		});
+		add(buildPanel("Processors", processorsTable, addProcessorBtn));
 
 		// bottom right in 2x2 grid
 
 		JPanel processorsDetailsPanel = new JPanel();
 		add(processorsDetailsPanel);
+	}
+
+	private JPanel buildPanel(String labelText, JTable table, JButton addBtn) { // used for OutputFile-Table and DataProcessor-Table
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		JLabel label = new JLabel("<html><b>" + labelText + "</b></html>");
+		label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		label.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		panel.add(label);
+		table.setTableHeader(null);
+		JScrollPane tableScrollPane = new JScrollPane(table);
+		tableScrollPane.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		panel.add(tableScrollPane);
+		panel.add(Box.createRigidArea(new Dimension(0, 10)));
+		addBtn.setAlignmentX(Component.RIGHT_ALIGNMENT); // for some reason this works only if the two components above are also set to right-align, even so then they left-align :)
+		panel.add(addBtn);
+		return panel;
 	}
 
 	public void setVadereScenario(ScenarioRunManager scenario) {
