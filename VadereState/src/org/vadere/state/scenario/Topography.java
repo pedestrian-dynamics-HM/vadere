@@ -77,9 +77,6 @@ public class Topography {
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
 	}
 
-	/**
-	 * Creates an empty scenario where bounds and finishTime are empty / zero.
-	 */
 	public Topography() {
 		this(new AttributesTopography(), new AttributesAgent());
 	}
