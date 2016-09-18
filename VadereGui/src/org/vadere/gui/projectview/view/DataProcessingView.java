@@ -3,13 +3,20 @@ package org.vadere.gui.projectview.view;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
 
 public class DataProcessingView extends JPanel {
 
@@ -19,6 +26,8 @@ public class DataProcessingView extends JPanel {
 	private DefaultTableModel filesTableModel;
 	private JTable processorsTable;
 	private DefaultTableModel processorsTableModel;
+	private JPanel filesDetailsPanel;
+	private JPanel processorsDetailsPanel;
 
 	private ScenarioRunManager currentScenario;
 	private boolean isEditable;
@@ -70,7 +79,9 @@ public class DataProcessingView extends JPanel {
 
 		// top right in 2x2 grid
 
-		JPanel filesDetailsPanel = new JPanel();
+		filesDetailsPanel = new JPanel();
+		filesDetailsPanel.setLayout(new GridBagLayout());
+		filesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		add(filesDetailsPanel);
 
 		// bottom left in 2x2 grid
@@ -85,7 +96,8 @@ public class DataProcessingView extends JPanel {
 
 		// bottom right in 2x2 grid
 
-		JPanel processorsDetailsPanel = new JPanel();
+		processorsDetailsPanel = new JPanel();
+		processorsDetailsPanel.setLayout(new BoxLayout(processorsDetailsPanel, BoxLayout.Y_AXIS));
 		add(processorsDetailsPanel);
 	}
 
@@ -121,7 +133,53 @@ public class DataProcessingView extends JPanel {
 	}
 
 	private void handleOutputFileSelected(OutputFile outputFile) {
-		// TODO
+		filesDetailsPanel.removeAll();
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.WEST; // alignment
+		c.ipady = 15; // y-gap between components
+
+		JLabel label = new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>");
+		label.setHorizontalAlignment(SwingConstants.LEFT);
+
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		filesDetailsPanel.add(label, c);
+
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		filesDetailsPanel.add(new JLabel("Type: "), c);
+
+		String[] options = new String[]{
+				NoDataKeyOutputFile.class.getSimpleName(),
+				PedestrianIdOutputFile.class.getSimpleName(),
+				TimestepOutputFile.class.getSimpleName(),
+				TimestepPedestrianIdOutputFile.class.getSimpleName()
+		};
+		JComboBox typesComboBox = new JComboBox(options);
+		typesComboBox.setSelectedItem(outputFile.getClass().getSimpleName());
+
+		c.gridx = 1;
+		c.gridy = 1;
+		filesDetailsPanel.add(typesComboBox, c);
+
+		StringBuilder sb = new StringBuilder();
+		outputFile.getProcessorIds().forEach(id -> sb.append(", ").append(id));
+		JTextField processorIDsTextField = new JTextField();
+		processorIDsTextField.setText(sb.length() > 2 ? sb.substring(2) : "");
+
+		c.gridx = 0;
+		c.gridy = 2;
+		filesDetailsPanel.add(new JLabel("Processors: "), c);
+
+		c.gridx = 1;
+		c.gridy = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		filesDetailsPanel.add(processorIDsTextField, c);
+
+		revalidate();
 	}
 
 	private void handleDataProcessorSelected(DataProcessor dataProcessor) {
