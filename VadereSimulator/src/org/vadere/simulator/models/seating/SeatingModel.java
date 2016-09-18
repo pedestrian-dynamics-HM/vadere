@@ -25,8 +25,10 @@ import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import com.vividsolutions.jts.math.MathUtil;
@@ -68,12 +70,12 @@ public class SeatingModel implements ActiveCallback, Model {
 		
 		// choose compartment for those peds without a target
 		pedestrians.stream()
-				.filter(p -> p.getTargets().isEmpty())
+				.filter(this::isNoTargetAssigned)
 				.forEach(this::assignCompartmentTarget);
 		
 		// choose seat group and seat for those peds that wait at an interim target
 		pedestrians.stream()
-				.filter(p -> !p.getTargets().isEmpty() && !p.hasNextTarget())
+				.filter(this::isPedestrianAtInterimTarget)
 				.forEach(this::assignSeatTarget);
 	}
 	
@@ -88,6 +90,18 @@ public class SeatingModel implements ActiveCallback, Model {
 		final int entranceAreaIndex = 5; // TODO get entrance area where person spawned
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
 		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
+	}
+
+	private boolean isNoTargetAssigned(Pedestrian p) {
+		return p.getTargets().isEmpty();
+	}
+	
+	private boolean isPedestrianAtInterimTarget(Pedestrian p) {
+		final Target target = topography.getTarget(p.getNextTargetId());
+		final VShape targetShape = target.getAttributes().getShape();
+		final double distance = targetShape.distance(p.getPosition());
+		return p.getTargets().size() == 1 && distance < 0.5;
+		// TODO incorrect condition
 	}
 
 	@Override
