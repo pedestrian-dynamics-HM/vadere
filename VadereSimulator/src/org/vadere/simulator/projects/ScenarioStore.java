@@ -53,31 +53,4 @@ public class ScenarioStore {
 		}
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		ScenarioStore that = (ScenarioStore) o;
-
-		if (attributesList != null ? !attributesList.equals(that.attributesList) : that.attributesList != null)
-			return false;
-		if (attributesSimulation != null ? !attributesSimulation.equals(that.attributesSimulation)
-				: that.attributesSimulation != null)
-			return false;
-		if (topography != null ? !topography.equals(that.topography) : that.topography != null)
-			return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = attributesList != null ? attributesList.hashCode() : 0;
-		result = 31 * result + (attributesSimulation != null ? attributesSimulation.hashCode() : 0);
-		result = 31 * result + (topography != null ? topography.hashCode() : 0);
-		return result;
-	}
 }
