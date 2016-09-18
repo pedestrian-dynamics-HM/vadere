@@ -25,6 +25,8 @@ public class DataProcessingView extends JPanel {
 		GridLayout gridLayout = new GridLayout(2, 2);
 		setLayout(gridLayout);
 
+		// set up table models
+
 		filesTableModel = new DefaultTableModel(new String[] {"Files"}, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -32,27 +34,43 @@ public class DataProcessingView extends JPanel {
 			}
 		};
 		filesTableModel.addRow(new String[] {"test.txt"});
-		filesTable = new JTable(filesTableModel);
-
-		JPanel filesPanel = new JPanel();
-		filesPanel.add(new JLabel("Files:"));
-		filesPanel.add(filesTable);
-		add(filesPanel);
-
-		JPanel filesDetailsPanel = new JPanel();
-		filesDetailsPanel.setBorder(BorderFactory.createLineBorder(Color.red));
-		add(filesDetailsPanel);
 
 		processorsTableModel = new DefaultTableModel(new String[] {"ID", "Name"}, 0);
 		processorsTableModel.addRow(new String[] {"0", "PedestrianPositionProcessor"});
-		processorsTable = new JTable(processorsTableModel);
+
+		// top left in 2x2 grid
+
+		JPanel filesPanel = new JPanel();
+		filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
+		JLabel filesLabel = new JLabel("<html><b>Files</b></html>");
+		filesLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		filesPanel.add(filesLabel);
+		filesTable = new JTable(filesTableModel);
+		filesTable.setAlignmentX(Component.LEFT_ALIGNMENT);
+		filesPanel.add(filesTable);
+		add(filesPanel);
+
+		// top right in 2x2 grid
+
+		JPanel filesDetailsPanel = new JPanel();
+		add(filesDetailsPanel);
+
+		// bottom left in 2x2 grid
+
 		JPanel processorsPanel = new JPanel();
-		processorsPanel.add(new JLabel("Processors:"));
+		processorsPanel.setLayout(new BoxLayout(processorsPanel, BoxLayout.PAGE_AXIS));
+		JLabel processorsLabel = new JLabel("<html><b>Processors</b></html>");
+		processorsLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		processorsPanel.add(processorsLabel);
+		processorsTable = new JTable(processorsTableModel);
+		processorsTable.getColumnModel().getColumn(0).setMaxWidth(40);
+		processorsTable.setAlignmentX(Component.LEFT_ALIGNMENT);
 		processorsPanel.add(processorsTable);
 		add(processorsPanel);
 
+		// bottom right in 2x2 grid
+
 		JPanel processorsDetailsPanel = new JPanel();
-		processorsDetailsPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
 		add(processorsDetailsPanel);
 	}
 
