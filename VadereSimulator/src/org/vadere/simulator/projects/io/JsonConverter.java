@@ -174,6 +174,12 @@ public abstract class JsonConverter {
 		return mapper;
 	}
 
+	public static <T> T deserializeObjectFromJson(String json, Class<T> objectClass) throws JsonProcessingException, IOException, TextOutOfNodeException {
+		final JsonNode node = mapper.readTree(json);
+		checkForTextOutOfNode(json);
+		return mapper.treeToValue(node, objectClass);
+	}
+
 	// - - - - DESERIALIZING - - - -
 
 	public static JsonNode deserializeToNode(String dev) throws IOException {
@@ -281,9 +287,7 @@ public abstract class JsonConverter {
 
 	public static AttributesSimulation deserializeAttributesSimulation(String json)
 			throws IOException, TextOutOfNodeException {
-		JsonNode node = mapper.readTree(json);
-		checkForTextOutOfNode(json);
-		return deserializeAttributesSimulationFromNode(node);
+		return deserializeObjectFromJson(json, AttributesSimulation.class);
 	}
 
 	private static AttributesSimulation deserializeAttributesSimulationFromNode(JsonNode node)
