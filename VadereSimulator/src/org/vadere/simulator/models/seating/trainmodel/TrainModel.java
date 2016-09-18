@@ -164,6 +164,18 @@ public class TrainModel {
 		return numberOfEntranceAreas;
 	}
 
+	public Compartment getCompartment(int index) {
+		return compartments.get(index);
+	}
+
+	public SeatGroup getSeatGroup(int compartmentIndex, int seatGroupIndex) {
+		return getCompartment(compartmentIndex).getSeatGroup(seatGroupIndex);
+	}
+	
+	public Seat getSeat(int compartmentIndex, int seatGroupIndex, int seatIndex) {
+		return getSeatGroup(compartmentIndex, seatGroupIndex).getSeat(seatIndex);
+	}
+	
 	public List<SeatGroup> getSeatGroups() {
 		return Collections.unmodifiableList(seatGroups);
 	}
@@ -190,10 +202,6 @@ public class TrainModel {
 		return new ArrayList<>(topography.getElements(Pedestrian.class));
 	}
 	
-	public Compartment getCompartment(int index) {
-		return compartments.get(index);
-	}
-
 	private List<Target> findTargets(Rectangle2D box) {
 		return findScenarioElement(topography.getTargets(), box);
 	}
