@@ -12,6 +12,7 @@ import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.state.attributes.processor.AttributesLogEventProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 /**

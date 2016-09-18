@@ -1,6 +1,7 @@
-package org.vadere.simulator.projects.dataprocessing.outputfile;
+package org.vadere.simulator.models.seating;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 
 public class LogEventOutputFile extends OutputFile<IdDataKey> {
 

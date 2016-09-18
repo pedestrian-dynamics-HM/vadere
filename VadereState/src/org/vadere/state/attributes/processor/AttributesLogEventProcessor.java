@@ -1,8 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.state.attributes.Attributes;
-
-public class AttributesLogEventProcessor extends Attributes {
+public class AttributesLogEventProcessor extends AttributesProcessor {
 	
 	private int compartmentIndex = 0;
 
