@@ -21,7 +21,6 @@ public class TestTrainModel {
 	private static final int nInterimDestinations = nCompartments * 3 - 4; // includes 2 targets from half-compartments
 	private static final int nSeatGroups = nCompartments * 4 - 4;
 	private static final int nSeats = nSeatGroups * 4;
-	private static final int nPersons = 0;
 
 	private TrainModel trainModel;
 
@@ -36,7 +35,10 @@ public class TestTrainModel {
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
-		assertEquals(nPersons, trainModel.getPedestrians().size());
+		
+		// Peds are created by the main model when the simulation starts!
+		// They don't really exist before that.
+		assertEquals(0, trainModel.getPedestrians().size());
 	}
 	
 	@Test

@@ -197,7 +197,11 @@ public class TrainModel {
 		return Collections.unmodifiableList(interimDestinations);
 	}
 
-	/** Return a new list of all pedestrians in the scenario. */
+	/**
+	 * Return a new list of all pedestrians in the scenario. Pedestrians that
+	 * are already defined in the topography are not counted until the
+	 * simulation has started.
+	 */
 	public Collection<Pedestrian> getPedestrians() {
 		return new ArrayList<>(topography.getElements(Pedestrian.class));
 	}
