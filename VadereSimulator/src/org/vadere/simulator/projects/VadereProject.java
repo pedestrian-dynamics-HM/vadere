@@ -39,9 +39,6 @@ public class VadereProject implements ScenarioFinishedListener {
 	private Path outputDirectory;
 	private int[] migrationStats; // scenarios: [0] total, [1] legacy'ed, [2] nonmigratable
 
-	/**
-	 * @param scenarios
-	 */
 	public VadereProject(final String name, final Iterable<ScenarioRunManager> scenarios) {
 		this.name = name;
 		scenarios.forEach(scenario -> addScenario(scenario));
@@ -259,12 +256,6 @@ public class VadereProject implements ScenarioFinishedListener {
 	public ScenarioRunManager getScenario(int index) {
 		return getScenarios().toArray(new ScenarioRunManager[] {})[index];
 	}
-
-	/*
-	 * public void removeScenario(int row) {
-	 * removeScenario(this.getScenario(row));
-	 * }
-	 */
 
 	public void removeScenario(final ScenarioRunManager scenario) {
 		scenarios.remove(scenario.getName());
