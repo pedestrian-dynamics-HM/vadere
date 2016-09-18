@@ -8,7 +8,7 @@ import javax.swing.JFileChooser;
 
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.gui.topographycreator.utils.JSONWriter;
+import org.vadere.gui.topographycreator.utils.TopographyJsonWriter;
 
 /**
  * Action: save the topography to a new file.
@@ -40,7 +40,7 @@ public class ActionSaveTopography extends TopographyAction {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
 			// new XMLWriter(getScenarioPanelModel(), file).writeScenario();
-			JSONWriter.writeTopography(getScenarioPanelModel().build(), file);
+			TopographyJsonWriter.writeTopography(getScenarioPanelModel().build(), file);
 			resources.setProperty("last_save_point", file.getAbsolutePath());
 		}
 	}
