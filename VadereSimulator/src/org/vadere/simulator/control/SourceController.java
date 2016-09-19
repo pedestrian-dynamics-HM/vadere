@@ -186,7 +186,7 @@ public class SourceController {
 		// TODO [priority=high] [task=refactoring] why only if he has no targets? because the createElement method
 		// might add some.
 		if (newElement.getTargets().isEmpty()) {
-			newElement.setTargets(new LinkedList<>(source.getAttributes().getTargetIds()));
+			newElement.setTargets(new LinkedList<>(sourceAttributes.getTargetIds()));
 		}
 
 		topography.addElement(newElement);
@@ -202,7 +202,7 @@ public class SourceController {
 				return dynamicElementFactory.createElement(position, 0, Car.class);
 			default:
 				throw new IllegalArgumentException("The controller's source has an unsupported element type: "
-						+ this.source.getAttributes().getDynamicElementType());
+						+ sourceAttributes.getDynamicElementType());
 		}
 	}
 
