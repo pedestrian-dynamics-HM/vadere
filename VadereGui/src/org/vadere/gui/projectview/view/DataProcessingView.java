@@ -129,9 +129,13 @@ public class DataProcessingView extends JPanel {
 	public void setVadereScenario(ScenarioRunManager scenario) {
 		this.currentScenario = scenario;
 
+		filesTableModel.setRowCount(0);
+		filesDetailsPanel.removeAll();
 		scenario.getDataProcessingJsonManager().getOutputFiles()
 				.forEach(outputFile -> filesTableModel.addRow(new OutputFile[] {outputFile}));
 
+		processorsTableModel.setRowCount(0);
+		processorsDetailsPanel.removeAll();
 		scenario.getDataProcessingJsonManager().getDataProcessors()
 				.forEach(dataProcessor -> processorsTableModel.addRow(new DataProcessor[] {dataProcessor}));
 	}
