@@ -45,11 +45,13 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void init(ProcessorManager manager) {
 		attributes = (AttributesLogEventProcessor) getAttributes();
-		trainModel = getTrainModelFromProcessorManager(manager);
 	}
 
 	@Override
 	public void preLoop(SimulationState state) {
+		// TODO ProcessorManager should be an extra parameter
+		trainModel = getTrainModelFromProcessorManager(state.getProcessorManager());
+
 		// TODO only use seats in attributes.getCompartmentIndex()
 		emptySeats = new LinkedList<>(trainModel.getSeats()); // will be filtered in writeNewSitDownEvents()
 		time = LocalTime.now();
