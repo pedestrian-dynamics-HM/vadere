@@ -9,6 +9,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+/**
+ * Base class for data processors.
+ *
+ * This class contains all common functionality for all data processors.
+ * It provides access to the internal data map for saving concrete data of type <tt>V</tt> with key type <tt>K</tt>.
+ *
+ * The methods <tt>preLoop</tt> and <tt>postLoop</tt> are called at corresponding points in time related to the simulation loop.
+ *
+ * The method <tt>doUpdate</tt> gets called after every simulation step with the current <tt>SimulationState</tt>.
+ * Here, one gets the opportunity to compute a new value or to update the state for a computation in <tt>postLoop</tt>.
+ * The computed value can be stored afterwards in the data by using the <tt>addValue</tt> method.
+ *
+ * To get specific attributes defined in JSON or access to the <tt>MainModel</tt>, one has to use the <tt>init</tt> method which
+ * gives access to all significant things via the argument <tt>manager</tt> of type <tt>ProcessorManager</tt>.
+ *
+ * @param <K> key type
+ * @param <V> value type
+ *
+ */
+
 public abstract class DataProcessor<K extends Comparable<K>, V> {
 	private int id;
 	private AttributesProcessor attributes;

@@ -15,6 +15,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Base class for all types of output files.
+ *
+ * This class knows all the data processors of which the data should be saved.
+ * It writes the data with the specified <tt>separator</tt> sign into a file specified by <tt>filename</tt>.
+ *
+ * @param <K> key type
+ *
+ */
+
 public abstract class OutputFile<K extends Comparable<K>> {
 	private String[] keyHeaders;
 	private String fileName;
@@ -24,7 +34,7 @@ public abstract class OutputFile<K extends Comparable<K>> {
 
     private String separator;
 
-	OutputFile(final String... keyHeaders) {
+	protected OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
 		this.dataProcessors = new ArrayList<>();
 	}

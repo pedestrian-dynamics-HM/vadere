@@ -2,13 +2,12 @@ package org.vadere.simulator.models;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
-
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.data.FindByClass;
 
 /**
  * Interface for a simulation model. The <code>initialize</code> method must be called before usage!
@@ -24,20 +23,16 @@ public interface Model {
 	void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random);
 
-	@SuppressWarnings("unchecked")
 	public static <T extends Attributes> T findAttributes(List<Attributes> attributesList, final Class<T> type) {
-		List<T> validAttributes = attributesList.stream()
-				.filter(attr -> attr.getClass() == type)
-				.map(attr -> (T) attr)
-				.collect(Collectors.toList());
-
-		if (validAttributes.isEmpty()) {
+		try {
+			final T a = FindByClass.findSingleObjectOfClass(attributesList, type);
+			if (a != null) {
+				return a;
+			}
 			throw new AttributesNotFoundException(type);
-		} else if (validAttributes.size() > 1) {
+		} catch (IllegalArgumentException e) {
 			throw new AttributesMultiplyDefinedException(type);
 		}
-
-		return validAttributes.get(0);
 	}
 
 }

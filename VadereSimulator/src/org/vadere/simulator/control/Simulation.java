@@ -4,7 +4,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -56,12 +55,12 @@ public class Simulation {
 	private SimulationState simulationState;
 	private ScenarioStore scenarioStore;
 	private String name;
-	private Model model;
+	private MainModel mainModel;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
 		this.name = name;
-		this.model = mainModel;
+		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.attributesSimulation;
 		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
@@ -125,7 +124,7 @@ public class Simulation {
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
 
 		for (ActiveCallback ac : activeCallbacks) {
 			ac.postLoop(simTimeInSec);
@@ -143,7 +142,7 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			processorManager.setModel(this.model);
+			processorManager.setMainModel(mainModel);
 			processorManager.initOutputFiles();
 
 			preLoop();
@@ -200,13 +199,13 @@ public class Simulation {
 			postLoop();
 
 			processorManager.writeOutput();
-			this.logger.info("Logged all processor in logfiles");
+			logger.info("Logged all processor in logfiles");
 		}
 	}
 
 	private SimulationState initialSimulationState() {
 		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, this.processorManager);
+				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step);
 
 		return state;
 	}
@@ -214,7 +213,7 @@ public class Simulation {
 	private void updateWriters(double simTimeInSec) {
 
 		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, this.processorManager);
+				new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
 
 		this.simulationState = simulationState;
 	}

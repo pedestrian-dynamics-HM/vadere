@@ -17,7 +17,7 @@ public class PointDensityGaussianAlgorithm extends PointDensityAlgorithm {
 	private int lastStep;
 
 	public PointDensityGaussianAlgorithm(double scale, double standDev, boolean isObstacleDensity) {
-		super("Gaussian" + scale);
+		super("gaussian" + scale);
 
 		this.scale = scale;
 		this.standDev = standDev;

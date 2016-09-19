@@ -3,7 +3,6 @@ package org.vadere.gui.projectview.view;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.postvisualization.control.ActionOpenFile;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.ActionAddScenario;
@@ -42,7 +41,6 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
@@ -175,10 +173,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	public void error(final ScenarioRunManager scenario, final int scenarioLefts, final Throwable throwable) {
 		replace(scenario, VadereState.INTERRUPTED);
 		new Thread(
-				() -> IOUtils.errorBox(
-						Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario + ": "
-								+ throwable,
-						Messages.getString("ProjectView.simulationRunErrorDialog.title"))).start();
+				() -> {
+					IOUtils.errorBox(Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario
+							+ ": " + throwable, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
+				}).start();
 	}
 
 	private void replace(final ScenarioRunManager scenarioRM, final VadereState state) {

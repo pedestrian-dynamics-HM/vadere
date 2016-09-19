@@ -13,7 +13,7 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
     private VRectangle waitingArea;
 
     public PedestrianWaitingEndTimeProcessor() {
-        super("twaitend");
+        super("waitingEndTime");
     }
 
     @Override

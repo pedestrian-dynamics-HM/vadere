@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
     public PedestrianEndTimeProcessor() {
-        super("tend");
+        super("endTime");
     }
 
     @Override

@@ -30,12 +30,13 @@ public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 
 					final double spawnDelay = source.get("spawnDelay").asDouble();
 					final ObjectNode s = (ObjectNode) source;
+					final JsonNode distribution = source.get("interSpawnTimeDistribution");
 
 					// If spawn delay is set AND constant spawn rate algorithm is used:
 					// copy spawn delay to distribution parameters
 					if (spawnDelay != -1.0 &&
-							source.get("interSpawnTimeDistribution").asText()
-							.equals(AttributesSource.CONSTANT_DISTRIBUTION)) {
+							(distribution == null
+							|| distribution.asText().equals(AttributesSource.CONSTANT_DISTRIBUTION))) {
 
 						s.set("distributionParameters", JsonConverter.toJsonNode(new Double[] {spawnDelay}));
 					}

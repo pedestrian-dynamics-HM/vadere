@@ -13,7 +13,7 @@ public class EvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 
     public EvacuationTimeProcessor() {
-        super("tevac");
+        super("evacuationTime");
     }
 
     @Override

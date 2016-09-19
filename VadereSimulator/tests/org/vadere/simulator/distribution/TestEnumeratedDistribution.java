@@ -20,6 +20,7 @@ public class TestEnumeratedDistribution {
 	private static final int SAMPLE_COUNT = 1000;
 
 	// WARNING: this is a statistical test. in case of failure, just run it again.
+	// TODO use new annotation @StatisticalTestCase once seating model branch is merged
 	@Test
 	public void testEnumeratedIntegerDistributionWithFractions() {
 		EnumeratedIntegerDistribution d = new EnumeratedIntegerDistribution(TEST_DATA, TEST_FRACTIONS);
@@ -30,6 +31,7 @@ public class TestEnumeratedDistribution {
 	}
 
 	// WARNING: this is a statistical test. in case of failure, just run it again.
+	// TODO use new annotation @StatisticalTestCase once seating model branch is merged
 	@Test
 	public void testEnumeratedDistributionWithFractions() {
 		List<Pair<Integer, Double>> list = new ArrayList<>(2);

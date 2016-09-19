@@ -10,7 +10,7 @@ import java.util.Set;
 public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
 
 	public PedestrianStartTimeProcessor() {
-		super("tstart");
+		super("startTime");
 	}
 
 	@Override

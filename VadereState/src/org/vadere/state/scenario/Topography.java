@@ -111,10 +111,7 @@ public class Topography {
 	}
 
 	/**
-	 * Returns a List containing Targets with the specific id. This List maybe empty.
-	 * 
-	 * @param targetId
-	 * @return
+	 * Returns a list containing Targets with the specific id. This list may be empty.
 	 */
 	public List<Target> getTargets(final int targetId) {
 		return getTargets().stream().filter(t -> t.getId() == targetId).collect(Collectors.toList());
@@ -140,7 +137,7 @@ public class Topography {
 		// TODO [priority=medium] [task=refactoring] this is needed for the SimulationDataWriter. Refactor in the process of refactoring the Writer.
 		if (DynamicElement.class.isAssignableFrom(elementType)) {
 
-			DynamicElementContainer result = new DynamicElementContainer<DynamicElement>(this.getBounds(), CELL_SIZE);
+			DynamicElementContainer result = new DynamicElementContainer<>(this.getBounds(), CELL_SIZE);
 			for (Pedestrian ped : pedestrians.getElements()) {
 				result.addElement(ped);
 			}
@@ -221,12 +218,6 @@ public class Topography {
 		this.teleporter = teleporter;
 	}
 
-	/*
-	 * public double getFinishTime() {
-	 * return attributes.getFinishTime();
-	 * }
-	 */
-
 	public <T extends DynamicElement> void addInitialElement(T element) {
 		((DynamicElementContainer<T>) this.getContainer(element.getClass())).addInitialElement(element);
 	}
@@ -277,8 +268,6 @@ public class Topography {
 	 * Adds a given obstacle to the list of obstacles as well as the list of boundary obstacles.
 	 * This way, the boundary can both be treated like normal obstacles, but can also be removed for
 	 * writing the topography to file.
-	 * 
-	 * @param obstacle
 	 */
 	public void addBoundary(Obstacle obstacle) {
 		this.addObstacle(obstacle);
@@ -391,88 +380,6 @@ public class Topography {
 
 	public boolean hasBoundary() {
 		return this.boundaryObstacles.size() > 0;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((attributes == null) ? 0 : attributes.hashCode());
-		result = prime * result
-				+ ((attributesPedestrian == null) ? 0 : attributesPedestrian.hashCode());
-		result = prime
-				* result
-				+ ((boundaryObstacles == null) ? 0 : boundaryObstacles
-						.hashCode());
-		result = prime * result
-				+ ((obstacles == null) ? 0 : obstacles.hashCode());
-		result = prime * result
-				+ ((stairs == null) ? 0 : stairs.hashCode());
-		result = prime * result
-				+ ((pedestrians == null) ? 0 : pedestrians.hashCode());
-		result = prime * result + ((sources == null) ? 0 : sources.hashCode());
-		result = prime * result + ((targets == null) ? 0 : targets.hashCode());
-		result = prime * result
-				+ ((teleporter == null) ? 0 : teleporter.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Topography))
-			return false;
-		Topography other = (Topography) obj;
-		if (attributes == null) {
-			if (other.attributes != null)
-				return false;
-		} else if (!attributes.equals(other.attributes))
-			return false;
-		if (attributesPedestrian == null) {
-			if (other.attributesPedestrian != null)
-				return false;
-		} else if (!attributesPedestrian.equals(other.attributesPedestrian))
-			return false;
-		if (boundaryObstacles == null) {
-			if (other.boundaryObstacles != null)
-				return false;
-		} else if (!boundaryObstacles.equals(other.boundaryObstacles))
-			return false;
-		if (obstacles == null) {
-			if (other.obstacles != null)
-				return false;
-		} else if (!obstacles.equals(other.obstacles))
-			return false;
-		if (stairs == null) {
-			if (other.stairs != null)
-				return false;
-		} else if (!stairs.equals(other.stairs))
-			return false;
-		if (pedestrians == null) {
-			if (other.pedestrians != null)
-				return false;
-		} else if (!pedestrians.equals(other.pedestrians))
-			return false;
-		if (sources == null) {
-			if (other.sources != null)
-				return false;
-		} else if (!sources.equals(other.sources))
-			return false;
-		if (targets == null) {
-			if (other.targets != null)
-				return false;
-		} else if (!targets.equals(other.targets))
-			return false;
-		if (teleporter == null) {
-			if (other.teleporter != null)
-				return false;
-		} else if (!teleporter.equals(other.teleporter))
-			return false;
-		return true;
 	}
 
 }

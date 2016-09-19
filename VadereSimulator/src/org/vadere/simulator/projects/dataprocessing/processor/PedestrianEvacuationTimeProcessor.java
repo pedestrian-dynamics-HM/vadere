@@ -10,7 +10,7 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 	private PedestrianStartTimeProcessor pedStTimeProc;
 
 	public PedestrianEvacuationTimeProcessor() {
-		super("tevac");
+		super("evacuationTime");
 	}
 
 	@Override

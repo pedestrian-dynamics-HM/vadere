@@ -4,9 +4,6 @@ import java.util.*;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 public class Pedestrian extends Agent {
@@ -20,11 +17,9 @@ public class Pedestrian extends Agent {
 
 	private LinkedList<Integer> groupIds;
 
+	/** Used only for JSON serialization? */
+	// TODO used at all? Car does NOT have this field. remove if unused!
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN;
-
-
-	// this is for the queuing game
-	// private PedestrianAttitudeType attituteType = PedestrianAttitudeType.COMPETITIVE;
 
 	/* this constructor will be called by gson */
 	@SuppressWarnings("unused")
@@ -78,14 +73,9 @@ public class Pedestrian extends Agent {
 		return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
 	}
 
-	// Setters...
-
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
-
-
-	// Getters...
 
 	public VShape getInformationShape() {
 		return null;

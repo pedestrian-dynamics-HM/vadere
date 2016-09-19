@@ -6,13 +6,20 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 public abstract class Agent implements DynamicElement {
+	
+	/**
+	 * Source where the agent was spawned. The {@link SourceController} should
+	 * set this field. It may be <code>null</code> when the agent is created
+	 * in different way.
+	 */
+	private Source source;
+
 	private LinkedList<Integer> targetIds;
 	private VPoint position;
 	private Vector2D velocity;
@@ -98,20 +105,14 @@ public abstract class Agent implements DynamicElement {
 		return new VCircle(position, attributes.getRadius());
 	}
 
+	public Source getSource() {
+		return source;
+	}
 
 	@Override
 	public int getId() {
 		return attributes.getId();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see scenario.ScenarioElement#getType()
-	 */
-	@Override
-	public abstract ScenarioElementType getType();
-
 
 	@Override
 	public abstract Agent clone();
@@ -196,6 +197,10 @@ public abstract class Agent implements DynamicElement {
 		this.nextTargetListIndex = nextTargetListIndex;
 	}
 
+	public void setSource(Source source) {
+		this.source = source;
+	}
+
 	public void incrementNextTargetListIndex() {
 		// Deprecated target list usage
 		if (nextTargetListIndex == -1) {
@@ -222,4 +227,5 @@ public abstract class Agent implements DynamicElement {
 	public void setFreeFlowSpeed(double freeFlowSpeed) {
 		this.freeFlowSpeed = freeFlowSpeed;
 	}
+
 }

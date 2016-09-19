@@ -1,18 +1,5 @@
 package org.vadere.simulator.projects;
 
-import au.com.bytecode.opencsv.CSVReader;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.models.MainModelBuilder;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.io.filewatcher.LockFileHandler;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -26,6 +13,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.control.Simulation;
+import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.io.filewatcher.LockFileHandler;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Can be used to start Vadere in [lock] mode.
@@ -41,14 +41,7 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 
 	private String timeStepFile;
 
-	private String outputFormat;
-	private String outputVariables;
-	private String tsfFormat;
-	private String tsfVariables;
-
 	private String lockDirectory;
-
-	private boolean outputAll;
 
 	public ScenarioRunLocked(String name, ScenarioStore store) {
 		super(name, store);
@@ -147,23 +140,12 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 	public void setWaitOnLockData(String lockDirectory, String timeStepFile, Boolean outputAll) {
 		this.lockDirectory = lockDirectory;
 		this.timeStepFile = timeStepFile;
-		this.outputAll = outputAll;
 
 		try {
 			this.lockFileHandler = new LockFileHandler(lockDirectory);
 		} catch (Exception e) {
 			logger.error(e);
 		}
-	}
-
-	public void setOutputFormat(String format, String variables) {
-		this.outputFormat = format;
-		this.outputVariables = variables;
-	}
-
-	public void setTSFFormat(String format, String variables) {
-		this.tsfFormat = format;
-		this.tsfVariables = variables;
 	}
 
 	private Topography prepareTopographyWithTSF(Topography topography) throws IOException {

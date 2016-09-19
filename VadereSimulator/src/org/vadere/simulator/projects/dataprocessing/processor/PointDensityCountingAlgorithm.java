@@ -9,7 +9,7 @@ public class PointDensityCountingAlgorithm extends PointDensityAlgorithm {
 	private double circArea;
 
 	public PointDensityCountingAlgorithm(double radius) {
-		super("Counting");
+		super("counting");
 
 		this.radius = radius;
 		this.circArea = this.radius * this.radius * Math.PI;

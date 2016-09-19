@@ -15,7 +15,7 @@ public class AreaSpeedProcessor extends AreaDataProcessor<Double> {
     private PedestrianVelocityProcessor pedVelProc;
 
     public AreaSpeedProcessor() {
-        this.setHeader("area-speed");
+        this.setHeader("areaSpeed");
     }
 
     @Override
