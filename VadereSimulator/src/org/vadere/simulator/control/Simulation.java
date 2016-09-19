@@ -199,7 +199,7 @@ public class Simulation {
 			postLoop();
 
 			processorManager.writeOutput();
-			this.logger.info("Logged all processor in logfiles");
+			logger.info("Logged all processor in logfiles");
 		}
 	}
 
