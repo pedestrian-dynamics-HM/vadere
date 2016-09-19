@@ -1,22 +1,5 @@
 package org.vadere.simulator.dataprocessing;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.ScenarioRunManager;
@@ -29,6 +12,21 @@ import org.vadere.state.simulation.Step;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class TestTrajectoryReader {
 
@@ -82,8 +80,7 @@ public class TestTrajectoryReader {
 
 		IntStream.range(0, sortedSteps.size())
 				.forEach(i -> assertTrue("missing step " + i, sortedSteps.get(i).getStepNumber() == i + 1));
-		IntStream.range(0, sortedSteps.size()).forEach(i -> assertTrue("missing step " + i,
-				EPSILON < Math.abs((i + 1) * 0.4 - sortedSteps.get(i).getSimTimeInSec().get())));
+
 		assertTrue("wrong number of pedestrians", pedestriansByStep.get(sortedSteps.get(10)).size() == 5);
 		assertTrue("wrong number of pedestrians", pedestriansByStep.get(sortedSteps.get(39)).size() == 7);
 	}

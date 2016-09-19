@@ -10,11 +10,6 @@ public class Step implements Comparable<Step> {
 	private final Integer stepNumber;
 	private final Double simTimeInSec;
 
-	public Step(final int stepNumber, final double simTimeInSec) {
-		this.stepNumber = stepNumber;
-		this.simTimeInSec = simTimeInSec;
-	}
-
 	public Step(final int stepNumber) {
 		this.stepNumber = stepNumber;
 		this.simTimeInSec = null;
