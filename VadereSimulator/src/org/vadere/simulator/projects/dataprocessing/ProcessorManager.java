@@ -46,6 +46,9 @@ public class ProcessorManager {
 	}
 
 	public MainModel getMainModel() {
+		if (mainModel == null)
+			throw new IllegalStateException(
+					"The main model is not available until the simulation has started (Simulation.run())");
 		return mainModel;
 	}
 
