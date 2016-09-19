@@ -10,8 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.seating.TestTopographyAndModelBuilder;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 
 public class TestTrainModel {
@@ -29,7 +31,7 @@ public class TestTrainModel {
 		trainModel = new TestTopographyAndModelBuilder().getTrainModel();
 	}
 
-		@Test
+	@Test
 	public void testBasicModelProperties() {
 		assertEquals(nEntranceAreas, trainModel.getEntranceAreaCount());
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
@@ -41,6 +43,30 @@ public class TestTrainModel {
 		assertEquals(0, trainModel.getPedestrians().size());
 	}
 	
+	@Test(expected=RuntimeException.class)
+	public void testGetEntranceAreaIndexForPersonFail1() {
+		Pedestrian p = createTestPedestrian();
+		// no source assigned
+		trainModel.getEntranceAreaIndexForPerson(p);
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void testGetEntranceAreaIndexForPersonFail2() {
+		Pedestrian p = createTestPedestrian();
+		// assign source that is not one of the door sources
+		p.setSource(new Source(new AttributesSource(0)));
+		trainModel.getEntranceAreaIndexForPerson(p);
+	}
+	
+	@Test
+	public void testGetEntranceAreaIndexForPerson() {
+		Pedestrian p = createTestPedestrian();
+		for (Source s : trainModel.getAllDoorSources()) {
+			p.setSource(s);
+			assertEquals(trainModel.entranceAreaIndexOfSource(s), trainModel.getEntranceAreaIndexForPerson(p));
+		}
+	}
+
 	@Test
 	public void testGetSeatGroupLimits() {
 		assertTrue(trainModel.getSeatGroup(0) != null);

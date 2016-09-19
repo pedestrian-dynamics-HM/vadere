@@ -261,4 +261,35 @@ public class TrainModel {
 		}
 	}
 
+	public int getEntranceAreaIndexForPerson(Pedestrian p) {
+		final Source source = p.getSource();
+		if (source == null)
+			throw new RuntimeException("Person's source is null.");
+
+		final int index = entranceAreaIndexOfSource(source);
+		if (index == -1)
+			throw new RuntimeException("Person is not spawned at one of the doors.");
+		return index;
+	}
+
+	int entranceAreaIndexOfSource(Source source) {
+		final double x = source.getShape().getCentroid().getX();
+		for (int i = 0; i < getEntranceAreaCount(); i++) {
+			if (isXIn(x, trainGeometry.getEntranceAreaRect(i))) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	List<Source> getAllDoorSources() {
+		final ArrayList<Source> result = new ArrayList<>(leftDoors);
+		result.addAll(rightDoors);
+		return result;
+	}
+
+	private boolean isXIn(double x, Rectangle2D rect) {
+		return x >= rect.getMinX() && x <= rect.getMaxX();
+	}
+
 }

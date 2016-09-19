@@ -87,7 +87,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 	
 	private void assignCompartmentTarget(Pedestrian p) {
-		final int entranceAreaIndex = 5; // TODO get entrance area where person spawned
+		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
 		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
 	}
