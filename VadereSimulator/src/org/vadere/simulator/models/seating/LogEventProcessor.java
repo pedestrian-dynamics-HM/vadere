@@ -32,6 +32,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	
 	private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_LOCAL_TIME; // 15:20:00
 
+	private ProcessorManager processorManager;
 	private AttributesLogEventProcessor attributes;
 	private TrainModel trainModel;
 	private LocalTime time;
@@ -45,12 +46,12 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void init(ProcessorManager manager) {
 		attributes = (AttributesLogEventProcessor) getAttributes();
+		processorManager = manager;
 	}
 
 	@Override
 	public void preLoop(SimulationState state) {
-		// TODO ProcessorManager should be an extra parameter
-		trainModel = getTrainModelFromProcessorManager(state.getProcessorManager());
+		trainModel = getTrainModelFromProcessorManager();
 
 		// TODO only use seats in attributes.getCompartmentIndex()
 		emptySeats = new LinkedList<>(trainModel.getSeats()); // will be filtered in writeNewSitDownEvents()
@@ -66,8 +67,8 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		writeNewSitDownEvents();
 	}
 
-	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {
-		final MainModel mainModel = manager.getMainModel();
+	private TrainModel getTrainModelFromProcessorManager() {
+		final MainModel mainModel = processorManager.getMainModel();
 		final SeatingModel seatingModel = FindByClass.findFirstObjectOfClass(mainModel.getActiveCallbacks(), SeatingModel.class);
 		return seatingModel.getTrainModel();
 	}
