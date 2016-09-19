@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -14,6 +15,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.processor.AttributesLogEventProcessor;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.data.FindByClass;
 
 /**
  * Produce output in same format as LOG_EVENT.csv from the SeatingDataCollection app.
@@ -63,7 +65,8 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	}
 
 	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {
-		final SeatingModel seatingModel = (SeatingModel) manager.getModel();
+		final MainModel mainModel = manager.getMainModel();
+		final SeatingModel seatingModel = FindByClass.findFirstObjectOfClass(mainModel.getActiveCallbacks(), SeatingModel.class);
 		return seatingModel.getTrainModel();
 	}
 
