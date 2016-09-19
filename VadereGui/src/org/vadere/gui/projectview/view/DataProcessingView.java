@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.vadere.gui.components.view.JComboCheckBox;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.stream.Collectors;
 
 
 public class DataProcessingView extends JPanel {
@@ -172,22 +174,28 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 1;
 		c.gridy = 1;
-		filesDetailsPanel.add(typesComboBox, c);
-
-		StringBuilder sb = new StringBuilder();
-		outputFile.getProcessorIds().forEach(id -> sb.append(", ").append(id));
-		JTextField processorIDsTextField = new JTextField();
-		processorIDsTextField.setText(sb.length() > 2 ? sb.substring(2) : "");
 		filesDetailsPanel.add(new JLabel(typeName.substring(typeName.lastIndexOf(".") + 1)), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
 		filesDetailsPanel.add(new JLabel("Processors: "), c);
 
+		JComboCheckBox<Integer> dataProcessorIDsComboCheckBox =
+				new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
+						.getDataProcessors().stream()
+						.filter(dataProcessor -> getDataKey(dataProcessor) == outputFileDataKey) // only show processors with same DataKey as outputFile
+						.map(DataProcessor::getId)
+						.collect(Collectors.toList()));
+
+		dataProcessorIDsComboCheckBox.setCheckedItems(outputFile.getProcessorIds());
+		dataProcessorIDsComboCheckBox.addActionListener(e -> {
+			// TODO Mario?
+		});
+
 		c.gridx = 1;
 		c.gridy = 2;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		filesDetailsPanel.add(processorIDsTextField, c);
+		filesDetailsPanel.add(dataProcessorIDsComboCheckBox, c);
 
 		revalidate();
 		repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
