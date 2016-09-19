@@ -185,6 +185,7 @@ public class DataProcessingView extends JPanel {
 		filesDetailsPanel.add(processorIDsTextField, c);
 
 		revalidate();
+		repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
 	}
 
 	private void handleDataProcessorSelected(DataProcessor dataProcessor) {
@@ -213,6 +214,7 @@ public class DataProcessingView extends JPanel {
 		processorsDetailsPanel.add(attributesTextArea, c);
 
 		revalidate();
+		repaint();
 	}
 
 }
