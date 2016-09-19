@@ -76,12 +76,12 @@ public class TestTrainModel {
 	@Test
 	public void testFirstHalfCompartment() {
 		final Compartment c = trainModel.getCompartment(0);
-		assertTrue(c.getSeatGroups().get(0) == null);
-		assertTrue(c.getSeatGroups().get(1) == null);
-		assertTrue(c.getSeatGroups().get(2) == trainModel.getSeatGroup(0));
-		assertTrue(c.getSeatGroups().get(3) == trainModel.getSeatGroup(1));
+		assertEquals(2, c.getSeatGroups().size());
 
-		assertTrue(c.getSeatGroups().get(2).getSeat(0) == trainModel.getSeats().get(0));
+		assertEquals(trainModel.getSeatGroup(0), c.getSeatGroups().get(0));
+		assertEquals(trainModel.getSeatGroup(1), c.getSeatGroups().get(1));
+
+		assertEquals(trainModel.getSeats().get(0), c.getSeatGroups().get(0).getSeat(0));
 		
 		for (int i = 0; i < nEntranceAreas; i++) {
 			assertEquals(trainModel.getInterimDestinations().get(0),
@@ -92,10 +92,12 @@ public class TestTrainModel {
 	@Test
 	public void testFirstNormalCompartment() {
 		final Compartment c = trainModel.getCompartment(1);
-		assertTrue(c.getSeatGroups().get(0) == trainModel.getSeatGroup(2));
-		assertTrue(c.getSeatGroups().get(1) == trainModel.getSeatGroup(3));
-		assertTrue(c.getSeatGroups().get(2) == trainModel.getSeatGroup(4));
-		assertTrue(c.getSeatGroups().get(3) == trainModel.getSeatGroup(5));
+		assertEquals(4, c.getSeatGroups().size());
+
+		assertEquals(trainModel.getSeatGroup(2), c.getSeatGroups().get(0));
+		assertEquals(trainModel.getSeatGroup(3), c.getSeatGroups().get(1));
+		assertEquals(trainModel.getSeatGroup(4), c.getSeatGroups().get(2));
+		assertEquals(trainModel.getSeatGroup(5), c.getSeatGroups().get(3));
 
 		assertTrue(c.getSeatGroups().get(0).getSeat(0) == trainModel.getSeats().get(8));
 		
@@ -109,10 +111,10 @@ public class TestTrainModel {
 	@Test
 	public void testLastHalfCompartment() {
 		final Compartment c = trainModel.getCompartment(nCompartments - 1);
-		assertTrue(c.getSeatGroups().get(0) == trainModel.getSeatGroup(nSeatGroups - 2));
-		assertTrue(c.getSeatGroups().get(1) == trainModel.getSeatGroup(nSeatGroups - 1));
-		assertTrue(c.getSeatGroups().get(2) == null);
-		assertTrue(c.getSeatGroups().get(3) == null);
+		assertEquals(2, c.getSeatGroups().size());
+
+		assertEquals(trainModel.getSeatGroup(nSeatGroups - 2), c.getSeatGroups().get(0));
+		assertEquals(trainModel.getSeatGroup(nSeatGroups - 1), c.getSeatGroups().get(1));
 		
 		assertTrue(c.getSeatGroups().get(1).getSeat(3) == trainModel.getSeats().get(nSeats - 1));
 		

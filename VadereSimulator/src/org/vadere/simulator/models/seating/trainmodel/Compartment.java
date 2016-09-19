@@ -2,6 +2,7 @@ package org.vadere.simulator.models.seating.trainmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.vadere.state.scenario.Target;
 
@@ -12,6 +13,10 @@ public class Compartment {
 
 	private TrainModel trainModel;
 	private int index;
+	
+	/**
+	 * For half-compartments, the first and the last seat groups respectively are set to null.
+	 */
 	private List<SeatGroup> seatGroups;
 
 	public Compartment(TrainModel trainModel, int index) {
@@ -61,10 +66,13 @@ public class Compartment {
 	}
 
 	/**
-	 * For half-compartments, the first and the last seat groups respectively are set to null.
+	 * A list of the compartment's seat groups. For half-compartments, there are
+	 * only two seat groups in the list.
 	 */
 	public List<SeatGroup> getSeatGroups() {
-		return seatGroups;
+		return seatGroups.stream()
+				.filter(sg -> sg != null)
+				.collect(Collectors.toList());
 	}
 
 	public Target getInterimTargetCloserTo(int entranceAreaIndex) {
