@@ -6,10 +6,10 @@ Every data is computed by a __data processor__, or simply called processor. A pr
 
 There are already some predefined key classes:
 
-	1. TimestepDataKey
-	2. PedestrianIdDataKey
-	3. TimestepPedestrianIdDataKey
-	(4. NoDataKey)
+ 1. TimestepDataKey
+ 2. PedestrianIdDataKey
+ 3. TimestepPedestrianIdDataKey
+ (4. NoDataKey)
 
 __Example__: The class _PedestrianPositionProcessor_ is responsible for "computing" and storing the positions of each pedestrian at every point in time meaning that the corresponding key type is the _TimestepPedestrianIdDataKey_. So, the PedestrianPositionProcessor can be combined with other processors whose data is identified by the same key type (e.g. _PedestrianVelocityProcessor_). The value type is _VPoint_.
 
@@ -26,18 +26,18 @@ For each key type, there exists a corresponding output file type:
 The data processing's JSON structure is:
 ```json
 {
-	"files": [ {
-    	"type": (output file type),
+    "files": [ {
+        "type": (output file type),
         "filename": (filename),
         "processors": [ (processor ids) ],
         "separator": (separator's sign in output file, optional, default is space)
     }, ... ],
     "processors": [ {
-    	"type": (processor type),
+        "type": (processor type),
         "id": (processor's id),
         "attributesType": (attributes' type, optional),
         "attributes": {
-        	(attribute name): (attribute name),
+            (attribute name): (attribute name),
             ...
         } (optional)
     } ]
@@ -83,8 +83,8 @@ The output file is saved in the projects' output' folder of the scenario run (wi
 
 There are two important base classes:
 
-	1. OutputFile<K>
-	2. DataProcessor<K,V>
+ 1. OutputFile<K>
+ 2. DataProcessor<K,V>
 
 Common functionality for every output file, and every processor respectively, is located in the corresponding abstract base class.
 
@@ -109,7 +109,7 @@ The most important method is _doUpdate()_. It is called in every timestep with t
 
 ```java
 protected abstract void doUpdate(final SimulationState state) {
-	int timeStep = state.getStep();
+    int timeStep = state.getStep();
     int amountPeds = state.getTopography().getElements(Pedestrian.class).size();
 
     this.addValue(new TimestepDataKey(timeStep), amountPeds);
@@ -120,22 +120,22 @@ The _init()_ method gets called when the scenario is loading its processors. It 
 
 ```java
 class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
-	private PedestrianPositionProcessor pedPosProc;
+    private PedestrianPositionProcessor pedPosProc;
     private int backSteps;
     ...
     @Override
     public void init(final ProcessorManager manager) {
         AttributesPedestrianVelocityProcessor attributes =
-        	(AttributesPedestrianVelocityProcessor) this.getAttributes();
+            (AttributesPedestrianVelocityProcessor) this.getAttributes();
 
         this.pedPosProc =
-        	(PedestrianPositionProcessor) manager.getProcessor(attributes.getPedestrianPositionProcessorId());
+            (PedestrianPositionProcessor) manager.getProcessor(attributes.getPedestrianPositionProcessorId());
         this.backSteps = attributes.getBackSteps();
     }
 
     @Override
-	public void doUpdate(final SimulationState state) {
-    	// use this.pedPosProc and this.backSteps for your computation
+    public void doUpdate(final SimulationState state) {
+        // use this.pedPosProc and this.backSteps for your computation
     }
     ...
 }
