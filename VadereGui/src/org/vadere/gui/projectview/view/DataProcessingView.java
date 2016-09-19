@@ -169,7 +169,7 @@ public class DataProcessingView extends JPanel {
 		JComboBox typesComboBox = new JComboBox(options);
 		typesComboBox.setSelectedItem(outputFile.getClass().getSimpleName());*/
 
-		Type outputFileDataKey = getDataKey(outputFile);
+		Type outputFileDataKey = getDataKeyForOutputFile(outputFile);
 		String typeName = outputFileDataKey.getTypeName();
 
 		c.gridx = 1;
@@ -183,7 +183,7 @@ public class DataProcessingView extends JPanel {
 		JComboCheckBox<Integer> dataProcessorIDsComboCheckBox =
 				new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
 						.getDataProcessors().stream()
-						.filter(dataProcessor -> getDataKey(dataProcessor) == outputFileDataKey) // only show processors with same DataKey as outputFile
+						.filter(dataProcessor -> getDataKeyForDataProcessor(dataProcessor) == outputFileDataKey) // only show processors with same DataKey as outputFile
 						.map(DataProcessor::getId)
 						.collect(Collectors.toList()));
 
@@ -230,12 +230,16 @@ public class DataProcessingView extends JPanel {
 		repaint();
 	}
 
-	private static Type getDataKey(Object object) {
-		if (object.getClass().getSuperclass().getTypeParameters().length == 0) { // e.g. PedestrianDensityCountingProcessor extends PedestrianDensityProcessor, and only the latter has the type params we want
-			return ((ParameterizedType) object.getClass().getSuperclass().getGenericSuperclass()).getActualTypeArguments()[0];
-		} else {
-			return ((ParameterizedType) object.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+	private static Type getDataKeyForDataProcessor(Object object) {
+		Class cls = object.getClass();
+		while (cls.getSuperclass() != DataProcessor.class) { // climb up until we can get the DataKey from the highest class DataProcessor
+			cls = cls.getSuperclass();
 		}
+		return ((ParameterizedType) cls.getGenericSuperclass()).getActualTypeArguments()[0];
+	}
+
+	private static Type getDataKeyForOutputFile(Object object) {
+		return ((ParameterizedType) object.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
 }
