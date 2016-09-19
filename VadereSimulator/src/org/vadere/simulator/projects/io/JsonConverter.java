@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
@@ -541,14 +540,6 @@ public abstract class JsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
-		return writer.writeValueAsString(node);
-	}
-
-	public static String serializeSimulationStateSnapshot(final SimulationState state, boolean commitHashIncluded) throws JsonProcessingException {
-		ObjectNode node = mapper.createObjectNode();
-		serializeMeta(node, commitHashIncluded, state.getScenarioStore());
-		node.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, state.getProcessorManager().serializeToNode());
-		node.set("vadere", serializeVadereNode(state.getScenarioStore()));
 		return writer.writeValueAsString(node);
 	}
 
