@@ -13,7 +13,11 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public abstract class Agent implements DynamicElement {
 	
-	/** Source where the agent was spawned. */
+	/**
+	 * Source where the agent was spawned. The {@link SourceController} should
+	 * set this field. It may be <code>null</code> when the agent is created
+	 * in different way.
+	 */
 	private Source source;
 
 	private LinkedList<Integer> targetIds;
