@@ -57,7 +57,7 @@ public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPe
 
     @Override
     public void init(final ProcessorManager manager) {
-        Model model = manager.getModel();
+        Model model = manager.getMainModel();
         if (model instanceof OptimalStepsModel)
             this.osm = (OptimalStepsModel) model;
     }
