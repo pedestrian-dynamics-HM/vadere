@@ -7,11 +7,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.io.JsonConverter;
 
@@ -22,7 +18,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 
 public class DataProcessingView extends JPanel {
@@ -159,8 +156,8 @@ public class DataProcessingView extends JPanel {
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 1;
-		filesDetailsPanel.add(new JLabel("Type: "), c);
-
+		filesDetailsPanel.add(new JLabel("Data key: "), c);
+/*
 		String[] options = new String[]{
 				NoDataKeyOutputFile.class.getSimpleName(),
 				PedestrianIdOutputFile.class.getSimpleName(),
@@ -168,7 +165,10 @@ public class DataProcessingView extends JPanel {
 				TimestepPedestrianIdOutputFile.class.getSimpleName()
 		};
 		JComboBox typesComboBox = new JComboBox(options);
-		typesComboBox.setSelectedItem(outputFile.getClass().getSimpleName());
+		typesComboBox.setSelectedItem(outputFile.getClass().getSimpleName());*/
+
+		Type outputFileDataKey = getDataKey(outputFile);
+		String typeName = outputFileDataKey.getTypeName();
 
 		c.gridx = 1;
 		c.gridy = 1;
@@ -178,6 +178,7 @@ public class DataProcessingView extends JPanel {
 		outputFile.getProcessorIds().forEach(id -> sb.append(", ").append(id));
 		JTextField processorIDsTextField = new JTextField();
 		processorIDsTextField.setText(sb.length() > 2 ? sb.substring(2) : "");
+		filesDetailsPanel.add(new JLabel(typeName.substring(typeName.lastIndexOf(".") + 1)), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
@@ -219,6 +220,14 @@ public class DataProcessingView extends JPanel {
 
 		revalidate();
 		repaint();
+	}
+
+	private static Type getDataKey(Object object) {
+		if (object.getClass().getSuperclass().getTypeParameters().length == 0) { // e.g. PedestrianDensityCountingProcessor extends PedestrianDensityProcessor, and only the latter has the type params we want
+			return ((ParameterizedType) object.getClass().getSuperclass().getGenericSuperclass()).getActualTypeArguments()[0];
+		} else {
+			return ((ParameterizedType) object.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		}
 	}
 
 }
