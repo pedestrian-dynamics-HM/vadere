@@ -13,6 +13,7 @@ import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.processor.AttributesLogEventProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.FindByClass;
@@ -46,6 +47,9 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void init(ProcessorManager manager) {
 		attributes = (AttributesLogEventProcessor) getAttributes();
+		if (attributes == null)
+			throw new AttributesNotFoundException(AttributesLogEventProcessor.class); //, "Attributes for log event processor are undefined."
+
 		nextLogEventId = attributes.getFirstLogEventId();
 		processorManager = manager;
 	}
