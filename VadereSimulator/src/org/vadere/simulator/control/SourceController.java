@@ -195,15 +195,20 @@ public class SourceController {
 	}
 
 	private DynamicElement createDynamicElement(final VPoint position) {
-		switch (this.source.getAttributes().getDynamicElementType()) {
+		Agent result;
+		switch (sourceAttributes.getDynamicElementType()) {
 			case PEDESTRIAN:
-				return dynamicElementFactory.createElement(position, 0, Pedestrian.class);
+				result = (Agent) dynamicElementFactory.createElement(position, 0, Pedestrian.class);
+				break;
 			case CAR:
-				return dynamicElementFactory.createElement(position, 0, Car.class);
+				result = (Agent) dynamicElementFactory.createElement(position, 0, Car.class);
+				break;
 			default:
 				throw new IllegalArgumentException("The controller's source has an unsupported element type: "
 						+ sourceAttributes.getDynamicElementType());
 		}
+		result.setSource(source);
+		return result;
 	}
 
 	private LinkedList<VPoint> getDynamicElementPositions(int numDynamicElements) {

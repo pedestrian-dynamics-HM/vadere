@@ -12,6 +12,10 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 public abstract class Agent implements DynamicElement {
+	
+	/** Source where the agent was spawned. */
+	private Source source;
+
 	private LinkedList<Integer> targetIds;
 	private VPoint position;
 	private Vector2D velocity;
@@ -97,6 +101,9 @@ public abstract class Agent implements DynamicElement {
 		return new VCircle(position, attributes.getRadius());
 	}
 
+	public Source getSource() {
+		return source;
+	}
 
 	@Override
 	public int getId() {
@@ -184,6 +191,10 @@ public abstract class Agent implements DynamicElement {
 	 */
 	public void setNextTargetListIndex(int nextTargetListIndex) {
 		this.nextTargetListIndex = nextTargetListIndex;
+	}
+
+	public void setSource(Source source) {
+		this.source = source;
 	}
 
 	public void incrementNextTargetListIndex() {
