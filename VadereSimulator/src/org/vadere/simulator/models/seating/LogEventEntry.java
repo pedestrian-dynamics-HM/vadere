@@ -2,7 +2,6 @@ package org.vadere.simulator.models.seating;
 
 public class LogEventEntry {
 
-	private static final int defaultSurveyId = 0;
 	private static final String NA_STRING = "NA";
 
 	private final String eventType;
@@ -13,8 +12,8 @@ public class LogEventEntry {
 	private final int surveyId;
 	private final String time;
 
-	public LogEventEntry(String time, String eventType, Integer personId, Integer seatNumber) {
-		this(eventType, null, null, personId, seatNumber, defaultSurveyId, time);
+	public LogEventEntry(String time, String eventType, Integer personId, Integer seatNumber, int surveyId) {
+		this(eventType, null, null, personId, seatNumber, surveyId, time);
 	}
 
 	public LogEventEntry(String eventType, Integer extraInt, String extraString, Integer personId, Integer seatNumber,

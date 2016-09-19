@@ -46,6 +46,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void init(ProcessorManager manager) {
 		attributes = (AttributesLogEventProcessor) getAttributes();
+		nextLogEventId = attributes.getFirstLogEventId();
 		processorManager = manager;
 	}
 
@@ -95,13 +96,14 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	}
 
 	private void writeSitDownEvent(Pedestrian person, int seatNumber) {
-		writeEvent(SIT_DOWN_EVENT, person.getId(), seatNumber);
+		writeEvent(SIT_DOWN_EVENT, person.getId() + attributes.getPersonIdOffset(), seatNumber);
 	}
 
 	private void writeEvent(String eventType, Integer personId, Integer seatNumber) {
 		final int logEventId = nextLogEventId++;
 		final String timeString = timeFormatter.format(time);
-		addValue(new IdDataKey(logEventId), new LogEventEntry(timeString, eventType, personId, seatNumber));
+		final int surveyId = attributes.getSurveyId();
+		addValue(new IdDataKey(logEventId), new LogEventEntry(timeString, eventType, personId, seatNumber, surveyId));
 	}
 
 	private void updateTime(SimulationState state) {
