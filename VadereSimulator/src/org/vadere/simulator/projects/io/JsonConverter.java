@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
@@ -258,8 +257,7 @@ public abstract class JsonConverter {
 	public static ScenarioRunManager deserializeScenarioRunManager(String json) throws IOException {
 		return deserializeScenarioRunManagerFromNode(mapper.readTree(json));
 	}
-
-	// TODO [priority=high] [task=deprecation] remove deprecated call. This call is required to deserialize the output processor
+	
 	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
@@ -272,10 +270,6 @@ public abstract class JsonConverter {
 		String description = rootNode.get("description").asText();
 		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, am, as, to);
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
-
-		//scenarioRunManager.removeAllWriters();
-		//ProcessorWriter.fromJsonList(node.get(ProcessorWriter.JSON_ATTRIBUTE_NAME).toString())
-		//		.forEach(writer -> scenarioRunManager.addWriter(writer));
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
 		scenarioRunManager.saveChanges();
@@ -417,13 +411,11 @@ public abstract class JsonConverter {
 		return writer.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}
 
-	// TODO [priority=medium] [task=deprecation] remove deprecated call. This call is required to serialize the output processor
 	public static JsonNode serializeScenarioRunManagerToNode(ScenarioRunManager scenarioRunManager,
 			boolean commitHashIncluded) throws IOException {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
-		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(scenarioRunManager.getAllWriters()));
 		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenarioRunManager.getDataProcessingJsonManager().serializeToNode());
 		rootNode.set("vadere", serializeVadereNode(scenarioStore));
 		return rootNode;
@@ -552,14 +544,6 @@ public abstract class JsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
-		return writer.writeValueAsString(node);
-	}
-
-	public static String serializeSimulationStateSnapshot(final SimulationState state, boolean commitHashIncluded) throws JsonProcessingException {
-		ObjectNode node = mapper.createObjectNode();
-		serializeMeta(node, commitHashIncluded, state.getScenarioStore());
-		node.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, state.getProcessorManager().serializeToNode());
-		node.set("vadere", serializeVadereNode(state.getScenarioStore()));
 		return writer.writeValueAsString(node);
 	}
 

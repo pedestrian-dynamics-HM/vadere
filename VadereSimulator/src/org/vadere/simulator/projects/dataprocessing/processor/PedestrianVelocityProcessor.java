@@ -17,7 +17,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 	private LinkedList<Double> lastSimTimes;
 
 	public PedestrianVelocityProcessor() {
-		super("v");
+		super("velocity");
 
 		this.lastSimTimes = new LinkedList<>();
 		this.lastSimTimes.add(0.0);

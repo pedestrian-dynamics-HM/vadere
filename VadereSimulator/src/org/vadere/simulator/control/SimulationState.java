@@ -1,7 +1,6 @@
 package org.vadere.simulator.control;
 
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -17,21 +16,18 @@ public class SimulationState {
 	private final ScenarioStore scenarioStore;
 	private final int step;
 	private final String name;
-	private ProcessorManager processorManager;
 
 	protected SimulationState(final String name,
 							  final Topography topography,
 							  final ScenarioStore scenarioStore,
 							  final double simTimeInSec,
-							  final int step,
-							  final ProcessorManager processorManager) {
+							  final int step) {
 		this.name = name;
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
 		this.step = step;
 		this.pedestrianPositionMap = new HashMap<>();
 		this.scenarioStore = scenarioStore;
-		this.processorManager = processorManager;
 
 		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
 			pedestrianPositionMap.put(pedestrian.getId(), pedestrian.getPosition());
@@ -76,9 +72,5 @@ public class SimulationState {
 
 	public String getName() {
 		return name;
-	}
-
-	public ProcessorManager getProcessorManager() {
-		return this.processorManager;
 	}
 }

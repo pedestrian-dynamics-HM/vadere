@@ -12,7 +12,7 @@ public class TimestepDataKey implements Comparable<TimestepDataKey> {
     }
 
     public static String getHeader() {
-        return "ts";
+        return "timeStep";
     }
 
 	@Override

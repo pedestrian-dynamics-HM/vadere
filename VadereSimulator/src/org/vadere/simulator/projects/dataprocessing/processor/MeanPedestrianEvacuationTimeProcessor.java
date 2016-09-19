@@ -12,7 +12,7 @@ public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataK
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 
     public MeanPedestrianEvacuationTimeProcessor() {
-        super("tmeanevac");
+        super("meanEvacuationTime");
     }
 
     @Override

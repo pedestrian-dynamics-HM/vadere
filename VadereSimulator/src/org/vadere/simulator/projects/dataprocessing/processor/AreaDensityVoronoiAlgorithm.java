@@ -15,7 +15,7 @@ public class AreaDensityVoronoiAlgorithm extends AreaDensityAlgorithm {
     private VRectangle voronoiArea;
 
     public AreaDensityVoronoiAlgorithm(final VRectangle measurementArea, final VRectangle voronoiArea) {
-        super("Area-Voronoi");
+        super("areaVoronoi");
 
         this.measurementArea = measurementArea;
         this.voronoiArea = voronoiArea;

@@ -327,19 +327,4 @@ public class IOUtils {
 		return JOptionPane.showConfirmDialog(null, infoMessage, title,
 				JOptionPane.YES_NO_CANCEL_OPTION);
 	}
-
-	public static Path getPath(final String stringPath, final String fileName) {
-		try {
-			final Path path = Paths.get(stringPath);
-			Files.createDirectories(path); // TODO it does not make sense to create the same directory for every output file
-
-			final Path fullPath = Paths.get(stringPath, fileName);
-			Files.createFile(fullPath); // TODO it probably does not make sense to create files in advance
-
-			return path;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
 }

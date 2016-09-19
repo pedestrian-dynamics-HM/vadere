@@ -19,6 +19,8 @@ import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -116,7 +118,7 @@ public class ScenarioRunManager implements Runnable {
 			doBeforeSimulation();
 
 			// prepare processor and simulation data writer
-			prepareOutput();
+			createAndSetOutputDirectory();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 				out.println(JsonConverter.serializeScenarioRunManager(this, true));
@@ -263,8 +265,14 @@ public class ScenarioRunManager implements Runnable {
 
 
 	// Output stuff...
-	private void prepareOutput() {
-		this.processorManager.setOutputPath(this.outputPath.toString());
+	private void createAndSetOutputDirectory() {
+		try {
+			// Create output directory
+			Files.createDirectories(outputPath);
+			processorManager.setOutputPath(outputPath.toString());
+		} catch (IOException ex) {
+			throw new UncheckedIOException(ex);
+		}
 	}
 
 	@Override

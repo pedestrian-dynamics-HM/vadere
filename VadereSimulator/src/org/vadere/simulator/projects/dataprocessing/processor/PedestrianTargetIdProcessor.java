@@ -10,7 +10,7 @@ import java.util.Collection;
 public class PedestrianTargetIdProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Integer> {
 
 	public PedestrianTargetIdProcessor() {
-		super("tid");
+		super("targetId");
 	}
 
 	@Override
