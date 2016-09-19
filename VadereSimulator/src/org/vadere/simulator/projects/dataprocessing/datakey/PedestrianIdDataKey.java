@@ -12,7 +12,7 @@ public class PedestrianIdDataKey implements Comparable<PedestrianIdDataKey> {
 	}
 
 	public static String getHeader() {
-		return "pid";
+		return "pedestrianId";
 	}
 
 	@Override

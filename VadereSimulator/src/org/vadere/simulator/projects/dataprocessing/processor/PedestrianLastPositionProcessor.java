@@ -13,7 +13,7 @@ public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdD
 	private PedestrianPositionProcessor pedPosProc;
 
 	public PedestrianLastPositionProcessor() {
-		super("lastx", "lasty");
+		super("lastX", "lastY");
 	}
 
 	@Override

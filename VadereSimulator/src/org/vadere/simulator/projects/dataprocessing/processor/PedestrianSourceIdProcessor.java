@@ -10,7 +10,7 @@ import java.util.Collection;
 public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdDataKey, Integer> {
 
 	public PedestrianSourceIdProcessor() {
-		super("sid");
+		super("sourceId");
 	}
 
 	@Override

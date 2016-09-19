@@ -13,7 +13,7 @@ public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPe
     private OptimalStepsModel osm;
 
     public PedestrianOSMStrideLengthProcessor() {
-        super("stridelength");
+        super("strideLength");
 
         this.osm = null;
     }
