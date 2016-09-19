@@ -8,7 +8,9 @@ import java.util.List;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
+import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
@@ -58,12 +60,22 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	public void preLoop(SimulationState state) {
 		trainModel = getTrainModelFromProcessorManager();
 
-		// TODO only use seats in attributes.getCompartmentIndex()
-		emptySeats = new LinkedList<>(trainModel.getSeats()); // will be filtered in writeNewSitDownEvents()
+		emptySeats = getSeatsOfCompartment(); // will be filtered in writeNewSitDownEvents()
 		time = LocalTime.now();
 
 		writeInitialSitDownEvents();
 		writeInitializationEndEvent();
+	}
+
+	private List<Seat> getSeatsOfCompartment() {
+		final Compartment compartment = trainModel.getCompartment(attributes.getCompartmentIndex());
+		final List<Seat> result = new LinkedList<>();
+		for (SeatGroup sg : compartment.getSeatGroups()) {
+			for (int i = 0; i < 4; i++) {
+				result.add(sg.getSeat(i));
+			}
+		}
+		return result;
 	}
 
 	@Override
