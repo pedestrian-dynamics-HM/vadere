@@ -124,9 +124,11 @@ public class TrainModel {
 					"This model depends on interim targets. Please create a train scenario with interim destinations.");
 		}
 
-		final int sourceMargin = 8;
-		Rectangle2D leftDoorsRect = createFilterRect(leftmostCompartment.getMinY() - sourceMargin/2, sourceMargin);
-		Rectangle2D rightDoorsRect = createFilterRect(leftmostCompartment.getMaxY() + sourceMargin/2, sourceMargin);
+		final double innerOffset = trainGeometry.getBenchWidth() / 8;
+		Rectangle2D leftDoorsRect = createFilterRect(topography.getBounds().getMinY(),
+				leftmostCompartment.getMinY() - topography.getBounds().getMinY() + innerOffset);
+		Rectangle2D rightDoorsRect = createFilterRect(leftmostCompartment.getMaxY() - innerOffset,
+				topography.getBounds().getMaxY() - leftmostCompartment.getMaxY() + innerOffset);
 		leftDoors = findSources(leftDoorsRect);
 		rightDoors = findSources(rightDoorsRect);
 
