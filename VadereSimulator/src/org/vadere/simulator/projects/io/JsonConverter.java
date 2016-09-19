@@ -408,13 +408,11 @@ public abstract class JsonConverter {
 		return writer.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}
 
-	// TODO [priority=medium] [task=deprecation] remove deprecated call. This call is required to serialize the output processor
 	public static JsonNode serializeScenarioRunManagerToNode(ScenarioRunManager scenarioRunManager,
 			boolean commitHashIncluded) throws IOException {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
-		//rootNode.set(ProcessorWriter.JSON_ATTRIBUTE_NAME, serializeProcessorWriters(scenarioRunManager.getAllWriters()));
 		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenarioRunManager.getDataProcessingJsonManager().serializeToNode());
 		rootNode.set("vadere", serializeVadereNode(scenarioStore));
 		return rootNode;
