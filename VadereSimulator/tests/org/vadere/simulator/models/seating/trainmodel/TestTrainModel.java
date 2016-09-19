@@ -16,14 +16,10 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 
+import static org.vadere.simulator.models.seating.TestTopographyAndModelBuilder.*;
+
 public class TestTrainModel {
 	
-	private static final int nEntranceAreas = 12;
-	private static final int nCompartments = nEntranceAreas + 1; // includes 2 half-compartments
-	private static final int nInterimDestinations = nCompartments * 3 - 4; // includes 2 targets from half-compartments
-	private static final int nSeatGroups = nCompartments * 4 - 4;
-	private static final int nSeats = nSeatGroups * 4;
-
 	private TrainModel trainModel;
 
 	@Before
@@ -37,10 +33,23 @@ public class TestTrainModel {
 		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
-		
+
 		// Peds are created by the main model when the simulation starts!
 		// They don't really exist before that.
-		assertEquals(0, trainModel.getPedestrians().size());
+		checkSize(0, trainModel.getPedestrians());
+	}
+	
+	@Test
+	public void testDoorSources() {
+		checkSize(nSources, trainModel.getAllDoorSources());
+		checkSize(nSourcesLeft, trainModel.getLeftDoorSources());
+		checkSize(nSourcesRight, trainModel.getRightDoorSources());
+
+		boolean interimDestsContain133 = trainModel.getInterimDestinations().stream()
+				.mapToInt(d -> d.getId())
+				.filter(id -> id == 133)
+				.count() > 0;
+		assertTrue(interimDestsContain133);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -102,7 +111,7 @@ public class TestTrainModel {
 	@Test
 	public void testFirstHalfCompartment() {
 		final Compartment c = trainModel.getCompartment(0);
-		assertEquals(2, c.getSeatGroups().size());
+		checkSize(2, c.getSeatGroups());
 
 		assertEquals(trainModel.getSeatGroup(0), c.getSeatGroups().get(0));
 		assertEquals(trainModel.getSeatGroup(1), c.getSeatGroups().get(1));
@@ -118,7 +127,7 @@ public class TestTrainModel {
 	@Test
 	public void testFirstNormalCompartment() {
 		final Compartment c = trainModel.getCompartment(1);
-		assertEquals(4, c.getSeatGroups().size());
+		checkSize(4, c.getSeatGroups());
 
 		assertEquals(trainModel.getSeatGroup(2), c.getSeatGroups().get(0));
 		assertEquals(trainModel.getSeatGroup(3), c.getSeatGroups().get(1));
@@ -137,7 +146,7 @@ public class TestTrainModel {
 	@Test
 	public void testLastHalfCompartment() {
 		final Compartment c = trainModel.getCompartment(nCompartments - 1);
-		assertEquals(2, c.getSeatGroups().size());
+		checkSize(2, c.getSeatGroups());
 
 		assertEquals(trainModel.getSeatGroup(nSeatGroups - 2), c.getSeatGroups().get(0));
 		assertEquals(trainModel.getSeatGroup(nSeatGroups - 1), c.getSeatGroups().get(1));
@@ -203,6 +212,4 @@ public class TestTrainModel {
 		return new Pedestrian(new AttributesAgent(), new Random());
 	}
 	
-	// TODO test getCompartment(Person) getCompartment(Target)
-
 }

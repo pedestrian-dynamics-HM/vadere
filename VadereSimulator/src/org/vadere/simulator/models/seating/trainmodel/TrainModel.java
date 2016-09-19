@@ -124,8 +124,9 @@ public class TrainModel {
 					"This model depends on interim targets. Please create a train scenario with interim destinations.");
 		}
 
-		Rectangle2D leftDoorsRect = createFilterRect(leftmostCompartment.getMinY() - 0.5, 1);
-		Rectangle2D rightDoorsRect = createFilterRect(leftmostCompartment.getMaxY() - 0.5, 1);
+		final int sourceMargin = 8;
+		Rectangle2D leftDoorsRect = createFilterRect(leftmostCompartment.getMinY() - sourceMargin/2, sourceMargin);
+		Rectangle2D rightDoorsRect = createFilterRect(leftmostCompartment.getMaxY() + sourceMargin/2, sourceMargin);
 		leftDoors = findSources(leftDoorsRect);
 		rightDoors = findSources(rightDoorsRect);
 
@@ -286,6 +287,14 @@ public class TrainModel {
 		final ArrayList<Source> result = new ArrayList<>(leftDoors);
 		result.addAll(rightDoors);
 		return result;
+	}
+
+	List<Source> getLeftDoorSources() {
+		return leftDoors;
+	}
+
+	List<Source> getRightDoorSources() {
+		return rightDoors;
 	}
 
 	private boolean isXIn(double x, Rectangle2D rect) {

@@ -16,6 +16,18 @@ import org.vadere.state.scenario.Topography;
 
 public class TestTopographyAndModelBuilder {
 	
+	private static final String TEST_TRAIN_TOPOGRAPHY_RESOURCE = "/data/test-train-topography.json";
+
+	public static final int nEntranceAreas = 12;
+	public static final int nCompartments = nEntranceAreas + 1; // includes 2 half-compartments
+	public static final int nInterimDestinations = nCompartments * 3 - 4; // includes 2 targets from half-compartments
+	public static final int nSeatGroups = nCompartments * 4 - 4;
+	public static final int nSeats = nSeatGroups * 4;
+	// sum of the counts from the --stop options (when generating the scenario)
+	public static final int nSources = 50;
+	public static final int nSourcesLeft = 20;
+	public static final int nSourcesRight = 30;
+
 	private Topography topography;
 
 	public TestTopographyAndModelBuilder() {
@@ -41,7 +53,7 @@ public class TestTopographyAndModelBuilder {
 	private Topography createTestTopography() {
 		try {
 			@SuppressWarnings("resource")
-			final String json = new Scanner(TestTopographyAndModelBuilder.class.getResourceAsStream("/data/test-train-topography.json"), "UTF-8").useDelimiter("\\A").next();
+			final String json = new Scanner(TestTopographyAndModelBuilder.class.getResourceAsStream(TEST_TRAIN_TOPOGRAPHY_RESOURCE), "UTF-8").useDelimiter("\\A").next();
 			return JsonConverter.deserializeTopography(json);
 		} catch (IOException | TextOutOfNodeException e) {
 			e.printStackTrace();
