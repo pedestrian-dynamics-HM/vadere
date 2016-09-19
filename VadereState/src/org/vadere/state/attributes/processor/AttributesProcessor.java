@@ -1,4 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-public abstract class AttributesProcessor {
+import org.vadere.state.attributes.Attributes;
+
+public abstract class AttributesProcessor extends Attributes {
 }
