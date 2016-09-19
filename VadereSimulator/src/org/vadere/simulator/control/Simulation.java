@@ -4,7 +4,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -56,12 +55,12 @@ public class Simulation {
 	private SimulationState simulationState;
 	private ScenarioStore scenarioStore;
 	private String name;
-	private Model model;
+	private MainModel mainModel;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
 		this.name = name;
-		this.model = mainModel;
+		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.attributesSimulation;
 		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
@@ -143,7 +142,7 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			processorManager.setModel(this.model);
+			processorManager.setMainModel(mainModel);
 			processorManager.initOutputFiles();
 
 			preLoop();

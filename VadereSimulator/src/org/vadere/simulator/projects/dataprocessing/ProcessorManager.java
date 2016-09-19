@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.util.io.IOUtils;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class ProcessorManager {
 	private DataProcessingJsonManager jsonManager;
 
-	private Model model;
+	private MainModel mainModel;
 
 	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
@@ -33,8 +33,8 @@ public class ProcessorManager {
 		dataProcessors.forEach(proc -> proc.init(this));
 	}
 
-	public void setModel(Model model) {
-		this.model = model;
+	public void setMainModel(MainModel mainModel) {
+		this.mainModel = mainModel;
 	}
 
 	public void initOutputFiles() {
@@ -45,8 +45,8 @@ public class ProcessorManager {
 		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
 	}
 
-	public Model getModel() {
-		return this.model;
+	public MainModel getMainModel() {
+		return mainModel;
 	}
 
 	public void preLoop(final SimulationState state) {
