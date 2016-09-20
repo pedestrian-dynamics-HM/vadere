@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
-public class TimestepDataKey implements Comparable<TimestepDataKey> {
+public class TimestepDataKey implements DataKey<TimestepDataKey> {
 	private final int timestep;
     public TimestepDataKey(int timestep) {
     	this.timestep = timestep;
