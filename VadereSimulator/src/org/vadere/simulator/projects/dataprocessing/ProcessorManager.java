@@ -21,8 +21,9 @@ public class ProcessorManager {
 	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
 
-	public ProcessorManager(DataProcessingJsonManager jsonManager, List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles) {
+	public ProcessorManager(DataProcessingJsonManager jsonManager, List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles, MainModel mainModel) {
 		this.jsonManager = jsonManager;
+		this.mainModel = mainModel;
 
 		this.outputFiles = outputFiles;
 

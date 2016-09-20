@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
@@ -205,7 +206,7 @@ public class DataProcessingJsonManager {
         return store;
     }
 
-    public ProcessorManager createProcessorManager() {
-        return new ProcessorManager(this, this.dataProcessors, this.outputFiles);
+    public ProcessorManager createProcessorManager(MainModel mainModel) {
+        return new ProcessorManager(this, this.dataProcessors, this.outputFiles, mainModel);
     }
 }
