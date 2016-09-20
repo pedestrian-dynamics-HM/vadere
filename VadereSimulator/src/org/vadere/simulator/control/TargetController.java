@@ -3,6 +3,7 @@ package org.vadere.simulator.control;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -41,14 +42,13 @@ public class TargetController {
 		}
 		final double reachedDistance = target.getAttributes().getDeletionDistance();
 
-		Rectangle2D bounds = target.getShape().getBounds2D();
-		VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
-		double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
+		final Rectangle2D bounds = target.getShape().getBounds2D();
+		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
+		final double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
 
-		Collection<DynamicElement> elementsInRange = new LinkedList<>();
-		elementsInRange.addAll(topography.getSpatialMap(Pedestrian.class).getObjects(center, radius));
-		elementsInRange.addAll(topography.getSpatialMap(Car.class).getObjects(center, radius));
-
+		final Collection<DynamicElement> elementsInRange = new LinkedList<>();
+		elementsInRange.addAll(getObjectsInCircle(Pedestrian.class, center, radius));
+		elementsInRange.addAll(getObjectsInCircle(Car.class, center, radius));
 
 		for (DynamicElement element : elementsInRange) {
 
@@ -94,6 +94,10 @@ public class TargetController {
 				}
 			}
 		}
+	}
+
+	private <T extends DynamicElement> List<T> getObjectsInCircle(final Class<T> clazz, final VPoint center, final double radius) {
+		return topography.getSpatialMap(clazz).getObjects(center, radius);
 	}
 
 	private boolean hasAgentReachedThisTarget(Agent agent, double reachedDistance) {
