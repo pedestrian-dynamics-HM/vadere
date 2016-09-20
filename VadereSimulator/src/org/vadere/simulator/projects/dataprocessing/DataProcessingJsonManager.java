@@ -1,13 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -56,18 +52,7 @@ public class DataProcessingJsonManager {
     static {
         mapper = JsonConverter.getMapper();
         writer = mapper.writerWithDefaultPrettyPrinter();
-
-        SimpleModule sm = new SimpleModule();
-        sm.addDeserializer(DataProcessorStore.class, new JsonDeserializer<DataProcessorStore>() {
-            @Override
-            public DataProcessorStore deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-
-
-                return null;
-            }
-        });
-        mapper.registerModule(sm);
-
+        
         outputFileInstantiator = new DynamicClassInstantiator<>();
         processorInstantiator = new DynamicClassInstantiator<>();
     }
