@@ -32,8 +32,8 @@ public class DataProcessingView extends JPanel {
 	private DefaultTableModel filesTableModel;
 	private JTable processorsTable;
 	private DefaultTableModel processorsTableModel;
-	private JPanel filesDetailsPanel;
-	private JPanel processorsDetailsPanel;
+	private JPanel outputFilesDetailsPanel;
+	private JPanel dataProcessorsDetailsPanel;
 
 	private ScenarioRunManager currentScenario;
 	private boolean isEditable;
@@ -85,10 +85,10 @@ public class DataProcessingView extends JPanel {
 
 		// top right in 2x2 grid
 
-		filesDetailsPanel = new JPanel();
-		filesDetailsPanel.setLayout(new GridBagLayout());
-		filesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-		add(filesDetailsPanel);
+		outputFilesDetailsPanel = new JPanel();
+		outputFilesDetailsPanel.setLayout(new GridBagLayout());
+		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		add(outputFilesDetailsPanel);
 
 		// bottom left in 2x2 grid
 
@@ -102,10 +102,10 @@ public class DataProcessingView extends JPanel {
 
 		// bottom right in 2x2 grid
 
-		processorsDetailsPanel = new JPanel();
-		processorsDetailsPanel.setLayout(new GridBagLayout());
-		processorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-		add(processorsDetailsPanel);
+		dataProcessorsDetailsPanel = new JPanel();
+		dataProcessorsDetailsPanel.setLayout(new GridBagLayout());
+		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		add(dataProcessorsDetailsPanel);
 	}
 
 	private JPanel buildPanel(String labelText, JTable table, JButton addBtn) { // used for OutputFile-Table and DataProcessor-Table
@@ -129,12 +129,12 @@ public class DataProcessingView extends JPanel {
 		this.currentScenario = scenario;
 
 		filesTableModel.setRowCount(0);
-		filesDetailsPanel.removeAll();
+		outputFilesDetailsPanel.removeAll();
 		scenario.getDataProcessingJsonManager().getOutputFiles()
 				.forEach(outputFile -> filesTableModel.addRow(new OutputFile[] {outputFile}));
 
 		processorsTableModel.setRowCount(0);
-		processorsDetailsPanel.removeAll();
+		dataProcessorsDetailsPanel.removeAll();
 		scenario.getDataProcessingJsonManager().getDataProcessors()
 				.forEach(dataProcessor -> processorsTableModel.addRow(new DataProcessor[] {dataProcessor}));
 	}
@@ -144,7 +144,7 @@ public class DataProcessingView extends JPanel {
 	}
 
 	private void handleOutputFileSelected(OutputFile outputFile) {
-		filesDetailsPanel.removeAll();
+		outputFilesDetailsPanel.removeAll();
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST; // alignment
@@ -153,12 +153,12 @@ public class DataProcessingView extends JPanel {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		filesDetailsPanel.add(new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>"), c);
+		outputFilesDetailsPanel.add(new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>"), c);
 
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 1;
-		filesDetailsPanel.add(new JLabel("Data key: "), c);
+		outputFilesDetailsPanel.add(new JLabel("Data key: "), c);
 /*
 		String[] options = new String[]{
 				NoDataKeyOutputFile.class.getSimpleName(),
@@ -173,11 +173,11 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 1;
 		c.gridy = 1;
-		filesDetailsPanel.add(new JLabel(getSimpleDataKeyName(outputFileDataKey)), c);
+		outputFilesDetailsPanel.add(new JLabel(getSimpleDataKeyName(outputFileDataKey)), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
-		filesDetailsPanel.add(new JLabel("Processors: "), c);
+		outputFilesDetailsPanel.add(new JLabel("Processors: "), c);
 
 		JComboCheckBox<Integer> dataProcessorIDsComboCheckBox =
 				new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
@@ -194,25 +194,25 @@ public class DataProcessingView extends JPanel {
 		c.gridx = 1;
 		c.gridy = 2;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		filesDetailsPanel.add(dataProcessorIDsComboCheckBox, c);
+		outputFilesDetailsPanel.add(dataProcessorIDsComboCheckBox, c);
 
 		revalidate();
 		repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
 	}
 
 	private void handleDataProcessorSelected(DataProcessor dataProcessor) {
-		processorsDetailsPanel.removeAll();
+		dataProcessorsDetailsPanel.removeAll();
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.ipady = 15;
 
 		c.gridx = 0;
 		c.gridy = 0;
-		processorsDetailsPanel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
+		dataProcessorsDetailsPanel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
 
 		c.gridx = 0;
 		c.gridy = 1;
-		processorsDetailsPanel.add(new JLabel("Data key: " + getSimpleDataKeyName(getDataKeyForDataProcessor(dataProcessor))), c);
+		dataProcessorsDetailsPanel.add(new JLabel("Data key: " + getSimpleDataKeyName(getDataKeyForDataProcessor(dataProcessor))), c);
 
 		RSyntaxTextArea attributesTextArea = new RSyntaxTextArea();
 		attributesTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
@@ -227,7 +227,7 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 0;
 		c.gridy = 2;
-		processorsDetailsPanel.add(attributesTextArea, c);
+		dataProcessorsDetailsPanel.add(attributesTextArea, c);
 
 		revalidate();
 		repaint();
