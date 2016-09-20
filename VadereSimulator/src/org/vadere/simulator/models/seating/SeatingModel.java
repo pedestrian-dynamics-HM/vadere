@@ -96,7 +96,6 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 	
 	private boolean hasJustReachedItsFirstTarget(Pedestrian p) {
-		// TODO does not work as i want
 		return p.getTargets().size() == 1 && !p.hasNextTarget();
 	}
 

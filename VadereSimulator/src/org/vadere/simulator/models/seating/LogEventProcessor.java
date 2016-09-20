@@ -98,7 +98,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 			final Seat seat = it.next();
 			final Pedestrian person = seat.getSittingPerson();
 			if (person != null) {
-				writeSitDownEvent(person, getSeatNumber(seat));
+				writeSitDownEvent(person, seat.getSeatNumberWithinCompartment());
 				it.remove();
 			}
 		}

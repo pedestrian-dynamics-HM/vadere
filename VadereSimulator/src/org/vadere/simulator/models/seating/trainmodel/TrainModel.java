@@ -226,8 +226,14 @@ public class TrainModel {
 
 	private void makeSeat(List<List<Target>> longRows, int seatGroupIndex, int indexInSeatGroup, int longRowIndex,
 			int indexInLongRow) {
-		getSeatGroups().get(seatGroupIndex).setSeat(indexInSeatGroup,
-				new Seat(longRows.get(longRowIndex).get(indexInLongRow)));
+		final int number = calculateSeatNumberWithinCompartment(longRowIndex, indexInLongRow);
+		final Seat newSeat = new Seat(longRows.get(longRowIndex).get(indexInLongRow), number);
+		getSeatGroups().get(seatGroupIndex).setSeat(indexInSeatGroup, newSeat);
+	}
+
+	int calculateSeatNumberWithinCompartment(int longRowIndex, int indexInLongRow) {
+		final int i = (indexInLongRow - 2) % 4; // row of 4 abreast seats in compartment
+		return i * 4 + longRowIndex;
 	}
 
 	private Rectangle2D createFilterRect(double y, double height) {
