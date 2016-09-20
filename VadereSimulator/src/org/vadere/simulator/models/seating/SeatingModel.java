@@ -67,33 +67,35 @@ public class SeatingModel implements ActiveCallback, Model {
 		
 		// choose compartment for those peds without a target
 		pedestrians.stream()
-				.filter(this::isNoTargetAssigned)
+				.filter(this::hasNoTargetAssigned)
 				.forEach(this::assignCompartmentTarget);
 		
 		// choose seat group and seat for those peds that wait at their interim target
 		pedestrians.stream()
-				.filter(this::hasPedestrianJustReachedItsFirstTarget) // the interim target
+				.filter(this::hasJustReachedItsFirstTarget) // the interim target
 				.forEach(this::assignSeatTarget);
 	}
 	
+	private void assignCompartmentTarget(Pedestrian p) {
+		log.debug("Assigning compartment target to pedestrian " + p.getId());
+		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
+		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
+		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
+	}
+
 	private void assignSeatTarget(Pedestrian p) {
+		log.debug("Assigning seat target to pedestrian " + p.getId());
 		final Compartment compartment = trainModel.getCompartment(p);
 		final SeatGroup seatGroup = chooseSeatGroup(compartment);
 		final Seat seat = chooseSeat(seatGroup);
 		p.addTarget(seat.getAssociatedTarget());
 	}
 	
-	private void assignCompartmentTarget(Pedestrian p) {
-		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
-		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
-		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
-	}
-
-	private boolean isNoTargetAssigned(Pedestrian p) {
+	private boolean hasNoTargetAssigned(Pedestrian p) {
 		return p.getTargets().isEmpty();
 	}
 	
-	private boolean hasPedestrianJustReachedItsFirstTarget(Pedestrian p) {
+	private boolean hasJustReachedItsFirstTarget(Pedestrian p) {
 		// TODO does not work as i want
 		return p.getTargets().size() == 1 && !p.hasNextTarget();
 	}
