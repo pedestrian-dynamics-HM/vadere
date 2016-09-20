@@ -40,6 +40,11 @@ public class LogEventEntry {
 		return headers;
 	}
 	
+	@Override
+	public String toString() {
+		return String.join(" ", toStrings());
+	}
+	
 	private String stringOrNA(Object o) {
 		return o == null ? NA_STRING : o.toString();
 	}
