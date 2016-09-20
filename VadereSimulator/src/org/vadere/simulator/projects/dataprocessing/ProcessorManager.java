@@ -21,8 +21,9 @@ public class ProcessorManager {
 	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
 
-	public ProcessorManager(DataProcessingJsonManager jsonManager, List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles) {
+	public ProcessorManager(DataProcessingJsonManager jsonManager, List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles, MainModel mainModel) {
 		this.jsonManager = jsonManager;
+		this.mainModel = mainModel;
 
 		this.outputFiles = outputFiles;
 
@@ -46,9 +47,6 @@ public class ProcessorManager {
 	}
 
 	public MainModel getMainModel() {
-		if (mainModel == null)
-			throw new IllegalStateException(
-					"The main model is not available until the simulation has started (Simulation.run())");
 		return mainModel;
 	}
 
