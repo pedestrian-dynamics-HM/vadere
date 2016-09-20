@@ -35,7 +35,6 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	
 	private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_LOCAL_TIME; // 15:20:00
 
-	private ProcessorManager processorManager;
 	private AttributesLogEventProcessor attributes;
 	private TrainModel trainModel;
 	private LocalTime time;
@@ -53,13 +52,12 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 			throw new AttributesNotFoundException(AttributesLogEventProcessor.class); //, "Attributes for log event processor are undefined."
 
 		nextLogEventId = attributes.getFirstLogEventId();
-		processorManager = manager;
+
+		trainModel = getTrainModelFromProcessorManager(manager);
 	}
 
 	@Override
 	public void preLoop(SimulationState state) {
-		trainModel = getTrainModelFromProcessorManager();
-
 		emptySeats = getSeatsOfCompartment(); // will be filtered in writeNewSitDownEvents()
 		time = LocalTime.now();
 
@@ -84,8 +82,8 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		writeNewSitDownEvents();
 	}
 
-	private TrainModel getTrainModelFromProcessorManager() {
-		final MainModel mainModel = processorManager.getMainModel();
+	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {
+		final MainModel mainModel = manager.getMainModel();
 		final SeatingModel seatingModel = FindByClass.findFirstObjectOfClass(mainModel.getActiveCallbacks(), SeatingModel.class);
 		return seatingModel.getTrainModel();
 	}
