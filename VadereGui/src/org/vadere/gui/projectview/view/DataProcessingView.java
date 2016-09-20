@@ -177,6 +177,12 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 0;
 		c.gridy = 2;
+		c.gridwidth = 2;
+		outputFilesDetailsPanel.add(new JLabel("Header: " + outputFile.getHeader()), c);
+
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 1;
 		outputFilesDetailsPanel.add(new JLabel("Processors: "), c);
 
 		JComboCheckBox<Integer> dataProcessorIDsComboCheckBox =
@@ -192,7 +198,7 @@ public class DataProcessingView extends JPanel {
 		});
 
 		c.gridx = 1;
-		c.gridy = 2;
+		c.gridy = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		outputFilesDetailsPanel.add(dataProcessorIDsComboCheckBox, c);
 

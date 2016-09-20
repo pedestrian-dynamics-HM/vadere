@@ -75,9 +75,16 @@ public abstract class OutputFile<K extends Comparable<K>> {
         }
 	}
 
-	private void printHeader(PrintWriter out) {
-		final List<String> fieldHeaders = composeLine(keyHeaders, p -> Arrays.stream(p.getHeaders()));
-		writeLine(out, fieldHeaders);
+	private List<String> getFieldHeaders() {
+		return composeLine(keyHeaders, p -> Arrays.stream(p.getHeaders()));
+	}
+
+	public void printHeader(PrintWriter out) {
+		writeLine(out, getFieldHeaders());
+	}
+
+	public String getHeader() {
+		return String.join(this.separator, getFieldHeaders());
 	}
 
 	private void printRow(final PrintWriter out, final K key) {
