@@ -97,15 +97,15 @@ public class TrainModel {
 
 			// left seat group
 			makeSeat(seatRows, seatGroupIndex, 0, 0, i);
-			makeSeat(seatRows, seatGroupIndex, 1, 1, i + 1);
-			makeSeat(seatRows, seatGroupIndex, 2, 0, i);
+			makeSeat(seatRows, seatGroupIndex, 1, 1, i);
+			makeSeat(seatRows, seatGroupIndex, 2, 0, i + 1);
 			makeSeat(seatRows, seatGroupIndex, 3, 1, i + 1);
 			seatGroupIndex++;
 
 			// right seat group
 			makeSeat(seatRows, seatGroupIndex, 0, 2, i);
-			makeSeat(seatRows, seatGroupIndex, 1, 3, i + 1);
-			makeSeat(seatRows, seatGroupIndex, 2, 2, i);
+			makeSeat(seatRows, seatGroupIndex, 1, 3, i);
+			makeSeat(seatRows, seatGroupIndex, 2, 2, i + 1);
 			makeSeat(seatRows, seatGroupIndex, 3, 3, i + 1);
 			seatGroupIndex++;
 		}
