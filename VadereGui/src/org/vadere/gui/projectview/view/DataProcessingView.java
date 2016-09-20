@@ -170,11 +170,10 @@ public class DataProcessingView extends JPanel {
 		typesComboBox.setSelectedItem(outputFile.getClass().getSimpleName());*/
 
 		Type outputFileDataKey = getDataKeyForOutputFile(outputFile);
-		String typeName = outputFileDataKey.getTypeName();
 
 		c.gridx = 1;
 		c.gridy = 1;
-		filesDetailsPanel.add(new JLabel(typeName.substring(typeName.lastIndexOf(".") + 1)), c);
+		filesDetailsPanel.add(new JLabel(getSimpleDataKeyName(outputFileDataKey)), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
@@ -211,6 +210,10 @@ public class DataProcessingView extends JPanel {
 		c.gridy = 0;
 		processorsDetailsPanel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
 
+		c.gridx = 0;
+		c.gridy = 1;
+		processorsDetailsPanel.add(new JLabel("Data key: " + getSimpleDataKeyName(getDataKeyForDataProcessor(dataProcessor))), c);
+
 		RSyntaxTextArea attributesTextArea = new RSyntaxTextArea();
 		attributesTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
 		InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
@@ -223,7 +226,7 @@ public class DataProcessingView extends JPanel {
 		}
 
 		c.gridx = 0;
-		c.gridy = 1;
+		c.gridy = 2;
 		processorsDetailsPanel.add(attributesTextArea, c);
 
 		revalidate();
@@ -242,4 +245,7 @@ public class DataProcessingView extends JPanel {
 		return ((ParameterizedType) object.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
+	private static String getSimpleDataKeyName(Type dataKey) {
+		return dataKey.getTypeName().substring(dataKey.getTypeName().lastIndexOf(".") + 1);
+	}
 }
