@@ -3,6 +3,7 @@ package org.vadere.simulator.control;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.vadere.state.scenario.Agent;
@@ -51,8 +52,8 @@ public class TargetController {
 
 		for (DynamicElement element : elementsInRange) {
 
-			Agent agent;
-			if (Agent.class.isAssignableFrom(element.getClass())) {
+			final Agent agent;
+			if (element instanceof Agent) {
 				agent = (Agent) element;
 			} else {
 				log.error("The given object is not a subtype of Agent.");
@@ -62,18 +63,25 @@ public class TargetController {
 			if (isNextTargetForAgent(agent)
 					&& hasAgentReachedThisTarget(agent, reachedDistance)) {
 
-				if (this.target.getWaitingTime() > 0) {
+				if (target.getWaitingTime() <= 0) {
+					checkRemove(agent);
+				} else {
+					final int agentId = agent.getId();
 					// individual waiting behaviour, as opposed to waiting at a traffic light
-					if (this.target.getAttributes().isIndividualWaiting()) {
-						if (target.getEnteringTimes().containsKey(agent.getId())) {
-							if (simTimeInSec - target.getEnteringTimes().get(agent.getId()) > this.target
+					if (target.getAttributes().isIndividualWaiting()) {
+						final Map<Integer, Double> enteringTimes = target.getEnteringTimes();
+						if (enteringTimes.containsKey(agentId)) {
+							if (simTimeInSec - enteringTimes.get(agentId) > target
 									.getWaitingTime()) {
-								target.getEnteringTimes().remove(agent.getId());
+								enteringTimes.remove(agentId);
 								checkRemove(agent);
 							}
-						} else if (this.target.getParallelWaiters() <= 0 || (this.target.getParallelWaiters() > 0 &&
-								target.getEnteringTimes().size() < this.target.getParallelWaiters())) {
-							target.getEnteringTimes().put(agent.getId(), simTimeInSec);
+						} else {
+							final int parallelWaiters = target.getParallelWaiters();
+							if (parallelWaiters <= 0 || (parallelWaiters > 0 &&
+									enteringTimes.size() < parallelWaiters)) {
+								enteringTimes.put(agentId, simTimeInSec);
+							}
 						}
 					} else {
 						// traffic light switching based on waiting time. Light starts green.
@@ -83,8 +91,6 @@ public class TargetController {
 							checkRemove(agent);
 						}
 					}
-				} else {
-					checkRemove(agent);
 				}
 			}
 		}
