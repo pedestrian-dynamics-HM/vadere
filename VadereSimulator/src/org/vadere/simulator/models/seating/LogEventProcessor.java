@@ -2,9 +2,9 @@ package org.vadere.simulator.models.seating;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
@@ -40,7 +40,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	private TrainModel trainModel;
 	private LocalTime time;
 	private int nextLogEventId = 1;
-	private List<Seat> emptySeats;
+	private Set<Seat> emptySeats;
 
 	public LogEventProcessor() {
 		super(LogEventEntry.getHeaders());
@@ -67,9 +67,9 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		writeInitializationEndEvent();
 	}
 
-	private List<Seat> getSeatsOfCompartment() {
+	private Set<Seat> getSeatsOfCompartment() {
 		final Compartment compartment = trainModel.getCompartment(attributes.getCompartmentIndex());
-		final List<Seat> result = new LinkedList<>();
+		final Set<Seat> result = new HashSet<>();
 		for (SeatGroup sg : compartment.getSeatGroups()) {
 			for (int i = 0; i < 4; i++) {
 				result.add(sg.getSeat(i));
@@ -100,11 +100,15 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 			final Seat seat = it.next();
 			final Pedestrian person = seat.getSittingPerson();
 			if (person != null) {
-				// TODO this does not work yet: 2nd param must be the seat number from 1 to 16 within one compartment!
-				writeSitDownEvent(person, seat.getAssociatedTarget().getId());
+				writeSitDownEvent(person, getSeatNumber(seat));
 				it.remove();
 			}
 		}
+	}
+
+	private int getSeatNumber(Seat seat) {
+		// TODO this does not work yet: must be the seat number from 1 to 16 within one compartment!
+		return 0;
 	}
 
 	private void writeInitializationEndEvent() {
