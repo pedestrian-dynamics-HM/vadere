@@ -193,13 +193,12 @@ public class Simulation {
 					logger.info("Simulation interrupted.");
 				}
 			}
-		}
-		finally {
+		} finally {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
 			processorManager.writeOutput();
-			logger.info("Logged all processor in logfiles");
+			logger.info("Finished writing all output files");
 		}
 	}
 
