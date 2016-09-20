@@ -8,9 +8,6 @@ package org.vadere.state.attributes.scenario;
  * 
  * 
  */
-// @JsonPropertyOrder({"radius", "densityDependentSpeed", "speedDistributionMean",
-// "speedDistributionStandardDeviation", "minimumSpeed", "maximumSpeed", "acceleration", "id"}) //
-// in order to have id from superclass last, to match the GSON-order
 public class AttributesAgent extends AttributesDynamicElement {
 
 	private double radius = 0.195;
