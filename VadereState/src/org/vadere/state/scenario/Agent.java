@@ -37,7 +37,7 @@ public abstract class Agent implements DynamicElement {
 		position = new VPoint(0, 0);
 		velocity = new Vector2D(0, 0);
 		targetIds = new LinkedList<>();
-		nextTargetListIndex = -1;
+		nextTargetListIndex = 0;
 
 		attributes = attributesAgent;
 	}
