@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
 import java.io.FileWriter;
@@ -25,7 +26,7 @@ import java.util.stream.Stream;
  *
  */
 
-public abstract class OutputFile<K extends Comparable<K>> {
+public abstract class OutputFile<K extends DataKey<K>> {
 	private String[] keyHeaders;
 	private String fileName;
 
