@@ -231,9 +231,25 @@ public class TrainModel {
 		getSeatGroups().get(seatGroupIndex).setSeat(indexInSeatGroup, newSeat);
 	}
 
+	/**
+	 * Calculate the seat number within a compartment. The seat number
+	 * corresponds to the numbering used in the data collection app and data
+	 * processing.
+	 * 
+	 * @param longRowIndex
+	 *            the index of a "long row" of seats which goes from the front
+	 *            to the rear. Long rows are indexed from left to right.
+	 * @param indexInLongRow
+	 *            the index of a seat within a long row.
+	 */
 	int calculateSeatNumberWithinCompartment(int longRowIndex, int indexInLongRow) {
-		final int i = (indexInLongRow - 2) % 4; // row of 4 abreast seats in compartment
-		return i * 4 + longRowIndex;
+		int offset;
+		if (indexInLongRow < 2) // first half-compartment
+			offset = indexInLongRow;
+		else
+			offset = (indexInLongRow - 2) % 4; // row of 4 abreast seats in compartment
+
+		return offset * 4 + longRowIndex + 1;
 	}
 
 	private Rectangle2D createFilterRect(double y, double height) {

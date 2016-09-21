@@ -23,6 +23,7 @@ public class TestTopographyAndModelBuilder {
 	public static final int nInterimDestinations = nCompartments * 3 - 4; // includes 2 targets from half-compartments
 	public static final int nSeatGroups = nCompartments * 4 - 4;
 	public static final int nSeats = nSeatGroups * 4;
+	public static final int nSeatRows = nCompartments * 4 - 4;
 	// not the sum of the counts from the --stop options (when generating the scenario)
 	public static final int nSources = 48;
 	public static final int nSourcesLeft = 24;

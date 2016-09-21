@@ -15,7 +15,7 @@ public class TestSeat {
 	public void test() {
 		final Target target = new Target(new AttributesTarget());
 		final Pedestrian pedestrian = TestTrainModel.createTestPedestrian();
-		final Seat seat = new Seat(target);
+		final Seat seat = new Seat(target, 0);
 
 		assertEquals(target, seat.getAssociatedTarget());
 

@@ -200,6 +200,50 @@ public class TestTrainModel {
 		trainModel.getCompartment(p);
 	}
 
+	@Test
+	public void testCalcSeatNumberWithinCompartmentFirstHalfCompartment() {
+		assertEquals(1, trainModel.calculateSeatNumberWithinCompartment(0, 0));
+		assertEquals(2, trainModel.calculateSeatNumberWithinCompartment(1, 0));
+		assertEquals(3, trainModel.calculateSeatNumberWithinCompartment(2, 0));
+		assertEquals(4, trainModel.calculateSeatNumberWithinCompartment(3, 0));
+		assertEquals(5, trainModel.calculateSeatNumberWithinCompartment(0, 1));
+		assertEquals(6, trainModel.calculateSeatNumberWithinCompartment(1, 1));
+		assertEquals(7, trainModel.calculateSeatNumberWithinCompartment(2, 1));
+		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, 1));
+	}
+
+	@Test
+	public void testCalcSeatNumberWithinCompartmentFirstNormalCompartment() {
+		assertEquals(1, trainModel.calculateSeatNumberWithinCompartment(0, 2));
+		assertEquals(2, trainModel.calculateSeatNumberWithinCompartment(1, 2));
+		assertEquals(3, trainModel.calculateSeatNumberWithinCompartment(2, 2));
+		assertEquals(4, trainModel.calculateSeatNumberWithinCompartment(3, 2));
+		assertEquals(5, trainModel.calculateSeatNumberWithinCompartment(0, 3));
+		assertEquals(6, trainModel.calculateSeatNumberWithinCompartment(1, 3));
+		assertEquals(7, trainModel.calculateSeatNumberWithinCompartment(2, 3));
+		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, 3));
+		assertEquals(9,  trainModel.calculateSeatNumberWithinCompartment(0, 4));
+		assertEquals(10, trainModel.calculateSeatNumberWithinCompartment(1, 4));
+		assertEquals(11, trainModel.calculateSeatNumberWithinCompartment(2, 4));
+		assertEquals(12, trainModel.calculateSeatNumberWithinCompartment(3, 4));
+		assertEquals(13, trainModel.calculateSeatNumberWithinCompartment(0, 5));
+		assertEquals(14, trainModel.calculateSeatNumberWithinCompartment(1, 5));
+		assertEquals(15, trainModel.calculateSeatNumberWithinCompartment(2, 5));
+		assertEquals(16, trainModel.calculateSeatNumberWithinCompartment(3, 5));
+	}
+
+	@Test
+	public void testCalcSeatNumberWithinCompartmentLastHalfCompartment() {
+		assertEquals(1, trainModel.calculateSeatNumberWithinCompartment(0, nSeatRows - 2));
+		assertEquals(2, trainModel.calculateSeatNumberWithinCompartment(1, nSeatRows - 2));
+		assertEquals(3, trainModel.calculateSeatNumberWithinCompartment(2, nSeatRows - 2));
+		assertEquals(4, trainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 2));
+		assertEquals(5, trainModel.calculateSeatNumberWithinCompartment(0, nSeatRows - 1));
+		assertEquals(6, trainModel.calculateSeatNumberWithinCompartment(1, nSeatRows - 1));
+		assertEquals(7, trainModel.calculateSeatNumberWithinCompartment(2, nSeatRows - 1));
+		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 1));
+	}
+
 	private Compartment getCompartmentByInterimTargetIndex(int index) {
 		return trainModel.getCompartment(trainModel.getInterimDestinations().get(index));
 	}
