@@ -55,12 +55,14 @@ public class TestTrainModel {
 		checkSize(nSources, trainModel.getAllDoorSources());
 		checkSize(nSourcesLeft, trainModel.getLeftDoorSources());
 		checkSize(nSourcesRight, trainModel.getRightDoorSources());
-
-		boolean interimDestsContain133 = trainModel.getInterimDestinations().stream()
-				.mapToInt(d -> d.getId())
-				.filter(id -> id == 133)
-				.count() > 0;
-		assertTrue(interimDestsContain133);
+	}
+	
+	@Test
+	public void testCertainInterimTarget() {
+		for (Target t : trainModel.getInterimDestinations())
+			if (t.getId() == 133)
+				return;
+		fail("Interim target with id not found.");
 	}
 	
 	@Test(expected=RuntimeException.class)
