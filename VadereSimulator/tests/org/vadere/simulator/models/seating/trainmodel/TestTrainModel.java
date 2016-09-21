@@ -255,6 +255,27 @@ public class TestTrainModel {
 		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 1));
 	}
 
+	@Test
+	public void testGetSeatNumberWithinCompartment() {
+		// params: expectedSeatNumber, compartmentIndex, seatGroupIndex, seatIndex
+		assertEqualsSeatNumber(1, 0, 0, 0);
+		assertEqualsSeatNumber(2, 0, 0, 1);
+		assertEqualsSeatNumber(3, 0, 1, 0);
+		assertEqualsSeatNumber(5, 0, 0, 2);
+		assertEqualsSeatNumber(8, 0, 1, 3);
+
+		assertEqualsSeatNumber(1, 1, 0, 0);
+		assertEqualsSeatNumber(7, 1, 1, 2);
+		assertEqualsSeatNumber(9, 1, 2, 0);
+		assertEqualsSeatNumber(15, 1, 3, 2);
+	}
+
+	private void assertEqualsSeatNumber(int expectedSeatNumber, int compartmentIndex, int seatGroupIndex, int seatIndex) {
+		assertEquals(expectedSeatNumber,
+				trainModel.getSeat(compartmentIndex, seatGroupIndex, seatIndex)
+						.getSeatNumberWithinCompartment());
+	}
+
 	private Compartment getCompartmentByInterimTargetIndex(int index) {
 		return trainModel.getCompartment(trainModel.getInterimDestinations().get(index));
 	}
