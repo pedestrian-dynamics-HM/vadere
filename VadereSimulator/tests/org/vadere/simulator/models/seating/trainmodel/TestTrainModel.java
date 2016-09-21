@@ -51,6 +51,15 @@ public class TestTrainModel {
 	}
 
 	@Test
+	public void testAllInterimTargetsAreDistinct() {
+		final List<Target> interimTargets = trainModel.getInterimDestinations();
+		final int distinctTargetCount = (int) interimTargets.stream()
+				.distinct()
+				.count();
+		assertEquals(interimTargets.size(), distinctTargetCount);
+	}
+
+	@Test
 	public void testDoorSources() {
 		checkSize(nSources, trainModel.getAllDoorSources());
 		checkSize(nSourcesLeft, trainModel.getLeftDoorSources());
