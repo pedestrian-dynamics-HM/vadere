@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,16 @@ public class TestTrainModel {
 		checkSize(0, trainModel.getPedestrians());
 	}
 	
+	@Test
+	public void testAllSeatTargetsAreDistinct() {
+		final List<Seat> seats = trainModel.getSeats();
+		final int distinctTargetCount = (int) seats.stream()
+				.map(s -> s.getAssociatedTarget())
+				.distinct()
+				.count();
+		assertEquals(seats.size(), distinctTargetCount);
+	}
+
 	@Test
 	public void testDoorSources() {
 		checkSize(nSources, trainModel.getAllDoorSources());
