@@ -133,7 +133,8 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		JMenu mnAttributesMenu = new JMenu(Messages.getString("Tab.Model.addAttributesMenu.title"));
 		presetMenuBar.add(mnAttributesMenu);
 		menusInTabs.add(mnAttributesMenu);
-		ClassFinder.getAttributesNames().forEach(
+		ClassFinder.getAttributesNames().stream()
+			.sorted().forEach(
 				attributesClassName -> mnAttributesMenu.add(new JMenuItem(new AbstractAction(attributesClassName) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -149,14 +150,16 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
 		menusInTabs.add(mnModelNameMenu);
-		ClassFinder.getMainModelNames()
+		ClassFinder.getMainModelNames().stream()
+				.sorted()
 				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className + " (MainModel)") {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
 				})));
-		ClassFinder.getModelNames()
+		ClassFinder.getModelNames().stream()
+				.sorted()
 				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
