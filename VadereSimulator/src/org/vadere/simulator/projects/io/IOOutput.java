@@ -9,6 +9,8 @@ import org.vadere.state.simulation.Step;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +37,7 @@ public abstract class IOOutput {
 		List<File> selectedOutputDirectories = new LinkedList<>();
 
 		selectedOutputDirectories = listAllOutputDirs(project).stream()
-				.filter(dir -> isValidOutputDirectory(project, dir, scenario))
+				.filter(dir -> isMatchingOutputDirectory(project, dir, scenario))
 				.collect(Collectors.toList());
 
 		return selectedOutputDirectories;
@@ -204,17 +206,21 @@ public abstract class IOOutput {
 		return readOutputFile(project, directory).isPresent();
 	}
 
-	private static boolean isValidOutputDirectory(final VadereProject project, final File directory,
+	private static boolean isMatchingOutputDirectory(final VadereProject project, final File directory,
 			final ScenarioRunManager scenario) {
-		Optional<ScenarioRunManager> optionalVadere = readOutputFile(project, directory);
-		return directory.isDirectory() && optionalVadere.isPresent() && equalHash(optionalVadere.get(), scenario);
+		Optional<ScenarioRunManager> optionalScenario = readOutputFile(project, directory);
+		return directory.isDirectory() && optionalScenario.isPresent() && equalHash(optionalScenario.get(), scenario);
 	}
 
 	private static boolean equalHash(final ScenarioRunManager scenario1, ScenarioRunManager scenario2) {
-		return HashGenerator.attributesHash(scenario1.getScenarioStore())
-				.equals(HashGenerator.attributesHash(scenario2.getScenarioStore()))
-				&& HashGenerator.topographyHash(scenario1.getTopography())
-						.equals(HashGenerator.topographyHash(scenario2.getTopography()));
+		try {
+			final String hash1 = scenario1.getScenarioStore().hashOfJsonRepresentation();
+			final String hash2 = scenario2.getScenarioStore().hashOfJsonRepresentation();
+			return hash1.equals(hash2);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private static Path getPathToOutputFile(final VadereProject project, final String directoryName,
