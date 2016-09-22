@@ -4,11 +4,9 @@ package org.vadere.util.math;
 import com.nativelibs4java.opencl.*;
 
 import org.bridj.Pointer;
-import org.vadere.util.main.opencl.imageprocessing.Convolve;
+import org.vadere.util.opencl.kernels.Convolve;
 
 import java.io.IOException;
-
-import static org.bridj.Pointer.allocateFloats;
 
 public class CLConvolution {
 
@@ -127,12 +125,7 @@ public class CLConvolution {
 	}
 
 	private CLBuffer<Float> doubleArrayToCLBuffer(float[] matrix) {
-		Pointer<Float> aPtr = allocateFloats(matrix.length).order(context.getByteOrder());
-		for (int i = 0; i < matrix.length; i++) {
-			aPtr.set(i, matrix[i]);
-		}
-
-		return context.createFloatBuffer(CLMem.Usage.Input, aPtr);
+		return CLUtils.doubleArrayToCLBuffer(matrix, context);
 	}
 
 }

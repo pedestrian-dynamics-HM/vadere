@@ -1,9 +1,11 @@
 package org.vadere.util.math;
 
 import java.awt.Point;
+import java.awt.geom.Arc2D;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
+import org.apache.commons.math3.complex.Complex;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -396,4 +398,48 @@ public class MathUtil {
 		return new VPoint(projection.x * tmp, projection.y * tmp);
 	}
 
+	/**
+	 * Transforms an array of Complex numbers to a double array of doubled length. At even indicies
+	 * there are the real parts and at odd indicies are the imaginary parts of the complex numbers.
+	 *
+	 * @param complex a array of Complex numbers
+	 * @return a double array representing the same complex numbers
+	 */
+	public static double[] toDouble(final Complex[] complex) {
+		double[] pairs = new double[complex.length*2];
+		for(int i = 0; i < complex.length*2; i += 2) {
+			pairs[i] = complex[i/2].getReal();
+			pairs[i+1] = complex[i/2].getImaginary();
+		}
+		return pairs;
+	}
+
+	/**
+	 * Transforms an array of Complex numbers to a float array of doubled length. At even indicies
+	 * there are the real parts and at odd indicies are the imaginary parts of the complex numbers.
+	 *
+	 * @param complex a array of Complex numbers
+	 * @return a float array representing the same complex numbers
+	 */
+	public static float[] toFloat(final Complex[] complex) {
+		float[] pairs = new float[complex.length*2];
+		for(int i = 0; i < complex.length*2; i += 2) {
+			pairs[i] = (float)complex[i/2].getReal();
+			pairs[i+1] = (float)complex[i/2].getImaginary();
+		}
+		return pairs;
+	}
+
+	/**
+	 * Transform the real numbers to complex numbers i.e. the imaginary part is zero.
+	 * @param realValues
+	 * @return a complex array representing the same real numbers
+	 */
+	public static Complex[] toComplex(final double[] realValues) {
+		Complex[] complex = new Complex[realValues.length];
+		for(int i = 0; i < realValues.length; i++) {
+			complex[i] = Complex.valueOf(realValues[i], 0.0);
+		}
+		return complex;
+	}
 }
