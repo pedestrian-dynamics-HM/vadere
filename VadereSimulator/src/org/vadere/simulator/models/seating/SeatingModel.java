@@ -77,17 +77,18 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 	
 	private void assignCompartmentTarget(Pedestrian p) {
-		log.debug("Assigning compartment target to pedestrian " + p.getId());
 		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
+		logDebug("Assigning compartment %d to pedestrian %d", compartment.getIndex(), p.getId());
 		p.addTarget(compartment.getInterimTarget());
 	}
 
 	private void assignSeatTarget(Pedestrian p) {
-		log.debug("Assigning seat target to pedestrian " + p.getId());
 		final Compartment compartment = trainModel.getCompartment(p);
 		final SeatGroup seatGroup = chooseSeatGroup(compartment);
 		final Seat seat = chooseSeat(seatGroup);
+		logDebug("Assigning seat %d.%d to pedestrian %d", compartment.getIndex(),
+				seat.getSeatNumberWithinCompartment(), p.getId());
 		p.addTarget(seat.getAssociatedTarget());
 	}
 	
@@ -236,6 +237,10 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	private Seat chooseSeat3(final SeatGroup seatGroup) {
 		return seatGroup.getTheAvailableSeat();
+	}
+
+	private void logDebug(String formatString, Object... args) {
+		log.debug(String.format(formatString, args));
 	}
 
 }

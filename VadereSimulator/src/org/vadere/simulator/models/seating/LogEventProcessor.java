@@ -104,11 +104,6 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		}
 	}
 
-	private int getSeatNumber(Seat seat) {
-		// TODO this does not work yet: must be the seat number from 1 to 16 within one compartment!
-		return 0;
-	}
-
 	private void writeInitializationEndEvent() {
 		writeEvent(INITIALIZATION_END_EVENT, null, null);
 	}
