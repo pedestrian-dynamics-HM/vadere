@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.Collection;
@@ -29,7 +30,7 @@ import java.util.TreeMap;
  *
  */
 
-public abstract class DataProcessor<K extends Comparable<K>, V> {
+public abstract class DataProcessor<K extends DataKey<K>, V> {
 	private int id;
 	private AttributesProcessor attributes;
 
