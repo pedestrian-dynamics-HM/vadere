@@ -167,7 +167,7 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 1;
 		c.gridy = 1;
-		panel.add(new JLabel(getSimpleDataKeyName(outputFileDataKey)), c);
+		panel.add(new JLabel(extractSimpleName(outputFileDataKey)), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
@@ -223,7 +223,7 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 1;
 		c.gridy = 1;
-		panel.add(new JLabel(getSimpleDataKeyName(getDataKeyForDataProcessor(dataProcessor))), c);
+		panel.add(new JLabel(extractSimpleName(getDataKeyForDataProcessor(dataProcessor))), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
@@ -257,7 +257,7 @@ public class DataProcessingView extends JPanel {
 		return ((ParameterizedType) object.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
-	private static String getSimpleDataKeyName(Type dataKey) {
-		return dataKey.getTypeName().substring(dataKey.getTypeName().lastIndexOf(".") + 1);
+	private static String extractSimpleName(Type type) {
+		return type.getTypeName().substring(type.getTypeName().lastIndexOf(".") + 1);
 	}
 }
