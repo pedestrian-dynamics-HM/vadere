@@ -190,11 +190,9 @@ public class DataProcessingView extends JPanel {
 						.filter(dataProcessor -> getDataKeyForDataProcessor(dataProcessor) == outputFileDataKey) // only show processors with same DataKey as outputFile
 						.map(DataProcessor::getId)
 						.collect(Collectors.toList()));
-
 		dataProcessorIDsComboCheckBox.setCheckedItems(outputFile.getProcessorIds());
-		dataProcessorIDsComboCheckBox.addActionListener(e -> {
-			// TODO Mario?
-		});
+		dataProcessorIDsComboCheckBox.addActionListener(e ->
+				outputFile.setProcessorIds(dataProcessorIDsComboCheckBox.getCheckedItems()));
 		panel.add(dataProcessorIDsComboCheckBox, c);
 
 		revalidate();
