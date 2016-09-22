@@ -78,7 +78,8 @@ public class SeatingModel implements ActiveCallback, Model {
 	
 	private void assignCompartmentTarget(Pedestrian p) {
 		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
-		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
+//		final Compartment compartment = chooseCompartment(p, entranceAreaIndex); // TODO choose algorithm
+		final Compartment compartment = chooseCompartmentByRandom(p, entranceAreaIndex);
 		logDebug("Assigning compartment %d to pedestrian %d", compartment.getIndex(), p.getId());
 		p.addTarget(compartment.getInterimTarget());
 	}
@@ -88,6 +89,16 @@ public class SeatingModel implements ActiveCallback, Model {
 		final SeatGroup seatGroup = chooseSeatGroup(compartment);
 		final Seat seat = chooseSeat(seatGroup);
 		logDebug("Assigning seat %d.%d to pedestrian %d", compartment.getIndex(),
+				seat.getSeatNumberWithinCompartment(), p.getId());
+		p.addTarget(seat.getAssociatedTarget());
+	}
+	
+	private void assignRandomSeat(Pedestrian p) {
+		final List<Seat> availableSeats = trainModel.getSeats().stream()
+				.filter(Seat::isAvailable)
+				.collect(Collectors.toList());
+		final Seat seat = drawRandomElement(availableSeats);
+		logDebug("Assigning seat %d to pedestrian %d",
 				seat.getSeatNumberWithinCompartment(), p.getId());
 		p.addTarget(seat.getAssociatedTarget());
 	}
@@ -118,11 +129,18 @@ public class SeatingModel implements ActiveCallback, Model {
 		return trainModel;
 	}
 
+	public Compartment chooseCompartmentByRandom(Pedestrian person, int entranceAreaIndex) {
+		int index = random.nextInt(getCompartmentCount() - 1); // 2 half-compartments are counted as one
+		if (index == 0 && random.nextBoolean()) // 50 percent chance to switch to other half-compartment
+			index = getCompartmentCount() - 1;
+		return trainModel.getCompartment(index);
+	}
+
 	public Compartment chooseCompartment(Pedestrian person, int entranceAreaIndex) {
 		// entrance areas:    0   1   2   3
 		// compartments:    0   1   2   3   4
 		// left- and rightmost compartments are "half-compartments"
-
+		
 		final int entranceAreaCount = trainModel.getEntranceAreaCount();
 
 		final double distributionMean = entranceAreaIndex + 0.5;
@@ -241,6 +259,21 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	private void logDebug(String formatString, Object... args) {
 		log.debug(String.format(formatString, args));
+	}
+	
+	// TODO test
+	private double mapEntranceAreaIndexToRange01(int index) {
+		double compartmentIntervalWidth = 1.0 / getCompartmentCount();
+		return (index + 1) * compartmentIntervalWidth;
+	}
+	
+	// TODO test
+	private int mapRange01ToCompartmentIndex(double value) {
+		return (int) Math.floor(value * getCompartmentCount());
+	}
+	
+	private int getCompartmentCount() {
+		return trainModel.getEntranceAreaCount() + 1;
 	}
 
 }
