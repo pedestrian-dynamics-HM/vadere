@@ -71,6 +71,8 @@ public class IncidentDatabase {
 		incidents.get(Version.NOT_A_RELEASE).add(new AttributesPotentialCompactVSosmIncident()); // requested by Bene
 		incidents.get(Version.NOT_A_RELEASE).add(new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
+		incidents.get(Version.NOT_A_RELEASE).add(new RenameIncident(path("vadere"), JsonConverter.SCENARIO_KEY));
+
 		// - - - - - - - - - - - - "0.1" to "?" - - - - - - - - - - - -
 
 		//incidents.put(Version.V0_1, new ArrayList<>());
