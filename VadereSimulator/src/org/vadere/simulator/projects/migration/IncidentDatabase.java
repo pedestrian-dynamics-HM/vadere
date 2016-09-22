@@ -76,13 +76,13 @@ public class IncidentDatabase {
 
 		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
-		incidents.put(Version.V0_1, new LinkedList<>());
-		//addIncident(.V0_1, ...
+		incidents.put(V0_1, new LinkedList<>());
+		//addIncident(V0_1, ...
 
 		// - - - - - - - - - - - - "0.?" to "?" - - - - - - - - - - - -
 
-		//incidents.put(Version.V0_?, new LinkedList<>());
-		//addIncident(.V0_, ...
+		//incidents.put(V0_?, new LinkedList<>());
+		//addIncident(V0_, ...
 	}
 
 	private void addIncident(Version version, Incident incident) {
