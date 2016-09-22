@@ -19,6 +19,8 @@ import org.vadere.simulator.projects.migration.incidents.RenameIncident;
 import org.vadere.simulator.projects.migration.incidents.specialized.AttributesPotentialCompactVSosmIncident;
 import org.vadere.simulator.projects.migration.incidents.specialized.MoveSpawnDelayIntoDistributionParametersIncident;
 
+import static org.vadere.simulator.projects.migration.MigrationAssistant.Version.*;
+
 public class IncidentDatabase {
 
 	private Map<Version, List<Incident>> incidents = new LinkedHashMap<>();
@@ -36,51 +38,55 @@ public class IncidentDatabase {
 
 		incidents.put(Version.NOT_A_RELEASE, new LinkedList<>());
 
-		incidents.get(Version.NOT_A_RELEASE).add(new RelocationIncident(
+		addIncident(NOT_A_RELEASE, new RelocationIncident(
 				"finishTime",
 				path("vadere", "topography", "attributes"),
 				path("vadere", "attributesSimulation")));
 
-		incidents.get(Version.NOT_A_RELEASE).add(new RelocationIncident(
+		addIncident(NOT_A_RELEASE, new RelocationIncident(
 				"attributesPedestrian",
 				path("vadere"),
 				path("vadere", "topography")));
 
-		incidents.get(Version.NOT_A_RELEASE).add(new DeletionIncident(
+		addIncident(NOT_A_RELEASE, new DeletionIncident(
 				path("vadere", "topography", "pedestrians")));
 
-		incidents.get(Version.NOT_A_RELEASE).add(new RenameInArrayIncident(
+		addIncident(NOT_A_RELEASE, new RenameInArrayIncident(
 				path("vadere", "topography", "dynamicElements"),
 				"nextTargetListPosition",
 				"nextTargetListIndex"));
 
 		for (String oldName : LookupTables.version0to1_ModelRenaming.keySet()) {
 			String newName = LookupTables.version0to1_ModelRenaming.get(oldName);
-			incidents.get(Version.NOT_A_RELEASE).add(new RenameIncident(
+			addIncident(NOT_A_RELEASE, new RenameIncident(
 					path("vadere", "attributesModel", oldName), newName));
 		}
 
-		incidents.get(Version.NOT_A_RELEASE).add(new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
+		addIncident(NOT_A_RELEASE, new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
 				path("vadere"),
 				JsonConverter.MAIN_MODEL_KEY,
 				path("vadere", "attributesModel")));
 
-		incidents.get(Version.NOT_A_RELEASE).add(new AddTextNodeIncident(
+		addIncident(NOT_A_RELEASE, new AddTextNodeIncident(
 				path(),
 				"description", ""));
 
-		incidents.get(Version.NOT_A_RELEASE).add(new AttributesPotentialCompactVSosmIncident()); // requested by Bene
-		incidents.get(Version.NOT_A_RELEASE).add(new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
+		addIncident(NOT_A_RELEASE, new AttributesPotentialCompactVSosmIncident()); // requested by Bene
+		addIncident(NOT_A_RELEASE, new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
 		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
 		incidents.put(Version.V0_1, new LinkedList<>());
-		//incidents.get(Version.V0_1).add(...
+		//addIncident(.V0_1, ...
 
 		// - - - - - - - - - - - - "0.?" to "?" - - - - - - - - - - - -
 
 		//incidents.put(Version.V0_?, new LinkedList<>());
-		//incidents.get(Version.V0_?).add(...
+		//addIncident(.V0_, ...
+	}
+
+	private void addIncident(Version version, Incident incident) {
+		incidents.get(version).add(incident);
 	}
 
 	public List<Incident> getPossibleIncidentsFor(Version version) {
