@@ -43,11 +43,60 @@ public class DataProcessingView extends JPanel {
 
 
 	public DataProcessingView() {
-		GridLayout gridLayout = new GridLayout(2, 2);
-		setLayout(gridLayout);
+		setLayout(new GridLayout(1, 1));
 
-		// set up table models
+		// GUI PANEL
 
+		JPanel guiPanel = new JPanel(new GridBagLayout());
+		add(guiPanel);
+		GridBagConstraints c = new GridBagConstraints();
+		c.weighty = 1;
+		c.fill = GridBagConstraints.BOTH;
+
+		JPanel tableSide = new JPanel(new GridLayout(2, 1));
+		tableSide.setBorder(BorderFactory.createLineBorder(Color.blue));
+		c.weightx = 0.4;
+		guiPanel.add(tableSide, c);
+
+		JPanel detailsSide = new JPanel(new GridLayout(2, 1));
+		detailsSide.setBorder(BorderFactory.createLineBorder(Color.red));
+		c.weightx = 0.6;
+		guiPanel.add(detailsSide, c);
+
+		// tables side
+
+		setupTables();
+
+		JButton addFileBtn = new JButton(new AbstractAction("Add file") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO
+			}
+		});
+		tableSide.add(buildPanel("Files", filesTable, addFileBtn));
+
+		JButton addProcessorBtn = new JButton(new AbstractAction("Add processor") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO
+			}
+		});
+		tableSide.add(buildPanel("Processors", processorsTable, addProcessorBtn));
+
+		// details side
+
+		outputFilesDetailsPanel = new JPanel();
+		outputFilesDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
+		detailsSide.add(outputFilesDetailsPanel);
+
+		dataProcessorsDetailsPanel = new JPanel();
+		dataProcessorsDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
+		detailsSide.add(dataProcessorsDetailsPanel);
+	}
+
+	private void setupTables() {
 		filesTableModel = new DefaultTableModel(new OutputFile[] {null}, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -75,46 +124,10 @@ public class DataProcessingView extends JPanel {
 				handleDataProcessorSelected((DataProcessor) processorsTable.getValueAt(processorsTable.getSelectedRow(), 0));
 			}
 		});
-
-		// top left in 2x2 grid
-
-		JButton addFileBtn = new JButton(new AbstractAction("Add file") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				isEditable(false);
-				// TODO
-			}
-		});
-		add(buildPanel("Files", filesTable, addFileBtn));
-		editableComponents.add(addFileBtn);
-
-		// top right in 2x2 grid
-
-		outputFilesDetailsPanel = new JPanel();
-		outputFilesDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
-		add(outputFilesDetailsPanel);
-
-		// bottom left in 2x2 grid
-
-		JButton addProcessorBtn = new JButton(new AbstractAction("Add processor") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO
-			}
-		});
-		add(buildPanel("Processors", processorsTable, addProcessorBtn));
-		editableComponents.add(addProcessorBtn);
-
-		// bottom right in 2x2 grid
-
-		dataProcessorsDetailsPanel = new JPanel();
-		dataProcessorsDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
-		add(dataProcessorsDetailsPanel);
 	}
 
 	private JPanel buildPanel(String labelText, JTable table, JButton addBtn) { // used for OutputFile-Table and DataProcessor-Table
+		/*
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		JLabel label = new JLabel("<html><b>" + labelText + "</b></html>");
@@ -128,6 +141,36 @@ public class DataProcessingView extends JPanel {
 		panel.add(Box.createRigidArea(new Dimension(0, 10)));
 		addBtn.setAlignmentX(Component.RIGHT_ALIGNMENT); // for some reason this works only if the two components above are also set to right-align, even so then they left-align :)
 		panel.add(addBtn);
+		*/
+
+		JPanel panel = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.WEST;
+		c.ipady = 15;
+		c.weightx = 1;
+
+		c.fill = GridBagConstraints.BOTH;
+
+		c.weighty = 0.05;
+		c.gridy = 0;
+		JLabel label = new JLabel("<html><b>" + labelText + "</b></html>");
+		label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		panel.add(label, c);
+
+		c.weighty = 0.9;
+		c.gridy = 1;
+		table.setTableHeader(null);
+		JScrollPane tableScrollPane = new JScrollPane(table);
+		panel.add(tableScrollPane, c);
+
+		c.weighty = 0.05;
+		c.gridy = 2;
+
+		JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		btnPanel.add(addBtn);
+		panel.add(btnPanel, c);
+
+		editableComponents.add(addBtn);
 		return panel;
 	}
 
@@ -161,6 +204,7 @@ public class DataProcessingView extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST; // alignment
 		c.ipady = 15; // y-gap between components
+		c.weightx = 1;
 
 		c.gridx = 0;
 		c.gridy = 0;
@@ -191,6 +235,7 @@ public class DataProcessingView extends JPanel {
 		c.gridx = 1;
 		c.gridy = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 2;
 		JComboCheckBox<Integer> comboBox =
 				new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
 						.getDataProcessors().stream()
@@ -244,7 +289,9 @@ public class DataProcessingView extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		panel.add(attributesTextArea, c);
+		JScrollPane scrollPane = new JScrollPane(attributesTextArea);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		panel.add(scrollPane, c);
 
 		revalidate();
 		repaint();
