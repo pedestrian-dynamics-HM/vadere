@@ -87,7 +87,7 @@ public class DataProcessingView extends JPanel {
 
 		outputFilesDetailsPanel = new JPanel();
 		outputFilesDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 20, 0, 0));
+		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
 		add(outputFilesDetailsPanel);
 
 		// bottom left in 2x2 grid
@@ -103,8 +103,8 @@ public class DataProcessingView extends JPanel {
 		// bottom right in 2x2 grid
 
 		dataProcessorsDetailsPanel = new JPanel();
-		dataProcessorsDetailsPanel.setLayout(new GridBagLayout());
-		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		dataProcessorsDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
 		add(dataProcessorsDetailsPanel);
 	}
 
@@ -163,7 +163,7 @@ public class DataProcessingView extends JPanel {
 
 		c.gridx = 0;
 		c.gridy = 1;
-		panel.add(new JLabel("<html><i>Data key:</i></html>"), c);
+		panel.add(new JLabel("<html><i>DataKey:</i></html>"), c);
 
 		c.gridx = 1;
 		c.gridy = 1;
@@ -204,17 +204,31 @@ public class DataProcessingView extends JPanel {
 	private void handleDataProcessorSelected(DataProcessor dataProcessor) {
 		dataProcessorsDetailsPanel.removeAll();
 
+		JPanel panel = new JPanel(new GridBagLayout());
+		dataProcessorsDetailsPanel.add(panel);
+
 		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.WEST;
 		c.ipady = 15;
 
 		c.gridx = 0;
 		c.gridy = 0;
-		dataProcessorsDetailsPanel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
+		c.gridwidth = 2;
+		panel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
+		c.gridwidth = 1;
 
 		c.gridx = 0;
 		c.gridy = 1;
-		dataProcessorsDetailsPanel.add(new JLabel("Data key: " + getSimpleDataKeyName(getDataKeyForDataProcessor(dataProcessor))), c);
+		panel.add(new JLabel("<html><i>DataKey: </i></html>"), c);
 
+		c.gridx = 1;
+		c.gridy = 1;
+		panel.add(new JLabel(getSimpleDataKeyName(getDataKeyForDataProcessor(dataProcessor))), c);
+
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		RSyntaxTextArea attributesTextArea = new RSyntaxTextArea();
 		attributesTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
 		InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
@@ -225,10 +239,7 @@ public class DataProcessingView extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		c.gridx = 0;
-		c.gridy = 2;
-		dataProcessorsDetailsPanel.add(attributesTextArea, c);
+		panel.add(attributesTextArea, c);
 
 		revalidate();
 		repaint();
