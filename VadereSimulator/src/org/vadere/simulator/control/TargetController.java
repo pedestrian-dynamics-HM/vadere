@@ -3,6 +3,8 @@ package org.vadere.simulator.control;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.vadere.state.scenario.Agent;
@@ -40,19 +42,18 @@ public class TargetController {
 		}
 		final double reachedDistance = target.getAttributes().getDeletionDistance();
 
-		Rectangle2D bounds = target.getShape().getBounds2D();
-		VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
-		double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
+		final Rectangle2D bounds = target.getShape().getBounds2D();
+		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
+		final double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
 
-		Collection<DynamicElement> elementsInRange = new LinkedList<>();
-		elementsInRange.addAll(topography.getSpatialMap(Pedestrian.class).getObjects(center, radius));
-		elementsInRange.addAll(topography.getSpatialMap(Car.class).getObjects(center, radius));
-
+		final Collection<DynamicElement> elementsInRange = new LinkedList<>();
+		elementsInRange.addAll(getObjectsInCircle(Pedestrian.class, center, radius));
+		elementsInRange.addAll(getObjectsInCircle(Car.class, center, radius));
 
 		for (DynamicElement element : elementsInRange) {
 
-			Agent agent;
-			if (Agent.class.isAssignableFrom(element.getClass())) {
+			final Agent agent;
+			if (element instanceof Agent) {
 				agent = (Agent) element;
 			} else {
 				log.error("The given object is not a subtype of Agent.");
@@ -62,18 +63,25 @@ public class TargetController {
 			if (isNextTargetForAgent(agent)
 					&& hasAgentReachedThisTarget(agent, reachedDistance)) {
 
-				if (this.target.getWaitingTime() > 0) {
+				if (target.getWaitingTime() <= 0) {
+					checkRemove(agent);
+				} else {
+					final int agentId = agent.getId();
 					// individual waiting behaviour, as opposed to waiting at a traffic light
-					if (this.target.getAttributes().isIndividualWaiting()) {
-						if (target.getEnteringTimes().containsKey(agent.getId())) {
-							if (simTimeInSec - target.getEnteringTimes().get(agent.getId()) > this.target
+					if (target.getAttributes().isIndividualWaiting()) {
+						final Map<Integer, Double> enteringTimes = target.getEnteringTimes();
+						if (enteringTimes.containsKey(agentId)) {
+							if (simTimeInSec - enteringTimes.get(agentId) > target
 									.getWaitingTime()) {
-								target.getEnteringTimes().remove(agent.getId());
+								enteringTimes.remove(agentId);
 								checkRemove(agent);
 							}
-						} else if (this.target.getParallelWaiters() <= 0 || (this.target.getParallelWaiters() > 0 &&
-								target.getEnteringTimes().size() < this.target.getParallelWaiters())) {
-							target.getEnteringTimes().put(agent.getId(), simTimeInSec);
+						} else {
+							final int parallelWaiters = target.getParallelWaiters();
+							if (parallelWaiters <= 0 || (parallelWaiters > 0 &&
+									enteringTimes.size() < parallelWaiters)) {
+								enteringTimes.put(agentId, simTimeInSec);
+							}
 						}
 					} else {
 						// traffic light switching based on waiting time. Light starts green.
@@ -83,11 +91,13 @@ public class TargetController {
 							checkRemove(agent);
 						}
 					}
-				} else {
-					checkRemove(agent);
 				}
 			}
 		}
+	}
+
+	private <T extends DynamicElement> List<T> getObjectsInCircle(final Class<T> clazz, final VPoint center, final double radius) {
+		return topography.getSpatialMap(clazz).getObjects(center, radius);
 	}
 
 	private boolean hasAgentReachedThisTarget(Agent agent, double reachedDistance) {

@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestrianIdDataKey, VPoint> {
 
 	public PedestrianPositionProcessor() {

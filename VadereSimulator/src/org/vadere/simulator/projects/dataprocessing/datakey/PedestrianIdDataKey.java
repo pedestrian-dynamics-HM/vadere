@@ -1,6 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
-public class PedestrianIdDataKey implements Comparable<PedestrianIdDataKey> {
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
+public class PedestrianIdDataKey implements DataKey<PedestrianIdDataKey> {
 	private final int pedestrianId;
 
 	public PedestrianIdDataKey(int pedestrianId) {

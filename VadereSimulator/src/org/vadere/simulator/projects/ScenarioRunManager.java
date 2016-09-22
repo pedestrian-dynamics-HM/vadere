@@ -114,20 +114,23 @@ public class ScenarioRunManager implements Runnable {
 	 */
 	@Override
 	public void run() {
-		try {
-			doBeforeSimulation();
+		doBeforeSimulation();
 
-			// prepare processor and simulation data writer
+		try {
+			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
+			modelBuilder.createModelAndRandom();
+
+			final MainModel mainModel = modelBuilder.getModel();
+			final Random random = modelBuilder.getRandom();
+			
+			// prepare processors and simulation data writer
+			this.processorManager = this.dataProcessingJsonManager.createProcessorManager(mainModel);
+
 			createAndSetOutputDirectory();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 				out.println(JsonConverter.serializeScenarioRunManager(this, true));
 			}
-
-			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
-			modelBuilder.createModelAndRandom();
-			final MainModel mainModel = modelBuilder.getModel();
-			final Random random = modelBuilder.getRandom();
 
 			// Run simulation main loop from start time = 0 seconds
 			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
@@ -165,8 +168,6 @@ public class ScenarioRunManager implements Runnable {
 
 		logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
 		scenarioStore.topography.reset();
-
-		this.processorManager = this.dataProcessingJsonManager.createProcessorManager();
 	}
 
 	// Getter...

@@ -3,6 +3,11 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianDensityGaussianProcessor extends PedestrianDensityProcessor {
 
 	@Override

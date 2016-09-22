@@ -8,6 +8,11 @@ import org.vadere.state.scenario.Source;
 
 import java.util.Collection;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdDataKey, Integer> {
 
 	public PedestrianSourceIdProcessor() {

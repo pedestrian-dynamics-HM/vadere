@@ -4,6 +4,11 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.util.geometry.shapes.VPoint;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PointDensityGaussianAlgorithm extends PointDensityAlgorithm {
 	private double scale;
 	private double standDev;

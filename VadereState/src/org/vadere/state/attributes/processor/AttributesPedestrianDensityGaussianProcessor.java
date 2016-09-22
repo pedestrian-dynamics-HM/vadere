@@ -1,5 +1,10 @@
 package org.vadere.state.attributes.processor;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class AttributesPedestrianDensityGaussianProcessor extends AttributesPedestrianDensityProcessor {
 	private double scale = 10;
 	private double standardDerivation = 0.7;

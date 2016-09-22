@@ -1,6 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
-public final class NoDataKey implements Comparable<NoDataKey> {
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
+public final class NoDataKey implements DataKey<NoDataKey> {
 
     private static NoDataKey key;
 

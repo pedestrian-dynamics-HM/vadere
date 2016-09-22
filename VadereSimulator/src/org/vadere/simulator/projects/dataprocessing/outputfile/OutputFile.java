@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
 import java.io.FileWriter;
@@ -22,10 +23,12 @@ import java.util.stream.Stream;
  * It writes the data with the specified <tt>separator</tt> sign into a file specified by <tt>filename</tt>.
  *
  * @param <K> key type
+ * 
+ * @author Mario Teixeira Parente
  *
  */
 
-public abstract class OutputFile<K extends Comparable<K>> {
+public abstract class OutputFile<K extends DataKey<K>> {
 	private String[] keyHeaders;
 	private String fileName;
 

@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.Collection;
@@ -27,9 +28,11 @@ import java.util.TreeMap;
  * @param <K> key type
  * @param <V> value type
  *
+ * @author Mario Teixeira Parente
+ *
  */
 
-public abstract class DataProcessor<K extends Comparable<K>, V> {
+public abstract class DataProcessor<K extends DataKey<K>, V> {
 	private int id;
 	private AttributesProcessor attributes;
 
@@ -115,7 +118,7 @@ public abstract class DataProcessor<K extends Comparable<K>, V> {
 	public abstract void init(final ProcessorManager manager);
 
 	public String[] toStrings(final K key) {
-		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NaN" };
+		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NA" };
 	}
 
 	public String getType() {

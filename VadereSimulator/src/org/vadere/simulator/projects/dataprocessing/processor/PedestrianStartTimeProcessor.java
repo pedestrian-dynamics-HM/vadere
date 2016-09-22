@@ -7,6 +7,11 @@ import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Set;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
 
 	public PedestrianStartTimeProcessor() {

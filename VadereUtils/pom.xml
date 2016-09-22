@@ -29,6 +29,9 @@
             <groupId>com.nativelibs4java</groupId>
             <artifactId>maven-javacl-plugin</artifactId>
             <version>1.0.0-RC4</version>
+            <configuration>
+                <sourcesDirectory>${project.build.directory}/../src/org/vadere/util/opencl</sourcesDirectory>
+           </configuration>
             <executions>
                 <execution>
                     <phase>generate-sources</phase>

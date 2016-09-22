@@ -3,6 +3,11 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
     @Override
     public void init(final ProcessorManager manager) {

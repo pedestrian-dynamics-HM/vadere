@@ -1,5 +1,10 @@
 package org.vadere.state.attributes.processor;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class AttributesAreaSpeedProcessor extends AttributesAreaProcessor {
     private int pedestrianPositionProcessorId;
     private int pedestrianVelocityProcessorId;

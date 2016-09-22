@@ -32,13 +32,11 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution.
 
-### Build the Application
+### Run the Application
 
-Run `git clone https://gitlab.lrz.de/vadere/vadere`. Go to the project directory and run `mvn clean package` (or `mvn clean package -DskipTests` if you want to skip the unit tests).
-
-### Run Application
-
-After building the application, you can start Vadere by running `java -jar VadereGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
+1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
+2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -DskipTests` if you want to skip the unit tests).
+3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
 
 ## Usage Example 
 
@@ -52,7 +50,7 @@ With the following steps, you can start a scenario of the [ExampleProject](Docum
 
 ## Development Setup
 
-Follow the installation instructions above. Go to the project directory and run `mvn clean install`. The project can now be imported *As Maven Project* in your IDE.
+Follow the **installation instructions** above i.e. install all required software and get the source. Go to the project directory and run `mvn clean install`. The project can now be imported *As Maven Project* in your IDE.
 
 ### Eclipse
 
@@ -68,6 +66,10 @@ Follow the installation instructions above. Go to the project directory and run 
 - click the *run*-icon next to the `main` method
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
+
+### Git Hooks
+
+Follow the instructions in [Version Control HowTo](Documentation/version-control/HOWTO.txt).
 
 ## Contribution
 

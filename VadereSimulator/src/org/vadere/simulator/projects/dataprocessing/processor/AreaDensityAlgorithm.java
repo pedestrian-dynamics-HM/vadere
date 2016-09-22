@@ -1,5 +1,10 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public abstract class AreaDensityAlgorithm implements IAreaDensityAlgorithm {
     private String name;
 
