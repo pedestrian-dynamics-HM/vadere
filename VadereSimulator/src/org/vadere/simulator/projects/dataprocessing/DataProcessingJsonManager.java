@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class DataProcessingJsonManager {
 
     //TODO Change to 'dataprocessing'

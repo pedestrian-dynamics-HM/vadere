@@ -8,6 +8,11 @@ import org.vadere.state.attributes.processor.AttributesPedestrianFlowProcessor;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
     private PedestrianVelocityProcessor pedVelProc;
     private PedestrianDensityProcessor pedDensProc;

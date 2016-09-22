@@ -8,6 +8,11 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Integer> {
     private double pedRadius;
 

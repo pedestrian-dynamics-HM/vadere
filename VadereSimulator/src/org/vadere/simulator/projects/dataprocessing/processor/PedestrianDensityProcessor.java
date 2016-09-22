@@ -6,6 +6,11 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
 	private IPointDensityAlgorithm densAlg;

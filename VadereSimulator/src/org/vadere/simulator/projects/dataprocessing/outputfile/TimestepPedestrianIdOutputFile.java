@@ -2,6 +2,11 @@ package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class TimestepPedestrianIdOutputFile extends OutputFile<TimestepPedestrianIdDataKey> {
 
 	public TimestepPedestrianIdOutputFile() {

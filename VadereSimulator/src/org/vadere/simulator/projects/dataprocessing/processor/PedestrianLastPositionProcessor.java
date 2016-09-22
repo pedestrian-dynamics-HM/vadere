@@ -9,6 +9,11 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdDataKey, VPoint> {
 	private PedestrianPositionProcessor pedPosProc;
 

@@ -9,6 +9,11 @@ import org.vadere.state.scenario.Pedestrian;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class EvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 
