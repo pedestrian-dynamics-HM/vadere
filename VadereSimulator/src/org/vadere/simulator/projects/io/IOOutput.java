@@ -188,16 +188,13 @@ public abstract class IOOutput {
 	}
 
 	private static Optional<ScenarioRunManager> readOutputFile(final VadereProject project, final File directory) {
-		Optional<ScenarioRunManager> optionalVadere = Optional.empty();
-		Path pathToSnapshot;
 		try {
-			pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
-			optionalVadere = Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
+			final Path pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
+			return Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
 		} catch (IOException | VadereClassNotFoundException e) {
-			optionalVadere = Optional.empty();
 			logger.error("Error in output file " + directory.getName());
+			return Optional.empty();
 		}
-		return optionalVadere;
 	}
 
 	private static boolean isValidOutputDirectory(final VadereProject project, final File directory) {
