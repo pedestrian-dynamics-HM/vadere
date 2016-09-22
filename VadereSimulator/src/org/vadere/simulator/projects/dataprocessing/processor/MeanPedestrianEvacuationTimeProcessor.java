@@ -8,6 +8,11 @@ import org.vadere.state.attributes.processor.AttributesMeanPedestrianEvacuationT
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 

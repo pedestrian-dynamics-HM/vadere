@@ -23,6 +23,8 @@ import java.util.stream.Stream;
  * It writes the data with the specified <tt>separator</tt> sign into a file specified by <tt>filename</tt>.
  *
  * @param <K> key type
+ * 
+ * @author Mario Teixeira Parente
  *
  */
 

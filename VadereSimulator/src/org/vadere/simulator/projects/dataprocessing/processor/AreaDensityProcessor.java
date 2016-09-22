@@ -3,6 +3,11 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public abstract class AreaDensityProcessor extends AreaDataProcessor<Double> {
     private IAreaDensityAlgorithm densAlg;
 

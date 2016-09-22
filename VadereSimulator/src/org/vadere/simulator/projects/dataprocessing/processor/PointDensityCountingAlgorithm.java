@@ -4,6 +4,11 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PointDensityCountingAlgorithm extends PointDensityAlgorithm {
 	private double radius;
 	private double circArea;

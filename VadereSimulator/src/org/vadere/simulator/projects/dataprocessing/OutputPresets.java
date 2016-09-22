@@ -6,6 +6,11 @@ import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 
 import java.util.Arrays;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public final class OutputPresets {
     private static OutputPresets instance;
     private final OutputDefinitionStore outputDefinition;

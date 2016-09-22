@@ -1,5 +1,10 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class TimestepDataKey implements DataKey<TimestepDataKey> {
 	private final int timestep;
     public TimestepDataKey(int timestep) {

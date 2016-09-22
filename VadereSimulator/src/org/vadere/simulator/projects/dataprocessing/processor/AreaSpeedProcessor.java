@@ -10,6 +10,11 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class AreaSpeedProcessor extends AreaDataProcessor<Double> {
     private PedestrianPositionProcessor pedPosProc;
     private PedestrianVelocityProcessor pedVelProc;

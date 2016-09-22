@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class DataProcessingJsonManager {
 
     //TODO Change to 'dataprocessing'
@@ -193,13 +198,15 @@ public class DataProcessingJsonManager {
 
         if(node.has(ATTRIBUTESTYPE_KEY)) {
             String attType = node.get(ATTRIBUTESTYPE_KEY).asText();
-            store.setAttributesType(attType);
 
-            try {
-                store.setAttributes(mapper.readValue(node.get(ATTRIBUTES_KEY).toString(), mapper.getTypeFactory().constructFromCanonical(attType)));
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
+            if (attType != "") {
+                store.setAttributesType(attType);
+
+                try {
+                    store.setAttributes(mapper.readValue(node.get(ATTRIBUTES_KEY).toString(), mapper.getTypeFactory().constructFromCanonical(attType)));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 

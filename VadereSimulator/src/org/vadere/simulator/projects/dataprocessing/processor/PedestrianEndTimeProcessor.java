@@ -7,6 +7,11 @@ import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
 
+/**
+ * @author Mario Teixeira Parente
+ *
+ */
+
 public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
     public PedestrianEndTimeProcessor() {
         super("endTime");
