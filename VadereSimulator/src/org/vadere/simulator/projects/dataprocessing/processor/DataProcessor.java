@@ -118,6 +118,6 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	public abstract void init(final ProcessorManager manager);
 
 	public String[] toStrings(final K key) {
-		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NaN" };
+		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NA" };
 	}
 }
