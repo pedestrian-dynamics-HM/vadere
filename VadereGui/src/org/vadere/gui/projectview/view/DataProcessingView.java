@@ -191,18 +191,16 @@ public class DataProcessingView extends JPanel {
 		c.gridx = 1;
 		c.gridy = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		JComboCheckBox<Integer> dataProcessorIDsComboCheckBox =
+		JComboCheckBox<Integer> comboBox =
 				new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
 						.getDataProcessors().stream()
 						.filter(dataProcessor -> getDataKeyForDataProcessor(dataProcessor) == outputFileDataKey) // only show processors with same DataKey as outputFile
-						.map(DataProcessor::getId)
-						.collect(Collectors.toList()));
-		dataProcessorIDsComboCheckBox.setCheckedItems(outputFile.getProcessorIds());
-		dataProcessorIDsComboCheckBox.addActionListener(e ->
-				outputFile.setProcessorIds(dataProcessorIDsComboCheckBox.getCheckedItems()));
-		panel.add(dataProcessorIDsComboCheckBox, c);
-		editableComponents.add(dataProcessorIDsComboCheckBox);
-		dataProcessorIDsComboCheckBox.setEnabled(isEditable);
+						.map(DataProcessor::getId).collect(Collectors.toList()));
+		comboBox.setCheckedItems(outputFile.getProcessorIds());
+		comboBox.addActionListener(e -> outputFile.setProcessorIds(comboBox.getCheckedItems()));
+		panel.add(comboBox, c);
+		editableComponents.add(comboBox);
+		comboBox.setEnabled(isEditable);
 
 		revalidate();
 		repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
