@@ -43,8 +43,8 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
-	private TextView outputView; // new Output tab
-	private DataProcessingView dataProcessingGUIview;
+	private TextView outputView; // "expert" (raw json) DataProcessing View
+	private DataProcessingView dataProcessingGUIview; // DataProcessing GUI
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 

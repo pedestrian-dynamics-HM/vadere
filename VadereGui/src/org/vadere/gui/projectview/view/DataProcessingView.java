@@ -86,8 +86,8 @@ public class DataProcessingView extends JPanel {
 		// top right in 2x2 grid
 
 		outputFilesDetailsPanel = new JPanel();
-		outputFilesDetailsPanel.setLayout(new GridBagLayout());
-		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		outputFilesDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 20, 0, 0));
 		add(outputFilesDetailsPanel);
 
 		// bottom left in 2x2 grid
@@ -144,7 +144,12 @@ public class DataProcessingView extends JPanel {
 	}
 
 	private void handleOutputFileSelected(OutputFile outputFile) {
+		Type outputFileDataKey = getDataKeyForOutputFile(outputFile);
+
 		outputFilesDetailsPanel.removeAll();
+
+		JPanel panel = new JPanel(new GridBagLayout());
+		outputFilesDetailsPanel.add(panel);
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST; // alignment
@@ -153,38 +158,32 @@ public class DataProcessingView extends JPanel {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		outputFilesDetailsPanel.add(new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>"), c);
+		panel.add(new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>"), c);
+		c.gridwidth = 1;
 
 		c.gridx = 0;
 		c.gridy = 1;
-		c.gridwidth = 1;
-		outputFilesDetailsPanel.add(new JLabel("Data key: "), c);
-/*
-		String[] options = new String[]{
-				NoDataKeyOutputFile.class.getSimpleName(),
-				PedestrianIdOutputFile.class.getSimpleName(),
-				TimestepOutputFile.class.getSimpleName(),
-				TimestepPedestrianIdOutputFile.class.getSimpleName()
-		};
-		JComboBox typesComboBox = new JComboBox(options);
-		typesComboBox.setSelectedItem(outputFile.getClass().getSimpleName());*/
-
-		Type outputFileDataKey = getDataKeyForOutputFile(outputFile);
+		panel.add(new JLabel("<html><i>Data key:</i></html>"), c);
 
 		c.gridx = 1;
 		c.gridy = 1;
-		outputFilesDetailsPanel.add(new JLabel(getSimpleDataKeyName(outputFileDataKey)), c);
+		panel.add(new JLabel(getSimpleDataKeyName(outputFileDataKey)), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
-		c.gridwidth = 2;
-		outputFilesDetailsPanel.add(new JLabel("Header: " + outputFile.getHeader()), c);
+		panel.add(new JLabel("<html><i>Header:</i></html>"), c);
+
+		c.gridx = 1;
+		c.gridy = 2;
+		panel.add(new JLabel(outputFile.getHeader()), c);
 
 		c.gridx = 0;
 		c.gridy = 3;
-		c.gridwidth = 1;
-		outputFilesDetailsPanel.add(new JLabel("Processors: "), c);
+		panel.add(new JLabel("<html><i>Processors:</i></html>"), c);
 
+		c.gridx = 1;
+		c.gridy = 3;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		JComboCheckBox<Integer> dataProcessorIDsComboCheckBox =
 				new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
 						.getDataProcessors().stream()
@@ -196,11 +195,7 @@ public class DataProcessingView extends JPanel {
 		dataProcessorIDsComboCheckBox.addActionListener(e -> {
 			// TODO Mario?
 		});
-
-		c.gridx = 1;
-		c.gridy = 3;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		outputFilesDetailsPanel.add(dataProcessorIDsComboCheckBox, c);
+		panel.add(dataProcessorIDsComboCheckBox, c);
 
 		revalidate();
 		repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
