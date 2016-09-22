@@ -26,8 +26,7 @@ public class MigrationAssistant {
 	public enum Version {
 		UNDEFINED("undefined"),
 		NOT_A_RELEASE("not a release"),
-		V0_1("0.1"),
-		V0_2("0.2");
+		V0_1("0.1");
 
 		private String label;
 
