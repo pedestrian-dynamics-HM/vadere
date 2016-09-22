@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -16,16 +17,21 @@ import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.TrainGeometry;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import static org.vadere.simulator.models.seating.TestTopographyAndModelBuilder.*;
 
 public class TestTrainModel {
 	
+	private TrainGeometry trainGeometry;
 	private TrainModel trainModel;
 
 	@Before
 	public void setUp() {
-		trainModel = new TestTopographyAndModelBuilder().getTrainModel();
+		TestTopographyAndModelBuilder builder = new TestTopographyAndModelBuilder();
+		trainModel = builder.getTrainModel();
+		trainGeometry = builder.getTrainGeometry();
 	}
 
 	@Test
@@ -181,6 +187,28 @@ public class TestTrainModel {
 		}
 	}
 	
+	@Test
+	public void testSeatLocationFallInCompartment() {
+		assertIsInCompartment(trainModel.getSeat(0, 0, 0).getAssociatedTarget(), 0);
+		assertIsInCompartment(trainModel.getSeat(0, 1, 1).getAssociatedTarget(), 0);
+
+		assertIsInCompartment(trainModel.getSeat(1, 0, 2).getAssociatedTarget(), 1);
+		assertIsInCompartment(trainModel.getSeat(1, 3, 3).getAssociatedTarget(), 1);
+	}
+	
+	@Test
+	public void testInterimTargetLocationFallInCompartment() {
+		assertIsInCompartment(trainModel.getInterimDestinations().get(0), 0);
+
+		assertIsInCompartment(trainModel.getInterimDestinations().get(nInterimDestinations - 1), nCompartments - 1);
+	}
+	
+	private void assertIsInCompartment(Target target, int compartmentIndex) {
+		final VPoint point = target.getShape().getCentroid();
+		final Point2D targetPoint = new Point2D.Double(point.getX(), point.getY());
+		assertTrue(trainGeometry.getCompartmentRect(compartmentIndex).contains(targetPoint));
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetCompartmentWithInvalidTarget() {
 		trainModel.getCompartment(new Target(new AttributesTarget()));

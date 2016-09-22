@@ -117,7 +117,7 @@ public class TrainModel {
 
 		// Sort interim target by x coordinate. Right-most target must be the first in the list.
 		interimDestinations = findTargets(longAisle).stream()
-				.sorted((a, b) -> Double.compare(b.getShape().getBounds().getX(), a.getShape().getBounds().getX()))
+				.sorted((a, b) -> Double.compare(a.getShape().getBounds().getX(), b.getShape().getBounds().getX()))
 				.collect(Collectors.toList());
 		if (interimDestinations.isEmpty()) {
 			throw new IllegalArgumentException(

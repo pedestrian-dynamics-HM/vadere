@@ -13,6 +13,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.scenario.Et423Geometry;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.TrainGeometry;
 
 public class TestTopographyAndModelBuilder {
 	
@@ -41,7 +42,7 @@ public class TestTopographyAndModelBuilder {
 
 	public TrainModel getTrainModel() {
 		final Topography topography = createTestTopography();
-		return new TrainModel(topography, new Et423Geometry());
+		return new TrainModel(topography, getTrainGeometry());
 	}
 	
 	public SeatingModel getSeatingModel() {
@@ -62,5 +63,8 @@ public class TestTopographyAndModelBuilder {
 		}
 	}
 
+	public TrainGeometry getTrainGeometry() {
+		return new Et423Geometry();
+	}
 
 }
