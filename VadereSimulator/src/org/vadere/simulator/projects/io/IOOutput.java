@@ -45,8 +45,6 @@ public abstract class IOOutput {
 
 	/**
 	 * Returns all valid output directories of the project.
-	 * 
-	 * @return all valid output directories of the project
 	 */
 	public static List<File> listAllOutputDirs(final VadereProject project) {
 		return listAllDirs(project).stream().filter(f -> isValidOutputDirectory(project, f))
@@ -61,14 +59,6 @@ public abstract class IOOutput {
 				.forEach(dir -> cleanDir(project, dir));
 	}
 
-	/**
-	 *
-	 * @param project
-	 * @param directoryName
-	 * @param scenario
-	 * @return
-	 * @throws IOException
-	 */
 	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project,
 			final ScenarioRunManager scenario, final String directoryName) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(
