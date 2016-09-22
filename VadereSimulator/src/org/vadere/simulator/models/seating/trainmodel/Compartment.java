@@ -67,29 +67,11 @@ public class Compartment {
 		return seatGroups;
 	}
 
-	public Target getInterimTargetCloserTo(int entranceAreaIndex) {
+	public Target getInterimTarget() {
 		// entrance areas:     0   1   2   3
 		// compartments:     0   1   2   3   4
-		// interim targets:  0  123 456 489  .
-		
-		trainModel.checkEntranceAreaIndexRange(entranceAreaIndex);
-		
-		final List<Target> interimTargets = trainModel.getInterimDestinations();
-		
-		if (isFirstHalfCompartment()) {
-			return interimTargets.get(0);
-		} else if (isLastHalfCompartment()) {
-			return interimTargets.get(interimTargets.size() - 1);
-		}
-		
-		final int interimTargetStartIndex = index * 3 - 2;
-		if (index <= entranceAreaIndex) {
-			// use interim target with higher number
-			return interimTargets.get(interimTargetStartIndex + 2);
-		} else {
-			// use interim target with smaller number
-			return interimTargets.get(interimTargetStartIndex);
-		}
+		// interim targets:  0   1   2   3   4
+		return trainModel.getInterimDestinations().get(index);
 	}
 
 	private boolean isLastHalfCompartment() {

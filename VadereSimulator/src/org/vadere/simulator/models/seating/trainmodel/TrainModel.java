@@ -275,8 +275,7 @@ public class TrainModel {
 		if (index == -1) {
 			throw new IllegalArgumentException("Given target is not an interim target.");
 		}
-		System.out.println("index of interim target: " + index + "; index of compartment: " + (index + 2) / 3);
-		return getCompartment((index + 2) / 3);
+		return getCompartment(index);
 	}
 
 	void checkEntranceAreaIndexRange(int entranceAreaIndex) {

@@ -80,7 +80,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		log.debug("Assigning compartment target to pedestrian " + p.getId());
 		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
-		p.addTarget(compartment.getInterimTargetCloserTo(entranceAreaIndex));
+		p.addTarget(compartment.getInterimTarget());
 	}
 
 	private void assignSeatTarget(Pedestrian p) {
