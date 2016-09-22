@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.migration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class IncidentDatabase {
 
 		// - - - - - - - - - - - - "not a release" to "0.1" - - - - - - - - - - - -
 
-		incidents.put(Version.NOT_A_RELEASE, new ArrayList<>());
+		incidents.put(Version.NOT_A_RELEASE, new LinkedList<>());
 
 		incidents.get(Version.NOT_A_RELEASE).add(new RelocationIncident(
 				"finishTime",
@@ -71,10 +72,15 @@ public class IncidentDatabase {
 		incidents.get(Version.NOT_A_RELEASE).add(new AttributesPotentialCompactVSosmIncident()); // requested by Bene
 		incidents.get(Version.NOT_A_RELEASE).add(new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
-		// - - - - - - - - - - - - "0.1" to "?" - - - - - - - - - - - -
+		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
-		//incidents.put(Version.V0_1, new ArrayList<>());
+		incidents.put(Version.V0_1, new LinkedList<>());
 		//incidents.get(Version.V0_1).add(...
+
+		// - - - - - - - - - - - - "0.?" to "?" - - - - - - - - - - - -
+
+		//incidents.put(Version.V0_?, new LinkedList<>());
+		//incidents.get(Version.V0_?).add(...
 	}
 
 	public List<Incident> getPossibleIncidentsFor(Version version) {
