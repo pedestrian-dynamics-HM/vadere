@@ -54,7 +54,7 @@ public class DataProcessingView extends JPanel {
 		filesTable = new JTable(filesTableModel);
 		filesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		filesTable.getSelectionModel().addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
+			if (!e.getValueIsAdjusting() && filesTable.getSelectedRow() > -1) {
 				handleOutputFileSelected((OutputFile) filesTableModel.getValueAt(filesTable.getSelectedRow(), 0));
 			}
 		});
@@ -68,7 +68,7 @@ public class DataProcessingView extends JPanel {
 		processorsTable = new JTable(processorsTableModel);
 		processorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		processorsTable.getSelectionModel().addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
+			if (!e.getValueIsAdjusting() && processorsTable.getSelectedRow() > -1) {
 				handleDataProcessorSelected((DataProcessor) processorsTable.getValueAt(processorsTable.getSelectedRow(), 0));
 			}
 		});
