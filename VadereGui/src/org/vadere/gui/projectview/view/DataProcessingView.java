@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 
@@ -37,6 +39,7 @@ public class DataProcessingView extends JPanel {
 
 	private ScenarioRunManager currentScenario;
 	private boolean isEditable;
+	private List<Component> editableComponents = new ArrayList<>();
 
 
 	public DataProcessingView() {
@@ -78,10 +81,12 @@ public class DataProcessingView extends JPanel {
 		JButton addFileBtn = new JButton(new AbstractAction("Add file") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				isEditable(false);
 				// TODO
 			}
 		});
 		add(buildPanel("Files", filesTable, addFileBtn));
+		editableComponents.add(addFileBtn);
 
 		// top right in 2x2 grid
 
@@ -99,6 +104,7 @@ public class DataProcessingView extends JPanel {
 			}
 		});
 		add(buildPanel("Processors", processorsTable, addProcessorBtn));
+		editableComponents.add(addProcessorBtn);
 
 		// bottom right in 2x2 grid
 
@@ -141,6 +147,7 @@ public class DataProcessingView extends JPanel {
 
 	public void isEditable(boolean isEditable) {
 		this.isEditable = isEditable;
+		editableComponents.forEach(comp -> comp.setEnabled(isEditable));
 	}
 
 	private void handleOutputFileSelected(OutputFile outputFile) {
@@ -194,6 +201,8 @@ public class DataProcessingView extends JPanel {
 		dataProcessorIDsComboCheckBox.addActionListener(e ->
 				outputFile.setProcessorIds(dataProcessorIDsComboCheckBox.getCheckedItems()));
 		panel.add(dataProcessorIDsComboCheckBox, c);
+		editableComponents.add(dataProcessorIDsComboCheckBox);
+		dataProcessorIDsComboCheckBox.setEnabled(isEditable);
 
 		revalidate();
 		repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
