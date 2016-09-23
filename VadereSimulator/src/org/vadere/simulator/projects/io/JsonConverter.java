@@ -1,7 +1,5 @@
 package org.vadere.simulator.projects.io;
 
-import com.google.gson.JsonElement;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -61,7 +59,6 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -421,25 +418,12 @@ public abstract class JsonConverter {
 		return rootNode;
 	}
 
-	private static JsonNode processorManagerToNode(ScenarioRunManager srm) throws IOException {
-		//JsonNode node = mapper.readTree(srm.getOutputProcessorsJson());
-		// TODO do proper serialization instead of storing the original json
-		return null;
-	}
-
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {
 		node.put("name", scenarioStore.name);
 		node.put("description", scenarioStore.description);
 		node.put("release", HashGenerator.releaseNumber());
 		if (commitHashIncluded)
 			node.put("commithash", HashGenerator.commitHash());
-		node.put("topographyhash", HashGenerator.topographyHash(scenarioStore.topography));
-		node.put("attributeshash", HashGenerator.attributesHash(scenarioStore));
-	}
-
-	// temporary, until GSON is finally completely gone, only used for serializing OutputProcessors
-	private static JsonNode jsonElementToJsonNode(JsonElement jsonElement) throws IOException {
-		return mapper.readValue(jsonElement.toString(), JsonNode.class);
 	}
 
 	private static ObjectNode serializeVadereNode(ScenarioStore scenarioStore) {
@@ -476,13 +460,6 @@ public abstract class JsonConverter {
 		for (Attributes a : attributesList)
 			list.add(Pair.of(a.getClass().getName(), a));
 		return list;
-	}
-
-	private static Map<String, Attributes> attributesListToMap(List<Attributes> attributesList) {
-		Map<String, Attributes> map = new HashMap<>();
-		for (Attributes a : attributesList)
-			map.put(a.getClass().getName(), a);
-		return map;
 	}
 
 	private static ObjectNode serializeTopographyToNode(Topography topography) {
