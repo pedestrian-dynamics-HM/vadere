@@ -66,6 +66,8 @@ import java.util.Map;
 
 public abstract class JsonConverter {
 
+	public static final String SCENARIO_KEY = "scenario";
+
 	public static final String MAIN_MODEL_KEY = "mainModel";
 
 	private static Logger logger = LogManager.getLogger(JsonConverter.class);
@@ -258,7 +260,7 @@ public abstract class JsonConverter {
 	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
-		JsonNode vadereNode = rootNode.get("vadere");
+		JsonNode vadereNode = rootNode.get(SCENARIO_KEY);
 		AttributesSimulation as = deserializeAttributesSimulationFromNode(vadereNode.get("attributesSimulation"));
 		JsonNode attributesModelNode = vadereNode.get("attributesModel");
 		String mainModel = vadereNode.get(MAIN_MODEL_KEY).isNull() ? null : vadereNode.get(MAIN_MODEL_KEY).asText();
@@ -414,7 +416,7 @@ public abstract class JsonConverter {
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
 		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenarioRunManager.getDataProcessingJsonManager().serializeToNode());
-		rootNode.set("vadere", serializeVadereNode(scenarioStore));
+		rootNode.set(SCENARIO_KEY, serializeVadereNode(scenarioStore));
 		return rootNode;
 	}
 
