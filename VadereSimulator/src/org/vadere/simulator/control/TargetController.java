@@ -144,14 +144,16 @@ public class TargetController {
 		if (target.isAbsorbing()) {
 			topography.removeElement(agent);
 		} else {
+			final int nextTargetListIndex = agent.getNextTargetListIndex();
+
 			// Deprecated target list usage
-			if (agent.getNextTargetListIndex() == -1 && !agent.getTargets().isEmpty()) {
+			if (nextTargetListIndex == -1 && !agent.getTargets().isEmpty()) {
 				agent.getTargets().removeFirst();
 			}
 
 			// The right way (later this first check should not be necessary anymore):
-			if (agent.getNextTargetListIndex() != -1) {
-				if (agent.getNextTargetListIndex() < agent.getTargets().size()) {
+			if (nextTargetListIndex != -1) {
+				if (nextTargetListIndex < agent.getTargets().size()) {
 					agent.incrementNextTargetListIndex();
 				}
 			}
