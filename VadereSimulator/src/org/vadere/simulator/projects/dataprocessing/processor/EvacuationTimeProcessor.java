@@ -23,7 +23,7 @@ public class EvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        // No implementation needed, look at 'postLoop(SimulationState)'
+        this.pedEvacTimeProc.update(state);
     }
 
     @Override
