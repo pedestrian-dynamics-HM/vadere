@@ -273,8 +273,6 @@ public abstract class JsonConverter {
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
 		scenarioRunManager.saveChanges();
 
-		if (scenarioRunManager.getTopography() == null)
-			logger.error("Loading topography failed."); // migrated from GSON, not sure if still necessary
 		return scenarioRunManager;
 	}
 
