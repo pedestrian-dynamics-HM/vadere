@@ -56,7 +56,7 @@ public abstract class IOOutput {
 	 */
 	public static void cleanOutputDirs(final VadereProject project) {
 		listAllDirs(project).stream().filter(f -> !isValidOutputDirectory(project, f))
-				.forEach(dir -> cleanDir(project, dir));
+				.forEach(dir -> cleanDirectory(project, dir));
 	}
 
 	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project,
@@ -80,7 +80,7 @@ public abstract class IOOutput {
 		return IOVadere.fromJson(snapshotString);
 	}
 
-	public static ScenarioRunManager readVadere(final File file) throws IOException {
+	public static ScenarioRunManager readScenario(final File file) throws IOException {
 		String snapshotString;
 		Path path = file.toPath();
 		if (file.isFile() && file.getName().endsWith(IOUtils.SCENARIO_FILE_EXTENSION)) {
@@ -99,8 +99,8 @@ public abstract class IOOutput {
 		return IOVadere.fromJson(snapshotString);
 	}
 
-	public static ScenarioRunManager readVadere(final Path path) throws IOException {
-		return IOOutput.readVadere(path.toFile());
+	public static ScenarioRunManager readScenario(final Path path) throws IOException {
+		return IOOutput.readScenario(path.toFile());
 	}
 
 	public static boolean renameOutputDirectory(final File directory, final String newName) {
@@ -163,7 +163,7 @@ public abstract class IOOutput {
 		return outputDirectories;
 	}
 
-	private static void cleanDir(final VadereProject project, final File directory) {
+	private static void cleanDirectory(final VadereProject project, final File directory) {
 		IOUtils.errorBox(
 				"The directory '"
 						+ directory.getName()
