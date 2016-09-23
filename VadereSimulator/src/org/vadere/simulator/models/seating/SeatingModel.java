@@ -50,6 +50,20 @@ public class SeatingModel implements ActiveCallback, Model {
 	private RandomGenerator rng;
 
 	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+			AttributesAgent attributesPedestrian, Random random) {
+		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
+		this.topography = topography;
+		
+		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();
+		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
+		// TODO catch exception of TrainModel constructor when train scenario is corrupt
+		this.trainModel = new TrainModel(topography, trainGeometry);
+		this.random = random;
+		this.rng = new JDKRandomGenerator(random.nextInt());
+	}
+
+	@Override
 	public void preLoop(double simTimeInSec) {
 		// before simulation
 	}
@@ -107,20 +121,6 @@ public class SeatingModel implements ActiveCallback, Model {
 	
 	private boolean hasJustReachedItsFirstTarget(Pedestrian p) {
 		return p.getTargets().size() == 1 && !p.hasNextTarget();
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
-		this.topography = topography;
-		
-		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();
-		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
-		// TODO catch exception of TrainModel constructor when train scenario is corrupt
-		this.trainModel = new TrainModel(topography, trainGeometry);
-		this.random = random;
-		this.rng = new JDKRandomGenerator(random.nextInt());
 	}
 
 	public TrainModel getTrainModel() {
