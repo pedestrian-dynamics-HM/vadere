@@ -58,10 +58,8 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		int targetId = ped.getNextTargetId();
 
 		// Pedestrian has reached the target
-		if (topography.getTarget(targetId) != null) {
-			if (topography.getTarget(targetId).getShape().contains(pos)) {
-				return 0; // the arrival time is zero
-			}
+		if (topography.getTarget(targetId).getShape().contains(pos)) {
+			return 0; // the arrival time is zero
 		}
 
 		// Pedestrain inside an obstacle
