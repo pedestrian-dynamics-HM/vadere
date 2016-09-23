@@ -61,7 +61,8 @@ public class TargetController {
 				continue;
 			}
 
-			if (isNextTargetForAgent(agent)) {
+			if (isNextTargetForAgent(agent)
+					&& hasAgentReachedThisTarget(agent, reachedDistance)) {
 
 				notifyListenersTargetReached(agent);
 
@@ -100,6 +101,11 @@ public class TargetController {
 
 	private <T extends DynamicElement> List<T> getObjectsInCircle(final Class<T> clazz, final VPoint center, final double radius) {
 		return topography.getSpatialMap(clazz).getObjects(center, radius);
+	}
+
+	private boolean hasAgentReachedThisTarget(Agent agent, double reachedDistance) {
+		return target.getShape().contains(agent.getPosition())
+				|| target.getShape().distance(agent.getPosition()) < reachedDistance;
 	}
 
 	private TrafficLightPhase getCurrentTrafficLightPhase(double simTimeInSec) {
