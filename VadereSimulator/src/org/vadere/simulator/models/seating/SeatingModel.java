@@ -47,7 +47,6 @@ public class SeatingModel implements ActiveCallback, Model {
 	
 	private AttributesSeating attributes;
 	private TrainModel trainModel;
-	private Topography topography;
 	private Random random;
 	/** Used for distributions from Apache Commons Math. */
 	private RandomGenerator rng;
@@ -56,7 +55,6 @@ public class SeatingModel implements ActiveCallback, Model {
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
-		this.topography = topography;
 		
 		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();
 		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
@@ -263,17 +261,6 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	private void logDebug(String formatString, Object... args) {
 		log.debug(String.format(formatString, args));
-	}
-	
-	// TODO test
-	private double mapEntranceAreaIndexToRange01(int index) {
-		double compartmentIntervalWidth = 1.0 / getCompartmentCount();
-		return (index + 1) * compartmentIntervalWidth;
-	}
-	
-	// TODO test
-	private int mapRange01ToCompartmentIndex(double value) {
-		return (int) Math.floor(value * getCompartmentCount());
 	}
 	
 	private int getCompartmentCount() {
