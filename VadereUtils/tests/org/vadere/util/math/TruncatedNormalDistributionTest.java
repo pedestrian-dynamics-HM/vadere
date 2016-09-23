@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Test;
+import org.vadere.util.test.StatisticalTestCase;
 
 public class TruncatedNormalDistributionTest {
 	
@@ -22,7 +23,7 @@ public class TruncatedNormalDistributionTest {
 		new TruncatedNormalDistribution(rng, 0, 1, 2, 1, maxIterations);
 	}
 
-	// TODO annotate with statistical test case
+	@StatisticalTestCase
 	@Test
 	public void testSample() {
 		final double min = -1;
@@ -34,7 +35,7 @@ public class TruncatedNormalDistributionTest {
 		}
 	}
 
-	// TODO annotate with statistical test case
+	@StatisticalTestCase
 	@Test(expected=IllegalArgumentException.class)
 	public void testBadMinMax() {
 		final double min = -10001;
