@@ -54,15 +54,8 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 
 		CellGrid potentialField;
 		double targetPotential = Double.MAX_VALUE;
-		int targetId = -1;
 
-		assert targetIds.size() > 0;
-
-		if (targetIds.size() > 0) {
-			targetId = targetIds.get(0);
-		} else {
-			return 0;
-		}
+		int targetId = ped.getNextTargetId();
 
 		// Pedestrian has reached the target
 		if (topography.getTarget(targetId) != null) {
