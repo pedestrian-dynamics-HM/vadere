@@ -13,6 +13,10 @@ import org.vadere.util.geometry.shapes.VRectangle;
 public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepDataKey, V> {
     private VRectangle measurementArea;
 
+    protected AreaDataProcessor(final String... headers) {
+        super(headers);
+    }
+
     @Override
     public void init(final ProcessorManager manager) {
         AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();

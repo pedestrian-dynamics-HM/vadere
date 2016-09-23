@@ -76,8 +76,8 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		return this.headers;
 	}
 
-	public void setHeader(final String header) {
-		this.headers = new String[] { header };
+	public void setHeaders(final String... headers) {
+		this.headers = headers;
 	}
 
 	public Set<K> getKeys() {
