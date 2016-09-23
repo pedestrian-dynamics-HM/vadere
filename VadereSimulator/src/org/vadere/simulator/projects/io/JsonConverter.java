@@ -260,14 +260,14 @@ public abstract class JsonConverter {
 	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
-		JsonNode vadereNode = rootNode.get(SCENARIO_KEY);
-		AttributesSimulation as = deserializeAttributesSimulationFromNode(vadereNode.get("attributesSimulation"));
-		JsonNode attributesModelNode = vadereNode.get("attributesModel");
-		String mainModel = vadereNode.get(MAIN_MODEL_KEY).isNull() ? null : vadereNode.get(MAIN_MODEL_KEY).asText();
-		List<Attributes> am = deserializeAttributesListFromNode(attributesModelNode);
-		Topography to = deserializeTopographyFromNode(vadereNode.get("topography"));
+		JsonNode scenarioNode = rootNode.get(SCENARIO_KEY);
+		AttributesSimulation attributesSimulation = deserializeAttributesSimulationFromNode(scenarioNode.get("attributesSimulation"));
+		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
+		String mainModel = scenarioNode.get(MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(MAIN_MODEL_KEY).asText();
+		List<Attributes> attributesModel = deserializeAttributesListFromNode(attributesModelNode);
+		Topography topography = deserializeTopographyFromNode(scenarioNode.get("topography"));
 		String description = rootNode.get("description").asText();
-		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, am, as, to);
+		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, attributesModel, attributesSimulation, topography);
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
