@@ -20,6 +20,10 @@
 		"type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
 		"filename": "postvis.trajectories",
 		"processors": [ 1, 18 ]
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepRowOutputFile",
+		"filename": "output_ts_row.txt",
+		"processors": [ 20 ]
 	} ],
 	"processors": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -165,5 +169,8 @@
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSourceIdProcessor",
 		"id": 19
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing.processor.FloorFieldGridProcessor",
+		"id": 20
 	} ]
 }
