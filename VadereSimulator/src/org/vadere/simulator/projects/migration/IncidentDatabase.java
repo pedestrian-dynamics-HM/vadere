@@ -74,8 +74,8 @@ public class IncidentDatabase {
 		addIncident(NOT_A_RELEASE, new AttributesPotentialCompactVSosmIncident()); // requested by Bene
 		addIncident(NOT_A_RELEASE, new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
-		incidents.get(Version.NOT_A_RELEASE).add(new DeletionIncident(path("topographyhash")));
-		incidents.get(Version.NOT_A_RELEASE).add(new DeletionIncident(path("attributeshash")));
+		addIncident(NOT_A_RELEASE, new DeletionIncident(path("topographyhash")));
+		addIncident(NOT_A_RELEASE, new DeletionIncident(path("attributeshash")));
 
 		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
