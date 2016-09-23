@@ -50,7 +50,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 *
 	 */
 	@Override
-	public double getTargetPotential(final List<Integer> targetIds, final VPoint pos, final Agent ped) {
+	public double getTargetPotential(final VPoint pos, final Agent ped) {
 
 		CellGrid potentialField;
 		Topography floor = topography;
@@ -107,7 +107,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 			incY = 0;
 		}
 
-		List<Point> points = new LinkedList<Point>();
+		List<Point> points = new LinkedList<>();
 		points.add(gridPoint);
 		points.add(new Point(gridPoint.x + incX, gridPoint.y));
 		points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
@@ -222,7 +222,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 */
 	@Override
 	public HashMap<Integer, CellGrid> getCellGrids() {
-		HashMap<Integer, CellGrid> map = new HashMap<Integer, CellGrid>();
+		HashMap<Integer, CellGrid> map = new HashMap<>();
 
 
 		for (Map.Entry<Integer, PotentialFieldAndInitializer> entry2 : targetPotentialFields

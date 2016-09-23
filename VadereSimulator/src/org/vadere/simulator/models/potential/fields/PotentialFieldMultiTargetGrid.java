@@ -8,7 +8,6 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
@@ -59,7 +58,7 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractPote
 	}
 
 	@Override
-	public Vector2D getTargetPotentialGradient(List<Integer> targetIds, VPoint pos, Agent ped) {
+	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
 		throw new UnsupportedOperationException("method not jet implemented.");
 	}
 

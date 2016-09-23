@@ -221,7 +221,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	public double getPotential(VPoint newPos) {
 
-		double targetPotential = potentialFieldTarget.getTargetPotential(getTargets(), newPos, this);
+		double targetPotential = potentialFieldTarget.getTargetPotential(newPos, this);
 
 		double pedestrianPotential = potentialFieldPedestrian
 				.getAgentPotential(newPos, this, relevantPedestrians);
@@ -239,7 +239,7 @@ public class PedestrianOSM extends Pedestrian {
 	// Getters...
 
 	public double getTargetPotential(VPoint pos) {
-		return potentialFieldTarget.getTargetPotential(getTargets(), pos, this);
+		return potentialFieldTarget.getTargetPotential(pos, this);
 	}
 
 	public PotentialFieldTarget getPotentialFieldTarget() {
@@ -247,8 +247,7 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public Vector2D getTargetGradient(VPoint pos) {
-		return potentialFieldTarget.getTargetPotentialGradient(getTargets(),
-				pos, this);
+		return potentialFieldTarget.getTargetPotentialGradient(pos, this);
 	}
 
 	public Vector2D getObstacleGradient(VPoint pos) {
