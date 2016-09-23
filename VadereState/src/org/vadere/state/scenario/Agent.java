@@ -45,14 +45,18 @@ public abstract class Agent implements DynamicElement {
 	public Agent(AttributesAgent attributesAgent, Random random) {
 		this(attributesAgent);
 
-		final RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
-		final TruncatedNormalDistribution speedDistribution = new TruncatedNormalDistribution(rng,
-				attributesAgent.getSpeedDistributionMean(),
-				attributesAgent.getSpeedDistributionStandardDeviation(),
-				attributesAgent.getMinimumSpeed(),
-				attributesAgent.getMaximumSpeed(),
-				100);
-		freeFlowSpeed = speedDistribution.sample();
+		if (attributesAgent.getSpeedDistributionStandardDeviation() == 0) {
+			freeFlowSpeed = attributesAgent.getSpeedDistributionMean();
+		} else {
+			final RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
+			final TruncatedNormalDistribution speedDistribution = new TruncatedNormalDistribution(rng,
+					attributesAgent.getSpeedDistributionMean(),
+					attributesAgent.getSpeedDistributionStandardDeviation(),
+					attributesAgent.getMinimumSpeed(),
+					attributesAgent.getMaximumSpeed(),
+					100);
+			freeFlowSpeed = speedDistribution.sample();
+		}
 	}
 
 	public Agent(Agent other) {
