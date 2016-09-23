@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,8 @@ public class TrainModel {
 
 	private Topography topography;
 	private TrainGeometry trainGeometry;
+
+	private Map<Target, Seat> targetSeatMap = new HashMap<>();
 
 	private final Comparator<ScenarioElement> scenarioElementComperatorX = new Comparator<ScenarioElement>() {
 		@Override
@@ -227,8 +231,10 @@ public class TrainModel {
 	private void makeSeat(List<List<Target>> longRows, int seatGroupIndex, int indexInSeatGroup, int longRowIndex,
 			int indexInLongRow) {
 		final int number = calculateSeatNumberWithinCompartment(longRowIndex, indexInLongRow);
-		final Seat newSeat = new Seat(longRows.get(longRowIndex).get(indexInLongRow), number);
-		getSeatGroups().get(seatGroupIndex).setSeat(indexInSeatGroup, newSeat);
+		final Target target = longRows.get(longRowIndex).get(indexInLongRow);
+		final Seat newSeat = new Seat(target, number);
+		targetSeatMap.put(target, newSeat);
+		getSeatGroup(seatGroupIndex).setSeat(indexInSeatGroup, newSeat);
 	}
 
 	/**
@@ -322,6 +328,10 @@ public class TrainModel {
 
 	private boolean isXIn(double x, Rectangle2D rect) {
 		return x >= rect.getMinX() && x <= rect.getMaxX();
+	}
+
+	public Seat getSeatForTarget(Target target) {
+		return targetSeatMap.get(target);
 	}
 
 }
