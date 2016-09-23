@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -11,7 +11,7 @@ import org.vadere.state.scenario.Pedestrian;
  *
  */
 
-public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
+public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
 	private PedestrianStartTimeProcessor pedStTimeProc;
 
 	public PedestrianEvacuationTimeProcessor() {
@@ -23,14 +23,14 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 		this.pedStTimeProc.update(state);
 
 		state.getTopography().getElements(Pedestrian.class).stream()
-				.map(ped -> new PedestrianIdDataKey(ped.getId()))
+				.map(ped -> new PedestrianIdKey(ped.getId()))
 				.forEach(key -> this.addValue(key, state.getSimTimeInSec() - this.pedStTimeProc.getValue(key)));
 	}
 
 	@Override
 	public void postLoop(final SimulationState state) {
 		state.getTopography().getElements(Pedestrian.class).stream()
-				.map(ped -> new PedestrianIdDataKey(ped.getId()))
+				.map(ped -> new PedestrianIdKey(ped.getId()))
 				.forEach(key -> this.addValue(key, Double.NaN));
 	}
 

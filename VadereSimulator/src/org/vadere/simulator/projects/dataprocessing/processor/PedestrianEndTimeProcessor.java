@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
@@ -12,7 +12,7 @@ import java.util.Collection;
  *
  */
 
-public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
+public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
     public PedestrianEndTimeProcessor() {
         super("endTime");
     }
@@ -33,7 +33,7 @@ public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdDataKe
     }
 
     private void setValues(Collection<Pedestrian> peds, double value) {
-        peds.stream().map(ped -> new PedestrianIdDataKey(ped.getId()))
+        peds.stream().map(ped -> new PedestrianIdKey(ped.getId()))
                 .forEach(key -> this.addValue(key, value));
     }
 }

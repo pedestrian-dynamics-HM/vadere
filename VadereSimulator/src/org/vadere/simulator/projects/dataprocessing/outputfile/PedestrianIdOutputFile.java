@@ -1,15 +1,15 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 
 /**
  * @author Mario Teixeira Parente
  *
  */
 
-public class PedestrianIdOutputFile extends OutputFile<PedestrianIdDataKey> {
+public class PedestrianIdOutputFile extends OutputFile<PedestrianIdKey> {
 
 	public PedestrianIdOutputFile() {
-		super(PedestrianIdDataKey.getHeader());
+		super(PedestrianIdKey.getHeader());
 	}
 }

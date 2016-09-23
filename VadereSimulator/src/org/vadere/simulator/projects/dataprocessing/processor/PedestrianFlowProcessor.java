@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianFlowProcessor;
 
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  *
  */
 
-public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
+public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
     private PedestrianVelocityProcessor pedVelProc;
     private PedestrianDensityProcessor pedDensProc;
 
@@ -26,9 +26,9 @@ public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdD
         this.pedVelProc.update(state);
         this.pedDensProc.update(state);
 
-        Set<TimestepPedestrianIdDataKey> keys = this.pedVelProc.getKeys().stream().filter(key -> key.getTimestep() == state.getStep()).collect(Collectors.toSet());
+        Set<TimestepPedestrianIdKey> keys = this.pedVelProc.getKeys().stream().filter(key -> key.getTimestep() == state.getStep()).collect(Collectors.toSet());
 
-        for (TimestepPedestrianIdDataKey key : keys) {
+        for (TimestepPedestrianIdKey key : keys) {
             double velocity = this.pedVelProc.getValue(key);
             double density = this.pedDensProc.getValue(key);
 

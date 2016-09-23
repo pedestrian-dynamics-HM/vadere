@@ -2,9 +2,9 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
@@ -16,16 +16,16 @@ import java.util.stream.Collectors;
  *
  */
 
-public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestrianIdDataKey, VPoint> {
+public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestrianIdKey, VPoint> {
 
 	public PedestrianPositionProcessor() {
 		super("x", "y");
 	}
 
-	public Map<PedestrianIdDataKey, VPoint> getPositions(TimestepDataKey timestepKey) {
+	public Map<PedestrianIdKey, VPoint> getPositions(TimestepKey timestepKey) {
 		return this.getData().entrySet().stream()
 				.filter(e -> e.getKey().equals(timestepKey))
-				.collect(Collectors.toMap(e -> new PedestrianIdDataKey(e.getKey().getPedestrianId()), e -> e.getValue()));
+				.collect(Collectors.toMap(e -> new PedestrianIdKey(e.getKey().getPedestrianId()), e -> e.getValue()));
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 			Integer pedId = entry.getKey();
 			VPoint pos = entry.getValue();
 
-			this.addValue(new TimestepPedestrianIdDataKey(timeStep, pedId), pos);
+			this.addValue(new TimestepPedestrianIdKey(timeStep, pedId), pos);
 		}
 	}
 
@@ -45,7 +45,7 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 	public void init(final ProcessorManager manager) {}
 
 	@Override
-	public String[] toStrings(TimestepPedestrianIdDataKey key) {
+	public String[] toStrings(TimestepPedestrianIdKey key) {
 		VPoint p = this.getValue(key);
 
 		return new String[] { Double.toString(p.x), Double.toString(p.y) };

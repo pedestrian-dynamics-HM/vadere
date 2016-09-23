@@ -5,14 +5,14 @@ package org.vadere.simulator.projects.dataprocessing.datakey;
  *
  */
 
-public class TimestepDataKey implements DataKey<TimestepDataKey> {
+public class TimestepKey implements DataKey<TimestepKey> {
 	private final int timestep;
-    public TimestepDataKey(int timestep) {
+    public TimestepKey(int timestep) {
     	this.timestep = timestep;
     }
 
     @Override
-    public int compareTo(final TimestepDataKey o) {
+    public int compareTo(final TimestepKey o) {
         return Integer.compare(timestep, o.timestep);
     }
 
@@ -36,7 +36,7 @@ public class TimestepDataKey implements DataKey<TimestepDataKey> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TimestepDataKey other = (TimestepDataKey) obj;
+		TimestepKey other = (TimestepKey) obj;
 		if (timestep != other.timestep)
 			return false;
 		return true;

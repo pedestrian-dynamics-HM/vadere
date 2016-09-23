@@ -4,7 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Collection;
  *
  */
 
-public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
+public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
     private OptimalStepsModel osm;
 
     public PedestrianOSMStrideLengthProcessor() {
@@ -27,7 +27,7 @@ public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPe
     protected void doUpdate(final SimulationState state) {
         Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
         // TODO: if osm != null then compute stridelength
-        peds.forEach(ped -> this.addValue(new TimestepPedestrianIdDataKey(state.getStep(), ped.getId()), this.osm == null ? Double.NaN : 0.0));
+        peds.forEach(ped -> this.addValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), this.osm == null ? Double.NaN : 0.0));
 
         // TODO Use this comment from the old implementation for this implementation
 //        @Override

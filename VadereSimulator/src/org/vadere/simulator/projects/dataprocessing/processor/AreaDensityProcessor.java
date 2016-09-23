@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 
 /**
  * @author Mario Teixeira Parente
@@ -18,6 +18,6 @@ public abstract class AreaDensityProcessor extends AreaDataProcessor<Double> {
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        this.addValue(new TimestepDataKey(state.getStep()), this.densAlg.getDensity(state));
+        this.addValue(new TimestepKey(state.getStep()), this.densAlg.getDensity(state));
     }
 }

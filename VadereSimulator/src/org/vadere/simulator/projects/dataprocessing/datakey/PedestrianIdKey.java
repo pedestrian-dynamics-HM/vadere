@@ -5,10 +5,10 @@ package org.vadere.simulator.projects.dataprocessing.datakey;
  *
  */
 
-public class PedestrianIdDataKey implements DataKey<PedestrianIdDataKey> {
+public class PedestrianIdKey implements DataKey<PedestrianIdKey> {
 	private final int pedestrianId;
 
-	public PedestrianIdDataKey(int pedestrianId) {
+	public PedestrianIdKey(int pedestrianId) {
 		this.pedestrianId = pedestrianId;
 	}
 
@@ -36,14 +36,14 @@ public class PedestrianIdDataKey implements DataKey<PedestrianIdDataKey> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PedestrianIdDataKey other = (PedestrianIdDataKey) obj;
+		PedestrianIdKey other = (PedestrianIdKey) obj;
 		if (pedestrianId != other.pedestrianId)
 			return false;
 		return true;
 	}
 
 	@Override
-	public int compareTo(PedestrianIdDataKey o) {
+	public int compareTo(PedestrianIdKey o) {
 		return Integer.compare(pedestrianId, o.pedestrianId);
 	}
 
