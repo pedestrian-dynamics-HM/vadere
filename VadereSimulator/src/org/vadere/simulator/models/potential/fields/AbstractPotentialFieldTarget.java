@@ -53,7 +53,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	public double getTargetPotential(final VPoint pos, final Agent ped) {
 
 		CellGrid potentialField;
-		Topography floor = topography;
 		double targetPotential = Double.MAX_VALUE;
 		int targetId = -1;
 
@@ -66,14 +65,14 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		}
 
 		// Pedestrian has reached the target
-		if (floor.getTarget(targetId) != null) {
-			if (floor.getTarget(targetId).getShape().contains(pos)) {
+		if (topography.getTarget(targetId) != null) {
+			if (topography.getTarget(targetId).getShape().contains(pos)) {
 				return 0; // the arrival time is zero
 			}
 		}
 
 		// Pedestrain inside an obstacle
-		for (ScenarioElement b : floor.getObstacles()) {
+		for (ScenarioElement b : topography.getObstacles()) {
 			if (b.getShape().contains(pos)) {
 				return Double.MAX_VALUE;
 			}
