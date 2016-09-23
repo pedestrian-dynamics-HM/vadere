@@ -3,7 +3,6 @@ package org.vadere.simulator.models.seating;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.vadere.simulator.control.SimulationState;
@@ -17,7 +16,10 @@ import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.processor.AttributesLogEventProcessor;
+import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.TargetListener;
 import org.vadere.util.data.FindByClass;
 
 /**
@@ -39,7 +41,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	private TrainModel trainModel;
 	private LocalTime time;
 	private int nextLogEventId = 1;
-	private Set<Seat> emptySeats;
+	private Set<Seat> observedSeats;
 
 	public LogEventProcessor() {
 		super(LogEventEntry.getHeaders());
@@ -54,11 +56,16 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		nextLogEventId = attributes.getFirstLogEventId();
 
 		trainModel = getTrainModelFromProcessorManager(manager);
+		observedSeats = getSeatsOfCompartment();
+	
+		for (Seat seat : observedSeats) {
+			final int seatNumber = seat.getSeatNumberWithinCompartment();
+			seat.getAssociatedTarget().addListener(new LogEventTargetListener(seatNumber));
+		}
 	}
 
 	@Override
 	public void preLoop(SimulationState state) {
-		emptySeats = getSeatsOfCompartment(); // will be filtered in writeNewSitDownEvents()
 		time = LocalTime.now();
 
 		writeInitialSitDownEvents();
@@ -79,7 +86,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void doUpdate(SimulationState state) {
 		updateTime(state);
-		writeNewSitDownEvents();
+		// sit-down events are logged by a target listener registered in init()
 	}
 
 	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {
@@ -89,17 +96,10 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	}
 
 	private void writeInitialSitDownEvents() {
-		writeNewSitDownEvents();
-	}
-
-	private void writeNewSitDownEvents() {
-		Iterator<Seat> it = emptySeats.iterator();
-		while (it.hasNext()) {
-			final Seat seat = it.next();
+		for (Seat seat : observedSeats) {
 			final Pedestrian person = seat.getSittingPerson();
 			if (person != null) {
 				writeSitDownEvent(person, seat.getSeatNumberWithinCompartment());
-				it.remove();
 			}
 		}
 	}
@@ -122,6 +122,19 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	private void updateTime(SimulationState state) {
 		long nanos = (long) (state.getSimTimeInSec() * 1e9);
 		time = time.plusNanos(nanos);
+	}
+
+	private class LogEventTargetListener implements TargetListener {
+		private int seatNumber;
+
+		public LogEventTargetListener(int seatNumberWithinCompartment) {
+			seatNumber = seatNumberWithinCompartment;
+		}
+
+		@Override
+		public void reachedTarget(Target target, Agent agent) {
+			writeSitDownEvent((Pedestrian) agent, seatNumber);
+		}
 	}
 
 }
