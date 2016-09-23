@@ -12,6 +12,7 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -62,6 +63,8 @@ public class TargetController {
 
 			if (isNextTargetForAgent(agent)
 					&& hasAgentReachedThisTarget(agent, reachedDistance)) {
+
+				notifyListenersTargetReached(agent);
 
 				if (target.getWaitingTime() <= 0) {
 					checkRemove(agent);
@@ -160,4 +163,11 @@ public class TargetController {
 			}
 		}
 	}
+	
+	private void notifyListenersTargetReached(final Agent agent) {
+		for (TargetListener l : target.getTargetListeners()) {
+			l.reachedTarget(target, agent);
+		}
+	}
+	
 }
