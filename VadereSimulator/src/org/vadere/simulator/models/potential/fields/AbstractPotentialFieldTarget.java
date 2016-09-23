@@ -58,6 +58,8 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		int targetId = ped.getNextTargetId();
 
 		// Pedestrian has reached the target
+		// TODO Is this necessary? The target controller changes the
+		// pedestrian's target as soon the pedestrian arrives it.
 		if (topography.getTarget(targetId).getShape().contains(pos)) {
 			return 0; // the arrival time is zero
 		}
