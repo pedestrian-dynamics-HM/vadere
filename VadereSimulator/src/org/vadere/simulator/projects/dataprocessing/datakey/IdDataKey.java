@@ -5,7 +5,7 @@ package org.vadere.simulator.projects.dataprocessing.datakey;
  * ID are not enough.
  * 
  */
-public class IdDataKey implements Comparable<IdDataKey> {
+public class IdDataKey implements DataKey<IdDataKey> {
 	private final int id;
 
 	public IdDataKey(int id) {
