@@ -45,6 +45,7 @@ public class AttributesTarget extends Attributes {
 	 */
 	private boolean individualWaiting = true;
 
+	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
 	private double deletionDistance = 0.1;
 
 	/**
