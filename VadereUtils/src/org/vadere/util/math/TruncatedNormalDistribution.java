@@ -9,23 +9,28 @@ public class TruncatedNormalDistribution extends NormalDistribution {
 	
 	private double min;
 	private double max;
+	
+	private int maxIterations;
 
 	public TruncatedNormalDistribution(RandomGenerator rng, double mean, double standardDeviation, double min,
-			double max) {
+			double max, int maxIterations) {
 		super(rng, mean, standardDeviation);
 		if (max <= min)
 			throw new IllegalArgumentException("Parameter min must be less than max.");
 		this.min = min;
 		this.max = max;
+		this.maxIterations = maxIterations;
 	}
 
 	@Override
 	public double sample() {
-		double sample = super.sample();
-		while (sample < min || sample > max) {
-			sample = super.sample();
+		for (int i = 0; i < maxIterations; i++) {
+			double sample = super.sample();
+			if (sample >= min && sample <= max)
+				return sample;
 		}
-		return sample;
+		throw new IllegalArgumentException(
+				"Max iteration count reached on sampling for truncated distribution. Parameters max and min are not suitable.");
 	}
 
 }
