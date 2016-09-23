@@ -23,7 +23,10 @@ import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
 import org.vadere.util.math.TruncatedNormalDistribution;
@@ -61,6 +64,15 @@ public class SeatingModel implements ActiveCallback, Model {
 		this.trainModel = new TrainModel(topography, trainGeometry);
 		this.random = random;
 		this.rng = new JDKRandomGenerator(random.nextInt());
+		
+		for (final Target target : trainModel.getInterimDestinations()) {
+			target.addListener(interimTargetListener);
+		}
+
+		for (final Seat seat : trainModel.getSeats()) {
+			seat.getAssociatedTarget().addListener(seatTargetListener);
+		}
+
 	}
 
 	@Override
@@ -82,10 +94,7 @@ public class SeatingModel implements ActiveCallback, Model {
 				.filter(this::hasNoTargetAssigned)
 				.forEach(this::assignCompartmentTarget);
 		
-		// choose seat group and seat for those peds that wait at their interim target
-		pedestrians.stream()
-				.filter(this::hasJustReachedItsFirstTarget) // the interim target
-				.forEach(this::assignSeatTarget);
+		// the next steps are done by target listeners registered in initialize()
 	}
 	
 	private void assignCompartmentTarget(Pedestrian p) {
@@ -119,10 +128,6 @@ public class SeatingModel implements ActiveCallback, Model {
 		return p.getTargets().isEmpty();
 	}
 	
-	private boolean hasJustReachedItsFirstTarget(Pedestrian p) {
-		return p.getTargets().size() == 1 && !p.hasNextTarget();
-	}
-
 	public TrainModel getTrainModel() {
 		return trainModel;
 	}
@@ -274,5 +279,20 @@ public class SeatingModel implements ActiveCallback, Model {
 	private int getCompartmentCount() {
 		return trainModel.getEntranceAreaCount() + 1;
 	}
+
+	private final TargetListener interimTargetListener = new TargetListener() {
+		@Override
+		public void reachedTarget(Target target, Agent agent) {
+			assignSeatTarget((Pedestrian) agent);
+		}
+	};
+
+	private final TargetListener seatTargetListener = new TargetListener() {
+		@Override
+		public void reachedTarget(Target target, Agent agent) {
+			trainModel.getSeatForTarget(target).setSittingPerson((Pedestrian) agent);
+		}
+	};
+
 
 }
