@@ -13,7 +13,7 @@ public abstract class AreaDensityProcessor extends AreaDataProcessor<Double> {
 
     protected void setAlgorithm(final IAreaDensityAlgorithm densAlg) {
         this.densAlg = densAlg;
-        this.setHeader(this.densAlg.getName() + "Density");
+        this.setHeaders(this.densAlg.getName() + "Density");
     }
 
     @Override
