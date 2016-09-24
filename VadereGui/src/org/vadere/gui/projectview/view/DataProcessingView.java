@@ -128,48 +128,26 @@ public class DataProcessingView extends JPanel {
 	}
 
 	private JPanel buildPanel(String labelText, JTable table, JButton addBtn) { // used for OutputFile-Table and DataProcessor-Table
-		/*
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		// label
 		JLabel label = new JLabel("<html><b>" + labelText + "</b></html>");
 		label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		label.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panel.add(label);
+		JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		labelPanel.add(label);
+		panel.add(labelPanel);
+		
+		// table
 		table.setTableHeader(null);
 		JScrollPane tableScrollPane = new JScrollPane(table);
-		tableScrollPane.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		panel.add(tableScrollPane);
 		panel.add(Box.createRigidArea(new Dimension(0, 10)));
-		addBtn.setAlignmentX(Component.RIGHT_ALIGNMENT); // for some reason this works only if the two components above are also set to right-align, even so then they left-align :)
-		panel.add(addBtn);
-		*/
 
-		JPanel panel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.ipady = 15;
-		c.weightx = 1;
-
-		c.fill = GridBagConstraints.BOTH;
-
-		c.weighty = 0.05;
-		c.gridy = 0;
-		JLabel label = new JLabel("<html><b>" + labelText + "</b></html>");
-		label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		panel.add(label, c);
-
-		c.weighty = 0.9;
-		c.gridy = 1;
-		table.setTableHeader(null);
-		JScrollPane tableScrollPane = new JScrollPane(table);
-		panel.add(tableScrollPane, c);
-
-		c.weighty = 0.05;
-		c.gridy = 2;
-
+		// button
 		JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		btnPanel.add(addBtn);
-		panel.add(btnPanel, c);
+		panel.add(btnPanel);
 
 		editableComponents.add(addBtn);
 		return panel;
