@@ -254,6 +254,7 @@ public class DataProcessingView extends JPanel {
 		c.gridy = 1;
 		panel.add(new JLabel(extractSimpleName(getDataKeyForDataProcessor(dataProcessor))), c);
 
+		// processor json
 		c.gridx = 0;
 		c.gridy = 2;
 		c.gridwidth = 2;
@@ -270,6 +271,7 @@ public class DataProcessingView extends JPanel {
 		}
 		JScrollPane scrollPane = new JScrollPane(attributesTextArea);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 35, 100)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
 		panel.add(scrollPane, c);
 
 		revalidate();
