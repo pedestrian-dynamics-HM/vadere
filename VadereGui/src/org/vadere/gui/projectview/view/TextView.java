@@ -34,7 +34,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * 
  * 
  */
-public class TextView extends JPanel {
+public class TextView extends JPanel implements IJsonView {
 
 	private static Logger logger = LogManager.getLogger(TextView.class);
 
@@ -199,6 +199,7 @@ public class TextView extends JPanel {
 		jsonValidIndicator.setValid();
 	}
 
+	@Override
 	public void setVadereScenario(ScenarioRunManager scenario) { // in order to avoid passing the exception upwards. might not be the best solution
 		try {
 			setVadereScenarioThrows(scenario);
@@ -232,6 +233,7 @@ public class TextView extends JPanel {
 		this.txtrTextfiletextarea.setCaretPosition(0);
 	}
 
+	@Override
 	public void isEditable(boolean isEditable) {
 		this.isEditable = isEditable;
 		btnLoadFromFile.setEnabled(isEditable);
