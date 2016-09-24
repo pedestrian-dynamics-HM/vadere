@@ -333,8 +333,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					if (newName.isEmpty()) {
 						msg = "File name can't be empty";
 					}
-					if (currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
-							.filter(oFile -> oFile.getFileName().equals(newName)).findAny().isPresent()) {
+					if (outputFileNameAlreadyExists(newName)) {
 						msg = "File name is already in use";
 					}
 					if (msg.isEmpty()) {
@@ -513,6 +512,11 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 		private String extractSimpleName(Type type) {
 			return type.getTypeName().substring(type.getTypeName().lastIndexOf(".") + 1);
+		}
+
+		private boolean outputFileNameAlreadyExists(String filename) {
+			return currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
+					.filter(oFile -> oFile.getFileName().equals(filename)).findAny().isPresent();
 		}
 	}
 }
