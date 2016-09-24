@@ -301,17 +301,53 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor = GridBagConstraints.WEST; // alignment
 			c.ipady = 15; // y-gap between components
-			c.weightx = 1;
+			c.fill = GridBagConstraints.HORIZONTAL;
 
 			c.gridx = 0;
 			c.gridy = 0;
-			c.gridwidth = 2;
-			panel.add(new JLabel("<html><b>" + outputFile.getFileName() + "</b></html>"), c);
-			c.gridwidth = 1;
+			panel.add(new JLabel("<html><i>File name:</i></html>"), c);
+
+			c.gridx = 1;
+			c.gridy = 0;
+			JTextField nameField = new JTextField(outputFile.getFileName());
+			nameField.setEditable(false);
+			nameField.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					nameField.setEditable(true);
+					nameField.getCaret().setVisible(true);
+				}
+			});
+			nameField.addActionListener(ae -> {
+				String oldName = outputFile.getFileName();
+				String newName = nameField.getText();
+				if (!oldName.equals(newName)) {
+					String msg = "";
+					if (newName.isEmpty()) {
+						msg = "File name can't be empty";
+					}
+					if (currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
+							.filter(oFile -> oFile.getFileName().equals(newName)).findAny().isPresent()) {
+						msg = "File name is already in use";
+					}
+					if (msg.isEmpty()) {
+						outputFile.setFileName(newName);
+						filesTable.repaint();
+					} else {
+						nameField.setText(oldName);
+						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
+								"Invalid file name", JOptionPane.WARNING_MESSAGE);
+					}
+				}
+				nameField.setEditable(false);
+				nameField.getCaret().setVisible(false);
+			});
+
+			panel.add(nameField, c);
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel("<html><i>DataKey:</i></html>"), c);
+			panel.add(new JLabel("<html><i>Data key:</i></html>"), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
@@ -336,7 +372,6 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 1;
 			c.gridy = 3;
-			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridwidth = 2;
 			JComboCheckBox<Integer> comboBox =
 					new JComboCheckBox<>(currentScenario.getDataProcessingJsonManager()
