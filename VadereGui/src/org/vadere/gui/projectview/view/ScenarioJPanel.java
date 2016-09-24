@@ -43,8 +43,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
-	private TextView outputView; // "expert" (raw json) DataProcessing View
-	private DataProcessingView dataProcessingGUIview; // DataProcessing GUI
+	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
@@ -171,45 +170,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 
-		outputView = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
-
-		JMenuBar processorsMenuBar = new JMenuBar();
-		JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
-		processorsMenuBar.add(processorsMenu);
-		menusInTabs.add(processorsMenu);
-
-		try {
-			File[] templateFiles = new File(this.getClass().getResource("/outputTemplates/").getPath()).listFiles();
-
-			for (File templateFile : Arrays.stream(templateFiles).filter(f -> f.isFile()).collect(Collectors.toList())) {
-				String templateFileName = templateFile.getName();
-				String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
-
-				processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-								Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
-								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-							try {
-								outputView.setText(templateJson);
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-						}
-					}
-				}));
-			}
-
-			outputView.getPanelTop().add(processorsMenuBar, 0);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), outputView);
-
 		dataProcessingGUIview = new DataProcessingView();
 		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
 
@@ -292,9 +252,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		this.topographyFileView.setVadereScenario(scenario);
 		this.topographyFileView.isEditable(isEditable);
-
-		this.outputView.setVadereScenario(scenario);
-		this.outputView.isEditable(isEditable);
 
 		this.dataProcessingGUIview.setVadereScenario(scenario);
 		this.dataProcessingGUIview.isEditable(isEditable);
