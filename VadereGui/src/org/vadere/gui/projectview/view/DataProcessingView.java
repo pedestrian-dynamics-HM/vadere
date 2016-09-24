@@ -315,7 +315,12 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 1;
 			c.gridy = 1;
-			panel.add(new JLabel(extractSimpleName(outputFileDataKey)), c);
+			String outputFileDataKeyName = extractSimpleName(outputFileDataKey); // panel.add(new JLabel(extractSimpleName(outputFileDataKey)), c);
+			String[] dataKeys = {"NoDataKey", "PedestrianIdDataKey", "TimestepDataKey", "TimestepPedestrianIdDataKey"}; // TODO use the actual classes
+			JComboBox dataKeysChooser = new JComboBox<>(dataKeys);
+			dataKeysChooser.setSelectedItem(outputFileDataKeyName);
+			dataKeysChooser.addActionListener(ae -> dataKeysChooser.setSelectedItem(outputFileDataKeyName)); // quick hack for now to allow viewing but not editing
+			panel.add(dataKeysChooser, c);
 
 			c.gridx = 0;
 			c.gridy = 2;
