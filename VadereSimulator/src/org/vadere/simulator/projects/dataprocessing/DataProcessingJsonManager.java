@@ -94,6 +94,11 @@ public class DataProcessingJsonManager {
         this.dataProcessors.add(dataProcessor);
     }
 
+    public void updateDataProcessor(final DataProcessor oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
+        this.dataProcessors.remove(oldDataProcessor);
+        addProcessor(newDataProcessorStore);
+    }
+
     private static JsonNode serializeOutputFile(final OutputFile outputFile) {
         ObjectNode node = mapper.createObjectNode();
 
@@ -198,7 +203,7 @@ public class DataProcessingJsonManager {
         return manager;
     }
 
-    private static DataProcessorStore deserializeProcessorStore(JsonNode node) {
+    public static DataProcessorStore deserializeProcessorStore(JsonNode node) {
         DataProcessorStore store = new DataProcessorStore();
 
         store.setType(node.get(TYPE_KEY).asText());

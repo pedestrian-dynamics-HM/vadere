@@ -1,5 +1,8 @@
 package org.vadere.gui.projectview.view;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import info.clearthought.layout.TableLayout;
 
 import org.apache.log4j.LogManager;
@@ -386,10 +389,60 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			try {
 				Theme syntaxTheme = Theme.load(in);
 				syntaxTheme.apply(attributesTextArea);
-				attributesTextArea.setText(JsonConverter.serializeJsonNode(DataProcessingJsonManager.serializeProcessor(dataProcessor)));
+
+				ObjectNode node = (ObjectNode) DataProcessingJsonManager.serializeProcessor(dataProcessor);
+				JsonNode idNode = node.remove("id");
+				JsonNode typeNode = node.remove("type");
+
+				/*if (node.get("attributesType") != null) {
+					JsonNode attributesTypeNode = node.get("attributesType");
+					JsonNode attributesNode = node.get("attributes");
+				}*/
+
+				attributesTextArea.setText(JsonConverter.serializeJsonNode(node));
+
+				/* TODO
+				attributesTextArea.getDocument().addDocumentListener(new DocumentListener() {
+					@Override
+					public void changedUpdate(DocumentEvent e) {
+						setScenarioContent();
+					}
+
+					@Override
+					public void removeUpdate(DocumentEvent e) {
+						setScenarioContent();
+					}
+
+					@Override
+					public void insertUpdate(DocumentEvent e) {
+						setScenarioContent();
+					}
+
+					public void setScenarioContent() {
+						if (isEditable) {
+							String json = attributesTextArea.getText();
+							if (json.length() == 0)
+								return;
+							try {
+								ObjectNode processorNode = (ObjectNode) JsonConverter.deserializeToNode(json);
+								processorNode.set("id", idNode);
+								processorNode.set("type", typeNode);
+								DataProcessorStore dataProcessorStore = DataProcessingJsonManager.deserializeProcessorStore(processorNode);
+								currentScenario.getDataProcessingJsonManager().updateDataProcessor(dataProcessor, dataProcessorStore);
+								currentScenario.updateCurrentStateSerialized();
+								ProjectView.getMainWindow().refreshScenarioNames();
+								//jsonValidIndicator.setValid();
+							} catch (Exception e) {
+								e.printStackTrace();
+								//jsonValidIndicator.setInvalid();
+							}
+						}
+					}
+				});*/
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			attributesTextArea.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(attributesTextArea);
 			scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 			scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 30, 100)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
