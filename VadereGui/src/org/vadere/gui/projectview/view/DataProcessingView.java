@@ -336,7 +336,11 @@ public class DataProcessingView extends JPanel implements IJsonView {
 							.filter(dataProcessor -> getDataKeyForDataProcessor(dataProcessor) == outputFileDataKey) // only show processors with same DataKey as outputFile
 							.map(DataProcessor::getId).collect(Collectors.toList()));
 			comboBox.setCheckedItems(outputFile.getProcessorIds());
-			comboBox.addActionListener(e -> outputFile.setProcessorIds(comboBox.getCheckedItems()));
+			comboBox.addActionListener(e -> {
+				if (e.getActionCommand().equals("inputComplete")) {
+					outputFile.setProcessorIds(comboBox.getCheckedItems());
+				}
+			});
 			panel.add(comboBox, c);
 			editableComponents.add(comboBox);
 			comboBox.setEnabled(isEditable);

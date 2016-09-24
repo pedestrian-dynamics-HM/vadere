@@ -21,7 +21,12 @@ public class JComboCheckBox<E> extends JComboBox {
 	public JComboCheckBox(List<E> items) {
 		super(items.toArray());
 		items.forEach(item -> memory.put(item, false));
-		addActionListener(ae -> memory.put(getSelectedItem(), !memory.get(getSelectedItem()))); // toogle associated boolean in memory upon click on item
+		addActionListener(ae -> {
+			if (!ae.getActionCommand().equals("inputComplete")) {
+				memory.put(getSelectedItem(), !memory.get(getSelectedItem())); // toogle associated boolean in memory upon click on item
+				inputCompleted();
+			}
+		});
 
 		addPopupMenuListener(new PopupMenuListener() {
 			@Override public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
@@ -55,6 +60,15 @@ public class JComboCheckBox<E> extends JComboBox {
 
 				return cb;
 			}
+		});
+	}
+
+	private void inputCompleted() {
+		SwingUtilities.invokeLater(() -> {
+			String oldCommand = getActionCommand();
+			setActionCommand("inputComplete");
+			fireActionEvent();
+			setActionCommand(oldCommand);
 		});
 	}
 
