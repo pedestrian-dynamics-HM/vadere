@@ -16,6 +16,7 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.util.io.IOUtils;
 
@@ -159,10 +160,10 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		private ScenarioRunManager currentScenario;
 		private boolean isEditable;
 
-		private JTable filesTable;
-		private DefaultTableModel filesTableModel;
-		private JTable processorsTable;
-		private DefaultTableModel processorsTableModel;
+		private JTable outputFilesTable;
+		private DefaultTableModel outputFilesTableModel;
+		private JTable dataProcessorsTable;
+		private DefaultTableModel dataProcessorsTableModel;
 		private JPanel outputFilesDetailsPanel;
 		private JPanel dataProcessorsDetailsPanel;
 		private List<Component> editableComponents = new ArrayList<>();
@@ -190,7 +191,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					// TODO
 				}
 			});
-			tableSide.add(buildPanel("Files", filesTable, addFileBtn));
+			tableSide.add(buildPanel("Files", outputFilesTable, addFileBtn));
 
 			JButton addProcessorBtn = new JButton(new AbstractAction("Add processor") {
 				@Override
@@ -198,7 +199,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					// TODO
 				}
 			});
-			tableSide.add(buildPanel("Processors", processorsTable, addProcessorBtn));
+			tableSide.add(buildPanel("Processors", dataProcessorsTable, addProcessorBtn));
 
 			// details side
 
@@ -216,16 +217,22 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		@Override
 		public void setVadereScenario(ScenarioRunManager scenario) {
 			this.currentScenario = scenario;
+			updateOutputFilesTable();
+			updateDataProcessorsTable();
+		}
 
-			filesTableModel.setRowCount(0);
+		private void updateOutputFilesTable() {
+			outputFilesTableModel.setRowCount(0);
 			outputFilesDetailsPanel.removeAll();
-			scenario.getDataProcessingJsonManager().getOutputFiles()
-					.forEach(outputFile -> filesTableModel.addRow(new OutputFile[] {outputFile}));
+			currentScenario.getDataProcessingJsonManager().getOutputFiles()
+					.forEach(outputFile -> outputFilesTableModel.addRow(new OutputFile[] {outputFile}));
+		}
 
-			processorsTableModel.setRowCount(0);
+		private void updateDataProcessorsTable() {
+			dataProcessorsTableModel.setRowCount(0);
 			dataProcessorsDetailsPanel.removeAll();
-			scenario.getDataProcessingJsonManager().getDataProcessors()
-					.forEach(dataProcessor -> processorsTableModel.addRow(new DataProcessor[] {dataProcessor}));
+			currentScenario.getDataProcessingJsonManager().getDataProcessors()
+					.forEach(dataProcessor -> dataProcessorsTableModel.addRow(new DataProcessor[] {dataProcessor}));
 		}
 
 		@Override
@@ -235,31 +242,31 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		}
 
 		private void setupTables() {
-			filesTableModel = new DefaultTableModel(new OutputFile[] {null}, 0) {
+			outputFilesTableModel = new DefaultTableModel(new OutputFile[] {null}, 0) {
 				@Override
 				public boolean isCellEditable(int row, int column) {
 					return false;
 				}
 			};
-			filesTable = new JTable(filesTableModel);
-			filesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			filesTable.getSelectionModel().addListSelectionListener(e -> {
-				if (!e.getValueIsAdjusting() && filesTable.getSelectedRow() > -1) {
-					handleOutputFileSelected((OutputFile) filesTableModel.getValueAt(filesTable.getSelectedRow(), 0));
+			outputFilesTable = new JTable(outputFilesTableModel);
+			outputFilesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			outputFilesTable.getSelectionModel().addListSelectionListener(e -> {
+				if (!e.getValueIsAdjusting() && outputFilesTable.getSelectedRow() > -1) {
+					handleOutputFileSelected((OutputFile) outputFilesTableModel.getValueAt(outputFilesTable.getSelectedRow(), 0));
 				}
 			});
 
-			processorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
+			dataProcessorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
 				@Override
 				public boolean isCellEditable(int row, int column) {
 					return false;
 				}
 			};
-			processorsTable = new JTable(processorsTableModel);
-			processorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			processorsTable.getSelectionModel().addListSelectionListener(e -> {
-				if (!e.getValueIsAdjusting() && processorsTable.getSelectedRow() > -1) {
-					handleDataProcessorSelected((DataProcessor) processorsTable.getValueAt(processorsTable.getSelectedRow(), 0));
+			dataProcessorsTable = new JTable(dataProcessorsTableModel);
+			dataProcessorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			dataProcessorsTable.getSelectionModel().addListSelectionListener(e -> {
+				if (!e.getValueIsAdjusting() && dataProcessorsTable.getSelectedRow() > -1) {
+					handleDataProcessorSelected((DataProcessor) dataProcessorsTable.getValueAt(dataProcessorsTable.getSelectedRow(), 0));
 				}
 			});
 		}
@@ -332,7 +339,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					}
 					if (msg.isEmpty()) {
 						outputFile.setFileName(newName);
-						filesTable.repaint();
+						outputFilesTable.repaint();
 					} else {
 						nameField.setText(oldName);
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
