@@ -527,8 +527,9 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			}
 			attributesTextArea.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(attributesTextArea);
-			scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-			scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 30, 100)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
+			scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 30, 145)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
 			panel.add(scrollPane, c);
 
 			revalidate();
