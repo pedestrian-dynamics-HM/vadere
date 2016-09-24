@@ -57,11 +57,9 @@ public class DataProcessingView extends JPanel {
 		add(guiPanel);
 
 		JPanel tableSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
-		tableSide.setBorder(BorderFactory.createLineBorder(Color.blue));
 		guiPanel.add(tableSide, "0, 0");
 
 		JPanel detailsSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
-		detailsSide.setBorder(BorderFactory.createLineBorder(Color.red));
 		guiPanel.add(detailsSide, "1, 0");
 
 		// tables side
@@ -88,12 +86,12 @@ public class DataProcessingView extends JPanel {
 
 		outputFilesDetailsPanel = new JPanel();
 		outputFilesDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
+		outputFilesDetailsPanel.setBorder(BorderFactory.createEmptyBorder(40, 10, 0, 0));
 		detailsSide.add(outputFilesDetailsPanel);
 
 		dataProcessorsDetailsPanel = new JPanel();
 		dataProcessorsDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(25, 10, 0, 0));
+		dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(40, 10, 0, 0));
 		detailsSide.add(dataProcessorsDetailsPanel);
 	}
 
@@ -271,7 +269,7 @@ public class DataProcessingView extends JPanel {
 		}
 		JScrollPane scrollPane = new JScrollPane(attributesTextArea);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 35, 100)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
+		scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 30, 100)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
 		panel.add(scrollPane, c);
 
 		revalidate();
