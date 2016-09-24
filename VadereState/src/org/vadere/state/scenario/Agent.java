@@ -5,11 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.TruncatedNormalDistribution;
 
 public abstract class Agent implements DynamicElement {
 	
@@ -42,22 +45,18 @@ public abstract class Agent implements DynamicElement {
 	public Agent(AttributesAgent attributesAgent, Random random) {
 		this(attributesAgent);
 
-		// repeatedly draw from a normal distribution until the speed lies within the given
-		// interval.
-		double freeFlowSpeed;
-		int counter = 0; // robustness counter s.t. even with wrong interval boundaries, the program shuts down in a controlled way.
-		do {
-			freeFlowSpeed = attributesAgent.getSpeedDistributionMean() +
-					attributesAgent.getSpeedDistributionStandardDeviation() * random.nextGaussian();
-
-			counter++;
-		} while ((freeFlowSpeed < attributesAgent.getMinimumSpeed() || freeFlowSpeed > attributesAgent
-				.getMaximumSpeed()) && counter < 100);
-		if (counter > 99) {
-			throw new IllegalArgumentException(
-					"A pedestrians minimumSpeed and maximumSpeed are not sufficiently far apart.");
+		if (attributesAgent.getSpeedDistributionStandardDeviation() == 0) {
+			freeFlowSpeed = attributesAgent.getSpeedDistributionMean();
+		} else {
+			final RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
+			final TruncatedNormalDistribution speedDistribution = new TruncatedNormalDistribution(rng,
+					attributesAgent.getSpeedDistributionMean(),
+					attributesAgent.getSpeedDistributionStandardDeviation(),
+					attributesAgent.getMinimumSpeed(),
+					attributesAgent.getMaximumSpeed(),
+					100);
+			freeFlowSpeed = speedDistribution.sample();
 		}
-		this.freeFlowSpeed = freeFlowSpeed;
 	}
 
 	public Agent(Agent other) {

@@ -89,7 +89,7 @@ public class PostVisualizationConsole {
 
 			if (trajectoryFile.isPresent() && scenarioFile.isPresent()) {
 				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath());
-				model.init(reader.readFile(), IOOutput.readVadere(scenarioFile.get().toPath()));
+				model.init(reader.readFile(), IOOutput.readScenario(scenarioFile.get().toPath()));
 			} else {
 				System.err.println("could not find trajectory or scenario file in: " + outputDirectoryPath);
 			}

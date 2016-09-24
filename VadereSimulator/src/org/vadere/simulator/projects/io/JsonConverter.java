@@ -1,7 +1,5 @@
 package org.vadere.simulator.projects.io;
 
-import com.google.gson.JsonElement;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -61,13 +59,14 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public abstract class JsonConverter {
+
+	public static final String SCENARIO_KEY = "scenario";
 
 	public static final String MAIN_MODEL_KEY = "mainModel";
 
@@ -261,21 +260,19 @@ public abstract class JsonConverter {
 	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
-		JsonNode vadereNode = rootNode.get("vadere");
-		AttributesSimulation as = deserializeAttributesSimulationFromNode(vadereNode.get("attributesSimulation"));
-		JsonNode attributesModelNode = vadereNode.get("attributesModel");
-		String mainModel = vadereNode.get(MAIN_MODEL_KEY).isNull() ? null : vadereNode.get(MAIN_MODEL_KEY).asText();
-		List<Attributes> am = deserializeAttributesListFromNode(attributesModelNode);
-		Topography to = deserializeTopographyFromNode(vadereNode.get("topography"));
+		JsonNode scenarioNode = rootNode.get(SCENARIO_KEY);
+		AttributesSimulation attributesSimulation = deserializeAttributesSimulationFromNode(scenarioNode.get("attributesSimulation"));
+		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
+		String mainModel = scenarioNode.get(MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(MAIN_MODEL_KEY).asText();
+		List<Attributes> attributesModel = deserializeAttributesListFromNode(attributesModelNode);
+		Topography topography = deserializeTopographyFromNode(scenarioNode.get("topography"));
 		String description = rootNode.get("description").asText();
-		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, am, as, to);
+		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, attributesModel, attributesSimulation, topography);
 		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
 		scenarioRunManager.saveChanges();
 
-		if (scenarioRunManager.getTopography() == null)
-			logger.error("Loading topography failed."); // migrated from GSON, not sure if still necessary
 		return scenarioRunManager;
 	}
 
@@ -417,14 +414,8 @@ public abstract class JsonConverter {
 		ObjectNode rootNode = mapper.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
 		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenarioRunManager.getDataProcessingJsonManager().serializeToNode());
-		rootNode.set("vadere", serializeVadereNode(scenarioStore));
+		rootNode.set(SCENARIO_KEY, serializeVadereNode(scenarioStore));
 		return rootNode;
-	}
-
-	private static JsonNode processorManagerToNode(ScenarioRunManager srm) throws IOException {
-		//JsonNode node = mapper.readTree(srm.getOutputProcessorsJson());
-		// TODO do proper serialization instead of storing the original json
-		return null;
 	}
 
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {
@@ -433,13 +424,6 @@ public abstract class JsonConverter {
 		node.put("release", HashGenerator.releaseNumber());
 		if (commitHashIncluded)
 			node.put("commithash", HashGenerator.commitHash());
-		node.put("topographyhash", HashGenerator.topographyHash(scenarioStore.topography));
-		node.put("attributeshash", HashGenerator.attributesHash(scenarioStore));
-	}
-
-	// temporary, until GSON is finally completely gone, only used for serializing OutputProcessors
-	private static JsonNode jsonElementToJsonNode(JsonElement jsonElement) throws IOException {
-		return mapper.readValue(jsonElement.toString(), JsonNode.class);
 	}
 
 	private static ObjectNode serializeVadereNode(ScenarioStore scenarioStore) {
@@ -476,13 +460,6 @@ public abstract class JsonConverter {
 		for (Attributes a : attributesList)
 			list.add(Pair.of(a.getClass().getName(), a));
 		return list;
-	}
-
-	private static Map<String, Attributes> attributesListToMap(List<Attributes> attributesList) {
-		Map<String, Attributes> map = new HashMap<>();
-		for (Attributes a : attributesList)
-			map.put(a.getClass().getName(), a);
-		return map;
 	}
 
 	private static ObjectNode serializeTopographyToNode(Topography topography) {

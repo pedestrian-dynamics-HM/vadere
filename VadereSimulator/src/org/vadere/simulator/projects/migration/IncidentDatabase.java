@@ -74,6 +74,11 @@ public class IncidentDatabase {
 		addIncident(NOT_A_RELEASE, new AttributesPotentialCompactVSosmIncident()); // requested by Bene
 		addIncident(NOT_A_RELEASE, new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
+		addIncident(NOT_A_RELEASE, new DeletionIncident(path("topographyhash")));
+		addIncident(NOT_A_RELEASE, new DeletionIncident(path("attributeshash")));
+
+		addIncident(NOT_A_RELEASE, new RenameIncident(path("vadere"), JsonConverter.SCENARIO_KEY));
+
 		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
 		incidents.put(V0_1, new LinkedList<>());

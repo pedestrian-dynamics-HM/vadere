@@ -81,7 +81,7 @@ public class ActionOpenFile extends ActionVisualization {
 							IOUtils.getFirstFile(scenarioOutputDir, IOUtils.SCENARIO_FILE_EXTENSION);
 
 					if (trajectoryFile.isPresent() && snapshotFile.isPresent()) {
-						ScenarioRunManager vadere = IOOutput.readVadere(snapshotFile.get().toPath());
+						ScenarioRunManager vadere = IOOutput.readScenario(snapshotFile.get().toPath());
 						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadere), vadere);
 						model.notifyObservers();
 						dialog.dispose();

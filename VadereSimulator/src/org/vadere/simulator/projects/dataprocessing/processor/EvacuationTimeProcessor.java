@@ -4,9 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor;
-import org.vadere.state.scenario.Pedestrian;
 
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -23,18 +21,22 @@ public class EvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        // No implementation needed, look at 'postLoop(SimulationState)'
+        this.pedEvacTimeProc.update(state);
     }
 
     @Override
     public void postLoop(final SimulationState state) {
         this.pedEvacTimeProc.postLoop(state);
 
-        Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
+        double result = 0.0;
 
-        this.addValue(NoDataKey.key(), this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
-                ? Double.NaN
-                : Collections.max(this.pedEvacTimeProc.getValues()));
+        if (this.pedEvacTimeProc.getValues().size() > 0) {
+            result = this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
+                    ? Double.NaN
+                    : Collections.max(this.pedEvacTimeProc.getValues());
+        }
+
+        this.addValue(NoDataKey.key(), result);
     }
 
     @Override

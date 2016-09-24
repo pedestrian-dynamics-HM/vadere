@@ -25,7 +25,7 @@ public class ActionOutputToScenario extends ActionAbstractAddScenario {
 	@Override
 	protected ScenarioRunManager generateVadere(final String name) throws IOException {
 		OutputBundle bundle = model.getSelectedOutputBundle();
-		ScenarioRunManager scenarioRM = IOOutput.readVadere(bundle.getDirectory());
+		ScenarioRunManager scenarioRM = IOOutput.readScenario(bundle.getDirectory());
 		scenarioRM.setName(name);
 		return scenarioRM;
 	}
