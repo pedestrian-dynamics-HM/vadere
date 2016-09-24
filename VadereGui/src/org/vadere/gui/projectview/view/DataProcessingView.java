@@ -1,5 +1,7 @@
 package org.vadere.gui.projectview.view;
 
+import info.clearthought.layout.TableLayout;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -43,25 +45,24 @@ public class DataProcessingView extends JPanel {
 
 
 	public DataProcessingView() {
-		setLayout(new GridLayout(1, 1));
+		setLayout(new GridLayout(1, 1)); // force it to span across the whole available space
 
 		// GUI PANEL
 
-		JPanel guiPanel = new JPanel(new GridBagLayout());
+		/* via www.oracle.com/technetwork/java/tablelayout-141489.html,
+		I don't like adding a maven dependency for a swing layout,
+		but all the native ones can't seem to ensure relative column width */
+		double size[][] = {{0.35, 0.65}, {TableLayout.FILL}};
+		JPanel guiPanel = new JPanel(new TableLayout(size));
 		add(guiPanel);
-		GridBagConstraints c = new GridBagConstraints();
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
 
-		JPanel tableSide = new JPanel(new GridLayout(2, 1));
+		JPanel tableSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
 		tableSide.setBorder(BorderFactory.createLineBorder(Color.blue));
-		c.weightx = 0.4;
-		guiPanel.add(tableSide, c);
+		guiPanel.add(tableSide, "0, 0");
 
-		JPanel detailsSide = new JPanel(new GridLayout(2, 1));
+		JPanel detailsSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
 		detailsSide.setBorder(BorderFactory.createLineBorder(Color.red));
-		c.weightx = 0.6;
-		guiPanel.add(detailsSide, c);
+		guiPanel.add(detailsSide, "1, 0");
 
 		// tables side
 
