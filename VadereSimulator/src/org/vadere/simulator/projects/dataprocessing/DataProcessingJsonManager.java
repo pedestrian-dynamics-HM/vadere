@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
@@ -45,6 +46,7 @@ public class DataProcessingJsonManager {
     public static final String ATTRIBUTES_KEY = "attributes";
 
     public static final String DEFAULT_SEPARATOR = " ";
+    public static final String DEFAULT_OUTPUTFILE_TYPE = NoDataKeyOutputFile.class.getName();
 
     private static ObjectMapper mapper;
     public static ObjectWriter writer;

@@ -12,6 +12,7 @@ public class OutputFileStore {
 
     public OutputFileStore() {
         this.separator = DataProcessingJsonManager.DEFAULT_SEPARATOR;
+        this.type = DataProcessingJsonManager.DEFAULT_OUTPUTFILE_TYPE;
     }
 
     public String getType() {

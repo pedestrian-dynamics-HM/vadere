@@ -185,15 +185,25 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			setupTables();
 
-			JButton addFileBtn = new JButton(new AbstractAction("Add file") {
+			JButton addFileBtn = new JButton(new AbstractAction("Add") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO
+					String filename = "out.txt";
+					int count = 1;
+					while (outputFileNameAlreadyExists(filename)) { // ensure unique suggested filename
+						filename = "out" + (count ++) + ".txt";
+					}
+					OutputFileStore outputFileStore = new OutputFileStore();
+					outputFileStore.setFilename(filename);
+					currentScenario.getDataProcessingJsonManager().addOutputFile(outputFileStore);
+					updateOutputFilesTable();
+					int index = outputFilesTableModel.getRowCount() - 1;
+					outputFilesTable.setRowSelectionInterval(index, index);
 				}
 			});
 			tableSide.add(buildPanel("Files", outputFilesTable, addFileBtn));
 
-			JButton addProcessorBtn = new JButton(new AbstractAction("Add processor") {
+			JButton addProcessorBtn = new JButton(new AbstractAction("Add") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO
