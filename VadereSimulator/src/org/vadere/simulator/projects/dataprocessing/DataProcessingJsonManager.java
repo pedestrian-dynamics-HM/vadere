@@ -81,12 +81,31 @@ public class DataProcessingJsonManager {
     public void addOutputFile(final OutputFileStore fileStore) {
         // If fileName already exists, change it by removing and readding
         this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.getFilename())).collect(Collectors.toList()));
+        this.outputFiles.add(instantiateOutputFile(fileStore));
+    }
 
+    private OutputFile<?> instantiateOutputFile(final OutputFileStore fileStore) {
         OutputFile<?> file = outputFileInstantiator.createObject(fileStore.getType());
         file.setFileName(fileStore.getFilename());
         file.setProcessorIds(fileStore.getProcessors());
         file.setSeparator(fileStore.getSeparator());
-        this.outputFiles.add(file);
+        return file;
+    }
+
+    public int replaceOutputFile(OutputFileStore fileStore) {
+        int index = indexOf(fileStore.getFilename());
+        this.outputFiles.remove(index);
+        this.outputFiles.add(index, instantiateOutputFile(fileStore));
+        return index;
+    }
+
+    private int indexOf(String filename) {
+        for (int i = 0; i < outputFiles.size(); i ++) {
+            if (outputFiles.get(i).getFileName().equals(filename)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void addProcessor(final DataProcessorStore dataProcessorStore) {

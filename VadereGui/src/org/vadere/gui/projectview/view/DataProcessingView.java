@@ -14,7 +14,11 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.simulator.projects.io.JsonConverter;
@@ -367,11 +371,34 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 1;
 			c.gridy = 1;
-			String outputFileDataKeyName = extractSimpleName(outputFileDataKey); // panel.add(new JLabel(extractSimpleName(outputFileDataKey)), c);
-			String[] dataKeys = {"NoDataKey", "PedestrianIdDataKey", "TimestepDataKey", "TimestepPedestrianIdDataKey"}; // TODO use the actual classes
+			String outputFileDataKeyName = extractSimpleName(outputFileDataKey);
+			String[] dataKeys = {"NoDataKey", "PedestrianIdDataKey", "TimestepDataKey", "TimestepPedestrianIdDataKey"}; // TODO find a more direct way of collecting these and toString()ing them
 			JComboBox dataKeysChooser = new JComboBox<>(dataKeys);
 			dataKeysChooser.setSelectedItem(outputFileDataKeyName);
-			dataKeysChooser.addActionListener(ae -> dataKeysChooser.setSelectedItem(outputFileDataKeyName)); // quick hack for now to allow viewing but not editing
+			dataKeysChooser.addActionListener(ae -> {
+				String newDataKey = (String) dataKeysChooser.getSelectedItem();
+				if (!newDataKey.equals(outputFileDataKeyName)) {
+					OutputFileStore outputFileStore = new OutputFileStore();
+					outputFileStore.setFilename(outputFile.getFileName());
+					switch (newDataKey) {
+						case "NoDataKey":
+							outputFileStore.setType(NoDataKeyOutputFile.class.getName());
+							break;
+						case "PedestrianIdDataKey":
+							outputFileStore.setType(PedestrianIdOutputFile.class.getName());
+							break;
+						case "TimestepDataKey":
+							outputFileStore.setType(TimestepOutputFile.class.getName());
+							break;
+						case "TimestepPedestrianIdDataKey":
+							outputFileStore.setType(TimestepPedestrianIdOutputFile.class.getName());
+							break;
+					}
+					int index = currentScenario.getDataProcessingJsonManager().replaceOutputFile(outputFileStore);
+					updateOutputFilesTable();
+					outputFilesTable.setRowSelectionInterval(index, index);
+				}
+			});
 			panel.add(dataKeysChooser, c);
 
 			c.gridx = 0;
