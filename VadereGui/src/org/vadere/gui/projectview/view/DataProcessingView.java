@@ -339,6 +339,8 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			comboBox.addActionListener(e -> {
 				if (e.getActionCommand().equals("inputComplete")) {
 					outputFile.setProcessorIds(comboBox.getCheckedItems());
+					currentScenario.updateCurrentStateSerialized();
+					ProjectView.getMainWindow().refreshScenarioNames();
 				}
 			});
 			panel.add(comboBox, c);
