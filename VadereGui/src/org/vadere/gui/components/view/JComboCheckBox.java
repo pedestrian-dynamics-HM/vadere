@@ -77,9 +77,7 @@ public class JComboCheckBox<E> extends JComboBox {
 	}
 
 	public void setCheckedItems(List<E> checkedItems) {
-		if (checkedItems != null) {
-			checkedItems.forEach(checkedItem -> memory.put(checkedItem, true));
-		}
+		checkedItems.forEach(checkedItem -> memory.put(checkedItem, true));
 	}
 
 	public List<E> getCheckedItems() {
