@@ -16,6 +16,7 @@ import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 public class TargetController {
 
@@ -62,7 +63,7 @@ public class TargetController {
 			}
 
 			if (isNextTargetForAgent(agent)
-					&& hasAgentReachedThisTarget(agent, reachedDistance)) {
+					&& hasAgentReachedThisTarget(agent)) {
 
 				notifyListenersTargetReached(agent);
 
@@ -103,9 +104,13 @@ public class TargetController {
 		return topography.getSpatialMap(clazz).getObjects(center, radius);
 	}
 
-	private boolean hasAgentReachedThisTarget(Agent agent, double reachedDistance) {
-		return target.getShape().contains(agent.getPosition())
-				|| target.getShape().distance(agent.getPosition()) < reachedDistance;
+	private boolean hasAgentReachedThisTarget(Agent agent) {
+		final double reachedDistance = target.getAttributes().getDeletionDistance();
+		final VPoint agentPosition = agent.getPosition();
+		final VShape targetShape = target.getShape();
+
+		return targetShape.contains(agentPosition)
+				|| targetShape.distance(agentPosition) < reachedDistance;
 	}
 
 	private TrafficLightPhase getCurrentTrafficLightPhase(double simTimeInSec) {
