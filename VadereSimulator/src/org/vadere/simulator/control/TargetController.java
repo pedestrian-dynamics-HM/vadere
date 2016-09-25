@@ -61,31 +61,7 @@ public class TargetController {
 				if (target.getWaitingTime() <= 0) {
 					checkRemove(agent);
 				} else {
-					final int agentId = agent.getId();
-					// individual waiting behaviour, as opposed to waiting at a traffic light
-					if (target.getAttributes().isIndividualWaiting()) {
-						final Map<Integer, Double> enteringTimes = target.getEnteringTimes();
-						if (enteringTimes.containsKey(agentId)) {
-							if (simTimeInSec - enteringTimes.get(agentId) > target
-									.getWaitingTime()) {
-								enteringTimes.remove(agentId);
-								checkRemove(agent);
-							}
-						} else {
-							final int parallelWaiters = target.getParallelWaiters();
-							if (parallelWaiters <= 0 || (parallelWaiters > 0 &&
-									enteringTimes.size() < parallelWaiters)) {
-								enteringTimes.put(agentId, simTimeInSec);
-							}
-						}
-					} else {
-						// traffic light switching based on waiting time. Light starts green.
-						phase = getCurrentTrafficLightPhase(simTimeInSec);
-
-						if (phase == TrafficLightPhase.GREEN) {
-							checkRemove(agent);
-						}
-					}
+					waitingBehavior(simTimeInSec, agent);
 				}
 			}
 		}
@@ -103,6 +79,34 @@ public class TargetController {
 		elementsInRange.addAll(getObjectsInCircle(Car.class, center, radius));
 		
 		return elementsInRange;
+	}
+
+	private void waitingBehavior(double simTimeInSec, final Agent agent) {
+		final int agentId = agent.getId();
+		// individual waiting behaviour, as opposed to waiting at a traffic light
+		if (target.getAttributes().isIndividualWaiting()) {
+			final Map<Integer, Double> enteringTimes = target.getEnteringTimes();
+			if (enteringTimes.containsKey(agentId)) {
+				if (simTimeInSec - enteringTimes.get(agentId) > target
+						.getWaitingTime()) {
+					enteringTimes.remove(agentId);
+					checkRemove(agent);
+				}
+			} else {
+				final int parallelWaiters = target.getParallelWaiters();
+				if (parallelWaiters <= 0 || (parallelWaiters > 0 &&
+						enteringTimes.size() < parallelWaiters)) {
+					enteringTimes.put(agentId, simTimeInSec);
+				}
+			}
+		} else {
+			// traffic light switching based on waiting time. Light starts green.
+			phase = getCurrentTrafficLightPhase(simTimeInSec);
+
+			if (phase == TrafficLightPhase.GREEN) {
+				checkRemove(agent);
+			}
+		}
 	}
 
 	private <T extends DynamicElement> List<T> getObjectsInCircle(final Class<T> clazz, final VPoint center, final double radius) {
