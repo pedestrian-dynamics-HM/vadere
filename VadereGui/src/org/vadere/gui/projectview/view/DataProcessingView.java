@@ -326,7 +326,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 0;
-			panel.add(new JLabel("<html><i>File name:</i></html>"), c);
+			panel.add(new JLabel("File name:"), c);
 
 			c.gridx = 1;
 			c.gridy = 0;
@@ -367,7 +367,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel("<html><i>Data key:</i></html>"), c);
+			panel.add(new JLabel("Data key:"), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
@@ -403,7 +403,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 2;
-			panel.add(new JLabel("<html><i>Header:</i></html>"), c);
+			panel.add(new JLabel("Header:"), c);
 
 			c.gridx = 1;
 			c.gridy = 2;
@@ -411,7 +411,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 3;
-			panel.add(new JLabel("<html><i>Processors:</i></html>"), c);
+			panel.add(new JLabel("Processors:"), c);
 
 			c.gridx = 1;
 			c.gridy = 3;
@@ -455,7 +455,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel("<html><i>DataKey: </i></html>"), c);
+			panel.add(new JLabel("DataKey:"), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
