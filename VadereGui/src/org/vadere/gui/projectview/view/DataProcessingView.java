@@ -321,7 +321,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor = GridBagConstraints.WEST; // alignment
-			c.ipady = 15; // y-gap between components
+			c.insets = new Insets(6, 6, 6, 6);
 			c.fill = GridBagConstraints.HORIZONTAL;
 
 			c.gridx = 0;
@@ -445,7 +445,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor = GridBagConstraints.WEST;
-			c.ipady = 15;
+			c.insets = new Insets(6, 6, 6, 6);
 
 			c.gridx = 0;
 			c.gridy = 0;
