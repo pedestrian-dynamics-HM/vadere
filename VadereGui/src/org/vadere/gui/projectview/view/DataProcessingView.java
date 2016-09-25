@@ -255,6 +255,11 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			editableComponents.forEach(comp -> comp.setEnabled(isEditable));
 		}
 
+		private void addEditableComponent(Component comp) {
+			comp.setEnabled(isEditable);
+			editableComponents.add(comp);
+		}
+
 		private void setupTables() {
 			outputFilesTableModel = new DefaultTableModel(new OutputFile[] {null}, 0) {
 				@Override
@@ -307,7 +312,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			btnPanel.add(addBtn);
 			panel.add(btnPanel);
 
-			editableComponents.add(addBtn);
+			addEditableComponent(addBtn);
 			return panel;
 		}
 
@@ -363,6 +368,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 				nameField.getCaret().setVisible(false);
 			});
 
+			addEditableComponent(nameField);
 			panel.add(nameField, c);
 
 			c.gridx = 0;
@@ -399,6 +405,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					outputFilesTable.setRowSelectionInterval(index, index);
 				}
 			});
+			addEditableComponent(dataKeysChooser);
 			panel.add(dataKeysChooser, c);
 
 			c.gridx = 0;
@@ -430,8 +437,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 				}
 			});
 			panel.add(comboBox, c);
-			editableComponents.add(comboBox);
-			comboBox.setEnabled(isEditable);
+			addEditableComponent(comboBox);
 
 			revalidate();
 			repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
