@@ -39,7 +39,7 @@ public class TargetController {
 	}
 
 	public void update(double simTimeInSec) {
-		if (this.target.isTargetPedestrian()) {
+		if (target.isTargetPedestrian()) {
 			return;
 		}
 
