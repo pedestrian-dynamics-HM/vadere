@@ -42,17 +42,8 @@ public class TargetController {
 		if (this.target.isTargetPedestrian()) {
 			return;
 		}
-		final double reachedDistance = target.getAttributes().getDeletionDistance();
 
-		final Rectangle2D bounds = target.getShape().getBounds2D();
-		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
-		final double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
-
-		final Collection<DynamicElement> elementsInRange = new LinkedList<>();
-		elementsInRange.addAll(getObjectsInCircle(Pedestrian.class, center, radius));
-		elementsInRange.addAll(getObjectsInCircle(Car.class, center, radius));
-
-		for (DynamicElement element : elementsInRange) {
+		for (DynamicElement element : getPrefilteredDynamicElements()) {
 
 			final Agent agent;
 			if (element instanceof Agent) {
@@ -98,6 +89,20 @@ public class TargetController {
 				}
 			}
 		}
+	}
+
+	private Collection<DynamicElement> getPrefilteredDynamicElements() {
+		final double reachedDistance = target.getAttributes().getDeletionDistance();
+
+		final Rectangle2D bounds = target.getShape().getBounds2D();
+		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
+		final double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
+
+		final Collection<DynamicElement> elementsInRange = new LinkedList<>();
+		elementsInRange.addAll(getObjectsInCircle(Pedestrian.class, center, radius));
+		elementsInRange.addAll(getObjectsInCircle(Car.class, center, radius));
+		
+		return elementsInRange;
 	}
 
 	private <T extends DynamicElement> List<T> getObjectsInCircle(final Class<T> clazz, final VPoint center, final double radius) {
