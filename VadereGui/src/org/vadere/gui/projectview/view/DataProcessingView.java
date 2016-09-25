@@ -28,9 +28,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -340,8 +338,10 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			nameField.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseReleased(MouseEvent e) {
-					nameField.setEditable(true);
-					nameField.getCaret().setVisible(true);
+					if (isEditable) {
+						nameField.setEditable(true);
+						nameField.getCaret().setVisible(true);
+					}
 				}
 			});
 			nameField.addActionListener(ae -> {
@@ -367,7 +367,13 @@ public class DataProcessingView extends JPanel implements IJsonView {
 				nameField.setEditable(false);
 				nameField.getCaret().setVisible(false);
 			});
-
+			nameField.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					nameField.setText(outputFile.getFileName());
+					nameField.setEditable(false);
+				}
+			});
 			addEditableComponent(nameField);
 			panel.add(nameField, c);
 
