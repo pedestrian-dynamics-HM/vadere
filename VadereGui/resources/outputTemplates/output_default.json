@@ -24,6 +24,10 @@
 		"type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepRowOutputFile",
 		"filename": "output_ts_row.txt",
 		"processors": [ 20 ]
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+		"filename": "output_ts_pos.txt",
+		"processors": [ 21 ]
 	} ],
 	"processors": [ {
 		"type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -171,6 +175,17 @@
 		"id": 19
 	}, {
 		"type": "org.vadere.simulator.projects.dataprocessing.processor.FloorFieldGridProcessor",
-		"id": 20
+		"id": 20,
+		"attributesType": "org.vadere.state.attributes.processor.AttributesFloorFieldProcessor",
+		"attributes": {
+			"targetId": 1
+		}
+	}, {
+		"type": "org.vadere.simulator.projects.dataprocessing.processor.FloorFieldProcessor",
+		"id": 21,
+		"attributesType": "org.vadere.state.attributes.processor.AttributesFloorFieldProcessor",
+		"attributes": {
+			"targetId": 1
+		}
 	} ]
 }

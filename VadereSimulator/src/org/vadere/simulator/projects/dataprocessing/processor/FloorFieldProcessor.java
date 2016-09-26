@@ -2,18 +2,28 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepRowKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
-import org.vadere.util.data.FloorFieldGridRow;
+import org.vadere.util.geometry.shapes.VPoint;
 
-public class FloorFieldGridProcessor extends DataProcessor<TimestepRowKey, FloorFieldGridRow> {
+/**
+ * @author Mario Teixeira Parente
+ */
+
+public class FloorFieldProcessor extends DataProcessor<TimestepPositionKey, Double> {
     private int targetId;
+
+    public FloorFieldProcessor() {
+        super("potential");
+    }
 
     @Override
     protected void doUpdate(SimulationState state) {
         // First try, TODO: Implementation
-        for (int i = 0; i < 50; ++i) {
-            this.setValue(new TimestepRowKey(state.getStep(), i), new FloorFieldGridRow(50));
+        for (int x = 0; x < 50; ++x) {
+            for (int y = 0; y < 50; ++y) {
+                this.setValue(new TimestepPositionKey(state.getStep(), new VPoint(x, y)), 0.0);
+            }
         }
     }
 
@@ -21,10 +31,5 @@ public class FloorFieldGridProcessor extends DataProcessor<TimestepRowKey, Floor
     public void init(ProcessorManager manager) {
         AttributesFloorFieldProcessor att = (AttributesFloorFieldProcessor) this.getAttributes();
         this.targetId = att.getTargetId();
-    }
-
-    @Override
-    public String[] toStrings(TimestepRowKey key) {
-        return this.getValue(key).toStrings();
     }
 }
