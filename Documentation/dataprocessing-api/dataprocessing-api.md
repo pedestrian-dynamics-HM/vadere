@@ -112,7 +112,7 @@ protected abstract void doUpdate(final SimulationState state) {
     int timeStep = state.getStep();
     int amountPeds = state.getTopography().getElements(Pedestrian.class).size();
 
-    this.addValue(new TimestepDataKey(timeStep), amountPeds);
+    this.setValue(new TimestepDataKey(timeStep), amountPeds);
 }
 ```
 
