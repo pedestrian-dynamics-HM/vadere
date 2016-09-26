@@ -26,7 +26,7 @@ public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdKey, 
 		peds.forEach(p -> {
 			final Source s = p.getSource();
 			final int sourceId = (s == null) ? -1 : s.getId();
-			this.addValue(new PedestrianIdKey(p.getId()), sourceId);
+			this.setValue(new PedestrianIdKey(p.getId()), sourceId);
 		});
 	}
 

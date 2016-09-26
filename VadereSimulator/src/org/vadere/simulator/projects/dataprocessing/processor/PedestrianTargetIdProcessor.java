@@ -22,7 +22,7 @@ public class PedestrianTargetIdProcessor extends DataProcessor<TimestepPedestria
 	public void doUpdate(final SimulationState state) {
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 
-		peds.forEach(p -> this.addValue(new TimestepPedestrianIdKey(state.getStep(), p.getId()),
+		peds.forEach(p -> this.setValue(new TimestepPedestrianIdKey(state.getStep(), p.getId()),
 				p.getTargets().isEmpty() ? -1 : p.getTargets().getFirst()));
 	}
 

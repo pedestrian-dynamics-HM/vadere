@@ -33,6 +33,6 @@ public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdKey,
 		Set<PedestrianIdKey> keys = this.getKeys();
 
 		if (!keys.contains(pedIdKey))
-			this.addValue(pedIdKey, startTime);
+			this.setValue(pedIdKey, startTime);
 	}
 }

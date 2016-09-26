@@ -13,7 +13,7 @@ public class FloorFieldGridProcessor extends DataProcessor<TimestepRowKey, Floor
     protected void doUpdate(SimulationState state) {
         // First try, TODO: Implementation
         for (int i = 0; i < 50; ++i) {
-            this.addValue(new TimestepRowKey(state.getStep(), i), new FloorFieldGridRow(50));
+            this.setValue(new TimestepRowKey(state.getStep(), i), new FloorFieldGridRow(50));
         }
     }
 

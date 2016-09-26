@@ -25,7 +25,7 @@ public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepP
 		this.pedPosProc.update(state);
 
 		state.getTopography().getElements(Pedestrian.class).stream()
-				.forEach(ped -> this.addValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()),
+				.forEach(ped -> this.setValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()),
 						this.densAlg.getDensity(ped.getPosition(), state)));
 	}
 

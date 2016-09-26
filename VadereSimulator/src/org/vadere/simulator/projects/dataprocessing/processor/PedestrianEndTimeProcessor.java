@@ -34,6 +34,6 @@ public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdKey, D
 
     private void setValues(Collection<Pedestrian> peds, double value) {
         peds.stream().map(ped -> new PedestrianIdKey(ped.getId()))
-                .forEach(key -> this.addValue(key, value));
+                .forEach(key -> this.setValue(key, value));
     }
 }

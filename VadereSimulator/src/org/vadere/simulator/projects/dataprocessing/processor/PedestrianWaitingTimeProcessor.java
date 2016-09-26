@@ -36,7 +36,7 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 
             if (this.waitingArea.contains(pos)) {
                 PedestrianIdKey key = new PedestrianIdKey(pedId);
-                this.addValue(key, (this.hasValue(key) ? this.getValue(key) : 0.0) + dt);
+                this.setValue(key, (this.hasValue(key) ? this.getValue(key) : 0.0) + dt);
             }
         }
 
