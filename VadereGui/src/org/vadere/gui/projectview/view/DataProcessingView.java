@@ -12,33 +12,35 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
+import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.util.io.IOUtils;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 
 public class DataProcessingView extends JPanel implements IJsonView {
@@ -384,28 +386,18 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 1;
 			c.gridy = 1;
 			String outputFileDataKeyName = extractSimpleName(outputFileDataKey);
-			String[] dataKeys = {"NoDataKey", "PedestrianIdDataKey", "TimestepDataKey", "TimestepPedestrianIdDataKey"}; // TODO find a more direct way of collecting these and toString()ing them
-			JComboBox dataKeysChooser = new JComboBox<>(dataKeys);
+
+			Map<String, Class> dataKeysOutputFiles = ClassFinder.getDataKeysOutputFileRelation();
+			JComboBox dataKeysChooser = new JComboBox<>(dataKeysOutputFiles.keySet().toArray());
+
 			dataKeysChooser.setSelectedItem(outputFileDataKeyName);
 			dataKeysChooser.addActionListener(ae -> {
 				String newDataKey = (String) dataKeysChooser.getSelectedItem();
 				if (!newDataKey.equals(outputFileDataKeyName)) {
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(outputFile.getFileName());
-					switch (newDataKey) {
-						case "NoDataKey":
-							outputFileStore.setType(NoDataKeyOutputFile.class.getName());
-							break;
-						case "PedestrianIdDataKey":
-							outputFileStore.setType(PedestrianIdOutputFile.class.getName());
-							break;
-						case "TimestepDataKey":
-							outputFileStore.setType(TimestepOutputFile.class.getName());
-							break;
-						case "TimestepPedestrianIdDataKey":
-							outputFileStore.setType(TimestepPedestrianIdOutputFile.class.getName());
-							break;
-					}
+					outputFileStore.setType(dataKeysOutputFiles.get(newDataKey).getName()); // Choose corresponding outputfile type
+
 					int index = currentScenario.getDataProcessingJsonManager().replaceOutputFile(outputFileStore);
 					updateOutputFilesTable();
 					outputFilesTable.setRowSelectionInterval(index, index);

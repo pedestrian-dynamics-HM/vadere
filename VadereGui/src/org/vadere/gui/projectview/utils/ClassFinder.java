@@ -1,7 +1,9 @@
 package org.vadere.gui.projectview.utils;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
@@ -16,6 +18,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
@@ -42,6 +46,40 @@ public class ClassFinder {
 		return findSubclassesInPackage(OutputFile.class.getPackage().getName(), OutputFile.class)
 				.stream().filter(cfile -> !Modifier.isAbstract(cfile.getModifiers()))
 				.collect(Collectors.toList());
+	}
+
+	public static Map<String, Class> getDataKeysOutputFileRelation() {
+		try {
+			return getClasses(DataKey.class.getPackage().getName())
+					.stream()
+					.filter(c -> !Modifier.isInterface(c.getModifiers()))
+					.filter(c -> DataKey.class.isAssignableFrom(c))
+					.map(c -> {
+						// Find corresponding outputfile class
+						try {
+							List<Class<?>> opClasses = getClasses(OutputFile.class.getPackage().getName());
+
+							Optional<Class<?>> corrOpClass = opClasses
+									.stream()
+									.filter(opc -> !Modifier.isAbstract(opc.getModifiers()))
+									.filter(opc -> ((ParameterizedType) opc.getGenericSuperclass()).getActualTypeArguments()[0].getTypeName().equals(c.getName()))
+									.findFirst();
+
+							return Pair.of((Class) c, corrOpClass);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+
+						return null;
+					})
+					.filter(p -> p.getValue().isPresent())
+					.map(p -> Pair.of(p.getKey(), p.getValue().get()))
+					.collect(Collectors.toMap(p -> p.getKey().getSimpleName(), p -> (Class) p.getValue()));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public static List<Class<?>> getProcessorClasses(Type keyType) {
