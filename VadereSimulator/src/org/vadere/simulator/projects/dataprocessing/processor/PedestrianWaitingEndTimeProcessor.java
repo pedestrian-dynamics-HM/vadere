@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -14,7 +14,7 @@ import java.util.Map;
  *
  */
 
-public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
+public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
     private VRectangle waitingArea;
 
     public PedestrianWaitingEndTimeProcessor() {
@@ -30,8 +30,8 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
             VPoint pos = entry.getValue();
 
             if (this.waitingArea.contains(pos)) {
-                PedestrianIdDataKey key = new PedestrianIdDataKey(pedId);
-                this.addValue(key, state.getSimTimeInSec());
+                PedestrianIdKey key = new PedestrianIdKey(pedId);
+                this.setValue(key, state.getSimTimeInSec());
             }
         }
     }

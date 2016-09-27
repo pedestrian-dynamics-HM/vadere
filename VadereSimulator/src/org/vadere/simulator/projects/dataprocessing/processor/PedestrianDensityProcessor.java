@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -11,7 +11,7 @@ import org.vadere.state.scenario.Pedestrian;
  *
  */
 
-public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
+public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
 	private IPointDensityAlgorithm densAlg;
 
@@ -25,7 +25,7 @@ public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepP
 		this.pedPosProc.update(state);
 
 		state.getTopography().getElements(Pedestrian.class).stream()
-				.forEach(ped -> this.addValue(new TimestepPedestrianIdDataKey(state.getStep(), ped.getId()),
+				.forEach(ped -> this.setValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()),
 						this.densAlg.getDensity(ped.getPosition(), state)));
 	}
 

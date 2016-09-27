@@ -2,8 +2,8 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -14,7 +14,7 @@ import java.util.Map;
  *
  */
 
-public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdDataKey, VPoint> {
+public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdKey, VPoint> {
 	private PedestrianPositionProcessor pedPosProc;
 
 	public PedestrianLastPositionProcessor() {
@@ -26,8 +26,8 @@ public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdD
 		this.pedPosProc.update(state);
 
 		Map<Integer, VPoint> pedPosMap = state.getPedestrianPositionMap();
-		pedPosMap.keySet().forEach(pedId -> this.addValue(new PedestrianIdDataKey(pedId),
-				this.pedPosProc.getValue(new TimestepPedestrianIdDataKey(state.getStep(), pedId))));
+		pedPosMap.keySet().forEach(pedId -> this.setValue(new PedestrianIdKey(pedId),
+				this.pedPosProc.getValue(new TimestepPedestrianIdKey(state.getStep(), pedId))));
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdD
 	}
 
 	@Override
-	public String[] toStrings(final PedestrianIdDataKey key) {
+	public String[] toStrings(final PedestrianIdKey key) {
 		VPoint pos = this.getValue(key);
 
 		return new String[] { Double.toString(pos.x), Double.toString(pos.y) };

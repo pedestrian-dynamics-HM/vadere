@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 
@@ -13,7 +13,7 @@ import java.util.Collection;
  *
  */
 
-public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdDataKey, Integer> {
+public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdKey, Integer> {
 
 	public PedestrianSourceIdProcessor() {
 		super("sourceId");
@@ -26,7 +26,7 @@ public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdDataK
 		peds.forEach(p -> {
 			final Source s = p.getSource();
 			final int sourceId = (s == null) ? -1 : s.getId();
-			this.addValue(new PedestrianIdDataKey(p.getId()), sourceId);
+			this.setValue(new PedestrianIdKey(p.getId()), sourceId);
 		});
 	}
 

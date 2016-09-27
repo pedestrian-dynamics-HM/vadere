@@ -2,9 +2,9 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepDataKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -30,22 +30,22 @@ public class AreaSpeedProcessor extends AreaDataProcessor<Double> {
         this.pedPosProc.update(state);
         this.pedVelProc.update(state);
 
-        Map<PedestrianIdDataKey, VPoint> positionMap = this.pedPosProc.getPositions(new TimestepDataKey(step));
+        Map<PedestrianIdKey, VPoint> positionMap = this.pedPosProc.getPositions(new TimestepKey(step));
 
         int pedCount = 0;
         double sumVelocities = 0.0;
 
-        for (Map.Entry<PedestrianIdDataKey, VPoint> entry : positionMap.entrySet()) {
+        for (Map.Entry<PedestrianIdKey, VPoint> entry : positionMap.entrySet()) {
             final int pedId = entry.getKey().getPedestrianId();
             final VPoint pos = entry.getValue();
 
             if (getMeasurementArea().contains(pos)) {
-                sumVelocities += this.pedVelProc.getValue(new TimestepPedestrianIdDataKey(step, pedId));
+                sumVelocities += this.pedVelProc.getValue(new TimestepPedestrianIdKey(step, pedId));
                 pedCount++;
             }
         }
 
-        this.addValue(new TimestepDataKey(step), sumVelocities / pedCount);
+        this.setValue(new TimestepKey(step), sumVelocities / pedCount);
     }
 
     @Override
