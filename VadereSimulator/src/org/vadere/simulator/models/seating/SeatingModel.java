@@ -99,8 +99,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	
 	private void assignCompartmentTarget(Pedestrian p) {
 		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
-//		final Compartment compartment = chooseCompartment(p, entranceAreaIndex); // TODO choose algorithm
-		final Compartment compartment = chooseCompartmentByRandom(p, entranceAreaIndex);
+		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
 		logDebug("Assigning compartment %d to pedestrian %d", compartment.getIndex(), p.getId());
 		p.addTarget(compartment.getInterimTarget());
 	}
@@ -120,13 +119,6 @@ public class SeatingModel implements ActiveCallback, Model {
 	
 	public TrainModel getTrainModel() {
 		return trainModel;
-	}
-
-	public Compartment chooseCompartmentByRandom(Pedestrian person, int entranceAreaIndex) {
-		int index = random.nextInt(getCompartmentCount() - 1); // 2 half-compartments are counted as one
-		if (index == 0 && random.nextBoolean()) // 50 percent chance to switch to other half-compartment
-			index = getCompartmentCount() - 1;
-		return trainModel.getCompartment(index);
 	}
 
 	public Compartment chooseCompartment(Pedestrian person, int entranceAreaIndex) {
@@ -255,10 +247,6 @@ public class SeatingModel implements ActiveCallback, Model {
 		log.debug(String.format(formatString, args));
 	}
 	
-	private int getCompartmentCount() {
-		return trainModel.getEntranceAreaCount() + 1;
-	}
-
 	private final TargetListener interimTargetListener = new TargetListener() {
 		@Override
 		public void reachedTarget(Target target, Agent agent) {
