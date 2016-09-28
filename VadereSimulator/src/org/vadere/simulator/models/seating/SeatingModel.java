@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.seating;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -85,10 +84,8 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	@Override
 	public void update(double simTimeInSec) {
-		final Collection<Pedestrian> pedestrians = trainModel.getPedestrians();
-		
 		// choose compartment for those peds without a target
-		pedestrians.stream()
+		trainModel.getPedestrians().stream()
 				.filter(this::hasNoTargetAssigned)
 				.forEach(this::assignCompartmentTarget);
 		
