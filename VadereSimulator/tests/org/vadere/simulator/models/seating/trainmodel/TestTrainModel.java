@@ -37,7 +37,7 @@ public class TestTrainModel {
 	@Test
 	public void testBasicModelProperties() {
 		assertEquals(nEntranceAreas, trainModel.getEntranceAreaCount());
-		checkSize(nInterimDestinations, trainModel.getInterimDestinations());
+		checkSize(nCompartmentTargets, trainModel.getCompartmentTargets());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
 
@@ -57,12 +57,12 @@ public class TestTrainModel {
 	}
 
 	@Test
-	public void testAllInterimTargetsAreDistinct() {
-		final List<Target> interimTargets = trainModel.getInterimDestinations();
-		final int distinctTargetCount = (int) interimTargets.stream()
+	public void testAllCompartmentTargetsAreDistinct() {
+		final List<Target> compartmentTargets = trainModel.getCompartmentTargets();
+		final int distinctTargetCount = (int) compartmentTargets.stream()
 				.distinct()
 				.count();
-		assertEquals(interimTargets.size(), distinctTargetCount);
+		assertEquals(compartmentTargets.size(), distinctTargetCount);
 	}
 
 	@Test
@@ -73,11 +73,11 @@ public class TestTrainModel {
 	}
 	
 	@Test
-	public void testCertainInterimTarget() {
-		for (Target t : trainModel.getInterimDestinations())
-			if (t.getId() == 205) // an example for an interim target
+	public void testCertainCompartmentTarget() {
+		for (Target t : trainModel.getCompartmentTargets())
+			if (t.getId() == 205) // an example for an compartment target
 				return;
-		fail("Interim target with id not found.");
+		fail("Compartment target with id not found.");
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -146,8 +146,8 @@ public class TestTrainModel {
 
 		assertEquals(trainModel.getSeats().get(0), c.getSeatGroups().get(0).getSeat(0));
 		
-		assertEquals(trainModel.getInterimDestinations().get(0),
-				c.getInterimTarget());
+		assertEquals(trainModel.getCompartmentTargets().get(0),
+				c.getCompartmentTarget());
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class TestTrainModel {
 
 		assertTrue(c.getSeatGroups().get(0).getSeat(0) == trainModel.getSeats().get(8));
 		
-		assertEquals(trainModel.getInterimDestinations().get(1), c.getInterimTarget());
+		assertEquals(trainModel.getCompartmentTargets().get(1), c.getCompartmentTarget());
 	}
 
 	@Test
@@ -175,8 +175,8 @@ public class TestTrainModel {
 		
 		assertTrue(c.getSeatGroups().get(1).getSeat(3) == trainModel.getSeats().get(nSeats - 1));
 		
-		assertEquals(trainModel.getInterimDestinations().get(nInterimDestinations - 1),
-				c.getInterimTarget());
+		assertEquals(trainModel.getCompartmentTargets().get(nCompartmentTargets - 1),
+				c.getCompartmentTarget());
 	}
 	
 	@Test
@@ -189,10 +189,10 @@ public class TestTrainModel {
 	}
 	
 	@Test
-	public void testInterimTargetLocationFallInCompartment() {
-		assertIsInCompartment(trainModel.getInterimDestinations().get(0), 0);
+	public void testCompartmentTargetLocationFallInCompartment() {
+		assertIsInCompartment(trainModel.getCompartmentTargets().get(0), 0);
 
-		assertIsInCompartment(trainModel.getInterimDestinations().get(nInterimDestinations - 1), nCompartments - 1);
+		assertIsInCompartment(trainModel.getCompartmentTargets().get(nCompartmentTargets - 1), nCompartments - 1);
 	}
 	
 	private void assertIsInCompartment(Target target, int compartmentIndex) {
@@ -209,24 +209,24 @@ public class TestTrainModel {
 	@Test
 	public void testGetCompartmentByTarget() {
 		assertEquals(trainModel.getCompartment(0), trainModel.getCompartment(0));
-		assertEquals(trainModel.getCompartment(0), getCompartmentByInterimTargetIndex(0));
+		assertEquals(trainModel.getCompartment(0), getCompartmentByCompartmentTargetIndex(0));
 
-		assertEquals(trainModel.getCompartment(1), getCompartmentByInterimTargetIndex(1));
-		assertEquals(trainModel.getCompartment(2), getCompartmentByInterimTargetIndex(2));
-		assertEquals(trainModel.getCompartment(3), getCompartmentByInterimTargetIndex(3));
+		assertEquals(trainModel.getCompartment(1), getCompartmentByCompartmentTargetIndex(1));
+		assertEquals(trainModel.getCompartment(2), getCompartmentByCompartmentTargetIndex(2));
+		assertEquals(trainModel.getCompartment(3), getCompartmentByCompartmentTargetIndex(3));
 
-		assertEquals(trainModel.getCompartment(nCompartments - 4), getCompartmentByInterimTargetIndex(nInterimDestinations - 4));
-		assertEquals(trainModel.getCompartment(nCompartments - 3), getCompartmentByInterimTargetIndex(nInterimDestinations - 3));
-		assertEquals(trainModel.getCompartment(nCompartments - 2), getCompartmentByInterimTargetIndex(nInterimDestinations - 2));
+		assertEquals(trainModel.getCompartment(nCompartments - 4), getCompartmentByCompartmentTargetIndex(nCompartmentTargets - 4));
+		assertEquals(trainModel.getCompartment(nCompartments - 3), getCompartmentByCompartmentTargetIndex(nCompartmentTargets - 3));
+		assertEquals(trainModel.getCompartment(nCompartments - 2), getCompartmentByCompartmentTargetIndex(nCompartmentTargets - 2));
 
-		assertEquals(trainModel.getCompartment(nCompartments - 1), getCompartmentByInterimTargetIndex(nInterimDestinations - 1));
+		assertEquals(trainModel.getCompartment(nCompartments - 1), getCompartmentByCompartmentTargetIndex(nCompartmentTargets - 1));
 	}
 
 	@Test
 	public void testGetCompartmentByPedestrian() {
 		Pedestrian p = createTestPedestrian();
-		p.addTarget(trainModel.getInterimDestinations().get(0));
-		assertEquals(trainModel.getCompartment(p), getCompartmentByInterimTargetIndex(0));
+		p.addTarget(trainModel.getCompartmentTargets().get(0));
+		assertEquals(trainModel.getCompartment(p), getCompartmentByCompartmentTargetIndex(0));
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -307,8 +307,8 @@ public class TestTrainModel {
 						.getSeatNumberWithinCompartment());
 	}
 
-	private Compartment getCompartmentByInterimTargetIndex(int index) {
-		return trainModel.getCompartment(trainModel.getInterimDestinations().get(index));
+	private Compartment getCompartmentByCompartmentTargetIndex(int index) {
+		return trainModel.getCompartment(trainModel.getCompartmentTargets().get(index));
 	}
 
 	private void checkSize(int expected, Collection<?> actualCollection) {

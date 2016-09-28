@@ -67,8 +67,8 @@ public class SeatingModel implements ActiveCallback, Model {
 		this.random = random;
 		this.rng = new JDKRandomGenerator(random.nextInt());
 		
-		for (final Target target : trainModel.getInterimDestinations()) {
-			target.addListener(interimTargetListener);
+		for (final Target target : trainModel.getCompartmentTargets()) {
+			target.addListener(compartmentTargetListener);
 		}
 
 		for (final Seat seat : trainModel.getSeats()) {
@@ -101,7 +101,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
 		logDebug("Assigning compartment %d to pedestrian %d", compartment.getIndex(), p.getId());
-		p.addTarget(compartment.getInterimTarget());
+		p.addTarget(compartment.getCompartmentTarget());
 	}
 
 	private void assignSeatTarget(Pedestrian p) {
@@ -247,7 +247,7 @@ public class SeatingModel implements ActiveCallback, Model {
 		log.debug(String.format(formatString, args));
 	}
 	
-	private final TargetListener interimTargetListener = new TargetListener() {
+	private final TargetListener compartmentTargetListener = new TargetListener() {
 		@Override
 		public void reachedTarget(Target target, Agent agent) {
 			assignSeatTarget((Pedestrian) agent);

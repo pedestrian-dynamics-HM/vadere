@@ -21,7 +21,7 @@ public class TestTopographyAndModelBuilder {
 
 	public static final int nEntranceAreas = 12;
 	public static final int nCompartments = nEntranceAreas + 1; // includes 2 half-compartments
-	public static final int nInterimDestinations = nCompartments; // includes 2 targets from half-compartments
+	public static final int nCompartmentTargets = nCompartments; // includes 2 targets from half-compartments
 	public static final int nSeatGroups = nCompartments * 4 - 4;
 	public static final int nSeats = nSeatGroups * 4;
 	public static final int nSeatRows = nCompartments * 4 - 4;

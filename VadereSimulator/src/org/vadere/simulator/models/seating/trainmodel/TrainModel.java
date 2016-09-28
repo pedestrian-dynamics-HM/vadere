@@ -47,7 +47,7 @@ public class TrainModel {
 
 	private List<Seat> seats;
 
-	private List<Target> interimDestinations;
+	private List<Target> compartmentTargets;
 	private List<Source> leftDoors;
 	private List<Source> rightDoors;
 
@@ -114,16 +114,16 @@ public class TrainModel {
 			seatGroupIndex++;
 		}
 
-		// find doors, interim destinations, and persons
+		// find doors, compartment targets, and persons
 
 		Rectangle2D longAisle = createFilterRect(leftmostCompartment.getMinY() + trainGeometry.getBenchWidth(),
 				trainGeometry.getAisleWidth());
 
-		// Sort interim target by x coordinate. Right-most target must be the first in the list.
-		interimDestinations = findTargets(longAisle).stream()
+		// Sort compartment target by x coordinate. Right-most target must be the first in the list.
+		compartmentTargets = findTargets(longAisle).stream()
 				.sorted((a, b) -> Double.compare(a.getShape().getBounds().getX(), b.getShape().getBounds().getX()))
 				.collect(Collectors.toList());
-		if (interimDestinations.isEmpty()) {
+		if (compartmentTargets.isEmpty()) {
 			throw new IllegalArgumentException(
 					"This model depends on interim targets. Please create a train scenario with interim destinations.");
 		}
@@ -199,9 +199,9 @@ public class TrainModel {
 		return Collections.unmodifiableList(seats);
 	}
 
-	/** Return an unmodifiable list of interim destinations. */
-	public List<Target> getInterimDestinations() {
-		return Collections.unmodifiableList(interimDestinations);
+	/** Return an unmodifiable list of compartment targets. */
+	public List<Target> getCompartmentTargets() {
+		return Collections.unmodifiableList(compartmentTargets);
 	}
 
 	/**
@@ -277,9 +277,9 @@ public class TrainModel {
 	}
 
 	Compartment getCompartment(Target target) {
-		final int index = interimDestinations.indexOf(target);
+		final int index = compartmentTargets.indexOf(target);
 		if (index == -1) {
-			throw new IllegalArgumentException("Given target is not an interim target.");
+			throw new IllegalArgumentException("Given target is not an compartment target.");
 		}
 		return getCompartment(index);
 	}

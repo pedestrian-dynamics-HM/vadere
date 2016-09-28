@@ -67,11 +67,11 @@ public class Compartment {
 		return seatGroups;
 	}
 
-	public Target getInterimTarget() {
-		// entrance areas:     0   1   2   3
-		// compartments:     0   1   2   3   4
-		// interim targets:  0   1   2   3   4
-		return trainModel.getInterimDestinations().get(index);
+	public Target getCompartmentTarget() {
+		// entrance areas:         0   1   2   3
+		// compartments:         0   1   2   3   4
+		// compartment targets:  0   1   2   3   4
+		return trainModel.getCompartmentTargets().get(index);
 	}
 
 	private boolean isLastHalfCompartment() {
