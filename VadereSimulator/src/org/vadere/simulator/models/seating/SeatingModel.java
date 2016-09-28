@@ -114,16 +114,6 @@ public class SeatingModel implements ActiveCallback, Model {
 		p.addTarget(seat.getAssociatedTarget());
 	}
 	
-	private void assignRandomSeat(Pedestrian p) {
-		final List<Seat> availableSeats = trainModel.getSeats().stream()
-				.filter(Seat::isAvailable)
-				.collect(Collectors.toList());
-		final Seat seat = drawRandomElement(availableSeats);
-		logDebug("Assigning seat %d to pedestrian %d",
-				seat.getSeatNumberWithinCompartment(), p.getId());
-		p.addTarget(seat.getAssociatedTarget());
-	}
-	
 	private boolean hasNoTargetAssigned(Pedestrian p) {
 		return p.getTargets().isEmpty();
 	}
