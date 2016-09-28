@@ -57,8 +57,13 @@ public class SeatingModel implements ActiveCallback, Model {
 		
 		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();
 		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
-		// TODO catch exception of TrainModel constructor when train scenario is corrupt
-		this.trainModel = new TrainModel(topography, trainGeometry);
+		try {
+			trainModel = new TrainModel(topography, trainGeometry);
+		} catch (Exception e) {
+			throw new IllegalStateException(String.format("Topography is corrupt or not a %s train.",
+					trainGeometry.getClass().getSimpleName()));
+		}
+
 		this.random = random;
 		this.rng = new JDKRandomGenerator(random.nextInt());
 		
