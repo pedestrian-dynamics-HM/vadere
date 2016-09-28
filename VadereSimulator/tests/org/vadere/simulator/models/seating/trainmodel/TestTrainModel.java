@@ -37,6 +37,7 @@ public class TestTrainModel {
 	@Test
 	public void testBasicModelProperties() {
 		assertEquals(nEntranceAreas, trainModel.getEntranceAreaCount());
+		assertEquals(nCompartments, trainModel.getCompartmentCount());
 		checkSize(nCompartmentTargets, trainModel.getCompartmentTargets());
 		checkSize(nSeatGroups, trainModel.getSeatGroups());
 		checkSize(nSeats, trainModel.getSeats());
@@ -100,7 +101,7 @@ public class TestTrainModel {
 		Pedestrian p = createTestPedestrian();
 		for (Source s : trainModel.getAllDoorSources()) {
 			p.setSource(s);
-			assertEquals(trainModel.entranceAreaIndexOfSource(s), trainModel.getEntranceAreaIndexForPerson(p));
+			assertEquals(trainModel.getEntranceAreaIndexOfSource(s), trainModel.getEntranceAreaIndexForPerson(p));
 		}
 	}
 

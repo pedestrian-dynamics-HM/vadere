@@ -43,6 +43,8 @@ public class TrainModel {
 		}
 	}
 
+	public static final int MAX_PERSONS_PER_COMPARTMENT = 16;
+
 	private int numberOfEntranceAreas;
 
 	private List<Seat> seats;
@@ -296,13 +298,13 @@ public class TrainModel {
 		if (source == null)
 			throw new RuntimeException("Person's source is null.");
 
-		final int index = entranceAreaIndexOfSource(source);
+		final int index = getEntranceAreaIndexOfSource(source);
 		if (index == -1)
 			throw new RuntimeException("Person is not spawned at one of the doors.");
 		return index;
 	}
 
-	int entranceAreaIndexOfSource(Source source) {
+	public int getEntranceAreaIndexOfSource(Source source) {
 		final double x = source.getShape().getCentroid().getX();
 		for (int i = 0; i < getEntranceAreaCount(); i++) {
 			if (isXIn(x, trainGeometry.getEntranceAreaRect(i))) {
@@ -332,6 +334,11 @@ public class TrainModel {
 
 	public Seat getSeatForTarget(Target target) {
 		return targetSeatMap.get(target);
+	}
+
+	/** Number of compartments including half-compartments. */
+	public int getCompartmentCount() {
+		return numberOfEntranceAreas + 1;
 	}
 
 }

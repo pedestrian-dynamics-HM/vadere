@@ -100,12 +100,23 @@ public class SeatingModel implements ActiveCallback, Model {
 	private void assignCompartmentTarget(Pedestrian p) {
 		final int entranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
 		final Compartment compartment = chooseCompartment(p, entranceAreaIndex);
-		logDebug("Assigning compartment %d to pedestrian %d", compartment.getIndex(), p.getId());
+		logAssigningCompartment(p, compartment);
 		p.addTarget(compartment.getCompartmentTarget());
+	}
+
+	private void logAssigningCompartment(Pedestrian p, final Compartment compartment) {
+		logDebug("Assigning compartment %d to pedestrian %d", compartment.getIndex(), p.getId());
 	}
 
 	private void assignSeatTarget(Pedestrian p) {
 		final Compartment compartment = trainModel.getCompartment(p);
+		if (compartment.getPersonCount() == TrainModel.MAX_PERSONS_PER_COMPARTMENT) {
+			logDebug("Compartment %d is full. No seat available for pedestrian %d.",
+					compartment.getIndex(), p.getId());
+			proceedToNextCompartmentIfPossible(p);
+			return;
+		}
+		
 		final SeatGroup seatGroup = chooseSeatGroup(compartment);
 		final Seat seat = chooseSeat(seatGroup);
 		logDebug("Assigning seat %d.%d to pedestrian %d", compartment.getIndex(),
@@ -113,6 +124,26 @@ public class SeatingModel implements ActiveCallback, Model {
 		p.addTarget(seat.getAssociatedTarget());
 	}
 	
+	private void proceedToNextCompartmentIfPossible(Pedestrian p) {
+		final int fromEntranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
+		final int compartmentIndex = trainModel.getCompartment(p).getIndex();
+		if (compartmentIndex > 0 && compartmentIndex < trainModel.getCompartmentCount() - 1) {
+			final int direction = getDirectionFromEntranceAreaToCompartment(fromEntranceAreaIndex, compartmentIndex);
+			final Compartment nextCompartment = trainModel.getCompartment(compartmentIndex + direction);
+			logAssigningCompartment(p, nextCompartment);
+			p.addTarget(nextCompartment.getCompartmentTarget());
+		}
+	}
+
+	private int getDirectionFromEntranceAreaToCompartment(int entranceAreaIndex, int compartmentIndex) {
+		// entrance areas:    0   1   2   3
+		// compartments:    0   1   2   3   4
+		if (compartmentIndex <= entranceAreaIndex)
+			return -1;
+		else
+			return +1;
+	}
+
 	private boolean hasNoTargetAssigned(Pedestrian p) {
 		return p.getTargets().isEmpty();
 	}
