@@ -118,14 +118,8 @@ public class SourceController {
 		return isAfterSourceEndTime(simTimeInSec) && dynamicElementsToCreate == 0;
 	}
 
-	private boolean isMaximumNumberOfSpawnedElementsReached() {
-		final int maxNumber = sourceAttributes.getMaxSpawnNumberTotal();
-		return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
-				&& dynamicElementsCreatedTotal >= maxNumber;
-	}
-
-	private boolean isSourceWithOneSingleSpawnEvent() {
-		return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
+	private boolean hasNextEvent() {
+		return timeOfNextEvent != null;
 	}
 
 	private void processNextEventWhenItIsTime(double simTimeInSec) {
@@ -154,8 +148,14 @@ public class SourceController {
 		processNextEventWhenItIsTime(simTimeInSec);
 	}
 
-	private boolean hasNextEvent() {
-		return timeOfNextEvent != null;
+	private boolean isMaximumNumberOfSpawnedElementsReached() {
+		final int maxNumber = sourceAttributes.getMaxSpawnNumberTotal();
+		return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
+				&& dynamicElementsCreatedTotal >= maxNumber;
+	}
+
+	private boolean isSourceWithOneSingleSpawnEvent() {
+		return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
 	}
 
 	private boolean isAfterSourceEndTime(double time) {
