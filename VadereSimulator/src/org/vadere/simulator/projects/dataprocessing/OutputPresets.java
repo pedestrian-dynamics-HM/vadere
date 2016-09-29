@@ -33,6 +33,8 @@ public final class OutputPresets {
         outputFile.setFilename(DataProcessingJsonManager.TRAJECTORIES_FILENAME);
         outputFile.setProcessors(Arrays.asList(1, 2));
         this.outputDefinition.addOutputFile(outputFile);
+
+        this.outputDefinition.setTimestamped(true);
     }
 
     public static OutputDefinitionStore getOutputDefinition() {
