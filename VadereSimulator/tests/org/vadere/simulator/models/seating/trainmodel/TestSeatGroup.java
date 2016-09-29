@@ -17,13 +17,15 @@ import org.vadere.state.scenario.Pedestrian;
 public class TestSeatGroup {
 
 	private TrainModel trainModel;
-	private SeatGroup aSeatGroup;
 	private Pedestrian aPerson;
+	private SeatGroup aSeatGroup;
+	private SeatGroup rightSeatGroup;
 
 	@Before
 	public void setUp() {
 		trainModel = new TestTopographyAndModelBuilder().getTrainModel();
 		aSeatGroup = trainModel.getSeatGroup(0, 0);
+		rightSeatGroup = trainModel.getSeatGroup(0, 1);
 		aPerson = TestTrainModel.createTestPedestrian();
 	}
 
@@ -210,6 +212,11 @@ public class TestSeatGroup {
 		testRelativePosition(0, 1, SeatRelativePosition.NEXT);
 
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testSeatRelativeToWithInvalidSeat() {
+		aSeatGroup.seatRelativeTo(trainModel.getSeat(1, 1, 1), SeatRelativePosition.ACROSS);
+	}
 
 	private void testRelativePosition(int actual, int seat, SeatRelativePosition relativePosition) {
 		assertEquals(aSeatGroup.getSeat(actual), aSeatGroup.seatRelativeTo(aSeatGroup.getSeat(seat), relativePosition));
@@ -274,26 +281,76 @@ public class TestSeatGroup {
 
 	@Test
 	public void testAvailableSeatAtSideWindow1() {
-		sitDownTestPerson(0);
-		assertEquals(aSeatGroup.getSeat(2), aSeatGroup.availableSeatAtSide(SeatSide.WINDOW));
+		testAvailableSeat(aSeatGroup, SeatSide.WINDOW, 0, 2);
 	}
 
 	@Test
 	public void testAvailableSeatAtSideWindow2() {
-		sitDownTestPerson(2);
-		assertEquals(aSeatGroup.getSeat(0), aSeatGroup.availableSeatAtSide(SeatSide.WINDOW));
+		testAvailableSeat(aSeatGroup, SeatSide.WINDOW, 2, 0);
 	}
 
 	@Test
 	public void testAvailableSeatAtSideAisle1() {
-		sitDownTestPerson(1);
-		assertEquals(aSeatGroup.getSeat(3), aSeatGroup.availableSeatAtSide(SeatSide.AISLE));
+		testAvailableSeat(aSeatGroup, SeatSide.AISLE, 1, 3);
 	}
 
 	@Test
 	public void testAvailableSeatAtSideAisle2() {
+		testAvailableSeat(aSeatGroup, SeatSide.AISLE, 3, 1);
+	}
+
+	@Test
+	public void testAvailableSeatAtSideWindow1RightSeatGroup() {
+		testAvailableSeat(rightSeatGroup, SeatSide.WINDOW, 1, 3);
+	}
+
+	@Test
+	public void testAvailableSeatAtSideWindow2RightSeatGroup() {
+		testAvailableSeat(rightSeatGroup, SeatSide.WINDOW, 3, 1);
+	}
+
+	@Test
+	public void testAvailableSeatAtSideAisle1RightSeatGroup() {
+		testAvailableSeat(rightSeatGroup, SeatSide.AISLE, 0, 2);
+	}
+
+	@Test
+	public void testAvailableSeatAtSideAisle2RightSeatGroup() {
+		testAvailableSeat(rightSeatGroup, SeatSide.AISLE, 2, 0);
+	}
+	
+	@Test
+	public void testGetCompartment() {
+		assertEquals(trainModel.getCompartment(0), aSeatGroup.getCompartment());
+		assertEquals(trainModel.getCompartment(0), rightSeatGroup.getCompartment());
+		
+		assertEquals(trainModel.getCompartment(1), trainModel.getSeatGroup(1, 3).getCompartment());
+	}
+
+	@Test(expected=UnsupportedOperationException.class)
+	public void testGetSeatsIsUnmodifiable() {
+		aSeatGroup.getSeats().add(null);
+	}
+	
+	@Test
+	public void testGetSeats() {
+		assertEquals(SeatGroup.SEATS_PER_SEAT_GROUP, aSeatGroup.getSeats().size());
+		assertEquals(trainModel.getSeat(0, 0, 0), aSeatGroup.getSeats().get(0));
+	}
+	
+	@Test
+	public void testIsFull() {
+		sitDownTestPerson(0);
+		sitDownTestPerson(1);
+		sitDownTestPerson(2);
+		assertFalse(aSeatGroup.isFull());
 		sitDownTestPerson(3);
-		assertEquals(aSeatGroup.getSeat(1), aSeatGroup.availableSeatAtSide(SeatSide.AISLE));
+		assertTrue(aSeatGroup.isFull());
+	}
+	
+	private void testAvailableSeat(SeatGroup seatGroup, SeatSide side, int personSeatIndex, int expectedSeatIndex) {
+		seatGroup.getSeat(personSeatIndex).setSittingPerson(aPerson);
+		assertEquals(seatGroup.getSeat(expectedSeatIndex), seatGroup.availableSeatAtSide(side));
 	}
 
 	private void clearTestSeats() {
