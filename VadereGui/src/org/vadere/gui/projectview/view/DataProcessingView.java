@@ -176,6 +176,9 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		private JPanel outputFilesDetailsPanel;
 		private JPanel dataProcessorsDetailsPanel;
 		private List<Component> editableComponents = new ArrayList<>();
+		private JButton deleteFileBtn, deleteProcessorBtn;
+		private OutputFile selectedOutputFile;
+		private DataProcessor selectedDataProcessor;
 
 		GuiView() {
 			/* via www.oracle.com/technetwork/java/tablelayout-141489.html,
@@ -184,15 +187,23 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			double size[][] = {{0.35, 0.65}, {TableLayout.FILL}};
 			setLayout(new TableLayout(size));
 
+			// left tables side
+
 			JPanel tableSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
 			add(tableSide, "0, 0");
 
-			JPanel detailsSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
-			add(detailsSide, "1, 0");
-
-			// tables side
-
-			setupTables();
+			JPanel filesPanel = new JPanel();
+			filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
+			isTimestampedCheckBox = new JCheckBox("Add timestamp to output folder");
+			isTimestampedCheckBox.addActionListener(new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					currentScenario.getDataProcessingJsonManager().setTimestamped(isTimestampedCheckBox.isSelected());
+				}
+			});
+			isTimestampedCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+			addEditableComponent(isTimestampedCheckBox);
+			filesPanel.add(isTimestampedCheckBox);
 
 			JButton addFileBtn = new JButton(new AbstractAction("Add") {
 				@Override
@@ -210,19 +221,20 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					outputFilesTable.setRowSelectionInterval(index, index);
 				}
 			});
-
-			JPanel filesPanel = new JPanel();
-			filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
-			isTimestampedCheckBox = new JCheckBox("Add timestamp to output folder");
-			isTimestampedCheckBox.addActionListener(new AbstractAction() {
+			deleteFileBtn = new JButton(new AbstractAction("Delete") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					currentScenario.getDataProcessingJsonManager().setTimestamped(isTimestampedCheckBox.isSelected());
+					if (selectedOutputFile == null) {
+						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No output file selected.");
+					} else {
+						// TODO
+					}
 				}
 			});
-			isTimestampedCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-			filesPanel.add(isTimestampedCheckBox);
-			JPanel filesTable = buildPanel("Files", outputFilesTable, addFileBtn);
+
+			setupTables();
+
+			JPanel filesTable = buildPanel("Files", outputFilesTable, addFileBtn, deleteFileBtn);
 			filesTable.setAlignmentX(Component.LEFT_ALIGNMENT);
 			filesPanel.add(filesTable);
 			tableSide.add(filesPanel);
@@ -233,9 +245,22 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					// TODO
 				}
 			});
-			tableSide.add(buildPanel("Processors", dataProcessorsTable, addProcessorBtn));
+			deleteProcessorBtn = new JButton(new AbstractAction("Delete") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (selectedDataProcessor == null) {
+						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No data processor selected.");
+					} else {
+						// TODO
+					}
+				}
+			});
+			tableSide.add(buildPanel("Processors", dataProcessorsTable, addProcessorBtn, deleteProcessorBtn));
 
-			// details side
+			// right details side
+
+			JPanel detailsSide = new JPanel(new GridLayout(2, 1)); // one column, two equally sized rows
+			add(detailsSide, "1, 0");
 
 			outputFilesDetailsPanel = new JPanel();
 			outputFilesDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -250,6 +275,8 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 		@Override
 		public void setVadereScenario(ScenarioRunManager scenario) {
+			selectedOutputFile = null;
+			selectedDataProcessor = null;
 			this.currentScenario = scenario;
 			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
 			updateOutputFilesTable();
@@ -311,7 +338,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			});
 		}
 
-		private JPanel buildPanel(String labelText, JTable table, JButton addBtn) { // used for OutputFile-Table and DataProcessor-Table
+		private JPanel buildPanel(String labelText, JTable table, JButton addBtn, JButton deleteBtn) { // used for OutputFile-Table and DataProcessor-Table
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -331,13 +358,16 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			// button
 			JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			btnPanel.add(addBtn);
+			btnPanel.add(deleteBtn);
 			panel.add(btnPanel);
 
 			addEditableComponent(addBtn);
+			addEditableComponent(deleteBtn);
 			return panel;
 		}
 
 		private void handleOutputFileSelected(OutputFile outputFile) {
+			selectedOutputFile = outputFile;
 			Type outputFileDataKey = getDataKeyForOutputFile(outputFile);
 
 			outputFilesDetailsPanel.removeAll();
@@ -463,6 +493,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		}
 
 		private void handleDataProcessorSelected(DataProcessor dataProcessor) {
+			selectedDataProcessor = dataProcessor;
 			dataProcessorsDetailsPanel.removeAll();
 
 			JPanel panel = new JPanel(new GridBagLayout());
