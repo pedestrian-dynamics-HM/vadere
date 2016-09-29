@@ -17,6 +17,7 @@ import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.util.io.IOUtils;
@@ -40,6 +41,8 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -180,6 +183,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		private JButton deleteFileBtn, deleteProcessorBtn;
 		private OutputFile selectedOutputFile;
 		private DataProcessor selectedDataProcessor;
+		private String latestJsonParsingError;
 
 		GuiView() {
 			/* via www.oracle.com/technetwork/java/tablelayout-141489.html,
@@ -230,8 +234,9 @@ public class DataProcessingView extends JPanel implements IJsonView {
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No output file selected.");
 					} else {
 						currentScenario.getDataProcessingJsonManager().getOutputFiles().remove(selectedOutputFile);
-						updateOutputFilesTable();
+						selectedOutputFile = null;
 						outputFilesDetailsPanel.removeAll();
+						updateOutputFilesTable();
 						revalidate();
 						repaint();
 						refreshGUI();
@@ -261,6 +266,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					} else {
 						Integer id = selectedDataProcessor.getId();
 						currentScenario.getDataProcessingJsonManager().getDataProcessors().remove(selectedDataProcessor);
+						selectedDataProcessor = null;
 						dataProcessorsDetailsPanel.removeAll();
 						currentScenario.getDataProcessingJsonManager().getOutputFiles().forEach(outputFile -> {
 							if (outputFile.getProcessorIds().remove(id) && outputFile == selectedOutputFile) {
@@ -299,9 +305,10 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 		@Override
 		public void setVadereScenario(ScenarioRunManager scenario) {
+			this.currentScenario = scenario;
+			latestJsonParsingError = null;
 			selectedOutputFile = null;
 			selectedDataProcessor = null;
-			this.currentScenario = scenario;
 			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
 			updateOutputFilesTable();
 			updateDataProcessorsTable();
@@ -556,7 +563,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 0;
-			c.gridwidth = 2;
+			c.gridwidth = 3;
 			panel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
 			c.gridwidth = 1;
 
@@ -568,12 +575,38 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			c.gridy = 1;
 			panel.add(new JLabel(extractSimpleName(getDataKeyForDataProcessor(dataProcessor))), c);
 
+			c.gridx = 2;
+			c.gridy = 1;
+			c.anchor = GridBagConstraints.EAST;
+			JLabel jsonInvalidLabel = new JLabel("<html><font color='red'>invalid json</font> <font color=gray size=-2><a href=#>show error</a></font></html>");
+			jsonInvalidLabel.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					VDialogManager.showMessageDialogWithTextArea(
+							Messages.getString("TextView.lbljsoninvalid.errorMsgPopup.title"),
+							latestJsonParsingError,
+							JOptionPane.ERROR_MESSAGE);
+				}
+			});
+
+			jsonInvalidLabel.setVisible(false);
+			panel.add(jsonInvalidLabel, c);
+			c.anchor = GridBagConstraints.WEST;
+
 			// processor json
 			c.gridx = 0;
 			c.gridy = 2;
-			c.gridwidth = 2;
+			c.gridwidth = 3;
 			c.fill = GridBagConstraints.HORIZONTAL;
+
 			RSyntaxTextArea attributesTextArea = new RSyntaxTextArea();
+
+			JScrollPane jsonScrollPane = new JScrollPane(attributesTextArea);
+			jsonScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			jsonScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+			jsonScrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 30, 145)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
+			panel.add(jsonScrollPane, c);
+
 			attributesTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
 			InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
 			try {
@@ -583,32 +616,13 @@ public class DataProcessingView extends JPanel implements IJsonView {
 				ObjectNode node = (ObjectNode) DataProcessingJsonManager.serializeProcessor(dataProcessor);
 				JsonNode idNode = node.remove("id");
 				JsonNode typeNode = node.remove("type");
-
-				/*if (node.get("attributesType") != null) {
-					JsonNode attributesTypeNode = node.get("attributesType");
-					JsonNode attributesNode = node.get("attributes");
-				}*/
-
 				attributesTextArea.setText(JsonConverter.serializeJsonNode(node));
 
-				/* TODO
 				attributesTextArea.getDocument().addDocumentListener(new DocumentListener() {
-					@Override
-					public void changedUpdate(DocumentEvent e) {
-						setScenarioContent();
-					}
-
-					@Override
-					public void removeUpdate(DocumentEvent e) {
-						setScenarioContent();
-					}
-
-					@Override
-					public void insertUpdate(DocumentEvent e) {
-						setScenarioContent();
-					}
-
-					public void setScenarioContent() {
+					@Override public void changedUpdate(DocumentEvent e) { setScenarioContent(); }
+					@Override public void removeUpdate(DocumentEvent e) { setScenarioContent(); }
+					@Override  public void insertUpdate(DocumentEvent e) { setScenarioContent(); }
+					void setScenarioContent() {
 						if (isEditable) {
 							String json = attributesTextArea.getText();
 							if (json.length() == 0)
@@ -618,26 +632,23 @@ public class DataProcessingView extends JPanel implements IJsonView {
 								processorNode.set("id", idNode);
 								processorNode.set("type", typeNode);
 								DataProcessorStore dataProcessorStore = DataProcessingJsonManager.deserializeProcessorStore(processorNode);
-								currentScenario.getDataProcessingJsonManager().updateDataProcessor(dataProcessor, dataProcessorStore);
-								currentScenario.updateCurrentStateSerialized();
-								ProjectView.getMainWindow().refreshScenarioNames();
-								//jsonValidIndicator.setValid();
+								dataProcessor.setAttributes(dataProcessorStore.getAttributes());
+								jsonInvalidLabel.setVisible(false);
+								jsonScrollPane.setBorder(null);
+								refreshGUI();
 							} catch (Exception e) {
-								e.printStackTrace();
-								//jsonValidIndicator.setInvalid();
+								latestJsonParsingError = e.getMessage();
+								jsonInvalidLabel.setVisible(true);
+								jsonScrollPane.setBorder(BorderFactory.createLineBorder(Color.red, 2));
 							}
 						}
 					}
-				});*/
+				});
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			attributesTextArea.setEditable(false);
-			JScrollPane scrollPane = new JScrollPane(attributesTextArea);
-			scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-			scrollPane.setPreferredSize(new Dimension(dataProcessorsDetailsPanel.getWidth() - 30, 145)); // hackish, but didn't find another way from avoiding the JScrollPane to break through the east border with full length
-			panel.add(scrollPane, c);
+			attributesTextArea.setEditable(isEditable);
+			attributesTextArea.setBackground(isEditable ? Color.WHITE : Color.LIGHT_GRAY);
 
 			revalidate();
 			repaint();
