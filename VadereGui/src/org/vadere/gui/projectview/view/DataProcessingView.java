@@ -219,6 +219,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					updateOutputFilesTable();
 					int index = outputFilesTableModel.getRowCount() - 1;
 					outputFilesTable.setRowSelectionInterval(index, index);
+					refreshGUI();
 				}
 			});
 			deleteFileBtn = new JButton(new AbstractAction("Delete") {
@@ -227,7 +228,12 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					if (selectedOutputFile == null) {
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No output file selected.");
 					} else {
-						// TODO
+						currentScenario.getDataProcessingJsonManager().getOutputFiles().remove(selectedOutputFile);
+						updateOutputFilesTable();
+						outputFilesDetailsPanel.removeAll();
+						revalidate();
+						repaint();
+						refreshGUI();
 					}
 				}
 			});
@@ -243,6 +249,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO
+					refreshGUI();
 				}
 			});
 			deleteProcessorBtn = new JButton(new AbstractAction("Delete") {
@@ -251,7 +258,18 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					if (selectedDataProcessor == null) {
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No data processor selected.");
 					} else {
-						// TODO
+						Integer id = selectedDataProcessor.getId();
+						currentScenario.getDataProcessingJsonManager().getDataProcessors().remove(selectedDataProcessor);
+						dataProcessorsDetailsPanel.removeAll();
+						currentScenario.getDataProcessingJsonManager().getOutputFiles().forEach(outputFile -> {
+							if (outputFile.getProcessorIds().remove(id) && outputFile == selectedOutputFile) {
+								handleOutputFileSelected(selectedOutputFile);
+							}
+						});
+						updateDataProcessorsTable();
+						refreshGUI();
+						revalidate();
+						repaint();
 					}
 				}
 			});
@@ -271,6 +289,11 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			dataProcessorsDetailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 			dataProcessorsDetailsPanel.setBorder(BorderFactory.createEmptyBorder(40, 10, 0, 0));
 			detailsSide.add(dataProcessorsDetailsPanel);
+		}
+
+		private void refreshGUI() {
+			currentScenario.updateCurrentStateSerialized();
+			ProjectView.getMainWindow().refreshScenarioNames();
 		}
 
 		@Override
@@ -411,6 +434,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					if (msg.isEmpty()) {
 						outputFile.setFileName(newName);
 						outputFilesTable.repaint();
+						refreshGUI();
 					} else {
 						nameField.setText(oldName);
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
@@ -452,6 +476,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					int index = currentScenario.getDataProcessingJsonManager().replaceOutputFile(outputFileStore);
 					updateOutputFilesTable();
 					outputFilesTable.setRowSelectionInterval(index, index);
+					refreshGUI();
 				}
 			});
 			addEditableComponent(dataKeysChooser);
@@ -481,8 +506,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			comboBox.addActionListener(e -> {
 				if (e.getActionCommand().equals("inputComplete")) {
 					outputFile.setProcessorIds(comboBox.getCheckedItems());
-					currentScenario.updateCurrentStateSerialized();
-					ProjectView.getMainWindow().refreshScenarioNames();
+					refreshGUI();
 				}
 			});
 			panel.add(comboBox, c);
