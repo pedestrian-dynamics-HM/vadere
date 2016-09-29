@@ -5,11 +5,11 @@ package org.vadere.simulator.projects.dataprocessing.datakey;
  *
  */
 
-public class TimestepPedestrianIdDataKey implements DataKey<TimestepPedestrianIdDataKey> {
+public class TimestepPedestrianIdKey implements DataKey<TimestepPedestrianIdKey> {
 	private final int timestep;
 	private final int pedestrianId;
 
-	public TimestepPedestrianIdDataKey(int timestep, int pedestrianId) {
+	public TimestepPedestrianIdKey(int timestep, int pedestrianId) {
 		this.timestep = timestep;
 		this.pedestrianId = pedestrianId;
 	}
@@ -23,7 +23,7 @@ public class TimestepPedestrianIdDataKey implements DataKey<TimestepPedestrianId
 	}
 
 	@Override
-	public int compareTo(TimestepPedestrianIdDataKey o) {
+	public int compareTo(TimestepPedestrianIdKey o) {
 		int result = Integer.compare(timestep, o.timestep);
 		if (result == 0) {
 			return Integer.compare(pedestrianId, o.pedestrianId);
@@ -32,7 +32,7 @@ public class TimestepPedestrianIdDataKey implements DataKey<TimestepPedestrianId
 	}
 
 	public static String[] getHeaders() {
-		return new String[] { TimestepDataKey.getHeader(), PedestrianIdDataKey.getHeader() };
+		return new String[] { TimestepKey.getHeader(), PedestrianIdKey.getHeader() };
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class TimestepPedestrianIdDataKey implements DataKey<TimestepPedestrianId
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TimestepPedestrianIdDataKey other = (TimestepPedestrianIdDataKey) obj;
+		TimestepPedestrianIdKey other = (TimestepPedestrianIdKey) obj;
 		if (pedestrianId != other.pedestrianId)
 			return false;
 		if (timestep != other.timestep)

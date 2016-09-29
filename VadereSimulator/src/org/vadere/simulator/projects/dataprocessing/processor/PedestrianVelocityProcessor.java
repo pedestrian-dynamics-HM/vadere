@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  *
  */
 
-public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdDataKey, Double> {
+public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
 	private int backSteps;
 
@@ -35,7 +35,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 		Integer timeStep = state.getStep();
 		Stream<Integer> pedIds = state.getTopography().getElements(Pedestrian.class).stream().map(ped -> ped.getId());
 
-		pedIds.forEach(pedId -> this.addValue(new TimestepPedestrianIdDataKey(timeStep, pedId),
+		pedIds.forEach(pedId -> this.setValue(new TimestepPedestrianIdKey(timeStep, pedId),
 				this.getVelocity(timeStep, state.getSimTimeInSec(), pedId)));
 
 		if (this.lastSimTimes.size() >= this.backSteps)
@@ -53,13 +53,13 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 	}
 
 	private Double getVelocity(int timeStep, double currentSimTime, int pedId) {
-		TimestepPedestrianIdDataKey keyBefore = new TimestepPedestrianIdDataKey(timeStep - this.backSteps > 0 ? timeStep - this.backSteps : 1, pedId);
+		TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(timeStep - this.backSteps > 0 ? timeStep - this.backSteps : 1, pedId);
 
 		if (timeStep <= 1 || !this.pedPosProc.hasValue(keyBefore))
 			return 0.0; // For performance
 
 		VPoint posBefore = this.pedPosProc.getValue(keyBefore);
-		VPoint posNow = this.pedPosProc.getValue(new TimestepPedestrianIdDataKey(timeStep, pedId));
+		VPoint posNow = this.pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
 
 		return posNow.subtract(posBefore).scalarMultiply(1 / (currentSimTime - this.lastSimTimes.getFirst()))
 				.distanceToOrigin();

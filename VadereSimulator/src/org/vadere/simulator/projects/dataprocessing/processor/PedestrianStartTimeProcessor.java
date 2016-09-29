@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Set;
@@ -12,7 +12,7 @@ import java.util.Set;
  *
  */
 
-public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdDataKey, Double> {
+public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
 
 	public PedestrianStartTimeProcessor() {
 		super("startTime");
@@ -21,7 +21,7 @@ public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdData
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		state.getTopography().getElements(Pedestrian.class).stream()
-				.forEach(ped -> this.update(new PedestrianIdDataKey(ped.getId()), state.getSimTimeInSec()));
+				.forEach(ped -> this.update(new PedestrianIdKey(ped.getId()), state.getSimTimeInSec()));
 	}
 
 	@Override
@@ -29,10 +29,10 @@ public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdData
 		// No initialization needed
 	}
 
-	private void update(PedestrianIdDataKey pedIdKey, double startTime) {
-		Set<PedestrianIdDataKey> keys = this.getKeys();
+	private void update(PedestrianIdKey pedIdKey, double startTime) {
+		Set<PedestrianIdKey> keys = this.getKeys();
 
 		if (!keys.contains(pedIdKey))
-			this.addValue(pedIdKey, startTime);
+			this.setValue(pedIdKey, startTime);
 	}
 }
