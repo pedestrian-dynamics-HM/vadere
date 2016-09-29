@@ -30,7 +30,7 @@ public class TestChooseSeat {
 	public void setUp() {
 		model = new TestTopographyAndModelBuilder().getSeatingModel();
 		trainModel = model.getTrainModel();
-		seatGroup = trainModel.getSeatGroup(0);
+		seatGroup = trainModel.getSeatGroup(0, 0);
 		assert seatGroup.getPersonCount() == 0;
 	}
 

@@ -5,11 +5,13 @@ import org.vadere.state.scenario.Target;
 
 public class Seat {
 
+	private SeatGroup seatGroup;
 	private int seatNumberWithinCompartment;
 	private Target associatedTarget;
 	private Pedestrian sittingPerson;
 
-	public Seat(Target associatedTarget, int seatNumberWithinCompartment) {
+	public Seat(SeatGroup seatGroup, Target associatedTarget, int seatNumberWithinCompartment) {
+		this.seatGroup = seatGroup;
 		this.seatNumberWithinCompartment = seatNumberWithinCompartment;
 		this.associatedTarget = associatedTarget;
 	}
@@ -36,6 +38,10 @@ public class Seat {
 
 	public int getSeatNumberWithinCompartment() {
 		return seatNumberWithinCompartment;
+	}
+
+	public SeatGroup getSeatGroup() {
+		return seatGroup;
 	}
 
 }

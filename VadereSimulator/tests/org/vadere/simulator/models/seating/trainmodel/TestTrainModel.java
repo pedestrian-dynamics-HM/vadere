@@ -39,7 +39,7 @@ public class TestTrainModel {
 		assertEquals(nEntranceAreas, trainModel.getEntranceAreaCount());
 		assertEquals(nCompartments, trainModel.getCompartmentCount());
 		checkSize(nCompartmentTargets, trainModel.getCompartmentTargets());
-		checkSize(nSeatGroups, trainModel.getSeatGroups());
+		assertEquals(nSeatGroups, trainModel.getSeatGroupCount());
 		checkSize(nSeats, trainModel.getSeats());
 
 		// Peds are created by the main model when the simulation starts!
@@ -49,7 +49,7 @@ public class TestTrainModel {
 	
 	@Test
 	public void testAllSeatTargetsAreDistinct() {
-		final List<Seat> seats = trainModel.getSeats();
+		final Collection<Seat> seats = trainModel.getSeats();
 		final int distinctTargetCount = (int) seats.stream()
 				.map(s -> s.getAssociatedTarget())
 				.distinct()
@@ -106,21 +106,6 @@ public class TestTrainModel {
 	}
 
 	@Test
-	public void testGetSeatGroupLimits() {
-		assertTrue(trainModel.getSeatGroup(0) != null);
-		try {
-			trainModel.getSeatGroup(-1);
-			fail("exception expected");
-		} catch (IndexOutOfBoundsException e) { }
-		
-		assertTrue(trainModel.getSeatGroup(nSeatGroups - 1) != null);
-		try {
-			trainModel.getSeatGroup(nSeatGroups);
-			fail("exception expected");
-		} catch (IndexOutOfBoundsException e) { }
-	}
-	
-	@Test
 	public void testGetCompartmentLimits() {
 		assertTrue(trainModel.getCompartment(0) != null); // first half-compartment
 		assertTrue(trainModel.getCompartment(1) != null); // first normal compartment
@@ -142,10 +127,10 @@ public class TestTrainModel {
 		final Compartment c = trainModel.getCompartment(0);
 		checkSize(2, c.getSeatGroups());
 
-		assertEquals(trainModel.getSeatGroup(0), c.getSeatGroups().get(0));
-		assertEquals(trainModel.getSeatGroup(1), c.getSeatGroups().get(1));
+		assertEquals(trainModel.getSeatGroup(0, 0), c.getSeatGroups().get(0));
+		assertEquals(trainModel.getSeatGroup(0, 1), c.getSeatGroups().get(1));
 
-		assertEquals(trainModel.getSeats().get(0), c.getSeatGroups().get(0).getSeat(0));
+		assertEquals(trainModel.getSeat(0, 0, 0), c.getSeatGroups().get(0).getSeat(0));
 		
 		assertEquals(trainModel.getCompartmentTargets().get(0),
 				c.getCompartmentTarget());
@@ -156,12 +141,12 @@ public class TestTrainModel {
 		final Compartment c = trainModel.getCompartment(1);
 		checkSize(4, c.getSeatGroups());
 
-		assertEquals(trainModel.getSeatGroup(2), c.getSeatGroups().get(0));
-		assertEquals(trainModel.getSeatGroup(3), c.getSeatGroups().get(1));
-		assertEquals(trainModel.getSeatGroup(4), c.getSeatGroups().get(2));
-		assertEquals(trainModel.getSeatGroup(5), c.getSeatGroups().get(3));
+		assertEquals(trainModel.getSeatGroup(1, 0), c.getSeatGroups().get(0));
+		assertEquals(trainModel.getSeatGroup(1, 1), c.getSeatGroups().get(1));
+		assertEquals(trainModel.getSeatGroup(1, 2), c.getSeatGroups().get(2));
+		assertEquals(trainModel.getSeatGroup(1, 3), c.getSeatGroups().get(3));
 
-		assertTrue(c.getSeatGroups().get(0).getSeat(0) == trainModel.getSeats().get(8));
+		assertTrue(c.getSeatGroups().get(0).getSeat(0) == trainModel.getSeat(1, 0, 0));
 		
 		assertEquals(trainModel.getCompartmentTargets().get(1), c.getCompartmentTarget());
 	}
@@ -171,10 +156,10 @@ public class TestTrainModel {
 		final Compartment c = trainModel.getCompartment(nCompartments - 1);
 		checkSize(2, c.getSeatGroups());
 
-		assertEquals(trainModel.getSeatGroup(nSeatGroups - 2), c.getSeatGroups().get(0));
-		assertEquals(trainModel.getSeatGroup(nSeatGroups - 1), c.getSeatGroups().get(1));
+		assertEquals(trainModel.getSeatGroup(nCompartments - 1, 0), c.getSeatGroups().get(0));
+		assertEquals(trainModel.getSeatGroup(nCompartments - 1, 1), c.getSeatGroups().get(1));
 		
-		assertTrue(c.getSeatGroups().get(1).getSeat(3) == trainModel.getSeats().get(nSeats - 1));
+		assertTrue(c.getSeatGroups().get(1).getSeat(3) == trainModel.getSeat(nCompartments - 1, 1, 3));
 		
 		assertEquals(trainModel.getCompartmentTargets().get(nCompartmentTargets - 1),
 				c.getCompartmentTarget());
@@ -239,52 +224,59 @@ public class TestTrainModel {
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetCompartmentByPedestrianWrongLastTarget() {
 		Pedestrian p = createTestPedestrian();
-		p.addTarget(trainModel.getSeatGroup(0).getSeat(0).getAssociatedTarget());
+		p.addTarget(trainModel.getSeatGroup(0, 0).getSeat(0).getAssociatedTarget());
 		trainModel.getCompartment(p);
 	}
 
 	@Test
 	public void testCalcSeatNumberWithinCompartmentFirstHalfCompartment() {
-		assertEquals(1, trainModel.calculateSeatNumberWithinCompartment(0, 0));
-		assertEquals(2, trainModel.calculateSeatNumberWithinCompartment(1, 0));
-		assertEquals(3, trainModel.calculateSeatNumberWithinCompartment(2, 0));
-		assertEquals(4, trainModel.calculateSeatNumberWithinCompartment(3, 0));
-		assertEquals(5, trainModel.calculateSeatNumberWithinCompartment(0, 1));
-		assertEquals(6, trainModel.calculateSeatNumberWithinCompartment(1, 1));
-		assertEquals(7, trainModel.calculateSeatNumberWithinCompartment(2, 1));
-		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, 1));
+		assertEquals(1, TrainModel.calculateSeatNumberWithinCompartment(0, 0));
+		assertEquals(2, TrainModel.calculateSeatNumberWithinCompartment(1, 0));
+		assertEquals(3, TrainModel.calculateSeatNumberWithinCompartment(2, 0));
+		assertEquals(4, TrainModel.calculateSeatNumberWithinCompartment(3, 0));
+		assertEquals(5, TrainModel.calculateSeatNumberWithinCompartment(0, 1));
+		assertEquals(6, TrainModel.calculateSeatNumberWithinCompartment(1, 1));
+		assertEquals(7, TrainModel.calculateSeatNumberWithinCompartment(2, 1));
+		assertEquals(8, TrainModel.calculateSeatNumberWithinCompartment(3, 1));
 	}
 
 	@Test
 	public void testCalcSeatNumberWithinCompartmentFirstNormalCompartment() {
-		assertEquals(1, trainModel.calculateSeatNumberWithinCompartment(0, 2));
-		assertEquals(2, trainModel.calculateSeatNumberWithinCompartment(1, 2));
-		assertEquals(3, trainModel.calculateSeatNumberWithinCompartment(2, 2));
-		assertEquals(4, trainModel.calculateSeatNumberWithinCompartment(3, 2));
-		assertEquals(5, trainModel.calculateSeatNumberWithinCompartment(0, 3));
-		assertEquals(6, trainModel.calculateSeatNumberWithinCompartment(1, 3));
-		assertEquals(7, trainModel.calculateSeatNumberWithinCompartment(2, 3));
-		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, 3));
-		assertEquals(9,  trainModel.calculateSeatNumberWithinCompartment(0, 4));
-		assertEquals(10, trainModel.calculateSeatNumberWithinCompartment(1, 4));
-		assertEquals(11, trainModel.calculateSeatNumberWithinCompartment(2, 4));
-		assertEquals(12, trainModel.calculateSeatNumberWithinCompartment(3, 4));
-		assertEquals(13, trainModel.calculateSeatNumberWithinCompartment(0, 5));
-		assertEquals(14, trainModel.calculateSeatNumberWithinCompartment(1, 5));
-		assertEquals(15, trainModel.calculateSeatNumberWithinCompartment(2, 5));
-		assertEquals(16, trainModel.calculateSeatNumberWithinCompartment(3, 5));
+		assertEquals(1, TrainModel.calculateSeatNumberWithinCompartment(0, 2));
+		assertEquals(2, TrainModel.calculateSeatNumberWithinCompartment(1, 2));
+		assertEquals(3, TrainModel.calculateSeatNumberWithinCompartment(2, 2));
+		assertEquals(4, TrainModel.calculateSeatNumberWithinCompartment(3, 2));
+		assertEquals(5, TrainModel.calculateSeatNumberWithinCompartment(0, 3));
+		assertEquals(6, TrainModel.calculateSeatNumberWithinCompartment(1, 3));
+		assertEquals(7, TrainModel.calculateSeatNumberWithinCompartment(2, 3));
+		assertEquals(8, TrainModel.calculateSeatNumberWithinCompartment(3, 3));
+		assertEquals(9,  TrainModel.calculateSeatNumberWithinCompartment(0, 4));
+		assertEquals(10, TrainModel.calculateSeatNumberWithinCompartment(1, 4));
+		assertEquals(11, TrainModel.calculateSeatNumberWithinCompartment(2, 4));
+		assertEquals(12, TrainModel.calculateSeatNumberWithinCompartment(3, 4));
+		assertEquals(13, TrainModel.calculateSeatNumberWithinCompartment(0, 5));
+		assertEquals(14, TrainModel.calculateSeatNumberWithinCompartment(1, 5));
+		assertEquals(15, TrainModel.calculateSeatNumberWithinCompartment(2, 5));
+		assertEquals(16, TrainModel.calculateSeatNumberWithinCompartment(3, 5));
 	}
 
 	@Test
 	public void testCalcSeatNumberWithinCompartmentLastHalfCompartment() {
-		assertEquals(1, trainModel.calculateSeatNumberWithinCompartment(0, nSeatRows - 2));
-		assertEquals(2, trainModel.calculateSeatNumberWithinCompartment(1, nSeatRows - 2));
-		assertEquals(3, trainModel.calculateSeatNumberWithinCompartment(2, nSeatRows - 2));
-		assertEquals(4, trainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 2));
-		assertEquals(5, trainModel.calculateSeatNumberWithinCompartment(0, nSeatRows - 1));
-		assertEquals(6, trainModel.calculateSeatNumberWithinCompartment(1, nSeatRows - 1));
-		assertEquals(7, trainModel.calculateSeatNumberWithinCompartment(2, nSeatRows - 1));
-		assertEquals(8, trainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 1));
+		assertEquals(1, TrainModel.calculateSeatNumberWithinCompartment(0, nSeatRows - 2));
+		assertEquals(2, TrainModel.calculateSeatNumberWithinCompartment(1, nSeatRows - 2));
+		assertEquals(3, TrainModel.calculateSeatNumberWithinCompartment(2, nSeatRows - 2));
+		assertEquals(4, TrainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 2));
+		assertEquals(5, TrainModel.calculateSeatNumberWithinCompartment(0, nSeatRows - 1));
+		assertEquals(6, TrainModel.calculateSeatNumberWithinCompartment(1, nSeatRows - 1));
+		assertEquals(7, TrainModel.calculateSeatNumberWithinCompartment(2, nSeatRows - 1));
+		assertEquals(8, TrainModel.calculateSeatNumberWithinCompartment(3, nSeatRows - 1));
+	}
+	
+	@Test
+	public void testGetSeatForTargetForNonSeatTargets() {
+		for (Target t : trainModel.getCompartmentTargets()) {
+			assertTrue(trainModel.getSeatForTarget(t) == null);
+		}
 	}
 
 	@Test

@@ -23,33 +23,33 @@ public class TestSeatGroup {
 	@Before
 	public void setUp() {
 		trainModel = new TestTopographyAndModelBuilder().getTrainModel();
-		aSeatGroup = trainModel.getSeatGroup(0);
+		aSeatGroup = trainModel.getSeatGroup(0, 0);
 		aPerson = TestTrainModel.createTestPedestrian();
 	}
 
 	@Test
 	public void testGetSeat() {
-		SeatGroup sg = trainModel.getSeatGroup(0);
-		assertEquals(trainModel.getSeats().get(0), sg.getSeat(0));
+		SeatGroup sg = aSeatGroup;
+		assertEquals(trainModel.getSeat(0, 0, 0), sg.getSeat(0));
 		
-		sg = trainModel.getSeatGroup(2);
+		sg = trainModel.getSeatGroup(1, 0);
 		Seat s = sg.getSeat(1);
-		assertEquals(trainModel.getSeats().get(9), s);
+		assertEquals(trainModel.getSeat(1, 0, 1), s);
 //		assertTrue(s.isOccupied());
 	}
 
 	@Test
 	public void testGetIndex() {
-		for (int i = 0; i < trainModel.getSeatGroups().size(); i++) {
-			assertEquals(0, trainModel.getSeatGroup(0).getIndex());
+		for (int i = 0; i < trainModel.getSeatGroupCount(); i++) {
+			assertEquals(0, trainModel.getSeatGroup(0, 0).getIndex());
 		}
 	}
 
 	@Test
 	public void testGetPersonCount() {
 		// as long as existing persons are not recognized:
-		for (int i = 0; i < trainModel.getSeatGroups().size(); i++) {
-			assertEquals(0, trainModel.getSeatGroup(0).getPersonCount());
+		for (int i = 0; i < trainModel.getSeatGroupCount(); i++) {
+			assertEquals(0, trainModel.getSeatGroup(0, 0).getPersonCount());
 		}
 	}
 

@@ -2,25 +2,68 @@ package org.vadere.simulator.models.seating.trainmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
+import org.vadere.state.scenario.Target;
 
 public class SeatGroup {
 
 	private List<Seat> seats;
 	private int index;
+	private Compartment compartment;
 
-	/**
-	 * @param seats list of all seats in the train.
-	 * @param index absolute index, not the index within a compartment!
-	 */
-	public SeatGroup(List<Seat> seats, int index) {
-		this.seats = seats;
+	// only for initialization
+	private Map<Target, Seat> targetSeatMap;
+	private List<List<Target>> longSeatRows;
+
+	public SeatGroup(Compartment compartment, int index, List<List<Target>> longSeatRows, Map<Target, Seat> targetSeatMap) {
 		this.index = index;
+		this.compartment = compartment;
+		this.seats = new ArrayList<>(4);
+		
+		this.longSeatRows = longSeatRows;
+		this.targetSeatMap = targetSeatMap;
+		createSeats();
+	}
+
+	private void createSeats() {
+		final int compartmentIndex = compartment.getIndex();
+		
+		final int longRowIndex1, longRowIndex2;
+		if (isInLeftRow()) {
+			longRowIndex1 = 0;
+			longRowIndex2 = 1;
+		} else {
+			longRowIndex1 = 2;
+			longRowIndex2 = 3;
+		}
+
+		final int targetIndex1;
+		if (compartment.isFirstHalfCompartment())
+			targetIndex1 = 0;
+		else
+			targetIndex1 = (compartmentIndex - 1) * 4 + (index / 2) * 2 + 2;
+		
+		addNewSeat(longRowIndex1, targetIndex1);
+		addNewSeat(longRowIndex2, targetIndex1);
+		addNewSeat(longRowIndex1, targetIndex1 + 1);
+		addNewSeat(longRowIndex2, targetIndex1 + 1);
+
+	}
+
+	private void addNewSeat(int longRowIndex, int targetIndex) {
+		final int number = TrainModel.calculateSeatNumberWithinCompartment(longRowIndex, targetIndex);
+		final Target target = longSeatRows.get(longRowIndex).get(targetIndex);
+
+		final Seat newSeat = new Seat(this, target, number);
+		seats.add(newSeat);
+		targetSeatMap.put(target, newSeat);
+		
 	}
 
 	private boolean isInLeftRow() {
@@ -28,11 +71,11 @@ public class SeatGroup {
 	}
 
 	public Seat getSeat(int index) {
-		return seats.get(calculateOverallIndex(index));
+		return seats.get(index);
 	}
 
 	public Seat setSeat(int index, Seat seat) {
-		return seats.set(calculateOverallIndex(index), seat);
+		return seats.set(index, seat);
 	}
 
 	public int getIndex() {
@@ -72,10 +115,6 @@ public class SeatGroup {
 			list.add(getSeat(i));
 		}
 		return list.stream();
-	}
-
-	private int calculateOverallIndex(int index) {
-		return this.index * 4 + index;
 	}
 
 	private void checkPersonCount(int count) {
@@ -168,6 +207,10 @@ public class SeatGroup {
 			}
 		}
 		throw new IllegalStateException("This method must only be called when there is a seat available with facing direction" + facingDirection);
+	}
+
+	public Compartment getCompartment() {
+		return compartment;
 	}
 
 }

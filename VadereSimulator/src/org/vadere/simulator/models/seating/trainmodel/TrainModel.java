@@ -2,7 +2,6 @@ package org.vadere.simulator.models.seating.trainmodel;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,18 +42,13 @@ public class TrainModel {
 		}
 	}
 
-	public static final int MAX_PERSONS_PER_COMPARTMENT = 16;
+	private int entranceAreaCount;
 
-	private int numberOfEntranceAreas;
-
-	private List<Seat> seats;
+	private List<Compartment> compartments;
 
 	private List<Target> compartmentTargets;
 	private List<Source> leftDoors;
 	private List<Source> rightDoors;
-
-	private List<Compartment> compartments;
-	private List<SeatGroup> seatGroups;
 
 	private Topography topography;
 	private TrainGeometry trainGeometry;
@@ -95,27 +89,12 @@ public class TrainModel {
 		}
 
 		final int longRowLength = seatRows.get(0).size();
-		final int numberOfEntranceAreas = longRowLength / 4;
-		initialize(numberOfEntranceAreas);
+		this.entranceAreaCount = longRowLength / 4;
 
-		// now I have 4 long rows of seats
-		for (int i = 0, seatGroupIndex = 0; i < longRowLength; i += 2) {
-
-			// left seat group
-			makeSeat(seatRows, seatGroupIndex, 0, 0, i);
-			makeSeat(seatRows, seatGroupIndex, 1, 1, i);
-			makeSeat(seatRows, seatGroupIndex, 2, 0, i + 1);
-			makeSeat(seatRows, seatGroupIndex, 3, 1, i + 1);
-			seatGroupIndex++;
-
-			// right seat group
-			makeSeat(seatRows, seatGroupIndex, 0, 2, i);
-			makeSeat(seatRows, seatGroupIndex, 1, 3, i);
-			makeSeat(seatRows, seatGroupIndex, 2, 2, i + 1);
-			makeSeat(seatRows, seatGroupIndex, 3, 3, i + 1);
-			seatGroupIndex++;
-		}
-
+		// ******************************
+		// create compartments, seat groups, and seats
+		// ******************************
+		
 		// find doors, compartment targets, and persons
 
 		Rectangle2D longAisle = createFilterRect(leftmostCompartment.getMinY() + trainGeometry.getBenchWidth(),
@@ -141,36 +120,24 @@ public class TrainModel {
 		Collection<Pedestrian> pedestrians = getPedestrians();
 		// sit persons on seats
 		for (Pedestrian p : pedestrians) {
-			for (Seat s : seats) {
-				if (p.getPosition().equals(s.getAssociatedTarget().getShape().getCentroid())) {
-					p.getTargets().add(s.getAssociatedTarget().getId());
-					s.setSittingPerson(p);
-				}
-			}
+			// TODO not implemented
+//			for (Seat s : seats) {
+//				if (p.getPosition().equals(s.getAssociatedTarget().getShape().getCentroid())) {
+//					p.getTargets().add(s.getAssociatedTarget().getId());
+//					s.setSittingPerson(p);
+//				}
+//			}
 		}
 
-	}
-
-	private void initialize(int numberOfEntranceAreas) {
-		this.numberOfEntranceAreas = numberOfEntranceAreas;
-		final int numberOfCompartments = numberOfEntranceAreas + 1;
-		final int numberOfSeatGroups = 4 * numberOfEntranceAreas;
-		final int numberOfSeats = 4 * numberOfSeatGroups;
-
-		seats = Arrays.asList(new Seat[numberOfSeats]);
-		seatGroups = new ArrayList<>(numberOfSeatGroups);
-		for (int i = 0; i < numberOfSeatGroups; i++) {
-			seatGroups.add(new SeatGroup(seats, i));
+		compartments = new ArrayList<>(getCompartmentCount());
+		for (int i = 0; i < getCompartmentCount(); i++) {
+			compartments.add(new Compartment(this, i, compartmentTargets, seatRows, targetSeatMap));
 		}
-		
-		compartments = new ArrayList<>(numberOfCompartments);
-		for (int i = 0; i < numberOfCompartments; i++) {
-			compartments.add(new Compartment(this, i));
-		}
+
 	}
 
 	public int getEntranceAreaCount() {
-		return numberOfEntranceAreas;
+		return entranceAreaCount;
 	}
 
 	public Compartment getCompartment(int index) {
@@ -185,22 +152,6 @@ public class TrainModel {
 		return getSeatGroup(compartmentIndex, seatGroupIndex).getSeat(seatIndex);
 	}
 	
-	public List<SeatGroup> getSeatGroups() {
-		return Collections.unmodifiableList(seatGroups);
-	}
-
-	/**
-	 * 
-	 * @param seatGroupIndex The seat group's overall index. Not within-compartment index.
-	 */
-	public SeatGroup getSeatGroup(int seatGroupIndex) {
-		return seatGroups.get(seatGroupIndex);
-	}
-
-	public List<Seat> getSeats() {
-		return Collections.unmodifiableList(seats);
-	}
-
 	/** Return an unmodifiable list of compartment targets. */
 	public List<Target> getCompartmentTargets() {
 		return Collections.unmodifiableList(compartmentTargets);
@@ -230,15 +181,6 @@ public class TrainModel {
 				.collect(Collectors.toList());
 	}
 
-	private void makeSeat(List<List<Target>> longRows, int seatGroupIndex, int indexInSeatGroup, int longRowIndex,
-			int indexInLongRow) {
-		final int number = calculateSeatNumberWithinCompartment(longRowIndex, indexInLongRow);
-		final Target target = longRows.get(longRowIndex).get(indexInLongRow);
-		final Seat newSeat = new Seat(target, number);
-		targetSeatMap.put(target, newSeat);
-		getSeatGroup(seatGroupIndex).setSeat(indexInSeatGroup, newSeat);
-	}
-
 	/**
 	 * Calculate the seat number within a compartment. The seat number
 	 * corresponds to the numbering used in the data collection app and data
@@ -250,7 +192,7 @@ public class TrainModel {
 	 * @param indexInLongRow
 	 *            the index of a seat within a long row.
 	 */
-	int calculateSeatNumberWithinCompartment(int longRowIndex, int indexInLongRow) {
+	static int calculateSeatNumberWithinCompartment(int longRowIndex, int indexInLongRow) {
 		int offset;
 		if (indexInLongRow < 2) // first half-compartment
 			offset = indexInLongRow;
@@ -287,9 +229,9 @@ public class TrainModel {
 	}
 
 	void checkEntranceAreaIndexRange(int entranceAreaIndex) {
-		if (entranceAreaIndex < 0 || entranceAreaIndex >= numberOfEntranceAreas) {
+		if (entranceAreaIndex < 0 || entranceAreaIndex >= entranceAreaCount) {
 			throw new IllegalArgumentException(
-					"Entrance area index must be in range 0 to less than " + numberOfEntranceAreas);
+					"Entrance area index must be in range 0 to less than " + entranceAreaCount);
 		}
 	}
 
@@ -338,7 +280,15 @@ public class TrainModel {
 
 	/** Number of compartments including half-compartments. */
 	public int getCompartmentCount() {
-		return numberOfEntranceAreas + 1;
+		return entranceAreaCount + 1;
+	}
+	
+	public Collection<Seat> getSeats() {
+		return targetSeatMap.values();
+	}
+
+	public int getSeatGroupCount() {
+		return (getCompartmentCount() - 1) * 4;
 	}
 
 }

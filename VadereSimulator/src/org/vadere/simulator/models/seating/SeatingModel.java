@@ -110,7 +110,7 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	private void assignSeatTarget(Pedestrian p) {
 		final Compartment compartment = trainModel.getCompartment(p);
-		if (compartment.getPersonCount() == TrainModel.MAX_PERSONS_PER_COMPARTMENT) {
+		if (compartment.getPersonCount() == Compartment.MAX_PERSONS_PER_COMPARTMENT) {
 			logDebug("Compartment %d is full. No seat available for pedestrian %d.",
 					compartment.getIndex(), p.getId());
 			proceedToNextCompartmentIfPossible(p);
@@ -274,6 +274,19 @@ public class SeatingModel implements ActiveCallback, Model {
 		return seatGroup.getTheAvailableSeat();
 	}
 
+	private void sitDownIfPossible(Pedestrian pedestrian, Seat seat) {
+		if (seat.getSittingPerson() == null) {
+			seat.setSittingPerson(pedestrian);
+		} else {
+			// try other empty seat in same seat group
+			SeatGroup seatGroup = seat.getSeatGroup();
+			final Compartment compartment = trainModel.getCompartment(pedestrian.getTargets().get(pedestrian.getTargets().size()));
+//			compartment.get
+			// if there is none, go back to compartment target to trigger assign seat
+			throw new RuntimeException("not yet implemented");
+		}
+	}
+
 	private void logDebug(String formatString, Object... args) {
 		log.debug(String.format(formatString, args));
 	}
@@ -288,7 +301,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	private final TargetListener seatTargetListener = new TargetListener() {
 		@Override
 		public void reachedTarget(Target target, Agent agent) {
-			trainModel.getSeatForTarget(target).setSittingPerson((Pedestrian) agent);
+			sitDownIfPossible((Pedestrian) agent, trainModel.getSeatForTarget(target));
 		}
 	};
 

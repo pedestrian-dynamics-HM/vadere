@@ -2,6 +2,8 @@ package org.vadere.simulator.models.seating.trainmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.vadere.state.scenario.Target;
 
 /**
@@ -9,28 +11,38 @@ import org.vadere.state.scenario.Target;
  */
 public class Compartment {
 
+	public static final int MAX_PERSONS_PER_COMPARTMENT = 16;
+
 	private TrainModel trainModel;
 	private int index;
-	
-	/**
-	 * For half-compartments, the first and the last seat groups respectively are set to null.
-	 */
+	private Target compartmentTarget;
 	private List<SeatGroup> seatGroups;
 
-	public Compartment(TrainModel trainModel, int index) {
+	// only for building:
+	private List<List<Target>> longSeatRows;
+	private Map<Target, Seat> targetSeatMap;
+
+	public Compartment(TrainModel trainModel, int index, List<Target> compartmentTargets, List<List<Target>> seatRows, Map<Target, Seat> targetSeatMap) {
 		this.trainModel = trainModel;
 		this.index = index;
+		this.compartmentTarget = compartmentTargets.get(index);
+		this.longSeatRows = seatRows;
+		this.targetSeatMap = targetSeatMap;
 
 		seatGroups = new ArrayList<>(4);
-		if (isFirstHalfCompartment()) {
-			addFirstHalfCompartment();
-		} else if (isLastHalfCompartment()) {
-			addLastHalfCompartment();
+		final int nSeatGroups;
+		if (isHalfCompartment()) {
+			nSeatGroups = 2;
 		} else {
-			addNormalCompartment();
+			nSeatGroups = 4;
 		}
+		addCompartment(nSeatGroups);
 	}
 
+	private void addCompartment(int nSeatGroups) {
+		for (int i = 0; i < nSeatGroups; i++)
+			addNewSeatGroup(i);
+	}
 
 	public SeatGroup getSeatGroup(int seatGroupIndex) {
 		return seatGroups.get(seatGroupIndex);
@@ -40,23 +52,8 @@ public class Compartment {
 		return getSeatGroup(seatGroupIndex).getSeat(seatIndex);
 	}
 
-	private void addNormalCompartment() {
-		final int startSeatGroupIndex = index * 4 - 2;
-		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex));
-		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex + 1));
-		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex + 2));
-		seatGroups.add(trainModel.getSeatGroup(startSeatGroupIndex + 3));
-	}
-	
-	private void addFirstHalfCompartment() {
-		seatGroups.add(trainModel.getSeatGroup(0));
-		seatGroups.add(trainModel.getSeatGroup(1));
-	}
-
-	private void addLastHalfCompartment() {
-		final int n = trainModel.getSeatGroups().size();
-		seatGroups.add(trainModel.getSeatGroup(n - 2));
-		seatGroups.add(trainModel.getSeatGroup(n - 1));
+	private void addNewSeatGroup(int index) {
+		seatGroups.add(new SeatGroup(this, index, longSeatRows, targetSeatMap));
 	}
 
 	/**
@@ -68,17 +65,18 @@ public class Compartment {
 	}
 
 	public Target getCompartmentTarget() {
-		// entrance areas:         0   1   2   3
-		// compartments:         0   1   2   3   4
-		// compartment targets:  0   1   2   3   4
-		return trainModel.getCompartmentTargets().get(index);
+		return compartmentTarget;
+	}
+	
+	public boolean isHalfCompartment() {
+		return isFirstHalfCompartment() || isLastHalfCompartment();
 	}
 
-	private boolean isLastHalfCompartment() {
-		return index == trainModel.getEntranceAreaCount();
+	public boolean isLastHalfCompartment() {
+		return index == trainModel.getCompartmentCount() - 1;
 	}
 
-	private boolean isFirstHalfCompartment() {
+	boolean isFirstHalfCompartment() {
 		return index == 0;
 	}
 
