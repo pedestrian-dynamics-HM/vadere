@@ -40,6 +40,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -345,6 +346,18 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					handleOutputFileSelected((OutputFile) outputFilesTableModel.getValueAt(outputFilesTable.getSelectedRow(), 0));
 				}
 			});
+			outputFilesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+				@Override
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+					if (((OutputFile) value).getProcessorIds().isEmpty()) {
+						c.setForeground(Color.gray);
+					} else {
+						c.setForeground(Color.black); // has at least one DataProcessor selected
+					}
+					return c;
+				}
+			});
 
 			dataProcessorsTableModel = new DefaultTableModel(new DataProcessor[] {null}, 0) {
 				@Override
@@ -357,6 +370,20 @@ public class DataProcessingView extends JPanel implements IJsonView {
 			dataProcessorsTable.getSelectionModel().addListSelectionListener(e -> {
 				if (!e.getValueIsAdjusting() && dataProcessorsTable.getSelectedRow() > -1) {
 					handleDataProcessorSelected((DataProcessor) dataProcessorsTable.getValueAt(dataProcessorsTable.getSelectedRow(), 0));
+				}
+			});
+			dataProcessorsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+				@Override
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+					if (currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
+							.filter(oFile -> oFile.getProcessorIds().contains(((DataProcessor) value).getId()))
+							.findAny().isPresent()) {
+						c.setForeground(Color.black); // at least one OutputFile is using this DataProcessor
+					} else {
+						c.setForeground(Color.gray);
+					}
+					return c;
 				}
 			});
 		}
