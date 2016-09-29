@@ -35,7 +35,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static final long serialVersionUID = 7217609523783631174L;
 
 	private JTabbedPane tabbedPane;
-	private final JFrame owner;
 	private final JLabel scenarioName;
 
 	// tabs
@@ -59,8 +58,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	ScenarioJPanel(JFrame owner, JLabel scenarioName) {
-		this.owner = owner;
+	ScenarioJPanel(JLabel scenarioName) {
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow();
