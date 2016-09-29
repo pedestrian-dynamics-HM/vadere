@@ -127,12 +127,16 @@ public class SeatingModel implements ActiveCallback, Model {
 	private void proceedToNextCompartmentIfPossible(Pedestrian p) {
 		final int fromEntranceAreaIndex = trainModel.getEntranceAreaIndexForPerson(p);
 		final int compartmentIndex = trainModel.getCompartment(p).getIndex();
-		if (compartmentIndex > 0 && compartmentIndex < trainModel.getCompartmentCount() - 1) {
+		if (isInnerCompartment(compartmentIndex)) {
 			final int direction = getDirectionFromEntranceAreaToCompartment(fromEntranceAreaIndex, compartmentIndex);
 			final Compartment nextCompartment = trainModel.getCompartment(compartmentIndex + direction);
 			logAssigningCompartment(p, nextCompartment);
 			p.addTarget(nextCompartment.getCompartmentTarget());
 		}
+	}
+
+	private boolean isInnerCompartment(final int compartmentIndex) {
+		return compartmentIndex > 0 && compartmentIndex < trainModel.getCompartmentCount() - 1;
 	}
 
 	private int getDirectionFromEntranceAreaToCompartment(int entranceAreaIndex, int compartmentIndex) {
