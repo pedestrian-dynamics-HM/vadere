@@ -47,7 +47,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 
-public class DataProcessingView extends JPanel implements IJsonView {
+class DataProcessingView extends JPanel implements IJsonView {
 
 	private static Logger logger = LogManager.getLogger(DataProcessingView.class);
 
@@ -62,7 +62,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 	private boolean isEditable;
 
 
-	public DataProcessingView() {
+	DataProcessingView() {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
 
 		viewPanel = new JPanel(new GridLayout(1, 1));
@@ -125,11 +125,9 @@ public class DataProcessingView extends JPanel implements IJsonView {
 
 		try {
 			File[] templateFiles = new File(this.getClass().getResource("/outputTemplates/").getPath()).listFiles();
-
-			for (File templateFile : Arrays.stream(templateFiles).filter(f -> f.isFile()).collect(Collectors.toList())) {
+			for (File templateFile : Arrays.stream(templateFiles).filter(File::isFile).collect(Collectors.toList())) {
 				String templateFileName = templateFile.getName();
 				String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
-
 				processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -506,7 +504,6 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(outputFile.getFileName());
 					outputFileStore.setType(dataKeysOutputFiles.get(newDataKey).getName()); // Choose corresponding outputfile type
-
 					int index = currentScenario.getDataProcessingJsonManager().replaceOutputFile(outputFileStore);
 					updateOutputFilesTable();
 					outputFilesTable.setRowSelectionInterval(index, index);
