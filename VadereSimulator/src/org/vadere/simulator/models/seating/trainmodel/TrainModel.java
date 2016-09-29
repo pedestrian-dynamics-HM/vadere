@@ -91,7 +91,7 @@ public class TrainModel {
 		if (seatRows.stream().anyMatch(l -> l.size() % 4 != 0) // there must be 4 seat groups per entrance area
 				// not all seat rows of same length?
 				|| seatRows.stream().map(List::size).distinct().count() != 1) {
-			throw new IllegalArgumentException("improper number of targets in seat rows.");
+			throw new IllegalArgumentException("Improper number of targets in seat rows.");
 		}
 
 		final int longRowLength = seatRows.get(0).size();

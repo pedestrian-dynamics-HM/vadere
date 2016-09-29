@@ -61,7 +61,7 @@ public class SeatingModel implements ActiveCallback, Model {
 			trainModel = new TrainModel(topography, trainGeometry);
 		} catch (Exception e) {
 			throw new IllegalStateException(String.format("Topography is corrupt or not a %s train.",
-					trainGeometry.getClass().getSimpleName()));
+					trainGeometry.getClass().getSimpleName()), e);
 		}
 
 		this.random = random;
