@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.seating.trainmodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,6 +13,8 @@ import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.scenario.Target;
 
 public class SeatGroup {
+
+	public static final int SEATS_PER_SEAT_GROUP = 4;
 
 	private List<Seat> seats;
 	private int index;
@@ -211,6 +214,14 @@ public class SeatGroup {
 
 	public Compartment getCompartment() {
 		return compartment;
+	}
+
+	public List<Seat> getSeats() {
+		return Collections.unmodifiableList(seats);
+	}
+
+	public boolean isFull() {
+		return getPersonCount() == SEATS_PER_SEAT_GROUP;
 	}
 
 }

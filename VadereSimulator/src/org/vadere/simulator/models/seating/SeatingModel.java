@@ -277,13 +277,28 @@ public class SeatingModel implements ActiveCallback, Model {
 	private void sitDownIfPossible(Pedestrian pedestrian, Seat seat) {
 		if (seat.getSittingPerson() == null) {
 			seat.setSittingPerson(pedestrian);
+
 		} else {
-			// try other empty seat in same seat group
-			SeatGroup seatGroup = seat.getSeatGroup();
-			final Compartment compartment = trainModel.getCompartment(pedestrian.getTargets().get(pedestrian.getTargets().size()));
-//			compartment.get
-			// if there is none, go back to compartment target to trigger assign seat
-			throw new RuntimeException("not yet implemented");
+			lookForAlternativeSeat(pedestrian, seat);
+		}
+	}
+
+	private void lookForAlternativeSeat(Pedestrian pedestrian, Seat seat) {
+		final SeatGroup seatGroup = seat.getSeatGroup();
+		if (!seatGroup.isFull()) {
+			// Try other available seat in same seat group
+			List<Seat> availableOtherSeats = seatGroup.getSeats().stream()
+					.filter(s -> s != seat)
+					.filter(Seat::isAvailable)
+					.collect(Collectors.toList());
+			final Seat otherSeat = drawRandomElement(availableOtherSeats);
+			pedestrian.addTarget(otherSeat.getAssociatedTarget());
+
+		} else {
+			
+			// Go back to compartment target to re-trigger seat assignment
+			final Compartment compartment = seatGroup.getCompartment();
+			pedestrian.addTarget(compartment.getCompartmentTarget());
 		}
 	}
 
