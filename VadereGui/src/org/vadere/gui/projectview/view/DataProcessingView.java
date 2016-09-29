@@ -168,6 +168,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		private ScenarioRunManager currentScenario;
 		private boolean isEditable;
 
+		private JCheckBox isTimestampedCheckBox;
 		private JTable outputFilesTable;
 		private DefaultTableModel outputFilesTableModel;
 		private JTable dataProcessorsTable;
@@ -209,7 +210,22 @@ public class DataProcessingView extends JPanel implements IJsonView {
 					outputFilesTable.setRowSelectionInterval(index, index);
 				}
 			});
-			tableSide.add(buildPanel("Files", outputFilesTable, addFileBtn));
+
+			JPanel filesPanel = new JPanel();
+			filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
+			isTimestampedCheckBox = new JCheckBox("Add timestamp to output folder");
+			isTimestampedCheckBox.addActionListener(new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					currentScenario.getDataProcessingJsonManager().setTimestamped(isTimestampedCheckBox.isSelected());
+				}
+			});
+			isTimestampedCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+			filesPanel.add(isTimestampedCheckBox);
+			JPanel filesTable = buildPanel("Files", outputFilesTable, addFileBtn);
+			filesTable.setAlignmentX(Component.LEFT_ALIGNMENT);
+			filesPanel.add(filesTable);
+			tableSide.add(filesPanel);
 
 			JButton addProcessorBtn = new JButton(new AbstractAction("Add") {
 				@Override
@@ -235,6 +251,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		@Override
 		public void setVadereScenario(ScenarioRunManager scenario) {
 			this.currentScenario = scenario;
+			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
 			updateOutputFilesTable();
 			updateDataProcessorsTable();
 		}

@@ -128,7 +128,7 @@ public class DataProcessingJsonManager {
         return this.isTimestamped;
     }
 
-    private void setTimestamped(boolean isTimestamped) {
+    public void setTimestamped(boolean isTimestamped) {
         this.isTimestamped = isTimestamped;
     }
 
