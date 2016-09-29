@@ -109,11 +109,14 @@ public class DataProcessingView extends JPanel implements IJsonView {
 		repaint();
 	}
 
+	private JMenu processorsMenu = new JMenu();
+
 	private TextView buildExpertView() {
 		TextView panel = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
 
 		JMenuBar processorsMenuBar = new JMenuBar();
-		JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+		processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+		processorsMenu.setEnabled(isEditable);
 		processorsMenuBar.add(processorsMenu);
 
 		try {
@@ -156,6 +159,7 @@ public class DataProcessingView extends JPanel implements IJsonView {
 	public void isEditable(boolean isEditable) {
 		this.isEditable = isEditable;
 		activeJsonView.isEditable(isEditable);
+		processorsMenu.setEnabled(isEditable); // this is a bit of a hack, it would be nicer to place all menus inside TextView and control enablement there
 	}
 
 
