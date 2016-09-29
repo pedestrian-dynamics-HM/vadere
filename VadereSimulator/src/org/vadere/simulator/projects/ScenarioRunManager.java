@@ -214,8 +214,12 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void setOutputPaths(final Path outputPath) {
-		String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
-		this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
+		if (this.dataProcessingJsonManager.isTimestamped()) {
+			String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
+			this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
+		} else {
+			this.outputPath = Paths.get(outputPath.toString(), this.getName());
+		}
 	}
 
 	public void setName(String name) {

@@ -45,6 +45,8 @@ public class DataProcessingJsonManager {
     private static final String ATTRIBUTESTYPE_KEY = "attributesType";
     public static final String ATTRIBUTES_KEY = "attributes";
 
+    private static final String TIMESTAMP_KEY = "isTimestamped";
+
     public static final String DEFAULT_SEPARATOR = " ";
     public static final String DEFAULT_OUTPUTFILE_TYPE = NoDataKeyOutputFile.class.getName();
 
@@ -56,6 +58,7 @@ public class DataProcessingJsonManager {
 
     private List<OutputFile<?>> outputFiles;
     private List<DataProcessor<?, ?>> dataProcessors;
+    private boolean isTimestamped;
 
     static {
         mapper = JsonConverter.getMapper();
@@ -68,6 +71,7 @@ public class DataProcessingJsonManager {
     public DataProcessingJsonManager() {
         this.outputFiles = new ArrayList<>();
         this.dataProcessors = new ArrayList<>();
+        this.isTimestamped = true;
     }
 
     public List<OutputFile<?>> getOutputFiles() {
@@ -114,10 +118,18 @@ public class DataProcessingJsonManager {
         dataProcessor.setAttributes(dataProcessorStore.getAttributes());
         this.dataProcessors.add(dataProcessor);
     }
-
+    
     public void updateDataProcessor(final DataProcessor oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
         this.dataProcessors.remove(oldDataProcessor);
         addProcessor(newDataProcessorStore);
+    }
+
+    public boolean isTimestamped() {
+        return this.isTimestamped;
+    }
+
+    private void setTimestamped(boolean isTimestamped) {
+        this.isTimestamped = isTimestamped;
     }
 
     private static JsonNode serializeOutputFile(final OutputFile outputFile) {
@@ -159,21 +171,22 @@ public class DataProcessingJsonManager {
     public JsonNode serializeToNode() {
         ObjectNode main = mapper.createObjectNode();
 
-        ArrayNode outputFilesArrayNode = mapper.createArrayNode();
-        ArrayNode processorsArrayNode = mapper.createArrayNode();
-
         // part 1: output files
+        ArrayNode outputFilesArrayNode = mapper.createArrayNode();
         this.outputFiles.forEach(file -> {
             outputFilesArrayNode.add(serializeOutputFile(file));
         });
+        main.set(FILES_KEY, outputFilesArrayNode);
 
-        // part 2: processor
+        // part 2: processors
+        ArrayNode processorsArrayNode = mapper.createArrayNode();
         this.dataProcessors.forEach(proc -> {
             processorsArrayNode.add(serializeProcessor(proc));
         });
-
-        main.set(FILES_KEY, outputFilesArrayNode);
         main.set(PROCESSORS_KEY, processorsArrayNode);
+
+        // part 3: timestamp
+        main.put(TIMESTAMP_KEY, this.isTimestamped);
 
         return main;
     }
@@ -204,22 +217,27 @@ public class DataProcessingJsonManager {
     public static DataProcessingJsonManager deserializeFromNode(JsonNode node) throws JsonProcessingException {
         DataProcessingJsonManager manager = new DataProcessingJsonManager();
 
-        ArrayNode outputFilesArrayNode = (ArrayNode) node.get(FILES_KEY);
-        ArrayNode processorsArrayNode = (ArrayNode) node.get(PROCESSORS_KEY);
-
         // part 1: output files
+        ArrayNode outputFilesArrayNode = (ArrayNode) node.get(FILES_KEY);
         if (outputFilesArrayNode != null)
             for (JsonNode fileNode : outputFilesArrayNode) {
                 OutputFileStore fileStore = mapper.treeToValue(fileNode, OutputFileStore.class);
                 manager.addOutputFile(fileStore);
             }
 
-        // part 2: processor
+        // part 2: processors
+        ArrayNode processorsArrayNode = (ArrayNode) node.get(PROCESSORS_KEY);
         if (processorsArrayNode != null)
             for (JsonNode processorNode : processorsArrayNode) {
                 DataProcessorStore dataProcessorStore = deserializeProcessorStore(processorNode);
                 manager.addProcessor(dataProcessorStore);
             }
+
+        // part 3: timestamp
+        JsonNode timestampArrayNode = node.get(TIMESTAMP_KEY);
+        if (timestampArrayNode != null) {
+            manager.setTimestamped(timestampArrayNode.asBoolean());
+        }
 
         return manager;
     }

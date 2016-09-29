@@ -187,5 +187,6 @@
 		"attributes": {
 			"targetId": 1
 		}
-	} ]
+	} ],
+	"isTimestamped": true
 }

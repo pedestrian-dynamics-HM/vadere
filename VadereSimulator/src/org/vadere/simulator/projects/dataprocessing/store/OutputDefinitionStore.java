@@ -6,10 +6,12 @@ import java.util.List;
 public class OutputDefinitionStore {
     private List<OutputFileStore> files;
     private List<DataProcessorStore> processors;
+    private boolean isTimestamped;
 
     public OutputDefinitionStore() {
         this.files = new ArrayList<>();
         this.processors = new ArrayList<>();
+        this.isTimestamped = true;
     }
 
     public void addOutputFile(OutputFileStore file) {
@@ -18,5 +20,9 @@ public class OutputDefinitionStore {
 
     public void addProcessor(DataProcessorStore processor) {
         this.processors.add(processor);
+    }
+
+    public void setTimestamped(boolean isTimestamped) {
+        this.isTimestamped = isTimestamped;
     }
 }
