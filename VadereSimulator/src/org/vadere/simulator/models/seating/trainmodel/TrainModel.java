@@ -228,13 +228,6 @@ public class TrainModel {
 		return getCompartment(index);
 	}
 
-	void checkEntranceAreaIndexRange(int entranceAreaIndex) {
-		if (entranceAreaIndex < 0 || entranceAreaIndex >= entranceAreaCount) {
-			throw new IllegalArgumentException(
-					"Entrance area index must be in range 0 to less than " + entranceAreaCount);
-		}
-	}
-
 	public int getEntranceAreaIndexForPerson(Pedestrian p) {
 		final Source source = p.getSource();
 		if (source == null)
