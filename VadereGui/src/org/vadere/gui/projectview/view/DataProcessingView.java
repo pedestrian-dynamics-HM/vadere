@@ -35,8 +35,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
@@ -184,6 +186,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private OutputFile selectedOutputFile;
 		private DataProcessor selectedDataProcessor;
 		private String latestJsonParsingError;
+		private Set<Integer> dataProcessIdsInUse = new HashSet<>();
 
 		GuiView() {
 			/* via www.oracle.com/technetwork/java/tablelayout-141489.html,
@@ -326,6 +329,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
 			updateOutputFilesTable();
 			updateDataProcessorsTable();
+			updateDataProcessIdsInUse();
 		}
 
 		private void updateOutputFilesTable() {
@@ -333,6 +337,11 @@ class DataProcessingView extends JPanel implements IJsonView {
 			outputFilesDetailsPanel.removeAll();
 			currentScenario.getDataProcessingJsonManager().getOutputFiles()
 					.forEach(outputFile -> outputFilesTableModel.addRow(new OutputFile[] {outputFile}));
+		}
+
+		private void updateDataProcessIdsInUse() {
+			dataProcessIdsInUse.clear();
+			currentScenario.getDataProcessingJsonManager().getOutputFiles().forEach(oFile -> dataProcessIdsInUse.addAll(oFile.getProcessorIds()));
 		}
 
 		private void updateDataProcessorsTable() {
@@ -397,9 +406,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 				@Override
 				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-					if (currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
-							.filter(oFile -> oFile.getProcessorIds().contains(((DataProcessor) value).getId()))
-							.findAny().isPresent()) {
+					if (dataProcessIdsInUse.contains(((DataProcessor) value).getId())) {
 						c.setForeground(Color.black); // at least one OutputFile is using this DataProcessor
 					} else {
 						c.setForeground(Color.gray);
@@ -535,6 +542,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			comboBox.addActionListener(e -> {
 				if (e.getActionCommand().equals("inputComplete")) {
 					outputFile.setProcessorIds(comboBox.getCheckedItems());
+					updateDataProcessIdsInUse();
 					refreshGUI();
 				}
 			});
