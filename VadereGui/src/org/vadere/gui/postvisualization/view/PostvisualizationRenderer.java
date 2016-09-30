@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -27,11 +28,14 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 	private final Map<Integer, VPoint> pedestrianDirections;
 
+	private ColorHelper colorHelper;
+
 	public PostvisualizationRenderer(final PostvisualizationModel model) {
 		super(model);
 		this.model = model;
 		this.pedestrianDirections = new HashMap<>();
 		this.lastPedestrianPositions = new HashMap<>();
+		this.colorHelper = new ColorHelper(model.getStepCount());
 	}
 
 	public PostvisualizationModel getModel() {
@@ -40,6 +44,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 	@Override
 	protected void renderSimulationContent(final Graphics2D g) {
+		this.colorHelper = new ColorHelper(model.getStepCount());
 		renderPedestrians(g, null);
 	}
 
@@ -72,9 +77,13 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			int targetId = pedestrian.hasNextTarget() ? pedestrian.getNextTargetId() : -1;
 
 			// choose the color
+			Optional<Color> c = model.config.isUseEvacuationTimeColor() ?
+					Optional.of(colorHelper.numberToColor(trajectory.getLifeTime().orElse(0))) :
+					Optional.empty();
 			g.setColor(model.getColor(pedestrian)
 					.orElse(model.config.getColorByTargetId(targetId)
-							.orElseGet(model.config::getPedestrianDefaultColor)));
+							.orElse(c
+								.orElseGet(model.config::getPedestrianDefaultColor))));
 
 			// renderImage the pedestrian
 			if (model.config.isShowPedestrians()) {

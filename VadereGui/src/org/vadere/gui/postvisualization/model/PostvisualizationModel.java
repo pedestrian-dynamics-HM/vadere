@@ -2,6 +2,7 @@ package org.vadere.gui.postvisualization.model;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.security.cert.PKIXRevocationChecker;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,6 +99,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere) {
 		logger.info("start init postvis model");
+		init(vadere);
 		this.vadere = vadere;
 		this.agentsByStep = agentsByStep;
 		Map<Integer, Step> map = agentsByStep
