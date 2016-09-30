@@ -118,6 +118,10 @@ public class DataProcessingJsonManager {
         dataProcessor.setAttributes(dataProcessorStore.getAttributes());
         this.dataProcessors.add(dataProcessor);
     }
+
+    public void addInstantiatedProcessor(final DataProcessor dataProcessor) {
+        this.dataProcessors.add(dataProcessor);
+    }
     
     public void updateDataProcessor(final DataProcessor oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
         this.dataProcessors.remove(oldDataProcessor);
@@ -267,5 +271,15 @@ public class DataProcessingJsonManager {
 
     public ProcessorManager createProcessorManager(MainModel mainModel) {
         return new ProcessorManager(this, this.dataProcessors, this.outputFiles, mainModel);
+    }
+
+    public int getMaxProcessorsId() {
+        int maxId = 0;
+        for (DataProcessor<?, ?> dataProc : dataProcessors) {
+            if (dataProc.getId() > maxId) {
+                maxId = dataProc.getId();
+            }
+        }
+        return maxId;
     }
 }

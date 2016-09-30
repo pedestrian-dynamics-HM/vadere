@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -80,6 +81,12 @@ public class ClassFinder {
 		}
 
 		return null;
+	}
+
+	public static Map<String, Class> getProcessorClassesWithNames() {
+		Map<String, Class> map = new HashMap<>();
+		getAllProcessorClasses().forEach(procCls -> map.put(procCls.getSimpleName(), procCls));
+		return map;
 	}
 
 	public static List<Class<?>> getProcessorClasses(Type keyType) {

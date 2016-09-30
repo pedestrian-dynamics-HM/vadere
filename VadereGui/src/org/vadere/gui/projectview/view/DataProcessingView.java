@@ -252,7 +252,21 @@ class DataProcessingView extends JPanel implements IJsonView {
 			JButton addProcessorBtn = new JButton(new AbstractAction("Add") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO
+					Map<String, Class> processorNameToClass = ClassFinder.getProcessorClassesWithNames();
+					JComboBox processorOptions = new JComboBox<>(processorNameToClass.keySet().toArray());
+					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
+							"Choose data processor", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						try {
+							DataProcessor newDataProcessor = (DataProcessor) processorNameToClass.get(processorOptions.getSelectedItem()).newInstance();
+							newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
+							currentScenario.getDataProcessingJsonManager().addInstantiatedProcessor(newDataProcessor);
+							updateDataProcessorsTable();
+							int index = dataProcessorsTable.getRowCount() - 1;
+							dataProcessorsTable.setRowSelectionInterval(index, index);
+						} catch (InstantiationException | IllegalAccessException ex) {
+							ex.printStackTrace();
+						}
+					}
 					refreshGUI();
 				}
 			});
