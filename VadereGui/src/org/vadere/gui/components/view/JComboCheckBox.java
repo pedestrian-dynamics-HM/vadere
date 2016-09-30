@@ -24,7 +24,8 @@ public class JComboCheckBox<E> extends JComboBox {
 		addActionListener(ae -> {
 			if (!ae.getActionCommand().equals("inputComplete")) {
 				memory.put(getSelectedItem(), !memory.get(getSelectedItem())); // toogle associated boolean in memory upon click on item
-				inputCompleted();
+				hidePopup();
+				setPopupVisible(true);
 			}
 		});
 
@@ -33,6 +34,7 @@ public class JComboCheckBox<E> extends JComboBox {
 			@Override public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
 			@Override public void popupMenuCanceled(PopupMenuEvent e) {
 				repaint();
+				inputCompleted();
 			}
 		});
 
@@ -61,6 +63,18 @@ public class JComboCheckBox<E> extends JComboBox {
 				return cb;
 			}
 		});
+	}
+
+	@Override
+	public void setPopupVisible(boolean v) {
+		if (v) {
+			super.setPopupVisible(v);
+		}
+	}
+
+	@Override
+	public void hidePopup() {
+		super.setPopupVisible(false);
 	}
 
 	private void inputCompleted() {
