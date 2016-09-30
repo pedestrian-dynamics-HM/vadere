@@ -90,6 +90,13 @@ public class ClassFinder {
 				.collect(Collectors.toList());
 	}
 
+	public static List<Class<?>> getAllProcessorClasses() {
+		return findSubclassesInPackage(DataProcessor.class.getPackage().getName(), DataProcessor.class)
+				.stream()
+				.filter(cproc -> !Modifier.isAbstract(cproc.getModifiers()))
+				.collect(Collectors.toList());
+	}
+
 	private static List<String> getClassNamesWithTagInPackage(String packageName, Class<?> baseClassOrInterface) {
 		return findSubclassesInPackage(packageName, baseClassOrInterface).stream()
 				.map(Class::getName)
