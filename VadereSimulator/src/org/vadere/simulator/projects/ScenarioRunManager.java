@@ -311,6 +311,7 @@ public class ScenarioRunManager implements Runnable {
 			// not all necessary! only the ones that could have changed
 			this.scenarioStore = srm.scenarioStore;
 			this.outputPath = srm.outputPath;
+			this.dataProcessingJsonManager = srm.dataProcessingJsonManager;
 			this.processorManager = srm.processorManager;
 			this.modelTests = srm.modelTests;
 			this.finishedListener = srm.finishedListener;
