@@ -20,7 +20,7 @@ public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdKey,
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
-		state.getTopography().getElements(Pedestrian.class).stream()
+		state.getTopography().getElements(Pedestrian.class)
 				.forEach(ped -> this.update(new PedestrianIdKey(ped.getId()), state.getSimTimeInSec()));
 	}
 
