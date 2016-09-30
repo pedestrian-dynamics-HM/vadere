@@ -136,6 +136,8 @@ public class ActionLoadProject extends AbstractAction {
 			}
 
 		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Migration assistant",
+					JOptionPane.ERROR_MESSAGE);
 			logger.error(e);
 			e.printStackTrace();
 		}
