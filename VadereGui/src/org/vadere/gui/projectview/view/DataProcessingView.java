@@ -88,9 +88,11 @@ class DataProcessingView extends JPanel implements IJsonView {
 	}
 
 	private void switchMode() {
-		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='gray'>" +
-				"switch to <b>" + (inGuiViewMode ? jsonViewMode : guiViewMode) + "</b> mode<font>");
-		Preferences.userNodeForPackage(DataProcessingView.class).put("dataProcessingViewMode", inGuiViewMode ? guiViewMode : jsonViewMode);
+		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='blue'>" +
+				"<u>switch to <b>" + (inGuiViewMode ? jsonViewMode : guiViewMode)
+				+ "</b> mode</u></font></span></html>");
+		Preferences.userNodeForPackage(DataProcessingView.class).put("dataProcessingViewMode",
+				inGuiViewMode ? guiViewMode : jsonViewMode);
 
 		viewPanel.removeAll();
 
