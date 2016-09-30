@@ -442,6 +442,10 @@ class DataProcessingView extends JPanel implements IJsonView {
 			return panel;
 		}
 
+		private void passFocusOn() {
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(); // get rid of the focus
+		}
+
 		private void handleOutputFileSelected(OutputFile outputFile) {
 			selectedOutputFile = outputFile;
 			Type outputFileDataKey = getDataKeyForOutputFile(outputFile);
@@ -484,7 +488,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 								"Invalid file name", JOptionPane.WARNING_MESSAGE);
 					}
 				}
-				KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(); // get rid of the focus
+				passFocusOn();
 			});
 			addEditableComponent(nameField);
 			panel.add(nameField, c);
@@ -542,6 +546,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					outputFile.setProcessorIds(comboBox.getCheckedItems());
 					updateDataProcessIdsInUse();
 					refreshGUI();
+					passFocusOn();
 				}
 			});
 			panel.add(comboBox, c);
