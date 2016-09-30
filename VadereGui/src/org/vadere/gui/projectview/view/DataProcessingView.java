@@ -456,16 +456,6 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 1;
 			c.gridy = 0;
 			JTextField nameField = new JTextField(outputFile.getFileName());
-			nameField.setEditable(false);
-			nameField.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseReleased(MouseEvent e) {
-					if (isEditable) {
-						nameField.setEditable(true);
-						nameField.getCaret().setVisible(true);
-					}
-				}
-			});
 			nameField.addActionListener(ae -> {
 				String oldName = outputFile.getFileName();
 				String newName = nameField.getText();
@@ -487,15 +477,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 								"Invalid file name", JOptionPane.WARNING_MESSAGE);
 					}
 				}
-				nameField.setEditable(false);
-				nameField.getCaret().setVisible(false);
-			});
-			nameField.addFocusListener(new FocusAdapter() {
-				@Override
-				public void focusLost(FocusEvent e) {
-					nameField.setText(outputFile.getFileName());
-					nameField.setEditable(false);
-				}
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(); // get rid of the focus
 			});
 			addEditableComponent(nameField);
 			panel.add(nameField, c);
