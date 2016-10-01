@@ -88,4 +88,12 @@ public class Compartment {
 		return getSeatGroups().stream().mapToInt(SeatGroup::getPersonCount).sum();
 	}
 
+	public boolean isFull() {
+		for (SeatGroup sg : seatGroups) {
+			if (!sg.isFull())
+				return false;
+		}
+		return true;
+	}
+
 }

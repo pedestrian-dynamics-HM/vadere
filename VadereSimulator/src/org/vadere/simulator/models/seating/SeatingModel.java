@@ -110,7 +110,7 @@ public class SeatingModel implements ActiveCallback, Model {
 
 	private void assignSeatTarget(Pedestrian p) {
 		final Compartment compartment = trainModel.getCompartment(p);
-		if (compartment.getPersonCount() == Compartment.MAX_PERSONS_PER_COMPARTMENT) {
+		if (compartment.isFull()) {
 			logDebug("Compartment %d is full. No seat available for pedestrian %d.",
 					compartment.getIndex(), p.getId());
 			proceedToNextCompartmentIfPossible(p);
