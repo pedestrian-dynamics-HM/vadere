@@ -74,6 +74,12 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 
 	private Set<Seat> getSeatsOfCompartment() {
 		final Compartment compartment = trainModel.getCompartment(attributes.getCompartmentIndex());
+		if (compartment.isHalfCompartment())
+			throw new IllegalArgumentException(
+					"The log event processors's attribute compartmentIndex denotes a half-compartment."
+					+ "The processor cannot be used for half-compartments.");
+		// Otherwise, the resulting files are not comparable with the collected data.
+
 		final Set<Seat> result = new HashSet<>();
 		for (SeatGroup sg : compartment.getSeatGroups()) {
 			result.addAll(sg.getSeats());
