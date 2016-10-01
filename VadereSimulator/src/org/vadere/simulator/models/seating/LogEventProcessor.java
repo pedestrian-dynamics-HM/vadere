@@ -131,7 +131,12 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 
 		@Override
 		public void reachedTarget(Target target, Agent agent) {
-			writeSitDownEvent((Pedestrian) agent, seatNumber);
+			final Seat seat = trainModel.getSeatForTarget(target);
+			// This check is necessary because a second person could reach the
+			// target (and find that the seat is already taken).
+			// Order of listener invocations is not predictable, therefore both options are checked.
+			if (seat.isAvailable() || seat.getSittingPerson() == agent)
+				writeSitDownEvent((Pedestrian) agent, seatNumber);
 		}
 	}
 

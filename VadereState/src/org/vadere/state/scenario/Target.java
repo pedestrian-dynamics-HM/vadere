@@ -15,7 +15,10 @@ public class Target implements ScenarioElement, Comparable<Target> {
 	private final AttributesTarget attributes;
 	private final Map<Integer, Double> enteringTimes;
 	
-	/** Collection of listeners - order does not play a role. */
+	/**
+	 * Collection of listeners - unordered because it's order is not predictable
+	 * (at least not for clients).
+	 */
 	private final Collection<TargetListener> targetListeners = new LinkedList<>();
 
 	public Target(AttributesTarget attributes) {
