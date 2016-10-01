@@ -11,8 +11,6 @@ import org.vadere.state.scenario.Target;
  */
 public class Compartment {
 
-	public static final int MAX_PERSONS_PER_COMPARTMENT = 16;
-
 	private TrainModel trainModel;
 	private int index;
 	private Target compartmentTarget;
