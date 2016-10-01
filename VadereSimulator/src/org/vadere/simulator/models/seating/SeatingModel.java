@@ -111,7 +111,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	private void assignSeatTarget(Pedestrian p) {
 		final Compartment compartment = trainModel.getCompartment(p);
 		if (compartment.isFull()) {
-			logDebug("Compartment %d is full. No seat available for pedestrian %d.",
+			logDebug("Compartment %d is full. No seat available for pedestrian %d. Proceeding to next compartment.",
 					compartment.getIndex(), p.getId());
 			proceedToNextCompartmentIfPossible(p);
 			return;
@@ -320,6 +320,10 @@ public class SeatingModel implements ActiveCallback, Model {
 	private final TargetListener seatTargetListener = new TargetListener() {
 		@Override
 		public void reachedTarget(Target target, Agent agent) {
+			final Seat seat = trainModel.getSeatForTarget(target);
+			logDebug("Pedestrian %d reached seat %d.%d (%d)", agent.getId(),
+					seat.getSeatGroup().getCompartment().getIndex(), seat.getSeatNumberWithinCompartment(),
+					target.getId());
 			sitDownIfPossible((Pedestrian) agent, trainModel.getSeatForTarget(target));
 		}
 	};
