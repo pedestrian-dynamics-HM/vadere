@@ -76,9 +76,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		final Compartment compartment = trainModel.getCompartment(attributes.getCompartmentIndex());
 		final Set<Seat> result = new HashSet<>();
 		for (SeatGroup sg : compartment.getSeatGroups()) {
-			for (int i = 0; i < 4; i++) {
-				result.add(sg.getSeat(i));
-			}
+			result.addAll(sg.getSeats());
 		}
 		return result;
 	}
