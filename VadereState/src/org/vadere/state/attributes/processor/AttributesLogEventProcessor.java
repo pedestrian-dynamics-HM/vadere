@@ -2,7 +2,11 @@ package org.vadere.state.attributes.processor;
 
 public class AttributesLogEventProcessor extends AttributesProcessor {
 	
-	private int compartmentIndex = 0;
+	/**
+	 * The compartment to observe. Index 0 and the last index denote
+	 * half-compartments which should not be observed.
+	 */
+	private int compartmentIndex = 1;
 	
 	private int surveyId = 1;
 	/**
