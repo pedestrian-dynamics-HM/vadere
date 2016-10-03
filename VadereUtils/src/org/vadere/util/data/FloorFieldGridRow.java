@@ -14,4 +14,8 @@ public class FloorFieldGridRow {
     public String[] toStrings() {
         return this.values.stream().map(v -> v.toString()).toArray(size -> new String[size]);
     }
+
+    public void setValue(int index, final Double value) {
+	    this.values.set(index, value);
+    }
 }

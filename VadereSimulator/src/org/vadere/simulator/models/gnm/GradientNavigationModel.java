@@ -5,9 +5,11 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
+import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -28,7 +30,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> {
+public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> implements PotentialFieldModel {
 	private AttributesGNM attributes;
 	private GradientProvider floorGradient;
 	private Map<Integer, Target> targets;
@@ -167,4 +169,18 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		return activeCallbacks;
 	}
 
+	@Override
+	public PotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
+	}
+
+	@Override
+	public PotentialFieldObstacle getPotentialFieldObstacle() {
+		return potentialFieldObstacle;
+	}
+
+	@Override
+	public PotentialFieldAgent getPotentialFieldAgent() {
+		return potentialFieldPedestrian;
+	}
 }

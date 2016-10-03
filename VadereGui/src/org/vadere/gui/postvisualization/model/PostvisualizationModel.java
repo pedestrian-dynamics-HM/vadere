@@ -28,7 +28,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
-import org.vadere.util.io.IOUtils;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
 import org.vadere.util.potential.CellGrid;
@@ -56,6 +55,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	private Comparator<Step> stepComparator = (s1, s2) -> s1.getStepNumber() - s2.getStepNumber();
 
 	private List<Step> steps;
+
+	private String outputPath;
 
 	// public Configuration config;
 
@@ -96,10 +97,11 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				});
 	}
 
-	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere) {
+	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere, final String projectPath) {
 		logger.info("start init postvis model");
 		this.vadere = vadere;
 		this.agentsByStep = agentsByStep;
+		this.outputPath = projectPath;
 		Map<Integer, Step> map = agentsByStep
 				.keySet().stream()
 				.sorted(stepComparator)
@@ -134,12 +136,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		logger.info("finished init postvis model");
 	}
 
-	public void init(final ScenarioRunManager vadere) {
+	public void init(final ScenarioRunManager vadere, final String projectPath) {
 		this.vadere = vadere;
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();
 		this.trajectories = new HashMap<>();
 		this.selectedElement = null;
+		this.outputPath = projectPath;
 	}
 
 	public Optional<Step> getLastStep() {
@@ -156,6 +159,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	public ScenarioRunManager getScenarioRunManager() {
+		return vadere;
 	}
 
 	@Override
@@ -324,6 +331,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	public int getTopographyId() {
 		return topographyId;
+	}
+
+	public String getOutputPath() {
+		return outputPath;
 	}
 
 	private void clear() {

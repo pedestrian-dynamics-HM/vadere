@@ -33,3 +33,6 @@ VadereModelTests/TestOVM/processed output/*
 #deprecated: can potentially be removed
 bin/
 VadereGui/output/
+
+#mac osx files
+.DS_Store

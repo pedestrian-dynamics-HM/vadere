@@ -6,6 +6,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
@@ -36,6 +37,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 	private JTabbedPane tabbedPane;
 	private final JLabel scenarioName;
+	private ProjectViewModel model;
 
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
@@ -58,10 +60,11 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	ScenarioJPanel(JLabel scenarioName) {
+	ScenarioJPanel(JLabel scenarioName, ProjectViewModel model) {
+		this.model = model;
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
-		this.postVisualizationView = new PostvisualizationWindow();
+		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
 
 		super.setBorder(new EmptyBorder(5, 5, 5, 5));
 		super.setLayout(new CardLayout(0, 0));

@@ -82,7 +82,7 @@ public class ActionOpenFile extends ActionVisualization {
 
 					if (trajectoryFile.isPresent() && snapshotFile.isPresent()) {
 						ScenarioRunManager vadere = IOOutput.readScenario(snapshotFile.get().toPath());
-						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadere), vadere);
+						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadere), vadere, trajectoryFile.get().getParent());
 						model.notifyObservers();
 						dialog.dispose();
 						setLastDirectories(scenarioOutputDir);

@@ -349,4 +349,8 @@ public class ScenarioRunManager implements Runnable {
 	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {
 		this.dataProcessingJsonManager = manager;
 	}
+
+	public Path getOutputPath() {
+		return outputPath;
+	}
 }

@@ -48,11 +48,11 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final ScenarioElementView textView;
 
-	public PostvisualizationWindow() {
-		this(false);
+	public PostvisualizationWindow(final String projectPath) {
+		this(false, projectPath);
 	}
 
-	public PostvisualizationWindow(final boolean loadTopographyInformationsOnly) {
+	public PostvisualizationWindow(final boolean loadTopographyInformationsOnly, final String projectPath) {
 
 		// 1. get data from the user screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -328,13 +328,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 	public void loadOutputFile(final File trajectoryFile, final ScenarioRunManager scenario) throws IOException {
 		Player.getInstance(model).stop();
-		model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario);
+		model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
 		model.notifyObservers();
 	}
 
 	public void loadOutputFile(final ScenarioRunManager scenario) throws IOException {
 		Player.getInstance(model).stop();
-		model.init(scenario);
+		model.init(scenario, model.getOutputPath());
 		model.notifyObservers();
 	}
 
@@ -371,7 +371,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 		EventQueue.invokeLater(() -> {
 			JFrame frame = new JFrame();
-			PostvisualizationWindow postVisWindow = new PostvisualizationWindow(true);
+			PostvisualizationWindow postVisWindow = new PostvisualizationWindow(true, "./");
 			frame.add(postVisWindow);
 			frame.setJMenuBar(postVisWindow.getMenu());
 
