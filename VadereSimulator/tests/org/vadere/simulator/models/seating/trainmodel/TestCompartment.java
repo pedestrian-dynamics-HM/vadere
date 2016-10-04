@@ -27,6 +27,20 @@ public class TestCompartment {
 		assertEquals(4, c.getPersonCount());
 
 	}
+	
+	@Test
+	public void testIsFull() {
+		final TrainModel trainModel = new TestTopographyAndModelBuilder().getTrainModel();
+		final Compartment c = trainModel.getCompartment(11);
+
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++) {
+				assertFalse(c.isFull());
+				sitDownPerson(c, i, j);
+			}
+
+		assertTrue(c.isFull());
+	}
 
 	private void sitDownPerson(Compartment c, int seatGroupIndex, int seatIndex) {
 		// not for half-compartments!
