@@ -135,11 +135,11 @@ public class SeatingModel implements ActiveCallback, Model {
 		}
 	}
 
-	private boolean isInnerCompartment(final int compartmentIndex) {
+	boolean isInnerCompartment(final int compartmentIndex) {
 		return compartmentIndex > 0 && compartmentIndex < trainModel.getCompartmentCount() - 1;
 	}
 
-	private int getDirectionFromEntranceAreaToCompartment(int entranceAreaIndex, int compartmentIndex) {
+	int getDirectionFromEntranceAreaToCompartment(int entranceAreaIndex, int compartmentIndex) {
 		// entrance areas:    0   1   2   3
 		// compartments:    0   1   2   3   4
 		if (compartmentIndex <= entranceAreaIndex)
