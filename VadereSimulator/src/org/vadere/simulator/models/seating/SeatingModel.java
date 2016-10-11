@@ -28,6 +28,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.TruncatedNormalDistribution;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
@@ -281,6 +282,8 @@ public class SeatingModel implements ActiveCallback, Model {
 	private void sitDownIfPossible(Pedestrian pedestrian, Seat seat) {
 		if (seat.getSittingPerson() == null) {
 			seat.setSittingPerson(pedestrian);
+			final VShape seatGeometry = seat.getAssociatedTarget().getShape();
+			pedestrian.setPosition(seatGeometry.getCentroid());
 
 		} else {
 			lookForAlternativeSeat(pedestrian, seat);
