@@ -126,7 +126,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 	}
 
 	@Override
-	public double getTargetPotential(final List<Integer> targetIds, final VPoint pos, final Agent pedArgument) {
+	public double getTargetPotential(final VPoint pos, final Agent pedArgument) {
 		if (Pedestrian.class.isAssignableFrom(pedArgument.getClass()))
 			throw new IllegalArgumentException("Target grid can only handle type Pedestrian");
 		Pedestrian ped = (Pedestrian) pedArgument;
@@ -134,14 +134,14 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 		if (pedestrianAttitudeMap.containsKey(ped) && queues.stream().anyMatch(queue -> queue.isQueued(ped))) {
 			switch (pedestrianAttitudeMap.get(ped)) {
 				case COMPETITIVE:
-					return competitiveField.getTargetPotential(targetIds, pos, ped);
+					return competitiveField.getTargetPotential(pos, ped);
 				case GENTLE:
-					return gentleField.getTargetPotential(targetIds, pos, ped);
+					return gentleField.getTargetPotential(pos, ped);
 				default:
 					throw new IllegalArgumentException(ped + " is not contained in the attitude map.");
 			}
 		} else if (queues.stream().noneMatch(queue -> queue.isQueued(ped))) {
-			return competitiveField.getTargetPotential(targetIds, pos, ped);
+			return competitiveField.getTargetPotential(pos, ped);
 		} else {
 			logger.warn("ped is neither queued nor not-queued.");
 			return 0;
@@ -149,7 +149,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 	}
 
 	@Override
-	public Vector2D getTargetPotentialGradient(final List<Integer> targetIds, final VPoint pos, final Agent ped) {
+	public Vector2D getTargetPotentialGradient(final VPoint pos, final Agent ped) {
 		throw new UnsupportedOperationException("method not implemented jet.");
 	}
 

@@ -17,6 +17,7 @@ import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTargetRingExperiment;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -135,9 +136,8 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void updateNextPosition() {
 
-		if (org.vadere.simulator.models.potential.fields.PotentialFieldTargetRingExperiment.class
-				.equals(this.potentialFieldTarget.getClass())) {
-			VCircle reachableArea = new VCircle(this.getPosition(), getStepSize());
+		if (PotentialFieldTargetRingExperiment.class.equals(potentialFieldTarget.getClass())) {
+			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
 			this.relevantPedestrians = potentialFieldPedestrian
 					.getRelevantAgents(reachableArea, this, topography);
 
@@ -146,11 +146,11 @@ public class PedestrianOSM extends Pedestrian {
 			// nextPosition = this.getPosition();
 			// }
 		} else if (!hasNextTarget()) {
-			this.nextPosition = this.getPosition();
-		} else if (topography.getTarget(super.getNextTargetId()).getShape().contains(super.getPosition())) {
-			this.nextPosition = this.getPosition();
+			this.nextPosition = getPosition();
+		} else if (topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
+			this.nextPosition = getPosition();
 		} else {
-			VCircle reachableArea = new VCircle(this.getPosition(), getStepSize());
+			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
 
 			this.relevantPedestrians = potentialFieldPedestrian
 					.getRelevantAgents(reachableArea, this, topography);
@@ -159,7 +159,7 @@ public class PedestrianOSM extends Pedestrian {
 			// get stairs pedestrian is on - remains null if on area
 			Stairs stairs = null;
 			for (Stairs singleStairs : topography.getStairs()) {
-				if (singleStairs.getShape().contains(this.getPosition())) {
+				if (singleStairs.getShape().contains(getPosition())) {
 					stairs = singleStairs;
 					break;
 				}
@@ -169,7 +169,7 @@ public class PedestrianOSM extends Pedestrian {
 				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
-				reachableArea = new VCircle(this.getPosition(), stairs.getTreadDepth() * 1.99);
+				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
 				nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
 				// Logger.getLogger(this.getClass()).info("Pedestrian " + this.getId() + " is on
 				// stairs @position: " + nextPosition);
@@ -221,7 +221,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	public double getPotential(VPoint newPos) {
 
-		double targetPotential = potentialFieldTarget.getTargetPotential(getTargets(), newPos, this);
+		double targetPotential = potentialFieldTarget.getTargetPotential(newPos, this);
 
 		double pedestrianPotential = potentialFieldPedestrian
 				.getAgentPotential(newPos, this, relevantPedestrians);
@@ -239,7 +239,7 @@ public class PedestrianOSM extends Pedestrian {
 	// Getters...
 
 	public double getTargetPotential(VPoint pos) {
-		return potentialFieldTarget.getTargetPotential(getTargets(), pos, this);
+		return potentialFieldTarget.getTargetPotential(pos, this);
 	}
 
 	public PotentialFieldTarget getPotentialFieldTarget() {
@@ -247,8 +247,7 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public Vector2D getTargetGradient(VPoint pos) {
-		return potentialFieldTarget.getTargetPotentialGradient(getTargets(),
-				pos, this);
+		return potentialFieldTarget.getTargetPotentialGradient(pos, this);
 	}
 
 	public Vector2D getObstacleGradient(VPoint pos) {

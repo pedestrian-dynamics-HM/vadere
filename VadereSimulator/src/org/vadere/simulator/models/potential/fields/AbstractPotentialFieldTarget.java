@@ -50,30 +50,22 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 *
 	 */
 	@Override
-	public double getTargetPotential(final List<Integer> targetIds, final VPoint pos, final Agent ped) {
+	public double getTargetPotential(final VPoint pos, final Agent ped) {
 
 		CellGrid potentialField;
-		Topography floor = topography;
 		double targetPotential = Double.MAX_VALUE;
-		int targetId = -1;
 
-		assert targetIds.size() > 0;
-
-		if (targetIds.size() > 0) {
-			targetId = targetIds.get(0);
-		} else {
-			return 0;
-		}
+		int targetId = ped.getNextTargetId();
 
 		// Pedestrian has reached the target
-		if (floor.getTarget(targetId) != null) {
-			if (floor.getTarget(targetId).getShape().contains(pos)) {
-				return 0; // the arrival time is zero
-			}
+		// TODO Is this necessary? The target controller changes the
+		// pedestrian's target as soon the pedestrian arrives it.
+		if (topography.getTarget(targetId).getShape().contains(pos)) {
+			return 0; // the arrival time is zero
 		}
 
 		// Pedestrain inside an obstacle
-		for (ScenarioElement b : floor.getObstacles()) {
+		for (ScenarioElement b : topography.getObstacles()) {
 			if (b.getShape().contains(pos)) {
 				return Double.MAX_VALUE;
 			}
@@ -107,7 +99,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 			incY = 0;
 		}
 
-		List<Point> points = new LinkedList<Point>();
+		List<Point> points = new LinkedList<>();
 		points.add(gridPoint);
 		points.add(new Point(gridPoint.x + incX, gridPoint.y));
 		points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
@@ -222,7 +214,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 */
 	@Override
 	public HashMap<Integer, CellGrid> getCellGrids() {
-		HashMap<Integer, CellGrid> map = new HashMap<Integer, CellGrid>();
+		HashMap<Integer, CellGrid> map = new HashMap<>();
 
 
 		for (Map.Entry<Integer, PotentialFieldAndInitializer> entry2 : targetPotentialFields
