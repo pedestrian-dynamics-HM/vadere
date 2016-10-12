@@ -44,8 +44,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 	 * Afterwards, rate "pos" and check if it lies in the same direction as tangent vector.
 	 */
 	@Override
-	public double getTargetPotential(List<Integer> targetIds, VPoint pos,
-			Agent ped) {
+	public double getTargetPotential(VPoint pos, Agent ped) {
 		Vector2D pedestrian = new Vector2D(ped.getPosition());
 		Vector2D center = new Vector2D(attributes.getCenter());
 
@@ -69,8 +68,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 	}
 
 	@Override
-	public Vector2D getTargetPotentialGradient(List<Integer> targetIds,
-			VPoint pos, Agent ped) {
+	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
 		Vector2D pedestrian = new Vector2D(ped.getPosition());
 		Vector2D center = new Vector2D(attributes.getCenter());
 
