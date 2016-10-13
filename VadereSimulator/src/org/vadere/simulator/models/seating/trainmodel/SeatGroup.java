@@ -38,7 +38,7 @@ public class SeatGroup {
 		final int compartmentIndex = compartment.getIndex();
 		
 		final int longRowIndex1, longRowIndex2;
-		if (isInLeftRow()) {
+		if (isAtLeftSide()) {
 			longRowIndex1 = 0;
 			longRowIndex2 = 1;
 		} else {
@@ -67,10 +67,6 @@ public class SeatGroup {
 		seats.add(newSeat);
 		targetSeatMap.put(target, newSeat);
 		
-	}
-
-	private boolean isInLeftRow() {
-		return index % 2 == 0; // even -> left row
 	}
 
 	public Seat getSeat(int index) {
@@ -173,7 +169,7 @@ public class SeatGroup {
 	public Seat availableSeatAtSide(SeatSide side) {
 		int[] indexes;
 
-		if (isInLeftRow()) {
+		if (isAtLeftSide()) {
 			if (side == SeatSide.WINDOW) {
 				indexes = new int[] {0, 2};
 			} else {
@@ -222,6 +218,10 @@ public class SeatGroup {
 
 	public boolean isFull() {
 		return getPersonCount() == SEATS_PER_SEAT_GROUP;
+	}
+
+	public boolean isAtLeftSide() {
+		return index % 2 == 0;
 	}
 
 }

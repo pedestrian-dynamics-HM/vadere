@@ -28,12 +28,7 @@ public class Compartment {
 		this.targetSeatMap = targetSeatMap;
 
 		seatGroups = new ArrayList<>(4);
-		final int nSeatGroups;
-		if (isHalfCompartment()) {
-			nSeatGroups = 2;
-		} else {
-			nSeatGroups = 4;
-		}
+		final int nSeatGroups = isHalfCompartment() ? 2 : 4;
 		addCompartment(nSeatGroups);
 	}
 
