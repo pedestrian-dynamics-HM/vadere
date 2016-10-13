@@ -2,6 +2,7 @@ package org.vadere.simulator.models.seating.trainmodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import java.util.stream.Stream;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
+import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.scenario.Target;
 
 public class SeatGroup {
@@ -218,6 +220,26 @@ public class SeatGroup {
 
 	public boolean isFull() {
 		return getPersonCount() == SEATS_PER_SEAT_GROUP;
+	}
+
+	public Seat getSeatByPosition(SeatPosition seatPosition) {
+		return seats.get(getSeatIndexByPosition(seatPosition));
+	}
+
+	private int getSeatIndexByPosition(SeatPosition seatPosition) {
+		final Map<SeatPosition, Integer> seatPositionMapping = new HashMap<>();
+		if (isAtLeftSide()) {
+			seatPositionMapping.put(SeatPosition.WINDOW_BACKWARD, 0);
+			seatPositionMapping.put(SeatPosition.AISLE_BACKWARD,  1);
+			seatPositionMapping.put(SeatPosition.WINDOW_FORWARD,  2);
+			seatPositionMapping.put(SeatPosition.AISLE_FORWARD,   3);
+		} else {
+			seatPositionMapping.put(SeatPosition.AISLE_BACKWARD,  0);
+			seatPositionMapping.put(SeatPosition.WINDOW_BACKWARD, 1);
+			seatPositionMapping.put(SeatPosition.AISLE_FORWARD,   2);
+			seatPositionMapping.put(SeatPosition.WINDOW_FORWARD,  3);
+		}
+		return seatPositionMapping.get(seatPosition);
 	}
 
 	public boolean isAtLeftSide() {

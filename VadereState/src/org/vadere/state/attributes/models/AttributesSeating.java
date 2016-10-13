@@ -10,6 +10,7 @@ import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.models.seating.ValueWithProbabilityFraction;
+import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.scenario.Et423Geometry;
 
 /**
@@ -27,8 +28,7 @@ public class AttributesSeating extends Attributes {
 	 */
 	private List<ValueWithProbabilityFraction<Boolean>> seatGroupChoice;
 
-	/** Probabilities for seat indexes 0 to 3. */
-	private double[] seatChoice0;
+	private List<ValueWithProbabilityFraction<SeatPosition>> seatChoice0;
 
 	private List<ValueWithProbabilityFraction<SeatRelativePosition>> seatChoice1;
 
@@ -44,7 +44,11 @@ public class AttributesSeating extends Attributes {
 		addFraction(seatGroupChoice, true,  64.0);
 		addFraction(seatGroupChoice, false, 11.0);
 		
-		seatChoice0 = new double[] { 2, 1, 14, 5 };
+		seatChoice0 = new ArrayList<>(4);
+		addFraction(seatChoice0, SeatPosition.WINDOW_BACKWARD, 2);
+		addFraction(seatChoice0, SeatPosition.AISLE_BACKWARD, 1);
+		addFraction(seatChoice0, SeatPosition.WINDOW_FORWARD, 14);
+		addFraction(seatChoice0, SeatPosition.AISLE_FORWARD, 5);
 		
 		seatChoice1 = new ArrayList<>(3);
 		addFraction(seatChoice1, SeatRelativePosition.DIAGONAL, 31);
@@ -69,8 +73,8 @@ public class AttributesSeating extends Attributes {
 		return toPairListForEnumeratedDistribution(seatGroupChoice);
 	}
 
-	public double[] getSeatChoice0() {
-		return seatChoice0; // TODO fix names
+	public List<Pair<SeatPosition, Double>> getSeatChoice0() {
+		return toPairListForEnumeratedDistribution(seatChoice0);
 	}
 
 	public List<Pair<SeatRelativePosition, Double>> getSeatChoice1() {

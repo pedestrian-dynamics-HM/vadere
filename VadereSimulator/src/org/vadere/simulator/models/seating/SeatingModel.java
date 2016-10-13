@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
-import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -21,6 +20,7 @@ import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
+import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -40,8 +40,6 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
  *
  */
 public class SeatingModel implements ActiveCallback, Model {
-
-	private static final int[] SEAT_INDEXES = {0, 1, 2, 3};
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);
 	
@@ -245,9 +243,9 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 
 	private Seat chooseSeat0(SeatGroup seatGroup) {
-		final double[] probabilities = attributes.getSeatChoice0();
-		final EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(rng, SEAT_INDEXES, probabilities);
-		return seatGroup.getSeat(distribution.sample());
+		final EnumeratedDistribution<SeatPosition> distribution =
+				new EnumeratedDistribution<>(rng, attributes.getSeatChoice0());
+		return seatGroup.getSeatByPosition(distribution.sample());
 	}
 
 	private Seat chooseSeat1(final SeatGroup seatGroup) {

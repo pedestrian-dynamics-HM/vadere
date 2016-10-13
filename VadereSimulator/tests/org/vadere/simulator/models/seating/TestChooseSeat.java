@@ -14,6 +14,7 @@ import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
+import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.TallySheet;
@@ -46,12 +47,19 @@ public class TestChooseSeat {
 		final int nTrials = 1000;
 		TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
 
-		final double[] probabilities = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice0());
+		final Map<SeatPosition, Double> probabilities = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice0());
 		
 		for (int i = 0; i < tallySheet.getKeys().size(); i++) {
 			Seat s = seatGroup.getSeat(i);
-			assertEquals(probabilities[i], (double) tallySheet.getCount(s) / nTrials, 0.05);
+			assertEquals(probabilities.get(getSeatPosition(s)), (double) tallySheet.getCount(s) / nTrials, 0.05);
 		}
+	}
+
+	private SeatPosition getSeatPosition(Seat seat) {
+		for (SeatPosition pos : SeatPosition.values())
+			if (seatGroup.getSeatByPosition(pos) == seat)
+				return pos;
+		throw new IllegalArgumentException("cannot get position for seat");
 	}
 
 	@StatisticalTestCase
