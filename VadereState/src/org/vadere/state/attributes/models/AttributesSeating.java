@@ -74,15 +74,15 @@ public class AttributesSeating extends Attributes {
 	}
 
 	public List<Pair<SeatRelativePosition, Double>> getSeatChoice1() {
-		return toPairListForEnumeratedDistribution(seatChoice1); // TODO fix name
+		return toPairListForEnumeratedDistribution(seatChoice1);
 	}
 
 	public List<Pair<SeatSide, Double>> getSeatChoice2Side() {
-		return toPairListForEnumeratedDistribution(seatChoice2Side); // TODO fix name
+		return toPairListForEnumeratedDistribution(seatChoice2Side);
 	}
 
 	public List<Pair<SeatFacingDirection, Double>> getSeatChoice2FacingDirection() {
-		return toPairListForEnumeratedDistribution(seatChoice2FacingDirection); // TODO fix name
+		return toPairListForEnumeratedDistribution(seatChoice2FacingDirection);
 	}
 	
 	public static <T> List<Pair<T, Double>> toPairListForEnumeratedDistribution(
