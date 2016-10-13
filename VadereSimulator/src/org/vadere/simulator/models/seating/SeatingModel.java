@@ -251,7 +251,8 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 
 	private Seat chooseSeat1(final SeatGroup seatGroup) {
-		final EnumeratedDistribution<SeatRelativePosition> distribution = new EnumeratedDistribution<>(rng, attributes.getSeatChoice1());
+		final EnumeratedDistribution<SeatRelativePosition> distribution =
+				new EnumeratedDistribution<>(rng, attributes.getSeatChoice1());
 		final SeatRelativePosition relativePosition = distribution.sample();
 		return seatGroup.seatRelativeTo(seatGroup.getTheOccupiedSeat(), relativePosition);
 	}
@@ -259,13 +260,15 @@ public class SeatingModel implements ActiveCallback, Model {
 	private Seat chooseSeat2(final SeatGroup seatGroup) {
 		if (seatGroup.onlySideChoice()) {
 			// choice only between window/aisle
-			final EnumeratedDistribution<SeatSide> distribution = new EnumeratedDistribution<>(rng, attributes.getSeatChoice2Side());
+			final EnumeratedDistribution<SeatSide> distribution =
+					new EnumeratedDistribution<>(rng, attributes.getSeatChoice2Side());
 			SeatSide side = distribution.sample();
 			return seatGroup.availableSeatAtSide(side);
 
 		} else if (seatGroup.onlyFacingDirectionChoice()) {
 			// choice only between forward/backward
-			final EnumeratedDistribution<SeatFacingDirection> distribution = new EnumeratedDistribution<>(rng, attributes.getSeatChoice2FacingDirection());
+			final EnumeratedDistribution<SeatFacingDirection> distribution =
+					new EnumeratedDistribution<>(rng, attributes.getSeatChoice2FacingDirection());
 			SeatFacingDirection facingDirection = distribution.sample();
 			return seatGroup.availableSeatAtFacingDirection(facingDirection);
 
