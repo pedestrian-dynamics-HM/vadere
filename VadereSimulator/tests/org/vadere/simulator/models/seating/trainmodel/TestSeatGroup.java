@@ -12,6 +12,7 @@ import org.vadere.simulator.models.seating.TestTopographyAndModelBuilder;
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
+import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.scenario.Pedestrian;
 
 public class TestSeatGroup {
@@ -348,6 +349,25 @@ public class TestSeatGroup {
 		assertTrue(aSeatGroup.isFull());
 	}
 	
+	@Test
+	public void testIsAtLeftSide() {
+		assertTrue(aSeatGroup.isAtLeftSide());
+		assertFalse(rightSeatGroup.isAtLeftSide());
+	}
+	
+	@Test
+	public void testGetSeatByPosition() {
+		assertEquals(aSeatGroup.getSeat(0), aSeatGroup.getSeatByPosition(SeatPosition.WINDOW_BACKWARD));
+		assertEquals(aSeatGroup.getSeat(1), aSeatGroup.getSeatByPosition(SeatPosition.AISLE_BACKWARD));
+		assertEquals(aSeatGroup.getSeat(2), aSeatGroup.getSeatByPosition(SeatPosition.WINDOW_FORWARD));
+		assertEquals(aSeatGroup.getSeat(3), aSeatGroup.getSeatByPosition(SeatPosition.AISLE_FORWARD));
+
+		assertEquals(rightSeatGroup.getSeat(0), rightSeatGroup.getSeatByPosition(SeatPosition.AISLE_BACKWARD));
+		assertEquals(rightSeatGroup.getSeat(1), rightSeatGroup.getSeatByPosition(SeatPosition.WINDOW_BACKWARD));
+		assertEquals(rightSeatGroup.getSeat(2), rightSeatGroup.getSeatByPosition(SeatPosition.AISLE_FORWARD));
+		assertEquals(rightSeatGroup.getSeat(3), rightSeatGroup.getSeatByPosition(SeatPosition.WINDOW_FORWARD));
+	}
+
 	private void testAvailableSeat(SeatGroup seatGroup, SeatSide side, int personSeatIndex, int expectedSeatIndex) {
 		seatGroup.getSeat(personSeatIndex).setSittingPerson(aPerson);
 		assertEquals(seatGroup.getSeat(expectedSeatIndex), seatGroup.availableSeatAtSide(side));
