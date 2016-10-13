@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.seating;
+package org.vadere.simulator.models.seating.dataprocessing;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;

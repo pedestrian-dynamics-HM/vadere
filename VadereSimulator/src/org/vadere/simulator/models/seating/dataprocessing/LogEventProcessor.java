@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.seating;
+package org.vadere.simulator.models.seating.dataprocessing;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.seating.SeatingModel;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
