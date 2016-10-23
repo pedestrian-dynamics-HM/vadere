@@ -17,9 +17,7 @@ import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
-import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
-import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -256,24 +254,7 @@ public class SeatingModel implements ActiveCallback, Model {
 	}
 
 	private Seat chooseSeat2(final SeatGroup seatGroup) {
-		if (seatGroup.onlySideChoice()) {
-			// choice only between window/aisle
-			final EnumeratedDistribution<SeatSide> distribution =
-					new EnumeratedDistribution<>(rng, attributes.getSeatChoice2Side());
-			SeatSide side = distribution.sample();
-			return seatGroup.availableSeatAtSide(side);
-
-		} else if (seatGroup.onlyFacingDirectionChoice()) {
-			// choice only between forward/backward
-			final EnumeratedDistribution<SeatFacingDirection> distribution =
-					new EnumeratedDistribution<>(rng, attributes.getSeatChoice2FacingDirection());
-			SeatFacingDirection facingDirection = distribution.sample();
-			return seatGroup.availableSeatAtFacingDirection(facingDirection);
-
-		} else {
-			// choice between both window/aisle and forward/backward
-			return seatGroup.getTheTwoAvailableSeats().get(random.nextInt(2));
-		}
+		return seatGroup.getTheTwoAvailableSeats().get(random.nextInt(2));
 	}
 
 	private Seat chooseSeat3(final SeatGroup seatGroup) {

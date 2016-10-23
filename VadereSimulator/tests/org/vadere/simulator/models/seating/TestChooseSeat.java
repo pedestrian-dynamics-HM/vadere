@@ -11,9 +11,7 @@ import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.state.attributes.models.AttributesSeating;
-import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
-import org.vadere.state.attributes.models.seating.SeatSide;
 import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
@@ -78,34 +76,6 @@ public class TestChooseSeat {
 			assertEquals(map.get(SeatRelativePosition.DIAGONAL),
 					(double) tallySheet.getCount(diagonallyOppositeSeat) / nTrials, 0.05);
 		}
-	}
-
-	@StatisticalTestCase
-	@Test
-	public void testChooseSeat2OnlySideChoice() {
-		final int nTrials = 1000;
-		fillSeatGroup(seatGroup, 0, 1);
-
-		final TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
-
-		final Seat seat = seatGroup.getSeat(2); // window seat
-		Map<SeatSide, Double> map = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice2Side());
-		assertEquals(map.get(SeatSide.WINDOW),
-				(double) tallySheet.getCount(seat) / nTrials, 0.05);
-	}
-
-	@StatisticalTestCase
-	@Test
-	public void testChooseSeat2OnlyDirectionChoice() {
-		final int nTrials = 1000;
-		fillSeatGroup(seatGroup, 0, 2);
-
-		final TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
-
-		final Seat seat = seatGroup.getSeat(3); // forward facing seat
-		Map<SeatFacingDirection, Double> map = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice2FacingDirection());
-		assertEquals(map.get(SeatFacingDirection.FORWARD),
-				(double) tallySheet.getCount(seat) / nTrials, 0.05);
 	}
 
 	@StatisticalTestCase
