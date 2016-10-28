@@ -51,6 +51,11 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 */
 	@Override
 	public double getTargetPotential(final VPoint pos, final Agent ped) {
+		
+		if(!ped.hasNextTarget())
+		{
+			return 0.0;
+		}
 
 		CellGrid potentialField;
 		double targetPotential = Double.MAX_VALUE;
