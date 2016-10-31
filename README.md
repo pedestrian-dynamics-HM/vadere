@@ -84,7 +84,7 @@ Please see [Contribution guidelines](CONTRIBUTION.md). The document defines guid
 
 People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
 
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Sch&ouml;ttl, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Benedikt Z&ouml;nnchen
+Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Sch&ouml;ttl, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Z&ouml;nnchen
 
 
 ## License
