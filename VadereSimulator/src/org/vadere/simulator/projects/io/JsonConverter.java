@@ -191,7 +191,7 @@ public abstract class JsonConverter {
 	private static class TopographyStore {
 		AttributesTopography attributes = new AttributesTopography();
 		AttributesAgent attributesPedestrian = new AttributesAgent();
-		AttributesCar attributesCar;
+		AttributesCar attributesCar = new AttributesCar();
 		Collection<AttributesObstacle> obstacles = new LinkedList<>();
 		Collection<AttributesStairs> stairs = new LinkedList<>();
 		Collection<AttributesTarget> targets = new LinkedList<>();

@@ -58,13 +58,9 @@ public class Topography {
 
 	public Topography(AttributesTopography attributes, AttributesAgent attributesPedestrian,
 			AttributesCar attributesCar) {
-		this(attributes, attributesPedestrian);
-		this.attributesCar = attributesCar;
-	}
-
-	public Topography(AttributesTopography attributes, AttributesAgent attributesPedestrian) {
 		this.attributes = attributes;
 		this.attributesPedestrian = attributesPedestrian;
+		this.attributesCar = attributesCar;
 		this.obstacles = new LinkedList<>();
 		this.stairs = new LinkedList<>();
 		this.sources = new LinkedList<>();
@@ -81,7 +77,7 @@ public class Topography {
 	 * Creates an empty scenario where bounds and finishTime are empty / zero.
 	 */
 	public Topography() {
-		this(new AttributesTopography(), new AttributesAgent());
+		this(new AttributesTopography(), new AttributesAgent(), new AttributesCar());
 	}
 
 	public Rectangle2D.Double getBounds() {
@@ -303,8 +299,7 @@ public class Topography {
 	 */
 	@Override
 	public Topography clone() {
-		Topography s = new Topography(this.attributes, this.attributesPedestrian);
-		s.attributesCar = this.attributesCar;
+		Topography s = new Topography(this.attributes, this.attributesPedestrian, this.attributesCar);
 
 		for (Obstacle obstacle : this.getObstacles()) {
 			if (this.boundaryObstacles.contains(obstacle))
