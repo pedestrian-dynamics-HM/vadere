@@ -11,7 +11,7 @@ import org.vadere.util.geometry.GeometryUtils;
  * 
  * 
  */
-public class VPoint {
+public class VPoint implements Cloneable {
 
 	public static final VPoint ZERO = new VPoint(0, 0);
 
