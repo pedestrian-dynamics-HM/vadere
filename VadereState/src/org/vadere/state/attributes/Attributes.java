@@ -2,6 +2,7 @@ package org.vadere.state.attributes;
 
 import java.lang.reflect.Field;
 
+import org.apache.commons.attributes.DefaultSealable;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -12,7 +13,7 @@ import com.google.gson.JsonElement;
  * 
  * 
  */
-public abstract class Attributes {
+public abstract class Attributes extends DefaultSealable {
 
 	public Attributes() {}
 

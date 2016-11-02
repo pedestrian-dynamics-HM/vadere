@@ -13,6 +13,7 @@ public class AttributesPedestrianDensityCountingProcessor extends AttributesPede
 	}
 
 	public void setRadius(double radius) {
+		checkSealed();
 		this.radius = radius;
 	}
 }

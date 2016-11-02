@@ -14,6 +14,7 @@ public class AttributesPedestrianVelocityProcessor extends AttributesProcessor {
 	}
 
 	public void setPedestrianPositionProcessorId(int pedestrianPositionProcessorId) {
+		checkSealed();
 		this.pedestrianPositionProcessorId = pedestrianPositionProcessorId;
 	}
 
@@ -22,6 +23,7 @@ public class AttributesPedestrianVelocityProcessor extends AttributesProcessor {
 	}
 
 	public void setBackSteps(int backSteps) {
+		checkSealed();
 		this.backSteps = backSteps;
 	}
 }
