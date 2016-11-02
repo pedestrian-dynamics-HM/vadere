@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.osm;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -76,7 +75,7 @@ public class OptimalStepsModel implements MainModel {
 	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 
 	private ExecutorService executorService;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> activeCallbacks = new LinkedList<>();
 
 	@Deprecated
 	public OptimalStepsModel(final Topography topography, final AttributesOSM attributes,
@@ -326,7 +325,7 @@ public class OptimalStepsModel implements MainModel {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
+	public List<Model> getActiveCallbacks() {
 		return activeCallbacks;
 	}
 

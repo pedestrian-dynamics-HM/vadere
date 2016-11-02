@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.gnm;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -36,7 +35,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private int pedestrianIdCounter;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> activeCallbacks = new LinkedList<>();
 
 	@Deprecated
 	public GradientNavigationModel(final Topography scenario,
@@ -163,7 +162,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
+	public List<Model> getActiveCallbacks() {
 		return activeCallbacks;
 	}
 

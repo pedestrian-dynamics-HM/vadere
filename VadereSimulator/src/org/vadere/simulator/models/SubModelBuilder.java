@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
@@ -46,11 +45,9 @@ public class SubModelBuilder {
 	 * Maybe in future <code>getSubModels()</code> instead? Currently, this is
 	 * the best way to avoid redundancy of adding them to the list.
 	 */
-	public void addSubModelsToActiveCallbacks(List<ActiveCallback> activeCallbacks) {
+	public void addSubModelsToActiveCallbacks(List<Model> activeCallbacks) {
 		for (Model model : subModels) {
-			if (model instanceof ActiveCallback) {
-				activeCallbacks.add((ActiveCallback) model);
-			}
+			activeCallbacks.add(model);
 		}
 	}
 

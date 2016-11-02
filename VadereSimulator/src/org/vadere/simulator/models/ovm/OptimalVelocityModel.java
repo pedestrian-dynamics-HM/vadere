@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -33,7 +32,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	private int carIdCounter = 10000000; // TODO [priority=low] [task=refactoring] hack, think about another way of separating car IDs and pedestrian IDs.
 	private AttributesOVM attributesOVM;
 	private OVMEquations ovmEquations;
-	private List<ActiveCallback> activeCallbacks;
+	private List<Model> activeCallbacks;
 
 	/**
 	 * Constructor for OptimalVelocityModel used in the ModelCreator
@@ -141,7 +140,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
+	public List<Model> getActiveCallbacks() {
 		return activeCallbacks;
 	}
 

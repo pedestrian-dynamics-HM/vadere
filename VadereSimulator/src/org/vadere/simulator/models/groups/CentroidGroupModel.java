@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.groups;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-public class CentroidGroupModel implements GroupModel, ActiveCallback {
+public class CentroidGroupModel implements GroupModel {
 
 	/**
 	 * A Container for all the output this Callback generate. The output will be used

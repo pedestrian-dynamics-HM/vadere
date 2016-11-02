@@ -123,4 +123,5 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO [priority=medium] [task=refactoring] should be used to initialize the Model
 	}
+
 }

@@ -23,8 +23,7 @@ import org.vadere.util.potential.gradients.GradientProvider;
  * calculating the distance to that point.
  * 
  */
-public class PotentialFieldObstacleGNM implements GradientProvider,
-		PotentialFieldObstacle {
+public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFieldObstacle {
 
 	private Collection<Obstacle> obstacles;
 
@@ -125,4 +124,5 @@ public class PotentialFieldObstacleGNM implements GradientProvider,
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
 	}
+
 }

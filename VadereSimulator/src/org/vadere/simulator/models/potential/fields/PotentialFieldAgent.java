@@ -30,6 +30,18 @@ public interface PotentialFieldAgent extends Model {
 
 	Logger logger = LogManager.getLogger(PotentialFieldAgent.class);
 
+	@Override
+	default void preLoop(double simTimeInSec) {
+	}
+
+	@Override
+	default void postLoop(double simTimeInSec) {
+	}
+
+	@Override
+	default void update(double simTimeInSec) {
+	}
+
 	/**
 	 * Computes the pedestrians possessing a potential that reaches into the
 	 * given relevantArea.
@@ -98,4 +110,5 @@ public interface PotentialFieldAgent extends Model {
 
 		return result;
 	}
+	
 }

@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.sfm;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -35,7 +34,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private IPotentialTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> activeCallbacks = new LinkedList<>();
 
 	private int pedestrianIdCounter;
 
@@ -158,7 +157,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
+	public List<Model> getActiveCallbacks() {
 		return activeCallbacks;
 	}
 

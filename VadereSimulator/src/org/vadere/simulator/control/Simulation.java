@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -31,7 +32,7 @@ public class Simulation {
 	private DynamicElementFactory dynamicElementFactory;
 
 	private final List<PassiveCallback> passiveCallbacks;
-	private List<ActiveCallback> activeCallbacks;
+	private List<Model> activeCallbacks;
 
 	private ProcessorManager processorManager;
 
@@ -112,7 +113,7 @@ public class Simulation {
 		runSimulation = true;
 		simTimeInSec = startTimeInSec;
 
-		for (ActiveCallback ac : activeCallbacks) {
+		for (Model ac : activeCallbacks) {
 			ac.preLoop(simTimeInSec);
 		}
 
@@ -126,7 +127,7 @@ public class Simulation {
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
 
-		for (ActiveCallback ac : activeCallbacks) {
+		for (Model ac : activeCallbacks) {
 			ac.postLoop(simTimeInSec);
 		}
 
@@ -236,7 +237,7 @@ public class Simulation {
 		topographyController.update(simTimeInSec);
 		step++;
 
-		for (ActiveCallback ac : activeCallbacks) {
+		for (Model ac : activeCallbacks) {
 			ac.update(simTimeInSec);
 		}
 

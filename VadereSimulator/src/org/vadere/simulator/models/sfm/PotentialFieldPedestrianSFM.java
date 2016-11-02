@@ -9,7 +9,6 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -137,5 +136,23 @@ public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
+	}
+
+	@Override
+	public void preLoop(double simTimeInSec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postLoop(double simTimeInSec) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(double simTimeInSec) {
+		// TODO Auto-generated method stub
+		
 	}
 }
