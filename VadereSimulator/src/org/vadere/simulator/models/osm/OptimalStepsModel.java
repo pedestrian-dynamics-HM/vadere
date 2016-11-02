@@ -128,7 +128,7 @@ public class OptimalStepsModel implements MainModel {
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
-		subModelBuilder.addSubModels(models);
+		subModelBuilder.addBuildedSubModelsToList(models);
 
 		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());

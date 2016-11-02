@@ -39,14 +39,11 @@ public class SubModelBuilder {
 		}
 	}
 
-	/**
-	 * Add submodels to a list of models.
-	 *
-	 * Maybe in future <code>getSubModels()</code> instead? Currently, this is
-	 * the best way to avoid redundancy of adding them to the list.
-	 */
-	public void addSubModels(List<Model> models) {
-		subModels.addAll(models);
+	/** Add the builded submodels to the client's list of models. */
+	public void addBuildedSubModelsToList(List<Model> modelList) {
+		// Maybe in future getSubModels() instead? Currently, this is
+		// the best way to avoid the redundancy of adding them to the list.
+		modelList.addAll(subModels);
 	}
 
 }
