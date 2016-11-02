@@ -10,11 +10,10 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.FindByClass;
 
 /**
- * Interface for a simulation model. The <code>initialize</code> method must be called before usage!
- * 
+ * Interface for a simulation model.
+ * The <code>initialize</code> method must be called before usage!
  * This interface defines a callbacks for the simulation loop.
  * It's implementations define the major part of the simulation model's logic.
- * It is called "active" since it's implementations do change the state.
  *
  */
 public interface Model {
