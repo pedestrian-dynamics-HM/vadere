@@ -75,7 +75,7 @@ public class OptimalStepsModel implements MainModel {
 	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 
 	private ExecutorService executorService;
-	private List<Model> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	@Deprecated
 	public OptimalStepsModel(final Topography topography, final AttributesOSM attributes,
@@ -128,13 +128,13 @@ public class OptimalStepsModel implements MainModel {
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
-		subModelBuilder.addSubModelsToActiveCallbacks(activeCallbacks);
+		subModelBuilder.addSubModels(models);
 
 		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributesOSM.getObstaclePotentialModel());
@@ -142,7 +142,7 @@ public class OptimalStepsModel implements MainModel {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributesOSM.getPedestrianPotentialModel());
 		
-		Optional<CentroidGroupModel> opCentroidGroupModel = activeCallbacks.stream().
+		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 			filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel)ac).findAny();
 		
 		if (opCentroidGroupModel.isPresent()) {
@@ -179,7 +179,7 @@ public class OptimalStepsModel implements MainModel {
 			this.executorService = null;
 		}
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	private StepCircleOptimizer createStepCircleOptimizer(
@@ -325,8 +325,8 @@ public class OptimalStepsModel implements MainModel {
 	}
 
 	@Override
-	public List<Model> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 }

@@ -32,7 +32,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	private int carIdCounter = 10000000; // TODO [priority=low] [task=refactoring] hack, think about another way of separating car IDs and pedestrian IDs.
 	private AttributesOVM attributesOVM;
 	private OVMEquations ovmEquations;
-	private List<Model> activeCallbacks;
+	private List<Model> models;
 
 	/**
 	 * Constructor for OptimalVelocityModel used in the ModelCreator
@@ -86,7 +86,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 		ovmEquations.setModelAttributes(attributesOVM);
 		ovmEquations.setGradients(null, null, null, topography);
 
-		activeCallbacks = Collections.singletonList(this);
+		models = Collections.singletonList(this);
 	}
 
 
@@ -140,8 +140,8 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	}
 
 	@Override
-	public List<Model> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 }

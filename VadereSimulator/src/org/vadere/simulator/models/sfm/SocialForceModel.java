@@ -34,7 +34,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private IPotentialTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<Model> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	private int pedestrianIdCounter;
 
@@ -83,7 +83,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributes.getObstaclePotentialModel());
@@ -91,7 +91,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributes.getPedestrianPotentialModel());
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	public void rebuildFloorField(final double simTimeInSec) {
@@ -157,8 +157,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	}
 
 	@Override
-	public List<Model> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 }

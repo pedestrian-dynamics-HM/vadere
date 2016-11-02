@@ -11,7 +11,7 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 
 /**
  * Helper class to build submodels of a main model and add them to a
- * ActiveCallback list.
+ * list of models.
  */
 public class SubModelBuilder {
 	
@@ -40,15 +40,13 @@ public class SubModelBuilder {
 	}
 
 	/**
-	 * Add submodels to a ActiveCallback list.
+	 * Add submodels to a list of models.
 	 *
 	 * Maybe in future <code>getSubModels()</code> instead? Currently, this is
 	 * the best way to avoid redundancy of adding them to the list.
 	 */
-	public void addSubModelsToActiveCallbacks(List<Model> activeCallbacks) {
-		for (Model model : subModels) {
-			activeCallbacks.add(model);
-		}
+	public void addSubModels(List<Model> models) {
+		subModels.addAll(models);
 	}
 
 }

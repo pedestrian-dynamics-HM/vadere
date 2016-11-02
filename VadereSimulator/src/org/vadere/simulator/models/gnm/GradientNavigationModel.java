@@ -35,7 +35,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private int pedestrianIdCounter;
-	private List<Model> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	@Deprecated
 	public GradientNavigationModel(final Topography scenario,
@@ -80,7 +80,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributes.getObstaclePotentialModel());
@@ -88,7 +88,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributes.getPedestrianPotentialModel());
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	public void rebuildFloorField(final double simTimeInSec) {
@@ -162,8 +162,8 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public List<Model> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 }

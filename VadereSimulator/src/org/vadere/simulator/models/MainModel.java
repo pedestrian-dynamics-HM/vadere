@@ -8,6 +8,6 @@ import java.util.List;
  */
 public interface MainModel extends Model, DynamicElementFactory {
 
-	List<Model> getActiveCallbacks();
+	List<Model> getSubmodels();
 
 }

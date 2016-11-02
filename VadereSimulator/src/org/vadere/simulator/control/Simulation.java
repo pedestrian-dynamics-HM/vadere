@@ -32,7 +32,7 @@ public class Simulation {
 	private DynamicElementFactory dynamicElementFactory;
 
 	private final List<PassiveCallback> passiveCallbacks;
-	private List<Model> activeCallbacks;
+	private List<Model> models;
 
 	private ProcessorManager processorManager;
 
@@ -73,7 +73,7 @@ public class Simulation {
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
 
-		this.activeCallbacks = mainModel.getActiveCallbacks();
+		this.models = mainModel.getSubmodels();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
@@ -113,7 +113,7 @@ public class Simulation {
 		runSimulation = true;
 		simTimeInSec = startTimeInSec;
 
-		for (Model ac : activeCallbacks) {
+		for (Model ac : models) {
 			ac.preLoop(simTimeInSec);
 		}
 
@@ -127,7 +127,7 @@ public class Simulation {
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
 
-		for (Model ac : activeCallbacks) {
+		for (Model ac : models) {
 			ac.postLoop(simTimeInSec);
 		}
 
@@ -169,7 +169,7 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
-				updateActiveCallbacks(simTimeInSec);
+				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 				processorManager.update(this.simulationState);
 
@@ -219,7 +219,7 @@ public class Simulation {
 		this.simulationState = simulationState;
 	}
 
-	private void updateActiveCallbacks(double simTimeInSec) {
+	private void updateCallbacks(double simTimeInSec) {
 
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
@@ -237,7 +237,7 @@ public class Simulation {
 		topographyController.update(simTimeInSec);
 		step++;
 
-		for (Model ac : activeCallbacks) {
+		for (Model ac : models) {
 			ac.update(simTimeInSec);
 		}
 
