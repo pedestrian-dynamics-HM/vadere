@@ -35,7 +35,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 		Integer timeStep = state.getStep();
 		Stream<Integer> pedIds = state.getTopography().getElements(Pedestrian.class).stream().map(ped -> ped.getId());
 
-		pedIds.forEach(pedId -> this.setValue(new TimestepPedestrianIdKey(timeStep, pedId),
+		pedIds.forEach(pedId -> this.putValue(new TimestepPedestrianIdKey(timeStep, pedId),
 				this.getVelocity(timeStep, state.getSimTimeInSec(), pedId)));
 
 		if (this.lastSimTimes.size() >= this.backSteps)

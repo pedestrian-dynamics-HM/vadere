@@ -27,7 +27,7 @@ public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPe
     protected void doUpdate(final SimulationState state) {
         Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
         // TODO: if osm != null then compute stridelength
-        peds.forEach(ped -> this.setValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), this.osm == null ? Double.NaN : 0.0));
+        peds.forEach(ped -> this.putValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), this.osm == null ? Double.NaN : 0.0));
 
         // TODO Use this comment from the old implementation for this implementation
 //        @Override

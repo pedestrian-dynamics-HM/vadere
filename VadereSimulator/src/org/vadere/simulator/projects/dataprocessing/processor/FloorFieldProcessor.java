@@ -22,7 +22,7 @@ public class FloorFieldProcessor extends DataProcessor<TimestepPositionKey, Doub
         // First try, TODO: Implementation
         for (int x = 0; x < 50; ++x) {
             for (int y = 0; y < 50; ++y) {
-                this.setValue(new TimestepPositionKey(state.getStep(), new VPoint(x, y)), 0.0);
+                this.putValue(new TimestepPositionKey(state.getStep(), new VPoint(x, y)), 0.0);
             }
         }
     }

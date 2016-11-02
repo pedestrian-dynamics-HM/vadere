@@ -20,7 +20,7 @@ import java.util.TreeMap;
  *
  * The method <tt>doUpdate</tt> gets called after every simulation step with the current <tt>SimulationState</tt>.
  * Here, one gets the opportunity to compute a new value or to update the state for a computation in <tt>postLoop</tt>.
- * The computed value can be stored afterwards in the data by using the <tt>setValue</tt> method.
+ * The computed value can be stored afterwards in the data by using the <tt>putValue</tt> method.
  *
  * To get specific attributes defined in JSON or access to the <tt>MainModel</tt>, one has to use the <tt>init</tt> method which
  * gives access to all significant things via the argument <tt>manager</tt> of type <tt>ProcessorManager</tt>.
@@ -96,7 +96,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		return data.get(key);
 	}
 
-	protected void setValue(final K key, final V value) {
+	protected void putValue(final K key, final V value) {
 		this.data.put(key, value);
 	}
 

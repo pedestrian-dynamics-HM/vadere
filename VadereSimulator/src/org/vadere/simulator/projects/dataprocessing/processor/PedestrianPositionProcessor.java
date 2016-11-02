@@ -37,7 +37,7 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 			Integer pedId = entry.getKey();
 			VPoint pos = entry.getValue();
 
-			this.setValue(new TimestepPedestrianIdKey(timeStep, pedId), pos);
+			this.putValue(new TimestepPedestrianIdKey(timeStep, pedId), pos);
 		}
 	}
 

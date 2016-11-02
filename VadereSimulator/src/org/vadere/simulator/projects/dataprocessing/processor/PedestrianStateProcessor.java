@@ -44,7 +44,7 @@ public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianId
 					.count() > 0;
 					
 				String pedState = pedEntryExists ? "m" : "c";
-				this.setValue(new TimestepPedestrianIdKey(state.getStep(), id), pedState);
+				this.putValue(new TimestepPedestrianIdKey(state.getStep(), id), pedState);
 			});
 		
 		//detect deleted peds and inserts states d = deleted
@@ -60,6 +60,6 @@ public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianId
 			.collect(Collectors.toList());
 		
 		deletedPeds.stream()
-			.forEach(id -> this.setValue(new TimestepPedestrianIdKey(previousStep, id), "d"));
+			.forEach(id -> this.putValue(new TimestepPedestrianIdKey(previousStep, id), "d"));
 	}
 }

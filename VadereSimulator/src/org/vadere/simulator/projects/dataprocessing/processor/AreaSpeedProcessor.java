@@ -45,7 +45,7 @@ public class AreaSpeedProcessor extends AreaDataProcessor<Double> {
             }
         }
 
-        this.setValue(new TimestepKey(step), sumVelocities / pedCount);
+        this.putValue(new TimestepKey(step), sumVelocities / pedCount);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class EvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
                     : Collections.max(this.pedEvacTimeProc.getValues());
         }
 
-        this.setValue(NoDataKey.key(), result);
+        this.putValue(NoDataKey.key(), result);
     }
 
     @Override

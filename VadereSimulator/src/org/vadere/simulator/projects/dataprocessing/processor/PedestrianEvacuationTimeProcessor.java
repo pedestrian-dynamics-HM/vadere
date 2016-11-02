@@ -56,14 +56,14 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 
 		state.getTopography().getElements(Pedestrian.class).stream()
 				.map(ped -> new PedestrianIdKey(ped.getId()))
-				.forEach(key -> this.setValue(key, state.getSimTimeInSec() - pedStartTimeProc.getValue(key)));
+				.forEach(key -> this.putValue(key, state.getSimTimeInSec() - pedStartTimeProc.getValue(key)));
 	}
 
 	@Override
 	public void postLoop(final SimulationState state) {
 		state.getTopography().getElements(Pedestrian.class).stream()
 				.map(ped -> new PedestrianIdKey(ped.getId()))
-				.forEach(key -> this.setValue(key, Double.NaN));
+				.forEach(key -> this.putValue(key, Double.NaN));
 	}
 
 }
