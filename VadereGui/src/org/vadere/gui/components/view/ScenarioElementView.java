@@ -25,10 +25,10 @@ import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.ScenarioJPanel;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.util.StateJsonConverter;
 
 /**
  * The ScenarioElementView display's a ScenarioElement in JSON-Format.
@@ -131,14 +131,14 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				// JsonSerializerVShape shapeSerializer = new JsonSerializerVShape();
 				Pedestrian ped = null;
 				try {
-					ped = JsonConverter.deserializePedestrian(json);
+					ped = StateJsonConverter.deserializePedestrian(json);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				((AgentWrapper) element).setAgentInitialStore(ped);
 			} else {
 				try {
-					Attributes attributes = JsonConverter.deserializeScenarioElementType(json, element.getType());
+					Attributes attributes = StateJsonConverter.deserializeScenarioElementType(json, element.getType());
 					ReflectionAttributeModifier.setAttributes(element, attributes);
 					ScenarioJPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();
@@ -177,11 +177,11 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				try {
 					if (scenarioElement instanceof AgentWrapper) {
 						this.txtrTextfiletextarea.setText(
-								JsonConverter.serializeObject(((AgentWrapper) scenarioElement).getAgentInitialStore()));
+								StateJsonConverter.serializeObject(((AgentWrapper) scenarioElement).getAgentInitialStore()));
 					} else if (scenarioElement instanceof Pedestrian) {
-						this.txtrTextfiletextarea.setText(JsonConverter.serializeObject(scenarioElement));
+						this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
 					} else {
-						this.txtrTextfiletextarea.setText(JsonConverter
+						this.txtrTextfiletextarea.setText(StateJsonConverter
 								.serializeObject(ReflectionAttributeModifier.getAttributes(scenarioElement)));
 					}
 				} catch (JsonProcessingException e) {

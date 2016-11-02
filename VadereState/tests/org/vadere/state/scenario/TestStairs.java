@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Stairs.Tread;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.io.IOUtils;
 
@@ -26,13 +27,13 @@ public class TestStairs {
 	public void setUp() throws Exception {
 		attributesStore1 =
 				"{shape:{x: 2.0,    y: 0.0,    width: 10.0,    height: 5.0,    type: RECTANGLE }, id:1,treadCount:5,upwardDirection:{x:1.0,y:0.0}}";
-		attributes1 = IOUtils.getGson().fromJson(attributesStore1, AttributesStairs.class);
+		attributes1 = StateJsonConverter.deserializeObjectFromJson(attributesStore1, AttributesStairs.class);
 
 		this.stairs1 = new Stairs(attributes1);
 
 		attributesStore2 =
 				"{shape:{x: 0.0,    y: 1.0,    width: 10.0,    height: 5.0,    type: RECTANGLE }, id:1,treadCount:5,upwardDirection:{x:0.0,y:1.0}}";
-		attributes2 = IOUtils.getGson().fromJson(attributesStore2, AttributesStairs.class);
+		attributes2 = StateJsonConverter.deserializeObjectFromJson(attributesStore2, AttributesStairs.class);
 
 		this.stairs2 = new Stairs(attributes2);
 	}

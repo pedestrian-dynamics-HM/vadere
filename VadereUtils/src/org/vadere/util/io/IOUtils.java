@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,14 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.vadere.util.geometry.shapes.VShape;
-
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonParseException;
 
 /**
  * Contains utilities for input and output.
@@ -108,61 +99,6 @@ public class IOUtils {
 		if (!Files.exists(path)) {
 			Files.createDirectories(path);
 		}
-	}
-
-	/**
-	 * Converts a given object to an unecaped, pretty printed JSON string. This
-	 * function uses Gson.
-	 * 
-	 * @param object
-	 * @return a pretty printed json string that represents the given object.
-	 */
-	@Deprecated
-	public static String toPrettyPrintJson(Object object) {
-		Gson gson = getGsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-		String json = gson.toJson(object);
-		return json;
-	}
-
-	@Deprecated
-	public static String toPrettyPrintJson(Object object, ExclusionStrategy exclusionStrategy) {
-		Gson gson = getGsonBuilder().setExclusionStrategies(exclusionStrategy).setPrettyPrinting().disableHtmlEscaping()
-				.create();
-		return gson.toJson(object);
-	}
-
-	/**
-	 * Converts a given object to an unescaped JSON string.
-	 */
-	@Deprecated
-	public static String toJson(Object object) {
-		Gson gson = getGsonBuilder().disableHtmlEscaping().create();
-		return gson.toJson(object);
-	}
-
-	@Deprecated
-	public static Gson getGson() {
-		return getGsonBuilder().create();
-	}
-
-	@Deprecated
-	public static Gson getGson(final ExclusionStrategy exclusionStrategy) {
-		return getGsonBuilder().setExclusionStrategies(exclusionStrategy).create();
-	}
-
-	@Deprecated
-	public static GsonBuilder getGsonBuilder() {
-		GsonBuilder builder = new GsonBuilder().disableHtmlEscaping();
-		builder.registerTypeAdapter(VShape.class, new JsonSerializerVShape());
-		builder.registerTypeAdapter(boolean.class,
-				(JsonDeserializer<Boolean>) (jsonElement, type, jsonDeserializationContext) -> {
-					String value = jsonElement.getAsString();
-					if (!(value.equals("true") || value.equals("false")))
-						throw new JsonParseException("Can't parse \"" + value + "\" as boolean");
-					return jsonElement.getAsBoolean();
-				});
-		builder.serializeSpecialFloatingPointValues();
-		return builder;
 	}
 
 	/**

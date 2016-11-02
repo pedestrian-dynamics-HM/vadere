@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects;
 
-import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class ProjectWriter {
 		for (ScenarioRunManager scenario : project.getScenarios()) {
 			IOUtils.writeTextFile(
 					getScenarioPath(scenarioPath, scenario).toString(),
-					JsonConverter.serializeScenarioRunManager(scenario, includeCommitHash));
+					StateJsonConverter.serializeScenarioRunManager(scenario, includeCommitHash));
 		}
 	}
 
@@ -82,7 +82,7 @@ public class ProjectWriter {
 		Path scenariosDir = Files.createDirectories(Paths.get(projectFolderPath, IOUtils.SCENARIO_DIR));
 		IOUtils.writeTextFile(
 				getScenarioPath(scenariosDir, scenario).toString(),
-				JsonConverter.serializeScenarioRunManager(scenario, true));
+				StateJsonConverter.serializeScenarioRunManager(scenario, true));
 	}
 
 	public static Path getScenarioPath(Path scenariosDir, ScenarioRunManager scenario) {

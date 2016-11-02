@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 import org.xml.sax.SAXException;
 
@@ -25,7 +26,7 @@ public class IOVadere {
 	private static Logger logger = LogManager.getLogger(IOVadere.class);
 
 	public static ScenarioRunManager fromJson(final String json) throws IOException {
-		return JsonConverter.deserializeScenarioRunManager(json);
+		return StateJsonConverter.deserializeScenarioRunManager(json);
 	}
 
 	public static VadereProject readProjectJson(final String filepath)
@@ -51,7 +52,7 @@ public class IOVadere {
 
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				ScenarioRunManager scenario =
-						JsonConverter.deserializeScenarioRunManager(IOUtils.readTextFile(file.getAbsolutePath()));
+						StateJsonConverter.deserializeScenarioRunManager(IOUtils.readTextFile(file.getAbsolutePath()));
 				if (!scenarioNames.add(scenario.getName())) {
 					logger.error("there are two scenarios with the same name!");
 					throw new IOException("Found two scenarios with the same name.");

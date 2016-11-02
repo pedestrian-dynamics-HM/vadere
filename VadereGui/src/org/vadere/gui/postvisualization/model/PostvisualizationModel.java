@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
@@ -29,6 +28,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
@@ -221,7 +221,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	public Optional<Color> getColor(final Agent agent) {
-		JsonNode jsonObj = JsonConverter.toJsonNode(agent);
+		JsonNode jsonObj = StateJsonConverter.toJsonNode(agent);
 		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet().stream().filter(
 				entry -> {
 					try {

@@ -9,11 +9,11 @@ import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
@@ -78,7 +78,7 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
-		savedStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		savedStateSerialized = StateJsonConverter.serializeScenarioRunManager(this);
 		currentStateSerialized = savedStateSerialized;
 	}
 
@@ -87,11 +87,11 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void updateCurrentStateSerialized() {
-		currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		currentStateSerialized = StateJsonConverter.serializeScenarioRunManager(this);
 	}
 
 	public String getDiff() {
-		String currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		String currentStateSerialized = StateJsonConverter.serializeScenarioRunManager(this);
 		if (!savedStateSerialized.equals(currentStateSerialized)) {
 			StringBuilder diff = new StringBuilder();
 			List<String> original = new ArrayList<>(Arrays.asList(savedStateSerialized.split("\n")));
@@ -129,7 +129,7 @@ public class ScenarioRunManager implements Runnable {
 			createAndSetOutputDirectory();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
-				out.println(JsonConverter.serializeScenarioRunManager(this, true));
+				out.println(StateJsonConverter.serializeScenarioRunManager(this, true));
 			}
 
 			// Run simulation main loop from start time = 0 seconds
@@ -284,7 +284,7 @@ public class ScenarioRunManager implements Runnable {
 	public ScenarioRunManager clone() {
 		ScenarioRunManager clonedScenario = null;
 		try {
-			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
+			clonedScenario = StateJsonConverter.cloneScenarioRunManager(this);
 			clonedScenario.outputPath = outputPath;
 		} catch (IOException | VadereClassNotFoundException e) {
 			logger.error(e);
@@ -307,7 +307,7 @@ public class ScenarioRunManager implements Runnable {
 
 	public void discardChanges() {
 		try {
-			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
+			ScenarioRunManager srm = StateJsonConverter.deserializeScenarioRunManager(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
 			this.scenarioStore = srm.scenarioStore;
 			this.outputPath = srm.outputPath;

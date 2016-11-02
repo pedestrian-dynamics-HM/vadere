@@ -2,11 +2,11 @@ package org.vadere.simulator.projects.migration.incidents.specialized;
 
 import static org.vadere.simulator.projects.migration.IncidentDatabase.path;
 
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.Graph;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.util.StateJsonConverter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -38,7 +38,7 @@ public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 							(distribution == null
 							|| distribution.asText().equals(AttributesSource.CONSTANT_DISTRIBUTION))) {
 
-						s.set("distributionParameters", JsonConverter.toJsonNode(new Double[] {spawnDelay}));
+						s.set("distributionParameters", StateJsonConverter.toJsonNode(new Double[] {spawnDelay}));
 					}
 
 					s.remove("spawnDelay");

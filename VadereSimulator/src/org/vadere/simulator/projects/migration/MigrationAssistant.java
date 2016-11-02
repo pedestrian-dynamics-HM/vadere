@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 public class MigrationAssistant {
@@ -147,7 +147,7 @@ public class MigrationAssistant {
 
 	private static boolean analyzeScenario(Path scenarioFilePath, Path legacyDir, StringBuilder log, boolean isScenario) throws IOException, MigrationException {
 		String json = IOUtils.readTextFile(scenarioFilePath);
-		JsonNode node = JsonConverter.deserializeToNode(json);
+		JsonNode node = StateJsonConverter.deserializeToNode(json);
 		Graph graph = new Graph(node);
 
 		String outputScenarioParentFolderName = isScenario ? "" : scenarioFilePath.getParent().getFileName().toString() + " _ ";
@@ -198,7 +198,7 @@ public class MigrationAssistant {
 		if (legacyDir != null) {
 			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION, false);
 		}
-		IOUtils.writeTextFile(scenarioFilePath.toString(), JsonConverter.serializeJsonNode(node));
+		IOUtils.writeTextFile(scenarioFilePath.toString(), StateJsonConverter.serializeJsonNode(node));
 		return true;
 	}
 

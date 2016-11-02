@@ -11,9 +11,9 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
@@ -169,18 +169,18 @@ public class TextView extends JPanel {
 					try {
 						switch (attributeType) {
 							case MODEL:
-								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
+								ModelDefinition modelDefinition = StateJsonConverter.deserializeModelDefinition(json);
 								currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
 								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
 								break;
 							case SIMULATION:
-								currentScenario.setAttributesSimulation(JsonConverter.deserializeAttributesSimulation(json));
+								currentScenario.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
 								break;
 							case OUTPUTPROCESSOR:
 								currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
 								break;
 							case TOPOGRAPHY:
-								currentScenario.setTopography(JsonConverter.deserializeTopography(json));
+								currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 								break;
 						}
 						currentScenario.updateCurrentStateSerialized();
@@ -212,12 +212,12 @@ public class TextView extends JPanel {
 
 		switch (attributeType) {
 			case MODEL:
-				this.txtrTextfiletextarea.setText(JsonConverter.serializeMainModelAttributesModelBundle(
+				this.txtrTextfiletextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
 						scenario.getSortedAttributesMode(), scenario.getScenarioStore().mainModel));
 				break;
 			case SIMULATION:
 				this.txtrTextfiletextarea
-						.setText(JsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
+						.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
 				break;
 			case OUTPUTPROCESSOR:
 				this.txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
@@ -226,7 +226,7 @@ public class TextView extends JPanel {
 			case TOPOGRAPHY:
 				Topography topography = scenario.getTopography().clone();
 				topography.removeBoundary();
-				this.txtrTextfiletextarea.setText(JsonConverter.serializeTopography(topography));
+				this.txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
 				break;
 		}
 		this.txtrTextfiletextarea.setCaretPosition(0);

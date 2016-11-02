@@ -11,8 +11,8 @@ import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
@@ -119,7 +119,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
 								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 							try {
-								attributesModelView.setText(JsonConverter.serializeModelPreset(modelDefinition));
+								attributesModelView.setText(StateJsonConverter.serializeModelPreset(modelDefinition));
 							} catch (Exception e1) {
 								e1.printStackTrace();
 							}
@@ -136,7 +136,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							attributesModelView.setText(JsonConverter.addAttributesModel(attributesClassName,
+							attributesModelView.setText(StateJsonConverter.addAttributesModel(attributesClassName,
 									attributesModelView.getText()));
 						} catch (IOException e1) {
 							e1.printStackTrace();

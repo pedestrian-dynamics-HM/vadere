@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -29,7 +29,7 @@ public class JSONWriter {
 	}
 
 	public static void writeTopography(Topography topography, PrintStream stream) throws JsonProcessingException {
-		stream.print(JsonConverter.serializeTopography(topography));
+		stream.print(StateJsonConverter.serializeTopography(topography));
 		stream.flush();
 	}
 }

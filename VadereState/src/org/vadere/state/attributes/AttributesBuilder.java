@@ -1,24 +1,20 @@
 package org.vadere.state.attributes;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.io.IOUtils;
-
-import com.google.gson.Gson;
+import org.vadere.state.util.StateJsonConverter;
+import org.vadere.state.util.TextOutOfNodeException;
 
 public class AttributesBuilder<T extends Attributes> {
 
 	private static Logger logger = LogManager.getLogger(AttributesBuilder.class);
 	private final T attributes;
-	private final Gson gson;
 
-	@SuppressWarnings("unchecked")
-    @Deprecated
 	public AttributesBuilder(T attributes) {
-		this.gson = IOUtils.getGson();
-		this.attributes = (T) gson.fromJson(gson.toJson(attributes), attributes.getClass());
+		this.attributes = cloneAttribute(attributes);
 	}
 
 	public void setField(String name, Object value) {
@@ -34,8 +30,14 @@ public class AttributesBuilder<T extends Attributes> {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public T build() {
-		return (T) gson.fromJson(gson.toJson(attributes), attributes.getClass());
+		return (T) cloneAttribute(attributes);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private T cloneAttribute(T attributes)
+	{
+		// TODO should we implement cloneable in Attributes instead?
+		return (T) StateJsonConverter.deserializeObjectFromJson(StateJsonConverter.serializeObject(attributes), attributes.getClass());
 	}
 }

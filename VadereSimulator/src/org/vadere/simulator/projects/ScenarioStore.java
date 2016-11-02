@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,7 +49,7 @@ public class ScenarioStore {
 	@Override
 	public ScenarioStore clone() {
 		try {
-			return JsonConverter.cloneScenarioStore(this);
+			return StateJsonConverter.cloneScenarioStore(this);
 		} catch (IOException | VadereClassNotFoundException e) {
 			throw new RuntimeException(e);
 			// Do not return null or Optional, that does not make sense!
@@ -57,7 +57,7 @@ public class ScenarioStore {
 	}
 	
 	public String hashOfJsonRepresentation() throws JsonProcessingException {
-		return DigestUtils.sha1Hex(JsonConverter.serializeObject(this));
+		return DigestUtils.sha1Hex(StateJsonConverter.serializeObject(this));
 	}
 
 }

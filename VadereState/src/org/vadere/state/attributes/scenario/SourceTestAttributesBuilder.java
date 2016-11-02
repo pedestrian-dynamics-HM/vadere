@@ -1,10 +1,15 @@
 package org.vadere.state.attributes.scenario;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.state.scenario.ConstantDistribution;
+import org.vadere.state.util.StateJsonConverter;
+import org.vadere.state.util.TextOutOfNodeException;
 import org.vadere.util.io.IOUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class SourceTestAttributesBuilder {
 
@@ -18,7 +23,7 @@ public class SourceTestAttributesBuilder {
 	
 	public AttributesSource getResult() {
 		String json = generateSourceAttributesJson();
-		return IOUtils.getGson().fromJson(json, AttributesSource.class);
+		return StateJsonConverter.deserializeObjectFromJson(json, AttributesSource.class);
 	}
 
 	public SourceTestAttributesBuilder setOneTimeSpawn(double time) {

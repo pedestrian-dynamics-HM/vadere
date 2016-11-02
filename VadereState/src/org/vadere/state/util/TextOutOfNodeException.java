@@ -1,4 +1,4 @@
-package org.vadere.simulator.projects.io;
+package org.vadere.state.util;
 
 public class TextOutOfNodeException extends Exception {
 

@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
 import org.vadere.simulator.projects.migration.incidents.AddTextNodeIncident;
 import org.vadere.simulator.projects.migration.incidents.DeletionIncident;
@@ -18,6 +17,7 @@ import org.vadere.simulator.projects.migration.incidents.RenameInArrayIncident;
 import org.vadere.simulator.projects.migration.incidents.RenameIncident;
 import org.vadere.simulator.projects.migration.incidents.specialized.AttributesPotentialCompactVSosmIncident;
 import org.vadere.simulator.projects.migration.incidents.specialized.MoveSpawnDelayIntoDistributionParametersIncident;
+import org.vadere.state.util.StateJsonConverter;
 
 import static org.vadere.simulator.projects.migration.MigrationAssistant.Version.*;
 
@@ -64,7 +64,7 @@ public class IncidentDatabase {
 
 		addIncident(NOT_A_RELEASE, new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
 				path("vadere"),
-				JsonConverter.MAIN_MODEL_KEY,
+				StateJsonConverter.MAIN_MODEL_KEY,
 				path("vadere", "attributesModel")));
 
 		addIncident(NOT_A_RELEASE, new AddTextNodeIncident(
@@ -77,7 +77,7 @@ public class IncidentDatabase {
 		addIncident(NOT_A_RELEASE, new DeletionIncident(path("topographyhash")));
 		addIncident(NOT_A_RELEASE, new DeletionIncident(path("attributeshash")));
 
-		addIncident(NOT_A_RELEASE, new RenameIncident(path("vadere"), JsonConverter.SCENARIO_KEY));
+		addIncident(NOT_A_RELEASE, new RenameIncident(path("vadere"), StateJsonConverter.SCENARIO_KEY));
 
 		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
