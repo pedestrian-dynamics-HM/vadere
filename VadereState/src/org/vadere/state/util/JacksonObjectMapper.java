@@ -85,8 +85,9 @@ public class JacksonObjectMapper extends ObjectMapper {
 						return convertValue(node, Polygon2DStore.class).newVPolygon();
 					case RECTANGLE:
 						return deserializeVRectangle(node);
+					default:
+						return null;
 				}
-				return null;
 			}
 		});
 
@@ -105,6 +106,8 @@ public class JacksonObjectMapper extends ObjectMapper {
 					case RECTANGLE:
 						jsonGenerator.writeTree(serializeVRectangle((VRectangle) vShape)); // this doesn't seem to get called ever, the VRectangle serializer always seem to get called
 						break;
+					default:
+						break;
 				}
 			}
 		});
@@ -119,8 +122,9 @@ public class JacksonObjectMapper extends ObjectMapper {
 					case PEDESTRIAN:
 						return convertValue(node, Pedestrian.class);
 					// ... ?
+					default: 
+						return null;
 				}
-				return null;
 			}
 		});
 
@@ -135,6 +139,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 		return convertValue(new VRectangleStore(vRect), JsonNode.class);
 	}
 
+	@SuppressWarnings("unused")
 	private static class VRectangleStore {
 		public double x;
 		public double y;
@@ -156,6 +161,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class Polygon2DStore {
 		public ShapeType type = ShapeType.POLYGON;
 		public List<VPoint> points;
@@ -171,6 +177,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class CircleStore {
 		public double radius;
 		public VPoint center;
