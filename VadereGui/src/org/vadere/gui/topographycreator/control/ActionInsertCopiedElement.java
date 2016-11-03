@@ -10,9 +10,7 @@ import javax.swing.undo.UndoableEditSupport;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesBuilder;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.ScenarioElementBuilder;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -35,45 +33,42 @@ public class ActionInsertCopiedElement extends TopographyAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		IDrawPanelModel model = getScenarioPanelModel();
-		ScenarioElement element = model.getCopiedElement();
+		ScenarioElement elementToCopy = model.getCopiedElement();
 
-		if (element != null) {
-			// 1. reposition the copy
-			VPoint elementPos;
-
-			Rectangle2D rect = element.getShape().getBounds2D();
-
-			if (element.getShape() instanceof VCircle) {
-				elementPos = new VPoint(rect.getCenterX(), rect.getCenterY());
-			} else {
-				elementPos = new VPoint(rect.getX(), rect.getY());
-			}
-
-			VPoint diff = model.getMousePosition().subtract(elementPos);
-			VShape newShape = model.translate(diff);
-			ScenarioElement newElement = null;
-
-			if (element instanceof AgentWrapper) {
-				VPoint position = new VPoint(newShape.getBounds2D().getCenterX(), newShape.getBounds2D().getCenterY());
-				newElement = element.clone();
-				((AgentWrapper) newElement).getAgentInitialStore().setPosition(position);
-			} else {
-				// change attributes with reflection!
-				ScenarioElementBuilder<ScenarioElement> elBuilder = new ScenarioElementBuilder<>(element);
-				AttributesBuilder<Attributes> attBuilder = new AttributesBuilder<Attributes>(element.getAttributes());
-				attBuilder.setField("shape", newShape);
-				elBuilder.setAttributes(attBuilder.build());
-				newElement = elBuilder.build();
-			}
-
-			// 2. add the copy
-			UndoableEdit edit = new EditDrawShape(model, newElement.getType());
-			undoSupport.postEdit(edit);
-			model.addShape(newElement);
-			// getScenarioPanelModel().setSelectedElement(element);
-			model.notifyObservers();
-		} else {
+		if (elementToCopy == null) {
 			Toolkit.getDefaultToolkit().beep();
+			return;
+		}
+
+		// 1. reposition the copy
+		ScenarioElement newElement = elementToCopy.clone();
+		VPoint elementPos = getElementPosition(elementToCopy);
+
+		VPoint diff = model.getMousePosition().subtract(elementPos);
+		VShape newShape = model.translate(diff);
+
+		if (elementToCopy instanceof AgentWrapper) {
+			VPoint position = new VPoint(newShape.getBounds2D().getCenterX(), newShape.getBounds2D().getCenterY());
+			((AgentWrapper) newElement).getAgentInitialStore().setPosition(position);
+		} else {
+			newElement.setShape(newShape);
+		}
+
+		// 2. add the copy
+		UndoableEdit edit = new EditDrawShape(model, newElement.getType());
+		undoSupport.postEdit(edit);
+		model.addShape(newElement);
+		// getScenarioPanelModel().setSelectedElement(element);
+		model.notifyObservers();
+	}
+
+	private VPoint getElementPosition(ScenarioElement elementToCopy) {
+		final Rectangle2D rect = elementToCopy.getShape().getBounds2D();
+		if (elementToCopy.getShape() instanceof VCircle) {
+			return new VPoint(rect.getCenterX(), rect.getCenterY());
+		} else {
+			return new VPoint(rect.getX(), rect.getY());
 		}
 	}
+
 }

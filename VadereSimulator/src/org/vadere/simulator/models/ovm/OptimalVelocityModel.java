@@ -6,9 +6,7 @@ package org.vadere.simulator.models.ovm;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.vadere.simulator.control.ActiveCallback;
@@ -22,9 +20,7 @@ import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 
