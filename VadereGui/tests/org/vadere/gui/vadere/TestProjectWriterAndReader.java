@@ -1,13 +1,25 @@
 package org.vadere.gui.vadere;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.io.IOVadere;
+import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -15,18 +27,7 @@ import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.util.StateJsonConverter;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestProjectWriterAndReader {
 
@@ -69,9 +70,9 @@ public class TestProjectWriterAndReader {
 		VadereProject projectJson = IOVadere.readProjectJson(testFileJson);
 
 		assertEquals(
-				projectJson.getScenarios().stream().map(scenario -> StateJsonConverter.serializeScenarioRunManager(scenario))
+				projectJson.getScenarios().stream().map(scenario -> JsonConverter.serializeScenarioRunManager(scenario))
 						.collect(Collectors.toList()),
-				testProject.getScenarios().stream().map(scenario -> StateJsonConverter.serializeScenarioRunManager(scenario))
+				testProject.getScenarios().stream().map(scenario -> JsonConverter.serializeScenarioRunManager(scenario))
 						.collect(Collectors.toList()));
 	}
 }

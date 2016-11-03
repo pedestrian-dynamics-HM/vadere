@@ -1,6 +1,24 @@
 package org.vadere.gui.projectview.view;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.prefs.Preferences;
+
+import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -11,23 +29,13 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Shows text like the JSON formatted attributes.
@@ -169,7 +177,7 @@ public class TextView extends JPanel {
 					try {
 						switch (attributeType) {
 							case MODEL:
-								ModelDefinition modelDefinition = StateJsonConverter.deserializeModelDefinition(json);
+								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
 								currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
 								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
 								break;

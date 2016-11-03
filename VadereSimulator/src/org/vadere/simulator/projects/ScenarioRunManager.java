@@ -1,22 +1,5 @@
 package org.vadere.simulator.projects;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.MainModelBuilder;
-import org.vadere.simulator.projects.dataprocessing.ModelTest;
-import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.io.IOUtils;
-import org.vadere.util.reflection.VadereClassNotFoundException;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
@@ -30,6 +13,23 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.control.Simulation;
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.ModelTest;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import difflib.DiffUtils;
 
@@ -78,7 +78,7 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
-		savedStateSerialized = StateJsonConverter.serializeScenarioRunManager(this);
+		savedStateSerialized = JsonConverter.serializeScenarioRunManager(this);
 		currentStateSerialized = savedStateSerialized;
 	}
 
@@ -87,11 +87,11 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void updateCurrentStateSerialized() {
-		currentStateSerialized = StateJsonConverter.serializeScenarioRunManager(this);
+		currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
 	}
 
 	public String getDiff() {
-		String currentStateSerialized = StateJsonConverter.serializeScenarioRunManager(this);
+		String currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
 		if (!savedStateSerialized.equals(currentStateSerialized)) {
 			StringBuilder diff = new StringBuilder();
 			List<String> original = new ArrayList<>(Arrays.asList(savedStateSerialized.split("\n")));
@@ -129,7 +129,7 @@ public class ScenarioRunManager implements Runnable {
 			createAndSetOutputDirectory();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
-				out.println(StateJsonConverter.serializeScenarioRunManager(this, true));
+				out.println(JsonConverter.serializeScenarioRunManager(this, true));
 			}
 
 			// Run simulation main loop from start time = 0 seconds
@@ -284,7 +284,7 @@ public class ScenarioRunManager implements Runnable {
 	public ScenarioRunManager clone() {
 		ScenarioRunManager clonedScenario = null;
 		try {
-			clonedScenario = StateJsonConverter.cloneScenarioRunManager(this);
+			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
 			clonedScenario.outputPath = outputPath;
 		} catch (IOException | VadereClassNotFoundException e) {
 			logger.error(e);
@@ -307,7 +307,7 @@ public class ScenarioRunManager implements Runnable {
 
 	public void discardChanges() {
 		try {
-			ScenarioRunManager srm = StateJsonConverter.deserializeScenarioRunManager(savedStateSerialized);
+			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
 			this.scenarioStore = srm.scenarioStore;
 			this.outputPath = srm.outputPath;
