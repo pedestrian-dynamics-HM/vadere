@@ -113,8 +113,8 @@ public class Simulation {
 		runSimulation = true;
 		simTimeInSec = startTimeInSec;
 
-		for (Model ac : models) {
-			ac.preLoop(simTimeInSec);
+		for (Model m : models) {
+			m.preLoop(simTimeInSec);
 		}
 
 		for (PassiveCallback c : passiveCallbacks) {
@@ -127,8 +127,8 @@ public class Simulation {
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
 
-		for (Model ac : models) {
-			ac.postLoop(simTimeInSec);
+		for (Model m : models) {
+			m.postLoop(simTimeInSec);
 		}
 
 		for (PassiveCallback c : passiveCallbacks) {
@@ -237,8 +237,8 @@ public class Simulation {
 		topographyController.update(simTimeInSec);
 		step++;
 
-		for (Model ac : models) {
-			ac.update(simTimeInSec);
+		for (Model m : models) {
+			m.update(simTimeInSec);
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {
