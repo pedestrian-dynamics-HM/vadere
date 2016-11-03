@@ -32,31 +32,13 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.ShapeType;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -69,103 +51,10 @@ public abstract class StateJsonConverter {
 	private static Logger logger = LogManager.getLogger(StateJsonConverter.class);
 
 	/** Connection to jackson library. */
-	private static ObjectMapper mapper = new ObjectMapper();
+	private static ObjectMapper mapper = new JacksonObjectMapper();
 
 	/** Connection to jackson library. */
 	private static ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
-	static {
-		mapper.configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, false); // otherwise 4.7 will automatically be casted to 4 for integers, with this it throws an error
-		mapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // forbids duplicate keys
-		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS); // to allow empty attributes like "attributes.SeatingAttr": {}, useful while in dev
-		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // otherwise private fields won't be usable
-		// these three are to forbid deriving class variables from getters/setters, otherwise e.g. Pedestrian would have too many fields
-		mapper.setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
-		mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
-		mapper.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE);
-
-		SimpleModule sm = new SimpleModule();
-
-		sm.addDeserializer(boolean.class, new JsonDeserializer<Boolean>() { // make boolean parsing more strict, otherwise integers are accepted with 0=false and all other integers=true
-			@Override
-			public Boolean deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-					throws IOException {
-				if (!jsonParser.getCurrentToken().isBoolean())
-					throw new JsonParseException(jsonParser,
-							"Can't parse \"" + jsonParser.getValueAsString() + "\" as boolean");
-				return jsonParser.getValueAsBoolean();
-			}
-		});
-
-		sm.addDeserializer(VRectangle.class, new JsonDeserializer<VRectangle>() {
-			@Override
-			public VRectangle deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-					throws IOException {
-				return deserializeVRectangle(jsonParser.readValueAsTree());
-			}
-		});
-
-		sm.addSerializer(VRectangle.class, new JsonSerializer<VRectangle>() {
-			@Override
-			public void serialize(VRectangle vRect, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-					throws IOException {
-				jsonGenerator.writeTree(serializeVRectangle(vRect));
-			}
-		});
-
-		sm.addDeserializer(VShape.class, new JsonDeserializer<VShape>() {
-			@Override
-			public VShape deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-					throws IOException {
-				JsonNode node = jsonParser.readValueAsTree();
-				ShapeType shapeType = mapper.convertValue(node.get("type"), ShapeType.class);
-				switch (shapeType) {
-					case CIRCLE:
-						return mapper.convertValue(node, CircleStore.class).newVCircle();
-					case POLYGON:
-						return mapper.convertValue(node, Polygon2DStore.class).newVPolygon();
-					case RECTANGLE:
-						return deserializeVRectangle(node);
-				}
-				return null;
-			}
-		});
-
-		sm.addSerializer(VShape.class, new JsonSerializer<VShape>() {
-			@Override
-			public void serialize(VShape vShape, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-					throws IOException {
-				switch (vShape.getType()) {
-					case CIRCLE:
-						jsonGenerator.writeTree(mapper.convertValue(new CircleStore((VCircle) vShape), JsonNode.class));
-						break;
-					case POLYGON:
-						jsonGenerator
-								.writeTree(mapper.convertValue(new Polygon2DStore((VPolygon) vShape), JsonNode.class));
-						break;
-					case RECTANGLE:
-						jsonGenerator.writeTree(serializeVRectangle((VRectangle) vShape)); // this doesn't seem to get called ever, the VRectangle serializer always seem to get called
-						break;
-				}
-			}
-		});
-
-		sm.addDeserializer(DynamicElement.class, new JsonDeserializer<DynamicElement>() {
-			@Override
-			public DynamicElement deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-					throws IOException {
-				JsonNode node = jsonParser.readValueAsTree();
-				ScenarioElementType type = mapper.convertValue(node.get("type"), ScenarioElementType.class);
-				switch (type) {
-					case PEDESTRIAN:
-						return mapper.convertValue(node, Pedestrian.class);
-					// ... ?
-				}
-				return null;
-			}
-		});
-
-		mapper.registerModule(sm);
-	}
 
 	public static ObjectMapper getMapper() {
 		return mapper;
@@ -189,10 +78,6 @@ public abstract class StateJsonConverter {
 		return mapper.readTree(dev);
 	}
 
-	private static VRectangle deserializeVRectangle(JsonNode node) {
-		return mapper.convertValue(node, VRectangleStore.class).newVRectangle();
-	}
-
 	private static class TopographyStore {
 		AttributesTopography attributes = new AttributesTopography();
 		AttributesAgent attributesPedestrian = new AttributesAgent();
@@ -203,59 +88,6 @@ public abstract class StateJsonConverter {
 		Collection<AttributesSource> sources = new LinkedList<>();
 		Collection<? extends DynamicElement> dynamicElements = new LinkedList<>();
 		AttributesTeleporter teleporter = null;
-	}
-
-	private static class VRectangleStore {
-		public double x;
-		public double y;
-		public double width;
-		public double height;
-		public ShapeType type = ShapeType.RECTANGLE;
-
-		public VRectangleStore() {}
-
-		public VRectangleStore(VRectangle vRect) {
-			x = vRect.x;
-			y = vRect.y;
-			height = vRect.height;
-			width = vRect.width;
-		}
-
-		public VRectangle newVRectangle() {
-			return new VRectangle(x, y, width, height);
-		}
-	}
-
-	private static class Polygon2DStore {
-		public ShapeType type = ShapeType.POLYGON;
-		public List<VPoint> points;
-
-		public Polygon2DStore() {}
-
-		public Polygon2DStore(VPolygon vPoly) {
-			points = vPoly.getPoints();
-		}
-
-		public VPolygon newVPolygon() {
-			return GeometryUtils.polygonFromPoints2D(points);
-		}
-	}
-
-	private static class CircleStore {
-		public double radius;
-		public VPoint center;
-		public ShapeType type = ShapeType.CIRCLE;
-
-		public CircleStore() {}
-
-		public CircleStore(VCircle vCircle) {
-			radius = vCircle.getRadius();
-			center = vCircle.getCenter();
-		}
-
-		public VCircle newVCircle() {
-			return new VCircle(center, radius);
-		}
 	}
 
 	public static AttributesSimulation deserializeAttributesSimulation(String json)
@@ -344,10 +176,6 @@ public abstract class StateJsonConverter {
 	}
 
 	// - - - - SERIALIZING - - - -
-
-	private static JsonNode serializeVRectangle(VRectangle vRect) {
-		return mapper.convertValue(new VRectangleStore(vRect), JsonNode.class);
-	}
 
 	// could also serialize each ModelType individually and add the strings with comma and brackets
 	// in between - but building a proper mini-Json-ObjectNode seems a more stable and elegant solution
