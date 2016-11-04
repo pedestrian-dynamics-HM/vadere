@@ -72,7 +72,7 @@ public class Topography {
 		allOtherAttributes.add(attributes);
 		allOtherAttributes.add(attributesCar);
 		allOtherAttributes.add(attributesPedestrian);
-		removeNullAttributes();
+		removeNullAttributesFrom(allOtherAttributes);
 
 		obstacles = new LinkedList<>();
 		stairs = new LinkedList<>();
@@ -94,7 +94,7 @@ public class Topography {
 	}
 
 	/** Clean up the list of attributes by removing {@code null}. */
-	private void removeNullAttributes() {
+	private void removeNullAttributesFrom(Set<Attributes> allOtherAttributes) {
 		allOtherAttributes.remove(null);
 		// Actually, only attributes, not nulls should be added to this set.
 		// But sometimes null is passed as attributes and added to the set,
