@@ -1,8 +1,10 @@
 package org.vadere.simulator.models.groups;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
@@ -28,7 +30,6 @@ public class CentroidGroupModel implements GroupModel {
 	public CentroidGroupModel() {
 		this.groupFactories = new TreeMap<>();
 		this.pedestrianGroupData = new HashMap<>();
-		this.outputTables = new HashMap<>();
 	}
 	
 	@Override

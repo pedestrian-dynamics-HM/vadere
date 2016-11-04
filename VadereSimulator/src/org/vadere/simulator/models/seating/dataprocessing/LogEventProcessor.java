@@ -96,7 +96,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 
 	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {
 		final MainModel mainModel = manager.getMainModel();
-		final SeatingModel seatingModel = FindByClass.findFirstObjectOfClass(mainModel.getActiveCallbacks(), SeatingModel.class);
+		final SeatingModel seatingModel = FindByClass.findFirstObjectOfClass(mainModel.getSubmodels(), SeatingModel.class);
 		return seatingModel.getTrainModel();
 	}
 

@@ -9,7 +9,6 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
@@ -37,7 +36,7 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
  * load a train topography.
  *
  */
-public class SeatingModel implements ActiveCallback, Model {
+public class SeatingModel implements Model {
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);
 	
