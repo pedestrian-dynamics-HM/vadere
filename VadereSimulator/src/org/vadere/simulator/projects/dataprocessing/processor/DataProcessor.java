@@ -65,7 +65,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	}
 
 	public AttributesProcessor getAttributes() {
-		return this.attributes;
+		return attributes;
 	}
 
 	public void setAttributes(AttributesProcessor attributes) {
@@ -122,7 +122,8 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	}
 
 	public void sealAttributes() {
-		attributes.seal();
+		if (attributes != null) // some processors might not have attributes
+			attributes.seal();
 	}
 
 }

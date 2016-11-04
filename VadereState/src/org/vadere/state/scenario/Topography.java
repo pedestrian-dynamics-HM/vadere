@@ -72,6 +72,7 @@ public class Topography {
 		allOtherAttributes.add(attributes);
 		allOtherAttributes.add(attributesCar);
 		allOtherAttributes.add(attributesPedestrian);
+		removeNullAttributes();
 
 		obstacles = new LinkedList<>();
 		stairs = new LinkedList<>();
@@ -90,6 +91,15 @@ public class Topography {
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		
+	}
+
+	/** Clean up the list of attributes by removing {@code null}. */
+	private void removeNullAttributes() {
+		allOtherAttributes.remove(null);
+		// Actually, only attributes, not nulls should be added to this set.
+		// But sometimes null is passed as attributes and added to the set,
+		// although it is bad practice to pass null in the first place
+		// (as constructor argument).
 	}
 
 	/**
