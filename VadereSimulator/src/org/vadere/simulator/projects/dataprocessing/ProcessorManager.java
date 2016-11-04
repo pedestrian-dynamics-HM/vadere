@@ -78,4 +78,8 @@ public class ProcessorManager {
     public JsonNode serializeToNode() throws JsonProcessingException {
     	return this.jsonManager.serializeToNode();
 	}
+
+    public void sealAllAttributes() {
+    	processorMap.values().forEach(p -> p.sealAttributes());
+	}
 }

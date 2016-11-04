@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunLocked;
 import org.vadere.simulator.projects.ScenarioRunManager;
 import org.vadere.util.io.IOUtils;
 
@@ -70,19 +69,9 @@ public class VadereConsole {
 		logger.info(String.format("Running VADERE on %s...", scenarioFilePath));
 
 		try {
-			if (projectDirectory == null) {
-				ScenarioRunLocked vadereJava = VadereFactory.createVadereWithFiles(Paths.get(outputFile).toString(),
-						scenarioFilePath, vadereName);
-
-				vadereJava.setWaitOnLockData(lockDirectory, timeStepFile, outputAll);
-
-				vadereJava.run();
-			} else {
-				ScenarioRunManager vadereJava = VadereFactory.createVadereWithProjectDirectory(projectDirectory,
-						vadereName + IOUtils.SCENARIO_FILE_EXTENSION, vadereName);
-				vadereJava.run();
-			}
-
+			ScenarioRunManager vadereJava = VadereFactory.createVadereWithProjectDirectory(projectDirectory,
+					vadereName + IOUtils.SCENARIO_FILE_EXTENSION, vadereName);
+			vadereJava.run();
 		} catch (IOException e) {
 			logger.error(e);
 		}

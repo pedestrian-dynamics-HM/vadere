@@ -270,7 +270,7 @@ public class DataProcessingJsonManager {
     }
 
     public ProcessorManager createProcessorManager(MainModel mainModel) {
-        return new ProcessorManager(this, this.dataProcessors, this.outputFiles, mainModel);
+        return new ProcessorManager(this, dataProcessors, outputFiles, mainModel);
     }
 
     public int getMaxProcessorsId() {
@@ -282,4 +282,5 @@ public class DataProcessingJsonManager {
         }
         return maxId;
     }
+
 }

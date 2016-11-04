@@ -13,6 +13,7 @@ public class AttributesPedestrianDensityProcessor extends AttributesProcessor {
 	}
 
 	public void setPedestrianPositionProcessorId(int pedestrianPositionProcessorId) {
+		checkSealed();
 		this.pedestrianPositionProcessorId = pedestrianPositionProcessorId;
 	}
 }
