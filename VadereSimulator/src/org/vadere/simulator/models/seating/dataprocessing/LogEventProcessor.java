@@ -121,7 +121,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 		final int logEventId = nextLogEventId++;
 		final String timeString = timeFormatter.format(time);
 		final int surveyId = attributes.getSurveyId();
-		addValue(new IdDataKey(logEventId), new LogEventEntry(timeString, eventType, personId, seatNumber, surveyId));
+		putValue(new IdDataKey(logEventId), new LogEventEntry(timeString, eventType, personId, seatNumber, surveyId));
 	}
 
 	private void updateTime(SimulationState state) {
