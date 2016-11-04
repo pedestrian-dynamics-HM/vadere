@@ -19,7 +19,7 @@ public class TestAttributesInitialization {
 	@Before
 	public void setUp() {
 
-		store = "{speedDistributionMean:0.2}";
+		store = "{\"speedDistributionMean\":0.2}";
 	}
 
 	/**

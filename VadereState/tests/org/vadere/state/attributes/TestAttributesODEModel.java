@@ -20,10 +20,10 @@ public class TestAttributesODEModel {
 	 */
 	@Before
 	public void setUp() {
-		store = "{" + "'solverType' : 'CLASSICAL_RK4',"
-				+ "'toleranceAbsolute' : '" + new Double(1e-5).toString() + "'," + "'toleranceRelative' : '"
-				+ new Double(1e-5).toString() + "'," + "'stepSizeMin' : '" + new Double(1e-5).toString() + "',"
-				+ "'stepSizeMax' : '" + new Double(1e-5).toString() + "'" + "}";
+		store = "{" + "\"solverType\" : \"CLASSICAL_RK4\","
+				+ "\"toleranceAbsolute\" : " + new Double(1e-5).toString() + "," + "\"toleranceRelative\" : "
+				+ new Double(1e-5).toString() + "," + "\"stepSizeMin\" : " + new Double(1e-5).toString() + ","
+				+ "\"stepSizeMax\" : " + new Double(1e-5).toString() + "}";
 	}
 
 	/**
