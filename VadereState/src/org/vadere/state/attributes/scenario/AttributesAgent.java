@@ -19,7 +19,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	private double acceleration = 2.0;
 
 	public AttributesAgent() {
-		super(-1);
+		this(-1);
 	}
 
 	public AttributesAgent(final int id) {

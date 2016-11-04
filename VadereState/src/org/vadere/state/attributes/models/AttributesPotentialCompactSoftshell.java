@@ -22,8 +22,6 @@ public class AttributesPotentialCompactSoftshell extends Attributes {
 		return intimateSpaceFactor;
 	}
 
-	public AttributesPotentialCompactSoftshell() {}
-
 	public double getPedPotentialIntimateSpaceWidth() {
 		return pedPotentialIntimateSpaceWidth;
 	}

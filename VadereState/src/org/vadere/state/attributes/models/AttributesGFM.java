@@ -4,7 +4,6 @@ import org.vadere.state.attributes.Attributes;
 
 public class AttributesGFM extends Attributes {
 
-
 	private double gravityFactor = 1;
 	private double normalParticleStiffness = 5000;
 	private double dampingParticle = 40;
@@ -25,9 +24,6 @@ public class AttributesGFM extends Attributes {
 	private double massParticle = 1;
 	private double momOfInertia = 1;
 	private double startOmega = 0;
-
-	public AttributesGFM() {}
-
 
 	public double getGravityFactor() {
 		return gravityFactor;

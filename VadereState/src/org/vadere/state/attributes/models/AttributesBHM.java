@@ -49,8 +49,6 @@ public class AttributesBHM extends Attributes {
 	private double spaceToKeep = 0.01;
 	private boolean stepAwayFromCollisions = false;
 
-	public AttributesBHM() {}
-
 	public double getStepLengthIntercept() {
 		return stepLengthIntercept;
 	}

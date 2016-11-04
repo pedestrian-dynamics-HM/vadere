@@ -18,8 +18,6 @@ public class AttributesODEIntegrator extends Attributes {
 	private double toleranceAbsolute = 1e-5;
 	private double toleranceRelative = 1e-4;
 
-	public AttributesODEIntegrator() {}
-
 	// Getters...
 	public IntegratorType getSolverType() {
 		return solverType;

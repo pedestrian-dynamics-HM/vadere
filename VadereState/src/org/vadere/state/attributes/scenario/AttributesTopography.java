@@ -12,8 +12,6 @@ public class AttributesTopography extends Attributes {
 	private double boundingBoxWidth = 0.5;
 	private boolean bounded = true;
 
-	public AttributesTopography() {}
-
 	// Getters...
 
 	public double getBoundingBoxWidth() {

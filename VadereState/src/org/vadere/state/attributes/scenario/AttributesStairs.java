@@ -23,9 +23,7 @@ public class AttributesStairs extends Attributes {
 	private int treadCount = 1;
 	private Vector2D upwardDirection = new Vector2D(1.0, 0.0);
 
-	public AttributesStairs() {
-		// TODO may be required for Jackson?
-	}
+	public AttributesStairs() { }
 
 	public AttributesStairs(int id) {
 		this.id = id;

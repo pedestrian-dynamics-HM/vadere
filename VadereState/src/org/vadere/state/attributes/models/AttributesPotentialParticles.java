@@ -14,8 +14,6 @@ public class AttributesPotentialParticles extends Attributes {
 	private double obstacleBodyPotential = 20.1;
 	private double obstacleRepulsionStrength = 0.25;
 
-	public AttributesPotentialParticles() {}
-
 	// Getters...
 
 	public double getPedestrianBodyPotential() {

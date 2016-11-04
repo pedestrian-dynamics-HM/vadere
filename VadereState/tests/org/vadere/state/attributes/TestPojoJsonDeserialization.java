@@ -13,6 +13,13 @@ public class TestPojoJsonDeserialization {
 	private static final String completeJson = "{\"a\":4,\"b\":5}";
 
 	@Test
+	public void testEmptyDeserializationWithImplicitDefaultCtor() {
+		// Important: After deserialization with incomplete JSON,
+		// the init values (for a and b) in POJOs take effect!
+		assertTestPojoEquals(new TestPojoWithImplicitDefaultConstructor(), "{}", TestPojoWithImplicitDefaultConstructor.class);
+	}
+
+	@Test
 	public void testIncompleteDeserialization() {
 		// Important: After deserialization with incomplete JSON,
 		// the init values (for a and b) in POJOs take effect!
@@ -69,6 +76,27 @@ public class TestPojoJsonDeserialization {
 			if (getClass() != obj.getClass())
 				return false;
 			TestPojoWithDefaultConstructor other = (TestPojoWithDefaultConstructor) obj;
+			if (a != other.a)
+				return false;
+			if (b != other.b)
+				return false;
+			return true;
+		}
+	}
+
+	public static class TestPojoWithImplicitDefaultConstructor {
+		int a = 1;
+		int b = 2;
+		@Override
+		public boolean equals(Object obj) {
+			// auto-generated
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TestPojoWithImplicitDefaultConstructor other = (TestPojoWithImplicitDefaultConstructor) obj;
 			if (a != other.a)
 				return false;
 			if (b != other.b)

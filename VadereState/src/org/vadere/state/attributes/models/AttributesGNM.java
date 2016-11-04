@@ -4,6 +4,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.GradientProviderType;
 
 public class AttributesGNM extends Attributes {
+
 	private AttributesODEIntegrator attributesODEIntegrator;
 	private GradientProviderType floorGradientProviderType = GradientProviderType.FLOOR_EIKONAL_DISCRETE;
 

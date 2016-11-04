@@ -13,10 +13,6 @@ public class AttributesPotentialRingExperiment extends Attributes {
 	private double allowedTrajectoryWidth = 0.1;
 	private double pedestrianRadius = 0.5;
 
-	public AttributesPotentialRingExperiment() {
-
-	}
-
 	public VPoint getCenter() {
 		return center;
 	}
