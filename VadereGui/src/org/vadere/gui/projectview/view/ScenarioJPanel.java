@@ -6,6 +6,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
@@ -35,15 +36,15 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static final long serialVersionUID = 7217609523783631174L;
 
 	private JTabbedPane tabbedPane;
-	private final JFrame owner;
 	private final JLabel scenarioName;
+	private ProjectViewModel model;
 
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
-	private TextView outputView; // new Output tab
+	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
 
@@ -59,11 +60,11 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	ScenarioJPanel(JFrame owner, JLabel scenarioName) {
-		this.owner = owner;
+	ScenarioJPanel(JLabel scenarioName, ProjectViewModel model) {
+		this.model = model;
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
-		this.postVisualizationView = new PostvisualizationWindow();
+		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
 
 		super.setBorder(new EmptyBorder(5, 5, 5, 5));
 		super.setLayout(new CardLayout(0, 0));
@@ -99,7 +100,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 		attributesSimulationView =
 				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);
-		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), null, attributesSimulationView, null);
+		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), attributesSimulationView);
 
 		attributesModelView = new TextView("/attributes", "default_directory_attributes", AttributeType.MODEL);
 
@@ -165,50 +166,14 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 				})));
 
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftest position instead of the rightest
-		tabbedPane.addTab(Messages.getString("Tab.Model.title"), null, attributesModelView, null);
+		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
-		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), null, topographyFileView, null);
+		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 
-		outputView = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		dataProcessingGUIview = new DataProcessingView();
+		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
 
-		JMenuBar processorsMenuBar = new JMenuBar();
-		JMenu processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
-		processorsMenuBar.add(processorsMenu);
-		menusInTabs.add(processorsMenu);
-
-		try {
-			File[] templateFiles = new File(this.getClass().getResource("/outputTemplates/").getPath()).listFiles();
-
-			for (File templateFile : Arrays.stream(templateFiles).filter(f -> f.isFile()).collect(Collectors.toList())) {
-				String templateFileName = templateFile.getName();
-				String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
-
-				processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-								Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
-								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-							try {
-								outputView.setText(templateJson);
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-						}
-					}
-				}));
-			}
-
-			outputView.getPanelTop().add(processorsMenuBar, 0);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), null, outputView, null);
-		
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 
@@ -289,8 +254,8 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		this.topographyFileView.setVadereScenario(scenario);
 		this.topographyFileView.isEditable(isEditable);
 
-		this.outputView.setVadereScenario(scenario);
-		this.outputView.isEditable(isEditable);
+		this.dataProcessingGUIview.setVadereScenario(scenario);
+		this.dataProcessingGUIview.isEditable(isEditable);
 	}
 
 	private void setTopography(Topography topography) {

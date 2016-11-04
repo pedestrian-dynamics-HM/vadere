@@ -124,7 +124,7 @@ public class Simulation {
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
 		for (ActiveCallback ac : activeCallbacks) {
 			ac.postLoop(simTimeInSec);
@@ -204,7 +204,7 @@ public class Simulation {
 
 	private SimulationState initialSimulationState() {
 		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step);
+				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
 
 		return state;
 	}
@@ -212,7 +212,7 @@ public class Simulation {
 	private void updateWriters(double simTimeInSec) {
 
 		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, simTimeInSec, step);
+				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
 		this.simulationState = simulationState;
 	}

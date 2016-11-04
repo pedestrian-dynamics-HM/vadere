@@ -120,4 +120,13 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	public String[] toStrings(final K key) {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NA" };
 	}
+
+	public String getType() {
+		return getClass().getSimpleName();
+	}
+
+	@Override
+	public String toString() {
+		return id + ": " + getType();
+	}
 }

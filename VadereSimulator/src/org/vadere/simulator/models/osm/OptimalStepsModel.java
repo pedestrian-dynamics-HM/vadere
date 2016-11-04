@@ -17,6 +17,7 @@ import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerNelderMea
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
 import org.vadere.simulator.models.osm.updateScheme.ParallelWorkerOSM;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
+import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
@@ -44,7 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class OptimalStepsModel implements MainModel {
+public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	/**
 	 * Compares the time of the next possible move.
@@ -330,4 +331,18 @@ public class OptimalStepsModel implements MainModel {
 		return activeCallbacks;
 	}
 
+	@Override
+	public PotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
+	}
+
+	@Override
+	public PotentialFieldObstacle getPotentialFieldObstacle() {
+		return potentialFieldObstacle;
+	}
+
+	@Override
+	public PotentialFieldAgent getPotentialFieldAgent() {
+		return potentialFieldPedestrian;
+	}
 }

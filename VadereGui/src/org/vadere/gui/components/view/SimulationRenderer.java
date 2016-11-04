@@ -45,7 +45,9 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
 		if (model.isFloorFieldAvailable() && model.config.isShowPotentialField()) {
 			synchronized (model) {
-				renderPotentialField(graphics2D, width, height);
+				renderPotentialField(graphics2D,
+						(int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
+						(int)(Math.min(model.getTopographyBound().height, model.getViewportBound().height) * model.getScaleFactor()));
 			}
 		}
 		super.renderPreTransformation(graphics2D, width, height);

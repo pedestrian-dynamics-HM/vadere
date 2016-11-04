@@ -311,6 +311,7 @@ public class ScenarioRunManager implements Runnable {
 			// not all necessary! only the ones that could have changed
 			scenarioStore = srm.scenarioStore;
 			outputPath = srm.outputPath;
+			dataProcessingJsonManager = srm.dataProcessingJsonManager;
 			processorManager = srm.processorManager;
 			modelTests = srm.modelTests;
 			finishedListener = srm.finishedListener;
@@ -347,5 +348,9 @@ public class ScenarioRunManager implements Runnable {
 
 	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {
 		this.dataProcessingJsonManager = manager;
+	}
+
+	public Path getOutputPath() {
+		return outputPath;
 	}
 }

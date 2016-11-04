@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
@@ -47,6 +48,7 @@ public class DataProcessingJsonManager {
     private static final String TIMESTAMP_KEY = "isTimestamped";
 
     public static final String DEFAULT_SEPARATOR = " ";
+    public static final String DEFAULT_OUTPUTFILE_TYPE = NoDataKeyOutputFile.class.getName();
 
     private static ObjectMapper mapper;
     public static ObjectWriter writer;
@@ -72,15 +74,42 @@ public class DataProcessingJsonManager {
         this.isTimestamped = true;
     }
 
+    public List<OutputFile<?>> getOutputFiles() {
+        return outputFiles;
+    }
+
+    public List<DataProcessor<?, ?>> getDataProcessors() {
+        return dataProcessors;
+    }
+
     public void addOutputFile(final OutputFileStore fileStore) {
         // If fileName already exists, change it by removing and readding
         this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.getFilename())).collect(Collectors.toList()));
+        this.outputFiles.add(instantiateOutputFile(fileStore));
+    }
 
+    private OutputFile<?> instantiateOutputFile(final OutputFileStore fileStore) {
         OutputFile<?> file = outputFileInstantiator.createObject(fileStore.getType());
         file.setFileName(fileStore.getFilename());
         file.setProcessorIds(fileStore.getProcessors());
         file.setSeparator(fileStore.getSeparator());
-        this.outputFiles.add(file);
+        return file;
+    }
+
+    public int replaceOutputFile(OutputFileStore fileStore) {
+        int index = indexOf(fileStore.getFilename());
+        this.outputFiles.remove(index);
+        this.outputFiles.add(index, instantiateOutputFile(fileStore));
+        return index;
+    }
+
+    private int indexOf(String filename) {
+        for (int i = 0; i < outputFiles.size(); i ++) {
+            if (outputFiles.get(i).getFileName().equals(filename)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void addProcessor(final DataProcessorStore dataProcessorStore) {
@@ -90,11 +119,20 @@ public class DataProcessingJsonManager {
         this.dataProcessors.add(dataProcessor);
     }
 
+    public void addInstantiatedProcessor(final DataProcessor dataProcessor) {
+        this.dataProcessors.add(dataProcessor);
+    }
+    
+    public void updateDataProcessor(final DataProcessor oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
+        this.dataProcessors.remove(oldDataProcessor);
+        addProcessor(newDataProcessorStore);
+    }
+
     public boolean isTimestamped() {
         return this.isTimestamped;
     }
 
-    private void setTimestamped(boolean isTimestamped) {
+    public void setTimestamped(boolean isTimestamped) {
         this.isTimestamped = isTimestamped;
     }
 
@@ -113,7 +151,7 @@ public class DataProcessingJsonManager {
         return node;
     }
 
-    private static JsonNode serializeProcessor(final DataProcessor dataProcessor) {
+    public static JsonNode serializeProcessor(final DataProcessor dataProcessor) {
         ObjectNode node = mapper.createObjectNode();
 
         node.put(TYPE_KEY, dataProcessor.getClass().getName());
@@ -208,7 +246,7 @@ public class DataProcessingJsonManager {
         return manager;
     }
 
-    private static DataProcessorStore deserializeProcessorStore(JsonNode node) {
+    public static DataProcessorStore deserializeProcessorStore(JsonNode node) {
         DataProcessorStore store = new DataProcessorStore();
 
         store.setType(node.get(TYPE_KEY).asText());
@@ -233,5 +271,15 @@ public class DataProcessingJsonManager {
 
     public ProcessorManager createProcessorManager(MainModel mainModel) {
         return new ProcessorManager(this, this.dataProcessors, this.outputFiles, mainModel);
+    }
+
+    public int getMaxProcessorsId() {
+        int maxId = 0;
+        for (DataProcessor<?, ?> dataProc : dataProcessors) {
+            if (dataProc.getId() > maxId) {
+                maxId = dataProc.getId();
+            }
+        }
+        return maxId;
     }
 }

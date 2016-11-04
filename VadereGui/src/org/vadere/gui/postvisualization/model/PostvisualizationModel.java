@@ -2,7 +2,6 @@ package org.vadere.gui.postvisualization.model;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.security.cert.PKIXRevocationChecker;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.SimulationModel;
@@ -29,10 +27,11 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.io.IOUtils;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
 import org.vadere.util.potential.CellGrid;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class PostvisualizationModel extends SimulationModel<PostvisualizationConfig> {
 
@@ -57,6 +56,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	private Comparator<Step> stepComparator = (s1, s2) -> s1.getStepNumber() - s2.getStepNumber();
 
 	private List<Step> steps;
+
+	private String outputPath;
 
 	// public Configuration config;
 
@@ -97,10 +98,9 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				});
 	}
 
-	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere) {
+	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere, final String projectPath) {
 		logger.info("start init postvis model");
-		init(vadere);
-		this.vadere = vadere;
+		init(vadere, projectPath);
 		this.agentsByStep = agentsByStep;
 		Map<Integer, Step> map = agentsByStep
 				.keySet().stream()
@@ -136,12 +136,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		logger.info("finished init postvis model");
 	}
 
-	public void init(final ScenarioRunManager vadere) {
+	public void init(final ScenarioRunManager vadere, final String projectPath) {
 		this.vadere = vadere;
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();
 		this.trajectories = new HashMap<>();
 		this.selectedElement = null;
+		this.outputPath = projectPath;
 	}
 
 	public Optional<Step> getLastStep() {
@@ -158,6 +159,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	public ScenarioRunManager getScenarioRunManager() {
+		return vadere;
 	}
 
 	@Override
@@ -324,8 +329,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return agentsByStep.size() == 0;
 	}
 
+	@Override
 	public int getTopographyId() {
 		return topographyId;
+	}
+
+	public String getOutputPath() {
+		return outputPath;
 	}
 
 	private void clear() {

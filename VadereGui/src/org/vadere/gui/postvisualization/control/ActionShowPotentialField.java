@@ -6,16 +6,11 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.gui.postvisualization.view.DialogFactory;
-import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellGridConverter;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.List;
-import java.util.prefs.Preferences;
 
 public class ActionShowPotentialField extends ActionVisualization {
 
@@ -30,8 +25,8 @@ public class ActionShowPotentialField extends ActionVisualization {
 	public void actionPerformed(final ActionEvent event) {
 
 		if (!model.config.isShowPotentialField()) {
-			final JFileChooser fc = new JFileChooser(resources.getProperty("View.outputDirectory.path"));
-
+			//final JFileChooser fc = new JFileChooser(resources.getProperty("View.outputDirectory.path"));
+			final JFileChooser fc = new JFileChooser(model.getOutputPath());
 			int returnVal = fc.showOpenDialog(null);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -47,7 +42,7 @@ public class ActionShowPotentialField extends ActionVisualization {
 					try {
 						Topography topography = model.getTopography();
 						PotentialFieldContainer container = new PotentialFieldContainer(file,
-								topography.getBounds().getWidth(), topography.getBounds().getHeight(), true);
+								topography.getBounds().getWidth(), topography.getBounds().getHeight(), false);
 						model.setPotentialFieldContainer(container);
 						model.config.setShowPotentialField(true);
 						model.notifyObservers();

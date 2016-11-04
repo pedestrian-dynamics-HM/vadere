@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.store;
 
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OutputFileStore {
@@ -12,6 +13,8 @@ public class OutputFileStore {
 
     public OutputFileStore() {
         this.separator = DataProcessingJsonManager.DEFAULT_SEPARATOR;
+        this.type = DataProcessingJsonManager.DEFAULT_OUTPUTFILE_TYPE;
+        this.processors = new ArrayList<>();
     }
 
     public String getType() {

@@ -95,6 +95,11 @@
 	<artifactId>jgoodies-forms</artifactId>
 	<version>1.6.0</version>
   </dependency>
+<dependency>
+	<groupId>tablelayout</groupId>
+	<artifactId>TableLayout</artifactId>
+	<version>20050920</version>
+</dependency>
   
 <!-- movie & screenshot -->
   <dependency>
