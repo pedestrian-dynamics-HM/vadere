@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
@@ -40,6 +41,13 @@ public class Topography {
 	 */
 	private final LinkedList<Target> targets;
 
+	/**
+	 * List of obstacles used as a boundary for the whole topography.
+	 */
+	private List<Obstacle> boundaryObstacles;
+
+	private final List<Stairs> stairs;
+
 	private Teleporter teleporter;
 
 	private transient final DynamicElementContainer<Pedestrian> pedestrians;
@@ -48,29 +56,40 @@ public class Topography {
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
 
-
-	/**
-	 * List of obstacles used as a boundary for the whole topography.
-	 */
-	private List<Obstacle> boundaryObstacles;
-
-	private final List<Stairs> stairs;
+	/** Used to get attributes of all scenario elements. */
+	private Set<List<? extends ScenarioElement>> allScenarioElements = new HashSet<>(); // will be filled in the constructor
+	
+	/** Used to store links to all attributes that are not part of scenario elements. */
+	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
 
 	public Topography(AttributesTopography attributes, AttributesAgent attributesPedestrian,
 			AttributesCar attributesCar) {
+
 		this.attributes = attributes;
 		this.attributesPedestrian = attributesPedestrian;
 		this.attributesCar = attributesCar;
-		this.obstacles = new LinkedList<>();
-		this.stairs = new LinkedList<>();
-		this.sources = new LinkedList<>();
-		this.targets = new LinkedList<>();
-		this.boundaryObstacles = new LinkedList<>();
+
+		allOtherAttributes.add(attributes);
+		allOtherAttributes.add(attributesCar);
+		allOtherAttributes.add(attributesPedestrian);
+
+		obstacles = new LinkedList<>();
+		stairs = new LinkedList<>();
+		sources = new LinkedList<>();
+		targets = new LinkedList<>();
+		boundaryObstacles = new LinkedList<>();
+		
+		allScenarioElements.add(obstacles);
+		allScenarioElements.add(stairs);
+		allScenarioElements.add(sources);
+		allScenarioElements.add(targets);
+		allScenarioElements.add(boundaryObstacles);
 
 		RectangularShape bounds = this.getBounds();
 
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
+		
 	}
 
 	/**
@@ -212,6 +231,7 @@ public class Topography {
 
 	public void setTeleporter(Teleporter teleporter) {
 		this.teleporter = teleporter;
+		allScenarioElements.add(Collections.singletonList(teleporter));
 	}
 
 	public <T extends DynamicElement> void addInitialElement(T element) {
@@ -378,7 +398,11 @@ public class Topography {
 	}
 
 	public void sealAllAttributes() {
-		// TODO how to seal all attributes in a clean way? they are pretty much distributed...
+		// don't try to do this with flatMap -> weird compiler error "cannot infer type arguments ..."
+		for (List<? extends ScenarioElement> list : allScenarioElements) {
+			list.forEach(se -> se.getAttributes().seal());
+		}
+		allOtherAttributes.forEach(a -> a.seal());
 	}
 
 }
