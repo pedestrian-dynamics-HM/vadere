@@ -596,7 +596,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 0;
 			c.gridy = 0;
 			c.gridwidth = 3;
-			panel.add(new JLabel("<html><b>" + dataProcessor.getType() + "</b></html>"), c);
+			panel.add(new JLabel("<html><b>" + dataProcessor.getSimpleProcessorTypeName() + "</b></html>"), c);
 			c.gridwidth = 1;
 
 			c.gridx = 0;

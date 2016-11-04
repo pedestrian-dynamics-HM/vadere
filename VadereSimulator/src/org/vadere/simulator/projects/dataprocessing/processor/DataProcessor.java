@@ -121,13 +121,13 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NA" };
 	}
 
-	public String getType() {
+	public String getSimpleProcessorTypeName() {
 		return getClass().getSimpleName();
 	}
 
 	@Override
 	public String toString() {
-		return id + ": " + getType();
+		return id + ": " + getSimpleProcessorTypeName();
 	}
 
 	public void sealAttributes() {
