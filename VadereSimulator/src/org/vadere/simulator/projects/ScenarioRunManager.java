@@ -114,9 +114,14 @@ public class ScenarioRunManager implements Runnable {
 	 */
 	@Override
 	public void run() {
-		doBeforeSimulation();
-
 		try {
+			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
+
+			if (finishedListener != null)
+				this.finishedListener.scenarioStarted(this);
+
+			scenarioStore.topography.reset();
+
 			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 			modelBuilder.createModelAndRandom();
 
@@ -124,13 +129,15 @@ public class ScenarioRunManager implements Runnable {
 			final Random random = modelBuilder.getRandom();
 			
 			// prepare processors and simulation data writer
-			this.processorManager = this.dataProcessingJsonManager.createProcessorManager(mainModel);
+			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
 
 			createAndSetOutputDirectory();
 
 			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 				out.println(JsonConverter.serializeScenarioRunManager(this, true));
 			}
+
+			sealAllAttributes();
 
 			// Run simulation main loop from start time = 0 seconds
 			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
@@ -162,12 +169,9 @@ public class ScenarioRunManager implements Runnable {
 				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
 	}
 
-	protected void doBeforeSimulation() {
-		if (finishedListener != null)
-			this.finishedListener.scenarioStarted(this);
-
-		logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
-		scenarioStore.topography.reset();
+	private void sealAllAttributes() {
+		scenarioStore.sealAllAttributes();
+		processorManager.sealAllAttributes();
 	}
 
 	// Getter...
@@ -236,7 +240,7 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void setAttributesModel(List<Attributes> attributesList) {
-		this.scenarioStore.attributesList = attributesList;
+		scenarioStore.attributesList = attributesList;
 	}
 
 	public void setAttributesPedestrian(AttributesAgent attributesPedestrian) {

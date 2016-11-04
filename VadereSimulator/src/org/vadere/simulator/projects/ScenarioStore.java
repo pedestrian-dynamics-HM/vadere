@@ -59,5 +59,11 @@ public class ScenarioStore {
 	public String hashOfJsonRepresentation() throws JsonProcessingException {
 		return DigestUtils.sha1Hex(JsonConverter.serializeObject(this));
 	}
+	
+	public void sealAllAttributes() {
+		attributesList.forEach(a -> a.seal());
+		attributesSimulation.seal();
+		topography.sealAllAttributes();
+	}
 
 }

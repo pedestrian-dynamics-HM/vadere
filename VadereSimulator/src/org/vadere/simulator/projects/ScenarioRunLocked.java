@@ -50,7 +50,8 @@ public class ScenarioRunLocked extends ScenarioRunManager {
 
 	@Override
 	public void run() {
-		doBeforeSimulation();
+		// TODO this class is broken; see super.run() for what's going on.
+		// e.g. the processors and models are not initialized here.
 
 		handleLock(Paths.get(this.lockDirectory));
 	}

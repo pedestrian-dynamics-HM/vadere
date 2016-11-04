@@ -377,4 +377,8 @@ public class Topography {
 		return this.boundaryObstacles.size() > 0;
 	}
 
+	public void sealAllAttributes() {
+		// TODO how to seal all attributes in a clean way? they are pretty much distributed...
+	}
+
 }
