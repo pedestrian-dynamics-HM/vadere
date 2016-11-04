@@ -221,6 +221,10 @@ public abstract class Agent implements DynamicElement {
 	public void setTargets(LinkedList<Integer> targetIds) {
 		this.targetIds = targetIds;
 	}
+	
+	public void addTarget(Target target) {
+		targetIds.add(target.getId());
+	}
 
 	// TODO [task=refactoring] remove again!
 	public void setFreeFlowSpeed(double freeFlowSpeed) {

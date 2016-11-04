@@ -1,7 +1,6 @@
 package org.vadere.util.math;
 
 import java.awt.Point;
-import java.awt.geom.Arc2D;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
@@ -270,10 +269,10 @@ public class MathUtil {
 		double sideLenY = height / binsY;
 
 		// create a coordinate list to draw from later
-		List<SimpleEntry<Integer, Integer>> binCoodinates = new LinkedList<SimpleEntry<Integer, Integer>>();
+		List<SimpleEntry<Integer, Integer>> binCoodinates = new LinkedList<>();
 		for (int i = 0; i < binsX; i++) {
 			for (int k = 0; k < binsY; k++) {
-				binCoodinates.add(new SimpleEntry<Integer, Integer>(i, k));
+				binCoodinates.add(new SimpleEntry<>(i, k));
 			}
 		}
 
@@ -314,7 +313,7 @@ public class MathUtil {
 	 * neighborhood of the given point p.
 	 */
 	public static List<Point> getMooreNeighborhood(Point p) {
-		List<Point> mooreNeighborhood = new LinkedList<Point>();
+		List<Point> mooreNeighborhood = new LinkedList<>();
 
 		mooreNeighborhood.add(new Point(p.x + 1, p.y));
 		mooreNeighborhood.add(new Point(p.x, p.y + 1));
@@ -333,7 +332,7 @@ public class MathUtil {
 	 * neighborhood of the given point p.
 	 */
 	public static List<Point> getNeumannNeighborhood(final Point p) {
-		List<Point> neumannNeighborhood = new LinkedList<Point>();
+		List<Point> neumannNeighborhood = new LinkedList<>();
 
 		neumannNeighborhood.add(new Point(p.x - 1, p.y));
 		neumannNeighborhood.add(new Point(p.x + 1, p.y));
@@ -362,7 +361,7 @@ public class MathUtil {
 	 * Returns the real solutions of the quadratic equation ax^2+bx+c=0
 	 */
 	public static List<Double> solveQuadratic(double a, double b, double c) {
-		ArrayList<Double> result = new ArrayList<Double>(2);
+		ArrayList<Double> result = new ArrayList<>(2);
 		if (a != 0) {
 			double discr = (b * b) - (4 * a * c);
 
@@ -442,4 +441,9 @@ public class MathUtil {
 		}
 		return complex;
 	}
+
+	public static double clamp(double val, double min, double max) {
+		return Math.max(min, Math.min(max, val));
+	}
+
 }

@@ -73,9 +73,6 @@ public class Topography {
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
 	}
 
-	/**
-	 * Creates an empty scenario where bounds and finishTime are empty / zero.
-	 */
 	public Topography() {
 		this(new AttributesTopography(), new AttributesAgent(), new AttributesCar());
 	}
@@ -215,7 +212,9 @@ public class Topography {
 	}
 
 	public <T extends DynamicElement> void addInitialElement(T element) {
-		((DynamicElementContainer<T>) this.getContainer(element.getClass())).addInitialElement(element);
+		@SuppressWarnings("unchecked") // getContainer returns a correctly parameterized object
+		final DynamicElementContainer<T> container = (DynamicElementContainer<T>) getContainer(element.getClass());
+		container.addInitialElement(element);
 	}
 
 	public <T extends DynamicElement> List<T> getInitialElements(Class<T> elementType) {

@@ -1,0 +1,12 @@
+--number-entrance-areas=12
+--door-source-distance=0.5
+--block-ends --block-exits
+--interim-destinations
+--random-seed=0
+--number-sitting-persons=10
+--stop=10,top,10
+--stop=20,bottom,20
+--stop=30,top,10
+--stop=30,bottom,10
+--train-geometry=org.vadere.state.scenario.Et423Geometry
+--output-file=/tmp/test-train-topography.json

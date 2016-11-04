@@ -10,16 +10,12 @@ import org.vadere.state.scenario.Topography;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
- * IO-Class to write a Topography to a certain stream.
+ * Write a topography to a stream.
  *
  */
-public class JSONWriter {
-	/**
-	 * Write the Topography to a certain File.
-	 * 
-	 * @param topography the topography
-	 * @param file the certain file
-	 */
+public class TopographyJsonWriter {
+
+	/** Write the topography to a certain file. */
 	public static void writeTopography(final Topography topography, final File file) {
 		try {
 			writeTopography(topography, new PrintStream(file));
