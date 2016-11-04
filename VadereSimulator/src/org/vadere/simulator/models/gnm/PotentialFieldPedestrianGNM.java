@@ -112,4 +112,5 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
 	}
+
 }

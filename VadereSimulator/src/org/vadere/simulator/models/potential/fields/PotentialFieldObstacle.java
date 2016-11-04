@@ -25,6 +25,19 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
 public interface PotentialFieldObstacle extends Model {
+
+	@Override
+	default void preLoop(double simTimeInSec) {
+	}
+
+	@Override
+	default void postLoop(double simTimeInSec) {
+	}
+
+	@Override
+	default void update(double simTimeInSec) {
+	}
+
 	public double getObstaclePotential(VPoint pos, Agent pedestrian);
 
 	public Vector2D getObstaclePotentialGradient(VPoint pos,

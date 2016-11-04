@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.sfm;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -35,7 +34,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private IPotentialTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	private int pedestrianIdCounter;
 
@@ -84,7 +83,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributes.getObstaclePotentialModel());
@@ -92,7 +91,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributes.getPedestrianPotentialModel());
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	public void rebuildFloorField(final double simTimeInSec) {
@@ -158,8 +157,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 }

@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.osm;
 
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -77,7 +76,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 
 	private ExecutorService executorService;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	@Deprecated
 	public OptimalStepsModel(final Topography topography, final AttributesOSM attributes,
@@ -130,13 +129,13 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
-		subModelBuilder.addSubModelsToActiveCallbacks(activeCallbacks);
+		subModelBuilder.addBuildedSubModelsToList(models);
 
 		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributesOSM.getObstaclePotentialModel());
@@ -144,7 +143,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributesOSM.getPedestrianPotentialModel());
 		
-		Optional<CentroidGroupModel> opCentroidGroupModel = activeCallbacks.stream().
+		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 			filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel)ac).findAny();
 		
 		if (opCentroidGroupModel.isPresent()) {
@@ -181,7 +180,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			this.executorService = null;
 		}
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	private StepCircleOptimizer createStepCircleOptimizer(
@@ -327,8 +326,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 	@Override

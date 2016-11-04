@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -31,7 +32,7 @@ public class Simulation {
 	private DynamicElementFactory dynamicElementFactory;
 
 	private final List<PassiveCallback> passiveCallbacks;
-	private List<ActiveCallback> activeCallbacks;
+	private List<Model> models;
 
 	private ProcessorManager processorManager;
 
@@ -72,7 +73,7 @@ public class Simulation {
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
 
-		this.activeCallbacks = mainModel.getActiveCallbacks();
+		this.models = mainModel.getSubmodels();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
@@ -112,8 +113,8 @@ public class Simulation {
 		runSimulation = true;
 		simTimeInSec = startTimeInSec;
 
-		for (ActiveCallback ac : activeCallbacks) {
-			ac.preLoop(simTimeInSec);
+		for (Model m : models) {
+			m.preLoop(simTimeInSec);
 		}
 
 		for (PassiveCallback c : passiveCallbacks) {
@@ -126,8 +127,8 @@ public class Simulation {
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
-		for (ActiveCallback ac : activeCallbacks) {
-			ac.postLoop(simTimeInSec);
+		for (Model m : models) {
+			m.postLoop(simTimeInSec);
 		}
 
 		for (PassiveCallback c : passiveCallbacks) {
@@ -168,7 +169,7 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
-				updateActiveCallbacks(simTimeInSec);
+				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 				processorManager.update(this.simulationState);
 
@@ -217,7 +218,7 @@ public class Simulation {
 		this.simulationState = simulationState;
 	}
 
-	private void updateActiveCallbacks(double simTimeInSec) {
+	private void updateCallbacks(double simTimeInSec) {
 
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
@@ -235,8 +236,8 @@ public class Simulation {
 		topographyController.update(simTimeInSec);
 		step++;
 
-		for (ActiveCallback ac : activeCallbacks) {
-			ac.update(simTimeInSec);
+		for (Model m : models) {
+			m.update(simTimeInSec);
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {

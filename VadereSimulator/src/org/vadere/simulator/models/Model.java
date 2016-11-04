@@ -10,8 +10,10 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.FindByClass;
 
 /**
- * Interface for a simulation model. The <code>initialize</code> method must be called before usage!
- * 
+ * Interface for a simulation model.
+ * The <code>initialize</code> method must be called before usage!
+ * This interface defines a callbacks for the simulation loop.
+ * It's implementations define the major part of the simulation model's logic.
  *
  */
 public interface Model {
@@ -22,6 +24,12 @@ public interface Model {
 	 */
 	void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random);
+
+	void preLoop(final double simTimeInSec);
+
+	void postLoop(final double simTimeInSec);
+
+	void update(final double simTimeInSec);
 
 	public static <T extends Attributes> T findAttributes(List<Attributes> attributesList, final Class<T> type) {
 		try {

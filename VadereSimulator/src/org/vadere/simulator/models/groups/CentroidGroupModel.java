@@ -1,6 +1,9 @@
 package org.vadere.simulator.models.groups;
 
-import org.vadere.simulator.control.ActiveCallback;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
@@ -9,21 +12,8 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.Table;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
-public class CentroidGroupModel implements GroupModel, ActiveCallback {
-
-	/**
-	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processor.
-	 */
-	private Map<String, Table> outputTables;
+public class CentroidGroupModel implements GroupModel {
 
 	private GroupSizeDeterminator groupSizeDeterminator;
 	private Map<Integer, CentroidGroupFactory> groupFactories;
