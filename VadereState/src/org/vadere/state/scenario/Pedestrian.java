@@ -21,9 +21,9 @@ public class Pedestrian extends Agent {
 	// TODO used at all? Car does NOT have this field. remove if unused!
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN;
 
-	/* this constructor will be called by gson */
 	@SuppressWarnings("unused")
 	private Pedestrian() {
+		// TODO constructor may be required for Jackson?
 		this(new AttributesAgent());
 	}
 

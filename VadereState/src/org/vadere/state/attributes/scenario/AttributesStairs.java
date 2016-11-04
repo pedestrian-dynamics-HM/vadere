@@ -24,7 +24,7 @@ public class AttributesStairs extends Attributes {
 	private Vector2D upwardDirection = new Vector2D(1.0, 0.0);
 
 	public AttributesStairs() {
-		// needs to be present for GSON
+		// TODO may be required for Jackson?
 	}
 
 	public AttributesStairs(int id) {

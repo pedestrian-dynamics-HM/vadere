@@ -209,7 +209,9 @@ public abstract class StateJsonConverter {
 		ObjectNode topographyNode = mapper.createObjectNode();
 
 		JsonNode attributesNode = mapper.convertValue(topography.getAttributes(), JsonNode.class);
-		((ObjectNode) attributesNode.get("bounds")).remove("type"); // manually remove that field to match the old GSON-format, seems easier than avoiding it selectively
+		// manually remove that field to match the old gson-format, seems easier than avoiding it selectively
+		// TODO what does this mean?
+		((ObjectNode) attributesNode.get("bounds")).remove("type");
 		topographyNode.set("attributes", attributesNode);
 
 		ArrayNode obstacleNodes = mapper.createArrayNode();
