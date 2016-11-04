@@ -1,22 +1,5 @@
 package org.vadere.simulator.projects;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.MainModelBuilder;
-import org.vadere.simulator.projects.dataprocessing.ModelTest;
-import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Topography;
-import org.vadere.util.io.IOUtils;
-import org.vadere.util.reflection.VadereClassNotFoundException;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
@@ -30,6 +13,23 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.control.Simulation;
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.ModelTest;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import difflib.DiffUtils;
 
@@ -124,11 +124,11 @@ public class ScenarioRunManager implements Runnable {
 			final Random random = modelBuilder.getRandom();
 			
 			// prepare processors and simulation data writer
-			this.processorManager = this.dataProcessingJsonManager.createProcessorManager(mainModel);
+			this.processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
 
 			createAndSetOutputDirectory();
 
-			try (PrintWriter out = new PrintWriter(Paths.get(this.outputPath.toString(), this.getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
+			try (PrintWriter out = new PrintWriter(Paths.get(outputPath.toString(), getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 				out.println(JsonConverter.serializeScenarioRunManager(this, true));
 			}
 
@@ -152,21 +152,21 @@ public class ScenarioRunManager implements Runnable {
 
 	protected void doAfterSimulation() {
 		if (finishedListener != null)
-			this.finishedListener.scenarioFinished(this);
+			finishedListener.scenarioFinished(this);
 
-		this.passiveCallbacks.clear();
+		passiveCallbacks.clear();
 
 		logger.info(String.format("Scenario finished."));
 		logger.info(String.format("Running output processor, if any..."));
-		logger.info(String.format("Done running scenario '%s': '%s'", this.getName(),
+		logger.info(String.format("Done running scenario '%s': '%s'", getName(),
 				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
 	}
 
 	protected void doBeforeSimulation() {
 		if (finishedListener != null)
-			this.finishedListener.scenarioStarted(this);
+			finishedListener.scenarioStarted(this);
 
-		logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
+		logger.info(String.format("Initializing scenario. Start of scenario '%s'...", getName()));
 		scenarioStore.topography.reset();
 	}
 
@@ -180,7 +180,7 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public ScenarioStore getScenarioStore() {
-		return this.scenarioStore;
+		return scenarioStore;
 	}
 
 	public List<Attributes> getAttributesModel() {
@@ -210,11 +210,11 @@ public class ScenarioRunManager implements Runnable {
 	}
 
 	public void addPassiveCallback(final PassiveCallback pc) {
-		this.passiveCallbacks.add(pc);
+		passiveCallbacks.add(pc);
 	}
 
 	public void setOutputPaths(final Path outputPath) {
-		if (this.dataProcessingJsonManager.isTimestamped()) {
+		if (dataProcessingJsonManager.isTimestamped()) {
 			String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
 			this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
 		} else {
@@ -309,13 +309,13 @@ public class ScenarioRunManager implements Runnable {
 		try {
 			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
-			this.scenarioStore = srm.scenarioStore;
-			this.outputPath = srm.outputPath;
-			this.processorManager = srm.processorManager;
-			this.modelTests = srm.modelTests;
-			this.finishedListener = srm.finishedListener;
-			this.simulation = srm.simulation;
-			this.simpleOutputProcessorName = srm.simpleOutputProcessorName;
+			scenarioStore = srm.scenarioStore;
+			outputPath = srm.outputPath;
+			processorManager = srm.processorManager;
+			modelTests = srm.modelTests;
+			finishedListener = srm.finishedListener;
+			simulation = srm.simulation;
+			simpleOutputProcessorName = srm.simpleOutputProcessorName;
 			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
 		} catch (IOException | VadereClassNotFoundException e) {
 			e.printStackTrace();

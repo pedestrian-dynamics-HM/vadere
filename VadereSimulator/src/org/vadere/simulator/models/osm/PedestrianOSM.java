@@ -31,10 +31,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 public class PedestrianOSM extends Pedestrian {
 
-	/**
-	 * transient fields will not be serialized by Gson.
-	 */
-
 	private final AttributesOSM attributesOSM;
 	private final transient StepCircleOptimizer stepCircleOptimizer;
 	private final transient UpdateSchemeOSM updateScheme;

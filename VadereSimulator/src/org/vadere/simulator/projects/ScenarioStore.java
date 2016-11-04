@@ -10,6 +10,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,7 +58,7 @@ public class ScenarioStore {
 	}
 	
 	public String hashOfJsonRepresentation() throws JsonProcessingException {
-		return DigestUtils.sha1Hex(JsonConverter.serializeObject(this));
+		return DigestUtils.sha1Hex(StateJsonConverter.serializeObject(this));
 	}
 
 }

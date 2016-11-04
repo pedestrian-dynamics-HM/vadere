@@ -14,8 +14,6 @@ public class AttributesPotentialGNM extends Attributes {
 	private double obstacleBodyPotential = 20.1;
 	private double obstacleRepulsionStrength = 0.25;
 
-	public AttributesPotentialGNM() {}
-
 	// Getters...
 
 	public double getPedestrianBodyPotential() {

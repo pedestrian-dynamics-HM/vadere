@@ -28,11 +28,12 @@ public class TestVadereTestProject {
 
 	@Test
 	public void testToJSON() throws IOException {
+		// TODO implement json test
 		/*
 		 * String json = IOUtils.toPrettyPrintJson(IOVadere.toJson(testProject));
 		 * // System.out.println(json);
 		 * 
-		 * Map<String, Object> store = new Gson().fromJson(json, Map.class);
+		 * Map<String, Object> store = fromJson(json, Map.class);
 		 * 
 		 * assertEquals(testProject.getName(), store.get("name"));
 		 * 
@@ -48,6 +49,7 @@ public class TestVadereTestProject {
 
 	@Test
 	public void testFromJSON() throws IOException {
+		// TODO implement json test
 		/*
 		 * String json = IOUtils.toPrettyPrintJson(IOVadere.toJson(testProject));
 		 * VadereProject testInstanceNew = IOVadere.projectFromJson(json);

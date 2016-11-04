@@ -1,12 +1,12 @@
 package org.vadere.simulator.projects;
 
-import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.util.io.IOUtils;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.util.io.IOUtils;
 
 /**
  * Writes a {@link VadereProject} to a file.

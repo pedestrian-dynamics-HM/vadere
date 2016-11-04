@@ -48,11 +48,6 @@ public class AttributesSource extends Attributes {
 	 */
 	private DynamicElementType dynamicElementType = DynamicElementType.PEDESTRIAN;
 
-	/**
-	 * This (private) default constructor is used by Gson. Without it, the initial field assignments
-	 * above have no effect. In other words, no default values for fields are possible without a
-	 * default constructor.
-	 */
 	@SuppressWarnings("unused")
 	private AttributesSource() {}
 

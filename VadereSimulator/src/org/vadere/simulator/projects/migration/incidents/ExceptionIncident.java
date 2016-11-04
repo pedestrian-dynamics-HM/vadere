@@ -1,12 +1,13 @@
 package org.vadere.simulator.projects.migration.incidents;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.Graph;
 import org.vadere.simulator.projects.migration.MigrationException;
 
-import java.io.IOException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ExceptionIncident extends Incident {
 

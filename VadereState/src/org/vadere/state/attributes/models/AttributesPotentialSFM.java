@@ -14,8 +14,6 @@ public class AttributesPotentialSFM extends Attributes {
 	private double obstacleBodyPotential = 20.1;
 	private double obstacleRepulsionStrength = 0.25;
 
-	public AttributesPotentialSFM() {}
-
 	// Getters...
 
 	public double getPedestrianBodyPotential() {

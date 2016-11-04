@@ -12,8 +12,8 @@ import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class DataProcessingJsonManager {
     private boolean isTimestamped;
 
     static {
-        mapper = JsonConverter.getMapper();
+        mapper = StateJsonConverter.getMapper();
         writer = mapper.writerWithDefaultPrettyPrinter();
         
         outputFileInstantiator = new DynamicClassInstantiator<>();

@@ -1,17 +1,18 @@
 package org.vadere.gui.components.view;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -25,10 +26,13 @@ import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.ScenarioJPanel;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.util.StateJsonConverter;
+
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * The ScenarioElementView display's a ScenarioElement in JSON-Format.
@@ -131,14 +135,14 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				// JsonSerializerVShape shapeSerializer = new JsonSerializerVShape();
 				Pedestrian ped = null;
 				try {
-					ped = JsonConverter.deserializePedestrian(json);
+					ped = StateJsonConverter.deserializePedestrian(json);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				((AgentWrapper) element).setAgentInitialStore(ped);
 			} else {
 				try {
-					Attributes attributes = JsonConverter.deserializeScenarioElementType(json, element.getType());
+					Attributes attributes = StateJsonConverter.deserializeScenarioElementType(json, element.getType());
 					ReflectionAttributeModifier.setAttributes(element, attributes);
 					ScenarioJPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();
@@ -174,18 +178,14 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 					jsonValidIndicator.hide();
 				}
 			} else {
-				try {
-					if (scenarioElement instanceof AgentWrapper) {
-						this.txtrTextfiletextarea.setText(
-								JsonConverter.serializeObject(((AgentWrapper) scenarioElement).getAgentInitialStore()));
-					} else if (scenarioElement instanceof Pedestrian) {
-						this.txtrTextfiletextarea.setText(JsonConverter.serializeObject(scenarioElement));
-					} else {
-						this.txtrTextfiletextarea.setText(JsonConverter
-								.serializeObject(ReflectionAttributeModifier.getAttributes(scenarioElement)));
-					}
-				} catch (JsonProcessingException e) {
-					// ?
+				if (scenarioElement instanceof AgentWrapper) {
+					this.txtrTextfiletextarea.setText(
+							StateJsonConverter.serializeObject(((AgentWrapper) scenarioElement).getAgentInitialStore()));
+				} else if (scenarioElement instanceof Pedestrian) {
+					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
+				} else {
+					this.txtrTextfiletextarea.setText(StateJsonConverter
+							.serializeObject(ReflectionAttributeModifier.getAttributes(scenarioElement)));
 				}
 			}
 		}

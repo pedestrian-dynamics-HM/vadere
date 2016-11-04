@@ -5,8 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-
-import com.google.gson.Gson;
+import org.vadere.state.util.StateJsonConverter;
 
 public class TestAttributesInitialization {
 
@@ -20,7 +19,7 @@ public class TestAttributesInitialization {
 	@Before
 	public void setUp() {
 
-		store = "{speedDistributionMean:0.2}";
+		store = "{\"speedDistributionMean\":0.2}";
 	}
 
 	/**
@@ -34,7 +33,7 @@ public class TestAttributesInitialization {
 	@Test
 	public void testInit() throws IllegalArgumentException, IllegalAccessException {
 		// correct case
-		attributesPedestrian = new Gson().fromJson(store, AttributesAgent.class);
+		attributesPedestrian = StateJsonConverter.deserializeObjectFromJson(store, AttributesAgent.class);
 
 		assertArrayEquals(new double[] {0.2}, new double[] {attributesPedestrian.getSpeedDistributionMean()}, delta);
 
@@ -52,7 +51,7 @@ public class TestAttributesInitialization {
 	public void testInitDefault() throws IllegalArgumentException, IllegalAccessException {
 		// correct case
 		store = "{}";
-		attributesPedestrian = new Gson().fromJson(store, AttributesAgent.class);
+		attributesPedestrian = StateJsonConverter.deserializeObjectFromJson(store, AttributesAgent.class);
 
 		assertArrayEquals(new double[] {1.34}, new double[] {attributesPedestrian.getSpeedDistributionMean()},
 				delta);
