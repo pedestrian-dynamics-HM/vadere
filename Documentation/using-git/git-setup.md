@@ -52,11 +52,15 @@ The URLs for public and private repositories are:
 
 For standard development and bugfixes, you can follow this workflow.
 
+First, fork the public repository:
+
+![GitLab fork](gitlab-fork.png)
+
 ```
-git clone <url-of-public-repo>
+git clone git@gitlab.lrz.de:YOURUSERNAME/vadere.git
 cd vadere
-git checkout develop
-git checkout -b dev/my-feature
+git checkout origin/develop
+git checkout -b my-feature
 ```
 
 With this commands, you
@@ -65,10 +69,9 @@ With this commands, you
 2. checkout the development branch on which we are working.
    (The `master` branch is reserved for stable releases.)
 3. checkout a new branch (based on `develop`) to work on a new feature.
-   (Note that the feature branch should start with `dev/` but cannot start with `develop/`.)
 
 After you finished the new feature, go to GitLab, view your feature branch and create a pull/merge request.
-The target branch must be `develop`, not `master`.
+The target branch must be `develop`, not `master`, in the official Vadere repository.
 
 ![Screenshout of GitLab merge request creation (1)](gitlab-merge-request.png)
 
@@ -80,7 +83,7 @@ To work on a private project, you can follow this workflow.
 
 If not already done,
 
-1. clone the public repository (see above).
+1. fork and clone the public repository (see above).
 2. add the private repository as a remote: `git remote add private <url-of-private-repo>`
 
 Now proceed with:
@@ -108,7 +111,7 @@ Precondition: One person has set up a private branch (see previous section).
 
 First, the co-worker has to do this steps (described in the previous section):
 
-1. Clone the public repository.
+1. Fork and clone the public repository.
 2. Add the private repository as a remote.
 
 Now, the co-worker proceeds with:
