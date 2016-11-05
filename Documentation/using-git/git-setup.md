@@ -46,6 +46,10 @@ The URLs for public and private repositories are:
 * git@gitlab.lrz.de:vadere/vadere.git
 * git@gitlab.lrz.de:vadere/vadere-private.git
 
+To access the GitLab repositories it is good to use an SSH key.
+GitHub explains the necessary steps on their
+[help pages](https://help.github.com/articles/generating-an-ssh-key/).
+
 ## Workflows
 
 ### Getting started & public contribution
