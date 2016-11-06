@@ -144,4 +144,9 @@ public class AttributesTarget extends Attributes {
 		return nextSpeed;
 	}
 
+	public void setReachedDistance(double reachedDistance) {
+		checkSealed();
+		this.deletionDistance = reachedDistance;
+	}
+
 }

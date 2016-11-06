@@ -32,4 +32,9 @@ public class AttributesTopography extends Attributes {
 		return bounded;
 	}
 
+	public void setBounds(VRectangle bounds) {
+		checkSealed();
+		this.bounds = bounds;
+	}
+
 }

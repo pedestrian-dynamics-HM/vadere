@@ -131,4 +131,34 @@ public class AttributesSource extends Attributes {
 		return dynamicElementType;
 	}
 
+	public void setStartTime(double time) {
+		checkSealed();
+		startTime = time;
+	}
+
+	public void setEndTime(double time) {
+		checkSealed();
+		endTime = time;
+	}
+
+	public void setDistributionParameters(List<Double> distributionParameters) {
+		checkSealed();
+		this.distributionParameters = distributionParameters;
+	}
+
+	public void setInterSpawnTimeDistribution(String interSpawnTimeDistribution) {
+		checkSealed();
+		this.interSpawnTimeDistribution = interSpawnTimeDistribution;
+	}
+
+	public void setMaxSpawnNumberTotal(int maxSpawnNumberTotal) {
+		checkSealed();
+		this.maxSpawnNumberTotal = maxSpawnNumberTotal;
+	}
+
+	public void setSpawnAtRandomPositions(boolean spawnAtRandomPositions) {
+		checkSealed();
+		this.spawnAtRandomPositions = spawnAtRandomPositions;
+	}
+
 }
