@@ -407,7 +407,7 @@ public class Topography {
 	}
 
 	public void sealAllAttributes() {
-		// don't try to do this with flatMap -> weird compiler error "cannot infer type arguments ..."
+		// tried to do this with flatMap -> weird compiler error "cannot infer type arguments ..."
 		for (List<? extends ScenarioElement> list : allScenarioElements) {
 			list.forEach(se -> se.getAttributes().seal());
 		}
