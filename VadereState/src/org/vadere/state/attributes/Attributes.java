@@ -17,4 +17,6 @@ package org.vadere.state.attributes;
  * 
  */
 public abstract class Attributes extends DefaultSealable {
+	/** Used for default ID values of some scenario elements. */
+	protected static final int ID_NOT_SET = -1;
 }

@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.VShape;
  */
 public class AttributesTarget extends Attributes {
 
-	private int id = -1;
+	private int id = ID_NOT_SET;
 	/**
 	 * True: elements are removed from the simulation after entering.
 	 * False: the target id is removed from the target id list, but the element remains.

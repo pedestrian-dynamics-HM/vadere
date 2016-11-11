@@ -14,7 +14,7 @@ public class AttributesSource extends Attributes {
 	public static final String CONSTANT_DISTRIBUTION = ConstantDistribution.class.getName();
 	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
 
-	private int id = -1;
+	private int id = ID_NOT_SET;
 
 	/** Shape and position. */
 	private VShape shape = null;

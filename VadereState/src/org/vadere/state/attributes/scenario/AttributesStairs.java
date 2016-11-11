@@ -19,7 +19,7 @@ import org.vadere.util.geometry.shapes.VShape;
 public class AttributesStairs extends Attributes {
 
 	private VShape shape = null;
-	private int id = -1;
+	private int id = ID_NOT_SET;
 	private int treadCount = 1;
 	private Vector2D upwardDirection = new Vector2D(1.0, 0.0);
 
