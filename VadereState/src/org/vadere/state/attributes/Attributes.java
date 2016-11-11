@@ -1,7 +1,5 @@
 package org.vadere.state.attributes;
 
-import org.apache.commons.attributes.DefaultSealable;
-
 /**
  * Abstract base class for all static simulation attributes.
  * 
