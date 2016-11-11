@@ -63,18 +63,6 @@ public class AttributesTarget extends Attributes {
 
 	public AttributesTarget() {}
 
-	public AttributesTarget(final AttributesTarget attributes, final VShape shape) {
-		this.shape = shape;
-		this.absorbing = attributes.absorbing;
-		this.id = attributes.id;
-		this.waitingTime = attributes.waitingTime;
-		this.waitingTimeYellowPhase = attributes.waitingTimeYellowPhase;
-		this.parallelWaiters = attributes.parallelWaiters;
-		this.individualWaiting = attributes.individualWaiting;
-		this.individualWaiting = attributes.startingWithRedLight;
-		this.nextSpeed = attributes.nextSpeed;
-	}
-
 	public AttributesTarget(final VShape shape) {
 		this.shape = shape;
 	}
