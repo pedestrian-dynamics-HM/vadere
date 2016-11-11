@@ -34,8 +34,6 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private List<Model> models;
 
-	private ProcessorManager processorManager;
-
 	private boolean runSimulation = false;
 	private boolean paused = false;
 	/**
@@ -52,11 +50,14 @@ public class Simulation {
 	private double runTimeInSec = 0;
 	private long lastFrameInMs = 0;
 	private int step = 0;
-	private final Topography topography;
 	private SimulationState simulationState;
-	private ScenarioStore scenarioStore;
+
 	private String name;
-	private MainModel mainModel;
+	private final ScenarioStore scenarioStore;
+	private final MainModel mainModel;
+	/** Hold the topography in an extra field for convenience. */
+	private final Topography topography;
+	private final ProcessorManager processorManager;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
