@@ -29,7 +29,7 @@ public class VadereProject implements ScenarioFinishedListener {
 
 	private String name;
 	private Thread currentScenarioThread;
-	private Scenario currentScenario;
+	private ScenarioRun currentScenarioRun;
 	private final List<PassiveCallback> visualization = new LinkedList<>();
 	private final ConcurrentMap<String, Scenario> scenarios = new ConcurrentHashMap<>();
 	private final BlockingQueue<ProjectFinishedListener> projectFinishedListener = new LinkedBlockingQueue<>();
@@ -77,14 +77,14 @@ public class VadereProject implements ScenarioFinishedListener {
 	/**
 	 * Runs the given scenarios, each in a separate thread.
 	 */
-	public void runScenarios(final Collection<Scenario> scenariosRMsToRun) {
-		for (Scenario scenarioRM : scenariosRMsToRun) {
+	public void runScenarios(final Collection<Scenario> scenariosToRun) {
+		for (Scenario scenarioRM : scenariosToRun) {
 			scenarioRM.setOutputPaths(outputDirectory);
 		}
 
 		// TODO [priority=normal] [task=bugfix] this is a bug: scenariosLeft may be overwritten even if there are still scenarios in it
 		scenariosLeft = new LinkedBlockingDeque<>();
-		scenariosLeft.addAll(scenariosRMsToRun);
+		scenariosLeft.addAll(scenariosToRun);
 
 		if (!scenariosLeft.isEmpty()) {
 			notifyProjectListenerAboutPreRun();
@@ -93,12 +93,12 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	private void prepareAndStartScenarioRunThread() {
-		currentScenario = prepareNextScenario();
-		currentScenarioThread = new Thread(currentScenario);
+		currentScenarioRun = prepareNextScenario();
+		currentScenarioThread = new Thread(currentScenarioRun);
 
 		currentScenarioThread.setUncaughtExceptionHandler((t, ex) -> {
-			currentScenario.simulationFailed(ex);
-			singleScenarioFinishedListener.forEach(l -> l.error(currentScenario, scenariosLeft.size(), ex));
+			currentScenarioRun.simulationFailed(ex);
+			singleScenarioFinishedListener.forEach(l -> l.error(currentScenarioRun.getScenario(), scenariosLeft.size(), ex));
 		});
 		currentScenarioThread.start();
 	}
@@ -138,18 +138,18 @@ public class VadereProject implements ScenarioFinishedListener {
 	@Override
 	public void scenarioRunThrewException(final Scenario scenario, final Throwable ex) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
-			l.error(currentScenario, scenariosLeft.size(), ex);
+			l.error(currentScenarioRun.getScenario(), scenariosLeft.size(), ex);
 		}
 	}
 
 	@Override
 	public void scenarioStarted(final Scenario scenario) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
-			l.scenarioStarted(currentScenario, scenariosLeft.size() + 1);
+			l.scenarioStarted(currentScenarioRun.getScenario(), scenariosLeft.size() + 1);
 		}
 	}
 
-	private Scenario prepareNextScenario() {
+	private ScenarioRun prepareNextScenario() {
 		Scenario nextScenario = scenariosLeft.remove().clone();
 		nextScenario.setScenarioFinishedListener(this);
 
@@ -160,7 +160,7 @@ public class VadereProject implements ScenarioFinishedListener {
 		if (!this.visualization.isEmpty()) {
 			nextScenario.addPassiveCallback(this.visualization.get(0));
 		}
-		return nextScenario;
+		return new ScenarioRun(nextScenario);
 	}
 
 	public void runAllScenarios() {
@@ -168,19 +168,19 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	public void pauseRunnningScenario() {
-		if (currentScenario.pause()) {
+		if (currentScenarioRun.pause()) {
 			for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
-				listener.scenarioPaused(currentScenario, scenariosLeft.size() + 1);
+				listener.scenarioPaused(currentScenarioRun.getScenario(), scenariosLeft.size() + 1);
 			}
 		}
 	}
 
 	public boolean isScenarioPaused() {
-		return !currentScenario.isRunning();
+		return !currentScenarioRun.isRunning();
 	}
 
 	public void resumePausedScenarios() {
-		currentScenario.resume();
+		currentScenarioRun.resume();
 	}
 
 	public void interruptRunningScenarios() {
@@ -199,7 +199,7 @@ public class VadereProject implements ScenarioFinishedListener {
 		}
 
 		for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
-			listener.scenarioInterrupted(currentScenario, scenariosLeft.size());
+			listener.scenarioInterrupted(currentScenarioRun.getScenario(), scenariosLeft.size());
 		}
 	}
 
@@ -268,7 +268,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	public Scenario getCurrentScenario() {
-		return currentScenario;
+		return currentScenarioRun.getScenario();
 	}
 
 	public void setMigrationStats(int[] migrationStats) {

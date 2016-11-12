@@ -287,4 +287,8 @@ public class ScenarioRun implements Runnable {
 	public Path getOutputPath() {
 		return outputPath;
 	}
+
+	public Scenario getScenario() {
+		return scenario;
+	}
 }
