@@ -5,8 +5,6 @@ import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ScenarioFactory {
@@ -26,14 +24,9 @@ public class ScenarioFactory {
 			scenarioDir = "";
 
 		String json = IOUtils.readTextFile(Paths.get(projectdirectory, scenarioDir, fileName).toString());
-		Scenario v = IOVadere.fromJson(json);
+		Scenario scenario = IOVadere.fromJson(json);
 
-		Path outPath = Paths.get(projectdirectory, IOUtils.OUTPUT_DIR);
-		if (!Files.exists(outPath))
-			Files.createDirectories(outPath);
-		v.setOutputPaths(outPath);
-
-		return v;
+		return scenario;
 	}
 
 }

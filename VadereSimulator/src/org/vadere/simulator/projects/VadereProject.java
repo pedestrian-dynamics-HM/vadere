@@ -78,10 +78,6 @@ public class VadereProject implements ScenarioFinishedListener {
 	 * Runs the given scenarios, each in a separate thread.
 	 */
 	public void runScenarios(final Collection<Scenario> scenariosToRun) {
-		for (Scenario scenarioRM : scenariosToRun) {
-			scenarioRM.setOutputPaths(outputDirectory);
-		}
-
 		// TODO [priority=normal] [task=bugfix] this is a bug: scenariosLeft may be overwritten even if there are still scenarios in it
 		scenariosLeft = new LinkedBlockingDeque<>();
 		scenariosLeft.addAll(scenariosToRun);
@@ -160,7 +156,9 @@ public class VadereProject implements ScenarioFinishedListener {
 		if (!this.visualization.isEmpty()) {
 			nextScenario.addPassiveCallback(this.visualization.get(0));
 		}
-		return new ScenarioRun(nextScenario);
+		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario);
+		scenarioRun.setOutputPaths(outputDirectory);
+		return scenarioRun;
 	}
 
 	public void runAllScenarios() {

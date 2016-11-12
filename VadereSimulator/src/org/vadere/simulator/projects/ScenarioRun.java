@@ -108,7 +108,7 @@ public class ScenarioRun implements Runnable {
 
 			createAndSetOutputDirectory();
 
-			scenario.saveToOutputPath();
+			scenario.saveToOutputPath(outputPath);
 
 			scenario.sealAllAttributes();
 

@@ -5,10 +5,8 @@ import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,7 +38,6 @@ public class Scenario {
 	private static Logger logger = LogManager.getLogger(Scenario.class);
 
 	private ScenarioStore scenarioStore;
-	private Path outputPath;
 
 	private List<ModelTest> modelTests;
 	private final List<PassiveCallback> passiveCallbacks;
@@ -69,7 +66,6 @@ public class Scenario {
 		this.scenarioStore = store;
 
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
-		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 
 		this.saveChanges();
 	}
@@ -147,15 +143,6 @@ public class Scenario {
 		passiveCallbacks.add(pc);
 	}
 
-	public void setOutputPaths(final Path outputPath) {
-		if (dataProcessingJsonManager.isTimestamped()) {
-			String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
-			this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
-		} else {
-			this.outputPath = Paths.get(outputPath.toString(), this.getName());
-		}
-	}
-
 	public void setName(String name) {
 		this.scenarioStore.name = name;
 	}
@@ -194,7 +181,6 @@ public class Scenario {
 		Scenario clonedScenario = null;
 		try {
 			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
-			clonedScenario.outputPath = outputPath;
 		} catch (IOException | VadereClassNotFoundException e) {
 			logger.error(e);
 		}
@@ -219,7 +205,6 @@ public class Scenario {
 			Scenario srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
 			scenarioStore = srm.scenarioStore;
-			outputPath = srm.outputPath;
 			dataProcessingJsonManager = srm.dataProcessingJsonManager;
 			processorManager = srm.processorManager;
 			modelTests = srm.modelTests;
@@ -258,11 +243,7 @@ public class Scenario {
 		this.dataProcessingJsonManager = manager;
 	}
 
-	public Path getOutputPath() {
-		return outputPath;
-	}
-
-	public void saveToOutputPath() {
+	public void saveToOutputPath(final Path outputPath) {
 		try (PrintWriter out = new PrintWriter(Paths.get(outputPath.toString(), getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 			out.println(JsonConverter.serializeScenarioRunManager(this, true));
 		} catch (IOException e) {
