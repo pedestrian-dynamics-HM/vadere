@@ -70,7 +70,7 @@ public class VadereConsole {
 		logger.info(String.format("Running VADERE on %s...", scenarioFilePath));
 
 		try {
-			Scenario scenario = VadereFactory.createVadereWithProjectDirectory(projectDirectory,
+			Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(projectDirectory,
 					vadereName + IOUtils.SCENARIO_FILE_EXTENSION, vadereName);
 			new ScenarioRun(scenario).run();
 		} catch (IOException e) {

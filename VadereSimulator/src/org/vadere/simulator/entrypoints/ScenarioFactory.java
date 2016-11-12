@@ -1,7 +1,5 @@
 package org.vadere.simulator.entrypoints;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.util.io.IOUtils;
@@ -11,23 +9,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * The VadereFactory create new Vadere-Scenario objects.
- *
- */
-public class VadereFactory {
-
-	private static Logger logger = LogManager.getLogger(VadereFactory.class);
+public class ScenarioFactory {
 
 	/**
-	 * Create a new Vadere with the specified name based on the path to the directory of the project
-	 * and the filename of the scenario of the Vadere.
+	 * Create a new {@link Scenario} with the specified name based on the path
+	 * to the directory of the project and the filename of the scenario.
 	 * 
 	 * @param projectdirectory directory to the addressed project
-	 * @param name name of the new Vadere object
+	 * @param name name of the new scenario
 	 * @param fileName filename of the addressed scenario
-	 * @return a new Vadere object
-	 * @throws IOException if something goes wrong creatin the output folders of the project
 	 */
 	public static Scenario createVadereWithProjectDirectory(final String projectdirectory,
 			final String fileName, final String name) throws IOException {
