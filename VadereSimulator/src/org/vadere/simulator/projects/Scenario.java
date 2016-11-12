@@ -3,7 +3,6 @@ package org.vadere.simulator.projects;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -12,14 +11,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -34,39 +29,41 @@ import org.vadere.util.reflection.VadereClassNotFoundException;
 import difflib.DiffUtils;
 
 /**
- * Receives an object of type ScenarioStore, manages a scenario and runs the simulation.
+ * Represents a Vadere scenario.
+ * Holds  a {@link ScenarioStore} object.
+ * 
+ * @author Jakob Schöttl
  * 
  */
-public class ScenarioRunManager implements Runnable {
+public class Scenario {
 
-	private static Logger logger = LogManager.getLogger(ScenarioRunManager.class);
+	private static Logger logger = LogManager.getLogger(Scenario.class);
 
-	protected ScenarioStore scenarioStore;
-	protected Path outputPath;
+	private ScenarioStore scenarioStore;
+	private Path outputPath;
 
 	private List<ModelTest> modelTests;
-	protected final List<PassiveCallback> passiveCallbacks;
+	private final List<PassiveCallback> passiveCallbacks;
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
-	protected ProcessorManager processorManager;
+	private ProcessorManager processorManager;
 
 	private ScenarioFinishedListener finishedListener;
-	protected Simulation simulation;
 	private boolean simpleOutputProcessorName = false;
 
 	private String savedStateSerialized;
 	private String currentStateSerialized;
 
 
-	public ScenarioRunManager(final String name) {
+	public Scenario(final String name) {
 		this(name, new ScenarioStore(name));
 	}
 
-	public ScenarioRunManager(final ScenarioStore store) {
+	public Scenario(final ScenarioStore store) {
 		this(store.name, store);
 	}
 
-	public ScenarioRunManager(final String name, final ScenarioStore store) {
+	public Scenario(final String name, final ScenarioStore store) {
 		this.passiveCallbacks = new LinkedList<>();
 		this.modelTests = new LinkedList<>();
 		this.scenarioStore = store;
@@ -107,76 +104,9 @@ public class ScenarioRunManager implements Runnable {
 		return null;
 	}
 
-	/**
-	 * This method runs a simulation. It must not catch any exceptions! The
-	 * caller (i.e. the calling thread) should catch exceptions and call
-	 * {@link #simulationFailed(Throwable)}.
-	 */
-	@Override
-	public void run() {
-		try {
-			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", this.getName()));
-
-			if (finishedListener != null)
-				this.finishedListener.scenarioStarted(this);
-
-			scenarioStore.topography.reset();
-
-			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
-			modelBuilder.createModelAndRandom();
-
-			final MainModel mainModel = modelBuilder.getModel();
-			final Random random = modelBuilder.getRandom();
-			
-			// prepare processors and simulation data writer
-			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
-
-			createAndSetOutputDirectory();
-
-			try (PrintWriter out = new PrintWriter(Paths.get(outputPath.toString(), getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
-				out.println(JsonConverter.serializeScenarioRunManager(this, true));
-			}
-
-			sealAllAttributes();
-
-			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
-			simulation.run();
-
-		} catch (Exception e) {
-			throw new RuntimeException("Simulation failed.", e);
-		} finally {
-			doAfterSimulation();
-		}
-	}
-	
-	public void simulationFailed(Throwable e) {
-			e.printStackTrace();
-			logger.error(e);
-			if (finishedListener != null)
-				finishedListener.scenarioRunThrewException(this, new Throwable(e));
-	}
-
-	protected void doAfterSimulation() {
-		if (finishedListener != null)
-			finishedListener.scenarioFinished(this);
-
-		passiveCallbacks.clear();
-
-		logger.info(String.format("Scenario finished."));
-		logger.info(String.format("Running output processor, if any..."));
-		logger.info(String.format("Done running scenario '%s': '%s'", getName(),
-				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
-	}
-
-	private void sealAllAttributes() {
+	public void sealAllAttributes() {
 		scenarioStore.sealAllAttributes();
 		processorManager.sealAllAttributes();
-	}
-
-	// Getter...
-	public boolean isRunning() {
-		return simulation != null && simulation.isRunning();
 	}
 
 	public String getName() {
@@ -259,34 +189,9 @@ public class ScenarioRunManager implements Runnable {
 		this.finishedListener = finishedListener;
 	}
 
-	public boolean pause() {
-		if (simulation != null) {
-			simulation.pause();
-			return true;
-		}
-		return false;
-	}
-
-	public void resume() {
-		if (simulation != null)
-			simulation.resume();
-	}
-
-
-	// Output stuff...
-	private void createAndSetOutputDirectory() {
-		try {
-			// Create output directory
-			Files.createDirectories(outputPath);
-			processorManager.setOutputPath(outputPath.toString());
-		} catch (IOException ex) {
-			throw new UncheckedIOException(ex);
-		}
-	}
-
 	@Override
-	public ScenarioRunManager clone() {
-		ScenarioRunManager clonedScenario = null;
+	public Scenario clone() {
+		Scenario clonedScenario = null;
 		try {
 			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
 			clonedScenario.outputPath = outputPath;
@@ -311,7 +216,7 @@ public class ScenarioRunManager implements Runnable {
 
 	public void discardChanges() {
 		try {
-			ScenarioRunManager srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
+			Scenario srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
 			scenarioStore = srm.scenarioStore;
 			outputPath = srm.outputPath;
@@ -319,7 +224,6 @@ public class ScenarioRunManager implements Runnable {
 			processorManager = srm.processorManager;
 			modelTests = srm.modelTests;
 			finishedListener = srm.finishedListener;
-			simulation = srm.simulation;
 			simpleOutputProcessorName = srm.simpleOutputProcessorName;
 			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
 		} catch (IOException | VadereClassNotFoundException e) {
@@ -356,5 +260,13 @@ public class ScenarioRunManager implements Runnable {
 
 	public Path getOutputPath() {
 		return outputPath;
+	}
+
+	public void saveToOutputPath() {
+		try (PrintWriter out = new PrintWriter(Paths.get(outputPath.toString(), getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
+			out.println(JsonConverter.serializeScenarioRunManager(this, true));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 }

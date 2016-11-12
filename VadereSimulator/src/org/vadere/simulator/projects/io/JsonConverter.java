@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.attributes.Attributes;
@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonConverter {
 	
-	public static ScenarioRunManager deserializeScenarioRunManager(String json) throws IOException {
+	public static Scenario deserializeScenarioRunManager(String json) throws IOException {
 		return deserializeScenarioRunManagerFromNode(StateJsonConverter.readTree(json));
 	}
 	
-	public static ScenarioRunManager deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
+	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
 		JsonNode scenarioNode = rootNode.get(StateJsonConverter.SCENARIO_KEY);
@@ -34,7 +34,7 @@ public class JsonConverter {
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
 		String description = rootNode.get("description").asText();
 		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, attributesModel, attributesSimulation, topography);
-		ScenarioRunManager scenarioRunManager = new ScenarioRunManager(scenarioStore);
+		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
 		scenarioRunManager.saveChanges();
@@ -62,7 +62,7 @@ public class JsonConverter {
 
 
 	// used in hasUnsavedChanges, TODO [priority=high] [task=bugfix] check if commitHashIncluded can always be false
-	public static String serializeScenarioRunManager(ScenarioRunManager scenarioRunManager) {
+	public static String serializeScenarioRunManager(Scenario scenarioRunManager) {
 		try {
 			return serializeScenarioRunManager(scenarioRunManager, false);
 		} catch (IOException e) {
@@ -71,12 +71,12 @@ public class JsonConverter {
 		return null;
 	}
 
-	public static String serializeScenarioRunManager(ScenarioRunManager scenarioRunManager, boolean commitHashIncluded)
+	public static String serializeScenarioRunManager(Scenario scenarioRunManager, boolean commitHashIncluded)
 			throws IOException {
 		return StateJsonConverter.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}
 
-	public static JsonNode serializeScenarioRunManagerToNode(ScenarioRunManager scenarioRunManager,
+	public static JsonNode serializeScenarioRunManagerToNode(Scenario scenarioRunManager,
 			boolean commitHashIncluded) throws IOException {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
 		ObjectNode rootNode = StateJsonConverter.createObjectNode();
@@ -113,7 +113,7 @@ public class JsonConverter {
 		return vadereNode;
 	}
 
-	public static ScenarioRunManager cloneScenarioRunManager(ScenarioRunManager original) throws IOException {
+	public static Scenario cloneScenarioRunManager(Scenario original) throws IOException {
 		JsonNode clone = serializeScenarioRunManagerToNode(original, false);
 		return deserializeScenarioRunManagerFromNode(clone);
 	}

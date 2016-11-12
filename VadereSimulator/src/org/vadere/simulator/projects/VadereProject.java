@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 /**
- * A VadereProject holds a list of {@link ScenarioRunManager}s and functionality to manage them.
+ * A VadereProject holds a list of {@link Scenario}s and functionality to manage them.
  * 
  */
 public class VadereProject implements ScenarioFinishedListener {
@@ -29,17 +29,17 @@ public class VadereProject implements ScenarioFinishedListener {
 
 	private String name;
 	private Thread currentScenarioThread;
-	private ScenarioRunManager currentScenario;
+	private Scenario currentScenario;
 	private final List<PassiveCallback> visualization = new LinkedList<>();
-	private final ConcurrentMap<String, ScenarioRunManager> scenarios = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Scenario> scenarios = new ConcurrentHashMap<>();
 	private final BlockingQueue<ProjectFinishedListener> projectFinishedListener = new LinkedBlockingQueue<>();
 	private final BlockingQueue<SingleScenarioFinishedListener> singleScenarioFinishedListener =
 			new LinkedBlockingQueue<>();
-	private LinkedBlockingDeque<ScenarioRunManager> scenariosLeft;
+	private LinkedBlockingDeque<Scenario> scenariosLeft;
 	private Path outputDirectory;
 	private int[] migrationStats; // scenarios: [0] total, [1] legacy'ed, [2] nonmigratable
 
-	public VadereProject(final String name, final Iterable<ScenarioRunManager> scenarios) {
+	public VadereProject(final String name, final Iterable<Scenario> scenarios) {
 		this.name = name;
 		scenarios.forEach(scenario -> addScenario(scenario));
 		this.outputDirectory = Paths.get("output");
@@ -53,7 +53,7 @@ public class VadereProject implements ScenarioFinishedListener {
 
 	public boolean hasUnsavedChanges() {
 		Set<String> currentScenarioIds = new HashSet<>();
-		for (ScenarioRunManager srm : getScenarios()) {
+		for (Scenario srm : getScenarios()) {
 			currentScenarioIds.add(srm.getName());
 			if (srm.hasUnsavedChanges())
 				return true;
@@ -65,7 +65,7 @@ public class VadereProject implements ScenarioFinishedListener {
 		String eol = "\n---------------\n";
 		Set<String> currentScenarioIds = new HashSet<>();
 		StringBuilder collectDiffs = new StringBuilder();
-		for (ScenarioRunManager srm : getScenarios()) {
+		for (Scenario srm : getScenarios()) {
 			currentScenarioIds.add(srm.getName());
 			String diff = srm.getDiff();
 			if (diff != null)
@@ -77,8 +77,8 @@ public class VadereProject implements ScenarioFinishedListener {
 	/**
 	 * Runs the given scenarios, each in a separate thread.
 	 */
-	public void runScenarios(final Collection<ScenarioRunManager> scenariosRMsToRun) {
-		for (ScenarioRunManager scenarioRM : scenariosRMsToRun) {
+	public void runScenarios(final Collection<Scenario> scenariosRMsToRun) {
+		for (Scenario scenarioRM : scenariosRMsToRun) {
 			scenarioRM.setOutputPaths(outputDirectory);
 		}
 
@@ -103,7 +103,7 @@ public class VadereProject implements ScenarioFinishedListener {
 		currentScenarioThread.start();
 	}
 
-	public void runScenario(final ScenarioRunManager scenario) {
+	public void runScenario(final Scenario scenario) {
 		runScenarios(Collections.singleton(scenario));
 	}
 
@@ -111,7 +111,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	 * Calls the next scenario if available.
 	 */
 	@Override
-	public void scenarioFinished(final ScenarioRunManager scenario) {
+	public void scenarioFinished(final Scenario scenario) {
 		notifyScenarioRMListenerAboutPostRun(scenario);
 
 		if (scenariosLeft.isEmpty()) {
@@ -129,28 +129,28 @@ public class VadereProject implements ScenarioFinishedListener {
 		}
 	}
 
-	private void notifyScenarioRMListenerAboutPostRun(final ScenarioRunManager scenario) {
+	private void notifyScenarioRMListenerAboutPostRun(final Scenario scenario) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
 			l.postScenarioRun(scenario, scenariosLeft.size());
 		}
 	}
 
 	@Override
-	public void scenarioRunThrewException(final ScenarioRunManager scenario, final Throwable ex) {
+	public void scenarioRunThrewException(final Scenario scenario, final Throwable ex) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
 			l.error(currentScenario, scenariosLeft.size(), ex);
 		}
 	}
 
 	@Override
-	public void scenarioStarted(final ScenarioRunManager scenario) {
+	public void scenarioStarted(final Scenario scenario) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
 			l.scenarioStarted(currentScenario, scenariosLeft.size() + 1);
 		}
 	}
 
-	private ScenarioRunManager prepareNextScenario() {
-		ScenarioRunManager nextScenario = scenariosLeft.remove().clone();
+	private Scenario prepareNextScenario() {
+		Scenario nextScenario = scenariosLeft.remove().clone();
 		nextScenario.setScenarioFinishedListener(this);
 
 		for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
@@ -230,14 +230,14 @@ public class VadereProject implements ScenarioFinishedListener {
 
 	// Getter...
 
-	public BlockingQueue<ScenarioRunManager> getScenarios() {
+	public BlockingQueue<Scenario> getScenarios() {
 		return scenarios.values().stream().sorted((f1, f2) -> f1.getName().compareTo(f2.getName())).collect(Collectors.toCollection(LinkedBlockingQueue::new));
 	}
 
-	public int getScenarioIndexByName(final ScenarioRunManager srm) {
+	public int getScenarioIndexByName(final Scenario srm) {
 		int index = -1;
 		int currentIndex = 0;
-		for(ScenarioRunManager csrm : getScenarios()) {
+		for(Scenario csrm : getScenarios()) {
 			if(csrm.getName().equals(srm.getName())) {
 				return currentIndex;
 			} else {
@@ -251,11 +251,11 @@ public class VadereProject implements ScenarioFinishedListener {
 		return name;
 	}
 
-	public ScenarioRunManager getScenario(int index) {
-		return getScenarios().toArray(new ScenarioRunManager[] {})[index];
+	public Scenario getScenario(int index) {
+		return getScenarios().toArray(new Scenario[] {})[index];
 	}
 
-	public void removeScenario(final ScenarioRunManager scenario) {
+	public void removeScenario(final Scenario scenario) {
 		scenarios.remove(scenario.getName());
 	}
 
@@ -263,11 +263,11 @@ public class VadereProject implements ScenarioFinishedListener {
 		return outputDirectory;
 	}
 
-	public void addScenario(final ScenarioRunManager scenario) {
+	public void addScenario(final Scenario scenario) {
 		this.scenarios.put(scenario.getName(), scenario);
 	}
 
-	public ScenarioRunManager getCurrentScenario() {
+	public Scenario getCurrentScenario() {
 		return currentScenario;
 	}
 

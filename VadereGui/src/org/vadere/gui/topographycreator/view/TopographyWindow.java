@@ -61,7 +61,7 @@ import org.vadere.gui.topographycreator.control.TopographyAction;
 import org.vadere.gui.topographycreator.control.UndoAdaptor;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.types.ScenarioElementType;
 
 import com.jgoodies.forms.layout.CellConstraints;
@@ -83,7 +83,7 @@ public class TopographyWindow extends JPanel {
 		return panelModel;
 	}
 
-	public TopographyWindow(final ScenarioRunManager currentScenario) throws IOException, IntrospectionException {
+	public TopographyWindow(final Scenario currentScenario) throws IOException, IntrospectionException {
 
 		toolbar = new ScenarioToolBar("Toolbar");
 		int toolbarSize = Integer.parseInt(resources.getProperty("Toolbar.size"));

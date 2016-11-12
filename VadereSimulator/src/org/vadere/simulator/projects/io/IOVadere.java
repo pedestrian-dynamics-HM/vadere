@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.io;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
@@ -25,7 +25,7 @@ public class IOVadere {
 
 	private static Logger logger = LogManager.getLogger(IOVadere.class);
 
-	public static ScenarioRunManager fromJson(final String json) throws IOException {
+	public static Scenario fromJson(final String json) throws IOException {
 		return JsonConverter.deserializeScenarioRunManager(json);
 	}
 
@@ -42,7 +42,7 @@ public class IOVadere {
 
 	public static VadereProject readProject(final String folderpath) throws IOException {
 		String name = IOUtils.readTextFile(Paths.get(folderpath, IOUtils.VADERE_PROJECT_FILENAME).toString());
-		List<ScenarioRunManager> scenarios = new ArrayList<>();
+		List<Scenario> scenarios = new ArrayList<>();
 		Set<String> scenarioNames = new HashSet<>();
 		Path p = Paths.get(folderpath, IOUtils.SCENARIO_DIR);
 		int[] migrationStats = {0, 0, 0};
@@ -52,7 +52,7 @@ public class IOVadere {
 
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				try {
-					ScenarioRunManager scenario =
+					Scenario scenario =
 							JsonConverter.deserializeScenarioRunManager(IOUtils.readTextFile(file.getAbsolutePath()));
 					if (!scenarioNames.add(scenario.getName())) {
 						logger.error("there are two scenarios with the same name!");

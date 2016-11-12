@@ -27,7 +27,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
@@ -53,7 +53,7 @@ public class TextView extends JPanel implements IJsonView {
 	private JPanel panelTop = new JPanel();
 
 	private static final long serialVersionUID = 3975758744810301970L;
-	private ScenarioRunManager currentScenario;
+	private Scenario currentScenario;
 
 	private JsonValidIndicator jsonValidIndicator;
 
@@ -208,7 +208,7 @@ public class TextView extends JPanel implements IJsonView {
 	}
 
 	@Override
-	public void setVadereScenario(ScenarioRunManager scenario) { // in order to avoid passing the exception upwards. might not be the best solution
+	public void setVadereScenario(Scenario scenario) { // in order to avoid passing the exception upwards. might not be the best solution
 		try {
 			setVadereScenarioThrows(scenario);
 		} catch (JsonProcessingException e) {
@@ -216,7 +216,7 @@ public class TextView extends JPanel implements IJsonView {
 		}
 	}
 
-	private void setVadereScenarioThrows(ScenarioRunManager scenario) throws JsonProcessingException {
+	private void setVadereScenarioThrows(Scenario scenario) throws JsonProcessingException {
 		this.currentScenario = scenario;
 
 		switch (attributeType) {

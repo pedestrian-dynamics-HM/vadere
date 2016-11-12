@@ -70,14 +70,14 @@ public class ProjectWriter {
 
 		// create all scenario files, try to save as many as possible!
 
-		for (ScenarioRunManager scenario : project.getScenarios()) {
+		for (Scenario scenario : project.getScenarios()) {
 			IOUtils.writeTextFile(
 					getScenarioPath(scenarioPath, scenario).toString(),
 					JsonConverter.serializeScenarioRunManager(scenario, includeCommitHash));
 		}
 	}
 
-	public static void writeScenarioFileJson(final String projectFolderPath, ScenarioRunManager scenario)
+	public static void writeScenarioFileJson(final String projectFolderPath, Scenario scenario)
 			throws IOException {
 		Path scenariosDir = Files.createDirectories(Paths.get(projectFolderPath, IOUtils.SCENARIO_DIR));
 		IOUtils.writeTextFile(
@@ -85,11 +85,11 @@ public class ProjectWriter {
 				JsonConverter.serializeScenarioRunManager(scenario, true));
 	}
 
-	public static Path getScenarioPath(Path scenariosDir, ScenarioRunManager scenario) {
+	public static Path getScenarioPath(Path scenariosDir, Scenario scenario) {
 		return Paths.get(scenariosDir.toString(), scenario.getName() + IOUtils.SCENARIO_FILE_EXTENSION);
 	}
 
-	public static void deleteScenario(ScenarioRunManager scenario, String folderpath) throws IOException {
+	public static void deleteScenario(Scenario scenario, String folderpath) throws IOException {
 		Path scenariosDir = Files.createDirectories(Paths.get(folderpath, IOUtils.SCENARIO_DIR));
 		Files.delete(getScenarioPath(scenariosDir, scenario));
 	}
@@ -102,7 +102,7 @@ public class ProjectWriter {
 		Files.move(Paths.get(oldPath), Paths.get(newPath));
 	}
 
-	public static void renameScenario(ScenarioRunManager scenario, String folderpath, String newName)
+	public static void renameScenario(Scenario scenario, String folderpath, String newName)
 			throws IOException {
 		Path scenariosDir = Files.createDirectories(Paths.get(folderpath, IOUtils.SCENARIO_DIR));
 		Path scenarioPath = getScenarioPath(scenariosDir, scenario);

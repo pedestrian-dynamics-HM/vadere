@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.io;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
@@ -33,7 +33,7 @@ public abstract class IOOutput {
 
 	private static Logger logger = LogManager.getLogger(IOOutput.class);
 
-	public static List<File> listSelectedOutputDirs(final VadereProject project, final ScenarioRunManager scenario) {
+	public static List<File> listSelectedOutputDirs(final VadereProject project, final Scenario scenario) {
 		List<File> selectedOutputDirectories = new LinkedList<>();
 
 		selectedOutputDirectories = listAllOutputDirs(project).stream()
@@ -60,27 +60,27 @@ public abstract class IOOutput {
 	}
 
 	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project,
-			final ScenarioRunManager scenario, final String directoryName) throws IOException {
+			final Scenario scenario, final String directoryName) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(
 				getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
 		return reader.readFile();
 	}
 
 	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath,
-			final ScenarioRunManager scenario) throws IOException {
+			final Scenario scenario) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(trajectoryFilePath, scenario);
 		Map<Step, List<Agent>> result = reader.readFile();
 		return result;
 	}
 
-	public static ScenarioRunManager readScenarioRunManager(final VadereProject project, final String directoryName)
+	public static Scenario readScenarioRunManager(final VadereProject project, final String directoryName)
 			throws IOException {
 		String snapshotString = IOUtils
 				.readTextFile(getPathToOutputFile(project, directoryName, IOUtils.SCENARIO_FILE_EXTENSION).toString());
 		return IOVadere.fromJson(snapshotString);
 	}
 
-	public static ScenarioRunManager readScenario(final File file) throws IOException {
+	public static Scenario readScenario(final File file) throws IOException {
 		String snapshotString;
 		Path path = file.toPath();
 		if (file.isFile() && file.getName().endsWith(IOUtils.SCENARIO_FILE_EXTENSION)) {
@@ -99,7 +99,7 @@ public abstract class IOOutput {
 		return IOVadere.fromJson(snapshotString);
 	}
 
-	public static ScenarioRunManager readScenario(final Path path) throws IOException {
+	public static Scenario readScenario(final Path path) throws IOException {
 		return IOOutput.readScenario(path.toFile());
 	}
 
@@ -179,7 +179,7 @@ public abstract class IOOutput {
 		}
 	}
 
-	private static Optional<ScenarioRunManager> readOutputFile(final VadereProject project, final File directory) {
+	private static Optional<Scenario> readOutputFile(final VadereProject project, final File directory) {
 		try {
 			final Path pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
 			return Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
@@ -194,12 +194,12 @@ public abstract class IOOutput {
 	}
 
 	private static boolean isMatchingOutputDirectory(final VadereProject project, final File directory,
-			final ScenarioRunManager scenario) {
-		Optional<ScenarioRunManager> optionalScenario = readOutputFile(project, directory);
+			final Scenario scenario) {
+		Optional<Scenario> optionalScenario = readOutputFile(project, directory);
 		return directory.isDirectory() && optionalScenario.isPresent() && equalHash(optionalScenario.get(), scenario);
 	}
 
-	private static boolean equalHash(final ScenarioRunManager scenario1, ScenarioRunManager scenario2) {
+	private static boolean equalHash(final Scenario scenario1, Scenario scenario2) {
 		try {
 			final String hash1 = scenario1.getScenarioStore().hashOfJsonRepresentation();
 			final String hash2 = scenario2.getScenarioStore().hashOfJsonRepresentation();

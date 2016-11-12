@@ -10,7 +10,7 @@ import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
@@ -54,7 +54,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private String visualizationCardName = "visualization";
 	private String editCardName = "edit";
 
-	private ScenarioRunManager scenario;
+	private Scenario scenario;
 	private boolean initialized;
 
 	private static String activeJsonParsingErrorMsg = null;
@@ -205,7 +205,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	 * @param scenario
 	 *        Vadere with data that should be shown and edited.
 	 */
-	public void setScenario(ScenarioRunManager scenario, boolean isEditable) {
+	public void setScenario(Scenario scenario, boolean isEditable) {
 		this.scenario = scenario;
 		this.scenarioName.setText(scenario.getDisplayName());
 		if (!initialized) {
@@ -302,11 +302,11 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		showEditScenario();
 	}
 
-	public void loadOutputFileForPostVis(ScenarioRunManager scenarioRM) throws IOException {
+	public void loadOutputFileForPostVis(Scenario scenarioRM) throws IOException {
 		postVisualizationView.loadOutputFile(scenarioRM);
 	}
 
-	public void loadOutputFileForPostVis(File trajectoryFile, ScenarioRunManager scenarioRM) throws IOException {
+	public void loadOutputFileForPostVis(File trajectoryFile, Scenario scenarioRM) throws IOException {
 		postVisualizationView.loadOutputFile(trajectoryFile, scenarioRM);
 	}
 
