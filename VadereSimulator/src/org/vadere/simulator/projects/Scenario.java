@@ -232,11 +232,11 @@ public class Scenario {
 	}
 
 	public ProcessorManager getProcessorManager() {
-		return this.processorManager;
+		return processorManager;
 	}
 
 	public DataProcessingJsonManager getDataProcessingJsonManager() {
-		return this.dataProcessingJsonManager;
+		return dataProcessingJsonManager;
 	}
 
 	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {

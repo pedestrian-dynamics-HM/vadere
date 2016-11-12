@@ -90,7 +90,7 @@ public class ScenarioRun implements Runnable {
 	@Override
 	public void run() {
 		try {
-			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", getName()));
+			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 
 			if (finishedListener != null)
 				this.finishedListener.scenarioStarted(scenario);
@@ -127,7 +127,7 @@ public class ScenarioRun implements Runnable {
 			e.printStackTrace();
 			logger.error(e);
 			if (finishedListener != null)
-				finishedListener.scenarioRunThrewException(scenario, new Throwable(e));
+				finishedListener.scenarioRunThrewException(scenario, e);
 	}
 
 	protected void doAfterSimulation() {
@@ -138,17 +138,13 @@ public class ScenarioRun implements Runnable {
 
 		logger.info(String.format("Scenario finished."));
 		logger.info(String.format("Running output processor, if any..."));
-		logger.info(String.format("Done running scenario '%s': '%s'", getName(),
+		logger.info(String.format("Done running scenario '%s': '%s'", scenario.getName(),
 				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
 	}
 
 	// Getter...
 	public boolean isRunning() {
 		return simulation != null && simulation.isRunning();
-	}
-
-	public String getName() {
-		return scenarioStore.name;
 	}
 
 	public ScenarioStore getScenarioStore() {
@@ -188,9 +184,9 @@ public class ScenarioRun implements Runnable {
 	public void setOutputPaths(final Path outputPath) {
 		if (dataProcessingJsonManager.isTimestamped()) {
 			String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
-			this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", this.getName(), dateString));
+			this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", scenario.getName(), dateString));
 		} else {
-			this.outputPath = Paths.get(outputPath.toString(), this.getName());
+			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
 		}
 	}
 
@@ -254,7 +250,7 @@ public class ScenarioRun implements Runnable {
 
 	@Override
 	public String toString() {
-		return getName();
+		return scenario.getName();
 	}
 
 	public String getDescription() {
