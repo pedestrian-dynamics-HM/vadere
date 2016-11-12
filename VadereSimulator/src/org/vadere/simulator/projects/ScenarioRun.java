@@ -19,7 +19,6 @@ import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -40,7 +39,6 @@ public class ScenarioRun implements Runnable {
 	private ScenarioStore scenarioStore;
 	private Path outputPath;
 
-	private List<ModelTest> modelTests;
 	private final List<PassiveCallback> passiveCallbacks;
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
@@ -68,7 +66,6 @@ public class ScenarioRun implements Runnable {
 	@Deprecated
 	public ScenarioRun(final String name, final ScenarioStore store) {
 		this.passiveCallbacks = new LinkedList<>();
-		this.modelTests = new LinkedList<>();
 		this.scenarioStore = store;
 		
 		this.scenario = null;
@@ -136,10 +133,7 @@ public class ScenarioRun implements Runnable {
 
 		passiveCallbacks.clear();
 
-		logger.info(String.format("Scenario finished."));
-		logger.info(String.format("Running output processor, if any..."));
-		logger.info(String.format("Done running scenario '%s': '%s'", scenario.getName(),
-				(isSuccessful() ? "SUCCESSFUL" : "FAILURE")));
+		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
 
 	// Getter...
@@ -192,15 +186,6 @@ public class ScenarioRun implements Runnable {
 
 	public void setName(String name) {
 		this.scenarioStore.name = name;
-	}
-
-	public boolean isSuccessful() {
-		for (ModelTest modelTest : modelTests) {
-			if (!modelTest.isSucceeded()) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public void setAttributesModel(List<Attributes> attributesList) {

@@ -14,7 +14,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.ModelTest;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -39,7 +38,6 @@ public class Scenario {
 
 	private ScenarioStore scenarioStore;
 
-	private List<ModelTest> modelTests;
 	private final List<PassiveCallback> passiveCallbacks;
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
@@ -62,7 +60,6 @@ public class Scenario {
 
 	public Scenario(final String name, final ScenarioStore store) {
 		this.passiveCallbacks = new LinkedList<>();
-		this.modelTests = new LinkedList<>();
 		this.scenarioStore = store;
 
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
@@ -147,15 +144,6 @@ public class Scenario {
 		this.scenarioStore.name = name;
 	}
 
-	public boolean isSuccessful() {
-		for (ModelTest modelTest : modelTests) {
-			if (!modelTest.isSucceeded()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public void setAttributesModel(List<Attributes> attributesList) {
 		scenarioStore.attributesList = attributesList;
 	}
@@ -207,7 +195,6 @@ public class Scenario {
 			scenarioStore = srm.scenarioStore;
 			dataProcessingJsonManager = srm.dataProcessingJsonManager;
 			processorManager = srm.processorManager;
-			modelTests = srm.modelTests;
 			finishedListener = srm.finishedListener;
 			simpleOutputProcessorName = srm.simpleOutputProcessorName;
 			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
