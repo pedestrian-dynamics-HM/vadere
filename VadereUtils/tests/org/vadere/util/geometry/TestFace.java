@@ -10,12 +10,11 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 
+import static org.junit.Assert.assertEquals;
 
 public class TestFace {
 
