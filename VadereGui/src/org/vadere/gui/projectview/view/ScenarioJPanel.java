@@ -286,7 +286,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	@Override
 	public void projectChanged(final VadereProject project) {
 		clear();
-		project.addVisualization(onlineVisualization);
+		project.setVisualization(onlineVisualization);
 	}
 
 	@Override

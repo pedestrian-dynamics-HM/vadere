@@ -9,8 +9,6 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +28,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	private String name;
 	private Thread currentScenarioThread;
 	private ScenarioRun currentScenarioRun;
-	private final List<PassiveCallback> visualization = new LinkedList<>();
+	private PassiveCallback visualization;
 	private final ConcurrentMap<String, Scenario> scenarios = new ConcurrentHashMap<>();
 	private final BlockingQueue<ProjectFinishedListener> projectFinishedListener = new LinkedBlockingQueue<>();
 	private final BlockingQueue<SingleScenarioFinishedListener> singleScenarioFinishedListener =
@@ -151,8 +149,8 @@ public class VadereProject implements ScenarioFinishedListener {
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		if (!visualization.isEmpty()) {
-			nextScenario.addPassiveCallback(visualization.get(0));
+		if (visualization != null) {
+			nextScenario.addPassiveCallback(visualization);
 		}
 		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario);
 		scenarioRun.setOutputPaths(outputDirectory);
@@ -215,9 +213,8 @@ public class VadereProject implements ScenarioFinishedListener {
 		singleScenarioFinishedListener.add(listener);
 	}
 
-	public void addVisualization(PassiveCallback pc) {
-		visualization.clear();
-		visualization.add(pc);
+	public void setVisualization(PassiveCallback passiveCallback) {
+		visualization = passiveCallback;
 	}
 
 	// Setter...
