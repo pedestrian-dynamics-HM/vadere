@@ -1,7 +1,6 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.util.geometry.mesh.Face;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.potential.CellGrid;

@@ -92,6 +92,34 @@ public class VTriangle extends VPolygon {
 				|| l3.ptSegDist(p1) < GeometryUtils.DOUBLE_EPS;
 	}
 
+	@Override
+	public VPoint getCentroid() {
+		if(centroid == null) {
+			centroid = super.getCentroid();
+		}
+		return centroid;
+	}
+
+	public VPoint getCenter(){
+		if(center == null) {
+			double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
+			double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
+					+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
+					+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p1.getY() - p2.getY())) / d;
+			double y = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p3.getX() - p2.getX())
+					+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p1.getX() - p3.getX())
+					+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p2.getX() - p1.getX())) / d;
+
+			center = new VPoint(x,y);
+		}
+
+		return center;
+	}
+
+	public boolean isInCircumscribedCycle(final VPoint point) {
+		return getCenter().distance(point) < getCircumscribedRadius();
+	}
+
 	public boolean isNonAcute() {
 		double angle1 = GeometryUtils.angle(p1, p2, p3);
 		double angle2 = GeometryUtils.angle(p2, p3, p1);
@@ -101,14 +129,6 @@ public class VTriangle extends VPolygon {
 		double maxAngle = Math.max(Math.max(angle1, angle2), angle3);
 		double rightAngle = Math.PI/2;
 		return maxAngle > rightAngle;
-	}
-
-	@Override
-	public VPoint getCentroid() {
-		if(centroid == null) {
-			centroid = super.getCentroid();
-		}
-		return centroid;
 	}
 
 	public VPoint getIncenter(){
