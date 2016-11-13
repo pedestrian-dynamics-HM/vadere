@@ -13,7 +13,6 @@ import org.vadere.util.geometry.shapes.VRectangle;
 public class Car extends Agent implements Comparable<Car> {
 
 	private final AttributesCar attributesCar;
-	private transient Random random;
 
 	public Car(AttributesCar attributesCar, Random random) {
 		super(attributesCar, random);
@@ -30,7 +29,7 @@ public class Car extends Agent implements Comparable<Car> {
 	 * @param other: Car to clone
 	 */
 	private Car(Car other) {
-		this(other.attributesCar, other.random);
+		this(other.attributesCar, null); // TODO car cannot be cloned because it cannot provide a random
 		setPosition(other.getPosition());
 		setVelocity(other.getVelocity());
 		setTargets(new LinkedList<>(other.getTargets()));
@@ -86,11 +85,5 @@ public class Car extends Agent implements Comparable<Car> {
 	public int getId() {
 		return attributesCar.getId();
 	}
-
-	/*
-	 * public LinkedList<Integer> getTargetIDs() {
-	 * return getTargets();
-	 * }
-	 */
 
 }
