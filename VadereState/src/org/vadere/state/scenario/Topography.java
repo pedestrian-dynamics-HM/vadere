@@ -2,10 +2,17 @@ package org.vadere.state.scenario;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -17,6 +24,9 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public class Topography {
 
+	/** Transient to prevent JSON serialization. */
+	private transient Logger logger = Logger.getLogger(Topography.class);
+	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
 	 * Cell size of the internal storage of DynamicElements. Is used in the LinkedCellsGrid.
@@ -73,6 +83,10 @@ public class Topography {
 		allOtherAttributes.add(attributesCar);
 		allOtherAttributes.add(attributesPedestrian);
 		removeNullFromSet(allOtherAttributes);
+		// Actually, only attributes, not nulls should be added to this set.
+		// But sometimes null is passed as attributes and added to the set,
+		// although it is bad practice to pass null in the first place
+		// (as constructor argument).
 
 		obstacles = new LinkedList<>();
 		stairs = new LinkedList<>();
@@ -85,7 +99,6 @@ public class Topography {
 		allScenarioElements.add(sources);
 		allScenarioElements.add(targets);
 		allScenarioElements.add(boundaryObstacles);
-		removeNullFromSet(allScenarioElements);
 
 		RectangularShape bounds = this.getBounds();
 
@@ -97,10 +110,6 @@ public class Topography {
 	/** Clean up a set by removing {@code null}. */
 	private void removeNullFromSet(Set<?> aSet) {
 		aSet.remove(null);
-		// Actually, only attributes, not nulls should be added to this set.
-		// But sometimes null is passed as attributes and added to the set,
-		// although it is bad practice to pass null in the first place
-		// (as constructor argument).
 	}
 
 	public Topography() {
@@ -413,12 +422,18 @@ public class Topography {
 	public void sealAllAttributes() {
 		// tried to do this with flatMap -> weird compiler error "cannot infer type arguments ..."
 		for (List<? extends ScenarioElement> list : allScenarioElements) {
+
+			// defensive programming:
 			if (list == null)
 				throw new RuntimeException("scenario elem list is null");
 			for (ScenarioElement scenarioElement : list) {
-				if (scenarioElement.getAttributes() != null)
-					throw new RuntimeException("scenario elem attr are null: " + scenarioElement);
+				if (scenarioElement.getAttributes() == null) {
+					list.remove(scenarioElement);
+					logger.warn("a scenario element has null as attributes: " + scenarioElement);
+					// TODO this is an error in a different place and should be fixed!
+				}
 			}
+
 			list.forEach(se -> se.getAttributes().seal());
 		}
 		allOtherAttributes.forEach(a -> a.seal());
