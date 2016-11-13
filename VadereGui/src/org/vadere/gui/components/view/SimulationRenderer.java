@@ -7,6 +7,7 @@ import java.awt.Stroke;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
@@ -17,6 +18,7 @@ import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
@@ -91,6 +93,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 			renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
 		}
 
+		if(model.isTriangulationVisible()) {
+			renderTriangulation(graphics, model.getTriangulation());
+		}
+
 		renderSimulationContent(graphics);
 
 		if (model.isElementSelected()) {
@@ -131,6 +137,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		g.draw(path);
 		g.setColor(color);
 		// g.setStroke(stroke);
+	}
+
+	protected void renderTriangulation(final Graphics2D g, final Collection<VTriangle> triangleList) {
+		g.setColor(Color.GRAY);
+		g.setStroke(new BasicStroke(getGridLineWidth()));
+		triangleList.stream().forEach(triangle -> g.draw(triangle));
 	}
 
 	private void renderDensity(final Graphics2D g) {
@@ -192,4 +204,8 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	}
 
 	protected abstract void renderSimulationContent(final Graphics2D g);
+
+	private float getGridLineWidth() {
+		return (float) (0.5 / model.getScaleFactor());
+	}
 }

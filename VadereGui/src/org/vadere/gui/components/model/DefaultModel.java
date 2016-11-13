@@ -7,7 +7,10 @@ import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.adaptive.PerssonStrangDistmesh;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
@@ -15,6 +18,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -35,6 +39,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	private boolean showSelection;
 
 	private boolean showVoroniDiagram;
+
+	private boolean showTriangulation;
 
 	private VPoint cursorWorldPosition;
 
@@ -58,6 +64,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
+	public List<VTriangle> triangulation;
+
 	public DefaultModel(final T config) {
 		this.config = config;
 		this.scaleFactor = 50;
@@ -67,10 +75,12 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.selectScenarioElementListener = new LinkedList<>();
 		this.voronoiDiagram = null;
 		this.showVoroniDiagram = false;
+		this.showTriangulation = false;
 		this.showSelection = false;
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();
 		this.scaleChangeListeners = new ArrayList<>();
+		this.triangulation = new ArrayList<>();
 	}
 
 	@Override
@@ -143,6 +153,10 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		for (IViewportChangeListener listener : viewportChangeListeners) {
 			listener.viewportChange(event);
 		}
+	}
+
+	public boolean isTriangulationVisible() {
+		return showTriangulation;
 	}
 
 	@Override
@@ -335,6 +349,18 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
+	public void showTriangulation() {
+		showTriangulation = true;
+		setChanged();
+	}
+
+	@Override
+	public void hideTriangulation() {
+		showTriangulation = false;
+		setChanged();
+	}
+
+	@Override
 	public void showSelection() {
 		showSelection = true;
 		setChanged();
@@ -473,5 +499,22 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public T getConfig() {
 		return config;
+	}
+
+	/*
+	 * returns the adaptive triangulation (see persson-2004 'A Simple Mesh Generator in MATLAB.')
+	 */
+	public Collection<VTriangle> getTriangulation() {
+		if(triangulation.isEmpty()) {
+			PerssonStrangDistmesh psd = new PerssonStrangDistmesh(
+					new VRectangle(getTopographyBound()),
+					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+					1.0,
+					false,
+					l -> 0.0,
+					"Distmesh");
+			triangulation = psd.getTriangulation().getVTriangles();
+		}
+		return triangulation;
 	}
 }
