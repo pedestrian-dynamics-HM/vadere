@@ -12,7 +12,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.triangulation.adaptive.PSDistmesh;
+import org.vadere.util.triangulation.adaptive.PerssonStrangDistmesh;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
@@ -66,9 +66,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	public Collection<? extends VTriangle> triangulation;
-
-	protected boolean triangulationTriggered = false;
+	public List<VTriangle> triangulation;
 
 	public DefaultModel(final T config) {
 		this.config = config;
@@ -508,41 +506,17 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	/*
 	 * returns the adaptive triangulation (see persson-2004 'A Simple Mesh Generator in MATLAB.')
 	 */
-	public void startTriangulation() {
-		if(!triangulationTriggered) {
-			triangulationTriggered = true;
-			VRectangle bound = new VRectangle(getTopographyBound());
-			Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
-			obstacles.addAll(getTopography().getObstacles());
-
-			PSDistmesh psDistmesh = new PSDistmesh(
-					bound,
-					obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList()),
-					Math.max(0.1, Math.max(bound.getWidth(), bound.getHeight())) / 100,
-					false
-			);
-
-			Thread t = new Thread(
-				() -> {
-					while (!psDistmesh.hasConverged() && !psDistmesh.hasMaximalSteps()) {
-						psDistmesh.step();
-						synchronized (triangulation) {
-							triangulation = psDistmesh.getTriangles();
-							setChanged();
-							fireChangeViewportEvent(bound);
-						}
-					}
-					psDistmesh.cleanUp();
-					triangulation = psDistmesh.getTriangles();
-					setChanged();
-					fireChangeViewportEvent(bound);
-				});
-
-			t.start();
-		}
-	}
-
 	public Collection<? extends VTriangle> getTriangulation() {
+		if(triangulation.isEmpty()) {
+			PerssonStrangDistmesh psd = new PerssonStrangDistmesh(
+					new VRectangle(getTopographyBound()),
+					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+					1.0,
+					false,
+					l -> 0.0,
+					"Distmesh");
+			triangulation = psd.getTriangulation().getVTriangles();
+		}
 		return triangulation;
 	}
 }
