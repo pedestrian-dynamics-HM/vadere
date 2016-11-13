@@ -192,11 +192,11 @@ public class TextView extends JPanel implements IJsonView {
 								break;
 						}
 						currentScenario.updateCurrentStateSerialized();
-						ScenarioJPanel.removeJsonParsingErrorMsg();
+						ScenarioPanel.removeJsonParsingErrorMsg();
 						ProjectView.getMainWindow().refreshScenarioNames();
 						jsonValidIndicator.setValid();
 					} catch (Exception e) {
-						ScenarioJPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
+						ScenarioPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
 						jsonValidIndicator.setInvalid();
 					}
 				}

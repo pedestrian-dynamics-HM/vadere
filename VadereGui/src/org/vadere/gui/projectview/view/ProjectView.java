@@ -98,7 +98,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JButton btnPauseRunningScenarios;
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
-	private ScenarioJPanel scenarioJPanel;
+	private ScenarioPanel scenarioJPanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
 
@@ -644,7 +644,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ScenarioNamePanel.add(scenarioName);
 		scenarioName.setHorizontalAlignment(SwingConstants.CENTER);
 
-		scenarioJPanel = new ScenarioJPanel(scenarioName, model);
+		scenarioJPanel = new ScenarioPanel(scenarioName, model);
 		model.setScenarioNameLabel(scenarioName); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);

@@ -10,7 +10,7 @@ public class TabbedPaneWrapper extends JTabbedPane {
 
 	@Override
 	public void setSelectedIndex(int index) {
-		String errorMsg = ScenarioJPanel.getActiveJsonParsingErrorMsg();
+		String errorMsg = ScenarioPanel.getActiveJsonParsingErrorMsg();
 		if (errorMsg == null)
 			super.setSelectedIndex(index);
 		else

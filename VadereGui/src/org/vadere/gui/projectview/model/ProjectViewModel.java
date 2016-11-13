@@ -6,7 +6,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.gui.projectview.view.ScenarioJPanel;
+import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.projectview.view.VTable;
 import org.vadere.simulator.projects.Scenario;
@@ -365,7 +365,7 @@ public class ProjectViewModel {
 			}
 		}
 
-		String errorMsg = ScenarioJPanel.getActiveJsonParsingErrorMsg();
+		String errorMsg = ScenarioPanel.getActiveJsonParsingErrorMsg();
 		if (errorMsg != null) {
 			VDialogManager.showMessageDialogWithBodyAndTextArea(
 					Messages.getString("RunScenarioJsonErrors.title"),

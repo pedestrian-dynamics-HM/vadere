@@ -25,9 +25,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 
-public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
+public class ScenarioPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
 
-	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
+	private static Logger logger = LogManager.getLogger(ScenarioPanel.class);
 	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;
@@ -54,7 +54,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	ScenarioJPanel(JLabel scenarioName, ProjectViewModel model) {
+	ScenarioPanel(JLabel scenarioName, ProjectViewModel model) {
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
