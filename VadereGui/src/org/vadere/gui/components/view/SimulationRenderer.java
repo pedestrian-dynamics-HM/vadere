@@ -22,76 +22,76 @@ import org.vadere.util.geometry.shapes.VTriangle;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
-    private static Logger logger = LogManager.getLogger(SimulationRenderer.class);
-    private static Resources resources = Resources.getInstance("postvisualization");
+	private static Logger logger = LogManager.getLogger(SimulationRenderer.class);
+	private static Resources resources = Resources.getInstance("postvisualization");
 
-    private static double MAX_POTENTIAL = 1000.0;
-    private static double CONTOUR_STEP = 2.0;
-    private static double CONTOUR_THINKNESS = 0.2;
+	private static double MAX_POTENTIAL = 1000.0;
+	private static double CONTOUR_STEP = 2.0;
+	private static double CONTOUR_THINKNESS = 0.2;
 
-    private SimulationModel model;
-    private BufferedImage obstacleDensity = null;
-    private BufferedImage potentialFieldImage = null;
-    private ColorHelper colorHelper;
-    private Color lastDensityColor = null;
-    private int topographyId;
+	private SimulationModel model;
+	private BufferedImage obstacleDensity = null;
+	private BufferedImage potentialFieldImage = null;
+	private ColorHelper colorHelper;
+	private Color lastDensityColor = null;
+	private int topographyId;
 
-    public SimulationRenderer(final SimulationModel model) {
-        super(model);
-        this.model = model;
-        this.topographyId = -1;
-        this.colorHelper = new ColorHelper(40);
-    }
+	public SimulationRenderer(final SimulationModel model) {
+		super(model);
+		this.model = model;
+		this.topographyId = -1;
+		this.colorHelper = new ColorHelper(40);
+	}
 
-    @Override
-    protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
-        if (model.isFloorFieldAvailable() && model.config.isShowPotentialField()) {
-            synchronized (model) {
-                renderPotentialField(graphics2D,
-                        (int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
-                        (int)(Math.min(model.getTopographyBound().height, model.getViewportBound().height) * model.getScaleFactor()));
-            }
-        }
-        super.renderPreTransformation(graphics2D, width, height);
-    }
+	@Override
+	protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
+		if (model.isFloorFieldAvailable() && model.config.isShowPotentialField()) {
+			synchronized (model) {
+				renderPotentialField(graphics2D,
+						(int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
+						(int)(Math.min(model.getTopographyBound().height, model.getViewportBound().height) * model.getScaleFactor()));
+			}
+		}
+		super.renderPreTransformation(graphics2D, width, height);
+	}
 
-    @Override
-    public void renderPostTransformation(final Graphics2D graphics, final int width, final int height) {
-        graphics.setColor(Color.BLACK);
+	@Override
+	public void renderPostTransformation(final Graphics2D graphics, final int width, final int height) {
+		graphics.setColor(Color.BLACK);
 
-        // if there is no potential field than draw the default background (white)
-        // otherwise do not overdraw the potential field!!!
-        if (!model.isFloorFieldAvailable() || !model.config.isShowPotentialField()) {
-            super.renderPostTransformation(graphics, width, height);
-        }
+		// if there is no potential field than draw the default background (white)
+		// otherwise do not overdraw the potential field!!!
+		if (!model.isFloorFieldAvailable() || !model.config.isShowPotentialField()) {
+			super.renderPostTransformation(graphics, width, height);
+		}
 
-        if (model.config.isShowDensity()) {
-            renderDensity(graphics);
-        }
+		if (model.config.isShowDensity()) {
+			renderDensity(graphics);
+		}
 
-        if (model.config.isShowGrid()) {
-            renderGrid(graphics);
-        }
+		if (model.config.isShowGrid()) {
+			renderGrid(graphics);
+		}
 
-        if (model.config.isShowObstacles()) {
-            renderScenarioElement(model.getTopography().getObstacles(), graphics, model.config.getObstacleColor());
-        }
+		if (model.config.isShowObstacles()) {
+			renderScenarioElement(model.getTopography().getObstacles(), graphics, model.config.getObstacleColor());
+		}
 
-        if (model.config.isShowStairs()) {
-            renderScenarioElement(model.getTopography().getStairs(), graphics, model.config.getStairColor());
-        }
+		if (model.config.isShowStairs()) {
+			renderScenarioElement(model.getTopography().getStairs(), graphics, model.config.getStairColor());
+		}
 
-        if (model.config.isShowTargets()) {
-            renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
-        }
+		if (model.config.isShowTargets()) {
+			renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
+		}
 
-        if (model.config.isShowSources()) {
-            renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
-        }
+		if (model.config.isShowSources()) {
+			renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
+		}
 
-        if (model.isVoronoiDiagramAvailable() && model.isVoronoiDiagramVisible()) {
-            renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
-        }
+		if (model.isVoronoiDiagramAvailable() && model.isVoronoiDiagramVisible()) {
+			renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
+		}
 
 		if(model.isTriangulationVisible()) {
 			model.startTriangulation();
@@ -100,45 +100,45 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
 		renderSimulationContent(graphics);
 
-        if (model.isElementSelected()) {
-            renderSelectionBorder(graphics);
-        }
+		if (model.isElementSelected()) {
+			renderSelectionBorder(graphics);
+		}
 
-        if (model.isSelectionVisible()) {
-            renderSelectionShape(graphics);
-        }
+		if (model.isSelectionVisible()) {
+			renderSelectionShape(graphics);
+		}
 
-        if (hasLogo() && model.config.isShowLogo()) {
-            renderLogo(graphics, model.getScaleFactor(), height);
-        }
+		if (hasLogo() && model.config.isShowLogo()) {
+			renderLogo(graphics, model.getScaleFactor(), height);
+		}
 
-        graphics.dispose();
-    }
+		graphics.dispose();
+	}
 
-    protected void renderTrajectory(final Graphics2D g, final java.util.List<VPoint> points, final Agent pedestrain) {
-        renderTrajectory(g, points.stream(), pedestrain);
-    }
+	protected void renderTrajectory(final Graphics2D g, final java.util.List<VPoint> points, final Agent pedestrain) {
+		renderTrajectory(g, points.stream(), pedestrain);
+	}
 
-    protected void renderTrajectory(final Graphics2D g, final Stream<VPoint> points, final Agent pedestrain) {
-        Color color = g.getColor();
-        Stroke stroke = g.getStroke();
+	protected void renderTrajectory(final Graphics2D g, final Stream<VPoint> points, final Agent pedestrain) {
+		Color color = g.getColor();
+		Stroke stroke = g.getStroke();
 
-        if (model.isElementSelected() && model.getSelectedElement().equals(pedestrain)) {
-            g.setColor(Color.MAGENTA);
-            g.setStroke(new BasicStroke(getLineWidth() / 2.0f));
-        } else {
-            g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
-        }
+		if (model.isElementSelected() && model.getSelectedElement().equals(pedestrain)) {
+			g.setColor(Color.MAGENTA);
+			g.setStroke(new BasicStroke(getLineWidth() / 2.0f));
+		} else {
+			g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
+		}
 
-        Path2D.Double path = new Path2D.Double();
-        path.moveTo(pedestrain.getPosition().getX(), pedestrain.getPosition().getY());
-        points.forEachOrdered(
-                p -> path.lineTo(p.getX(), p.getY()));
+		Path2D.Double path = new Path2D.Double();
+		path.moveTo(pedestrain.getPosition().getX(), pedestrain.getPosition().getY());
+		points.forEachOrdered(
+				p -> path.lineTo(p.getX(), p.getY()));
 
-        g.draw(path);
-        g.setColor(color);
-        // g.setStroke(stroke);
-    }
+		g.draw(path);
+		g.setColor(color);
+		// g.setStroke(stroke);
+	}
 
 	protected void renderTriangulation(final Graphics2D g, final Collection<VTriangle> triangleList) {
 		g.setColor(Color.GRAY);
