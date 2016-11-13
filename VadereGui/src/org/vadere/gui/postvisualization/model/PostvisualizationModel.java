@@ -18,7 +18,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
@@ -41,7 +41,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private int topographyId;
 
-	private ScenarioRunManager vadere;
+	private Scenario vadere;
 
 	private PotentialFieldContainer potentialContainer;
 
@@ -65,7 +65,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		super(new PostvisualizationConfig());
 		this.trajectories = new HashMap<>();
 		this.agentsByStep = new HashMap<>();
-		this.vadere = new ScenarioRunManager("");
+		this.vadere = new Scenario("");
 		this.topographyId = 0;
 		this.colorEvalFunctions = new HashMap<>();
 		this.potentialContainer = null;
@@ -98,7 +98,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				});
 	}
 
-	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere, final String projectPath) {
+	public void init(final Map<Step, List<Agent>> agentsByStep, final Scenario vadere, final String projectPath) {
 		logger.info("start init postvis model");
 		init(vadere, projectPath);
 		this.agentsByStep = agentsByStep;
@@ -136,7 +136,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		logger.info("finished init postvis model");
 	}
 
-	public void init(final ScenarioRunManager vadere, final String projectPath) {
+	public void init(final Scenario vadere, final String projectPath) {
 		this.vadere = vadere;
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();
@@ -161,7 +161,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 	}
 
-	public ScenarioRunManager getScenarioRunManager() {
+	public Scenario getScenarioRunManager() {
 		return vadere;
 	}
 

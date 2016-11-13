@@ -7,7 +7,7 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.view.DialogFactory;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
 
@@ -81,7 +81,7 @@ public class ActionOpenFile extends ActionVisualization {
 							IOUtils.getFirstFile(scenarioOutputDir, IOUtils.SCENARIO_FILE_EXTENSION);
 
 					if (trajectoryFile.isPresent() && snapshotFile.isPresent()) {
-						ScenarioRunManager vadere = IOOutput.readScenario(snapshotFile.get().toPath());
+						Scenario vadere = IOOutput.readScenario(snapshotFile.get().toPath());
 						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadere), vadere, trajectoryFile.get().getParent());
 						model.notifyObservers();
 						dialog.dispose();

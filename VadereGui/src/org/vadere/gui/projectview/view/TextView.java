@@ -27,7 +27,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
@@ -53,7 +53,7 @@ public class TextView extends JPanel implements IJsonView {
 	private JPanel panelTop = new JPanel();
 
 	private static final long serialVersionUID = 3975758744810301970L;
-	private ScenarioRunManager currentScenario;
+	private Scenario currentScenario;
 
 	private JsonValidIndicator jsonValidIndicator;
 
@@ -176,27 +176,30 @@ public class TextView extends JPanel implements IJsonView {
 
 					try {
 						switch (attributeType) {
-							case MODEL:
-								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
-								currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
-								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
-								break;
-							case SIMULATION:
-								currentScenario.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
-								break;
-							case OUTPUTPROCESSOR:
-								currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
-								break;
-							case TOPOGRAPHY:
-								currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
-								break;
+						case MODEL:
+							ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
+							currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
+							currentScenario.setAttributesModel(modelDefinition.getAttributesList());
+							break;
+						case SIMULATION:
+							currentScenario
+									.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
+							break;
+						case OUTPUTPROCESSOR:
+							currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
+							break;
+						case TOPOGRAPHY:
+							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
+							break;
+						default:
+							throw new RuntimeException("attribute type not implemented.");
 						}
 						currentScenario.updateCurrentStateSerialized();
-						ScenarioJPanel.removeJsonParsingErrorMsg();
+						ScenarioPanel.removeJsonParsingErrorMsg();
 						ProjectView.getMainWindow().refreshScenarioNames();
 						jsonValidIndicator.setValid();
 					} catch (Exception e) {
-						ScenarioJPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
+						ScenarioPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
 						jsonValidIndicator.setInvalid();
 					}
 				}
@@ -208,7 +211,7 @@ public class TextView extends JPanel implements IJsonView {
 	}
 
 	@Override
-	public void setVadereScenario(ScenarioRunManager scenario) { // in order to avoid passing the exception upwards. might not be the best solution
+	public void setVadereScenario(Scenario scenario) { // in order to avoid passing the exception upwards. might not be the best solution
 		try {
 			setVadereScenarioThrows(scenario);
 		} catch (JsonProcessingException e) {
@@ -216,29 +219,31 @@ public class TextView extends JPanel implements IJsonView {
 		}
 	}
 
-	private void setVadereScenarioThrows(ScenarioRunManager scenario) throws JsonProcessingException {
-		this.currentScenario = scenario;
+	private void setVadereScenarioThrows(Scenario scenario) throws JsonProcessingException {
+		currentScenario = scenario;
 
 		switch (attributeType) {
-			case MODEL:
-				this.txtrTextfiletextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
-						scenario.getSortedAttributesMode(), scenario.getScenarioStore().mainModel));
-				break;
-			case SIMULATION:
-				this.txtrTextfiletextarea
-						.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
-				break;
-			case OUTPUTPROCESSOR:
-				this.txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
-				break;
+		case MODEL:
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
+					scenario.getModelAttributes(), scenario.getScenarioStore().mainModel));
+			break;
+		case SIMULATION:
+			txtrTextfiletextarea
+					.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
+			break;
+		case OUTPUTPROCESSOR:
+			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
+			break;
 
-			case TOPOGRAPHY:
-				Topography topography = scenario.getTopography().clone();
-				topography.removeBoundary();
-				this.txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
-				break;
+		case TOPOGRAPHY:
+			Topography topography = scenario.getTopography().clone();
+			topography.removeBoundary();
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			break;
+		default:
+			throw new RuntimeException("attribute type not implemented.");
 		}
-		this.txtrTextfiletextarea.setCaretPosition(0);
+		txtrTextfiletextarea.setCaretPosition(0);
 	}
 
 	@Override

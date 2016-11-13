@@ -84,7 +84,7 @@ public class VDialogManager {
 	}
 
 	public static boolean continueSavingDespitePossibleJsonError() {
-		String errorMsg = ScenarioJPanel.getActiveJsonParsingErrorMsg();
+		String errorMsg = ScenarioPanel.getActiveJsonParsingErrorMsg();
 		if (errorMsg != null) {
 			int ret = VDialogManager.showConfirmDialogWithBodyAndTextArea(
 					Messages.getString("SaveDespiteJsonErrors.title"),

@@ -9,13 +9,13 @@ import org.vadere.util.geometry.shapes.VShape;
 public class Pedestrian extends Agent {
 
 	/** Target ID if the pedestrian represents a target, -1 otherwise. */
-	private int idAsTarget;
+	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
 
-	private boolean isChild;
-	private boolean isLikelyInjured;
+	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
+	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
-	private LinkedList<Integer> groupIds;
+	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 
 	/** Used only for JSON serialization? */
 	// TODO used at all? Car does NOT have this field. remove if unused!

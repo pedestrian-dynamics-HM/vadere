@@ -37,7 +37,7 @@ public class JsonValidIndicator extends JPanel {
 			public void mouseReleased(MouseEvent e) {
 				VDialogManager.showMessageDialogWithTextArea(
 						Messages.getString("TextView.lbljsoninvalid.errorMsgPopup.title"),
-						ScenarioJPanel.getActiveJsonParsingErrorMsg(),
+						ScenarioPanel.getActiveJsonParsingErrorMsg(),
 						JOptionPane.ERROR_MESSAGE);
 			}
 		});

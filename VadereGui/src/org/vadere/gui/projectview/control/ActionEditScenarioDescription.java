@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,7 +27,7 @@ public class ActionEditScenarioDescription extends AbstractAction {
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		ScenarioRunManager scenario = model.getSelectedScenarioBundle().getScenario();
+		Scenario scenario = model.getSelectedScenarioBundle().getScenario();
 
 		JTextArea textArea = new JTextArea(scenario.getDescription());
 		JScrollPane scrollPane = new JScrollPane(textArea);

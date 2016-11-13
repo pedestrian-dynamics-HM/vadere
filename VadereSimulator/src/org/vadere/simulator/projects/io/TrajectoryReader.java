@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.io;
 import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -36,7 +36,7 @@ public class TrajectoryReader {
 
 	private AttributesAgent attributesPedestrian;
 
-	public TrajectoryReader(final Path trajectoryFilePath, final ScenarioRunManager scenario) throws IOException {
+	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) throws IOException {
 		this.trajectoryFilePath = trajectoryFilePath;
 		this.attributesPedestrian = scenario.getAttributesPedestrian();
 	}

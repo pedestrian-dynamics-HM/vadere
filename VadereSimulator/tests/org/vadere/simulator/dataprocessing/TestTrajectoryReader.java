@@ -2,7 +2,7 @@ package org.vadere.simulator.dataprocessing;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.io.TrajectoryReader;
@@ -30,7 +30,7 @@ import static junit.framework.Assert.assertTrue;
 
 public class TestTrajectoryReader {
 
-	private ScenarioRunManager test;
+	private Scenario test;
 	private VadereProject project;
 	private AttributesAgent attributes;
 	private String folderName;

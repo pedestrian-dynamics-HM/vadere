@@ -37,7 +37,7 @@ import org.vadere.gui.projectview.model.VadereScenarioTableModel.VadereDisplay;
 import org.vadere.gui.projectview.model.VadereState;
 import org.vadere.gui.projectview.utils.TableSelectionListener;
 import org.vadere.simulator.projects.ProjectFinishedListener;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOOutput;
@@ -98,7 +98,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JButton btnPauseRunningScenarios;
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
-	private ScenarioJPanel scenarioJPanel;
+	private ScenarioPanel scenarioJPanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
 
@@ -130,13 +130,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	@Override
-	public void preScenarioRun(final ScenarioRunManager scenario, final int scenariosLeft) {
+	public void preScenarioRun(final Scenario scenario, final int scenariosLeft) {
 		model.setScenarioNameLabel(scenario.getName());
 		repaint();
 	}
 
 	@Override
-	public void postScenarioRun(final ScenarioRunManager cloneScenario, final int scenarioLeft) {
+	public void postScenarioRun(final Scenario cloneScenario, final int scenarioLeft) {
 		// take the original!
 		replace(cloneScenario, VadereState.INITIALIZED);
 
@@ -150,19 +150,19 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	@Override
-	public void scenarioStarted(final ScenarioRunManager cloneScenario, final int scenariosLeft) {
+	public void scenarioStarted(final Scenario cloneScenario, final int scenariosLeft) {
 		// take the original!
 		replace(cloneScenario, VadereState.RUNNING);
 	}
 
 	@Override
-	public void scenarioPaused(final ScenarioRunManager cloneScenario, final int scenariosLeft) {
+	public void scenarioPaused(final Scenario cloneScenario, final int scenariosLeft) {
 		// take the original!
 		replace(cloneScenario, VadereState.PAUSED);
 	}
 
 	@Override
-	public void scenarioInterrupted(final ScenarioRunManager scenario, final int scenariosLeft) {
+	public void scenarioInterrupted(final Scenario scenario, final int scenariosLeft) {
 		replace(scenario, VadereState.INTERRUPTED);
 		setScenariosRunning(false);
 		selectCurrentScenarioRunManager();
@@ -170,7 +170,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	@Override
-	public void error(final ScenarioRunManager scenario, final int scenarioLefts, final Throwable throwable) {
+	public void error(final Scenario scenario, final int scenarioLefts, final Throwable throwable) {
 		replace(scenario, VadereState.INTERRUPTED);
 		new Thread(
 				() -> {
@@ -179,7 +179,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				}).start();
 	}
 
-	private void replace(final ScenarioRunManager scenarioRM, final VadereState state) {
+	private void replace(final Scenario scenarioRM, final VadereState state) {
 		int rowIndex = model.getScenarioTableModel().indexOfRow(scenarioRM);
 		VadereDisplay originalScenario = model.getScenarioTableModel().getValue(rowIndex);
 		VadereDisplay dubiousCopy = new VadereDisplay(originalScenario.scenarioRM, state);
@@ -516,7 +516,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			}
 
 			private void loadScenarioIntoGui(OutputBundle bundle) throws IOException {
-				ScenarioRunManager scenarioRM = IOOutput.readScenarioRunManager(bundle.getProject(),
+				Scenario scenarioRM = IOOutput.readScenarioRunManager(bundle.getProject(),
 						bundle.getDirectory().getName());
 				Optional<File> optionalTrajectoryFile = IOUtils
 						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
@@ -644,7 +644,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ScenarioNamePanel.add(scenarioName);
 		scenarioName.setHorizontalAlignment(SwingConstants.CENTER);
 
-		scenarioJPanel = new ScenarioJPanel(scenarioName, model);
+		scenarioJPanel = new ScenarioPanel(scenarioName, model);
 		model.setScenarioNameLabel(scenarioName); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);

@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects;
 
 public interface ScenarioFinishedListener {
-	void scenarioStarted(final ScenarioRunManager scenario);
+	void scenarioStarted(final Scenario scenario);
 
-	void scenarioFinished(final ScenarioRunManager scenario);
+	void scenarioFinished(final Scenario scenario);
 
-	void scenarioRunThrewException(final ScenarioRunManager scenario, final Throwable ex);
+	void scenarioRunThrewException(final Scenario scenario, final Throwable ex);
 }

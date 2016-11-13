@@ -6,7 +6,8 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioRun;
 import org.vadere.util.io.IOUtils;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -69,9 +70,9 @@ public class VadereConsole {
 		logger.info(String.format("Running VADERE on %s...", scenarioFilePath));
 
 		try {
-			ScenarioRunManager vadereJava = VadereFactory.createVadereWithProjectDirectory(projectDirectory,
+			Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(projectDirectory,
 					vadereName + IOUtils.SCENARIO_FILE_EXTENSION, vadereName);
-			vadereJava.run();
+			new ScenarioRun(scenario).run();
 		} catch (IOException e) {
 			logger.error(e);
 		}

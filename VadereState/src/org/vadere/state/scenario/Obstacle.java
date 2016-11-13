@@ -10,6 +10,9 @@ public class Obstacle implements ScenarioElement {
 	private final AttributesObstacle attributes;
 
 	public Obstacle(AttributesObstacle attributes) {
+		if (attributes == null)
+			throw new IllegalArgumentException("Attributes must not be null.");
+
 		this.attributes = attributes;
 	}
 

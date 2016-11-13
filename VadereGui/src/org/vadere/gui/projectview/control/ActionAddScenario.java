@@ -3,14 +3,14 @@ package org.vadere.gui.projectview.control;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.scenario.Topography;
 
 import java.io.IOException;
 
 /**
- * Add a new and fresh {@link org.vadere.simulator.projects.ScenarioRunManager} scenario to the
+ * Add a new and fresh {@link org.vadere.simulator.projects.Scenario} scenario to the
  * {@link org.vadere.simulator.projects.VadereProject} project.
  *
  */
@@ -27,8 +27,8 @@ public class ActionAddScenario extends ActionAbstractAddScenario {
 	}
 
 	@Override
-	protected ScenarioRunManager generateVadere(final String name) throws IOException {
-		ScenarioRunManager newScenario = new ScenarioRunManager(name);
+	protected Scenario generateVadere(final String name) throws IOException {
+		Scenario newScenario = new Scenario(name);
 		newScenario.setDataProcessingJsonManager(DataProcessingJsonManager.createDefault());
 		if (topography != null) {
 			newScenario.setTopography(topography);

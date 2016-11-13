@@ -23,7 +23,7 @@ import org.vadere.gui.components.control.ReflectionAttributeModifier;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.gui.projectview.view.ScenarioJPanel;
+import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.Attributes;
@@ -144,12 +144,12 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				try {
 					Attributes attributes = StateJsonConverter.deserializeScenarioElementType(json, element.getType());
 					ReflectionAttributeModifier.setAttributes(element, attributes);
-					ScenarioJPanel.removeJsonParsingErrorMsg();
+					ScenarioPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();
 					jsonValidIndicator.setValid();
 					((TopographyCreatorModel) panelModel).getScenario().updateCurrentStateSerialized(); // casting should be safe her because in the other two modes (onlineVis and postVis), updateModel() won't be called because it's set to uneditable
 				} catch (IOException e) {
-					ScenarioJPanel.setActiveJsonParsingErrorMsg("TOPOGRAPHY CREATOR tab:\n" + e.getMessage()); // add name of scenario element?
+					ScenarioPanel.setActiveJsonParsingErrorMsg("TOPOGRAPHY CREATOR tab:\n" + e.getMessage()); // add name of scenario element?
 					jsonValidIndicator.setInvalid();
 				}
 			}

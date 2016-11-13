@@ -10,34 +10,28 @@ import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
 import org.vadere.simulator.projects.ProjectFinishedListener;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.io.IOUtils;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 
-public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
+public class ScenarioPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
 
-	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
-	private static final long serialVersionUID = 7217609523783631174L;
+	private static Logger logger = LogManager.getLogger(ScenarioPanel.class);
+	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;
 	private final JLabel scenarioName;
-	private ProjectViewModel model;
 
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
@@ -54,25 +48,25 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	private String visualizationCardName = "visualization";
 	private String editCardName = "edit";
 
-	private ScenarioRunManager scenario;
+	private Scenario scenario;
 	private boolean initialized;
 
 	private static String activeJsonParsingErrorMsg = null;
 
 
-	ScenarioJPanel(JLabel scenarioName, ProjectViewModel model) {
-		this.model = model;
+	ScenarioPanel(JLabel scenarioName, ProjectViewModel model) {
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
 
-		super.setBorder(new EmptyBorder(5, 5, 5, 5));
-		super.setLayout(new CardLayout(0, 0));
-		super.setBounds(0, 0, 500, 100);
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new CardLayout(0, 0));
+		setBounds(0, 0, 500, 100);
 	}
 
+	@SuppressWarnings("serial")
 	private void initialize() {
-		this.initialized = true;
+		initialized = true;
 
 		// Edit card...
 		JPanel editCard = new JPanel();
@@ -205,7 +199,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 	 * @param scenario
 	 *        Vadere with data that should be shown and edited.
 	 */
-	public void setScenario(ScenarioRunManager scenario, boolean isEditable) {
+	public void setScenario(Scenario scenario, boolean isEditable) {
 		this.scenario = scenario;
 		this.scenarioName.setText(scenario.getDisplayName());
 		if (!initialized) {
@@ -272,21 +266,21 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 	}
 
-	public void clear() {
-		this.scenarioName.setText("");
-		this.initialized = false;
+	public void clearScenarioView() {
+		scenarioName.setText("");
+		initialized = false;
 
-		super.removeAll();
+		removeAll();
 
-		super.setBorder(new EmptyBorder(5, 5, 5, 5));
-		super.setLayout(new CardLayout(0, 0));
-		super.setBounds(0, 0, 500, 100);
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new CardLayout(0, 0));
+		setBounds(0, 0, 500, 100);
 	}
 
 	@Override
 	public void projectChanged(final VadereProject project) {
-		clear();
-		project.addVisualization(onlineVisualization);
+		clearScenarioView();
+		project.setVisualization(onlineVisualization);
 	}
 
 	@Override
@@ -302,11 +296,11 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		showEditScenario();
 	}
 
-	public void loadOutputFileForPostVis(ScenarioRunManager scenarioRM) throws IOException {
+	public void loadOutputFileForPostVis(Scenario scenarioRM) throws IOException {
 		postVisualizationView.loadOutputFile(scenarioRM);
 	}
 
-	public void loadOutputFileForPostVis(File trajectoryFile, ScenarioRunManager scenarioRM) throws IOException {
+	public void loadOutputFileForPostVis(File trajectoryFile, Scenario scenarioRM) throws IOException {
 		postVisualizationView.loadOutputFile(trajectoryFile, scenarioRM);
 	}
 

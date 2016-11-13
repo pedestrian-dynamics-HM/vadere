@@ -6,10 +6,10 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.gui.projectview.view.ScenarioJPanel;
+import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.projectview.view.VTable;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.io.IOOutput;
@@ -24,7 +24,7 @@ public class ProjectViewModel {
 	private static Logger logger = LogManager.getLogger(ProjectViewModel.class);
 
 	private VadereProject project;
-	private ScenarioRunManager currentScenario;
+	private Scenario currentScenario;
 
 	private final OutputFileTableModel outputTableModel;
 	private final VadereScenarioTableModel scenarioTableModel;
@@ -89,13 +89,13 @@ public class ProjectViewModel {
 		});
 	}
 
-	public void saveScenarioToDisk(ScenarioRunManager scenario) throws IOException {
+	public void saveScenarioToDisk(Scenario scenario) throws IOException {
 		ProjectWriter.writeScenarioFileJson(getCurrentProjectPath(), scenario);
 		scenario.saveChanges();
 	}
 
-	private List<ScenarioRunManager> getScenariosByRows(final int[] rows) {
-		List<ScenarioRunManager> scenarios = new ArrayList<>();
+	private List<Scenario> getScenariosByRows(final int[] rows) {
+		List<Scenario> scenarios = new ArrayList<>();
 		Arrays.stream(rows).boxed() // TODO code [priority=medium] [task=refactoring] copied from deleteScenarios(), might be possible simpler?
 				.sorted((row1, row2) -> row2 - row1)
 				.map(i -> getScenarioTableModel().getValue(i))
@@ -105,13 +105,13 @@ public class ProjectViewModel {
 	}
 
 	public boolean selectedScenariosContainChangedOnes(final int[] rows) {
-		for (ScenarioRunManager srm : getScenariosByRows(rows))
+		for (Scenario srm : getScenariosByRows(rows))
 			if (srm.hasUnsavedChanges())
 				return true;
 		return false;
 	}
 
-	private void deleteScenario(final ScenarioRunManager scenario) {
+	private void deleteScenario(final Scenario scenario) {
 		try {
 			ProjectWriter.deleteScenario(scenario, getCurrentProjectPath());
 			getProject().removeScenario(scenario);
@@ -136,7 +136,7 @@ public class ProjectViewModel {
 		refreshOutputThread.start();
 	}
 
-	public void addScenario(final ScenarioRunManager scenario) {
+	public void addScenario(final Scenario scenario) {
 		project.addScenario(scenario);
 		getScenarioTableModel()
 				.insertValue(new VadereScenarioTableModel.VadereDisplay(scenario, VadereState.INITIALIZED));
@@ -197,29 +197,29 @@ public class ProjectViewModel {
 
 	public OutputBundle getSelectedOutputBundle() throws IOException {
 		File directory = outputTableModel.getValue(outputTable.getSelectedRow());
-		ScenarioRunManager scenarioRM = IOOutput.readScenarioRunManager(project, directory.getName());
+		Scenario scenarioRM = IOOutput.readScenarioRunManager(project, directory.getName());
 		return new OutputBundle(directory, project, IOOutput.listSelectedOutputDirs(project, scenarioRM));
 	}
 
 	public ScenarioBundle getRunningScenario() {
-		ScenarioRunManager scenarioRM = project.getCurrentScenario();
+		Scenario scenarioRM = project.getCurrentScenario();
 		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
 
 	public ScenarioBundle getSelectedScenarioBundle() {
-		ScenarioRunManager scenarioRM = getSelectedScenarioRunManager();
+		Scenario scenarioRM = getSelectedScenarioRunManager();
 		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
 
-	private ScenarioRunManager getSelectedScenarioRunManager() {
+	private Scenario getSelectedScenarioRunManager() {
 		return scenarioTableModel.getValue(scenarioTable.getSelectedRow()).scenarioRM;
 	}
 
-	public Collection<ScenarioRunManager> getScenarios(final int[] rows) {
+	public Collection<Scenario> getScenarios(final int[] rows) {
 		return Arrays.stream(rows)
 				.boxed()
 				.map(i -> getScenarioTableModel().getValue(i))
@@ -277,11 +277,11 @@ public class ProjectViewModel {
 	}
 
 	public static class ScenarioBundle {
-		private final ScenarioRunManager scenarioRM;
+		private final Scenario scenarioRM;
 		private final VadereProject project;
 		private final Collection<String> outputDirectories;
 
-		public ScenarioBundle(final VadereProject project, final ScenarioRunManager scenarioRM,
+		public ScenarioBundle(final VadereProject project, final Scenario scenarioRM,
 				final Collection<String> outputDirectories) {
 			this.project = project;
 			this.scenarioRM = scenarioRM;
@@ -292,7 +292,7 @@ public class ProjectViewModel {
 			return outputDirectories;
 		}
 
-		public ScenarioRunManager getScenario() {
+		public Scenario getScenario() {
 			return scenarioRM;
 		}
 
@@ -349,13 +349,13 @@ public class ProjectViewModel {
 	}
 
 	/** Set selection in scenario JTable. */
-	public void selectScenario(ScenarioRunManager scenarioRM) {
+	public void selectScenario(Scenario scenarioRM) {
 		int i = scenarioTableModel.indexOfRow(scenarioRM);
 		setSelectedRowIndexInScenarioTable(i);
 	}
 
 	public boolean runScenarioIsOk() {
-		for (ScenarioRunManager srm : getScenarios(scenarioTable.getSelectedRows())) {
+		for (Scenario srm : getScenarios(scenarioTable.getSelectedRows())) {
 			String response = srm.readyToRunResponse();
 			if (response != null) {
 				VDialogManager.showMessageDialogWithBodyAndTextArea("Error",
@@ -365,7 +365,7 @@ public class ProjectViewModel {
 			}
 		}
 
-		String errorMsg = ScenarioJPanel.getActiveJsonParsingErrorMsg();
+		String errorMsg = ScenarioPanel.getActiveJsonParsingErrorMsg();
 		if (errorMsg != null) {
 			VDialogManager.showMessageDialogWithBodyAndTextArea(
 					Messages.getString("RunScenarioJsonErrors.title"),
@@ -384,11 +384,11 @@ public class ProjectViewModel {
 		}
 	}
 
-	public void setCurrentScenario(ScenarioRunManager scenario) {
+	public void setCurrentScenario(Scenario scenario) {
 		this.currentScenario = scenario;
 	}
 
-	public ScenarioRunManager getCurrentScenario() {
+	public Scenario getCurrentScenario() {
 		return currentScenario;
 	}
 

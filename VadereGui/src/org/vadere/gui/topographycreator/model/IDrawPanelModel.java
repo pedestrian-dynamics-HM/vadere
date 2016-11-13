@@ -10,7 +10,7 @@ import java.util.Observer;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
@@ -111,7 +111,7 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	void setScalingFactor(double scalingFactor);
 
-	void setVadereScenario(ScenarioRunManager vadereScenario);
+	void setVadereScenario(Scenario vadereScenario);
 
 	Teleporter getTeleporter();
 

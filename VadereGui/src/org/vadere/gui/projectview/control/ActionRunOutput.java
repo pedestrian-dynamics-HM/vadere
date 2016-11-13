@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.simulator.control.OfflineSimulation;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 
 import java.awt.event.ActionEvent;
@@ -33,7 +33,7 @@ public class ActionRunOutput extends AbstractAction {
 
 			String directoryName = outputBundle.getDirectory().getName();
 			try {
-				ScenarioRunManager vadere =
+				Scenario vadere =
 						IOOutput.readScenarioRunManager(outputBundle.getProject(), directoryName);
 				OfflineSimulation offlineSimulation = new OfflineSimulation(
 						IOOutput.readTrajectories(outputBundle.getProject(), vadere, directoryName),

@@ -58,7 +58,7 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
 import org.vadere.gui.projectview.utils.ClassFinder;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
@@ -84,7 +84,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private static final String jsonViewMode = "json";
 	private boolean inGuiViewMode = true;
 
-	private ScenarioRunManager currentScenario;
+	private Scenario currentScenario;
 	private boolean isEditable;
 
 
@@ -180,7 +180,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	}
 
 	@Override
-	public void setVadereScenario(ScenarioRunManager scenario) {
+	public void setVadereScenario(Scenario scenario) {
 		this.currentScenario = scenario;
 		activeJsonView.setVadereScenario(scenario);
 	}
@@ -195,7 +195,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 	private class GuiView extends JPanel implements IJsonView {
 
-		private ScenarioRunManager currentScenario;
+		private Scenario currentScenario;
 		private boolean isEditable;
 
 		private JCheckBox isTimestampedCheckBox;
@@ -345,7 +345,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		}
 
 		@Override
-		public void setVadereScenario(ScenarioRunManager scenario) {
+		public void setVadereScenario(Scenario scenario) {
 			this.currentScenario = scenario;
 			latestJsonParsingError = null;
 			selectedOutputFile = null;
