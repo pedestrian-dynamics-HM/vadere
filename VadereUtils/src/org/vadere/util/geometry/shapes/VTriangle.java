@@ -22,18 +22,14 @@ public class VTriangle extends VPolygon {
 	public final VPoint p2;
 	public final VPoint p3;
 
+	public final VLine[] lines;
+
 	/**
-	 * Neighboring triangles of point 1
+	 * The centroid will be saved for performance boost, since this object is immutable.
 	 */
-	public final List<VTriangle> neighbors1;
-	/**
-	 * Neighboring triangles of point 2
-	 */
-	public final List<VTriangle> neighbors2;
-	/**
-	 * Neighboring triangles of point 3
-	 */
-	public final List<VTriangle> neighbors3;
+	private VPoint centroid;
+
+	private VPoint center;
 
 	/**
 	 * Creates a triangle. Points must be given in ccw order.
@@ -49,9 +45,7 @@ public class VTriangle extends VPolygon {
 		this.p2 = p2;
 		this.p3 = p3;
 
-		this.neighbors1 = new LinkedList<VTriangle>();
-		this.neighbors2 = new LinkedList<VTriangle>();
-		this.neighbors3 = new LinkedList<VTriangle>();
+		lines = new VLine[]{ new VLine(p1, p2), new VLine(p2, p3), new VLine(p3,p1) };
 	}
 
 	public VPoint midPoint() {
@@ -67,6 +61,38 @@ public class VTriangle extends VPolygon {
 		return l1.ptSegDist(p3) < GeometryUtils.DOUBLE_EPS
 				|| l2.ptSegDist(p2) < GeometryUtils.DOUBLE_EPS
 				|| l3.ptSegDist(p1) < GeometryUtils.DOUBLE_EPS;
+	}
+
+	@Override
+	public VPoint getCentroid() {
+		if(centroid == null) {
+			centroid = super.getCentroid();
+		}
+		return centroid;
+	}
+
+	public VPoint getCenter(){
+		if(center == null) {
+			double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
+			double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
+					+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
+					+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p1.getY() - p2.getY())) / d;
+			double y = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p3.getX() - p2.getX())
+					+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p1.getX() - p3.getX())
+					+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p2.getX() - p1.getX())) / d;
+
+			center = new VPoint(x,y);
+		}
+
+		return center;
+	}
+
+	public double getCircumscribedRadius() {
+		return getCenter().distance(p1);
+	}
+
+	public boolean isInCircumscribedCycle(final VPoint point) {
+		return getCenter().distance(point) < getCircumscribedRadius();
 	}
 
 	/**
@@ -93,5 +119,9 @@ public class VTriangle extends VPolygon {
 	public boolean hasBoundaryPoint(DataPoint point) {
 		return this.p1.equals(point) || this.p2.equals(point)
 				|| this.p3.equals(point);
+	}
+
+	public VLine[] getLines() {
+		return lines;
 	}
 }
