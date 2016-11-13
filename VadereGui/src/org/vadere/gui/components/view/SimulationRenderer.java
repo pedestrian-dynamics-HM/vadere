@@ -145,10 +145,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		triangleList.stream().forEach(triangle -> g.draw(triangle));
 	}
 
-    private void renderDensity(final Graphics2D g) {
-        CLGaussianCalculator densityCalculator = new CLGaussianCalculator(model, model.config.getDensityScale(),
-                model.config.getDensityMeasurementRadius(),
-                model.config.getDensityColor(), true, true);
+	private void renderDensity(final Graphics2D g) {
+		CLGaussianCalculator densityCalculator = new CLGaussianCalculator(model, model.config.getDensityScale(),
+				model.config.getDensityMeasurementRadius(),
+				model.config.getDensityColor(), true, true);
 		/*
 		 * if (obstacleDensity == null || !model.config.getDensityColor().equals(lastDensityColor)
 		 * || model.getTopographyId() != topographyId) {
@@ -164,45 +164,44 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		 * model.config.getPedestrianTorso());
 		 */
 
-        BufferedImage densityImage = densityCalculator.getDensityImage();
+		BufferedImage densityImage = densityCalculator.getDensityImage();
 
-        g.scale(1.0 / model.config.getDensityScale(), 1.0 / model.config.getDensityScale());
-        g.drawImage(densityImage, 0, 0, null);
-        // g.drawImage(pedestrianDensity, 0, 0, null);
-        g.scale(model.config.getDensityScale(), model.config.getDensityScale());
-        densityCalculator.destroy();
-    }
+		g.scale(1.0 / model.config.getDensityScale(), 1.0 / model.config.getDensityScale());
+		g.drawImage(densityImage, 0, 0, null);
+		// g.drawImage(pedestrianDensity, 0, 0, null);
+		g.scale(model.config.getDensityScale(), model.config.getDensityScale());
+	}
 
-    private void renderPotentialField(final Graphics2D g, final int width, final int height) {
+	private void renderPotentialField(final Graphics2D g, final int width, final int height) {
 
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
 		 */
-        Rectangle2D.Double viewportBound = model.getViewportBound();
-        double dy = model.getTopographyBound().getHeight() - viewportBound.getHeight();
+		Rectangle2D.Double viewportBound = model.getViewportBound();
+		double dy = model.getTopographyBound().getHeight() - viewportBound.getHeight();
 
-        int startX = (int) (viewportBound.getX() * model.getScaleFactor());
-        int startY = (int) (Math.max((dy - viewportBound.getY()), 0) * model.getScaleFactor());
-        potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		int startX = (int) (viewportBound.getX() * model.getScaleFactor());
+		int startY = (int) (Math.max((dy - viewportBound.getY()), 0) * model.getScaleFactor());
+		potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 
-        for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
-            for (int y = 0; y < potentialFieldImage.getHeight(); y++) {
-                Color c;
-                double potential = model.getPotential(x + startX, y + startY);
+		for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
+			for (int y = 0; y < potentialFieldImage.getHeight(); y++) {
+				Color c;
+				double potential = model.getPotential(x + startX, y + startY);
 
-                if (potential >= MAX_POTENTIAL) {
-                    c = model.config.getObstacleColor();
-                } else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
-                    c = Color.BLACK;
-                } else {
-                    c = colorHelper.numberToColor(potential % 100);
-                }
-                potentialFieldImage.setRGB(x, y, c.getRGB());
-            }
-        }
-        g.drawImage(potentialFieldImage, 0, 0, null);
-    }
+				if (potential >= MAX_POTENTIAL) {
+					c = model.config.getObstacleColor();
+				} else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
+					c = Color.BLACK;
+				} else {
+					c = colorHelper.numberToColor(potential % 100);
+				}
+				potentialFieldImage.setRGB(x, y, c.getRGB());
+			}
+		}
+		g.drawImage(potentialFieldImage, 0, 0, null);
+	}
 
     protected abstract void renderSimulationContent(final Graphics2D g);
 
