@@ -12,13 +12,13 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 public class Car extends Agent implements Comparable<Car> {
 
-	private AttributesCar attributesCar;
+	private final AttributesCar attributesCar;
 	private transient Random random;
 
 	public Car(AttributesCar attributesCar, Random random) {
 		super(attributesCar, random);
 
-		this.setAttributesCar(attributesCar);
+		this.attributesCar = attributesCar;
 		setPosition(new VPoint(0, 0));
 		setVelocity(new Vector2D(0, 0));
 		// this.targetIds = new LinkedList<>();
@@ -35,11 +35,6 @@ public class Car extends Agent implements Comparable<Car> {
 		setVelocity(other.getVelocity());
 		setTargets(new LinkedList<>(other.getTargets()));
 	}
-
-	public void setAttributesCar(AttributesCar attributesCar) {
-		this.attributesCar = attributesCar;
-	}
-
 
 	@Override
 	public int compareTo(Car o) {

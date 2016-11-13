@@ -31,7 +31,7 @@ public abstract class Agent implements DynamicElement {
 
 	private double freeFlowSpeed;
 
-	private AttributesAgent attributes;
+	private final AttributesAgent attributes;
 
 	public Agent(AttributesAgent attributesAgent) {
 		position = new VPoint(0, 0);

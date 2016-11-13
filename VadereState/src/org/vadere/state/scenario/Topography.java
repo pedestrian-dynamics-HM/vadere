@@ -72,7 +72,7 @@ public class Topography {
 		allOtherAttributes.add(attributes);
 		allOtherAttributes.add(attributesCar);
 		allOtherAttributes.add(attributesPedestrian);
-		removeNullAttributesFrom(allOtherAttributes);
+		removeNullFromSet(allOtherAttributes);
 
 		obstacles = new LinkedList<>();
 		stairs = new LinkedList<>();
@@ -85,6 +85,7 @@ public class Topography {
 		allScenarioElements.add(sources);
 		allScenarioElements.add(targets);
 		allScenarioElements.add(boundaryObstacles);
+		removeNullFromSet(allScenarioElements);
 
 		RectangularShape bounds = this.getBounds();
 
@@ -93,9 +94,9 @@ public class Topography {
 		
 	}
 
-	/** Clean up the list of attributes by removing {@code null}. */
-	private void removeNullAttributesFrom(Set<Attributes> allOtherAttributes) {
-		allOtherAttributes.remove(null);
+	/** Clean up a set by removing {@code null}. */
+	private void removeNullFromSet(Set<?> aSet) {
+		aSet.remove(null);
 		// Actually, only attributes, not nulls should be added to this set.
 		// But sometimes null is passed as attributes and added to the set,
 		// although it is bad practice to pass null in the first place
@@ -237,8 +238,11 @@ public class Topography {
 	}
 
 	public void setTeleporter(Teleporter teleporter) {
+		allScenarioElements.remove(this.teleporter); // remove old teleporter
+
 		this.teleporter = teleporter;
-		allScenarioElements.add(Collections.singletonList(teleporter));
+		if (teleporter != null)
+			allScenarioElements.add(Collections.singletonList(teleporter));
 	}
 
 	public <T extends DynamicElement> void addInitialElement(T element) {
@@ -409,6 +413,12 @@ public class Topography {
 	public void sealAllAttributes() {
 		// tried to do this with flatMap -> weird compiler error "cannot infer type arguments ..."
 		for (List<? extends ScenarioElement> list : allScenarioElements) {
+			if (list == null)
+				throw new RuntimeException("scenario elem list is null");
+			for (ScenarioElement scenarioElement : list) {
+				if (scenarioElement.getAttributes() != null)
+					throw new RuntimeException("scenario elem attr are null: " + scenarioElement);
+			}
 			list.forEach(se -> se.getAttributes().seal());
 		}
 		allOtherAttributes.forEach(a -> a.seal());
