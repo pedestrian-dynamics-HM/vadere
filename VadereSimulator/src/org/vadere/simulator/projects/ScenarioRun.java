@@ -36,18 +36,17 @@ public class ScenarioRun implements Runnable {
 
 	private static Logger logger = LogManager.getLogger(ScenarioRun.class);
 
-	private ScenarioStore scenarioStore;
 	private Path outputPath;
 
 	private final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
-	private DataProcessingJsonManager dataProcessingJsonManager;
-	private ProcessorManager processorManager;
+	private final DataProcessingJsonManager dataProcessingJsonManager;
 
 	private ScenarioFinishedListener finishedListener;
 	private Simulation simulation;
 
 	private final Scenario scenario;
+	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
 
 	public ScenarioRun(final Scenario scenario) {
 		this.scenario = scenario;
@@ -78,13 +77,13 @@ public class ScenarioRun implements Runnable {
 			final Random random = modelBuilder.getRandom();
 			
 			// prepare processors and simulation data writer
-			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+			final ProcessorManager processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
 
-			createAndSetOutputDirectory();
+			createAndSetOutputDirectory(processorManager);
 
 			scenario.saveToOutputPath(outputPath);
 
-			sealAllAttributes();
+			sealAllAttributes(processorManager);
 
 			// Run simulation main loop from start time = 0 seconds
 			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
@@ -183,22 +182,21 @@ public class ScenarioRun implements Runnable {
 		this.finishedListener = finishedListener;
 	}
 
-	public boolean pause() {
-		if (simulation != null) {
+	public void pause() {
+		if (simulation != null) { // TODO throw an illegal state exception if simulation is not running
 			simulation.pause();
-			return true;
 		}
-		return false;
 	}
 
 	public void resume() {
-		if (simulation != null)
+		if (simulation != null) { // TODO throw an illegal state exception if simulation is not running
 			simulation.resume();
+		}
 	}
 
 
 	// Output stuff...
-	private void createAndSetOutputDirectory() {
+	private void createAndSetOutputDirectory(final ProcessorManager processorManager) {
 		try {
 			// Create output directory
 			Files.createDirectories(outputPath);
@@ -228,16 +226,8 @@ public class ScenarioRun implements Runnable {
 		return null;
 	}
 
-	public ProcessorManager getProcessorManager() {
-		return processorManager;
-	}
-
 	public DataProcessingJsonManager getDataProcessingJsonManager() {
 		return dataProcessingJsonManager;
-	}
-
-	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {
-		this.dataProcessingJsonManager = manager;
 	}
 
 	public Path getOutputPath() {
@@ -248,7 +238,7 @@ public class ScenarioRun implements Runnable {
 		return scenario;
 	}
 
-	public void sealAllAttributes() {
+	public void sealAllAttributes(final ProcessorManager processorManager) {
 		scenarioStore.sealAllAttributes();
 		processorManager.sealAllAttributes();
 	}

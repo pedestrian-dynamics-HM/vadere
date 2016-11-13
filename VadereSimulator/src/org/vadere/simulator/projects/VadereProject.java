@@ -146,8 +146,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	private ScenarioRun prepareNextScenario() {
-		final Scenario nextScenario = scenariosLeft.remove().clone();
-		nextScenario.setScenarioFinishedListener(this);
+		final Scenario nextScenario = scenariosLeft.remove().clone(); // TODO why clone? scenario should not be changed during a simulation run
 
 		notifySingleScenarioFinishListener(nextScenario);
 
@@ -156,6 +155,7 @@ public class VadereProject implements ScenarioFinishedListener {
 		if (visualization != null) {
 			scenarioRun.addPassiveCallback(visualization);
 		}
+		scenarioRun.setScenarioFinishedListener(this);
 		return scenarioRun;
 	}
 
@@ -170,10 +170,9 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	public void pauseRunnningScenario() {
-		if (currentScenarioRun.pause()) {
-			for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
-				listener.scenarioPaused(currentScenarioRun.getScenario(), scenariosLeft.size() + 1);
-			}
+		currentScenarioRun.pause();
+		for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
+			listener.scenarioPaused(currentScenarioRun.getScenario(), scenariosLeft.size() + 1);
 		}
 	}
 

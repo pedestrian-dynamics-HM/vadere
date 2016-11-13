@@ -37,9 +37,6 @@ public class Scenario {
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
 
-	private ScenarioFinishedListener finishedListener;
-	private boolean simpleOutputProcessorName = false;
-
 	private String savedStateSerialized;
 	private String currentStateSerialized;
 
@@ -144,10 +141,6 @@ public class Scenario {
 		scenarioStore.topography = topography;
 	}
 
-	public void setScenarioFinishedListener(ScenarioFinishedListener finishedListener) {
-		this.finishedListener = finishedListener;
-	}
-
 	@Override
 	public Scenario clone() {
 		Scenario clonedScenario = null;
@@ -164,10 +157,6 @@ public class Scenario {
 		return getName();
 	}
 
-	public void setSimpleOutputProcessorName(boolean simpleOutputProcessorName) {
-		this.simpleOutputProcessorName = simpleOutputProcessorName;
-	}
-
 	public String getDisplayName() {
 		return scenarioStore.name + (hasUnsavedChanges() ? "*" : "");
 	}
@@ -178,8 +167,6 @@ public class Scenario {
 			// not all necessary! only the ones that could have changed
 			scenarioStore = srm.scenarioStore;
 			dataProcessingJsonManager = srm.dataProcessingJsonManager;
-			finishedListener = srm.finishedListener;
-			simpleOutputProcessorName = srm.simpleOutputProcessorName;
 		} catch (IOException | VadereClassNotFoundException e) {
 			e.printStackTrace();
 		}
