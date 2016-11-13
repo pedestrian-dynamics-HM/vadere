@@ -24,12 +24,12 @@ public class TestFace {
 		HalfEdge halfEdge1 = new HalfEdge(new VPoint(0,0), face);
 		HalfEdge halfEdge2 = new HalfEdge(new VPoint(3,0), face);
 		HalfEdge halfEdge3 = new HalfEdge(new VPoint(1.5,3.0), face);
-
 		halfEdge1.setNext(halfEdge2);
 		halfEdge2.setNext(halfEdge3);
 		halfEdge3.setNext(halfEdge1);
 
 		face.setEdge(halfEdge1);
+		face = new Face(halfEdge1);
 	}
 
 	@Test
