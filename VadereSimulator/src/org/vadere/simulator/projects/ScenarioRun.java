@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,10 +19,6 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
 /**
@@ -111,39 +106,8 @@ public class ScenarioRun implements Runnable {
 		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
 
-	// Getter...
 	public boolean isRunning() {
 		return simulation != null && simulation.isRunning();
-	}
-
-	public ScenarioStore getScenarioStore() {
-		return scenarioStore;
-	}
-
-	public List<Attributes> getAttributesModel() {
-		return scenarioStore.attributesList;
-	}
-
-	/**
-	 * Returns a copy of the used ModelTypes in a natural order.
-	 * This is useful for displaying the different Model Attributes in a good order.
-	 * 
-	 * @return the used ModelTypes in a natural order
-	 */
-	public List<Attributes> getSortedAttributesMode() {
-		return new ArrayList<>(scenarioStore.attributesList);
-	}
-
-	public AttributesAgent getAttributesPedestrian() {
-		return scenarioStore.topography.getAttributesPedestrian();
-	}
-
-	public AttributesSimulation getAttributesSimulation() {
-		return scenarioStore.attributesSimulation;
-	}
-
-	public Topography getTopography() {
-		return scenarioStore.topography;
 	}
 
 	public void addPassiveCallback(final PassiveCallback pc) {
@@ -157,26 +121,6 @@ public class ScenarioRun implements Runnable {
 		} else {
 			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
 		}
-	}
-
-	public void setName(String name) {
-		this.scenarioStore.name = name;
-	}
-
-	public void setAttributesModel(List<Attributes> attributesList) {
-		scenarioStore.attributesList = attributesList;
-	}
-
-	public void setAttributesPedestrian(AttributesAgent attributesPedestrian) {
-		scenarioStore.topography.setAttributesPedestrian(attributesPedestrian);
-	}
-
-	public void setAttributesSimulation(AttributesSimulation attributesSimulation) {
-		this.scenarioStore.attributesSimulation = attributesSimulation;
-	}
-
-	public void setTopography(final Topography topography) {
-		scenarioStore.topography = topography;
 	}
 
 	public void setScenarioFinishedListener(ScenarioFinishedListener finishedListener) {
@@ -195,8 +139,6 @@ public class ScenarioRun implements Runnable {
 		}
 	}
 
-
-	// Output stuff...
 	private void createAndSetOutputDirectory() {
 		try {
 			// Create output directory
@@ -212,27 +154,11 @@ public class ScenarioRun implements Runnable {
 		return scenario.getName();
 	}
 
-	public String getDescription() {
-		return scenarioStore.description;
-	}
-
-	public void setDescription(String description) {
-		scenarioStore.description = description;
-	}
-
 	public String readyToRunResponse() { // TODO [priority=medium] [task=check] add more conditions
 		if (scenarioStore.mainModel == null) {
 			return scenarioStore.name + ": no mainModel is set";
 		}
 		return null;
-	}
-
-	public DataProcessingJsonManager getDataProcessingJsonManager() {
-		return dataProcessingJsonManager;
-	}
-
-	public Path getOutputPath() {
-		return outputPath;
 	}
 
 	public Scenario getScenario() {
