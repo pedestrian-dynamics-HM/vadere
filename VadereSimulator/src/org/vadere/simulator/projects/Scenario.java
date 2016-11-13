@@ -7,12 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -26,7 +24,7 @@ import difflib.DiffUtils;
 
 /**
  * Represents a Vadere scenario.
- * Holds  a {@link ScenarioStore} object.
+ * Holds a {@link ScenarioStore} object.
  * 
  * @author Jakob Schöttl
  * 
@@ -36,8 +34,6 @@ public class Scenario {
 	private static Logger logger = LogManager.getLogger(Scenario.class);
 
 	private ScenarioStore scenarioStore;
-
-	private final List<PassiveCallback> passiveCallbacks;
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
 
@@ -57,7 +53,6 @@ public class Scenario {
 	}
 
 	public Scenario(final String name, final ScenarioStore store) {
-		this.passiveCallbacks = new LinkedList<>();
 		this.scenarioStore = store;
 
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
@@ -129,10 +124,6 @@ public class Scenario {
 		return scenarioStore.topography;
 	}
 
-	public void addPassiveCallback(final PassiveCallback pc) {
-		passiveCallbacks.add(pc);
-	}
-
 	public void setName(String name) {
 		this.scenarioStore.name = name;
 	}
@@ -189,7 +180,6 @@ public class Scenario {
 			dataProcessingJsonManager = srm.dataProcessingJsonManager;
 			finishedListener = srm.finishedListener;
 			simpleOutputProcessorName = srm.simpleOutputProcessorName;
-			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
 		} catch (IOException | VadereClassNotFoundException e) {
 			e.printStackTrace();
 		}

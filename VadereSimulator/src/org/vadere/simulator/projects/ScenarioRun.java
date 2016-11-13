@@ -39,7 +39,7 @@ public class ScenarioRun implements Runnable {
 	private ScenarioStore scenarioStore;
 	private Path outputPath;
 
-	private final List<PassiveCallback> passiveCallbacks;
+	private final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
 	private ProcessorManager processorManager;
@@ -51,7 +51,6 @@ public class ScenarioRun implements Runnable {
 
 	public ScenarioRun(final Scenario scenario) {
 		this.scenario = scenario;
-		this.passiveCallbacks = new LinkedList<>();
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
@@ -108,8 +107,6 @@ public class ScenarioRun implements Runnable {
 	protected void doAfterSimulation() {
 		if (finishedListener != null)
 			finishedListener.scenarioFinished(scenario);
-
-		passiveCallbacks.clear();
 
 		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
@@ -232,11 +229,11 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public ProcessorManager getProcessorManager() {
-		return this.processorManager;
+		return processorManager;
 	}
 
 	public DataProcessingJsonManager getDataProcessingJsonManager() {
-		return this.dataProcessingJsonManager;
+		return dataProcessingJsonManager;
 	}
 
 	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {

@@ -35,6 +35,8 @@ public class VadereProject implements ScenarioFinishedListener {
 			new LinkedBlockingQueue<>();
 	private LinkedBlockingDeque<Scenario> scenariosLeft;
 	private Path outputDirectory;
+
+	// TODO should be encapsulated in a class (we are not programming in C):
 	private int[] migrationStats; // scenarios: [0] total, [1] legacy'ed, [2] nonmigratable
 
 	public VadereProject(final String name, final Iterable<Scenario> scenarios) {
@@ -149,11 +151,11 @@ public class VadereProject implements ScenarioFinishedListener {
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		if (visualization != null) {
-			nextScenario.addPassiveCallback(visualization);
-		}
 		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario);
 		scenarioRun.setOutputPaths(outputDirectory);
+		if (visualization != null) {
+			scenarioRun.addPassiveCallback(visualization);
+		}
 		return scenarioRun;
 	}
 
