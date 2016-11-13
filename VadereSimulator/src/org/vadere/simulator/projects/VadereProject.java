@@ -146,19 +146,23 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	private ScenarioRun prepareNextScenario() {
-		Scenario nextScenario = scenariosLeft.remove().clone();
+		final Scenario nextScenario = scenariosLeft.remove().clone();
 		nextScenario.setScenarioFinishedListener(this);
 
-		for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
-			listener.preScenarioRun(nextScenario, scenariosLeft.size() + 1);
-		}
+		notifySingleScenarioFinishListener(nextScenario);
 
-		if (!this.visualization.isEmpty()) {
-			nextScenario.addPassiveCallback(this.visualization.get(0));
+		if (!visualization.isEmpty()) {
+			nextScenario.addPassiveCallback(visualization.get(0));
 		}
 		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario);
 		scenarioRun.setOutputPaths(outputDirectory);
 		return scenarioRun;
+	}
+
+	private void notifySingleScenarioFinishListener(final Scenario scenario) {
+		for (SingleScenarioFinishedListener listener : singleScenarioFinishedListener) {
+			listener.preScenarioRun(scenario, scenariosLeft.size() + 1);
+		}
 	}
 
 	public void runAllScenarios() {
