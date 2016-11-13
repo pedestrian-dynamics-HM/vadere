@@ -44,6 +44,7 @@ public class ScenarioRun implements Runnable {
 
 	private ScenarioFinishedListener finishedListener;
 	private Simulation simulation;
+	private ProcessorManager processorManager;
 
 	private final Scenario scenario;
 	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
@@ -77,13 +78,13 @@ public class ScenarioRun implements Runnable {
 			final Random random = modelBuilder.getRandom();
 			
 			// prepare processors and simulation data writer
-			final ProcessorManager processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
 
-			createAndSetOutputDirectory(processorManager);
+			createAndSetOutputDirectory();
 
 			scenario.saveToOutputPath(outputPath);
 
-			sealAllAttributes(processorManager);
+			sealAllAttributes();
 
 			// Run simulation main loop from start time = 0 seconds
 			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
@@ -196,7 +197,7 @@ public class ScenarioRun implements Runnable {
 
 
 	// Output stuff...
-	private void createAndSetOutputDirectory(final ProcessorManager processorManager) {
+	private void createAndSetOutputDirectory() {
 		try {
 			// Create output directory
 			Files.createDirectories(outputPath);
@@ -238,7 +239,7 @@ public class ScenarioRun implements Runnable {
 		return scenario;
 	}
 
-	public void sealAllAttributes(final ProcessorManager processorManager) {
+	private void sealAllAttributes() {
 		scenarioStore.sealAllAttributes();
 		processorManager.sealAllAttributes();
 	}
