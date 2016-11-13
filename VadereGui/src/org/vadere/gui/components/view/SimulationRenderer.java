@@ -94,7 +94,6 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		}
 
 		if(model.isTriangulationVisible()) {
-			model.startTriangulation();
 			renderTriangulation(graphics, model.getTriangulation());
 		}
 
