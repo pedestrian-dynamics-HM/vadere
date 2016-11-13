@@ -193,6 +193,25 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				;
 				}, "View.btnShowTrajectories.tooltip");
 
+
+		addActionToToolbar(toolbar,
+				new ActionVisualization("show_triangulation",
+						resources.getIcon("triangulation.png", iconWidth, iconHeight), model) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(model.isTriangulationVisible()) {
+							model.hideTriangulation();
+						}
+						else {
+							model.showTriangulation();
+						}
+						model.notifyObservers();
+					}
+
+					;
+				}, "View.btnShowTriangulation.tooltip"
+		);
+
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_direction",
 						resources.getIcon("walking_direction.png", iconWidth, iconHeight), model) {

@@ -93,7 +93,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
         }
 
-        renderSimulationContent(graphics);
+		if(model.isTriangulationVisible()) {
+			renderTriangulation(graphics, model.getTriangulation());
+		}
+
+		renderSimulationContent(graphics);
 
         if (model.isElementSelected()) {
             renderSelectionBorder(graphics);
@@ -135,11 +139,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         // g.setStroke(stroke);
     }
 
-    protected void renderTriangulation(final Graphics2D g, final Collection<VTriangle> triangleList) {
-        g.setColor(Color.GRAY);
-        g.setStroke(new BasicStroke(getGridLineWidth()));
-        triangleList.stream().forEach(triangle -> g.draw(triangle));
-    }
+	protected void renderTriangulation(final Graphics2D g, final Collection<VTriangle> triangleList) {
+		g.setColor(Color.GRAY);
+		g.setStroke(new BasicStroke(getGridLineWidth()));
+		triangleList.stream().forEach(triangle -> g.draw(triangle));
+	}
 
     private void renderDensity(final Graphics2D g) {
         CLGaussianCalculator densityCalculator = new CLGaussianCalculator(model, model.config.getDensityScale(),
