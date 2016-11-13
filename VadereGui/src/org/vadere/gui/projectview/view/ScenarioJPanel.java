@@ -14,18 +14,13 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.io.IOUtils;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -66,13 +61,13 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
 
-		super.setBorder(new EmptyBorder(5, 5, 5, 5));
-		super.setLayout(new CardLayout(0, 0));
-		super.setBounds(0, 0, 500, 100);
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new CardLayout(0, 0));
+		setBounds(0, 0, 500, 100);
 	}
 
 	private void initialize() {
-		this.initialized = true;
+		initialized = true;
 
 		// Edit card...
 		JPanel editCard = new JPanel();
@@ -272,20 +267,20 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		}
 	}
 
-	public void clear() {
-		this.scenarioName.setText("");
-		this.initialized = false;
+	public void clearScenarioView() {
+		scenarioName.setText("");
+		initialized = false;
 
-		super.removeAll();
+		removeAll();
 
-		super.setBorder(new EmptyBorder(5, 5, 5, 5));
-		super.setLayout(new CardLayout(0, 0));
-		super.setBounds(0, 0, 500, 100);
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new CardLayout(0, 0));
+		setBounds(0, 0, 500, 100);
 	}
 
 	@Override
 	public void projectChanged(final VadereProject project) {
-		clear();
+		clearScenarioView();
 		project.setVisualization(onlineVisualization);
 	}
 
