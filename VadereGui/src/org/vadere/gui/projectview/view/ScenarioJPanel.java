@@ -28,11 +28,10 @@ import javax.swing.border.EmptyBorder;
 public class ScenarioJPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
 
 	private static Logger logger = LogManager.getLogger(ScenarioJPanel.class);
-	private static final long serialVersionUID = 7217609523783631174L;
+	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;
 	private final JLabel scenarioName;
-	private ProjectViewModel model;
 
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
@@ -56,7 +55,6 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 
 
 	ScenarioJPanel(JLabel scenarioName, ProjectViewModel model) {
-		this.model = model;
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
@@ -66,6 +64,7 @@ public class ScenarioJPanel extends JPanel implements IProjectChangeListener, Pr
 		setBounds(0, 0, 500, 100);
 	}
 
+	@SuppressWarnings("serial")
 	private void initialize() {
 		initialized = true;
 
