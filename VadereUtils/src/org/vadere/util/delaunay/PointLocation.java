@@ -126,12 +126,7 @@ public class PointLocation {
 			return Optional.of(edge.getFace());
 		}
 		else {
-			if(edge.getTwin().isPresent()) {
-				return Optional.of(edge.getTwin().get().getFace());
-			}
-			else {
-				return Optional.empty();
-			}
+            return Optional.empty();
 		}
 	}
 }

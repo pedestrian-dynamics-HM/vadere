@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+
 public class Face implements Iterable<HalfEdge> {
 
 	/**
@@ -18,13 +19,12 @@ public class Face implements Iterable<HalfEdge> {
 	 */
 	private HalfEdge edge;
 
-	public Face(final HalfEdge edge) {
-		this.edge = edge;
-	}
-
 	public Face() {}
 
 	public void setEdge(@NotNull HalfEdge edge) {
+
+    }
+	public Face(final @NotNull HalfEdge edge) {
 		this.edge = edge;
 	}
 
