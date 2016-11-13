@@ -24,7 +24,7 @@ public class Teleporter implements ScenarioElement {
 
 	@Override
 	public Teleporter clone() {
-		return new Teleporter(this.attributes);
+		return new Teleporter(attributes);
 	}
 
 	@Override
@@ -37,8 +37,9 @@ public class Teleporter implements ScenarioElement {
 		return -1;
 	}
 
+	@Override
 	public AttributesTeleporter getAttributes() {
-		return this.attributes;
+		return attributes;
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import org.vadere.util.geometry.shapes.VShape;
  */
 public final class AgentWrapper implements ScenarioElement {
 	/** we only need the radius from the attributes. */
-	private AttributesAgent attributes;
+	private final AttributesAgent attributes;
 
 	/** the wrapped store object. */
 	private Agent store;
