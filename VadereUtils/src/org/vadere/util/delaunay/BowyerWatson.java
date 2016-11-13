@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -41,7 +42,7 @@ public class BowyerWatson<P extends VPoint> {
         P max = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
         P min = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
         VRectangle bound = new VRectangle(min.getX(), min.getY(), max.getX()-min.getX(), max.getY()- min.getY());
-        init(bound);
+	    init(bound);
         points.stream().forEach(point -> handle(point));
         cleanUp();
     }
@@ -80,6 +81,7 @@ public class BowyerWatson<P extends VPoint> {
     private void handle(final P point) {
         HashSet<Line> edges = new HashSet<>();
 
+	    // This is way to expensive O(n) instead of O(log(n))
         Map<Boolean, List<Triple<P, P, P>>> partition = triangles.parallelStream().collect(Collectors.partitioningBy(t -> pointsToTriangle(t).isInCircumscribedCycle(point)));
 
 	    List<Triple<P, P, P>> badTriangles = partition.get(true);
@@ -171,7 +173,7 @@ public class BowyerWatson<P extends VPoint> {
 		points.add(new VPoint(80,70));*/
 
         Random r = new Random();
-        for(int i=0; i<10000; i++) {
+        for(int i=0; i<100; i++) {
             VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
             points.add(point);
         }
