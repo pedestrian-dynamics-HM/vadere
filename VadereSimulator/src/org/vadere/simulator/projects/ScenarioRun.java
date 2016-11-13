@@ -27,7 +27,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
 /**
- * Receives an object of type ScenarioStore, manages a scenario and runs the simulation.
+ * Manages single simulation runs.
  * 
  * @author Jakob Schöttl
  * 
@@ -47,36 +47,14 @@ public class ScenarioRun implements Runnable {
 	private ScenarioFinishedListener finishedListener;
 	private Simulation simulation;
 
-	private Scenario scenario; // TODO make final
+	private final Scenario scenario;
 
-
-	// TODO remove
-	@Deprecated
-	public ScenarioRun(final String name) {
-		this(name, new ScenarioStore(name));
-	}
-
-	// TODO remove
-	@Deprecated
-	public ScenarioRun(final ScenarioStore store) {
-		this(store.name, store);
-	}
-
-	// TODO remove
-	@Deprecated
-	public ScenarioRun(final String name, final ScenarioStore store) {
+	public ScenarioRun(final Scenario scenario) {
+		this.scenario = scenario;
 		this.passiveCallbacks = new LinkedList<>();
-		this.scenarioStore = store;
-		
-		this.scenario = null;
-
+		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
-	}
-	
-	public ScenarioRun(final Scenario scenario) {
-		this(scenario.getName(), scenario.getScenarioStore());
-		this.scenario = scenario;
 	}
 
 	/**
@@ -107,7 +85,7 @@ public class ScenarioRun implements Runnable {
 
 			scenario.saveToOutputPath(outputPath);
 
-			scenario.sealAllAttributes();
+			sealAllAttributes();
 
 			// Run simulation main loop from start time = 0 seconds
 			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
@@ -272,4 +250,10 @@ public class ScenarioRun implements Runnable {
 	public Scenario getScenario() {
 		return scenario;
 	}
+
+	public void sealAllAttributes() {
+		scenarioStore.sealAllAttributes();
+		processorManager.sealAllAttributes();
+	}
+
 }

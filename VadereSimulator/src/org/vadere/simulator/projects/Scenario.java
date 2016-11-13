@@ -14,7 +14,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -41,7 +40,6 @@ public class Scenario {
 	private final List<PassiveCallback> passiveCallbacks;
 
 	private DataProcessingJsonManager dataProcessingJsonManager;
-	private ProcessorManager processorManager;
 
 	private ScenarioFinishedListener finishedListener;
 	private boolean simpleOutputProcessorName = false;
@@ -95,11 +93,6 @@ public class Scenario {
 			return diff.toString();
 		}
 		return null;
-	}
-
-	public void sealAllAttributes() {
-		scenarioStore.sealAllAttributes();
-		processorManager.sealAllAttributes();
 	}
 
 	public String getName() {
@@ -194,7 +187,6 @@ public class Scenario {
 			// not all necessary! only the ones that could have changed
 			scenarioStore = srm.scenarioStore;
 			dataProcessingJsonManager = srm.dataProcessingJsonManager;
-			processorManager = srm.processorManager;
 			finishedListener = srm.finishedListener;
 			simpleOutputProcessorName = srm.simpleOutputProcessorName;
 			//this.passiveCallbacks = srm.passiveCallbacks; // is final, can't be reassigned
@@ -216,10 +208,6 @@ public class Scenario {
 			return scenarioStore.name + ": no mainModel is set";
 		}
 		return null;
-	}
-
-	public ProcessorManager getProcessorManager() {
-		return processorManager;
 	}
 
 	public DataProcessingJsonManager getDataProcessingJsonManager() {
