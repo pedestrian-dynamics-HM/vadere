@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class  PSDistmesh {
+public class PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
 	private IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
@@ -96,7 +96,7 @@ public class  PSDistmesh {
 	}
 
 	public boolean hasMaximalSteps() {
-		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
+		return steps >= 1000;
 	}
 
 	/**

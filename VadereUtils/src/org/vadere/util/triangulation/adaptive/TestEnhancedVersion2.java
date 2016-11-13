@@ -65,8 +65,6 @@ public class TestEnhancedVersion2 extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
 
-		new Thread(() -> meshGenerator.execude()).start();
-
 		while(true) {
 			try {
 				Thread.sleep(1000);
@@ -99,7 +97,7 @@ public class TestEnhancedVersion2 extends JFrame {
 			graphics.translate(5,5);
 			graphics.setColor(Color.BLACK);
 
-			meshGenerator.getTriangulation().getTriangles().parallelStream().forEach(t -> graphics.draw(t));
+			//meshGenerator.getTriangulation().getTriangles().parallelStream().forEach(t -> graphics.draw(t));
 
 			graphics.setColor(Color.GRAY);
 			for(VShape obstacle : obstacles) {

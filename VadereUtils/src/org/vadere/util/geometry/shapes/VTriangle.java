@@ -171,6 +171,10 @@ public class VTriangle extends VPolygon {
 		return getCircumcenter().distance(point) < getCircumscribedRadius();
 	}
 
+	public boolean isInCircumscribedCycle(final VPoint point) {
+		return getCircumcenter().distance(point) < getCircumscribedRadius();
+	}
+
 	/**
 	 * Computes the inward facing normal vector for the given points of the
 	 * triangle.
@@ -196,10 +200,6 @@ public class VTriangle extends VPolygon {
 		return this.p1.equals(point) || this.p2.equals(point) || this.p3.equals(point);
 	}
 
-	public VLine[] getLines() {
-		return lines;
-	}
-
 	public Stream<VLine> getLineStream() {
 		return Arrays.stream(getLines());
 	}
@@ -214,5 +214,9 @@ public class VTriangle extends VPolygon {
 	@Override
 	public String toString() {
 		return p1 + "-" + p2 + "-" + p3;
+	}
+
+	public VLine[] getLines() {
+		return lines;
 	}
 }
