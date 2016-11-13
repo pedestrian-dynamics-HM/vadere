@@ -25,7 +25,7 @@ import org.vadere.util.geometry.shapes.VShape;
 public class Topography {
 
 	/** Transient to prevent JSON serialization. */
-	private transient Logger logger = Logger.getLogger(Topography.class);
+	private static Logger logger = Logger.getLogger(Topography.class);
 	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**

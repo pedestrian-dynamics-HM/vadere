@@ -119,11 +119,11 @@ public class DataProcessingJsonManager {
         this.dataProcessors.add(dataProcessor);
     }
 
-    public void addInstantiatedProcessor(final DataProcessor dataProcessor) {
+    public void addInstantiatedProcessor(final DataProcessor<?, ?> dataProcessor) {
         this.dataProcessors.add(dataProcessor);
     }
     
-    public void updateDataProcessor(final DataProcessor oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
+    public void updateDataProcessor(final DataProcessor<?, ?> oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
         this.dataProcessors.remove(oldDataProcessor);
         addProcessor(newDataProcessorStore);
     }
@@ -136,7 +136,7 @@ public class DataProcessingJsonManager {
         this.isTimestamped = isTimestamped;
     }
 
-    private static JsonNode serializeOutputFile(final OutputFile outputFile) {
+    private static JsonNode serializeOutputFile(final OutputFile<?> outputFile) {
         ObjectNode node = mapper.createObjectNode();
 
         node.put(TYPE_KEY, outputFile.getClass().getName());
@@ -151,7 +151,7 @@ public class DataProcessingJsonManager {
         return node;
     }
 
-    public static JsonNode serializeProcessor(final DataProcessor dataProcessor) {
+    public static JsonNode serializeProcessor(final DataProcessor<?, ?> dataProcessor) {
         ObjectNode node = mapper.createObjectNode();
 
         node.put(TYPE_KEY, dataProcessor.getClass().getName());
