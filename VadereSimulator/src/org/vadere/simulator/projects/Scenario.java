@@ -95,18 +95,8 @@ public class Scenario {
 		return scenarioStore;
 	}
 
-	public List<Attributes> getAttributesModel() {
+	public List<Attributes> getModelAttributes() {
 		return scenarioStore.attributesList;
-	}
-
-	/**
-	 * Returns a copy of the used ModelTypes in a natural order.
-	 * This is useful for displaying the different Model Attributes in a good order.
-	 * 
-	 * @return the used ModelTypes in a natural order
-	 */
-	public List<Attributes> getSortedAttributesMode() {
-		return new ArrayList<>(scenarioStore.attributesList);
 	}
 
 	public AttributesAgent getAttributesPedestrian() {
@@ -127,10 +117,6 @@ public class Scenario {
 
 	public void setAttributesModel(List<Attributes> attributesList) {
 		scenarioStore.attributesList = attributesList;
-	}
-
-	public void setAttributesPedestrian(AttributesAgent attributesPedestrian) {
-		scenarioStore.topography.setAttributesPedestrian(attributesPedestrian);
 	}
 
 	public void setAttributesSimulation(AttributesSimulation attributesSimulation) {

@@ -29,7 +29,7 @@ public class TestVadereTestProject {
 		final Scenario srm = JsonConverter.deserializeScenarioRunManager(scenarioJson);
 
 		assertEquals("Neues_Szenario", srm.getName());
-		assertEquals(3, srm.getAttributesModel().size());
+		assertEquals(3, srm.getModelAttributes().size());
 		assertEquals(21, srm.getDataProcessingJsonManager().getDataProcessors().size());
 		assertEquals(6, srm.getDataProcessingJsonManager().getOutputFiles().size());
 		assertTrue(srm.getAttributesPedestrian() != null);
