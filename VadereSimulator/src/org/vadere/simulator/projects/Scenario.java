@@ -143,13 +143,11 @@ public class Scenario {
 
 	@Override
 	public Scenario clone() {
-		Scenario clonedScenario = null;
 		try {
-			clonedScenario = JsonConverter.cloneScenarioRunManager(this);
+			return JsonConverter.cloneScenarioRunManager(this);
 		} catch (IOException | VadereClassNotFoundException e) {
-			logger.error(e);
+			throw new RuntimeException(e);
 		}
-		return clonedScenario;
 	}
 
 	@Override

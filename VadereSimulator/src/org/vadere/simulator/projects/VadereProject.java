@@ -146,7 +146,7 @@ public class VadereProject implements ScenarioFinishedListener {
 	}
 
 	private ScenarioRun prepareNextScenario() {
-		final Scenario nextScenario = scenariosLeft.remove().clone(); // TODO why clone? scenario should not be changed during a simulation run
+		final Scenario nextScenario = scenariosLeft.remove();
 
 		notifySingleScenarioFinishListener(nextScenario);
 
