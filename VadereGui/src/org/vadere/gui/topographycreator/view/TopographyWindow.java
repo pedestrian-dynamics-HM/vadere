@@ -68,7 +68,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class TopographyWindow extends JPanel {
-	private static Resources resources = Resources.getInstance("topologycreator");
+	private static Resources resources = Resources.getInstance("topographycreator");
 	private static final long serialVersionUID = -2472077480081283655L;
 	private IDrawPanelModel panelModel;
 	// private JScrollPane scrollpane;

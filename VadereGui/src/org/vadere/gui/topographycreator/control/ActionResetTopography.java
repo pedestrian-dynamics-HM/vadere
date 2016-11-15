@@ -16,7 +16,7 @@ import org.vadere.state.scenario.Topography;
  * 
  */
 public class ActionResetTopography extends TopographyAction {
-	private static Resources resources = Resources.getInstance("topologycreator");
+	private static Resources resources = Resources.getInstance("topographycreator");
 	private static final long serialVersionUID = -5557013510457451231L;
 
 	private final UndoableEditSupport undoSupport;

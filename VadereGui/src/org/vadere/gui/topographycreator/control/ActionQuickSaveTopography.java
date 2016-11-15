@@ -16,7 +16,7 @@ import org.vadere.gui.topographycreator.utils.TopographyJsonWriter;
  *
  */
 public class ActionQuickSaveTopography extends TopographyAction {
-	private static Resources resources = Resources.getInstance("topologycreator");
+	private static Resources resources = Resources.getInstance("topographycreator");
 	private static final long serialVersionUID = -6802761549259354252L;
 
 	public ActionQuickSaveTopography(String name, ImageIcon icon, IDrawPanelModel panelModel) {
