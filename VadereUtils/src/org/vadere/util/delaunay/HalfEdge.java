@@ -1,11 +1,11 @@
 package org.vadere.util.delaunay;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
-/**
- * Created by bzoennchen on 13.11.16.
- */
+import java.util.Optional;
+
 public class HalfEdge {
 
 	/**
@@ -36,9 +36,13 @@ public class HalfEdge {
 
 
 
-	public HalfEdge (final VPoint end, final Face face) {
+	public HalfEdge (@NotNull final VPoint end, @NotNull final Face face) {
 		this.end = end;
 		this.face = face;
+	}
+
+	public Face getFace() {
+		return face;
 	}
 
 	public VPoint getEnd() {
@@ -57,13 +61,13 @@ public class HalfEdge {
 		return previous;
 	}
 
-	public HalfEdge getTwin() {
-		return twin;
+	public Optional<HalfEdge> getTwin() {
+		return Optional.ofNullable(twin);
 	}
 
 	public void setTwin(final @NotNull HalfEdge twin) {
 		this.twin = twin;
-		if(twin.getTwin() != this) {
+		if(!twin.getTwin().isPresent() || twin.getTwin().get() != this) {
 			twin.setTwin(this);
 		}
 	}
@@ -80,6 +84,10 @@ public class HalfEdge {
 		if(next.getPrevious() != this) {
 			next.setPrevious(this);
 		}
+	}
+
+	public VLine toLine() {
+		return new VLine(this.getPrevious().getEnd(), this.getEnd());
 	}
 
 	@Override
