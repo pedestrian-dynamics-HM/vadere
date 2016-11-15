@@ -2,10 +2,14 @@ package org.vadere.util.delaunay;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
+import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Face implements Iterable<HalfEdge> {
 
@@ -14,7 +18,13 @@ public class Face implements Iterable<HalfEdge> {
 	 */
 	private HalfEdge edge;
 
-	public Face(final @NotNull HalfEdge edge) {
+	public Face(final HalfEdge edge) {
+		this.edge = edge;
+	}
+
+	public Face() {}
+
+	public void setEdge(@NotNull HalfEdge edge) {
 		this.edge = edge;
 	}
 
@@ -37,11 +47,28 @@ public class Face implements Iterable<HalfEdge> {
 		return list;
 	}
 
+	public boolean contains(final VPoint point) {
+		return toPolygon().contains(point);
+	}
+
+	public VPolygon toPolygon() {
+		Path2D path2D = new Path2D.Double();
+		path2D.moveTo(edge.getPrevious().getEnd().getX(), edge.getPrevious().getEnd().getY());
+		for(HalfEdge edge : this) {
+			path2D.lineTo(edge.getEnd().getX(), edge.getEnd().getY());
+		}
+		return new VPolygon(path2D);
+	}
+
 	@Override
 	public Iterator<HalfEdge> iterator() {
 		return new HalfEdgeIterator();
 	}
 
+	public Stream<HalfEdge> stream () {
+		Iterable<HalfEdge> iterable = () -> iterator();
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
 
 	private class HalfEdgeIterator implements Iterator<HalfEdge> {
 		private HalfEdge currentHalfEdge;
