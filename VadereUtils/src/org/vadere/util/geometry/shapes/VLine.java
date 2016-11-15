@@ -19,6 +19,10 @@ public class VLine extends Line2D.Double {
 		return super.ptSegDist(point.x, point.y);
 	}
 
+	public double slope() {
+		return (y2 - y1) / (x2 - x1);
+	}
+
 	public double distance(VPoint point) {
 		return GeometryUtils.closestToSegment(this, point).distance(point);
 	}
