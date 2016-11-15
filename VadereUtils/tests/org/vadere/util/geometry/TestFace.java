@@ -29,7 +29,6 @@ public class TestFace {
 		halfEdge3.setNext(halfEdge1);
 
 		face.setEdge(halfEdge1);
-		face = new Face(halfEdge1);
 	}
 
 	@Test
