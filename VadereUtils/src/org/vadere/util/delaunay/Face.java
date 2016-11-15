@@ -2,7 +2,6 @@ package org.vadere.util.delaunay;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
-
 import org.vadere.util.geometry.shapes.VPolygon;
 
 import java.awt.geom.Path2D;
@@ -11,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
 
 public class Face implements Iterable<HalfEdge> {
 
@@ -62,12 +60,10 @@ public class Face implements Iterable<HalfEdge> {
 		return new VPolygon(path2D);
 	}
 
-
 	@Override
 	public Iterator<HalfEdge> iterator() {
 		return new HalfEdgeIterator();
 	}
-
 
 	public Stream<HalfEdge> stream () {
 		Iterable<HalfEdge> iterable = () -> iterator();
