@@ -391,6 +391,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mnHelp.add(mntmLanguageChoiceMenu);
 		JRadioButtonMenuItem mntmEnglishLocale =
 				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmEnglishLocale.text")) {
+					private static final long serialVersionUID = 1L;
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						Messages.changeLanguage(Locale.ENGLISH);
@@ -399,6 +400,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mntmLanguageChoiceMenu.add(mntmEnglishLocale);
 		JRadioButtonMenuItem mntmGermanLocale =
 				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmGermanLocale.text")) {
+					private static final long serialVersionUID = 1L;
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						Messages.changeLanguage(Locale.GERMAN);
@@ -414,6 +416,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			mntmEnglishLocale.setSelected(true);
 
 		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmReapplyMigration.text")) {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				(new ActionLoadProject(Messages.getString("ProjectView.mntmLoadTestProject.text"), model)).loadProject(true);
