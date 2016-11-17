@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * A VadereProject holds a list of {@link Scenario}s and functionality to manage them.
  * 
  */
-public class VadereProject implements ScenarioFinishedListener {
+public class VadereProject {
 
 	private static Logger logger = LogManager.getLogger(VadereProject.class);
 
@@ -94,29 +94,15 @@ public class VadereProject implements ScenarioFinishedListener {
 
 		currentScenarioThread.setUncaughtExceptionHandler((t, ex) -> {
 			currentScenarioRun.simulationFailed(ex);
-			singleScenarioFinishedListener.forEach(l -> l.error(currentScenarioRun.getScenario(), scenariosLeft.size(), ex));
+			notifySimulationListenersSimulationError(currentScenarioRun.getScenario(), ex);
 		});
+		
+		notifySimulationListenersSimulationStarted(getCurrentScenario());
 		currentScenarioThread.start();
 	}
 
 	public void runScenario(final Scenario scenario) {
 		runScenarios(Collections.singleton(scenario));
-	}
-
-	/**
-	 * Calls the next scenario if available.
-	 */
-	@Override
-	public void scenarioFinished(final Scenario scenario) {
-		notifyScenarioRMListenerAboutPostRun(scenario);
-
-		if (scenariosLeft.isEmpty()) {
-			for (ProjectFinishedListener listener : projectFinishedListener) {
-				listener.postProjectRun(this);
-			}
-		} else {
-			prepareAndStartScenarioRunThread();
-		}
 	}
 
 	private void notifyProjectListenerAboutPreRun() {
@@ -131,15 +117,13 @@ public class VadereProject implements ScenarioFinishedListener {
 		}
 	}
 
-	@Override
-	public void scenarioRunThrewException(final Scenario scenario, final Throwable ex) {
+	private void notifySimulationListenersSimulationError(final Scenario scenario, final Throwable ex) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
 			l.error(currentScenarioRun.getScenario(), scenariosLeft.size(), ex);
 		}
 	}
 
-	@Override
-	public void scenarioStarted(final Scenario scenario) {
+	private void notifySimulationListenersSimulationStarted(final Scenario scenario) {
 		for (SingleScenarioFinishedListener l : singleScenarioFinishedListener) {
 			l.scenarioStarted(currentScenarioRun.getScenario(), scenariosLeft.size() + 1);
 		}
@@ -150,12 +134,11 @@ public class VadereProject implements ScenarioFinishedListener {
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario);
+		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener);
 		scenarioRun.setOutputPaths(outputDirectory);
 		if (visualization != null) {
 			scenarioRun.addPassiveCallback(visualization);
 		}
-		scenarioRun.setScenarioFinishedListener(this);
 		return scenarioRun;
 	}
 
@@ -278,4 +261,21 @@ public class VadereProject implements ScenarioFinishedListener {
 	public int[] getMigrationStats() {
 		return migrationStats;
 	}
+
+	/** Starts the next simulation if any. */
+	private RunnableFinishedListener scenarioFinishedListener = new RunnableFinishedListener() {
+		@Override
+		public void finished(Runnable runnable) {
+			notifyScenarioRMListenerAboutPostRun(getCurrentScenario());
+
+			if (scenariosLeft.isEmpty()) {
+				for (ProjectFinishedListener listener : projectFinishedListener) {
+					listener.postProjectRun(VadereProject.this);
+				}
+			} else {
+				prepareAndStartScenarioRunThread();
+			}
+		}
+	};
+
 }

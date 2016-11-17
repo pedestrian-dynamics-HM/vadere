@@ -37,18 +37,20 @@ public class ScenarioRun implements Runnable {
 
 	private final DataProcessingJsonManager dataProcessingJsonManager;
 
-	private ScenarioFinishedListener finishedListener;
 	private Simulation simulation;
 	private ProcessorManager processorManager;
 
 	private final Scenario scenario;
 	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
 
-	public ScenarioRun(final Scenario scenario) {
+	private final RunnableFinishedListener finishedListener;
+
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+		this.finishedListener = scenarioFinishedListener;
 	}
 
 	/**
@@ -60,9 +62,6 @@ public class ScenarioRun implements Runnable {
 	public void run() {
 		try {
 			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
-
-			if (finishedListener != null)
-				this.finishedListener.scenarioStarted(scenario);
 
 			scenarioStore.topography.reset();
 
@@ -95,13 +94,11 @@ public class ScenarioRun implements Runnable {
 	public void simulationFailed(Throwable e) {
 			e.printStackTrace();
 			logger.error(e);
-			if (finishedListener != null)
-				finishedListener.scenarioRunThrewException(scenario, e);
 	}
 
 	protected void doAfterSimulation() {
 		if (finishedListener != null)
-			finishedListener.scenarioFinished(scenario);
+			finishedListener.finished(this);
 
 		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
@@ -121,10 +118,6 @@ public class ScenarioRun implements Runnable {
 		} else {
 			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
 		}
-	}
-
-	public void setScenarioFinishedListener(ScenarioFinishedListener finishedListener) {
-		this.finishedListener = finishedListener;
 	}
 
 	public void pause() {
