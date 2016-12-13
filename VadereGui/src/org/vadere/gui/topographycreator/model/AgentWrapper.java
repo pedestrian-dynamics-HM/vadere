@@ -20,7 +20,7 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  *
  */
-public final class AgentWrapper implements ScenarioElement {
+public final class AgentWrapper extends ScenarioElement {
 	/** we only need the radius from the attributes. */
 	private final AttributesAgent attributes;
 
@@ -65,11 +65,6 @@ public final class AgentWrapper implements ScenarioElement {
 	@Override
 	public ScenarioElementType getType() {
 		return ScenarioElementType.PEDESTRIAN;
-	}
-
-	@Override
-	public AgentWrapper clone() {
-		return new AgentWrapper(this);
 	}
 
 	@Override

@@ -5,7 +5,7 @@ import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Obstacle implements ScenarioElement {
+public class Obstacle extends ScenarioElement {
 
 	private final AttributesObstacle attributes;
 
@@ -14,14 +14,6 @@ public class Obstacle implements ScenarioElement {
 			throw new IllegalArgumentException("Attributes must not be null.");
 
 		this.attributes = attributes;
-	}
-
-	/**
-	 * Returns a copy of this obstacle with the same attributes.
-	 */
-	@Override
-	public Obstacle clone() {
-		return new Obstacle(attributes);
 	}
 
 	@Override

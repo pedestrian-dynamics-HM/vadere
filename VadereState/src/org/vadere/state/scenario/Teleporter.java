@@ -6,7 +6,7 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Teleporter implements ScenarioElement {
+public class Teleporter extends ScenarioElement {
 
 	private final AttributesTeleporter attributes;
 
@@ -20,11 +20,6 @@ public class Teleporter implements ScenarioElement {
 
 	public VPoint getTeleporterPosition() {
 		return this.attributes.getTeleporterPosition();
-	}
-
-	@Override
-	public Teleporter clone() {
-		return new Teleporter(attributes);
 	}
 
 	@Override

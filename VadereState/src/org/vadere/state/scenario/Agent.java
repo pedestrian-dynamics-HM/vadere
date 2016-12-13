@@ -14,7 +14,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
-public abstract class Agent implements DynamicElement {
+public abstract class Agent extends DynamicElement {
 	
 	/**
 	 * Source where the agent was spawned. The {@link SourceController} should
@@ -112,9 +112,6 @@ public abstract class Agent implements DynamicElement {
 	public int getId() {
 		return attributes.getId();
 	}
-
-	@Override
-	public abstract Agent clone();
 
 	/**
 	 * Converts a Iterable of Agent to a List of VPoint positions.
