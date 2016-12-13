@@ -15,6 +15,11 @@ public class TargetPedestrian extends Target implements DynamicElementRemoveList
 	}
 
 	@Override
+	public void setShape(VShape newShape) {
+		pedestrian.setShape(newShape);
+	}
+
+	@Override
 	public VShape getShape() {
 		return pedestrian.getShape();
 	}

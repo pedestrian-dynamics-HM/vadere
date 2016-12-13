@@ -13,6 +13,11 @@ public class Source extends ScenarioElement {
 	}
 
 	@Override
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
+	}
+
+	@Override
 	public VShape getShape() {
 		return attributes.getShape();
 	}

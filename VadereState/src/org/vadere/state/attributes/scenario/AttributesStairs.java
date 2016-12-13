@@ -42,6 +42,10 @@ public class AttributesStairs extends Attributes {
 		}
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}

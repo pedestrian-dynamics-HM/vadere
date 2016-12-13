@@ -64,6 +64,11 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	}
 
 	@Override
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
+	}
+
+	@Override
 	public VShape getShape() {
 		return attributes.getShape();
 	}

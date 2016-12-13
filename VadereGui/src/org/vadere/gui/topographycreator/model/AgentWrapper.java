@@ -44,6 +44,11 @@ public final class AgentWrapper extends ScenarioElement {
 	public void setAgentInitialStore(final Agent store) {
 		this.agent = store;
 	}
+	
+	@Override
+	public void setShape(VShape newShape) {
+		agent.setShape(newShape);
+	}
 
 	@Override
 	public VShape getShape() {

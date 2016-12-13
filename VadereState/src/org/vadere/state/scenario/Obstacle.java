@@ -15,6 +15,11 @@ public class Obstacle extends ScenarioElement {
 
 		this.attributes = attributes;
 	}
+	
+	@Override
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
+	}
 
 	@Override
 	public VShape getShape() {

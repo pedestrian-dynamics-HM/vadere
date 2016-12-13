@@ -98,6 +98,11 @@ public abstract class Agent extends DynamicElement {
 	public VPoint getPosition() {
 		return position;
 	}
+	
+	@Override
+	public void setShape(VShape newShape) {
+		position = newShape.getCentroid();
+	}
 
 	@Override
 	public VShape getShape() {
