@@ -27,24 +27,16 @@ public final class AgentWrapper implements ScenarioElement {
 	/** the wrapped store object. */
 	private Agent store;
 
-	/**
-	 * the shape of this Pedestrian (VCircle). For refection, this attribute has to be changeable
-	 * (not final)
-	 */
-	// private VShape shape;
-
 	AgentWrapper(final VPoint position) {
 		this.attributes = new AttributesAgent();
 		this.store = new Pedestrian(this.attributes, new Random()); // use a Pedestrian as default
 		this.store.setPosition(position);
 		this.store.setTargets(new LinkedList<Integer>());
-		// this.shape = new VCircle(store.position, attributes.getRadius());
 	}
 
 	public AgentWrapper(final Agent store) {
 		this.attributes = store.getAttributes();
 		this.store = store.clone();
-		// this.shape = new VCircle(store.position, attributes.getRadius());
 	}
 
 	private AgentWrapper(final AgentWrapper wrapper) {
