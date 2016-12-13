@@ -60,11 +60,6 @@ public class Pedestrian extends Agent {
 		}
 	}
 
-	@Override
-	public Pedestrian clone() {
-		return new Pedestrian(this);
-	}
-
 	public <T extends ModelPedestrian> T getModelPedestrian(Class<? extends T> modelType) {
 		return (T) modelPedestrianMap.get(modelType);
 	}

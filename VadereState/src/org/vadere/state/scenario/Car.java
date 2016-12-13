@@ -1,6 +1,5 @@
 package org.vadere.state.scenario;
 
-import java.util.LinkedList;
 import java.util.Random;
 
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -21,18 +20,6 @@ public class Car extends Agent implements Comparable<Car> {
 		setPosition(new VPoint(0, 0));
 		setVelocity(new Vector2D(0, 0));
 		// this.targetIds = new LinkedList<>();
-	}
-
-	/**
-	 * Constructor for cloning
-	 * 
-	 * @param other: Car to clone
-	 */
-	private Car(Car other) {
-		this(other.attributesCar, null); // TODO car cannot be cloned because it cannot provide a random
-		setPosition(other.getPosition());
-		setVelocity(other.getVelocity());
-		setTargets(new LinkedList<>(other.getTargets()));
 	}
 
 	@Override
@@ -69,11 +56,6 @@ public class Car extends Agent implements Comparable<Car> {
 	@Override
 	public ScenarioElementType getType() {
 		return ScenarioElementType.CAR;
-	}
-
-	@Override
-	public Car clone() {
-		return new Car(this);
 	}
 
 	@Override
