@@ -340,8 +340,6 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return getSelectedElement().getShape().translatePrecise(alignToGrid(vector));
 	}
 
-	// can return null!
-
 	@Override
 	public int getBoundId() {
 		return boundId;

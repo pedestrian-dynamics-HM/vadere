@@ -65,9 +65,9 @@ public abstract class Agent extends DynamicElement {
 		this.setTargets(new LinkedList<>(other.targetIds));
 		this.setNextTargetListIndex(other.nextTargetListIndex);
 
-		this.setPosition(other.position);
-		this.setVelocity(other.velocity);
-		this.setFreeFlowSpeed(other.freeFlowSpeed);
+		this.position = other.position;
+		this.velocity = other.velocity;
+		this.freeFlowSpeed = other.freeFlowSpeed;
 	}
 
 	public LinkedList<Integer> getTargets() {
