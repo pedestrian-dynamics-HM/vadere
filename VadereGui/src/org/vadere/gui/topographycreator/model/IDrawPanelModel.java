@@ -165,4 +165,6 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	void setCopiedElement(ScenarioElement copiedElement);
 
 	VShape translate(VPoint vector);
+
+	VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
 }

@@ -44,7 +44,7 @@ public class ActionInsertCopiedElement extends TopographyAction {
 		VPoint elementPos = getElementPosition(elementToCopy);
 
 		VPoint diff = model.getMousePosition().subtract(elementPos);
-		VShape newShape = model.translate(diff);
+		VShape newShape = model.translateElement(elementToCopy, diff);
 
 		if (elementToCopy instanceof AgentWrapper) {
 			VPoint position = new VPoint(newShape.getBounds2D().getCenterX(), newShape.getBounds2D().getCenterY());
