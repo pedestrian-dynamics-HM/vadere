@@ -25,7 +25,6 @@ import org.vadere.util.geometry.shapes.VShape;
 /**
  * The data of the DrawPanel. Its holds the whole data of one scenario.
  * 
- * 
  */
 public class TopographyCreatorModel extends DefaultModel implements IDrawPanelModel {
 
@@ -220,13 +219,6 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public Font getFont() {
 		return font;
 	}
-
-	/*
-	 * @Override
-	 * public double getFinishTime() {
-	 * return topographyBuilder.getAttributes().getFinishTime();
-	 * }
-	 */
 
 	@Override
 	public void setTopographyBound(final VRectangle scenarioBound) {
@@ -437,9 +429,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return topographyBuilder.build();
 	}
 
-	// privte helper methods
 	private VPoint alignToGrid(final VPoint point) {
 		double factor = Math.max(10, 1 / getGridResolution());
 		return new VPoint(Math.round(point.x * factor) / factor, Math.round(point.y * factor) / factor);
 	}
+
 }
