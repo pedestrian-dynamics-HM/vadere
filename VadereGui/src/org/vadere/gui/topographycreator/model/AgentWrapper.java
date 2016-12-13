@@ -21,54 +21,48 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  */
 public final class AgentWrapper extends ScenarioElement {
-	/** we only need the radius from the attributes. */
-	private final AttributesAgent attributes;
 
 	/** the wrapped store object. */
-	private Agent store;
+	private Agent agent;
 
 	AgentWrapper(final VPoint position) {
-		this.attributes = new AttributesAgent();
-		this.store = new Pedestrian(this.attributes, new Random()); // use a Pedestrian as default
-		this.store.setPosition(position);
-		this.store.setTargets(new LinkedList<Integer>());
+		// use a Pedestrian as default
+		// TODO this default does not make much sense
+		this.agent = new Pedestrian(new AttributesAgent(), new Random());
+		this.agent.setPosition(position);
+		this.agent.setTargets(new LinkedList<Integer>());
 	}
 
-	public AgentWrapper(final Agent store) {
-		this.attributes = store.getAttributes();
-		this.store = store.clone();
-	}
-
-	private AgentWrapper(final AgentWrapper wrapper) {
-		this.attributes = wrapper.attributes;
-		this.store = wrapper.store.clone();
+	public AgentWrapper(final Agent agent) {
+		this.agent = (Agent) agent.clone();
 	}
 
 	public Agent getAgentInitialStore() {
-		return store;
+		return agent;
 	}
 
 	public void setAgentInitialStore(final Agent store) {
-		this.store = store;
+		this.agent = store;
 	}
 
 	@Override
 	public VShape getShape() {
-		return store.getShape();
+		return agent.getShape();
 	}
 
 	@Override
 	public int getId() {
-		return attributes.getId();
+		return agent.getId();
 	}
 
 	@Override
 	public ScenarioElementType getType() {
+		// TODO bug - this is a agent wrapper, not necessarily an pedestrian wrapper
 		return ScenarioElementType.PEDESTRIAN;
 	}
 
 	@Override
 	public Attributes getAttributes() {
-		return attributes;
+		return agent.getAttributes();
 	}
 }
