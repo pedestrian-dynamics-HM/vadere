@@ -22,12 +22,4 @@ public abstract class Attributes extends DefaultSealable implements Cloneable {
 
 	public Attributes() {}
 
-	public Attributes cloneAttributes() {
-		try {
-			return (Attributes) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException("This should never happen because the base class Attributes is Cloneable.");
-		}
-	}
-
 }
