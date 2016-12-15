@@ -68,4 +68,12 @@ public class Car extends Agent implements Comparable<Car> {
 		return attributesCar.getId();
 	}
 
+	@Override
+	public Car clone() {
+		throw new RuntimeException("clone is not supported for Car; it seems hard to implement.");
+		// return new Car(attributesCar, new Random());
+		// TODO get random from super class instead of creating a new one
+		// TODO attributesAgent in super class must be copied as well
+	}
+
 }

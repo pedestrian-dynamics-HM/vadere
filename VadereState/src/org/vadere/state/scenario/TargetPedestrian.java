@@ -60,4 +60,10 @@ public class TargetPedestrian extends Target implements DynamicElementRemoveList
 
 		return true;
 	}
+	
+	@Override
+	public TargetPedestrian clone() {
+		throw new RuntimeException("clone is not supported for TargetPedestrian; it seems hard to implement.");
+	}
+
 }

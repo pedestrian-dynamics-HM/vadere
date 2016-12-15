@@ -71,4 +71,9 @@ public class Source extends ScenarioElement {
 	public ScenarioElementType getType() {
 		return ScenarioElementType.SOURCE;
 	}
+
+	@Override
+	public Source clone() {
+		return new Source((AttributesSource) attributes.clone());
+	}
 }

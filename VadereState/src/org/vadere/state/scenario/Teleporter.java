@@ -61,4 +61,10 @@ public class Teleporter extends ScenarioElement {
 	public int hashCode() {
 		return attributes != null ? attributes.hashCode() : 0;
 	}
+
+	@Override
+	public Teleporter clone() {
+		return new Teleporter((AttributesTeleporter) attributes.clone());
+	}
+
 }

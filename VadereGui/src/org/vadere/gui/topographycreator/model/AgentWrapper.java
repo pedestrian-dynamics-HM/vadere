@@ -22,7 +22,7 @@ import org.vadere.util.geometry.shapes.VShape;
  */
 public final class AgentWrapper extends ScenarioElement {
 
-	/** the wrapped store object. */
+	/** The wrapped store object. */
 	private Agent agent;
 
 	AgentWrapper(final VPoint position) {
@@ -70,4 +70,10 @@ public final class AgentWrapper extends ScenarioElement {
 	public Attributes getAttributes() {
 		return agent.getAttributes();
 	}
+
+	@Override
+	public AgentWrapper clone() {
+		return new AgentWrapper((Agent) agent.clone());
+	}
+
 }

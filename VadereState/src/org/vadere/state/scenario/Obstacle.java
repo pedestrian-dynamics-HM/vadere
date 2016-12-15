@@ -70,4 +70,9 @@ public class Obstacle extends ScenarioElement {
 	public Attributes getAttributes() {
 		return attributes;
 	}
+
+	@Override
+	public Obstacle clone() {
+		return new Obstacle((AttributesObstacle) attributes.clone());
+	}
 }

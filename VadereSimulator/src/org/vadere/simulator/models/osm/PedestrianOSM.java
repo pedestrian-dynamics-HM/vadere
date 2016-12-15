@@ -317,5 +317,10 @@ public class PedestrianOSM extends Pedestrian {
 	public double getMinStepLength() {
 		return minStepLength;
 	}
+	
+	@Override
+	public PedestrianOSM clone() {
+		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
+	}
 
 }

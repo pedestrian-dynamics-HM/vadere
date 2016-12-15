@@ -126,4 +126,10 @@ public class Stairs extends ScenarioElement {
 	public AttributesStairs getAttributes() {
 		return attributes;
 	}
+
+	@Override
+	public Stairs clone() {
+		return new Stairs((AttributesStairs) attributes.clone());
+	}
+
 }

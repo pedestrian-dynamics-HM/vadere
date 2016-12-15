@@ -141,4 +141,9 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		return Collections.unmodifiableCollection(targetListeners);
 	}
 
+	@Override
+	public Target clone() {
+		return new Target((AttributesTarget) attributes.clone());
+	}
+
 }
