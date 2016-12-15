@@ -6,7 +6,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.math.BigDecimal;
 
 import org.vadere.util.geometry.ShapeType;
 import org.vadere.util.geometry.Vector2D;
