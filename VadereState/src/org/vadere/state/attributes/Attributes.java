@@ -22,6 +22,10 @@ public abstract class Attributes extends DefaultSealable implements Cloneable {
 
 	public Attributes() {}
 	
+	/**
+	 * Standard shallow clone of attributes. The shallow clone is sufficient
+	 * because (as noted above) all fields must be immutable anyway.
+	 */
 	@Override
 	public Attributes clone() {
 		try {
