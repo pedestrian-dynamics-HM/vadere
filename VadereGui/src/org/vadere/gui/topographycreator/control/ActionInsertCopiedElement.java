@@ -9,7 +9,6 @@ import javax.swing.undo.UndoableEditSupport;
 
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -24,7 +23,7 @@ public class ActionInsertCopiedElement extends TopographyAction {
 	private static final long serialVersionUID = 5049099647921341318L;
 	private final UndoableEditSupport undoSupport;
 
-	public ActionInsertCopiedElement(final String name, final IDrawPanelModel model,
+	public ActionInsertCopiedElement(final String name, final IDrawPanelModel<?> model,
 			final UndoableEditSupport undoSupport) {
 		super(name, model);
 		this.undoSupport = undoSupport;
@@ -32,7 +31,7 @@ public class ActionInsertCopiedElement extends TopographyAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		IDrawPanelModel model = getScenarioPanelModel();
+		IDrawPanelModel<?> model = getScenarioPanelModel();
 		ScenarioElement elementToCopy = model.getCopiedElement();
 
 		if (elementToCopy == null) {
@@ -45,7 +44,7 @@ public class ActionInsertCopiedElement extends TopographyAction {
 		VPoint elementPos = getElementPosition(elementToCopy);
 
 		VPoint diff = model.getMousePosition().subtract(elementPos);
-		VShape newShape = model.translate(diff);
+		VShape newShape = model.translateElement(elementToCopy, diff);
 
 		if (elementToCopy instanceof AgentWrapper) {
 			VPoint position = new VPoint(newShape.getBounds2D().getCenterX(), newShape.getBounds2D().getCenterY());

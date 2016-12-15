@@ -123,6 +123,10 @@ public class AttributesSource extends Attributes {
 		return id;
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}

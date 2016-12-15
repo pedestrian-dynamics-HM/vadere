@@ -19,6 +19,10 @@ public class AttributesObstacle extends Attributes {
 		this.shape = shape;
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}

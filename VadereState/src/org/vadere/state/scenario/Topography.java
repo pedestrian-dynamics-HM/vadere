@@ -338,41 +338,45 @@ public class Topography {
 
 	/**
 	 * Creates a deep copy of the scenario.
+	 * 
+	 * @deprecated This manual implementation is error-prone. Remove this method
+	 *             and use the standard clone instead.
 	 */
+	@Deprecated
 	@Override
 	public Topography clone() {
 		Topography s = new Topography(this.attributes, this.attributesPedestrian, this.attributesCar);
 
 		for (Obstacle obstacle : this.getObstacles()) {
-			if (this.boundaryObstacles.contains(obstacle))
-				s.addBoundary(obstacle.clone());
+			if (boundaryObstacles.contains(obstacle))
+				s.addBoundary((Obstacle) obstacle.clone());
 			else
-				s.addObstacle(obstacle.clone());
+				s.addObstacle((Obstacle) obstacle.clone());
 		}
-		for (Stairs stairs : this.getStairs()) {
+		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
-		for (Target target : this.getTargets()) {
-			s.addTarget(target.clone());
+		for (Target target : getTargets()) {
+			s.addTarget((Target) target.clone());
 		}
-		for (Source source : this.getSources()) {
-			s.addSource(source.clone());
+		for (Source source : getSources()) {
+			s.addSource((Source) source.clone());
 		}
-		for (Pedestrian pedestrian : this.getElements(Pedestrian.class)) {
+		for (Pedestrian pedestrian : getElements(Pedestrian.class)) {
 			s.addElement(pedestrian);
 		}
 		for (Pedestrian ped : getInitialElements(Pedestrian.class)) {
 			s.addInitialElement(ped);
 		}
-		for (Car car : this.getElements(Car.class)) {
+		for (Car car : getElements(Car.class)) {
 			s.addElement(car);
 		}
 		for (Car car : getInitialElements(Car.class)) {
 			s.addInitialElement(car);
 		}
 
-		if (this.hasTeleporter()) {
-			s.setTeleporter(this.getTeleporter().clone());
+		if (hasTeleporter()) {
+			s.setTeleporter((Teleporter) teleporter.clone());
 		}
 
 		for (DynamicElementAddListener<Pedestrian> pedestrianAddListener : this.pedestrians.getElementAddedListener()) {

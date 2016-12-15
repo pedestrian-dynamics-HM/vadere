@@ -5,7 +5,7 @@ import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Obstacle implements ScenarioElement {
+public class Obstacle extends ScenarioElement {
 
 	private final AttributesObstacle attributes;
 
@@ -15,13 +15,10 @@ public class Obstacle implements ScenarioElement {
 
 		this.attributes = attributes;
 	}
-
-	/**
-	 * Returns a copy of this obstacle with the same attributes.
-	 */
+	
 	@Override
-	public Obstacle clone() {
-		return new Obstacle(attributes);
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
 	}
 
 	@Override
@@ -72,5 +69,10 @@ public class Obstacle implements ScenarioElement {
 	@Override
 	public Attributes getAttributes() {
 		return attributes;
+	}
+
+	@Override
+	public Obstacle clone() {
+		return new Obstacle((AttributesObstacle) attributes.clone());
 	}
 }

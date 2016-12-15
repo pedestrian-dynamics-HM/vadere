@@ -4,19 +4,25 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public interface ScenarioElement extends Cloneable {
+public abstract class ScenarioElement {
 
-	VShape getShape();
+	public abstract VShape getShape();
 	
-	default void setShape(VShape newShape) {
+	public void setShape(VShape newShape) {
 		throw new UnsupportedOperationException("This concrete scenario element does not support setting the shape.");
 	}
 
-	int getId();
+	public abstract int getId();
 
-	ScenarioElementType getType();
+	public abstract ScenarioElementType getType();
 
-	ScenarioElement clone();
+	/**
+	 * Redeclare the clone method as public to enable copy & paste of scenario
+	 * elements in scenario editor.
+	 * Subclasses must implement this method using a copy constructor.
+	 */
+	@Override
+	public abstract ScenarioElement clone();
 
-	Attributes getAttributes();
+	public abstract Attributes getAttributes();
 }

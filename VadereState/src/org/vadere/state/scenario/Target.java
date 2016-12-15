@@ -10,7 +10,7 @@ import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Target implements ScenarioElement, Comparable<Target> {
+public class Target extends ScenarioElement implements Comparable<Target> {
 
 	private final AttributesTarget attributes;
 	private final Map<Integer, Double> enteringTimes;
@@ -64,17 +64,13 @@ public class Target implements ScenarioElement, Comparable<Target> {
 	}
 
 	@Override
-	public VShape getShape() {
-		return attributes.getShape();
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
 	}
 
-	/**
-	 * Returns a new target with the same attributes as this one, but no
-	 * {@link org.vadere.state.scenario.DynamicElementRemoveListener}.
-	 */
 	@Override
-	public Target clone() {
-		return new Target(attributes);
+	public VShape getShape() {
+		return attributes.getShape();
 	}
 
 	@Override
@@ -143,6 +139,11 @@ public class Target implements ScenarioElement, Comparable<Target> {
 	/** Returns an unmodifiable collection. */
 	public Collection<TargetListener> getTargetListeners() {
 		return Collections.unmodifiableCollection(targetListeners);
+	}
+
+	@Override
+	public Target clone() {
+		return new Target((AttributesTarget) attributes.clone());
 	}
 
 }

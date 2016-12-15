@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.ComponentListener;
 import java.util.Observer;
 
 import org.vadere.gui.components.control.IMode;
@@ -21,6 +20,7 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<T>, Iterable<ScenarioElement> {
 
+	@Override
 	void notifyObservers();
 
 	/**
@@ -67,17 +67,20 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	 * 
 	 * @return true if the user is selecting a topography element, otherwise false.
 	 */
+	@Override
 	boolean isSelectionVisible();
 
 
 	/**
 	 * After this call the selction shape will be painted.
 	 */
+	@Override
 	void showSelection();
 
 	/**
 	 * After this call the selction shape will no longer be painted.
 	 */
+	@Override
 	void hideSelection();
 
 	/**
@@ -93,14 +96,17 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	void resetScenario();
 
 
+	@Override
 	ScenarioElement getSelectedElement();
 
 	Color getCursorColor();
 
 	void setCursorColor(Color red);
 
+	@Override
 	void setMouseSelectionMode(IMode selectionMode);
 
+	@Override
 	IMode getMouseSelectionMode();
 
 	Cursor getCursor();
@@ -128,6 +134,7 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	 * @param position
 	 * @return
 	 */
+	@Override
 	ScenarioElement setSelectedElement(VPoint position);
 
 	boolean removeElement(ScenarioElement element);
@@ -142,10 +149,12 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	void setTopography(Topography topography);
 
+	@Override
 	void notifyObservers(final Object string);
 
 	int getBoundId();
 
+	@Override
 	void setSelectedElement(ScenarioElement selectedElement);
 
 	VShape translate(Point vector);
@@ -165,4 +174,6 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	void setCopiedElement(ScenarioElement copiedElement);
 
 	VShape translate(VPoint vector);
+
+	VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
 }

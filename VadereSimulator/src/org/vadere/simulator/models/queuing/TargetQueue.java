@@ -13,4 +13,10 @@ public class TargetQueue extends Target {
 	public boolean isMovingTarget() {
 		return true;
 	}
+
+	@Override
+	public TargetQueue clone() {
+		throw new RuntimeException("clone is not supported for TargetQueue; it seems hard to implement.");
+	}
+
 }

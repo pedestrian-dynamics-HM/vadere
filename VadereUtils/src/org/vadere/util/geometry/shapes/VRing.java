@@ -10,9 +10,6 @@ import java.util.List;
 
 import org.vadere.util.geometry.ShapeType;
 
-import com.vividsolutions.jts.geomgraph.Edge;
-import com.vividsolutions.jts.geomgraph.index.EdgeSetIntersector;
-
 /**
  * A ring consists of two circles of different size.
  * 
@@ -28,12 +25,6 @@ public class VRing implements VShape {
 
 	public VRing(double radius1, double radius2) {
 		this(new VPoint(0, 0), radius1, radius2);
-	}
-
-	private VRing(VRing ring) {
-		this.center = ring.center;
-		this.radiusInnerCircle = ring.radiusInnerCircle;
-		this.radiusOuterCircle = ring.radiusOuterCircle;
 	}
 
 	public VRing(VPoint center, double radius1, double radius2) {
@@ -87,6 +78,7 @@ public class VRing implements VShape {
 	}
 
 	@Override
+	// TODO not implemented, not tested!
 	public boolean contains(double x, double y, double w, double h) {
 		return contains(new VRectangle(x, y, w, h));
 
@@ -116,7 +108,7 @@ public class VRing implements VShape {
 	}
 
 	private List<VPoint> normalizePointsToCenter(List<VPoint> points) {
-		List<VPoint> normalizedPoints = new ArrayList<VPoint>();
+		List<VPoint> normalizedPoints = new ArrayList<>();
 
 		for (VPoint point : points) {
 			VPoint normalizedPoint = new VPoint(point.x - center.x, point.y - center.y);
