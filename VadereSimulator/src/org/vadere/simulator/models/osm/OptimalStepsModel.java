@@ -78,40 +78,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
 
-	@Deprecated
-	public OptimalStepsModel(final Topography topography, final AttributesOSM attributes,
-			final AttributesAgent attributesPedestrian,
-			final PotentialFieldTarget potentialFieldTarget,
-			final PotentialFieldObstacle potentialFieldObstacle,
-			final PotentialFieldAgent potentialFieldPedestrian,
-			final List<SpeedAdjuster> speedAdjusters,
-			final StepCircleOptimizer stepCircleOptimizer, Random random) {
-		this.attributesOSM = attributes;
-		this.attributesPedestrian = attributesPedestrian;
-		this.topography = topography;
-		this.random = random;
-		this.potentialFieldTarget = potentialFieldTarget;
-		this.potentialFieldObstacle = potentialFieldObstacle;
-		this.potentialFieldPedestrian = potentialFieldPedestrian;
-		this.stepCircleOptimizer = stepCircleOptimizer;
-		this.pedestrianIdCounter = 0;
-		this.speedAdjusters = speedAdjusters;
-
-		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN) {
-			this.pedestrianEventsQueue = new PriorityQueue<>(100,
-					new ComparatorPedestrianOSM());
-		} else {
-			// not needed and should not be used in this case
-			this.pedestrianEventsQueue = null;
-		}
-
-		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
-			this.executorService = Executors.newFixedThreadPool(8);
-		} else {
-			this.executorService = null;
-		}
-	}
-
 	public OptimalStepsModel() {
 		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = new LinkedList<>();
