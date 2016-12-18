@@ -8,6 +8,7 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.ovm.OptimalVelocityModel;
+import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
 import org.vadere.simulator.models.sfm.SocialForceModel;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.ModelDefinition;
@@ -18,6 +19,7 @@ import org.vadere.state.attributes.models.AttributesOVM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.models.AttributesPotentialGNM;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
+import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.models.AttributesSFM;
 
 /**
@@ -46,21 +48,29 @@ public class ModelPresets {
 		list.add(AttributesFloorField.class);
 		registerModelPreset(OptimalStepsModel.class, list);
 
+		// GNM
 		list.clear();
 		list.add(AttributesGNM.class);
 		list.add(AttributesPotentialGNM.class);
 		list.add(AttributesFloorField.class);
 		registerModelPreset(GradientNavigationModel.class, list);
 
+		// Social Force Model
 		list.clear();
 		list.add(AttributesSFM.class);
 		list.add(AttributesPotentialSFM.class);
 		list.add(AttributesFloorField.class);
 		registerModelPreset(SocialForceModel.class, list);
 		
+		// Optimal Velocity Model
 		list.clear();
 		list.add(AttributesOVM.class);
 		registerModelPreset(OptimalVelocityModel.class, list);
+
+		// Reynolds-Steering Model
+		list.clear();
+		list.add(AttributesReynolds.class);
+		registerModelPreset(ReynoldsSteeringModel.class, list);
 
 		// list.clear();
 		// list.add(...);
