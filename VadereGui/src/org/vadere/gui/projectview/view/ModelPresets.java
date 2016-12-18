@@ -67,7 +67,7 @@ public class ModelPresets {
 		list.add(AttributesOVM.class);
 		registerModelPreset(OptimalVelocityModel.class, list);
 
-		// Reynolds-Steering Model
+		// Reynold's Steering Model
 		list.clear();
 		list.add(AttributesReynolds.class);
 		registerModelPreset(ReynoldsSteeringModel.class, list);
