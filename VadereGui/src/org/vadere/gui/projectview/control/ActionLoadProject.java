@@ -101,7 +101,7 @@ public class ActionLoadProject extends AbstractAction {
 			int[] stats = project.getMigrationStats();
 
 			if (stats[1] > 0 || stats[2] > 0) { // scenarios: [0] total, [1] legacy'ed, [2] unmigratable
-				SwingWorker worker = new SwingWorker<Void, Void>() {
+				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 					@Override
 					public Void doInBackground() {
 						int total = stats[0];

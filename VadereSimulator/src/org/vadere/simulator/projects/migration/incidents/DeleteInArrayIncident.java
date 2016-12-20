@@ -24,6 +24,6 @@ public class DeleteInArrayIncident extends Incident{
 	public void resolve(@NotNull final Tree tree, @NotNull StringBuilder log) throws MigrationException {
 		super.stillApplies(tree);
 		tree.deleteNodeInArray(pathToArray, key);
-		log.append("\t- delete node [" + key + "] in array " + tree.pathToString(pathToArray)+"\n");
+		log.append("\t- delete node [" + key + "] in array " + Tree.pathToString(pathToArray) + "\n");
 	}
 }
