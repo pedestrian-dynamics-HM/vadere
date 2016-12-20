@@ -1,8 +1,8 @@
 package org.vadere.simulator.projects.migration.incidents;
 
 import org.vadere.simulator.projects.migration.Tree;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
-import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

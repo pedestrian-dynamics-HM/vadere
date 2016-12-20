@@ -6,6 +6,7 @@ import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.VDialogManager;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
@@ -113,7 +114,7 @@ public class ActionLoadProject extends AbstractAction {
 						String message =
 								"The migration assistant analyzed the " + total + " scenarios in the scenarios and output " +
 										"directories of this project and attempted to upgrade them to the latest version "
-										+ MigrationAssistant.Version.latest().label() + ".\n" +
+										+ Version.latest().label() + ".\n" +
 										"Log-files have been created in legacy/scenarios and legacy/output.\n\n";
 
 						if (untouched > 0)

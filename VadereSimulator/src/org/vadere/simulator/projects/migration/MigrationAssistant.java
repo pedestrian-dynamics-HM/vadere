@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
@@ -21,36 +22,6 @@ import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 public class MigrationAssistant {
-
-	// versions in strict order from oldest to newest
-	public enum Version {
-		UNDEFINED("undefined"),
-		NOT_A_RELEASE("not a release"),
-		V0_1("0.1"),
-		V0_2("0.2");
-
-		private String label;
-
-		Version(String label) {
-			this.label = label;
-		}
-
-		public String label() {
-			return label;
-		}
-
-		static Version fromString(String versionStr) {
-			for (Version v : values()) {
-				if (v.label.equals(versionStr))
-					return v;
-			}
-			return null;
-		}
-
-		public static Version latest() {
-			return values()[values().length - 1];
-		}
-	}
 
 	public static final String INCIDENT_ORDER_ERROR = "An incident that was found applicable couldn't be resolved. " +
 			"That means, that a previously resolved incident rendered this one no longer applicable. " +

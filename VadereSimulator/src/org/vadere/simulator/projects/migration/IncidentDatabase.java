@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.incidents.AddTextNodeIncident;
 import org.vadere.simulator.projects.migration.incidents.DeletionIncident;
 import org.vadere.simulator.projects.migration.incidents.Incident;
@@ -19,7 +19,7 @@ import org.vadere.simulator.projects.migration.incidents.specialized.AttributesP
 import org.vadere.simulator.projects.migration.incidents.specialized.MoveSpawnDelayIntoDistributionParametersIncident;
 import org.vadere.state.util.StateJsonConverter;
 
-import static org.vadere.simulator.projects.migration.MigrationAssistant.Version.*;
+import static org.vadere.simulator.entrypoints.Version.*;
 
 public class IncidentDatabase {
 
