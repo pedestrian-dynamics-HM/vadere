@@ -84,6 +84,7 @@ public class ModelPresets {
 		// Biomechanics Model
 		list.clear();
 		list.add(AttributesBMM.class);
+		list.add(AttributesBHM.class);
 		registerModelPreset(BiomechanicsModel.class, list);
 
 		// list.clear();
