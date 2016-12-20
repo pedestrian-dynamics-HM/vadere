@@ -15,6 +15,11 @@ package org.vadere.state.attributes;
  * these objects. All other fields must be immutable (e.g. String, Double,
  * VPoint,...).
  * 
+ * The standard clone method makes a flat copy. This is enough if the subclass
+ * only contains immutable fields. If the subclass contains other Attributes
+ * objects, it must implement a copy constructor and override {@link #clone()}
+ * to make a deep copy.
+ * 
  */
 public abstract class Attributes extends DefaultSealable implements Cloneable {
 	/** Used for default ID values of some scenario elements. */
@@ -23,8 +28,8 @@ public abstract class Attributes extends DefaultSealable implements Cloneable {
 	public Attributes() {}
 	
 	/**
-	 * Standard shallow clone of attributes. The shallow clone is sufficient
-	 * because (as noted above) all fields must be immutable anyway.
+	 * Standard flat copy of attributes. The flat copy is only sufficient (as
+	 * noted above) if all fields are immutable.
 	 */
 	@Override
 	public Attributes clone() {
