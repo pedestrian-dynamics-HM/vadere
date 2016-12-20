@@ -69,7 +69,20 @@ Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http:/
 
 ### Git Hooks
 
-Follow the instructions in [Version Control HowTo](Documentation/version-control/HOWTO.txt).
+Since it is important to reproduce simulation results, we have the guidline that each output file has to provide its commit-hash. This commit-hash identifies
+the state the software was in when the output file was generated. Therefore, git hooks save the commit-hash in the **current_commit_hash.txt** which
+will be created in the [VadereSimulator/resource](vadere/VadereSimulator/resource) directory whenever a commit is made or the developer
+switches to another commit. If the file is missing or there is no commit-hash in it, you will be warned in the log. 
+We strongly suggest that you install these git hooks on your local machine:
+
+1. Copy files [post-checkout](Documentation/version-control/post-checkout), [post-merge](Documentation/version-control/post-merge), 
+[post-applypatch](Documentation/version-control/post-applypatch) and [post-commit](Documentation/version-control/post-commit) 
+from [version-control](Documentation/version-control) to your local **.git/hooks/** directory.
+These files start the script [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software).
+2. Make sure that [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software) is executable.
+
+To create this file without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
+switch to another branch and switch back again using the command line or any other tool you prefer.
 
 ## Contribution
 
@@ -77,7 +90,8 @@ Please see [Contribution guidelines](CONTRIBUTION.md). The document defines guid
 
 ## Release History
 
-0.1	initial release of the software as open source
+- 0.1 initial release of the software as open source
+- 0.2 stability and usability improved, additional pedestrian simulation models are supported
 
 
 ## Contributors
@@ -91,6 +105,3 @@ Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob
 
 This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
 For more information: http://www.gnu.org/licenses/lgpl.html
-
-
-
