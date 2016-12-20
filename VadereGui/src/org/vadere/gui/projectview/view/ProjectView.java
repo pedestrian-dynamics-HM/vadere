@@ -1,7 +1,9 @@
 package org.vadere.gui.projectview.view;
 
+import org.apache.commons.codec.language.bm.Lang;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.Language;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
@@ -410,7 +412,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ButtonGroup languageChoicesGroup = new ButtonGroup();
 		languageChoicesGroup.add(mntmEnglishLocale);
 		languageChoicesGroup.add(mntmGermanLocale);
-		if (Messages.languageIsGerman())
+		if (Language.languageIsGerman())
 			mntmGermanLocale.setSelected(true);
 		else
 			mntmEnglishLocale.setSelected(true);
