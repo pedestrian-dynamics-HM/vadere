@@ -40,11 +40,11 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 
 ## Usage Example 
 
-With the following steps, you can start a scenario of the [ExampleProject](Documentation/Examples/ExampleProject):
+With the following steps, you can start a scenario of one of the model test projects in [VadereModelTests](VadereModelTests):
 
 - start Vadere 
 - *Project* > *Open* 
-- choose `vadere.project` and click *open*
+- choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
 - select the scenario on the left and press *run selected scenario*
 
 
