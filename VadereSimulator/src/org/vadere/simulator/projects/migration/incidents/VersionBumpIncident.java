@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.migration.incidents;
 
-import org.vadere.simulator.projects.migration.Graph;
+import org.vadere.simulator.projects.migration.Tree;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
 
@@ -18,12 +18,12 @@ public class VersionBumpIncident extends Incident {
 	}
 
 	@Override
-	public boolean applies(Graph graph) {
+	public boolean applies(Tree graph) {
 		return true;
 	}
 
 	@Override
-	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
+	public void resolve(Tree graph, StringBuilder log) throws MigrationException {
 		log.append("\t- change [release] version from \"" + currentVersion.label() + "\" to \""
 				+ Version.latest().label() + "\"\n");
 		((ObjectNode) node).put("release", Version.latest().label());

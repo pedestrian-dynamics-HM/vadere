@@ -24,7 +24,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -127,7 +127,7 @@
         },
         "spawnDelay" : 20.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 20.0 ],
         "spawnNumber" : 10,
         "startTime" : 0.0,
         "endTime" : 100.0,

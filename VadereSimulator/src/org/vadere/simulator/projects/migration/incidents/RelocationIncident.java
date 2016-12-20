@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.migration.incidents;
 
 import java.util.List;
 
-import org.vadere.simulator.projects.migration.Graph;
+import org.vadere.simulator.projects.migration.Tree;
 import org.vadere.simulator.projects.migration.MigrationException;
 
 public class RelocationIncident extends Incident {
@@ -24,12 +24,12 @@ public class RelocationIncident extends Incident {
 	}
 
 	@Override
-	public boolean applies(Graph graph) {
+	public boolean applies(Tree graph) {
 		return graph.pathExists(fullOldPath);
 	}
 
 	@Override
-	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
+	public void resolve(Tree graph, StringBuilder log) throws MigrationException {
 		super.stillApplies(graph);
 		graph.relocateNode(fullOldPath, newPath);
 		log.append("\t- attach node [" + key + "] to " + graph.pathToString(oldPath) + ", instead of "

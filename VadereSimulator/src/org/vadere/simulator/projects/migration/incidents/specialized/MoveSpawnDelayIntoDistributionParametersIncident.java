@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.migration.incidents.specialized;
 
 import static org.vadere.simulator.projects.migration.IncidentDatabase.path;
 
-import org.vadere.simulator.projects.migration.Graph;
+import org.vadere.simulator.projects.migration.Tree;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.state.attributes.scenario.AttributesSource;
@@ -15,14 +15,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 
 	@Override
-	public boolean applies(Graph graph) {
+	public boolean applies(Tree graph) {
 		return true;
 	}
 
 	@Override
-	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
+	public void resolve(Tree graph, StringBuilder log) throws MigrationException {
 
-		Graph.Node sourcesNode = graph.getNodeByPath(path("vadere", "topography", "sources"));
+		Tree.Node sourcesNode = graph.getNodeByPath(path("vadere", "topography", "sources"));
 
 		if (sourcesNode != null) {
 			for (JsonNode source : sourcesNode.getJsonNode()) {

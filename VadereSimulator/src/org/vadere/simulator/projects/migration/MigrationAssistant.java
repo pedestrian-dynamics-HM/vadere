@@ -26,7 +26,8 @@ public class MigrationAssistant {
 	public enum Version {
 		UNDEFINED("undefined"),
 		NOT_A_RELEASE("not a release"),
-		V0_1("0.1");
+		V0_1("0.1"),
+		V0_2("0.2");
 
 		private String label;
 
@@ -148,7 +149,7 @@ public class MigrationAssistant {
 	private static boolean analyzeScenario(Path scenarioFilePath, Path legacyDir, StringBuilder log, boolean isScenario) throws IOException, MigrationException {
 		String json = IOUtils.readTextFile(scenarioFilePath);
 		JsonNode node = StateJsonConverter.deserializeToNode(json);
-		Graph graph = new Graph(node);
+		Tree graph = new Tree(node);
 
 		String outputScenarioParentFolderName = isScenario ? "" : scenarioFilePath.getParent().getFileName().toString() + " _ ";
 

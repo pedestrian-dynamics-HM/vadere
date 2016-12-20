@@ -106,7 +106,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {

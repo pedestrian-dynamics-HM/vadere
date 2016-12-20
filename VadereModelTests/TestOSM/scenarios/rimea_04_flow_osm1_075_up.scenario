@@ -5,7 +5,7 @@
   "topographyhash" : "97e82c32e10351e4f71c4a5070ca5d018ab21b21",
   "attributeshash" : "b906982adb598e93b86c6a26153f04ed0c8e4753",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
