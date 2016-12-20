@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.vadere.simulator.projects.migration.MigrationAssistant.Version;
 import org.vadere.simulator.projects.migration.incidents.AddTextNodeIncident;
-import org.vadere.simulator.projects.migration.incidents.DeleteInArrayIncident;
 import org.vadere.simulator.projects.migration.incidents.DeletionIncident;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.simulator.projects.migration.incidents.MissingMainModelIncident;
@@ -83,8 +82,6 @@ public class IncidentDatabase {
 		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
 
 		incidents.put(V0_1, new LinkedList<>());
-		addIncident(V0_1, new DeleteInArrayIncident(
-				path("scenario", "topography", "sources"), "spawnDelay"));
 		//addIncident(V0_1, ...
 
 		// - - - - - - - - - - - - "0.?" to "?" - - - - - - - - - - - -
