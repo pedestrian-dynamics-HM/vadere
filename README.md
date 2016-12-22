@@ -45,15 +45,9 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 
 With the following steps, you can start a scenario of one of the model test projects in [VadereModelTests](VadereModelTests):
 
-<<<<<<< HEAD
-- start VADERE
-- *Project* > *Open*
-- choose `vadere.project` and click *open*
-=======
 - start Vadere 
 - *Project* > *Open* 
 - choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
->>>>>>> develop
 - select the scenario on the left and press *run selected scenario*
 
 
@@ -90,7 +84,7 @@ from [version-control](Documentation/version-control) to your local **.git/hooks
 These files start the script [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software).
 2. Make sure that [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software) is executable.
 
-To create this file without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
+To create the **current_commit_hash.txt** without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
 switch to another branch and switch back again using the command line or any other tool you prefer.
 
 ## Contribution
@@ -99,12 +93,8 @@ Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guid
 
 ## Release History
 
-<<<<<<< HEAD
- - 0.1 - initial release of the software as open source (2016-08-05)
-=======
-- 0.1 initial release of the software as open source
-- 0.2 stability and usability improved, additional pedestrian simulation models are supported
->>>>>>> develop
+- 0.1 initial release of the software as open source (2016-08-05)
+- 0.2 stability and usability improved, additional pedestrian simulation models are supported (2016-12-22)
 
 
 ## Contributors
@@ -117,11 +107,5 @@ Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob
 ## License
 
 This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
-<<<<<<< HEAD
-More information: http://www.gnu.org/licenses/lgpl.html
 
-
-
-=======
 For more information: http://www.gnu.org/licenses/lgpl.html
->>>>>>> develop
