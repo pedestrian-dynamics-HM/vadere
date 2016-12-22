@@ -1,11 +1,9 @@
 {
   "name" : "rimea_13_stairs_gnm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "24289b6dcc1f2a298dc224a71be74323751a2db8",
-  "attributeshash" : "dab676aefa66fe6570fb091d53c1682a8688a001",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -129,7 +127,6 @@
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 150,

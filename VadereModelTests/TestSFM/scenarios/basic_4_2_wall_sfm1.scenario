@@ -1,9 +1,7 @@
 {
   "name" : "basic_4_2_wall_sfm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "5fc90d02be8a59ea3408bc65eb803dc8117184e7",
-  "attributeshash" : "34462d153a959a288d3ddb2d2b6969153139bd54",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "waitingTimeTest" ],
@@ -54,7 +52,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -155,7 +153,6 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 50,

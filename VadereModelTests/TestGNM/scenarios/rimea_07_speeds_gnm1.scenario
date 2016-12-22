@@ -1,9 +1,7 @@
 {
   "name" : "rimea_07_speeds_gnm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "43feafada4a10775a493cf454fa4712f20b447e9",
-  "attributeshash" : "f9bda304904d2c0f38489d332c08325b311250bc",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "evacuationTimeTest" ],
@@ -58,7 +56,7 @@
       "clazz" : "PedestrianVelocityProcessor"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -150,9 +148,8 @@
           "height" : 50.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 20.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 20.0 ],
         "spawnNumber" : 1,
         "startTime" : 0.0,
         "endTime" : 1000.0,

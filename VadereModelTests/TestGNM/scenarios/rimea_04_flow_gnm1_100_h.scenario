@@ -1,11 +1,9 @@
 {
   "name" : "rimea_04_flow_gnm1_100_h",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "5d8f3904564d818d63e6606a6d9e63a94b003c2c",
-  "attributeshash" : "7b32bc9ad9cbd96f058355bb305680d03212cbb3",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -97,7 +95,6 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 100,

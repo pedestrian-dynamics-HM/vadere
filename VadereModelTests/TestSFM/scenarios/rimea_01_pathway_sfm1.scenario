@@ -1,9 +1,7 @@
 {
   "name" : "rimea_01_pathway_sfm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "5a4523766dd5c78246918cda6671c9ef2bdcc4f3",
-  "attributeshash" : "da857819fc05cfe39c6946237e73f1e674b633fc",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "evacuationTimeTest" ],
@@ -24,7 +22,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -116,9 +114,8 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 30.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
         "startTime" : 0.0,
         "endTime" : 1200.0,

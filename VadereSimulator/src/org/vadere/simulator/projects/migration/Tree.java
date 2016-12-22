@@ -88,10 +88,20 @@ public class Tree {
 	 */
 	public void deleteUnrecognizedField(final String parentKey, final String key, final StringBuilder log, final Incident caller)
 			throws MigrationException {
-		Node node = recursiveScan(root, parentKey, key, caller);
-		log.append("\t- delete unrecognized node [" + key + "] under node "
-				+ pathToString(getPathToNode(node.parent)) + "\n");
-		node.delete();
+		List<Node> nodes = recursiveScan(root, parentKey, key, caller);
+		if(nodes.size() > 1) {
+			throw new MigrationException(caller, "can't automatically delete the unrecognized field [" + key
+					+ "] because more than one tree-path ends with [" + parentKey + " > " + key + "]");
+		}
+		else if(nodes.isEmpty()) {
+			throw new MigrationException(caller, "can't automatically delete the unrecognized field [" + key
+					+ "] no tree-path ends with [" + parentKey + " > " + key + "]");
+		}
+		else {
+			log.append("\t- delete unrecognized node [" + key + "] under node "
+					+ pathToString(getPathToNode(nodes.get(0).parent)) + "\n");
+			nodes.get(0).delete();
+		}
 	}
 
 	/**
@@ -99,22 +109,33 @@ public class Tree {
 	 * Transforms the node to an integer.
 	 *
 	 * @param parentKey the key of the parent of the node
-	 * @param childKey  the key of the node
+	 * @param key       the key of the node
 	 * @param log       a string builder to protocol the changes
 	 * @param caller
 	 * @throws MigrationException
 	 */
-	public void enforceIntegerValue(String parentKey, String childKey, StringBuilder log, Incident caller)
+	public void enforceIntegerValue(String parentKey, String key, StringBuilder log, Incident caller)
 			throws MigrationException {
-		Node node = recursiveScan(root, parentKey, childKey, caller);
-		log.append("\t- enforce integer-value (" + node.jsonNode.asInt() + " instead of " + node.jsonNode
-				+ ") of node [" + childKey + "] under node " + pathToString(getPathToNode(node.parent)) + "\n");
-		node.enforceIntegerValue();
+		List<Node> nodes = recursiveScan(root, parentKey, key, caller);
+
+		if(nodes.size() > 1) {
+			throw new MigrationException(caller, "can't automatically enforce integer-value for [" + key
+					+ "] because more than one tree-path ends with [" + parentKey + " > " + key + "]");
+		}
+		else if(nodes.isEmpty()) {
+			throw new MigrationException(caller, "can't automatically enforce integer-value for [" + key
+					+ "] no tree-path ends with [" + parentKey + " > " + key + "]");
+		}
+		else {
+			log.append("\t- enforce integer-value (" + nodes.get(0).jsonNode.asInt() + " instead of " + nodes.get(0).jsonNode
+					+ ") of node [" + key + "] under node " + pathToString(getPathToNode(nodes.get(0).parent)) + "\n");
+			nodes.get(0).enforceIntegerValue();
+		}
 	}
 
 	/**
-	 * TODO: remove caller variable, maybe this method should return a list of objects found and should not throw an exception!
-	 * Searches for a node starting at parentCandidate. They node has to be the child of a node which has the key equal to parentKey.
+	 * Searches for a all nodes which has to be the child of a node which has the key equal to parentKey.
+	 * The search starts at parentCandidate in a dept-first-fashion.
 	 *
 	 * @param parentCandidate   the current parent candidate
 	 * @param parentKey         the key of the parent
@@ -122,24 +143,21 @@ public class Tree {
 	 * @param caller
 	 * @throws MigrationException
 	 */
-	public Node recursiveScan(final Node parentCandidate, final String parentKey, final String key, final Incident caller)
+	public List<Node> recursiveScan(final Node parentCandidate, final String parentKey, final String key, final Incident caller)
 			throws MigrationException { // the alternative would be to collect all leaves and check their parents
-		Node firstResult = null;
-		Node secondResult = null;
+		List<Node> foundNodes = new LinkedList<>();
+		recursiveScan(parentCandidate, parentKey, key, foundNodes);
+		return foundNodes;
+	}
 
+	private void recursiveScan(final Node parentCandidate, final String parentKey, final String key, final List<Node> foundNodes) {
 		if (parentCandidate.key.equals(parentKey) && parentCandidate.children.keySet().contains(key)) { // = a path was found that ends on [childKey] and has [parentKey] as parent
-			firstResult = parentCandidate.children.get(key);
+			foundNodes.add(parentCandidate.children.get(key));
 		}
 
 		for (String child : parentCandidate.children.keySet()) {
-			secondResult = recursiveScan(parentCandidate.children.get(child), parentKey, key, caller);
-			if(firstResult != null && secondResult != null) {
-				throw new MigrationException(caller, "can't automatically delete the unrecognized field [" + key
-						+ "] because more than one graph-path ends with [" + parentKey + " > " + key + "]");
-			}
+			recursiveScan(parentCandidate.children.get(child), parentKey, key, foundNodes);
 		}
-
-		return (firstResult != null) ? firstResult : secondResult;
 	}
 
 	/**

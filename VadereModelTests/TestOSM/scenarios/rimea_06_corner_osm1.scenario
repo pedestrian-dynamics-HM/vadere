@@ -1,59 +1,12 @@
 {
   "name" : "rimea_06_corner_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "1438039afb5520d28837c2d7cdb0e2572c2ac829",
-  "attributeshash" : "41e26cd80b956a51e760712244e1634738451dcd",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 70.0,
-        "maxEvacuationTimeMean" : 50.0,
-        "minEvacuationTime" : 10.0,
-        "minEvacuationTimeMean" : 10.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  }, {
-    "formatString" : "%s",
-    "columnNames" : [ "waitingTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "pedestrianWaitingTimeProcessor" : {
-        "attributes" : {
-          "waitingArea" : {
-            "x" : 1.0,
-            "y" : 3.5,
-            "width" : 9.5,
-            "height" : 10.0
-          }
-        },
-        "columnNames" : [ "totalWaitingTime", "time", "id" ],
-        "clazz" : "PedestrianWaitingTimeProcessor"
-      },
-      "attributes" : {
-        "maxWaitingTime" : 0.0,
-        "maxWaitingTimeMean" : 0.0,
-        "minWaitingTime" : 0.0,
-        "minWaitingTimeMean" : 0.0,
-        "expectFailure" : false
-      },
-      "columnNames" : [ ],
-      "clazz" : "PedestrianWaitingTimeTest"
-    }
-  } ],
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
@@ -173,10 +126,10 @@
           "height" : 1.6,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 20,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,

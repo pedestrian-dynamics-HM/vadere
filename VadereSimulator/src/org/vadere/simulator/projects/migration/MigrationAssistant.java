@@ -34,9 +34,16 @@ public class MigrationAssistant {
 	private static Logger logger = LogManager.getLogger(MigrationAssistant.class);
 
 	private static boolean reapplyLatestMigrationFlag = false;
+	private static Version baseVersion = null;
 
 	public static void setReapplyLatestMigrationFlag() {
 		reapplyLatestMigrationFlag = true;
+		baseVersion = null;
+	}
+
+	public static void setReapplyLatestMigrationFlag(final Version version) {
+		reapplyLatestMigrationFlag = true;
+		baseVersion = version;
 	}
 
 	public static void analyzeSingleScenario(Path path) {
@@ -61,6 +68,7 @@ public class MigrationAssistant {
 		}
 
 		reapplyLatestMigrationFlag = false;
+		baseVersion = null;
 
 		return stats;
 	}
@@ -120,7 +128,7 @@ public class MigrationAssistant {
 	private static boolean analyzeScenario(Path scenarioFilePath, Path legacyDir, StringBuilder log, boolean isScenario) throws IOException, MigrationException {
 		String json = IOUtils.readTextFile(scenarioFilePath);
 		JsonNode node = StateJsonConverter.deserializeToNode(json);
-		Tree graph = new Tree(node);
+		Tree tree = new Tree(node);
 
 		String outputScenarioParentFolderName = isScenario ? "" : scenarioFilePath.getParent().getFileName().toString() + " _ ";
 
@@ -130,16 +138,27 @@ public class MigrationAssistant {
 
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());
+
 			if (version == null) {
 				throw new MigrationException("release version " + node.get("release").asText() + " is unknown. If this " +
 						"is a valid release, update the version-list in MigrationAssistant accordingly");
 			}
-			if (version == Version.latest()) {
-				if (reapplyLatestMigrationFlag) {
-					version = Version.values()[Version.values().length - 2];
-				} else {
+
+			// if enforced migration should be done from baseVersion to latestVersion
+			if (reapplyLatestMigrationFlag && baseVersion != null) {
+				version = baseVersion;
+
+			} else if(reapplyLatestMigrationFlag) { // if enforced migration should be done from prev version to latest
+				Optional<Version> optVersion = Version.getPrevious(version);
+				if(optVersion.isPresent()) {
+					version = optVersion.get();
+				}
+				else {
 					return false;
 				}
+			} // if no enforced migration should be done and we are at the latest version, no migration is required.
+			else if(version == Version.latest()) {
+				return false;
 			}
 		}
 
@@ -158,14 +177,14 @@ public class MigrationAssistant {
 		// 2. filter those out that don't apply
 
 		List<Incident> applicableIncidents = possibleIncidents.stream()
-				.filter(incident -> incident.applies(graph))
+				.filter(incident -> incident.applies(tree))
 				.collect(Collectors.toList());
 
 		// 3. resolve the applicable incidents (step 2 and 3 are intentionally separated to uncover
 		//		potentially dangerous flaws in the order of the incidents in the IncidentDatabase)
 
 		for (Incident incident : applicableIncidents)
-			incident.resolve(graph, log);
+			incident.resolve(tree, log);
 
 		if (legacyDir != null) {
 			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION, false);

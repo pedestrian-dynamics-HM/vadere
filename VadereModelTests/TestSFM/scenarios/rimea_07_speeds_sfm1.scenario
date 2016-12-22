@@ -1,9 +1,7 @@
 {
   "name" : "rimea_07_speeds_sfm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "da1d61825abf9afd88a1bd13f7137be19cea4224",
-  "attributeshash" : "b0f9d2f9e8246f2dd1a7249e2255097a9a4dd26e",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "evacuationTimeTest" ],
@@ -24,7 +22,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -116,9 +114,8 @@
           "height" : 50.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 20.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 20.0 ],
         "spawnNumber" : 10,
         "startTime" : 0.0,
         "endTime" : 100.0,

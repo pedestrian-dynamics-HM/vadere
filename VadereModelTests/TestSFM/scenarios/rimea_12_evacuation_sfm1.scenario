@@ -1,9 +1,7 @@
 {
   "name" : "rimea_12_evacuation_sfm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "6df1a2e2049b77eb4efec2727906995a725fd6da",
-  "attributeshash" : "a37b0556d777c29673caaa1d913901bbe1b93c9d",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s %s %s",
     "columnNames" : [ "densityTest" ],
@@ -106,7 +104,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -234,7 +232,6 @@
           "height" : 9.6,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 150,

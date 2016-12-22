@@ -1,11 +1,9 @@
 {
   "name" : "rimea_09_publicRoom_sfm1_2",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "67ca02c368d68648d95bbb7abaf3dda6156c892d",
-  "attributeshash" : "81201a51b45e47523928197eecd5eea1f0f7ce8b",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -199,7 +197,6 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1000,

@@ -1,5 +1,9 @@
 package org.vadere.simulator.entrypoints;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
+
 /** Versions in strict order from oldest to newest. */
 public enum Version {
 
@@ -28,6 +32,19 @@ public enum Version {
 
 	public static Version latest() {
 		return values()[values().length - 1];
+	}
+
+	public static Optional<Version> getPrevious(@NotNull final Version successorVersion) {
+		Version prevVersion = null;
+
+		for(Version version : values()) {
+			if(successorVersion.equals(version)) {
+				return Optional.ofNullable(prevVersion);
+			}
+			prevVersion = version;
+		}
+
+		return Optional.empty();
 	}
 	
 	@Override

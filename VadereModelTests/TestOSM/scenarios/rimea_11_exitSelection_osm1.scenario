@@ -1,10 +1,12 @@
 {
   "name" : "rimea_11_exitSelection_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "388a836ae85a814e6f84d34f6d2509d6d319a1aa",
-  "attributeshash" : "2a80e801318ee7a6bcaab6f940f91597d1030037",
-  "processWriters" : [ ],
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
@@ -178,10 +180,10 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1000,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,

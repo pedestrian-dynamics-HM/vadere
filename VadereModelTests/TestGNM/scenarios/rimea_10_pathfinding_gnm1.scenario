@@ -1,9 +1,7 @@
 {
   "name" : "rimea_10_pathfinding_gnm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "ca2072236c2fdb761e5b8d9fd2d15764d94841e2",
-  "attributeshash" : "bb06d945206a783e7148ed12df152fa5acc16d2d",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s %s %s %s %s %s %s %s %s %s %s",
     "columnNames" : [ "time", "id", "lastX", "lastY", "firstX", "firstY", "targetId", "sourceId", "startTime", "endTime", "evacTime" ],
@@ -16,7 +14,7 @@
       "clazz" : "PedestrianLastPositionProcessor"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -512,7 +510,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -531,7 +528,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -550,7 +546,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -569,7 +564,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -588,7 +582,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -607,7 +600,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -626,7 +618,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -645,7 +636,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -664,7 +654,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -683,7 +672,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -702,7 +690,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,
@@ -721,7 +708,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 2,

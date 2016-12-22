@@ -2,6 +2,7 @@ package org.vadere.gui.projectview.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -47,12 +48,31 @@ public class ActionLoadProject extends AbstractAction {
 
 			if (projectFilePath != null) {
 
+				Object[] options = new Object[Version.values().length+1];
+				System.arraycopy(Version.values(),0,options, 0, Version.values().length);
+				options[options.length-1] = Messages.getString("ProjectView.chooseMigrationBaseDialog.defaultOption");
+
+				//TODO: [refactoring]: static call which has side-effect to the following call!
 				if (isRemigrationLoading) {
-					MigrationAssistant.setReapplyLatestMigrationFlag();
+					Object option = JOptionPane.showInputDialog(null,
+							Messages.getString("ProjectView.chooseMigrationBaseDialog.text"),
+							Messages.getString("ProjectView.chooseMigrationBaseDialog.title"),
+							JOptionPane.INFORMATION_MESSAGE, null,
+							options, options[options.length-1]);
+
+					if(option.equals(options[options.length-1])) {
+						MigrationAssistant.setReapplyLatestMigrationFlag();
+					}
+					else {
+						Version version = (Version)option;
+						MigrationAssistant.setReapplyLatestMigrationFlag(version);
+					}
+
 				}
 
 				// 3. load project
 				loadProjectByPath(model, projectFilePath);
+
 			} else {
 				logger.info(String.format("user canceled load project."));
 			}

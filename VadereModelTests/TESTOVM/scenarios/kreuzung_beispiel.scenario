@@ -1,11 +1,9 @@
 {
   "name" : "kreuzung_beispiel",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "d5b33611f248b560d123cb7700691a3108554a09",
-  "attributeshash" : "146a0a64e733fed65c5ac9559aea5e52866289b0",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.ovm.OptimalVelocityModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOVM" : {
@@ -383,7 +381,6 @@
           "height" : 0.03,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,
@@ -402,7 +399,6 @@
           "height" : 0.03,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,
@@ -421,7 +417,6 @@
           "height" : 0.03,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,
@@ -440,7 +435,6 @@
           "height" : 0.03,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,

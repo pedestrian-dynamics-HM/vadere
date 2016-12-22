@@ -1,11 +1,9 @@
 {
   "name" : "testtrafficlight",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "3a43d25b7f32b87eb28b2c836106e7854c1ede37",
-  "attributeshash" : "2f8bd261d0d5d20fcb2da3a6c142c3074aeeef89",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -123,9 +121,8 @@
           "height" : 1.1,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 30.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 2,
         "startTime" : 0.0,
         "endTime" : 1000.0,

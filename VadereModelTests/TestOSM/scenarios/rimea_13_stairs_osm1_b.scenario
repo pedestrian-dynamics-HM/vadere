@@ -1,10 +1,12 @@
 {
   "name" : "rimea_13_stairs_osm1_b",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "73a4ebc0c8f6e4a3ed99e51aff7868939c441e4c",
-  "attributeshash" : "94ceb2a6cec8ec64afacacaf9bf2cb89fa382423",
-  "processWriters" : [ ],
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
@@ -138,10 +140,10 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 4.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 4.0 ],
         "spawnNumber" : 15,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 36.0,
         "spawnAtRandomPositions" : false,

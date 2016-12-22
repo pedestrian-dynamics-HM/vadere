@@ -1,9 +1,7 @@
 {
   "name" : "basic_1_chicken_sfm2",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "cde764736cfb41b5cd5e4ff40e0adfca0fee6370",
-  "attributeshash" : "f7f91318526235ffe200ee70e83d350e8e08cb45",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "waitingTimeTest" ],
@@ -84,7 +82,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -203,7 +201,6 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 200,

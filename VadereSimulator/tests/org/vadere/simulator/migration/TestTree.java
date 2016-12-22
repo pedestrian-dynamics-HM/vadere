@@ -11,12 +11,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.Tree;
+import org.vadere.simulator.projects.migration.incidents.DeleteInArrayIncident;
 import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
 import org.vadere.state.util.StateJsonConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class TestTree {
 
@@ -47,16 +49,9 @@ public class TestTree {
 	public void testRecursiveScan() throws IOException, MigrationException {
 		JsonNode jsonNode = StateJsonConverter.deserializeToNode(json);
 		Tree tree = new Tree(jsonNode);
-		assertEquals("number", tree.recursiveScan(tree.getRoot(), "house", "number", new ExceptionIncident(jsonNode)).getKey());
-	}
-
-	@Test
-	public void testRedcursiveScan() throws IOException, MigrationException {
-		JsonNode jsonNode = StateJsonConverter.deserializeToNode(json);
-		Tree tree = new Tree(jsonNode);
-		assertEquals("number", tree.recursiveScan(tree.getRoot(), "house", "number", new ExceptionIncident(jsonNode)).getKey());
+		assertEquals("number", tree.recursiveScan(tree.getRoot(), "house", "number", new ExceptionIncident(jsonNode)).get(0).getKey());
 		tree.deleteUnrecognizedField("house", "number", new StringBuilder(), new ExceptionIncident(jsonNode));
-		assertEquals(null, tree.recursiveScan(tree.getRoot(), "house", "number", new ExceptionIncident(jsonNode)));
+		assertEquals(new LinkedList<>(), tree.recursiveScan(tree.getRoot(), "house", "number", new ExceptionIncident(jsonNode)));
 	}
 
 	@Test
@@ -67,5 +62,18 @@ public class TestTree {
 		assertTrue(tree.getNodeByPath(Arrays.asList("persons")).getJsonNode().get(0).has("name"));
 		tree.deleteNodeInArray(Arrays.asList("persons"), "name");
 		assertFalse(tree.getNodeByPath(Arrays.asList("persons")).getJsonNode().get(0).has("name"));
+		tree.deleteNodeInArray(Arrays.asList("persons"), "name");
+		assertFalse(tree.getNodeByPath(Arrays.asList("persons")).getJsonNode().get(0).has("name"));
+	}
+
+	@Test
+	public void testDeleteNodeInArrayIncident() throws IOException, MigrationException {
+		JsonNode jsonNode = StateJsonConverter.deserializeToNode(json);
+		DeleteInArrayIncident incident = new DeleteInArrayIncident(Arrays.asList("persons"), "name");
+		Tree tree = new Tree(jsonNode);
+
+		assertTrue(incident.applies(tree));
+		incident.resolve(tree, new StringBuilder());
+		assertFalse(incident.applies(tree));
 	}
 }

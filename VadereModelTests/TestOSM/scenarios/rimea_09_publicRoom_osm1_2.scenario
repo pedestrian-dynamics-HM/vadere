@@ -1,10 +1,12 @@
 {
   "name" : "rimea_09_publicRoom_osm1_2",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "3b00f24d1aecc13094fb4631ad6822983783c7e2",
-  "attributeshash" : "2f8bd261d0d5d20fcb2da3a6c142c3074aeeef89",
-  "processWriters" : [ ],
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
@@ -199,10 +201,10 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1000,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
