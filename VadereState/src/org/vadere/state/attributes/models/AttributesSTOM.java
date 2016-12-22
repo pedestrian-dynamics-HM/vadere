@@ -12,8 +12,6 @@ public class AttributesSTOM extends Attributes {
 	private String tactics = null;
 	private String strategy = null;
 
-	public AttributesSTOM() {}
-
 	// Getters...
 	public String getOperation() {
 		return operation;

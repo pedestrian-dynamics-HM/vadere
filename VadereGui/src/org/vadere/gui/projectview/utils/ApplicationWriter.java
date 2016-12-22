@@ -6,7 +6,7 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.ActionLoadProject;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class ApplicationWriter {
 	public static void savePreferences() throws IOException, BackingStoreException {
 		logger.info(String.format("saving preferences..."));
 		Resources.getInstance("postvisualization").save(); // TODO [priority=medium] [task=refactoring] is this necessary? these file seem to have gotten changed last in 2014...
-		Resources.getInstance("topologycreator").save();
+		Resources.getInstance("topographycreator").save();
 		IOUtils.saveUserPreferences(VadereApplication.preferencesFilename,
 				Preferences.userNodeForPackage(VadereApplication.class));
 		logger.info(String.format("saved preferences."));

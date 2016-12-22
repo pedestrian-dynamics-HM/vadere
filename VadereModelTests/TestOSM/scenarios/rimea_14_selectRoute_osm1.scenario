@@ -1,11 +1,13 @@
 {
   "name" : "rimea_14_selectRoute_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "d4f8babf2f7826c11f933468513f6ebb9588c335",
-  "attributeshash" : "94ceb2a6cec8ec64afacacaf9bf2cb89fa382423",
-  "processWriters" : [ ],
-  "vadere" : {
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -188,10 +190,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 100,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,

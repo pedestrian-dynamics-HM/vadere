@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 
 import java.awt.*;
 
@@ -21,7 +21,7 @@ public class ScenarioTableRenderer extends DefaultTableCellRenderer {
 	public Component getTableCellRendererComponent(final JTable table, Object value, final boolean isSelected,
 			final boolean hasFocus, final int row, final int column) {
 		if (column == 0)
-			super.getTableCellRendererComponent(table, ((ScenarioRunManager) value).getDisplayName(), isSelected,
+			super.getTableCellRendererComponent(table, ((Scenario) value).getDisplayName(), isSelected,
 					hasFocus, row, column);
 		else
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

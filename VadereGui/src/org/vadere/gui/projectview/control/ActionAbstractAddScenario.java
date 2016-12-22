@@ -4,8 +4,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;
@@ -42,7 +42,7 @@ public abstract class ActionAbstractAddScenario extends AbstractAction {
 
 		if (isScenarioNameValid(scenarioName)) {
 			try {
-				ScenarioRunManager vadere = generateVadere(scenarioName);
+				Scenario vadere = generateVadere(scenarioName);
 				if (vadere == null) // e.g. canceled by user
 					return;
 				addScenario(vadere);
@@ -59,9 +59,9 @@ public abstract class ActionAbstractAddScenario extends AbstractAction {
 		return !model.isScenarioNameInConflict(name);
 	}
 
-	protected abstract ScenarioRunManager generateVadere(final String name) throws IOException;
+	protected abstract Scenario generateVadere(final String name) throws IOException;
 
-	protected void addScenario(final ScenarioRunManager scenarioRM) throws IOException {
+	protected void addScenario(final Scenario scenarioRM) throws IOException {
 		ProjectWriter.writeScenarioFileJson(model.getCurrentProjectPath(), scenarioRM);
 		model.addScenario(scenarioRM);
 		logger.info("add scenario: " + scenarioRM);

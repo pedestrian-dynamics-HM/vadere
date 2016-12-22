@@ -1,10 +1,7 @@
 package org.vadere.simulator.io;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.simulator.projects.io.JsonSerializerTopography;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
@@ -14,10 +11,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.io.IOUtils;
-
-import com.google.gson.JsonElement;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class TestScenarioToJson {

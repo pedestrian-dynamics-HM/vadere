@@ -1,17 +1,22 @@
 package org.vadere.simulator.entrypoints;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.*;
-import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunLocked;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.util.io.IOUtils;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
+
+import org.apache.log4j.Logger;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioRun;
+import org.vadere.util.io.IOUtils;
+
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentGroup;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 /**
  * Provides the possibility to start VADERE in console mode.
@@ -43,10 +48,6 @@ public class VadereConsole {
 		String outputFile = ns.getString("output-file");
 		String lockDirectory = ns.getString("lock-folder");
 		String timeStepFile = ns.getString("time-step-file");
-		String outputFormat = ns.getString("output_format");
-		String outputVariables = ns.getString("output_variables");
-		String tsfFormat = ns.getString("tsf_format");
-		String tsfVariables = ns.getString("tsf_variables");
 		Boolean outputAll = ns.getBoolean("all");
 
 		if ((lockDirectory == null || outputFile == null || timeStepFile == null) && projectDirectory == null) {
@@ -69,21 +70,9 @@ public class VadereConsole {
 		logger.info(String.format("Running VADERE on %s...", scenarioFilePath));
 
 		try {
-			if (projectDirectory == null) {
-				ScenarioRunLocked vadereJava = VadereFactory.createVadereWithFiles(Paths.get(outputFile).toString(),
-						scenarioFilePath, vadereName);
-
-				vadereJava.setWaitOnLockData(lockDirectory, timeStepFile, outputAll);
-				vadereJava.setOutputFormat(outputFormat, outputVariables);
-				vadereJava.setTSFFormat(tsfFormat, tsfVariables);
-
-				vadereJava.run();
-			} else {
-				ScenarioRunManager vadereJava = VadereFactory.createVadereWithProjectDirectory(projectDirectory,
-						vadereName + IOUtils.SCENARIO_FILE_EXTENSION, vadereName);
-				vadereJava.run();
-			}
-
+			Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(projectDirectory,
+					vadereName + IOUtils.SCENARIO_FILE_EXTENSION, vadereName);
+			new ScenarioRun(scenario, null).run();
 		} catch (IOException e) {
 			logger.error(e);
 		}
@@ -112,7 +101,7 @@ public class VadereConsole {
 						" and Vadere waits for its deletion again.");
 
 		modesGroup.addArgument("-op", "--out-path")
-				.help("NOT in [lock] mode! Path to the output folder where VADERE stores additional results of the simulation.");
+				.help("NOT in [lock] mode! Path to the output folder where VADERE store additional results of the simulation.");
 
 		modesGroup.addArgument("-mtv").type(Boolean.class).action(Arguments.storeTrue())
 				.help("Initializes the [lock] mode. Needs three strings: 1. path to folder where the lock.lck file is created, 2. path to time step file, 3. path to output file.");
@@ -121,7 +110,7 @@ public class VadereConsole {
 		// .help("Path to the output file where VADERE appends results of the simulation.");
 
 		// parser.addArgument("-tsf", "--time-step-file")
-		// .help("Path to the time step file where VADERE stores and reads intermediate results.");
+		// .help("Path to the time step file where VADERE store and reads intermediate results.");
 
 		// parser.addArgument("-l","--lock")
 		// .help("Path to the .lock files folder.");

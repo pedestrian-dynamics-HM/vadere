@@ -1,5 +1,26 @@
 package org.vadere.simulator.models.gnm;
 
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.ode.IntegratorFactory;
+import org.vadere.simulator.models.ode.ODEModel;
+import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
+import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
+import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesGNM;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.types.GradientProviderType;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.parallel.ParallelWorkerUtil;
+import org.vadere.util.potential.gradients.GradientProvider;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,30 +29,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.vadere.simulator.control.ActiveCallback;
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.ode.IntegratorFactory;
-import org.vadere.simulator.models.ode.ODEModel;
-import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
-import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
-import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesGNM;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.types.GradientProviderType;
-import org.vadere.util.data.Table;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.parallel.ParallelWorkerUtil;
-import org.vadere.util.potential.gradients.GradientProvider;
-
-public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> {
+public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> implements PotentialFieldModel {
 	private AttributesGNM attributes;
 	private GradientProvider floorGradient;
 	private Map<Integer, Target> targets;
@@ -39,7 +37,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private int pedestrianIdCounter;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	@Deprecated
 	public GradientNavigationModel(final Topography scenario,
@@ -84,7 +82,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributes.getObstaclePotentialModel());
@@ -92,7 +90,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributes.getPedestrianPotentialModel());
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	public void rebuildFloorField(final double simTimeInSec) {
@@ -155,11 +153,6 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public Map<String, Table> getOutputTables() {
-		return new HashMap<>();
-	}
-
-	@Override
 	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Class<T> type) {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("GNM cannot initialize " + type.getCanonicalName());
@@ -171,8 +164,22 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
+	@Override
+	public PotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
+	}
+
+	@Override
+	public PotentialFieldObstacle getPotentialFieldObstacle() {
+		return potentialFieldObstacle;
+	}
+
+	@Override
+	public PotentialFieldAgent getPotentialFieldAgent() {
+		return potentialFieldPedestrian;
+	}
 }

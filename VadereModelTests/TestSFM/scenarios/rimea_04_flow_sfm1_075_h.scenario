@@ -1,11 +1,9 @@
 {
   "name" : "rimea_04_flow_sfm1_075_h",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "fc420a9ff8db52039a2593397ad057df977a99ea",
-  "attributeshash" : "6c8eef339f24d23c24a76353850942bff1d634e8",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -97,7 +95,6 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 75,

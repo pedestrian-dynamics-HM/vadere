@@ -16,7 +16,7 @@ import org.vadere.util.geometry.shapes.VCircle;
  * 
  */
 public class DrawDotMode extends DefaultSelectionMode {
-	private static Resources resources = Resources.getInstance("topologycreator");
+	private static Resources resources = Resources.getInstance("topographycreator");
 
 	private final UndoableEditSupport undoSupport;
 	private final double dotRadius;

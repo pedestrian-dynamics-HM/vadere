@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.VadereScenarioTableModel;
 import org.vadere.gui.projectview.model.VadereState;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -25,7 +25,7 @@ public class ActionPauseScenario extends AbstractAction {
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		ProjectViewModel.ScenarioBundle optionalScenarioBundle = model.getRunningScenario();
-		ScenarioRunManager scenario = optionalScenarioBundle.getScenario();
+		Scenario scenario = optionalScenarioBundle.getScenario();
 		if (model.getProject().isScenarioPaused()) {
 			model.getProject().resumePausedScenarios();
 			model.getScenarioTableModel().replace(scenario,

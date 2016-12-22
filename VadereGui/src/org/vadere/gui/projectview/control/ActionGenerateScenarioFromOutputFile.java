@@ -4,7 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.util.io.IOUtils;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
 
 /**
  * Ask the user to select a scenario-file from an output directory to convert this file to a
- * {@link org.vadere.simulator.projects.ScenarioRunManager} scenario.
+ * {@link org.vadere.simulator.projects.Scenario} scenario.
  *
  */
 public class ActionGenerateScenarioFromOutputFile extends ActionAbstractAddScenario {
@@ -36,7 +36,7 @@ public class ActionGenerateScenarioFromOutputFile extends ActionAbstractAddScena
 	}
 
 	@Override
-	protected ScenarioRunManager generateVadere(final String name) throws IOException {
+	protected Scenario generateVadere(final String name) throws IOException {
 		try {
 			FileFilter filter = new FileNameExtensionFilter("Scenario", IOUtils.SCENARIO_FILE_EXTENSION);
 			String path =
@@ -44,7 +44,7 @@ public class ActionGenerateScenarioFromOutputFile extends ActionAbstractAddScena
 			if (path == null) {
 				return null;
 			}
-			ScenarioRunManager vadere = IOVadere.fromJson(IOUtils.readTextFile(path));
+			Scenario vadere = IOVadere.fromJson(IOUtils.readTextFile(path));
 			vadere.setName(name);
 			return vadere;
 		} catch (IOException e) {

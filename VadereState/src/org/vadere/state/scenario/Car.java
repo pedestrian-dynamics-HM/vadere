@@ -1,6 +1,5 @@
 package org.vadere.state.scenario;
 
-import java.util.LinkedList;
 import java.util.Random;
 
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -12,34 +11,16 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 public class Car extends Agent implements Comparable<Car> {
 
-	private AttributesCar attributesCar;
-	private transient Random random;
+	private final AttributesCar attributesCar;
 
 	public Car(AttributesCar attributesCar, Random random) {
 		super(attributesCar, random);
 
-		this.setAttributesCar(attributesCar);
+		this.attributesCar = attributesCar;
 		setPosition(new VPoint(0, 0));
 		setVelocity(new Vector2D(0, 0));
 		// this.targetIds = new LinkedList<>();
 	}
-
-	/**
-	 * Constructor for cloning
-	 * 
-	 * @param other: Car to clone
-	 */
-	private Car(Car other) {
-		this(other.attributesCar, other.random);
-		setPosition(other.getPosition());
-		setVelocity(other.getVelocity());
-		setTargets(new LinkedList<>(other.getTargets()));
-	}
-
-	public void setAttributesCar(AttributesCar attributesCar) {
-		this.attributesCar = attributesCar;
-	}
-
 
 	@Override
 	public int compareTo(Car o) {
@@ -78,11 +59,6 @@ public class Car extends Agent implements Comparable<Car> {
 	}
 
 	@Override
-	public Car clone() {
-		return new Car(this);
-	}
-
-	@Override
 	public AttributesCar getAttributes() {
 		return this.attributesCar;
 	}
@@ -92,10 +68,12 @@ public class Car extends Agent implements Comparable<Car> {
 		return attributesCar.getId();
 	}
 
-	/*
-	 * public LinkedList<Integer> getTargetIDs() {
-	 * return getTargets();
-	 * }
-	 */
+	@Override
+	public Car clone() {
+		throw new RuntimeException("clone is not supported for Car; it seems hard to implement.");
+		// return new Car(attributesCar, new Random());
+		// TODO get random from super class instead of creating a new one
+		// TODO attributesAgent in super class must be copied as well
+	}
 
 }

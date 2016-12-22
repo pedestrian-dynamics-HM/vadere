@@ -1,5 +1,7 @@
 package org.vadere.gui.components.utils;
 
+import com.android.dx.gen.Local;
+
 import javax.swing.*;
 
 import org.vadere.gui.projectview.VadereApplication;
@@ -18,6 +20,8 @@ import java.util.prefs.Preferences;
  */
 public abstract class Messages {
 
+	private static final String BUNDLE_NAME = "messages";
+	private static final ResourceBundle RESOURCE_BUNDLE = loadBundle();
 
 	public static String getString(String key) {
 		try {
@@ -28,36 +32,14 @@ public abstract class Messages {
 		}
 	}
 
-	private static final String BUNDLE_NAME = "messages";
-	public static final Locale locale = setLanguage();
-	private static final ResourceBundle RESOURCE_BUNDLE = loadBundle();
-
 	private static ResourceBundle loadBundle() {
-		return ResourceBundle.getBundle(BUNDLE_NAME, locale);
-	}
-
-	private static Locale setLanguage() {
-		String language = Preferences.userNodeForPackage(VadereApplication.class).get("language", null);
-		if (language != null) {
-			switch (language) {
-				case "de":
-					return Locale.GERMAN;
-				case "en":
-				default:
-					return Locale.ENGLISH;
-			}
-		}
-		return Locale.getDefault();
+		return ResourceBundle.getBundle(BUNDLE_NAME, Language.locale);
 	}
 
 	public static void changeLanguage(Locale lang) {
 		Preferences.userNodeForPackage(VadereApplication.class).put("language", lang.getLanguage());
 		JOptionPane.showMessageDialog(ProjectView.getMainWindow(), getString("Messages.changeLanguagePopup.text"),
 				getString("Messages.changeLanguagePopup.title"), JOptionPane.INFORMATION_MESSAGE);
-	}
-
-	public static boolean languageIsGerman() {
-		return locale.getLanguage().equals(Locale.GERMAN.getLanguage());
 	}
 
 }

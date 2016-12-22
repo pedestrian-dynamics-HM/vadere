@@ -1,14 +1,11 @@
 package org.vadere.util.io;
 
-import com.google.gson.*;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.vadere.util.geometry.shapes.VShape;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +16,11 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Contains utilities for input and output.
@@ -40,8 +41,6 @@ public class IOUtils {
 	public static final String SCENARIO_DIR = "scenarios";
 
 	public static final String CORRUPT_DIR = "corrupt";
-
-	public static final String OUTPUTPROCESSOR_OUTPUT_DIR = "processed output";
 
 	public static final String VADERE_PROJECT_FILENAME = "vadere.project";
 
@@ -82,11 +81,6 @@ public class IOUtils {
 
 	/**
 	 * Prints a given string to a file with a given name.
-	 * 
-	 * @param filename
-	 * @param data
-	 * @throws IOException
-	 *         if something goes wrong with the file.
 	 */
 	public static void printDataFile(Path filename, String data)
 			throws IOException {
@@ -105,61 +99,6 @@ public class IOUtils {
 		if (!Files.exists(path)) {
 			Files.createDirectories(path);
 		}
-	}
-
-	/**
-	 * Converts a given object to an unecaped, pretty printed JSON string. This
-	 * function uses Gson.
-	 * 
-	 * @param object
-	 * @return a pretty printed json string that represents the given object.
-	 */
-	@Deprecated
-	public static String toPrettyPrintJson(Object object) {
-		Gson gson = getGsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-		String json = gson.toJson(object);
-		return json;
-	}
-
-	@Deprecated
-	public static String toPrettyPrintJson(Object object, ExclusionStrategy exclusionStrategy) {
-		Gson gson = getGsonBuilder().setExclusionStrategies(exclusionStrategy).setPrettyPrinting().disableHtmlEscaping()
-				.create();
-		return gson.toJson(object);
-	}
-
-	/**
-	 * Converts a given object to an unescaped JSON string.
-	 */
-	@Deprecated
-	public static String toJson(Object object) {
-		Gson gson = getGsonBuilder().disableHtmlEscaping().create();
-		return gson.toJson(object);
-	}
-
-	@Deprecated
-	public static Gson getGson() {
-		return getGsonBuilder().create();
-	}
-
-	@Deprecated
-	public static Gson getGson(final ExclusionStrategy exclusionStrategy) {
-		return getGsonBuilder().setExclusionStrategies(exclusionStrategy).create();
-	}
-
-	@Deprecated
-	public static GsonBuilder getGsonBuilder() {
-		GsonBuilder builder = new GsonBuilder().disableHtmlEscaping();
-		builder.registerTypeAdapter(VShape.class, new JsonSerializerVShape());
-		builder.registerTypeAdapter(boolean.class,
-				(JsonDeserializer<Boolean>) (jsonElement, type, jsonDeserializationContext) -> {
-					String value = jsonElement.getAsString();
-					if (!(value.equals("true") || value.equals("false")))
-						throw new JsonParseException("Can't parse \"" + value + "\" as boolean");
-					return jsonElement.getAsBoolean();
-				});
-		builder.serializeSpecialFloatingPointValues();
-		return builder;
 	}
 
 	/**
@@ -193,14 +132,7 @@ public class IOUtils {
 		return Preferences.userNodeForPackage(cls);
 	}
 
-	/**
-	 * Saves a given preference to file.
-	 * 
-	 * @param preferencesfilename
-	 * @param prefs
-	 * @throws IOException
-	 * @throws BackingStoreException
-	 */
+	/** Saves a given preference to file. */
 	public static void saveUserPreferences(String preferencesfilename,
 			Preferences prefs) throws IOException, BackingStoreException {
 		try (FileOutputStream fos = new FileOutputStream(preferencesfilename)) {
@@ -210,13 +142,7 @@ public class IOUtils {
 		}
 	}
 
-	/**
-	 * Writes a given string to a given file.
-	 * 
-	 * @param filepath
-	 * @param text
-	 * @throws IOException
-	 */
+	/** Writes a given string to a given file. */
 	public static void writeTextFile(String filepath, String text) throws IOException {
 		Files.deleteIfExists(Paths.get(filepath));
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
@@ -224,13 +150,7 @@ public class IOUtils {
 		}
 	}
 
-	/**
-	 * Reads all text of a given file and stores it in a string.
-	 * 
-	 * @param filePath
-	 * @return
-	 * @throws IOException
-	 */
+	/** Reads all text of a given file and store it in a string. */
 	public static String readTextFile(Path filePath) throws IOException {
 		List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
 		StringBuilder sb = new StringBuilder();
@@ -250,10 +170,6 @@ public class IOUtils {
 	/**
 	 * Runs file selector with given title using given subdirectory. If the
 	 * subdirectory is not an absolute path, it is combined with user.dir.
-	 * 
-	 * @param title
-	 * @param subdir
-	 * @return
 	 */
 	public static String chooseFile(String title, String subdir,
 			FileFilter filter) {
@@ -321,34 +237,19 @@ public class IOUtils {
 		return chooseFileSave(title, subdir, filter);
 	}
 
-	/**
-	 * Shows an error box with given message and title.
-	 * 
-	 * @param infoMessage
-	 * @param title
-	 */
+	/** Shows an error box with given message and title. */
 	public static void errorBox(String infoMessage, String title) {
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
 				JOptionPane.ERROR_MESSAGE);
 	}
 
-	/**
-	 * Shows an warn box with given message and title.
-	 *
-	 * @param infoMessage
-	 * @param title
-	 */
+	/** Shows an warn box with given message and title. */
 	public static void warnBox(String infoMessage, String title) {
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
 				JOptionPane.WARNING_MESSAGE);
 	}
 
-	/**
-	 * Shows an info box with given message and title.
-	 *
-	 * @param infoMessage
-	 * @param title
-	 */
+	/** Shows an info box with given message and title. */
 	public static void infoBox(String infoMessage, String title) {
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
 				JOptionPane.INFORMATION_MESSAGE);
@@ -357,34 +258,9 @@ public class IOUtils {
 	/**
 	 * Opens a yes-no-cancel message box and returns its result (as
 	 * JOptionPane.OPTION, i.e. int)
-	 * 
-	 * @param infoMessage
-	 * @param title
-	 * @return
 	 */
 	public static int chooseYesNoCancel(String infoMessage, String title) {
 		return JOptionPane.showConfirmDialog(null, infoMessage, title,
 				JOptionPane.YES_NO_CANCEL_OPTION);
 	}
-
-	public static Path getPath(final String stringPath, final String fileName) {
-		Path path = Paths.get(stringPath, "");
-		if (!Files.exists(path)) {
-			try {
-				Files.createDirectories(path);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		path = Paths.get(stringPath, fileName);
-		if (!Files.exists(path)) {
-			try {
-				Files.createFile(path);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return path;
-	}
-
 }

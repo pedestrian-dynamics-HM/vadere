@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.VShape;
  */
 public class AttributesTarget extends Attributes {
 
-	private int id = -1;
+	private int id = ID_NOT_SET;
 	/**
 	 * True: elements are removed from the simulation after entering.
 	 * False: the target id is removed from the target id list, but the element remains.
@@ -45,6 +45,7 @@ public class AttributesTarget extends Attributes {
 	 */
 	private boolean individualWaiting = true;
 
+	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
 	private double deletionDistance = 0.1;
 
 	/**
@@ -61,18 +62,6 @@ public class AttributesTarget extends Attributes {
 	private double nextSpeed = -1.0;
 
 	public AttributesTarget() {}
-
-	public AttributesTarget(final AttributesTarget attributes, final VShape shape) {
-		this.shape = shape;
-		this.absorbing = attributes.absorbing;
-		this.id = attributes.id;
-		this.waitingTime = attributes.waitingTime;
-		this.waitingTimeYellowPhase = attributes.waitingTimeYellowPhase;
-		this.parallelWaiters = attributes.parallelWaiters;
-		this.individualWaiting = attributes.individualWaiting;
-		this.individualWaiting = attributes.startingWithRedLight;
-		this.nextSpeed = attributes.nextSpeed;
-	}
 
 	public AttributesTarget(final VShape shape) {
 		this.shape = shape;
@@ -110,6 +99,10 @@ public class AttributesTarget extends Attributes {
 		return id;
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}
@@ -143,65 +136,9 @@ public class AttributesTarget extends Attributes {
 		return nextSpeed;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (absorbing ? 1231 : 1237);
-		long temp;
-		temp = Double.doubleToLongBits(deletionDistance);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + id;
-		result = prime * result + (individualWaiting ? 1231 : 1237);
-		temp = Double.doubleToLongBits(nextSpeed);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + parallelWaiters;
-		result = prime * result + ((shape == null) ? 0 : shape.hashCode());
-		result = prime * result + (startingWithRedLight ? 1231 : 1237);
-		temp = Double.doubleToLongBits(waitingTime);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(waitingTimeYellowPhase);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AttributesTarget other = (AttributesTarget) obj;
-		if (absorbing != other.absorbing)
-			return false;
-		if (Double.doubleToLongBits(deletionDistance) != Double
-				.doubleToLongBits(other.deletionDistance))
-			return false;
-		if (id != other.id)
-			return false;
-		if (individualWaiting != other.individualWaiting)
-			return false;
-		if (Double.doubleToLongBits(nextSpeed) != Double
-				.doubleToLongBits(other.nextSpeed))
-			return false;
-		if (parallelWaiters != other.parallelWaiters)
-			return false;
-		if (shape == null) {
-			if (other.shape != null)
-				return false;
-		} else if (!shape.equals(other.shape))
-			return false;
-		if (startingWithRedLight != other.startingWithRedLight)
-			return false;
-		if (Double.doubleToLongBits(waitingTime) != Double
-				.doubleToLongBits(other.waitingTime))
-			return false;
-		if (Double.doubleToLongBits(waitingTimeYellowPhase) != Double
-				.doubleToLongBits(other.waitingTimeYellowPhase))
-			return false;
-		return true;
+	public void setReachedDistance(double reachedDistance) {
+		checkSealed();
+		this.deletionDistance = reachedDistance;
 	}
 
 }

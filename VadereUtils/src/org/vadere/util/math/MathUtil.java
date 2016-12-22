@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
+import org.apache.commons.math3.complex.Complex;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -268,10 +269,10 @@ public class MathUtil {
 		double sideLenY = height / binsY;
 
 		// create a coordinate list to draw from later
-		List<SimpleEntry<Integer, Integer>> binCoodinates = new LinkedList<SimpleEntry<Integer, Integer>>();
+		List<SimpleEntry<Integer, Integer>> binCoodinates = new LinkedList<>();
 		for (int i = 0; i < binsX; i++) {
 			for (int k = 0; k < binsY; k++) {
-				binCoodinates.add(new SimpleEntry<Integer, Integer>(i, k));
+				binCoodinates.add(new SimpleEntry<>(i, k));
 			}
 		}
 
@@ -291,7 +292,7 @@ public class MathUtil {
 	}
 
 	/**
-	 * Computes the cross product of two vectors and stores it in the cross
+	 * Computes the cross product of two vectors and store it in the cross
 	 * vector.
 	 * 
 	 * @param v1
@@ -312,7 +313,7 @@ public class MathUtil {
 	 * neighborhood of the given point p.
 	 */
 	public static List<Point> getMooreNeighborhood(Point p) {
-		List<Point> mooreNeighborhood = new LinkedList<Point>();
+		List<Point> mooreNeighborhood = new LinkedList<>();
 
 		mooreNeighborhood.add(new Point(p.x + 1, p.y));
 		mooreNeighborhood.add(new Point(p.x, p.y + 1));
@@ -331,7 +332,7 @@ public class MathUtil {
 	 * neighborhood of the given point p.
 	 */
 	public static List<Point> getNeumannNeighborhood(final Point p) {
-		List<Point> neumannNeighborhood = new LinkedList<Point>();
+		List<Point> neumannNeighborhood = new LinkedList<>();
 
 		neumannNeighborhood.add(new Point(p.x - 1, p.y));
 		neumannNeighborhood.add(new Point(p.x + 1, p.y));
@@ -360,7 +361,7 @@ public class MathUtil {
 	 * Returns the real solutions of the quadratic equation ax^2+bx+c=0
 	 */
 	public static List<Double> solveQuadratic(double a, double b, double c) {
-		ArrayList<Double> result = new ArrayList<Double>(2);
+		ArrayList<Double> result = new ArrayList<>(2);
 		if (a != 0) {
 			double discr = (b * b) - (4 * a * c);
 
@@ -394,6 +395,55 @@ public class MathUtil {
 		double tmp = (origin.x * projection.x + origin.y * projection.y)
 				/ (projection.x * projection.x + projection.y * projection.y);
 		return new VPoint(projection.x * tmp, projection.y * tmp);
+	}
+
+	/**
+	 * Transforms an array of Complex numbers to a double array of doubled length. At even indicies
+	 * there are the real parts and at odd indicies are the imaginary parts of the complex numbers.
+	 *
+	 * @param complex a array of Complex numbers
+	 * @return a double array representing the same complex numbers
+	 */
+	public static double[] toDouble(final Complex[] complex) {
+		double[] pairs = new double[complex.length*2];
+		for(int i = 0; i < complex.length*2; i += 2) {
+			pairs[i] = complex[i/2].getReal();
+			pairs[i+1] = complex[i/2].getImaginary();
+		}
+		return pairs;
+	}
+
+	/**
+	 * Transforms an array of Complex numbers to a float array of doubled length. At even indicies
+	 * there are the real parts and at odd indicies are the imaginary parts of the complex numbers.
+	 *
+	 * @param complex a array of Complex numbers
+	 * @return a float array representing the same complex numbers
+	 */
+	public static float[] toFloat(final Complex[] complex) {
+		float[] pairs = new float[complex.length*2];
+		for(int i = 0; i < complex.length*2; i += 2) {
+			pairs[i] = (float)complex[i/2].getReal();
+			pairs[i+1] = (float)complex[i/2].getImaginary();
+		}
+		return pairs;
+	}
+
+	/**
+	 * Transform the real numbers to complex numbers i.e. the imaginary part is zero.
+	 * @param realValues
+	 * @return a complex array representing the same real numbers
+	 */
+	public static Complex[] toComplex(final double[] realValues) {
+		Complex[] complex = new Complex[realValues.length];
+		for(int i = 0; i < realValues.length; i++) {
+			complex[i] = Complex.valueOf(realValues[i], 0.0);
+		}
+		return complex;
+	}
+
+	public static double clamp(double val, double min, double max) {
+		return Math.max(min, Math.min(max, val));
 	}
 
 }

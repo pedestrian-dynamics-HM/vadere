@@ -1,11 +1,13 @@
 {
   "name" : "rimea_05_react_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "eeba5fbe296b72d9dca240ba9cc04bc924bacce8",
-  "attributeshash" : "b7dda81628372d30f2bfb15d15bfcdd22d2b0bad",
-  "processWriters" : [ ],
-  "vadere" : {
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -124,10 +126,10 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 10,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,

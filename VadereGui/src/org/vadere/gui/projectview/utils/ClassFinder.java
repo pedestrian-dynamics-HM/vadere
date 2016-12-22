@@ -1,16 +1,27 @@
 package org.vadere.gui.projectview.utils;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesOSM;
+
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
-
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesOSM;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ClassFinder {
 
@@ -31,28 +42,90 @@ public class ClassFinder {
 		return modelNames;
 	}
 
-	private static List<String> getClassNamesWithTagInPackage(String packageName, Class classTag) {
-		List<String> classNames = new ArrayList<>();
+	// all output file classes
+	public static List<Class<?>> getOutputFileClasses() {
+		return findSubclassesInPackage(OutputFile.class.getPackage().getName(), OutputFile.class)
+				.stream().filter(cfile -> !Modifier.isAbstract(cfile.getModifiers()))
+				.collect(Collectors.toList());
+	}
+
+	public static Map<String, Class> getDataKeysOutputFileRelation() {
 		try {
-			for (Class cls : getClasses(packageName)) {
-				if (!cls.isInterface() && classTag.isAssignableFrom(cls)) {
-					String name = cls.getName();
-					if (isNotAnInnerClass(name)) {
-						classNames.add(name);
-					}
-				}
-			}
+			return getClasses(DataKey.class.getPackage().getName())
+					.stream()
+					.filter(c -> !Modifier.isInterface(c.getModifiers()))
+					.filter(c -> DataKey.class.isAssignableFrom(c))
+					.map(c -> {
+						// Find corresponding outputfile class
+						try {
+							List<Class<?>> opClasses = getClasses(OutputFile.class.getPackage().getName());
+
+							Optional<Class<?>> corrOpClass = opClasses
+									.stream()
+									.filter(opc -> !Modifier.isAbstract(opc.getModifiers()))
+									.filter(opc -> ((ParameterizedType) opc.getGenericSuperclass()).getActualTypeArguments()[0].getTypeName().equals(c.getName()))
+									.findFirst();
+
+							return Pair.of((Class) c, corrOpClass);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+
+						return null;
+					})
+					.filter(p -> p.getValue().isPresent())
+					.map(p -> Pair.of(p.getKey(), p.getValue().get()))
+					.collect(Collectors.toMap(p -> p.getKey().getSimpleName(), p -> (Class) p.getValue()));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static Map<String, Class> getProcessorClassesWithNames() {
+		Map<String, Class> map = new HashMap<>();
+		getAllProcessorClasses().forEach(procCls -> map.put(procCls.getSimpleName(), procCls));
+		return map;
+	}
+
+	public static List<Class<?>> getProcessorClasses(Type keyType) {
+		return findSubclassesInPackage(DataProcessor.class.getPackage().getName(), DataProcessor.class)
+				.stream()
+				.filter(cproc -> !Modifier.isAbstract(cproc.getModifiers()))
+				.filter(cproc -> findGenericProcessorSuperclass(cproc).getActualTypeArguments()[0].equals(keyType))
+				.collect(Collectors.toList());
+	}
+
+	public static List<Class<?>> getAllProcessorClasses() {
+		return findSubclassesInPackage(DataProcessor.class.getPackage().getName(), DataProcessor.class)
+				.stream()
+				.filter(cproc -> !Modifier.isAbstract(cproc.getModifiers()))
+				.collect(Collectors.toList());
+	}
+
+	private static List<String> getClassNamesWithTagInPackage(String packageName, Class<?> baseClassOrInterface) {
+		return findSubclassesInPackage(packageName, baseClassOrInterface).stream()
+				.map(Class::getName)
+				.collect(Collectors.toList());
+	}
+
+	private static List<Class<?>> findSubclassesInPackage(String packageName, Class<?> baseClassOrInterface) {
+		try {
+			return getClasses(packageName).stream()
+					.filter(c -> !c.isInterface()
+							&& baseClassOrInterface.isAssignableFrom(c) 
+							&& isNotAnInnerClass(c))
+					.collect(Collectors.toList());
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-		return classNames;
+		return new ArrayList<>();
 	}
 
-
-	private static boolean isNotAnInnerClass(String name) {
-		return !name.contains("$");
+	private static boolean isNotAnInnerClass(Class<?> clazz) {
+		return !clazz.getName().contains("$");
 	}
-
 
 	// below via https://dzone.com/articles/get-all-classes-within-package
 
@@ -65,7 +138,7 @@ public class ClassFinder {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+	private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		assert classLoader != null;
 		String path = packageName.replace('.', '/');
@@ -75,11 +148,11 @@ public class ClassFinder {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
 		}
-		ArrayList<Class> classes = new ArrayList<>();
+		ArrayList<Class<?>> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
-		return classes.toArray(new Class[classes.size()]);
+		return classes;
 	}
 
 	/**
@@ -90,8 +163,8 @@ public class ClassFinder {
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 */
-	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<>();
+	private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
 		if (!directory.exists()) {
 			return classes;
 		}
@@ -108,4 +181,16 @@ public class ClassFinder {
 		return classes;
 	}
 
+	private static ParameterizedType findGenericProcessorSuperclass(Class<?> c) {
+		Class<?> superclass = c;
+
+		while (!superclass.equals(Object.class)) {
+			if(superclass.getSuperclass().equals(DataProcessor.class))
+				return (ParameterizedType) superclass.getGenericSuperclass();
+
+			superclass = superclass.getSuperclass();
+		}
+
+		return null;
+	}
 }

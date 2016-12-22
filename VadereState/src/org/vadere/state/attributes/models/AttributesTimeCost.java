@@ -12,7 +12,6 @@ public class AttributesTimeCost extends Attributes {
 	 * The different time cost function types that represents different scenario
 	 * types.
 	 * 
-	 * 
 	 */
 	public enum TimeCostFunctionType {
 		/** a static middle scale navigation. */
@@ -90,8 +89,6 @@ public class AttributesTimeCost extends Attributes {
 	 */
 	// @SerializedName("laodingType")
 	private LoadingType loadingType = LoadingType.CONSTANT;
-
-	public AttributesTimeCost() {}
 
 	// Getters...
 	public double getStandardDerivation() {

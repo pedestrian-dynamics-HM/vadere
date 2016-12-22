@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
+/**
+ * @author Benedikt Zoennchen
+ */
 public class SettingsDialog extends JDialog {
 	private static Logger logger = LogManager.getLogger(SettingsDialog.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
@@ -46,30 +49,36 @@ public class SettingsDialog extends JDialog {
 				"5dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		CellConstraints cc = new CellConstraints();
 
-		getContentPane().setLayout(mainLayout);
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(mainLayout);
+		JScrollPane scrollPane = new JScrollPane(mainPanel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		getContentPane().add(scrollPane);
 
 		JLayeredPane colorLayeredPane = new JLayeredPane();
 		JLayeredPane additionalLayeredPane = new JLayeredPane();
 		colorLayeredPane
 				.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.colors.border.text")));
-		getContentPane().add(colorLayeredPane, cc.xy(2, 2));
+		mainPanel.add(colorLayeredPane, cc.xy(2, 2));
 		additionalLayeredPane.setBorder(
 				BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
-		getContentPane().add(additionalLayeredPane, cc.xy(2, 4));
+		mainPanel.add(additionalLayeredPane, cc.xy(2, 4));
 		JButton closeButton = new JButton(Messages.getString("SettingsDialog.btnClose.text"));
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(closeButton);
 		closeButton.addActionListener(new ActionCloseSettingDialog(this));
-		getContentPane().add(controlPanel, cc.xyw(2, 6, 2));
+		mainPanel.add(controlPanel, cc.xyw(2, 6, 2));
+
 		// ######################################################################################
 
 		// Layout definition for sub panels
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu", // col
 				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		FormLayout colorLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		colorLayeredPane.setLayout(colorLayout);
 		additionalLayeredPane.setLayout(additionalLayout);
 
@@ -232,6 +241,14 @@ public class SettingsDialog extends JDialog {
 		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model.getPedestrianColorTableModel());
 		colorLayeredPane.add(pedestrianColorPanel, cc.xyw(2, 20, 8));
 
+		JCheckBox chShowEvacTimeColor = new JCheckBox(Messages.getString("PostVis.chShowEvacTimeColor.text"));
+		colorLayeredPane.add(chShowEvacTimeColor, cc.xyw(2, 22, 8));
+
+		chShowEvacTimeColor.addItemListener(e -> {
+			model.config.setUseEvacuationTimeColor(!model.config.isUseEvacuationTimeColor());
+			model.notifyObservers();
+		});
+
 		additionalLayeredPane.add(chCleanPed, cc.xyw(2, 2, 5));
 		additionalLayeredPane.add(chCleanTrajecties, cc.xyw(2, 4, 5));
 		additionalLayeredPane.add(chCleanSnapshot, cc.xyw(2, 6, 5));
@@ -277,8 +294,9 @@ public class SettingsDialog extends JDialog {
 		});
 		additionalLayeredPane.add(chChowLogo, cc.xyw(2, 24, 5));
 
+		scrollPane.setPreferredSize(new Dimension(mainPanel.getPreferredSize().width+10, Math.min(mainPanel.getPreferredSize().height, Toolkit.getDefaultToolkit().getScreenSize().height - 50)));
 		pack();
-		setResizable(false);
+		setResizable(true);
 		SwingUtils.centerComponent(this);
 		setVisible(true);
 	}

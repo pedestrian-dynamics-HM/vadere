@@ -1,9 +1,7 @@
 {
   "name" : "basic_1_chicken_sfm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "cde764736cfb41b5cd5e4ff40e0adfca0fee6370",
-  "attributeshash" : "a37b0556d777c29673caaa1d913901bbe1b93c9d",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "waitingTimeTest" ],
@@ -11,7 +9,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "pedestrianWaitingTimeProcessor" : {
         "attributes" : {
           "waitingArea" : {
@@ -41,7 +39,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "pedestrianWaitingTimeProcessor" : {
         "attributes" : {
           "waitingArea" : {
@@ -71,7 +69,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "attributes" : {
         "maxEvacuationTime" : 190.0,
         "maxEvacuationTimeMean" : 190.0,
@@ -84,7 +82,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -203,7 +201,6 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 200,

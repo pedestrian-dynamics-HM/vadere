@@ -1,9 +1,51 @@
 package org.vadere.gui.projectview.view;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import org.apache.commons.codec.language.bm.Lang;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.Language;
+import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.gui.projectview.control.ActionAddScenario;
+import org.vadere.gui.projectview.control.ActionCloneScenario;
+import org.vadere.gui.projectview.control.ActionCloseApplication;
+import org.vadere.gui.projectview.control.ActionCreateProject;
+import org.vadere.gui.projectview.control.ActionDeleteOutputDirectories;
+import org.vadere.gui.projectview.control.ActionDeleteScenarios;
+import org.vadere.gui.projectview.control.ActionEditScenarioDescription;
+import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
+import org.vadere.gui.projectview.control.ActionInterruptScenarios;
+import org.vadere.gui.projectview.control.ActionLoadProject;
+import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionOutputToScenario;
+import org.vadere.gui.projectview.control.ActionPauseScenario;
+import org.vadere.gui.projectview.control.ActionRenameOutputFile;
+import org.vadere.gui.projectview.control.ActionRenameProject;
+import org.vadere.gui.projectview.control.ActionRenameScenario;
+import org.vadere.gui.projectview.control.ActionRunAllScenarios;
+import org.vadere.gui.projectview.control.ActionRunOutput;
+import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
+import org.vadere.gui.projectview.control.ActionSaveAsProject;
+import org.vadere.gui.projectview.control.ActionSaveProject;
+import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
+import org.vadere.gui.projectview.control.ActionShowAboutDialog;
+import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
+import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.model.ProjectViewModel;
+import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
+import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
+import org.vadere.gui.projectview.model.VadereScenarioTableModel.VadereDisplay;
+import org.vadere.gui.projectview.model.VadereState;
+import org.vadere.gui.projectview.utils.TableSelectionListener;
+import org.vadere.simulator.projects.ProjectFinishedListener;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.SingleScenarioFinishedListener;
+import org.vadere.simulator.projects.VadereProject;
+import org.vadere.simulator.projects.io.IOOutput;
+import org.vadere.util.io.IOUtils;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -16,28 +58,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.Preferences;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.postvisualization.control.Player;
-import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.gui.projectview.control.*;
-import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.gui.projectview.model.VadereState;
-import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
-import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
-import org.vadere.gui.projectview.model.VadereScenarioTableModel.VadereDisplay;
-import org.vadere.gui.projectview.utils.TableSelectionListener;
-import org.vadere.gui.topographycreator.view.JLabelObserver;
-import org.vadere.simulator.projects.ProjectFinishedListener;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.SingleScenarioFinishedListener;
-import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.util.io.IOUtils;
 
 /**
  * Main view of the Vadere GUI.
@@ -76,7 +100,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JButton btnPauseRunningScenarios;
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
-	private ScenarioJPanel scenarioJPanel;
+	private ScenarioPanel scenarioJPanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
 
@@ -90,10 +114,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		setScenariosRunning(false);
 		progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
 		scenarioJPanel.showEditScenario();
-		selectCurrentSceanrioRunManager();
+		selectCurrentScenarioRunManager();
 	}
 
-	private void selectCurrentSceanrioRunManager() {
+	private void selectCurrentScenarioRunManager() {
 		int index = model.getProject().getScenarioIndexByName(model.getProject().getCurrentScenario());
 
 		if(index != -1) {
@@ -108,13 +132,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	@Override
-	public void preScenarioRun(final ScenarioRunManager scenario, final int scenariosLeft) {
+	public void preScenarioRun(final Scenario scenario, final int scenariosLeft) {
 		model.setScenarioNameLabel(scenario.getName());
 		repaint();
 	}
 
 	@Override
-	public void postScenarioRun(final ScenarioRunManager cloneScenario, final int scenarioLeft) {
+	public void postScenarioRun(final Scenario cloneScenario, final int scenarioLeft) {
 		// take the original!
 		replace(cloneScenario, VadereState.INITIALIZED);
 
@@ -128,36 +152,36 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	@Override
-	public void scenarioStarted(final ScenarioRunManager cloneScenario, final int scenariosLeft) {
+	public void scenarioStarted(final Scenario cloneScenario, final int scenariosLeft) {
 		// take the original!
 		replace(cloneScenario, VadereState.RUNNING);
 	}
 
 	@Override
-	public void scenarioPaused(final ScenarioRunManager cloneScenario, final int scenariosLeft) {
+	public void scenarioPaused(final Scenario cloneScenario, final int scenariosLeft) {
 		// take the original!
 		replace(cloneScenario, VadereState.PAUSED);
 	}
 
 	@Override
-	public void scenarioInterrupted(final ScenarioRunManager scenario, final int scenariosLeft) {
+	public void scenarioInterrupted(final Scenario scenario, final int scenariosLeft) {
 		replace(scenario, VadereState.INTERRUPTED);
 		setScenariosRunning(false);
-		selectCurrentSceanrioRunManager();
+		selectCurrentScenarioRunManager();
 		logger.info(String.format("all running scenarios interrupted"));
 	}
 
 	@Override
-	public void error(final ScenarioRunManager scenario, final int scenarioLefts, final Throwable throwable) {
+	public void error(final Scenario scenario, final int scenarioLefts, final Throwable throwable) {
 		replace(scenario, VadereState.INTERRUPTED);
 		new Thread(
-				() -> IOUtils.errorBox(
-						Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario + ": "
-								+ throwable,
-						Messages.getString("ProjectView.simulationRunErrorDialog.title"))).start();
+				() -> {
+					IOUtils.errorBox(Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario
+							+ ": " + throwable, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
+				}).start();
 	}
 
-	private void replace(final ScenarioRunManager scenarioRM, final VadereState state) {
+	private void replace(final Scenario scenarioRM, final VadereState state) {
 		int rowIndex = model.getScenarioTableModel().indexOfRow(scenarioRM);
 		VadereDisplay originalScenario = model.getScenarioTableModel().getValue(rowIndex);
 		VadereDisplay dubiousCopy = new VadereDisplay(originalScenario.scenarioRM, state);
@@ -369,6 +393,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mnHelp.add(mntmLanguageChoiceMenu);
 		JRadioButtonMenuItem mntmEnglishLocale =
 				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmEnglishLocale.text")) {
+					private static final long serialVersionUID = 1L;
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						Messages.changeLanguage(Locale.ENGLISH);
@@ -377,6 +402,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mntmLanguageChoiceMenu.add(mntmEnglishLocale);
 		JRadioButtonMenuItem mntmGermanLocale =
 				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmGermanLocale.text")) {
+					private static final long serialVersionUID = 1L;
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						Messages.changeLanguage(Locale.GERMAN);
@@ -386,10 +412,19 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ButtonGroup languageChoicesGroup = new ButtonGroup();
 		languageChoicesGroup.add(mntmEnglishLocale);
 		languageChoicesGroup.add(mntmGermanLocale);
-		if (Messages.languageIsGerman())
+		if (Language.languageIsGerman())
 			mntmGermanLocale.setSelected(true);
 		else
 			mntmEnglishLocale.setSelected(true);
+
+		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmReapplyMigration.text")) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				(new ActionLoadProject(Messages.getString("ProjectView.mntmLoadTestProject.text"), model)).loadProject(true);
+			}
+		});
+		mnHelp.add(mntmReapplyMigration);
 	}
 
 	private void setAcceleratorFromLocalizedShortcut(Action action, String localizedShortcutKey) {
@@ -486,7 +521,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			}
 
 			private void loadScenarioIntoGui(OutputBundle bundle) throws IOException {
-				ScenarioRunManager scenarioRM = IOOutput.readScenarioRunManager(bundle.getProject(),
+				Scenario scenarioRM = IOOutput.readScenarioRunManager(bundle.getProject(),
 						bundle.getDirectory().getName());
 				Optional<File> optionalTrajectoryFile = IOUtils
 						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
@@ -614,7 +649,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ScenarioNamePanel.add(scenarioName);
 		scenarioName.setHorizontalAlignment(SwingConstants.CENTER);
 
-		scenarioJPanel = new ScenarioJPanel(this, scenarioName);
+		scenarioJPanel = new ScenarioPanel(scenarioName, model);
 		model.setScenarioNameLabel(scenarioName); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);

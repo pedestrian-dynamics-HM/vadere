@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.migration.incidents;
 
 import java.util.List;
 
-import org.vadere.simulator.projects.migration.Graph;
+import org.vadere.simulator.projects.migration.Tree;
 import org.vadere.simulator.projects.migration.MigrationException;
 
 public class RenameInArrayIncident extends Incident { // better name?
@@ -18,12 +18,12 @@ public class RenameInArrayIncident extends Incident { // better name?
 	}
 
 	@Override
-	public boolean applies(Graph graph) {
+	public boolean applies(Tree graph) {
 		return graph.keyExistsInArray(pathToArray, oldName);
 	}
 
 	@Override
-	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
+	public void resolve(Tree graph, StringBuilder log) throws MigrationException {
 		super.stillApplies(graph);
 		graph.renameKeyOccurrencesInArray(pathToArray, oldName, newName);
 		log.append("\t- rename node [" + oldName + "] in array " + graph.pathToString(pathToArray) + " to [" + newName

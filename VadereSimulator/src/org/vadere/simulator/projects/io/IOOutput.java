@@ -1,5 +1,16 @@
 package org.vadere.simulator.projects.io;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.VadereProject;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.simulation.Step;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.reflection.VadereClassNotFoundException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,16 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.VadereProject;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.simulation.Step;
-import org.vadere.util.io.IOUtils;
-import org.vadere.util.reflection.VadereClassNotFoundException;
-
 /**
  * This IOUtility class provides all methods to load, delete, list, clean output directories.
  * Each output directory contains two fiels *.scenario and *.trajectories.
@@ -32,11 +33,11 @@ public abstract class IOOutput {
 
 	private static Logger logger = LogManager.getLogger(IOOutput.class);
 
-	public static List<File> listSelectedOutputDirs(final VadereProject project, final ScenarioRunManager scenario) {
+	public static List<File> listSelectedOutputDirs(final VadereProject project, final Scenario scenario) {
 		List<File> selectedOutputDirectories = new LinkedList<>();
 
 		selectedOutputDirectories = listAllOutputDirs(project).stream()
-				.filter(dir -> isValidOutputDirectory(project, dir, scenario))
+				.filter(dir -> isMatchingOutputDirectory(project, dir, scenario))
 				.collect(Collectors.toList());
 
 		return selectedOutputDirectories;
@@ -44,8 +45,6 @@ public abstract class IOOutput {
 
 	/**
 	 * Returns all valid output directories of the project.
-	 * 
-	 * @return all valid output directories of the project
 	 */
 	public static List<File> listAllOutputDirs(final VadereProject project) {
 		return listAllDirs(project).stream().filter(f -> isValidOutputDirectory(project, f))
@@ -57,39 +56,31 @@ public abstract class IOOutput {
 	 */
 	public static void cleanOutputDirs(final VadereProject project) {
 		listAllDirs(project).stream().filter(f -> !isValidOutputDirectory(project, f))
-				.forEach(dir -> cleanDir(project, dir));
+				.forEach(dir -> cleanDirectory(project, dir));
 	}
 
-	/**
-	 *
-	 * @param project
-	 * @param directoryName
-	 * @param scenario
-	 * @return
-	 * @throws IOException
-	 */
 	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project,
-			final ScenarioRunManager scenario, final String directoryName) throws IOException {
+			final Scenario scenario, final String directoryName) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(
 				getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
 		return reader.readFile();
 	}
 
 	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath,
-			final ScenarioRunManager scenario) throws IOException {
+			final Scenario scenario) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(trajectoryFilePath, scenario);
 		Map<Step, List<Agent>> result = reader.readFile();
 		return result;
 	}
 
-	public static ScenarioRunManager readScenarioRunManager(final VadereProject project, final String directoryName)
+	public static Scenario readScenarioRunManager(final VadereProject project, final String directoryName)
 			throws IOException {
 		String snapshotString = IOUtils
 				.readTextFile(getPathToOutputFile(project, directoryName, IOUtils.SCENARIO_FILE_EXTENSION).toString());
 		return IOVadere.fromJson(snapshotString);
 	}
 
-	public static ScenarioRunManager readVadere(final File file) throws IOException {
+	public static Scenario readScenario(final File file) throws IOException {
 		String snapshotString;
 		Path path = file.toPath();
 		if (file.isFile() && file.getName().endsWith(IOUtils.SCENARIO_FILE_EXTENSION)) {
@@ -108,8 +99,8 @@ public abstract class IOOutput {
 		return IOVadere.fromJson(snapshotString);
 	}
 
-	public static ScenarioRunManager readVadere(final Path path) throws IOException {
-		return IOOutput.readVadere(path.toFile());
+	public static Scenario readScenario(final Path path) throws IOException {
+		return IOOutput.readScenario(path.toFile());
 	}
 
 	public static boolean renameOutputDirectory(final File directory, final String newName) {
@@ -172,7 +163,7 @@ public abstract class IOOutput {
 		return outputDirectories;
 	}
 
-	private static void cleanDir(final VadereProject project, final File directory) {
+	private static void cleanDirectory(final VadereProject project, final File directory) {
 		IOUtils.errorBox(
 				"The directory '"
 						+ directory.getName()
@@ -188,34 +179,35 @@ public abstract class IOOutput {
 		}
 	}
 
-	private static Optional<ScenarioRunManager> readOutputFile(final VadereProject project, final File directory) {
-		Optional<ScenarioRunManager> optionalVadere = Optional.empty();
-		Path pathToSnapshot;
+	private static Optional<Scenario> readOutputFile(final VadereProject project, final File directory) {
 		try {
-			pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
-			optionalVadere = Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
+			final Path pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
+			return Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
 		} catch (IOException | VadereClassNotFoundException e) {
-			optionalVadere = Optional.empty();
 			logger.error("Error in output file " + directory.getName());
+			return Optional.empty();
 		}
-		return optionalVadere;
 	}
 
 	private static boolean isValidOutputDirectory(final VadereProject project, final File directory) {
 		return readOutputFile(project, directory).isPresent();
 	}
 
-	private static boolean isValidOutputDirectory(final VadereProject project, final File directory,
-			final ScenarioRunManager scenario) {
-		Optional<ScenarioRunManager> optionalVadere = readOutputFile(project, directory);
-		return directory.isDirectory() && optionalVadere.isPresent() && euqalHash(optionalVadere.get(), scenario);
+	private static boolean isMatchingOutputDirectory(final VadereProject project, final File directory,
+			final Scenario scenario) {
+		Optional<Scenario> optionalScenario = readOutputFile(project, directory);
+		return directory.isDirectory() && optionalScenario.isPresent() && equalHash(optionalScenario.get(), scenario);
 	}
 
-	private static boolean euqalHash(final ScenarioRunManager scenario1, ScenarioRunManager scenario2) {
-		return HashGenerator.attributesHash(scenario1.getScenarioStore())
-				.equals(HashGenerator.attributesHash(scenario2.getScenarioStore()))
-				&& HashGenerator.topographyHash(scenario1.getTopography())
-						.equals(HashGenerator.topographyHash(scenario2.getTopography()));
+	private static boolean equalHash(final Scenario scenario1, Scenario scenario2) {
+		try {
+			final String hash1 = scenario1.getScenarioStore().hashOfJsonRepresentation();
+			final String hash2 = scenario2.getScenarioStore().hashOfJsonRepresentation();
+			return hash1.equals(hash2);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private static Path getPathToOutputFile(final VadereProject project, final String directoryName,

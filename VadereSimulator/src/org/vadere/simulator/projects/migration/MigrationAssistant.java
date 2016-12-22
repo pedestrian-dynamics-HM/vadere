@@ -14,16 +14,14 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 public class MigrationAssistant {
-
-	private static final List<String> versions = Arrays.asList("not a release", "0.1"); // put somewhere more central?
-	public static final String latestVersion = versions.get(versions.size() - 1);
 
 	public static final String INCIDENT_ORDER_ERROR = "An incident that was found applicable couldn't be resolved. " +
 			"That means, that a previously resolved incident rendered this one no longer applicable. " +
@@ -34,6 +32,19 @@ public class MigrationAssistant {
 	private static final String NONMIGRATABLE_EXTENSION = "nonmigratable";
 
 	private static Logger logger = LogManager.getLogger(MigrationAssistant.class);
+
+	private static boolean reapplyLatestMigrationFlag = false;
+	private static Version baseVersion = null;
+
+	public static void setReapplyLatestMigrationFlag() {
+		reapplyLatestMigrationFlag = true;
+		baseVersion = null;
+	}
+
+	public static void setReapplyLatestMigrationFlag(final Version version) {
+		reapplyLatestMigrationFlag = true;
+		baseVersion = version;
+	}
 
 	public static void analyzeSingleScenario(Path path) {
 		// TODO [priority=high] [task=implement] for runs initiated not from GUI... where to hook in?
@@ -55,6 +66,9 @@ public class MigrationAssistant {
 				stats[i] += outputDirStats[i];
 			}
 		}
+
+		reapplyLatestMigrationFlag = false;
+		baseVersion = null;
 
 		return stats;
 	}
@@ -88,7 +102,7 @@ public class MigrationAssistant {
 					legacyedCount++;
 				}
 			} catch (MigrationException e) {
-				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION);
+				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION, !isScenario);
 				log.append(
 						"! --> Can't migrate the scenario to latest version, removed it from the directory ("
 								+ e.getMessage() + ")\n" +
@@ -113,62 +127,83 @@ public class MigrationAssistant {
 
 	private static boolean analyzeScenario(Path scenarioFilePath, Path legacyDir, StringBuilder log, boolean isScenario) throws IOException, MigrationException {
 		String json = IOUtils.readTextFile(scenarioFilePath);
-		JsonNode node = JsonConverter.deserializeToNode(json);
-		Graph graph = new Graph(node);
+		JsonNode node = StateJsonConverter.deserializeToNode(json);
+		Tree tree = new Tree(node);
 
 		String outputScenarioParentFolderName = isScenario ? "" : scenarioFilePath.getParent().getFileName().toString() + " _ ";
 
 		log.append("\n>> analyzing JSON tree of scenario <" + outputScenarioParentFolderName + node.get("name").asText() + ">\n");
 
-		String releaseVersion = "undefined";
-		int releaseVersionIndex = 0;
+		Version version = Version.UNDEFINED;
 
 		if (node.get("release") != null) {
-			releaseVersion = node.get("release").asText();
-			if (releaseVersion.equals(latestVersion))
-				return false;
+			version = Version.fromString(node.get("release").asText());
 
-			releaseVersionIndex = versions.indexOf(releaseVersion);
-			if (releaseVersionIndex == -1)
-				throw new MigrationException("release version " + releaseVersion
-						+ " is unknown - if this is actually a valid release, update the version-list in MigrationAssistant accordingly");
+			if (version == null) {
+				throw new MigrationException("release version " + node.get("release").asText() + " is unknown. If this " +
+						"is a valid release, update the version-list in MigrationAssistant accordingly");
+			}
+
+			// if enforced migration should be done from baseVersion to latestVersion
+			if (reapplyLatestMigrationFlag && baseVersion != null) {
+				version = baseVersion;
+
+			} else if(reapplyLatestMigrationFlag) { // if enforced migration should be done from prev version to latest
+				Optional<Version> optVersion = Version.getPrevious(version);
+				if(optVersion.isPresent()) {
+					version = optVersion.get();
+				}
+				else {
+					return false;
+				}
+			} // if no enforced migration should be done and we are at the latest version, no migration is required.
+			else if(version == Version.latest()) {
+				return false;
+			}
 		}
 
 		// 1. collect possible incidents
 
 		List<Incident> possibleIncidents = new ArrayList<>();
-		for (int version = releaseVersionIndex; version < versions.size() - 1; version++) {
-			log.append("  > checking possible incidents from version \"" + versions.get(version) + "\" to version \""
-					+ versions.get(version + 1) + "\"\n");
-			possibleIncidents.addAll(IncidentDatabase.getInstance().getPossibleIncidentsFor(version));
+		for (int versionIndex = version.ordinal(); versionIndex < Version.latest().ordinal(); versionIndex ++) {
+			Version ver = Version.values()[versionIndex];
+			log.append("  > checking possible incidents from version \"" + ver.label() + "\" to version \""
+					+ Version.values()[versionIndex + 1].label() + "\"\n");
+			possibleIncidents.addAll(IncidentDatabase.getInstance().getPossibleIncidentsFor(ver));
 		}
 		possibleIncidents.add(new ExceptionIncident(node));
-		possibleIncidents.add(new VersionBumpIncident(node, releaseVersion));
+		possibleIncidents.add(new VersionBumpIncident(node, version));
 
 		// 2. filter those out that don't apply
 
 		List<Incident> applicableIncidents = possibleIncidents.stream()
-				.filter(incident -> incident.applies(graph))
+				.filter(incident -> incident.applies(tree))
 				.collect(Collectors.toList());
 
 		// 3. resolve the applicable incidents (step 2 and 3 are intentionally separated to uncover
 		//		potentially dangerous flaws in the order of the incidents in the IncidentDatabase)
 
 		for (Incident incident : applicableIncidents)
-			incident.resolve(graph, log);
+			incident.resolve(tree, log);
 
 		if (legacyDir != null) {
-			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION);
+			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION, false);
 		}
-		IOUtils.writeTextFile(scenarioFilePath.toString(), JsonConverter.serializeJsonNode(node));
+		IOUtils.writeTextFile(scenarioFilePath.toString(), StateJsonConverter.serializeJsonNode(node));
 		return true;
 	}
 
-	private static void moveFileAddExtension(Path scenarioFilePath, Path legacyDir, String additionalExtension)
-			throws IOException {
-		IOUtils.createDirectoryIfNotExisting(legacyDir);
-		Files.move(scenarioFilePath, legacyDir.resolve(scenarioFilePath.getFileName() + "." + additionalExtension),
-				StandardCopyOption.REPLACE_EXISTING); // ensure potential existing files aren't overwritten?
+	private static void moveFileAddExtension(Path scenarioFilePath, Path legacyDir, String additionalExtension, boolean moveOutputFolder) throws IOException {
+		Path source = scenarioFilePath;
+		Path target = legacyDir.resolve(source.getFileName() + "." + additionalExtension);
+
+		if (moveOutputFolder) {
+			source = source.getParent();
+			target = Paths.get(legacyDir.toAbsolutePath() + "." + additionalExtension);
+		}
+
+		IOUtils.createDirectoryIfNotExisting(target);
+		Files.move(source, target, StandardCopyOption.REPLACE_EXISTING); // ensure potential existing files aren't overwritten?
 	}
 
 	private static String getTimestamp() {

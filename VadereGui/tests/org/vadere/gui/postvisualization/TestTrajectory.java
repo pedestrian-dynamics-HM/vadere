@@ -39,7 +39,7 @@ public class TestTrajectory extends TestCase {
 				new Pedestrian(new AttributesAgent(-1), new Random()));
 
 		steps.forEach(step -> pedestriansByStep.put(step,
-				pedestrians.stream().map(ped -> ped.clone())
+				pedestrians.stream().map(ped -> (Agent) ped.clone())
 						.peek(ped -> ped.setPosition(
 								ped.getPosition().add(new VPoint(step.getStepNumber(), step.getStepNumber()))))
 						.collect(Collectors.toList())));

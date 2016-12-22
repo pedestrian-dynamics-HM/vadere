@@ -100,7 +100,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 
 	@Override
 	protected DynamicElementContainer<T> clone() throws CloneNotSupportedException {
-		DynamicElementContainer<T> clone = new DynamicElementContainer<T>(bounds, cellSize);
+		DynamicElementContainer<T> clone = new DynamicElementContainer<>(bounds, cellSize);
 
 		for (T element : this.elementMap.values()) {
 			clone.addElement(element);

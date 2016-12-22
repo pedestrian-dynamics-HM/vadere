@@ -6,9 +6,8 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.VadereScenarioTableModel;
 import org.vadere.gui.projectview.model.VadereState;
-import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.dataprocessing.ProjectWriter;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ProjectWriter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +30,7 @@ public class ActionRenameScenario extends AbstractAction {
 
 		ProjectViewModel.ScenarioBundle optionalScenarioBundle = model.getSelectedScenarioBundle();
 
-		ScenarioRunManager scenario = optionalScenarioBundle.getScenario();
+		Scenario scenario = optionalScenarioBundle.getScenario();
 		String oldName = optionalScenarioBundle.getScenario().getName();
 		String newName =
 				JOptionPane.showInputDialog(null, Messages.getString("listMenuRenameButtonAction.title"), oldName);

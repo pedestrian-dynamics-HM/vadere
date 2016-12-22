@@ -7,9 +7,8 @@ import org.vadere.util.geometry.ShapeType;
 /**
  * Geometric shape and position.
  * 
- * 
  */
-public interface VShape extends Shape {
+public interface VShape extends Shape, Cloneable {
 	double distance(VPoint point);
 
 	VPoint closestPoint(VPoint point);

@@ -3,21 +3,21 @@ package org.vadere.gui.projectview.model;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 
 /**
  * The table panelModel used in the table that displays
- * {@link org.vadere.simulator.projects.ScenarioRunManager}s.
+ * {@link org.vadere.simulator.projects.Scenario}s.
  *
  */
 public class VadereScenarioTableModel extends VadereTableModelSorted<VadereScenarioTableModel.VadereDisplay> {
 
 	public static class VadereDisplay {
-		public final ScenarioRunManager scenarioRM;
+		public final Scenario scenarioRM;
 		public final VadereState state;
 
-		public VadereDisplay(final ScenarioRunManager scenarioRM, final VadereState state) {
+		public VadereDisplay(final Scenario scenarioRM, final VadereState state) {
 			this.scenarioRM = scenarioRM;
 			this.state = state;
 		}
@@ -60,7 +60,7 @@ public class VadereScenarioTableModel extends VadereTableModelSorted<VadereScena
 				.forEach(scenario -> insertValue(new VadereDisplay(scenario, VadereState.INITIALIZED)));
 	}
 
-	public synchronized boolean replace(final ScenarioRunManager oldValue, final VadereDisplay newValue) {
+	public synchronized boolean replace(final Scenario oldValue, final VadereDisplay newValue) {
 		if (remove(oldValue)) {
 			insertValue(newValue);
 			fireTableDataChanged();
@@ -74,14 +74,14 @@ public class VadereScenarioTableModel extends VadereTableModelSorted<VadereScena
 		return indexOfRow(value.scenarioRM);
 	}
 
-	public synchronized int indexOfRow(final ScenarioRunManager value) {
+	public synchronized int indexOfRow(final Scenario value) {
 		for (int i = 0; i < getRowCount(); i++)
-			if (((ScenarioRunManager) getValueAt(i, 0)).getName().equals(value.getName()))
+			if (((Scenario) getValueAt(i, 0)).getName().equals(value.getName()))
 				return i;
 		throw new RuntimeException("Can't find row in scenarioTable corresponding to scenario " + value.getName()); // if we'd return -1 as before, this throws in-thread errors that are difficult to debug because of the lack of a stacktrace!
 	}
 
-	public synchronized boolean remove(final ScenarioRunManager value) {
+	public synchronized boolean remove(final Scenario value) {
 		return super.remove(new VadereDisplay(value, VadereState.INITIALIZED));
 	}
 

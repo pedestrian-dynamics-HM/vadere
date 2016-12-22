@@ -3,6 +3,8 @@ package org.vadere.simulator.control;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.vadere.state.scenario.Agent;
@@ -10,9 +12,11 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 public class TargetController {
 
@@ -35,24 +39,14 @@ public class TargetController {
 	}
 
 	public void update(double simTimeInSec) {
-		if (this.target.isTargetPedestrian()) {
+		if (target.isTargetPedestrian()) {
 			return;
 		}
-		final double reachedDistance = target.getAttributes().getDeletionDistance();
 
-		Rectangle2D bounds = target.getShape().getBounds2D();
-		VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
-		double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
+		for (DynamicElement element : getPrefilteredDynamicElements()) {
 
-		Collection<DynamicElement> elementsInRange = new LinkedList<>();
-		elementsInRange.addAll(topography.getSpatialMap(Pedestrian.class).getObjects(center, radius));
-		elementsInRange.addAll(topography.getSpatialMap(Car.class).getObjects(center, radius));
-
-
-		for (DynamicElement element : elementsInRange) {
-
-			Agent agent;
-			if (Agent.class.isAssignableFrom(element.getClass())) {
+			final Agent agent;
+			if (element instanceof Agent) {
 				agent = (Agent) element;
 			} else {
 				log.error("The given object is not a subtype of Agent.");
@@ -60,39 +54,72 @@ public class TargetController {
 			}
 
 			if (isNextTargetForAgent(agent)
-					&& hasAgentReachedThisTarget(agent, reachedDistance)) {
+					&& hasAgentReachedThisTarget(agent)) {
 
-				if (this.target.getWaitingTime() > 0) {
-					// individual waiting behaviour, as opposed to waiting at a traffic light
-					if (this.target.getAttributes().isIndividualWaiting()) {
-						if (target.getEnteringTimes().containsKey(agent.getId())) {
-							if (simTimeInSec - target.getEnteringTimes().get(agent.getId()) > this.target
-									.getWaitingTime()) {
-								target.getEnteringTimes().remove(agent.getId());
-								checkRemove(agent);
-							}
-						} else if (this.target.getParallelWaiters() <= 0 || (this.target.getParallelWaiters() > 0 &&
-								target.getEnteringTimes().size() < this.target.getParallelWaiters())) {
-							target.getEnteringTimes().put(agent.getId(), simTimeInSec);
-						}
-					} else {
-						// traffic light switching based on waiting time. Light starts green.
-						phase = getCurrentTrafficLightPhase(simTimeInSec);
+				notifyListenersTargetReached(agent);
 
-						if (phase == TrafficLightPhase.GREEN) {
-							checkRemove(agent);
-						}
-					}
-				} else {
+				if (target.getWaitingTime() <= 0) {
 					checkRemove(agent);
+				} else {
+					waitingBehavior(simTimeInSec, agent);
 				}
 			}
 		}
 	}
 
-	private boolean hasAgentReachedThisTarget(Agent agent, double reachedDistance) {
-		return target.getShape().contains(agent.getPosition())
-				|| target.getShape().distance(agent.getPosition()) < reachedDistance;
+	private Collection<DynamicElement> getPrefilteredDynamicElements() {
+		final double reachedDistance = target.getAttributes().getDeletionDistance();
+
+		final Rectangle2D bounds = target.getShape().getBounds2D();
+		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
+		final double radius = Math.max(bounds.getHeight(), bounds.getWidth()) + reachedDistance;
+
+		final Collection<DynamicElement> elementsInRange = new LinkedList<>();
+		elementsInRange.addAll(getObjectsInCircle(Pedestrian.class, center, radius));
+		elementsInRange.addAll(getObjectsInCircle(Car.class, center, radius));
+		
+		return elementsInRange;
+	}
+
+	private void waitingBehavior(double simTimeInSec, final Agent agent) {
+		final int agentId = agent.getId();
+		// individual waiting behaviour, as opposed to waiting at a traffic light
+		if (target.getAttributes().isIndividualWaiting()) {
+			final Map<Integer, Double> enteringTimes = target.getEnteringTimes();
+			if (enteringTimes.containsKey(agentId)) {
+				if (simTimeInSec - enteringTimes.get(agentId) > target
+						.getWaitingTime()) {
+					enteringTimes.remove(agentId);
+					checkRemove(agent);
+				}
+			} else {
+				final int parallelWaiters = target.getParallelWaiters();
+				if (parallelWaiters <= 0 || (parallelWaiters > 0 &&
+						enteringTimes.size() < parallelWaiters)) {
+					enteringTimes.put(agentId, simTimeInSec);
+				}
+			}
+		} else {
+			// traffic light switching based on waiting time. Light starts green.
+			phase = getCurrentTrafficLightPhase(simTimeInSec);
+
+			if (phase == TrafficLightPhase.GREEN) {
+				checkRemove(agent);
+			}
+		}
+	}
+
+	private <T extends DynamicElement> List<T> getObjectsInCircle(final Class<T> clazz, final VPoint center, final double radius) {
+		return topography.getSpatialMap(clazz).getObjects(center, radius);
+	}
+
+	private boolean hasAgentReachedThisTarget(Agent agent) {
+		final double reachedDistance = target.getAttributes().getDeletionDistance();
+		final VPoint agentPosition = agent.getPosition();
+		final VShape targetShape = target.getShape();
+
+		return targetShape.contains(agentPosition)
+				|| targetShape.distance(agentPosition) < reachedDistance;
 	}
 
 	private TrafficLightPhase getCurrentTrafficLightPhase(double simTimeInSec) {
@@ -131,14 +158,16 @@ public class TargetController {
 		if (target.isAbsorbing()) {
 			topography.removeElement(agent);
 		} else {
+			final int nextTargetListIndex = agent.getNextTargetListIndex();
+
 			// Deprecated target list usage
-			if (agent.getNextTargetListIndex() == -1 && !agent.getTargets().isEmpty()) {
+			if (nextTargetListIndex == -1 && !agent.getTargets().isEmpty()) {
 				agent.getTargets().removeFirst();
 			}
 
 			// The right way (later this first check should not be necessary anymore):
-			if (agent.getNextTargetListIndex() != -1) {
-				if (agent.getNextTargetListIndex() < agent.getTargets().size()) {
+			if (nextTargetListIndex != -1) {
+				if (nextTargetListIndex < agent.getTargets().size()) {
 					agent.incrementNextTargetListIndex();
 				}
 			}
@@ -150,4 +179,11 @@ public class TargetController {
 			}
 		}
 	}
+	
+	private void notifyListenersTargetReached(final Agent agent) {
+		for (TargetListener l : target.getTargetListeners()) {
+			l.reachedTarget(target, agent);
+		}
+	}
+	
 }

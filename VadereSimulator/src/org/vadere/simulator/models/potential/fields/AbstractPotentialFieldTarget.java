@@ -1,12 +1,5 @@
 package org.vadere.simulator.models.potential.fields;
 
-import java.awt.Point;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -15,12 +8,17 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellGridConverter;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGrid {
 
@@ -29,12 +27,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	private Topography topography;
 	private boolean wasUpdated;
 	private static Logger logger = LogManager.getLogger(AbstractPotentialFieldTarget.class);
-
-	/**
-	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processors.
-	 */
-	private Map<String, Table> outputTables;
 
 	/**
 	 * Stores all potential fields which represent the observation area. The key
@@ -47,7 +39,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		this.topography = topography;
 		this.wasUpdated = false;
 		this.targetPotentialFields = new HashMap<>();
-		this.outputTables = new HashMap<>();
 	}
 
 	/**
@@ -59,30 +50,27 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 *
 	 */
 	@Override
-	public double getTargetPotential(final List<Integer> targetIds, final VPoint pos, final Agent ped) {
-
-		CellGrid potentialField;
-		Topography floor = topography;
-		double targetPotential = Double.MAX_VALUE;
-		int targetId = -1;
-
-		assert targetIds.size() > 0;
-
-		if (targetIds.size() > 0) {
-			targetId = targetIds.get(0);
-		} else {
-			return 0;
+	public double getTargetPotential(final VPoint pos, final Agent ped) {
+		
+		if(!ped.hasNextTarget())
+		{
+			return 0.0;
 		}
 
+		CellGrid potentialField;
+		double targetPotential = Double.MAX_VALUE;
+
+		int targetId = ped.getNextTargetId();
+
 		// Pedestrian has reached the target
-		if (floor.getTarget(targetId) != null) {
-			if (floor.getTarget(targetId).getShape().contains(pos)) {
-				return 0; // the arrival time is zero
-			}
+		// TODO Is this necessary? The target controller changes the
+		// pedestrian's target as soon the pedestrian arrives it.
+		if (topography.getTarget(targetId).getShape().contains(pos)) {
+			return 0; // the arrival time is zero
 		}
 
 		// Pedestrain inside an obstacle
-		for (ScenarioElement b : floor.getObstacles()) {
+		for (ScenarioElement b : topography.getObstacles()) {
 			if (b.getShape().contains(pos)) {
 				return Double.MAX_VALUE;
 			}
@@ -116,7 +104,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 			incY = 0;
 		}
 
-		List<Point> points = new LinkedList<Point>();
+		List<Point> points = new LinkedList<>();
 		points.add(gridPoint);
 		points.add(new Point(gridPoint.x + incX, gridPoint.y));
 		points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
@@ -231,7 +219,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 	 */
 	@Override
 	public HashMap<Integer, CellGrid> getCellGrids() {
-		HashMap<Integer, CellGrid> map = new HashMap<Integer, CellGrid>();
+		HashMap<Integer, CellGrid> map = new HashMap<>();
 
 
 		for (Map.Entry<Integer, PotentialFieldAndInitializer> entry2 : targetPotentialFields
@@ -240,21 +228,6 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		}
 
 		return map;
-	}
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		if (wasUpdated() || outputTables.isEmpty()) {
-			outputTables.clear();
-			List<Target> list = topography.getTargets();
-			list.stream().filter(t -> targetPotentialFields.containsKey(t.getId())).forEach(target -> {
-				PotentialFieldAndInitializer potentialfieldAndInitializer = targetPotentialFields.get(target.getId());
-				Table potentialFieldTable =
-						new CellGridConverter(potentialfieldAndInitializer.eikonalSolver.getPotentialField()).toTable();
-				outputTables.put(String.valueOf(target.getId()), potentialFieldTable);
-			});
-		}
-		return outputTables;
 	}
 
 	protected Optional<PotentialFieldAndInitializer> getPotentialFieldAndInitializer(final int targetId) {

@@ -29,7 +29,7 @@ public class FloorGradientProviderDiscrete implements GradientProvider {
 
 	/**
 	 * Ctor of FloorGradientProviderDiscrete. Runs the fast marching algorithm
-	 * on the geometry given in the scenario and stores the result in the
+	 * on the geometry given in the scenario and store the result in the
 	 * potential[][] array.
 	 * 
 	 * @param potentialFields

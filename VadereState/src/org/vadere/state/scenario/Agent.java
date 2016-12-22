@@ -5,14 +5,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.TruncatedNormalDistribution;
 
-public abstract class Agent implements DynamicElement {
+public abstract class Agent extends DynamicElement {
+	
+	/**
+	 * Source where the agent was spawned. The {@link SourceController} should
+	 * set this field. It may be <code>null</code> when the agent is created
+	 * in different way.
+	 */
+	private Source source;
+
 	private LinkedList<Integer> targetIds;
 	private VPoint position;
 	private Vector2D velocity;
@@ -21,13 +31,13 @@ public abstract class Agent implements DynamicElement {
 
 	private double freeFlowSpeed;
 
-	private AttributesAgent attributes;
+	private final AttributesAgent attributes;
 
 	public Agent(AttributesAgent attributesAgent) {
 		position = new VPoint(0, 0);
 		velocity = new Vector2D(0, 0);
 		targetIds = new LinkedList<>();
-		nextTargetListIndex = -1;
+		nextTargetListIndex = 0;
 
 		attributes = attributesAgent;
 	}
@@ -35,22 +45,18 @@ public abstract class Agent implements DynamicElement {
 	public Agent(AttributesAgent attributesAgent, Random random) {
 		this(attributesAgent);
 
-		// repeatedly draw from a normal distribution until the speed lies within the given
-		// interval.
-		double freeFlowSpeed;
-		int counter = 0; // robustness counter s.t. even with wrong interval boundaries, the program shuts down in a controlled way.
-		do {
-			freeFlowSpeed = attributesAgent.getSpeedDistributionMean() +
-					attributesAgent.getSpeedDistributionStandardDeviation() * random.nextGaussian();
-
-			counter++;
-		} while ((freeFlowSpeed < attributesAgent.getMinimumSpeed() || freeFlowSpeed > attributesAgent
-				.getMaximumSpeed()) && counter < 100);
-		if (counter > 99) {
-			throw new IllegalArgumentException(
-					"A pedestrians minimumSpeed and maximumSpeed are not sufficiently far apart.");
+		if (attributesAgent.getSpeedDistributionStandardDeviation() == 0) {
+			freeFlowSpeed = attributesAgent.getSpeedDistributionMean();
+		} else {
+			final RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
+			final TruncatedNormalDistribution speedDistribution = new TruncatedNormalDistribution(rng,
+					attributesAgent.getSpeedDistributionMean(),
+					attributesAgent.getSpeedDistributionStandardDeviation(),
+					attributesAgent.getMinimumSpeed(),
+					attributesAgent.getMaximumSpeed(),
+					100);
+			freeFlowSpeed = speedDistribution.sample();
 		}
-		this.freeFlowSpeed = freeFlowSpeed;
 	}
 
 	public Agent(Agent other) {
@@ -59,9 +65,9 @@ public abstract class Agent implements DynamicElement {
 		this.setTargets(new LinkedList<>(other.targetIds));
 		this.setNextTargetListIndex(other.nextTargetListIndex);
 
-		this.setPosition(other.position);
-		this.setVelocity(other.velocity);
-		this.setFreeFlowSpeed(other.freeFlowSpeed);
+		this.position = other.position;
+		this.velocity = other.velocity;
+		this.freeFlowSpeed = other.freeFlowSpeed;
 	}
 
 	public LinkedList<Integer> getTargets() {
@@ -92,29 +98,25 @@ public abstract class Agent implements DynamicElement {
 	public VPoint getPosition() {
 		return position;
 	}
+	
+	@Override
+	public void setShape(VShape newShape) {
+		position = newShape.getCentroid();
+	}
 
 	@Override
 	public VShape getShape() {
 		return new VCircle(position, attributes.getRadius());
 	}
 
+	public Source getSource() {
+		return source;
+	}
 
 	@Override
 	public int getId() {
 		return attributes.getId();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see scenario.ScenarioElement#getType()
-	 */
-	@Override
-	public abstract ScenarioElementType getType();
-
-
-	@Override
-	public abstract Agent clone();
 
 	/**
 	 * Converts a Iterable of Agent to a List of VPoint positions.
@@ -196,6 +198,10 @@ public abstract class Agent implements DynamicElement {
 		this.nextTargetListIndex = nextTargetListIndex;
 	}
 
+	public void setSource(Source source) {
+		this.source = source;
+	}
+
 	public void incrementNextTargetListIndex() {
 		// Deprecated target list usage
 		if (nextTargetListIndex == -1) {
@@ -217,9 +223,14 @@ public abstract class Agent implements DynamicElement {
 	public void setTargets(LinkedList<Integer> targetIds) {
 		this.targetIds = targetIds;
 	}
+	
+	public void addTarget(Target target) {
+		targetIds.add(target.getId());
+	}
 
 	// TODO [task=refactoring] remove again!
 	public void setFreeFlowSpeed(double freeFlowSpeed) {
 		this.freeFlowSpeed = freeFlowSpeed;
 	}
+
 }

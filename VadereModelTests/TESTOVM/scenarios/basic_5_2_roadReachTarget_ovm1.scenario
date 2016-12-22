@@ -1,9 +1,7 @@
 {
   "name" : "basic_5_2_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "a73a189c7ee0fc46c4593cac89a785639a48a327",
-  "attributeshash" : "85431a1c845fd08e1d8fb23b75fa13032a02567f",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s %s %s %s %s %s %s %s %s %s %s %s",
     "columnNames" : [ "sourceId", "vx", "vy", "dx", "targetId", "dy", "x", "y", "step", "time", "id", "speed" ],
@@ -11,7 +9,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "attributes" : {
         "maxAcceptedVelocity" : 3.0,
         "backSteps" : 1,
@@ -34,7 +32,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "attributes" : {
         "maxEvacuationTime" : 270.0,
         "maxEvacuationTimeMean" : 270.0,
@@ -47,7 +45,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.ovm.OptimalVelocityModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOVM" : {
@@ -153,9 +151,8 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 2.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 2.0 ],
         "spawnNumber" : 1,
         "startTime" : 0.0,
         "endTime" : 60.0,

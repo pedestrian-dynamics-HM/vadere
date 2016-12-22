@@ -2,10 +2,18 @@ package org.vadere.state.scenario;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
@@ -16,6 +24,9 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public class Topography {
 
+	/** Transient to prevent JSON serialization. */
+	private static Logger logger = Logger.getLogger(Topography.class);
+	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
 	 * Cell size of the internal storage of DynamicElements. Is used in the LinkedCellsGrid.
@@ -40,6 +51,13 @@ public class Topography {
 	 */
 	private final LinkedList<Target> targets;
 
+	/**
+	 * List of obstacles used as a boundary for the whole topography.
+	 */
+	private List<Obstacle> boundaryObstacles;
+
+	private final List<Stairs> stairs;
+
 	private Teleporter teleporter;
 
 	private transient final DynamicElementContainer<Pedestrian> pedestrians;
@@ -48,40 +66,54 @@ public class Topography {
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
 
-
-	/**
-	 * List of obstacles used as a boundary for the whole topography.
-	 */
-	private List<Obstacle> boundaryObstacles;
-
-	private final List<Stairs> stairs;
+	/** Used to get attributes of all scenario elements. */
+	private Set<List<? extends ScenarioElement>> allScenarioElements = new HashSet<>(); // will be filled in the constructor
+	
+	/** Used to store links to all attributes that are not part of scenario elements. */
+	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
 
 	public Topography(AttributesTopography attributes, AttributesAgent attributesPedestrian,
 			AttributesCar attributesCar) {
-		this(attributes, attributesPedestrian);
-		this.attributesCar = attributesCar;
-	}
 
-	public Topography(AttributesTopography attributes, AttributesAgent attributesPedestrian) {
 		this.attributes = attributes;
 		this.attributesPedestrian = attributesPedestrian;
-		this.obstacles = new LinkedList<>();
-		this.stairs = new LinkedList<>();
-		this.sources = new LinkedList<>();
-		this.targets = new LinkedList<>();
-		this.boundaryObstacles = new LinkedList<>();
+		this.attributesCar = attributesCar;
+
+		allOtherAttributes.add(attributes);
+		allOtherAttributes.add(attributesCar);
+		allOtherAttributes.add(attributesPedestrian);
+		removeNullFromSet(allOtherAttributes);
+		// Actually, only attributes, not nulls should be added to this set.
+		// But sometimes null is passed as attributes and added to the set,
+		// although it is bad practice to pass null in the first place
+		// (as constructor argument).
+
+		obstacles = new LinkedList<>();
+		stairs = new LinkedList<>();
+		sources = new LinkedList<>();
+		targets = new LinkedList<>();
+		boundaryObstacles = new LinkedList<>();
+		
+		allScenarioElements.add(obstacles);
+		allScenarioElements.add(stairs);
+		allScenarioElements.add(sources);
+		allScenarioElements.add(targets);
+		allScenarioElements.add(boundaryObstacles);
 
 		RectangularShape bounds = this.getBounds();
 
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
+		
 	}
 
-	/**
-	 * Creates an empty scenario where bounds and finishTime are empty / zero.
-	 */
+	/** Clean up a set by removing {@code null}. */
+	private void removeNullFromSet(Set<?> aSet) {
+		aSet.remove(null);
+	}
+
 	public Topography() {
-		this(new AttributesTopography(), new AttributesAgent());
+		this(new AttributesTopography(), new AttributesAgent(), new AttributesCar());
 	}
 
 	public Rectangle2D.Double getBounds() {
@@ -111,10 +143,7 @@ public class Topography {
 	}
 
 	/**
-	 * Returns a List containing Targets with the specific id. This List maybe empty.
-	 * 
-	 * @param targetId
-	 * @return
+	 * Returns a list containing Targets with the specific id. This list may be empty.
 	 */
 	public List<Target> getTargets(final int targetId) {
 		return getTargets().stream().filter(t -> t.getId() == targetId).collect(Collectors.toList());
@@ -140,7 +169,7 @@ public class Topography {
 		// TODO [priority=medium] [task=refactoring] this is needed for the SimulationDataWriter. Refactor in the process of refactoring the Writer.
 		if (DynamicElement.class.isAssignableFrom(elementType)) {
 
-			DynamicElementContainer result = new DynamicElementContainer<DynamicElement>(this.getBounds(), CELL_SIZE);
+			DynamicElementContainer result = new DynamicElementContainer<>(this.getBounds(), CELL_SIZE);
 			for (Pedestrian ped : pedestrians.getElements()) {
 				result.addElement(ped);
 			}
@@ -218,17 +247,17 @@ public class Topography {
 	}
 
 	public void setTeleporter(Teleporter teleporter) {
+		allScenarioElements.remove(this.teleporter); // remove old teleporter
+
 		this.teleporter = teleporter;
+		if (teleporter != null)
+			allScenarioElements.add(Collections.singletonList(teleporter));
 	}
 
-	/*
-	 * public double getFinishTime() {
-	 * return attributes.getFinishTime();
-	 * }
-	 */
-
 	public <T extends DynamicElement> void addInitialElement(T element) {
-		((DynamicElementContainer<T>) this.getContainer(element.getClass())).addInitialElement(element);
+		@SuppressWarnings("unchecked") // getContainer returns a correctly parameterized object
+		final DynamicElementContainer<T> container = (DynamicElementContainer<T>) getContainer(element.getClass());
+		container.addInitialElement(element);
 	}
 
 	public <T extends DynamicElement> List<T> getInitialElements(Class<T> elementType) {
@@ -277,8 +306,6 @@ public class Topography {
 	 * Adds a given obstacle to the list of obstacles as well as the list of boundary obstacles.
 	 * This way, the boundary can both be treated like normal obstacles, but can also be removed for
 	 * writing the topography to file.
-	 * 
-	 * @param obstacle
 	 */
 	public void addBoundary(Obstacle obstacle) {
 		this.addObstacle(obstacle);
@@ -311,42 +338,45 @@ public class Topography {
 
 	/**
 	 * Creates a deep copy of the scenario.
+	 * 
+	 * @deprecated This manual implementation is error-prone. Remove this method
+	 *             and use the standard clone instead.
 	 */
+	@Deprecated
 	@Override
 	public Topography clone() {
-		Topography s = new Topography(this.attributes, this.attributesPedestrian);
-		s.attributesCar = this.attributesCar;
+		Topography s = new Topography(this.attributes, this.attributesPedestrian, this.attributesCar);
 
 		for (Obstacle obstacle : this.getObstacles()) {
-			if (this.boundaryObstacles.contains(obstacle))
-				s.addBoundary(obstacle.clone());
+			if (boundaryObstacles.contains(obstacle))
+				s.addBoundary((Obstacle) obstacle.clone());
 			else
-				s.addObstacle(obstacle.clone());
+				s.addObstacle((Obstacle) obstacle.clone());
 		}
-		for (Stairs stairs : this.getStairs()) {
+		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
-		for (Target target : this.getTargets()) {
-			s.addTarget(target.clone());
+		for (Target target : getTargets()) {
+			s.addTarget((Target) target.clone());
 		}
-		for (Source source : this.getSources()) {
-			s.addSource(source.clone());
+		for (Source source : getSources()) {
+			s.addSource((Source) source.clone());
 		}
-		for (Pedestrian pedestrian : this.getElements(Pedestrian.class)) {
+		for (Pedestrian pedestrian : getElements(Pedestrian.class)) {
 			s.addElement(pedestrian);
 		}
 		for (Pedestrian ped : getInitialElements(Pedestrian.class)) {
 			s.addInitialElement(ped);
 		}
-		for (Car car : this.getElements(Car.class)) {
+		for (Car car : getElements(Car.class)) {
 			s.addElement(car);
 		}
 		for (Car car : getInitialElements(Car.class)) {
 			s.addInitialElement(car);
 		}
 
-		if (this.hasTeleporter()) {
-			s.setTeleporter(this.getTeleporter().clone());
+		if (hasTeleporter()) {
+			s.setTeleporter((Teleporter) teleporter.clone());
 		}
 
 		for (DynamicElementAddListener<Pedestrian> pedestrianAddListener : this.pedestrians.getElementAddedListener()) {
@@ -393,86 +423,24 @@ public class Topography {
 		return this.boundaryObstacles.size() > 0;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((attributes == null) ? 0 : attributes.hashCode());
-		result = prime * result
-				+ ((attributesPedestrian == null) ? 0 : attributesPedestrian.hashCode());
-		result = prime
-				* result
-				+ ((boundaryObstacles == null) ? 0 : boundaryObstacles
-						.hashCode());
-		result = prime * result
-				+ ((obstacles == null) ? 0 : obstacles.hashCode());
-		result = prime * result
-				+ ((stairs == null) ? 0 : stairs.hashCode());
-		result = prime * result
-				+ ((pedestrians == null) ? 0 : pedestrians.hashCode());
-		result = prime * result + ((sources == null) ? 0 : sources.hashCode());
-		result = prime * result + ((targets == null) ? 0 : targets.hashCode());
-		result = prime * result
-				+ ((teleporter == null) ? 0 : teleporter.hashCode());
-		return result;
-	}
+	public void sealAllAttributes() {
+		// tried to do this with flatMap -> weird compiler error "cannot infer type arguments ..."
+		for (List<? extends ScenarioElement> list : allScenarioElements) {
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Topography))
-			return false;
-		Topography other = (Topography) obj;
-		if (attributes == null) {
-			if (other.attributes != null)
-				return false;
-		} else if (!attributes.equals(other.attributes))
-			return false;
-		if (attributesPedestrian == null) {
-			if (other.attributesPedestrian != null)
-				return false;
-		} else if (!attributesPedestrian.equals(other.attributesPedestrian))
-			return false;
-		if (boundaryObstacles == null) {
-			if (other.boundaryObstacles != null)
-				return false;
-		} else if (!boundaryObstacles.equals(other.boundaryObstacles))
-			return false;
-		if (obstacles == null) {
-			if (other.obstacles != null)
-				return false;
-		} else if (!obstacles.equals(other.obstacles))
-			return false;
-		if (stairs == null) {
-			if (other.stairs != null)
-				return false;
-		} else if (!stairs.equals(other.stairs))
-			return false;
-		if (pedestrians == null) {
-			if (other.pedestrians != null)
-				return false;
-		} else if (!pedestrians.equals(other.pedestrians))
-			return false;
-		if (sources == null) {
-			if (other.sources != null)
-				return false;
-		} else if (!sources.equals(other.sources))
-			return false;
-		if (targets == null) {
-			if (other.targets != null)
-				return false;
-		} else if (!targets.equals(other.targets))
-			return false;
-		if (teleporter == null) {
-			if (other.teleporter != null)
-				return false;
-		} else if (!teleporter.equals(other.teleporter))
-			return false;
-		return true;
+			// defensive programming:
+			if (list == null)
+				throw new RuntimeException("scenario elem list is null");
+			for (ScenarioElement scenarioElement : list) {
+				if (scenarioElement.getAttributes() == null) {
+					list.remove(scenarioElement);
+					logger.warn("a scenario element has null as attributes: " + scenarioElement);
+					// TODO this is an error in a different place and should be fixed!
+				}
+			}
+
+			list.forEach(se -> se.getAttributes().seal());
+		}
+		allOtherAttributes.forEach(a -> a.seal());
 	}
 
 }

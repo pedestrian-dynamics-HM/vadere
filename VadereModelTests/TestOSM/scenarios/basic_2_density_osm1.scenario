@@ -1,60 +1,13 @@
 {
   "name" : "basic_2_density_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "033539da8c31611622e76d2566fc5b54d18870fa",
-  "attributeshash" : "75778572f188cffcdedc74a7a9b60ddbe42359fc",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "densityTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "pedestrianDensityProcessor" : {
-        "densityProcessor" : {
-          "attributes" : {
-            "radius" : 1.5
-          },
-          "columnNames" : [ "x", "y", "circleDensity", "step", "time" ],
-          "clazz" : "DensityCountingProcessor"
-        },
-        "columnNames" : [ "circleDensity" ],
-        "clazz" : "PedestrianDensityProcessor"
-      },
-      "attributes" : {
-        "maxDensity" : 10.0,
-        "minDensity" : 0.0,
-        "maxMeanDensity" : 6.0,
-        "minMeanDensity" : 0.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianDensityTest"
-    }
-  }, {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 100.0,
-        "maxEvacuationTimeMean" : 100.0,
-        "minEvacuationTime" : 0.0,
-        "minEvacuationTimeMean" : 0.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  } ],
-  "vadere" : {
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -191,10 +144,10 @@
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 200,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,

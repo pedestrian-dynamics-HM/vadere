@@ -1,9 +1,7 @@
 {
   "name" : "basic_3_2_wall_gnm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "77ae0f32c9f316a3a9590b44b966566a0101ec06",
-  "attributeshash" : "6361b7f540016d14d148a408e8b6246a71d08d44",
+  "release" : "0.2",
   "processWriters" : [ {
     "formatString" : "%s",
     "columnNames" : [ "waitingTimeTest" ],
@@ -11,7 +9,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "pedestrianWaitingTimeProcessor" : {
         "attributes" : {
           "waitingArea" : {
@@ -41,7 +39,7 @@
       "startTime" : 0.0,
       "endTime" : 1.7976931348623157E308
     },
-    "processor" : {
+    "dataProcessor" : {
       "attributes" : {
         "maxEvacuationTime" : 1.0,
         "maxEvacuationTimeMean" : 1.0,
@@ -54,7 +52,7 @@
       "clazz" : "PedestrianEvacuationTimeTest"
     }
   } ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -155,7 +153,6 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 50,

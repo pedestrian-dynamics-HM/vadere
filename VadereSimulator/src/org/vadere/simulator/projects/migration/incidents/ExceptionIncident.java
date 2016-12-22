@@ -1,11 +1,13 @@
 package org.vadere.simulator.projects.migration.incidents;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.simulator.projects.migration.Graph;
+import org.vadere.simulator.projects.migration.Tree;
 import org.vadere.simulator.projects.migration.MigrationException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ExceptionIncident extends Incident {
 
@@ -16,25 +18,25 @@ public class ExceptionIncident extends Incident {
 	}
 
 	@Override
-	public boolean applies(Graph graph) {
+	public boolean applies(Tree tree) {
 		return true;
 	}
 
 	@Override
-	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
+	public void resolve(Tree tree, StringBuilder log) throws MigrationException {
 		while (true) {
 			try {
-				JsonConverter.deserializeScenarioRunMangerFromNode(node);
+				JsonConverter.deserializeScenarioRunManagerFromNode(node);
 				break;
-			} catch (JsonProcessingException e) {
+			} catch (IOException e) {
 				String errMsg = e.getMessage();
 				if (errMsg.startsWith("Unrecognized field")) { // UnrecognizedFieldExceptionIncident
 					Pair<String, String> referenceChainNodes = getReferenceChainNodes(errMsg);
-					graph.deleteUnrecognizedField(referenceChainNodes.getLeft(), referenceChainNodes.getRight(), log,
+					tree.deleteUnrecognizedField(referenceChainNodes.getLeft(), referenceChainNodes.getRight(), log,
 							this);
 				} else if (errMsg.startsWith("Can not coerce a floating-point")) { // EnforceIntegerExceptionIncident
 					Pair<String, String> referenceChainNodes = getReferenceChainNodes(errMsg);
-					graph.enforceIntegerValue(referenceChainNodes.getLeft(), referenceChainNodes.getRight(), log, this);
+					tree.enforceIntegerValue(referenceChainNodes.getLeft(), referenceChainNodes.getRight(), log, this);
 
 					// add new auto-corrections here
 
@@ -54,6 +56,7 @@ public class ExceptionIncident extends Incident {
 		}
 	}
 
+	//TODO: implement this cleaner
 	private Pair<String, String> getReferenceChainNodes(String errMsg) {
 		String referenceChain =
 				errMsg.substring(errMsg.indexOf("through reference chain: ") + "through reference chain: ".length());

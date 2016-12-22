@@ -1,13 +1,5 @@
 package org.vadere.simulator.models.queuing;
 
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
@@ -23,13 +15,20 @@ import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
+
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, DynamicElementRemoveListener<Pedestrian>,
 		DynamicElementAddListener<Pedestrian> {
@@ -127,7 +126,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 	}
 
 	@Override
-	public double getTargetPotential(final List<Integer> targetIds, final VPoint pos, final Agent pedArgument) {
+	public double getTargetPotential(final VPoint pos, final Agent pedArgument) {
 		if (Pedestrian.class.isAssignableFrom(pedArgument.getClass()))
 			throw new IllegalArgumentException("Target grid can only handle type Pedestrian");
 		Pedestrian ped = (Pedestrian) pedArgument;
@@ -135,14 +134,14 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 		if (pedestrianAttitudeMap.containsKey(ped) && queues.stream().anyMatch(queue -> queue.isQueued(ped))) {
 			switch (pedestrianAttitudeMap.get(ped)) {
 				case COMPETITIVE:
-					return competitiveField.getTargetPotential(targetIds, pos, ped);
+					return competitiveField.getTargetPotential(pos, ped);
 				case GENTLE:
-					return gentleField.getTargetPotential(targetIds, pos, ped);
+					return gentleField.getTargetPotential(pos, ped);
 				default:
 					throw new IllegalArgumentException(ped + " is not contained in the attitude map.");
 			}
 		} else if (queues.stream().noneMatch(queue -> queue.isQueued(ped))) {
-			return competitiveField.getTargetPotential(targetIds, pos, ped);
+			return competitiveField.getTargetPotential(pos, ped);
 		} else {
 			logger.warn("ped is neither queued nor not-queued.");
 			return 0;
@@ -150,7 +149,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 	}
 
 	@Override
-	public Vector2D getTargetPotentialGradient(final List<Integer> targetIds, final VPoint pos, final Agent ped) {
+	public Vector2D getTargetPotentialGradient(final VPoint pos, final Agent ped) {
 		throw new UnsupportedOperationException("method not implemented jet.");
 	}
 
@@ -258,11 +257,6 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 		// logger.info("prob: " + prob + ", expexted value (sec): " + expectedValue);
 		boolean result = random.nextDouble() <= prob;
 		return result;
-	}
-
-	@Override
-	public Map<String, Table> getOutputTables() {
-		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	@Override

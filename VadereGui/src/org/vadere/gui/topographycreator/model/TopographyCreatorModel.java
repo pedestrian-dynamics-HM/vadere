@@ -11,7 +11,7 @@ import java.util.Observer;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.DefaultModel;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
@@ -24,7 +24,6 @@ import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * The data of the DrawPanel. Its holds the whole data of one scenario.
- * 
  * 
  */
 public class TopographyCreatorModel extends DefaultModel implements IDrawPanelModel {
@@ -63,18 +62,18 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 	private Color cursorColor;
 
-	private ScenarioRunManager scenario;
+	private Scenario scenario;
 
 	private Observer scenarioObserver;
 
 	private int boundId;
 
-	public TopographyCreatorModel(final ScenarioRunManager scenario) {
+	public TopographyCreatorModel(final Scenario scenario) {
 		this(scenario.getTopography(), scenario);
 		setVadereScenario(scenario);
 	}
 
-	public TopographyCreatorModel(final Topography topography, final ScenarioRunManager scenario) {
+	public TopographyCreatorModel(final Topography topography, final Scenario scenario) {
 		super(new DefaultConfig());
 		this.font = new Font("Arial", Font.PLAIN, 12);
 		this.prototypeVisble = false;
@@ -89,10 +88,14 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
-	public void setVadereScenario(final ScenarioRunManager scenario) {
+	public void setVadereScenario(final Scenario scenario) {
 		this.scenarioObserver = (model, obj) -> scenario.setTopography(topographyBuilder.build());
 		this.scenario = scenario;
 		this.addObserver(scenarioObserver);
+	}
+
+	public Scenario getScenario() {
+		return scenario;
 	}
 
 	@Override
@@ -217,13 +220,6 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return font;
 	}
 
-	/*
-	 * @Override
-	 * public double getFinishTime() {
-	 * return topographyBuilder.getAttributes().getFinishTime();
-	 * }
-	 */
-
 	@Override
 	public void setTopographyBound(final VRectangle scenarioBound) {
 		try {
@@ -325,18 +321,20 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 	@Override
 	public VShape translate(final Point vector) {
-		// double factor = Math.max(10,1/getGridResulution());
 		VPoint worldVector = new VPoint(vector.x / getScaleFactor(), -vector.y / getScaleFactor());
 		return translate(worldVector);
 	}
 
 	@Override
 	public VShape translate(final VPoint vector) {
-		// double factor = Math.max(10,1/getGridResulution());
-		return getSelectedElement().getShape().translatePrecise(alignToGrid(vector));
+		return translateElement(getSelectedElement(), vector);
 	}
 
-	// can return null!
+	@Override
+	public VShape translateElement(ScenarioElement element, VPoint vector) {
+		// double factor = Math.max(10,1/getGridResulution()); // ?? related to scaleTopography?
+		return element.getShape().translatePrecise(alignToGrid(vector));
+	}
 
 	@Override
 	public int getBoundId() {
@@ -431,9 +429,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return topographyBuilder.build();
 	}
 
-	// privte helper methods
 	private VPoint alignToGrid(final VPoint point) {
 		double factor = Math.max(10, 1 / getGridResolution());
 		return new VPoint(Math.round(point.x * factor) / factor, Math.round(point.y * factor) / factor);
 	}
+
 }

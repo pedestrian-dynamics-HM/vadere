@@ -1,14 +1,5 @@
 package org.vadere.simulator.models.sfm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -24,17 +15,18 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.gradients.GradientProvider;
 
-public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
-	/**
-	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processors.
-	 */
-	private Map<String, Table> outputTables;
+public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 	private AttributesSFM attributes;
 	private GradientProvider floorGradient;
@@ -42,7 +34,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private IPotentialTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
+	private List<Model> models = new LinkedList<>();
 
 	private int pedestrianIdCounter;
 
@@ -65,12 +57,9 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
 		this.potentialFieldTarget = potentialFieldTarget;
-		this.outputTables = new HashMap<>();
-
 	}
 
 	public SocialForceModel() {
-		this.outputTables = new HashMap<>();
 		this.targets = new TreeMap<>();
 	}
 
@@ -94,7 +83,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributes.getObstaclePotentialModel());
@@ -102,7 +91,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributes.getPedestrianPotentialModel());
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	public void rebuildFloorField(final double simTimeInSec) {
@@ -156,11 +145,6 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	}
 
 	@Override
-	public Map<String, Table> getOutputTables() {
-		return outputTables;
-	}
-
-	@Override
 	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Class<T> type) {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("SFM cannot initialize " + type.getCanonicalName());
@@ -173,8 +157,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
 }

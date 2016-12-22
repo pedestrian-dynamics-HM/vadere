@@ -1,11 +1,9 @@
 {
   "name" : "rimea_05_react_gnm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "eeba5fbe296b72d9dca240ba9cc04bc924bacce8",
-  "attributeshash" : "bbe40f37f3349597117aa8209bb97fe097934787",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -115,7 +113,6 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 10,

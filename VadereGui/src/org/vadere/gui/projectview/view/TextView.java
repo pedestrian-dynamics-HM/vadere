@@ -1,6 +1,24 @@
 package org.vadere.gui.projectview.view;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.prefs.Preferences;
+
+import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -9,32 +27,22 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.simulator.projects.ScenarioRunManager;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.prefs.Preferences;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Shows text like the JSON formatted attributes.
  * 
  * 
  */
-public class TextView extends JPanel {
+public class TextView extends JPanel implements IJsonView {
 
 	private static Logger logger = LogManager.getLogger(TextView.class);
 
@@ -45,13 +53,15 @@ public class TextView extends JPanel {
 	private JPanel panelTop = new JPanel();
 
 	private static final long serialVersionUID = 3975758744810301970L;
-	private ScenarioRunManager currentScenario;
+	private Scenario currentScenario;
 
 	private JsonValidIndicator jsonValidIndicator;
 
 	private AbstractButton btnLoadFromFile;
 
 	private boolean isEditable;
+
+	private DocumentListener documentListener;
 
 
 	private JTextArea txtrTextfiletextarea;
@@ -141,7 +151,7 @@ public class TextView extends JPanel {
 		scrollPane.setViewportView(txtrTextfiletextarea);
 		txtrTextfiletextarea.setText(Messages.getString("TextFileView.txtrTextfiletextarea.text"));
 
-		txtrTextfiletextarea.getDocument().addDocumentListener(new DocumentListener() {
+		documentListener = new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				setScenarioContent();
@@ -166,35 +176,42 @@ public class TextView extends JPanel {
 
 					try {
 						switch (attributeType) {
-							case MODEL:
-								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
-								currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
-								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
-								break;
-							case SIMULATION:
-								currentScenario
-										.setAttributesSimulation(JsonConverter.deserializeAttributesSimulation(json));
-								break;
-							case TOPOGRAPHY:
-								currentScenario.setTopography(JsonConverter.deserializeTopography(json));
-								break;
+						case MODEL:
+							ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
+							currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
+							currentScenario.setAttributesModel(modelDefinition.getAttributesList());
+							break;
+						case SIMULATION:
+							currentScenario
+									.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
+							break;
+						case OUTPUTPROCESSOR:
+							currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
+							break;
+						case TOPOGRAPHY:
+							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
+							break;
+						default:
+							throw new RuntimeException("attribute type not implemented.");
 						}
-						ScenarioJPanel.removeJsonParsingErrorMsg();
+						currentScenario.updateCurrentStateSerialized();
+						ScenarioPanel.removeJsonParsingErrorMsg();
 						ProjectView.getMainWindow().refreshScenarioNames();
 						jsonValidIndicator.setValid();
 					} catch (Exception e) {
-						ScenarioJPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
+						ScenarioPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
 						jsonValidIndicator.setInvalid();
 					}
 				}
 			}
-		});
+		};
 
 		this.attributeType = attributeType;
 		jsonValidIndicator.setValid();
 	}
 
-	public void setVadereScenario(ScenarioRunManager scenario) { // in order to avoid passing the exception upwards. might not be the best solution
+	@Override
+	public void setVadereScenario(Scenario scenario) { // in order to avoid passing the exception upwards. might not be the best solution
 		try {
 			setVadereScenarioThrows(scenario);
 		} catch (JsonProcessingException e) {
@@ -202,35 +219,44 @@ public class TextView extends JPanel {
 		}
 	}
 
-	private void setVadereScenarioThrows(ScenarioRunManager scenario) throws JsonProcessingException {
-		this.currentScenario = scenario;
+	private void setVadereScenarioThrows(Scenario scenario) throws JsonProcessingException {
+		currentScenario = scenario;
 
 		switch (attributeType) {
-			case MODEL:
-				this.txtrTextfiletextarea.setText(JsonConverter.serializeMainModelAttributesModelBundle(
-						scenario.getSortedAttributesMode(), scenario.getScenarioStore().mainModel));
-				break;
-			case SIMULATION:
-				this.txtrTextfiletextarea
-						.setText(JsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
-				break;
-			case TOPOGRAPHY:
-				Topography topography = scenario.getTopography().clone();
-				topography.removeBoundary();
-				this.txtrTextfiletextarea.setText(JsonConverter.serializeTopography(topography));
-				break;
+		case MODEL:
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
+					scenario.getModelAttributes(), scenario.getScenarioStore().mainModel));
+			break;
+		case SIMULATION:
+			txtrTextfiletextarea
+					.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
+			break;
+		case OUTPUTPROCESSOR:
+			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
+			break;
+
+		case TOPOGRAPHY:
+			Topography topography = scenario.getTopography().clone();
+			topography.removeBoundary();
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			break;
+		default:
+			throw new RuntimeException("attribute type not implemented.");
 		}
-		this.txtrTextfiletextarea.setCaretPosition(0);
+		txtrTextfiletextarea.setCaretPosition(0);
 	}
 
+	@Override
 	public void isEditable(boolean isEditable) {
 		this.isEditable = isEditable;
 		btnLoadFromFile.setEnabled(isEditable);
 		txtrTextfiletextarea.setEnabled(isEditable);
 		if (isEditable) {
 			txtrTextfiletextarea.setBackground(Color.WHITE);
+			txtrTextfiletextarea.getDocument().addDocumentListener(documentListener);
 		} else {
 			txtrTextfiletextarea.setBackground(Color.LIGHT_GRAY);
+			txtrTextfiletextarea.getDocument().removeDocumentListener(documentListener);
 		}
 	}
 

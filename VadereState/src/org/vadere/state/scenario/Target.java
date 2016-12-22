@@ -1,16 +1,25 @@
 package org.vadere.state.scenario;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Target implements ScenarioElement, Comparable<Target> {
+public class Target extends ScenarioElement implements Comparable<Target> {
 
 	private final AttributesTarget attributes;
 	private final Map<Integer, Double> enteringTimes;
+	
+	/**
+	 * Collection of listeners - unordered because it's order is not predictable
+	 * (at least not for clients).
+	 */
+	private final Collection<TargetListener> targetListeners = new LinkedList<>();
 
 	public Target(AttributesTarget attributes) {
 		this(attributes, new HashMap<>());
@@ -55,17 +64,13 @@ public class Target implements ScenarioElement, Comparable<Target> {
 	}
 
 	@Override
-	public VShape getShape() {
-		return attributes.getShape();
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
 	}
 
-	/**
-	 * Returns a new target with the same attributes as this one, but no
-	 * {@link org.vadere.state.scenario.DynamicElementRemoveListener}.
-	 */
 	@Override
-	public Target clone() {
-		return new Target(attributes);
+	public VShape getShape() {
+		return attributes.getShape();
 	}
 
 	@Override
@@ -120,6 +125,25 @@ public class Target implements ScenarioElement, Comparable<Target> {
 	@Override
 	public int compareTo(Target otherTarget) {
 		return this.getId() - otherTarget.getId();
+	}
+
+	/** Models can register a target listener. */
+	public void addListener(TargetListener listener) {
+		targetListeners.add(listener);
+	}
+
+	public boolean removeListener(TargetListener listener) {
+		return targetListeners.remove(listener);
+	}
+
+	/** Returns an unmodifiable collection. */
+	public Collection<TargetListener> getTargetListeners() {
+		return Collections.unmodifiableCollection(targetListeners);
+	}
+
+	@Override
+	public Target clone() {
+		return new Target((AttributesTarget) attributes.clone());
 	}
 
 }

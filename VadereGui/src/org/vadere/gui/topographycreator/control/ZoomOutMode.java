@@ -17,7 +17,7 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
  * 
  */
 public class ZoomOutMode extends DefaultModeAdapter {
-	private static Resources resources = Resources.getInstance("topologycreator");
+	private static Resources resources = Resources.getInstance("topographycreator");
 
 	private Cursor cursor;
 	private IDrawPanelModel model;

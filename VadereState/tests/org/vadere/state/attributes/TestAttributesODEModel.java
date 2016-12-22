@@ -7,8 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.models.AttributesODEIntegrator;
 import org.vadere.state.types.IntegratorType;
-
-import com.google.gson.Gson;
+import org.vadere.state.util.StateJsonConverter;
 
 public class TestAttributesODEModel {
 
@@ -21,10 +20,10 @@ public class TestAttributesODEModel {
 	 */
 	@Before
 	public void setUp() {
-		store = "{" + "'solverType' : 'CLASSICAL_RK4',"
-				+ "'toleranceAbsolute' : '" + new Double(1e-5).toString() + "'," + "'toleranceRelative' : '"
-				+ new Double(1e-5).toString() + "'," + "'stepSizeMin' : '" + new Double(1e-5).toString() + "',"
-				+ "'stepSizeMax' : '" + new Double(1e-5).toString() + "'" + "}";
+		store = "{" + "\"solverType\" : \"CLASSICAL_RK4\","
+				+ "\"toleranceAbsolute\" : " + new Double(1e-5).toString() + "," + "\"toleranceRelative\" : "
+				+ new Double(1e-5).toString() + "," + "\"stepSizeMin\" : " + new Double(1e-5).toString() + ","
+				+ "\"stepSizeMax\" : " + new Double(1e-5).toString() + "}";
 	}
 
 	/**
@@ -39,7 +38,7 @@ public class TestAttributesODEModel {
 	@Test
 	public void testAttributesODEModel() throws IllegalArgumentException, IllegalAccessException {
 		// correct case
-		attributesODEModel = new Gson().fromJson(store, AttributesODEIntegrator.class);
+		attributesODEModel = StateJsonConverter.deserializeObjectFromJson(store, AttributesODEIntegrator.class);
 		assertArrayEquals(new double[] {1e-5}, new double[] {attributesODEModel.getToleranceAbsolute()}, delta);
 		assertEquals("integrator type is not correct", IntegratorType.CLASSICAL_RK4.name(), attributesODEModel
 				.getSolverType().name());

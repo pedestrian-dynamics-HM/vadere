@@ -22,8 +22,6 @@ public class AttributesPotentialOSM extends Attributes {
 	private double aObsOSM = 3.5;
 	private double bObsOSM = 0.2;
 
-	public AttributesPotentialOSM() {}
-
 	// Getters...
 
 	public double getPedestrianBodyPotential() {

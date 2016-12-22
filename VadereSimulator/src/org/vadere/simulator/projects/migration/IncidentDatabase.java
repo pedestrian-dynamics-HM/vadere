@@ -1,63 +1,104 @@
 package org.vadere.simulator.projects.migration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.simulator.projects.migration.incidents.*;
+import org.vadere.simulator.entrypoints.Version;
+import org.vadere.simulator.projects.migration.incidents.AddTextNodeIncident;
+import org.vadere.simulator.projects.migration.incidents.DeletionIncident;
+import org.vadere.simulator.projects.migration.incidents.Incident;
+import org.vadere.simulator.projects.migration.incidents.MissingMainModelIncident;
+import org.vadere.simulator.projects.migration.incidents.RelocationIncident;
+import org.vadere.simulator.projects.migration.incidents.RenameInArrayIncident;
+import org.vadere.simulator.projects.migration.incidents.RenameIncident;
 import org.vadere.simulator.projects.migration.incidents.specialized.AttributesPotentialCompactVSosmIncident;
+import org.vadere.simulator.projects.migration.incidents.specialized.MoveSpawnDelayIntoDistributionParametersIncident;
+import org.vadere.state.util.StateJsonConverter;
+
+import static org.vadere.simulator.entrypoints.Version.*;
 
 public class IncidentDatabase {
 
-	private Map<Integer, List<Incident>> versionIncidents = new LinkedHashMap<>();
+	private Map<Version, List<Incident>> incidents = new LinkedHashMap<>();
 
 	private IncidentDatabase() {
 
-		// - - - - - - - - - - - - 0 ("not a release") to 1 ("0.1") - - - - - - - - - - - -
+		/*
+		A list of incidents always marks the possible incidents from one version to another.
+		The key in the Map represents the departure-version. An incident that's added to the
+		Version.NOT_A_RELEASE list for instance, get's checked for applicability when making
+		the migration <from> Version.NOT_A_RELEASE <to> Version.V0_1
+		 */
 
-		List<Incident> version0to1 = new ArrayList<>();
-		versionIncidents.put(0, version0to1);
+		// - - - - - - - - - - - - "not a release" to "0.1" - - - - - - - - - - - -
 
-		version0to1.add(new RelocationIncident(
+		incidents.put(Version.NOT_A_RELEASE, new LinkedList<>());
+
+		addIncident(NOT_A_RELEASE, new RelocationIncident(
 				"finishTime",
 				path("vadere", "topography", "attributes"),
 				path("vadere", "attributesSimulation")));
 
-		version0to1.add(new RelocationIncident(
+		addIncident(NOT_A_RELEASE, new RelocationIncident(
 				"attributesPedestrian",
 				path("vadere"),
 				path("vadere", "topography")));
 
-		version0to1.add(new DeletionIncident(
+		addIncident(NOT_A_RELEASE, new DeletionIncident(
 				path("vadere", "topography", "pedestrians")));
 
-		version0to1.add(new RenameInArrayIncident(
+		addIncident(NOT_A_RELEASE, new RenameInArrayIncident(
 				path("vadere", "topography", "dynamicElements"),
 				"nextTargetListPosition",
 				"nextTargetListIndex"));
 
-		LookupTables.version0to1_ModelRenaming.forEach((oldName, newName) -> version0to1.add(new RenameIncident(
-				path("vadere", "attributesModel", oldName),
-				newName)));
+		for (String oldName : LookupTables.version0to1_ModelRenaming.keySet()) {
+			String newName = LookupTables.version0to1_ModelRenaming.get(oldName);
+			addIncident(NOT_A_RELEASE, new RenameIncident(
+					path("vadere", "attributesModel", oldName), newName));
+		}
 
-		version0to1.add(new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
+		addIncident(NOT_A_RELEASE, new MissingMainModelIncident( // must come AFTER the model renaming that was done in the loop before
 				path("vadere"),
-				JsonConverter.MAIN_MODEL_KEY,
+				StateJsonConverter.MAIN_MODEL_KEY,
 				path("vadere", "attributesModel")));
 
-		version0to1.add(new AddTextNodeIncident(
+		addIncident(NOT_A_RELEASE, new AddTextNodeIncident(
 				path(),
 				"description", ""));
 
-		version0to1.add(new AttributesPotentialCompactVSosmIncident());
+		addIncident(NOT_A_RELEASE, new AttributesPotentialCompactVSosmIncident()); // requested by Bene
+		addIncident(NOT_A_RELEASE, new MoveSpawnDelayIntoDistributionParametersIncident()); // requested by Jakob
 
-		// - - - - - - - - - - - - 1 ("0.1") to 2 (?) - - - - - - - - - - - -
-		// List<Incident> version1to2 = new ArrayList<>();
-		// versionIncidents.put(1, version1to2);
-		// ...
+		addIncident(NOT_A_RELEASE, new DeletionIncident(path("topographyhash")));
+		addIncident(NOT_A_RELEASE, new DeletionIncident(path("attributeshash")));
+
+		addIncident(NOT_A_RELEASE, new RenameIncident(path("vadere"), StateJsonConverter.SCENARIO_KEY));
+
+		// - - - - - - - - - - - - "0.1" to "0.2" - - - - - - - - - - - -
+
+		incidents.put(V0_1, new LinkedList<>());
+		//addIncident(V0_1, ...
+
+		// - - - - - - - - - - - - "0.?" to "?" - - - - - - - - - - - -
+
+		//incidents.put(V0_?, new LinkedList<>());
+		//addIncident(V0_, ...
 	}
 
-	public List<Incident> getPossibleIncidentsFor(int version) {
-		return versionIncidents.get(version);
+	private void addIncident(Version version, Incident incident) {
+		incidents.get(version).add(incident);
+	}
+
+	public List<Incident> getPossibleIncidentsFor(Version version) {
+		if (incidents.containsKey(version)) {
+			return incidents.get(version);
+		}
+		return new ArrayList<>();
 	}
 
 	public static List<String> path(String... entries) {

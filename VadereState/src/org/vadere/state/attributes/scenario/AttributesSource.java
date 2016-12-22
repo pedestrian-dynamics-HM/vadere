@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,21 +12,24 @@ import org.vadere.util.geometry.shapes.VShape;
 public class AttributesSource extends Attributes {
 
 	public static final String CONSTANT_DISTRIBUTION = ConstantDistribution.class.getName();
+	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
 
-	private int id;
+	private int id = ID_NOT_SET;
 
 	/** Shape and position. */
 	private VShape shape = null;
-	@Deprecated
-	private double spawnDelay = -1; // see getSpawnDelay()
 	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;
-	private List<Double> distributionParameters = Arrays.asList(new Double[] {1.0});
+	private List<Double> distributionParameters = Collections.singletonList(1.0);
 
 	private int spawnNumber = 1;
+
+	/** Maximum number of spawned elements. {@link #NO_MAX_SPAWN_NUMBER_TOTAL} -> no maximum number. */
+	private int maxSpawnNumberTotal = NO_MAX_SPAWN_NUMBER_TOTAL;
 
 	private double startTime = 0;
 	/** endTime == startTime means one single spawn event. */
 	private double endTime = 0;
+	
 	/**
 	 * The pedestrians are spawned at random positions rather than from the top
 	 * left corner downwards.
@@ -45,11 +48,6 @@ public class AttributesSource extends Attributes {
 	 */
 	private DynamicElementType dynamicElementType = DynamicElementType.PEDESTRIAN;
 
-	/**
-	 * This (private) default constructor is used by Gson. Without it, the initial field assignments
-	 * above have no effect. In other words, no default values for fields are possible without a
-	 * default constructor.
-	 */
 	@SuppressWarnings("unused")
 	private AttributesSource() {}
 
@@ -63,22 +61,6 @@ public class AttributesSource extends Attributes {
 	}
 
 	// Getters...
-
-	/**
-	 * Still used for constant spawn time algorithm. This property will be deleted in favor of
-	 * <code>distributionParameters</code>.
-	 * 
-	 * @deprecated Use {@link #getDistributionParameters()} instead.
-	 */
-	@Deprecated
-	public double getSpawnDelay() {
-		// use spawn delay from distribution parameter list if possible
-		if (interSpawnTimeDistribution.equals(CONSTANT_DISTRIBUTION)
-				&& spawnDelay == -1) {
-			return distributionParameters.get(0);
-		}
-		return spawnDelay;
-	}
 
 	/**
 	 * Class name of distribution for inter-spawn times. The name must point to a subclass of
@@ -112,6 +94,19 @@ public class AttributesSource extends Attributes {
 		return endTime;
 	}
 
+	/**
+	 * Maximum number of spawned elements. The number
+	 * {@link #NO_MAX_SPAWN_NUMBER_TOTAL} means there is no maximum.
+	 * 
+	 * This attribute can be used together with non-constant distributions. For
+	 * example, consider an exponential distribution. The times of events are
+	 * random. How to ensure, that exactly 10 elements are spawned? Solution:
+	 * Set the {@link endTime} to 1e9 and this attribute to 10.
+	 */
+	public int getMaxSpawnNumberTotal() {
+		return maxSpawnNumberTotal;
+	}
+
 	public boolean isSpawnAtRandomPositions() {
 		return spawnAtRandomPositions;
 	}
@@ -128,6 +123,10 @@ public class AttributesSource extends Attributes {
 		return id;
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}
@@ -136,78 +135,34 @@ public class AttributesSource extends Attributes {
 		return dynamicElementType;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((distributionParameters == null) ? 0 : distributionParameters.hashCode());
-		result = prime * result
-				+ ((dynamicElementType == null) ? 0 : dynamicElementType.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(endTime);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + id;
-		result = prime * result + ((interSpawnTimeDistribution == null) ? 0
-				: interSpawnTimeDistribution.hashCode());
-		result = prime * result + ((shape == null) ? 0 : shape.hashCode());
-		result = prime * result + (spawnAtRandomPositions ? 1231 : 1237);
-		temp = Double.doubleToLongBits(spawnDelay);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + spawnNumber;
-		temp = Double.doubleToLongBits(startTime);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((targetIds == null) ? 0 : targetIds.hashCode());
-		result = prime * result + (useFreeSpaceOnly ? 1231 : 1237);
-		return result;
+	public void setStartTime(double time) {
+		checkSealed();
+		startTime = time;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AttributesSource other = (AttributesSource) obj;
-		if (distributionParameters == null) {
-			if (other.distributionParameters != null)
-				return false;
-		} else if (!distributionParameters.equals(other.distributionParameters))
-			return false;
-		if (dynamicElementType != other.dynamicElementType)
-			return false;
-		if (Double.doubleToLongBits(endTime) != Double.doubleToLongBits(other.endTime))
-			return false;
-		if (id != other.id)
-			return false;
-		if (interSpawnTimeDistribution == null) {
-			if (other.interSpawnTimeDistribution != null)
-				return false;
-		} else if (!interSpawnTimeDistribution.equals(other.interSpawnTimeDistribution))
-			return false;
-		if (shape == null) {
-			if (other.shape != null)
-				return false;
-		} else if (!shape.equals(other.shape))
-			return false;
-		if (spawnAtRandomPositions != other.spawnAtRandomPositions)
-			return false;
-		if (Double.doubleToLongBits(spawnDelay) != Double.doubleToLongBits(other.spawnDelay))
-			return false;
-		if (spawnNumber != other.spawnNumber)
-			return false;
-		if (Double.doubleToLongBits(startTime) != Double.doubleToLongBits(other.startTime))
-			return false;
-		if (targetIds == null) {
-			if (other.targetIds != null)
-				return false;
-		} else if (!targetIds.equals(other.targetIds))
-			return false;
-		if (useFreeSpaceOnly != other.useFreeSpaceOnly)
-			return false;
-		return true;
+	public void setEndTime(double time) {
+		checkSealed();
+		endTime = time;
+	}
+
+	public void setDistributionParameters(List<Double> distributionParameters) {
+		checkSealed();
+		this.distributionParameters = distributionParameters;
+	}
+
+	public void setInterSpawnTimeDistribution(String interSpawnTimeDistribution) {
+		checkSealed();
+		this.interSpawnTimeDistribution = interSpawnTimeDistribution;
+	}
+
+	public void setMaxSpawnNumberTotal(int maxSpawnNumberTotal) {
+		checkSealed();
+		this.maxSpawnNumberTotal = maxSpawnNumberTotal;
+	}
+
+	public void setSpawnAtRandomPositions(boolean spawnAtRandomPositions) {
+		checkSealed();
+		this.spawnAtRandomPositions = spawnAtRandomPositions;
 	}
 
 }

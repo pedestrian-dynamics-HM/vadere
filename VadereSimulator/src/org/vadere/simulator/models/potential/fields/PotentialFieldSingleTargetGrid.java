@@ -50,7 +50,7 @@ public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget
 	}
 
 	@Override
-	public Vector2D getTargetPotentialGradient(List<Integer> targetIds, VPoint pos, Agent ped) {
+	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
 		throw new UnsupportedOperationException("method not jet implemented.");
 	}
 

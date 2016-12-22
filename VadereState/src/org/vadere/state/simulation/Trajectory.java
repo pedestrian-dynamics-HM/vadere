@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.math3.optim.OptimizationData;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -58,6 +59,12 @@ public class Trajectory {
 		if (trajectoryPoints == null || trajectoryPoints.isEmpty()) {
 			throw new IllegalArgumentException("empty trajectory map is not allowed");
 		}
+	}
+
+	public Optional<Integer> getLifeTime() {
+		return getEndStep().isPresent() && getStartStep().isPresent() ?
+				Optional.of(getEndStep().get().getStepNumber() - getStartStep().get().getStepNumber()) :
+				Optional.empty();
 	}
 
 	/**

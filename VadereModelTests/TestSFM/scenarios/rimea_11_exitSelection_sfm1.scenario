@@ -1,11 +1,9 @@
 {
   "name" : "rimea_11_exitSelection_sfm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "388a836ae85a814e6f84d34f6d2509d6d319a1aa",
-  "attributeshash" : "81201a51b45e47523928197eecd5eea1f0f7ce8b",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
@@ -169,7 +167,6 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1000,

@@ -4,31 +4,26 @@ import java.util.*;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 public class Pedestrian extends Agent {
 
 	/** Target ID if the pedestrian represents a target, -1 otherwise. */
-	private int idAsTarget;
+	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
 
-	private boolean isChild;
-	private boolean isLikelyInjured;
+	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
+	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
-	private LinkedList<Integer> groupIds;
+	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 
+	/** Used only for JSON serialization? */
+	// TODO used at all? Car does NOT have this field. remove if unused!
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN;
 
-
-	// this is for the queuing game
-	// private PedestrianAttitudeType attituteType = PedestrianAttitudeType.COMPETITIVE;
-
-	/* this constructor will be called by gson */
 	@SuppressWarnings("unused")
 	private Pedestrian() {
+		// TODO constructor may be required for Jackson?
 		this(new AttributesAgent());
 	}
 
@@ -65,11 +60,6 @@ public class Pedestrian extends Agent {
 		}
 	}
 
-	@Override
-	public Pedestrian clone() {
-		return new Pedestrian(this);
-	}
-
 	public <T extends ModelPedestrian> T getModelPedestrian(Class<? extends T> modelType) {
 		return (T) modelPedestrianMap.get(modelType);
 	}
@@ -78,14 +68,9 @@ public class Pedestrian extends Agent {
 		return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
 	}
 
-	// Setters...
-
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
-
-
-	// Getters...
 
 	public VShape getInformationShape() {
 		return null;
@@ -127,4 +112,10 @@ public class Pedestrian extends Agent {
 	public void setLikelyInjured(boolean likelyInjured) {
 		this.isLikelyInjured = likelyInjured;
 	}
+
+	@Override
+	public Pedestrian clone() {
+		return new Pedestrian(this);
+	}
+
 }

@@ -35,27 +35,31 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution.
 
-### Build the Application
+### Run the Application
 
-Run `git clone https://gitlab.lrz.de/vadere/vadere`. Go to the project directory and run `mvn clean package` (or `mvn clean package -DskipTests` if you want to skip the unit tests).
-
-### Run Application
-
-After building the application, you can start VADERE by running `java -jar VadereGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
+1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
+2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -DskipTests` if you want to skip the unit tests).
+3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/gui-0.1-SNAPSHOT-jar-with-dependencies.jar`.
 
 ## Usage Example
 
-With the following steps, you can start a scenario of the [ExampleProject](Documentation/Examples/ExampleProject):
+With the following steps, you can start a scenario of one of the model test projects in [VadereModelTests](VadereModelTests):
 
+<<<<<<< HEAD
 - start VADERE
 - *Project* > *Open*
 - choose `vadere.project` and click *open*
+=======
+- start Vadere 
+- *Project* > *Open* 
+- choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
+>>>>>>> develop
 - select the scenario on the left and press *run selected scenario*
 
 
 ## Development Setup
 
-Follow the installation instructions above. Go to the project directory and run `mvn clean install`. The project can now be imported *As Maven Project* in your IDE.
+Follow the **installation instructions** above i.e. install all required software and get the source. Go to the project directory and run `mvn clean install`. The project can now be imported *As Maven Project* in your IDE.
 
 ### Eclipse
 
@@ -72,26 +76,52 @@ Follow the installation instructions above. Go to the project directory and run 
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
 
+### Git Hooks
+
+Since it is important to reproduce simulation results, we have the guidline that each output file has to provide its commit-hash. This commit-hash identifies
+the state the software was in when the output file was generated. Therefore, git hooks save the commit-hash in the **current_commit_hash.txt** which
+will be created in the [VadereSimulator/resource](vadere/VadereSimulator/resource) directory whenever a commit is made or the developer
+switches to another commit. If the file is missing or there is no commit-hash in it, you will be warned in the log. 
+We strongly suggest that you install these git hooks on your local machine:
+
+1. Copy files [post-checkout](Documentation/version-control/post-checkout), [post-merge](Documentation/version-control/post-merge), 
+[post-applypatch](Documentation/version-control/post-applypatch) and [post-commit](Documentation/version-control/post-commit) 
+from [version-control](Documentation/version-control) to your local **.git/hooks/** directory.
+These files start the script [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software).
+2. Make sure that [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software) is executable.
+
+To create this file without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
+switch to another branch and switch back again using the command line or any other tool you prefer.
+
 ## Contribution
 
 Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
 
 ## Release History
 
+<<<<<<< HEAD
  - 0.1 - initial release of the software as open source (2016-08-05)
+=======
+- 0.1 initial release of the software as open source
+- 0.2 stability and usability improved, additional pedestrian simulation models are supported
+>>>>>>> develop
 
 
 ## Contributors
 
 People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
 
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Sch&ouml;ttl, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Benedikt Z&ouml;nnchen
+Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Sch&ouml;ttl, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Z&ouml;nnchen
 
 
 ## License
 
 This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
+<<<<<<< HEAD
 More information: http://www.gnu.org/licenses/lgpl.html
 
 
 
+=======
+For more information: http://www.gnu.org/licenses/lgpl.html
+>>>>>>> develop

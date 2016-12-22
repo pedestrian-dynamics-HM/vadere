@@ -19,8 +19,6 @@ public class AttributesSimulation extends Attributes {
 	private boolean useRandomSeed = true;
 	private long randomSeed = 1;
 
-	public AttributesSimulation() {}
-
 	// Getter...
 
 	public double getFinishTime() {

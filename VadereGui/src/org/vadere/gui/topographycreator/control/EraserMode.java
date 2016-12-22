@@ -20,7 +20,7 @@ import org.vadere.state.scenario.ScenarioElement;
  *
  */
 public class EraserMode extends DefaultSelectionMode {
-	private static Resources resources = Resources.getInstance("topologycreator");
+	private static Resources resources = Resources.getInstance("topographycreator");
 
 	private Cursor cursor;
 	private final UndoableEditSupport undoSupport;

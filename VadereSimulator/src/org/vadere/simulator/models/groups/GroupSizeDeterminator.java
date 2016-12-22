@@ -1,5 +1,5 @@
 package org.vadere.simulator.models.groups;
 
 public interface GroupSizeDeterminator {
-	public int getGroupSize();
+	public int nextGroupSize();
 }

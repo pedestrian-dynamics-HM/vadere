@@ -12,7 +12,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Stairs implements ScenarioElement {
+public class Stairs extends ScenarioElement {
 
 	public static class Tread {
 		public final VLine treadline;
@@ -64,12 +64,9 @@ public class Stairs implements ScenarioElement {
 		return treadsResult;
 	}
 
-	/**
-	 * Returns this {@link Stairs} object, which is immutable.
-	 */
 	@Override
-	public Stairs clone() {
-		return this;
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
 	}
 
 	@Override
@@ -129,4 +126,10 @@ public class Stairs implements ScenarioElement {
 	public AttributesStairs getAttributes() {
 		return attributes;
 	}
+
+	@Override
+	public Stairs clone() {
+		return new Stairs((AttributesStairs) attributes.clone());
+	}
+
 }

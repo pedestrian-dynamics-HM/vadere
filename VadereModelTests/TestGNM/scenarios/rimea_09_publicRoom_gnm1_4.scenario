@@ -1,11 +1,9 @@
 {
   "name" : "rimea_09_publicRoom_gnm1_4",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "08966b2db7102aef1cd3d85fe56e9f99a9e14b8e",
-  "attributeshash" : "bb06d945206a783e7148ed12df152fa5acc16d2d",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -181,7 +179,6 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1000,

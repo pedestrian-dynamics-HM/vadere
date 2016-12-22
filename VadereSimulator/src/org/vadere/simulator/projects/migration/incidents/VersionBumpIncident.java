@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.migration.incidents;
 
-import org.vadere.simulator.projects.migration.Graph;
-import org.vadere.simulator.projects.migration.MigrationAssistant;
+import org.vadere.simulator.projects.migration.Tree;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,23 +10,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class VersionBumpIncident extends Incident {
 
 	private JsonNode node;
-	private String currentVersion;
+	private Version currentVersion;
 
-	public VersionBumpIncident(JsonNode node, String currentVersion) {
+	public VersionBumpIncident(JsonNode node, Version currentVersion) {
 		this.node = node;
 		this.currentVersion = currentVersion;
 	}
 
 	@Override
-	public boolean applies(Graph graph) {
+	public boolean applies(Tree graph) {
 		return true;
 	}
 
 	@Override
-	public void resolve(Graph graph, StringBuilder log) throws MigrationException {
-		log.append("\t- change [release] version from \"" + currentVersion + "\" to \""
-				+ MigrationAssistant.latestVersion + "\"\n");
-		((ObjectNode) node).put("release", MigrationAssistant.latestVersion);
+	public void resolve(Tree graph, StringBuilder log) throws MigrationException {
+		log.append("\t- change [release] version from \"" + currentVersion.label() + "\" to \""
+				+ Version.latest().label() + "\"\n");
+		((ObjectNode) node).put("release", Version.latest().label());
 	}
 
 }

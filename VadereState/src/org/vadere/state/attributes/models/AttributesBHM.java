@@ -1,7 +1,6 @@
 package org.vadere.state.attributes.models;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.vadere.state.attributes.Attributes;
 
@@ -24,10 +23,10 @@ public class AttributesBHM extends Attributes {
 	private boolean followerProximityNavigation = true;
 
 	private boolean differentBehaviour = false;
-	private LinkedList<Double> differentEvasionBehaviourPercentage = new LinkedList<Double>();
+	private LinkedList<Double> differentEvasionBehaviourPercentage = new LinkedList<>();
 	private boolean varyingBehaviour = false;
 	private boolean adaptiveBehaviourDensity = false;
-	private LinkedList<Integer> adaptiveBehaviourStepsRemained = new LinkedList<Integer>();
+	private LinkedList<Integer> adaptiveBehaviourStepsRemained = new LinkedList<>();
 	private boolean switchBehaviour = false;
 
 	private double evasionDetourThreshold = 0.1;
@@ -48,8 +47,6 @@ public class AttributesBHM extends Attributes {
 
 	private double spaceToKeep = 0.01;
 	private boolean stepAwayFromCollisions = false;
-
-	public AttributesBHM() {}
 
 	public double getStepLengthIntercept() {
 		return stepLengthIntercept;

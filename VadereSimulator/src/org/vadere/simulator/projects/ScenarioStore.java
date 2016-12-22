@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.VadereClassNotFoundException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Contains the data for a Vadere object that can be serialized.
@@ -52,32 +56,15 @@ public class ScenarioStore {
 			// Do not return null or Optional, that does not make sense!
 		}
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		ScenarioStore that = (ScenarioStore) o;
-
-		if (attributesList != null ? !attributesList.equals(that.attributesList) : that.attributesList != null)
-			return false;
-		if (attributesSimulation != null ? !attributesSimulation.equals(that.attributesSimulation)
-				: that.attributesSimulation != null)
-			return false;
-		if (topography != null ? !topography.equals(that.topography) : that.topography != null)
-			return false;
-
-		return true;
+	
+	public String hashOfJsonRepresentation() throws JsonProcessingException {
+		return DigestUtils.sha1Hex(StateJsonConverter.serializeObject(this));
+	}
+	
+	public void sealAllAttributes() {
+		attributesList.forEach(a -> a.seal());
+		attributesSimulation.seal();
+		topography.sealAllAttributes();
 	}
 
-	@Override
-	public int hashCode() {
-		int result = attributesList != null ? attributesList.hashCode() : 0;
-		result = 31 * result + (attributesSimulation != null ? attributesSimulation.hashCode() : 0);
-		result = 31 * result + (topography != null ? topography.hashCode() : 0);
-		return result;
-	}
 }

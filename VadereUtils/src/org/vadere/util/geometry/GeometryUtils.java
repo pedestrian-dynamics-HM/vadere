@@ -108,7 +108,7 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Computes the cross product of two vectors and stores it in the cross
+	 * Computes the cross product of two vectors and store it in the cross
 	 * vector.
 	 * 
 	 * @param v1

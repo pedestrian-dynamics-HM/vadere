@@ -16,6 +16,7 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 	private boolean showFaydedPedestrians = false;
 	private boolean showPedestrianIds = false;
 	private boolean loadTopographyInformationsOnly = false;
+	private boolean useEvacuationTimeColor = false;
 	private double gridWidth = Double.valueOf(resources.getProperty("PostVis.cellWidth"));
 	private int fps = Integer.valueOf(resources.getProperty("PostVis.framesPerSecond"));
 
@@ -47,6 +48,7 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 		this.loadTopographyInformationsOnly = config.loadTopographyInformationsOnly;
 		this.showPedestrianIds = config.showPedestrianIds;
 		this.observable = config.observable;
+		this.useEvacuationTimeColor = config.useEvacuationTimeColor;
 	}
 
 	public boolean isShowAllTrajectories() {
@@ -55,6 +57,15 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 
 	public void setShowAllTrajectories(boolean showAllTrajectories) {
 		this.showAllTrajectories = showAllTrajectories;
+		setChanged();
+	}
+
+	public boolean isUseEvacuationTimeColor() {
+		return useEvacuationTimeColor;
+	}
+
+	public void setUseEvacuationTimeColor(boolean useEvacuationTimeColor) {
+		this.useEvacuationTimeColor = useEvacuationTimeColor;
 		setChanged();
 	}
 

@@ -19,6 +19,10 @@ public class AttributesObstacle extends Attributes {
 		this.shape = shape;
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}
@@ -27,27 +31,4 @@ public class AttributesObstacle extends Attributes {
 		return id;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		AttributesObstacle that = (AttributesObstacle) o;
-
-		if (id != that.id)
-			return false;
-		if (shape != null ? !shape.equals(that.shape) : that.shape != null)
-			return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = shape != null ? shape.hashCode() : 0;
-		result = 31 * result + id;
-		return result;
-	}
 }

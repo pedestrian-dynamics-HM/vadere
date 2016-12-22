@@ -1,23 +1,9 @@
 package org.vadere.simulator.models.osm;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.vadere.simulator.control.ActiveCallback;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
+import org.vadere.simulator.models.SubModelBuilder;
 import org.vadere.simulator.models.groups.CentroidGroupModel;
 import org.vadere.simulator.models.groups.CentroidGroupPotential;
 import org.vadere.simulator.models.groups.CentroidGroupSpeedAdjuster;
@@ -30,33 +16,35 @@ import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerNelderMea
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
 import org.vadere.simulator.models.osm.updateScheme.ParallelWorkerOSM;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
+import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
-import org.vadere.util.data.Table;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.ListUtils;
-import org.vadere.util.reflection.DynamicClassInstantiator;
 
-public class OptimalStepsModel implements MainModel {
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-	/**
-	 * A Container for all the output this Callback generate. The output will be used
-	 * by the processors.
-	 */
-	private Map<String, Table> outputTables;
+public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	/**
 	 * Compares the time of the next possible move.
@@ -88,46 +76,10 @@ public class OptimalStepsModel implements MainModel {
 	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 
 	private ExecutorService executorService;
-	private List<ActiveCallback> activeCallbacks = new LinkedList<>();
-
-	@Deprecated
-	public OptimalStepsModel(final Topography topography, final AttributesOSM attributes,
-			final AttributesAgent attributesPedestrian,
-			final PotentialFieldTarget potentialFieldTarget,
-			final PotentialFieldObstacle potentialFieldObstacle,
-			final PotentialFieldAgent potentialFieldPedestrian,
-			final List<SpeedAdjuster> speedAdjusters,
-			final StepCircleOptimizer stepCircleOptimizer, Random random) {
-		this.attributesOSM = attributes;
-		this.attributesPedestrian = attributesPedestrian;
-		this.topography = topography;
-		this.random = random;
-		this.potentialFieldTarget = potentialFieldTarget;
-		this.potentialFieldObstacle = potentialFieldObstacle;
-		this.potentialFieldPedestrian = potentialFieldPedestrian;
-		this.stepCircleOptimizer = stepCircleOptimizer;
-		this.pedestrianIdCounter = 0;
-		this.speedAdjusters = speedAdjusters;
-		this.outputTables = new HashMap<>();
-
-		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN) {
-			this.pedestrianEventsQueue = new PriorityQueue<>(100,
-					new ComparatorPedestrianOSM());
-		} else {
-			// not needed and should not be used in this case
-			this.pedestrianEventsQueue = null;
-		}
-
-		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
-			this.executorService = Executors.newFixedThreadPool(8);
-		} else {
-			this.executorService = null;
-		}
-	}
+	private List<Model> models = new LinkedList<>();
 
 	public OptimalStepsModel() {
 		this.pedestrianIdCounter = 0;
-		this.outputTables = new HashMap<>();
 		this.speedAdjusters = new LinkedList<>();
 	}
 
@@ -140,20 +92,16 @@ public class OptimalStepsModel implements MainModel {
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 
-		for (String submodelName : attributesOSM.getSubmodels()) {
-			final DynamicClassInstantiator<Model> modelInstantiator = new DynamicClassInstantiator<>();
-			final Model submodel = modelInstantiator.createObject(submodelName);
-			submodel.initialize(modelAttributesList, topography, attributesPedestrian, random);
-			if (submodel instanceof ActiveCallback) {
-				activeCallbacks.add((ActiveCallback) submodel);
-			}
-		}
+		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
+				attributesPedestrian, random);
+		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
+		subModelBuilder.addBuildedSubModelsToList(models);
 
 		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
-		activeCallbacks.add(iPotentialTargetGrid);
+		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributesOSM.getObstaclePotentialModel());
@@ -161,7 +109,7 @@ public class OptimalStepsModel implements MainModel {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributesOSM.getPedestrianPotentialModel());
 		
-		Optional<CentroidGroupModel> opCentroidGroupModel = activeCallbacks.stream().
+		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 			filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel)ac).findAny();
 		
 		if (opCentroidGroupModel.isPresent()) {
@@ -198,7 +146,7 @@ public class OptimalStepsModel implements MainModel {
 			this.executorService = null;
 		}
 
-		activeCallbacks.add(this);
+		models.add(this);
 	}
 
 	private StepCircleOptimizer createStepCircleOptimizer(
@@ -287,35 +235,6 @@ public class OptimalStepsModel implements MainModel {
 		}
 	}
 
-	@Override
-	public Map<String, Table> getOutputTables() {
-		outputTables.clear();
-
-		List<PedestrianOSM> pedestrians = ListUtils.select(
-				topography.getElements(Pedestrian.class), PedestrianOSM.class);
-		for (PedestrianOSM pedestrian : pedestrians) {
-
-			List<Double>[] pedStrides = pedestrian.getStrides();
-			if (pedStrides.length > 0 && !pedStrides[0].isEmpty()) {
-
-				Table strides = new Table("strideLength", "strideTime");
-
-				for (int i = 0; i < pedStrides[0].size(); i++) {
-					strides.addRow();
-					strides.addColumnEntry("strideLength", pedStrides[0].get(i));
-					strides.addColumnEntry("strideTime", pedStrides[1].get(i));
-				}
-
-				outputTables.put(String.valueOf(pedestrian.getId()), strides);
-			}
-
-			pedestrian.clearStrides();
-
-		}
-
-		return outputTables;
-	}
-
 	private void parallelCall(double timeStepInSec) {
 		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
 		List<Future<?>> futures;
@@ -373,8 +292,22 @@ public class OptimalStepsModel implements MainModel {
 	}
 
 	@Override
-	public List<ActiveCallback> getActiveCallbacks() {
-		return activeCallbacks;
+	public List<Model> getSubmodels() {
+		return models;
 	}
 
+	@Override
+	public PotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
+	}
+
+	@Override
+	public PotentialFieldObstacle getPotentialFieldObstacle() {
+		return potentialFieldObstacle;
+	}
+
+	@Override
+	public PotentialFieldAgent getPotentialFieldAgent() {
+		return potentialFieldPedestrian;
+	}
 }

@@ -4,7 +4,7 @@ import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Source implements ScenarioElement {
+public class Source extends ScenarioElement {
 
 	private final AttributesSource attributes;
 
@@ -12,13 +12,9 @@ public class Source implements ScenarioElement {
 		this.attributes = attributes;
 	}
 
-	/**
-	 * Creates a new source with the same attribute as this one, but no
-	 * pedestrianAddListeners.
-	 */
 	@Override
-	public Source clone() {
-		return new Source(attributes);
+	public void setShape(VShape newShape) {
+		attributes.setShape(newShape);
 	}
 
 	@Override
@@ -74,5 +70,10 @@ public class Source implements ScenarioElement {
 	@Override
 	public ScenarioElementType getType() {
 		return ScenarioElementType.SOURCE;
+	}
+
+	@Override
+	public Source clone() {
+		return new Source((AttributesSource) attributes.clone());
 	}
 }

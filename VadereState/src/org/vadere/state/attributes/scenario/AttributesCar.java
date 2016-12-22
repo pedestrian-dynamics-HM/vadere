@@ -17,7 +17,7 @@ public class AttributesCar extends AttributesAgent {
 	}
 
 	public AttributesCar() {
-		super(-1);
+		this(-1);
 	}
 
 	public AttributesCar(final int id) {
@@ -39,9 +39,11 @@ public class AttributesCar extends AttributesAgent {
 	}
 
 	public void setDirection(Vector2D direction) {
+		checkSealed();
 		this.direction = direction;
 	}
 
+	@Override
 	public double getRadius() {
 		if (width >= length) {
 			return width;

@@ -15,19 +15,19 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 public abstract class TopographyAction extends AbstractAction {
 
 	private static final long serialVersionUID = 7643236418545161283L;
-	private final IDrawPanelModel panelModel;
+	private final IDrawPanelModel<?> panelModel;
 
-	public TopographyAction(final String name, final ImageIcon icon, final IDrawPanelModel panelModel) {
+	public TopographyAction(final String name, final ImageIcon icon, final IDrawPanelModel<?> panelModel) {
 		super(name, icon);
 		this.panelModel = panelModel;
 	}
 
-	public TopographyAction(final String name, final IDrawPanelModel panelModel) {
+	public TopographyAction(final String name, final IDrawPanelModel<?> panelModel) {
 		super(name);
 		this.panelModel = panelModel;
 	}
 
-	protected IDrawPanelModel getScenarioPanelModel() {
+	protected IDrawPanelModel<?> getScenarioPanelModel() {
 		return panelModel;
 	}
 }

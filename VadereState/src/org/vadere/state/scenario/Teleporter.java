@@ -6,7 +6,7 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Teleporter implements ScenarioElement {
+public class Teleporter extends ScenarioElement {
 
 	private final AttributesTeleporter attributes;
 
@@ -23,11 +23,6 @@ public class Teleporter implements ScenarioElement {
 	}
 
 	@Override
-	public Teleporter clone() {
-		return new Teleporter(this.attributes);
-	}
-
-	@Override
 	public VShape getShape() {
 		throw new UnsupportedOperationException("A teleporter does not have a shape.");
 	}
@@ -37,8 +32,9 @@ public class Teleporter implements ScenarioElement {
 		return -1;
 	}
 
+	@Override
 	public AttributesTeleporter getAttributes() {
-		return this.attributes;
+		return attributes;
 	}
 
 	@Override
@@ -65,4 +61,10 @@ public class Teleporter implements ScenarioElement {
 	public int hashCode() {
 		return attributes != null ? attributes.hashCode() : 0;
 	}
+
+	@Override
+	public Teleporter clone() {
+		return new Teleporter((AttributesTeleporter) attributes.clone());
+	}
+
 }

@@ -1,11 +1,9 @@
 {
   "name" : "rimea_14_selectRoute_gnm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "0224bf025ee81cc3f07971eb9f8844f410bfacb5",
-  "attributeshash" : "c4f55f409b66ca4500558885fd514d6ba69f5738",
+  "release" : "0.2",
   "processWriters" : [ ],
-  "vadere" : {
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
@@ -179,7 +177,6 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 100,

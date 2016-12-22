@@ -1,30 +1,13 @@
 {
   "name" : "rimea_07_speeds_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "da1d61825abf9afd88a1bd13f7137be19cea4224",
-  "attributeshash" : "2f31693abf443bf496e60112238da23628635dd4",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 140.0,
-        "maxEvacuationTimeMean" : 140.0,
-        "minEvacuationTime" : 48.0,
-        "minEvacuationTimeMean" : 48.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  } ],
-  "vadere" : {
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -125,10 +108,10 @@
           "height" : 50.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 20.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 20.0 ],
         "spawnNumber" : 10,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 100.0,
         "spawnAtRandomPositions" : true,

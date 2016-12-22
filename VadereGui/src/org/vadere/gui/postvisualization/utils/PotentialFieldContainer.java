@@ -112,14 +112,14 @@ public class PotentialFieldContainer {
 		while ((line = reader.readLine()) != null) {
 			y++;
 			String[] splitLine = line.split(seperator);
-			if (resolution == null) {
-				resolution = width / (splitLine.length - 2);
-			}
-
 			// first line is the headline
 			if (!firstLine) {
+				if (resolution == null) {
+					resolution = width / (splitLine.length - 2);
+				}
+
 				readStep = Integer.parseInt(splitLine[0]);
-				double time = Double.parseDouble(splitLine[1]);
+				int row = Integer.parseInt(splitLine[1]);
 
 				if (readStep - 1 == requestedStep) {
 					return grid;

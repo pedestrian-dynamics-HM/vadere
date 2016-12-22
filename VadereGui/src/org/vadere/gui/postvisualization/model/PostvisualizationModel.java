@@ -14,13 +14,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
-import org.vadere.simulator.projects.ScenarioRunManager;
-import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
@@ -28,10 +26,12 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
-import org.vadere.util.io.IOUtils;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
 import org.vadere.util.potential.CellGrid;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class PostvisualizationModel extends SimulationModel<PostvisualizationConfig> {
 
@@ -41,7 +41,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private int topographyId;
 
-	private ScenarioRunManager vadere;
+	private Scenario vadere;
 
 	private PotentialFieldContainer potentialContainer;
 
@@ -57,13 +57,15 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private List<Step> steps;
 
+	private String outputPath;
+
 	// public Configuration config;
 
 	public PostvisualizationModel() {
 		super(new PostvisualizationConfig());
 		this.trajectories = new HashMap<>();
 		this.agentsByStep = new HashMap<>();
-		this.vadere = new ScenarioRunManager("");
+		this.vadere = new Scenario("");
 		this.topographyId = 0;
 		this.colorEvalFunctions = new HashMap<>();
 		this.potentialContainer = null;
@@ -96,9 +98,9 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				});
 	}
 
-	public void init(final Map<Step, List<Agent>> agentsByStep, final ScenarioRunManager vadere) {
+	public void init(final Map<Step, List<Agent>> agentsByStep, final Scenario vadere, final String projectPath) {
 		logger.info("start init postvis model");
-		this.vadere = vadere;
+		init(vadere, projectPath);
 		this.agentsByStep = agentsByStep;
 		Map<Integer, Step> map = agentsByStep
 				.keySet().stream()
@@ -134,12 +136,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		logger.info("finished init postvis model");
 	}
 
-	public void init(final ScenarioRunManager vadere) {
+	public void init(final Scenario vadere, final String projectPath) {
 		this.vadere = vadere;
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();
 		this.trajectories = new HashMap<>();
 		this.selectedElement = null;
+		this.outputPath = projectPath;
 	}
 
 	public Optional<Step> getLastStep() {
@@ -156,6 +159,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	public Scenario getScenarioRunManager() {
+		return vadere;
 	}
 
 	@Override
@@ -219,7 +226,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	public Optional<Color> getColor(final Agent agent) {
-		JsonNode jsonObj = JsonConverter.toJsonNode(agent);
+		JsonNode jsonObj = StateJsonConverter.toJsonNode(agent);
 		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet().stream().filter(
 				entry -> {
 					try {
@@ -322,8 +329,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return agentsByStep.size() == 0;
 	}
 
+	@Override
 	public int getTopographyId() {
 		return topographyId;
+	}
+
+	public String getOutputPath() {
+		return outputPath;
 	}
 
 	private void clear() {

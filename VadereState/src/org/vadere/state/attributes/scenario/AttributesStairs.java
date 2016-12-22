@@ -19,13 +19,11 @@ import org.vadere.util.geometry.shapes.VShape;
 public class AttributesStairs extends Attributes {
 
 	private VShape shape = null;
-	private int id = -1;
+	private int id = ID_NOT_SET;
 	private int treadCount = 1;
 	private Vector2D upwardDirection = new Vector2D(1.0, 0.0);
 
-	public AttributesStairs() {
-		// needs to be present for GSON
-	}
+	public AttributesStairs() { }
 
 	public AttributesStairs(int id) {
 		this.id = id;
@@ -44,6 +42,10 @@ public class AttributesStairs extends Attributes {
 		}
 	}
 
+	public void setShape(VShape shape) {
+		this.shape = shape;
+	}
+
 	public VShape getShape() {
 		return shape;
 	}
@@ -58,44 +60,6 @@ public class AttributesStairs extends Attributes {
 
 	public Vector2D getUpwardDirection() {
 		return upwardDirection;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		result = prime * result + ((shape == null) ? 0 : shape.hashCode());
-		result = prime * result + treadCount;
-		result = prime * result
-				+ ((upwardDirection == null) ? 0 : upwardDirection.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof AttributesStairs))
-			return false;
-		AttributesStairs other = (AttributesStairs) obj;
-		if (id != other.id)
-			return false;
-		if (shape == null) {
-			if (other.shape != null)
-				return false;
-		} else if (!shape.equals(other.shape))
-			return false;
-		if (treadCount != other.treadCount)
-			return false;
-		if (upwardDirection == null) {
-			if (other.upwardDirection != null)
-				return false;
-		} else if (!upwardDirection.equals(other.upwardDirection))
-			return false;
-		return true;
 	}
 
 }

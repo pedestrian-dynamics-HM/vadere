@@ -8,9 +8,6 @@ package org.vadere.state.attributes.scenario;
  * 
  * 
  */
-// @JsonPropertyOrder({"radius", "densityDependentSpeed", "speedDistributionMean",
-// "speedDistributionStandardDeviation", "minimumSpeed", "maximumSpeed", "acceleration", "id"}) //
-// in order to have id from superclass last, to match the GSON-order
 public class AttributesAgent extends AttributesDynamicElement {
 
 	private double radius = 0.195;
@@ -22,7 +19,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	private double acceleration = 2.0;
 
 	public AttributesAgent() {
-		super(-1);
+		this(-1);
 	}
 
 	public AttributesAgent(final int id) {
@@ -73,52 +70,4 @@ public class AttributesAgent extends AttributesDynamicElement {
 		return acceleration;
 	}
 
-
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		AttributesAgent that = (AttributesAgent) o;
-
-		if (Double.compare(that.acceleration, acceleration) != 0)
-			return false;
-		if (densityDependentSpeed != that.densityDependentSpeed)
-			return false;
-		if (Double.compare(that.maximumSpeed, maximumSpeed) != 0)
-			return false;
-		if (Double.compare(that.minimumSpeed, minimumSpeed) != 0)
-			return false;
-		if (Double.compare(that.radius, radius) != 0)
-			return false;
-		if (Double.compare(that.speedDistributionMean, speedDistributionMean) != 0)
-			return false;
-		if (Double.compare(that.speedDistributionStandardDeviation, speedDistributionStandardDeviation) != 0)
-			return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result;
-		long temp;
-		temp = Double.doubleToLongBits(radius);
-		result = (int) (temp ^ (temp >>> 32));
-		result = 31 * result + (densityDependentSpeed ? 1 : 0);
-		temp = Double.doubleToLongBits(speedDistributionMean);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(speedDistributionStandardDeviation);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(minimumSpeed);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(maximumSpeed);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(acceleration);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
 }

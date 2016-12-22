@@ -1,90 +1,13 @@
 {
   "name" : "basic_1_chicken_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "cde764736cfb41b5cd5e4ff40e0adfca0fee6370",
-  "attributeshash" : "75778572f188cffcdedc74a7a9b60ddbe42359fc",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "waitingTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "pedestrianWaitingTimeProcessor" : {
-        "attributes" : {
-          "waitingArea" : {
-            "x" : 10.0,
-            "y" : 32.0,
-            "width" : 15.0,
-            "height" : 8.0
-          }
-        },
-        "columnNames" : [ "totalWaitingTime", "time", "id" ],
-        "clazz" : "PedestrianWaitingTimeProcessor"
-      },
-      "attributes" : {
-        "maxWaitingTime" : 0.0,
-        "maxWaitingTimeMean" : 0.0,
-        "minWaitingTime" : 0.0,
-        "minWaitingTimeMean" : 0.0,
-        "expectFailure" : false
-      },
-      "columnNames" : [ ],
-      "clazz" : "PedestrianWaitingTimeTest"
-    }
-  }, {
-    "formatString" : "%s",
-    "columnNames" : [ "waitingTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "pedestrianWaitingTimeProcessor" : {
-        "attributes" : {
-          "waitingArea" : {
-            "x" : 10.0,
-            "y" : 23.5,
-            "width" : 15.0,
-            "height" : 7.5
-          }
-        },
-        "columnNames" : [ "totalWaitingTime", "time", "id" ],
-        "clazz" : "PedestrianWaitingTimeProcessor"
-      },
-      "attributes" : {
-        "maxWaitingTime" : 10.0,
-        "maxWaitingTimeMean" : 10.0,
-        "minWaitingTime" : 0.0,
-        "minWaitingTimeMean" : 0.0,
-        "expectFailure" : false
-      },
-      "columnNames" : [ ],
-      "clazz" : "PedestrianWaitingTimeTest"
-    }
-  }, {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 100.0,
-        "maxEvacuationTimeMean" : 100.0,
-        "minEvacuationTime" : 0.0,
-        "minEvacuationTimeMean" : 0.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  } ],
-  "vadere" : {
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -212,10 +135,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 200,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,

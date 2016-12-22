@@ -1,80 +1,13 @@
 {
   "name" : "basic_3_3_wall_osm1",
   "description" : "",
-  "release" : "0.1",
-  "topographyhash" : "100397af83428c5d8bae5453ddfec5a66eb77c5e",
-  "attributeshash" : "14cde99b5805307b7fdded3c409e1ff1acdc4c96",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "waitingTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "pedestrianWaitingTimeProcessor" : {
-        "attributes" : {
-          "waitingArea" : {
-            "x" : 9.0,
-            "y" : 0.0,
-            "width" : 7.0,
-            "height" : 10.0
-          }
-        },
-        "columnNames" : [ "totalWaitingTime", "time", "id" ],
-        "clazz" : "PedestrianWaitingTimeProcessor"
-      },
-      "attributes" : {
-        "maxWaitingTime" : 0.0,
-        "maxWaitingTimeMean" : 0.0,
-        "minWaitingTime" : 0.0,
-        "minWaitingTimeMean" : 0.0,
-        "expectFailure" : false
-      },
-      "columnNames" : [ ],
-      "clazz" : "PedestrianWaitingTimeTest"
-    }
-  }, {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 1.0,
-        "maxEvacuationTimeMean" : 1.0,
-        "minEvacuationTime" : 0.0,
-        "minEvacuationTimeMean" : 0.0,
-        "expectFailure" : true
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  }, {
-    "formatString" : "%s %s %s %s %s %s",
-    "columnNames" : [ "id", "gaussianDensity", "time", "y", "step", "x" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "processor" : {
-      "densityProcessor" : {
-        "attributes" : {
-          "scale" : 10.0,
-          "standardDerivation" : 0.7,
-          "obstacleDensity" : true
-        },
-        "columnNames" : [ "x", "y", "step", "time", "gaussianDensity" ],
-        "clazz" : "DensityGaussianProcessor"
-      },
-      "columnNames" : [ ],
-      "clazz" : "PedestrianDensityProcessor"
-    }
-  } ],
-  "vadere" : {
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
@@ -184,10 +117,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "spawnDelay" : 1.0,
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 50,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
