@@ -7,7 +7,7 @@ import org.vadere.util.geometry.GeometryUtils;
 @SuppressWarnings("serial")
 public class VLine extends Line2D.Double {
 
-	public VLine(VPoint p1, VPoint p2) {
+	public VLine(final VPoint p1, final VPoint p2) {
 		super(p1.x, p1.y, p2.x, p2.y);
 	}
 
@@ -25,5 +25,9 @@ public class VLine extends Line2D.Double {
 
 	public double distance(VPoint point) {
 		return GeometryUtils.closestToSegment(this, point).distance(point);
+	}
+
+	public double length() {
+		return getP1().distance(getP2());
 	}
 }

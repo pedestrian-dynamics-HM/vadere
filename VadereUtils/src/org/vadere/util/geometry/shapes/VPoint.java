@@ -152,7 +152,7 @@ public class VPoint implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "x:" + x + ", y:" + y;
+		return "(" + x + "," + y + ")";
 	}
 
 	public static VPoint addPrecise(final VPoint p1, final VPoint p2) {

@@ -20,7 +20,8 @@ import static java.lang.Math.pow;
 public class PerssonStrangDistmesh {
     private List<IndexedVPoint> points = new ArrayList<>();
     private List<IndexedVPoint> oldPoints = new ArrayList<>();
-    private BowyerWatson<IndexedVPoint> triangulation;
+    private BowyerWatson<IndexedVPoint, IndexedVTriangle> bowyerWatson;
+    private Collection<IndexedVTriangle> triangulation;
     private Function<VPoint, Double> fd;
     private Function<VPoint, Double> fh;
 
@@ -129,9 +130,12 @@ public class PerssonStrangDistmesh {
             {
                 copyPoints();
                 long now = System.currentTimeMillis();
-                triangulation = new BowyerWatson<>(points, (x, y) -> new IndexedVPoint(x, y, -1));
-                triangulation.execute();
-	            triangulation.removeTriangleIf(t -> fd.apply(new VTriangle(t.getLeft(), t.getMiddle(), t.getRight()).midPoint()) < -geps);
+                bowyerWatson = new BowyerWatson<>(points, (x, y) -> new IndexedVPoint(x, y, -1), (a, b, c) -> new IndexedVTriangle(a, b, c));
+                bowyerWatson.init();
+                bowyerWatson.execude();
+                triangulation = bowyerWatson.getTriangles();
+	            triangulation.removeIf(t -> fd.apply(t.midPoint()) < -geps);
+                //triangulation.removeIf(t -> fd.apply(new VTriangle(t.getLeft(), t.getMiddle(), t.getRight()).midPoint()) < -geps);
                 Date date = new Date(System.currentTimeMillis() - now);
                 System.out.println(new SimpleDateFormat("mm:ss:SSS").format(date) + " Bowyer-Watson-Algo");
             }
@@ -235,7 +239,7 @@ public class PerssonStrangDistmesh {
     {
         double ave = 0;
         int i = 0;
-        for(VTriangle v : triangulation.getVTriangles()) {
+        for(VTriangle v : triangulation) {
             VLine[] line = v.getLines();
             double a = Math.sqrt(Math.pow(line[0].getX1() - line[0].getX2(), 2) + Math.pow(line[0].getY1() - line[0].getY2(), 2));
             double b = Math.sqrt(Math.pow(line[1].getX1() - line[1].getX2(), 2) + Math.pow(line[1].getY1() - line[1].getY2(), 2));
@@ -357,8 +361,11 @@ public class PerssonStrangDistmesh {
      */
     private HashMap<IndexedVLine, Integer> createBars()
     {
-        List<IndexedVLine> allLines = triangulation.getTriangles().parallelStream()
-		        .flatMap(t -> Arrays.asList(new IndexedVLine(t.getLeft(), t.getMiddle()), new IndexedVLine(t.getMiddle(), t.getRight()), new IndexedVLine(t.getRight(), t.getLeft())).stream())
+        List<IndexedVLine> allLines = triangulation.parallelStream()
+		        .flatMap(t -> Arrays.asList(
+		        		new IndexedVLine(t.p1, t.p2),
+				        new IndexedVLine(t.p2, t.p3),
+				        new IndexedVLine(t.p3, t.p1)).stream())
 		        .distinct()
 		        .collect(Collectors.toList());
 
@@ -451,7 +458,11 @@ public class PerssonStrangDistmesh {
         return Math.min(d1, d2);
     }
 
-    public BowyerWatson<IndexedVPoint> getTriangulation() {
-        return triangulation;
+    public Collection<IndexedVTriangle> getTriangles() {
+    	return triangulation;
     }
+
+    /*public BoyerWatsonImproved<IndexedVPoint, IndexedVTriangle> getBowyerWatson() {
+        return bowyerWatson;
+    }*/
 }
