@@ -6,37 +6,37 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Optional;
 
-public class HalfEdge {
+public class HalfEdge<P extends VPoint> {
 
 	/**
 	 * point at the end of the half edge.
 	 */
-	private VPoint end;
+	private P end;
 
 	/**
 	 * next half-edge around the face.
 	 */
-	private HalfEdge next;
+	private HalfEdge<P> next;
 
 	/**
 	 * previous half-edge around the face.
 	 */
-	private HalfEdge previous;
+	private HalfEdge<P> previous;
 
 	/**
 	 * oppositely oriented adjacnet half-edge. If the face is a the boundary
 	 * there is no twin.
 	 */
-	private HalfEdge twin;
+	private HalfEdge<P> twin;
 
 	/**
 	 * the face the half-edge borders.
 	 */
-	private Face face;
+	private Face<P> face;
 
 
 
-	public HalfEdge (@NotNull final VPoint end, @NotNull final Face face) {
+	public HalfEdge (@NotNull final P end, @NotNull final Face<P> face) {
 		this.end = end;
 		this.face = face;
 	}
@@ -45,7 +45,11 @@ public class HalfEdge {
 		return face;
 	}
 
-	public VPoint getEnd() {
+	public void setFace(final Face<P> face) {
+		this.face = face;
+	}
+
+	public P getEnd() {
 		return end;
 	}
 
@@ -53,15 +57,19 @@ public class HalfEdge {
 		return next != null;
 	}
 
-	public HalfEdge getNext() {
+	public boolean hasTwin() {
+		return twin != null;
+	}
+
+	public HalfEdge<P> getNext() {
 		return next;
 	}
 
-	public HalfEdge getPrevious() {
+	public HalfEdge<P> getPrevious() {
 		return previous;
 	}
 
-	public Optional<HalfEdge> getTwin() {
+	public Optional<HalfEdge<P>> getTwin() {
 		return Optional.ofNullable(twin);
 	}
 
@@ -72,14 +80,14 @@ public class HalfEdge {
 		}
 	}
 
-	public void setPrevious(final @NotNull HalfEdge previous) {
+	public void setPrevious(final @NotNull HalfEdge<P> previous) {
 		this.previous = previous;
 		if(previous.getNext() != this) {
 			previous.setNext(this);
 		}
 	}
 
-	public void setNext(final @NotNull HalfEdge next) {
+	public void setNext(final @NotNull HalfEdge<P> next) {
 		this.next = next;
 		if(next.getPrevious() != this) {
 			next.setPrevious(this);
