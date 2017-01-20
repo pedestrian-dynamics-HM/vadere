@@ -9,10 +9,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.math.MathUtil;
 
 public class GeometryUtils {
 	/**
@@ -145,6 +149,175 @@ public class GeometryUtils {
 		// result.lineTo(first.getX(), first.getY());
 
 		return new VPolygon(result);
+	}
+
+	public static VPoint[] intersection(final VLine line, final VCircle circle) {
+		VCircle normedCircle = new VCircle(new VPoint(0,0), circle.getRadius());
+		Point2D p1 = line.getP1();
+		Point2D p2 = line.getP2();
+		VLine normedLine = new VLine(new VPoint(p1.getX(), p1.getY()).subtract(circle.getCenter()),
+				new VPoint(p2.getX(), p2.getY()).subtract(circle.getCenter()));
+
+		double dx = normedLine.getX2() - normedLine.getX1();
+		double dy = normedLine.getY2() - normedLine.getY1();
+		double drSquare = dx * dx + dy * dy;
+		double dr = Math.sqrt(drSquare);
+		double radius = normedCircle.getRadius();
+		double determinant = normedLine.getX1() * normedLine.getY2() - normedLine.getX2() * normedLine.getY1();
+		double discreminant = radius * radius * drSquare - determinant * determinant;
+
+		if(discreminant < 0) {
+			return new VPoint[0];
+		}
+		else if(discreminant == 0){
+			return  new VPoint[]{
+					new VPoint(determinant * dy / drSquare, -determinant * dx / drSquare).add(circle.getCenter())
+			};
+		}
+		else {
+			double sign = dy < 0 ? -1 : 1;
+			double x1 = (determinant * dy + sign * dx * Math.sqrt(discreminant)) / drSquare;
+			double y1 = (-determinant * dx + Math.abs(dy) * Math.sqrt(discreminant)) / drSquare;
+			double x2 = (determinant * dy - sign * dx * Math.sqrt(discreminant)) / drSquare;
+			double y2 = (-determinant * dx - Math.abs(dy) * Math.sqrt(discreminant)) / drSquare;
+
+			return new VPoint[]{ new VPoint(x1, y1).add(circle.getCenter()), new VPoint(x2, y2).add(circle.getCenter())};
+		}
+	}
+
+	public static VPoint[] intersection2(final VLine line, final VCircle circle) {
+		double m = line.slope();
+		double d = line.getY1() - m * line.getX1();
+		double a = circle.getCenter().getX();
+		double b = circle.getCenter().getY();
+
+		double discreminant = circle.getRadius() * circle.getRadius() * (1 + m*m) - (b -m * a -d) * (b - m * a - d);
+
+
+		if(discreminant < 0) {
+			return new VPoint[0];
+		}
+		else if(discreminant == 0){
+			double x = (a + b * m - d * m) / (1 + m*m);
+			double y = m * x + d;
+			return  new VPoint[]{new VPoint(x, y)};
+		}
+		else {
+			double x1 = (a + b * m - d * m + Math.sqrt(discreminant)) / (1 + m*m);
+			double y1 = m * x1 + d;
+
+			double x2 = (a + b * m - d * m - Math.sqrt(discreminant)) / (1 + m*m);
+			double y2 = m * x2 + d;
+
+			return new VPoint[]{ new VPoint(x1, y1), new VPoint(x2, y2)};
+		}
+	}
+
+	/**
+	 * The (smallest possible) angle at C from the triangle ACB.
+	 *
+	 * @param A
+	 * @param C
+	 * @param B
+	 * @return
+	 */
+	public static double angle(VPoint A, VPoint C, VPoint B) {
+		double phi1 = new Vector2D(A).angleTo(C);
+		double phi2 = new Vector2D(B).angleTo(C);
+		double phi = Math.abs(phi1 - phi2);
+		return Math.min(phi, 2 * Math.PI - phi);
+	}
+
+	/**
+	 * Returns the angle between line1 and line2 in clock wise order (cw).
+	 * @param line1
+	 * @param line2
+	 * @return
+	 */
+	public static double angleBetween2Lines(final VLine line1, final VLine line2)
+	{
+		double angle1 = Math.atan2(line1.getY1() - line1.getY2(),
+				line1.getX1() - line1.getX2());
+		double angle2 = Math.atan2(line2.getY1() - line2.getY2(),
+				line2.getX1() - line2.getX2());
+		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
+	}
+
+
+	/**
+	 * This method follows the construction from
+	 * https://proofwiki.org/wiki/Obtuse_Triangle_Divided_into_Acute_Triangles
+	 * i.e. divides an non-acute triangle acb into 7 acute triangles:
+	 *  new VTriangle(a, f, e),
+	 *  new VTriangle(e, f, d),
+	 *  new VTriangle(d, c, e),
+	 *  new VTriangle(d, h ,c),
+	 *  new VTriangle(d, g, h),
+	 *  new VTriangle(f, g, d),
+	 *  new VTriangle(g, b, h);.
+	 *  if the triangle is non-acute at c. If the triangle is already acute the method
+	 *  returns the original triangle.
+	 *
+	 * @param triangle
+	 * @throws throws an illegal argument exception if the triangle is not a feasible triangle.
+	 */
+	public static VTriangle[] generateAcuteTriangles(final VTriangle triangle) {
+		double angle1 = angle(triangle.p1, triangle.p2, triangle.p3);
+		double angle2 = angle(triangle.p2, triangle.p3, triangle.p1);
+		double angle3 = angle(triangle.p3, triangle.p1, triangle.p2);
+		double tolerance = 0.000001;
+
+		// non-acute triangle
+		if(triangle.isNonAcute()) {
+			VPoint c;
+			VPoint a;
+			VPoint b;
+			if(angle1 > angle2 && angle1 > angle3) {
+				a = triangle.p3;
+				c = triangle.p2;
+				b = triangle.p1;
+			}
+			else if(angle2 > angle1 && angle2 > angle3) {
+				a = triangle.p1;
+				c = triangle.p3;
+				b = triangle.p2;
+			}
+			else if(angle3 > angle1 && angle3 > angle2) {
+				a = triangle.p2;
+				c = triangle.p1;
+				b = triangle.p3;
+			}
+			else {
+				throw new IllegalArgumentException(triangle + " is not a feasible triangle");
+			}
+
+			VPoint d = triangle.getIncenter();
+			VCircle circle = new VCircle(d, d.distance(c));
+			VPoint[] iPoints = intersection2(new VLine(a, c), circle);
+
+			VPoint e = iPoints[0].equals(c, tolerance) ? iPoints[1] : iPoints[0];
+			iPoints = intersection2(new VLine(b, c), circle);
+			VPoint h = iPoints[0].equals(c, tolerance) ? iPoints[1] : iPoints[0];
+
+			iPoints = intersection2(new VLine(a, b), circle);
+
+			VPoint f = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[0] : iPoints[1];
+			VPoint g = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[1] : iPoints[0];
+
+			return new VTriangle[]{
+					new VTriangle(a, f, e),
+					new VTriangle(e, f, d),
+					new VTriangle(d, c, e),
+					new VTriangle(d, h ,c),
+					new VTriangle(d, g, h),
+					new VTriangle(f, g, d),
+					new VTriangle(g, b, h)
+			};
+		}
+		else {
+			return new VTriangle[]{triangle};
+		}
+
 	}
 
 	public static VPoint add(VPoint p1, VPoint p2) {

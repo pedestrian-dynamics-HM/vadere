@@ -513,7 +513,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					false,
 					l -> 0.0,
 					"Distmesh");
-			triangulation = psd.getTriangulation().getVTriangles();
+			triangulation = psd.getBowyerWatson().getVTriangles();
 		}
 		return triangulation;
 	}

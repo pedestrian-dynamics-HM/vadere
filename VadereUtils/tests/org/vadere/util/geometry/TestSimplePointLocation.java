@@ -48,7 +48,7 @@ public class TestSimplePointLocation {
 
 	@Test
 	public void testFaceIterator() {
-		PointLocation pointLocation = new PointLocation(Arrays.asList(face1, face2));
+		PointLocation<VPoint> pointLocation = new PointLocation<>(Arrays.asList(face1, face2), (x, y) -> new VPoint(x,y));
 
 		assertEquals(face1, pointLocation.getFace(new VPoint(0,0)).get());
 
