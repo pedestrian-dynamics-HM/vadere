@@ -10,7 +10,7 @@ import org.vadere.util.geometry.GeometryUtils;
 /**
  * A triangle. Points must be given in counter clockwise manner to get correct
  * inward facing normals.
- * 
+ *
  */
 public class VTriangle extends VPolygon {
 
@@ -38,7 +38,7 @@ public class VTriangle extends VPolygon {
 
 	/**
 	 * Creates a triangle. Points must be given in ccw order.
-	 * 
+	 *
 	 * @param p1
 	 * @param p2
 	 * @param p3
@@ -194,7 +194,7 @@ public class VTriangle extends VPolygon {
 	/**
 	 * Computes the inward facing normal vector for the given points of the
 	 * triangle.
-	 * 
+	 *
 	 * @param p1
 	 * @param p2
 	 * @return inward facing normal vector

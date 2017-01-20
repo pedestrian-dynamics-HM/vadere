@@ -44,7 +44,7 @@ public class TestEnhancedVersion extends JFrame {
             add(new VRectangle(0.65*300, 0.7*300, 0.1*300, 0.3*300));
         }};
 
-        PerssonStrangDistmesh psd = new PerssonStrangDistmesh(
+        PerssonStrangDistmesh meshGenerator = new PerssonStrangDistmesh(
                 bbox,
                 obstacles,
                 h0,
@@ -54,7 +54,7 @@ public class TestEnhancedVersion extends JFrame {
         System.out.println(System.currentTimeMillis()-now);
         now = System.currentTimeMillis();
         System.out.println(System.currentTimeMillis()-now);
-        DrawPanel JPanel = new DrawPanel(psd);
+        DrawPanel JPanel = new DrawPanel(meshGenerator);
         setSize(1000, 800);
         add(JPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -63,10 +63,10 @@ public class TestEnhancedVersion extends JFrame {
 
     private class DrawPanel extends Canvas {
 
-        private PerssonStrangDistmesh t;
+        private PerssonStrangDistmesh meshGenerator;
 
-        private DrawPanel(PerssonStrangDistmesh t) {
-            this.t = t;
+        private DrawPanel(PerssonStrangDistmesh meshGenerator) {
+            this.meshGenerator = meshGenerator;
         }
 
         @Override
@@ -74,7 +74,7 @@ public class TestEnhancedVersion extends JFrame {
             Graphics2D graphics = (Graphics2D) g;
             graphics.translate(125,125);
             graphics.setColor(Color.BLACK);
-            t.getTriangulation().getVTriangles().parallelStream().forEach(t -> graphics.draw(t));
+	        meshGenerator.getTriangles().parallelStream().forEach(t -> graphics.draw(t));
 //            graphics.setColor(Color.RED);
 //            tc.triangulation.getTriangles().parallelStream().forEach(graphics::draw);
         }

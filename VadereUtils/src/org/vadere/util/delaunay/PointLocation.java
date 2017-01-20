@@ -12,48 +12,50 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PointLocation {
+public class PointLocation<P extends VPoint> {
 
-	private final Collection<Face> faces;
-	private final List<VPoint> orderedPointList;
-	private final List<List<HalfEdge>> halfeEdgesSegments;
-	private final List<List<VPoint>> intersectionPointsInSegment;
+	private final Collection<Face<P>> faces;
+	private final List<P> orderedPointList;
+	private final List<List<HalfEdge<P>>> halfeEdgesSegments;
+	private final List<List<P>> intersectionPointsInSegment;
+	private final BiFunction<Double, Double, P> pointConstructor;
 
-	private Comparator<VPoint> pointComparatorX = (p1, p2) -> {
+	private Comparator<P> pointComparatorX = (p1, p2) -> {
 		double dx = p1.getX() - p2.getX();
 		if(dx < 0) return -1;
 		else if(dx > 0) return 1;
 		else return 0;
 	};
 
-	private Comparator<VPoint> pointComparatorY = (p1, p2) -> {
+	private Comparator<P> pointComparatorY = (p1, p2) -> {
 		double dy = p1.getY() - p2.getY();
 		if(dy < 0) return -1;
 		else if(dy > 0) return 1;
 		else return 0;
 	};
 
-	private class BetweenTwoPoints implements Predicate<HalfEdge> {
+	private class BetweenTwoPoints implements Predicate<HalfEdge<P>> {
 
-		private VPoint p1;
-		private VPoint p2;
+		private P p1;
+		private P p2;
 
-		private BetweenTwoPoints(final VPoint p1, final VPoint p2) {
+		private BetweenTwoPoints(final P p1, final P p2) {
 			this.p1 = p1;
 			this.p2 = p2;
 		}
 
 		@Override
-		public boolean test(final HalfEdge halfEdge) {
+		public boolean test(final HalfEdge<P> halfEdge) {
 			return (halfEdge.getEnd().getX() > p1.getX() && halfEdge.getPrevious().getEnd().getX() < p2.getX()) ||
 					(halfEdge.getEnd().getX() > p2.getX() && halfEdge.getPrevious().getEnd().getX() < p1.getX());
 		}
 	}
 
-	private class HalfEdgeComparator implements Comparator<HalfEdge> {
+	private class HalfEdgeComparator implements Comparator<HalfEdge<P>> {
 
 		private double x1;
 		private double x2;
@@ -64,7 +66,7 @@ public class PointLocation {
 		}
 
 		@Override
-		public int compare(final HalfEdge edge1, final HalfEdge edge2) {
+		public int compare(final HalfEdge<P> edge1, final HalfEdge<P> edge2) {
 			VLine line1 = edge1.toLine();
 			VLine line2 = edge2.toLine();
 			double slope1 = line1.slope();
@@ -79,10 +81,12 @@ public class PointLocation {
 		}
 	}
 
-	public PointLocation(final Collection<Face> faces) {
+	public PointLocation(final Collection<Face<P>> faces, final BiFunction<Double, Double, P> pointConstructor) {
 		this.faces = faces;
+		this.pointConstructor = pointConstructor;
+
 		//TODO distinct is maybe slow here
-		Set<VPoint> pointSet = faces.stream()
+		Set<P> pointSet = faces.stream()
 				.flatMap(face -> face.stream()).map(edge -> edge.getEnd())
 				.sorted(pointComparatorX).collect(Collectors.toSet());
 
@@ -91,11 +95,11 @@ public class PointLocation {
 		intersectionPointsInSegment = new ArrayList<>(orderedPointList.size()-1);
 
 		for(int i = 0; i < orderedPointList.size() - 1; i++) {
-			VPoint p1 = orderedPointList.get(i);
-			VPoint p2 = orderedPointList.get(i+1);
-			List<HalfEdge> halfEdges = faces.stream().flatMap(face -> face.stream()).filter(new BetweenTwoPoints(p1, p2))
+			P p1 = orderedPointList.get(i);
+			P p2 = orderedPointList.get(i+1);
+			List<HalfEdge<P>> halfEdges = faces.stream().flatMap(face -> face.stream()).filter(new BetweenTwoPoints(p1, p2))
 					.sorted(new HalfEdgeComparator(p1.getX(), p2.getX())).collect(Collectors.toList());
-			List<VPoint> intersectionPoints = halfEdges.stream()
+			List<P> intersectionPoints = halfEdges.stream()
 					.map(hf -> hf.toLine())
 					.map(line -> intersectionWithX(p1.getX(), line)).collect(Collectors.toList());
 			halfeEdgesSegments.add(halfEdges);
@@ -103,11 +107,11 @@ public class PointLocation {
 		}
 	}
 
-	private static VPoint intersectionWithX(double x, VLine line) {
-		return new VPoint(x, (line.getY1() + (line.getX1()-x) * line.slope()));
+	private P intersectionWithX(double x, VLine line) {
+		return pointConstructor.apply(x, (line.getY1() + (line.getX1()-x) * line.slope()));
 	}
 
-	public Optional<Face> getFace(final VPoint point) {
+	public Optional<Face<P>> getFace(final P point) {
 		int index = Collections.binarySearch(orderedPointList, point, pointComparatorX);
 		int xSegmentIndex = (index >= 0) ? index : -index - 2;
 		if(xSegmentIndex < 0 || xSegmentIndex >= intersectionPointsInSegment.size()) {
@@ -120,7 +124,7 @@ public class PointLocation {
 			return Optional.empty();
 		}
 
-		HalfEdge edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
+		HalfEdge<P> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
 
 		if(edge.getFace().contains(point)) {
 			return Optional.of(edge.getFace());
