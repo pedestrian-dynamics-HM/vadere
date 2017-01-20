@@ -51,21 +51,6 @@ public class Vector2D extends VPoint {
 	}
 
 	/**
-	 * The (smallest possible) angle at C from the triangle ACB.
-	 * 
-	 * @param A
-	 * @param C
-	 * @param B
-	 * @return
-	 */
-	public static double angle(VPoint A, VPoint C, VPoint B) {
-		double phi1 = new Vector2D(A).angleTo(C);
-		double phi2 = new Vector2D(B).angleTo(C);
-		double phi = Math.abs(phi1 - phi2);
-		return Math.min(phi, 2 * Math.PI - phi);
-	}
-
-	/**
 	 * Computes the angle between the x-axis through the given Point (0,0) and this.
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 */

@@ -1,7 +1,9 @@
 package org.vadere.util.geometry;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +12,8 @@ import org.junit.Test;
 import org.vadere.util.geometry.DataPoint;
 import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -49,6 +53,67 @@ public class TestGeometry {
 		assertEquals(new VPoint(0, roomSideLen), testList.get(1));
 		assertEquals(new VPoint(0, 0), testList.get(2));
 		assertEquals(new VPoint(roomSideLen, 0), testList.get(3));
+	}
+
+	@Test
+	public void testLineCircleIntersectionZeroResults() {
+		VCircle circle = new VCircle(1, 1, 1);
+		VLine line = new VLine(3,0, 4, 1);
+		VPoint[] intersectionPoints = GeometryUtils.intersection2(line, circle);
+		assertTrue(intersectionPoints.length == 0);
+	}
+
+	@Test
+	public void testLineCircleIntersectionTwoResults() {
+		VCircle circle = new VCircle(3, 4.1, 3);
+		VLine line = new VLine(3,4.1, 4, 5.1);
+		VPoint[] intersectionPoints = GeometryUtils.intersection2(line, circle);
+
+		// computed with http://www.ambrsoft.com/TrigoCalc/Circles2/circlrLine_.htm
+		VPoint[] expectedIntersectionPoints = new VPoint[]{
+				new VPoint(5.121, 6.221),
+				new VPoint(0.879, 1.979)};
+
+		assertTrue(intersectionPoints.length == 2);
+		assertTrue(testPointListEquality(expectedIntersectionPoints, intersectionPoints, 0.001));
+	}
+
+	@Test
+	public void testLineCircleIntersectionOneResults() {
+		VCircle circle = new VCircle(1, 1, 1);
+		VLine line = new VLine(3,0, 4, 0);
+		VPoint[] intersectionPoints = GeometryUtils.intersection2(line, circle);
+		assertTrue(intersectionPoints.length == 1);
+
+		VPoint[] expectedIntersectionPoints = new VPoint[]{new VPoint(1, 0)};
+		assertTrue(testPointListEquality(expectedIntersectionPoints, intersectionPoints, 0.001));
+	}
+
+	@Test
+	public void testGenerateAccuteTriangles() {
+
+	}
+
+	private static boolean testPointListEquality(final VPoint[] expectedPoints, final VPoint[] points, final double tolerance) {
+
+		if(expectedPoints.length != points.length) {
+			return false;
+		}
+
+		for(VPoint p1 : expectedPoints) {
+			boolean found = false;
+			for(VPoint p2 : points) {
+				if(p1.equals(p2, tolerance)) {
+					found = true;
+					break;
+				}
+			}
+			if(!found) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 }

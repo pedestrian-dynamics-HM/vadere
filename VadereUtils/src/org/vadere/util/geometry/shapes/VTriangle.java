@@ -1,8 +1,10 @@
 package org.vadere.util.geometry.shapes;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
+import org.jetbrains.annotations.NotNull;
+import org.omg.CORBA.portable.ValueOutputStream;
 import org.vadere.util.geometry.DataPoint;
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -31,6 +33,10 @@ public class VTriangle extends VPolygon {
 
 	private VPoint center;
 
+	private VPoint incenter;
+
+	private VPoint orthocenter;
+
 	/**
 	 * Creates a triangle. Points must be given in ccw order.
 	 * 
@@ -38,7 +44,7 @@ public class VTriangle extends VPolygon {
 	 * @param p2
 	 * @param p3
 	 */
-	public VTriangle(VPoint p1, VPoint p2, VPoint p3) {
+	public VTriangle(@NotNull VPoint p1, @NotNull VPoint p2, @NotNull VPoint p3) {
 		super(GeometryUtils.polygonFromPoints2D(p1, p2, p3));
 
 		this.p1 = p1;
@@ -63,6 +69,17 @@ public class VTriangle extends VPolygon {
 				|| l3.ptSegDist(p1) < GeometryUtils.DOUBLE_EPS;
 	}
 
+	public boolean isNonAcute() {
+		double angle1 = GeometryUtils.angle(p1, p2, p3);
+		double angle2 = GeometryUtils.angle(p2, p3, p1);
+		double angle3 = GeometryUtils.angle(p3, p1, p2);
+
+		// non-acute triangle
+		double maxAngle = Math.max(Math.max(angle1, angle2), angle3);
+		double rightAngle = Math.PI/2;
+		return maxAngle > rightAngle;
+	}
+
 	@Override
 	public VPoint getCentroid() {
 		if(centroid == null) {
@@ -71,7 +88,43 @@ public class VTriangle extends VPolygon {
 		return centroid;
 	}
 
-	public VPoint getCenter(){
+	public VPoint getIncenter(){
+		if(incenter == null) {
+			double a = p1.distance(p2);
+			double b = p2.distance(p3);
+			double c = p3.distance(p1);
+			double perimeter = a + b + c;
+
+			incenter = new VPoint((a * p3.x + b * p1.x + c * p2.x) / perimeter,
+					(a * p3.y + b * p1.y + c * p2.y) / perimeter);
+		}
+
+		return incenter;
+	}
+
+	public VPoint getOrthocenter() {
+		if(orthocenter == null) {
+			double slope = -1 / ((p2.y - p1.y) / (p2.x - p1.x));
+			// y  = slope * (x - p3.x) + p3.y
+
+			double slope2 = -1 / ((p1.y - p3.y) / (p1.x - p3.x));
+			// y = slope2 * (x - p2.x) + p2.y
+
+			// slope2 * (x - p2.x) + p2.y  = slope * (x - p3.x) + p3.y
+			// slope2 * (x - p2.x) - slope * (x - p3.x)  =  + p3.y - p2.y
+			// slope2 * x - slope2 * p2.x - slope * x + slope * p3.x =  + p3.y - p2.y
+			// slope2 * x  - slope * x  =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
+			// x * (slope2 - slope) =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
+			double x = (p3.y - p2.y + slope2 * p2.x - slope * p3.x) / (slope2 - slope);
+			double y = slope * (x - p3.x) + p3.y;
+
+			orthocenter = new VPoint(x, y);
+		}
+
+		return orthocenter;
+	}
+
+	public VPoint getCircumcenter(){
 		if(center == null) {
 			double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
 			double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
@@ -88,11 +141,11 @@ public class VTriangle extends VPolygon {
 	}
 
 	public double getCircumscribedRadius() {
-		return getCenter().distance(p1);
+		return getCircumcenter().distance(p1);
 	}
 
 	public boolean isInCircumscribedCycle(final VPoint point) {
-		return getCenter().distance(point) < getCircumscribedRadius();
+		return getCircumcenter().distance(point) < getCircumscribedRadius();
 	}
 
 	/**
@@ -103,7 +156,7 @@ public class VTriangle extends VPolygon {
 	 * @param p2
 	 * @return inward facing normal vector
 	 */
-	public VPoint getNormal(VPoint p1, VPoint p2) {
+	public VPoint getNormal(final VPoint p1, final VPoint p2) {
 		VPoint normal = new VPoint(p2.y - p1.y, -(p2.x - p1.x));
 		// if the normal is already inward facing, return it
 		if (GeometryUtils.ccw(p1, p2, normal) == GeometryUtils.ccw(p1, p2,
@@ -116,12 +169,21 @@ public class VTriangle extends VPolygon {
 		}
 	}
 
-	public boolean hasBoundaryPoint(DataPoint point) {
+	public boolean hasBoundaryPoint(final DataPoint point) {
 		return this.p1.equals(point) || this.p2.equals(point)
 				|| this.p3.equals(point);
 	}
 
 	public VLine[] getLines() {
 		return lines;
+	}
+
+	public Stream<VLine> getLineStream() {
+		return Arrays.stream(getLines());
+	}
+
+	@Override
+	public String toString() {
+		return p1 + "-" + p2 + "-" + p3;
 	}
 }

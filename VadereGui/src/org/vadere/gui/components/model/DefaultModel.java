@@ -64,7 +64,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	public List<VTriangle> triangulation;
+	public Collection<? extends VTriangle> triangulation;
 
 	public DefaultModel(final T config) {
 		this.config = config;
@@ -504,7 +504,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	/*
 	 * returns the adaptive triangulation (see persson-2004 'A Simple Mesh Generator in MATLAB.')
 	 */
-	public Collection<VTriangle> getTriangulation() {
+	public Collection<? extends VTriangle> getTriangulation() {
 		if(triangulation.isEmpty()) {
 			PerssonStrangDistmesh psd = new PerssonStrangDistmesh(
 					new VRectangle(getTopographyBound()),
@@ -513,7 +513,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					false,
 					l -> 0.0,
 					"Distmesh");
-			triangulation = psd.getTriangulation().getVTriangles();
+			triangulation = psd.getTriangles();
 		}
 		return triangulation;
 	}
