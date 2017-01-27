@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.shapes;
 
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
 import org.vadere.util.geometry.GeometryUtils;
@@ -117,5 +118,22 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	@Override
 	public ShapeType getType() {
 		return ShapeType.RECTANGLE;
+	}
+
+	public VPolygon toPolygon() {
+		return new VPolygon(this);
+	}
+
+	@Override
+	public boolean intersect(final VShape shape) {
+		if(shape instanceof VPolygon) {
+			return toPolygon().intersects((VPolygon) shape);
+		}
+		else if(shape instanceof VRectangle){
+			return intersects(((VRectangle)shape));
+		}
+		else {
+			throw new UnsupportedOperationException("not yet implemented");
+		}
 	}
 }
