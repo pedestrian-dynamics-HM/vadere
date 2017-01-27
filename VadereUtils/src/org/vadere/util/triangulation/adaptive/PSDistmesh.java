@@ -23,6 +23,7 @@ public class PSDistmesh {
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
 	private Collection<? extends VShape> obstacles;
+	private int steps;
 
 	// Parameters
 	private double initialEdgeLen;
@@ -71,6 +72,7 @@ public class PSDistmesh {
 		this.deps = 1.4901e-8 * initialEdgeLen;
 		this.triangulation = new ArrayList<>();
 		this.obstacles = obstacles;
+		this.steps = 0;
 	}
 
 	public void execute() {
@@ -82,11 +84,22 @@ public class PSDistmesh {
 		}
 	}
 
+	public boolean hasConverged() {
+		double test = qualityCheck();
+		System.out.println("quality: " + test);
+		return test > Parameters.qualityMeasurement;
+	}
+
+	public boolean hasMaximalSteps() {
+		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
+	}
+
 	/*
 	Stellt den Verlauf der Iterationen dar. Innerhalb der while(true) passiert eine Iteration des Algorithmus
 	 */
 	public void step()
 	{
+		steps++;
 		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			maxMovementLen = 0;
 			bowyerWatson = new BowyerWatson<>(points, (x, y) -> new MPoint(x, y, -1), (a, b, c) -> new VTriangle(a, b, c));

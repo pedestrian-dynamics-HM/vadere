@@ -139,6 +139,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	public void init(final Scenario vadere, final String projectPath) {
+		// avoid the long computation
+		this.hideTriangulation();
+		this.triangulationTriggered = false;
+
 		this.vadere = vadere;
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();

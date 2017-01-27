@@ -3,6 +3,7 @@ package org.vadere.state.scenario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,9 +19,11 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes"})
@@ -351,18 +354,18 @@ public class Topography {
 
 		for (Obstacle obstacle : this.getObstacles()) {
 			if (boundaryObstacles.contains(obstacle))
-				s.addBoundary((Obstacle) obstacle.clone());
+				s.addBoundary(obstacle.clone());
 			else
-				s.addObstacle((Obstacle) obstacle.clone());
+				s.addObstacle(obstacle.clone());
 		}
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
 		for (Target target : getTargets()) {
-			s.addTarget((Target) target.clone());
+			s.addTarget(target.clone());
 		}
 		for (Source source : getSources()) {
-			s.addSource((Source) source.clone());
+			s.addSource(source.clone());
 		}
 		for (Pedestrian pedestrian : getElements(Pedestrian.class)) {
 			s.addElement(pedestrian);
@@ -378,7 +381,7 @@ public class Topography {
 		}
 
 		if (hasTeleporter()) {
-			s.setTeleporter((Teleporter) teleporter.clone());
+			s.setTeleporter(teleporter.clone());
 		}
 
 		for (DynamicElementAddListener<Pedestrian> pedestrianAddListener : this.pedestrians.getElementAddedListener()) {
@@ -444,5 +447,22 @@ public class Topography {
 		}
 		allOtherAttributes.forEach(a -> a.seal());
 	}
+
+	public static Collection<Obstacle> createObstacleBoundary(final Topography topography) {
+		List<Obstacle> obstacles = new ArrayList<>();
+		VPolygon boundary = new VPolygon(topography.getBounds());
+		double width = topography.getBoundingBoxWidth();
+		Collection<VPolygon> boundingBoxObstacleShapes = boundary
+				.borderAsShapes(width, width / 2.0, 0.0001);
+		for (VPolygon obstacleShape : boundingBoxObstacleShapes) {
+			AttributesObstacle obstacleAttributes = new AttributesObstacle(
+					-1, obstacleShape);
+			Obstacle obstacle = new Obstacle(obstacleAttributes);
+			obstacles.add(obstacle);
+		}
+
+		return obstacles;
+	}
+
 
 }
