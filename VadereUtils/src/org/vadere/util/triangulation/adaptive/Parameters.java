@@ -17,4 +17,5 @@ public class Parameters {
 	final static int SAMPLENUMBER = 10;
 	final static int SAMPLEDIVISION = 10;
 	static final int SEGMENTDIVISION = 0;
+	final static int MAX_NUMBER_OF_STEPS = 20;
 }
