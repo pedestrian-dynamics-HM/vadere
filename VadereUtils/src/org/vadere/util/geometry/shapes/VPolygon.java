@@ -142,14 +142,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	public double getArea() {
-		List<VPoint> pointList = getPoints();
-
-		double result = 0;
-		for (int i = 0; i < pointList.size() - 1; i++) {
-			result += (pointList.get(i).y + pointList.get(i + 1).y)
-					* (pointList.get(i).x - pointList.get(i + 1).x);
-		}
-		return Math.abs(result) / 2.0;
+		return GeometryUtils.areaOfPolygon(getPoints());
 	}
 
 	// Assumed that first and last point are equal
@@ -322,7 +315,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public double distance(VPoint target) {
+	public double distance(IPoint target) {
 		if (contains(target)) {
 			return -closestPoint(target).distance(target);
 		} else {
@@ -331,7 +324,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
+	public VPoint closestPoint(IPoint point) {
 		double currentMinDistance = java.lang.Double.MAX_VALUE;
 		VPoint resultPoint = null;
 
@@ -387,19 +380,19 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public boolean contains(VPoint point) {
-		return super.contains(point.x, point.y);
+	public boolean contains(final IPoint point) {
+		return super.contains(point.getX(), point.getY());
 	}
 
 	@Override
-	public VPolygon translatePrecise(final VPoint vector) {
+	public VPolygon translatePrecise(final IPoint vector) {
 		return translate(vector);
 	}
 
 	@Override
-	public VPolygon translate(final VPoint vector) {
+	public VPolygon translate(final IPoint vector) {
 		AffineTransform transform = new AffineTransform();
-		transform.translate(vector.x, vector.y);
+		transform.translate(vector.getX(), vector.getY());
 		return new VPolygon(new Path2D.Double(this, transform));
 	}
 
@@ -433,9 +426,9 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return new VPoint(xValue, yValue);
 	}
 
-	public VPolygon rotate(VPoint anchor, double angle) {
+	public VPolygon rotate(IPoint anchor, double angle) {
 		VPolygon resultPolygon = new VPolygon(this);
-		resultPolygon.transform(AffineTransform.getRotateInstance(angle, anchor.x, anchor.y));
+		resultPolygon.transform(AffineTransform.getRotateInstance(angle, anchor.getX(), anchor.getY()));
 		return resultPolygon;
 	}
 

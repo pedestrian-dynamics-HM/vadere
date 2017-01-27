@@ -1,7 +1,7 @@
 package org.vadere.util.delaunay;
 
-import com.sun.javafx.UnmodifiableArrayList;
-
+import org.vadere.util.geometry.data.Face;
+import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 

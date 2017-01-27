@@ -1,5 +1,6 @@
 package org.vadere.util.geometry;
 
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class Vector2D extends VPoint {
@@ -17,8 +18,8 @@ public class Vector2D extends VPoint {
 		super(x, y);
 	}
 
-	public Vector2D(VPoint p) {
-		super(p.x, p.y);
+	public Vector2D(IPoint p) {
+		super(p.getX(), p.getY());
 	}
 
 	@Override
@@ -69,8 +70,8 @@ public class Vector2D extends VPoint {
 	 * Computes the angle between the x-axis through the given Point "center" and this.
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 */
-	public double angleTo(VPoint center) {
-		double atan2 = Math.atan2(this.y - center.y, this.x - center.x);
+	public double angleTo(IPoint center) {
+		double atan2 = Math.atan2(this.y - center.getY(), this.x - center.getX());
 
 		if (atan2 < 0.0) {
 			atan2 = Math.PI * 2 + atan2;

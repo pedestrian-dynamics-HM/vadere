@@ -44,7 +44,7 @@ public class VCircle implements VShape {
 	 * The distance to the boundary of the circle.
 	 */
 	@Override
-	public double distance(VPoint pos) {
+	public double distance(IPoint pos) {
 		return Math.abs(this.center.distance(pos) - this.radius);
 	}
 
@@ -56,8 +56,8 @@ public class VCircle implements VShape {
 	 * Not implemented.
 	 */
 	@Override
-	public VPoint closestPoint(VPoint point) {
-		Vector2D direction = new Vector2D(point.x - center.x, point.y
+	public VPoint closestPoint(IPoint point) {
+		Vector2D direction = new Vector2D(point.getX() - center.x, point.getY()
 				- center.y);
 		VPoint vector = direction.normalize(radius);
 		return new VPoint(vector.x + center.x, vector.y + center.y);
@@ -108,7 +108,7 @@ public class VCircle implements VShape {
 	}
 
 	@Override
-	public boolean contains(VPoint p) {
+	public boolean contains(IPoint p) {
 		return p.distance(center) <= radius;
 	}
 
@@ -158,12 +158,12 @@ public class VCircle implements VShape {
 	}
 
 	@Override
-	public VShape translate(final VPoint vector) {
+	public VShape translate(final IPoint vector) {
 		return new VCircle(getCenter().add(vector), getRadius());
 	}
 
 	@Override
-	public VShape translatePrecise(final VPoint vector) {
+	public VShape translatePrecise(final IPoint vector) {
 		return new VCircle(getCenter().addPrecise(vector), getRadius());
 	}
 
