@@ -26,4 +26,7 @@ public interface VShape extends Shape, Cloneable {
 	VPoint getCentroid();
 
 	ShapeType getType();
+
+	boolean intersect(VShape shape);
+
 }

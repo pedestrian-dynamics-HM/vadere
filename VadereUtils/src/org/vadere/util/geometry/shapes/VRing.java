@@ -220,4 +220,9 @@ public class VRing implements VShape {
 		return ShapeType.RING;
 	}
 
+	@Override
+	public boolean intersect(VShape shape) {
+		throw new UnsupportedOperationException("not yet implemented.");
+	}
+
 }
