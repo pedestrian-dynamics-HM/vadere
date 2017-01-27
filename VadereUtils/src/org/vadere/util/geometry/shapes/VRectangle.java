@@ -124,16 +124,16 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		return new VPolygon(this);
 	}
 
-	@Override
-	public boolean intersect(final VShape shape) {
-		if(shape instanceof VRectangle){
-			return intersects(((VRectangle)shape));
-		}
-		else if(shape instanceof VPolygon) {
-			return shape.intersect(this);
-		}
-		else {
-			throw new UnsupportedOperationException("not yet implemented");
-		}
-	}
+    @Override
+    public boolean intersect(final VShape shape) {
+        if(shape instanceof VRectangle){
+            return intersects(((VRectangle)shape));
+        }
+        else if(shape instanceof VPolygon) {
+            return shape.intersect(this);
+        }
+        else {
+            throw new UnsupportedOperationException("not yet implemented");
+        }
+    }
 }
