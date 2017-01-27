@@ -19,7 +19,6 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 		return new DensityEdgeLenFunction(densityFunc, regionBoundingBox);
 	}
 
-
 	static IEdgeLengthFunction create(final VRectangle regionBoundingBox,
 	                                  final Collection<? extends VShape> obstacles,
 	                                  final IDistanceFunction distanceFunc){

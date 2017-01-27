@@ -1,9 +1,8 @@
-package org.vadere.util.delaunay;
+package org.vadere.util.geometry.data;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.data.DAG;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 
 import java.awt.geom.Path2D;
@@ -13,20 +12,35 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class Face<P extends VPoint> implements Iterable<HalfEdge<P>> {
+/**
+ * A Face is a region of a planar separation of the 2-D space, e.g. the region of a Polygon/Triangle and so on.
+ *
+ * @param <P> the type of the coordinates the face uses.
+ */
+public class Face<P extends IPoint> implements Iterable<HalfEdge<P>> {
 
 	/**
-	 * one of the half-edges bordering this face.
+	 * One of the half-edges bordering this face.
 	 */
 	private HalfEdge<P> edge;
 
-	public Face(final HalfEdge<P> edge) {
+	/**
+	 * Default constructor. To construct a face where you have already some half-edges
+	 * bordering this face.
+	 *
+	 * @param edge one of the half-edges bordering this face.
+	 */
+	public Face(@NotNull final HalfEdge<P> edge) {
 		this.edge = edge;
 	}
 
+	/**
+	 * This constructor can be used for constructing a new face without having
+	 * constructed the bordering half-edges jet.
+	 */
 	public Face() {}
 
-	public static <P extends VPoint> Face<P> of(P p1, P p2, P p3) {
+	public static <P extends IPoint> Face<P> of(P p1, P p2, P p3) {
 		Face superTriangle = new Face();
 		HalfEdge edge1 = new HalfEdge(p1, superTriangle);
 		HalfEdge edge2 = new HalfEdge(p2, superTriangle);
@@ -38,21 +52,26 @@ public class Face<P extends VPoint> implements Iterable<HalfEdge<P>> {
 		return superTriangle;
 	}
 
+	/**
+	 * Sets one of the half-edges bordering this face.
+	 * @param edge half-edge bordering this face
+	 */
 	public void setEdge(@NotNull HalfEdge<P> edge) {
 		this.edge = edge;
 	}
 
+	/**
+	 * Computes the area of this face.
+	 * @return the area of this face
+	 */
 	public double getArea() {
-		List<P> pointList = getPoints();
-
-		double result = 0;
-		for (int i = 0; i < pointList.size() - 1; i++) {
-			result += (pointList.get(i).y + pointList.get(i + 1).y)
-					* (pointList.get(i).x - pointList.get(i + 1).x);
-		}
-		return Math.abs(result) / 2.0;
+		return GeometryUtils.areaOfPolygon(getPoints());
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public List<P> getPoints() {
 		return streamPoints().collect(Collectors.toList());
 	}
