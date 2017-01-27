@@ -24,10 +24,12 @@ public class PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
 	private IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
+
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
 	private Collection<? extends VShape> obstacles;
+
 	private int steps;
 
 	// Parameters
@@ -165,6 +167,7 @@ public class PSDistmesh {
 		}
 
 		// compute the total forces / velocities
+
 		for(MLine<MeshPoint> line : lines) {
 			if(!line.p1.isFixPoint()) {
 				//line.p1.increaseVelocity(new VPoint(3, 3));

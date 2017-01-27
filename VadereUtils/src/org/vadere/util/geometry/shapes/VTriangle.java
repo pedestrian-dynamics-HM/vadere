@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
-
 import org.vadere.util.geometry.DataPoint;
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -167,10 +166,6 @@ public class VTriangle extends VPolygon {
 	}
 
 	public boolean isInCircumscribedCycle(final IPoint point) {
-		return getCircumcenter().distance(point) < getCircumscribedRadius();
-	}
-
-	public boolean isInCircumscribedCycle(final VPoint point) {
 		return getCircumcenter().distance(point) < getCircumscribedRadius();
 	}
 

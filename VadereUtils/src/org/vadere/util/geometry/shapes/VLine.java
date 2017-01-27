@@ -9,15 +9,12 @@ import org.vadere.util.geometry.GeometryUtils;
 public class VLine extends Line2D.Double {
 
 	private String identifier;
-	// TODO: delete these points
+
 	private VPoint p1;
 	private VPoint p2;
 
 	public VLine(final VPoint p1, final VPoint p2) {
 		super(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-		if(p1.equals(p2)) {
-			throw new IllegalArgumentException(p1 + " is equal " + p2);
-		}
 		this.p1 = p1;
 		this.p2 = p2;
 	}

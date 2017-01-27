@@ -7,7 +7,6 @@ import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.impl.PMesh;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.VPoint;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;

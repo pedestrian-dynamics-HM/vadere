@@ -166,7 +166,7 @@ public class GeometryUtils {
 		return Math.abs(result) / 2.0;
 	}
 
-	public static double areaOfPolygon(final IPoint... vertices) {
+    public static double areaOfPolygon(final IPoint... vertices) {
 		double result = 0;
 
 		for (int i = 0; i < vertices.length - 1; i++) {
@@ -185,40 +185,6 @@ public class GeometryUtils {
 	 * @return  all intersection poins of the line with the circle i.e. 1, 2 or 0 results.
 	 */
 	public static VPoint[] intersection(final VLine line, final VCircle circle) {
-		VCircle normedCircle = new VCircle(new VPoint(0,0), circle.getRadius());
-		Point2D p1 = line.getP1();
-		Point2D p2 = line.getP2();
-		VLine normedLine = new VLine(new VPoint(p1.getX(), p1.getY()).subtract(circle.getCenter()),
-				new VPoint(p2.getX(), p2.getY()).subtract(circle.getCenter()));
-
-		double dx = normedLine.getX2() - normedLine.getX1();
-		double dy = normedLine.getY2() - normedLine.getY1();
-		double drSquare = dx * dx + dy * dy;
-		double dr = Math.sqrt(drSquare);
-		double radius = normedCircle.getRadius();
-		double determinant = normedLine.getX1() * normedLine.getY2() - normedLine.getX2() * normedLine.getY1();
-		double discreminant = radius * radius * drSquare - determinant * determinant;
-
-		if(discreminant < 0) {
-			return new VPoint[0];
-		}
-		else if(discreminant == 0){
-			return  new VPoint[]{
-					new VPoint(determinant * dy / drSquare, -determinant * dx / drSquare).add(circle.getCenter())
-			};
-		}
-		else {
-			double sign = dy < 0 ? -1 : 1;
-			double x1 = (determinant * dy + sign * dx * Math.sqrt(discreminant)) / drSquare;
-			double y1 = (-determinant * dx + Math.abs(dy) * Math.sqrt(discreminant)) / drSquare;
-			double x2 = (determinant * dy - sign * dx * Math.sqrt(discreminant)) / drSquare;
-			double y2 = (-determinant * dx - Math.abs(dy) * Math.sqrt(discreminant)) / drSquare;
-
-			return new VPoint[]{ new VPoint(x1, y1).add(circle.getCenter()), new VPoint(x2, y2).add(circle.getCenter())};
-		}
-	}
-
-	public static VPoint[] intersection2(final VLine line, final VCircle circle) {
 		double m = line.slope();
 		double d = line.getY1() - m * line.getX1();
 		double a = circle.getCenter().getX();
@@ -262,7 +228,6 @@ public class GeometryUtils {
 	}
 
 	/**
-<<<<<<< HEAD
 	 *
 	 * Computes the angle between the x-axis through the given Point "center" and this.
 	 * Result is in interval (0,2*PI) according to standard math usage.
@@ -282,8 +247,6 @@ public class GeometryUtils {
 	}
 
 	/**
-=======
->>>>>>> much faster implementation of the BowyerWatson algorithm and a splitting algorithm for obscuse triangles
 	 * Returns the angle between line1 and line2 in clock wise order (cw).
 	 * @param line1
 	 * @param line2
