@@ -1,9 +1,13 @@
 package org.vadere.util.delaunay;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.data.DAG;
+import org.vadere.util.geometry.data.DAG;
+import org.vadere.util.geometry.data.Face;
+import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -11,84 +15,273 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
 
-public class BowyerWatson<P extends VPoint, T extends VTriangle> {
+public class BowyerWatson<P extends IPoint> {
 
 	private final Collection<P> points;
 	private final PointConstructor<P> pointConstructor;
-	private final TriangleConstructor<P, T> triangleConstructor;
+	private final TriangleConstructor<VPoint> triangleConstructor;
 	private P p0;
 	private P p1;
 	private P p2;
-	private DAG<DAGElement<P, T>> dag;
-	private final HashMap<Face<P>, DAG<DAGElement<P, T>>> map;
+	private DAG<DAGElement<P>> dag;
+	private final HashMap<Face<P>, DAG<DAGElement<P>>> map;
+	private Set<DAG<DAGElement<P>>> triangles;
 
 	public BowyerWatson(
 			final Collection<P> points,
 			final PointConstructor<P> pointConstructor,
-			final TriangleConstructor<P, T> triangleConstructor) {
+			final TriangleConstructor<VPoint> triangleConstructor) {
 		this.points = points;
 		this.pointConstructor = pointConstructor;
 		this.triangleConstructor = triangleConstructor;
 		this.map = new HashMap<>();
+		this.triangles = new HashSet<>();
 	}
 
 	public void init() {
-		P p_max = points.parallelStream().reduce(pointConstructor.create(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
-		P p_min = points.parallelStream().reduce(pointConstructor.create(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
+		P p_max = points.stream().reduce(pointConstructor.create(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
+		P p_min = points.stream().reduce(pointConstructor.create(Double.MAX_VALUE, Double.MAX_VALUE), (a, b) -> pointConstructor.create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
 		VRectangle bound = new VRectangle(p_min.getX(), p_min.getY(), p_max.getX()-p_min.getX(), p_max.getY()- p_min.getY());
 
 		double gap = 1.0;
-		double max = Math.max(bound.getWidth(), bound.getHeight());
+		double max = Math.max(bound.getWidth(), bound.getHeight())*2;
 		p0 = pointConstructor.create(bound.getX() - max - gap, bound.getY() - gap);
 		p1 = pointConstructor.create(bound.getX() + 2 * max + gap, bound.getY() - gap);
-		p2 = pointConstructor.create(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max+ gap);
+		p2 = pointConstructor.create(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max + gap);
 
-		Face superTriangle = Face.of(p0, p1, p2);
-		this.dag = new DAG<>(new DAGElement<>(superTriangle, Triple.of(p0, p1, p2), triangleConstructor));
+		Face<P> superTriangle = Face.of(p0, p1, p2);
+		this.dag = new DAG<>(new DAGElement<P>(superTriangle, Triple.of(p0, p1, p2), triangleConstructor));
 		this.map.put(superTriangle, dag);
 	}
 
 	public void execude() {
 		// 1. compute a random permutation of the point set/collection.
 
+		int count = 0;
+		// 2. insert points
 		for(P p : points) {
 			// find triangle containing p using the DAG.
-			Optional<DAG<DAGElement<P, T>>> opt = dag.matchAll(dagElement -> dagElement.getTriangle().contains(p));
-			assert opt.isPresent();
+			Set<DAG<DAGElement<P>>> leafs = locatePoint(p);
+			assert leafs.size() == 2 ||leafs.size() == 1;
 
-			DAG<DAGElement<P, T>> trianglePair = opt.get();
-			T vTriangle = trianglePair.getRoot().getTriangle();
-			Face<P> fTriangle = trianglePair.getRoot().getFace();
+			count++;
 
-			// p lies in the interior of the triangle
-			if(vTriangle.contains(p)){
-				// split the triangle into 3 new triangles.
-				split(p, trianglePair);
+			// point is inside a triangle
+			if(leafs.size() == 1) {
+				split(p, leafs.stream().findAny().get());
+			} // point lies on an edge of 2 triangles
+			else if(leafs.size() == 2) {
+				Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
+				splitBoth(p, it.next(), it.next());
+			}
+			else if(leafs.size() == 0) {
+				// problem due numerical calculation.
+				System.out.println("numerical error!");
 			}
 			else {
-				throw new IllegalStateException("this should never happen!");
+				Set<DAG<DAGElement<P>>> leafs2 = locatePoint(p);
+				System.out.println(leafs2 + " contains " + p);
+				throw new IllegalArgumentException("something is wrong here, this should never happen " + leafs.size() + " / " + p + " / " + count);
 			}
 		}
+
+		// 3. remove initial points
+		triangles = map.values().stream().filter(
+				dagElement -> {
+					Triple<P, P, P> triple = dagElement.getElement().getVertices();
+					Set<P> pointset = new HashSet<P>();
+					pointset.add(triple.getLeft());
+					pointset.add(triple.getMiddle());
+					pointset.add(triple.getRight());
+					return !pointset.contains(p0) && !pointset.contains(p1) && !pointset.contains(p2);
+				}
+		).collect(Collectors.toSet());
 	}
 
-	public Collection<T> getTriangles() {
-		return map.values().stream().map(dagElement -> dagElement.getRoot().getTriangle()).collect(Collectors.toList());
+	public Set<DAG<DAGElement<P>>> locatePoint(final P point) {
+
+		Set<DAG<DAGElement<P>>> leafs = new HashSet<>();
+		LinkedList<DAG<DAGElement<P>>> nodesToVisit = new LinkedList<>();
+		nodesToVisit.add(dag);
+
+		while(!nodesToVisit.isEmpty()) {
+			DAG<DAGElement<P>> currentNode = nodesToVisit.removeLast();
+			//System.out.println(nodesToVisit.size());
+			if(currentNode.getElement().getTriangle().isPartOf(point, 0.0)) {
+				if(currentNode.isLeaf()) {
+					leafs.add(currentNode);
+				}
+				else {
+					boolean check = false;
+					for(DAG<DAGElement<P>> child : currentNode.getChildren()) {
+						if(child.getElement().getTriangle().isPartOf(point, 0.0)) {
+							check = true;
+							nodesToVisit.add(child);
+							break;
+						}
+					}
+
+					// this may (due to nummerical errors) happen if the point is exactly on an edge of 2 triangles => add both
+					if(!check) {
+						int count = 0;
+						for(DAG<DAGElement<P>> child : currentNode.getChildren()) {
+							if(child.getElement().getTriangle().isPartOf(point, 0.0)) {
+								nodesToVisit.add(child);
+								count++;
+							}
+						}
+
+						if(count != 2) {
+							System.out.println("this can not be the case!");
+						}
+					}
+				}
+			}
+		}
+
+		return leafs;
+	}
+
+	public Collection<VTriangle> getTriangles() {
+		return triangles.stream().map(dagElement -> dagElement.getElement().getTriangle()).collect(Collectors.toList());
+	}
+
+	public Collection<Triple<P, P, P>> getTrianglePoints() {
+		return triangles.stream().map(dagElement -> dagElement.getElement().getVertices()).collect(Collectors.toList());
 	}
 
 	public Set<VLine> getEdges() {
-		return map.values().stream().flatMap(dagElement -> dagElement.getRoot().getTriangle().getLineStream()).collect(Collectors.toSet());
+		return triangles.stream().flatMap(dagElement -> dagElement.getElement().getTriangle().getLineStream()).collect(Collectors.toSet());
+	}
+
+	public Pair<DAG<DAGElement<P>>, DAG<DAGElement<P>>> splitBoth(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag, @NotNull DAG<DAGElement<P>> xwzDag) {
+		VTriangle xyzTriangle = xyzDag.getElement().getTriangle();
+		Face<P> xyzFace = xyzDag.getElement().getFace();
+		List<HalfEdge<P>> edges = xyzFace.getEdges();
+
+		HalfEdge<P> xz;
+		HalfEdge<P> zy;
+		HalfEdge<P> yx;
+
+		double eps = 0.00001;
+		if(Math.abs(pointOnEdge(edges.get(0), p)) < eps) {
+			xz = edges.get(0);
+			zy = edges.get(1);
+			yx = edges.get(2);
+		}
+		else if(Math.abs(pointOnEdge(edges.get(1), p)) < eps) {
+			xz = edges.get(1);
+			zy = edges.get(2);
+			yx = edges.get(0);
+		}
+		else if(Math.abs(pointOnEdge(edges.get(2), p)) < eps) {
+			xz = edges.get(2);
+			zy = edges.get(0);
+			yx = edges.get(1);
+		}
+		else {
+			pointOnEdge(edges.get(0), p);
+			pointOnEdge(edges.get(1), p);
+			pointOnEdge(edges.get(2), p);
+			throw new IllegalArgumentException(p + " lies on no edge!");
+		}
+		HalfEdge<P> zx = xz.getTwin().get();
+		HalfEdge<P> xw = zx.getNext();
+		HalfEdge<P> wz = xw.getNext();
+
+		Face<P> xwp = new Face<>(xw);
+		Face<P> wzp = new Face<>(wz);
+		Face<P> zyp = new Face<>(zy);
+		Face<P> yxp = new Face<>(yx);
+
+		// update faces for old edges
+		xw.setFace(xwp);
+		wz.setFace(wzp);
+		zy.setFace(zyp);
+		yx.setFace(yxp);
+
+		P x = yx.getEnd();
+		P y = zy.getEnd();
+		P z = wz.getEnd();
+		P w = xw.getEnd();
+
+		// new edges with twins
+		HalfEdge<P> px = new HalfEdge<>(x, xwp);
+		HalfEdge<P> xp = new HalfEdge<>(p, yxp);
+		px.setTwin(xp);
+
+		HalfEdge<P> pz = new HalfEdge<>(z, zyp);
+		HalfEdge<P> zp = new HalfEdge<>(p, wzp);
+		pz.setTwin(zp);
+
+		HalfEdge<P> py = new HalfEdge<>(y, yxp);
+		HalfEdge<P> yp = new HalfEdge<>(p, zyp);
+		py.setTwin(yp);
+
+		HalfEdge<P> pw = new HalfEdge<>(w, wzp);
+		HalfEdge<P> wp = new HalfEdge<>(p, xwp);
+		pw.setTwin(wp);
+
+		// build 4 triangles
+		xw.setNext(wp);
+		wp.setNext(px);
+		px.setNext(xw);
+
+		wz.setNext(zp);
+		zp.setNext(pw);
+		pw.setNext(wz);
+
+		zy.setNext(yp);
+		yp.setNext(pz);
+		pz.setNext(zy);
+
+		yx.setNext(xp);
+		xp.setNext(py);
+		py.setNext(yx);
+
+		DAG<DAGElement<P>> zypDag = new DAG<>(new DAGElement(zyp, Triple.of(z, y, p), triangleConstructor));
+		DAG<DAGElement<P>> yxpDag = new DAG<>(new DAGElement(yxp, Triple.of(y, x, p), triangleConstructor));
+
+		DAG<DAGElement<P>> xwpDag = new DAG<>(new DAGElement(xwp, Triple.of(x, w, p), triangleConstructor));
+		DAG<DAGElement<P>> wzpDag = new DAG<>(new DAGElement(wzp, Triple.of(w, z, p), triangleConstructor));
+
+		xyzDag.addChild(zypDag);
+		xyzDag.addChild(yxpDag);
+
+		xwzDag.addChild(xwpDag);
+		xwzDag.addChild(wzpDag);
+
+		map.remove(xyzDag.getElement().getFace());
+		map.remove(xwzDag.getElement().getFace());
+
+		map.put(zyp, zypDag);
+		map.put(yxp, yxpDag);
+
+		map.put(xwp, xwpDag);
+		map.put(wzp, wzpDag);
+
+		legalize(p, zy);
+		legalize(p, yx);
+		legalize(p, xw);
+		legalize(p, wz);
+		return Pair.of(xyzDag, xwzDag);
+	}
+
+	private static  <D extends IPoint> double pointOnEdge(final HalfEdge<D> edge, D point) {
+		double sign = GeometryUtils.sign(point, edge.getEnd(), edge.getPrevious().getEnd());
+		return sign;
 	}
 
 	/**
@@ -97,9 +290,8 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 	 * @param p
 	 * @param xyzDag
 	 */
-	public DAG<DAGElement<P, T>> split(@NotNull P p, @NotNull DAG<DAGElement<P, T>> xyzDag) {
-		VTriangle xyzTriangle = xyzDag.getRoot().getTriangle();
-		Face<P> xyzFace = xyzDag.getRoot().getFace();
+	public DAG<DAGElement<P>> split(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag) {
+		Face<P> xyzFace = xyzDag.getElement().getFace();
 
 		List<HalfEdge<P>> edges = xyzFace.getEdges();
 
@@ -147,15 +339,15 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 		zx.setFace(zxp);
 		yz.setFace(yzp);
 
-		DAG<DAGElement<P, T>> xypDag = new DAG<>(new DAGElement(xyp, Triple.of(x, y , p), triangleConstructor));
-		DAG<DAGElement<P, T>> yzpDag = new DAG<>(new DAGElement(yzp, Triple.of(y, z, p), triangleConstructor));
-		DAG<DAGElement<P, T>> zxpDag = new DAG<>(new DAGElement(zxp, Triple.of(z, x, p), triangleConstructor));
+		DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(xyp, Triple.of(x, y , p), triangleConstructor));
+		DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(yzp, Triple.of(y, z, p), triangleConstructor));
+		DAG<DAGElement<P>> zxpDag = new DAG<>(new DAGElement(zxp, Triple.of(z, x, p), triangleConstructor));
 
 		xyzDag.addChild(xypDag);
 		xyzDag.addChild(yzpDag);
 		xyzDag.addChild(zxpDag);
 
-		map.remove(xyzDag.getRoot().getFace());
+		map.remove(xyzDag.getElement().getFace());
 		map.put(xyp, xypDag);
 		map.put(yzp, yzpDag);
 		map.put(zxp, zxpDag);
@@ -167,7 +359,7 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 		return xyzDag;
 	}
 
-	public DAG<DAGElement<P, T>> getDag() {
+	public DAG<DAGElement<P>> getDag() {
 		return dag;
 	}
 
@@ -184,7 +376,7 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 			P x = edge.getTwin().get().getEnd();
 			P y = edge.getTwin().get().getNext().getEnd();
 			P z = edge.getTwin().get().getNext().getNext().getEnd();
-			VTriangle triangle = new VTriangle(x,y,z);
+			VTriangle triangle = new VTriangle(new VPoint(x.getX(), x.getY()), new VPoint(y.getX(), y.getY()), new VPoint(z.getX(), z.getY()));
 			return triangle.isInCircumscribedCycle(p);
 		}
 		return false;
@@ -215,12 +407,12 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 			P z = pz.getEnd();
 
 			Face<P> f1 = xz.getFace();
-			DAG<DAGElement<P, T>> xpzDag = map.get(f2);
-			DAG<DAGElement<P, T>> xzyDag = map.get(f1);
+			DAG<DAGElement<P>> xpzDag = map.get(f2);
+			DAG<DAGElement<P>> xzyDag = map.get(f1);
 
 			// update data structure
-			HalfEdge<P> py = new HalfEdge<P>(y, f2);
-			HalfEdge<P> yp = new HalfEdge<P>(p, f1);
+			HalfEdge<P> py = new HalfEdge<>(y, f2);
+			HalfEdge<P> yp = new HalfEdge<>(p, f1);
 			py.setTwin(yp);
 
 			xp.setNext(py);
@@ -243,8 +435,8 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 			yp.setFace(f1);
 
 			// update DAG
-			DAG<DAGElement<P, T>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(y, z, p), triangleConstructor));
-			DAG<DAGElement<P, T>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(x, y, p), triangleConstructor));
+			DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(y, z, p), triangleConstructor));
+			DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(x, y, p), triangleConstructor));
 
 			xpzDag.addChild(yzpDag);
 			xpzDag.addChild(xypDag);
@@ -298,13 +490,13 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 		points.add(new VPoint(80,70));*/
 
 		Random r = new Random();
-		for(int i=0; i<100; i++) {
+		for(int i=0; i< 1000000; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
 
 		long ms = System.currentTimeMillis();
-		BowyerWatson<VPoint, VTriangle> bw = new BowyerWatson<>(points,
+		BowyerWatson<VPoint> bw = new BowyerWatson<>(points,
 				(x, y) -> new VPoint(x, y),
 				(p1, p2, p3) -> new VTriangle(p1, p2, p3));
 		bw.init();
@@ -324,9 +516,9 @@ public class BowyerWatson<P extends VPoint, T extends VTriangle> {
 		ms = System.currentTimeMillis();
 		BowyerWatsonSlow<VPoint> bw2 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
 		bw2.execute();
-		Set<VLine> edges2 = bw2.getVTriangles().stream()
-				.map(triangle -> Arrays.asList(GeometryUtils.generateAcuteTriangles(triangle)))
-				.flatMap(list -> list.stream())
+		Set<VLine> edges2 = bw2.getTriangles().stream()
+				//.map(triangle -> Arrays.asList(GeometryUtils.generateAcuteTriangles(triangle)))
+				//.flatMap(list -> list.stream())
 				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
 		System.out.println(System.currentTimeMillis() - ms);
 
