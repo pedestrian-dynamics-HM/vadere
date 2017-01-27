@@ -29,7 +29,6 @@ public class PSDistmesh {
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
 	private Collection<? extends VShape> obstacles;
-
 	private int steps;
 
 	// Parameters
@@ -98,46 +97,7 @@ public class PSDistmesh {
 	}
 
 	public boolean hasMaximalSteps() {
-		return steps >= 1000;
-	}
-
-	/**
-	 * Remove all triangles intersecting any obstacle shape.
-	 */
-	public void cleanUp() {
-		/*bowyerWatson
-				.stream()
-				.map(face -> face.toTriangle())
-				.filter(triangle -> triangle.isNonAcute())
-				.map(triangle -> triangle.getCircumcenter())
-				.collect(Collectors.toSet())
-				.forEach(p -> bowyerWatson.insert(new MeshPoint(p, false)));*/
-
-	}
-
-	private void reTriangulate() {
-		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
-			maxMovementLen = 0;
-			bowyerWatson = new IncrementalTriangulation<>(new PMesh<>((x, y) -> new MeshPoint(x, y, false)), points, (x, y) -> new MeshPoint(x, y, false));
-
-			System.out.println("triangulation started");
-			bowyerWatson.compute();
-			System.out.println("triangulation finished");
-
-			IMesh<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();
-			Function<PHalfEdge<MeshPoint>, MLine<MeshPoint>> toLine = edge -> new MLine<>(mesh.getVertex(mesh.getPrev(edge)), mesh.getVertex(edge));
-
-			// compute the line and points again, since we filter some triangles
-			lines = bowyerWatson.streamFaces()
-					.filter(face -> distanceFunc.apply(bowyerWatson.getMesh().toTriangle(face).midPoint()) < -geps)
-					.flatMap(face ->mesh.streamEdges(face).map(halfEdge -> toLine.apply(halfEdge)))
-					.collect(Collectors.toSet());
-
-			points = lines.stream().flatMap(line -> line.streamPoints()).collect(Collectors.toSet());
-
-			System.out.println("number of edges: " + lines.size());
-			System.out.println("number of points: " + points.size());
-		}
+		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
 	}
 
 	/*
