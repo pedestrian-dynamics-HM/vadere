@@ -532,6 +532,10 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 							fireChangeViewportEvent(bound);
 						}
 					}
+					psDistmesh.cleanUp();
+					triangulation = psDistmesh.getTriangles();
+					setChanged();
+					fireChangeViewportEvent(bound);
 				});
 
 			t.start();
