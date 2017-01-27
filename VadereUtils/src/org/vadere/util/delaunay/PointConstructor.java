@@ -1,8 +1,8 @@
 package org.vadere.util.delaunay;
 
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.IPoint;
 
 @FunctionalInterface
-public interface PointConstructor<P extends VPoint> {
+public interface PointConstructor<P extends IPoint> {
 	P create(double x, double y);
 }

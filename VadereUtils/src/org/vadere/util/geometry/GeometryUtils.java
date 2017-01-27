@@ -2,21 +2,18 @@ package org.vadere.util.geometry;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.math.MathUtil;
 
 public class GeometryUtils {
 	/**
@@ -55,12 +52,12 @@ public class GeometryUtils {
 	 *        line representing the segment
 	 * @return the point on the line that is closest to p
 	 */
-	public static VPoint closestToSegment(VLine line, VPoint point) {
+	public static VPoint closestToSegment(VLine line, IPoint point) {
 		if (new VPoint((Point2D.Double) line.getP1()).equals(point)) {
 			return new VPoint(line.x1, line.y1);
 		}
 
-		VPoint a2p = new VPoint(point.x - line.x1, point.y - line.y1);
+		VPoint a2p = new VPoint(point.getX() - line.x1, point.getY() - line.y1);
 		VPoint a2b = new VPoint(line.x2 - line.x1, line.y2 - line.y1);
 		double distAB = a2b.x * a2b.x + a2b.y * a2b.y;
 		double a2p_dot_a2b = a2p.x * a2b.x + a2p.y * a2b.y;
@@ -125,67 +122,67 @@ public class GeometryUtils {
 		cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
 	}
 
-	public static VPolygon polygonFromPoints2D(List<VPoint> vertices) {
+	public static VPolygon polygonFromPoints2D(final List<VPoint> vertices) {
 		return polygonFromPoints2D(vertices.toArray(new VPoint[0]));
 	}
 
 	/**
-	 * 
-	 * @param vertices
-	 * @return
+	 * Constructs a new Polygon defined by the vertices. It is assumed that
+	 * all vertices a distinct.
+	 *
+	 * @param vertices the defining distinct vertices.
+	 * @return a new Polygon
 	 */
-	public static VPolygon polygonFromPoints2D(VPoint... vertices) {
+	public static VPolygon polygonFromPoints2D(final IPoint... vertices) {
 		Path2D.Double result = new Path2D.Double();
 		if (vertices.length == 0)
 			return new VPolygon(result);
 
-		VPoint last = vertices[vertices.length - 1];
+		IPoint last = vertices[vertices.length - 1];
 		result.moveTo(last.getX(), last.getY());
 
 		for (int i = 0; i < vertices.length; i++) {
 			result.lineTo(vertices[i].getX(), vertices[i].getY());
 		}
 
-		// result.lineTo(first.getX(), first.getY());
-
 		return new VPolygon(result);
 	}
 
-	public static VPoint[] intersection(final VLine line, final VCircle circle) {
-		VCircle normedCircle = new VCircle(new VPoint(0,0), circle.getRadius());
-		Point2D p1 = line.getP1();
-		Point2D p2 = line.getP2();
-		VLine normedLine = new VLine(new VPoint(p1.getX(), p1.getY()).subtract(circle.getCenter()),
-				new VPoint(p2.getX(), p2.getY()).subtract(circle.getCenter()));
+	/**
+	 * Computes the area of a Polygon.
+	 *
+	 * @param vertices distinct vertices defining the polygon.
+	 * @return the area of a polygon
+	 */
+	public static double areaOfPolygon(final List<? extends IPoint> vertices) {
+		double result = 0;
 
-		double dx = normedLine.getX2() - normedLine.getX1();
-		double dy = normedLine.getY2() - normedLine.getY1();
-		double drSquare = dx * dx + dy * dy;
-		double dr = Math.sqrt(drSquare);
-		double radius = normedCircle.getRadius();
-		double determinant = normedLine.getX1() * normedLine.getY2() - normedLine.getX2() * normedLine.getY1();
-		double discreminant = radius * radius * drSquare - determinant * determinant;
-
-		if(discreminant < 0) {
-			return new VPoint[0];
+		for (int i = 0; i < vertices.size() - 1; i++) {
+			result += (vertices.get(i).getY() + vertices.get(i + 1).getY())
+					* (vertices.get(i).getX() - vertices.get(i + 1).getX());
 		}
-		else if(discreminant == 0){
-			return  new VPoint[]{
-					new VPoint(determinant * dy / drSquare, -determinant * dx / drSquare).add(circle.getCenter())
-			};
-		}
-		else {
-			double sign = dy < 0 ? -1 : 1;
-			double x1 = (determinant * dy + sign * dx * Math.sqrt(discreminant)) / drSquare;
-			double y1 = (-determinant * dx + Math.abs(dy) * Math.sqrt(discreminant)) / drSquare;
-			double x2 = (determinant * dy - sign * dx * Math.sqrt(discreminant)) / drSquare;
-			double y2 = (-determinant * dx - Math.abs(dy) * Math.sqrt(discreminant)) / drSquare;
-
-			return new VPoint[]{ new VPoint(x1, y1).add(circle.getCenter()), new VPoint(x2, y2).add(circle.getCenter())};
-		}
+		return Math.abs(result) / 2.0;
 	}
 
-	public static VPoint[] intersection2(final VLine line, final VCircle circle) {
+	public static double areaOfPolygon(final IPoint... vertices) {
+		double result = 0;
+
+		for (int i = 0; i < vertices.length - 1; i++) {
+			result += (vertices[i].getY() + vertices[i + 1].getY())
+					* (vertices[i].getX() - vertices[i + 1].getX());
+		}
+		return Math.abs(result) / 2.0;
+	}
+
+	/**
+	 * Computes the intersection points of a line and a circle. The line is supposed to have infinity
+	 * length and is defined by the two points of the VLine.
+	 *
+	 * @param line      the line
+	 * @param circle    the circle
+	 * @return  all intersection poins of the line with the circle i.e. 1, 2 or 0 results.
+	 */
+	public static VPoint[] intersection(final VLine line, final VCircle circle) {
 		double m = line.slope();
 		double d = line.getY1() - m * line.getX1();
 		double a = circle.getCenter().getX();
@@ -221,7 +218,7 @@ public class GeometryUtils {
 	 * @param B
 	 * @return
 	 */
-	public static double angle(VPoint A, VPoint C, VPoint B) {
+	public static double angle(IPoint A, IPoint C, IPoint B) {
 		double phi1 = new Vector2D(A).angleTo(C);
 		double phi2 = new Vector2D(B).angleTo(C);
 		double phi = Math.abs(phi1 - phi2);
@@ -241,6 +238,10 @@ public class GeometryUtils {
 		double angle2 = Math.atan2(line2.getY1() - line2.getY2(),
 				line2.getX1() - line2.getX2());
 		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
+	}
+
+	public static double sign(final IPoint p1, final IPoint p2, final IPoint p3) {
+		return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
 	}
 
 
@@ -293,13 +294,13 @@ public class GeometryUtils {
 
 			VPoint d = triangle.getIncenter();
 			VCircle circle = new VCircle(d, d.distance(c));
-			VPoint[] iPoints = intersection2(new VLine(a, c), circle);
+			VPoint[] iPoints = intersection(new VLine(a, c), circle);
 
 			VPoint e = iPoints[0].equals(c, tolerance) ? iPoints[1] : iPoints[0];
-			iPoints = intersection2(new VLine(b, c), circle);
+			iPoints = intersection(new VLine(b, c), circle);
 			VPoint h = iPoints[0].equals(c, tolerance) ? iPoints[1] : iPoints[0];
 
-			iPoints = intersection2(new VLine(a, b), circle);
+			iPoints = intersection(new VLine(a, b), circle);
 
 			VPoint f = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[0] : iPoints[1];
 			VPoint g = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[1] : iPoints[0];
@@ -320,7 +321,7 @@ public class GeometryUtils {
 
 	}
 
-	public static VPoint add(VPoint p1, VPoint p2) {
+	public static VPoint add(final VPoint p1, final VPoint p2) {
 		return new VPoint(p1.x + p2.x, p1.y + p2.y);
 	}
 }

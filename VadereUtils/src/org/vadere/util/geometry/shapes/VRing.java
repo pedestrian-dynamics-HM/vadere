@@ -149,29 +149,29 @@ public class VRing implements VShape {
 	}
 
 	@Override
-	public double distance(VPoint point) {
+	public double distance(IPoint point) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
+	public VPoint closestPoint(IPoint point) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
 	@Override
-	public boolean contains(VPoint point) {
+	public boolean contains(IPoint point) {
 		double distanceFromCenterToPoint = center.distance(point);
 
 		return distanceFromCenterToPoint >= radiusInnerCircle && distanceFromCenterToPoint <= radiusOuterCircle;
 	}
 
 	@Override
-	public VShape translate(VPoint vector) {
+	public VShape translate(IPoint vector) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
 	@Override
-	public VShape translatePrecise(VPoint vector) {
+	public VShape translatePrecise(IPoint vector) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 

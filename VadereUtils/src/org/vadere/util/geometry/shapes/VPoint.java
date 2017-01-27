@@ -11,12 +11,13 @@ import org.vadere.util.geometry.GeometryUtils;
  * 
  * 
  */
-public class VPoint implements Cloneable {
+public class VPoint implements Cloneable, IPoint {
 
 	public static final VPoint ZERO = new VPoint(0, 0);
 
 	public double x;
 	public double y;
+	public int identifier = -1;
 
 	public VPoint() {}
 
@@ -24,6 +25,13 @@ public class VPoint implements Cloneable {
 		this.x = x;
 		this.y = y;
 	}
+
+	public VPoint(double x, double y, int identifier) {
+		this.x = x;
+		this.y = y;
+		this.identifier = identifier;
+	}
+
 
 	public VPoint(Point2D.Double copy) {
 		this.x = copy.x;
@@ -35,12 +43,20 @@ public class VPoint implements Cloneable {
 		this.y = copy.y;
 	}
 
-	public double distance(VPoint other) {
-		return Point2D.distance(x, y, other.x, other.y);
+	public double distance(IPoint other) {
+		return Point2D.distance(x, y, other.getX(), other.getY());
 	}
 
 	public double distance(Point2D other) {
 		return Point2D.distance(x, y, other.getX(), other.getY());
+	}
+
+	public void setId(int identifier) {
+		this.identifier = identifier;
+	}
+
+	public int getId() {
+		return identifier;
 	}
 
 	@Override
@@ -48,17 +64,6 @@ public class VPoint implements Cloneable {
 		return new VPoint(x, y);
 	}
 
-
-	@Override
-	public int hashCode() {
-		int result;
-		long temp;
-		temp = Double.doubleToLongBits(x);
-		result = (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(y);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -81,6 +86,14 @@ public class VPoint implements Cloneable {
 		return true;
 	}
 
+	@Override
+	public int hashCode() {
+		// hashCode of java.awt.geom.Point2D
+		long bits = java.lang.Double.doubleToLongBits(getX());
+		bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
+		return (((int) bits) ^ ((int) (bits >> 32)));
+	}
+
 	public boolean equals(final VPoint point, double tolerance) {
 		if (point == null) {
 			return false;
@@ -94,48 +107,60 @@ public class VPoint implements Cloneable {
 		return true;
 	}
 
+	@Override
 	public double getX() {
 		return x;
 	}
 
+	@Override
 	public double getY() {
 		return y;
 	}
 
+
+	@Override
 	public VPoint rotate(final double radAngle) {
 		return new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
 				x * Math.sin(radAngle) + y * Math.cos(radAngle));
 	}
 
-	public VPoint add(final VPoint point) {
-		return new VPoint(x + point.x, y + point.y);
+	@Override
+	public VPoint add(final IPoint point) {
+		return new VPoint(x + point.getX(), y + point.getY());
 	}
 
-	public VPoint addPrecise(final VPoint point) {
+	@Override
+	public VPoint addPrecise(final IPoint point) {
 		return VPoint.addPrecise(this, point);
 	}
 
-	public VPoint subtract(final VPoint point) {
-		return new VPoint(x - point.x, y - point.y);
+	@Override
+	public VPoint subtract(final IPoint point) {
+		return new VPoint(x - point.getX(), y - point.getY());
 	}
 
-	public VPoint multiply(final VPoint point) {
-		return new VPoint(x * point.x, y * point.y);
+	@Override
+	public VPoint multiply(final IPoint point) {
+		return new VPoint(x * point.getX(), y * point.getY());
 	}
 
+	@Override
 	public VPoint scalarMultiply(final double factor) {
 		return new VPoint(x * factor, y * factor);
 	}
 
-	public double scalarProduct(VPoint point) {
-		return x * point.x + y * point.y;
+	@Override
+	public double scalarProduct(IPoint point) {
+		return x * point.getX() + y * point.getY();
 	}
 
+	@Override
 	public VPoint norm() {
 		double abs = distanceToOrigin();
 		return new VPoint(x / abs, y / abs);
 	}
 
+	@Override
 	public VPoint normZeroSafe() {
 
 		VPoint result;
@@ -155,7 +180,7 @@ public class VPoint implements Cloneable {
 		return "(" + x + "," + y + ")";
 	}
 
-	public static VPoint addPrecise(final VPoint p1, final VPoint p2) {
+	public static VPoint addPrecise(final IPoint p1, final IPoint p2) {
 		BigDecimal p1X = BigDecimal.valueOf(p1.getX());
 		BigDecimal p2X = BigDecimal.valueOf(p2.getX());
 
@@ -165,6 +190,7 @@ public class VPoint implements Cloneable {
 		return new VPoint(p1X.add(p2X).doubleValue(), p1Y.add(p2Y).doubleValue());
 	}
 
+	@Override
 	public double distanceToOrigin() {
 		return Math.sqrt(x * x + y * y);
 	}
