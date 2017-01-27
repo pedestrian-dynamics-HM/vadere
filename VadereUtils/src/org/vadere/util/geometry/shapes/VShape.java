@@ -9,15 +9,15 @@ import org.vadere.util.geometry.ShapeType;
  * 
  */
 public interface VShape extends Shape, Cloneable {
-	double distance(VPoint point);
+	double distance(IPoint point);
 
-	VPoint closestPoint(VPoint point);
+	VPoint closestPoint(IPoint point);
 
-	boolean contains(VPoint point);
+	boolean contains(IPoint point);
 
-	VShape translate(final VPoint vector);
+	VShape translate(final IPoint vector);
 
-	VShape translatePrecise(final VPoint vector);
+	VShape translatePrecise(final IPoint vector);
 
 	VShape scale(final double scalar);
 

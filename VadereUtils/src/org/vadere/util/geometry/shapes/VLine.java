@@ -7,24 +7,53 @@ import org.vadere.util.geometry.GeometryUtils;
 @SuppressWarnings("serial")
 public class VLine extends Line2D.Double {
 
+	private String identifier;
+	private VPoint p1;
+	private VPoint p2;
+
 	public VLine(final VPoint p1, final VPoint p2) {
-		super(p1.x, p1.y, p2.x, p2.y);
+		super(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+		this.p1 = p1;
+		this.p2 = p2;
 	}
 
 	public VLine(double x1, double y1, double x2, double y2) {
 		super(x1, y1, x2, y2);
 	}
 
-	public double ptSegDist(VPoint point) {
-		return super.ptSegDist(point.x, point.y);
+	public double ptSegDist(IPoint point) {
+		return super.ptSegDist(point.getX(), point.getY());
 	}
 
 	public double slope() {
 		return (y2 - y1) / (x2 - x1);
 	}
 
-	public double distance(VPoint point) {
+	public double distance(IPoint point) {
 		return GeometryUtils.closestToSegment(this, point).distance(point);
+	}
+
+	@Override
+	public int hashCode() {
+		// this has to be symmetric
+		return super.getP1().hashCode() * getP2().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Line2D.Double) {
+			Line2D.Double other = (Line2D.Double)obj;
+			return getP1().equals(other.getP1()) && getP2().equals(other.getP2()) || getP1().equals(other.getP2()) && getP2().equals(other.getP1());
+		}
+		return false;
+	}
+
+	public String getIdentifier() {
+		return p1.identifier + ":" + p2.identifier;
+	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 
 	public double length() {

@@ -1,12 +1,13 @@
-package org.vadere.util.delaunay;
+package org.vadere.util.geometry.data;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Optional;
 
-public class HalfEdge<P extends VPoint> {
+public class HalfEdge<P extends IPoint> {
 
 	/**
 	 * point at the end of the half edge.
@@ -95,7 +96,7 @@ public class HalfEdge<P extends VPoint> {
 	}
 
 	public VLine toLine() {
-		return new VLine(this.getPrevious().getEnd(), this.getEnd());
+		return new VLine((VPoint) this.getPrevious().getEnd(), (VPoint) this.getEnd());
 	}
 
 	@Override

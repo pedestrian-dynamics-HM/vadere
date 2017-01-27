@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
-import org.omg.CORBA.portable.ValueOutputStream;
 import org.vadere.util.geometry.DataPoint;
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -47,6 +46,9 @@ public class VTriangle extends VPolygon {
 	public VTriangle(@NotNull VPoint p1, @NotNull VPoint p2, @NotNull VPoint p3) {
 		super(GeometryUtils.polygonFromPoints2D(p1, p2, p3));
 
+		if(p1.equals(p2) || p1.equals(p3) || p2.equals(p3)) {
+			System.out.println("fucked up");
+		}
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
@@ -54,9 +56,30 @@ public class VTriangle extends VPolygon {
 		lines = new VLine[]{ new VLine(p1, p2), new VLine(p2, p3), new VLine(p3,p1) };
 	}
 
+	@Override
+	public boolean contains(final IPoint point) {
+		boolean b1, b2, b3;
+		double d1 = GeometryUtils.sign(point, p1, p2);
+		double d2 = GeometryUtils.sign(point, p2, p3);
+		double d3 = GeometryUtils.sign(point, p3, p1);
+		b1 = d1 < 0.0;
+		b2 = d2 < 0.0;
+		b3 = d3 < 0.0;
+		return ((b1 == b2) && (b2 == b3));
+	}
+
+	// TODO: find better name
+	public boolean isPartOf(final IPoint point, final double eps) {
+		boolean b1, b2, b3;
+		double d1 = GeometryUtils.sign(point, p1, p2);
+		double d2 = GeometryUtils.sign(point, p2, p3);
+		double d3 = GeometryUtils.sign(point, p3, p1);
+		return (d1 <= eps && d2 <= eps && d3 <= eps) || (d1 >= -eps && d2 >= -eps && d3 >= -eps);
+	}
+
 	public VPoint midPoint() {
-		return new VPoint((p1.x + p2.x + p3.x) / 3.0,
-				(p1.y + p2.y + p3.y) / 3.0);
+		return new VPoint((p1.getX() + p2.getX() + p3.getX()) / 3.0,
+				(p1.getY() + p2.getY() + p3.getY()) / 3.0);
 	}
 
 	public boolean isLine() {
@@ -95,8 +118,8 @@ public class VTriangle extends VPolygon {
 			double c = p3.distance(p1);
 			double perimeter = a + b + c;
 
-			incenter = new VPoint((a * p3.x + b * p1.x + c * p2.x) / perimeter,
-					(a * p3.y + b * p1.y + c * p2.y) / perimeter);
+			incenter = new VPoint((a * p3.getX() + b * p1.getX() + c * p2.getX()) / perimeter,
+					(a * p3.getY() + b * p1.getY() + c * p2.getY()) / perimeter);
 		}
 
 		return incenter;
@@ -104,10 +127,10 @@ public class VTriangle extends VPolygon {
 
 	public VPoint getOrthocenter() {
 		if(orthocenter == null) {
-			double slope = -1 / ((p2.y - p1.y) / (p2.x - p1.x));
+			double slope = -1 / ((p2.getY() - p1.getY()) / (p2.getX() - p1.getX()));
 			// y  = slope * (x - p3.x) + p3.y
 
-			double slope2 = -1 / ((p1.y - p3.y) / (p1.x - p3.x));
+			double slope2 = -1 / ((p1.getY() - p3.getY()) / (p1.getX() - p3.getX()));
 			// y = slope2 * (x - p2.x) + p2.y
 
 			// slope2 * (x - p2.x) + p2.y  = slope * (x - p3.x) + p3.y
@@ -115,8 +138,8 @@ public class VTriangle extends VPolygon {
 			// slope2 * x - slope2 * p2.x - slope * x + slope * p3.x =  + p3.y - p2.y
 			// slope2 * x  - slope * x  =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
 			// x * (slope2 - slope) =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
-			double x = (p3.y - p2.y + slope2 * p2.x - slope * p3.x) / (slope2 - slope);
-			double y = slope * (x - p3.x) + p3.y;
+			double x = (p3.getY() - p2.getY() + slope2 * p2.getX() - slope * p3.getX()) / (slope2 - slope);
+			double y = slope * (x - p3.getX()) + p3.getY();
 
 			orthocenter = new VPoint(x, y);
 		}
@@ -144,7 +167,7 @@ public class VTriangle extends VPolygon {
 		return getCircumcenter().distance(p1);
 	}
 
-	public boolean isInCircumscribedCycle(final VPoint point) {
+	public boolean isInCircumscribedCycle(final IPoint point) {
 		return getCircumcenter().distance(point) < getCircumscribedRadius();
 	}
 
