@@ -25,7 +25,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public double distance(VPoint point) {
+	public double distance(IPoint point) {
 		VPoint closestPoint = closestPoint(point);
 
 		if (contains(point)) {
@@ -36,7 +36,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
+	public VPoint closestPoint(IPoint point) {
 		VLine[] lines = getLines();
 		VPoint result = GeometryUtils.closestToSegment(lines[0], point);
 		double distanceToLine = result.distance(point);
@@ -80,19 +80,19 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public boolean contains(VPoint point) {
-		return super.contains(point.x, point.y);
+	public boolean contains(IPoint point) {
+		return super.contains(point.getX(), point.getY());
 	}
 
 	@Override
-	public VShape translatePrecise(final VPoint vector) {
+	public VShape translatePrecise(final IPoint vector) {
 		VPoint dp = VPoint.addPrecise(vector, new VPoint(getX(), getY()));
 		return new VRectangle(dp.getX(), dp.getY(), getWidth(), getHeight());
 	}
 
 	@Override
-	public VShape translate(final VPoint vector) {
-		return new VRectangle(getX() + vector.x, getY() + vector.y, getWidth(), getHeight());
+	public VShape translate(final IPoint vector) {
+		return new VRectangle(getX() + vector.getX(), getY() + vector.getY(), getWidth(), getHeight());
 	}
 
 	@Override

@@ -2,13 +2,12 @@ package org.vadere.util.geometry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.delaunay.Face;
-import org.vadere.util.delaunay.HalfEdge;
+import org.vadere.util.geometry.data.Face;
+import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.delaunay.PointLocation;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
