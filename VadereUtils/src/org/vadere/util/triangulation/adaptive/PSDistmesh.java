@@ -100,6 +100,14 @@ public class PSDistmesh {
 		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
 	}
 
+	/**
+	 * Remove all triangles intersecting any obstacle shape.
+	 */
+	public void cleanUp() {
+		triangulation = triangulation.stream()
+				.filter(triple -> obstacles.stream().noneMatch(obstacle -> tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());
+	}
+
 	/*
 	Stellt den Verlauf der Iterationen dar. Innerhalb der while(true) passiert eine Iteration des Algorithmus
 	 */
