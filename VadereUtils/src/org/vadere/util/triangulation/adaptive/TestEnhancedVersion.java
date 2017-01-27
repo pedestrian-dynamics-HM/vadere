@@ -19,7 +19,7 @@ public class TestEnhancedVersion extends JFrame {
     {
 //        VRectangle bbox = new VRectangle(0,0,100,100);
 //        ArrayList<VRectangle> obs = new ArrayList<VRectangle>() {{ add(new VRectangle(20,20,20,20));}};
-	    double h0 = 0.1;
+	    double h0 = 1.0;
 
 	    long now = System.currentTimeMillis();
 

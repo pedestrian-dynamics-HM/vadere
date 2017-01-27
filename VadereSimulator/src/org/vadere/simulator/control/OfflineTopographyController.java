@@ -28,14 +28,7 @@ public class OfflineTopographyController {
 	// add bounding box
 	protected void prepareTopography() {
 		if (this.topography.isBounded() && !this.topography.hasBoundary()) {
-			VPolygon boundary = new VPolygon(this.topography.getBounds());
-			double width = this.topography.getBoundingBoxWidth();
-			Collection<VPolygon> boundingBoxObstacleShapes = boundary
-					.borderAsShapes(width, width / 2.0, 0.0001);
-			for (VPolygon obstacleShape : boundingBoxObstacleShapes) {
-				AttributesObstacle obstacleAttributes = new AttributesObstacle(
-						-1, obstacleShape);
-				Obstacle obstacle = new Obstacle(obstacleAttributes);
+			for(Obstacle obstacle : Topography.createObstacleBoundary(topography)) {
 				this.topography.addBoundary(obstacle);
 			}
 		}
