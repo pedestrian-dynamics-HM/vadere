@@ -82,6 +82,7 @@ public class PSDistmesh {
 			step();
 			test = qualityCheck();
 		}
+		cleanUp();
 	}
 
 	public boolean hasConverged() {
@@ -92,6 +93,14 @@ public class PSDistmesh {
 
 	public boolean hasMaximalSteps() {
 		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
+	}
+
+	/**
+	 * Remove all triangles intersecting any obstacle shape.
+	 */
+	public void cleanUp() {
+		triangulation = triangulation.stream()
+				.filter(triple -> obstacles.stream().noneMatch(obstacle -> tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());
 	}
 
 	/*

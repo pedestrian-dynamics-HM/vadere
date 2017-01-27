@@ -436,4 +436,17 @@ public class VPolygon extends Path2D.Double implements VShape {
 	public ShapeType getType() {
 		return ShapeType.POLYGON;
 	}
+
+	@Override
+	public boolean intersect(final VShape shape) {
+		if(shape instanceof VPolygon) {
+			return intersects((VPolygon) shape);
+		}
+		else if(shape instanceof VRectangle){
+			return intersects(((VRectangle)shape));
+		}
+		else {
+			throw new UnsupportedOperationException("not yet implemented");
+		}
+	}
 }

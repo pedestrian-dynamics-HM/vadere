@@ -188,4 +188,9 @@ public class VCircle implements VShape {
 	public ShapeType getType() {
 		return ShapeType.CIRCLE;
 	}
+
+	@Override
+	public boolean intersect(final VShape shape) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
 }
