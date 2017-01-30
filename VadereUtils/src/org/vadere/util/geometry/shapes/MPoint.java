@@ -1,21 +1,10 @@
-package org.vadere.util.triangulation.adaptive;
+package org.vadere.util.geometry.shapes;
 
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-
-public class MPoint implements IPoint {
-	private boolean fixPoint;
+public class MPoint implements IPoint{
 	private VPoint point;
-	private IPoint velocity;
 
-	public MPoint(final double x, final double y, boolean fixPoint){
+	public MPoint(final double x, final double y){
 		this.point = new VPoint(x, y);
-		this.fixPoint = fixPoint;
-		this.velocity = new VPoint(0,0);
-	}
-
-	public MPoint(final double x, final double y, final int id){
-		this(x, y, false);
 	}
 
 	public VPoint toVPoint() {
@@ -101,10 +90,10 @@ public class MPoint implements IPoint {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof MPoint))
+		if (!(obj instanceof IPoint))
 			return false;
 
-		MPoint other = (MPoint) obj;
+		IPoint other = (IPoint) obj;
 
 		if (this.getX() != other.getX())
 			return false;
@@ -129,25 +118,5 @@ public class MPoint implements IPoint {
 	public double distanceToOrigin() {
 		return this.point.distanceToOrigin();
 	}
-
-	public void increaseVelocity(final VPoint increase) {
-		this.velocity = this.velocity.add(increase);
-	}
-
-	public void decreaseVelocity(final VPoint decrease) {
-		this.velocity = this.velocity.subtract(decrease);
-	}
-
-	public void setVelocity(final VPoint velocity) {
-		this.velocity = velocity;
-	}
-
-	public IPoint getVelocity() {
-		return velocity;
-	}
-
-	public boolean isFixPoint() {
-		return fixPoint;
-	}
-
+	
 }

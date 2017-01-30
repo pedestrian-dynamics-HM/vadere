@@ -8,7 +8,7 @@ import org.vadere.util.geometry.GeometryUtils;
 
 /**
  * Immutable point.
- * 
+ * TODO: this class should be final
  * 
  */
 public class VPoint implements Cloneable, IPoint {
