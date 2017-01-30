@@ -26,13 +26,13 @@ import java.util.List;
  * contains the factory method to create a PotentialFieldAndInitializer object.
  *
  */
-class PotentialFieldAndInitializer {
-	protected final EikonalSolver eikonalSolver;
+class PotentialFieldAndInitializer<E extends EikonalSolver> {
+	protected final E eikonalSolver;
 	protected final AttributesFloorField attributesFloorField;
 	private static Logger logger = LogManager.getLogger(PotentialFieldAndInitializer.class);
 
 	protected PotentialFieldAndInitializer(
-			final EikonalSolver eikonalSolver,
+			final E eikonalSolver,
 			final AttributesFloorField attributesFloorField) {
 		this.eikonalSolver = eikonalSolver;
 		this.attributesFloorField = attributesFloorField;
@@ -78,29 +78,19 @@ class PotentialFieldAndInitializer {
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
 			case FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty());
 				break;
 			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty());
 				break;
 			default:
-				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty());
 		}
 
 		long ms = System.currentTimeMillis();
 		eikonalSolver.initialize();
 		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 
-		return new PotentialFieldAndInitializer(eikonalSolver, attributesPotential);
-	}
-
-	public double[] getGridPotentials(List<Point> points) {
-		double[] result = new double[points.size()];
-
-		for (int i = 0; i < points.size(); i++) {
-			result[i] = this.eikonalSolver.getPotentialField().getValue(points.get(i)).potential;
-		}
-
-		return result;
+		return new PotentialFieldAndInitializer<>(eikonalSolver, attributesPotential);
 	}
 }

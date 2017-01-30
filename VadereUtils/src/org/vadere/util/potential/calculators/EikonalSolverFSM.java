@@ -9,10 +9,6 @@ import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +26,7 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFSM implements EikonalSolver {
+public class EikonalSolverFSM extends AbstractGridEikonalSolver {
 	private CellGrid cellGrid;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFSM.class);
 	private ITimeCostFunction timeCostFunction;
@@ -40,10 +36,13 @@ public class EikonalSolverFSM implements EikonalSolver {
 
 	private static final double EPSILON = 0.001;
 
-	public EikonalSolverFSM(final CellGrid cellGrid,
+	public EikonalSolverFSM(
+			final CellGrid cellGrid,
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
-			final ITimeCostFunction timeCostFunction) {
+			final ITimeCostFunction timeCostFunction,
+			final double unknownPenalty) {
+		super(cellGrid, unknownPenalty);
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
@@ -78,11 +77,6 @@ public class EikonalSolverFSM implements EikonalSolver {
 		 * e.printStackTrace();
 		 * }
 		 */
-	}
-
-	@Override
-	public CellGrid getPotentialField() {
-		return cellGrid;
 	}
 
 	private void init() {
@@ -174,6 +168,11 @@ public class EikonalSolverFSM implements EikonalSolver {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isValidPoint(Point point) {
+		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

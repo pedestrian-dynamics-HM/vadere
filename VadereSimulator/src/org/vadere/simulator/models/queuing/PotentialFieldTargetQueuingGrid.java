@@ -80,7 +80,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 				topography.getTargets().stream().map(t -> t.getShape()).collect(Collectors.toList());
 
 		this.detector = new QueueDetector(cellGrid, targetShapes, true, new UnitTimeCostFunction(),
-				attributesPedestrian, topography);
+				attributesPedestrian, topography, new AttributesFloorField().getObstacleGridPenalty());
 		this.queues = topography.getTargets().stream().map(t -> t.getId()).distinct()
 				.map(targetId -> new Queue(topography, targetId, detector)).collect(Collectors.toList());
 	}

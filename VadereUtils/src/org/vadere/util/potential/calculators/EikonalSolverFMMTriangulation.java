@@ -1,9 +1,9 @@
 package org.vadere.util.potential.calculators;
 
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
+import java.awt.*;
 import java.util.List;
 
 
@@ -20,8 +20,14 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	}
 
 	@Override
-	public CellGrid getPotentialField() {
-		return null;
+	public double getValue(double x, double y) {
+		return 0;
 	}
+
+	@Override
+	public boolean isValidPoint(Point point) {
+		return false;
+	}
+
 
 }

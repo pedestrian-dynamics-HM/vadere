@@ -23,5 +23,5 @@ public interface GradientProvider {
 	 * @param grad
 	 *        the result vector
 	 */
-	public void gradient(double t, int currentTargetId, double[] x, double[] grad);
+	void gradient(double t, int currentTargetId, double[] x, double[] grad);
 }
