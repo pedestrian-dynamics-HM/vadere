@@ -99,10 +99,10 @@ public class TestEnhancedVersion extends JFrame {
 		        graphics.fill(obstacle);
 	        }
 
+	        graphics.setColor(Color.BLACK);
 	        meshGenerator.getTriangles().stream().forEach(t -> graphics.draw(t));
             //graphics.translate(5,5);
 	        graphics2D.drawImage(image, 20, 20, null);
-            graphics.setColor(Color.BLACK);
 
 
 

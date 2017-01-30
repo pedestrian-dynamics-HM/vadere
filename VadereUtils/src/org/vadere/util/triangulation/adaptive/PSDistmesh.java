@@ -14,6 +14,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.ITriangulation;
 
 import java.awt.geom.PathIterator;
 import java.util.*;
@@ -24,7 +25,6 @@ public class PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
 	private IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
-
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -104,11 +104,26 @@ public class PSDistmesh {
 	 * Remove all triangles intersecting any obstacle shape.
 	 */
 	public void cleanUp() {
-		triangulation = triangulation.stream()
-				.filter(triple -> obstacles.stream().noneMatch(obstacle -> tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());
+		/*triangulation = triangulation.stream()
+				.filter(triple -> obstacles.stream().noneMatch(
+						obstacle ->
+								tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());*/
+		reTriangulate();
+		/*obstacles.stream()
+				.filter(shape -> shape instanceof VRectangle)
+				.map(shape -> (VRectangle)shape).forEach(rect -> {
+					triangulation.removeIf(triple -> tripleToTriangle(triple).intersects(new VLine(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMaxY()))
+							|| tripleToTriangle(triple).intersects(new VLine(rect.getMaxX(), rect.getMinY(), rect.getMinX(), rect.getMaxY())));
+				}
+		);*/
 	}
 
-	/*
+    private void reTriangulate() {
+
+    }
+
+
+    /*
 	Stellt den Verlauf der Iterationen dar. Innerhalb der while(true) passiert eine Iteration des Algorithmus
 	 */
 	public void step()
@@ -135,7 +150,6 @@ public class PSDistmesh {
 		}
 
 		// compute the total forces / velocities
-
 		for(MLine<MeshPoint> line : lines) {
 			if(!line.p1.isFixPoint()) {
 				//line.p1.increaseVelocity(new VPoint(3, 3));
@@ -235,7 +249,6 @@ public class PSDistmesh {
 
 	private Set<MeshPoint> generatePoints() {
 		Set<MeshPoint> gridPoints = generateGridPoints();
-		//Set<MeshPoint> fixPoints = generateFixPoints();
 
 		// point density function 1 / (desiredLen^2)
 		Function<IPoint, Double> pointDensityFunc = vertex -> 1 / (relativeDesiredEdgeLengthFunc.apply(vertex) * relativeDesiredEdgeLengthFunc.apply(vertex));
@@ -333,7 +346,6 @@ public class PSDistmesh {
 			IPoint iPoint = lineIterator.next();
 			points.add(new MeshPoint(iPoint.getX(), iPoint.getY(), true));
 		}
-
 		return points;
 	}
 
@@ -355,5 +367,4 @@ public class PSDistmesh {
 	public IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation(){
 		return bowyerWatson;
 	}
-
 }

@@ -32,11 +32,17 @@ public class TestBoyerWatson {
 		VPoint p3 = new VPoint(50, 50);
 		VPoint p4 = new VPoint(0, 50);
 
+		VPoint p6 = new VPoint(50, 50);
 		VPoint p5 = new VPoint(25, 25);
 
-		Arrays.asList(p1, p2, p3, p4, p5);
+		Set<VPoint> points = new HashSet<>();
+		points.add(p1);
+		points.add(p2);
+		points.add(p3);
+		points.add(p4);
+		points.add(p6);
 
-		BowyerWatson<VPoint> boyerWatsonImproved = new BowyerWatson<>(Arrays.asList(p1, p2, p3, p4, p5), (x, y) -> new VPoint(x, y), (a, b, c) -> new VTriangle(a, b, c));
+		BowyerWatson<VPoint> boyerWatsonImproved = new BowyerWatson<>(points, (x, y) -> new VPoint(x, y), (a, b, c) -> new VTriangle(a, b, c));
 		boyerWatsonImproved.init();
 		boyerWatsonImproved.execude();
 		Collection<VTriangle> triangulation = boyerWatsonImproved.getTriangles();
@@ -50,10 +56,15 @@ public class TestBoyerWatson {
 		VPoint p3 = new VPoint(25, 25);
 		VPoint centerPoint = new VPoint(25, 10);
 
+		Set<VPoint> points = new HashSet<>();
+		points.add(p1);
+		points.add(p2);
+		points.add(p3);
+
 		Face<VPoint> face = Face.of(p1,p2,p3);
 		DAG<DAGElement<VPoint>> dag = new DAG<>(new DAGElement<>(face, Triple.of(p1,p2,p3), (a, b, c) -> new VTriangle(a, b, c)));
 
-		BowyerWatson<VPoint> boyerWatsonImproved = new BowyerWatson<>(Arrays.asList(p1, p2, p3), (x, y) -> new VPoint(x, y), (a, b, c) -> new VTriangle(a, b, c));
+		BowyerWatson<VPoint> boyerWatsonImproved = new BowyerWatson<>(points, (x, y) -> new VPoint(x, y), (a, b, c) -> new VTriangle(a, b, c));
 		DAG<DAGElement<VPoint>> result = boyerWatsonImproved.split(centerPoint, dag);
 		Set<VTriangle> triangulation = new HashSet<>(result.collectLeafs().stream().map(dagElement -> dagElement.getTriangle()).collect(Collectors.toList()));
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
