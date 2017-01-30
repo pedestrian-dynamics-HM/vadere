@@ -19,7 +19,7 @@ import org.vadere.util.geometry.shapes.VShape;
  * based on the AttributesFloorField.
  *
  */
-public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget {
+public class PotentialFieldSingleTargetGrid extends AbstractGridPotentialFieldTarget {
 
 	private Topography topography;
 	private AttributesFloorField attributesFloorField;

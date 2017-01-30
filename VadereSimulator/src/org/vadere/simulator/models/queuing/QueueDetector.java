@@ -41,9 +41,15 @@ public class QueueDetector extends EikonalSolverFMM {
 	 * @param isHighAccuracy
 	 * @param timeCostFunction
 	 */
-	public QueueDetector(CellGrid potentialField, List<VShape> targetShapes, boolean isHighAccuracy,
-			ITimeCostFunction timeCostFunction, AttributesAgent attributesPedestrian, Topography topography) {
-		super(potentialField, targetShapes, isHighAccuracy, timeCostFunction);
+	public QueueDetector(
+			final CellGrid potentialField,
+			final List<VShape> targetShapes,
+			final boolean isHighAccuracy,
+			final ITimeCostFunction timeCostFunction,
+			final AttributesAgent attributesPedestrian,
+			final Topography topography,
+			final double unkownPenalty) {
+		super(potentialField, targetShapes, isHighAccuracy, timeCostFunction, unkownPenalty);
 		this.orderedPoints = new LinkedList<>();
 		this.attributesPedestrian = attributesPedestrian;
 		this.topography = topography;

@@ -52,13 +52,13 @@ public class InterpolationUtil {
 	 * Computes bilinear interpolation while nodes may be undefined
 	 * (=Double.MAX_VALUE). See bilinearInterpolation for further information
 	 * about the basic method. In contrast to the original
-	 * bilinearInterpolation(), bilinearInterpolationWithUnkown() just
+	 * bilinearInterpolation(), bilinearInterpolationWithUnknown() just
 	 * accumulates the nodes whose values are known multiplied by its weight.
 	 * The accumulated weight of the known values are stored in the parameter
 	 * weightOfKnown.
 	 */
-	public static double bilinearInterpolationWithUnkown(double z[], double t,
-			double u, double weightOfKnown[]) {
+	public static double bilinearInterpolationWithUnknown(double z[], double t,
+	                                                      double u, double weightOfKnown[]) {
 		double result = 0;
 		double weight[] = {(1 - t) * (1 - u), t * (1 - u), t * u, (1 - t) * u};
 

@@ -1,7 +1,6 @@
 package org.vadere.util.potential.calculators;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ import org.vadere.util.potential.timecost.ITimeCostFunction;
  * Hence, the initializer may be used to realize static floor fields.
  * 
  */
-public class EikonalSolverFMM implements EikonalSolver {
+public class EikonalSolverFMM extends AbstractGridEikonalSolver {
 	protected final PriorityQueue<Point> narrowBand;
 	protected final ITimeCostFunction timeCostFunction;
 
@@ -39,10 +38,13 @@ public class EikonalSolverFMM implements EikonalSolver {
 	/**
 	 * Initializes the FM potential calculator with a time cost function F > 0.
 	 */
-	public EikonalSolverFMM(CellGrid potentialField,
-			List<VShape> targetShapes,
-			boolean isHighAccuracy,
-			ITimeCostFunction timeCostFunction) {
+	public EikonalSolverFMM(
+			final CellGrid potentialField,
+			final List<VShape> targetShapes,
+			final boolean isHighAccuracy,
+			final ITimeCostFunction timeCostFunction,
+			final double unknownPenalty) {
+		super(potentialField, unknownPenalty);
 		this.cellGrid = potentialField;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
@@ -137,8 +139,8 @@ public class EikonalSolverFMM implements EikonalSolver {
 	}
 
 	@Override
-	public CellGrid getPotentialField() {
-		return cellGrid;
+	public boolean isValidPoint(Point point) {
+		return cellGrid.isValidPoint(point);
 	}
 
 	protected void setNeighborDistances(final Point point) {
