@@ -19,13 +19,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public abstract class AbstractPotentialFieldTarget implements IPotentialFieldTargetGrid {
+public abstract class AbstractGridPotentialFieldTarget implements IPotentialFieldTargetGrid {
 
 	protected static double EPSILON_SIM_TIME = 1e-100; // TODO [priority=medium] [task=fix] 1e-100 comparisons with values that are O(1e-8) are dangerous. Better use 1e-8 here.
 	protected double lastUpdateTimestamp;
 	protected Topography topography;
 	private boolean wasUpdated;
-	private static Logger logger = LogManager.getLogger(AbstractPotentialFieldTarget.class);
+	private static Logger logger = LogManager.getLogger(AbstractGridPotentialFieldTarget.class);
 
 	/**
 	 * Stores all potential fields which represent the observation area. The key
@@ -34,7 +34,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialFieldTar
 	 */
 	protected final HashMap<Integer, PotentialFieldAndInitializer> targetPotentialFields;
 
-	public AbstractPotentialFieldTarget(final Topography topography) {
+	public AbstractGridPotentialFieldTarget(final Topography topography) {
 		this.topography = topography;
 		this.wasUpdated = false;
 		this.targetPotentialFields = new HashMap<>();

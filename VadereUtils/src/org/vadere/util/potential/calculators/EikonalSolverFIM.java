@@ -2,6 +2,7 @@ package org.vadere.util.potential.calculators;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
@@ -9,7 +10,6 @@ import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
-import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,28 +27,35 @@ import java.util.stream.Collectors;
  */
 public class EikonalSolverFIM implements EikonalSolver {
 
-	private CellGrid cellGrid;
 	private List<VShape> targetShapes;
 	private List<Point> targetPoints;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFIM.class);
 	private ITimeCostFunction timeCostFunction;
 	private boolean isHighAccuracy;
 	private boolean isActiveList[][];
-
+    private final CellGrid cellGrid;
 	private final double epsilon;
+
+	private final double weight;
+	private final double unknownPenalty;
 
 	private LinkedList<Point> activeList;
 
-	public EikonalSolverFIM(final CellGrid cellGrid,
+	public EikonalSolverFIM(
+			final CellGrid cellGrid,
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
-			final ITimeCostFunction timeCostFunction) {
+			final ITimeCostFunction timeCostFunction,
+            final double weight,
+            final double unknownPenalty) {
+	    this.cellGrid = cellGrid;
+	    this.weight = weight;
+	    this.unknownPenalty = unknownPenalty;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
-		this.cellGrid = cellGrid;
 		this.activeList = new LinkedList<>();
 		this.epsilon = cellGrid.getResolution() / 100;
 
@@ -148,14 +155,23 @@ public class EikonalSolverFIM implements EikonalSolver {
 		return false;
 	}
 
-	@Override
-	public CellGrid getPotentialField() {
-		return cellGrid;
-	}
+    @Override
+    public CellGrid getPotentialField() {
+        return cellGrid;
+    }
 
-	@Override
+    @Override
+    public double getValue(double x, double y) {
+        return getPotential(new VPoint(x,y), unknownPenalty, weight);
+    }
+
+    @Override
 	public ITimeCostFunction getTimeCostFunction() {
 		return timeCostFunction;
+	}
+
+	public boolean isValidPoint(Point point) {
+		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

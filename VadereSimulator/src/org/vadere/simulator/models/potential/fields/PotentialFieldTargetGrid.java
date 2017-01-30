@@ -15,7 +15,7 @@ import org.vadere.util.geometry.shapes.VShape;
  * based on the AttributesFloorField.
  *
  */
-public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
+public class PotentialFieldTargetGrid extends AbstractGridPotentialFieldTarget {
 
 	// private HashMap<Integer, PotentialFieldAndInitializer> staticPotentialFields;
 

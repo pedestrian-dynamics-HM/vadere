@@ -3,6 +3,7 @@ package org.vadere.util.potential.calculators;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
@@ -10,9 +11,8 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 
-import java.awt.*;
-import java.awt.List;
 import java.util.*;
+import java.awt.Point;
 import java.util.function.Function;
 
 /**
@@ -54,11 +54,17 @@ public interface EikonalSolver {
 	 * @param point
 	 * @return
 	 */
-	default double getValue(final Point point) {
-		return getPotentialField().getValue(point).potential;
+	default double getValue(final Point point, final CellGrid cellGrid) {
+		return cellGrid.getValue(point).potential;
 	}
 
 	CellGrid getPotentialField();
+
+	double getValue(final double x, final double y);
+
+	default double getValue(final IPoint position) {
+		return getValue(position.getX(), position.getY());
+	}
 
     /**
      * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.

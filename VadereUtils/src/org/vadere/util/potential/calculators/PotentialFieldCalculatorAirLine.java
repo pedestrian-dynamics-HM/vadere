@@ -5,13 +5,16 @@ import java.util.LinkedList;
 
 import org.vadere.util.potential.CellGrid;
 
-public class PotentialFieldCalculatorAirLine implements EikonalSolver {
+public class PotentialFieldCalculatorAirLine extends AbstractGridEikonalSolver {
 
 	private CellGrid potentialField;
 	private LinkedList<Point> targetPoints;
 
-	PotentialFieldCalculatorAirLine(CellGrid potentialField,
-			LinkedList<Point> targetPoints) {
+	PotentialFieldCalculatorAirLine(
+			final CellGrid potentialField,
+			final LinkedList<Point> targetPoints,
+			final double knownPenalty) {
+		super(potentialField, knownPenalty);
 		this.potentialField = potentialField;
 		this.targetPoints = targetPoints;
 	}
@@ -25,14 +28,11 @@ public class PotentialFieldCalculatorAirLine implements EikonalSolver {
 					double minTargetDistance = Double.MAX_VALUE;
 
 					for (Point p : targetPoints) {
-						double targetDistance = potentialField.pointDistance(p,
-								new Point(x, y));
-
+						double targetDistance = potentialField.pointDistance(p, new Point(x, y));
 						if (targetDistance < minTargetDistance) {
 							minTargetDistance = targetDistance;
 						}
 					}
-
 					potentialField.getValue(x, y).potential = minTargetDistance;
 				}
 			}
@@ -49,9 +49,7 @@ public class PotentialFieldCalculatorAirLine implements EikonalSolver {
 		return false;
 	}
 
-	@Override
-	public CellGrid getPotentialField() {
-		return potentialField;
+	public boolean isValidPoint(Point point) {
+		return potentialField.isValidPoint(point);
 	}
-
 }

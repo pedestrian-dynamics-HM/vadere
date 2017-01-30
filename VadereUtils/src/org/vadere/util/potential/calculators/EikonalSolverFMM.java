@@ -1,7 +1,6 @@
 package org.vadere.util.potential.calculators;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
@@ -36,13 +35,21 @@ public class EikonalSolverFMM implements EikonalSolver {
 	protected static Logger logger = LogManager.getLogger(EikonalSolverFMM.class);
 	protected long runtime = 0;
 
+    private final double weight;
+    private final double unknownPenalty;
+
 	/**
 	 * Initializes the FM potential calculator with a time cost function F > 0.
 	 */
-	public EikonalSolverFMM(CellGrid potentialField,
-			List<VShape> targetShapes,
-			boolean isHighAccuracy,
-			ITimeCostFunction timeCostFunction) {
+	public EikonalSolverFMM(
+			final CellGrid potentialField,
+			final List<VShape> targetShapes,
+			final boolean isHighAccuracy,
+			final ITimeCostFunction timeCostFunction,
+            final double weight,
+            final double unknownPenalty) {
+        this.unknownPenalty = unknownPenalty;
+        this.weight = weight;
 		this.cellGrid = potentialField;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
@@ -136,9 +143,18 @@ public class EikonalSolverFMM implements EikonalSolver {
 		return timeCostFunction.needsUpdate();
 	}
 
-	@Override
-	public CellGrid getPotentialField() {
-		return cellGrid;
+    @Override
+    public CellGrid getPotentialField() {
+        return cellGrid;
+    }
+
+    @Override
+    public double getValue(double x, double y) {
+        return getPotential(new VPoint(x,y), unknownPenalty, weight);
+    }
+
+    public boolean isValidPoint(Point point) {
+		return cellGrid.isValidPoint(point);
 	}
 
 	protected void setNeighborDistances(final Point point) {

@@ -78,13 +78,13 @@ class PotentialFieldAndInitializer {
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
 			case FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getTargetAttractionStrength(), attributesPotential.getObstacleGridPenalty());
 				break;
 			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getTargetAttractionStrength(), attributesPotential.getObstacleGridPenalty());
 				break;
 			default:
-				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getTargetAttractionStrength(), attributesPotential.getObstacleGridPenalty());
 		}
 
 		long ms = System.currentTimeMillis();

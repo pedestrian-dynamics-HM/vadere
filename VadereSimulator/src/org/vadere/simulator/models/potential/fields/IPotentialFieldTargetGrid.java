@@ -40,11 +40,11 @@ public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
                                                           final Topography topography,
                                                           final AttributesAgent attributesPedestrian, String className) {
 
-		DynamicClassInstantiator<IPotentialFieldTargetGrid> instantiator = new DynamicClassInstantiator<>();
+		DynamicClassInstantiator<IPotentialFieldTarget> instantiator = new DynamicClassInstantiator<>();
 
-		Class<? extends IPotentialFieldTargetGrid> type = instantiator.getClassFromName(className);
+		Class<? extends IPotentialFieldTarget> type = instantiator.getClassFromName(className);
 
-		IPotentialFieldTargetGrid result;
+        IPotentialFieldTargetGrid result;
 
 		if (type == PotentialFieldTargetGrid.class) {
 			AttributesFloorField attributesFloorField =

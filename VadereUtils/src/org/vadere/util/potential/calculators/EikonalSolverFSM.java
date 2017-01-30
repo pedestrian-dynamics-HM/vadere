@@ -2,6 +2,7 @@ package org.vadere.util.potential.calculators;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
@@ -9,10 +10,6 @@ import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +35,20 @@ public class EikonalSolverFSM implements EikonalSolver {
 	private List<Point> targetPoints;
 	private List<VShape> targetShapes;
 
+    private final double weight;
+    private final double unknownPenalty;
+
 	private static final double EPSILON = 0.001;
 
-	public EikonalSolverFSM(final CellGrid cellGrid,
+	public EikonalSolverFSM(
+			final CellGrid cellGrid,
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
-			final ITimeCostFunction timeCostFunction) {
+			final ITimeCostFunction timeCostFunction,
+            final double weight,
+            final double unknownPenalty) {
+        this.weight = weight;
+        this.unknownPenalty = unknownPenalty;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
@@ -80,12 +85,7 @@ public class EikonalSolverFSM implements EikonalSolver {
 		 */
 	}
 
-	@Override
-	public CellGrid getPotentialField() {
-		return cellGrid;
-	}
-
-	private void init() {
+    private void init() {
 		// set distances of the target neighbor points
 		targetPoints.stream()
 				.flatMap(p -> cellGrid.getLegitNeumannNeighborhood(p).stream())
@@ -175,6 +175,20 @@ public class EikonalSolverFSM implements EikonalSolver {
 			}
 		}
 	}
+
+    @Override
+    public CellGrid getPotentialField() {
+        return cellGrid;
+    }
+
+    @Override
+    public double getValue(double x, double y) {
+        return getPotential(new VPoint(x,y), unknownPenalty, weight);
+    }
+
+    public boolean isValidPoint(Point point) {
+        return cellGrid.isValidPoint(point);
+    }
 
 	@Override
 	public ITimeCostFunction getTimeCostFunction() {
