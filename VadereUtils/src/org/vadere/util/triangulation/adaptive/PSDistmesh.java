@@ -2,7 +2,9 @@ package org.vadere.util.triangulation.adaptive;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.delaunay.BowyerWatson;
+import org.vadere.util.geometry.LineIterator;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.MLine;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -15,10 +17,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PSDistmesh {
-	private Set<MPoint> points = new HashSet<>();
-	private Set<MLine> lines = new HashSet<>();
-	private BowyerWatson<MPoint> bowyerWatson;
-	private Collection<Triple<MPoint, MPoint, MPoint>> triangulation;
+	private Set<MeshPoint> points = new HashSet<>();
+	private Set<MLine<MeshPoint>> lines = new HashSet<>();
+	private BowyerWatson<MeshPoint> bowyerWatson;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -70,7 +71,6 @@ public class PSDistmesh {
 		this.initialEdgeLen = initialEdgeLen;
 		this.geps = .001 * initialEdgeLen;
 		this.deps = 1.4901e-8 * initialEdgeLen;
-		this.triangulation = new ArrayList<>();
 		this.obstacles = obstacles;
 		this.steps = 0;
 	}
@@ -99,8 +99,42 @@ public class PSDistmesh {
 	 * Remove all triangles intersecting any obstacle shape.
 	 */
 	public void cleanUp() {
-		triangulation = triangulation.stream()
-				.filter(triple -> obstacles.stream().noneMatch(obstacle -> tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());
+		/*triangulation = triangulation.stream()
+				.filter(triple -> obstacles.stream().noneMatch(
+						obstacle ->
+								tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());*/
+		reTriangulate();
+		/*obstacles.stream()
+				.filter(shape -> shape instanceof VRectangle)
+				.map(shape -> (VRectangle)shape).forEach(rect -> {
+					triangulation.removeIf(triple -> tripleToTriangle(triple).intersects(new VLine(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMaxY()))
+							|| tripleToTriangle(triple).intersects(new VLine(rect.getMaxX(), rect.getMinY(), rect.getMinX(), rect.getMaxY())));
+				}
+		);*/
+	}
+
+	private void reTriangulate() {
+		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
+			maxMovementLen = 0;
+			bowyerWatson = new BowyerWatson<>(points, (x, y) -> new MeshPoint(x, y, false), (a, b, c) -> new VTriangle(a, b, c));
+
+			bowyerWatson.init();
+			System.out.println("triangulation started");
+			bowyerWatson.execude();
+			System.out.println("triangulation finished");
+
+
+			// compute the line and points again, since we filter some triangles
+			lines = bowyerWatson.streamFaces()
+					.filter(face -> distanceFunc.apply(face.toTriangle().midPoint()) < -geps)
+					.flatMap(face -> face.streamLines())
+					.collect(Collectors.toSet());
+
+			points = lines.stream().flatMap(line -> line.streamPoints()).collect(Collectors.toSet());
+
+			System.out.println("number of edges: " + lines.size());
+			System.out.println("number of points: " + points.size());
+		}
 	}
 
 	/*
@@ -109,43 +143,7 @@ public class PSDistmesh {
 	public void step()
 	{
 		steps++;
-		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
-			maxMovementLen = 0;
-			bowyerWatson = new BowyerWatson<>(points, (x, y) -> new MPoint(x, y, -1), (a, b, c) -> new VTriangle(a, b, c));
-			bowyerWatson.init();
-
-			System.out.println("triangulation started");
-			bowyerWatson.execude();
-			triangulation = bowyerWatson.getTrianglePoints();
-			System.out.println("triangulation finished");
-
-			// compte the line ste
-			lines = new HashSet<>();
-			//points = new ArrayList<>();
-			for(Triple<MPoint, MPoint, MPoint> triple : triangulation) {
-				VTriangle triangle = new VTriangle(triple.getLeft().toVPoint(), triple.getMiddle().toVPoint(), triple.getRight().toVPoint());
-
-				MLine line1 = new MLine(triple.getLeft(), triple.getMiddle());
-				MLine line2 = new MLine(triple.getMiddle(), triple.getRight());
-				MLine line3 = new MLine(triple.getRight(), triple.getLeft());
-				//fd.apply(p.midPoint()) < -geps
-				if(distanceFunc.apply(triangle.midPoint()) < -geps) {
-					lines.add(line1);
-					lines.add(line2);
-					lines.add(line3);
-					points.add(line1.getP1());
-					points.add(line2.getP1());
-					points.add(line3.getP1());
-				}
-			//	else {
-			//		System.out.println("mid:" + triangle.midPoint() + " func: " + distanceFunc.apply(triangle.midPoint()));
-			//	}
-			}
-
-			System.out.println("number of edges: " + lines.size());
-			System.out.println("number of points: " + points.size());
-
-		}
+		reTriangulate();
 
 		// compute the forces / velocities for each line
 		double scalingFactor = computeScalingFactor(lines);
@@ -166,7 +164,7 @@ public class PSDistmesh {
 		}
 
 		// compute the total forces / velocities
-		for(MLine line : lines) {
+		for(MLine<MeshPoint> line : lines) {
 			if(!line.p1.isFixPoint()) {
 				//line.p1.increaseVelocity(new VPoint(3, 3));
 				line.p1.increaseVelocity(line.getVelocity());
@@ -179,8 +177,8 @@ public class PSDistmesh {
 		}
 
 		// do the euler step, we change the mutable point, this may destroy there unquieness.
-		Set<MPoint> newPoints = new HashSet();
-		for(MPoint point : points) {
+		Set<MeshPoint> newPoints = new HashSet();
+		for(MeshPoint point : points) {
 			if(!point.isFixPoint()) {
 				IPoint movement = point.getVelocity().scalarMultiply(Parameters.DELTAT);
 				double movementLen = point.getVelocity().distanceToOrigin();
@@ -219,27 +217,28 @@ public class PSDistmesh {
 	 */
 	public double qualityCheck()
 	{
-		if(triangulation.isEmpty()) {
+		if(bowyerWatson == null) {
 			return 0.0;
 		}
 		else {
+			Collection<VTriangle> triangles = bowyerWatson.getTriangles();
 			double aveSum = 0;
-			for(Triple<MPoint, MPoint, MPoint> triple : triangulation) {
-				VLine[] line = tripleToTriangle(triple).getLines();
-				double a = line[0].length();
-				double b = line[1].length();
-				double c = line[2].length();
+			for(VTriangle triangle : triangles) {
+				VLine[] lines = triangle.getLines();
+				double a = lines[0].length();
+				double b = lines[1].length();
+				double c = lines[2].length();
 				double part = 0.0;
 				if(a != 0.0 && b != 0.0 && c != 0.0) {
 					part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
 				}
 				aveSum += part;
 				if(Double.isNaN(part) || Double.isNaN(aveSum)) {
-					throw new IllegalArgumentException(tripleToTriangle(triple) + " is not a feasible triangle!");
+					throw new IllegalArgumentException(triangle + " is not a feasible triangle!");
 				}
 			}
 
-			return aveSum / triangulation.size();
+			return aveSum / triangles.size();
 		}
 	}
 
@@ -249,7 +248,7 @@ public class PSDistmesh {
 	 * @param lines
 	 * @return
 	 */
-	private double computeScalingFactor(final Collection<MLine> lines) {
+	private double computeScalingFactor(final Collection<MLine<MeshPoint>> lines) {
 		double sumOfqDesiredEdgeLength = 0;
 		double sumOfqLengths = 0;
 		for(MLine line : lines) {
@@ -262,9 +261,9 @@ public class PSDistmesh {
 	}
 
 
-	private Set<MPoint> generatePoints() {
-		List<MPoint> gridPoints = generateGridPoints();
-		List<MPoint> fixPoints = generateFixPoints();
+	private Set<MeshPoint> generatePoints() {
+		Set<MeshPoint> gridPoints = generateGridPoints();
+		Set<MeshPoint> fixPoints = generateFixPoints();
 
 		// point density function 1 / (desiredLen^2)
 		Function<IPoint, Double> pointDensityFunc = vertex -> 1 / (relativeDesiredEdgeLengthFunc.apply(vertex) * relativeDesiredEdgeLengthFunc.apply(vertex));
@@ -279,7 +278,7 @@ public class PSDistmesh {
 		 * Reject points with a certain probability which depends on the relative desired edge length.
 		 * The probability for the rejection increases for large desired edge length!
 		 */
-		Set<MPoint> generatedPoints = gridPoints.stream()
+		Set<MeshPoint> generatedPoints = gridPoints.stream()
 				.filter(vertex -> Math.random() < pointDensityFunc.apply(vertex) / max)
 				.collect(Collectors.toSet());
 		generatedPoints.addAll(fixPoints);
@@ -292,21 +291,21 @@ public class PSDistmesh {
 	 * @param
 	 * @return
 	 */
-	private List<MPoint> generateGridPoints() {
+	private Set<MeshPoint> generateGridPoints() {
 		int elementsInCol = (int) Math.ceil((regionBoundingBox.getX() + regionBoundingBox.getWidth())/ initialEdgeLen + 1);
 		int elementsInRow = (int) Math.ceil((regionBoundingBox.getY() + regionBoundingBox.getHeight())/ (initialEdgeLen * Math.sqrt(3)/2));
 		double startX = regionBoundingBox.getX();
 		double startY = regionBoundingBox.getY();
-		List<MPoint> generatedPoints = new ArrayList(elementsInRow * elementsInCol);
+		Set<MeshPoint> generatedPoints = new HashSet<>(elementsInRow * elementsInCol);
 		double sqrt3 = Math.sqrt(3);
 
 		for(int j = 0; j < elementsInRow; j++) {
 			for(int i = 0; i < elementsInCol; i++) {
-				MPoint point;
+				MeshPoint point;
 				if( j != 0 && j%2 != 0) {
-					point = new MPoint(startX+i* initialEdgeLen + initialEdgeLen /2, startY+j* initialEdgeLen *sqrt3/2, false);
+					point = new MeshPoint(startX+i* initialEdgeLen + initialEdgeLen /2, startY+j* initialEdgeLen *sqrt3/2, false);
 				} else {
-					point = new MPoint(startX+i* initialEdgeLen, startY+j* initialEdgeLen *sqrt3/2, false);
+					point = new MeshPoint(startX+i* initialEdgeLen, startY+j* initialEdgeLen *sqrt3/2, false);
 				}
 
 				//p -> fd.apply(p) < geps
@@ -321,13 +320,13 @@ public class PSDistmesh {
 	/*
 	Fügt Fixpunkte hinzu. Dabei werden von allen Objekten die Ecken hinzugefügt bzw. anhand von SEGMENTDIVISION
 	 */
-	private List<MPoint> generateFixPoints()
+	private Set<MeshPoint> generateFixPoints()
 	{
 		List<VShape> allShapes = new ArrayList<>(obstacles.size() + 1);
 		allShapes.addAll(obstacles);
-		allShapes.add(regionBoundingBox);
+		//allShapes.add(regionBoundingBox);
 
-		List<MPoint> fixPoints = new ArrayList<>();
+		Set<MeshPoint> fixPoints = new HashSet<>();
 
 		for(VShape obstacle : allShapes)
 		{
@@ -338,13 +337,12 @@ public class PSDistmesh {
 
 			while (!path.isDone()) {
 				path.next();
-
 				path.currentSegment(coordinates);
-				MPoint[] points = divLine(coordinates[0], coordinates[1], tempCoords[0], tempCoords[1], Parameters.SEGMENTDIVISION);
 				if (coordinates[0] == tempCoords[0] && coordinates[1] == tempCoords[1]) {
 					break;
 				}
-				fixPoints.addAll(Arrays.asList(points).subList(1, points.length));
+				List<MeshPoint> points = divLine(coordinates[0], coordinates[1], tempCoords[0], tempCoords[1], Parameters.SEGMENTDIVISION);
+				fixPoints.addAll(points);
 				path.currentSegment(tempCoords);
 			}
 		}
@@ -356,36 +354,26 @@ public class PSDistmesh {
 	/*
 	Unterteilt eine Linie eines Objekts in Fixpunkte
 	 */
-	private MPoint[] divLine(double x1, double y1, double x2, double y2, int segments)
-	{
-		MPoint[] points = new MPoint[segments+1];
-		double dX = (x1-x2)/segments;
-		double dY = (y1-y2)/segments;
-
-		for(int i = 1; i < points.length; i++) {
-			points[i] = new MPoint(x2 + i * dX, y2 + i * dY, true);
+	private List<MeshPoint> divLine(double x1, double y1, double x2, double y2, int segments) {
+		LineIterator lineIterator = new LineIterator(new VLine(x1, y1, x2, y2), initialEdgeLen);
+		List<MeshPoint> points = new ArrayList<>();
+		while (lineIterator.hasNext()) {
+			IPoint iPoint = lineIterator.next();
+			points.add(new MeshPoint(iPoint.getX(), iPoint.getY(), true));
 		}
+
 		return points;
 	}
 
-	public Collection<MPoint> getPoints() {
+	public Collection<MeshPoint> getPoints() {
 		return points;
 	}
 
-	private double doDDiff(double d1, double d2)
-	{
-		return Math.max(d1, -d2);
-	}
-
-	private double doDUnion(double d1, double d2) {
-		return Math.min(d1, d2);
-	}
-
-	private VTriangle tripleToTriangle(final Triple<MPoint, MPoint, MPoint> triple) {
+	private VTriangle tripleToTriangle(final Triple<MeshPoint, MeshPoint, MeshPoint> triple) {
 		return new VTriangle(triple.getLeft().toVPoint(), triple.getMiddle().toVPoint(), triple.getRight().toVPoint());
 	}
 
 	public Collection<VTriangle> getTriangles() {
-		return triangulation.stream().map(triple -> tripleToTriangle(triple)).collect(Collectors.toList());
+		return bowyerWatson.getTriangles();
 	}
 }
