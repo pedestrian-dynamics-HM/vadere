@@ -47,7 +47,7 @@ public class VTriangle extends VPolygon {
 		super(GeometryUtils.polygonFromPoints2D(p1, p2, p3));
 
 		if(p1.equals(p2) || p1.equals(p3) || p2.equals(p3)) {
-			System.out.println("fucked up");
+			throw new IllegalArgumentException("" + p1 + p2 + p3 + " is not a feasible set of points.");
 		}
 		this.p1 = p1;
 		this.p2 = p2;
