@@ -21,7 +21,7 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  *         Not finiehsed!
  */
-public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractPotentialFieldTarget {
+public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGridPotentialFieldTarget {
 
 	private static double EPSILON_SIM_TIME = 1e-100;
 	private final Map<Integer, AttributesFloorField> attributesByTarget;

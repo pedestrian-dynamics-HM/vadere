@@ -9,7 +9,6 @@ import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
-import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFIM implements EikonalSolver {
+public class EikonalSolverFIM extends AbstractGridEikonalSolver {
 
 	private CellGrid cellGrid;
 	private List<VShape> targetShapes;
@@ -39,10 +38,13 @@ public class EikonalSolverFIM implements EikonalSolver {
 
 	private LinkedList<Point> activeList;
 
-	public EikonalSolverFIM(final CellGrid cellGrid,
+	public EikonalSolverFIM(
+			final CellGrid cellGrid,
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
-			final ITimeCostFunction timeCostFunction) {
+			final ITimeCostFunction timeCostFunction,
+			final double unknownPenalty) {
+		super(cellGrid, unknownPenalty);
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
@@ -149,13 +151,13 @@ public class EikonalSolverFIM implements EikonalSolver {
 	}
 
 	@Override
-	public CellGrid getPotentialField() {
-		return cellGrid;
+	public ITimeCostFunction getTimeCostFunction() {
+		return timeCostFunction;
 	}
 
 	@Override
-	public ITimeCostFunction getTimeCostFunction() {
-		return timeCostFunction;
+	public boolean isValidPoint(Point point) {
+		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

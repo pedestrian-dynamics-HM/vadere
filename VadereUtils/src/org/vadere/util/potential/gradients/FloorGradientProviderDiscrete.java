@@ -42,18 +42,13 @@ public class FloorGradientProviderDiscrete implements GradientProvider {
 	public FloorGradientProviderDiscrete(
 			HashMap<Integer, CellGrid> potentialFields,
 			Rectangle2D scenarioBounds, Collection<Integer> targetIds) {
-		scenarioBounds.getMinX();
-		scenarioBounds.getMinY();
-
 		for (Integer targetID : targetIds) {
-
 			this.grids.put(targetID, potentialFields.get(targetID));
 		}
 	}
 
 	@Override
-	public void gradient(double t, int currentTargetId, double[] x,
-			double[] grad) {
+	public void gradient(double t, int currentTargetId, double[] x, double[] grad) {
 
 		/*
 		 * // MATLAB code

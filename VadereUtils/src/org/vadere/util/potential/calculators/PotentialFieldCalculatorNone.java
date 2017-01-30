@@ -1,8 +1,7 @@
 package org.vadere.util.potential.calculators;
 
 
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellState;
+import java.awt.*;
 
 public class PotentialFieldCalculatorNone implements EikonalSolver {
 
@@ -18,8 +17,12 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 	}
 
 	@Override
-	public CellGrid getPotentialField() {
-		return new CellGrid(0, 0, 1, new CellState());
+	public double getValue(double x, double y) {
+		return 0;
 	}
 
+	@Override
+	public boolean isValidPoint(Point point) {
+		return false;
+	}
 }

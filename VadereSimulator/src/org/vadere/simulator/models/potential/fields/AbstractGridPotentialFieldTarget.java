@@ -2,7 +2,6 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
@@ -10,32 +9,30 @@ import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.calculators.AbstractGridEikonalSolver;
 
-import java.awt.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGrid {
+public abstract class AbstractGridPotentialFieldTarget implements IPotentialTargetGrid {
 
 	protected static double EPSILON_SIM_TIME = 1e-100; // TODO [priority=medium] [task=fix] 1e-100 comparisons with values that are O(1e-8) are dangerous. Better use 1e-8 here.
 	protected double lastUpdateTimestamp;
 	private Topography topography;
 	private boolean wasUpdated;
-	private static Logger logger = LogManager.getLogger(AbstractPotentialFieldTarget.class);
+	private static Logger logger = LogManager.getLogger(AbstractGridPotentialFieldTarget.class);
 
 	/**
 	 * Stores all potential fields which represent the observation area. The key
 	 * of the outer map equals the id of the floor, the key of the inner map
 	 * equals the id of the target (there is a floor field per target).
 	 */
-	protected final HashMap<Integer, PotentialFieldAndInitializer> targetPotentialFields;
+	protected final HashMap<Integer, PotentialFieldAndInitializer<? extends AbstractGridEikonalSolver>> targetPotentialFields;
 
-	public AbstractPotentialFieldTarget(final Topography topography) {
+	public AbstractGridPotentialFieldTarget(final Topography topography) {
 		this.topography = topography;
 		this.wasUpdated = false;
 		this.targetPotentialFields = new HashMap<>();
@@ -77,7 +74,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		}
 
 		/* Find minimal potential of given targets. */
-		Optional<PotentialFieldAndInitializer> optionalPotentialFieldAndAnalyser =
+		Optional<PotentialFieldAndInitializer<? extends AbstractGridEikonalSolver>> optionalPotentialFieldAndAnalyser =
 				getPotentialFieldAndInitializer(targetId);
 
 		// no target exist
@@ -85,69 +82,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 			return 0;
 		}
 
-		PotentialFieldAndInitializer potentialFieldAndAnalyser = optionalPotentialFieldAndAnalyser.get();
-		AttributesFloorField attributesFloorField = potentialFieldAndAnalyser.attributesFloorField;
-		potentialField = potentialFieldAndAnalyser.eikonalSolver.getPotentialField();
-
-		Point gridPoint = potentialField.getNearestPointTowardsOrigin(pos);
-		VPoint gridPointCoord = potentialField.pointToCoord(gridPoint);
-		int incX = 1, incY = 1;
-		double gridPotentials[];
-		double weightOfKnown[] = new double[1];
-		double tmpPotential;
-
-		if (pos.x >= potentialField.getWidth()) {
-			incX = 0;
-		}
-
-		if (pos.y >= potentialField.getHeight()) {
-			incY = 0;
-		}
-
-		List<Point> points = new LinkedList<>();
-		points.add(gridPoint);
-		points.add(new Point(gridPoint.x + incX, gridPoint.y));
-		points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
-		points.add(new Point(gridPoint.x, gridPoint.y + incY));
-		gridPotentials = potentialFieldAndAnalyser.getGridPotentials(points);
-
-		/* Interpolate the known (potential < Double.MAX_VALUE) values. */
-		tmpPotential = InterpolationUtil
-				.bilinearInterpolationWithUnkown(
-						gridPotentials,
-						(pos.x - gridPointCoord.x)
-								/ potentialField.getResolution(),
-						(pos.y - gridPointCoord.y)
-								/ potentialField.getResolution(),
-						weightOfKnown);
-
-		/*
-		 * If at least one node is known, a specialized version of
-		 * interpolation is used: If the divisor weightOfKnown[ 0 ] would
-		 * not be part of the equation, it would be a general bilinear
-		 * interpolation using obstacleGridPenalty for the unknown. However,
-		 * as soon as the interpolated value is not on the line of known
-		 * values (weightOfKnown < 1) the potential is increased, like an
-		 * additional penalty. The more the interpolated value moves into
-		 * direction of the unknown, the higher the penalty becomes.
-		 */
-		if (weightOfKnown[0] > 0.00001) {
-			tmpPotential = tmpPotential / weightOfKnown[0]
-					+ (1 - weightOfKnown[0])
-							* attributesFloorField.getObstacleGridPenalty();
-		} else /* If all values are maximal, set potential to maximum. */
-		{
-			tmpPotential = Double.MAX_VALUE;
-		}
-
-		tmpPotential *= attributesFloorField.getTargetAttractionStrength();
-
-		if (tmpPotential < targetPotential) {
-			targetPotential = tmpPotential;
-		}
-
-
-		return targetPotential;
+		return optionalPotentialFieldAndAnalyser.get().eikonalSolver.getValue(pos);
 	}
 
 	/**
@@ -189,7 +124,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		return wasUpdated;
 	}
 
-	protected Map<Integer, PotentialFieldAndInitializer> getPotentialFieldMap() {
+	protected Map<Integer, PotentialFieldAndInitializer<? extends AbstractGridEikonalSolver>> getPotentialFieldMap() {
 		return targetPotentialFields;
 	}
 
@@ -222,7 +157,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		HashMap<Integer, CellGrid> map = new HashMap<>();
 
 
-		for (Map.Entry<Integer, PotentialFieldAndInitializer> entry2 : targetPotentialFields
+		for (Map.Entry<Integer, PotentialFieldAndInitializer<? extends AbstractGridEikonalSolver>> entry2 : targetPotentialFields
 				.entrySet()) {
 			map.put(entry2.getKey(), entry2.getValue().eikonalSolver.getPotentialField());
 		}
@@ -230,7 +165,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 		return map;
 	}
 
-	protected Optional<PotentialFieldAndInitializer> getPotentialFieldAndInitializer(final int targetId) {
+	protected Optional<PotentialFieldAndInitializer<? extends AbstractGridEikonalSolver>> getPotentialFieldAndInitializer(final int targetId) {
 		if (targetPotentialFields.containsKey(targetId)) {
 			return Optional.of(targetPotentialFields.get(targetId));
 		} else {
