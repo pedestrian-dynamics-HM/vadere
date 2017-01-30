@@ -65,5 +65,4 @@ public interface EikonalSolver {
 	default ITimeCostFunction getTimeCostFunction() {
 		return new UnitTimeCostFunction();
 	}
-
 }
