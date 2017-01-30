@@ -1,5 +1,7 @@
 package org.vadere.util.geometry.shapes;
 
+import org.vadere.util.triangulation.adaptive.MeshPoint;
+
 import java.util.stream.Stream;
 
 public class MLine<P extends IPoint> {

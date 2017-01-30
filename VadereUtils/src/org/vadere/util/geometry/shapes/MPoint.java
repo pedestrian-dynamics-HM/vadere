@@ -115,11 +115,6 @@ public class MPoint implements IPoint{
 	}
 
 	@Override
-	public double distance(double x, double y) {
-		return point.distance(x, y);
-	}
-
-	@Override
 	public double distanceToOrigin() {
 		return this.point.distanceToOrigin();
 	}
