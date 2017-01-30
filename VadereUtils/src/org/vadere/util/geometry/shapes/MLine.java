@@ -1,15 +1,16 @@
-package org.vadere.util.triangulation.adaptive;
+package org.vadere.util.geometry.shapes;
 
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
 
-public class MLine {
+import java.util.stream.Stream;
 
-	public final MPoint p1;
-	public final MPoint p2;
+public class MLine<P extends IPoint> {
+
+	public final P p1;
+	public final P p2;
 	private VPoint velocity;
 
-	public MLine(MPoint p1, MPoint p2) {
+	public MLine(final P p1, final P p2) {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.velocity = new VPoint(0,0);
@@ -39,11 +40,11 @@ public class MLine {
 		return p2.getY();
 	}
 
-	public MPoint getP1() {
+	public P getP1() {
 		return p1;
 	}
 
-	public MPoint getP2() {
+	public P getP2() {
 		return p2;
 	}
 
@@ -57,6 +58,10 @@ public class MLine {
 
 	public VPoint midPoint() {
 		return new VPoint((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
+	}
+
+	public Stream<P> streamPoints() {
+		return Stream.of(p1, p2);
 	}
 
 	@Override

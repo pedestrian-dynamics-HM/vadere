@@ -7,6 +7,7 @@ import org.vadere.util.geometry.data.DAG;
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.data.Triangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -24,12 +25,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 
-public class BowyerWatson<P extends IPoint> {
+public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 
-	private final Collection<P> points;
+	private final Set<P> points;
 	private final PointConstructor<P> pointConstructor;
 	private final TriangleConstructor<VPoint> triangleConstructor;
 	private P p0;
@@ -37,17 +39,17 @@ public class BowyerWatson<P extends IPoint> {
 	private P p2;
 	private DAG<DAGElement<P>> dag;
 	private final HashMap<Face<P>, DAG<DAGElement<P>>> map;
-	private Set<DAG<DAGElement<P>>> triangles;
+	private int count;
 
 	public BowyerWatson(
-			final Collection<P> points,
+			final Set<P> points,
 			final PointConstructor<P> pointConstructor,
 			final TriangleConstructor<VPoint> triangleConstructor) {
 		this.points = points;
 		this.pointConstructor = pointConstructor;
 		this.triangleConstructor = triangleConstructor;
 		this.map = new HashMap<>();
-		this.triangles = new HashSet<>();
+		this.count = 0;
 	}
 
 	public void init() {
@@ -72,45 +74,86 @@ public class BowyerWatson<P extends IPoint> {
 		int count = 0;
 		// 2. insert points
 		for(P p : points) {
-			// find triangle containing p using the DAG.
-			Set<DAG<DAGElement<P>>> leafs = locatePoint(p);
-			assert leafs.size() == 2 ||leafs.size() == 1;
-
+			insert(p);
 			count++;
-
-			// point is inside a triangle
-			if(leafs.size() == 1) {
-				split(p, leafs.stream().findAny().get());
-			} // point lies on an edge of 2 triangles
-			else if(leafs.size() == 2) {
-				Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
-				splitBoth(p, it.next(), it.next());
-			}
-			else if(leafs.size() == 0) {
-				// problem due numerical calculation.
-				System.out.println("numerical error!");
-			}
-			else {
-				Set<DAG<DAGElement<P>>> leafs2 = locatePoint(p);
-				System.out.println(leafs2 + " contains " + p);
-				throw new IllegalArgumentException("something is wrong here, this should never happen " + leafs.size() + " / " + p + " / " + count);
-			}
 		}
+	}
 
-		// 3. remove initial points
-		triangles = map.values().stream().filter(
-				dagElement -> {
+	@Override
+	public Face<P> locate(P point) {
+		return locatePoint(point).stream().findAny().get().getElement().getFace();
+	}
+
+	@Override
+	public Set<Face<P>> getFaces() {
+		return streamFaces().collect(Collectors.toSet());
+	}
+
+	@Override
+	public Stream<Face<P>> streamFaces() {
+		return map.values().stream()
+				.filter(dagElement -> {
 					Triple<P, P, P> triple = dagElement.getElement().getVertices();
-					Set<P> pointset = new HashSet<P>();
+					Set<P> pointset = new HashSet<>();
 					pointset.add(triple.getLeft());
 					pointset.add(triple.getMiddle());
 					pointset.add(triple.getRight());
 					return !pointset.contains(p0) && !pointset.contains(p1) && !pointset.contains(p2);
-				}
-		).collect(Collectors.toSet());
+				})
+				.map(dagElementDAG -> dagElementDAG.getElement().getFace());
 	}
 
-	public Set<DAG<DAGElement<P>>> locatePoint(final P point) {
+	@Override
+	public void insert(P point) {
+		Set<DAG<DAGElement<P>>> leafs = locatePoint(point);
+		assert leafs.size() == 2 ||leafs.size() == 1;
+		count++;
+
+		// point is inside a triangle
+		if(leafs.size() == 1) {
+			split(point, leafs.stream().findAny().get());
+		} // point lies on an edge of 2 triangles
+		else if(leafs.size() == 2) {
+			Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
+			splitBoth(point, it.next(), it.next());
+		}
+		else if(leafs.size() == 0) {
+			// problem due numerical calculation.
+			System.out.println("numerical error!");
+		}
+		else {
+			Set<DAG<DAGElement<P>>> leafs2 = locatePoint(point);
+			System.out.println(leafs2 + " contains " + point);
+			throw new IllegalArgumentException("something is wrong here, this should never happen " + leafs.size() + " / " + point + " / " + count);
+		}
+	}
+
+	@Override
+	public void remove(P point) {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
+	public Collection<VTriangle> getTriangles() {
+		return getFaces().stream().map(face -> faceToTriangle(face)).collect(Collectors.toSet());
+	}
+
+	/*public Collection<Triple<P, P, P>> getTrianglePoints() {
+		return triangles.stream().map(dagElement -> dagElement.getElement().getVertices()).collect(Collectors.toList());
+	}*/
+
+	public Set<VLine> getEdges() {
+		return getTriangles().stream().flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
+	}
+
+	private VTriangle faceToTriangle(final Face<P> face) {
+		List<P> points = face.getPoints();
+		P p1 = points.get(0);
+		P p2 = points.get(1);
+		P p3 = points.get(2);
+		return new VTriangle(new VPoint(p1.getX(), p1.getY()), new VPoint(p2.getX(), p2.getY()), new VPoint(p3.getX(), p3.getY()));
+	}
+
+	private Set<DAG<DAGElement<P>>> locatePoint(final P point) {
 
 		Set<DAG<DAGElement<P>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P>>> nodesToVisit = new LinkedList<>();
@@ -154,19 +197,9 @@ public class BowyerWatson<P extends IPoint> {
 		return leafs;
 	}
 
-	public Collection<VTriangle> getTriangles() {
-		return triangles.stream().map(dagElement -> dagElement.getElement().getTriangle()).collect(Collectors.toList());
-	}
-
-	public Collection<Triple<P, P, P>> getTrianglePoints() {
-		return triangles.stream().map(dagElement -> dagElement.getElement().getVertices()).collect(Collectors.toList());
-	}
-
-	public Set<VLine> getEdges() {
-		return triangles.stream().flatMap(dagElement -> dagElement.getElement().getTriangle().getLineStream()).collect(Collectors.toSet());
-	}
-
 	public Pair<DAG<DAGElement<P>>, DAG<DAGElement<P>>> splitBoth(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag, @NotNull DAG<DAGElement<P>> xwzDag) {
+		System.out.println("split both");
+
 		VTriangle xyzTriangle = xyzDag.getElement().getTriangle();
 		Face<P> xyzFace = xyzDag.getElement().getFace();
 		List<HalfEdge<P>> edges = xyzFace.getEdges();
@@ -307,16 +340,16 @@ public class BowyerWatson<P extends IPoint> {
 		P y = xy.getEnd();
 		P z = yz.getEnd();
 
-		HalfEdge<P> yp = new HalfEdge<P>(p, xyp);
-		HalfEdge<P> py = new HalfEdge<P>(y, yzp);
+		HalfEdge<P> yp = new HalfEdge<>(p, xyp);
+		HalfEdge<P> py = new HalfEdge<>(y, yzp);
 		yp.setTwin(py);
 
-		HalfEdge<P> xp = new HalfEdge<P>(p, zxp);
-		HalfEdge<P> px = new HalfEdge<P>(x, xyp);
+		HalfEdge<P> xp = new HalfEdge<>(p, zxp);
+		HalfEdge<P> px = new HalfEdge<>(x, xyp);
 		xp.setTwin(px);
 
-		HalfEdge<P> zp = new HalfEdge<P>(p, yzp);
-		HalfEdge<P> pz = new HalfEdge<P>(z, zxp);
+		HalfEdge<P> zp = new HalfEdge<>(p, yzp);
+		HalfEdge<P> pz = new HalfEdge<>(z, zxp);
 		zp.setTwin(pz);
 
 		zx.setNext(xp);
@@ -434,6 +467,10 @@ public class BowyerWatson<P extends IPoint> {
 			zy.setFace(f1);
 			yp.setFace(f1);
 
+			if(y.equals(p)) {
+				System.out.println("" + y + p);
+			}
+
 			// update DAG
 			DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(y, z, p), triangleConstructor));
 			DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(x, y, p), triangleConstructor));
@@ -451,30 +488,6 @@ public class BowyerWatson<P extends IPoint> {
 			legalize(p, yp.getPrevious());
 		}
 	}
-
-	/*public class DAGElement {
-		private Face<P> face;
-		private Triple<P, P, P> vertices;
-		private T triangle;
-
-		public DAGElement(final Face<P> face, final Triple<P, P, P> vertices) {
-			this.face = face;
-			this.vertices = vertices;
-			this.triangle = triangleConstructor.create(vertices.getLeft(), vertices.getMiddle(), vertices.getRight());
-		}
-
-		public Face<P> getFace() {
-			return face;
-		}
-
-		public T getTriangle() {
-			return triangle;
-		}
-
-		public Triple<P, P, P> getVertices() {
-			return vertices;
-		}
-	}*/
 
 	// TODO: the following code can be deleted, this is only for visual checks
 	public static void main(String[] args) {

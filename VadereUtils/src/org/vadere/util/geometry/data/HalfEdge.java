@@ -5,6 +5,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 public class HalfEdge<P extends IPoint> {
@@ -35,10 +36,12 @@ public class HalfEdge<P extends IPoint> {
 	 */
 	private Face<P> face;
 
+	private double data;
 
 	public HalfEdge (@NotNull final P end, @NotNull final Face<P> face) {
 		this.end = end;
 		this.face = face;
+		this.data = 0.0;
 	}
 
 	public Face getFace() {
@@ -98,29 +101,35 @@ public class HalfEdge<P extends IPoint> {
 		return new VLine((VPoint) this.getPrevious().getEnd(), (VPoint) this.getEnd());
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		HalfEdge halfEdge = (HalfEdge) o;
-
-		if (!end.equals(halfEdge.end)) return false;
-		if (next != null ? !next.equals(halfEdge.next) : halfEdge.next != null) return false;
-		if (previous != null ? !previous.equals(halfEdge.previous) : halfEdge.previous != null)
-			return false;
-		if (twin != null ? !twin.equals(halfEdge.twin) : halfEdge.twin != null) return false;
-		return face.equals(halfEdge.face);
-
+	public double getData() {
+		return data;
 	}
 
-	@Override
-	public int hashCode() {
-		int result = end.hashCode();
-		result = 31 * result + (next != null ? next.hashCode() : 0);
-		result = 31 * result + (previous != null ? previous.hashCode() : 0);
-		result = 31 * result + (twin != null ? twin.hashCode() : 0);
-		result = 31 * result + face.hashCode();
-		return result;
+	public void setData(double data) {
+		this.data = data;
+	}
+
+	public Iterator<HalfEdge<P>> incidentPointIterator() {
+		return new NeighbourIterator();
+	}
+
+	/**
+	 * This iterator assumes that the this edge is completely surrounded by faces.
+	 */
+	private class NeighbourIterator implements Iterator<HalfEdge<P>> {
+
+		private HalfEdge<P> current = HalfEdge.this;
+		private boolean first = true;
+
+		@Override
+		public boolean hasNext() {
+			return current.getTwin().isPresent() && (first || current != HalfEdge.this);
+		}
+
+		@Override
+		public HalfEdge<P> next() {
+			current = current.getTwin().get().getNext();
+			return current;
+		}
 	}
 }
