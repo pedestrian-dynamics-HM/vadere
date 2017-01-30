@@ -163,9 +163,7 @@ public interface EikonalSolver {
 		return new UnitTimeCostFunction();
 	}
 
-	default boolean isValidPoint(final Point point, final CellGrid cellGrid) {
-		return cellGrid.isValidPoint(point);
-	}
+	boolean isValidPoint(final Point point);
 
 	default double computeGodunovDifference(final Point point, final CellGrid cellGrid, final Direction direction) {
 
@@ -211,8 +209,8 @@ public interface EikonalSolver {
 				yhPoint = new Point(point.x, point.y - 2);
 				break;
 			default: {
-				if (isValidPoint(new Point(point.x + 1, point.y), cellGrid) &&
-						(!isValidPoint(new Point(point.x - 1, point.y), cellGrid)
+				if (isValidPoint(new Point(point.x + 1, point.y)) &&
+						(!isValidPoint(new Point(point.x - 1, point.y))
 								|| (cellGrid.getValue(new Point(point.x + 1, point.y)).potential < cellGrid
 										.getValue(new Point(point.x - 1, point.y)).potential))) {
 					xPoint = new Point(point.x + 1, point.y);
@@ -222,8 +220,8 @@ public interface EikonalSolver {
 					xhPoint = new Point(point.x - 2, point.y);
 				}
 
-				if (isValidPoint(new Point(point.x, point.y + 1), cellGrid) &&
-						(!isValidPoint(new Point(point.x, point.y - 1), cellGrid)
+				if (isValidPoint(new Point(point.x, point.y + 1)) &&
+						(!isValidPoint(new Point(point.x, point.y - 1))
 								|| (cellGrid.getValue(new Point(point.x, point.y + 1)).potential < cellGrid
 										.getValue(new Point(point.x, point.y - 1)).potential))) {
 					yPoint = new Point(point.x, point.y + 1);
@@ -236,7 +234,7 @@ public interface EikonalSolver {
 		}
 
 		double xVal = Double.MAX_VALUE;
-		if (isValidPoint(xPoint, cellGrid)) {
+		if (isValidPoint(xPoint)) {
 			xVal = cellGrid.getValue(xPoint).potential;
 			if (xVal != Double.MAX_VALUE) {
 				a += 1.0;
@@ -246,7 +244,7 @@ public interface EikonalSolver {
 		}
 
 		double yVal = Double.MAX_VALUE;
-		if (isValidPoint(yPoint, cellGrid)) {
+		if (isValidPoint(yPoint)) {
 			yVal = cellGrid.getValue(yPoint).potential;
 			if (yVal != Double.MAX_VALUE) {
 				a += 1.0;
@@ -261,7 +259,7 @@ public interface EikonalSolver {
 			// logger.warn("no solution possible");
 		} else {
 			if (isHighAccuracy()) {
-				if (isValidPoint(xhPoint, cellGrid) && cellGrid.getValue(xhPoint).potential < xVal) {
+				if (isValidPoint(xhPoint) && cellGrid.getValue(xhPoint).potential < xVal) {
 					double tp = (1.0 / 3.0) * (4.0 * xVal - cellGrid.getValue(xhPoint).potential);
 					double factor = 9.0 / 4.0;
 					a += factor;
@@ -269,7 +267,7 @@ public interface EikonalSolver {
 					c += factor * Math.pow(tp, 2);
 				}
 
-				if (isValidPoint(yhPoint, cellGrid) && cellGrid.getValue(yhPoint).potential < yVal) {
+				if (isValidPoint(yhPoint) && cellGrid.getValue(yhPoint).potential < yVal) {
 					double tp = (1.0 / 3.0) * (4.0 * yVal - cellGrid.getValue(yhPoint).potential);
 					double factor = 9.0 / 4.0;
 					a += factor;
@@ -317,13 +315,13 @@ public interface EikonalSolver {
 						point.x + neighbors.get(2 * j + i).x * 2, point.y
 								+ neighbors.get(2 * j + i).y * 2);
 
-				if (isValidPoint(pni, cellGrid) && cellGrid.getValue(pni).tag.frozen) {
+				if (isValidPoint(pni) && cellGrid.getValue(pni).tag.frozen) {
 					double val1n = cellGrid.getValue(pni).potential;
 
 					if (val1n < val1) {
 						val1 = val1n;
 
-						if (isValidPoint(pni2, cellGrid)) {
+						if (isValidPoint(pni2)) {
 							double val2n = cellGrid.getValue(pni2).potential;
 							if (cellGrid.getValue(pni2).tag.frozen
 									&& val2n <= val1n) {

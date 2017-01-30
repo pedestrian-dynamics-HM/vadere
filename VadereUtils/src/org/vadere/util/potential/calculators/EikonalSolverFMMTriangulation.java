@@ -23,6 +23,7 @@ import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
 import org.vadere.util.triangulation.IPointConstructor;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -190,8 +191,13 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 		return result;
 	}
 
+    @Override
+    public boolean isValidPoint(Point point) {
+        return false;
+    }
 
-	/**
+
+    /**
 	 * Calculate the fast marching solution. This is called only once,
 	 * subsequent calls only return the result of the first.
 	 */
