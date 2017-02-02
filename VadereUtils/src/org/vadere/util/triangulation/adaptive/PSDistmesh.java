@@ -1,7 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.vadere.util.delaunay.BowyerWatson;
+import org.vadere.util.triangulation.DelaunayTriangulation;
 import org.vadere.util.geometry.LineIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MLine;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
-	private BowyerWatson<MeshPoint> bowyerWatson;
+	private DelaunayTriangulation<MeshPoint> bowyerWatson;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -116,11 +116,10 @@ public class PSDistmesh {
 	private void reTriangulate() {
 		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			maxMovementLen = 0;
-			bowyerWatson = new BowyerWatson<>(points, (x, y) -> new MeshPoint(x, y, false), (a, b, c) -> new VTriangle(a, b, c));
+			bowyerWatson = new DelaunayTriangulation<>(points, (x, y) -> new MeshPoint(x, y, false));
 
-			bowyerWatson.init();
 			System.out.println("triangulation started");
-			bowyerWatson.execude();
+			bowyerWatson.compute();
 			System.out.println("triangulation finished");
 
 

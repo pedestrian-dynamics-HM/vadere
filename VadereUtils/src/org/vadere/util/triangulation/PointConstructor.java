@@ -1,4 +1,4 @@
-package org.vadere.util.delaunay;
+package org.vadere.util.triangulation;
 
 import org.vadere.util.geometry.shapes.IPoint;
 

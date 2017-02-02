@@ -1,4 +1,4 @@
-package org.vadere.util.delaunay;
+package org.vadere.util.triangulation;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
