@@ -1,17 +1,41 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.data.Face;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.calculators.PotentialPoint;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Interpolation utilities not covered by java.lang.Math
  * 
  */
 public class InterpolationUtil {
+
+	public static double barycentricInterpolation(final Face<PotentialPoint> triangle, final double x, final double y){
+		List<PotentialPoint> points = triangle.getPoints();
+		assert points.size() == 3;
+
+		PotentialPoint p1 = points.get(0);
+		PotentialPoint p2 = points.get(1);
+		PotentialPoint p3 = points.get(2);
+		VTriangle vtriangle = triangle.toTriangle();
+		double totalArea = vtriangle.getArea();
+		VPoint point = new VPoint(x, y);
+
+		double percentP1 = totalArea / (new VTriangle(new VPoint(p2), new VPoint(p3), point).getArea());
+		double percentP2 = totalArea / (new VTriangle(new VPoint(p1), new VPoint(p3), point).getArea());
+		double percentP3 = totalArea / (new VTriangle(new VPoint(p1), new VPoint(p2), point).getArea());
+
+		double value = percentP1 * p1.getPotential() + percentP2 * p2.getPotential() + percentP3 * p3.getPotential();
+		return value;
+	}
 
 	/**
 	 * Computes bilinear interpolation of z = f(x,y) with z1 to z4 being the

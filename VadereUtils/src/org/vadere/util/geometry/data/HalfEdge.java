@@ -72,13 +72,13 @@ public class HalfEdge<P extends IPoint> {
 		return previous;
 	}
 
-	public Optional<HalfEdge<P>> getTwin() {
-		return Optional.ofNullable(twin);
+	public HalfEdge<P> getTwin() {
+		return twin;
 	}
 
 	public void setTwin(final @NotNull HalfEdge twin) {
 		this.twin = twin;
-		if(!twin.getTwin().isPresent() || twin.getTwin().get() != this) {
+		if(twin.getTwin() != this) {
 			twin.setTwin(this);
 		}
 	}
@@ -113,23 +113,51 @@ public class HalfEdge<P extends IPoint> {
 		return new NeighbourIterator();
 	}
 
+	public Iterator<Face<P>> inciedentFaceIterator() { return new NeighbourFaceIterator(); }
+
+	/**
+	 * This iterator assumes that the this edge is completely surrounded by faces.
+	 */
+	private class NeighbourFaceIterator implements Iterator<Face<P>> {
+		private NeighbourIterator neighbourIterator = new NeighbourIterator();
+
+		private NeighbourFaceIterator() {
+			// such that no duplicated faces returned
+			if(neighbourIterator.hasNext()) {
+				neighbourIterator.next();
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return neighbourIterator.hasNext();
+		}
+
+		@Override
+		public Face<P> next() {
+			return neighbourIterator.next().getFace();
+		}
+	}
+
 	/**
 	 * This iterator assumes that the this edge is completely surrounded by faces.
 	 */
 	private class NeighbourIterator implements Iterator<HalfEdge<P>> {
 
-		private HalfEdge<P> current = HalfEdge.this;
+		private HalfEdge<P> current = HalfEdge.this.getNext();
 		private boolean first = true;
 
 		@Override
 		public boolean hasNext() {
-			return current.getTwin().isPresent() && (first || current != HalfEdge.this);
+			return (first || current != HalfEdge.this.getNext());
 		}
 
 		@Override
 		public HalfEdge<P> next() {
-			current = current.getTwin().get().getNext();
-			return current;
+			HalfEdge<P> result = current;
+			current = result.getTwin().getNext();
+			return result;
 		}
 	}
+
 }

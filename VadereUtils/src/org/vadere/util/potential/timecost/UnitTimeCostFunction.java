@@ -1,5 +1,6 @@
 package org.vadere.util.potential.timecost;
 
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -16,8 +17,8 @@ public class UnitTimeCostFunction implements ITimeCostFunction {
 	 * @return one, independent of p.
 	 */
 	@Override
-	public double costAt(VPoint p) {
-		return 1;
+	public double costAt(IPoint p) {
+			return 1;
 	}
 
 	@Override

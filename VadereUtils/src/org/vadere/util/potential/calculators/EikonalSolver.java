@@ -82,7 +82,7 @@ public interface EikonalSolver {
     }
 
     default double getPotential(final CellGrid potentialField, final VPoint pos, final double unknownPenalty, final double weight) {
-            double targetPotential = Double.MAX_VALUE;
+        double targetPotential = Double.MAX_VALUE;
         Point gridPoint = potentialField.getNearestPointTowardsOrigin(pos);
         VPoint gridPointCoord = potentialField.pointToCoord(gridPoint);
         int incX = 1, incY = 1;
@@ -105,9 +105,9 @@ public interface EikonalSolver {
 
 		/* Interpolate the known (potential < Double.MAX_VALUE) values. */
         Pair<Double, Double> result = InterpolationUtil.bilinearInterpolationWithUnkown(
-                        gridPotentials,
-                        (pos.x - gridPointCoord.x) / potentialField.getResolution(),
-                        (pos.y - gridPointCoord.y) / potentialField.getResolution());
+                gridPotentials,
+                (pos.x - gridPointCoord.x) / potentialField.getResolution(),
+                (pos.y - gridPointCoord.y) / potentialField.getResolution());
 
         double tmpPotential = result.getLeft();
 
