@@ -1,6 +1,5 @@
 package org.vadere.util.potential.calculators;
 
-<<<<<<< HEAD
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.GeometryUtils;
@@ -18,23 +17,16 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.PathFindingTag;
-=======
-import org.vadere.util.geometry.shapes.VShape;
->>>>>>> refactoring of the eikonalSolver code
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
 import org.vadere.util.triangulation.IPointConstructor;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
-=======
-import java.awt.*;
->>>>>>> refactoring of the eikonalSolver code
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
@@ -179,7 +171,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 
 	@Override
 	public double getValue(double x, double y) {
-<<<<<<< HEAD
 		Optional<F> optFace = triangulation.locate(new VPoint(x, y));
 
 		double result = Double.MAX_VALUE;
@@ -572,15 +563,4 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 			return halfEdge.toString();
 		}
 	}
-=======
-		return 0;
-	}
-
-	@Override
-	public boolean isValidPoint(Point point) {
-		return false;
-	}
-
-
->>>>>>> refactoring of the eikonalSolver code
 }

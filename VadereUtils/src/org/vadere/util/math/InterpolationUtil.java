@@ -19,6 +19,7 @@ public class InterpolationUtil {
 		PotentialPoint p1 = points.get(0);
 		PotentialPoint p2 = points.get(1);
 		PotentialPoint p3 = points.get(2);
+
 		VTriangle vtriangle = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
 
 		double totalArea = vtriangle.getArea();
