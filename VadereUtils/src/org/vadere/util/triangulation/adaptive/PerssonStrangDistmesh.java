@@ -1,9 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
 
-import org.vadere.util.delaunay.BowyerWatson;
-import org.vadere.util.delaunay.BowyerWatson3;
-import org.vadere.util.delaunay.BowyerWatsonSlow;
+import org.vadere.util.triangulation.BowyerWatson3;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;

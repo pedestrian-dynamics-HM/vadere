@@ -1,6 +1,5 @@
 package org.vadere.util.potential;
 
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -79,5 +78,4 @@ public class TestFFMUniformTriangulation {
 		assertTrue(0.1 > solver.getValue(5, 5));
 		assertTrue(0.0 < solver.getValue(1, 7));
 	}
-
 }
