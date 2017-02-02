@@ -1,5 +1,6 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.shapes.DPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -7,6 +8,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 public class MeshPoint extends MPoint {
 	private boolean fixPoint;
 	private IPoint velocity;
+	private double potential;
 
 	public MeshPoint(final double x, final double y, boolean fixPoint){
 		super(x, y);
@@ -37,5 +39,4 @@ public class MeshPoint extends MPoint {
 	public boolean isFixPoint() {
 		return fixPoint;
 	}
-
 }

@@ -1,8 +1,6 @@
 package org.vadere.util.potential.calculators;
 
 
-import java.awt.*;
-
 public class PotentialFieldCalculatorNone implements EikonalSolver {
 
 	@Override
@@ -21,8 +19,4 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 		return 0;
 	}
 
-	@Override
-	public boolean isValidPoint(Point point) {
-		return false;
-	}
 }

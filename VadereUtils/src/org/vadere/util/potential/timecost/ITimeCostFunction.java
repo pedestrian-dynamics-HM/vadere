@@ -1,6 +1,6 @@
 package org.vadere.util.potential.timecost;
 
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * Interface for a generic time cost function in 2D.
@@ -16,12 +16,12 @@ public interface ITimeCostFunction {
 	 *        a point in 2D space.
 	 * @return the double-valued cost at p.
 	 */
-	public double costAt(VPoint p);
+	double costAt(IPoint p);
 
 	/**
 	 * Prepares the dynamic timeCostFunction for the next step.
 	 */
-	public void update();
+	void update();
 
 	/**
 	 * Indicates that this ITimeCostFunction is for generating a dynamic
@@ -30,5 +30,5 @@ public interface ITimeCostFunction {
 	 * @return true => this ITimeCostFunction is for generating a dynaic
 	 *         potential field, otherwise false
 	 */
-	public boolean needsUpdate();
+	boolean needsUpdate();
 }

@@ -130,12 +130,7 @@ public class PointLocation<P extends VPoint> {
 			return Optional.of(edge.getFace());
 		}
 		else {
-			if(edge.getTwin().isPresent()) {
-				return Optional.of(edge.getTwin().get().getFace());
-			}
-			else {
-				return Optional.empty();
-			}
+			return Optional.of(edge.getTwin().getFace());
 		}
 	}
 }

@@ -8,6 +8,7 @@ import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
@@ -79,7 +80,7 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 	}
 
 	@Override
-	public double costAt(VPoint p) {
+	public double costAt(final IPoint p) {
 		long ms = System.currentTimeMillis();
 		double cost = calculatePedestrianDensity(new VPoint(p.getX(), p.getY()));
 
@@ -106,12 +107,12 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 		return true;
 	}
 
-	private double calculatePedestrianDensity(final VPoint position) {
+	private double calculatePedestrianDensity(final IPoint position) {
 		double densitySum = 0.0;
 
 		double radius = 4;
 		Collection<Pedestrian> pedestrianBodies = floor
-				.getSpatialMap(Pedestrian.class).getObjects(position, radius);
+				.getSpatialMap(Pedestrian.class).getObjects(new VPoint(position), radius);
 
 		if (!pedestrianBodies.isEmpty()) {
 			for (Pedestrian pedestrianBody : pedestrianBodies) {
