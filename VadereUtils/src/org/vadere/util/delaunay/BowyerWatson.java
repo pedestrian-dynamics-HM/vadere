@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -80,8 +81,19 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 	}
 
 	@Override
-	public Face<P> locate(P point) {
-		return locatePoint(point).stream().findAny().get().getElement().getFace();
+	public Face<P> locate(final IPoint point) {
+		Optional<DAG<DAGElement<P>>>  optDag = locatePoint(point).stream().findAny();
+		if(optDag.isPresent()) {
+			return optDag.get().getElement().getFace();
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public Face<P> locate(final double x, double y) {
+		return locate(new VPoint(x, y));
 	}
 
 	@Override
@@ -153,7 +165,7 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		return new VTriangle(new VPoint(p1.getX(), p1.getY()), new VPoint(p2.getX(), p2.getY()), new VPoint(p3.getX(), p3.getY()));
 	}
 
-	private Set<DAG<DAGElement<P>>> locatePoint(final P point) {
+	private Set<DAG<DAGElement<P>>> locatePoint(final IPoint point) {
 
 		Set<DAG<DAGElement<P>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P>>> nodesToVisit = new LinkedList<>();
@@ -230,7 +242,7 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 			pointOnEdge(edges.get(2), p);
 			throw new IllegalArgumentException(p + " lies on no edge!");
 		}
-		HalfEdge<P> zx = xz.getTwin().get();
+		HalfEdge<P> zx = xz.getTwin();
 		HalfEdge<P> xw = zx.getNext();
 		HalfEdge<P> wz = xw.getNext();
 
@@ -406,9 +418,9 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 	 */
 	private boolean isIllegalEdge(P p, HalfEdge<P> edge){
 		if(edge.hasTwin()) {
-			P x = edge.getTwin().get().getEnd();
-			P y = edge.getTwin().get().getNext().getEnd();
-			P z = edge.getTwin().get().getNext().getNext().getEnd();
+			P x = edge.getTwin().getEnd();
+			P y = edge.getTwin().getNext().getEnd();
+			P z = edge.getTwin().getNext().getNext().getEnd();
 			VTriangle triangle = new VTriangle(new VPoint(x.getX(), x.getY()), new VPoint(y.getX(), y.getY()), new VPoint(z.getX(), z.getY()));
 			return triangle.isInCircumscribedCycle(p);
 		}
@@ -431,7 +443,7 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 			HalfEdge<P> pz = xp.getNext();
 
 			Face<P> f2 = zx.getFace();
-			HalfEdge<P> xz = zx.getTwin().get();
+			HalfEdge<P> xz = zx.getTwin();
 			HalfEdge<P> zy = xz.getNext();
 			HalfEdge<P> yx = zy.getNext();
 

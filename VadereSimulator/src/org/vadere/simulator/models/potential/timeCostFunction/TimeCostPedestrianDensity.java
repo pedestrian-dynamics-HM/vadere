@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
@@ -45,12 +46,9 @@ public class TimeCostPedestrianDensity implements ITimeCostFunction {
 	}
 
 	@Override
-	public double costAt(final VPoint p) {
-		double cost = 0.0;
-
+	public double costAt(final IPoint p) {
 		long ms = System.currentTimeMillis();
-
-		cost = gaussianCalculator.getFilteredValue(p.x, p.y);
+		double cost = gaussianCalculator.getFilteredValue(p.getX(), p.getY());
 
 		if (heighestDensity < cost) {
 			heighestDensity = cost;

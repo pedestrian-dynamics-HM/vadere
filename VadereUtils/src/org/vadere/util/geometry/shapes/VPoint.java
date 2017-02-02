@@ -21,6 +21,10 @@ public class VPoint implements Cloneable, IPoint {
 
 	public VPoint() {}
 
+	public VPoint(final IPoint point) {
+		this(point.getX(), point.getY());
+	}
+
 	public VPoint(double x, double y) {
 		this.x = x;
 		this.y = y;
