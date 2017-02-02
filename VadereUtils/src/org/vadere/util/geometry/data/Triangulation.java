@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public interface Triangulation<P extends IPoint> {
+	void compute();
 	Face<P> locate(final double x, final double y);
 	Face<P> locate(final IPoint point);
 	Stream<Face<P>> streamFaces();
