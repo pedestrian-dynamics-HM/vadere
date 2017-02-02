@@ -25,7 +25,6 @@ import javax.swing.*;
  * This class is for computing the DelaunayTriangulation using the BowyerWatson-Algorithm. In average the algorithm should perfom in O(n LOG(n)) but
  * in degenerated cases its runtime can be in O(n^2) where n is the number of points.
  */
-@Deprecated
 public class BowyerWatson3 {
 	private List<VTriangle> triangles;
 	private Collection<VPoint> points;
