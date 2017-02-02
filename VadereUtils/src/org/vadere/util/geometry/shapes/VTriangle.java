@@ -193,8 +193,7 @@ public class VTriangle extends VPolygon {
 	}
 
 	public boolean hasBoundaryPoint(final DataPoint point) {
-		return this.p1.equals(point) || this.p2.equals(point)
-				|| this.p3.equals(point);
+		return this.p1.equals(point) || this.p2.equals(point) || this.p3.equals(point);
 	}
 
 	public VLine[] getLines() {
