@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.shapes;
 
 import java.awt.geom.Line2D;
+import java.util.stream.Stream;
 
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -54,6 +55,10 @@ public class VLine extends Line2D.Double {
 
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+	}
+
+	public Stream<VPoint> streamPoints() {
+		return Stream.of(p1, p2);
 	}
 
 	public double length() {

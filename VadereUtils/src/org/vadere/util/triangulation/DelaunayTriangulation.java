@@ -1,7 +1,9 @@
-package org.vadere.util.delaunay;
+package org.vadere.util.triangulation;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.data.DAG;
 import org.vadere.util.geometry.data.Face;
@@ -16,6 +18,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,39 +26,55 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.*;
 
-public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
+public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P> {
 
 	private final Set<P> points;
 	private final PointConstructor<P> pointConstructor;
-	private final TriangleConstructor<VPoint> triangleConstructor;
 	private P p0;
 	private P p1;
 	private P p2;
 	private DAG<DAGElement<P>> dag;
 	private final HashMap<Face<P>, DAG<DAGElement<P>>> map;
 	private int count;
+	private double eps = 0.001;
+	private static Logger log = LogManager.getLogger(DelaunayTriangulation.class);
 
-	public BowyerWatson(
+	public DelaunayTriangulation(
 			final Set<P> points,
-			final PointConstructor<P> pointConstructor,
-			final TriangleConstructor<VPoint> triangleConstructor) {
+			final PointConstructor<P> pointConstructor) {
 		this.points = points;
 		this.pointConstructor = pointConstructor;
-		this.triangleConstructor = triangleConstructor;
 		this.map = new HashMap<>();
 		this.count = 0;
+		P p_max = points.parallelStream().reduce(pointConstructor.create(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
+		P p_min = points.parallelStream().reduce(pointConstructor.create(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
+		init(p_max, p_min);
 	}
 
-	public void init() {
-		P p_max = points.stream().reduce(pointConstructor.create(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
-		P p_min = points.stream().reduce(pointConstructor.create(Double.MAX_VALUE, Double.MAX_VALUE), (a, b) -> pointConstructor.create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
+	public DelaunayTriangulation(
+			final double minX,
+			final double minY,
+			final double width,
+			final double height,
+			final PointConstructor<P> pointConstructor) {
+		this.points = new HashSet<P>();
+		this.pointConstructor = pointConstructor;
+		this.map = new HashMap<>();
+		this.count = 0;
+		P p_max = pointConstructor.create(minX + width, minY + height);
+		P p_min = pointConstructor.create(minX, minY);
+
+		init(p_max, p_min);
+
+	}
+
+	private void init(final P p_max, final P p_min) {
 		VRectangle bound = new VRectangle(p_min.getX(), p_min.getY(), p_max.getX()-p_min.getX(), p_max.getY()- p_min.getY());
 
 		double gap = 1.0;
@@ -65,14 +84,13 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		p2 = pointConstructor.create(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max + gap);
 
 		Face<P> superTriangle = Face.of(p0, p1, p2);
-		this.dag = new DAG<>(new DAGElement<P>(superTriangle, Triple.of(p0, p1, p2), triangleConstructor));
+		this.dag = new DAG<>(new DAGElement<P>(superTriangle, Triple.of(p0, p1, p2)));
 		this.map.put(superTriangle, dag);
+		this.count = 0;
 	}
 
-	public void execude() {
-		// 1. compute a random permutation of the point set/collection.
-
-		int count = 0;
+	@Override
+	public void compute() {
 		// 2. insert points
 		for(P p : points) {
 			insert(p);
@@ -117,26 +135,23 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 
 	@Override
 	public void insert(P point) {
-		Set<DAG<DAGElement<P>>> leafs = locatePoint(point);
-		assert leafs.size() == 2 ||leafs.size() == 1;
+		Collection<DAG<DAGElement<P>>> leafs = locatePoint(point);
+		assert leafs.size() == 2 ||leafs.size() == 1 ||leafs.size() == 0;
 		count++;
 
 		// point is inside a triangle
 		if(leafs.size() == 1) {
+			log.info("split " + count);
 			split(point, leafs.stream().findAny().get());
 		} // point lies on an edge of 2 triangles
 		else if(leafs.size() == 2) {
 			Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
+			log.info("split both");
 			splitBoth(point, it.next(), it.next());
 		}
 		else if(leafs.size() == 0) {
 			// problem due numerical calculation.
-			System.out.println("numerical error!");
-		}
-		else {
-			Set<DAG<DAGElement<P>>> leafs2 = locatePoint(point);
-			System.out.println(leafs2 + " contains " + point);
-			throw new IllegalArgumentException("something is wrong here, this should never happen " + leafs.size() + " / " + point + " / " + count);
+			log.warn("numerical error!");
 		}
 	}
 
@@ -165,7 +180,7 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		return new VTriangle(new VPoint(p1.getX(), p1.getY()), new VPoint(p2.getX(), p2.getY()), new VPoint(p3.getX(), p3.getY()));
 	}
 
-	private Set<DAG<DAGElement<P>>> locatePoint(final IPoint point) {
+	private Collection<DAG<DAGElement<P>>> locatePoint(final IPoint point) {
 
 		Set<DAG<DAGElement<P>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P>>> nodesToVisit = new LinkedList<>();
@@ -174,32 +189,24 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		while(!nodesToVisit.isEmpty()) {
 			DAG<DAGElement<P>> currentNode = nodesToVisit.removeLast();
 			//System.out.println(nodesToVisit.size());
-			if(currentNode.getElement().getTriangle().isPartOf(point, 0.0)) {
+			if(currentNode.getElement().getTriangle().isPartOf(point, eps)) {
 				if(currentNode.isLeaf()) {
 					leafs.add(currentNode);
+
+
+					// if we found 2 children this means that the point lies exactly on an edge.
+					// However, if we found 3 children the point has to be very very close (and we have an numerical error) to an already inserted point
+					// and we ignore this point.
+					if(leafs.size() > 2) {
+						return new ArrayList<>();
+					}
 				}
 				else {
-					boolean check = false;
+					int found = 0;
 					for(DAG<DAGElement<P>> child : currentNode.getChildren()) {
-						if(child.getElement().getTriangle().isPartOf(point, 0.0)) {
-							check = true;
+						if(child.getElement().getTriangle().isPartOf(point, eps)) {
+							found++;
 							nodesToVisit.add(child);
-							break;
-						}
-					}
-
-					// this may (due to nummerical errors) happen if the point is exactly on an edge of 2 triangles => add both
-					if(!check) {
-						int count = 0;
-						for(DAG<DAGElement<P>> child : currentNode.getChildren()) {
-							if(child.getElement().getTriangle().isPartOf(point, 0.0)) {
-								nodesToVisit.add(child);
-								count++;
-							}
-						}
-
-						if(count != 2) {
-							System.out.println("this can not be the case!");
 						}
 					}
 				}
@@ -210,7 +217,6 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 	}
 
 	public Pair<DAG<DAGElement<P>>, DAG<DAGElement<P>>> splitBoth(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag, @NotNull DAG<DAGElement<P>> xwzDag) {
-		System.out.println("split both");
 
 		VTriangle xyzTriangle = xyzDag.getElement().getTriangle();
 		Face<P> xyzFace = xyzDag.getElement().getFace();
@@ -220,18 +226,17 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		HalfEdge<P> zy;
 		HalfEdge<P> yx;
 
-		double eps = 0.00001;
-		if(Math.abs(pointOnEdge(edges.get(0), p)) < eps) {
+		if(pointOnEdge(edges.get(0), p) <= eps) {
 			xz = edges.get(0);
 			zy = edges.get(1);
 			yx = edges.get(2);
 		}
-		else if(Math.abs(pointOnEdge(edges.get(1), p)) < eps) {
+		else if(pointOnEdge(edges.get(1), p) <= eps) {
 			xz = edges.get(1);
 			zy = edges.get(2);
 			yx = edges.get(0);
 		}
-		else if(Math.abs(pointOnEdge(edges.get(2), p)) < eps) {
+		else if(pointOnEdge(edges.get(2), p) <= eps) {
 			xz = edges.get(2);
 			zy = edges.get(0);
 			yx = edges.get(1);
@@ -296,11 +301,11 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		xp.setNext(py);
 		py.setNext(yx);
 
-		DAG<DAGElement<P>> zypDag = new DAG<>(new DAGElement(zyp, Triple.of(z, y, p), triangleConstructor));
-		DAG<DAGElement<P>> yxpDag = new DAG<>(new DAGElement(yxp, Triple.of(y, x, p), triangleConstructor));
+		DAG<DAGElement<P>> zypDag = new DAG<>(new DAGElement(zyp, Triple.of(z, y, p)));
+		DAG<DAGElement<P>> yxpDag = new DAG<>(new DAGElement(yxp, Triple.of(y, x, p)));
 
-		DAG<DAGElement<P>> xwpDag = new DAG<>(new DAGElement(xwp, Triple.of(x, w, p), triangleConstructor));
-		DAG<DAGElement<P>> wzpDag = new DAG<>(new DAGElement(wzp, Triple.of(w, z, p), triangleConstructor));
+		DAG<DAGElement<P>> xwpDag = new DAG<>(new DAGElement(xwp, Triple.of(x, w, p)));
+		DAG<DAGElement<P>> wzpDag = new DAG<>(new DAGElement(wzp, Triple.of(w, z, p)));
 
 		xyzDag.addChild(zypDag);
 		xyzDag.addChild(yxpDag);
@@ -325,7 +330,7 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 	}
 
 	private static  <D extends IPoint> double pointOnEdge(final HalfEdge<D> edge, D point) {
-		double sign = GeometryUtils.sign(point, edge.getEnd(), edge.getPrevious().getEnd());
+		double sign = Math.abs(GeometryUtils.sign(point, edge.getEnd(), edge.getPrevious().getEnd()));
 		return sign;
 	}
 
@@ -384,9 +389,9 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		zx.setFace(zxp);
 		yz.setFace(yzp);
 
-		DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(xyp, Triple.of(x, y , p), triangleConstructor));
-		DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(yzp, Triple.of(y, z, p), triangleConstructor));
-		DAG<DAGElement<P>> zxpDag = new DAG<>(new DAGElement(zxp, Triple.of(z, x, p), triangleConstructor));
+		DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(xyp, Triple.of(x, y, p)));
+		DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(yzp, Triple.of(y, z, p)));
+		DAG<DAGElement<P>> zxpDag = new DAG<>(new DAGElement(zxp, Triple.of(z, x, p)));
 
 		xyzDag.addChild(xypDag);
 		xyzDag.addChild(yzpDag);
@@ -432,8 +437,8 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 	 * yxp and p is the point on the other side of xy. So legalizing means to flip xy with
 	 * zp.
 	 *
-	 * @param p     p is the point on the other side of xy
-	 * @param edge  an edge xy of a triangle xyz
+	 * @param p     p is the point on the other side of zx
+	 * @param edge  an edge zx of a triangle xyz
 	 */
 	private void legalize(final P p, final HalfEdge<P> edge) {
 		if(isIllegalEdge(p, edge)) {
@@ -484,8 +489,8 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 			}
 
 			// update DAG
-			DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(y, z, p), triangleConstructor));
-			DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(x, y, p), triangleConstructor));
+			DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(y, z, p)));
+			DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(x, y, p)));
 
 			xpzDag.addChild(yzpDag);
 			xpzDag.addChild(xypDag);
@@ -514,23 +519,18 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		points.add(new VPoint(75,53));
 		points.add(new VPoint(80,70));*/
 
-		Random r = new Random();
-		for(int i=0; i< 1000000; i++) {
+		/*Random r = new Random();
+		for(int i=0; i< 1000; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
 
 		long ms = System.currentTimeMillis();
-		BowyerWatson<VPoint> bw = new BowyerWatson<>(points,
-				(x, y) -> new VPoint(x, y),
-				(p1, p2, p3) -> new VTriangle(p1, p2, p3));
-		bw.init();
-		bw.execude();
+		DelaunayTriangulation<VPoint> bw = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		bw.compute();
 		Set<VLine> edges = bw.getEdges();
 		edges.addAll(bw.getTriangles().stream().map(triangle -> new VLine(triangle.getIncenter(), triangle.p1)).collect(Collectors.toList()));
 		System.out.println(System.currentTimeMillis() - ms);
-
-
 
 		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -538,22 +538,32 @@ public class BowyerWatson<P extends IPoint> implements Triangulation<P> {
 		window.getContentPane().add(new Lines(edges, points, max));
 		window.setVisible(true);
 
+
+
 		ms = System.currentTimeMillis();
 		BowyerWatsonSlow<VPoint> bw2 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
 		bw2.execute();
 		Set<VLine> edges2 = bw2.getTriangles().stream()
-				//.map(triangle -> Arrays.asList(GeometryUtils.generateAcuteTriangles(triangle)))
-				//.flatMap(list -> list.stream())
 				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
 		System.out.println(System.currentTimeMillis() - ms);
-
-
 
 		JFrame window2 = new JFrame();
 		window2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window2.setBounds(0, 0, max, max);
 		window2.getContentPane().add(new Lines(edges2, points, max));
-		window2.setVisible(true);
+		window2.setVisible(true);*/
+
+		UniformTriangulation<VPoint> uniformTriangulation = new UniformTriangulation<>(0, 0, width, height, 10.0, (x, y) -> new VPoint(x, y));
+		uniformTriangulation.compute();
+		Set<VLine> edges3 = uniformTriangulation.getEdges();
+		//edges3.addAll(uniformTriangulation.getTriangles().stream().map(triangle -> new VLine(triangle.getIncenter(), triangle.p1)).collect(Collectors.toList()));
+
+
+		JFrame window3 = new JFrame();
+		window3.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		window3.setBounds(0, 0, max, max);
+		window3.getContentPane().add(new Lines(edges3, edges3.stream().flatMap(edge -> edge.streamPoints()).collect(Collectors.toSet()), max));
+		window3.setVisible(true);
 	}
 
 	private static class Lines extends JComponent{
