@@ -4,8 +4,8 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.data.DAG;
-import org.vadere.util.delaunay.BowyerWatson;
-import org.vadere.util.delaunay.DAGElement;
+import org.vadere.util.triangulation.DelaunayTriangulation;
+import org.vadere.util.triangulation.DAGElement;
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -42,9 +42,8 @@ public class TestBoyerWatson {
 		points.add(p4);
 		points.add(p6);
 
-		BowyerWatson<VPoint> boyerWatsonImproved = new BowyerWatson<>(points, (x, y) -> new VPoint(x, y), (a, b, c) -> new VTriangle(a, b, c));
-		boyerWatsonImproved.init();
-		boyerWatsonImproved.execude();
+		DelaunayTriangulation<VPoint> boyerWatsonImproved = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		boyerWatsonImproved.compute();
 		Collection<VTriangle> triangulation = boyerWatsonImproved.getTriangles();
 		triangulation.forEach(System.out::print);
 	}
@@ -62,9 +61,9 @@ public class TestBoyerWatson {
 		points.add(p3);
 
 		Face<VPoint> face = Face.of(p1,p2,p3);
-		DAG<DAGElement<VPoint>> dag = new DAG<>(new DAGElement<>(face, Triple.of(p1,p2,p3), (a, b, c) -> new VTriangle(a, b, c)));
+		DAG<DAGElement<VPoint>> dag = new DAG<>(new DAGElement<>(face, Triple.of(p1,p2,p3)));
 
-		BowyerWatson<VPoint> boyerWatsonImproved = new BowyerWatson<>(points, (x, y) -> new VPoint(x, y), (a, b, c) -> new VTriangle(a, b, c));
+		DelaunayTriangulation<VPoint> boyerWatsonImproved = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
 		DAG<DAGElement<VPoint>> result = boyerWatsonImproved.split(centerPoint, dag);
 		Set<VTriangle> triangulation = new HashSet<>(result.collectLeafs().stream().map(dagElement -> dagElement.getTriangle()).collect(Collectors.toList()));
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
@@ -86,9 +85,8 @@ public class TestBoyerWatson {
 		}
 
 		long ms = System.currentTimeMillis();
-		BowyerWatson<VPoint> bw = new BowyerWatson<>(points, (x, y) -> new VPoint(x, y), (p1, p2, p3) -> new VTriangle(p1, p2, p3));
-		bw.init();
-		bw.execude();
+		DelaunayTriangulation<VPoint> bw = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		bw.compute();
 		System.out.println("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms));
 	}
 

@@ -25,7 +25,6 @@ import java.util.stream.Stream;
  * This class is for computing the DelaunayTriangulation using the BowyerWatson-Algorithm. In average the algorithm should perfom in O(n log(n)) but
  * in degenerated cases its runtime can be in O(n^2) where n is the number of points.
  */
-@Deprecated
 public class BowyerWatsonSlow<P extends IPoint> {
     private List<Triple<P, P, P>> triangles;
     private Collection<P> points;
@@ -38,7 +37,7 @@ public class BowyerWatsonSlow<P extends IPoint> {
     }
 
     public void execute() {
-       // P bound = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.bound(a.getX(), b.getX()), Math.bound(a.getY(), b.getY())));
+       // P max = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
        // P min = points.parallelStream().reduce(pointConstructor.apply(Double.MAX_VALUE, Double.MAX_VALUE), (a, b) -> pointConstructor.apply(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
 
 	    P max = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE,Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));

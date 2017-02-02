@@ -1,4 +1,4 @@
-package org.vadere.util.delaunay;
+package org.vadere.util.triangulation;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.geometry.data.Face;
@@ -11,13 +11,13 @@ public class DAGElement<P extends IPoint> {
 	private Triple<P, P, P> vertices;
 	private VTriangle triangle;
 
-	public DAGElement(final Face<P> face, final Triple<P, P, P> vertices, final TriangleConstructor<VPoint> triangleConstructor) {
+	public DAGElement(final Face<P> face, final Triple<P, P, P> vertices) {
 		this.face = face;
 		this.vertices = vertices;
 		VPoint p1 = new VPoint(vertices.getLeft().getX(), vertices.getLeft().getY());
 		VPoint p2 = new VPoint(vertices.getMiddle().getX(), vertices.getMiddle().getY());
 		VPoint p3 = new VPoint(vertices.getRight().getX(), vertices.getRight().getY());
-		this.triangle = triangleConstructor.create(p1, p2, p3);
+		this.triangle = new VTriangle(p1, p2, p3);
 	}
 
 	public Face<P> getFace() {

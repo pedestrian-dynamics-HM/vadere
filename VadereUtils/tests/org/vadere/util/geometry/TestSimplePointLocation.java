@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
-import org.vadere.util.delaunay.PointLocation;
+import org.vadere.util.triangulation.PointLocation;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Arrays;
