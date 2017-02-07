@@ -144,6 +144,8 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 				}
 			}
 		}
+
+		calculate();
 	}
 
 	@Override
@@ -229,6 +231,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 				}
 			}
 			else if(mesh.getVertex(neighbour).getPathFindingTag() == PathFindingTag.Reachable) {
+
 				//double potential = neighbour.getEnd().getPotential();
 				double potential = recalculatePoint(neighbour);
 
@@ -259,7 +262,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 				potential = Math.min(computeValue(mesh.getVertex(edge), face), potential);
 			}
 		}
-
 		return potential;
 	}
 
