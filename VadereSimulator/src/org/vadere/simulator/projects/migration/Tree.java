@@ -90,15 +90,15 @@ public class Tree {
 			throws MigrationException {
 		List<Node> nodes = recursiveScan(root, parentKey, key, caller);
 		if(nodes.size() > 1) {
-			throw new MigrationException(caller, "can't automatically delete the unrecognized field [" + key
+			throw new MigrationException(caller, "can't automatically deleteEdge the unrecognized field [" + key
 					+ "] because more than one tree-path ends with [" + parentKey + " > " + key + "]");
 		}
 		else if(nodes.isEmpty()) {
-			throw new MigrationException(caller, "can't automatically delete the unrecognized field [" + key
+			throw new MigrationException(caller, "can't automatically deleteEdge the unrecognized field [" + key
 					+ "] no tree-path ends with [" + parentKey + " > " + key + "]");
 		}
 		else {
-			log.append("\t- delete unrecognized node [" + key + "] under node "
+			log.append("\t- deleteEdge unrecognized node [" + key + "] under node "
 					+ pathToString(getPathToNode(nodes.get(0).parent)) + "\n");
 			nodes.get(0).delete();
 		}

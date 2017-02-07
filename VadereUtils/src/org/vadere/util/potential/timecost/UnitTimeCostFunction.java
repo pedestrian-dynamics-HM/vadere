@@ -1,7 +1,6 @@
 package org.vadere.util.potential.timecost;
 
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * Provides unit (= 1) cost at every point in 2D space.

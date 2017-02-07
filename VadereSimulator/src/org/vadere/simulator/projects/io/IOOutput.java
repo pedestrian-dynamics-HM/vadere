@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * This IOUtility class provides all methods to load, delete, list, clean output directories.
+ * This IOUtility class provides all methods to load, deleteEdge, list, clean output directories.
  * Each output directory contains two fiels *.scenario and *.trajectories.
  *
  */
@@ -129,7 +129,7 @@ public abstract class IOOutput {
 				try {
 					Files.delete(file.toPath());
 				} catch (IOException e) {
-					logger.error("could not delete scenario-file: " + file.getAbsolutePath() + ", "
+					logger.error("could not deleteEdge scenario-file: " + file.getAbsolutePath() + ", "
 							+ e.getLocalizedMessage());
 				}
 			}
@@ -138,7 +138,7 @@ public abstract class IOOutput {
 				try {
 					Files.delete(file.toPath());
 				} catch (IOException e) {
-					logger.error("could not delete trajectory-file: " + file.getAbsolutePath() + ", "
+					logger.error("could not deleteEdge trajectory-file: " + file.getAbsolutePath() + ", "
 							+ e.getLocalizedMessage());
 				}
 			}
@@ -146,7 +146,7 @@ public abstract class IOOutput {
 			try {
 				Files.delete(directory.toPath());
 			} catch (IOException e) {
-				logger.error("could not delete output-directory: " + directory.getAbsolutePath() + ", "
+				logger.error("could not deleteEdge output-directory: " + directory.getAbsolutePath() + ", "
 						+ e.getLocalizedMessage());
 			}
 

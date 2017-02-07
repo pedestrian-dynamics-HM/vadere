@@ -5,10 +5,10 @@ import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.data.Triangulation;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.util.Collection;
@@ -23,13 +23,13 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	private ITimeCostFunction timeCostFunction;
 	private Triangulation<PotentialPoint> triangulation;
 	private boolean calculationFinished;
-	private PriorityQueue<HalfEdge<PotentialPoint>> narrowBand;
+	private PriorityQueue<FFMHalfEdge> narrowBand;
 	private final Collection<HalfEdge<PotentialPoint>> targetPoints;
 
-	private Comparator<HalfEdge<PotentialPoint>> pointComparator = (he1, he2) -> {
-		if (he1.getEnd().getPotential() < he2.getEnd().getPotential()) {
+	private Comparator<FFMHalfEdge> pointComparator = (he1, he2) -> {
+		if (he1.halfEdge.getEnd().getPotential() < he2.halfEdge.getEnd().getPotential()) {
 			return -1;
-		} else if(he1.getEnd().getPotential() > he2.getEnd().getPotential()) {
+		} else if(he1.halfEdge.getEnd().getPotential() > he2.halfEdge.getEnd().getPotential()) {
 			return 1;
 		}
 		else {
@@ -51,10 +51,12 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 		this.narrowBand = new PriorityQueue<>(pointComparator);
 
 		for(HalfEdge<PotentialPoint> halfEdge : targetPoints) {
-			halfEdge.getEnd().freeze();
+			halfEdge.getEnd().setPathFindingTag(PathFindingTag.Target);
 			halfEdge.getEnd().setPotential(0.0);
-			narrowBand.add(halfEdge);
+			narrowBand.add(new FFMHalfEdge(halfEdge));
 		}
+
+		calculate();
 	}
 
     @Override
@@ -78,17 +80,19 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	 * Calculate the fast marching solution. This is called only once,
 	 * subsequent calls only return the result of the first.
 	 */
-	public void calculate() {
+	private void calculate() {
 		if (!calculationFinished) {
 			while (this.narrowBand.size() > 0) {
+				System.out.println(narrowBand.size());
 				// poll the point with lowest data value
-				HalfEdge<PotentialPoint> nextPoint = this.narrowBand.poll();
+				FFMHalfEdge ffmHalfEdge = this.narrowBand.poll();
 				// add it to the frozen points
-				nextPoint.getEnd().freeze();
+				ffmHalfEdge.halfEdge.getEnd().setPathFindingTag(PathFindingTag.Reached);
 				// recalculate the value based on the adjacent triangles
-				recalculatePoint(nextPoint);
+				double potential = recalculatePoint(ffmHalfEdge.halfEdge);
+				ffmHalfEdge.halfEdge.getEnd().setPotential(Math.min(ffmHalfEdge.halfEdge.getEnd().getPotential(), potential));
 				// add narrow points
-				getNarrowPoints(nextPoint);
+				setNeighborDistances(ffmHalfEdge.halfEdge);
 			}
 
 			this.calculationFinished = true;
@@ -98,20 +102,32 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	/**
 	 * Gets points in the narrow band around p.
 	 *
-	 * @param p
+	 * @param halfEdge
 	 * @return a set of points in the narrow band that are close to p.
 	 */
-	private void getNarrowPoints(final HalfEdge<PotentialPoint> p) {
+	private void setNeighborDistances(final HalfEdge<PotentialPoint> halfEdge) {
 		// remove frozen points
-		Iterator<HalfEdge<PotentialPoint>> it = p.incidentPointIterator();
+		Iterator<HalfEdge<PotentialPoint>> it = halfEdge.incidentVertexIterator();
 
 		while (it.hasNext()) {
 			HalfEdge<PotentialPoint> neighbour = it.next();
-			if(!neighbour.getEnd().isFrozen()) {
-				double potential = neighbour.getEnd().getPotential();
-				recalculatePoint(neighbour);
-				if (potential > neighbour.getEnd().getPotential()) {
-					this.narrowBand.add(neighbour);
+			if(neighbour.getEnd().getPathFindingTag() == PathFindingTag.Undefined) {
+				double potential = recalculatePoint(neighbour);
+				neighbour.getEnd().setPotential(potential);
+				neighbour.getEnd().setPathFindingTag(PathFindingTag.Reachable);
+				narrowBand.add(new FFMHalfEdge(neighbour));
+
+			}
+			else if(neighbour.getEnd().getPathFindingTag() == PathFindingTag.Reachable) {
+				//double potential = neighbour.getEnd().getPotential();
+				double potential = recalculatePoint(neighbour);
+
+				// neighbour might be already in the narrowBand => update it
+				if (potential < neighbour.getEnd().getPotential()) {
+					FFMHalfEdge ffmHalfEdge = new FFMHalfEdge(neighbour);
+					narrowBand.remove(new FFMHalfEdge(neighbour));
+					neighbour.getEnd().setPotential(potential);
+					narrowBand.add(ffmHalfEdge);
 				}
 			}
 		}
@@ -123,13 +139,18 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	 * @param point
 	 * @return the same point, with a (possibly) changed data value.
 	 */
-	private void recalculatePoint(final HalfEdge<PotentialPoint> point) {
+	private double recalculatePoint(final HalfEdge<PotentialPoint> point) {
 		// loop over all, check whether the point is contained and update its
 		// value accordingly
-		Iterator<Face<PotentialPoint>> it = point.inciedentFaceIterator();
+		double potential = Double.MAX_VALUE;
+		Iterator<Face<PotentialPoint>> it = point.incidentFaceIterator();
 		while (it.hasNext()) {
-			updatePoint(point, it.next());
+			Face<PotentialPoint> face = it.next();
+			if(!face.isBorder()) {
+				potential = Math.min(updatePoint(point, face), potential);
+			}
 		}
+		return potential;
 	}
 
 	/**
@@ -139,13 +160,12 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	 * @param halfEdge
 	 * @param face
 	 */
-	private void updatePoint(final HalfEdge<PotentialPoint> halfEdge, final Face<PotentialPoint> face) {
-		// check whether the triangle does contain useful data
-		VTriangle triangle = halfEdge.getFace().toTriangle();
-		List<PotentialPoint> points = face.getPoints();
-		points.removeIf(p -> p.equals(halfEdge.getEnd()));
+    private double updatePoint(final HalfEdge<PotentialPoint> halfEdge, final Face<PotentialPoint> face) {
+        // check whether the triangle does contain useful data
+        List<PotentialPoint> points = face.getPoints();
+        points.removeIf(p -> p.equals(halfEdge.getEnd()));
 
-		assert points.size() == 2;
+        assert points.size() == 2;
 
 		PotentialPoint p1 = points.get(0);
 		PotentialPoint p2 = points.get(1);
@@ -154,13 +174,15 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 		if ((Double.isInfinite(p1.getPotential()) && Double.isInfinite((p2.getPotential())))
 				|| (Double.isInfinite(p1.getPotential()) && Double.isInfinite(point.getPotential()))
 				|| (Double.isInfinite(p2.getPotential()) && Double.isInfinite(point.getPotential()))) {
-			return; // no nothing
+			return halfEdge.getEnd().getPotential();
 		}
 
 		// check whether they are in the frozen set. only if they are, we can
 		// continue.
 		// if(this.frozenPoints.contains(points.first()) &&
 		// this.frozenPoints.contains(points.last()))
+
+		if(p1.getPathFindingTag().frozen && p2.getPathFindingTag().frozen)
 		{
 			// see: Sethian, Level Set Methods and Fast Marching Methods, page
 			// 124.
@@ -185,10 +207,13 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 
 			double inTriangle = (b * (t - u) / t);
 			if (u < t && a * cosphi < inTriangle && inTriangle < a / cosphi) {
-				point.setPotential(Math.min(point.getPotential(), t + TA));
+				return t + TA;
 			} else {
-				point.setPotential(Math.min(Math.min(point.getPotential(), b * F + TA), c * F + TB));
+				return Math.min(b * F + TA, c * F + TB);
 			}
+		}
+		else {
+			return halfEdge.getEnd().getPotential();
 		}
 	}
 
@@ -209,5 +234,36 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 
 		return Math.max((-b + Math.sqrt(det)) / (2 * a), (-b - Math.sqrt(det))
 				/ (2 * a));
+	}
+
+	/**
+	 * We require a half-edge that has an equals which only depends on the end-vertex.
+	 */
+	private class FFMHalfEdge {
+		private HalfEdge<PotentialPoint> halfEdge;
+
+		public FFMHalfEdge(final HalfEdge<PotentialPoint> halfEdge){
+			this.halfEdge = halfEdge;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			FFMHalfEdge that = (FFMHalfEdge) o;
+
+			return halfEdge.getEnd().equals(that.halfEdge.getEnd());
+		}
+
+		@Override
+		public int hashCode() {
+			return halfEdge.getEnd().hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return halfEdge.toString();
+		}
 	}
 }
