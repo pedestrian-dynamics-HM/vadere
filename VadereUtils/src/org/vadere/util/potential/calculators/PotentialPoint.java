@@ -1,10 +1,11 @@
 package org.vadere.util.potential.calculators;
 
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.potential.PathFindingTag;
 
 public interface PotentialPoint extends IPoint {
 	double getPotential();
 	void setPotential(final double potential);
-	boolean isFrozen();
-	void freeze();
+	void setPathFindingTag(PathFindingTag tag);
+	PathFindingTag getPathFindingTag();
 }

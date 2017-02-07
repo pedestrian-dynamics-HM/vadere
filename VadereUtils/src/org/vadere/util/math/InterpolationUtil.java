@@ -18,20 +18,54 @@ public class InterpolationUtil {
 
 	public static double barycentricInterpolation(final Face<PotentialPoint> triangle, final double x, final double y){
 		List<PotentialPoint> points = triangle.getPoints();
+		if(points.size() != 3) {
+			System.out.println("error");
+		}
 		assert points.size() == 3;
 
 		PotentialPoint p1 = points.get(0);
 		PotentialPoint p2 = points.get(1);
 		PotentialPoint p3 = points.get(2);
 		VTriangle vtriangle = triangle.toTriangle();
+
 		double totalArea = vtriangle.getArea();
+
+		assert totalArea > 0;
+
 		VPoint point = new VPoint(x, y);
 
-		double percentP1 = totalArea / (new VTriangle(new VPoint(p2), new VPoint(p3), point).getArea());
-		double percentP2 = totalArea / (new VTriangle(new VPoint(p1), new VPoint(p3), point).getArea());
-		double percentP3 = totalArea / (new VTriangle(new VPoint(p1), new VPoint(p2), point).getArea());
+		double value = 0.0;
 
-		double value = percentP1 * p1.getPotential() + percentP2 * p2.getPotential() + percentP3 * p3.getPotential();
+		if(point.equals(p1)) {
+			value = p1.getPotential();
+		}
+		else if(point.equals(p2)) {
+			value = p2.getPotential();
+		}
+		else if(point.equals(p3)) {
+			value = p3.getPotential();
+		}
+		else {
+			double area1 = new VTriangle(new VPoint(p2), new VPoint(p3), point).getArea();
+			double area2 = new VTriangle(new VPoint(p1), new VPoint(p3), point).getArea();
+			double area3 = new VTriangle(new VPoint(p1), new VPoint(p2), point).getArea();
+
+			if(area1 > 0.0) {
+				double percentP1 = area1 / totalArea;
+				value += percentP1 * p1.getPotential();
+			}
+
+			if(area2 > 0.0) {
+				double percentP2 = area2 / totalArea;
+				value += percentP2 * p2.getPotential();
+			}
+
+
+			if(area3 > 0.0) {
+				double percentP3 = area3 / totalArea;
+				value += percentP3 * p3.getPotential();
+			}
+		}
 		return value;
 	}
 
