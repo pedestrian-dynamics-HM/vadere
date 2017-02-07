@@ -156,10 +156,12 @@ public class GeometryUtils {
 	 */
 	public static double areaOfPolygon(final List<? extends IPoint> vertices) {
 		double result = 0;
-
-		for (int i = 0; i < vertices.size() - 1; i++) {
-			result += (vertices.get(i).getY() + vertices.get(i + 1).getY())
-					* (vertices.get(i).getX() - vertices.get(i + 1).getX());
+		if(vertices.size() >= 3) {
+			for (int i = 0; i < vertices.size() - 1; i++) {
+				result += vertices.get(i).getX() * vertices.get(i + 1).getY() - vertices.get(i + 1).getX() * vertices.get(i).getY();
+			}
+			int n = vertices.size() - 1;
+			result += vertices.get(n).getX() * vertices.get(0).getY() - vertices.get(0).getX() * vertices.get(n).getY();
 		}
 		return Math.abs(result) / 2.0;
 	}

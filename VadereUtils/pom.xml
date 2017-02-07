@@ -24,6 +24,17 @@
               <directory>resources</directory>
           </resource>
       </resources>
+      <testResources>
+          <testResource>
+              <directory>testResources</directory>
+          </testResource>
+          <testResource>
+              <directory>tests</directory>
+              <excludes>
+                  <exclude>**/*.java</exclude>
+              </excludes>
+          </testResource>
+      </testResources>
     <plugins>
         <plugin>
             <groupId>com.nativelibs4java</groupId>
