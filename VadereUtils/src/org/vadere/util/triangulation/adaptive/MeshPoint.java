@@ -1,19 +1,23 @@
 package org.vadere.util.triangulation.adaptive;
 
-import org.vadere.util.geometry.shapes.DPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.potential.PathFindingTag;
+import org.vadere.util.potential.calculators.PotentialPoint;
 
-public class MeshPoint extends MPoint {
+public class MeshPoint extends MPoint implements PotentialPoint {
 	private boolean fixPoint;
 	private IPoint velocity;
 	private double potential;
+	private PathFindingTag tag;
 
 	public MeshPoint(final double x, final double y, boolean fixPoint){
 		super(x, y);
 		this.fixPoint = fixPoint;
+		this.potential = Double.MAX_VALUE;
 		this.velocity = new VPoint(0,0);
+		this.tag = PathFindingTag.Undefined;
 	}
 
 	public VPoint toVPoint() {
@@ -38,5 +42,31 @@ public class MeshPoint extends MPoint {
 
 	public boolean isFixPoint() {
 		return fixPoint;
+	}
+
+	@Override
+	public double getPotential() {
+		return potential;
+	}
+
+	@Override
+	public void setPotential(double potential) {
+		this.potential = potential;
+	}
+
+
+	@Override
+	public void setPathFindingTag(final PathFindingTag tag) {
+		this.tag = tag;
+	}
+
+	@Override
+	public PathFindingTag getPathFindingTag() {
+		return tag;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "/" + tag + "/" + potential;
 	}
 }
