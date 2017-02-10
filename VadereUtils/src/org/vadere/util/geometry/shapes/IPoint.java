@@ -27,4 +27,8 @@ public interface IPoint {
 	double distance(IPoint other);
 
 	double distanceToOrigin();
+
+	default double crossProduct(IPoint point) {
+		return getX() * point.getY() - point.getX() * getY();
+	}
 }

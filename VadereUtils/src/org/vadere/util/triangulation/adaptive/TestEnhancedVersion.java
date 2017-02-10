@@ -62,7 +62,7 @@ public class TestEnhancedVersion extends JFrame {
 
         double quality = meshGenerator.qualityCheck();
 
-        while (quality < 0.87) {
+        while (quality < 0.95) {
             System.out.println("quality:"+ quality);
 	        meshGenerator.step();
 	        /*try {
