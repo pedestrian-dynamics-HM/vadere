@@ -38,7 +38,6 @@ public class PerssonStrangDistmesh {
 	                             boolean uniform,
 	                             Function<VPoint, Double> density,
 	                             String method) {
-		long now = System.currentTimeMillis();
 		this.h0 = h0;
 		this.geps = .001*h0;
 		this.deps = 1.4901e-8*h0;
@@ -88,6 +87,10 @@ public class PerssonStrangDistmesh {
 			addAll(obstacles);
 			add(box);
 		}});
+	}
+
+	public void execude() {
+		long now = System.currentTimeMillis();
 		setOldPointsToInf();
 		work();
 		Date date = new Date(System.currentTimeMillis() - now);

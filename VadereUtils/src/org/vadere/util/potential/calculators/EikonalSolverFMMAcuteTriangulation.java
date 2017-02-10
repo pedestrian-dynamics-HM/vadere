@@ -1,15 +1,11 @@
 package org.vadere.util.potential.calculators;
 
-import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.data.Triangulation;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCone;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
@@ -21,7 +17,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 
-public class EikonalSolverFMMTriangulation implements EikonalSolver  {
+public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 
 	private ITimeCostFunction timeCostFunction;
 	private Triangulation<? extends PotentialPoint> triangulation;
@@ -40,7 +36,7 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 		}
 	};
 
-	public EikonalSolverFMMTriangulation(final Collection<IPoint> targetPoints,
+	public EikonalSolverFMMAcuteTriangulation(final Collection<IPoint> targetPoints,
 	                                          final ITimeCostFunction timeCostFunction,
 	                                          final Triangulation<? extends PotentialPoint> triangulation) {
 		this.triangulation = triangulation;
@@ -151,7 +147,7 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 		while (it.hasNext()) {
 			Face<? extends PotentialPoint> face = it.next();
 			if(!face.isBorder()) {
-				potential = Math.min(updatePoint(point.getEnd(), face), potential);
+				potential = Math.min(updatePoint(point, face), potential);
 			}
 		}
 		return potential;
@@ -161,65 +157,24 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 	 * Updates a point given a triangle. The point can only be updated if the
 	 * triangle contains it and the other two points are in the frozen band.
 	 *
-	 * @param point
+	 * @param halfEdge
 	 * @param face
 	 */
-	private double updatePoint(final PotentialPoint point, final Face<? extends PotentialPoint> face) {
+	private double updatePoint(final HalfEdge<? extends PotentialPoint> halfEdge, final Face<? extends PotentialPoint> face) {
 		// check whether the triangle does contain useful data
 		List<? extends PotentialPoint> points = face.getPoints();
-		HalfEdge<? extends PotentialPoint> halfEdge = face.stream().filter(p -> p.getEnd().equals(point)).findAny().get();
-		points.removeIf(p -> p.equals(point));
+		points.removeIf(p -> p.equals(halfEdge.getEnd()));
 
 		assert points.size() == 2;
+
 		PotentialPoint p1 = points.get(0);
 		PotentialPoint p2 = points.get(1);
-
-		// search another vertex in the acute cone
-		VTriangle triangle = face.toTriangle();
-		if(GeometryUtils.angle(p1, point, p2) > Math.PI / 2) {
-			// 1. construct the acute cone
-			VPoint direction = triangle.getIncenter().subtract(point);
-			double angle = Math.PI - GeometryUtils.angle(p1, point, p2);
-			VPoint o = new VPoint(point);
-			VCone cone = new VCone(new VPoint(point.getX(), point.getY()), direction, angle);
-
-			// 2. search for the nearest point inside the cone
-			HalfEdge<? extends PotentialPoint> he = halfEdge.getPrevious().getTwin();
-			while(!cone.contains(he.getNext().getEnd()) && !cone.contains(he.getPrevious().getEnd())) {
-				VLine line1 = new VLine(new VPoint(he.getEnd()), new VPoint(he.getNext().getEnd()));
-				VLine line2 = new VLine(new VPoint(he.getNext().getEnd()), new VPoint(he.getNext().getNext().getEnd()));
-				// the line segment from a to b intersect the cone?
-				if(cone.overlapLineSegment(line1)) {
-					he = he.getNext().getTwin();
-				}
-				else if(cone.overlapLineSegment(line2)) {
-					he = he.getNext().getNext().getTwin();
-				}
-				else {
-					cone.overlapLineSegment(line1);
-					cone.overlapLineSegment(line2);
-					throw new IllegalStateException("no line overlap the acute cone!");
-				}
-			}
-
-			he = cone.contains(he.getNext().getEnd()) ? he.getNext() : he.getPrevious();
-
-			double pot1 = updatePoint(point, he.getEnd(), p1);
-			double pot2 = updatePoint(point, he.getEnd(), p2);
-			return Math.min(pot1, pot2);
-
-		}
-		else {
-			return updatePoint(point, p1, p2);
-		}
-	}
-
-	private double updatePoint(final PotentialPoint point, final PotentialPoint p1, final PotentialPoint p2) {
+		PotentialPoint point = halfEdge.getEnd();
 
 		if ((Double.isInfinite(p1.getPotential()) && Double.isInfinite((p2.getPotential())))
 				|| (Double.isInfinite(p1.getPotential()) && Double.isInfinite(point.getPotential()))
 				|| (Double.isInfinite(p2.getPotential()) && Double.isInfinite(point.getPotential()))) {
-			return point.getPotential();
+			return halfEdge.getEnd().getPotential();
 		}
 
 		// check whether they are in the frozen set. only if they are, we can
@@ -227,7 +182,7 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 		// if(this.frozenPoints.contains(points.first()) &&
 		// this.frozenPoints.contains(points.last()))
 
-		//if(p1.getPathFindingTag().frozen && p2.getPathFindingTag().frozen)
+		if(p1.getPathFindingTag().frozen && p2.getPathFindingTag().frozen)
 		{
 			// see: Sethian, Level Set Methods and Fast Marching Methods, page
 			// 124.
@@ -257,9 +212,9 @@ public class EikonalSolverFMMTriangulation implements EikonalSolver  {
 				return Math.min(b * F + TA, c * F + TB);
 			}
 		}
-		/*else {
+		else {
 			return halfEdge.getEnd().getPotential();
-		}*/
+		}
 	}
 
 	/**

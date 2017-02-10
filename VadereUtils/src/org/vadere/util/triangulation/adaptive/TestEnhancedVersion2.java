@@ -65,15 +65,17 @@ public class TestEnhancedVersion2 extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
 
-		/*while(true) {
+		new Thread(() -> meshGenerator.execude()).start();
+
+		while(true) {
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			JPanel.repaint();
 			System.out.println("repaint");
-		}*/
+		}
 	}
 
 	private class DrawPanel extends Canvas {
