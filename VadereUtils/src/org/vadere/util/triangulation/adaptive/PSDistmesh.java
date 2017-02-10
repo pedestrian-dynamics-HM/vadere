@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class PSDistmesh {
+public class  PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
 	private IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
@@ -108,7 +108,7 @@ public class PSDistmesh {
 				.filter(triple -> obstacles.stream().noneMatch(
 						obstacle ->
 								tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());*/
-		reTriangulate();
+		//reTriangulate();
 		/*obstacles.stream()
 				.filter(shape -> shape instanceof VRectangle)
 				.map(shape -> (VRectangle)shape).forEach(rect -> {

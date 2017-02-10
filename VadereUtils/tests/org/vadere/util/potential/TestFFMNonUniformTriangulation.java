@@ -23,7 +23,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.*;
 
 
@@ -93,10 +92,5 @@ public class TestFFMNonUniformTriangulation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		while (true) {}
-
-		//assertTrue(0.0 == solver.getValue(5, 5));
-		//assertTrue(0.0 < solver.getValue(1, 7));
 	}
 }

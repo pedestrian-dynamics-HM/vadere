@@ -65,6 +65,8 @@ public class TestEnhancedVersion2 extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
 
+		new Thread(() -> meshGenerator.execude()).start();
+
 		while(true) {
 			try {
 				Thread.sleep(1000);

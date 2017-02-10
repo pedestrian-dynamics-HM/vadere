@@ -2,7 +2,10 @@ package org.vadere.util.triangulation;
 
 import org.vadere.util.geometry.shapes.IPoint;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -29,7 +32,9 @@ public class UniformTriangulation<P extends IPoint> extends DelaunayTriangulatio
 		this.minTriangleSideLength = minTriangleSideLength;
 		this.pointConstructor = pointConstructor;
 
-		for(P point : generatePointSet()) {
+		List<P> pointList = new ArrayList<P>(generatePointSet());
+		Collections.shuffle(pointList);
+		for(P point : pointList) {
 			insert(point);
 		}
 	}
