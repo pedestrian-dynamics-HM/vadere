@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class PSDistmesh {
+public class  PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
 	private DelaunayTriangulation<MeshPoint> bowyerWatson;
@@ -57,10 +57,11 @@ public class PSDistmesh {
 			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create();
 		}
 		else {
-			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create(regionBoundingBox, obstacles, distanceFunc);
+			// TODO: changed!
+			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create(regionBoundingBox, distanceFunc);
 		}
 
-		this.points = new HashSet<>(generatePoints());
+		this.points = generatePoints();
 		System.out.println("unrejected number of points: " + points.size());
 	}
 
@@ -103,7 +104,7 @@ public class PSDistmesh {
 				.filter(triple -> obstacles.stream().noneMatch(
 						obstacle ->
 								tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());*/
-		reTriangulate();
+		//reTriangulate();
 		/*obstacles.stream()
 				.filter(shape -> shape instanceof VRectangle)
 				.map(shape -> (VRectangle)shape).forEach(rect -> {
@@ -188,9 +189,9 @@ public class PSDistmesh {
 					maxMovementLen = movementLen;
 				}
 
-				if(distanceFunc.apply(point.toVPoint().add(movement)) <= 0) {
+				//if(distanceFunc.apply(point.toVPoint().add(movement)) <= 0) {
 					point.add(movement);
-				}
+				//}
 
 				point.setVelocity(new VPoint(0, 0));
 
@@ -262,7 +263,7 @@ public class PSDistmesh {
 
 	private Set<MeshPoint> generatePoints() {
 		Set<MeshPoint> gridPoints = generateGridPoints();
-		Set<MeshPoint> fixPoints = generateFixPoints();
+		//Set<MeshPoint> fixPoints = generateFixPoints();
 
 		// point density function 1 / (desiredLen^2)
 		Function<IPoint, Double> pointDensityFunc = vertex -> 1 / (relativeDesiredEdgeLengthFunc.apply(vertex) * relativeDesiredEdgeLengthFunc.apply(vertex));
@@ -280,7 +281,7 @@ public class PSDistmesh {
 		Set<MeshPoint> generatedPoints = gridPoints.stream()
 				.filter(vertex -> Math.random() < pointDensityFunc.apply(vertex) / max)
 				.collect(Collectors.toSet());
-		generatedPoints.addAll(fixPoints);
+		//generatedPoints.addAll(fixPoints);
 
 		return generatedPoints;
 	}
@@ -375,4 +376,9 @@ public class PSDistmesh {
 	public Collection<VTriangle> getTriangles() {
 		return bowyerWatson.getTriangles();
 	}
+
+	public DelaunayTriangulation<MeshPoint> getTriangulation(){
+		return bowyerWatson;
+	}
+
 }

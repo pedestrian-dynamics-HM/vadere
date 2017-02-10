@@ -23,16 +23,19 @@ public class DistanceEdgeLenFunction implements IEdgeLengthFunction {
 
 	@Override
 	public Double apply(IPoint iPoint) {
+		double max = Math.max(boundingBox.getWidth(), boundingBox.getHeight());
+		boolean smallScenario = max <= 10;
 
-		double result = 0.15 - 0.2 * boundingBox.distance(iPoint);
+		double result = 0.06 - 0.2 * boundingBox.distance(iPoint);
 		double last = -boundingBox.distance(iPoint);
+
 		for (VShape obstacle : obstacles) {
-			if (Math.max(boundingBox.getWidth(), boundingBox.getHeight()) <= 10) {
+			if (smallScenario) {
 				result = distanceFunc.doDUnion(result, 0.06 + 0.2 * obstacle.distance(iPoint));
 				last += obstacle.distance(iPoint);
 			} else {
-				result = distanceFunc.doDUnion(result, 0.06 + 0.2 * obstacle.distance(iPoint) * 10 / Math.max(boundingBox.getWidth(), boundingBox.getHeight()));
-				last += obstacle.distance(iPoint) * 10 / Math.max(boundingBox.getWidth(), boundingBox.getHeight());
+				result = distanceFunc.doDUnion(result, 0.06 + 0.2 * obstacle.distance(iPoint) * 10 / max);
+				last += obstacle.distance(iPoint) * 10 / max;
 			}
 		}
 		last /= obstacles.size();

@@ -19,10 +19,16 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 		return new DensityEdgeLenFunction(densityFunc, regionBoundingBox);
 	}
 
+
 	static IEdgeLengthFunction create(final VRectangle regionBoundingBox,
 	                                  final Collection<? extends VShape> obstacles,
 	                                  final IDistanceFunction distanceFunc){
 		return new DistanceEdgeLenFunction(regionBoundingBox, obstacles, distanceFunc);
+	}
+
+	static IEdgeLengthFunction create(final VRectangle regionBoundingBox,
+	                                  final IDistanceFunction distanceFunc){
+		return new SimpleDistanceEdgeLenFunction(regionBoundingBox, distanceFunc);
 	}
 
 	static IEdgeLengthFunction create(double factor) {return vertex -> factor * (1+vertex.getX()); }

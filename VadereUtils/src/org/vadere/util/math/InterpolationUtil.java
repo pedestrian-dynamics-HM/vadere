@@ -18,11 +18,8 @@ import java.util.List;
  */
 public class InterpolationUtil {
 
-	public static double barycentricInterpolation(final Face<PotentialPoint> triangle, final double x, final double y){
-		List<PotentialPoint> points = triangle.getPoints();
-		if(points.size() != 3) {
-			System.out.println("error");
-		}
+	public static double barycentricInterpolation(final Face<? extends PotentialPoint> triangle, final double x, final double y){
+		List<? extends PotentialPoint> points = triangle.getPoints();
 		assert points.size() == 3;
 
 		PotentialPoint p1 = points.get(0);

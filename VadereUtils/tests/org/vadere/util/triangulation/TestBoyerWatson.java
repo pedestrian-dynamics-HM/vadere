@@ -1,13 +1,11 @@
-package org.vadere.util.geometry;
+package org.vadere.util.triangulation;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.data.DAG;
-import org.vadere.util.geometry.data.HalfEdge;
-import org.vadere.util.triangulation.DelaunayTriangulation;
-import org.vadere.util.triangulation.DAGElement;
 import org.vadere.util.geometry.data.Face;
+import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
@@ -16,7 +14,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,7 +46,6 @@ public class TestBoyerWatson {
 		triangulation.forEach(System.out::print);
 	}
 
-	/* TODO: reimplement it
 	@Test
 	public void testSplit() {
 		VPoint p1 = new VPoint(0,0);
@@ -67,10 +63,11 @@ public class TestBoyerWatson {
 
 		DelaunayTriangulation<VPoint> boyerWatsonImproved = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
 		HalfEdge<VPoint> result = boyerWatsonImproved.split(centerPoint, dag);
+
 		Set<VTriangle> triangulation = new HashSet<>(result.collectLeafs().stream().map(dagElement -> dagElement.getTriangle()).collect(Collectors.toList()));
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
 		assertTrue(testTriangulationEquality(triangulation, expectedResult));
-	}*/
+	}
 
 	@Test
 	public void testPerformance() {
