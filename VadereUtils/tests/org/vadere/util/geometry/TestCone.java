@@ -15,8 +15,6 @@ public class TestCone {
 		// 90 degree cone
 		VCone cone = new VCone(new VPoint(0,0), new VPoint(1, 1), Math.PI/2);
 		assertTrue(cone.contains(new VPoint(1, 1)));
-		assertTrue(cone.contains(new VPoint(5, 7)));
-		assertTrue(cone.contains(new VPoint(5, 7000)));
 		assertTrue(cone.contains(new VPoint(1, 0.00001)));
 		assertTrue(cone.contains(new VPoint(0.00001, 1)));
 

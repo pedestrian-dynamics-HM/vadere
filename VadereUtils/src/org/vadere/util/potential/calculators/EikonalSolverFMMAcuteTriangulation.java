@@ -1,6 +1,5 @@
 package org.vadere.util.potential.calculators;
 
-
 public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	@Override
 	public void initialize() {
