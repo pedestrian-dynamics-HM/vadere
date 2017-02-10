@@ -45,7 +45,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	private DAG<DAGElement<P>> dag;
 	private final HashMap<Face<P>, DAG<DAGElement<P>>> map;
 	private int count;
-	private double eps = 0.001;
+	private double eps = 0.0000001;
 	private Face<P> superTriangle;
 	private Face<P> borderFace;
 	private static Logger log = LogManager.getLogger(DelaunayTriangulation.class);
@@ -127,7 +127,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 
 	@Override
 	public Face<P> locate(final IPoint point) {
-		Optional<DAG<DAGElement<P>>>  optDag = locatePoint(point).stream().findAny();
+		Optional<DAG<DAGElement<P>>>  optDag = locatePoint(point, false).stream().findAny();
 		if(optDag.isPresent()) {
 			return optDag.get().getElement().getFace();
 		}
@@ -162,18 +162,18 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 
 	@Override
 	public HalfEdge<P> insert(P point) {
-		Collection<DAG<DAGElement<P>>> leafs = locatePoint(point);
+		Collection<DAG<DAGElement<P>>> leafs = locatePoint(point, true);
 		assert leafs.size() == 2 ||leafs.size() == 1 ||leafs.size() == 0;
 		count++;
 
 		// point is inside a triangle
 		if(leafs.size() == 1) {
-			log.info("split " + count);
+			//log.info("split " + count);
 			return split(point, leafs.stream().findAny().get());
 		} // point lies on an edge of 2 triangles
 		else if(leafs.size() == 2) {
 			Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
-			log.info("split both");
+			//log.info("split both");
 			return splitBoth(point, it.next(), it.next());
 		}
 		else if(leafs.size() == 0) {
@@ -209,7 +209,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		return new VTriangle(new VPoint(p1.getX(), p1.getY()), new VPoint(p2.getX(), p2.getY()), new VPoint(p3.getX(), p3.getY()));
 	}
 
-	private Collection<DAG<DAGElement<P>>> locatePoint(final IPoint point) {
+	private Collection<DAG<DAGElement<P>>> locatePoint(final IPoint point, final boolean insertion) {
 
 		Set<DAG<DAGElement<P>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P>>> nodesToVisit = new LinkedList<>();
@@ -222,11 +222,15 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 				if(currentNode.isLeaf()) {
 					leafs.add(currentNode);
 
+					if(!insertion) {
+						return leafs;
+					}
+
 
 					// if we found 2 children this means that the point lies exactly on an edge.
 					// However, if we found 3 children the point has to be very very close (and we have an numerical error) to an already inserted point
 					// and we ignore this point.
-					if(leafs.size() > 2) {
+					if(leafs.size() > 2 && insertion) {
 						return new ArrayList<>();
 					}
 				}
@@ -255,6 +259,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		HalfEdge<P> zy;
 		HalfEdge<P> yx;
 
+		// get the edge the point is on.
 		if(pointOnEdge(edges.get(0), p) <= eps) {
 			xz = edges.get(0);
 			zy = edges.get(1);
@@ -271,11 +276,9 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 			yx = edges.get(1);
 		}
 		else {
-			pointOnEdge(edges.get(0), p);
-			pointOnEdge(edges.get(1), p);
-			pointOnEdge(edges.get(2), p);
 			throw new IllegalArgumentException(p + " lies on no edge!");
 		}
+
 		HalfEdge<P> zx = xz.getTwin();
 		HalfEdge<P> xw = zx.getNext();
 		HalfEdge<P> wz = xw.getNext();
@@ -366,8 +369,10 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	/**
 	 * Splits the triangle xyz into three new triangles xyp, yzp and zxp.
 	 *
-	 * @param p
-	 * @param xyzDag
+	 * @param p         the point which splits the triangle
+	 * @param xyzDag    the dag which has as its root the face which will be split
+	 *
+	 * returns a half-edge which has p as its end vertex
 	 */
 	public HalfEdge<P> split(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag) {
 		Face<P> xyzFace = xyzDag.getElement().getFace();
@@ -443,12 +448,13 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	}
 
 	/**
-	 * Checks if the edge xy of the triangle xyz is illegal, which is the case if:
-	 * There is a point p and a triangle yxp and p is in the circumscribed cycle of xyz.
+	 * Checks if the edge xy of the triangle xyz is illegal with respect to a point p, which is the case if:
+	 * There is a point p and a triangle yxp and p is in the circumscribed cycle of xyz. The assumption is
+	 * that the triangle yxp exists.
 	 *
-	 * @param p
-	 * @param edge
-	 * @return
+	 * @param p     the point that might causes the feasibility problem.
+	 * @param edge  the edge that might be illegal
+	 * @return true if the edge with respect to p is illegal, otherwise false
 	 */
 	private boolean isIllegalEdge(P p, HalfEdge<P> edge){
 		if(edge.hasTwin() && !edge.getTwin().getFace().isBorder()) {
@@ -459,6 +465,10 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 			return triangle.isInCircumscribedCycle(p);
 		}
 		return false;
+	}
+
+	private boolean isFlipFeasible(final HalfEdge<P> halfEdge){
+		return true;
 	}
 
 	/**
