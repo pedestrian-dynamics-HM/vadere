@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -39,11 +40,45 @@ public class TestBoyerWatson {
 		points.add(p3);
 		points.add(p4);
 		points.add(p6);
+		points.add(p5);
 
 		DelaunayTriangulation<VPoint> boyerWatsonImproved = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
 		boyerWatsonImproved.compute();
-		Collection<VTriangle> triangulation = boyerWatsonImproved.getTriangles();
-		triangulation.forEach(System.out::print);
+		boyerWatsonImproved.finalize();
+
+		Set<VTriangle> triangulation = new HashSet<>(boyerWatsonImproved.getTriangles());
+
+		Set<VPoint> triangle1 = new HashSet<>();
+		triangle1.add(p1);
+		triangle1.add(p5);
+		triangle1.add(p4);
+
+		Set<VPoint> triangle2 = new HashSet<>();
+		triangle2.add(p1);
+		triangle2.add(p2);
+		triangle2.add(p5);
+
+		Set<VPoint> triangle3 = new HashSet<>();
+		triangle3.add(p2);
+		triangle3.add(p3);
+		triangle3.add(p5);
+
+		Set<VPoint> triangle4 = new HashSet<>();
+		triangle4.add(p4);
+		triangle4.add(p5);
+		triangle4.add(p3);
+
+		Set<Set<VPoint>> pointSets = triangulation.stream().map(t -> new HashSet<>(t.getPoints())).collect(Collectors.toSet());
+
+		Set<Set<VPoint>> expextedPointSets = new HashSet<>();
+		expextedPointSets.add(triangle1);
+		expextedPointSets.add(triangle2);
+		expextedPointSets.add(triangle3);
+		expextedPointSets.add(triangle4);
+
+		assertTrue(expextedPointSets.equals(pointSets));
+
+		triangulation.forEach(System.out::println);
 	}
 
 	@Test
@@ -61,12 +96,13 @@ public class TestBoyerWatson {
 		Face<VPoint> face = Face.of(p1,p2,p3);
 		DAG<DAGElement<VPoint>> dag = new DAG<>(new DAGElement<>(face, Triple.of(p1,p2,p3)));
 
-		DelaunayTriangulation<VPoint> boyerWatsonImproved = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
-		HalfEdge<VPoint> result = boyerWatsonImproved.split(centerPoint, dag);
+		DelaunayTriangulation<VPoint> triangulation = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		triangulation.splitTriangleDB(centerPoint, dag);
+		triangulation.finalize();
 
-		Set<VTriangle> triangulation = new HashSet<>(result.collectLeafs().stream().map(dagElement -> dagElement.getTriangle()).collect(Collectors.toList()));
+		Set<VTriangle> triangles = new HashSet<>(triangulation.getTriangles());
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
-		assertTrue(testTriangulationEquality(triangulation, expectedResult));
+		assertTrue(testTriangulationEquality(triangles, expectedResult));
 	}
 
 	@Test

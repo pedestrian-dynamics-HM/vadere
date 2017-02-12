@@ -64,6 +64,8 @@ public class Face<P extends IPoint> implements Iterable<HalfEdge<P>> {
 
 	private boolean border;
 
+	private boolean destroyed = false;
+
 	/**
 	 * Default constructor. To construct a face where you have already some half-edges
 	 * bordering this face.
@@ -95,17 +97,26 @@ public class Face<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		return border;
 	}
 
+	public void destroy() {
+		setEdge(null);
+		destroyed = true;
+	}
+
 	/**
 	 * Sets one of the half-edges bordering this face.
 	 *
 	 * @param edge half-edge bordering this face
 	 */
-	public void setEdge(@NotNull HalfEdge<P> edge) {
+	public void setEdge(final HalfEdge<P> edge) {
 		this.edge = edge;
 	}
 
 	public HalfEdge<P> getEdge() {
 		return edge;
+	}
+
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 
 	/**
