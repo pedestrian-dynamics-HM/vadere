@@ -1,5 +1,6 @@
 package org.vadere.util.triangulation;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -25,14 +26,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.swing.*;
 
 public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P> {
 
+	private Face<P> face;
 	private final Set<P> points;
 	private final PointConstructor<P> pointConstructor;
 	private P p0;
@@ -41,6 +46,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	private HalfEdge<P> he0;
 	private HalfEdge<P> he1;
 	private HalfEdge<P> he2;
+	private boolean finalized;
 
 	private DAG<DAGElement<P>> dag;
 	private final HashMap<Face<P>, DAG<DAGElement<P>>> map;
@@ -97,9 +103,36 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		he2 = borderEdges.get(2);
 
 
-		this.dag = new DAG<>(new DAGElement<P>(superTriangle, Triple.of(p0, p1, p2)));
+		this.dag = new DAG<>(new DAGElement<>(superTriangle, Triple.of(p0, p1, p2)));
 		this.map.put(superTriangle, dag);
 		this.count = 0;
+		this.face = null;
+		this.finalized = false;
+	}
+
+	@Override
+	public void insert(P point) {
+		Collection<DAG<DAGElement<P>>> leafs = locatePoint(point, true);
+		assert leafs.size() == 2 ||leafs.size() == 1 ||leafs.size() == 0;
+		count++;
+
+		// point is inside a triangle
+		if(leafs.size() == 1) {
+			log.info("splitTriangle");
+			splitTriangleDB(point, leafs.stream().findAny().get());
+		} // point lies on an edge of 2 triangles
+		else if(leafs.size() == 2) {
+			Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
+			log.info("splitEdge");
+			splitEdgeDB(point, findTwins(it.next().getElement().getFace(),  it.next().getElement().getFace()));
+		}
+		else if(leafs.size() == 0) {
+			// problem due numerical calculation.
+			log.warn("numerical error!");
+		}
+		else {
+			log.warn("ignore insertion point, since this point already exists!");
+		}
 	}
 
 	/**
@@ -107,13 +140,93 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	 */
 	public void finalize() {
 		// we have to use other halfedges than he1 and he2 since they might be deleted
-		// if we delete he0!
-		HalfEdge<P> del0 = he0;
-		HalfEdge<P> del1 = he1.getTwin().getNext().getNext();
-		HalfEdge<P> del2 = he2.getTwin().getNext().getNext();
-		del0.deleteVertex();
-		del1.deleteVertex();
-		del2.deleteVertex();
+		// if we deleteBoundaryFace he0!
+		List<Face<P>> faces1 = IteratorUtils.toList(he0.incidentFaceIterator());
+		List<Face<P>> faces2 = IteratorUtils.toList(he1.incidentFaceIterator());
+		List<Face<P>> faces3 = IteratorUtils.toList(he2.incidentFaceIterator());
+
+		faces1.forEach(f -> deleteBoundaryFace(f));
+
+		faces2.removeIf(f -> f.isDestroyed());
+		faces2.forEach(f -> deleteBoundaryFace(f));
+
+		faces3.removeIf(f -> f.isDestroyed());
+		faces3.forEach(f -> deleteBoundaryFace(f));
+
+		finalized = true;
+	}
+
+	public boolean isDeletionOk(final Face<P> face) {
+		if(face.isDestroyed()) {
+			return false;
+		}
+
+		for(HalfEdge<P> halfEdge : face) {
+			if(halfEdge.getTwin().isBoundary()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Deletes a face assuming that the face contains at least one boundary edge, otherwise the
+	 * deletion will not result in an feasibly triangulation.
+	 *
+	 * @param face the face that will be deleted, which as to be adjacent to the boundary.
+	 */
+	public void deleteBoundaryFace(final Face<P> face) {
+		assert isDeletionOk(face);
+
+		// 3 cases: 1. triangle consist of 1, 2 or 3 boundary edges
+		List<HalfEdge<P>> boundaryEdges = new ArrayList<>(3);
+		List<HalfEdge<P>> nonBoundaryEdges = new ArrayList<>(3);
+
+		for(HalfEdge<P> halfEdge : face) {
+			if(halfEdge.getTwin().isBoundary()) {
+				boundaryEdges.add(halfEdge);
+			}
+			else {
+				nonBoundaryEdges.add(halfEdge);
+			}
+		}
+
+		if(boundaryEdges.size() == 3) {
+			// release memory
+			face.getEdges().forEach(halfEdge -> halfEdge.destroy());
+		}
+		else if(boundaryEdges.size() == 2) {
+			HalfEdge<P> toB = boundaryEdges.get(0).getNext().getTwin().isBoundary() ? boundaryEdges.get(0) : boundaryEdges.get(1);
+			HalfEdge<P> toF = boundaryEdges.get(0).getNext().getTwin().isBoundary() ? boundaryEdges.get(1) : boundaryEdges.get(0);
+
+			HalfEdge<P> nB = nonBoundaryEdges.get(0);
+			nB.setFace(toF.getTwin().getFace());
+			nB.setNext(toB.getTwin().getNext());
+			nB.setPrevious(toF.getTwin().getPrevious());
+
+			toF.getTwin().getFace().setEdge(nB);
+
+			// release memory
+			toF.destroy();
+			toB.destroy();
+		}
+		else {
+			HalfEdge<P> boundaryHe = boundaryEdges.get(0);
+			HalfEdge<P> prec = boundaryHe.getTwin().getPrevious();
+			HalfEdge<P> succ = boundaryHe.getTwin().getNext();
+
+			boundaryHe.getNext().setPrevious(prec);
+			boundaryHe.getNext().setFace(boundaryHe.getTwin().getFace());
+			boundaryHe.getPrevious().setNext(succ);
+			boundaryHe.getPrevious().setFace(boundaryHe.getTwin().getFace());
+			prec.getFace().setEdge(prec);
+
+			// release memory
+			boundaryHe.destroy();
+		}
+
+		face.destroy();
+		map.remove(face);
 	}
 
 	@Override
@@ -148,39 +261,39 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 
 	@Override
 	public Stream<Face<P>> streamFaces() {
-		return map.values().stream()
-				.filter(dagElement -> {
+		return stream();
+		//return map.values().stream()
+				/*.filter(dagElement -> {
 					Triple<P, P, P> triple = dagElement.getElement().getVertices();
 					Set<P> pointset = new HashSet<>();
 					pointset.add(triple.getLeft());
 					pointset.add(triple.getMiddle());
 					pointset.add(triple.getRight());
 					return !pointset.contains(p0) && !pointset.contains(p1) && !pointset.contains(p2);
-				})
-				.map(dagElementDAG -> dagElementDAG.getElement().getFace());
+				})*/
+				//.map(dagElementDAG -> dagElementDAG.getElement().getFace());
 	}
 
-	@Override
-	public HalfEdge<P> insert(P point) {
-		Collection<DAG<DAGElement<P>>> leafs = locatePoint(point, true);
-		assert leafs.size() == 2 ||leafs.size() == 1 ||leafs.size() == 0;
-		count++;
+	/**
+	 * Returns a half-edge such that it is part of face1 and the twin of this half-edge
+	 * is part of face2.
+	 *
+	 * @param face1 the first face
+	 * @param face2 the second face that might be a neighbour of face1
+	 * @return  the half-edge of face1 such that its twin is part of face2
+	 */
+	private HalfEdge<P> findTwins(final Face<P> face1, final Face<P> face2) {
+		for(HalfEdge<P> halfEdge1 : face1) {
+			for(HalfEdge<P> halfEdge2 : face2) {
+				if(halfEdge1.getTwin() == null) {
+					System.out.print("ddd");
+				}
 
-		// point is inside a triangle
-		if(leafs.size() == 1) {
-			//log.info("split " + count);
-			return split(point, leafs.stream().findAny().get());
-		} // point lies on an edge of 2 triangles
-		else if(leafs.size() == 2) {
-			Iterator<DAG<DAGElement<P>>> it = leafs.iterator();
-			//log.info("split both");
-			return splitBoth(point, it.next(), it.next());
+				if(halfEdge1.getTwin().equals(halfEdge2)) {
+					return halfEdge1;
+				}
+			}
 		}
-		else if(leafs.size() == 0) {
-			// problem due numerical calculation.
-			log.warn("numerical error!");
-		}
-
 		return null;
 	}
 
@@ -190,7 +303,8 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	}
 
 	public Collection<VTriangle> getTriangles() {
-		return getFaces().stream().map(face -> faceToTriangle(face)).collect(Collectors.toSet());
+		return stream().map(face -> faceToTriangle(face)).collect(Collectors.toSet());
+		//return getFaces().stream().map(face -> faceToTriangle(face)).collect(Collectors.toSet());
 	}
 
 	/*public Collection<Triple<P, P, P>> getTrianglePoints() {
@@ -217,31 +331,17 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 
 		while(!nodesToVisit.isEmpty()) {
 			DAG<DAGElement<P>> currentNode = nodesToVisit.removeLast();
-			//System.out.println(nodesToVisit.size());
 			if(currentNode.getElement().getTriangle().isPartOf(point, eps)) {
 				if(currentNode.isLeaf()) {
 					leafs.add(currentNode);
 
+					// if we are not interested in insertion we just want to find one triangle.
 					if(!insertion) {
 						return leafs;
 					}
-
-
-					// if we found 2 children this means that the point lies exactly on an edge.
-					// However, if we found 3 children the point has to be very very close (and we have an numerical error) to an already inserted point
-					// and we ignore this point.
-					if(leafs.size() > 2 && insertion) {
-						return new ArrayList<>();
-					}
 				}
 				else {
-					int found = 0;
-					for(DAG<DAGElement<P>> child : currentNode.getChildren()) {
-						if(child.getElement().getTriangle().isPartOf(point, eps)) {
-							found++;
-							nodesToVisit.add(child);
-						}
-					}
+					nodesToVisit.addAll(currentNode.getChildren());
 				}
 			}
 		}
@@ -249,6 +349,186 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		return leafs;
 	}
 
+
+	/**
+	 * Splits the half-edge at point p, preserving a valid triangulation.
+	 *
+	 * @param p         the split point
+	 * @param halfEdge  the half-edge which will be split
+	 */
+	public void splitEdge(@NotNull P p, @NotNull HalfEdge<P> halfEdge) {
+
+		/*
+		 * Situation: h0 = halfEdge
+		 * h1 -> h2 -> h0
+		 *       f0
+		 * o2 <- o1 <- o0
+		 *       f3
+		 *
+		 * After splitEdge:
+		 * h0 -> h1 -> t0
+		 *       f0
+		 * t1 <- h2 <- e0
+		 *       f1
+		 *
+		 * e1 -> o1 -> t2
+		 *       f2
+		 * o0 <- o2 <- e2
+		 *       f3
+		 */
+
+		HalfEdge<P> h0 = halfEdge;
+		HalfEdge<P> o0 = h0.getTwin();
+
+		P v2 = o0.getEnd();
+		Face<P> f0 = h0.getFace();
+		Face<P> f3 = o0.getFace();
+
+		// faces correct?
+		HalfEdge<P> e1 = new HalfEdge<>(v2, o0.getFace());
+		HalfEdge<P> t1 = new HalfEdge<>(p, h0.getFace());
+		e1.setTwin(t1);
+		o0.setEnd(p);
+
+		if(!h0.isBoundary()) {
+			Face<P> f1 = new Face<>();
+
+			HalfEdge<P> h1 = h0.getNext();
+			HalfEdge<P> h2 = h1.getNext();
+
+			P v1 = h1.getEnd();
+			HalfEdge<P> e0 = new HalfEdge<>(v1, f1);
+			HalfEdge<P> t0 = new HalfEdge<>(p, f0);
+			e0.setTwin(t0);
+
+			f0.setEdge(h0);
+			f1.setEdge(h2);
+
+			h1.setFace(f0);
+			t0.setFace(f0);
+			h0.setFace(f0);
+
+			h2.setFace(f1);
+			t1.setFace(f1);
+			e0.setFace(f1);
+
+			h0.setNext(h1);
+			h1.setNext(t0);
+			t0.setNext(h0);
+
+			e0.setNext(h2);
+			h2.setNext(t1);
+			t1.setNext(e0);
+		}
+		else {
+			h0.getPrevious().setNext(t1);
+			t1.setNext(h0);
+		}
+
+		if(!o0.isBoundary()) {
+			HalfEdge<P> o1 = o0.getNext();
+			HalfEdge<P> o2 = o1.getNext();
+
+			P v3 = o1.getEnd();
+			Face<P> f2 = new Face<>();
+
+			// face
+			HalfEdge<P> e2 = new HalfEdge<>(v3, o0.getFace());
+			HalfEdge<P> t2 = new HalfEdge<>(p, f2);
+			e2.setTwin(t2);
+
+			f2.setEdge(o1);
+			f3.setEdge(o0);
+
+			o1.setFace(f2);
+			t2.setFace(f2);
+			e1.setFace(f2);
+
+			o2.setFace(f3);
+			o0.setFace(f3);
+			e2.setFace(f3);
+
+			e1.setNext(o1);
+			o1.setNext(t2);
+			t2.setNext(e1);
+
+			o0.setNext(e2);
+			e2.setNext(o2);
+			o2.setNext(o0);
+		}
+		else {
+			e1.setNext(o0.getNext());
+			o0.setNext(e1);
+		}
+
+		this.face = f0;
+	}
+
+	private static <P extends IPoint> Triple<P, P, P> tripleOf(List<HalfEdge<P>> points) {
+		assert points.size() == 3;
+		return Triple.of(points.get(0).getEnd(), points.get(1).getEnd(), points.get(2).getEnd());
+	}
+
+	public void splitEdgeDB(@NotNull P p, @NotNull HalfEdge<P> halfEdge) {
+
+		// 1. gather references
+		HalfEdge<P> he = halfEdge;
+
+		// to be legalized edges
+		HalfEdge<P> h1 = he.getNext();
+		HalfEdge<P> h2 = h1.getNext();
+
+		HalfEdge<P> o1 = he.getTwin().getNext();
+		HalfEdge<P> o2 = o1.getNext();
+
+		Face<P> face0 = he.getFace();
+		Face<P> face3 = he.getTwin().getFace();
+
+		// 2. do the splitEdge
+		splitEdge(p, he);
+
+		// 3. update DB
+		DAG<DAGElement<P>> f0Dag = map.get(face0);
+		DAG<DAGElement<P>> f3Dag = map.get(face3);
+
+		map.remove(face0);
+		map.remove(face3);
+
+		HalfEdge<P> t0 = he.getPrevious();
+		Face<P> face1 = t0.getTwin().getFace();
+
+		HalfEdge<P> e2 = he.getTwin().getNext();
+		Face<P> face2 = e2.getTwin().getFace();
+
+
+		DAG<DAGElement<P>> nf0Dag = new DAG<>(new DAGElement(face0, tripleOf(face0.getEdges())));
+		DAG<DAGElement<P>> nf1Dag = new DAG<>(new DAGElement(face1, tripleOf(face1.getEdges())));
+
+		DAG<DAGElement<P>> nf2Dag = new DAG<>(new DAGElement(face2, tripleOf(face2.getEdges())));
+		DAG<DAGElement<P>> nf3Dag = new DAG<>(new DAGElement(face3, tripleOf(face3.getEdges())));
+
+		f0Dag.addChild(nf0Dag);
+		f0Dag.addChild(nf1Dag);
+
+		f3Dag.addChild(nf2Dag);
+		f3Dag.addChild(nf3Dag);
+
+
+		map.put(face0, nf0Dag);
+		map.put(face1, nf1Dag);
+
+		map.put(face2, nf2Dag);
+		map.put(face3, nf3Dag);
+
+		// 4. legalize result
+		legalize(p, h1);
+		legalize(p, h2);
+		legalize(p, o1);
+		legalize(p, o2);
+	}
+
+
+	@Deprecated
 	public HalfEdge<P> splitBoth(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag, @NotNull DAG<DAGElement<P>> xwzDag) {
 
 		VTriangle xyzTriangle = xyzDag.getElement().getTriangle();
@@ -374,7 +654,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	 *
 	 * returns a half-edge which has p as its end vertex
 	 */
-	public HalfEdge<P> split(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag) {
+	public HalfEdge<P> splitTriangleDB(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag) {
 		Face<P> xyzFace = xyzDag.getElement().getFace();
 
 		List<HalfEdge<P>> edges = xyzFace.getEdges();
@@ -440,6 +720,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		legalize(p, xy);
 		legalize(p, yz);
 
+		this.face = xyp;
 		return zp;
 	}
 
@@ -468,7 +749,82 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	}
 
 	private boolean isFlipFeasible(final HalfEdge<P> halfEdge){
+		return halfEdge.isValid() && !halfEdge.getFace().isBorder();
+	}
+
+	/**
+	 * Tests if a flip for this half-edge is valid, i.e. the edge does not already exist.
+	 *
+	 * @param halfEdge the half-edge that might be flipped
+	 * @return true if and only if the flip is valid
+	 */
+	public boolean isFlipOk(final HalfEdge<P> halfEdge) {
+		if(halfEdge.getFace().isBorder()) {
+			return false;
+		}
+		else {
+			HalfEdge<P> xy = halfEdge;
+			HalfEdge<P> yx = halfEdge.getTwin();
+
+			if(xy.getNext().getEnd().equals(yx.getNext().getEnd())) {
+				return false;
+			}
+
+			for(HalfEdge<P> neigbhour : xy.getNext()) {
+				if(neigbhour.getEnd().equals(yx.getNext().getEnd())) {
+					return false;
+				}
+			}
+		}
+
 		return true;
+	}
+
+
+	/**
+	 * Flips an edge in the triangulation assuming the egdge which will be
+	 * created is not jet there.
+	 *
+	 * @param edge the edge which will be flipped.
+	 */
+	public void flip(final HalfEdge<P> edge) {
+ 		assert isFlipOk(edge);
+
+		// 1. gather all the references required
+		HalfEdge<P> a0 = edge;
+		HalfEdge<P> a1 = a0.getNext();
+		HalfEdge<P> a2 = a1.getNext();
+
+		HalfEdge<P> b0 = edge.getTwin();
+		HalfEdge<P> b1 = b0.getNext();
+		HalfEdge<P> b2 = b1.getNext();
+
+		Face<P> fa = a0.getFace();
+		Face<P> fb = b0.getFace();
+
+		if(fb.getEdge().equals(b1)) {
+			fb.setEdge(a1);
+		}
+
+		if(fa.getEdge().equals(a1)) {
+			fa.setEdge(b1);
+		}
+
+		a0.setEnd(a1.getEnd());
+		b0.setEnd(b1.getEnd());
+
+		a0.setNext(a2);
+		a2.setNext(b1);
+		b1.setNext(a0);
+
+		b0.setNext(b2);
+		b2.setNext(a1);
+		a1.setNext(b0);
+
+		a1.setFace(fb);
+		b1.setFace(fa);
+
+		this.face = fb;
 	}
 
 	/**
@@ -481,69 +837,97 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	 */
 	private void legalize(final P p, final HalfEdge<P> edge) {
 		if(isIllegalEdge(p, edge)) {
-			// read all informations
-			HalfEdge<P> zx = edge;
-			HalfEdge<P> xp = zx.getNext();
-			HalfEdge<P> pz = xp.getNext();
+			Face<P> f1 = edge.getFace();
+			Face<P> f2 = edge.getTwin().getFace();
 
-			Face<P> f2 = zx.getFace();
-			HalfEdge<P> xz = zx.getTwin();
-			HalfEdge<P> zy = xz.getNext();
-			HalfEdge<P> yx = zy.getNext();
+			flip(edge);
 
-			P x = zx.getEnd();
-			P y = zy.getEnd();
-			P z = pz.getEnd();
-
-			Face<P> f1 = xz.getFace();
-			DAG<DAGElement<P>> xpzDag = map.get(f2);
-			DAG<DAGElement<P>> xzyDag = map.get(f1);
-
-			// update data structure
-			HalfEdge<P> py = new HalfEdge<>(y, f2);
-			HalfEdge<P> yp = new HalfEdge<>(p, f1);
-			py.setTwin(yp);
-
-			xp.setNext(py);
-			py.setNext(yx);
-			yx.setNext(xp);
-
-			xp.setFace(f2);
-			py.setFace(f2);
-			yx.setFace(f2);
-			f2.setEdge(py);
-
-
-			pz.setNext(zy);
-			zy.setNext(yp);
-			yp.setNext(pz);
-			f1.setEdge(yp);
-
-			pz.setFace(f1);
-			zy.setFace(f1);
-			yp.setFace(f1);
-
-			if(y.equals(p)) {
-				System.out.println("" + y + p);
-			}
+			DAG<DAGElement<P>> f1Dag = map.get(f1);
+			DAG<DAGElement<P>> f2Dag = map.get(f2);
 
 			// update DAG
-			DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(y, z, p)));
-			DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(x, y, p)));
+			List<P> points1 = f1.getPoints();
+			List<P> points2 = f2.getPoints();
+			DAG<DAGElement<P>> yzpDag = new DAG<>(new DAGElement(f1, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
+			DAG<DAGElement<P>> xypDag = new DAG<>(new DAGElement(f2, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
 
-			xpzDag.addChild(yzpDag);
-			xpzDag.addChild(xypDag);
+			f1Dag.addChild(yzpDag);
+			f1Dag.addChild(xypDag);
 
-			xzyDag.addChild(yzpDag);
-			xzyDag.addChild(xypDag);
+			f2Dag.addChild(yzpDag);
+			f2Dag.addChild(xypDag);
 
 			map.put(f1, yzpDag);
 			map.put(f2, xypDag);
 
-			legalize(p, py.getNext());
-			legalize(p, yp.getPrevious());
+			if(edge.getEnd().equals(p)) {
+				legalize(p, edge.getPrevious());
+				legalize(p, edge.getTwin().getNext());
+			}
+			else {
+				legalize(p, edge.getNext());
+				legalize(p, edge.getTwin().getPrevious());
+			}
 		}
 	}
+
+	@Override
+	public Iterator<Face<P>> iterator() {
+		return new FaceIterator();
+	}
+
+	public Stream<Face<P>> stream() {
+		return StreamSupport.stream(this.spliterator(), false);
+	}
+
+	private class FaceIterator implements Iterator<Face<P>> {
+
+		private LinkedList<Face<P>> facesToVisit;
+		private Set<Face<P>> visitedFaces;
+
+		private FaceIterator() {
+			facesToVisit = new LinkedList<>();
+			facesToVisit.add(face);
+			visitedFaces = new HashSet<>();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !facesToVisit.isEmpty();
+		}
+
+		@Override
+		public Face<P> next() {
+			Face<P> nextFace = facesToVisit.removeFirst();
+			visitedFaces.add(nextFace);
+
+			for(HalfEdge<P> he : nextFace) {
+				Face<P> twinFace = he.getTwin().getFace();
+
+				if(!visitedFaces.contains(twinFace)) {
+
+					// if the triangulation is finalized there are no border triangles
+					if(finalized) {
+						facesToVisit.add(twinFace);
+					}
+					else {
+						List<P> points = twinFace.getPoints();
+						if(!points.contains(p0) && !points.contains(p1) && !points.contains(p2)) {
+							facesToVisit.add(twinFace);
+						}
+						else {
+							visitedFaces.add(twinFace);
+						}
+					}
+				}
+
+				visitedFaces.add(twinFace);
+			}
+
+			return nextFace;
+		}
+	}
+
 
 	// TODO: the following code can be deleted, this is only for visual checks
 	public static void main(String[] args) {
@@ -558,7 +942,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		points.add(new VPoint(75,53));
 		points.add(new VPoint(80,70));*/
 
-		/*Random r = new Random();
+		Random r = new Random();
 		for(int i=0; i< 1000; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
@@ -577,8 +961,6 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		window.getContentPane().add(new Lines(edges, points, max));
 		window.setVisible(true);
 
-
-
 		ms = System.currentTimeMillis();
 		BowyerWatsonSlow<VPoint> bw2 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
 		bw2.execute();
@@ -590,15 +972,13 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		window2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window2.setBounds(0, 0, max, max);
 		window2.getContentPane().add(new Lines(edges2, points, max));
-		window2.setVisible(true);*/
+		window2.setVisible(true);
 
 		UniformTriangulation<VPoint> uniformTriangulation = new UniformTriangulation<>(0, 0, width, height, 10.0, (x, y) -> new VPoint(x, y));
 		uniformTriangulation.compute();
 		uniformTriangulation.finalize();
 		Set<VLine> edges3 = uniformTriangulation.getEdges();
-		//edges3.addAll(uniformTriangulation.getTriangles().stream().map(triangle -> new VLine(triangle.getIncenter(), triangle.p1)).collect(Collectors.toList()));
-
-
+		
 		JFrame window3 = new JFrame();
 		window3.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window3.setBounds(0, 0, max, max);

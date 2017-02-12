@@ -76,106 +76,14 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		return twin;
 	}
 
-	/**
-	 * Deletes the vertex i.e. end point of this halfedge from the geometry by deleting all halfedges
-	 * connected to this vertex.
-	 */
-	public void deleteVertex() {
-		// 1. gather all edges
-		List<HalfEdge<P>> edges = IteratorUtils.toList(this.iterator());
-
-		// 2. delete all edges of connected to the end point
-		edges.stream().filter(HalfEdge::isValid).forEach(edge -> edge.deleteEdge());
+	public boolean isBoundary() {
+		return face.isBorder();
 	}
 
 	/**
-	 * Deletes this edge (and its twin) from the geometry. This operation requires O(n) where
-	 * n is the number of edges inside a face. It may delete an vertex if it has degree = 2.
-	 * Furthermore, faces may be merged. If a face will become invalid it will be the face of this
-	 * edge.
-	 *
-	 * @return true if the operation deletes a vertex i.e. an end point is no longer part of the geometry, false otherwise.
+	 * removes the cyclic pointer structure such that the GC can deleteBoundaryFace these objects.
 	 */
-	public boolean deleteEdge() {
-
-		boolean deleteVertex = false;
-
-		// the edge is inside another face.
-		if(!getFace().isBorder() && !getTwin().getFace().isBorder()) {
-			// 1. remove one of the 2 faces. We deleteEdge the face of this edge, the twin face survives.
-			for(HalfEdge<P> halfEdge : this.face) {
-				halfEdge.setFace(getTwin().getFace());
-			}
-
-			// 2. Delete the edge and its twin be rearranging pointers
-			HalfEdge<P> xy = this;
-			HalfEdge<P> yx = getTwin();
-
-			HalfEdge<P> yz = xy.getNext();
-			HalfEdge<P> wy = yx.getPrevious();
-			wy.setNext(yz);
-
-			HalfEdge<P> ux = xy.getPrevious();
-			HalfEdge<P> xt = yx.getNext();
-			ux.setNext(xt);
-
-			// 3. update the edge of the survived face since it might be the twin.
-			getTwin().getFace().setEdge(ux);
-		} // the edge is on the border, therefore we remove the whole non-border face if this face does only consist of <= 3 edges before the deletion.
-		else {
-			Face<P> borderFace = getFace().isBorder() ? getFace() : getTwin().getFace();
-			Face<P> nonBorderFace = getFace().isBorder() ? getTwin().getFace() : getFace();
-
-			HalfEdge<P> borderHe = getFace().isBorder() ? this : getTwin();
-			HalfEdge<P> nonBorderHe = getFace().isBorder() ? getTwin() : this;
-
-			// nonBorder-Face is not a triangle
-			if(!nonBorderHe.getNext().getTwin().getFace().isBorder() && !nonBorderHe.getPrevious().getTwin().getFace().isBorder()) {
-				for(HalfEdge<P> halfEdge : nonBorderFace) {
-					halfEdge.setFace(borderFace);
-				}
-
-				// since the face may has this edge as pointer which will be invalid
-				borderFace.setEdge(borderHe.getNext());
-				//nonBorderFace.setEdge(nonBorderHe.getNext());
-
-				nonBorderHe.getPrevious().setNext(borderHe.getNext());
-				nonBorderHe.getNext().setPrevious(borderHe.getPrevious());
-			}
-			// special case1: there is no possibility to delete this edge without deleting the vertex, since the vertex has degree 2.
-			else if(!borderHe.equals(borderHe.getNext().getNext().getNext())) {
-				borderFace.setEdge(borderHe.getNext());
-				nonBorderFace.setEdge(nonBorderHe.getNext());
-
-				borderHe.getPrevious().setNext(borderHe.getNext());
-				nonBorderHe.getPrevious().setNext(nonBorderHe.getNext());
-				deleteVertex = true;
-			}
-			// special case2: inner face and outer face is a triangle => there is only 1 inner face.
-			// if we delete the edge there is no face in the geometry. Therefore we delete the whole triangle.
-			else {
-				HalfEdge<P> y = getNext();
-				HalfEdge<P> z = y.getNext();
-
-				// delete pointers for the GC
-				y.getTwin().destroy();
-				y.destroy();
-				z.getTwin().destroy();
-				z.destroy();
-				deleteVertex = true;
-			}
-		}
-
-		// delete pointers for the GC
-		getTwin().destroy();
-		destroy();
-		return deleteVertex;
-	}
-
-	/**
-	 * removes the cyclic pointer structure such that the GC can delete these objects.
-	 */
-	private void destroy() {
+	public void destroy() {
 		setNext(null);
 		setPrevious(null);
 		setTwin(null);
@@ -205,6 +113,10 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		if(next != null && next.getPrevious() != this) {
 			next.setPrevious(this);
 		}
+	}
+
+	public void setEnd(P end) {
+		this.end = end;
 	}
 
 	public VLine toLine() {

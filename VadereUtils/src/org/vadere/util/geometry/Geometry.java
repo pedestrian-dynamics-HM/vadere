@@ -89,7 +89,7 @@ public class Geometry {
 	 * 
 	 * @param polygon
 	 * @param createMidpoints
-	 *        if true, every line is split into two by inserting a midpoint.
+	 *        if true, every line is splitEdge into two by inserting a midpoint.
 	 * @return
 	 */
 	public boolean intersects(VPolygon polygon, boolean createMidpoints,
