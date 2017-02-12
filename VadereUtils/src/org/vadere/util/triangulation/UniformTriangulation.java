@@ -32,8 +32,8 @@ public class UniformTriangulation<P extends IPoint> extends DelaunayTriangulatio
 		this.minTriangleSideLength = minTriangleSideLength;
 		this.pointConstructor = pointConstructor;
 
-		List<P> pointList = new ArrayList<P>(generatePointSet());
-		Collections.shuffle(pointList);
+		List<P> pointList = new ArrayList<>(generatePointSet());
+		//Collections.shuffle(pointList);
 		for(P point : pointList) {
 			insert(point);
 		}
