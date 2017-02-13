@@ -57,8 +57,7 @@ public class  PSDistmesh {
 			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create();
 		}
 		else {
-			// TODO: changed!
-			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create(regionBoundingBox, distanceFunc);
+			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create(regionBoundingBox, obstacles, distanceFunc);
 		}
 
 		this.points = generatePoints();

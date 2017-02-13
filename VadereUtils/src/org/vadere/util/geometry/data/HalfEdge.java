@@ -129,7 +129,9 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 
 	public Iterator<Face<P>> incidentFaceIterator() { return new NeighbourFaceIterator(); }
 
-
+	public List<Face<P>> getIncidentFaces() {
+		return IteratorUtils.toList(incidentFaceIterator());
+	}
 
 	public List<HalfEdge<P>> getIncidentPoints() {
 		List<HalfEdge<P>> incidentPoints = new ArrayList<>();
@@ -158,12 +160,7 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 	private class NeighbourFaceIterator implements Iterator<Face<P>> {
 		private NeighbourIterator neighbourIterator = new NeighbourIterator();
 
-		private NeighbourFaceIterator() {
-			// such that no duplicated faces returned
-			if(neighbourIterator.hasNext()) {
-				neighbourIterator.next();
-			}
-		}
+		private NeighbourFaceIterator() {}
 
 		@Override
 		public boolean hasNext() {

@@ -11,6 +11,6 @@ public interface Triangulation<P extends IPoint> extends Iterable<Face<P>> {
 	Face<P> locate(final IPoint point);
 	Stream<Face<P>> streamFaces();
 	Set<Face<P>> getFaces();
-	void insert(final P point);
+	HalfEdge<P> insert(final P point);
 	void remove(final P point);
 }
