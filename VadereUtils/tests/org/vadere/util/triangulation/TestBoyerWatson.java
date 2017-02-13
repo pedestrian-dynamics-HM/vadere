@@ -112,7 +112,7 @@ public class TestBoyerWatson {
 		int height = 300;
 		Random r = new Random();
 
-		int numberOfPoints = 100000;
+		int numberOfPoints = 1000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
