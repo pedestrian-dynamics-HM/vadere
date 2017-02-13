@@ -9,6 +9,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -94,6 +95,13 @@ public class TestFace {
 
 	@Test
 	public void testFaceIterator() {
+		List<Face<VPoint>> incidentFaces = xy.getIncidentFaces();
+		assertEquals(incidentFaces.size(), 3);
+	}
+
+
+	@Test
+	public void testPointIterator() {
 		assertEquals(Arrays.asList(y, z, x), face1.getPoints());
 	}
 
