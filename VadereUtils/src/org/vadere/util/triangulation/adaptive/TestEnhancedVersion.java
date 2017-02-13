@@ -6,7 +6,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Created by Matimati-ka on 27.09.2016.
@@ -33,22 +33,17 @@ public class TestEnhancedVersion extends JFrame {
 //        test.lineTo(30,30);
 //        VPolygon p = new VPolygon(test);
 
-	    obstacles = new ArrayList<VShape>() {{
-//            add(new VRectangle(0.6*400, 0.6*400, 0.2*400, 5));
-//            add(new VRectangle(0.6*400, 0.65*400, 0.2*400, 5));
-		    add(new VRectangle(0.65*300, -5, 0.1*300, 0.6*300));
-		    add(new VRectangle(0.65*300, 0.7*300, 0.1*300, 0.3*300));
-//            add(p);
-	    }};
-	    ArrayList<VShape> fhIncluded = new ArrayList<VShape>() {{
-//            add(p);
-//            add(new VRectangle(0.6*400, 0.6*400, 0.2*400, 5));
-//            add(new VRectangle(0.6*400, 0.65*400, 0.2*400, 5));
-		    add(new VRectangle(0.65*300, -5, 0.1*300, 0.6*300));
-		    add(new VRectangle(0.65*300, 0.7*300, 0.1*300, 0.3*300));
+	    double height = 300;
+	    double width = 300;
+
+	    java.util.List<VShape> boundingBox = new ArrayList<VShape>() {{
+		    add(new VRectangle(0, 0, 5, width));
+		    add(new VRectangle(0, 0, width, 5));
+		    add(new VRectangle(width-5, 0, 5, height));
+		    add(new VRectangle(0, height-5, 5, height));
 	    }};
 
-	    PSDistmesh meshGenerator = new PSDistmesh(bbox, obstacles, h0,false);
+	    PSDistmesh meshGenerator = new PSDistmesh(bbox, boundingBox, h0,false);
 
         System.out.println(System.currentTimeMillis()-now);
         now = System.currentTimeMillis();
@@ -95,9 +90,9 @@ public class TestEnhancedVersion extends JFrame {
 	        graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
 
 	        graphics.setColor(Color.GRAY);
-	        for(VShape obstacle : obstacles) {
+	       /* for(VShape obstacle : obstacles) {
 		        graphics.fill(obstacle);
-	        }
+	        }*/
 
 	        graphics.setColor(Color.BLACK);
 	        meshGenerator.getTriangles().stream().forEach(t -> graphics.draw(t));
