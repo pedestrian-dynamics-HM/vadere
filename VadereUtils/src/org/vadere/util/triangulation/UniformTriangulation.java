@@ -33,7 +33,8 @@ public class UniformTriangulation<P extends IPoint> extends DelaunayTriangulatio
 		this.pointConstructor = pointConstructor;
 
 		List<P> pointList = new ArrayList<>(generatePointSet());
-		//Collections.shuffle(pointList);
+		Collections.shuffle(pointList);
+
 		for(P point : pointList) {
 			insert(point);
 		}
