@@ -71,7 +71,7 @@ public class TestFFMNonUniformTriangulation {
 		VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
 		targetAreas.add(rect);
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(targetPoints, new UnitTimeCostFunction(), triangulation);
+		EikonalSolver solver = new EikonalSolverFMMTriangulation(targetAreas, new UnitTimeCostFunction(), triangulation, (x, y) -> new MeshPoint(x, y, false));
 
 		log.info("start FFM");
 		solver.initialize();
