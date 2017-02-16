@@ -57,7 +57,7 @@ public class  PSDistmesh {
 			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create();
 		}
 		else {
-			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create(regionBoundingBox, obstacles, distanceFunc);
+			relativeDesiredEdgeLengthFunc = IEdgeLengthFunction.create(regionBoundingBox, distanceFunc);
 		}
 
 		this.points = generatePoints();
@@ -99,18 +99,14 @@ public class  PSDistmesh {
 	 * Remove all triangles intersecting any obstacle shape.
 	 */
 	public void cleanUp() {
-		/*triangulation = triangulation.stream()
-				.filter(triple -> obstacles.stream().noneMatch(
-						obstacle ->
-								tripleToTriangle(triple).intersect(obstacle))).collect(Collectors.toSet());*/
-		//reTriangulate();
-		/*obstacles.stream()
-				.filter(shape -> shape instanceof VRectangle)
-				.map(shape -> (VRectangle)shape).forEach(rect -> {
-					triangulation.removeIf(triple -> tripleToTriangle(triple).intersects(new VLine(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMaxY()))
-							|| tripleToTriangle(triple).intersects(new VLine(rect.getMaxX(), rect.getMinY(), rect.getMinX(), rect.getMaxY())));
-				}
-		);*/
+		/*bowyerWatson
+				.stream()
+				.map(face -> face.toTriangle())
+				.filter(triangle -> triangle.isNonAcute())
+				.map(triangle -> triangle.getCircumcenter())
+				.collect(Collectors.toSet())
+				.forEach(p -> bowyerWatson.insert(new MeshPoint(p, false)));*/
+
 	}
 
 	private void reTriangulate() {
@@ -373,6 +369,9 @@ public class  PSDistmesh {
 	}
 
 	public Collection<VTriangle> getTriangles() {
+		if(bowyerWatson == null) {
+			return new ArrayList<>();
+		}
 		return bowyerWatson.getTriangles();
 	}
 

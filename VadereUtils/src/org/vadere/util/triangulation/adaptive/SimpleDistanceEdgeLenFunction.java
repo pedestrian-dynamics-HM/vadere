@@ -16,6 +16,6 @@ public class SimpleDistanceEdgeLenFunction implements IEdgeLengthFunction {
 
 	@Override
 	public Double apply(IPoint iPoint) {
-		return 0.05 - 0.2 * distanceFunc.apply(iPoint) * 10 / Math.max(boundingBox.getWidth(), boundingBox.getHeight());
+		return 0.00005 - 0.000001 * distanceFunc.apply(iPoint);
 	}
 }
