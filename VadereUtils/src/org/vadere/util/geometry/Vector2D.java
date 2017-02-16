@@ -65,21 +65,6 @@ public class Vector2D extends VPoint {
 		return atan2;
 	}
 
-	/**
-	 * 
-	 * Computes the angle between the x-axis through the given Point "center" and this.
-	 * Result is in interval (0,2*PI) according to standard math usage.
-	 */
-	public double angleTo(IPoint center) {
-		double atan2 = Math.atan2(this.y - center.getY(), this.x - center.getX());
-
-		if (atan2 < 0.0) {
-			atan2 = Math.PI * 2 + atan2;
-		}
-
-		return atan2;
-	}
-
 	public Vector2D add(VPoint p) {
 		return new Vector2D(this.x + p.x, this.y + p.y);
 	}

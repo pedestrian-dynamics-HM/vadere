@@ -2,7 +2,6 @@ package org.vadere.util.potential.calculators;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.LineIterator;
 import org.vadere.util.geometry.data.Face;
@@ -13,7 +12,6 @@ import org.vadere.util.geometry.shapes.VCone;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
@@ -21,17 +19,20 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.triangulation.FaceIterator;
 import org.vadere.util.triangulation.PointConstructor;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements EikonalSolver  {
@@ -43,7 +44,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 	private boolean calculationFinished;
 	private PriorityQueue<FFMHalfEdge> narrowBand;
 	private final Collection<VRectangle> targetAreas;
-	private final PointConstructor<P> pointConstructor;
+	private PointConstructor<P> pointConstructor;
 
 	private Comparator<FFMHalfEdge> pointComparator = (he1, he2) -> {
 		if (he1.halfEdge.getEnd().getPotential() < he2.halfEdge.getEnd().getPotential()) {
@@ -66,6 +67,35 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 		this.timeCostFunction = timeCostFunction;
 		this.targetAreas = targetAreas;
 		this.pointConstructor = pointConstructor;
+		this.narrowBand = new PriorityQueue<>(pointComparator);
+	}
+
+	public EikonalSolverFMMTriangulation(final Collection<IPoint> targetPoints,
+	                                     final ITimeCostFunction timeCostFunction,
+	                                     final Triangulation<P> triangulation
+	) {
+		this.triangulation = triangulation;
+		this.calculationFinished = false;
+		this.timeCostFunction = timeCostFunction;
+		this.targetAreas = new ArrayList<>();
+		this.narrowBand = new PriorityQueue<>(pointComparator);
+
+		for(IPoint point : targetPoints) {
+			Face<? extends PotentialPoint> face = triangulation.locate(point);
+
+			for(HalfEdge<? extends PotentialPoint> halfEdge : face) {
+				PotentialPoint potentialPoint = halfEdge.getEnd();
+				double distance = point.distance(potentialPoint);
+
+				if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
+					narrowBand.remove(new FFMHalfEdge(halfEdge));
+				}
+
+				potentialPoint.setPotential(Math.min(potentialPoint.getPotential(), distance * timeCostFunction.costAt(potentialPoint)));
+				potentialPoint.setPathFindingTag(PathFindingTag.Reached);
+				narrowBand.add(new FFMHalfEdge(halfEdge));
+			}
+		}
 	}
 
 
@@ -115,7 +145,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 
 	@Override
 	public void initialize() {
-		narrowBand = new PriorityQueue<>(pointComparator);
 		initializeTargetAreas();
 		/*for(IPoint point : targetPoints) {
 			Face<? extends PotentialPoint> face = triangulation.locate(point);
@@ -193,7 +222,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 			HalfEdge<? extends PotentialPoint> neighbour = it.next();
 			if(neighbour.getEnd().getPathFindingTag() == PathFindingTag.Undefined) {
 				double potential = recalculatePoint(neighbour);
-
 				// if not, it was not possible to compute a valid potential. TODO?
 				if(potential < neighbour.getEnd().getPotential()) {
 					neighbour.getEnd().setPotential(potential);
@@ -201,9 +229,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 					narrowBand.add(new FFMHalfEdge(neighbour));
 				}
 				else {
-					logger.warn("could not set neighbour vertex" + neighbour + "," + neighbour.getFace().isBorder());
-					potential = recalculatePoint(neighbour);
-					potential = recalculatePoint(neighbour);
+					//logger.warn("could not set neighbour vertex" + neighbour + "," + neighbour.getFace().isBorder());
 				}
 			}
 			else if(neighbour.getEnd().getPathFindingTag() == PathFindingTag.Reachable) {
@@ -235,7 +261,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 		while (it.hasNext()) {
 			Face<? extends PotentialPoint> face = it.next();
 			if(!face.isBorder()) {
-				potential = Math.min(updatePoint(point.getEnd(), face), potential);
+				potential = Math.min(computeValue(point.getEnd(), face), potential);
 			}
 		}
 		return potential;
@@ -248,7 +274,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 	 * @param point
 	 * @param face
 	 */
-	private double updatePoint(final PotentialPoint point, final Face<? extends PotentialPoint> face) {
+	private double computeValue(final PotentialPoint point, final Face<? extends PotentialPoint> face) {
 		// check whether the triangle does contain useful data
 		List<? extends PotentialPoint> points = face.getPoints();
 		HalfEdge<? extends PotentialPoint> halfEdge = face.stream().filter(p -> p.getEnd().equals(point)).findAny().get();
@@ -258,32 +284,98 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 		PotentialPoint p1 = points.get(0);
 		PotentialPoint p2 = points.get(1);
 
-		/*if(!p1.getPathFindingTag().frozen && !p2.getPathFindingTag().frozen) {
-			return Double.MAX_VALUE;
-		}*/
+		if(feasableForComputation(p1) && feasableForComputation(p2) && !face.toTriangle().isNonAcute()){
+			return computeValue(point, p1, p2);
+		}
+		return point.getPotential();
 
-		// search another vertex in the acute cone
-		//if(GeometryUtils.angle(p1, point, p2) > Math.PI / 2) {
-		if(!p1.getPathFindingTag().frozen || !p2.getPathFindingTag().frozen) {
-			// find support vertex
-
-			Optional<HalfEdge<? extends PotentialPoint>> optHe = findPointInCone(halfEdge, p1, p2);
-
-			if(optHe.isPresent()) {
-				double pot1 = updatePoint(point, optHe.get().getEnd(), p1);
-				double pot2 = updatePoint(point, optHe.get().getEnd(), p2);
-				return Math.min(pot1, pot2);
+		// the general case
+		/*double angle = GeometryUtils.angle(p1, point, p2);
+		if(((feasableForComputation(p1) && feasableForComputation(p2)) || angle < Math.PI / 2)) {
+			return computeValue(point, p1, p2);
+		} // no update coming from this face is possible.
+		else if(!feasableForComputation(p1) || !feasableForComputation(p2)) {
+			PotentialPoint feasablePoint = feasableForComputation(p1) ? p1 : p2;
+			HalfEdge<? extends PotentialPoint> he = findPointInCone(halfEdge, p1, p2);
+			if(he == null) {
+				logger.warn("inconsistent update");
+				//return computeValue(point, p1, p2);
+				return feasablePoint.getPotential();
 			}
 			else {
-				return point.getPotential();
+				logger.info("consistent update " + point.distance(he.getEnd()));
+				assert GeometryUtils.angle(feasablePoint, point, he.getEnd()) < Math.PI / 2;
+				return computeValue(point, feasablePoint, he.getEnd());
 			}
 		}
-		else {
-			return updatePoint(point, p1, p2);
-		}
+		else { // both neighbours are computed but the angle is to large.
+			return point.getPotential();
+		}*/
 	}
 
-	private Optional<HalfEdge<? extends PotentialPoint>> findPointInCone(final HalfEdge<? extends PotentialPoint> halfEdge, final PotentialPoint p1, final PotentialPoint p2) {
+	private boolean feasableForComputation(final PotentialPoint p){
+		//return p.getPathFindingTag().frozen;
+		return p.getPathFindingTag() == PathFindingTag.Reachable || p.getPathFindingTag() == PathFindingTag.Reached;
+	}
+
+	private HalfEdge<? extends PotentialPoint> findIntersectionPoint(final HalfEdge<? extends PotentialPoint> halfEdge, final PotentialPoint acceptedPoint, final PotentialPoint unacceptedPoint) {
+		PotentialPoint point = halfEdge.getEnd();
+		VTriangle triangle = new VTriangle(new VPoint(point), new VPoint(acceptedPoint), new VPoint(unacceptedPoint));
+
+		// 1. construct the acute cone
+		VPoint direction = triangle.getIncenter().subtract(point);
+		double angle = Math.PI - GeometryUtils.angle(acceptedPoint, point, unacceptedPoint);
+		VPoint origin = new VPoint(point);
+		VCone cone = new VCone(origin, direction, angle);
+
+		HalfEdge<? extends PotentialPoint> minHe = null;
+
+		//
+		/*Predicate<Face<? extends PotentialPoint>> pred = f -> {
+			List<HalfEdge<? extends PotentialPoint>> pointList = f.stream()
+				//.filter(he -> he.getEnd().getPathFindingTag().frozen)
+				.filter(he -> !he.getEnd().equals(acceptedPoint))
+				.filter(he -> !he.getEnd().equals(point))
+				.collect(Collectors.toList());
+
+			for(HalfEdge<? extends PotentialPoint> he : pointList) {
+				VTriangle vTriangle = new VTriangle(new VPoint(he.getEnd()), new VPoint(point), new VPoint(acceptedPoint));
+				if(cone.intersect(vTriangle)) {
+					return true;
+				}
+			}
+			return false;
+		};*/
+		//
+
+
+
+		// 2. search for the nearest point inside the cone
+		FaceIterator<? extends PotentialPoint> faceIterator = new FaceIterator(halfEdge.getFace());
+		while (faceIterator.hasNext()) {
+			Face<? extends PotentialPoint> face = faceIterator.next();
+			List<HalfEdge<? extends PotentialPoint>> pointList = face.stream()
+					.filter(he -> feasableForComputation(he.getEnd()))
+					.filter(he -> !he.getEnd().equals(acceptedPoint))
+					.filter(he -> !he.getEnd().equals(point))
+					.collect(Collectors.toList());
+
+			for(HalfEdge<? extends PotentialPoint> he : pointList) {
+				if(cone.contains(new VPoint(he.getEnd()))) {
+					if(minHe == null || minHe.getEnd().getPotential() > he.getEnd().getPotential()) {
+						minHe = he;
+						return minHe;
+					}
+				}
+			}
+		}
+
+		return minHe;
+	}
+
+
+	//TODO: refactoring!
+	private HalfEdge<? extends PotentialPoint> findPointInCone(final HalfEdge<? extends PotentialPoint> halfEdge, final PotentialPoint p1, final PotentialPoint p2) {
 		PotentialPoint point = halfEdge.getEnd();
 		VTriangle triangle = new VTriangle(new VPoint(point), new VPoint(p1), new VPoint(p2));
 
@@ -294,36 +386,63 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 		VCone cone = new VCone(origin, direction, angle);
 
 		// 2. search for the nearest point inside the cone
-		HalfEdge<? extends PotentialPoint> he = halfEdge.getPrevious().getTwin();
+		Set<Face<? extends PotentialPoint>> visitedFaces = new HashSet<>();
+		LinkedList<HalfEdge<? extends PotentialPoint>> pointList = new LinkedList<>();
+		pointList.add(halfEdge.getPrevious().getTwin().getNext());
+		visitedFaces.add(halfEdge.getPrevious().getTwin().getNext().getFace());
 
-		while((!cone.contains(he.getNext().getEnd()) && !cone.contains(he.getPrevious().getEnd()))) {
+		while (!pointList.isEmpty()) {
+			HalfEdge<? extends PotentialPoint> candidate = pointList.removeFirst();
 
-			if(he.isBoundary()) {
-				return Optional.empty();
-			}
+			// we can not search further since we reach the boundary.
+			if (!candidate.isBoundary()) {
+				if (feasableForComputation(candidate.getEnd()) && cone.contains(new VPoint(candidate.getEnd()))) {
+					return candidate;
+				} else if(cone.contains(new VPoint(candidate.getEnd()))) {
+					HalfEdge<? extends PotentialPoint> newCandidate = candidate.getTwin().getNext();
+					if (!visitedFaces.contains(newCandidate.getFace())) {
+						visitedFaces.add(newCandidate.getFace());
+						pointList.add(newCandidate);
+					}
 
-			VLine line1 = new VLine(new VPoint(he.getEnd()), new VPoint(he.getNext().getEnd()));
-			VLine line2 = new VLine(new VPoint(he.getNext().getEnd()), new VPoint(he.getNext().getNext().getEnd()));
-			// the line segment from a to b intersect the cone?
-			if(cone.overlapLineSegment(line1)) {
-				he = he.getNext().getTwin();
-			}
-			else if(cone.overlapLineSegment(line2)) {
-				he = he.getNext().getNext().getTwin();
+					newCandidate = candidate.getNext().getTwin().getNext();
+					if (!visitedFaces.contains(newCandidate.getFace())) {
+						visitedFaces.add(newCandidate.getFace());
+						pointList.add(newCandidate);
+					}
+				}
+				else {
+					VLine line1 = new VLine(new VPoint(candidate.getEnd()), new VPoint(candidate.getPrevious().getEnd()));
+					VLine line2 = new VLine(new VPoint(candidate.getEnd()), new VPoint(candidate.getNext().getEnd()));
+
+					if (cone.overlapLineSegment(line1)) {
+						HalfEdge<? extends PotentialPoint> newCandidate = candidate.getTwin().getNext();
+						if (!visitedFaces.contains(newCandidate.getFace())) {
+							visitedFaces.add(newCandidate.getFace());
+							pointList.add(newCandidate);
+						}
+					}
+
+					if (cone.overlapLineSegment(line2)) {
+						HalfEdge<? extends PotentialPoint> newCandidate = candidate.getNext().getTwin().getNext();
+
+						if (!visitedFaces.contains(newCandidate.getFace())) {
+							visitedFaces.add(newCandidate.getFace());
+							pointList.add(newCandidate);
+						}
+					}
+				}
 			}
 			else {
-				logger.warn("could not recompute potential for " + point);
-				//findPointInCone(halfEdge, p1, p2);
-				return Optional.empty();
-				//findPointInCone(halfEdge, p1, p2);
-				//throw new IllegalStateException("no line overlap the acute cone!");
+				logger.warn("boundary reached!");
 			}
 		}
 
-		return Optional.of(he);
+		logger.warn("no virtual vertex was found");
+		return null;
 	}
 
-	private double updatePoint(final PotentialPoint point, final PotentialPoint p1, final PotentialPoint p2) {
+	private double computeValue(final PotentialPoint point, final PotentialPoint point1, final PotentialPoint point2) {
 
 		/*if ((Double.isInfinite(p1.getPotential()) && Double.isInfinite((p2.getPotential())))
 				|| (Double.isInfinite(p1.getPotential()) && Double.isInfinite(point.getPotential()))
@@ -340,37 +459,45 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 				(p1.getPathFindingTag() == PathFindingTag.Reached || p1.getPathFindingTag() == PathFindingTag.Reachable)
 						&& (p2.getPathFindingTag() == PathFindingTag.Reached || p2.getPathFindingTag() == PathFindingTag.Reachable))
 		{*/
-		if(p1.getPathFindingTag().frozen && p2.getPathFindingTag().frozen) {
+		//if(p1.getPathFindingTag().frozen && p2.getPathFindingTag().frozen) {
 			// see: Sethian, Level Set Methods and Fast Marching Methods, page
 			// 124.
-			double u = p2.getPotential() - p1.getX();
-			double a = p2.distance(point);
-			double b = p1.distance(point);
-			double c = p1.distance(p2);
-			double TA = p1.getPotential();
-			double TB = p2.getPotential();
+		PotentialPoint p1;
+		PotentialPoint p2;
 
-			double phi = GeometryUtils.angle(p1, point, p2);
-			double cosphi = Math.cos(phi);
-
-			double F = 1.0 / this.timeCostFunction.costAt(point);
-
-			// solve x2 t^2 + x1 t + x0 == 0
-			double x2 = a * a + b * b - 2 * a * b * cosphi;
-			double x1 = 2 * b * u * (a * cosphi - b);
-			double x0 = b * b
-					* (u * u - F * F * a * a * Math.sin(phi) * Math.sin(phi));
-			double t = solveQuadratic(x2, x1, x0);
-
-			double inTriangle = (b * (t - u) / t);
-			if (u < t && a * cosphi < inTriangle && inTriangle < a / cosphi) {
-				return t + TA;
-			} else {
-				return Math.min(b * F + TA, c * F + TB);
-			}
+		// assuming T(B) > T(A)
+		if(point1.getPotential() > point2.getPotential()) {
+			p2 = point1;
+			p1 = point2;
 		}
 		else {
-			return point.getPotential();
+			p2 = point2;
+			p1 = point1;
+		}
+
+		double TA = p1.getPotential();
+		double TB = p2.getPotential();
+		double u = TB - TA;
+		double a = p1.distance(point);
+		double b = p2.distance(point);
+		double c = p1.distance(p2);
+
+		double phi = GeometryUtils.angle(p1, point, p2);
+		double cosphi = Math.cos(phi);
+
+		double F = 1.0 / this.timeCostFunction.costAt(point);
+
+		// solve x2 t^2 + x1 t + x0 == 0
+		double x2 = a * a + b * b - 2 * a * b * cosphi;
+		double x1 = 2 * b * u * (a * cosphi - b);
+		double x0 = b * b * (u * u - F * F * a * a * Math.sin(phi) * Math.sin(phi));
+		double t = solveQuadratic(x2, x1, x0);
+
+		double inTriangle = (b * (t - u) / t);
+		if (u < t && a * cosphi < inTriangle && inTriangle < a / cosphi) {
+			return t + TA;
+		} else {
+			return Math.min(b * F + TA, c * F + TB);
 		}
 	}
 

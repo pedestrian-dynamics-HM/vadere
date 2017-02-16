@@ -20,6 +20,10 @@ public class MeshPoint extends MPoint implements PotentialPoint {
 		this.tag = PathFindingTag.Undefined;
 	}
 
+	public MeshPoint(final IPoint point, boolean fixPoint){
+		this(point.getX(), point.getY(), fixPoint);
+	}
+
 	public VPoint toVPoint() {
 		return new VPoint(getX(), getY());
 	}
