@@ -82,7 +82,7 @@ public class GeometryUtils {
 
 		for (int i = 0; i < allPoints.size(); i++) {
 			Vector2D p = new Vector2D(allPoints.get(i));
-			orderedList.add(new DataPoint(p.x, p.y, p.angleTo(center)));
+			orderedList.add(new DataPoint(p.x, p.y, GeometryUtils.angleTo(p, center)));
 		}
 		// sort by angle
 		Collections.sort(orderedList, DataPoint.getComparator());
@@ -221,10 +221,29 @@ public class GeometryUtils {
 	 * @return
 	 */
 	public static double angle(IPoint A, IPoint C, IPoint B) {
-		double phi1 = new Vector2D(A).angleTo(C);
-		double phi2 = new Vector2D(B).angleTo(C);
+		double phi1 = angleTo(A, C);
+		double phi2 = angleTo(B, C);
 		double phi = Math.abs(phi1 - phi2);
 		return Math.min(phi, 2 * Math.PI - phi);
+	}
+
+	/**
+	 *
+	 * Computes the angle between the x-axis through the given Point "center" and this.
+	 * Result is in interval (0,2*PI) according to standard math usage.
+	 */
+	public static double angleTo(final IPoint from, final IPoint to) {
+		double atan2 = Math.atan2(from.getY() - to.getY(), from.getX() - to.getX());
+
+		if (atan2 < 0.0) {
+			atan2 = Math.PI * 2 + atan2;
+		}
+
+		return atan2;
+	}
+
+	public static double angleTo(final IPoint to) {
+		return angleTo(new VPoint(0,0), to);
 	}
 
 	/**
