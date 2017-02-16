@@ -1,5 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.data.Triangulation;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
