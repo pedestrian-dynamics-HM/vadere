@@ -123,7 +123,7 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		if(leafs.size() == 0) {
 			log.warn(point);
 		}
-		assert leafs.size() == 2 || leafs.size() == 1 || leafs.size() > 0;
+//		assert leafs.size() == 2 || leafs.size() == 1 || leafs.size() > 0;
 
 		// point is inside a triangle
 		if(leafs.size() == 1) {
@@ -142,7 +142,13 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 		}
 		else {
 			log.warn("ignore insertion point, since this point already exists!");
-			return leafs.iterator().next().getElement().getFace().stream().filter(he -> he.getEnd().equals(point)).findAny().get();
+			Optional<HalfEdge<P>> optHe = leafs.iterator().next().getElement().getFace().stream().filter(he -> he.getEnd().equals(point)).findAny();
+			if(optHe.isPresent()) {
+				return optHe.get();
+			}
+			else {
+				return null;
+			}
 		}
 	}
 
@@ -801,43 +807,46 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 	 * @param edge the edge which will be flipped.
 	 */
 	public void flip(final HalfEdge<P> edge) {
- 		assert isFlipOk(edge);
+ 		if(isFlipOk(edge)) {
+		    // 1. gather all the references required
+		    HalfEdge<P> a0 = edge;
+		    HalfEdge<P> a1 = a0.getNext();
+		    HalfEdge<P> a2 = a1.getNext();
 
-		// 1. gather all the references required
-		HalfEdge<P> a0 = edge;
-		HalfEdge<P> a1 = a0.getNext();
-		HalfEdge<P> a2 = a1.getNext();
+		    HalfEdge<P> b0 = edge.getTwin();
+		    HalfEdge<P> b1 = b0.getNext();
+		    HalfEdge<P> b2 = b1.getNext();
 
-		HalfEdge<P> b0 = edge.getTwin();
-		HalfEdge<P> b1 = b0.getNext();
-		HalfEdge<P> b2 = b1.getNext();
+		    Face<P> fa = a0.getFace();
+		    Face<P> fb = b0.getFace();
 
-		Face<P> fa = a0.getFace();
-		Face<P> fb = b0.getFace();
+		    if(fb.getEdge().equals(b1)) {
+			    fb.setEdge(a1);
+		    }
 
-		if(fb.getEdge().equals(b1)) {
-			fb.setEdge(a1);
-		}
+		    if(fa.getEdge().equals(a1)) {
+			    fa.setEdge(b1);
+		    }
 
-		if(fa.getEdge().equals(a1)) {
-			fa.setEdge(b1);
-		}
+		    a0.setEnd(a1.getEnd());
+		    b0.setEnd(b1.getEnd());
 
-		a0.setEnd(a1.getEnd());
-		b0.setEnd(b1.getEnd());
+		    a0.setNext(a2);
+		    a2.setNext(b1);
+		    b1.setNext(a0);
 
-		a0.setNext(a2);
-		a2.setNext(b1);
-		b1.setNext(a0);
+		    b0.setNext(b2);
+		    b2.setNext(a1);
+		    a1.setNext(b0);
 
-		b0.setNext(b2);
-		b2.setNext(a1);
-		a1.setNext(b0);
+		    a1.setFace(fb);
+		    b1.setFace(fa);
 
-		a1.setFace(fb);
-		b1.setFace(fa);
-
-		this.face = fb;
+		    this.face = fb;
+	    }
+	    else {
+ 			log.warn("illegal flip.");
+	    }
 	}
 
 	/**
@@ -886,63 +895,11 @@ public class DelaunayTriangulation<P extends IPoint> implements Triangulation<P>
 
 	@Override
 	public Iterator<Face<P>> iterator() {
-		return new FaceIterator();
+		return new FaceIterator(face);
 	}
 
 	public Stream<Face<P>> stream() {
 		return StreamSupport.stream(this.spliterator(), false);
-	}
-
-	private class FaceIterator implements Iterator<Face<P>> {
-
-		private LinkedList<Face<P>> facesToVisit;
-		private Set<Face<P>> visitedFaces;
-
-		private FaceIterator() {
-			facesToVisit = new LinkedList<>();
-			facesToVisit.add(face.isBorder() ? face.getEdge().getTwin().getFace() : face);
-			visitedFaces = new HashSet<>();
-		}
-
-		@Override
-		public boolean hasNext() {
-			return !facesToVisit.isEmpty();
-		}
-
-		@Override
-		public Face<P> next() {
-			Face<P> nextFace = facesToVisit.removeFirst();
-			visitedFaces.add(nextFace);
-
-			for(HalfEdge<P> he : nextFace) {
-				Face<P> twinFace = he.getTwin().getFace();
-
-				if(twinFace.isBorder() || twinFace.isDestroyed()) {
-					visitedFaces.add(twinFace);
-				}
-
-				if(!visitedFaces.contains(twinFace)) {
-
-					// if the triangulation is finalized there are no border triangles
-					if(finalized) {
-						facesToVisit.add(twinFace);
-					}
-					else {
-						List<P> points = twinFace.getPoints();
-						if(!points.contains(p0) && !points.contains(p1) && !points.contains(p2)) {
-							facesToVisit.add(twinFace);
-						}
-						else {
-							visitedFaces.add(twinFace);
-						}
-					}
-				}
-
-				visitedFaces.add(twinFace);
-			}
-
-			return nextFace;
-		}
 	}
 
 

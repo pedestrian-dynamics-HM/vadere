@@ -1,5 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.data.Triangulation;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -19,7 +21,7 @@ public class TestEnhancedVersion extends JFrame {
     {
 //        VRectangle bbox = new VRectangle(0,0,100,100);
 //        ArrayList<VRectangle> obs = new ArrayList<VRectangle>() {{ add(new VRectangle(20,20,20,20));}};
-	    double h0 = 1.0;
+	    double h0 = 3.0;
 
 	    long now = System.currentTimeMillis();
 
@@ -48,13 +50,9 @@ public class TestEnhancedVersion extends JFrame {
         System.out.println(System.currentTimeMillis()-now);
         now = System.currentTimeMillis();
         System.out.println(System.currentTimeMillis()-now);
-        DrawPanel JPanel = new DrawPanel(meshGenerator);
-        setSize(1000, 800);
-        add(JPanel);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(true);
-
-
+        PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800);
+	    JFrame frame = distmeshPanel.display();
+		frame.setVisible(true);
         double quality = meshGenerator.qualityCheck();
 
         while (quality < 0.95) {
@@ -65,47 +63,11 @@ public class TestEnhancedVersion extends JFrame {
 	        } catch (InterruptedException e) {
 		        e.printStackTrace();
 	        }*/
-	        JPanel.repaint();
+	        distmeshPanel.repaint();
 	        quality = meshGenerator.qualityCheck();
         }
     }
 
-    private class DrawPanel extends Canvas {
-
-        private PSDistmesh meshGenerator;
-
-        private DrawPanel(PSDistmesh meshGenerator) {
-            this.meshGenerator = meshGenerator;
-        }
-
-        @Override
-        public void paint(Graphics g) {
-            Graphics2D graphics2D = (Graphics2D) g;
-	        BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-	        Graphics2D graphics = (Graphics2D)image.getGraphics();
-
-			graphics.setStroke(new BasicStroke(0.03f));
-	        graphics.scale(3, 3);
-	        graphics.setColor(Color.WHITE);
-	        graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
-
-	        graphics.setColor(Color.GRAY);
-	       /* for(VShape obstacle : obstacles) {
-		        graphics.fill(obstacle);
-	        }*/
-
-	        graphics.setColor(Color.BLACK);
-	        meshGenerator.getTriangles().stream().forEach(t -> graphics.draw(t));
-            //graphics.translate(5,5);
-	        graphics2D.drawImage(image, 20, 20, null);
-
-
-
-
-//            graphics.setColor(Color.RED);
-//            tc.triangulation.getTriangles().parallelStream().forEach(graphics::draw);
-        }
-    }
 
     public static void main(String[] args) {
         new TestEnhancedVersion();

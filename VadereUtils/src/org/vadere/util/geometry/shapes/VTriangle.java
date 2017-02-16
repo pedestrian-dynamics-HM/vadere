@@ -204,6 +204,13 @@ public class VTriangle extends VPolygon {
 		return Arrays.stream(getLines());
 	}
 
+	public double maxCoordinate() {
+		double max = Math.max(Math.abs(p1.getX()), Math.abs(p1.getY()));
+		max = Math.max(max, Math.max(Math.abs(p2.getX()), Math.abs(p2.getY())));
+		max = Math.max(max, Math.max(Math.abs(p3.getX()), Math.abs(p3.getY())));
+		return max;
+	}
+
 	@Override
 	public String toString() {
 		return p1 + "-" + p2 + "-" + p3;

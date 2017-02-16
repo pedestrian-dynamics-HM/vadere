@@ -18,12 +18,15 @@ import org.vadere.util.triangulation.DelaunayTriangulation;
 import org.vadere.util.triangulation.UniformTriangulation;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
+import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.*;
 
 
 public class TestFFMNonUniformTriangulation {
@@ -35,7 +38,7 @@ public class TestFFMNonUniformTriangulation {
 
 	@Before
 	public void setUp() {
-		double h0 = 1.0;
+		double h0 = 5.0;
 		width = 300;
 		height = 300;
 		VRectangle bbox = new VRectangle(0, 0, width, height);
@@ -54,17 +57,24 @@ public class TestFFMNonUniformTriangulation {
 		PSDistmesh meshGenerator = new PSDistmesh(bbox, boundingBox, h0,false);
 		meshGenerator.execute();
 		triangulation = meshGenerator.getTriangulation();
-		//triangulation = new UniformTriangulation<>(0, 0, 300, 300, 10, (a,b) -> new MeshPoint(a,b, false));
+
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800);
+		JFrame frame = distmeshPanel.display();
+		frame.setVisible(true);
+
+		//triangulation = new UniformTriangulation<>(0, 0, width, height, 10.0, (a,b) -> new MeshPoint(a,b, false));
 		//triangulation.finalize();
 	}
 
 	@Test
 	public void testFMM() {
 		List<VRectangle> targetAreas = new ArrayList<>();
-		VRectangle rect = new VRectangle(width / 2, height / 2, 5, 5);
+		List<IPoint> targetPoints = new ArrayList<>();
+		targetPoints.add(new VPoint(40, 40));
+		VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
 		targetAreas.add(rect);
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(targetAreas, new UnitTimeCostFunction(), triangulation, (x, y) -> new MeshPoint(x, y, false));
+		EikonalSolver solver = new EikonalSolverFMMTriangulation(targetPoints, new UnitTimeCostFunction(), triangulation);
 
 		log.info("start FFM");
 		solver.initialize();
@@ -85,6 +95,8 @@ public class TestFFMNonUniformTriangulation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		while (true) {}
 
 		//assertTrue(0.0 == solver.getValue(5, 5));
 		//assertTrue(0.0 < solver.getValue(1, 7));
