@@ -14,7 +14,7 @@ public class CLConvolution {
 	private Convolve gaussianFilter;
 
 	public CLConvolution() throws IOException {
-		context = JavaCL.createBestContext(CLPlatform.DeviceFeature.GPU, CLPlatform.DeviceFeature.MaxComputeUnits);
+		context = JavaCL.createBestContext();
 		gaussianFilter = new Convolve(context);
 	}
 
