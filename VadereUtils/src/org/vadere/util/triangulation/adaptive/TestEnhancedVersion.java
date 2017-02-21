@@ -4,8 +4,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
+
 import java.util.*;
 
 /**

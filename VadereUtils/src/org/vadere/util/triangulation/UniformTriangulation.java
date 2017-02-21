@@ -9,21 +9,21 @@ import java.util.List;
 import java.util.Set;
 
 
-public class UniformTriangulation<P extends IPoint> extends DelaunayTriangulation<P>{
+public class UniformTriangulation<P extends IPoint> extends IncrementalTriangulation<P> {
 
 	private double left;
 	private double top;
 	private double width;
 	private double height;
 	private double minTriangleSideLength;
-	private PointConstructor<P> pointConstructor;
+	private IPointConstructor<P> pointConstructor;
 
 	public UniformTriangulation(final double minX,
 	                            final double minY,
 	                            final double width,
 	                            final double height,
 	                            final double minTriangleSideLength,
-	                            final PointConstructor<P> pointConstructor) {
+	                            final IPointConstructor<P> pointConstructor) {
 		super(minX, minY, width, height, pointConstructor);
 		this.left = minX;
 		this.top = minY;
@@ -31,13 +31,18 @@ public class UniformTriangulation<P extends IPoint> extends DelaunayTriangulatio
 		this.height = height;
 		this.minTriangleSideLength = minTriangleSideLength;
 		this.pointConstructor = pointConstructor;
+	}
 
+	@Override
+	public void compute() {
 		List<P> pointList = new ArrayList<>(generatePointSet());
 		Collections.shuffle(pointList);
 
 		for(P point : pointList) {
 			insert(point);
 		}
+
+		super.compute();
 	}
 
 	private Set<P> generatePointSet() {
