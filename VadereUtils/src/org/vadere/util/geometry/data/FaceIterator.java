@@ -1,4 +1,4 @@
-package org.vadere.util.triangulation;
+package org.vadere.util.geometry.data;
 
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
@@ -51,7 +51,7 @@ public class FaceIterator<P extends IPoint> implements Iterator<Face<P>> {
 		for(HalfEdge<P> he : nextFace) {
 			Face<P> twinFace = he.getTwin().getFace();
 
-			if(twinFace.isBorder() || twinFace.isDestroyed() || !facePredicate.test(twinFace)) {
+ 			if(twinFace.isBorder() || twinFace.isDestroyed() || !facePredicate.test(twinFace)) {
 				visitedFaces.add(twinFace);
 			}
 

@@ -7,7 +7,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.awt.geom.Line2D;
 import java.util.Iterator;
 
-public class LineIterator implements Iterator<IPoint> {
+public class ConstantLineIterator implements Iterator<IPoint> {
 
 	private final Line2D.Double line;
 	private final double delta;
@@ -23,7 +23,7 @@ public class LineIterator implements Iterator<IPoint> {
 	private int counter;
 	private int numberOfSegments;
 
-	public LineIterator(final Line2D.Double line, final double delta) {
+	public ConstantLineIterator(final Line2D.Double line, final double delta) {
 		this.line = line;
 
 		if(line.getX1() < line.getX2()) {

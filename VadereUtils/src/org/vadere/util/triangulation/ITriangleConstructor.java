@@ -4,6 +4,6 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 @FunctionalInterface
-public interface TriangleConstructor<P extends IPoint> {
+public interface ITriangleConstructor<P extends IPoint> {
 	VTriangle create(P p1, P p2, P p3);
 }

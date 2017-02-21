@@ -44,7 +44,7 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		this.face = face;
 	}
 
-	public Face getFace() {
+	public Face<P> getFace() {
 		return face;
 	}
 
@@ -120,7 +120,7 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 	}
 
 	public VLine toLine() {
-		return new VLine((VPoint) this.getPrevious().getEnd(), (VPoint) this.getEnd());
+		return new VLine(new VPoint(this.getPrevious().getEnd()), new VPoint(this.getEnd()));
 	}
 
 	public Iterator<HalfEdge<P>> incidentVertexIterator() {

@@ -102,6 +102,10 @@ public class Face<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		destroyed = true;
 	}
 
+	public void toBorder() {
+		border = true;
+	}
+
 	/**
 	 * Sets one of the half-edges bordering this face.
 	 *
@@ -211,7 +215,7 @@ public class Face<P extends IPoint> implements Iterable<HalfEdge<P>> {
 
 		@Override
 		public boolean hasNext() {
-			return currentHalfEdge != null && (!started || !currentHalfEdge.equals(edge));
+			return !started || !currentHalfEdge.equals(edge);
 		}
 
 		@Override
