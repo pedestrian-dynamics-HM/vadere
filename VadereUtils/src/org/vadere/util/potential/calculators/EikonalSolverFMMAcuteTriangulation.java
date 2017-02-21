@@ -3,7 +3,7 @@ package org.vadere.util.potential.calculators;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
-import org.vadere.util.geometry.data.Triangulation;
+import org.vadere.util.triangulation.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
@@ -20,7 +20,7 @@ import java.util.PriorityQueue;
 public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 
 	private ITimeCostFunction timeCostFunction;
-	private Triangulation<? extends PotentialPoint> triangulation;
+	private ITriangulation<? extends PotentialPoint> triangulation;
 	private boolean calculationFinished;
 	private PriorityQueue<FFMHalfEdge> narrowBand;
 	private final Collection<IPoint> targetPoints;
@@ -38,7 +38,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 
 	public EikonalSolverFMMAcuteTriangulation(final Collection<IPoint> targetPoints,
 	                                          final ITimeCostFunction timeCostFunction,
-	                                          final Triangulation<? extends PotentialPoint> triangulation) {
+	                                          final ITriangulation<? extends PotentialPoint> triangulation) {
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
 		this.timeCostFunction = timeCostFunction;

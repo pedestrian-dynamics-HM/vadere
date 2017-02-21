@@ -4,18 +4,14 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.data.Triangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.calculators.EikonalSolver;
-import org.vadere.util.potential.calculators.EikonalSolverFMMAcuteTriangulation;
 import org.vadere.util.potential.calculators.EikonalSolverFMMTriangulation;
-import org.vadere.util.potential.calculators.PotentialPoint;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
-import org.vadere.util.triangulation.DelaunayTriangulation;
-import org.vadere.util.triangulation.UniformTriangulation;
+import org.vadere.util.triangulation.IncrementalTriangulation;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
 import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
@@ -34,7 +30,7 @@ public class TestFFMNonUniformTriangulation {
 	private static Logger log = LogManager.getLogger(TestFFMNonUniformTriangulation.class);
 	private int width;
 	private int height;
-	private DelaunayTriangulation<MeshPoint> triangulation;
+	private IncrementalTriangulation<MeshPoint> triangulation;
 
 	@Before
 	public void setUp() {

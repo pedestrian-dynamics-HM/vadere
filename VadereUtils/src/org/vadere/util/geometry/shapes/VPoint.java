@@ -36,7 +36,6 @@ public class VPoint implements Cloneable, IPoint {
 		this.identifier = identifier;
 	}
 
-
 	public VPoint(Point2D.Double copy) {
 		this.x = copy.x;
 		this.y = copy.y;

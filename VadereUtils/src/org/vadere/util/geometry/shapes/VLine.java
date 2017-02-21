@@ -9,6 +9,7 @@ import org.vadere.util.geometry.GeometryUtils;
 public class VLine extends Line2D.Double {
 
 	private String identifier;
+	// TODO: delete these points
 	private VPoint p1;
 	private VPoint p2;
 
@@ -22,7 +23,7 @@ public class VLine extends Line2D.Double {
 	}
 
 	public VLine(double x1, double y1, double x2, double y2) {
-		super(x1, y1, x2, y2);
+		this(new VPoint(x1, y1), new VPoint(x2, y2));
 	}
 
 	public double ptSegDist(IPoint point) {
@@ -35,6 +36,10 @@ public class VLine extends Line2D.Double {
 
 	public double distance(IPoint point) {
 		return GeometryUtils.closestToSegment(this, point).distance(point);
+	}
+
+	public VPoint midPoint() {
+		return p1.add(p2).scalarMultiply(0.5);
 	}
 
 	@Override
