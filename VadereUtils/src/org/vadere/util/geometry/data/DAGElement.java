@@ -1,4 +1,4 @@
-package org.vadere.util.triangulation;
+package org.vadere.util.geometry.data;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.geometry.data.Face;
