@@ -3,10 +3,10 @@ package org.vadere.util.potential.calculators;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.LineIterator;
+import org.vadere.util.geometry.ConstantLineIterator;
 import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.data.HalfEdge;
-import org.vadere.util.geometry.data.Triangulation;
+import org.vadere.util.triangulation.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCone;
 import org.vadere.util.geometry.shapes.VLine;
@@ -19,8 +19,8 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.FaceIterator;
-import org.vadere.util.triangulation.PointConstructor;
+import org.vadere.util.geometry.data.FaceIterator;
+import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,11 +40,11 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 	private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
 
 	private ITimeCostFunction timeCostFunction;
-	private Triangulation<P> triangulation;
+	private ITriangulation<P> triangulation;
 	private boolean calculationFinished;
 	private PriorityQueue<FFMHalfEdge> narrowBand;
 	private final Collection<VRectangle> targetAreas;
-	private PointConstructor<P> pointConstructor;
+	private IPointConstructor<P> pointConstructor;
 
 	private Comparator<FFMHalfEdge> pointComparator = (he1, he2) -> {
 		if (he1.halfEdge.getEnd().getPotential() < he2.halfEdge.getEnd().getPotential()) {
@@ -59,8 +59,8 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 
 	public EikonalSolverFMMTriangulation(final Collection<VRectangle> targetAreas,
 	                                     final ITimeCostFunction timeCostFunction,
-	                                     final Triangulation<P> triangulation,
-	                                     final PointConstructor<P> pointConstructor
+	                                     final ITriangulation<P> triangulation,
+	                                     final IPointConstructor<P> pointConstructor
 	                                     ) {
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
@@ -72,7 +72,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 
 	public EikonalSolverFMMTriangulation(final Collection<IPoint> targetPoints,
 	                                     final ITimeCostFunction timeCostFunction,
-	                                     final Triangulation<P> triangulation
+	                                     final ITriangulation<P> triangulation
 	) {
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
@@ -105,14 +105,14 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint> implements 
 			VPoint bottomLeft = new VPoint(rectangle.getX(), rectangle.getMaxY());
 			VPoint bottomRight = new VPoint(rectangle.getMaxX(), rectangle.getMaxY());
 			VPoint topRight = new VPoint(rectangle.getMaxX(), rectangle.getY());
-			LineIterator lineIterator1 = new LineIterator(new VLine(topLeft, topRight), 1.0);
-			LineIterator lineIterator2 = new LineIterator(new VLine(topLeft, bottomLeft), 1.0);
-			LineIterator lineIterator3 = new LineIterator(new VLine(bottomLeft, bottomRight), 1.0);
-			LineIterator lineIterator4 = new LineIterator(new VLine(topRight, bottomRight), 1.0);
+			ConstantLineIterator lineIterator1 = new ConstantLineIterator(new VLine(topLeft, topRight), 1.0);
+			ConstantLineIterator lineIterator2 = new ConstantLineIterator(new VLine(topLeft, bottomLeft), 1.0);
+			ConstantLineIterator lineIterator3 = new ConstantLineIterator(new VLine(bottomLeft, bottomRight), 1.0);
+			ConstantLineIterator lineIterator4 = new ConstantLineIterator(new VLine(topRight, bottomRight), 1.0);
 
-			List<LineIterator> lineIterators = Arrays.asList(lineIterator1, lineIterator2, lineIterator3, lineIterator4);
+			List<ConstantLineIterator> lineIterators = Arrays.asList(lineIterator1, lineIterator2, lineIterator3, lineIterator4);
 
-			for(LineIterator lineIterator : lineIterators) {
+			for(ConstantLineIterator lineIterator : lineIterators) {
 				while (lineIterator.hasNext()) {
 					IPoint next = lineIterator.next();
 					P potentialPoint = pointConstructor.create(next.getX(), next.getY());

@@ -22,7 +22,7 @@ public class TestLineIterator {
 		double x2 = 12.0;
 		double y2 = -3.0;
 		VLine line = new VLine(x1, y1, x2, y2);
-		LineIterator lineIterator = new LineIterator(line, 0.5);
+		ConstantLineIterator lineIterator = new ConstantLineIterator(line, 0.5);
 		double originalSlope = line.slope();
 		VPoint startPoint = new VPoint(x1, y1);
 
