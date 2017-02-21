@@ -48,7 +48,7 @@ public class ScenarioRun implements Runnable {
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
 		this.scenarioStore = scenario.getScenarioStore();
-		this.dataProcessingJsonManager = new DataProcessingJsonManager();
+		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(IOUtils.OUTPUT_DIR)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
 	}
