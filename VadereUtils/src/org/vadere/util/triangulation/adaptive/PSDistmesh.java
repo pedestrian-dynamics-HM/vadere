@@ -1,8 +1,8 @@
 package org.vadere.util.triangulation.adaptive;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.vadere.util.triangulation.DelaunayTriangulation;
-import org.vadere.util.geometry.LineIterator;
+import org.vadere.util.triangulation.IncrementalTriangulation;
+import org.vadere.util.geometry.ConstantLineIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MLine;
 import org.vadere.util.geometry.shapes.VLine;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class  PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
-	private DelaunayTriangulation<MeshPoint> bowyerWatson;
+	private IncrementalTriangulation<MeshPoint> bowyerWatson;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -117,7 +117,7 @@ public class  PSDistmesh {
 	private void reTriangulate() {
 		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			maxMovementLen = 0;
-			bowyerWatson = new DelaunayTriangulation<>(points, (x, y) -> new MeshPoint(x, y, false));
+			bowyerWatson = new IncrementalTriangulation<>(points, (x, y) -> new MeshPoint(x, y, false));
 
 			System.out.println("triangulation started");
 			bowyerWatson.compute();
@@ -355,7 +355,7 @@ public class  PSDistmesh {
 	Unterteilt eine Linie eines Objekts in Fixpunkte
 	 */
 	private List<MeshPoint> divLine(double x1, double y1, double x2, double y2, int segments) {
-		LineIterator lineIterator = new LineIterator(new VLine(x1, y1, x2, y2), initialEdgeLen);
+		ConstantLineIterator lineIterator = new ConstantLineIterator(new VLine(x1, y1, x2, y2), initialEdgeLen);
 		List<MeshPoint> points = new ArrayList<>();
 		while (lineIterator.hasNext()) {
 			IPoint iPoint = lineIterator.next();
@@ -377,7 +377,7 @@ public class  PSDistmesh {
 		return bowyerWatson.getTriangles();
 	}
 
-	public DelaunayTriangulation<MeshPoint> getTriangulation(){
+	public IncrementalTriangulation<MeshPoint> getTriangulation(){
 		return bowyerWatson;
 	}
 
