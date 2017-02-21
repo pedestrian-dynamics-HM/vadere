@@ -4,13 +4,12 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.data.DAG;
+import org.vadere.util.geometry.data.DAGElement;
 import org.vadere.util.geometry.data.Face;
-import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -42,7 +41,7 @@ public class TestBoyerWatson {
 		points.add(p6);
 		points.add(p5);
 
-		DelaunayTriangulation<VPoint> boyerWatsonImproved = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		IncrementalTriangulation<VPoint> boyerWatsonImproved = new IncrementalTriangulation<>(points, (x, y) -> new VPoint(x, y));
 		boyerWatsonImproved.compute();
 		boyerWatsonImproved.finalize();
 
@@ -96,7 +95,7 @@ public class TestBoyerWatson {
 		Face<VPoint> face = Face.of(p1,p2,p3);
 		DAG<DAGElement<VPoint>> dag = new DAG<>(new DAGElement<>(face, Triple.of(p1,p2,p3)));
 
-		DelaunayTriangulation<VPoint> triangulation = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		IncrementalTriangulation<VPoint> triangulation = new IncrementalTriangulation<>(points, (x, y) -> new VPoint(x, y));
 		triangulation.splitTriangleDB(centerPoint, dag);
 		triangulation.finalize();
 
@@ -120,7 +119,7 @@ public class TestBoyerWatson {
 		}
 
 		long ms = System.currentTimeMillis();
-		DelaunayTriangulation<VPoint> bw = new DelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		IncrementalTriangulation<VPoint> bw = new IncrementalTriangulation<>(points, (x, y) -> new VPoint(x, y));
 		bw.compute();
 		System.out.println("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms));
 	}
