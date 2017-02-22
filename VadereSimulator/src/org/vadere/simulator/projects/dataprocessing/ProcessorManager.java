@@ -8,6 +8,7 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,7 +69,7 @@ public class ProcessorManager {
 	}
 
 	public void setOutputPath(String directory) {
-		this.outputFiles.forEach(file -> file.setFileName(Paths.get(directory, String.format("%s", file.getFileName())).toString()));
+		this.outputFiles.forEach(file -> file.setFileName(Paths.get(directory, String.format("%s", new File(file.getFileName()).getName())).toString()));
 	}
 
 	public void writeOutput() {
