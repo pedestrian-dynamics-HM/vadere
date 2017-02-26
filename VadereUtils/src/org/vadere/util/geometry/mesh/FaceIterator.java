@@ -1,7 +1,5 @@
-package org.vadere.util.geometry.data;
+package org.vadere.util.geometry.mesh;
 
-import org.vadere.util.geometry.data.Face;
-import org.vadere.util.geometry.data.HalfEdge;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.HashSet;
@@ -48,7 +46,7 @@ public class FaceIterator<P extends IPoint> implements Iterator<Face<P>> {
 		Face<P> nextFace = facesToVisit.removeFirst();
 		visitedFaces.add(nextFace);
 
-		for(HalfEdge<P> he : nextFace) {
+		for(PHalfEdge<P> he : nextFace) {
 			Face<P> twinFace = he.getTwin().getFace();
 
  			if(twinFace.isBorder() || twinFace.isDestroyed() || !facePredicate.test(twinFace)) {
