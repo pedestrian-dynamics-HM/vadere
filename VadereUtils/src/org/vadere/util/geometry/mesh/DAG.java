@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.data;
+package org.vadere.util.geometry.mesh;
 
 import org.jetbrains.annotations.NotNull;
 
