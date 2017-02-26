@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.data;
+package org.vadere.util.geometry.mesh;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
+public class PHalfEdge<P extends IPoint> implements Iterable<PHalfEdge<P>>, IHalfEdge<P> {
 
 	/**
 	 * point at the end of the half edge.
@@ -20,18 +20,18 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 	/**
 	 * next half-edge around the face.
 	 */
-	private HalfEdge<P> next;
+	private PHalfEdge<P> next;
 
 	/**
 	 * previous half-edge around the face.
 	 */
-	private HalfEdge<P> previous;
+	private PHalfEdge<P> previous;
 
 	/**
 	 * oppositely oriented adjacnet half-edge. If the face is a the boundary
 	 * there is no twin.
 	 */
-	private HalfEdge<P> twin;
+	private PHalfEdge<P> twin;
 
 	/**
 	 * the face the half-edge borders.
@@ -39,9 +39,14 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 	private Face<P> face;
 
 
-	public HalfEdge (@NotNull final P end, @NotNull final Face<P> face) {
+	public PHalfEdge(@NotNull final P end, @NotNull final Face<P> face) {
 		this.end = end;
 		this.face = face;
+	}
+
+	public PHalfEdge(@NotNull final P end) {
+		this.end = end;
+		this.face = null;
 	}
 
 	public Face<P> getFace() {
@@ -64,16 +69,20 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		return twin != null;
 	}
 
-	public HalfEdge<P> getNext() {
+	public PHalfEdge<P> getNext() {
 		return next;
 	}
 
-	public HalfEdge<P> getPrevious() {
+	public PHalfEdge<P> getPrevious() {
 		return previous;
 	}
 
-	public HalfEdge<P> getTwin() {
+	public PHalfEdge<P> getTwin() {
 		return twin;
+	}
+
+	public boolean hasSameTwinFace(final PHalfEdge<P> halfEdge) {
+		return this.getTwin().getFace().equals(halfEdge.getTwin().getFace());
 	}
 
 	public boolean isBoundary() {
@@ -94,21 +103,21 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		return twin != null && next != null && previous != null && face != null;
 	}
 
-	public void setTwin(final HalfEdge twin) {
+	public void setTwin(final PHalfEdge twin) {
 		this.twin = twin;
 		if(twin != null && twin.getTwin() != this) {
 			twin.setTwin(this);
 		}
 	}
 
-	public void setPrevious(final HalfEdge<P> previous) {
+	public void setPrevious(final PHalfEdge<P> previous) {
 		this.previous = previous;
 		if(previous != null && previous.getNext() != this) {
 			previous.setNext(this);
 		}
 	}
 
-	public void setNext(final HalfEdge<P> next) {
+	public void setNext(final PHalfEdge<P> next) {
 		this.next = next;
 		if(next != null && next.getPrevious() != this) {
 			next.setPrevious(this);
@@ -123,7 +132,7 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		return new VLine(new VPoint(this.getPrevious().getEnd()), new VPoint(this.getEnd()));
 	}
 
-	public Iterator<HalfEdge<P>> incidentVertexIterator() {
+	public Iterator<PHalfEdge<P>> incidentVertexIterator() {
 		return new NeighbourIterator();
 	}
 
@@ -133,9 +142,9 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		return IteratorUtils.toList(incidentFaceIterator());
 	}
 
-	public List<HalfEdge<P>> getIncidentPoints() {
-		List<HalfEdge<P>> incidentPoints = new ArrayList<>();
-		Iterator<HalfEdge<P>> iterator = incidentVertexIterator();
+	public List<PHalfEdge<P>> getIncidentPoints() {
+		List<PHalfEdge<P>> incidentPoints = new ArrayList<>();
+		Iterator<PHalfEdge<P>> iterator = incidentVertexIterator();
 
 		while (iterator.hasNext()) {
 			incidentPoints.add(iterator.next());
@@ -150,7 +159,7 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 	}
 
 	@Override
-	public Iterator<HalfEdge<P>> iterator() {
+	public Iterator<PHalfEdge<P>> iterator() {
 		return incidentVertexIterator();
 	}
 
@@ -176,19 +185,19 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 	/**
 	 * This iterator assumes that the this edge is completely surrounded by faces.
 	 */
-	private class NeighbourIterator implements Iterator<HalfEdge<P>> {
+	private class NeighbourIterator implements Iterator<PHalfEdge<P>> {
 
-		private HalfEdge<P> current = HalfEdge.this.getNext();
+		private PHalfEdge<P> current = PHalfEdge.this.getNext();
 		private boolean first = true;
 
 		@Override
 		public boolean hasNext() {
-			return (first || current != HalfEdge.this.getNext());
+			return (first || current != PHalfEdge.this.getNext());
 		}
 
 		@Override
-		public HalfEdge<P> next() {
-			HalfEdge<P> result = current;
+		public PHalfEdge<P> next() {
+			PHalfEdge<P> result = current;
 			current = result.getTwin().getNext();
 			first = false;
 			return result;
@@ -205,7 +214,7 @@ public class HalfEdge<P extends IPoint> implements Iterable<HalfEdge<P>> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		HalfEdge<?> halfEdge = (HalfEdge<?>) o;
+		PHalfEdge<?> halfEdge = (PHalfEdge<?>) o;
 
 		if (!end.equals(halfEdge.end)) return false;
 		return face != null ? face.equals(halfEdge.face) : halfEdge.face == null;

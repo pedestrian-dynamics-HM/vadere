@@ -5,11 +5,15 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.data.DAG;
-import org.vadere.util.geometry.data.DAGElement;
-import org.vadere.util.geometry.data.Face;
-import org.vadere.util.geometry.data.FaceIterator;
-import org.vadere.util.geometry.data.HalfEdge;
+import org.vadere.util.geometry.mesh.DAG;
+import org.vadere.util.geometry.mesh.DAGElement;
+import org.vadere.util.geometry.mesh.Face;
+import org.vadere.util.geometry.mesh.FaceIterator;
+import org.vadere.util.geometry.mesh.IFace;
+import org.vadere.util.geometry.mesh.IHalfEdge;
+import org.vadere.util.geometry.mesh.IMesh;
+import org.vadere.util.geometry.mesh.NeighbourFaceIterator;
+import org.vadere.util.geometry.mesh.PHalfEdge;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -37,9 +41,9 @@ import java.util.stream.StreamSupport;
 
 import javax.swing.*;
 
-public class IncrementalTriangulation<P extends IPoint> implements ITriangulation<P> {
+public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, E, F> {
 
-	private Face<P> face;
+	private F face;
 	protected Set<P> points;
 	protected final IPointConstructor<P> pointConstructor;
 
@@ -47,25 +51,26 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	private P p0;
 	private P p1;
 	private P p2;
-	private HalfEdge<P> he0;
-	private HalfEdge<P> he1;
-	private HalfEdge<P> he2;
+	private E he0;
+	private E he1;
+	private E he2;
 	private P p_max;
 	private P p_min;
 	private boolean finalized;
+	private IMesh<P, E, F> mesh;
 
 	private DAG<DAGElement<P>> dag;
-	private final HashMap<Face<P>, DAG<DAGElement<P>>> map;
+	private final HashMap<F, DAG<DAGElement<P>>> map;
 	private double eps = 0.0000001;
-	protected Face<P> superTriangle;
-	private Face<P> borderFace;
-	private final Predicate<HalfEdge<P>> illegalPredicate;
+	protected F superTriangle;
+	private F borderFace;
+	private final Predicate<E> illegalPredicate;
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
 
 	public IncrementalTriangulation(
 			final Set<P> points,
 			final IPointConstructor<P> pointConstructor,
-			final Predicate<HalfEdge<P>> illegalPredicate) {
+			final Predicate<E> illegalPredicate) {
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
 		this.pointConstructor = pointConstructor;
@@ -87,7 +92,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 			final double width,
 			final double height,
 			final IPointConstructor<P> pointConstructor,
-			final Predicate<HalfEdge<P>> illegalPredicate) {
+			final Predicate<PHalfEdge<P>> illegalPredicate) {
 		this.points = new HashSet<>();
 		this.pointConstructor = pointConstructor;
 		this.map = new HashMap<>();
@@ -118,7 +123,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		superTriangle = Face.of(p0, p1, p2);
 		borderFace = superTriangle.getEdge().getTwin().getFace();
 
-		List<HalfEdge<P>> borderEdges = borderFace.getEdges();
+		List<PHalfEdge<P>> borderEdges = borderFace.getEdges();
 		he0 = borderEdges.get(0);
 		he1 = borderEdges.get(1);
 		he2 = borderEdges.get(2);
@@ -143,7 +148,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	}
 
 	@Override
-	public HalfEdge<P> insert(P point) {
+	public E insert(P point) {
 		Collection<DAG<DAGElement<P>>> leafs = locatePoint(point, true);
 		if(leafs.size() == 0) {
 			log.warn(point);
@@ -167,7 +172,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		}
 		else {
 			log.warn("ignore insertion point, since this point already exists!");
-			Optional<HalfEdge<P>> optHe = leafs.iterator().next().getElement().getFace().stream().filter(he -> he.getEnd().equals(point)).findAny();
+			Optional<PHalfEdge<P>> optHe = leafs.iterator().next().getElement().getFace().stream().filter(he -> he.getEnd().equals(point)).findAny();
 			if(optHe.isPresent()) {
 				return optHe.get();
 			}
@@ -184,17 +189,17 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		if(!finalized) {
 			// we have to use other halfedges than he1 and he2 since they might be deleted
 			// if we deleteBoundaryFace he0!
-			List<Face<P>> faces1 = IteratorUtils.toList(he0.incidentFaceIterator());
-			List<Face<P>> faces2 = IteratorUtils.toList(he1.incidentFaceIterator());
-			List<Face<P>> faces3 = IteratorUtils.toList(he2.incidentFaceIterator());
+			List<F> faces1 = IteratorUtils.toList(new NeighbourFaceIterator(mesh, he0));
+			List<F> faces2 = IteratorUtils.toList(new NeighbourFaceIterator(mesh, he1));
+			List<F> faces3 = IteratorUtils.toList(new NeighbourFaceIterator(mesh, he2));
 
-			faces1.removeIf(f -> f.isBorder());
+			faces1.removeIf(f -> mesh.isBoundary(f));
 			faces1.forEach(f -> deleteBoundaryFace(f));
 
-			faces2.removeIf(f -> f.isDestroyed() || f.isBorder());
+			faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
 			faces2.forEach(f -> deleteBoundaryFace(f));
 
-			faces3.removeIf(f -> f.isDestroyed() ||f.isBorder());
+			faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
 			faces3.forEach(f -> deleteBoundaryFace(f));
 
 			finalized = true;
@@ -204,7 +209,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	public void clear() {
 		List<Face<P>> faces = IteratorUtils.toList(iterator());
 		for(Face<P> face : faces) {
-			for(HalfEdge<P> edge : face) {
+			for(PHalfEdge<P> edge : face) {
 				edge.destroy();
 			}
 			face.destroy();
@@ -212,13 +217,13 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		init(p_max, p_min);
 	}
 
-	public boolean isDeletionOk(final Face<P> face) {
-		if(face.isDestroyed()) {
+	public boolean isDeletionOk(final F face) {
+		if(mesh.isDestroyed(face)) {
 			return false;
 		}
 
-		for(HalfEdge<P> halfEdge : face) {
-			if(halfEdge.getTwin().isBoundary()) {
+		for(E halfEdge : mesh.getEdgeIt(face)) {
+			if(mesh.isBoundary(mesh.getTwin(halfEdge))) {
 				return true;
 			}
 		}
@@ -231,15 +236,15 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 *
 	 * @param face the face that will be deleted, which as to be adjacent to the boundary.
 	 */
-	public void deleteBoundaryFace(final Face<P> face) {
+	public void deleteBoundaryFace(final F face) {
 		assert isDeletionOk(face);
 
 		// 3 cases: 1. triangle consist of 1, 2 or 3 boundary edges
-		List<HalfEdge<P>> boundaryEdges = new ArrayList<>(3);
-		List<HalfEdge<P>> nonBoundaryEdges = new ArrayList<>(3);
+		List<E> boundaryEdges = new ArrayList<>(3);
+		List<E> nonBoundaryEdges = new ArrayList<>(3);
 
-		for(HalfEdge<P> halfEdge : face) {
-			if(halfEdge.getTwin().isBoundary()) {
+		for(E halfEdge : mesh.getEdgeIt(face)) {
+			if(mesh.isBoundary(mesh.getTwin(halfEdge))) {
 				boundaryEdges.add(halfEdge);
 			}
 			else {
@@ -249,69 +254,76 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 
 		if(boundaryEdges.size() == 3) {
 			// release memory
-			face.getEdges().forEach(halfEdge -> halfEdge.destroy());
+			mesh.getEdges(face).forEach(halfEdge -> mesh.destroyEdge(halfEdge));
 		}
 		else if(boundaryEdges.size() == 2) {
-			HalfEdge<P> toB = boundaryEdges.get(0).getNext().getTwin().isBoundary() ? boundaryEdges.get(0) : boundaryEdges.get(1);
-			HalfEdge<P> toF = boundaryEdges.get(0).getNext().getTwin().isBoundary() ? boundaryEdges.get(1) : boundaryEdges.get(0);
+			E toB = mesh.isBoundary(mesh.getTwin(mesh.getNext(boundaryEdges.get(0)))) ? boundaryEdges.get(0) : boundaryEdges.get(1);
+			E toF = mesh.isBoundary(mesh.getTwin(mesh.getNext(boundaryEdges.get(0)))) ? boundaryEdges.get(1) : boundaryEdges.get(0);
+			E nB = nonBoundaryEdges.get(0);
+			mesh.setFace(nB, mesh.getTwinFace(toF));
+			mesh.setNext(nB, mesh.getNext(mesh.getTwin(toB)));
+			mesh.setPrev(nB, mesh.getPrev(mesh.getTwin(toF)));
+			mesh.setEdge(mesh.getFace(mesh.getTwin(toF)), nB);
 
-			HalfEdge<P> nB = nonBoundaryEdges.get(0);
-			nB.setFace(toF.getTwin().getFace());
-			nB.setNext(toB.getTwin().getNext());
-			nB.setPrevious(toF.getTwin().getPrevious());
-
-			toF.getTwin().getFace().setEdge(nB);
-
-			this.face = toF.getTwin().getFace();
+			this.face = mesh.getTwinFace(toF);
 
 			// release memory
-			toF.destroy();
-			toB.destroy();
+			mesh.destroyEdge(toF);
+			mesh.destroyEdge(toB);
 
 		}
 		else {
-			HalfEdge<P> boundaryHe = boundaryEdges.get(0);
-			HalfEdge<P> prec = boundaryHe.getTwin().getPrevious();
-			HalfEdge<P> succ = boundaryHe.getTwin().getNext();
+			E boundaryHe = boundaryEdges.get(0);
+			E prec = mesh.getPrev(mesh.getTwin(boundaryHe));
+			E succ = mesh.getNext(mesh.getTwin(boundaryHe));
 
-			boundaryHe.getNext().setPrevious(prec);
-			boundaryHe.getNext().setFace(boundaryHe.getTwin().getFace());
-			boundaryHe.getPrevious().setNext(succ);
-			boundaryHe.getPrevious().setFace(boundaryHe.getTwin().getFace());
-			prec.getFace().setEdge(prec);
+			E next = mesh.getNext(boundaryHe);
+			E prev = mesh.getPrev(boundaryHe);
+			mesh.setPrev(next, prec);
+			mesh.setFace(next, mesh.getTwinFace(boundaryHe));
 
-			this.face = prec.getFace();
+			mesh.setNext(prev, succ);
+			mesh.setFace(prev, mesh.getTwinFace(boundaryHe));
+
+			mesh.setEdge(mesh.getFace(prec), prec);
+
+			this.face = mesh.getFace(prec);
 			// release memory
-			boundaryHe.destroy();
+			mesh.destroyEdge(boundaryHe);
 		}
 
-		face.destroy();
+		mesh.destroyFace(face);
 		map.remove(face);
 	}
 
 	@Override
-	public Face<P> locate(final IPoint point) {
+	public Optional<F> locate(final P point) {
 		Optional<DAG<DAGElement<P>>> optDag = locatePoint(point, false).stream().findAny();
 		if(optDag.isPresent()) {
-			return optDag.get().getElement().getFace();
+			return Optional.of(optDag.get().getElement().getFace());
 		}
 		else {
-			return null;
+			return Optional.empty();
 		}
 	}
 
 	@Override
-	public Face<P> locate(final double x, double y) {
+	public IMesh<P, E, F> getMesh() {
+		return null;
+	}
+
+	@Override
+	public Optional<F> locate(final double x, double y) {
 		return locate(new VPoint(x, y));
 	}
 
 	@Override
-	public Set<Face<P>> getFaces() {
+	public Set<F> getFaces() {
 		return streamFaces().collect(Collectors.toSet());
 	}
 
 	@Override
-	public Stream<Face<P>> streamFaces() {
+	public Stream<F> streamFaces() {
 		return stream();
 		//return map.values().stream()
 				/*.filter(dagElement -> {
@@ -333,14 +345,14 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 * @param face2 the second face that might be a neighbour of face1
 	 * @return  the half-edge of face1 such that its twin is part of face2
 	 */
-	private HalfEdge<P> findTwins(final Face<P> face1, final Face<P> face2) {
-		for(HalfEdge<P> halfEdge1 : face1) {
-			for(HalfEdge<P> halfEdge2 : face2) {
-				if(halfEdge1.getTwin() == null) {
+	private E findTwins(final F face1, final F face2) {
+		for(E halfEdge1 : mesh.getEdgeIt(face1)) {
+			for(E halfEdge2 : mesh.getEdgeIt(face2)) {
+				if(mesh.getTwin(halfEdge1) == null) {
 					System.out.print("ddd");
 				}
 
-				if(halfEdge1.getTwin().equals(halfEdge2)) {
+				if(mesh.getTwin(halfEdge1).equals(halfEdge2)) {
 					return halfEdge1;
 				}
 			}
@@ -366,8 +378,8 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		return getTriangles().stream().flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
 	}
 
-	private VTriangle faceToTriangle(final Face<P> face) {
-		List<P> points = face.getPoints();
+	private VTriangle faceToTriangle(final F face) {
+		List<P> points = mesh.getEdges(face).stream().map(edge -> mesh.getVertex(edge)).collect(Collectors.toList());
 		P p1 = points.get(0);
 		P p2 = points.get(1);
 		P p3 = points.get(2);
@@ -407,8 +419,8 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 * @param p         the split point
 	 * @param halfEdge  the half-edge which will be split
 	 */
-	public List<HalfEdge<P>> splitEdge(@NotNull P p, @NotNull HalfEdge<P> halfEdge) {
-		List<HalfEdge<P>> newEdges = new ArrayList<>(4);
+	public List<PHalfEdge<P>> splitEdge(@NotNull P p, @NotNull PHalfEdge<P> halfEdge) {
+		List<PHalfEdge<P>> newEdges = new ArrayList<>(4);
 		/*
 		 * Situation: h0 = halfEdge
 		 * h1 -> h2 -> h0
@@ -431,16 +443,16 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		//h0,(t0),t1
 		//e2,(o0,
 
-		HalfEdge<P> h0 = halfEdge;
-		HalfEdge<P> o0 = h0.getTwin();
+		PHalfEdge<P> h0 = halfEdge;
+		PHalfEdge<P> o0 = h0.getTwin();
 
 		P v2 = o0.getEnd();
 		Face<P> f0 = h0.getFace();
 		Face<P> f3 = o0.getFace();
 
 		// faces correct?
-		HalfEdge<P> e1 = new HalfEdge<>(v2, o0.getFace());
-		HalfEdge<P> t1 = new HalfEdge<>(p, h0.getFace());
+		PHalfEdge<P> e1 = new PHalfEdge<>(v2, o0.getFace());
+		PHalfEdge<P> t1 = new PHalfEdge<>(p, h0.getFace());
 		e1.setTwin(t1);
 		o0.setEnd(p);
 		newEdges.add(t1);
@@ -449,12 +461,12 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		if(!h0.isBoundary()) {
 			Face<P> f1 = new Face<>();
 
-			HalfEdge<P> h1 = h0.getNext();
-			HalfEdge<P> h2 = h1.getNext();
+			PHalfEdge<P> h1 = h0.getNext();
+			PHalfEdge<P> h2 = h1.getNext();
 
 			P v1 = h1.getEnd();
-			HalfEdge<P> e0 = new HalfEdge<>(v1, f1);
-			HalfEdge<P> t0 = new HalfEdge<>(p, f0);
+			PHalfEdge<P> e0 = new PHalfEdge<>(v1, f1);
+			PHalfEdge<P> t0 = new PHalfEdge<>(p, f0);
 			e0.setTwin(t0);
 			newEdges.add(t0);
 
@@ -483,15 +495,15 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		}
 
 		if(!o0.isBoundary()) {
-			HalfEdge<P> o1 = o0.getNext();
-			HalfEdge<P> o2 = o1.getNext();
+			PHalfEdge<P> o1 = o0.getNext();
+			PHalfEdge<P> o2 = o1.getNext();
 
 			P v3 = o1.getEnd();
 			Face<P> f2 = new Face<>();
 
 			// face
-			HalfEdge<P> e2 = new HalfEdge<>(v3, o0.getFace());
-			HalfEdge<P> t2 = new HalfEdge<>(p, f2);
+			PHalfEdge<P> e2 = new PHalfEdge<>(v3, o0.getFace());
+			PHalfEdge<P> t2 = new PHalfEdge<>(p, f2);
 			e2.setTwin(t2);
 			newEdges.add(t2);
 
@@ -523,35 +535,35 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		return newEdges;
 	}
 
-	private static <P extends IPoint> Triple<P, P, P> tripleOf(List<HalfEdge<P>> points) {
+	private static <P extends IPoint> Triple<P, P, P> tripleOf(List<PHalfEdge<P>> points) {
 		assert points.size() == 3;
 		return Triple.of(points.get(0).getEnd(), points.get(1).getEnd(), points.get(2).getEnd());
 	}
 
-	public List<HalfEdge<P>> splitEdgeDB(@NotNull P p, @NotNull HalfEdge<P> halfEdge) {
+	public List<PHalfEdge<P>> splitEdgeDB(@NotNull P p, @NotNull PHalfEdge<P> halfEdge) {
 
 		// 1. gather references
-		HalfEdge<P> he = halfEdge;
+		PHalfEdge<P> he = halfEdge;
 
 		// to be legalized edges
-		HalfEdge<P> h1 = he.getNext();
-		HalfEdge<P> h2 = h1.getNext();
+		PHalfEdge<P> h1 = he.getNext();
+		PHalfEdge<P> h2 = h1.getNext();
 
-		HalfEdge<P> o1 = he.getTwin().getNext();
-		HalfEdge<P> o2 = o1.getNext();
+		PHalfEdge<P> o1 = he.getTwin().getNext();
+		PHalfEdge<P> o2 = o1.getNext();
 
 		Face<P> face0 = he.getFace();
 		Face<P> face3 = he.getTwin().getFace();
 
 		// 2. do the splitEdge
-		List<HalfEdge<P>> newEdges = splitEdge(p, he);
+		List<PHalfEdge<P>> newEdges = splitEdge(p, he);
 
 		// 3. update DB
 		if(!halfEdge.isBoundary()) {
 			DAG<DAGElement<P>> f0Dag = map.get(face0);
 			map.remove(face0);
 
-			HalfEdge<P> t0 = he.getPrevious();
+			PHalfEdge<P> t0 = he.getPrevious();
 			Face<P> face1 = t0.getTwin().getFace();
 
 			DAG<DAGElement<P>> nf0Dag = new DAG<>(new DAGElement(face0, tripleOf(face0.getEdges())));
@@ -569,7 +581,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 			DAG<DAGElement<P>> f3Dag = map.get(face3);
 			map.remove(face3);
 
-			HalfEdge<P> e2 = he.getTwin().getNext();
+			PHalfEdge<P> e2 = he.getTwin().getNext();
 			Face<P> face2 = e2.getTwin().getFace();
 
 			DAG<DAGElement<P>> nf2Dag = new DAG<>(new DAGElement(face2, tripleOf(face2.getEdges())));
@@ -592,7 +604,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		return newEdges;
 	}
 
-	private static  <D extends IPoint> double pointOnEdge(final HalfEdge<D> edge, D point) {
+	private static  <D extends IPoint> double pointOnEdge(final PHalfEdge<D> edge, D point) {
 		double sign = Math.abs(GeometryUtils.sign(point, edge.getEnd(), edge.getPrevious().getEnd()));
 		return sign;
 	}
@@ -605,33 +617,33 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 *
 	 * returns a half-edge which has p as its end vertex
 	 */
-	public HalfEdge<P> splitTriangleDB(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag) {
+	public PHalfEdge<P> splitTriangleDB(@NotNull P p, @NotNull DAG<DAGElement<P>> xyzDag) {
 		Face<P> xyzFace = xyzDag.getElement().getFace();
 
-		List<HalfEdge<P>> edges = xyzFace.getEdges();
+		List<PHalfEdge<P>> edges = xyzFace.getEdges();
 
 		Face xyp = new Face();
 		Face yzp = new Face();
 		Face zxp = new Face();
 
-		HalfEdge<P> zx = edges.get(0);
-		HalfEdge<P> xy = edges.get(1);
-		HalfEdge<P> yz = edges.get(2);
+		PHalfEdge<P> zx = edges.get(0);
+		PHalfEdge<P> xy = edges.get(1);
+		PHalfEdge<P> yz = edges.get(2);
 
 		P x = zx.getEnd();
 		P y = xy.getEnd();
 		P z = yz.getEnd();
 
-		HalfEdge<P> yp = new HalfEdge<>(p, xyp);
-		HalfEdge<P> py = new HalfEdge<>(y, yzp);
+		PHalfEdge<P> yp = new PHalfEdge<>(p, xyp);
+		PHalfEdge<P> py = new PHalfEdge<>(y, yzp);
 		yp.setTwin(py);
 
-		HalfEdge<P> xp = new HalfEdge<>(p, zxp);
-		HalfEdge<P> px = new HalfEdge<>(x, xyp);
+		PHalfEdge<P> xp = new PHalfEdge<>(p, zxp);
+		PHalfEdge<P> px = new PHalfEdge<>(x, xyp);
 		xp.setTwin(px);
 
-		HalfEdge<P> zp = new HalfEdge<>(p, yzp);
-		HalfEdge<P> pz = new HalfEdge<>(z, zxp);
+		PHalfEdge<P> zp = new PHalfEdge<>(p, yzp);
+		PHalfEdge<P> pz = new PHalfEdge<>(z, zxp);
 		zp.setTwin(pz);
 
 		zx.setNext(xp);
@@ -689,7 +701,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 * @param edge  the edge that might be illegal
 	 * @return true if the edge with respect to p is illegal, otherwise false
 	 */
-	private boolean isIllegalEdge(P p, HalfEdge<P> edge){
+	private boolean isIllegalEdge(P p, PHalfEdge<P> edge){
 		if(edge.hasTwin() && !edge.getTwin().getFace().isBorder()) {
 			P x = edge.getTwin().getEnd();
 			P y = edge.getTwin().getNext().getEnd();
@@ -700,7 +712,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 		return false;
 	}
 
-	public static <P extends IPoint> boolean isIllegalEdge(final HalfEdge<P> edge){
+	public static <P extends IPoint> boolean isIllegalEdge(final E edge){
 		P p = edge.getNext().getEnd();
 
 		if(!edge.isBoundary() && !edge.getTwin().isBoundary()) {
@@ -720,19 +732,19 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 * @param halfEdge the half-edge that might be flipped
 	 * @return true if and only if the flip is valid
 	 */
-	public boolean isFlipOk(final HalfEdge<P> halfEdge) {
+	public boolean isFlipOk(final PHalfEdge<P> halfEdge) {
 		if(halfEdge.getFace().isBorder()) {
 			return false;
 		}
 		else {
-			HalfEdge<P> xy = halfEdge;
-			HalfEdge<P> yx = halfEdge.getTwin();
+			PHalfEdge<P> xy = halfEdge;
+			PHalfEdge<P> yx = halfEdge.getTwin();
 
 			if(xy.getNext().getEnd().equals(yx.getNext().getEnd())) {
 				return false;
 			}
 
-			for(HalfEdge<P> neigbhour : xy.getNext()) {
+			for(PHalfEdge<P> neigbhour : xy.getNext()) {
 				if(neigbhour.getEnd().equals(yx.getNext().getEnd())) {
 					return false;
 				}
@@ -749,16 +761,16 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 *
 	 * @param edge the edge which will be flipped.
 	 */
-	public void flip(final HalfEdge<P> edge) {
+	public void flip(final PHalfEdge<P> edge) {
  		//if(isFlipOk(edge)) {
 		    // 1. gather all the references required
-		    HalfEdge<P> a0 = edge;
-		    HalfEdge<P> a1 = a0.getNext();
-		    HalfEdge<P> a2 = a1.getNext();
+		    PHalfEdge<P> a0 = edge;
+		    PHalfEdge<P> a1 = a0.getNext();
+		    PHalfEdge<P> a2 = a1.getNext();
 
-		    HalfEdge<P> b0 = edge.getTwin();
-		    HalfEdge<P> b1 = b0.getNext();
-		    HalfEdge<P> b2 = b1.getNext();
+		    PHalfEdge<P> b0 = edge.getTwin();
+		    PHalfEdge<P> b1 = b0.getNext();
+		    PHalfEdge<P> b2 = b1.getNext();
 
 		    Face<P> fa = a0.getFace();
 		    Face<P> fb = b0.getFace();
@@ -800,7 +812,7 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	 * @param p     p is the point on the other side of zx
 	 * @param edge  an edge zx of a triangle xyz
 	 */
-	private void legalize(final P p, final HalfEdge<P> edge) {
+	private void legalize(final P p, final PHalfEdge<P> edge) {
 		if(illegalPredicate.test(edge)) {
 			Face<P> f1 = edge.getFace();
 			Face<P> f2 = edge.getTwin().getFace();
@@ -841,11 +853,11 @@ public class IncrementalTriangulation<P extends IPoint> implements ITriangulatio
 	}
 
 	@Override
-	public Iterator<Face<P>> iterator() {
+	public Iterator<F> iterator() {
 		return new FaceIterator(face);
 	}
 
-	public Stream<Face<P>> stream() {
+	public Stream<F> stream() {
 		return StreamSupport.stream(this.spliterator(), false);
 	}
 
