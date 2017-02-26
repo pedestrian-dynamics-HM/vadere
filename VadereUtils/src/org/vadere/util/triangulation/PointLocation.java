@@ -1,7 +1,7 @@
 package org.vadere.util.triangulation;
 
-import org.vadere.util.geometry.data.Face;
-import org.vadere.util.geometry.data.HalfEdge;
+import org.vadere.util.geometry.mesh.Face;
+import org.vadere.util.geometry.mesh.PHalfEdge;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -20,7 +20,7 @@ public class PointLocation<P extends VPoint> {
 
 	private final Collection<Face<P>> faces;
 	private final List<P> orderedPointList;
-	private final List<List<HalfEdge<P>>> halfeEdgesSegments;
+	private final List<List<PHalfEdge<P>>> halfeEdgesSegments;
 	private final List<List<P>> intersectionPointsInSegment;
 	private final BiFunction<Double, Double, P> pointConstructor;
 
@@ -38,7 +38,7 @@ public class PointLocation<P extends VPoint> {
 		else return 0;
 	};
 
-	private class BetweenTwoPoints implements Predicate<HalfEdge<P>> {
+	private class BetweenTwoPoints implements Predicate<PHalfEdge<P>> {
 
 		private P p1;
 		private P p2;
@@ -49,13 +49,13 @@ public class PointLocation<P extends VPoint> {
 		}
 
 		@Override
-		public boolean test(final HalfEdge<P> halfEdge) {
+		public boolean test(final PHalfEdge<P> halfEdge) {
 			return (halfEdge.getEnd().getX() > p1.getX() && halfEdge.getPrevious().getEnd().getX() < p2.getX()) ||
 					(halfEdge.getEnd().getX() > p2.getX() && halfEdge.getPrevious().getEnd().getX() < p1.getX());
 		}
 	}
 
-	private class HalfEdgeComparator implements Comparator<HalfEdge<P>> {
+	private class HalfEdgeComparator implements Comparator<PHalfEdge<P>> {
 
 		private double x1;
 		private double x2;
@@ -66,7 +66,7 @@ public class PointLocation<P extends VPoint> {
 		}
 
 		@Override
-		public int compare(final HalfEdge<P> edge1, final HalfEdge<P> edge2) {
+		public int compare(final PHalfEdge<P> edge1, final PHalfEdge<P> edge2) {
 			VLine line1 = edge1.toLine();
 			VLine line2 = edge2.toLine();
 			double slope1 = line1.slope();
@@ -97,7 +97,7 @@ public class PointLocation<P extends VPoint> {
 		for(int i = 0; i < orderedPointList.size() - 1; i++) {
 			P p1 = orderedPointList.get(i);
 			P p2 = orderedPointList.get(i+1);
-			List<HalfEdge<P>> halfEdges = faces.stream().flatMap(face -> face.stream()).filter(new BetweenTwoPoints(p1, p2))
+			List<PHalfEdge<P>> halfEdges = faces.stream().flatMap(face -> face.stream()).filter(new BetweenTwoPoints(p1, p2))
 					.sorted(new HalfEdgeComparator(p1.getX(), p2.getX())).collect(Collectors.toList());
 			List<P> intersectionPoints = halfEdges.stream()
 					.map(hf -> hf.toLine())
@@ -124,7 +124,7 @@ public class PointLocation<P extends VPoint> {
 			return Optional.empty();
 		}
 
-		HalfEdge<P> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
+		PHalfEdge<P> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
 
 		if(edge.getFace().contains(point)) {
 			return Optional.of(edge.getFace());
