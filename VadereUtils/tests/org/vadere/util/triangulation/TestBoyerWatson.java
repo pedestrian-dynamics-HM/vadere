@@ -3,9 +3,9 @@ package org.vadere.util.triangulation;
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.data.DAG;
-import org.vadere.util.geometry.data.DAGElement;
-import org.vadere.util.geometry.data.Face;
+import org.vadere.util.geometry.mesh.DAG;
+import org.vadere.util.geometry.mesh.DAGElement;
+import org.vadere.util.geometry.mesh.Face;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 

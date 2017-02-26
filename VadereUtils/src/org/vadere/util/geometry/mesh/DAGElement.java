@@ -1,7 +1,6 @@
-package org.vadere.util.geometry.data;
+package org.vadere.util.geometry.mesh;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.vadere.util.geometry.data.Face;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;

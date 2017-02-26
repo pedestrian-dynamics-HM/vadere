@@ -2,8 +2,8 @@ package org.vadere.util.geometry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.data.Face;
-import org.vadere.util.geometry.data.HalfEdge;
+import org.vadere.util.geometry.mesh.Face;
+import org.vadere.util.geometry.mesh.PHalfEdge;
 import org.vadere.util.triangulation.PointLocation;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -25,14 +25,14 @@ public class TestSimplePointLocation {
 	public void setUp() throws Exception {
 		face1 = new Face();
 		face2 = new Face();
-		HalfEdge halfEdge1 = new HalfEdge(new VPoint(0,0), face1);
-		HalfEdge halfEdge2 = new HalfEdge(new VPoint(3,0), face1);
-		HalfEdge halfEdge3 = new HalfEdge(new VPoint(1.5,3.0), face1);
+		PHalfEdge halfEdge1 = new PHalfEdge(new VPoint(0,0), face1);
+		PHalfEdge halfEdge2 = new PHalfEdge(new VPoint(3,0), face1);
+		PHalfEdge halfEdge3 = new PHalfEdge(new VPoint(1.5,3.0), face1);
 
-		HalfEdge halfEdge4 = new HalfEdge(new VPoint(3.0,0), face2);
+		PHalfEdge halfEdge4 = new PHalfEdge(new VPoint(3.0,0), face2);
 		halfEdge4.setTwin(halfEdge3);
-		HalfEdge halfEdge5 = new HalfEdge(new VPoint(4.5,3.0), face2);
-		HalfEdge halfEdge6 = new HalfEdge(new VPoint(1.5,3.0), face2);
+		PHalfEdge halfEdge5 = new PHalfEdge(new VPoint(4.5,3.0), face2);
+		PHalfEdge halfEdge6 = new PHalfEdge(new VPoint(1.5,3.0), face2);
 
 		halfEdge4.setNext(halfEdge5);
 		halfEdge5.setNext(halfEdge6);
