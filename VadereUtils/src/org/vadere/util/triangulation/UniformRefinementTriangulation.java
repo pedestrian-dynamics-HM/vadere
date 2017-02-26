@@ -2,9 +2,8 @@ package org.vadere.util.triangulation;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.FixPointGenerator;
-import org.vadere.util.geometry.data.Face;
-import org.vadere.util.geometry.data.HalfEdge;
+import org.vadere.util.geometry.mesh.Face;
+import org.vadere.util.geometry.mesh.PHalfEdge;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -19,8 +18,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
@@ -31,7 +28,7 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 	private final Collection<VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
-	private final Set<HalfEdge<P>> refinedEdges;
+	private final Set<PHalfEdge<P>> refinedEdges;
 	private int splitCount;
 	private IncrementalTriangulation<P> triangulation;
 	private IPointConstructor<P> pointConstructor;
@@ -57,7 +54,7 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 		this.splitCount = 0;
 	}
 
-	public boolean isCompleted(final HalfEdge<P> edge) {
+	public boolean isCompleted(final PHalfEdge<P> edge) {
 		VTriangle triangle = edge.isBoundary() ? edge.getTwin().getFace().toTriangle() : edge.getFace().toTriangle();
 		//System.out.println(bbox.distance(triangle.midPoint()));
 		return !bbox.intersect(triangle) || boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D())) || edge.getEnd().distance(edge.getPrevious().getEnd()) <= lenFunc.apply(midPoint(edge));
@@ -66,19 +63,19 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 	public void compute() {
 		logger.info("start computation");
 		int count = 0;
-		LinkedList<HalfEdge<P>> toRefineEdges = new LinkedList<>();
-		List<HalfEdge<P>> edges = triangulation.superTriangle.getEdges();
+		LinkedList<PHalfEdge<P>> toRefineEdges = new LinkedList<>();
+		List<PHalfEdge<P>> edges = triangulation.superTriangle.getEdges();
 
-		for(HalfEdge<P> edge : edges) {
+		for(PHalfEdge<P> edge : edges) {
 			if(!isCompleted(edge) && !points.contains(edge.getEnd())) {
 				toRefineEdges.add(edge);
 			}
 		}
 
 		while (!toRefineEdges.isEmpty()) {
-			HalfEdge<P> edge = toRefineEdges.removeFirst();
+			PHalfEdge<P> edge = toRefineEdges.removeFirst();
 			count++;
-			for(HalfEdge<P> refinedHalfEdges : refine(edge)) {
+			for(PHalfEdge<P> refinedHalfEdges : refine(edge)) {
 				if(!isCompleted(refinedHalfEdges)) {
 					toRefineEdges.addLast(refinedHalfEdges);
 				}
@@ -92,69 +89,71 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 			if(face != null) {
 				// 2. build a border-face: delete edges as long as they are inside the boundary
 				//face.toBorder();
-				boolean changed = true;
-				HalfEdge<P> startEdge = face.getEdge();
-				HalfEdge<P> edge = null;
+				PHalfEdge<P> beginEdge = face.getEdge();
+				PHalfEdge<P> currentEdge = null;
 
-				while (!startEdge.equals(edge)) {
-					if (edge == null) {
-						edge = startEdge;
+				while (!beginEdge.equals(currentEdge) && count < 7941) {
+					if (currentEdge == null) {
+						currentEdge = beginEdge;
 					}
 
-					boolean eqNext = edge.getTwin().getFace().equals(edge.getNext().getTwin().getFace());
-					boolean eqPrev = edge.getTwin().getFace().equals(edge.getPrevious().getTwin().getFace());
+					if(currentEdge.getFace().equals(currentEdge.getTwin().getFace())) {
+						System.out.println("special case");
+					}
 
-					if (eqNext || eqPrev) {
-						HalfEdge<P> h0 = eqNext ? edge : edge.getPrevious();
-						if (shape.intersects(h0.toLine()) || shape.intersects(h0.getNext().toLine())) {
-							// change the face
-							HalfEdge<P> middleEdge = h0.getTwin().getNext();
-							middleEdge.setFace(face);
+					PHalfEdge<P> candidate = currentEdge;
+					LinkedList<PHalfEdge<P>> toRemove = new LinkedList<>();
+					toRemove.addLast(candidate);
+					while (candidate.hasSameTwinFace(candidate.getNext())) {
+						toRemove.addLast(candidate.getNext());
+						candidate = candidate.getNext();
+					}
 
-							// build connectivity
-							h0.getPrevious().setNext(middleEdge);
-							h0.getNext().getNext().setPrevious(middleEdge);
+					candidate = currentEdge;
+					while(candidate.hasSameTwinFace(candidate.getPrevious())) {
+						toRemove.addFirst(candidate.getPrevious());
+						candidate = candidate.getPrevious();
+					}
 
-							// change the edge of the face since we might destroy it
-							face.setEdge(h0.getNext().getNext());
-							edge = h0.getNext().getNext();
-							startEdge = middleEdge;
+					System.out.println("toRemove:" + toRemove.size());
 
-							// destroy
-							h0.getNext().getTwin().destroy();
-							h0.getNext().destroy();
-							h0.getFace().destroy();
+					PHalfEdge<P> next = toRemove.peekLast().getNext();
+					PHalfEdge<P> previous = toRemove.peekFirst().getPrevious();
 
-							h0.getTwin().destroy();
-							h0.destroy();
+					LinkedList<PHalfEdge<P>> toUpdate = new LinkedList<>();
+					PHalfEdge<P> start = toRemove.peekFirst().getTwin().getNext();
+					PHalfEdge<P> end = toRemove.peekLast().getTwin();
 
-						} else {
-							edge = edge.getNext();
+					while (!start.equals(end)) {
+						toUpdate.addLast(start);
+						start = start.getNext();
+					}
+
+					System.out.println("toUpdate:" + toUpdate.size());
+
+					if((toUpdate.size() + toRemove.size()) != 3) {
+						System.out.println("wtf");
+					}
+
+					if(!toUpdate.isEmpty()) {
+						toUpdate.peekFirst().getFace().destroy();
+						for(PHalfEdge<P> halfEdge : toUpdate) {
+							halfEdge.setFace(face);
 						}
-					} else if (shape.intersects(edge.toLine())) {
-						HalfEdge<P> twin = edge.getTwin();
-						HalfEdge<P> destroyEdge = edge;
-
-						// change the face
-						twin.getNext().setFace(face);
-						twin.getPrevious().setFace(face);
-
-						// build connectivity
-						edge.getPrevious().setNext(twin.getNext());
-						edge.getNext().setPrevious(twin.getPrevious());
-						startEdge = twin.getPrevious();
-
-						// change the edge of the face since we might destroy it
-						face.setEdge(edge.getNext());
-						edge = edge.getNext();
-
-						// destroy
-						twin.getFace().destroy();
-						destroyEdge.destroy();
-						twin.destroy();
-					} else {
-						edge = edge.getNext();
 					}
+
+					currentEdge = toRemove.peekLast().getNext();
+					face.setEdge(currentEdge);
+					for(PHalfEdge<P> halfEdge : toRemove) {
+						halfEdge.getTwin().destroy();
+						halfEdge.destroy();
+					}
+
+					next.setPrevious(toUpdate.peekLast());
+					previous.setNext(toUpdate.peekFirst());
+
+					count++;
+					System.out.println(count);
 				}
 			}
 		}
@@ -165,7 +164,7 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 		return triangulation.getEdges();
 	}
 
-	public Collection<HalfEdge<P>> refine(final HalfEdge<P> edge) {
+	public Collection<PHalfEdge<P>> refine(final PHalfEdge<P> edge) {
 		VPoint midPoint = midPoint(edge);
 		P p = pointConstructor.create(midPoint.getX(), midPoint.getY());
 
@@ -179,7 +178,7 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 		}
 	}
 
-	private boolean flipEdgeCrossBoundary(final HalfEdge<P> edge) {
+	private boolean flipEdgeCrossBoundary(final PHalfEdge<P> edge) {
 		P p1 = edge.getNext().getEnd();
 		P p2 = edge.getTwin().getNext().getEnd();
 
@@ -192,7 +191,7 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 		return false;
 	}
 
-	private VPoint midPoint(final HalfEdge<P> edge) {
+	private VPoint midPoint(final PHalfEdge<P> edge) {
 		VPoint p1 = new VPoint(edge.getEnd());
 		VPoint p2 = new VPoint(edge.getPrevious().getEnd());
 		return p2.add(p1).scalarMultiply(0.5);
