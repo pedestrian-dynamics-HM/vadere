@@ -1,25 +1,18 @@
 package org.vadere.util.potential.calculators;
 
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.Face;
-import org.vadere.util.geometry.mesh.PHalfEdge;
-import org.vadere.util.triangulation.ITriangulation;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.InterpolationUtil;
-import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
-
 
 public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
+	@Override
+	public void initialize() {
 
-	private ITimeCostFunction timeCostFunction;
+	}
+
+	@Override
+	public double getValue(double x, double y) {
+		return 0;
+	}
+
+	/*private ITimeCostFunction timeCostFunction;
 	private ITriangulation<? extends PotentialPoint> triangulation;
 	private boolean calculationFinished;
 	private PriorityQueue<FFMHalfEdge> narrowBand;
@@ -80,7 +73,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	 * Calculate the fast marching solution. This is called only once,
 	 * subsequent calls only return the result of the first.
 	 */
-	private void calculate() {
+	/*private void calculate() {
 		if (!calculationFinished) {
 			while (this.narrowBand.size() > 0) {
 				//System.out.println(narrowBand.size());
@@ -105,7 +98,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	 * @param halfEdge
 	 * @return a set of points in the narrow band that are close to p.
 	 */
-	private void setNeighborDistances(final PHalfEdge<? extends PotentialPoint> halfEdge) {
+	/*private void setNeighborDistances(final PHalfEdge<? extends PotentialPoint> halfEdge) {
 		// remove frozen points
 		Iterator<? extends PHalfEdge<? extends PotentialPoint>> it = halfEdge.incidentVertexIterator();
 
@@ -139,7 +132,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	 * @param point
 	 * @return the same point, with a (possibly) changed data value.
 	 */
-	private double recalculatePoint(final PHalfEdge<? extends PotentialPoint> point) {
+	/*private double recalculatePoint(final PHalfEdge<? extends PotentialPoint> point) {
 		// loop over all, check whether the point is contained and update its
 		// value accordingly
 		double potential = Double.MAX_VALUE;
@@ -160,7 +153,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	 * @param halfEdge
 	 * @param face
 	 */
-	private double updatePoint(final PHalfEdge<? extends PotentialPoint> halfEdge, final Face<? extends PotentialPoint> face) {
+	/*private double updatePoint(final PHalfEdge<? extends PotentialPoint> halfEdge, final Face<? extends PotentialPoint> face) {
 		// check whether the triangle does contain useful data
 		List<? extends PotentialPoint> points = face.getPoints();
 		points.removeIf(p -> p.equals(halfEdge.getEnd()));
@@ -226,7 +219,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	 * @return the maximum of both solutions, if any. If det=b^2-4ac < 0, it
 	 *         returns Double.MIN_VALUE
 	 */
-	private double solveQuadratic(double a, double b, double c) {
+	/*private double solveQuadratic(double a, double b, double c) {
 		double det = b * b - 4 * a * c;
 		if (det < 0) {
 			return Double.MIN_VALUE;
@@ -239,7 +232,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 	/**
 	 * We require a half-edge that has an equals which only depends on the end-vertex.
 	 */
-	private class FFMHalfEdge {
+	/*private class FFMHalfEdge {
 		private PHalfEdge<? extends PotentialPoint> halfEdge;
 
 		public FFMHalfEdge(final PHalfEdge<? extends PotentialPoint> halfEdge){
@@ -265,5 +258,5 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 		public String toString() {
 			return halfEdge.toString();
 		}
-	}
+	}*/
 }

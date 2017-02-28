@@ -1,6 +1,10 @@
-package org.vadere.util.triangulation;
+package org.vadere.util.geometry.mesh.triangulations;
 
+import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IHalfEdge;
+import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class UniformTriangulation<P extends IPoint> extends IncrementalTriangulation<P> {
+public class UniformTriangulation<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, E, F> {
 
 	private double left;
 	private double top;
@@ -18,13 +22,14 @@ public class UniformTriangulation<P extends IPoint> extends IncrementalTriangula
 	private double minTriangleSideLength;
 	private IPointConstructor<P> pointConstructor;
 
-	public UniformTriangulation(final double minX,
-	                            final double minY,
-	                            final double width,
-	                            final double height,
-	                            final double minTriangleSideLength,
-	                            final IPointConstructor<P> pointConstructor) {
-		super(minX, minY, width, height, pointConstructor);
+	public UniformTriangulation(final IMesh<P, E, F> mesh,
+								final double minX,
+								final double minY,
+								final double width,
+								final double height,
+								final double minTriangleSideLength,
+								final IPointConstructor<P> pointConstructor) {
+		super(mesh, minX, minY, width, height, pointConstructor);
 		this.left = minX;
 		this.top = minY;
 		this.width = width;
