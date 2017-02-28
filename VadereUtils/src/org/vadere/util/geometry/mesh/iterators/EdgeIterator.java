@@ -1,11 +1,19 @@
-package org.vadere.util.geometry.mesh;
+package org.vadere.util.geometry.mesh.iterators;
 
+import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IHalfEdge;
+import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 import java.util.Iterator;
 
 
 /**
+ * This Iterator iterates over all half-edges of a specific face.
+ *
  * @author Benedikt Zoennchen
+ * @param <P> the type of the vertex
+ * @param <E> the type of the half-edge
+ * @param <F> the type of the face
  */
 public class EdgeIterator<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<E> {
 	private E currentHalfEdge;

@@ -1,11 +1,12 @@
 package org.vadere.util.triangulation;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.mesh.DAG;
-import org.vadere.util.geometry.mesh.DAGElement;
-import org.vadere.util.geometry.mesh.Face;
+import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PMesh;
+import org.vadere.util.geometry.mesh.triangulations.IncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
@@ -20,18 +21,22 @@ import static org.junit.Assert.assertTrue;
 
 public class TestBoyerWatson {
 
+	private IMesh<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
+
 	@Before
-	public void setUp() throws Exception {}
+	public void setUp() throws Exception {
+		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
+	}
 
 	@Test
 	public void testFaceIterator() {
-		VPoint p1 = new VPoint(0,0);
-		VPoint p2 = new VPoint(50, 0);
-		VPoint p3 = new VPoint(50, 50);
-		VPoint p4 = new VPoint(0, 50);
+		VPoint p1 = mesh.createVertex(0, 0);
+		VPoint p2 = mesh.createVertex(50, 0);
+		VPoint p3 = mesh.createVertex(50, 50);
+		VPoint p4 = mesh.createVertex(0, 50);
 
-		VPoint p6 = new VPoint(50, 50);
-		VPoint p5 = new VPoint(25, 25);
+		VPoint p6 = mesh.createVertex(50, 50);
+		VPoint p5 = mesh.createVertex(25, 25);
 
 		Set<VPoint> points = new HashSet<>();
 		points.add(p1);
@@ -41,11 +46,11 @@ public class TestBoyerWatson {
 		points.add(p6);
 		points.add(p5);
 
-		IncrementalTriangulation<VPoint> boyerWatsonImproved = new IncrementalTriangulation<>(points, (x, y) -> new VPoint(x, y));
-		boyerWatsonImproved.compute();
-		boyerWatsonImproved.finalize();
+		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points, (x, y) -> new VPoint(x, y));
+		delaunayTriangulation.compute();
+		//delaunayTriangulation.finalize();
 
-		Set<VTriangle> triangulation = new HashSet<>(boyerWatsonImproved.getTriangles());
+		Set<VTriangle> triangulation = new HashSet<>(delaunayTriangulation.getTriangles());
 
 		Set<VPoint> triangle1 = new HashSet<>();
 		triangle1.add(p1);
@@ -81,25 +86,26 @@ public class TestBoyerWatson {
 	}
 
 	@Test
-	public void testSplit() {
-		VPoint p1 = new VPoint(0,0);
-		VPoint p2 = new VPoint(50, 0);
-		VPoint p3 = new VPoint(25, 25);
-		VPoint centerPoint = new VPoint(25, 10);
+	public void testSplitTriangle() {
+
+		VPoint p1 = mesh.createVertex(0, 0);
+		VPoint p2 = mesh.createVertex(50, 0);
+		VPoint p3 = mesh.createVertex(25, 25);
+		VPoint centerPoint = mesh.createVertex(25, 10);
 
 		Set<VPoint> points = new HashSet<>();
 		points.add(p1);
 		points.add(p2);
 		points.add(p3);
 
-		Face<VPoint> face = Face.of(p1,p2,p3);
-		DAG<DAGElement<VPoint>> dag = new DAG<>(new DAGElement<>(face, Triple.of(p1,p2,p3)));
+		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points, (x, y) -> new VPoint(x, y));
+		delaunayTriangulation.compute();
+		PFace<VPoint> face = delaunayTriangulation.locate(centerPoint).get();
 
-		IncrementalTriangulation<VPoint> triangulation = new IncrementalTriangulation<>(points, (x, y) -> new VPoint(x, y));
-		triangulation.splitTriangleDB(centerPoint, dag);
-		triangulation.finalize();
+		delaunayTriangulation.splitTriangle(face, centerPoint);
+		delaunayTriangulation.finalize();
 
-		Set<VTriangle> triangles = new HashSet<>(triangulation.getTriangles());
+		Set<VTriangle> triangles = new HashSet<>(delaunayTriangulation.getTriangles());
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
 		assertTrue(testTriangulationEquality(triangles, expectedResult));
 	}
@@ -114,13 +120,14 @@ public class TestBoyerWatson {
 		int numberOfPoints = 1000;
 
 		for(int i=0; i< numberOfPoints; i++) {
-			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
+			VPoint point = mesh.createVertex(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
 
 		long ms = System.currentTimeMillis();
-		IncrementalTriangulation<VPoint> bw = new IncrementalTriangulation<>(points, (x, y) -> new VPoint(x, y));
-		bw.compute();
+		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points, (x, y) -> new VPoint(x, y));
+
+		delaunayTriangulation.compute();
 		System.out.println("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms));
 	}
 

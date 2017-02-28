@@ -5,13 +5,16 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFMMAcuteTriangulation;
 import org.vadere.util.potential.calculators.PotentialPoint;
-import org.vadere.util.potential.timecost.UnitTimeCostFunction;
-import org.vadere.util.triangulation.UniformTriangulation;
+import org.vadere.util.geometry.mesh.triangulations.UniformTriangulation;
+import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 
 import java.io.FileNotFoundException;
@@ -26,20 +29,22 @@ public class TestFFMUniformTriangulation {
 
 	private static Logger log = LogManager.getLogger(TestFFMUniformTriangulation.class);
 
-	private UniformTriangulation<PotentialPoint> uniformTriangulation;
+	private UniformTriangulation<PotentialPoint, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> uniformTriangulation;
 	private int width = 10;
 	private int height = 10;
 	private double minTriangleSideLength = 0.1;
 
 	@Before
 	public void setUp() throws Exception {
+		IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
 		uniformTriangulation = new UniformTriangulation<>(
+				new PMesh<>(pointConstructor),
 				0,
 				0,
 				width,
 				height,
 				minTriangleSideLength,
-				(x, y) -> new MeshPoint(x, y, false));
+				pointConstructor);
 		uniformTriangulation.compute();
 		uniformTriangulation.finalize();
 	}
@@ -48,7 +53,9 @@ public class TestFFMUniformTriangulation {
 	public void testFFM() {
 		List<IPoint> targetPoints = new ArrayList<>();
 		targetPoints.add(new VPoint(5,5));
-		EikonalSolver solver = new EikonalSolverFMMAcuteTriangulation(targetPoints, new UnitTimeCostFunction(), uniformTriangulation);
+		//EikonalSolver solver = new EikonalSolverFMMAcuteTriangulation(targetPoints, new UnitTimeCostFunction(), uniformTriangulation);
+
+		EikonalSolver solver = new EikonalSolverFMMAcuteTriangulation();
 		log.info("start FFM");
 		solver.initialize();
 		log.info("FFM finished");
