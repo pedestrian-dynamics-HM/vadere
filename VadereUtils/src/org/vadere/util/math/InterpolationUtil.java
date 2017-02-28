@@ -16,14 +16,13 @@ import java.util.List;
  */
 public class InterpolationUtil {
 
-	public static double barycentricInterpolation(final Face<? extends PotentialPoint> triangle, final double x, final double y){
-		List<? extends PotentialPoint> points = triangle.getPoints();
+	public static double barycentricInterpolation(final List<? extends PotentialPoint> points, final double x, final double y){
 		assert points.size() == 3;
 
 		PotentialPoint p1 = points.get(0);
 		PotentialPoint p2 = points.get(1);
 		PotentialPoint p3 = points.get(2);
-		VTriangle vtriangle = triangle.toTriangle();
+		VTriangle vtriangle = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
 
 		double totalArea = vtriangle.getArea();
 
