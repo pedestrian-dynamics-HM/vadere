@@ -1,9 +1,12 @@
 package org.vadere.util.triangulation;
 
-import org.vadere.util.geometry.mesh.Face;
-import org.vadere.util.geometry.mesh.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,11 +21,11 @@ import java.util.stream.Collectors;
 
 public class PointLocation<P extends VPoint> {
 
-	private final Collection<Face<P>> faces;
+	private final Collection<PFace<P>> faces;
 	private final List<P> orderedPointList;
 	private final List<List<PHalfEdge<P>>> halfeEdgesSegments;
 	private final List<List<P>> intersectionPointsInSegment;
-	private final BiFunction<Double, Double, P> pointConstructor;
+	private final IMesh<P, PHalfEdge<P>, PFace<P>> mesh;
 
 	private Comparator<P> pointComparatorX = (p1, p2) -> {
 		double dx = p1.getX() - p2.getX();
@@ -50,8 +53,9 @@ public class PointLocation<P extends VPoint> {
 
 		@Override
 		public boolean test(final PHalfEdge<P> halfEdge) {
-			return (halfEdge.getEnd().getX() > p1.getX() && halfEdge.getPrevious().getEnd().getX() < p2.getX()) ||
-					(halfEdge.getEnd().getX() > p2.getX() && halfEdge.getPrevious().getEnd().getX() < p1.getX());
+			P v1 = mesh.getVertex(halfEdge);
+			P v2 = mesh.getVertex(mesh.getPrev(halfEdge));
+			return (v1.getX() > p1.getX() && v2.getX() < p2.getX()) || (v1.getX() > p2.getX() && v2.getX() < p1.getX());
 		}
 	}
 
@@ -81,13 +85,13 @@ public class PointLocation<P extends VPoint> {
 		}
 	}
 
-	public PointLocation(final Collection<Face<P>> faces, final BiFunction<Double, Double, P> pointConstructor) {
+	public PointLocation(final Collection<PFace<P>> faces, final IMesh<P, PHalfEdge<P>, PFace<P>> mesh) {
 		this.faces = faces;
-		this.pointConstructor = pointConstructor;
+		this.mesh = mesh;
 
 		//TODO distinct is maybe slow here
 		Set<P> pointSet = faces.stream()
-				.flatMap(face -> face.stream()).map(edge -> edge.getEnd())
+				.flatMap(face -> mesh.streamEdges(face)).map(edge -> mesh.getVertex(edge))
 				.sorted(pointComparatorX).collect(Collectors.toSet());
 
 		orderedPointList = pointSet.stream().sorted(pointComparatorX).collect(Collectors.toList());
@@ -97,7 +101,7 @@ public class PointLocation<P extends VPoint> {
 		for(int i = 0; i < orderedPointList.size() - 1; i++) {
 			P p1 = orderedPointList.get(i);
 			P p2 = orderedPointList.get(i+1);
-			List<PHalfEdge<P>> halfEdges = faces.stream().flatMap(face -> face.stream()).filter(new BetweenTwoPoints(p1, p2))
+			List<PHalfEdge<P>> halfEdges = faces.stream().flatMap(face -> mesh.streamEdges(face)).filter(new BetweenTwoPoints(p1, p2))
 					.sorted(new HalfEdgeComparator(p1.getX(), p2.getX())).collect(Collectors.toList());
 			List<P> intersectionPoints = halfEdges.stream()
 					.map(hf -> hf.toLine())
@@ -108,10 +112,10 @@ public class PointLocation<P extends VPoint> {
 	}
 
 	private P intersectionWithX(double x, VLine line) {
-		return pointConstructor.apply(x, (line.getY1() + (line.getX1()-x) * line.slope()));
+		return mesh.createVertex(x, (line.getY1() + (line.getX1()-x) * line.slope()));
 	}
 
-	public Optional<Face<P>> getFace(final P point) {
+	public Optional<PFace<P>> getFace(final P point) {
 		int index = Collections.binarySearch(orderedPointList, point, pointComparatorX);
 		int xSegmentIndex = (index >= 0) ? index : -index - 2;
 		if(xSegmentIndex < 0 || xSegmentIndex >= intersectionPointsInSegment.size()) {
@@ -126,11 +130,13 @@ public class PointLocation<P extends VPoint> {
 
 		PHalfEdge<P> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
 
-		if(edge.getFace().contains(point)) {
-			return Optional.of(edge.getFace());
+		PFace<P> face = mesh.getFace(edge);
+		VPolygon polygon = mesh.toPolygon(face);
+		if(polygon.contains(point)) {
+			return Optional.of(face);
 		}
 		else {
-			return Optional.of(edge.getTwin().getFace());
+			return Optional.of(mesh.getTwinFace(edge));
 		}
 	}
 }
