@@ -1,8 +1,9 @@
 package org.vadere.util.geometry.mesh;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IHalfEdge;
+import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.ArrayList;
@@ -17,11 +18,9 @@ import java.util.List;
  */
 public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> extends IPolyConnectivity<P, E, F> {
 
-	default void splitTriangleEvent(F face, List<F> faces) {}
+	default void splitFaceEvent(F original, F... faces) {}
 
-	default void flipEvent(F f1, F f2) {}
-
-	void splitEdgeEvent(List<E> newEdges);
+	default void flipEdgeEvent(F f1, F f2) {}
 
 	boolean isIllegal(E edge);
 
@@ -31,7 +30,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 	 * @param p         the split point
 	 * @param halfEdge  the half-edge which will be split
 	 */
-	default List<E> splitEdge(@NotNull P p, @NotNull E halfEdge) {
+	default List<E> splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
 		IMesh<P, E, F> mesh = getMesh();
 		List<E> newEdges = new ArrayList<>(4);
 		/*
@@ -103,6 +102,8 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 			mesh.setNext(e0, h2);
 			mesh.setNext(h2, t1);
 			mesh.setNext(t1, e0);
+
+			splitFaceEvent(f0, f0, f1);
 		}
 		else {
 			mesh.setNext(mesh.getPrev(h0), t1);
@@ -140,14 +141,35 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 			mesh.setNext(o0, e2);
 			mesh.setNext(e2, o2);
 			mesh.setNext(o2, o0);
+
+			splitFaceEvent(f3, f3, f2);
 		}
 		else {
 			mesh.setNext(e1, mesh.getNext(o0));
 			mesh.setNext(o0, e1);
 		}
 
-		splitEdgeEvent(newEdges);
+		if(legalize) {
+			if(!mesh.isBoundary(h0)) {
+				E h1 = mesh.getNext(h0);
+				E h2 = mesh.getPrev(t1);
+				legalize(h1);
+				legalize(h2);
+			}
+
+			if(!mesh.isBoundary(o0)) {
+				E o1 = mesh.getNext(e1);
+				E o2 = mesh.getPrev(o0);
+				legalize(o1);
+				legalize(o2);
+			}
+		}
+
 		return newEdges;
+	}
+
+	default List<E> splitEdge(@NotNull P p, @NotNull E halfEdge) {
+		return splitEdge(p, halfEdge, true);
 	}
 
 	/**
@@ -192,6 +214,8 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 
 		mesh.setFace(a1, fb);
 		mesh.setFace(b1, fa);
+
+		flipEdgeEvent(fa, fb);
 	}
 
 	default boolean isTriangle(F face) {
@@ -208,9 +232,9 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 	 *
 	 * returns a half-edge which has p as its end vertex
 	 */
-	default List<F> splitTriangle(@NotNull F face, P p) {
+	default List<F> splitTriangle(@NotNull F face, P p, boolean legalize) {
 		assert isTriangle(face);
-		List<F> faceList = new ArrayList<F>(3);
+		List<F> faceList = new ArrayList<>(3);
 		IMesh<P, E, F> mesh = getMesh();
 		List<E> edges = mesh.getEdges(face);
 
@@ -265,7 +289,19 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 		faceList.add(yzp);
 		faceList.add(zxp);
 
+		splitFaceEvent(face, xyp, yzp, zxp);
+
+		if(legalize) {
+			legalize(zx);
+			legalize(xy);
+			legalize(yz);
+		}
+
 		return faceList;
+	}
+
+	default List<F> splitTriangle(@NotNull F face, P p) {
+		return splitTriangle(face, p, true);
 	}
 
 	/**
@@ -283,7 +319,6 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 			F f2 = getMesh().getTwinFace(edge);
 
 			flip(edge);
-			flipEvent(f1, f2);
 
 			P vertex = getMesh().getVertex(edge);
 
@@ -298,6 +333,12 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 		}
 	}
 
+	/**
+	 * Tests if a flip for this half-edge is valid, i.e. the edge does not already exist.
+	 *
+	 * @param halfEdge the half-edge that might be flipped
+	 * @return true if and only if the flip is valid
+	 */
 	default boolean isFlipOk(final E halfEdge) {
 		if(getMesh().isBoundary(halfEdge)) {
 			return false;
@@ -311,7 +352,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 			}
 
 			P vertex = getMesh().getVertex(getMesh().getNext(yx));
-			for(E neigbhour : getMesh().getNeighbourIt(getMesh().getNext(xy))) {
+			for(E neigbhour : getMesh().getIncidentEdgesIt(getMesh().getNext(xy))) {
 
 				if(getMesh().getVertex(neigbhour).equals(vertex)) {
 					return false;

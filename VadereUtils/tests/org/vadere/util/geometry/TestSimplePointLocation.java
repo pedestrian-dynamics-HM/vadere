@@ -2,8 +2,10 @@ package org.vadere.util.geometry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.mesh.Face;
-import org.vadere.util.geometry.mesh.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PMesh;
+import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.triangulation.PointLocation;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -17,37 +19,41 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestSimplePointLocation {
 
-	private static Face face1;
-	private static Face face2;
+	private static PFace face1;
+	private static PFace face2;
 	private static double EPSILON = 1.0e-10;
+	private IMesh<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
 
 	@Before
 	public void setUp() throws Exception {
-		face1 = new Face();
-		face2 = new Face();
-		PHalfEdge halfEdge1 = new PHalfEdge(new VPoint(0,0), face1);
-		PHalfEdge halfEdge2 = new PHalfEdge(new VPoint(3,0), face1);
-		PHalfEdge halfEdge3 = new PHalfEdge(new VPoint(1.5,3.0), face1);
+		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
+		face1 = mesh.createFace();
+		face2 = mesh.createFace();
+		PHalfEdge halfEdge1 = mesh.createEdge(mesh.createVertex(0,0), face1);
+		PHalfEdge halfEdge2 = mesh.createEdge(mesh.createVertex(3,0), face1);
+		PHalfEdge halfEdge3 = mesh.createEdge(mesh.createVertex(1.5,3.0), face1);
 
-		PHalfEdge halfEdge4 = new PHalfEdge(new VPoint(3.0,0), face2);
-		halfEdge4.setTwin(halfEdge3);
-		PHalfEdge halfEdge5 = new PHalfEdge(new VPoint(4.5,3.0), face2);
-		PHalfEdge halfEdge6 = new PHalfEdge(new VPoint(1.5,3.0), face2);
+		PHalfEdge halfEdge4 = mesh.createEdge(mesh.createVertex(3.0,0), face2);
+		mesh.setTwin(halfEdge4, halfEdge3);
+		PHalfEdge halfEdge5 = mesh.createEdge(mesh.createVertex(4.5,3.0), face2);
+		PHalfEdge halfEdge6 = mesh.createEdge(mesh.createVertex(1.5,3.0), face2);
 
-		halfEdge4.setNext(halfEdge5);
-		halfEdge5.setNext(halfEdge6);
-		halfEdge6.setNext(halfEdge4);
-		face2.setEdge(halfEdge4);
+		mesh.setNext(halfEdge4, halfEdge5);
+		mesh.setNext(halfEdge5, halfEdge6);
+		mesh.setNext(halfEdge6, halfEdge4);
 
-		halfEdge1.setNext(halfEdge2);
-		halfEdge2.setNext(halfEdge3);
-		halfEdge3.setNext(halfEdge1);
-		face1.setEdge(halfEdge1);
+		mesh.setEdge(face2, halfEdge4);
+
+		mesh.setNext(halfEdge1, halfEdge2);
+		mesh.setNext(halfEdge2, halfEdge3);
+		mesh.setNext(halfEdge3, halfEdge1);
+
+		mesh.setEdge(face1, halfEdge1);
 	}
 
 	@Test
 	public void testFaceIterator() {
-		PointLocation<VPoint> pointLocation = new PointLocation<>(Arrays.asList(face1, face2), (x, y) -> new VPoint(x,y));
+		PointLocation<VPoint> pointLocation = new PointLocation<>(Arrays.asList(face1, face2), mesh);
 
 		assertEquals(face1, pointLocation.getFace(new VPoint(0,0)).get());
 
