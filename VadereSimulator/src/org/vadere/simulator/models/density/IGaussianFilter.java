@@ -8,7 +8,6 @@ import java.util.function.BiFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
 /**
