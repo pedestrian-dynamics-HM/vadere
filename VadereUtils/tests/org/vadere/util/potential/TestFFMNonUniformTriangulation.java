@@ -68,7 +68,7 @@ public class TestFFMNonUniformTriangulation {
 	public void testFMM() {
 		List<VRectangle> targetAreas = new ArrayList<>();
 		List<IPoint> targetPoints = new ArrayList<>();
-		targetPoints.add(new VPoint(40, 40));
+		targetPoints.add(new MeshPoint(40, 40, false));
 		VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
 		targetAreas.add(rect);
 
