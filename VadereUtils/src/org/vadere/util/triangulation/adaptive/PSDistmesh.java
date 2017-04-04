@@ -69,8 +69,8 @@ public class  PSDistmesh {
 	}
 
 	private void init(final VRectangle regionBoundingBox,
-	             final Collection<? extends VShape> obstacles,
-	             final double initialEdgeLen) {
+	                  final Collection<? extends VShape> obstacles,
+	                  final double initialEdgeLen) {
 		this.regionBoundingBox = regionBoundingBox;
 		this.initialEdgeLen = initialEdgeLen;
 		this.geps = .001 * initialEdgeLen;
@@ -191,7 +191,7 @@ public class  PSDistmesh {
 				}
 
 				//if(distanceFunc.apply(point.toVPoint().add(movement)) <= 0) {
-					point.add(movement);
+				point.add(movement);
 				//}
 
 				point.setVelocity(new VPoint(0, 0));
