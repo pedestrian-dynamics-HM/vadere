@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh;
+package org.vadere.util.geometry.mesh.triangulations;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.geometry.mesh.inter.IFace;

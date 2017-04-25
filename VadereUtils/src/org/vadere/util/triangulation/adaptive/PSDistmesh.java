@@ -14,7 +14,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.triangulation.ITriangulation;
 
 import java.awt.geom.PathIterator;
 import java.util.*;
@@ -114,32 +113,30 @@ public class  PSDistmesh {
 
 	}
 
-    private void reTriangulate() {
-        if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
-            maxMovementLen = 0;
+	private void reTriangulate() {
+		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
+			maxMovementLen = 0;
+			bowyerWatson = new IncrementalTriangulation<>(new PMesh<>((x, y) -> new MeshPoint(x, y, false)), points);
 
+			System.out.println("triangulation started");
+			bowyerWatson.compute();
+			System.out.println("triangulation finished");
 
-            System.out.println("triangulation started");
-            bowyerWatson = new IncrementalTriangulation<>(new PMesh<>((x,y) -> new MeshPoint(x,y, false)), points, (x, y) -> new MeshPoint(x, y, false));
-            bowyerWatson.finalize();
-            System.out.println("triangulation finished");
+			IMesh<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();
+			Function<PHalfEdge<MeshPoint>, MLine<MeshPoint>> toLine = edge -> new MLine<>(mesh.getVertex(mesh.getPrev(edge)), mesh.getVertex(edge));
 
-            IMesh<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();
-            Function<PHalfEdge<MeshPoint>, MLine<MeshPoint>> toLine = edge -> new MLine<>(mesh.getVertex(mesh.getPrev(edge)), mesh.getVertex(edge));
+			// compute the line and points again, since we filter some triangles
+			lines = bowyerWatson.streamFaces()
+					.filter(face -> distanceFunc.apply(bowyerWatson.getMesh().toTriangle(face).midPoint()) < -geps)
+					.flatMap(face ->mesh.streamEdges(face).map(halfEdge -> toLine.apply(halfEdge)))
+					.collect(Collectors.toSet());
 
-            // compute the line and points again, since we filter some triangles
-            lines = bowyerWatson.streamFaces()
-                    .filter(face -> distanceFunc.apply(bowyerWatson.getMesh().toTriangle(face).midPoint()) < -geps)
-                    .flatMap(face ->mesh.streamEdges(face).map(halfEdge -> toLine.apply(halfEdge)))
-                    .collect(Collectors.toSet());
+			points = lines.stream().flatMap(line -> line.streamPoints()).collect(Collectors.toSet());
 
-            points = lines.stream().flatMap(line -> line.streamPoints()).collect(Collectors.toSet());
-
-            System.out.println("number of edges: " + lines.size());
-            System.out.println("number of points: " + points.size());
-        }
-    }
-
+			System.out.println("number of edges: " + lines.size());
+			System.out.println("number of points: " + points.size());
+		}
+	}
 
 	/*
 	Stellt den Verlauf der Iterationen dar. Innerhalb der while(true) passiert eine Iteration des Algorithmus
@@ -267,6 +264,7 @@ public class  PSDistmesh {
 
 	private Set<MeshPoint> generatePoints() {
 		Set<MeshPoint> gridPoints = generateGridPoints();
+		//Set<MeshPoint> fixPoints = generateFixPoints();
 
 		// point density function 1 / (desiredLen^2)
 		Function<IPoint, Double> pointDensityFunc = vertex -> 1 / (relativeDesiredEdgeLengthFunc.apply(vertex) * relativeDesiredEdgeLengthFunc.apply(vertex));
@@ -364,6 +362,7 @@ public class  PSDistmesh {
 			IPoint iPoint = lineIterator.next();
 			points.add(new MeshPoint(iPoint.getX(), iPoint.getY(), true));
 		}
+
 		return points;
 	}
 
@@ -385,4 +384,5 @@ public class  PSDistmesh {
 	public IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation(){
 		return bowyerWatson;
 	}
+
 }

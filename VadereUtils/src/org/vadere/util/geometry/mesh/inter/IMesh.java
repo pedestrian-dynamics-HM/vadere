@@ -1,7 +1,11 @@
 package org.vadere.util.geometry.mesh.inter;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PMesh;
 import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.mesh.iterators.AdjacentFaceIterator;
 import org.vadere.util.geometry.mesh.iterators.IncidentEdgeIterator;
@@ -10,9 +14,11 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.IPointConstructor;
 
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,8 +54,18 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	}
 	F getFace();
 
+	/**
+	 * Returns true if the face is the boundar
+	 *
+	 * @param face
+	 * @return
+	 */
 	boolean isBoundary(@NotNull F face);
 	boolean isBoundary(@NotNull E halfEdge);
+
+	boolean isHole(@NotNull F face);
+	boolean isHole(@NotNull E halfEdge);
+
 	boolean isDestroyed(@NotNull F face);
 	boolean isDestroyed(@NotNull E edge);
 
@@ -67,6 +83,15 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	F createFace();
 	F createFace(boolean boundary);
 	P createVertex(double x, double y);
+	void insert(P vertex);
+
+	void insertVertex(P vertex);
+
+	default P insertVertex(double x, double y) {
+		P vertex = createVertex(x, y);
+		insertVertex(vertex);
+		return vertex;
+	}
 
 	// TODO: name?
 	default F createFace(P... points) {
@@ -114,6 +139,7 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 
 	void destroyFace(@NotNull F face);
 	void destroyEdge(@NotNull E edge);
+	void destroyVertex(@NotNull P vertex);
 
 	List<F> getFaces();
 
@@ -138,6 +164,12 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 		List<P> vertices = getVertices(face);
 		assert vertices.size() == 3;
 		return new VTriangle(new VPoint(vertices.get(0)), new VPoint(vertices.get(1)), new VPoint(vertices.get(2)));
+	}
+
+	default Triple<P, P, P> toTriple(F face) {
+		List<P> vertices = getVertices(face);
+		assert vertices.size() == 3;
+		return Triple.of(vertices.get(0), vertices.get(1), vertices.get(2));
 	}
 
 	default Optional<F> locate(final double x, final double y) {
@@ -245,7 +277,7 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	 * @return a List of all faces which are adjacent to the vertex of the edge
 	 */
 	default List<F> getAdjacentFaces(@NotNull E edge) {
-		return IteratorUtils.toList(new IncidentEdgeIterator(this, edge));
+		return IteratorUtils.toList(new AdjacentFaceIterator(this, edge));
 	}
 
 	/**
@@ -300,5 +332,29 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 		}
 
 		return vertices;
+	}
+
+	/**
+	 * Tests whether the point (x,y) is a vertex of the face.
+	 *
+	 * @param face
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	default boolean isMember(F face, double x, double y) {
+		return getMemberEdge(face, x, y).isPresent();
+	}
+
+	default Optional<E> getMemberEdge(F face, double x, double y) {
+		return streamEdges(face).filter(e -> getVertex(e).getX() == x && getVertex(e).getY() == y).findAny();
+	}
+
+	Collection<P> getVertices();
+
+	int getNumberOfVertices();
+
+	static <P extends IPoint> IMesh<P, PHalfEdge<P>, PFace<P>> createPMesh(final IPointConstructor<P> pointConstructor) {
+		return new PMesh<>(pointConstructor);
 	}
 }

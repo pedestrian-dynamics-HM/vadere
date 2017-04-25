@@ -52,7 +52,7 @@ public class VCone {
 		VPoint a = new VPoint(line.getX1(), line.getY1());
 		VPoint b = new VPoint(line.getX2(), line.getY2());
 
-		if(contains(a) ||contains(b)) {
+		if(contains(a) || contains(b)) {
 			return false;
 		}
 
