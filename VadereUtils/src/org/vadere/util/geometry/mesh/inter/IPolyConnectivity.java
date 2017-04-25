@@ -1,9 +1,6 @@
-package org.vadere.util.geometry.mesh;
+package org.vadere.util.geometry.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -21,7 +18,7 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 
 	IMesh<P, E, F> getMesh();
 
-	default boolean isBoundary(E halfEdge) {
+	default boolean isAtBoundary(E halfEdge) {
 		IMesh<P, E, F> mesh = getMesh();
 		return mesh.isBoundary(halfEdge) || mesh.isBoundary(mesh.getTwin(halfEdge));
 	}
@@ -40,13 +37,13 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		return locate(point.getX(), point.getY());
 	}
 
-	default boolean isBoundary(F face) {
-		return getMesh().getEdges(face).stream().anyMatch(edge -> isBoundary(edge));
+	default boolean isAtBoundary(F face) {
+		return getMesh().getEdges(face).stream().anyMatch(edge -> isAtBoundary(edge));
 	}
 
 	default void adjustVertex(P vertex){
 		List<E> edges = getMesh().getEdges(vertex);
-		edges.stream().filter(edge -> isBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
+		edges.stream().filter(edge -> isAtBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
 	}
 
 	default Optional<E> findEdge(P begin, P end) {

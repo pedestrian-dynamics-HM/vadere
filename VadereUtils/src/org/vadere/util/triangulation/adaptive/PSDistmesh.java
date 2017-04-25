@@ -116,7 +116,7 @@ public class  PSDistmesh {
 	private void reTriangulate() {
 		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			maxMovementLen = 0;
-			bowyerWatson = new IncrementalTriangulation<>(new PMesh<>((x, y) -> new MeshPoint(x, y, false)), points, (x, y) -> new MeshPoint(x, y, false));
+			bowyerWatson = new IncrementalTriangulation<>(new PMesh<>((x, y) -> new MeshPoint(x, y, false)), points);
 
 			System.out.println("triangulation started");
 			bowyerWatson.compute();

@@ -4,6 +4,8 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * @author Benedikt Zoennchen
- * @param <P> the type of the vertices
  */
-public interface IFace<P extends IPoint> {}
+public interface IHierarchyPoint extends IPoint {
+	void setDown(IHierarchyPoint down);
+	void setUp(IHierarchyPoint up);
+}

@@ -112,7 +112,7 @@ public class PointLocation<P extends VPoint> {
 	}
 
 	private P intersectionWithX(double x, VLine line) {
-		return mesh.createVertex(x, (line.getY1() + (line.getX1()-x) * line.slope()));
+		return mesh.insertVertex(x, (line.getY1() + (line.getX1()-x) * line.slope()));
 	}
 
 	public Optional<PFace<P>> getFace(final P point) {

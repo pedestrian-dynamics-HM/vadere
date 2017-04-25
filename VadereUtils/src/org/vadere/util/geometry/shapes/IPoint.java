@@ -26,6 +26,8 @@ public interface IPoint {
 
 	double distance(IPoint other);
 
+	double distance(double x, double y);
+
 	double distanceToOrigin();
 
 	default double crossProduct(IPoint point) {

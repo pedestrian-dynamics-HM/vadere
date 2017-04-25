@@ -7,7 +7,7 @@ import org.vadere.util.geometry.ConstantLineIterator;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.triangulation.ITriangulation;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCone;
 import org.vadere.util.geometry.shapes.VLine;
