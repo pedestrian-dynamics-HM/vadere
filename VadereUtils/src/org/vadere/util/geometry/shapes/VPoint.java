@@ -67,6 +67,14 @@ public class VPoint implements Cloneable, IPoint {
 		return identifier;
 	}
 
+	public void setId(int identifier) {
+		this.identifier = identifier;
+	}
+
+	public int getId() {
+		return identifier;
+	}
+
 	@Override
 	public VPoint clone() {
 		return new VPoint(x, y);
