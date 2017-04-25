@@ -56,6 +56,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	private boolean finalized;
 	private IMesh<P, E, F> mesh;
 	private IPointLocator<P, E, F> pointLocator;
+	private double epsilon = 0.0001;
 
 	protected F superTriangle;
 	private F borderFace;
@@ -139,49 +140,38 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	@Override
 	public E insert(P point) {
 
-		if(point.getX() == 15.0 && point.getY() == 112.58330249197701) {
-			System.out.println("steop here!");
-		}
-
 		Collection<F> faces = this.pointLocator.locatePoint(point, true);
-		faces = faces.stream().filter(f -> !getMesh().isMember(f, point.getX(), point.getY())).collect(Collectors.toList());
+		int numberOfFaces = faces.size();
 
-		if(faces.size() == 0) {
-			log.warn(point);
+		// problem due numerical calculation.
+		faces = faces.stream().filter(f -> !getMesh().isMember(f, point.getX(), point.getY(), epsilon)).collect(Collectors.toList());
+		E insertedEdge = null;
+
+		if(numberOfFaces == 0) {
+			log.warn("no face found at " + point);
 		}
-//		assert leafs.size() == 2 || leafs.size() == 1 || leafs.size() > 0;
-
-		// point is inside a triangle
-		if(faces.size() == 1) {
+		else if(faces.size() == 1) {
 			log.info("splitTriangle:" + point);
 			F face = faces.iterator().next();
 			splitTriangle(face, point,  true);
-			return mesh.getEdge(point);
+			insertedEdge = mesh.getEdge(point);
+
 		} // point lies on an edge of 2 triangles
 		else if(faces.size() == 2) {
 			Iterator<F> it = faces.iterator();
 			log.info("splitEdge:" + point);
-			E halfEdge = findTwins(it.next(),  it.next()).get();
+			E halfEdge = findTwins(it.next(), it.next()).get();
 			splitEdge(point, halfEdge, true);
-			return mesh.getEdge(point);
+			insertedEdge = mesh.getEdge(point);
 		}
 		else if(faces.size() == 0) {
-			// problem due numerical calculation.
-			log.warn("no triangle was found! Maybe " + point + " lies outside of the triangulation." );
-			return null;
+			log.warn("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
 		}
 		else {
-			log.warn(point + ":ignore insertion point, since this point already exists!");
-			F face = faces.iterator().next();
-			Optional<E> optHe = mesh.streamEdges(face).filter(he -> mesh.getVertex(he).equals(point)).findAny();
-
-			if(optHe.isPresent()) {
-				return optHe.get();
-			}
-			else {
-				return null;
-			}
+			log.error("more than 2 faces found and the point " + point + " is not a vertex jet, there is something wrong with the mesh structure!");
 		}
+
+		return insertedEdge;
 	}
 
 	/**
