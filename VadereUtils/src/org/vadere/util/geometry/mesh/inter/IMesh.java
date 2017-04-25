@@ -346,8 +346,16 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 		return getMemberEdge(face, x, y).isPresent();
 	}
 
+	default boolean isMember(F face, double x, double y, double epsilon) {
+		return getMemberEdge(face, x, y, epsilon).isPresent();
+	}
+
 	default Optional<E> getMemberEdge(F face, double x, double y) {
 		return streamEdges(face).filter(e -> getVertex(e).getX() == x && getVertex(e).getY() == y).findAny();
+	}
+
+	default Optional<E> getMemberEdge(F face, double x, double y, double epsilon) {
+		return streamEdges(face).filter(e -> getVertex(e).distance(x, y) <= epsilon).findAny();
 	}
 
 	Collection<P> getVertices();
