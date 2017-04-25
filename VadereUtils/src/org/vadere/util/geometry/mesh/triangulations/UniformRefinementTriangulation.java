@@ -32,7 +32,6 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
 	private IncrementalTriangulation<P, E, F> triangulation;
-	private IPointConstructor<P> pointConstructor;
 	private Set<P> points;
 	private IMesh<P, E, F> mesh;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulation.class);
@@ -43,13 +42,11 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 			final double minY,
 			final double width,
 			final double height,
-			final IPointConstructor<P> pointConstructor,
 			final Collection<VShape> boundary,
 			final IEdgeLengthFunction lenFunc) {
 		this.mesh = mesh;
-		this.triangulation = new IncrementalTriangulation<>(mesh, minX, minY, width, height, pointConstructor);
+		this.triangulation = new IncrementalTriangulation<>(mesh, minX, minY, width, height);
 		this.boundary = boundary;
-		this.pointConstructor = pointConstructor;
 		this.lenFunc = lenFunc;
 		this.bbox = new VRectangle(minX, minY, width, height);
 		this.points = new HashSet<>();
@@ -113,13 +110,14 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 
 	public Collection<E> refine(final E edge) {
 		VPoint midPoint = midPoint(edge);
-		P p = pointConstructor.create(midPoint.getX(), midPoint.getY());
+		P p = mesh.createVertex(midPoint.getX(), midPoint.getY());
 
 		if(points.contains(p)) {
 			return Collections.emptyList();
 		}
 		else {
 			points.add(p);
+			mesh.insert(p);
 			return triangulation.splitEdge(p, edge);
 		}
 	}

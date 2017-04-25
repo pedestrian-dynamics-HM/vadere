@@ -43,9 +43,9 @@ public class TestFace {
 
 		// first triangle xyz
 		face1 = mesh.createFace();
-		x = mesh.createVertex(0, 0);
-		y = mesh.createVertex(3, 0);
-		z = mesh.createVertex(1.5,3.0);
+		x = mesh.insertVertex(0, 0);
+		y = mesh.insertVertex(3, 0);
+		z = mesh.insertVertex(1.5,3.0);
 
 		zx = mesh.createEdge(x, face1);
 		xy = mesh.createEdge(y, face1);

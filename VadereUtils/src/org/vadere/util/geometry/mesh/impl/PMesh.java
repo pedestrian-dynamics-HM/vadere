@@ -6,7 +6,10 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -18,11 +21,14 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	private PFace<P> boundary;
 	private List<PHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
+	private Set<P> vertices;
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
 		this.edges = new ArrayList<>();
+		this.vertices = new HashSet<>();
 		this.boundary = new PFace<>(true);
+		//this.faces.add(boundary);
 		this.pointConstructor = pointConstructor;
 	}
 
@@ -77,6 +83,16 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
+	public boolean isHole(@NotNull PFace<P> face) {
+		return false;
+	}
+
+	@Override
+	public boolean isHole(@NotNull PHalfEdge<P> halfEdge) {
+		return false;
+	}
+
+	@Override
 	public boolean isDestroyed(@NotNull PFace<P> face) {
 		return face.isDestroyed();
 	}
@@ -127,6 +143,16 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
+	public Collection<P> getVertices() {
+		return vertices;
+	}
+
+	@Override
+	public int getNumberOfVertices() {
+		return vertices.size();
+	}
+
+	@Override
 	public PHalfEdge<P> createEdge(@NotNull P vertex) {
 		PHalfEdge<P> edge = new PHalfEdge<>(vertex);
 		edges.add(edge);
@@ -159,17 +185,36 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 
 	@Override
 	public P createVertex(double x, double y) {
-		return pointConstructor.create(x, y);
+		P vertex = pointConstructor.create(x, y);
+		//vertices.add(vertex);
+		return vertex;
+	}
+
+	@Override
+	public void insert(P vertex) {
+		vertices.add(vertex);
+	}
+
+	@Override
+	public void insertVertex(P vertex) {
+		vertices.add(vertex);
 	}
 
 	@Override
 	public void destroyFace(@NotNull PFace<P> face) {
+		faces.remove(face);
 		face.destroy();
 	}
 
 	@Override
 	public void destroyEdge(@NotNull PHalfEdge<P> edge) {
+		edges.remove(edge);
 		edge.destroy();
+	}
+
+	@Override
+	public void destroyVertex(@NotNull P vertex) {
+		vertices.remove(vertex);
 	}
 
 	@Override
