@@ -2,6 +2,8 @@ package org.vadere.gui.postvisualization.utils;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import org.apache.log4j.lf5.LogLevel;
 import org.jcodec.api.awt.SequenceEncoder;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
@@ -16,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Observable;
 import java.util.prefs.Preferences;
+
+import javax.swing.*;
 
 public class MovRecorder implements IRecorder {
 	private static Logger logger = LogManager.getLogger(MovRecorder.class);
@@ -61,7 +65,11 @@ public class MovRecorder implements IRecorder {
 
 	@Override
 	public synchronized void stopRecording() throws IOException {
-		enc.finish();
+		try {
+			enc.finish();
+		} catch (IndexOutOfBoundsException error) {
+			logger.log(Priority.DEBUG, "Nothing recorded! " + error.getMessage());
+		}
 		logger.info(this + " stop recording");
 	}
 
@@ -77,15 +85,25 @@ public class MovRecorder implements IRecorder {
 		Date todaysDate = new java.util.Date();
 		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("View.dataFormat"));
 		String formattedDate = formatter.format(todaysDate);
-		try {
-			this.enc = new SequenceEncoder(new File(
-					Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", ".")
-							+ System.getProperty("file.separator") + "pv_snapshot_" + formattedDate + ".mov"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
+		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", "."));
+		File outputFile = new File("pv_snapshot_" + formattedDate + ".mov");
+		fileChooser.setSelectedFile(outputFile);
+
+		int returnVal = fileChooser.showDialog(null, "Save");
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+			outputFile = fileChooser.getSelectedFile().toString().endsWith(".mov") ? fileChooser.getSelectedFile()
+					: new File(fileChooser.getSelectedFile().toString() + ".mov");
+			try {
+				this.enc = new SequenceEncoder(outputFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+			}
+			logger.info(this + " start recording");
 		}
-		logger.info(this + " start recording");
+
 	}
 
 	@Override

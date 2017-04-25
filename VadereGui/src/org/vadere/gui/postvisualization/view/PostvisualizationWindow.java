@@ -3,8 +3,6 @@ package org.vadere.gui.postvisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import javax.swing.*;
-
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -14,7 +12,18 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.PostVisualisation;
-import org.vadere.gui.postvisualization.control.*;
+import org.vadere.gui.postvisualization.control.ActionGeneratePNG;
+import org.vadere.gui.postvisualization.control.ActionGenerateSVG;
+import org.vadere.gui.postvisualization.control.ActionOpenFile;
+import org.vadere.gui.postvisualization.control.ActionPause;
+import org.vadere.gui.postvisualization.control.ActionPlay;
+import org.vadere.gui.postvisualization.control.ActionRecording;
+import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
+import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
+import org.vadere.gui.postvisualization.control.ActionStop;
+import org.vadere.gui.postvisualization.control.ActionSwapSelectionMode;
+import org.vadere.gui.postvisualization.control.ActionVisualization;
+import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
@@ -30,6 +39,8 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Observer;
 import java.util.prefs.Preferences;
+
+import javax.swing.*;
 
 /**
  * Main Window of the new post visualization.
@@ -319,7 +330,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 		// deselect selected element on esc
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
-		getActionMap().put("deselect", new ActionDeselect(model, this));
+		getActionMap().put("deselect", new ActionDeselect(model, this, null));
 	}
 
 	public JMenuBar getMenu() {
