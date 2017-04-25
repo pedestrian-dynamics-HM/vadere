@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh;
+package org.vadere.util.geometry.mesh.triangulations;
 
 import org.jetbrains.annotations.NotNull;
 

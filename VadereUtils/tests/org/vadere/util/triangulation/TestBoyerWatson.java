@@ -30,13 +30,13 @@ public class TestBoyerWatson {
 
 	@Test
 	public void testFaceIterator() {
-		VPoint p1 = mesh.createVertex(0, 0);
-		VPoint p2 = mesh.createVertex(50, 0);
-		VPoint p3 = mesh.createVertex(50, 50);
-		VPoint p4 = mesh.createVertex(0, 50);
+		VPoint p1 = mesh.insertVertex(0, 0);
+		VPoint p2 = mesh.insertVertex(50, 0);
+		VPoint p3 = mesh.insertVertex(50, 50);
+		VPoint p4 = mesh.insertVertex(0, 50);
 
-		VPoint p6 = mesh.createVertex(50, 50);
-		VPoint p5 = mesh.createVertex(25, 25);
+		VPoint p6 = mesh.insertVertex(50, 50);
+		VPoint p5 = mesh.insertVertex(25, 25);
 
 		Set<VPoint> points = new HashSet<>();
 		points.add(p1);
@@ -46,7 +46,7 @@ public class TestBoyerWatson {
 		points.add(p6);
 		points.add(p5);
 
-		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points, (x, y) -> new VPoint(x, y));
+		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points);
 		delaunayTriangulation.compute();
 		//delaunayTriangulation.finalize();
 
@@ -88,17 +88,17 @@ public class TestBoyerWatson {
 	@Test
 	public void testSplitTriangle() {
 
-		VPoint p1 = mesh.createVertex(0, 0);
-		VPoint p2 = mesh.createVertex(50, 0);
-		VPoint p3 = mesh.createVertex(25, 25);
-		VPoint centerPoint = mesh.createVertex(25, 10);
+		VPoint p1 = mesh.insertVertex(0, 0);
+		VPoint p2 = mesh.insertVertex(50, 0);
+		VPoint p3 = mesh.insertVertex(25, 25);
+		VPoint centerPoint = mesh.insertVertex(25, 10);
 
 		Set<VPoint> points = new HashSet<>();
 		points.add(p1);
 		points.add(p2);
 		points.add(p3);
 
-		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points, (x, y) -> new VPoint(x, y));
+		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points);
 		delaunayTriangulation.compute();
 		PFace<VPoint> face = delaunayTriangulation.locate(centerPoint).get();
 
@@ -120,12 +120,12 @@ public class TestBoyerWatson {
 		int numberOfPoints = 1000;
 
 		for(int i=0; i< numberOfPoints; i++) {
-			VPoint point = mesh.createVertex(width*r.nextDouble(), height*r.nextDouble());
+			VPoint point = mesh.insertVertex(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
 
 		long ms = System.currentTimeMillis();
-		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points, (x, y) -> new VPoint(x, y));
+		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = new IncrementalTriangulation<>(mesh, points);
 
 		delaunayTriangulation.compute();
 		System.out.println("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms));

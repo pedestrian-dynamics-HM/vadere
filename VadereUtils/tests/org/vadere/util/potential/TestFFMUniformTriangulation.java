@@ -36,15 +36,13 @@ public class TestFFMUniformTriangulation {
 
 	@Before
 	public void setUp() throws Exception {
-		IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
 		uniformTriangulation = new UniformTriangulation<>(
-				new PMesh<>(pointConstructor),
+				new PMesh<>((x, y) -> new MeshPoint(x, y, false)),
 				0,
 				0,
 				width,
 				height,
-				minTriangleSideLength,
-				pointConstructor);
+				minTriangleSideLength);
 		uniformTriangulation.compute();
 		uniformTriangulation.finalize();
 	}

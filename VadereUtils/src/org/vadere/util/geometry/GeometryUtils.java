@@ -265,6 +265,10 @@ public class GeometryUtils {
 		return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
 	}
 
+	public static double sign(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
+		return (x1 - x3) * (y2 - y3) - (x2 -x3) * (y1 - y3);
+	}
+
 
 	/**
 	 * This method follows the construction from

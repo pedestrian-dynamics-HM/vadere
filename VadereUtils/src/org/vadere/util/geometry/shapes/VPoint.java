@@ -50,8 +50,13 @@ public class VPoint implements Cloneable, IPoint {
 		return Point2D.distance(x, y, other.getX(), other.getY());
 	}
 
-	public double distance(Point2D other) {
-		return Point2D.distance(x, y, other.getX(), other.getY());
+	@Override
+	public double distance(final double x, final double y) {
+		return Point2D.distance(this.x, this.y, x, y);
+	}
+
+	public double distance(final Point2D other) {
+		return distance(other.getX(), other.getY());
 	}
 
 	public void setId(int identifier) {

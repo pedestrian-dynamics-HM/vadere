@@ -1,13 +1,17 @@
-package org.vadere.util.geometry.mesh;
+package org.vadere.util.geometry.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Benedikt Zoennchen
@@ -22,6 +26,8 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 
 	default void flipEdgeEvent(F f1, F f2) {}
 
+	default void insertEvent(P vertex) {};
+
 	boolean isIllegal(E edge);
 
 	/**
@@ -32,6 +38,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 	 */
 	default List<E> splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
 		IMesh<P, E, F> mesh = getMesh();
+		mesh.insertVertex(p);
 		List<E> newEdges = new ArrayList<>(4);
 		/*
 		 * Situation: h0 = halfEdge
@@ -224,6 +231,10 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 		return edges.size() == 3;
 	}
 
+	default boolean insert(@NotNull F face, @NotNull P p) {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
 	/**
 	 * Splits the triangle xyz into three new triangles xyp, yzp and zxp.
 	 *
@@ -234,6 +245,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 	 */
 	default List<F> splitTriangle(@NotNull F face, P p, boolean legalize) {
 		assert isTriangle(face);
+		getMesh().insertVertex(p);
 		List<F> faceList = new ArrayList<>(3);
 		IMesh<P, E, F> mesh = getMesh();
 		List<E> edges = mesh.getEdges(face);
@@ -323,13 +335,19 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 			P vertex = getMesh().getVertex(edge);
 
 			if(vertex.equals(p)) {
-				legalize(getMesh().getPrev(edge));
-				legalize(getMesh().getNext(getMesh().getTwin(edge)));
+				E e1 = getMesh().getPrev(edge);
+				E e2 = getMesh().getPrev(getMesh().getTwin(edge));
+				legalize(e1);
+				legalize(getMesh().getPrev(e2));
 			}
 			else {
-				legalize(getMesh().getNext(edge));
-				legalize(getMesh().getPrev(getMesh().getTwin(edge)));
+				E e1 = getMesh().getNext(edge);
+				E e2 = getMesh().getNext(getMesh().getTwin(edge));
+				legalize(e1);
+				legalize(getMesh().getNext(e2));
 			}
+
+
 		}
 	}
 
@@ -360,5 +378,187 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 			}
 		}
 		return true;
+	}
+
+	@Override
+	default Optional<F> locate(final IPoint point) {
+		return this.locate(point.getX(), point.getY());
+	}
+
+	@Override
+	default Optional<F> locate(final double x, final double y) {
+		return locate(x, y, getMesh().getFace());
+	}
+
+	/*default Optional<P> locateVertex(double x, double y, F startFace) {
+		Optional<F> optFace = locate(x, y, startFace);
+
+		if(optFace.isPresent()) {
+			F face = optFace.get();
+
+			assert !getMesh().isBoundary(face);
+
+
+		}
+
+		return Optional.empty();
+	}*/
+
+	default Optional<F> locate(double x, double y, F startFace) {
+		// there is no face.
+		if(getDimension() <= 0 ){
+			return Optional.empty();
+		}
+
+		if(getDimension() == 1) {
+			return marchLocate1D(x, y, startFace);
+		}
+		else {
+			VTriangle triangle = getMesh().toTriangle(startFace);
+			VPoint incenter = triangle.getIncenter();
+			return Optional.of(marchLocate2D(incenter.getX(), incenter.getY(), x, y, startFace));
+		}
+	}
+
+	default Optional<F> marchLocate1D(double x, double y, F startFace) {
+		if(contains(startFace, x, y)) {
+			return Optional.of(startFace);
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Marching to the face which contains the point defined by (x2, y2). The march
+	 * starts at (x1, y2) at inside the startFace.
+	 *
+	 * @param x1        the x-coordinate of the starting point
+	 * @param y1        the y-coordinate of the starting point
+	 * @param x2        the x-coordinate of the ending point
+	 * @param y2        the y-coordinate of the ending point
+	 * @param startFace the face where the march start containing (x1,y1).
+	 * @return
+	 */
+	default F marchLocate2D(double x1, double y1, double x2, double y2, F startFace) {
+		assert !getMesh().isBoundary(startFace);
+		assert contains(startFace, x1, y1);
+
+		E entryEdge = null;
+		F face = startFace;
+		boolean found = true;
+
+		while(found && !contains(face, x2, y2)) {
+			found = false;
+			for(E halfEdge : getMesh().getEdgeIt(face)) {
+				if(!halfEdge.equals(entryEdge)) {
+					P sVertex = getMesh().getVertex(getMesh().getPrev(halfEdge));
+					P eVertex = getMesh().getVertex(halfEdge);
+
+					if(VLine.linesIntersect(sVertex.getX(), sVertex.getY(), eVertex.getX(), eVertex.getY(), x1, y1, x2, y2)) {
+						entryEdge = getMesh().getTwin(halfEdge);
+						face = getMesh().getTwinFace(halfEdge);
+						found = true;
+						break;
+					}
+				}
+			}
+		}
+
+		assert found || getMesh().isBoundary(face);
+
+		return face;
+	}
+
+	default boolean contains(F face, double x, double y) {
+
+
+		if(getMesh().isMember(face, x, y)) {
+			return true;
+		}
+
+		// in this case the face might be a polygon
+		if(getMesh().isBoundary(face)) {
+			return getMesh().toPolygon(face).contains(x, y);
+		}
+		else {
+			return getMesh().toTriangle(face).contains(x, y);
+		}
+	}
+
+	//Optional<F> marchLocate2DLFC(double x, double y, F startFace);
+
+	default P getMaxDistanceVertex(F face, double x, double y) {
+		List<P> vertices = getMesh().getVertices(face);
+
+		assert vertices.size() == 3;
+
+		P result = vertices.get(0);
+		result = result.distance(x, y) < vertices.get(1).distance(x, y) ? vertices.get(1) : result;
+		result = result.distance(x, y) < vertices.get(2).distance(x, y) ? vertices.get(2) : result;
+		return result;
+	}
+
+	default P getMinDistanceVertex(F face, double x, double y) {
+		List<P> vertices = getMesh().getVertices(face);
+
+		assert vertices.size() == 3;
+
+		P result = vertices.get(0);
+		result = result.distance(x, y) > vertices.get(1).distance(x, y) ? vertices.get(1) : result;
+		result = result.distance(x, y) > vertices.get(2).distance(x, y) ? vertices.get(2) : result;
+		return result;
+	}
+
+	default int getDimension() {
+		return getMesh().getNumberOfVertices() - 2;
+	}
+
+	/**
+	 * Returns a Collection of faces which contain the point (x,y). In case of the point lying on the
+	 * boundary of the face, the face contains the point. If the point lies on a vertex of the face,
+	 * the face contains the point as well.
+	 *
+	 * @param x the x-coordinate of the point
+	 * @param y the y-coordinate of the point
+	 * @return a Collection of faces which contain the point.
+	 */
+	default Collection<F> getAdjacentFaces(final double x, final double y) {
+		Optional<F> optFace = locate(x, y);
+		if(optFace.isPresent()) {
+			F face = optFace.get();
+
+			/*
+			 * the point (x,y) may
+			 * 1. lies on a vertex of the face,
+			 * 2. lies on a edge of the face,
+			 * 3. lies on the interior of the face
+			 */
+			Optional<E> optMemberEdge = getMesh().getMemberEdge(face, x, y);
+			if(optMemberEdge.isPresent()) {
+				return getMesh().getAdjacentFaces(optMemberEdge.get());
+			}
+			else {
+				List<F> faces = new ArrayList<>(2);
+				faces.add(face);
+
+				for(E halfEdge : getMesh().getEdgeIt(face)) {
+					P v1 = getMesh().getVertex(halfEdge);
+					P v2 = getMesh().getVertex(getMesh().getPrev(halfEdge));
+
+					// TODO: think about the epsilon, absolute value seems to be a really bad idea!
+					if(!getMesh().isBoundary(getMesh().getTwinFace(halfEdge)) && Math.abs(GeometryUtils.sign(x, y, v1.getX(), v1.getY(), v2.getX(), v2.getY())) == 0.0) {
+						faces.add(getMesh().getTwinFace(halfEdge));
+						break;
+					}
+				}
+
+				return faces;
+			}
+
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 }
