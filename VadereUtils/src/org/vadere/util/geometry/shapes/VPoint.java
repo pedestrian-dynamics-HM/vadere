@@ -59,22 +59,6 @@ public class VPoint implements Cloneable, IPoint {
 		return distance(other.getX(), other.getY());
 	}
 
-	public void setId(int identifier) {
-		this.identifier = identifier;
-	}
-
-	public int getId() {
-		return identifier;
-	}
-
-	public void setId(int identifier) {
-		this.identifier = identifier;
-	}
-
-	public int getId() {
-		return identifier;
-	}
-
 	@Override
 	public VPoint clone() {
 		return new VPoint(x, y);

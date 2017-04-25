@@ -168,6 +168,7 @@ public class VTriangle extends VPolygon {
 	}
 
 	public boolean isInCircumscribedCycle(final IPoint point) {
+		double diff = getCircumcenter().distance(point) - getCircumscribedRadius();
 		return getCircumcenter().distance(point) < getCircumscribedRadius();
 	}
 
