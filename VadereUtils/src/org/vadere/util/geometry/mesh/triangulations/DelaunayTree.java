@@ -24,16 +24,27 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 	private final IMesh<P, E, F> mesh;
 	private double eps = 0.0000001;
 
-	public DelaunayTree(final ITriangulation<P, E, F> triangulation, final F superTriangle) {
+	public DelaunayTree(final ITriangulation<P, E, F> triangulation) {
 		this.mesh = triangulation.getMesh();
 		this.map = new HashMap<>();
+	}
 
-		this.dag = new DAG<>(new DAGElement<>(superTriangle, mesh.toTriple(superTriangle)));
-		this.map.put(superTriangle, dag);
+	private void checkRoot() {
+		if(dag == null) {
+			F face = mesh.getFace();
+
+			if(mesh.isBoundary(face)) {
+				face = mesh.getTwinFace(mesh.getEdge(face));
+			}
+			this.dag = new DAG<>(new DAGElement<>(face, mesh.toTriple(face)));
+			this.map.put(face, dag);
+		}
 	}
 
 	@Override
-	public Collection<F> locatePoint(final IPoint point, final boolean insertion) {
+	public Collection<F> locatePoint(final P point, final boolean insertion) {
+		checkRoot();
+
 
 		Set<DAG<DAGElement<P, F>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P, F>>> nodesToVisit = new LinkedList<>();
@@ -60,7 +71,8 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 	}
 
 	@Override
-	public Optional<F> locate(final IPoint point) {
+	public Optional<F> locate(final P point) {
+		checkRoot();
 		Optional<F> optFace = locatePoint(point, false).stream().findAny();
 		if(optFace.isPresent()) {
 			return Optional.of(optFace.get());
@@ -72,6 +84,7 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 
 	@Override
 	public void splitFaceEvent(F original, F[] faces) {
+		checkRoot();
 		DAG<DAGElement<P, F>> faceDag = map.remove(original);
 		for(F face : faces) {
 			List<P> points = mesh.getVertices(face);
@@ -83,6 +96,7 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 
 	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
+		checkRoot();
 		DAG<DAGElement<P, F>> f1Dag = map.remove(f1);
 		DAG<DAGElement<P, F>> f2Dag = map.remove(f2);
 		List<P> points1 = mesh.getVertices(f1);
@@ -102,10 +116,11 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 	}
 
 	@Override
-	public void insertEvent(P vertex) {}
+	public void insertEvent(E vertex) {}
 
 	@Override
 	public void deleteBoundaryFace(F face) {
+		checkRoot();
 		assert mesh.isBoundary(face);
 		map.remove(face);
 	}

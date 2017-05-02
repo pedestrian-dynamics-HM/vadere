@@ -4,6 +4,7 @@ import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.ArrayList;
@@ -22,22 +23,20 @@ public class UniformTriangulation<P extends IPoint, E extends IHalfEdge<P>, F ex
 	private double height;
 	private double minTriangleSideLength;
 
-	public UniformTriangulation(final IMesh<P, E, F> mesh,
-								final double minX,
-								final double minY,
-								final double width,
-								final double height,
+	public UniformTriangulation(final VRectangle bound,
 								final double minTriangleSideLength) {
-		super(mesh, minX, minY, width, height);
-		this.left = minX;
-		this.top = minY;
-		this.width = width;
-		this.height = height;
+		super(bound);
+		this.left = bound.getMinX();
+		this.top = bound.getMinY();
+		this.width = bound.getWidth();
+		this.height = bound.getHeight();
 		this.minTriangleSideLength = minTriangleSideLength;
 	}
 
 	@Override
 	public void compute() {
+		init();
+
 		List<P> pointList = new ArrayList<>(generatePointSet());
 		//Collections.shuffle(pointList);
 

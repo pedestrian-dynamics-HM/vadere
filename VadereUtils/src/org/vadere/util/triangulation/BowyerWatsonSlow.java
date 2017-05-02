@@ -38,7 +38,7 @@ public class BowyerWatsonSlow<P extends IPoint> {
     }
 
     public void execute() {
-       // P max = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
+       // P bound = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.bound(a.getX(), b.getX()), Math.bound(a.getY(), b.getY())));
        // P min = points.parallelStream().reduce(pointConstructor.apply(Double.MAX_VALUE, Double.MAX_VALUE), (a, b) -> pointConstructor.apply(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
 
 	    P max = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE,Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));

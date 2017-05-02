@@ -33,7 +33,7 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		return Optional.empty();
 	}
 
-	default Optional<F> locate(final IPoint point) {
+	default Optional<F> locate(final P point) {
 		return locate(point.getX(), point.getY());
 	}
 

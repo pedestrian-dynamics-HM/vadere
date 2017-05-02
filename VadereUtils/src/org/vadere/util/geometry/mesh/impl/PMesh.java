@@ -83,16 +83,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public boolean isHole(@NotNull PFace<P> face) {
-		return false;
-	}
-
-	@Override
-	public boolean isHole(@NotNull PHalfEdge<P> halfEdge) {
-		return false;
-	}
-
-	@Override
 	public boolean isDestroyed(@NotNull PFace<P> face) {
 		return face.isDestroyed();
 	}
@@ -153,6 +143,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
+	public int getNumberOfFaces() {
+		return faces.size();
+	}
+
+	@Override
 	public PHalfEdge<P> createEdge(@NotNull P vertex) {
 		PHalfEdge<P> edge = new PHalfEdge<>(vertex);
 		edges.add(edge);
@@ -188,6 +183,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 		P vertex = pointConstructor.create(x, y);
 		//vertices.add(vertex);
 		return vertex;
+	}
+
+	@Override
+	public PFace<P> getBoundary() {
+		return boundary;
 	}
 
 	@Override
