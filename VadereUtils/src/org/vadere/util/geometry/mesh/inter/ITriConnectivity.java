@@ -241,7 +241,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 	 * @param p       the point which splits the triangle
 	 * @param face    the triangle face we split
 	 *
-	 * returns a half-edge which has p as its end vertex
+	 * returns a list of all newly created face.
 	 */
 	default List<F> splitTriangle(@NotNull F face, P p, boolean legalize) {
 		assert isTriangle(face);
@@ -552,7 +552,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 					P v2 = getMesh().getVertex(getMesh().getPrev(halfEdge));
 
 					// TODO: think about the epsilon, absolute value seems to be a really bad idea!
-					if(!getMesh().isBoundary(getMesh().getTwinFace(halfEdge)) && Math.abs(GeometryUtils.sign(x, y, v1.getX(), v1.getY(), v2.getX(), v2.getY())) == 0.0) {
+					if(!getMesh().isBoundary(getMesh().getTwinFace(halfEdge)) && Math.abs(GeometryUtils.ccw(x, y, v1.getX(), v1.getY(), v2.getX(), v2.getY())) == 0.0) {
 						faces.add(getMesh().getTwinFace(halfEdge));
 						break;
 					}
