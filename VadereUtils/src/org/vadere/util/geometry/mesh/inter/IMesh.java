@@ -63,9 +63,6 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	boolean isBoundary(@NotNull F face);
 	boolean isBoundary(@NotNull E halfEdge);
 
-	boolean isHole(@NotNull F face);
-	boolean isHole(@NotNull E halfEdge);
-
 	boolean isDestroyed(@NotNull F face);
 	boolean isDestroyed(@NotNull E edge);
 
@@ -83,6 +80,8 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	F createFace();
 	F createFace(boolean boundary);
 	P createVertex(double x, double y);
+	F getBoundary();
+
 	void insert(P vertex);
 
 	void insertVertex(P vertex);
@@ -299,6 +298,17 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 		return streamIncidentEdges(edge).map(this::getVertex).collect(Collectors.toList());
 	}
 
+	default List<E> getEdges() {
+		List<E> edges = new ArrayList<>();
+		for(F face : this) {
+			for (E edge : getEdgeIt(face)) {
+				edges.add(edge);
+			}
+		}
+
+		return edges;
+	}
+
 	/**
 	 * Returns all edges which end-point is equal to the vertex
 	 *
@@ -361,6 +371,8 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	Collection<P> getVertices();
 
 	int getNumberOfVertices();
+
+	int getNumberOfFaces();
 
 	static <P extends IPoint> IMesh<P, PHalfEdge<P>, PFace<P>> createPMesh(final IPointConstructor<P> pointConstructor) {
 		return new PMesh<>(pointConstructor);

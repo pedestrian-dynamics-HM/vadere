@@ -128,7 +128,7 @@ public class Trajectory {
 	 * }
 	 * else {
 	 * Optional<Step> optionalStep = sortedSteps.stream().filter(s -> s.getStepNumber() <=
-	 * step.getStepNumber()).max((Step::compareTo));
+	 * step.getStepNumber()).bound((Step::compareTo));
 	 * if(optionalStep.isPresent()) {
 	 * optionalPedestrian = Optional.of(trajectoryPoints.get(optionalStep.get()));
 	 * }

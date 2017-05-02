@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 public class BasePointLocator<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, E, F> {
 
-	private final ITriConnectivity<P, E, F> triConnectivity;
+	private ITriConnectivity<P, E, F> triConnectivity;
 
 	public BasePointLocator(final ITriConnectivity<P, E, F> triConnectivity) {
 		this.triConnectivity = triConnectivity;
@@ -39,7 +39,7 @@ public class BasePointLocator<P extends IPoint, E extends IHalfEdge<P>, F extend
 	public void flipEdgeEvent(final F f1, final F f2) {}
 
 	@Override
-	public void insertEvent(final P vertex) {}
+	public void insertEvent(E vertex) {}
 
 	@Override
 	public void deleteBoundaryFace(final F face) {}

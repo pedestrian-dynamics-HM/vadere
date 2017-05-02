@@ -3,9 +3,9 @@ package org.vadere.util.triangulation.adaptive;
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
-import org.vadere.util.geometry.mesh.impl.PMesh;
 import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.mesh.triangulations.IncrementalTriangulation;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.ConstantLineIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MLine;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class  PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
-	private IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
+	private ITriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -116,10 +116,10 @@ public class  PSDistmesh {
 	private void reTriangulate() {
 		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			maxMovementLen = 0;
-			bowyerWatson = new IncrementalTriangulation<>(new PMesh<>((x, y) -> new MeshPoint(x, y, false)), points);
+
 
 			System.out.println("triangulation started");
-			bowyerWatson.compute();
+			bowyerWatson = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points, (x, y) -> new MeshPoint(x, y, false));
 			System.out.println("triangulation finished");
 
 			IMesh<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();
@@ -222,7 +222,7 @@ public class  PSDistmesh {
 			return 0.0;
 		}
 		else {
-			Collection<VTriangle> triangles = bowyerWatson.getTriangles();
+			Collection<VTriangle> triangles = bowyerWatson.streamTriangles().collect(Collectors.toList());
 			double aveSum = 0;
 			for(VTriangle triangle : triangles) {
 				VLine[] lines = triangle.getLines();
@@ -269,7 +269,7 @@ public class  PSDistmesh {
 		// point density function 1 / (desiredLen^2)
 		Function<IPoint, Double> pointDensityFunc = vertex -> 1 / (relativeDesiredEdgeLengthFunc.apply(vertex) * relativeDesiredEdgeLengthFunc.apply(vertex));
 
-		// max point density
+		// bound point density
 		double max = gridPoints.stream()
 				.mapToDouble(vertex -> pointDensityFunc.apply(vertex))
 				.max()
@@ -378,10 +378,10 @@ public class  PSDistmesh {
 		if(bowyerWatson == null) {
 			return new ArrayList<>();
 		}
-		return bowyerWatson.getTriangles();
+		return bowyerWatson.streamTriangles().collect(Collectors.toList());
 	}
 
-	public IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation(){
+	public ITriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation(){
 		return bowyerWatson;
 	}
 

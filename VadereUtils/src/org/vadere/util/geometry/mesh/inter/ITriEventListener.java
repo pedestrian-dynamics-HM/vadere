@@ -11,7 +11,7 @@ public interface ITriEventListener<P extends IPoint, E extends IHalfEdge<P>, F e
 
 	void flipEdgeEvent(F f1, F f2);
 
-	void insertEvent(P vertex);
+	void insertEvent(E vertex);
 
 	//void removeEvent()
 

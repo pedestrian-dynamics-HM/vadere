@@ -2,9 +2,11 @@ package org.vadere.util.geometry.mesh.triangulations;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -18,7 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,33 +28,30 @@ import java.util.Set;
  *
  * @param <P>
  */
-public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class UniformRefinementTriangulation<P extends IPoint> {
 	private final Collection<VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
-	private IncrementalTriangulation<P, E, F> triangulation;
+	private ITriangulation<P, PHalfEdge<P>, PFace<P>> pTriangulation;
 	private Set<P> points;
-	private IMesh<P, E, F> mesh;
+	private IMesh<P, PHalfEdge<P>, PFace<P>> mesh;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulation.class);
 
 	public UniformRefinementTriangulation(
-			final IMesh<P, E, F> mesh,
-			final double minX,
-			final double minY,
-			final double width,
-			final double height,
+			final VRectangle bound,
 			final Collection<VShape> boundary,
-			final IEdgeLengthFunction lenFunc) {
-		this.mesh = mesh;
-		this.triangulation = new IncrementalTriangulation<>(mesh, minX, minY, width, height);
+			final IEdgeLengthFunction lenFunc,
+			final IPointConstructor<P> pointConstructor) {
+		this.pTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, bound, pointConstructor);
+		this.mesh = pTriangulation.getMesh();
 		this.boundary = boundary;
 		this.lenFunc = lenFunc;
-		this.bbox = new VRectangle(minX, minY, width, height);
+		this.bbox = bound;
 		this.points = new HashSet<>();
 	}
 
-	public boolean isCompleted(final E edge) {
-		F face = mesh.isBoundary(edge) ? mesh.getTwinFace(edge) : mesh.getFace(edge);
+	public boolean isCompleted(final PHalfEdge<P> edge) {
+		PFace<P> face = mesh.isBoundary(edge) ? mesh.getTwinFace(edge) : mesh.getFace(edge);
 		VTriangle triangle = mesh.toTriangle(face);
 		P end = mesh.getVertex(edge);
 		P begin = mesh.getVertex(mesh.getPrev(edge));
@@ -61,19 +59,20 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 	}
 
 	public void compute() {
-		logger.info("start computation");
-		LinkedList<E> toRefineEdges = new LinkedList<>();
-		List<E> edges = mesh.getEdges(triangulation.superTriangle);
+		pTriangulation.init();
 
-		for(E edge : edges) {
+		logger.info("start computation");
+		LinkedList<PHalfEdge<P>> toRefineEdges = new LinkedList<>();
+
+		for(PHalfEdge<P> edge : mesh.getEdgeIt(mesh.getBoundary())) {
 			if(!isCompleted(edge) && !points.contains(mesh.getVertex(edge))) {
 				toRefineEdges.add(edge);
 			}
 		}
 
 		while (!toRefineEdges.isEmpty()) {
-			E edge = toRefineEdges.removeFirst();
-			for(E refinedHalfEdges : refine(edge)) {
+			PHalfEdge<P> edge = toRefineEdges.removeFirst();
+			for(PHalfEdge<P> refinedHalfEdges : refine(edge)) {
 				if(!isCompleted(refinedHalfEdges)) {
 					toRefineEdges.addLast(refinedHalfEdges);
 				}
@@ -82,18 +81,20 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 
 		for(VShape shape : boundary) {
 			// 1. find a triangle inside the boundary
-			Optional<F> optFace = triangulation.locate(shape.getCentroid());
+			VPoint centroid = shape.getCentroid();
+
+			Optional<PFace<P>> optFace = pTriangulation.locate(centroid.getX(), centroid.getY());
 
 			if(optFace.isPresent()) {
-				LinkedList<F> candidates = new LinkedList<>();
+				LinkedList<PFace<P>> candidates = new LinkedList<>();
 				candidates.add(optFace.get());
 
 				// 2. as long as there is a face which has a vertex inside the shape remove it
 				while (!candidates.isEmpty()) {
-					F face = candidates.removeFirst();
+					PFace<P> face = candidates.removeFirst();
 					if(mesh.streamEdges(face).map(mesh::getVertex).anyMatch(shape::contains)) {
 						mesh.streamFaces(face).forEach(f -> candidates.add(f));
-						triangulation.removeFace(face, false);
+						pTriangulation.removeFace(face, false);
 					}
 				}
 			}
@@ -105,10 +106,10 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 	}
 
 	public Set<VLine> getEdges() {
-		return triangulation.getEdges();
+		return pTriangulation.getEdges();
 	}
 
-	public Collection<E> refine(final E edge) {
+	public Collection<PHalfEdge<P>> refine(final PHalfEdge<P> edge) {
 		VPoint midPoint = midPoint(edge);
 		P p = mesh.createVertex(midPoint.getX(), midPoint.getY());
 
@@ -118,11 +119,11 @@ public class UniformRefinementTriangulation<P extends IPoint, E extends IHalfEdg
 		else {
 			points.add(p);
 			mesh.insert(p);
-			return triangulation.splitEdge(p, edge);
+			return pTriangulation.splitEdge(p, edge);
 		}
 	}
 
-	private VPoint midPoint(final E edge) {
+	private VPoint midPoint(final PHalfEdge<P> edge) {
 		VPoint p1 = new VPoint(mesh.getVertex(edge));
 		VPoint p2 = new VPoint(mesh.getVertex(mesh.getPrev(edge)));
 		return p2.add(p1).scalarMultiply(0.5);
