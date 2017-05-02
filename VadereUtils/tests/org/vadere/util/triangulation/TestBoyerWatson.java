@@ -137,10 +137,28 @@ public class TestBoyerWatson {
 		long ms = System.currentTimeMillis();
 		ITriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points, (x, y) -> new VPoint(x, y));
 		delaunayTriangulation.finalize();
-		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms));
+		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-tree");
 
 		log.info("start checking the delaunay property, this can take some time");
 		Collection<VTriangle> triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toList());
+
+		for(VTriangle triangle : triangles) {
+
+			List<VPoint> trianglePoints = triangle.getPoints();
+
+			for(VTriangle t : triangles) {
+				assertTrue(t.getPoints().stream().noneMatch(p -> !trianglePoints.contains(p) && triangle.isInCircumscribedCycle(p)));
+			}
+		}
+		log.info("end checking the delaunay property");
+
+		ms = System.currentTimeMillis();
+		delaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+		delaunayTriangulation.finalize();
+		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy");
+
+		log.info("start checking the delaunay property, this can take some time");
+		triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toList());
 
 		for(VTriangle triangle : triangles) {
 
