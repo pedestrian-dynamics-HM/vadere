@@ -24,7 +24,6 @@ public class TestSimplePointLocation {
 	public void setUp() throws Exception {
 		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
 		triangulation = ITriangulation.generateRandomTriangulation(numberOfPoints);
-		triangulation.compute();
 	}
 
 	@Test

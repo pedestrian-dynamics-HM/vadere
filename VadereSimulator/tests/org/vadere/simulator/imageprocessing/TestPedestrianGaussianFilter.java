@@ -79,8 +79,8 @@ public class TestPedestrianGaussianFilter {
 			for (double y = 0; y <= topographyBounds.getHeight() - 1; y += dy) {
 				assertTrue(maxDensity >= clFilter.getFilteredValue(x, y) - 0.1);
 				double exactDensity = calculateExactDensity(new VPoint(x, y), pedestriansMaxPacked, 0.7);
-				maxAbsErrorCL = Math.max(maxAbsErrorCL, Math.abs((clFilter.getFilteredValue(x, y) - exactDensity)));
-				maxRelErrorCL = Math.max(maxRelErrorCL,
+				maxAbsErrorCL = Math.bound(maxAbsErrorCL, Math.abs((clFilter.getFilteredValue(x, y) - exactDensity)));
+				maxRelErrorCL = Math.bound(maxRelErrorCL,
 						Math.abs((clFilter.getFilteredValue(x, y) - exactDensity)) / exactDensity);
 				// System.out.println("abs. cl-error:" + (clFilter.getFilteredValue(x, y) -
 				// exactDensity));

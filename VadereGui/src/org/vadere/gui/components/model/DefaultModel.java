@@ -196,8 +196,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * if (scaleFactor < MAX_SCALE_FACTOR) {
 	 * double w = getViewportBound().width / 1.2;
 	 * double h = getViewportBound().height / 1.2;
-	 * double x = Math.max(0, cursorWorldPosition.x - w / 2);
-	 * double y = Math.max(0, cursorWorldPosition.y - h / 2);
+	 * double x = Math.bound(0, cursorWorldPosition.x - w / 2);
+	 * double y = Math.bound(0, cursorWorldPosition.y - h / 2);
 	 * setViewportBound(new VRectangle(x, y, w, h));
 	 * return true;
 	 * }
@@ -209,9 +209,9 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * double w = Math.min(getTopographyBound().getWidth(), viewportBound.width * 1.2);
 	 * double h = Math.min(getTopographyBound().getWidth(), viewportBound.height * 1.2);
 	 * 
-	 * double x = Math.max(0, Math.min(cursorWorldPosition.x - w / 2,
+	 * double x = Math.bound(0, Math.min(cursorWorldPosition.x - w / 2,
 	 * getTopographyBound().getWidth() - w));
-	 * double y = Math.max(0, Math.min(cursorWorldPosition.y - h / 2,
+	 * double y = Math.bound(0, Math.min(cursorWorldPosition.y - h / 2,
 	 * getTopographyBound().getHeight() - h));
 	 * setViewportBound(new VRectangle(x, y, w, h));
 	 * return true;
