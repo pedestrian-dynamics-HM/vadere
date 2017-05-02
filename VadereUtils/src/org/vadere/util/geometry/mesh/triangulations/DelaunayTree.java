@@ -44,8 +44,7 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 	@Override
 	public Collection<F> locatePoint(final P point, final boolean insertion) {
 		checkRoot();
-
-
+		
 		Set<DAG<DAGElement<P, F>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P, F>>> nodesToVisit = new LinkedList<>();
 		nodesToVisit.add(dag);

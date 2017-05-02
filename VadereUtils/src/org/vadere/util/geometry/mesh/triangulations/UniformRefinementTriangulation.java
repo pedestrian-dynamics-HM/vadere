@@ -79,6 +79,12 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 			}
 		}
 
+		removeTrianglesInsideObstacles();
+
+		logger.info("end computation");
+	}
+
+	private void removeTrianglesInsideObstacles() {
 		for(VShape shape : boundary) {
 			// 1. find a triangle inside the boundary
 			VPoint centroid = shape.getCentroid();
@@ -102,7 +108,6 @@ public class UniformRefinementTriangulation<P extends IPoint> {
 				logger.warn("no face found");
 			}
 		}
-		logger.info("end computation");
 	}
 
 	public Set<VLine> getEdges() {

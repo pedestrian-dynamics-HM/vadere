@@ -58,22 +58,14 @@ public class VTriangle extends VPolygon {
 
 	@Override
 	public boolean contains(final IPoint point) {
-		boolean b1, b2, b3;
-		double d1 = GeometryUtils.sign(point, p1, p2);
-		double d2 = GeometryUtils.sign(point, p2, p3);
-		double d3 = GeometryUtils.sign(point, p3, p1);
-		b1 = d1 < 0.0;
-		b2 = d2 < 0.0;
-		b3 = d3 < 0.0;
-		return ((b1 == b2) && (b2 == b3));
+		return GeometryUtils.contains(p1, p2, p3, point);
 	}
 
 	// TODO: find better name
 	public boolean isPartOf(final IPoint point, final double eps) {
-		boolean b1, b2, b3;
-		double d1 = GeometryUtils.sign(point, p1, p2);
-		double d2 = GeometryUtils.sign(point, p2, p3);
-		double d3 = GeometryUtils.sign(point, p3, p1);
+		double d1 = GeometryUtils.ccw(point, p1, p2);
+		double d2 = GeometryUtils.ccw(point, p2, p3);
+		double d3 = GeometryUtils.ccw(point, p3, p1);
 		return (d1 <= eps && d2 <= eps && d3 <= eps) || (d1 >= -eps && d2 >= -eps && d3 >= -eps);
 	}
 
