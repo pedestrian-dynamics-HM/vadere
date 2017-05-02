@@ -175,7 +175,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 
 	@Override
 	public double getValue(double x, double y) {
-		Optional<F> optFace = triangulation.locate(new VPoint(x, y));
+		Optional<F> optFace = triangulation.locate(x, y);
 
 		double result = Double.MAX_VALUE;
 		if(!optFace.isPresent()) {
@@ -533,7 +533,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, E extends I
 			return Double.MIN_VALUE;
 		}
 
-		return Math.max((-b + Math.sqrt(det)) / (2 * a), (-b - Math.sqrt(det))
+		return Math.bound((-b + Math.sqrt(det)) / (2 * a), (-b - Math.sqrt(det))
 				/ (2 * a));*/
 	}
 

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -31,7 +32,7 @@ public class TestFFMNonUniformTriangulation {
 	private static Logger log = LogManager.getLogger(TestFFMNonUniformTriangulation.class);
 	private int width;
 	private int height;
-	private IncrementalTriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
+	private ITriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
 
 	@Before
 	public void setUp() {

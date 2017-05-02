@@ -7,8 +7,11 @@ import org.junit.Test;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.impl.PMesh;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFMMAcuteTriangulation;
 import org.vadere.util.potential.calculators.PotentialPoint;
@@ -35,13 +38,13 @@ public class TestFFMUniformTriangulation {
 
 	@Before
 	public void setUp() throws Exception {
-		uniformTriangulation = new UniformTriangulation<>(
-				new PMesh<>((x, y) -> new MeshPoint(x, y, false)),
-				0,
-				0,
-				width,
-				height,
-				minTriangleSideLength);
+		IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
+		uniformTriangulation = ITriangulation.createUnifirmTriangulation(
+				IPointLocator.Type.DELAUNAY_TREE,
+				new VRectangle(0, 0, width, height),
+				minTriangleSideLength,
+				pointConstructor
+				);
 		uniformTriangulation.compute();
 		uniformTriangulation.finalize();
 	}

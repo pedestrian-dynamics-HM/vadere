@@ -181,9 +181,9 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 
 		// create grid
 		/*
-		 * this.gridSize = (int) Math.max(1,
-		 * Math.ceil(Math.max(width, height) / sideLength));
-		 * this.cellSize = Math.max(width, height) / gridSize;
+		 * this.gridSize = (int) Math.bound(1,
+		 * Math.ceil(Math.bound(width, height) / sideLength));
+		 * this.cellSize = Math.bound(width, height) / gridSize;
 		 * this.grid = generateGrid(gridSize, gridSize);
 		 */
 

@@ -56,7 +56,7 @@ public class CLGaussianCalculator {
 		int maxColorValue = 255 * 255 * 255;
 		ColorHelper colorHelper = new ColorHelper(maxColorValue);
 
-		// double max = filter.getMaxFilteredValue();
+		// double bound = filter.getMaxFilteredValue();
 		double max = 1.00;
 		double factor = maxColorValue / max;
 		System.out.println(filterPedestrians.getMaxFilteredValue()); // 0.1259

@@ -26,7 +26,7 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 
 	default void flipEdgeEvent(F f1, F f2) {}
 
-	default void insertEvent(P vertex) {};
+	default void insertEvent(E vertex) {};
 
 	boolean isIllegal(E edge);
 
@@ -381,13 +381,18 @@ public interface ITriConnectivity<P extends IPoint, E extends IHalfEdge<P>, F ex
 	}
 
 	@Override
-	default Optional<F> locate(final IPoint point) {
+	default Optional<F> locate(final P point) {
 		return this.locate(point.getX(), point.getY());
 	}
 
 	@Override
 	default Optional<F> locate(final double x, final double y) {
-		return locate(x, y, getMesh().getFace());
+		if(getMesh().getNumberOfFaces() > 0) {
+			return locate(x, y, getMesh().getFace());
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	/*default Optional<P> locateVertex(double x, double y, F startFace) {

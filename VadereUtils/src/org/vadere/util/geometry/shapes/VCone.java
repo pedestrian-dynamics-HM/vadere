@@ -35,9 +35,9 @@ public class VCone {
 	}
 
 	/*public boolean intersect(final VTriangle triangle) {
-		double max = triangle.maxCoordinate();
-		this.rayPosition1 = position.add(rayDirection1.scalarMultiply(max));
-		this.rayPosition2 = position.add(rayDirection2.scalarMultiply(max));
+		double bound = triangle.maxCoordinate();
+		this.rayPosition1 = position.add(rayDirection1.scalarMultiply(bound));
+		this.rayPosition2 = position.add(rayDirection2.scalarMultiply(bound));
 		if(rayPosition1.equals(rayPosition2)) {
 			System.out.println("ww");
 		}
