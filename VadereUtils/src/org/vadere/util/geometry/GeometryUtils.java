@@ -92,6 +92,26 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Computes area (it maybe a negative area) of the parallelogram defined by p, q, r.
+	 * Note:    + This area is zero if p, q, r lie on one line.
+	 *          + The area is < 0 if the points p, q, r are aligned clockwise (order matters).
+	 *            This is equivalent to: r lies on the right side of the line defined by p, q.
+	 *          + The area is > 0 if the points p, q, r are aligned counter-clockwise (order matters).
+	 *            This is equivalent to: r lies on the left side of the line defined by p, q.
+	 *
+	 * @param pX x-coordinate of p
+	 * @param pY y-coordinate of p
+	 * @param qX x-coordinate of q
+	 * @param qY y-coordinate of q
+	 * @param rX x-coordinate of r
+	 * @param rY y-coordinate of r
+	 * @return
+	 */
+	public static double ccw(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
+		return (qX - pX) * (rY - pY) - (rX - pX) * (qY - pY);
+	}
+
+	/**
 	 * Calculate the counter clockwise result for the three given points.<br>
 	 * ccw(p1,p2,p3) < 0 if p3 is left of Line(p1,p2)<br>
 	 * ccw(p1,p2,p3) = 0 if p3 lies on Line(p1,p2)<br>
@@ -105,8 +125,93 @@ public class GeometryUtils {
 	 *        third point
 	 * @return ccw(p1 p2 p3)
 	 */
-	public static double ccw(VPoint p1, VPoint p2, VPoint p3) {
-		return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+	public static double ccw(final IPoint p1, final IPoint p2, final IPoint p3) {
+		return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) - (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
+	}
+
+	public static boolean isCCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
+		return ccw(qX, qY, pX, pY, rX, rY) > 0;
+	}
+
+	public static boolean isCCW(final IPoint p1, final IPoint p2, final IPoint p3) {
+		return ccw(p1, p2, p3) > 0;
+	}
+
+	public static boolean isCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
+		return ccw(qX, qY, pX, pY, rX, rY) < 0;
+	}
+
+	public static boolean isCW(final IPoint p1, final IPoint p2, final IPoint p3) {
+		return ccw(p1, p2, p3) < 0;
+	}
+
+	/**
+	 * Tests if the line-segment (p1, p2) intersects the line defined by p, q.
+	 * @param p     point defining the line
+	 * @param q     point defining the line
+	 * @param p1    point defining the line-segment
+	 * @param p2    point defining the line-segment
+	 * @return true if the line-segment intersects the line defined, otherwise false.
+	 */
+	public static boolean intersectLine(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
+		double ccw1 = ccw(p, q, p1);
+		double ccw2 = ccw(p, q, p2);
+		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
+	}
+
+	/**
+	 * Tests if the half-line-segment starting at p in the direction (q-p) intersects the line-segment (p1,p2).
+	 * @param p     the starting point of the half-line-segment
+	 * @param q     the point defining the direction (q-p) of the half-line-segment
+	 * @param p1    point defining the line-segment
+	 * @param p2    point defining the line-segment
+	 * @return true if the line-segment intersects the  half-line-segment defined, otherwise false.
+	 */
+	public static boolean intersectHalfLineSegment(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
+		double ccw1 = ccw(p, q, p1);
+		double ccw2 = ccw(p, q, p2);
+
+		if((ccw1 < 0 && ccw2 > 0)) {
+			return isCCW(p, p2, p1);
+		}
+		else if((ccw1 > 0 && ccw2 < 0)) {
+			return isCCW(p, p1, p2);
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * Tests if the first line-segment (p,q) intersects the second line-segment (p1,p2).
+	 * @param p     point defining the first line-segment
+	 * @param q     point defining the first line-segment
+	 * @param p1    point defining the second line-segment
+	 * @param p2    point defining the second line-segment
+	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
+	 */
+	public static boolean intersectLineSegment(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
+		return intersectLine(p, q, p1, p2) && intersectLine(p1, p2, p, q);
+	}
+
+	/**
+	 * Tests if the triangle (p1,p2,p3) contains the point r.
+	 *
+	 * @param p1    point of the triangle
+	 * @param p2    point of the triangle
+	 * @param p3    point of the triangle
+	 * @param r     point which the triangle might contain.
+	 * @return if the triangle (p1,p2,p3) contains the point r, otherwise false.
+	 */
+	public static boolean contains(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint r) {
+		boolean b1, b2, b3;
+		double d1 = GeometryUtils.ccw(r, p1, p2);
+		double d2 = GeometryUtils.ccw(r, p2, p3);
+		double d3 = GeometryUtils.ccw(r, p3, p1);
+		b1 = d1 < 0.0;
+		b2 = d2 < 0.0;
+		b3 = d3 < 0.0;
+		return ((b1 == b2) && (b2 == b3));
 	}
 
 	/**
@@ -262,13 +367,6 @@ public class GeometryUtils {
 		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
 	}
 
-	public static double sign(final IPoint p1, final IPoint p2, final IPoint p3) {
-		return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
-	}
-
-	public static double sign(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
-		return (x1 - x3) * (y2 - y3) - (x2 -x3) * (y1 - y3);
-	}
 
 	public static <P extends IPoint> VRectangle bound(final Collection<P> points) {
 

@@ -3,6 +3,7 @@ package org.vadere.util.geometry.mesh.inter;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.impl.PMesh;
@@ -366,6 +367,19 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 
 	default Optional<E> getMemberEdge(F face, double x, double y, double epsilon) {
 		return streamEdges(face).filter(e -> getVertex(e).distance(x, y) <= epsilon).findAny();
+	}
+
+	// TODO: rename?
+	default Optional<E> getEdgeCloseToVertex(F face, double x, double y, double epsilon) {
+		for(E halfEdge : getEdgeIt(face)) {
+			P p1 = getVertex(halfEdge);
+			P p2 = getVertex(getPrev(halfEdge));
+
+			if(Math.abs(GeometryUtils.ccw(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y)) < epsilon) {
+				return Optional.of(halfEdge);
+			}
+		}
+		return Optional.empty();
 	}
 
 	Collection<P> getVertices();

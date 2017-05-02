@@ -3,6 +3,7 @@ package org.vadere.util.geometry.mesh.triangulations;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
@@ -71,6 +72,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
 		this.bound = GeometryUtils.bound(points);
+		this.finalized = false;
 	}
 
 	public IncrementalTriangulation(final Set<P> points) {
@@ -83,6 +85,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = bound;
+		this.finalized = false;
 	}
 
 	public IncrementalTriangulation(final VRectangle bound) {
@@ -95,10 +98,6 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 
 	public void setMesh(final IMesh<P, E, F> mesh) {
 		this.mesh = mesh;
-	}
-
-	public F getSuperTriangle() {
-		return superTriangle;
 	}
 
 	@Override
@@ -117,7 +116,6 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		he1 = borderEdges.get(1);
 		he2 = borderEdges.get(2);
 
-		this.finalized = false;
 		this.initialized = true;
 	}
 
@@ -138,6 +136,10 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	@Override
 	public E insert(P point) {
 
+		if(!initialized) {
+			init();
+		}
+
 		Collection<F> faces = this.pointLocator.locatePoint(point, true);
 		int numberOfFaces = faces.size();
 
@@ -151,8 +153,8 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		else if(faces.size() == 1) {
 			log.info("splitTriangle:" + point);
 			F face = faces.iterator().next();
-			splitTriangle(face, point,  true);
-			insertedEdge = mesh.getEdge(point);
+			List<F> createdFaces = splitTriangle(face, point,  true);
+			insertedEdge = mesh.getMemberEdge(createdFaces.get(0), point.getX(), point.getY()).get();
 			insertEvent(insertedEdge);
 
 		} // point lies on an edge of 2 triangles
@@ -389,7 +391,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	}
 
 	@Override
-	public void insertEvent(final E halfEdge) {
+	public void insertEvent(@NotNull  final E halfEdge) {
 		pointLocator.insertEvent(halfEdge);
 	}
 
