@@ -3,6 +3,7 @@ package org.vadere.util.geometry.mesh.iterators;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import java.util.Iterator;
 
@@ -15,13 +16,13 @@ import java.util.Iterator;
  * @param <E> the type of the half-edge
  * @param <F> the type of the face
  */
-public class EdgeIterator<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<E> {
+public class EdgeIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<E> {
 	private E currentHalfEdge;
 	private E edge;
 	private boolean started = false;
-	private IMesh<P, E, F> mesh;
+	private IMesh<P, V, E, F> mesh;
 
-	public EdgeIterator(final IMesh<P, E, F> mesh, final F face){
+	public EdgeIterator(final IMesh<P, V, E, F> mesh, final F face){
 		this.edge = mesh.getEdge(face);
 		this.currentHalfEdge = edge;
 		this.mesh = mesh;

@@ -12,8 +12,9 @@ import java.util.Optional;
  * @param <E>
  * @param <F>
  */
-public interface IPointLocator<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> extends ITriEventListener<P, E, F> {
-	Collection<F> locatePoint(final P point, final boolean insertion);
+public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends ITriEventListener<P, V, E, F> {
+
+	F locatePoint(final P point, final boolean insertion);
 
 	Optional<F> locate(final P point);
 

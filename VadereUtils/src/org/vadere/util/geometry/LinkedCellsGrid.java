@@ -85,7 +85,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	private double[] cellSize = new double[2];
 
 	/**
-	 * One cell in the grid. It contains a mapping from points to lists of
+	 * One cell in the grid. It triangleContains a mapping from points to lists of
 	 * objects. This means that one can store multiple objects in one cell.
 	 * 
 	 * 
@@ -362,7 +362,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Tests whether the linked cells grid contains an object that equals(the
+	 * Tests whether the linked cells grid triangleContains an object that equals(the
 	 * given object). The complexity of this operation is O(N), N = number of
 	 * objects in the grid.
 	 * 

@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -22,6 +24,8 @@ public class GeometryUtils {
 	 * considered equal.
 	 */
 	public static final double DOUBLE_EPS = 1e-8;
+
+	public static final Logger log = LogManager.getLogger(GeometryUtils.class);
 
 	/**
 	 * Interpolates between start and end with the given factor.
@@ -40,6 +44,23 @@ public class GeometryUtils {
 			}
 		}
 		return false;
+	}
+
+	public static VPoint getCircumcenter(final IPoint p1, final IPoint p2, final IPoint p3) {
+		double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
+		double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
+				+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
+				+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p1.getY() - p2.getY())) / d;
+		double y = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p3.getX() - p2.getX())
+				+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p1.getX() - p3.getX())
+				+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p2.getX() - p1.getX())) / d;
+
+		return new VPoint(x,y);
+	}
+
+	public static boolean isInCircumscribedCycle(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint point) {
+		VPoint circumcenter = getCircumcenter(p1, p2, p3);
+		return circumcenter.distance(point) < circumcenter.distance(p1);
 	}
 
 	/**
@@ -93,11 +114,6 @@ public class GeometryUtils {
 
 	/**
 	 * Computes area (it maybe a negative area) of the parallelogram defined by p, q, r.
-	 * Note:    + This area is zero if p, q, r lie on one line.
-	 *          + The area is < 0 if the points p, q, r are aligned clockwise (order matters).
-	 *            This is equivalent to: r lies on the right side of the line defined by p, q.
-	 *          + The area is > 0 if the points p, q, r are aligned counter-clockwise (order matters).
-	 *            This is equivalent to: r lies on the left side of the line defined by p, q.
 	 *
 	 * @param pX x-coordinate of p
 	 * @param pY y-coordinate of p
@@ -108,7 +124,37 @@ public class GeometryUtils {
 	 * @return
 	 */
 	public static double ccw(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
-		return (qX - pX) * (rY - pY) - (rX - pX) * (qY - pY);
+		return -((qX - pX) * (rY - pY) - (rX - pX) * (qY - pY));
+	}
+
+	/**
+	 * Returns true if q is right of the oriented-line defined by (p1, p2).
+	 * @param p1
+	 * @param p2
+	 * @param q
+	 * @return true if q is right of the oriented-line defined by (p1, p2), false otherwise
+	 */
+	public static boolean isRightOf(final IPoint p1, final IPoint p2, final IPoint q) {
+		return isRightOf(p1, p2, q.getX(), q.getY());
+	}
+
+	/**
+	 * Returns true if q is left of the oriented-line defined by (p1, p2).
+	 * @param p1
+	 * @param p2
+	 * @param q
+	 * @return true if q is right of the oriented-line defined by (p1, p2), false otherwise
+	 */
+	public static boolean isLeftOf(final IPoint p1, final IPoint p2, final IPoint q) {
+		return isLeftOf(p1, p2, q.getX(), q.getY());
+	}
+
+	public static boolean isRightOf(final IPoint p1, final IPoint p2, final double x, final double y) {
+		return isCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+	}
+
+	public static boolean isLeftOf(final IPoint p1, final IPoint p2, final double x, final double y) {
+		return isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
 	/**
@@ -134,7 +180,7 @@ public class GeometryUtils {
 	}
 
 	public static boolean isCCW(final IPoint p1, final IPoint p2, final IPoint p3) {
-		return ccw(p1, p2, p3) > 0;
+		return isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
 
 	public static boolean isCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
@@ -201,9 +247,9 @@ public class GeometryUtils {
 	 * @param p2    point of the triangle
 	 * @param p3    point of the triangle
 	 * @param r     point which the triangle might contain.
-	 * @return if the triangle (p1,p2,p3) contains the point r, otherwise false.
+	 * @return true if the triangle (p1,p2,p3) contains the point r, otherwise false.
 	 */
-	public static boolean contains(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint r) {
+	public static boolean triangleContains(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint r) {
 		boolean b1, b2, b3;
 		double d1 = GeometryUtils.ccw(r, p1, p2);
 		double d2 = GeometryUtils.ccw(r, p2, p3);
@@ -212,6 +258,54 @@ public class GeometryUtils {
 		b2 = d2 < 0.0;
 		b3 = d3 < 0.0;
 		return ((b1 == b2) && (b2 == b3));
+	}
+
+	/**
+	 * Tests if the circle defined by three non-lin points (p1,p2,p3) contains the point r.
+	 * The center of the circle is the circumcenter of the triangle and the radius is equalt to the
+	 * distance between the circumcenter and any point of {p1, p2, p3}.
+	 *
+	 * @param a    point of the triangle
+	 * @param b    point of the triangle
+	 * @param c    point of the triangle
+	 * @param p    point which the circle might contain.
+	 * @return true, if the circle defined by three non-lin points (p1,p2,p3) contains the point r, otherwise false
+	 */
+	public static boolean isInsideCircle(final IPoint a, final IPoint b, final IPoint c, final IPoint p) {
+		return isInsideCircle(a, b, c, p.getX(), p.getY());
+	}
+
+
+	public static boolean isInsideCircle(final IPoint a, final IPoint b, final IPoint c, double x , double y) {
+		/*IPoint qp = q.subtract(p);
+		IPoint rp = r.subtract(p);
+		IPoint tp = t.subtract(p);
+
+		double a = qp.getX() * tp.getY() - qp.getY() * tp.getX();
+		double b = tp.getX() * (t.getX() - q.getX()) + tp.getY() * (t.getY() - q.getY());
+		double c = qp.getX() * rp.getY() - qp.getY() * rp.getX();
+		double d = rp.getX() * (r.getX() - q.getX()) + rp.getY() * (r.getY() - q.getY());
+
+		return a * d > c * b;*/
+
+
+		double adx = a.getX() - x;
+		double ady = a.getY() - y;
+		double bdx = b.getX() - x;
+		double bdy = b.getY() - y;
+		double cdx = c.getX() - x;
+		double cdy = c.getY() - y;
+
+		double abdet = adx * bdy - bdx * ady;
+		double bcdet = bdx * cdy - cdx * bdy;
+		double cadet = cdx * ady - adx * cdy;
+		double alift = adx * adx + ady * ady;
+		double blift = bdx * bdx + bdy * bdy;
+		double clift = cdx * cdx + cdy * cdy;
+
+		double disc = alift * bcdet + blift * cadet + clift * abdet;
+		//log.info("inCicle = " + disc);
+		return disc > 0;
 	}
 
 	/**
@@ -281,6 +375,38 @@ public class GeometryUtils {
 		}
 		return Math.abs(result) / 2.0;
 	}
+
+	/**
+	 * Computes the distance from the line-segment defined by (p1,p2) to the point p.
+	 * @param p1    first point of the line-segment
+	 * @param p2    second point of the line-segment
+	 * @param p     the point
+	 * @return he distance from the line-segment defined by (p1,p2) to the point p.
+	 */
+	public static double distanceToLineSegment(final IPoint p1, final IPoint p2, final IPoint p) {
+		return distanceToLineSegment(p1, p2, p.getX(), p.getY());
+	}
+
+	public static double distanceToLineSegment(final IPoint p1, final IPoint p2, final double x, final double y) {
+		if (p1.getX() == p2.getX() && p1.getY() == p2.getY())
+			return p1.distance(x,y);
+
+		double len2 = (p2.getX() - p1.getX()) * (p2.getX() - p1.getX()) + (p2.getY() - p1.getY()) * (p2.getY() - p1.getY());
+		double r = ((x - p1.getX()) * (p2.getX() - p1.getX()) + (y - p1.getY()) * (p2.getY() - p1.getY())) / len2;
+
+		if (r <= 0.0)
+			return p1.distance(x,y);
+		if (r >= 1.0)
+			return p2.distance(x,y);
+
+		double s = ((p1.getY() - y) * (p2.getX() - p1.getX()) - (p1.getX() - x) * (p2.getY() - p1.getY())) / len2;
+		return Math.abs(s) * Math.sqrt(len2);
+	}
+
+	public static boolean isOnEdge(final IPoint p1, final IPoint p2, final IPoint p, double tolerance) {
+		return distanceToLineSegment(p1, p2, p) < tolerance;
+	}
+
 
 	/**
 	 * Computes the intersection points of a line and a circle. The line is supposed to have infinity

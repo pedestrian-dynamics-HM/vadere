@@ -3,6 +3,7 @@ package org.vadere.util.triangulation.adaptive;
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class  PSDistmesh {
 	private Set<MeshPoint> points = new HashSet<>();
 	private Set<MLine<MeshPoint>> lines = new HashSet<>();
-	private ITriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
+	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> bowyerWatson;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -122,8 +123,8 @@ public class  PSDistmesh {
 			bowyerWatson = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points, (x, y) -> new MeshPoint(x, y, false));
 			System.out.println("triangulation finished");
 
-			IMesh<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();
-			Function<PHalfEdge<MeshPoint>, MLine<MeshPoint>> toLine = edge -> new MLine<>(mesh.getVertex(mesh.getPrev(edge)), mesh.getVertex(edge));
+			IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();
+			Function<PHalfEdge<MeshPoint>, MLine<MeshPoint>> toLine = edge -> new MLine<>(mesh.getPoint(mesh.getPrev(edge)), mesh.getPoint(edge));
 
 			// compute the line and points again, since we filter some triangles
 			lines = bowyerWatson.streamFaces()
@@ -381,7 +382,7 @@ public class  PSDistmesh {
 		return bowyerWatson.streamTriangles().collect(Collectors.toList());
 	}
 
-	public ITriangulation<MeshPoint, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation(){
+	public ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation(){
 		return bowyerWatson;
 	}
 

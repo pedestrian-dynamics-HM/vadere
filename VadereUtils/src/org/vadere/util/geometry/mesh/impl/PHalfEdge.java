@@ -11,7 +11,7 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 	/**
 	 * point at the end of the half edge.
 	 */
-	private P end;
+	private PVertex<P> end;
 
 	/**
 	 * next half-edge around the face.
@@ -35,12 +35,12 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 	private PFace<P> face;
 
 
-	PHalfEdge(@NotNull final P end, @NotNull final PFace<P> face) {
+	PHalfEdge(@NotNull final PVertex<P> end, @NotNull final PFace<P> face) {
 		this.end = end;
 		this.face = face;
 	}
 
-	PHalfEdge(@NotNull final P end) {
+	PHalfEdge(@NotNull final PVertex<P> end) {
 		this.end = end;
 		this.face = null;
 	}
@@ -53,7 +53,7 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 		this.face = face;
 	}
 
-	P getEnd() {
+	PVertex<P> getEnd() {
 		return end;
 	}
 
@@ -116,7 +116,7 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 		}
 	}
 
-	void setEnd(P end) {
+	void setEnd(PVertex<P> end) {
 		this.end = end;
 	}
 

@@ -7,6 +7,7 @@ import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.Collection;
@@ -18,13 +19,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, E, F> {
+public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
 	private DAG<DAGElement<P, F>> dag;
 	private final HashMap<F, DAG<DAGElement<P, F>>> map;
-	private final IMesh<P, E, F> mesh;
+	private final IMesh<P, V, E, F> mesh;
 	private double eps = 0.0000001;
 
-	public DelaunayTree(final ITriangulation<P, E, F> triangulation) {
+	public DelaunayTree(final ITriangulation<P, V, E, F> triangulation) {
 		this.mesh = triangulation.getMesh();
 		this.map = new HashMap<>();
 	}
@@ -42,9 +43,9 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 	}
 
 	@Override
-	public Collection<F> locatePoint(final P point, final boolean insertion) {
+	public F locatePoint(final P point, final boolean insertion) {
 		checkRoot();
-		
+
 		Set<DAG<DAGElement<P, F>>> leafs = new HashSet<>();
 		LinkedList<DAG<DAGElement<P, F>>> nodesToVisit = new LinkedList<>();
 		nodesToVisit.add(dag);
@@ -56,9 +57,7 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 					leafs.add(currentNode);
 
 					// if we are not interested in insertion we just want to find one triangle.
-					if(!insertion) {
-						return leafs.stream().map(dag -> dag.getElement().getFace()).collect(Collectors.toList());
-					}
+					return currentNode.getElement().getFace();
 				}
 				else {
 					nodesToVisit.addAll(currentNode.getChildren());
@@ -66,31 +65,55 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 			}
 		}
 
-		return leafs.stream().map(dag -> dag.getElement().getFace()).collect(Collectors.toList());
+		throw new IllegalArgumentException(point + " is invalid, it can not be located by " + this);
 	}
 
 	@Override
 	public Optional<F> locate(final P point) {
 		checkRoot();
-		Optional<F> optFace = locatePoint(point, false).stream().findAny();
-		if(optFace.isPresent()) {
-			return Optional.of(optFace.get());
-		}
-		else {
-			return Optional.empty();
-		}
+		return Optional.of(locatePoint(point, false));
 	}
 
 	@Override
-	public void splitFaceEvent(F original, F[] faces) {
+	public void splitTriangleEvent(F original, F f1, F f2, F f3) {
 		checkRoot();
 		DAG<DAGElement<P, F>> faceDag = map.remove(original);
-		for(F face : faces) {
-			List<P> points = mesh.getVertices(face);
-			DAG<DAGElement<P, F>> newFaceDag = new DAG<>(new DAGElement(face, Triple.of(points.get(0), points.get(1), points.get(2))));
-			faceDag.addChild(newFaceDag);
-			map.put(face, newFaceDag);
-		}
+
+		F face = f1;
+		List<V> points1 = mesh.getVertices(face);
+		DAG<DAGElement<P, F>> newFaceDag1 = new DAG<>(new DAGElement(face, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
+		faceDag.addChild(newFaceDag1);
+		map.put(face, newFaceDag1);
+
+		face = f2;
+		List<V> points2 = mesh.getVertices(face);
+		DAG<DAGElement<P, F>> newFaceDag2 = new DAG<>(new DAGElement(face, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
+		faceDag.addChild(newFaceDag2);
+		map.put(face, newFaceDag2);
+
+		face = f3;
+		List<V> points3 = mesh.getVertices(face);
+		DAG<DAGElement<P, F>> newFaceDag3 = new DAG<>(new DAGElement(face, Triple.of(points3.get(0), points3.get(1), points3.get(2))));
+		faceDag.addChild(newFaceDag3);
+		map.put(face, newFaceDag3);
+	}
+
+	@Override
+	public void splitEdgeEvent(F original, F f1, F f2) {
+		checkRoot();
+		DAG<DAGElement<P, F>> faceDag = map.remove(original);
+
+		F face = f1;
+		List<V> points1 = mesh.getVertices(face);
+		DAG<DAGElement<P, F>> newFaceDag1 = new DAG<>(new DAGElement(face, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
+		faceDag.addChild(newFaceDag1);
+		map.put(face, newFaceDag1);
+
+		face = f2;
+		List<V> points2 = mesh.getVertices(face);
+		DAG<DAGElement<P, F>> newFaceDag2 = new DAG<>(new DAGElement(face, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
+		faceDag.addChild(newFaceDag2);
+		map.put(face, newFaceDag2);
 	}
 
 	@Override
@@ -98,8 +121,8 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 		checkRoot();
 		DAG<DAGElement<P, F>> f1Dag = map.remove(f1);
 		DAG<DAGElement<P, F>> f2Dag = map.remove(f2);
-		List<P> points1 = mesh.getVertices(f1);
-		List<P> points2 = mesh.getVertices(f2);
+		List<V> points1 = mesh.getVertices(f1);
+		List<V> points2 = mesh.getVertices(f2);
 
 		DAG<DAGElement<P, F>> newf1Dag = new DAG<>(new DAGElement(f1, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
 		DAG<DAGElement<P, F>> newf2Dag = new DAG<>(new DAGElement(f2, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
@@ -115,7 +138,7 @@ public class DelaunayTree<P extends IPoint, E extends IHalfEdge<P>, F extends IF
 	}
 
 	@Override
-	public void insertEvent(E vertex) {}
+	public void insertEvent(V vertex) {}
 
 	@Override
 	public void deleteBoundaryFace(F face) {
