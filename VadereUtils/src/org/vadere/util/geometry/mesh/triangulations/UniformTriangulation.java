@@ -3,6 +3,7 @@ package org.vadere.util.geometry.mesh.triangulations;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.IPointConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class UniformTriangulation<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, E, F> {
+public class UniformTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, V, E, F> {
 
 	private double left;
 	private double top;
@@ -54,22 +55,22 @@ public class UniformTriangulation<P extends IPoint, E extends IHalfEdge<P>, F ex
 		double h = minTriangleSideLength * Math.sqrt(3) / 2.0;
 		// create stencil with four triangle which can be used to triangulate
 		// the whole rectangle seamlessly
-		P add1 = getMesh().createVertex(-s / 2, h);
-		P add2 = getMesh().createVertex(s / 2, h);
-		P add3 = getMesh().createVertex(s, 0);
-		P add4 = getMesh().createVertex(0, 2 * h);
-		P add5 = getMesh().createVertex(s, 2 * h);
+		P add1 = getMesh().createPoint(-s / 2, h);
+		P add2 = getMesh().createPoint(s / 2, h);
+		P add3 = getMesh().createPoint(s, 0);
+		P add4 = getMesh().createPoint(0, 2 * h);
+		P add5 = getMesh().createPoint(s, 2 * h);
 
 		for (int row = 0; row < (int) Math.ceil(height / h) + 1; row += 2) {
 			for (int col = 0; col < (int) Math.ceil(width
 					/ minTriangleSideLength); col++) {
-				P p1 = getMesh().createVertex(left + col * minTriangleSideLength, top + row * h);
+				P p1 = getMesh().createPoint(left + col * minTriangleSideLength, top + row * h);
 
-				P p2 = getMesh().createVertex(p1.getX() + add1.getX(), p1.getY() + add1.getY());
-				P p3 = getMesh().createVertex(p1.getX() + add2.getX(), p1.getY() + add2.getY());
-				P p4 = getMesh().createVertex(p1.getX() + add3.getX(), p1.getY() + add3.getY());
-				P p5 = getMesh().createVertex(p1.getX() + add4.getX(), p1.getY() + add4.getY());
-				P p6 = getMesh().createVertex(p1.getX() + add5.getX(), p1.getY() + add5.getY());
+				P p2 = getMesh().createPoint(p1.getX() + add1.getX(), p1.getY() + add1.getY());
+				P p3 = getMesh().createPoint(p1.getX() + add2.getX(), p1.getY() + add2.getY());
+				P p4 = getMesh().createPoint(p1.getX() + add3.getX(), p1.getY() + add3.getY());
+				P p5 = getMesh().createPoint(p1.getX() + add4.getX(), p1.getY() + add4.getY());
+				P p6 = getMesh().createPoint(p1.getX() + add5.getX(), p1.getY() + add5.getY());
 
 				pointSet.add(p1);
 				pointSet.add(p2);

@@ -14,16 +14,30 @@ import java.util.Set;
 /**
  * @author Benedikt Zoennchen
  */
-public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>{
+public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>{
 
-	IMesh<P, E, F> getMesh();
+	/**
+	 * Returns the mesh of this IPolyConnectivity.
+	 * Non mesh changing method.
+	 *
+	 * @return the mesh of this IPolyConnectivity
+	 */
+	IMesh<P, V, E, F> getMesh();
 
-	default boolean isAtBoundary(E halfEdge) {
-		IMesh<P, E, F> mesh = getMesh();
+	default boolean isAtBoundary(@NotNull final E halfEdge) {
+		IMesh<P, V, E, F> mesh = getMesh();
 		return mesh.isBoundary(halfEdge) || mesh.isBoundary(mesh.getTwin(halfEdge));
 	}
 
-	default Optional<F> locate(final double x, final double y) {
+	/**
+	 * Searches and returns the face containing the point (x,y).
+	 * Non mesh changing method.
+	 *
+	 * @param x x-coordinate of the location point
+	 * @param y y-coordinate of the location point
+	 * @return the face containing the point or empty() if there is none
+	 */
+	default Optional<F> locateFace(final double x, final double y) {
 		for(F face : getMesh().getFaces()) {
 			VPolygon polygon = getMesh().toPolygon(face);
 			if(polygon.contains(new VPoint(x, y))) {
@@ -33,25 +47,65 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		return Optional.empty();
 	}
 
-	default Optional<F> locate(final P point) {
-		return locate(point.getX(), point.getY());
+	/**
+	 * Searches and returns the face containing the point (x,y).
+	 * Non mesh changing method.
+	 *
+	 * @param point the location point
+	 * @return the face containing the point or empty() if there is none
+	 */
+	default Optional<F> locateFace(@NotNull final P point) {
+		return locateFace(point.getX(), point.getY());
 	}
 
-	default boolean isAtBoundary(F face) {
+	/**
+	 * Tests if the face share any boundary edge.
+	 * Non mesh changing method.
+	 *
+	 * @param face  the face
+	 * @return true if the face share any boundary edge, otherwise false
+	 */
+	default boolean isAtBoundary(@NotNull final F face) {
 		return getMesh().getEdges(face).stream().anyMatch(edge -> isAtBoundary(edge));
 	}
 
-	default void adjustVertex(P vertex){
+	/**
+	 * If there is an half-edge e which is at the boundary and has the vertex v
+	 * as its end point, this method will set the half-edge of v to e.
+	 * Non mesh changing method.
+	 *
+	 * @param vertex v
+	 */
+	default void adjustVertex(@NotNull final V vertex) {
 		List<E> edges = getMesh().getEdges(vertex);
 		edges.stream().filter(edge -> isAtBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
 	}
 
-	default Optional<E> findEdge(P begin, P end) {
-		IMesh<P, E, F> mesh = getMesh();
-		return mesh.getIncidentEdges(mesh.getEdge(begin)).stream().filter(edge -> mesh.getPrev(edge).equals(end)).map(edge -> mesh.getTwin(edge)).findAny();
+	/**
+	 * Returns a half-edge (begin, end) where end is its end point
+	 * and begin is the end point of its predecessor.
+	 * Non mesh changing method.
+	 *
+	 * @param begin the end point of the predecessor of the searched half-edge
+	 * @param end   the end point of the searched half-edge
+	 * @return a half-edge (begin, end) if there is any, otherwise empty()
+	 */
+	default Optional<E> findEdge(@NotNull final V begin, @NotNull final V end) {
+		IMesh<P, V, E, F> mesh = getMesh();
+		return mesh.getIncidentEdges(mesh.getEdge(begin)).stream()
+				.filter(edge -> mesh.getPrev(edge).equals(end))
+				.map(edge -> mesh.getTwin(edge)).findAny();
 	}
 
-	default boolean isSimpleLink(E halfEdge) {
+	/**
+	 * Tests if the half-edge is the only link (of the face of the half-edge)
+	 * between the face of the half-edge and the face of its twin.
+	 * Non mesh changing method.
+	 *
+	 * @param halfEdge a half-edge to test
+	 * @return true if the half-edge is a simple link, false otherwise
+	 */
+	default boolean isSimpleLink(@NotNull final E halfEdge) {
 		E edge = halfEdge;
 		E twin = getMesh().getTwin(halfEdge);
 		F twinFace = getMesh().getFace(twin);
@@ -67,7 +121,15 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		return true;
 	}
 
-	default boolean isSimpleConnected(F face) {
+	/**
+	 * Tests if there is any face which shares more than one edge with the face
+	 * we are checking.
+	 * Non mesh changing method.
+	 *
+	 * @param face the face we are checking
+	 * @return true if there is no face which shares more than one edge with this face, false otherwise
+	 */
+	default boolean isSimpleConnected(@NotNull final F face) {
 		Set<F> faceSet = new HashSet<>();
 		E edge = getMesh().getEdge(face);
 		E next = getMesh().getNext(edge);
@@ -85,7 +147,33 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		return true;
 	}
 
-	default void split(F face, P vertex) {
+	/**
+	 * Splitting the face i.e. a polygon into as many faces as the face has edges.
+	 * Assumption: the vertex is valid i.e. it is contained any face.
+	 * Mesh changing method.
+	 *
+	 * @param vertex the vertex which spilts the face which triangleContains the vertex. It has to be contained any face.
+	 */
+	default void split(@NotNull final V vertex) {
+		Optional<F> optFace = locateFace(getMesh().getPoint(vertex));
+		if(!optFace.isPresent()) {
+			throw new IllegalArgumentException(vertex + " is not contained in any face. Therefore, no face found to split into faces.");
+		} else {
+			split(optFace.get(), vertex);
+		}
+	}
+
+	/**
+	 * Splitting the face i.e. a polygon into as many faces as the face has edges.
+	 * Assumption: the vertex is valid i.e. it is contained in the face.
+	 * Mesh changing method.
+	 *
+	 * @param face      the face to be split into n faces, where n is the number of edges of the face
+	 * @param vertex    the vertex which spilts the face. It has to be contained in the face
+	 */
+	default void split(@NotNull final F face, @NotNull final V vertex) {
+		assert locateFace(getMesh().getPoint(vertex)).get().equals(face);
+
 		E hend = getMesh().getEdge(face);
 		E hh = getMesh().getNext(hend);
 		E hold = getMesh().createEdge(vertex);
@@ -100,7 +188,10 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 			E hnext = getMesh().getNext(hh);
 			F newFace = getMesh().createFace();
 			getMesh().setEdge(newFace, hh);
+
+			// update the edge of the vertex such that the last new created edge will be its edge
 			E hnew = getMesh().createEdge(vertex);
+			getMesh().setEdge(vertex, hnew);
 
 			getMesh().setNext(hnew, hold);
 			getMesh().setNext(hold, hh);
@@ -123,13 +214,16 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 	}
 
 	/**
-	 * Removes a simple link.
+	 * Removes a simple link. This will be done by merging two faces into one remaining face.
+	 * Assumption: the edge is a simple link
+	 * Mesh changing method.
 	 *
-	 * @param edge
-	 * @return
+	 * @param edge the simple link
+	 * @return the remaining face
 	 */
-	default F removeEdge(E edge) {
+	default F removeEdge(@NotNull final E edge) {
 		assert isSimpleLink(edge) && !getMesh().isDestroyed(edge);
+
 		E twin = getMesh().getTwin(edge);
 		F delFace = getMesh().getFace(edge);
 		F remFace = getMesh().getFace(twin);
@@ -151,10 +245,12 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		getMesh().setNext(prevEdge, nextTwin);
 		getMesh().setNext(prevTwin, nextEdge);
 
-		/* adjust vertices, mb later
-		P eVertex = getMesh().getVertex(edge);
-		P tVertex = getMesh().getVertex(twin);
-		*/
+		// adjust vertices, mb later
+		V eVertex = getMesh().getVertex(edge);
+		V tVertex = getMesh().getVertex(twin);
+
+		getMesh().setEdge(eVertex, prevTwin);
+		getMesh().setEdge(tVertex, prevEdge);
 
 		if(getMesh().getEdge(remFace).equals(edge)) {
 			getMesh().setEdge(remFace, prevTwin);
@@ -174,13 +270,21 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 		return remFace;
 	}
 
-	default void removeFace(@NotNull F face, boolean deleteIsolatedVertices) {
+	/**
+	 * Removes a face from the mesh by removing all boundary edges of the face.
+	 * If there are no boundary edges the face will be converted to be a part of the boundary
+	 * itself i.e. a hole.
+	 * Mesh changing method.
+	 *
+	 * @param face                      the face that will be removed from the mesh
+	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
+	 */
+	default void removeFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
 		assert !getMesh().isDestroyed(face);
 
 		getMesh().destroyFace(face);
 		List<E> delEdges = new ArrayList<>();
-
-		List<P> vertices = new ArrayList<>();
+		List<V> vertices = new ArrayList<>();
 
 		F boundary = getMesh().createFace(true);
 
@@ -195,7 +299,7 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 
 		if(!delEdges.isEmpty()) {
 			E h0, h1, next0, next1, prev0, prev1;
-			P v0, v1;
+			V v0, v1;
 
 			for(E delEdge : delEdges) {
 				h0 = delEdge;
@@ -208,18 +312,37 @@ public interface IPolyConnectivity<P extends IPoint, E extends IHalfEdge<P>, F e
 				next1 = getMesh().getNext(h1);
 				prev1 = getMesh().getPrev(h1);
 
-				// adjust next and prev handles
+				// adjust next and prev half-edges
 				getMesh().setNext(prev0, next1);
 				getMesh().setNext(prev1, next0);
+
+				// TODO: test the isolated part!
+				boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
+				boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
+
+				// adjust vertices
+				if(getMesh().getEdge(v0).equals(h0) && !isolated0) {
+					getMesh().setEdge(v0, prev1);
+				}
+
+				if(deleteIsolatedVertices && isolated0) {
+					getMesh().destroyVertex(v0);
+				}
+
+				if(getMesh().getEdge(v1).equals(h1) && !isolated1) {
+					getMesh().setEdge(v1, prev0);
+				}
+
+				if(deleteIsolatedVertices && isolated1) {
+					getMesh().destroyVertex(v1);
+				}
 
 				// mark edge deleted if the mesh has a edge status
 				getMesh().destroyEdge(h0);
 				getMesh().destroyEdge(h1);
 
-				// TODO: delete isolated vertices?
-
-
-				for(P vertex : vertices) {
+				// TODO: do we need this?
+				for(V vertex : vertices) {
 					adjustVertex(vertex);
 				}
 			}
