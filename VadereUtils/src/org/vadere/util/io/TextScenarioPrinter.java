@@ -183,7 +183,7 @@ public class TextScenarioPrinter {
 
 		for (String type : coordinateTypes) {
 			String modifiedType = " " + type + "=";
-			// if the line contains one of the given coordinateTypes, replace
+			// if the line triangleContains one of the given coordinateTypes, replace
 			// the number by an appropriate new number.
 			// this depends on whether its an x or y value type.
 			if (line.contains(modifiedType)) {

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.impl.PMesh;
+import org.vadere.util.geometry.mesh.impl.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.triangulation.PointLocation;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -21,34 +22,70 @@ public class TestSimplePointLocation {
 
 	private static PFace face1;
 	private static PFace face2;
+	private static PFace border;
 	private static double EPSILON = 1.0e-10;
-	private IMesh<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
+	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
 
 	@Before
 	public void setUp() throws Exception {
 		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
 		face1 = mesh.createFace();
 		face2 = mesh.createFace();
-		PHalfEdge halfEdge1 = mesh.createEdge(mesh.createVertex(0,0), face1);
-		PHalfEdge halfEdge2 = mesh.createEdge(mesh.createVertex(3,0), face1);
-		PHalfEdge halfEdge3 = mesh.createEdge(mesh.createVertex(1.5,3.0), face1);
+		border = mesh.createFace(true);
 
-		PHalfEdge halfEdge4 = mesh.createEdge(mesh.createVertex(3.0,0), face2);
-		mesh.setTwin(halfEdge4, halfEdge3);
-		PHalfEdge halfEdge5 = mesh.createEdge(mesh.createVertex(4.5,3.0), face2);
-		PHalfEdge halfEdge6 = mesh.createEdge(mesh.createVertex(1.5,3.0), face2);
 
-		mesh.setNext(halfEdge4, halfEdge5);
-		mesh.setNext(halfEdge5, halfEdge6);
-		mesh.setNext(halfEdge6, halfEdge4);
+		PVertex<VPoint> x = mesh.createVertex(0,0);
+		PVertex<VPoint> y = mesh.createVertex(3,0);
+		PVertex<VPoint> z = mesh.createVertex(1.5,3.0);
+		PVertex<VPoint> w = mesh.createVertex(4.5,3.0);
 
-		mesh.setEdge(face2, halfEdge4);
 
-		mesh.setNext(halfEdge1, halfEdge2);
-		mesh.setNext(halfEdge2, halfEdge3);
-		mesh.setNext(halfEdge3, halfEdge1);
+		PHalfEdge zx = mesh.createEdge(x, face1);
+		PHalfEdge xz = mesh.createEdge(z, border);
+		mesh.setTwin(zx, xz);
+		mesh.setEdge(x, zx);
 
-		mesh.setEdge(face1, halfEdge1);
+
+		PHalfEdge xy = mesh.createEdge(y, face1);
+		PHalfEdge yx = mesh.createEdge(x, border);
+		mesh.setTwin(xy, yx);
+		mesh.setEdge(y, xy);
+
+
+		PHalfEdge yz = mesh.createEdge(z, face1);
+		PHalfEdge zy = mesh.createEdge(y, face2);
+		mesh.setTwin(zy, yz);
+		mesh.setEdge(z, yz);
+
+
+		PHalfEdge yw = mesh.createEdge(w, face2);
+		PHalfEdge wy = mesh.createEdge(y, border);
+		mesh.setTwin(yw, wy);
+		mesh.setEdge(w, yw);
+
+		PHalfEdge wz = mesh.createEdge(z, face2);
+		PHalfEdge zw = mesh.createEdge(w, face2);
+		mesh.setTwin(wz, zw);
+
+		mesh.setNext(zy, yw);
+		mesh.setNext(yw, wz);
+		mesh.setNext(wz, zy);
+
+		mesh.setEdge(face2, zy);
+
+		mesh.setNext(zx, xy);
+		mesh.setNext(xy, yz);
+		mesh.setNext(yz, zx);
+
+
+		mesh.setNext(xz, zw);
+		mesh.setNext(zw, wy);
+		mesh.setNext(wy, yx);
+		mesh.setNext(yx, xz);
+
+		mesh.setEdge(face1, zx);
+
+		mesh.setEdge(border, xz);
 	}
 
 	@Test

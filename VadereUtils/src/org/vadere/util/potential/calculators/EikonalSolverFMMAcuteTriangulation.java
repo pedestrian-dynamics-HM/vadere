@@ -43,7 +43,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 		this.narrowBand = new PriorityQueue<>(pointComparator);
 
 		for(IPoint point : targetPoints) {
-			Face<? extends PotentialPoint> face = triangulation.locate(point);
+			Face<? extends PotentialPoint> face = triangulation.locateFace(point);
 
 			for(PHalfEdge<? extends PotentialPoint> halfEdge : face) {
 				PotentialPoint potentialPoint = halfEdge.getEnd();
@@ -64,7 +64,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 
 	@Override
 	public double getValue(double x, double y) {
-		Face<? extends PotentialPoint> triangle = triangulation.locate(new VPoint(x, y));
+		Face<? extends PotentialPoint> triangle = triangulation.locateFace(new VPoint(x, y));
 		return InterpolationUtil.barycentricInterpolation(triangle, x, y);
 	}
 
@@ -172,8 +172,8 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
 
 		// check whether they are in the frozen set. only if they are, we can
 		// continue.
-		// if(this.frozenPoints.contains(points.first()) &&
-		// this.frozenPoints.contains(points.last()))
+		// if(this.frozenPoints.triangleContains(points.first()) &&
+		// this.frozenPoints.triangleContains(points.last()))
 
 		if(p1.getPathFindingTag().frozen && p2.getPathFindingTag().frozen)
 		{

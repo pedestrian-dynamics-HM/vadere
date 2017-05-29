@@ -91,7 +91,7 @@ public class VRing implements VShape {
 		 * vertices.add(new VPoint(x, y + h));
 		 * 
 		 * for (int i = 0; i < vertices.size(); i++) {
-		 * if (!(contains(vertices.get(i)))) {
+		 * if (!(triangleContains(vertices.get(i)))) {
 		 * return false;
 		 * }
 		 * }

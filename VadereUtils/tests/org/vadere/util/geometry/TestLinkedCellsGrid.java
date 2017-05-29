@@ -324,7 +324,7 @@ public class TestLinkedCellsGrid {
 	/**
 	 * Test method for
 	 * {@link org.vadere.util.geometry.LinkedCellsGrid#contains(java.lang.Object)}. Checks
-	 * contains on an empty grid as well as with three added objects.
+	 * triangleContains on an empty grid as well as with three added objects.
 	 */
 	@Test
 	public void testContainsT() {

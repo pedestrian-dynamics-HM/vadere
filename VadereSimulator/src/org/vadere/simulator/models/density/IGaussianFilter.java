@@ -47,7 +47,7 @@ public interface IGaussianFilter {
 
 	void setInputValue(final int x, final int y, final double value);
 
-	/** refresh or update the values of the image that contains all values. */
+	/** refresh or update the values of the image that triangleContains all values. */
 	void filterImage();
 
 	void clear();

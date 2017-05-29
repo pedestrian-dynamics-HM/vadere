@@ -32,7 +32,7 @@ public class TestGrahamScan {
 		});
 
 		Stack<VPoint> stack = grahamScan.getConvexHull();
-		assertTrue("convex hull contains to many points", stack.size() == 4);
+		assertTrue("convex hull triangleContains to many points", stack.size() == 4);
 		assertTrue("convex hull does not contain " + new VPoint(2.0, 2.0), stack.contains(new VPoint(2.0, 2.0)));
 		assertTrue("convex hull does not contain " + new VPoint(-2.0, -2.0), stack.contains(new VPoint(-2.0, -2.0)));
 		assertTrue("convex hull does not contain " + new VPoint(2.0, -2.0), stack.contains(new VPoint(2.0, -2.0)));
@@ -83,6 +83,6 @@ public class TestGrahamScan {
 		});
 
 		Stack<VPoint> stack = grahamScan.getConvexHull();
-		assertTrue("convex hull contains to many points", stack.size() == 2);
+		assertTrue("convex hull triangleContains to many points", stack.size() == 2);
 	}
 }

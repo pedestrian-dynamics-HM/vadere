@@ -58,7 +58,7 @@ public class VTriangle extends VPolygon {
 
 	@Override
 	public boolean contains(final IPoint point) {
-		return GeometryUtils.contains(p1, p2, p3, point);
+		return GeometryUtils.triangleContains(p1, p2, p3, point);
 	}
 
 	// TODO: find better name
@@ -141,17 +141,8 @@ public class VTriangle extends VPolygon {
 
 	public VPoint getCircumcenter(){
 		if(center == null) {
-			double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
-			double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
-					+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
-					+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p1.getY() - p2.getY())) / d;
-			double y = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p3.getX() - p2.getX())
-					+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p1.getX() - p3.getX())
-					+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p2.getX() - p1.getX())) / d;
-
-			center = new VPoint(x,y);
+			center = GeometryUtils.getCircumcenter(p1, p2, p3);
 		}
-
 		return center;
 	}
 
