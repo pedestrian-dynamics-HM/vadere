@@ -9,20 +9,18 @@ import org.vadere.util.geometry.shapes.IPoint;
 import java.util.Iterator;
 
 /**
- * This Iterator iterates over all twin faces of its half-edges.
+ * This Iterator iterates over all vertices of a specific face.
  *
  * @author Benedikt Zoennchen
- * @param <P> the type of the point
- * @param <V> the type of the vertex
+ * @param <P> the type of the vertex
  * @param <E> the type of the half-edge
  * @param <F> the type of the face
  */
-public class SurroundingFaceIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<F> {
-
+public class VertexIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<V> {
 	private EdgeIterator<P, V, E, F> edgeIterator;
 	private IMesh<P, V, E, F> mesh;
 
-	public SurroundingFaceIterator(final IMesh<P, V, E, F> mesh, final F face) {
+	public VertexIterator(final IMesh<P, V, E, F> mesh, final F face){
 		this.mesh = mesh;
 		this.edgeIterator = new EdgeIterator<>(mesh, face);
 	}
@@ -33,7 +31,7 @@ public class SurroundingFaceIterator<P extends IPoint, V extends IVertex<P>, E e
 	}
 
 	@Override
-	public F next() {
-		return mesh.getTwinFace(edgeIterator.next());
+	public V next() {
+		return mesh.getVertex(edgeIterator.next());
 	}
 }

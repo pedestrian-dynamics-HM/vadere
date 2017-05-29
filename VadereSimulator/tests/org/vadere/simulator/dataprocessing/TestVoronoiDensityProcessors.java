@@ -30,7 +30,7 @@
 //
 //
 ///**
-// * This class contains tests that test both Voronoi-Implementation (the JTS-Version and our own
+// * This class triangleContains tests that test both Voronoi-Implementation (the JTS-Version and our own
 // * version).
 // */
 //public class TestVoronoiDensityProcessors {

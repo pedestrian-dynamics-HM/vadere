@@ -6,6 +6,8 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.impl.PFace;
+import org.vadere.util.geometry.mesh.impl.PVertex;
+import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
@@ -19,7 +21,6 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.triangulation.BowyerWatsonSlow;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
@@ -41,25 +42,28 @@ import java.util.stream.StreamSupport;
 
 import javax.swing.*;
 
-public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, E, F> {
+public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, V, E, F> {
 
-	protected Set<P> points;
+	protected Collection<P> points;
 
 	// TODO: use symbolic for the super-triangle points instead of real points!
-	private P p0;
-	private P p1;
-	private P p2;
+	private V p0;
+	private V p1;
+	private V p2;
 	private E he0;
 	private E he1;
 	private E he2;
 	private final VRectangle bound;
 	private boolean finalized = false;
-	private IMesh<P, E, F> mesh;
-	private IPointLocator<P, E, F> pointLocator;
+	private IMesh<P, V, E, F> mesh;
+	private IPointLocator<P, V, E, F> pointLocator;
 	private boolean initialized = false;
+	private List<V> superEdges;
+	private int maxDepth = 0;
 
 	// TODO this epsilon it hard coded!!! => replace it with a user choice
 	private double epsilon = 0.0001;
+	private double edgeCoincidenceTolerance = 0.0001;
 
 	protected F superTriangle;
 	private F borderFace;
@@ -67,7 +71,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
 
 	public IncrementalTriangulation(
-			final Set<P> points,
+			final Collection<P> points,
 			final Predicate<E> illegalPredicate) {
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
@@ -92,11 +96,11 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		this(bound, halfEdge -> true);
 	}
 
-	public void setPointLocator(final IPointLocator<P, E, F> pointLocator) {
+	public void setPointLocator(final IPointLocator<P, V, E, F> pointLocator) {
 		this.pointLocator = pointLocator;
 	}
 
-	public void setMesh(final IMesh<P, E, F> mesh) {
+	public void setMesh(final IMesh<P, V, E, F> mesh) {
 		this.mesh = mesh;
 	}
 
@@ -116,7 +120,13 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		he1 = borderEdges.get(1);
 		he2 = borderEdges.get(2);
 
+		this.superEdges = Arrays.asList(p0, p1, p2);
 		this.initialized = true;
+	}
+
+	@Override
+	public List<V> getSuperVertices() {
+		return superEdges;
 	}
 
 
@@ -134,50 +144,47 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	}
 
 	@Override
-	public E insert(P point) {
-
+	public E insert(@NotNull P point, @NotNull F face) {
 		if(!initialized) {
 			init();
 		}
 
-		Collection<F> faces = this.pointLocator.locatePoint(point, true);
-		int numberOfFaces = faces.size();
+		E edge = mesh.closestEdge(face, point.getX(), point.getY());
+		P p1 = mesh.getPoint(mesh.getPrev(edge));
+		P p2 = mesh.getPoint(edge);
 
-		// problem due numerical calculation.
-		faces = faces.stream().filter(f -> !getMesh().isMember(f, point.getX(), point.getY(), epsilon)).collect(Collectors.toList());
-		E insertedEdge = null;
-
-		if(numberOfFaces == 0) {
-			log.warn("no face found at " + point);
+		/*
+		 * 3 Cases:
+		 *      1) point lies on an vertex of a face => ignore the point
+		 *      2) point lies on an edge of a face => split the edge
+		 *      3) point lies in the interior of the face => split the face (this should be the main case)
+		 */
+		if(isMember(face, point.getX(), point.getY(), edgeCoincidenceTolerance)) {
+			log.info("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
+			return edge;
 		}
-		else if(faces.size() == 1) {
-			log.info("splitTriangle:" + point);
-			F face = faces.iterator().next();
-			List<F> createdFaces = splitTriangle(face, point,  true);
-			insertedEdge = mesh.getMemberEdge(createdFaces.get(0), point.getX(), point.getY()).get();
-			insertEvent(insertedEdge);
-
-		} // point lies on an edge of 2 triangles
-		else if(faces.size() == 2) {
-			Iterator<F> it = faces.iterator();
-			log.info("splitEdge:" + point);
-			E halfEdge = findTwins(it.next(), it.next()).get();
-			List<E> newEdges = splitEdge(point, halfEdge, true);
-			insertedEdge = newEdges.stream().filter(he -> getMesh().getVertex(he).equals(point)).findAny().get();
-			insertEvent(insertedEdge);
-		}
-		else if(faces.size() == 0) {
-			log.warn("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
+		if(GeometryUtils.isOnEdge(p1, p2, point, edgeCoincidenceTolerance)) {
+			//log.info("splitEdge()");
+			E newEdge = splitEdge(point, edge, true);
+			insertEvent(newEdge);
+			return newEdge;
 		}
 		else {
-			log.error("more than 2 faces found and the point " + point + " is not a vertex jet, there is something wrong with the mesh structure!");
+			//log.info("splitTriangle()");
+			E newEdge = splitTriangle(face, point,  true);
+			insertEvent(newEdge);
+			return newEdge;
 		}
-
-		return insertedEdge;
 	}
 
 	@Override
-	public void insert(final Set<P> points) {
+	public E insert(P point) {
+		F face = this.pointLocator.locatePoint(point, true);
+		return insert(point, face);
+	}
+
+	@Override
+	public void insert(final Collection<P> points) {
 		if(!initialized) {
 			init();
 		}
@@ -226,13 +233,13 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	}
 
 	/**
-	 * Deletes a face assuming that the face contains at least one boundary edge, otherwise the
+	 * Deletes a face assuming that the face triangleContains at least one boundary edge, otherwise the
 	 * deletion will not result in an feasibly triangulation.
 	 *
 	 * @param face the face that will be deleted, which as to be adjacent to the boundary.
 	 */
 	public void deleteBoundaryFace(final F face) {
-		assert isDeletionOk(face);
+		//assert isDeletionOk(face);
 
 		// 3 cases: 1. triangle consist of 1, 2 or 3 boundary edges
 		List<E> boundaryEdges = new ArrayList<>(3);
@@ -291,12 +298,12 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	}
 
 	@Override
-	public IMesh<P, E, F> getMesh() {
+	public IMesh<P, V, E, F> getMesh() {
 		return mesh;
 	}
 
 	@Override
-	public Optional<F> locate(final P point) {
+	public Optional<F> locateFace(final P point) {
 		return pointLocator.locate(point);
 	}
 
@@ -329,10 +336,10 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	}
 
 	private VTriangle faceToTriangle(final F face) {
-		List<P> points = mesh.getEdges(face).stream().map(edge -> mesh.getVertex(edge)).collect(Collectors.toList());
-		P p1 = points.get(0);
-		P p2 = points.get(1);
-		P p3 = points.get(2);
+		List<V> points = mesh.getEdges(face).stream().map(edge -> mesh.getVertex(edge)).collect(Collectors.toList());
+		V p1 = points.get(0);
+		V p2 = points.get(1);
+		V p3 = points.get(2);
 		return new VTriangle(new VPoint(p1.getX(), p1.getY()), new VPoint(p2.getX(), p2.getY()), new VPoint(p3.getX(), p3.getY()));
 	}
 
@@ -346,23 +353,76 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	 * @return true if the edge with respect to p is illegal, otherwise false
 	 */
 	@Override
-	public boolean isIllegal(E edge) {
-		return isIllegal(edge, mesh);
-	}
-
-	public static <P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> boolean isIllegal(E edge, IMesh<P, E, F> mesh) {
+	public boolean isIllegal(E edge, V p) {
 		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
-			P p = mesh.getVertex(mesh.getNext(edge));
+			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
+			//V p = mesh.getVertex(mesh.getNext(edge));
 			E t0 = mesh.getTwin(edge);
 			E t1 = mesh.getNext(t0);
 			E t2 = mesh.getNext(t1);
 
-			P x = mesh.getVertex(t0);
-			P y = mesh.getVertex(t1);
-			P z = mesh.getVertex(t2);
+			V x = mesh.getVertex(t0);
+			V y = mesh.getVertex(t1);
+			V z = mesh.getVertex(t2);
 
-			VTriangle triangle = new VTriangle(new VPoint(x), new VPoint(y), new VPoint(z));
-			return triangle.isInCircumscribedCycle(p);
+			//return GeometryUtils.angle(x, y, z) + GeometryUtils.angle(x, p, z) > Math.PI;
+
+			//return GeometryUtils.isInCircumscribedCycle(x, y, z, p);
+			//if(GeometryUtils.ccw(z,x,y) > 0) {
+			return GeometryUtils.isInsideCircle(z, x, y, p);
+			//}
+			//else {
+			//	return GeometryUtils.isInsideCircle(x, z, y, p);
+			//}
+		}
+
+		return false;
+		//return isIllegal(edge, p, mesh);
+	}
+
+	/*public static <P extends IPoint, V extends  IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> boolean isIllegal(E edge, V p, IMesh<P, V, E, F> mesh) {
+		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
+			//V p = mesh.getVertex(mesh.getNext(edge));
+			E t0 = mesh.getTwin(edge);
+			E t1 = mesh.getNext(t0);
+			E t2 = mesh.getNext(t1);
+
+			V x = mesh.getVertex(t0);
+			V y = mesh.getVertex(t1);
+			V z = mesh.getVertex(t2);
+
+			//return GeometryUtils.angle(x, y, z) + GeometryUtils.angle(x, p, z) > Math.PI;
+
+			//return GeometryUtils.isInCircumscribedCycle(x, y, z, p);
+			if (GeometryUtils.ccw(x,y,z) > 0
+					t.dest().rightOf(e) && v.isInCircle(e.orig(), t.dest(), e.dest())) {
+			log.info(GeometryUtils.ccw(x,y,z) > 0);
+			return GeometryUtils.isInsideCircle(x, y, z, p);
+		}
+		return false;
+	}*/
+
+	public static <P extends IPoint, V extends  IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> boolean isIllegal(E edge, V p, IMesh<P, V, E, F> mesh) {
+		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
+			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
+			//V p = mesh.getVertex(mesh.getNext(edge));
+			E t0 = mesh.getTwin(edge);
+			E t1 = mesh.getNext(t0);
+			E t2 = mesh.getNext(t1);
+
+			V x = mesh.getVertex(t0);
+			V y = mesh.getVertex(t1);
+			V z = mesh.getVertex(t2);
+
+			//return GeometryUtils.angle(x, y, z) + GeometryUtils.angle(x, p, z) > Math.PI;
+
+			//return GeometryUtils.isInCircumscribedCycle(x, y, z, p);
+			//if(GeometryUtils.ccw(z,x,y) > 0) {
+				return GeometryUtils.isInsideCircle(z, x, y, p);
+			//}
+			//else {
+			//	return GeometryUtils.isInsideCircle(x, z, y, p);
+			//}
 		}
 		return false;
 	}
@@ -381,18 +441,57 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 	}*/
 
 	@Override
+	public void legalizeNonRecursive(@NotNull final E edge, final V p) {
+		int flips = 0;
+		int its = 0;
+		//if(isIllegal(edge, p)) {
+
+			// this should be the same afterwards
+			//E halfEdge = getMesh().getNext(edge);
+
+			IMesh<P, V, E, F> mesh = getMesh();
+			E startEdge = mesh.getPrev(edge);
+			E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
+			E currentEdge = mesh.getPrev(edge);
+
+			// flipp
+			//c.prev.twin
+
+			while(currentEdge != endEdge) {
+				while (isIllegal(mesh.getNext(currentEdge), p)) {
+					flip(mesh.getNext(currentEdge));
+					flips++;
+					its++;
+				}
+
+				its++;
+
+				currentEdge = mesh.getTwin(mesh.getPrev(currentEdge));
+			}
+
+			//log.info("#flips = " + flips);
+			//log.info("#its = " + its);
+		//}
+	}
+
+	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
 		pointLocator.flipEdgeEvent(f1, f2);
 	}
 
 	@Override
-	public void splitFaceEvent(final F original, final F[] faces) {
-		pointLocator.splitFaceEvent(original, faces);
+	public void splitTriangleEvent(final F original, final F f1, F f2, F f3) {
+		pointLocator.splitTriangleEvent(original, f1, f2, f3);
 	}
 
 	@Override
-	public void insertEvent(@NotNull  final E halfEdge) {
-		pointLocator.insertEvent(halfEdge);
+	public void splitEdgeEvent(F original, F f1, F f2) {
+		pointLocator.splitEdgeEvent(original, f1, f2);
+	}
+
+	@Override
+	public void insertEvent(@NotNull final E halfEdge) {
+		pointLocator.insertEvent(getMesh().getVertex(halfEdge));
 	}
 
 	@Override
@@ -418,7 +517,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		points.add(new VPoint(80,70));*/
 
 		Random r = new Random();
-		for(int i=0; i< 1000; i++) {
+		for(int i=0; i< 1000000; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
@@ -427,13 +526,14 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		long ms = System.currentTimeMillis();
 
 		PMesh<VPoint> mesh = new PMesh<>(pointConstructor);
-		IncrementalTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> bw = new IncrementalTriangulation<>(points);
-		bw.setMesh(mesh);
-		bw.setPointLocator(new DelaunayTree<>(bw));
-		bw.compute();
+		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> bw = ITriangulation.createPTriangulation(
+				IPointLocator.Type.DELAUNAY_HIERARCHY,
+				points,
+				pointConstructor);
+				new IncrementalTriangulation<>(points);
+		bw.finalize();
 
 		Set<VLine> edges = bw.getEdges();
-		edges.addAll(bw.getTriangles().stream().map(triangle -> new VLine(triangle.getIncenter(), triangle.p1)).collect(Collectors.toList()));
 		System.out.println(System.currentTimeMillis() - ms);
 
 		JFrame window = new JFrame();
@@ -442,7 +542,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		window.getContentPane().add(new Lines(edges, points, max));
 		window.setVisible(true);
 
-		ms = System.currentTimeMillis();
+		/*ms = System.currentTimeMillis();
 		BowyerWatsonSlow<VPoint> bw2 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
 		bw2.execute();
 		Set<VLine> edges2 = bw2.getTriangles().stream()
@@ -455,7 +555,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		window2.getContentPane().add(new Lines(edges2, points, max));
 		window2.setVisible(true);
 
-		UniformTriangulation<VPoint, PHalfEdge<VPoint>, PFace<VPoint>> uniformTriangulation = ITriangulation.createUnifirmTriangulation(
+		UniformTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> uniformTriangulation = ITriangulation.createUnifirmTriangulation(
 				IPointLocator.Type.DELAUNAY_TREE,
 				new VRectangle(0, 0, width, height),
 				10.0,
@@ -483,7 +583,7 @@ public class IncrementalTriangulation<P extends IPoint, E extends IHalfEdge<P>, 
 		window4.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window4.setBounds(0, 0, max, max);
 		window4.getContentPane().add(new Lines(edges4, edges4.stream().flatMap(edge -> edge.streamPoints()).collect(Collectors.toSet()), max));
-		window4.setVisible(true);
+		window4.setVisible(true);*/
 	}
 
 	private static class Lines extends JComponent{

@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.impl.PMesh;
+import org.vadere.util.geometry.mesh.impl.PVertex;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -32,7 +33,7 @@ public class TestFFMUniformTriangulation {
 
 	private static Logger log = LogManager.getLogger(TestFFMUniformTriangulation.class);
 
-	private UniformTriangulation<PotentialPoint, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> uniformTriangulation;
+	private UniformTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> uniformTriangulation;
 	private int width = 10;
 	private int height = 10;
 	private double minTriangleSideLength = 0.1;

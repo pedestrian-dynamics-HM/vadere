@@ -11,17 +11,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Benedikt Zoennchen
  */
-public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>> {
+public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
 
 	private List<PFace<P>> faces;
 	private PFace<P> boundary;
 	private List<PHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
-	private Set<P> vertices;
+	private Set<PVertex<P>> vertices;
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
@@ -48,13 +49,13 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public PFace<P> getFace(final PHalfEdge<P> halfEdge) {
+	public PFace<P> getFace(@NotNull final PHalfEdge<P> halfEdge) {
 		return halfEdge.getFace();
 	}
 
 	@Override
-	public PHalfEdge<P> getEdge(@NotNull P vertex) {
-		return null;
+	public PHalfEdge<P> getEdge(@NotNull PVertex<P> vertex) {
+		return vertex.getEdge();
 	}
 
 	@Override
@@ -63,8 +64,18 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public P getVertex(@NotNull PHalfEdge<P> halfEdge) {
+	public P getPoint(@NotNull PHalfEdge<P> halfEdge) {
+		return getVertex(halfEdge).getPoint();
+	}
+
+	@Override
+	public PVertex<P> getVertex(@NotNull PHalfEdge<P> halfEdge) {
 		return halfEdge.getEnd();
+	}
+
+	@Override
+	public P getPoint(@NotNull PVertex<P> vertex) {
+		return vertex.getPoint();
 	}
 
 	@Override
@@ -118,22 +129,22 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public void setEdge(@NotNull P vertex, @NotNull PHalfEdge<P> edge) {
-		throw new UnsupportedOperationException("not jet implemented.");
+	public void setEdge(@NotNull PVertex<P> vertex, @NotNull PHalfEdge<P> edge) {
+		vertex.setEdge(edge);
 	}
 
 	@Override
-	public void setVertex(@NotNull PHalfEdge<P> halfEdge, @NotNull P vertex) {
+	public void setVertex(@NotNull PHalfEdge<P> halfEdge, @NotNull PVertex<P> vertex) {
 		halfEdge.setEnd(vertex);
 	}
 
 	@Override
-	public List<PHalfEdge<P>> getEdges(@NotNull P vertex) {
+	public List<PHalfEdge<P>> getEdges(@NotNull final PVertex<P> vertex) {
 		return edges.stream().filter(edge -> !edge.isValid()).filter(edge -> getVertex(edge).equals(vertex)).collect(Collectors.toList());
 	}
 
 	@Override
-	public Collection<P> getVertices() {
+	public Collection<PVertex<P>> getVertices() {
 		return vertices;
 	}
 
@@ -148,14 +159,14 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public PHalfEdge<P> createEdge(@NotNull P vertex) {
+	public PHalfEdge<P> createEdge(@NotNull PVertex<P> vertex) {
 		PHalfEdge<P> edge = new PHalfEdge<>(vertex);
 		edges.add(edge);
 		return edge;
 	}
 
 	@Override
-	public PHalfEdge<P> createEdge(@NotNull P vertex, @NotNull PFace<P> face) {
+	public PHalfEdge<P> createEdge(@NotNull PVertex<P> vertex, @NotNull PFace<P> face) {
 		PHalfEdge<P> edge = new PHalfEdge<>(vertex, face);
 		edges.add(edge);
 		return edge;
@@ -179,10 +190,20 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public P createVertex(double x, double y) {
-		P vertex = pointConstructor.create(x, y);
-		//vertices.add(vertex);
-		return vertex;
+	public P createPoint(double x, double y) {
+		return pointConstructor.create(x, y);
+	}
+
+
+	// TODO: maybe remove insertVertex!
+	@Override
+	public PVertex<P> createVertex(double x, double y) {
+		return createVertex(pointConstructor.create(x, y));
+	}
+
+	@Override
+	public PVertex<P> createVertex(P point) {
+		return new PVertex<>(point);
 	}
 
 	@Override
@@ -191,12 +212,12 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public void insert(P vertex) {
+	public void insert(final PVertex<P> vertex) {
 		vertices.add(vertex);
 	}
 
 	@Override
-	public void insertVertex(P vertex) {
+	public void insertVertex(final PVertex<P> vertex) {
 		vertices.add(vertex);
 	}
 
@@ -213,12 +234,32 @@ public class PMesh<P extends IPoint> implements IMesh<P, PHalfEdge<P>, PFace<P>>
 	}
 
 	@Override
-	public void destroyVertex(@NotNull P vertex) {
+	public void setDown(@NotNull PVertex<P> up, @NotNull PVertex<P> down) {
+		up.setDown(down);
+	}
+
+	@Override
+	public PVertex<P> getDown(@NotNull PVertex<P> vertex) {
+		return vertex.getDown();
+	}
+
+	@Override
+	public void destroyVertex(@NotNull PVertex<P> vertex) {
 		vertices.remove(vertex);
 	}
 
 	@Override
+	public Stream<PFace<P>> streamFaces() {
+		return faces.stream();
+	}
+
+	@Override
+	public Stream<PHalfEdge<P>> streamEdges() {
+		return streamFaces().flatMap(face -> streamEdges(face));
+	}
+
+	@Override
 	public List<PFace<P>> getFaces() {
-		return faces.stream().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+		return streamFaces().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
 	}
 }

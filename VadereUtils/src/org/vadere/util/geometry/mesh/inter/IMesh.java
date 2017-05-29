@@ -7,10 +7,12 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.impl.PFace;
 import org.vadere.util.geometry.mesh.impl.PHalfEdge;
 import org.vadere.util.geometry.mesh.impl.PMesh;
+import org.vadere.util.geometry.mesh.impl.PVertex;
 import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.mesh.iterators.AdjacentFaceIterator;
 import org.vadere.util.geometry.mesh.iterators.IncidentEdgeIterator;
 import org.vadere.util.geometry.mesh.iterators.SurroundingFaceIterator;
+import org.vadere.util.geometry.mesh.iterators.VertexIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -39,21 +41,36 @@ import java.util.stream.StreamSupport;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F> {
+public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F> {
 	E getNext(@NotNull E halfEdge);
 	E getPrev(@NotNull E halfEdge);
 	E getTwin(@NotNull E halfEdge);
 	F getFace(@NotNull E halfEdge);
 
-	E getEdge(@NotNull P vertex);
+	E getEdge(@NotNull V vertex);
+
 	E getEdge(@NotNull F face);
 
-	P getVertex(@NotNull E halfEdge);
+	P getPoint(@NotNull E halfEdge);
+
+	V getVertex(@NotNull E halfEdge);
+
+	// TODO: this is for the delaunay-hierarchy only!
+	V getDown(@NotNull V vertex);
+
+	// TODO: this is for the delaunay-hierarchy only!
+	void setDown(@NotNull V up, @NotNull V down);
+
+	P getPoint(@NotNull V vertex);
 
 	default F getTwinFace(@NotNull E halfEdge) {
 		return getFace(getTwin(halfEdge));
 	}
 	F getFace();
+
+	default F getFace(@NotNull V vertex) {
+		return getFace(getEdge(vertex));
+	}
 
 	/**
 	 * Returns true if the face is the boundar
@@ -73,35 +90,38 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	void setFace(@NotNull E halfEdge, @NotNull F face);
 
 	void setEdge(@NotNull F face, @NotNull E edge);
-	void setEdge(@NotNull P vertex, @NotNull E edge);
-	void setVertex(@NotNull E halfEdge, @NotNull P vertex);
+	void setEdge(@NotNull V vertex, @NotNull E edge);
+	void setVertex(@NotNull E halfEdge, @NotNull V vertex);
 
-	E createEdge(@NotNull P vertex);
-	E createEdge(@NotNull P vertex, @NotNull F face);
+	E createEdge(@NotNull V vertex);
+	E createEdge(@NotNull V vertex, @NotNull F face);
 	F createFace();
 	F createFace(boolean boundary);
-	P createVertex(double x, double y);
+	P createPoint(double x, double y);
+	V createVertex(double x, double y);
+	V createVertex(P point);
 	F getBoundary();
 
-	void insert(P vertex);
+	void insert(V vertex);
 
-	void insertVertex(P vertex);
+	void insertVertex(V vertex);
 
-	default P insertVertex(double x, double y) {
-		P vertex = createVertex(x, y);
+	default V insertVertex(double x, double y) {
+		V vertex = createVertex(x, y);
 		insertVertex(vertex);
 		return vertex;
 	}
 
 	// TODO: name?
-	default F createFace(P... points) {
+	default F createFace(V... points) {
 		F superTriangle = createFace();
 		F borderFace = createFace(true);
 
 		LinkedList<E> edges = new LinkedList<>();
 		LinkedList<E> borderEdges = new LinkedList<>();
-		for(P p : points) {
+		for(V p : points) {
 			E edge = createEdge(p, superTriangle);
+			setEdge(p, edge);
 			E borderEdge = createEdge(p, borderFace);
 			edges.add(edge);
 			borderEdges.add(borderEdge);
@@ -139,9 +159,13 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 
 	void destroyFace(@NotNull F face);
 	void destroyEdge(@NotNull E edge);
-	void destroyVertex(@NotNull P vertex);
+	void destroyVertex(@NotNull V vertex);
 
 	List<F> getFaces();
+
+	Stream<F> streamFaces();
+
+	Stream<E> streamEdges();
 
 	default VPolygon toPolygon(F face) {
 		Path2D path2D = new Path2D.Double();
@@ -153,7 +177,7 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 
 		while (!edge.equals(prev)) {
 			edge = getNext(edge);
-			P p = getVertex(edge);
+			V p = getVertex(edge);
 			path2D.lineTo(p.getX(), p.getY());
 		}
 
@@ -161,15 +185,15 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	}
 
 	default VTriangle toTriangle(F face) {
-		List<P> vertices = getVertices(face);
+		List<V> vertices = getVertices(face);
 		assert vertices.size() == 3;
 		return new VTriangle(new VPoint(vertices.get(0)), new VPoint(vertices.get(1)), new VPoint(vertices.get(2)));
 	}
 
 	default Triple<P, P, P> toTriple(F face) {
-		List<P> vertices = getVertices(face);
+		List<V> vertices = getVertices(face);
 		assert vertices.size() == 3;
-		return Triple.of(vertices.get(0), vertices.get(1), vertices.get(2));
+		return Triple.of(getPoint(vertices.get(0)), getPoint(vertices.get(1)), getPoint(vertices.get(2)));
 	}
 
 	default Optional<F> locate(final double x, final double y) {
@@ -218,6 +242,16 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	 */
 	default Iterable<E> getEdgeIt(F face) {
 		return () -> new EdgeIterator<>(this, face);
+	}
+
+	/**
+	 * Returns an Iterable which can be used to iterate over all vertices of a face.
+	 *
+	 * @param face the face the iterable iterates over
+	 * @return an Iterable which can be used to iterate over all vertices of a face.
+	 */
+	default Iterable<V> getVertexIt(F face) {
+		return () -> new VertexIterator<>(this, face);
 	}
 
 	/**
@@ -295,7 +329,7 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	 * @param edge the edge which holds the vertex
 	 * @return a list of vertices which are adjacent to the vertex of this edge.
 	 */
-	default List<P> getAdjacentVertices(@NotNull E edge) {
+	default List<V> getAdjacentVertices(@NotNull E edge) {
 		return streamIncidentEdges(edge).map(this::getVertex).collect(Collectors.toList());
 	}
 
@@ -316,7 +350,7 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	 * @param vertex the end-point of all the edges
 	 * @return all edges which end-point is equal to the vertex
 	 */
-	List<E> getEdges(@NotNull P vertex);
+	List<E> getEdges(@NotNull V vertex);
 
 	/**
 	 * Returns a list of all edges of a face.
@@ -334,15 +368,32 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	 * @param face the face
 	 * @return a list of all vertices of a face.
 	 */
-	default List<P> getVertices(@NotNull F face) {
-		EdgeIterator<P, E, F> edgeIterator = new EdgeIterator<>(this, face);
+	default List<V> getVertices(@NotNull F face) {
+		EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
 
-		List<P> vertices = new ArrayList<P>();
+		List<V> vertices = new ArrayList<>();
 		while (edgeIterator.hasNext()) {
 			vertices.add(getVertex(edgeIterator.next()));
 		}
 
 		return vertices;
+	}
+
+	/**
+	 * Returns a list of all points of a face.
+	 *
+	 * @param face the face
+	 * @return a list of all points of a face.
+	 */
+	default List<P> getPoints(@NotNull F face) {
+		EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
+
+		List<P> points = new ArrayList<>();
+		while (edgeIterator.hasNext()) {
+			points.add(getPoint(edgeIterator.next()));
+		}
+
+		return points;
 	}
 
 	/**
@@ -372,8 +423,8 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 	// TODO: rename?
 	default Optional<E> getEdgeCloseToVertex(F face, double x, double y, double epsilon) {
 		for(E halfEdge : getEdgeIt(face)) {
-			P p1 = getVertex(halfEdge);
-			P p2 = getVertex(getPrev(halfEdge));
+			V p1 = getVertex(halfEdge);
+			V p2 = getVertex(getPrev(halfEdge));
 
 			if(Math.abs(GeometryUtils.ccw(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y)) < epsilon) {
 				return Optional.of(halfEdge);
@@ -382,13 +433,46 @@ public interface IMesh<P extends IPoint, E extends IHalfEdge<P>, F extends IFace
 		return Optional.empty();
 	}
 
-	Collection<P> getVertices();
+	Collection<V> getVertices();
 
 	int getNumberOfVertices();
 
 	int getNumberOfFaces();
 
-	static <P extends IPoint> IMesh<P, PHalfEdge<P>, PFace<P>> createPMesh(final IPointConstructor<P> pointConstructor) {
+	static <P extends IPoint> IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPMesh(final IPointConstructor<P> pointConstructor) {
 		return new PMesh<>(pointConstructor);
+	}
+
+	default V closestVertex(final F face, final double x, final double y) {
+		V result = null;
+		double distance = Double.MAX_VALUE;
+		for (V vertex : getVertexIt(face)) {
+			if(getPoint(vertex).distance(x, y) < distance) {
+				result = vertex;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Returns the edge of a given face which is the closest edge of the face in respect to the point defined
+	 * by (x,y). The point might be outside or inside the face or even on an specific edge.
+	 *
+	 * @param face  the face
+	 * @param x     x-coordinate of the point
+	 * @param y     y-coordinate of the point
+	 * @return the edge of a given face which is closest to a point p = (x,y)
+	 */
+	default E closestEdge(final F face, final double x, final double y) {
+		E result = null;
+		double distance = Double.MAX_VALUE;
+		for (E edge : getEdgeIt(face)) {
+			if(GeometryUtils.distanceToLineSegment(getPoint(getPrev(edge)), getPoint(edge), x, y) < distance) {
+				result = edge;
+			}
+		}
+
+		return result;
 	}
 }
