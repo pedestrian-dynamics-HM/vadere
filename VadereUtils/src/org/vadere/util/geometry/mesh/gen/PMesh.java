@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,7 +19,6 @@ import java.util.stream.Stream;
 public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
 
 	private List<PFace<P>> faces;
-	//private List<PFace<P>> borderFaces;
 	private PFace<P> boundary;
 	private List<PHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
@@ -28,7 +26,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
-		//this.borderFaces = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new HashSet<>();
 		this.boundary = new PFace<>(true);
@@ -138,23 +135,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public void setEdge(@NotNull PVertex<P> vertex, @NotNull PHalfEdge<P> edge) {
-		assert edge.getEnd().equals(vertex);
-		if(!edge.getEnd().equals(vertex)) {
-			System.out.println("end of the edge is not equals to the vertex.");
-		}
 		vertex.setEdge(edge);
 	}
 
 	@Override
 	public void setVertex(@NotNull PHalfEdge<P> halfEdge, @NotNull PVertex<P> vertex) {
-		/*if(halfEdge.getEnd().getEdge() == halfEdge) {
-			System.out.println("error44");
-		}
-
-
-		if(!vertex.getEdge().getEnd().equals(vertex)) {
-			System.out.println("error2");
-		}*/
 		halfEdge.setEnd(vertex);
 	}
 
@@ -178,16 +163,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public int getNumberOfFaces() {
 		return faces.size();
-	}
-
-	@Override
-	public boolean tryLock(@NotNull PVertex<P> vertex) {
-		return vertex.getLock().tryLock();
-	}
-
-	@Override
-	public void unlock(@NotNull PVertex<P> vertex) {
-		vertex.getLock().unlock();
 	}
 
 	@Override
@@ -282,21 +257,13 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public Stream<PFace<P>> streamFaces() {
+		return faces.stream();
+	}
+
+	@Override
 	public Stream<PHalfEdge<P>> streamEdges() {
-		return edges.stream().filter(e -> !isDestroyed(e));
-	}
-
-	@Override
-	public Stream<PHalfEdge<P>> streamEdgesParallel() {
-		return edges.parallelStream().filter(e -> !isDestroyed(e));
-	}
-
-	@Override
-	public Stream<PVertex<P>> streamVertices() { return vertices.stream().filter(v -> !isDestroyed(v)); }
-
-	@Override
-	public Stream<PVertex<P>> streamVerticesParallel() {
-		return vertices.parallelStream().filter(v -> !isDestroyed(v));
+		return edges.stream();
 	}
 
 	@Override
@@ -306,25 +273,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public List<PFace<P>> getFaces() {
-		return streamFaces().filter(face -> !face.isBorder()).filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+		return streamFaces().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
 	}
-
-	@Override
-	public List<PHalfEdge<P>> getBoundaryEdges() {
-		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).collect(Collectors.toList());
-	}
-	@Override
-	public List<PVertex<P>> getBoundaryVertices() {
-		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).map(edge -> getVertex(edge)).collect(Collectors.toList());
-	}
-
-	@Override
-	public Stream<PFace<P>> streamFaces(@NotNull Predicate<PFace<P>> predicate) {
-		return faces.stream().filter(predicate);
-	}
-
-    @Override
-    public int getNumberOfEdges() {
-        return edges.size();
-    }
 }

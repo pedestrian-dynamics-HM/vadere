@@ -40,13 +40,11 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	private Supplier<ITriangulation<P, V, E, F>> triangulationSupplier;
 
 	// see delaunay-hierarchy paper!
-	/*private double alpha = 30;
-	private int maxLevel = 5;
-	private int minSize = 20;*/
+	private double alpha = 30;
 
-    private double alpha = 30;
-    private int maxLevel = 5;
-    private int minSize = 20;
+	private int maxLevel = 5;
+
+	private int minSize = 20;
 
 	private LinkedList<F> prevLocationResult;
 
@@ -127,8 +125,6 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 				prev = v;
 			}
 		}
-
-		//System.out.println(this);
 	}
 
 	private ITriangulation<P, V, E, F> getLevel(final int level) {
@@ -144,8 +140,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	}
 
 	private V getDown(V src, int srcLevel) {
-	    // srcLevel-1 since the resulting vertex is contained in the mesh one level below the src vertex!
-		return getLevel(srcLevel-1).getMesh().getDown(src);
+		return getLevel(srcLevel).getMesh().getDown(src);
 	}
 
 	private int randomLevel() {
@@ -235,16 +230,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 		}
 	}
 
-    @Override
-    public String toString() {
-	    StringBuilder builder = new StringBuilder("");
-        for(int i = 0; i < hierarchySets.size(); i++) {
-            builder.append("["+i+"]:" + hierarchySets.get(i).getMesh().getNumberOfVertices()+"\n");
-        }
-        return builder.toString();
-	}
-
-    /**
+	/**
 	 * Returns vertex of the triangulation of the face with the smallest distance to point.
 	 * Assumption: The face has to be part of the mesh of the triangulation.
 	 *

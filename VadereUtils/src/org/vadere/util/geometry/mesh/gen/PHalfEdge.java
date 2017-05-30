@@ -143,7 +143,7 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 	 * one half-edge part of face and ending at end.
 	 */
 
-	/*@Override
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -159,5 +159,5 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 		int result = end.hashCode();
 		result = 31 * result + (face != null ? face.hashCode() : 0);
 		return result;
-	}*/
+	}
 }

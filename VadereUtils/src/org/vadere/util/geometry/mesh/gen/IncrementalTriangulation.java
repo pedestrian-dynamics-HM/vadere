@@ -114,7 +114,6 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			p1 = mesh.insertVertex(bound.getX() + 2 * max + gap, bound.getY() - gap);
 			p2 = mesh.insertVertex(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max + gap);
 
-			// counter clockwise!
 			superTriangle = mesh.createFace(p0, p1, p2);
 			borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
 
@@ -230,24 +229,17 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		if(!finalized) {
 			// we have to use other halfedges than he1 and he2 since they might be deleted
 			// if we deleteBoundaryFace he0!
+			List<F> faces1 = mesh.getFaces(p0);
+			faces1.removeIf(f -> mesh.isBoundary(f));
+			faces1.forEach(f -> removeFace(f, true));
 
-			if(!mesh.isDestroyed(p0)) {
-				List<F> faces1 = mesh.getFaces(p0);
-				faces1.removeIf(f -> mesh.isBoundary(f));
-				faces1.forEach(f -> removeFace(f, true));
-			}
+			List<F> faces2 = mesh.getFaces(p1);
+			faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
+			faces2.forEach(f -> removeFace(f, true));
 
-			if(!mesh.isDestroyed(p1)) {
-				List<F> faces2 = mesh.getFaces(p1);
-				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces2.forEach(f -> removeFace(f, true));
-			}
-
-			if(!mesh.isDestroyed(p2)) {
-				List<F> faces3 = mesh.getFaces(p2);
-				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces3.forEach(f -> removeFace(f, true));
-			}
+			List<F> faces3 = mesh.getFaces(p2);
+			faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
+			faces3.forEach(f -> removeFace(f, true));
 
 			finalized = true;
 		}
@@ -384,7 +376,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 */
 	@Override
 	public boolean isIllegal(E edge, V p) {
-		if(!mesh.isAtBoundary(edge)) {
+		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
 			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 			//V p = mesh.getVertex(mesh.getNext(edge));
 			E t0 = mesh.getTwin(edge);
@@ -547,7 +539,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		points.add(new VPoint(80,70));*/
 
 		Random r = new Random();
-		for(int i=0; i< 10000; i++) {
+		for(int i=0; i< 1000000; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
@@ -560,31 +552,17 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				IPointLocator.Type.DELAUNAY_HIERARCHY,
 				points,
 				pointConstructor);
+				new IncrementalTriangulation<>(points);
 		bw.finalize();
+
+		Set<VLine> edges = bw.getEdges();
 		System.out.println(System.currentTimeMillis() - ms);
-        Set<VLine> edges = bw.getEdges();
 
 		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window.setBounds(0, 0, max, max);
 		window.getContentPane().add(new Lines(edges, points, max));
 		window.setVisible(true);
-
-
-        ms = System.currentTimeMillis();
-        ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> bw2 = ITriangulation.createATriangulation(
-                IPointLocator.Type.DELAUNAY_HIERARCHY,
-                points,
-                pointConstructor);
-        bw2.finalize();
-        System.out.println(System.currentTimeMillis() - ms);
-
-        Set<VLine> edges2 = bw2.getEdges();
-        JFrame window2 = new JFrame();
-        window2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        window2.setBounds(0, 0, max, max);
-        window2.getContentPane().add(new Lines(edges2, points, max));
-        window2.setVisible(true);
 
 		/*ms = System.currentTimeMillis();
 		BowyerWatsonSlow<VPoint> bw2 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
@@ -614,7 +592,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		window3.getContentPane().add(new Lines(edges3, edges3.stream().flatMap(edge -> edge.streamPoints()).collect(Collectors.toSet()), max));
 		window3.setVisible(true);*/
 
-		/*VRectangle bound = new VRectangle(0, 0, width, height);
+		VRectangle bound = new VRectangle(0, 0, width, height);
 		ITriangulation triangulation = ITriangulation.createVPTriangulation(bound);
 		VPUniformRefinement uniformRefinement = new VPUniformRefinement(
 				triangulation,
@@ -629,7 +607,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		window4.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window4.setBounds(0, 0, max, max);
 		window4.getContentPane().add(new Lines(edges4, edges4.stream().flatMap(edge -> edge.streamPoints()).collect(Collectors.toSet()), max));
-		window4.setVisible(true);*/
+		window4.setVisible(true);
 	}
 
 	private static class Lines extends JComponent{
