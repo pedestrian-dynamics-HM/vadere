@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.triangulations;
+package org.vadere.util.geometry.mesh.gen;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;

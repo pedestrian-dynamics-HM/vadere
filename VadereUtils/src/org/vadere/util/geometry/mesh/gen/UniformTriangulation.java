@@ -1,19 +1,15 @@
-package org.vadere.util.geometry.mesh.triangulations;
+package org.vadere.util.geometry.mesh.gen;
 
+import org.vadere.util.geometry.mesh.gen.IncrementalTriangulation;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class UniformTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, V, E, F> {

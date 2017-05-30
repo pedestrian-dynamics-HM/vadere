@@ -1,10 +1,9 @@
 package org.vadere.util.triangulation;
 
-import org.vadere.util.geometry.mesh.impl.PFace;
-import org.vadere.util.geometry.mesh.impl.PHalfEdge;
-import org.vadere.util.geometry.mesh.impl.PVertex;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -17,7 +16,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

@@ -2,10 +2,10 @@ package org.vadere.util.triangulation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.mesh.impl.PFace;
-import org.vadere.util.geometry.mesh.impl.PHalfEdge;
-import org.vadere.util.geometry.mesh.impl.PMesh;
-import org.vadere.util.geometry.mesh.impl.PVertex;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PMesh;
+import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;

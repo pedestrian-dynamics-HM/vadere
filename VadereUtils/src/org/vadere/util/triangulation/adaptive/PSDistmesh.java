@@ -1,9 +1,9 @@
 package org.vadere.util.triangulation.adaptive;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.vadere.util.geometry.mesh.impl.PFace;
-import org.vadere.util.geometry.mesh.impl.PHalfEdge;
-import org.vadere.util.geometry.mesh.impl.PVertex;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
@@ -120,7 +120,8 @@ public class  PSDistmesh {
 
 
 			System.out.println("triangulation started");
-			bowyerWatson = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points, (x, y) -> new MeshPoint(x, y, false));
+			bowyerWatson = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new MeshPoint(x, y, false));
+			bowyerWatson.finalize();
 			System.out.println("triangulation finished");
 
 			IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();

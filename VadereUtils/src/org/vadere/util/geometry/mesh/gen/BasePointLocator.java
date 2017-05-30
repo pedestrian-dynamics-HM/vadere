@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.triangulations;
+package org.vadere.util.geometry.mesh.gen;
 
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;

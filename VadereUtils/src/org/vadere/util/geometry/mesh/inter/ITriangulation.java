@@ -2,15 +2,17 @@ package org.vadere.util.geometry.mesh.inter;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.impl.PFace;
-import org.vadere.util.geometry.mesh.impl.PHalfEdge;
-import org.vadere.util.geometry.mesh.impl.PMesh;
-import org.vadere.util.geometry.mesh.impl.PVertex;
-import org.vadere.util.geometry.mesh.triangulations.BasePointLocator;
-import org.vadere.util.geometry.mesh.triangulations.DelaunayHierarchy;
-import org.vadere.util.geometry.mesh.triangulations.DelaunayTree;
-import org.vadere.util.geometry.mesh.triangulations.IncrementalTriangulation;
-import org.vadere.util.geometry.mesh.triangulations.UniformTriangulation;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PMesh;
+import org.vadere.util.geometry.mesh.gen.PVertex;
+import org.vadere.util.geometry.mesh.impl.VPMesh;
+import org.vadere.util.geometry.mesh.gen.BasePointLocator;
+import org.vadere.util.geometry.mesh.gen.DelaunayHierarchy;
+import org.vadere.util.geometry.mesh.gen.DelaunayTree;
+import org.vadere.util.geometry.mesh.gen.IncrementalTriangulation;
+import org.vadere.util.geometry.mesh.gen.UniformTriangulation;
+import org.vadere.util.geometry.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -43,10 +45,18 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 	Stream<VTriangle> streamTriangles();
 
 	default Set<VLine> getEdges() {
-		IMesh<P, V, E, F> mesh = getMesh();
-		return getMesh().getEdges().stream()
-				.map(he -> new VLine(new VPoint(mesh.getVertex(mesh.getPrev(he))), new VPoint(mesh.getVertex(he))))
-				.collect(Collectors.toSet());
+		return getMesh().streamEdges().filter(getMesh()::isAlive).map(getMesh()::toLine).collect(Collectors.toSet());
+	}
+
+
+	// factory methods
+
+	static VPTriangulation createVPTriangulation(final VRectangle bound) {
+		VPTriangulation vpTriangulation = new VPTriangulation(bound);
+		VPMesh mesh = new VPMesh();
+		vpTriangulation.setMesh(mesh);
+		vpTriangulation.setPointLocator(createPointLocator(IPointLocator.Type.DELAUNAY_HIERARCHY, vpTriangulation, bound, (x,y) -> mesh.createPoint(x, y)));
+		return vpTriangulation;
 	}
 
 	static <P extends IPoint> ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPTriangulation(
@@ -57,21 +67,7 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 		IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh = new PMesh<>(pointConstructor);
 		triangulation.setMesh(mesh);
 
-		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator;
-
-		switch (type) {
-			case BASE:
-				pointLocator = new BasePointLocator<>(triangulation);
-				break;
-			case DELAUNAY_HIERARCHY:
-				Supplier<ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>>> supplier = () -> createPTriangulation(IPointLocator.Type.BASE, bound, pointConstructor);
-				pointLocator = new DelaunayHierarchy<>(triangulation, supplier);
-				break;
-			case DELAUNAY_TREE:
-			default:
-				pointLocator = new DelaunayTree<>(triangulation);
-		}
-
+		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPointLocator(type, triangulation, bound, pointConstructor);
 		triangulation.setPointLocator(pointLocator);
 		return triangulation;
 	}
@@ -91,7 +87,8 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 		return createPTriangulation(type, bound, (x, y) -> new VPoint(x, y));
 	}
 
-	static <P extends IPoint> UniformTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createUnifirmTriangulation(
+
+	static <P extends IPoint> UniformTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createUniformTriangulation(
 			final IPointLocator.Type type,
 			final VRectangle bound,
 			final double minTriangleSideLen,
@@ -102,21 +99,7 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 		IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh = new PMesh<>(pointConstructor);
 		triangulation.setMesh(mesh);
 
-		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator;
-
-		switch (type) {
-			case BASE:
-				pointLocator = new BasePointLocator<>(triangulation);
-				break;
-			case DELAUNAY_HIERARCHY:
-				Supplier<ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>>> supplier = () -> createPTriangulation(IPointLocator.Type.BASE, bound, pointConstructor);
-				pointLocator = new DelaunayHierarchy<>(triangulation, supplier);
-				break;
-			case DELAUNAY_TREE:
-			default:
-				pointLocator = new DelaunayTree<>(triangulation);
-		}
-
+		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPointLocator(type, triangulation, bound, pointConstructor);
 		triangulation.setPointLocator(pointLocator);
 		return triangulation;
 	}
@@ -145,5 +128,28 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 		return triangulation;
 	}
 
+	static <P extends IPoint>  IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPointLocator(
+			final IPointLocator.Type type,
+			final ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triConnectivity,
+			final VRectangle bound,
+			final IPointConstructor<P> pointConstructor) {
+
+		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator;
+
+		switch (type) {
+			case BASE:
+				pointLocator = new BasePointLocator<>(triConnectivity);
+				break;
+			case DELAUNAY_HIERARCHY:
+				Supplier<ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>>> supplier = () -> createPTriangulation(IPointLocator.Type.BASE, bound, pointConstructor);
+				pointLocator = new DelaunayHierarchy<>(triConnectivity, supplier);
+				break;
+			case DELAUNAY_TREE:
+			default:
+				pointLocator = new DelaunayTree<>(triConnectivity);
+		}
+
+		return pointLocator;
+	}
 
 }
