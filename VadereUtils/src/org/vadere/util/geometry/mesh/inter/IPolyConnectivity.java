@@ -77,8 +77,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param vertex v
 	 */
 	default void adjustVertex(@NotNull final V vertex) {
-		List<E> edges = getMesh().getEdges(vertex);
-		edges.stream().filter(edge -> isAtBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
+		getMesh().streamEdges(vertex).filter(edge -> isAtBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
 	}
 
 	/**
@@ -282,7 +281,6 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	default void removeFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
 		assert !getMesh().isDestroyed(face);
 
-		getMesh().destroyFace(face);
 		List<E> delEdges = new ArrayList<>();
 		List<V> vertices = new ArrayList<>();
 
@@ -316,9 +314,11 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				getMesh().setNext(prev0, next1);
 				getMesh().setNext(prev1, next0);
 
-				// TODO: test the isolated part!
-				boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
-				boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
+				//boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
+				//boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
+
+				boolean isolated0 = getMesh().getTwin(h0).equals(getMesh().getNext(h0)) || getMesh().getTwin(h0).equals(getMesh().getPrev(h0));
+				boolean isolated1 = getMesh().getTwin(h1).equals(getMesh().getNext(h1)) || getMesh().getTwin(h1).equals(getMesh().getPrev(h1));
 
 				// adjust vertices
 				if(getMesh().getEdge(v0).equals(h0) && !isolated0) {
@@ -342,11 +342,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				getMesh().destroyEdge(h1);
 
 				// TODO: do we need this?
-				for(V vertex : vertices) {
-					adjustVertex(vertex);
-				}
+				vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
 			}
 		}
+		getMesh().destroyFace(face);
 	}
 
 	/**

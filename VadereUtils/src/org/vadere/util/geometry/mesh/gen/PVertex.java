@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.impl;
+package org.vadere.util.geometry.mesh.gen;
 
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -12,9 +12,11 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 	private final P point;
 	private PVertex<P> down;
 	private PHalfEdge<P> halfEdge;
+	private boolean destroyed;
 
 	public PVertex(final P point) {
 		this.point = point;
+		this.destroyed = false;
 		this.down = null;
 	}
 
@@ -50,6 +52,14 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		}
 
 		return point.equals(((PVertex<P>)obj).getPoint());
+	}
+
+	public boolean isDestroyed() {
+		return destroyed;
+	}
+
+	public void destroy() {
+		destroyed = true;
 	}
 
 	@Override

@@ -5,10 +5,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.mesh.impl.PFace;
-import org.vadere.util.geometry.mesh.impl.PHalfEdge;
-import org.vadere.util.geometry.mesh.impl.PMesh;
-import org.vadere.util.geometry.mesh.impl.PVertex;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -17,7 +16,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFMMAcuteTriangulation;
 import org.vadere.util.potential.calculators.PotentialPoint;
-import org.vadere.util.geometry.mesh.triangulations.UniformTriangulation;
+import org.vadere.util.geometry.mesh.gen.UniformTriangulation;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 
@@ -41,7 +40,7 @@ public class TestFFMUniformTriangulation {
 	@Before
 	public void setUp() throws Exception {
 		IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-		uniformTriangulation = ITriangulation.createUnifirmTriangulation(
+		uniformTriangulation = ITriangulation.createUniformTriangulation(
 				IPointLocator.Type.DELAUNAY_TREE,
 				new VRectangle(0, 0, width, height),
 				minTriangleSideLength,

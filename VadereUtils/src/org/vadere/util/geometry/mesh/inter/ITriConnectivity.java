@@ -104,7 +104,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		F f3 = mesh.getFace(o0);
 
 		// faces correct?
-		mesh.createEdge(v2, mesh.getFace(o0));
+		//mesh.createEdge(v2, mesh.getFace(o0));
 		E e1 = mesh.createEdge(v2, mesh.getFace(o0));
 
 		E t1 = mesh.createEdge(v, mesh.getFace(h0));
@@ -581,8 +581,8 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 		while (true) {
 			count++;
-			//boolean goLeft = random.nextBoolean();
-			boolean goLeft = true;
+			boolean goLeft = random.nextBoolean();
+			//boolean goLeft = true;
 
 			E e1 = getMesh().getEdge(face);
 			E e2 = getMesh().getNext(e1);

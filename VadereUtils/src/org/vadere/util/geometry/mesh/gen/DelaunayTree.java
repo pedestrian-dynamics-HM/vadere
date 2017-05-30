@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.triangulations;
+package org.vadere.util.geometry.mesh.gen;
 
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -10,14 +10,12 @@ import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
 	private DAG<DAGElement<P, F>> dag;
