@@ -1,21 +1,8 @@
-package org.vadere.util.geometry.mesh.impl;
+package org.vadere.util.geometry.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.MLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VTriangle;
-
-import java.awt.geom.Path2D;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * A Face is a region of a planar separation of the 2-D space, e.g. the region of a Polygon/Triangle and so on.
@@ -40,11 +27,11 @@ public class PFace<P extends IPoint> implements IFace<P> {
 	 *
 	 * @param edge one of the half-edges bordering this face.
 	 */
-	PFace(@NotNull final PHalfEdge<P> edge) {
+	protected PFace(@NotNull final PHalfEdge<P> edge) {
 		this(edge, false);
 	}
 
-	PFace(@NotNull final PHalfEdge<P> edge, boolean border) {
+	protected PFace(@NotNull final PHalfEdge<P> edge, boolean border) {
 		this.border = border;
 		this.edge = edge;
 	}

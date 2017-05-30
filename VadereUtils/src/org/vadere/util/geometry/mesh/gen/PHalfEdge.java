@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.impl;
+package org.vadere.util.geometry.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
@@ -34,15 +34,19 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 	 */
 	private PFace<P> face;
 
+	private boolean destroyed;
 
-	PHalfEdge(@NotNull final PVertex<P> end, @NotNull final PFace<P> face) {
+
+	protected PHalfEdge(@NotNull final PVertex<P> end, @NotNull final PFace<P> face) {
 		this.end = end;
 		this.face = face;
+		this.destroyed = false;
 	}
 
-	PHalfEdge(@NotNull final PVertex<P> end) {
+	protected PHalfEdge(@NotNull final PVertex<P> end) {
 		this.end = end;
 		this.face = null;
+		this.destroyed = false;
 	}
 
 	PFace<P> getFace() {
@@ -89,6 +93,7 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 		setPrevious(null);
 		setTwin(null);
 		setFace(null);
+		destroyed = true;
 	}
 
 	boolean isValid() {
@@ -124,11 +129,14 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 		return new VLine(new VPoint(this.getPrevious().getEnd()), new VPoint(this.getEnd()));
 	}
 
+	public boolean isDestroyed() {
+		return destroyed;
+	}
+
 	@Override
 	public String toString() {
 		return getEnd().toString();
 	}
-
 
 	/*
 	 * A half-edge is defined by its end vertex and its face. In a geometry there can not be more than

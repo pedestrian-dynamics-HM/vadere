@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.impl;
+package org.vadere.util.geometry.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IMesh;
@@ -104,6 +104,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public boolean isDestroyed(@NotNull PVertex<P> vertex) {
+		return vertex.isDestroyed();
+	}
+
+	@Override
 	public void setTwin(final PHalfEdge<P> halfEdge, final PHalfEdge<P> twin) {
 		halfEdge.setTwin(twin);
 	}
@@ -138,10 +143,12 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 		halfEdge.setEnd(vertex);
 	}
 
-	@Override
+	/*@Override
 	public List<PHalfEdge<P>> getEdges(@NotNull final PVertex<P> vertex) {
-		return edges.stream().filter(edge -> !edge.isValid()).filter(edge -> getVertex(edge).equals(vertex)).collect(Collectors.toList());
-	}
+		return
+		//return streamEdges().filter(edge -> !edge.isValid()).filter(edge -> getVertex(edge).equals(vertex)).collect(Collectors.toList());
+	}*/
+
 
 	@Override
 	public Collection<PVertex<P>> getVertices() {
@@ -246,6 +253,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public void destroyVertex(@NotNull PVertex<P> vertex) {
 		vertices.remove(vertex);
+		vertex.destroy();
 	}
 
 	@Override
@@ -255,7 +263,12 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public Stream<PHalfEdge<P>> streamEdges() {
-		return streamFaces().flatMap(face -> streamEdges(face));
+		return edges.stream();
+	}
+
+	@Override
+	public Iterable<PHalfEdge<P>> getEdgeIt() {
+		return () -> edges.iterator();
 	}
 
 	@Override
