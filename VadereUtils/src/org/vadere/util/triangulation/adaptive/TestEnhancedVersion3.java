@@ -3,9 +3,9 @@ package org.vadere.util.triangulation.adaptive;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
-import javax.swing.*;
+import java.util.ArrayList;
 
-import java.util.*;
+import javax.swing.*;
 
 /**
  * Created by Matimati-ka on 27.09.2016.
@@ -22,7 +22,7 @@ public class TestEnhancedVersion3 extends JFrame {
 
 		long now = System.currentTimeMillis();
 
-		VRectangle bbox = new VRectangle(0, 0, 300, 300);
+		VRectangle bbox = new VRectangle(-10, -10, 20, 20);
 //        Path2D.Double test = new Path2D.Double();
 //        test.moveTo(30,30);
 //        test.lineTo(90,80);
@@ -50,10 +50,13 @@ public class TestEnhancedVersion3 extends JFrame {
 			add(new VRectangle(0, height-5, 5, height));
 		}};
 
-		IDistanceFunction distanceFunc = IDistanceFunction.create(bbox, obstacles);
-		IEdgeLengthFunction edgeLengthFunc = IEdgeLengthFunction.create(bbox, distanceFunc);
+		//IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 
-		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, bbox, boundingBox);
+		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.max(Math.abs(p.getX()), Math.abs(p.getY()))) - 3;
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin()*10;
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 - distanceFunc.apply(p);
+
+		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, bbox, new ArrayList<>());
 
 		System.out.println(System.currentTimeMillis()-now);
 		now = System.currentTimeMillis();
@@ -63,16 +66,16 @@ public class TestEnhancedVersion3 extends JFrame {
 		frame.setVisible(true);
 
 		meshGenerator.initialize();
-		double maxLen = meshGenerator.step();
+		//double maxLen = meshGenerator.step();
+		double maxLen = 10;
 
-
-		while (maxLen > 0.000000001) {
-			System.out.println("quality:"+ maxLen);
+		while (maxLen > 0.5 || true) {
+			System.out.println("maxLen:"+ maxLen);
+			meshGenerator.improve();
+			distmeshPanel.update();
 			distmeshPanel.repaint();
-			maxLen = meshGenerator.step();
 		}
 	}
-
 
 	public static void main(String[] args) {
 		new TestEnhancedVersion3();

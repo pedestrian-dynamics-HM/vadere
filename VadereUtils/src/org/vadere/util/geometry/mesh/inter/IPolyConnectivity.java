@@ -291,6 +291,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 			if(getMesh().isBoundary(getMesh().getTwin(edge))) {
 				delEdges.add(edge);
 			}
+			else {
+				// update the edge of the boundary since it might be deleted!
+				getMesh().setEdge(boundary, edge);
+			}
 
 			vertices.add(getMesh().getVertex(edge));
 		}
@@ -310,6 +314,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				next1 = getMesh().getNext(h1);
 				prev1 = getMesh().getPrev(h1);
 
+				boolean isolated0 = isSimpleConnected(v0);
+				boolean isolated1 = isSimpleConnected(v1);
+
 				// adjust next and prev half-edges
 				getMesh().setNext(prev0, next1);
 				getMesh().setNext(prev1, next0);
@@ -317,11 +324,11 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				//boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
 				//boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
 
-				boolean isolated0 = getMesh().getTwin(h0).equals(getMesh().getNext(h0)) || getMesh().getTwin(h0).equals(getMesh().getPrev(h0));
-				boolean isolated1 = getMesh().getTwin(h1).equals(getMesh().getNext(h1)) || getMesh().getTwin(h1).equals(getMesh().getPrev(h1));
+				//boolean isolated0 = getMesh().getTwin(h0) == getMesh().getNext(h0) || getMesh().getTwin(h0) == getMesh().getPrev(h0);
+				//boolean isolated1 = getMesh().getTwin(h1) == getMesh().getNext(h1) || getMesh().getTwin(h1) == getMesh().getPrev(h1);
 
 				// adjust vertices
-				if(getMesh().getEdge(v0).equals(h0) && !isolated0) {
+				if(getMesh().getEdge(v0) == h0 && !isolated0) {
 					getMesh().setEdge(v0, prev1);
 				}
 
@@ -329,7 +336,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 					getMesh().destroyVertex(v0);
 				}
 
-				if(getMesh().getEdge(v1).equals(h1) && !isolated1) {
+				if(getMesh().getEdge(v1) == h1 && !isolated1) {
 					getMesh().setEdge(v1, prev0);
 				}
 
@@ -342,10 +349,29 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				getMesh().destroyEdge(h1);
 
 				// TODO: do we need this?
-				vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
+				//vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
 			}
 		}
 		getMesh().destroyFace(face);
+	}
+
+	/**
+	 * Tests whether the vertex has degree smaller or equals 2.
+	 * If an edge gets deleted and the vertex is simple connected
+	 * the vertex becomes isolated.
+	 *
+	 * @param vertex    the vertex
+	 * @return true if the vertex has degree smaller or equals 2, false otherwise.
+	 */
+	default boolean isSimpleConnected(@NotNull final V vertex) {
+		if(getMesh().isDestroyed(vertex)) {
+			return true;
+		}
+		// test if degree of the vertex is <= 2
+		E edge0 = getMesh().getEdge(vertex);
+		E edge1 = getMesh().getTwin(getMesh().getNext(edge0));
+		E edge2 = getMesh().getTwin(getMesh().getNext(edge1));
+		return edge0 == edge1 || edge0 == edge2;
 	}
 
 	/**

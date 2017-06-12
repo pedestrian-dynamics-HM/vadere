@@ -135,11 +135,23 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public void setEdge(@NotNull PVertex<P> vertex, @NotNull PHalfEdge<P> edge) {
+		assert edge.getEnd().equals(vertex);
+		if(!edge.getEnd().equals(vertex)) {
+			System.out.println("end of the edge is not equals to the vertex.");
+		}
 		vertex.setEdge(edge);
 	}
 
 	@Override
 	public void setVertex(@NotNull PHalfEdge<P> halfEdge, @NotNull PVertex<P> vertex) {
+		/*if(halfEdge.getEnd().getEdge() == halfEdge) {
+			System.out.println("error44");
+		}
+
+
+		if(!vertex.getEdge().getEnd().equals(vertex)) {
+			System.out.println("error2");
+		}*/
 		halfEdge.setEnd(vertex);
 	}
 
@@ -267,12 +279,15 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public Stream<PVertex<P>> streamVertices() { return vertices.stream(); };
+
+	@Override
 	public Iterable<PHalfEdge<P>> getEdgeIt() {
 		return () -> edges.iterator();
 	}
 
 	@Override
 	public List<PFace<P>> getFaces() {
-		return streamFaces().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+		return streamFaces().filter(face -> !face.isBorder()).filter(face -> !face.isDestroyed()).collect(Collectors.toList());
 	}
 }
