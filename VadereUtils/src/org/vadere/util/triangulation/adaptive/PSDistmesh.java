@@ -159,7 +159,10 @@ public class  PSDistmesh {
 			double lenDiff = Math.max(desiredLen - len, 0);
 			//double lenDiff = desiredLen - len;
 			//double force = desiredLen - len;
-			VPoint directedForce = new VPoint((lenDiff / len) * (line.getX1() - line.getX2()), (lenDiff / len) * (line.getY1() - line.getY2()));
+			IPoint forceDirection = new VPoint(line.getP1()).subtract(new VPoint(line.getP2())).norm();
+			VPoint directedForce = new VPoint(forceDirection.scalarMultiply((lenDiff / len)));
+
+			//VPoint directedForce = new VPoint((lenDiff / len) * (line.getX1() - line.getX2()), (lenDiff / len) * (line.getY1() - line.getY2()));
 			//VPoint directedForce = new VPoint(3, 3);
 			line.setVelocity(directedForce);
 			//line.setVelocity(line.getVelocity().add(new VPoint(Math.random(), Math.random())));

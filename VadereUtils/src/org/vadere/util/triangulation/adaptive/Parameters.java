@@ -6,7 +6,7 @@ package org.vadere.util.triangulation.adaptive;
 public class Parameters {
 	final static double TOL = .1;
 	final static double FSCALE = 1.0;
-	final static double DELTAT = 0.2;
+	final static double DELTAT = 0.06;
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"

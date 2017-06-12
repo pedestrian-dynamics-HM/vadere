@@ -21,6 +21,6 @@ public class VPUniformRefinement extends UniformRefinementTriangulation<VPoint, 
 			final VRectangle bound,
 			final Collection<VShape> boundary,
 			final IEdgeLengthFunction lenFunc) {
-		super(triangulation, bound, boundary, lenFunc);
+		super(triangulation, bound, boundary, lenFunc, p -> -1.0);
 	}
 }

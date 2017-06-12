@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.shapes;
 
+import java.awt.geom.PathIterator;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -137,6 +138,22 @@ public class VTriangle extends VPolygon {
 		}
 
 		return orthocenter;
+	}
+
+	public VPoint closestPoint(final IPoint point) {
+
+		VPoint currentClosest = null;
+		double currentMinDistance = java.lang.Double.MAX_VALUE;
+
+		for(VLine line : lines) {
+			VPoint p = GeometryUtils.closestToSegment(line, point);
+			if(p.distance(point) < currentMinDistance) {
+				currentMinDistance = p.distance(point);
+				currentClosest = p;
+			}
+		}
+
+		return currentClosest;
 	}
 
 	public VPoint getCircumcenter(){
