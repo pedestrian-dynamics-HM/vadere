@@ -60,6 +60,10 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 */
 	boolean isIllegal(E edge, V p);
 
+	default boolean isIllegal(E edge) {
+		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
+	}
+
 	/**
 	 * Splits the half-edge at point p, preserving a valid triangulation.
 	 * Assumption: p is located on the edge!
@@ -111,7 +115,17 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		mesh.setEdge(v, t1);
 
 		mesh.setTwin(e1, t1);
+
+		/*
+		 * These two operations are strongly connected.
+		 * Before these operations the vertex of o0 is v2.
+		 * If the edge of v2 is equal to o0, the edge becomes
+		 * invalid after calling mesh.setVertex(o0, v);
+		 */
 		mesh.setVertex(o0, v);
+		if(mesh.getEdge(v2).equals(o0)) {
+			mesh.setEdge(v2, e1);
+		}
 
 		if(!mesh.isBoundary(h0)) {
 			F f1 = mesh.createFace();
@@ -249,6 +263,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 
 		// TODO: maybe without if, just do it? its faster?
+
+
+		assert mesh.getVertex(b2) == va0;
+		assert mesh.getVertex(a2) == vb0;
+
 		if(mesh.getEdge(va0).equals(a0)) {
 			mesh.setEdge(va0, b2);
 		}

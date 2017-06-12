@@ -229,17 +229,24 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		if(!finalized) {
 			// we have to use other halfedges than he1 and he2 since they might be deleted
 			// if we deleteBoundaryFace he0!
-			List<F> faces1 = mesh.getFaces(p0);
-			faces1.removeIf(f -> mesh.isBoundary(f));
-			faces1.forEach(f -> removeFace(f, true));
 
-			List<F> faces2 = mesh.getFaces(p1);
-			faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-			faces2.forEach(f -> removeFace(f, true));
+			if(!mesh.isDestroyed(p0)) {
+				List<F> faces1 = mesh.getFaces(p0);
+				faces1.removeIf(f -> mesh.isBoundary(f));
+				faces1.forEach(f -> removeFace(f, true));
+			}
 
-			List<F> faces3 = mesh.getFaces(p2);
-			faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-			faces3.forEach(f -> removeFace(f, true));
+			if(!mesh.isDestroyed(p1)) {
+				List<F> faces2 = mesh.getFaces(p1);
+				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
+				faces2.forEach(f -> removeFace(f, true));
+			}
+
+			if(!mesh.isDestroyed(p2)) {
+				List<F> faces3 = mesh.getFaces(p2);
+				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
+				faces3.forEach(f -> removeFace(f, true));
+			}
 
 			finalized = true;
 		}
