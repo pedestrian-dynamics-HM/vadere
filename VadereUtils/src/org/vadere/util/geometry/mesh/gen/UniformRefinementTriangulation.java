@@ -13,12 +13,14 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -37,12 +39,15 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 	private Set<P> points;
 	private IMesh<P, V, E, F> mesh;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulation.class);
+	private final IDistanceFunction distFunc;
 
 	public UniformRefinementTriangulation(
 			final ITriangulation<P, V, E, F> triangulation,
 			final VRectangle bound,
 			final Collection<VShape> boundary,
-			final IEdgeLengthFunction lenFunc) {
+			final IEdgeLengthFunction lenFunc,
+			final IDistanceFunction distFunc) {
+		this.distFunc = distFunc;
 		this.triangulation = triangulation;
 		this.mesh = triangulation.getMesh();
 		this.boundary = boundary;
@@ -79,10 +84,31 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 	}
 
 	private void removeTrianglesOutsideBBox() {
-		//TODO:
+		boolean removedSome = true;
+
+		while (removedSome) {
+			removedSome = false;
+
+			List<F> candidates = mesh.getFaces(mesh.getBoundary());
+			for(F face : candidates) {
+				if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
+					triangulation.removeFace(face, true);
+					removedSome = true;
+				}
+			}
+		}
 	}
 
 	private void removeTrianglesInsideObstacles() {
+		List<F> faces = triangulation.getMesh().getFaces();
+		for(F face : faces) {
+			if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
+				triangulation.removeFace(face, true);
+			}
+		}
+	}
+
+	/*private void removeTrianglesInsideObstacles() {
 		for(VShape shape : boundary) {
 
 			// 1. find a triangle inside the boundary
@@ -110,7 +136,7 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 				logger.warn("no face found");
 			}
 		}
-	}
+	}*/
 
 	private boolean intersectShape(final VLine line, final VShape shape) {
 		return shape.intersects(line) || shape.contains(line.getP1()) || shape.contains(line.getP2());

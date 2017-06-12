@@ -15,11 +15,11 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	public VPolygon(Path2D.Double path) {
 		this.reset();
+		this.append(path, false);
+		this.closePath();
+		/*if (!path.getBounds().isEmpty()) {
 
-		if (!path.getBounds().isEmpty()) {
-			this.append(path, false);
-			this.closePath();
-		}
+		}*/
 	}
 
 	public VPolygon() {

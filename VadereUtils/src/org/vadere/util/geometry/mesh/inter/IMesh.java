@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.mesh.inter;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
@@ -184,6 +185,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	Stream<E> streamEdges();
 
+	Stream<V> streamVertices();
+
 	default VPolygon toPolygon(F face) {
 		Path2D path2D = new Path2D.Double();
 		E edge = getEdge(face);
@@ -307,6 +310,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return an Iterable which can be used to iterate over all surrounding faces.
 	 */
 	default Iterable<F> getFaceIt(F face) { return () -> new SurroundingFaceIterator<>(this, face);}
+
+	default Iterable<F> getFaceIt(V vertex) { return () -> new AdjacentFaceIterator(this, getEdge(vertex));}
+
+	default List<F> getFaces(F face) { return IteratorUtils.toList(new SurroundingFaceIterator<>(this, face)); }
 
 	/**
 	 * Returns a Stream consisting of all surrounding faces of the face.

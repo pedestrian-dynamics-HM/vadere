@@ -39,7 +39,7 @@ public class TestVisual {
 				triangulation,
 				bound,
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
-				p -> 30.0);
+				p -> 10.0);
 
 		uniformRefinement.compute();
 		//triangulation.finalize();

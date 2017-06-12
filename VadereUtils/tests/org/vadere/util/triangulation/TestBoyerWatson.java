@@ -11,8 +11,13 @@ import org.junit.Test;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.impl.VPTriangulation;
+import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.geometry.mesh.inter.IVertex;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -60,7 +65,7 @@ public class TestBoyerWatson {
 
 		triangulationList.add(ITriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y)));
 		triangulationList.add(ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points, (x, y) -> new VPoint(x, y)));
-		//triangulationList.add(ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y)));
+		triangulationList.add(ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y)));
 
 		for(ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation : triangulationList) {
 			delaunayTriangulation.finalize();
@@ -125,6 +130,7 @@ public class TestBoyerWatson {
 		assertTrue(testTriangulationEquality(triangles, expectedResult));
 	}
 
+
 	@Test
 	public void testPerformanceForDifferentPointLocators() {
 		List<VPoint> points = new ArrayList<>();
@@ -132,7 +138,7 @@ public class TestBoyerWatson {
 		int height = 300;
 		Random r = new Random();
 		assert false;
-		int numberOfPoints = 500000;
+		int numberOfPoints = 100000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
@@ -212,6 +218,27 @@ public class TestBoyerWatson {
 		log.info("runtime of the ? for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the JTS-Delaunay-Triangulation");
 	}
 
+	@Test
+	public void testEdgeVertexRelation() {
+		List<VPoint> points = new ArrayList<>();
+		int width = 300;
+		int height = 300;
+		Random r = new Random();
+		assert false;
+		int numberOfPoints = 5000;
+
+		for (int i = 0; i < numberOfPoints; i++) {
+			VPoint point = new VPoint(width * r.nextDouble(), height * r.nextDouble());
+			points.add(point);
+		}
+
+		VPTriangulation vpTriangulation = ITriangulation.createVPTriangulation(new VRectangle(0, 0, width, height));
+		vpTriangulation.insert(points);
+		vpTriangulation.finalize();
+
+		assertTrue(hasCorrectEdgeVertexRealtion(vpTriangulation));
+	}
+
 
 	private static boolean testTriangulationEquality(final Set<VTriangle> triangulation1, final Set<VTriangle> triangulation2) {
 		if(triangulation1.size() != triangulation2.size())
@@ -229,6 +256,13 @@ public class TestBoyerWatson {
 		}
 
 		return true;
+	}
+
+	private static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> boolean hasCorrectEdgeVertexRealtion(final ITriangulation<P, V, E, F> triangulation) {
+		return triangulation.getMesh()
+				.streamVertices()
+				.filter(v -> triangulation.getMesh().isAlive(v))
+				.noneMatch(v -> triangulation.getMesh().getVertex(triangulation.getMesh().getEdge(v)) != v);
 	}
 
 	private static boolean testTriangleEquality(final VTriangle triangle1, final VTriangle triangle2) {
