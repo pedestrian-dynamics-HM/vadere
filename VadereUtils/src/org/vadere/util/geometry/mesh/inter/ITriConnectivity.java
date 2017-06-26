@@ -9,6 +9,7 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -476,14 +477,22 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	@Override
 	default Optional<F> locateFace(final double x, final double y) {
+		Optional<F> optFace;
 		if(getMesh().getNumberOfFaces() > 1) {
-			return locateFace(x, y, getMesh().getFace());
+			optFace = locateFace(x, y, getMesh().getFace());
 		}
 		else if(getMesh().getNumberOfFaces() == 1) {
-			return Optional.of(getMesh().getFace());
+			optFace = Optional.of(getMesh().getFace());
 		}
 		else {
+			optFace = Optional.empty();
+		}
+
+		if(optFace.isPresent() && getMesh().isBoundary(optFace.get())) {
 			return Optional.empty();
+		}
+		else {
+			return optFace;
 		}
 	}
 
@@ -592,6 +601,31 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return face;
 	}
 
+	default F walkThroughHole(double x1, double y1, @NotNull F borderFace) {
+		assert getMesh().isBoundary(borderFace);
+
+		double minDistance = Double.MAX_VALUE;
+		F choosenFace = borderFace;
+
+		for(E edge : getMesh().getEdgeIt(borderFace)) {
+			V v1 = getMesh().getVertex(getMesh().getPrev(edge));
+			V v2 = getMesh().getVertex(edge);
+
+			// get out of the hole/border. Note: non-border faces are ccw oriented but border-faces are cw oriented!
+			if (GeometryUtils.isRightOf(v2, v1, x1, y1)) {
+
+				double distance = GeometryUtils.distanceToLineSegment(v1, v2, x1, y1);
+
+				if(distance < minDistance) {
+					minDistance = distance;
+					choosenFace = getMesh().getTwinFace(edge);
+				}
+			}
+		}
+
+		return choosenFace;
+	}
+
 	default F marchRandom2D(double x1, double y1, F startFace) {
 		boolean first = true;
 		F face = startFace;
@@ -599,6 +633,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		int count = 0;
 
 		while (true) {
+
+			if(getMesh().isBoundary(face)) {
+				F tmpFace = walkThroughHole(x1, y1, face);
+
+				if(getMesh().isBoundary(tmpFace)) {
+					assert tmpFace == face;
+					return tmpFace;
+				}
+				else {
+					face = tmpFace;
+				}
+			}
+
 			count++;
 			boolean goLeft = random.nextBoolean();
 			//boolean goLeft = true;
