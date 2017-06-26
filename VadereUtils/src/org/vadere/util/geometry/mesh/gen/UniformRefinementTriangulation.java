@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -40,6 +41,7 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 	private IMesh<P, V, E, F> mesh;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulation.class);
 	private final IDistanceFunction distFunc;
+	private final static Random random = new Random();
 
 	public UniformRefinementTriangulation(
 			final ITriangulation<P, V, E, F> triangulation,
@@ -64,7 +66,7 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 
 		for(E edge : mesh.getEdgeIt(mesh.getBoundary())) {
 			if(!isCompleted(edge) && !points.contains(mesh.getVertex(edge))) {
-				toRefineEdges.add(edge);
+				toRefineEdges.add(mesh.getTwin(edge));
 			}
 		}
 
@@ -142,17 +144,20 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 		return shape.intersects(line) || shape.contains(line.getP1()) || shape.contains(line.getP2());
 	}
 
-	private boolean isCompleted(final E edge) {
+	private boolean isCompleted(E edge) {
+		if(mesh.isBoundary(edge)){
+			edge = mesh.getTwin(edge);
+		}
+
 		F face = mesh.getFace(edge);
 		F twin = mesh.getTwinFace(edge);
 
 		VTriangle triangle = mesh.toTriangle(face);
-		VTriangle twinTriangle = mesh.toTriangle(twin);
 		VLine line = mesh.toLine(edge);
 
-		return line.length() <= lenFunc.apply(line.midPoint())
-				|| (!triangle.intersect(bbox) && !twinTriangle.intersect(bbox))
-				|| boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || shape.contains(twinTriangle.getBounds2D()));
+		return (line.length() <= lenFunc.apply(line.midPoint()) && random.nextDouble() < 0.96)
+				|| (!triangle.intersect(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersect(bbox)))
+				|| boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.isBoundary(twin) && shape.contains(mesh.toTriangle(twin).getBounds2D())));
 	}
 
 	private Collection<E> refine(final E edge) {

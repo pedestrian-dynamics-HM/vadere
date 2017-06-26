@@ -114,6 +114,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			p1 = mesh.insertVertex(bound.getX() + 2 * max + gap, bound.getY() - gap);
 			p2 = mesh.insertVertex(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max + gap);
 
+			// counter clockwise!
 			superTriangle = mesh.createFace(p0, p1, p2);
 			borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
 
