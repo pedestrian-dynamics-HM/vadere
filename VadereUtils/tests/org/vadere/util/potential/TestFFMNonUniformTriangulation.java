@@ -14,9 +14,12 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFMMTriangulation;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
 import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
+import org.vadere.util.triangulation.adaptive.PSMeshing;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -31,47 +34,39 @@ public class TestFFMNonUniformTriangulation {
 	private static Logger log = LogManager.getLogger(TestFFMNonUniformTriangulation.class);
 	private int width;
 	private int height;
+	private VRectangle bbox;
 	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
 
 	@Before
 	public void setUp() {
-		double h0 = 5.0;
-		width = 300;
-		height = 300;
-		VRectangle bbox = new VRectangle(0, 0, width, height);
-		/*List<VShape> obstacles = new ArrayList<VShape>() {{
-			add(new VRectangle(0.65*300, -5, 0.1*300, 0.6*300));
-			add(new VRectangle(0.65*300, 0.7*300, 0.1*300, 0.3*300));
-		}};*/
-
-		List<VShape> boundingBox = new ArrayList<VShape>() {{
-			add(new VRectangle(0, 0, 5, width));
-			add(new VRectangle(0, 0, width, 5));
-			add(new VRectangle(width-5, 0, 5, height));
-			add(new VRectangle(0, height-5, 5, height));
-		}};
-
-		PSDistmesh meshGenerator = new PSDistmesh(bbox, boundingBox, h0,false);
+		//IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
+		//IDistanceFunction distanceFunc = p -> -10+Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY());
+		//IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.max(Math.abs(p.getX()), Math.abs(p.getY()))) - 3;
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin()*10;
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p));
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p));
+		bbox = new VRectangle(-11, -11, 22, 22);
+		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
 		meshGenerator.execute();
 		triangulation = meshGenerator.getTriangulation();
-
-		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800);
-		JFrame frame = distmeshPanel.display();
-		frame.setVisible(true);
-
-		//triangulation = new UniformTriangulation<>(0, 0, width, height, 10.0, (a,b) -> new MeshPoint(a,b, false));
-		//triangulation.finalize();
 	}
 
 	@Test
 	public void testFMM() {
 		List<VRectangle> targetAreas = new ArrayList<>();
 		List<IPoint> targetPoints = new ArrayList<>();
-		targetPoints.add(new MeshPoint(40, 40, false));
+
+		//targetPoints.add(new MeshPoint(0, 0, false));
+
+
 		VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
 		targetAreas.add(rect);
+        
+		EikonalSolver solver = new EikonalSolverFMMTriangulation(new UnitTimeCostFunction(), triangulation, triangulation.getMesh().getBoundaryEdges());
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(targetAreas, new UnitTimeCostFunction(), triangulation, (x, y) -> new MeshPoint(x, y, false));
 
 		log.info("start FFM");
 		solver.initialize();
@@ -79,8 +74,8 @@ public class TestFFMNonUniformTriangulation {
 		try {
 			//System.out.println(getClass().getClassLoader().getResource("./potentialField.csv").getFile());
 			FileWriter writer = new FileWriter("./potentialField.csv");
-			for(double y = 0.2; y < height-0.2; y += 1.0) {
-				for(double x = 0.2; x < width-0.2; x += 1.0) {
+			for(double y = bbox.getMinY(); y <= bbox.getMaxY(); y += 0.1) {
+				for(double x = bbox.getMinX(); x < bbox.getMaxX(); x += 0.1) {
 					writer.write(""+solver.getValue(x ,y) + " ");
 				}
 				writer.write("\n");

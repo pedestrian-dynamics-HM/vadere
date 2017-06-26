@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
 
 	private List<PFace<P>> faces;
+	//private List<PFace<P>> borderFaces;
 	private PFace<P> boundary;
 	private List<PHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
@@ -26,6 +27,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
+		//this.borderFaces = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new HashSet<>();
 		this.boundary = new PFace<>(true);
@@ -289,5 +291,10 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public List<PFace<P>> getFaces() {
 		return streamFaces().filter(face -> !face.isBorder()).filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<PHalfEdge<P>> getBoundaryEdges() {
+		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).collect(Collectors.toList());
 	}
 }

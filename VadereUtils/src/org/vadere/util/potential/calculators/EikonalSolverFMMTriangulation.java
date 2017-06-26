@@ -4,6 +4,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ConstantLineIterator;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
@@ -22,6 +24,7 @@ import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
 import org.vadere.util.triangulation.IPointConstructor;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,6 +102,31 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 				potentialPoint.setPathFindingTag(PathFindingTag.Reached);
 				narrowBand.add(new FFMHalfEdge(halfEdge));
 			}
+		}
+	}
+
+	public EikonalSolverFMMTriangulation(final ITimeCostFunction timeCostFunction,
+	                                     final ITriangulation<P, V, E, F> triangulation,
+	                                     final Collection<E> targetEdges
+	) {
+		this.triangulation = triangulation;
+		this.calculationFinished = false;
+		this.timeCostFunction = timeCostFunction;
+		this.targetAreas = new ArrayList<>();
+		this.narrowBand = new PriorityQueue<>(pointComparator);
+		this.mesh = triangulation.getMesh();
+
+		for(E halfEdge : targetEdges) {
+			P potentialPoint = mesh.getPoint(halfEdge);
+			double distance = 0.0;
+
+			if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
+				narrowBand.remove(new FFMHalfEdge(halfEdge));
+			}
+
+			potentialPoint.setPotential(Math.min(potentialPoint.getPotential(), distance * timeCostFunction.costAt(potentialPoint)));
+			potentialPoint.setPathFindingTag(PathFindingTag.Reached);
+			narrowBand.add(new FFMHalfEdge(halfEdge));
 		}
 	}
 
@@ -276,7 +304,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 	private double computeValue(final P point, final F face) {
 		// check whether the triangle does contain useful data
 		List<P> points = mesh.getPoints(face);
-		E halfEdge = mesh.getEdges(face).stream().filter(p -> mesh.getVertex(p).equals(point)).findAny().get();
+		//E halfEdge = mesh.getEdges(face).stream().filter(p -> mesh.getPoint(p).equals(point)).findAny().get();
 		points.removeIf(p -> p.equals(point));
 
 		assert points.size() == 2;

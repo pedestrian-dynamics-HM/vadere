@@ -1,5 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
@@ -53,15 +55,23 @@ public class PSMeshingPanel extends Canvas {
 		graphics.setStroke(new BasicStroke(0.003f));
 		graphics.setColor(Color.BLACK);
 		for(VTriangle triangle : triangles) {
-			/*if(triangle.isNonAcute()) {
+
+			/*if(triangleToQuality(triangle) < 0.2) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
 				graphics.setColor(Color.RED);
 				graphics.fill(triangle);
-			} else {*/
+			}*/
+
+			if(triangle.isNonAcute()) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
-			//}
+				graphics.setColor(Color.RED);
+				graphics.fill(triangle);
+			} else {
+				graphics.setColor(Color.GRAY);
+				graphics.draw(triangle);
+			}
 		}
 		//graphics.translate(5,5);
 		graphics2D.drawImage(image, 0, 0, null);
@@ -69,6 +79,22 @@ public class PSMeshingPanel extends Canvas {
 
 //            graphics.setColor(Color.RED);
 //            tc.triangulation.getTriangles().parallelStream().forEach(graphics::draw);
+	}
+
+	public double triangleToQuality(final VTriangle triangle) {
+
+		VLine[] lines = triangle.getLines();
+		double a = lines[0].length();
+		double b = lines[1].length();
+		double c = lines[2].length();
+		double part = 0.0;
+		if(a != 0.0 && b != 0.0 && c != 0.0) {
+			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+		}
+		else {
+			throw new IllegalArgumentException(triangle + " is not a feasible triangle!");
+		}
+		return part;
 	}
 
 	public JFrame display() {

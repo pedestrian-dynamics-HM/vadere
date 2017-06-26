@@ -269,15 +269,82 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return remFace;
 	}
 
-	/**
-	 * Removes a face from the mesh by removing all boundary edges of the face.
-	 * If there are no boundary edges the face will be converted to be a part of the boundary
-	 * itself i.e. a hole.
-	 * Mesh changing method.
-	 *
-	 * @param face                      the face that will be removed from the mesh
-	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
-	 */
+	default void makeHole(final V vertex) {
+		List<F> toDeleteFaces = getMesh().getFaces(vertex);
+
+		for(F face : toDeleteFaces) {
+			removeFace(face, true);
+		}
+	}
+
+	/*default void fill_hole (final V v, final List<E> deletedEdges)
+	{
+		// uses the fact that the hole is starshaped
+		// with repect to v->point()
+		typedef std::list<Edge> Hole;
+
+		Face_handle  ff, fn;
+		int ii , in;
+		Vertex_handle v0, v1, v2;
+		Bounded_side side;
+
+		//stack algorithm to create faces
+		// create face v0,v1,v2
+		//if v0,v1,v2 are finite vertices
+		// and form a left_turn
+		// and triangle v0v1v2 does not contain v->point()
+		if( hole.size() != 3) {
+			typename Hole::iterator hit = hole.begin();
+			typename Hole::iterator next= hit;
+			while( hit != hole.end() && hole.size() != 3) {
+				ff = (*hit).first;
+				ii = (*hit).second;
+				v0 = ff->vertex(cw(ii));
+				v1 = ff->vertex(ccw(ii));
+				if( !is_infinite(v0) && !is_infinite(v1)) {
+					next=hit; next++;
+					if(next == hole.end()) next=hole.begin();
+					fn = (*next).first;
+					in = (*next).second;
+					v2 = fn->vertex(ccw(in));
+					if ( !is_infinite(v2) &&
+							orientation(v0->point(), v1->point(), v2->point()) == LEFT_TURN ) {
+						side =  bounded_side(v0->point(),
+								v1->point(),
+								v2->point(),
+								v->point());
+
+						if( side == ON_UNBOUNDED_SIDE ||
+								(side == ON_BOUNDARY && orientation(v0->point(),
+										v->point(),
+										v2->point()) == COLLINEAR &&
+										collinear_between(v0->point(),v->point(),v2->point()) ))
+						{
+							//create face
+							Face_handle  newf = create_face(ff,ii,fn,in);
+							typename Hole::iterator tempo=hit;
+							hit = hole.insert(hit,Edge(newf,1)); //push newf
+							hole.erase(tempo); //erase ff
+							hole.erase(next); //erase fn
+							if (hit != hole.begin() ) --hit;
+							continue;
+						}
+					}
+				}
+				++hit;
+			}
+		}*/
+
+
+		/**
+		 * Removes a face from the mesh by removing all boundary edges of the face.
+		 * If there are no boundary edges the face will be converted to be a part of the boundary
+		 * itself i.e. a hole.
+		 * Mesh changing method.
+		 *
+		 * @param face                      the face that will be removed from the mesh
+		 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
+		 */
 	default void removeFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
 		assert !getMesh().isDestroyed(face);
 
@@ -285,6 +352,18 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		List<V> vertices = new ArrayList<>();
 
 		F boundary = getMesh().createFace(true);
+
+		/*for(E edge : getMesh().getEdgeIt(face)) {
+			if(getMesh().isBoundary(getMesh().getTwin(edge))) {
+				boundary = getMesh().getTwinFace(edge);
+				break;
+			}
+		}
+
+		// no boundary around
+		if(boundary == null) {
+			boundary = getMesh().createFace(true);
+		}*/
 
 		for(E edge : getMesh().getEdgeIt(face)) {
 			getMesh().setFace(edge, boundary);
