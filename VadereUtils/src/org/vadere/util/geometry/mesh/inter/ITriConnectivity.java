@@ -9,7 +9,6 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -37,6 +36,59 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	default void splitTriangleEvent(F original, F f1, F f2, F f3) {}
 
 	default void splitEdgeEvent(F original, F f1, F f2) {}
+
+	/**
+	 * Inserts a point into the mesh which is contained in the boundary. The point will be
+	 * connected by the start and end point of the edge. Note that the user has to make sure
+	 * that a valid triangulation will obtained!
+	 *
+	 * @param point
+	 * @param edge
+	 * @return
+	 */
+	default F insertOutsidePoint(P point, E edge) {
+		assert getMesh().isBoundary(edge);
+		Optional<V> optVertex = getMesh()
+				.streamVertices()
+				.filter(v -> v.equals(getMesh().getPoint(v)))
+				.findAny();
+
+		V vertex = optVertex.orElse(getMesh().createVertex(point));
+		F face = getMesh().createFace();
+		F borderFace = getMesh().getFace(edge);
+
+		E prev = getMesh().getPrev(edge);
+		E next = getMesh().getNext(edge);
+
+		E e1 = getMesh().createEdge(vertex);
+		getMesh().setFace(e1, face);
+		E e2 = getMesh().createEdge(getMesh().getVertex(prev));
+		getMesh().setFace(e2, face);
+
+		E b1 = getMesh().createEdge(vertex);
+		getMesh().setFace(b1, borderFace);
+		E b2 = getMesh().createEdge(getMesh().getVertex(edge));
+		getMesh().setFace(b2, borderFace);
+
+		getMesh().setNext(prev, b1);
+		getMesh().setNext(b1, b2);
+		getMesh().setNext(b2, next);
+
+		getMesh().setNext(edge, e1);
+		getMesh().setNext(e1, e2);
+		getMesh().setNext(e2, edge);
+
+		getMesh().setTwin(b1, e2);
+		getMesh().setTwin(b2, e1);
+
+		getMesh().setEdge(vertex, e1);
+		getMesh().setEdge(borderFace, b1);
+		getMesh().setEdge(face, e1);
+
+		getMesh().setFace(edge, face);
+
+		return face;
+	}
 
 	/**
 	 * Non mesh changing method.
@@ -528,7 +580,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			return marchLocate1D(x, y, startFace);
 		}
 		else {
-			return Optional.of(marchRandom2D(x, y, startFace));
+			return Optional.of(straightWalk2D(x, y, startFace));
 		}
 	}
 
@@ -545,7 +597,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @return
 	 */
 	default Optional<F> marchLocate1D(double x, double y, F startFace) {
-		if(contains(startFace, x, y)) {
+		if(contains(x, y, startFace)) {
 			return Optional.of(startFace);
 		}
 		else {
@@ -578,7 +630,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 		//TODO: this seems to be very slow!
 
-		while(found && !contains(face, x1, y1)) {
+		while(found && !contains(x1, y1, face)) {
 			found = false;
 			for(E halfEdge : getMesh().getEdgeIt(face)) {
 				if(!halfEdge.equals(entryEdge)) {
@@ -626,6 +678,80 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return choosenFace;
 	}
 
+	/**
+	 * Marching to the face which triangleContains the point defined by (x2, y2). Inside the startFace.
+	 * This algorithm also works if there are convex polygon (holes) inside the triangulation.
+	 * None mesh changing method.
+	 *
+	 * @param x1        the x-coordinate of the ending point
+	 * @param y1        the y-coordinate of the ending point
+	 * @param startFace the face where the march start containing (x1,y1).
+	 * @return
+	 */
+	default F straightWalk2D(final double x1, final double y1, final F startFace) {
+		VPoint q = getMesh().toTriangle(startFace).getIncenter();
+		VPoint p = new VPoint(x1, y1);
+
+		if(q.getX() == x1 && q.getY() == y1) {
+			return startFace;
+		}
+
+		E intersectionEdge = getMesh().getTwin(getMesh()
+				.streamEdges(startFace)
+				.filter(edge -> intersects(q, p, edge)).findAny().get());
+
+		F face = getMesh().getFace(intersectionEdge);
+
+		while (!contains(x1, y1, face)) {
+
+			// default case i.e. checking a triangle
+			if(!getMesh().isBoundary(face)) {
+				E e1 = getMesh().getNext(intersectionEdge);
+				E e2 = getMesh().getNext(e1);
+
+				if(intersects(q, p, e1)){
+					intersectionEdge = getMesh().getTwin(e1);
+					face = getMesh().getFace(intersectionEdge);
+				}
+				else if(intersects(q, p, e2)) {
+					intersectionEdge = getMesh().getTwin(e2);
+					face = getMesh().getFace(intersectionEdge);
+				}
+				else {
+					if(isMember(face, x1, y1)) {
+						return face;
+					}
+					else {
+						intersects(q, p, e1);
+						intersects(q, p, e2);
+						throw new IllegalArgumentException(e1 + " and " + e2 + " do not intersect " + q + "->" + p);
+					}
+				}
+			} // non-default case checking a convex! polygon.
+			else {
+				final E enteringEdge = intersectionEdge;
+				intersectionEdge = getMesh().getTwin(getMesh()
+						.streamEdges(face)
+						.filter(edge -> getMesh().getTwin(edge) != enteringEdge)
+						.filter(edge -> intersects(q, p, edge))
+						.findAny().get());
+				face = getMesh().getFace(intersectionEdge);
+			}
+		}
+
+		return face;
+	}
+
+	/**
+	 * Marching to the face which triangleContains the point defined by (x2, y2). Inside the startFace.
+	 * This algorithm does NOT works if there are convex polygon (holes) inside the triangulation.
+	 * None mesh changing method.
+	 *
+	 * @param x1        the x-coordinate of the ending point
+	 * @param y1        the y-coordinate of the ending point
+	 * @param startFace the face where the march start containing (x1,y1).
+	 * @return
+	 */
 	default F marchRandom2D(double x1, double y1, F startFace) {
 		boolean first = true;
 		F face = startFace;
@@ -868,7 +994,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param y
 	 * @return
 	 */
-	default boolean contains(F face, double x, double y) {
+	/*default boolean contains(F face, double x, double y) {
 		if(isMember(face, x, y)) {
 			return true;
 		}
@@ -883,7 +1009,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			E h3 = getMesh().getNext(h2);
 			return GeometryUtils.triangleContains(getMesh().getPoint(h1), getMesh().getPoint(h2), getMesh().getPoint(h3), new VPoint(x, y));
 		}
-	}
+	}*/
 
 	//Optional<F> marchLocate2DLFC(double x, double y, F startFace);
 
@@ -1043,6 +1169,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	default Optional<E> getMemberEdge(F face, double x, double y) {
+		assert !getMesh().isBoundary(face);
 		E e1 = getMesh().getEdge(face);
 		P p1 = getMesh().getPoint(e1);
 
