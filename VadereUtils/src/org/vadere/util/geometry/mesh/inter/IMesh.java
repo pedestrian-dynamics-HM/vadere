@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -52,6 +53,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	default VLine toLine(@NotNull E halfEdge) {
 		return new VLine(new VPoint(getVertex(getPrev(halfEdge))), new VPoint(getVertex(halfEdge)));
+	}
+
+	default VPoint toPoint(@NotNull V vertex) {
+		return new VPoint(new VPoint(vertex));
 	}
 
 	E getEdge(@NotNull V vertex);
@@ -86,6 +91,27 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return
 	 */
 	boolean isBoundary(@NotNull F face);
+
+	default boolean isNeighbourBoundary(@NotNull F face){
+		for(F neighbourFace : getFaceIt(face)) {
+			if(isBoundary(neighbourFace)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	default Optional<E> getLinkToBoundary(@NotNull F face){
+		for(E edge : getEdgeIt(face)) {
+			if(isBoundary(getTwin(edge))) {
+				return Optional.of(edge);
+			}
+		}
+
+		return Optional.empty();
+	}
+
 	boolean isBoundary(@NotNull E halfEdge);
 
 	boolean isDestroyed(@NotNull F face);
@@ -180,6 +206,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	void destroyVertex(@NotNull V vertex);
 
 	List<F> getFaces();
+
+	List<E> getBoundaryEdges();
 
 	Stream<F> streamFaces();
 
@@ -414,6 +442,18 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		}
 
 		return edges;
+	}
+
+	default Set<VLine> getLines() {
+		return streamEdges().map(edge -> toLine(edge)).collect(Collectors.toSet());
+	}
+
+	default Set<VPoint> getUniquePoints() {
+		return streamVertices().map(vertex -> toPoint(vertex)).collect(Collectors.toSet());
+	}
+
+	default Collection<P> getPoints() {
+		return streamVertices().map(vertex -> getPoint(vertex)).collect(Collectors.toList());
 	}
 
 	Iterable<E> getEdgeIt();
