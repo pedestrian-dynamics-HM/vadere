@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -275,6 +276,23 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		for(F face : toDeleteFaces) {
 			removeFace(face, true);
 		}
+	}
+
+	default boolean contains(final double x1, final double y1, final F face) {
+		assert !getMesh().isBoundary(face);
+		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x1, y1, edge));
+	}
+
+	default boolean isRightOf(final double x1, final double y1, final E edge) {
+		VPoint p1 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(edge)));
+		VPoint p2 = getMesh().toPoint(getMesh().getVertex(edge));
+		return GeometryUtils.isRightOf(p1, p2, x1, y1);
+	}
+
+	default boolean intersects(final IPoint p1, final IPoint p2, E edge) {
+		VPoint q1 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(edge)));
+		VPoint q2 = getMesh().toPoint(getMesh().getVertex(edge));
+		return GeometryUtils.intersectLine(p1, p2, q1, q2);
 	}
 
 	/*default void fill_hole (final V v, final List<E> deletedEdges)
