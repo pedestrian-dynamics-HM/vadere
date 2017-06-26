@@ -205,6 +205,18 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	public static VPoint getIncenter(final IPoint p1, final IPoint p2, final IPoint p3) {
+		double a = p1.distance(p2);
+		double b = p2.distance(p3);
+		double c = p3.distance(p1);
+		double perimeter = a + b + c;
+
+		VPoint incenter = new VPoint((a * p3.getX() + b * p1.getX() + c * p2.getX()) / perimeter,
+				(a * p3.getY() + b * p1.getY() + c * p2.getY()) / perimeter);
+
+		return incenter;
+	}
+
 	/**
 	 * Tests if the half-line-segment starting at p in the direction (q-p) intersects the line-segment (p1,p2).
 	 * @param p     the starting point of the half-line-segment

@@ -126,13 +126,7 @@ public class VTriangle extends VPolygon {
 
 	public VPoint getIncenter(){
 		if(incenter == null) {
-			double a = p1.distance(p2);
-			double b = p2.distance(p3);
-			double c = p3.distance(p1);
-			double perimeter = a + b + c;
-
-			incenter = new VPoint((a * p3.getX() + b * p1.getX() + c * p2.getX()) / perimeter,
-					(a * p3.getY() + b * p1.getY() + c * p2.getY()) / perimeter);
+			incenter = GeometryUtils.getIncenter(p1, p2, p3);
 		}
 
 		return incenter;
