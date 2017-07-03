@@ -28,6 +28,12 @@ public class EdgeIterator<P extends IPoint, V extends IVertex<P>, E extends IHal
 		this.mesh = mesh;
 	}
 
+	public EdgeIterator(final IMesh<P, V, E, F> mesh, final E edge){
+		this.edge = edge;
+		this.currentHalfEdge = edge;
+		this.mesh = mesh;
+	}
+
 	@Override
 	public boolean hasNext() {
 		return currentHalfEdge != null && (!started || !currentHalfEdge.equals(edge));
