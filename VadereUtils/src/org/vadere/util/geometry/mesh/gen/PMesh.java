@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -271,11 +272,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public Stream<PFace<P>> streamFaces() {
-		return faces.stream();
-	}
-
-	@Override
 	public Stream<PHalfEdge<P>> streamEdges() {
 		return edges.stream();
 	}
@@ -297,4 +293,14 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	public List<PHalfEdge<P>> getBoundaryEdges() {
 		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).collect(Collectors.toList());
 	}
+	@Override
+	public List<PVertex<P>> getBoundaryVertices() {
+		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).map(edge -> getVertex(edge)).collect(Collectors.toList());
+	}
+
+	@Override
+	public Stream<PFace<P>> streamFaces(@NotNull Predicate<PFace<P>> predicate) {
+		return faces.stream().filter(predicate);
+	}
+
 }

@@ -36,6 +36,22 @@ public class GeometryUtils {
 		return result;
 	}
 
+	public static double derterminant2D(double x1, double y1, double x2, double y2) {
+		return x1 * y2 - y1 * x2;
+	}
+
+	//http://mathworld.wolfram.com/Line-LineIntersection.html
+	public static VPoint intersectionPoint(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+		double a = derterminant2D(x1, x2, y1, y2);
+		double b = derterminant2D(x3, x4, y3, y4);
+		double c = derterminant2D(x1-x2, x3 - x4, y1 - y2, y3 - y4);
+
+		double x = derterminant2D(a, b, x1 - x2, x3 - x4) / c;
+		double y = derterminant2D(a, b, y1 - y2, y3 - y4) / c;
+
+		return new VPoint(x,y);
+	}
+
 	public static boolean collectionContains(
 			Collection<? extends VShape> collection, VPoint point) {
 		for (VShape shape : collection) {
