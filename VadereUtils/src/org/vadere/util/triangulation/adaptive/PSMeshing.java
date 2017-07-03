@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 public class PSMeshing {
 
 	private BiFunction<Double, Double, Double> f = (l, l_0) -> Math.max(l_0 - l, 0.0);
-	private Function<Integer, Integer> funcNextTri = i -> (i*i)+1;
-
+	//private Function<Integer, Integer> funcNextTri = i -> (i*i)+1;
+	private Function<Integer, Integer> funcNextTri = i -> i+1;
 
 	private static final Logger log = LogManager.getLogger(PSMeshing.class);
 
@@ -323,7 +323,7 @@ public class PSMeshing {
 
 	public void retriangulate() {
 		//Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
-		removeLowQualityTriangles();
+		//removeLowQualityTriangles();
 		triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
 		removeTrianglesInsideObstacles();
 		triangulation.finalize();
@@ -398,12 +398,12 @@ public class PSMeshing {
 		while (first || current != halfEdge) {
 			first = false;
 			candidates.add(triangulation.getMesh().getPrev(current));
-			//triangulation.legalize(triangulation.getMesh().getPrev(current), p);
+			//triangulation.legalizeRecursively(triangulation.getMesh().getPrev(current), p);
 			current = triangulation.getMesh().getTwin(triangulation.getMesh().getNext(current));
 		}
 
 		for(PHalfEdge<MeshPoint> edge : candidates) {
-			//triangulation.legalize(triangulation.getMesh().getPrev(current), p);
+			//triangulation.legalizeRecursively(triangulation.getMesh().getPrev(current), p);
 		}
 
 	}

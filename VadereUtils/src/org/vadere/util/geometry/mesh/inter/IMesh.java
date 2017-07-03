@@ -9,10 +9,12 @@ import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PMesh;
 import org.vadere.util.geometry.mesh.gen.PVertex;
+import org.vadere.util.geometry.mesh.iterators.AdjacentVertexIterator;
 import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.mesh.iterators.AdjacentFaceIterator;
 import org.vadere.util.geometry.mesh.iterators.EdgeOfVertexIterator;
 import org.vadere.util.geometry.mesh.iterators.IncidentEdgeIterator;
+import org.vadere.util.geometry.mesh.iterators.PointIterator;
 import org.vadere.util.geometry.mesh.iterators.SurroundingFaceIterator;
 import org.vadere.util.geometry.mesh.iterators.VertexIterator;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -30,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -57,6 +60,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	default VPoint toPoint(@NotNull V vertex) {
 		return new VPoint(new VPoint(vertex));
+	}
+
+	default VPoint toPoint(@NotNull E edge) {
+		return toPoint(getVertex(edge));
 	}
 
 	E getEdge(@NotNull V vertex);
@@ -91,6 +98,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return
 	 */
 	boolean isBoundary(@NotNull F face);
+
+	default boolean isAtBoundary(@NotNull E edge) {
+		return isBoundary(edge) || isBoundary(getTwin(edge));
+	}
 
 	default boolean isNeighbourBoundary(@NotNull F face){
 		for(F neighbourFace : getFaceIt(face)) {
@@ -209,7 +220,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	List<E> getBoundaryEdges();
 
-	Stream<F> streamFaces();
+	List<V> getBoundaryVertices();
+
+	Stream<F> streamFaces(@NotNull final Predicate<F> predicate);
+
+	default Stream<F> streamFaces() {
+		return streamFaces(f -> true);
+	}
 
 	Stream<E> streamEdges();
 
@@ -281,13 +298,23 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	default List<F> getFaces(@NotNull V vertex) { return IteratorUtils.toList(new AdjacentFaceIterator(this, getEdge(vertex))); }
 
 	/**
-	 * Returns a Iterable which can be used to iterate over all edges which are adjacent to the vertex of this edge.
+	 * Returns a Iterable which can be used to iterate over all edges which end point is the vertex that is adjacent to the vertex of this edge.
 	 *
 	 * @param edge the edge which holds the vertex
 	 * @return a Iterable which can be used to iterate over all edges which are adjacent to the vertex of this edge.
 	 */
 	default Iterable<E> getIncidentEdgesIt(E edge) {
 		return () -> new IncidentEdgeIterator(this, edge);
+	}
+
+	/**
+	 * Returns a Iterable which can be used to iterate over adjacent vertices of this vertex.
+	 *
+	 * @param vertex the vertex
+	 * @return a Iterable which can be used to iterate over all adjacent vertices.
+	 */
+	default Iterable<V> getAdjacentVertexIt(@NotNull final V vertex) {
+		return () -> new AdjacentVertexIterator<>(this, vertex);
 	}
 
 	/**
@@ -301,6 +328,16 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	/**
+	 * Returns an Iterable which can be used to iterate over all edges of a face which the edge is part of.
+	 *
+	 * @param edge the edge which is part of the face the iterable iterates over
+	 * @return an Iterable which can be used to iterate over all edges of a face.
+	 */
+	default Iterable<E> getEdgeIt(E edge) {
+		return () -> new EdgeIterator<>(this, edge);
+	}
+
+	/**
 	 * Returns an Iterable which can be used to iterate over all vertices of a face.
 	 *
 	 * @param face the face the iterable iterates over
@@ -311,6 +348,16 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	/**
+	 * Returns an Iterable which can be used to iterate over all vertices of a face.
+	 *
+	 * @param face the face the iterable iterates over
+	 * @return an Iterable which can be used to iterate over all vertices of a face.
+	 */
+	default Iterable<P> getPointIt(F face) {
+		return () -> new PointIterator<>(this, face);
+	}
+
+	/**
 	 * Returns a Stream of edges of a face.
 	 *
 	 * @param face the faces of which edges the stream consist.
@@ -318,6 +365,17 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 */
 	default Stream<E> streamEdges(F face) {
 		Iterable<E> iterable = getEdgeIt(face);
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	/**
+	 * Returns a Stream of edges of a face.
+	 *
+	 * @param edge the edge of the face of which edges the stream consist.
+	 * @return a Stream of edges of a face specified by the edge.
+	 */
+	default Stream<E> streamEdges(E edge) {
+		Iterable<E> iterable = getEdgeIt(edge);
 		return StreamSupport.stream(iterable.spliterator(), false);
 	}
 
@@ -373,6 +431,14 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return an Iterable which can be used to iterate over all faces which are adjacent to the vertex of the edge
 	 */
 	default Iterable<F> getAdjacentFacesIt(@NotNull E edge) { return () -> new AdjacentFaceIterator<>(this, edge); }
+
+	/**
+	 * Returns an Iterable which can be used to iterate over all faces which are adjacent to the vertex.
+	 *
+	 * @param vertex the vertex
+	 * @return an Iterable which can be used to iterate over all faces which are adjacent to the vertex
+	 */
+	default Iterable<F> getAdjacentFacesIt(@NotNull V vertex) { return () -> new AdjacentFaceIterator<>(this, getEdge(vertex)); }
 
 	/**
 	 * Returns a List of all faces which are adjacent to the vertex of the edge

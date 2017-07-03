@@ -118,6 +118,7 @@ public class VPoint implements Cloneable, IPoint {
 	}
 
 
+	// CCW rotation!
 	@Override
 	public VPoint rotate(final double radAngle) {
 		return new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
