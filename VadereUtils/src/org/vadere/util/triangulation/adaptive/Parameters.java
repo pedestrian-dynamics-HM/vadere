@@ -6,12 +6,12 @@ package org.vadere.util.triangulation.adaptive;
 public class Parameters {
 	final static double TOL = .1;
 	final static double FSCALE = 1.2;
-	final static double DELTAT = 0.03;
+	final static double DELTAT = 0.02;
 	final static double MIN_QUALITY_TRIANGLE = 0.2;
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"
-	final static double qualityMeasurement = 0.91;
+	final static double qualityMeasurement = 0.949;
 	final static double MINIMUM = 0.25;
 	final static double DENSITYWEIGHT = 2;
 	final static int NPOINTS = 100000;

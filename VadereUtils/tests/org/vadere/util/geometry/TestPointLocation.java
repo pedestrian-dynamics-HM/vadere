@@ -50,48 +50,48 @@ public class TestPointLocation {
 		PVertex<VPoint> z = mesh.insertVertex(3.0,0);
 		PVertex<VPoint> w = mesh.insertVertex(4.5,3.0);
 
-		PHalfEdge xy = mesh.createEdge(y, face1);
+		PHalfEdge xy = mesh.createEdge(y, border);
 		mesh.setEdge(y, xy);
-		PHalfEdge yx = mesh.createEdge(x, border);
+		PHalfEdge yx = mesh.createEdge(x, face1);
 		mesh.setEdge(x, yx);
 		mesh.setTwin(xy, yx);
 
-		PHalfEdge yz = mesh.createEdge(z, face1);
+		PHalfEdge yz = mesh.createEdge(z, face2);
 		mesh.setEdge(z, yz);
 
-		PHalfEdge zx = mesh.createEdge(x, face1);
-		PHalfEdge xz = mesh.createEdge(z, border);
+		PHalfEdge zx = mesh.createEdge(x, border);
+		PHalfEdge xz = mesh.createEdge(z, face1);
 		mesh.setTwin(zx, xz);
 
-		PHalfEdge zy = mesh.createEdge(y, face2);
+		PHalfEdge zy = mesh.createEdge(y, face1);
 		mesh.setTwin(yz, zy);
-		PHalfEdge yw = mesh.createEdge(w, face2);
+		PHalfEdge yw = mesh.createEdge(w, border);
 		mesh.setEdge(w, yw);
-		PHalfEdge wy = mesh.createEdge(y, border);
+		PHalfEdge wy = mesh.createEdge(y, face2);
 		mesh.setTwin(yw, wy);
 
-		PHalfEdge wz = mesh.createEdge(z, face2);
-		PHalfEdge zw = mesh.createEdge(w, border);
+		PHalfEdge wz = mesh.createEdge(z, border);
+		PHalfEdge zw = mesh.createEdge(w, face2);
 		mesh.setTwin(wz, zw);
 
-		mesh.setNext(zy, yw);
-		mesh.setNext(yw, wz);
-		mesh.setNext(wz, zy);
-
-		mesh.setEdge(face2, zy);
-
-		mesh.setNext(xy, yz);
-		mesh.setNext(yz, zx);
-		mesh.setNext(zx, xy);
-
-		mesh.setEdge(face1, yz);
-
+		mesh.setNext(zy, yx);
 		mesh.setNext(yx, xz);
-		mesh.setNext(xz, zw);
-		mesh.setNext(zw, wy);
-		mesh.setNext(wy, yx);
+		mesh.setNext(xz, zy);
 
-		mesh.setEdge(border, yx);
+		mesh.setEdge(face1, zy);
+
+		mesh.setNext(yz, zw);
+		mesh.setNext(zw, wy);
+		mesh.setNext(wy, yz);
+
+		mesh.setEdge(face2, yz);
+
+		mesh.setNext(zx, xy);
+		mesh.setNext(xy, yw);
+		mesh.setNext(yw, wz);
+		mesh.setNext(wz, zx);
+
+		mesh.setEdge(border, zx);
 
 		triConnectivity = new ITriConnectivity() {
 			@Override

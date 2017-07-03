@@ -70,9 +70,14 @@ public class EikonalSolverFMM implements EikonalSolver {
 
 	@Override
 	public void initialize() {
+
 		for (Point point : targetPoints) {
-			setTargetNeighborsDistances(point);
+			if(!targetShapes.isEmpty()) {
+				setTargetNeighborsDistances(point);
+			}
+			narrowBand.add(point);
 		}
+
 
 		/**
 		 * Create whole Floor Field at the beginning.

@@ -25,15 +25,25 @@ public class TestLineIterator {
 		ConstantLineIterator lineIterator = new ConstantLineIterator(line, 0.5);
 		double originalSlope = line.slope();
 		VPoint startPoint = new VPoint(x1, y1);
+		int count = 0;
 
 		while (lineIterator.hasNext()) {
 			IPoint nextPoint = lineIterator.next();
 			VPoint nextVPoint = new VPoint(nextPoint.getX(), nextPoint.getY());
-			double slope = new VLine(startPoint, nextVPoint).slope();
 
-			if(!startPoint.equals(nextVPoint)) {
-				assertTrue(Math.abs(slope - originalSlope) < 0.0001);
+			if(count == 0) {
+				assertTrue(startPoint.equals(nextVPoint));
 			}
+			else {
+				double slope = new VLine(startPoint, nextVPoint).slope();
+
+				if(!startPoint.equals(nextVPoint)) {
+					assertTrue(Math.abs(slope - originalSlope) < 0.0001);
+				}
+			}
+			count++;
+
+
 		}
 	}
 }

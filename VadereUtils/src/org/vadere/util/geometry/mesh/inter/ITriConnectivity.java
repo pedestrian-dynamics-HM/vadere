@@ -4,15 +4,16 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
 
+//TODO: check unused methods!
 /**
  * @author Benedikt Zoennchen
  *
@@ -316,8 +317,6 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 
 		// TODO: maybe without if, just do it? its faster?
-
-
 		assert mesh.getVertex(b2) == va0;
 		assert mesh.getVertex(a2) == vb0;
 
@@ -361,7 +360,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 *
 	 * @param point     the point which splits the triangle
 	 * @param face      the triangle face we split
-	 * @param legalize  true means that recursive filps will be done afterwards to legalize illegal edges (e.g. delaunay requirement).
+	 * @param legalize  true means that recursive filps will be done afterwards to legalizeRecursively illegal edges (e.g. delaunay requirement).
 	 *
 	 * @return an half-edge which has point as its end-point
 	 */
@@ -455,7 +454,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 *
 	 * @param edge  an edge zx of a triangle xyz
 	 */
-	/*default void legalize(@NotNull final E edge, final V p, int depth) {
+	default void legalizeRecursively(@NotNull final E edge, final V p, int depth) {
 		if(isIllegal(edge, p)) {
 			assert isFlipOk(edge);
 			assert getMesh().getVertex(getMesh().getNext(edge)).equals(p);
@@ -472,19 +471,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				E e2 = getMesh().getNext(getMesh().getTwin(edge));
 
 
-				legalize(e1, p, depth+1);
-				legalize(e2, p, depth+1);
+				legalizeRecursively(e1, p, depth+1);
+				legalizeRecursively(e2, p, depth+1);
 			}
 			else {
 				E e1 = getMesh().getNext(edge);
 				E e2 = getMesh().getPrev(getMesh().getTwin(edge));
-				legalize(e1, p, depth+1);
-				legalize(e2, p, depth+1);
+				legalizeRecursively(e1, p, depth+1);
+				legalizeRecursively(e2, p, depth+1);
 			}
 
 
 		}
-	}*/
+	}
 
 	void legalizeNonRecursive(final E edge, final V p);
 
@@ -540,12 +539,14 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			optFace = Optional.empty();
 		}
 
-		if(optFace.isPresent() && getMesh().isBoundary(optFace.get())) {
+		return optFace;
+
+		/*if(optFace.isPresent() && getMesh().isBoundary(optFace.get())) {
 			return Optional.empty();
 		}
 		else {
 			return optFace;
-		}
+		}*/
 	}
 
 	/*default Optional<P> locateVertex(double x, double y, F startFace) {
@@ -605,77 +606,44 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
-	/**
-	 * Marching to the face which triangleContains the point defined by (x2, y2). Inside the startFace.
-	 * None mesh changing method.
-	 *
-	 * @param x1        the x-coordinate of the ending point
-	 * @param y1        the y-coordinate of the ending point
-	 * @param startFace the face where the march start containing (x1,y1).
-	 * @return
-	 */
-	default F marchLocate2D(double x1, double y1, F startFace) {
-		//assert !getMesh().isBoundary(startFace);
-		//assert contains(startFace, x1, y1);
+	// TODO: still required?
+	default E walkThroughHole(@NotNull VPoint q, @NotNull VPoint p, @NotNull E enteringEdge) {
+		assert GeometryUtils.intersectLine(q, p, getMesh().getPoint(enteringEdge), getMesh().getPoint(getMesh().getPrev(enteringEdge)));
+		E next = getMesh().getNext(enteringEdge);
 
-		VTriangle triangle = getMesh().toTriangle(startFace);
-		VPoint incenter = triangle.getIncenter();
-
-		double x2 = incenter.getX();
-		double y2 = incenter.getY();
-
-		E entryEdge = null;
-		F face = startFace;
-		boolean found = true;
-
-		//TODO: this seems to be very slow!
-
-		while(found && !contains(x1, y1, face)) {
-			found = false;
-			for(E halfEdge : getMesh().getEdgeIt(face)) {
-				if(!halfEdge.equals(entryEdge)) {
-					V sVertex = getMesh().getVertex(getMesh().getPrev(halfEdge));
-					V eVertex = getMesh().getVertex(halfEdge);
-
-					//TODO: use faster/own implementation?
-					if(VLine.linesIntersect(sVertex.getX(), sVertex.getY(), eVertex.getX(), eVertex.getY(), x1, y1, x2, y2)) {
-						entryEdge = getMesh().getTwin(halfEdge);
-						face = getMesh().getTwinFace(halfEdge);
-						found = true;
-						break;
-					}
-				}
+		while (enteringEdge != next) {
+			VPoint p1 = getMesh().toPoint(getMesh().getVertex(enteringEdge));
+			VPoint p2 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(enteringEdge)));
+			if(GeometryUtils.intersectLine(q, p, p1, p2)) {
+				return next;
 			}
+
+			next = getMesh().getNext(next);
 		}
 
-		//assert found || getMesh().isBoundary(face);
-
-		return face;
+		throw new IllegalArgumentException("no second intersection edge fount");
 	}
 
-	default F walkThroughHole(double x1, double y1, @NotNull F borderFace) {
-		assert getMesh().isBoundary(borderFace);
+	// TODO: still required?
+	default Optional<E> findIntersectionEdge(final double x1, final double y1, final V startVertex) {
+		VPoint q = getMesh().toPoint(startVertex);
+		VPoint p = new VPoint(x1, y1);
 
-		double minDistance = Double.MAX_VALUE;
-		F choosenFace = borderFace;
+		E edge = getMesh().getEdge(startVertex);
+		E candidate = getMesh().getPrev(edge);
+		E next = getMesh().getTwin(getMesh().getNext(edge));
 
-		for(E edge : getMesh().getEdgeIt(borderFace)) {
-			V v1 = getMesh().getVertex(getMesh().getPrev(edge));
-			V v2 = getMesh().getVertex(edge);
-
-			// get out of the hole/border. Note: non-border faces are ccw oriented but border-faces are cw oriented!
-			if (GeometryUtils.isRightOf(v2, v1, x1, y1)) {
-
-				double distance = GeometryUtils.distanceToLineSegment(v1, v2, x1, y1);
-
-				if(distance < minDistance) {
-					minDistance = distance;
-					choosenFace = getMesh().getTwinFace(edge);
-				}
+		do {
+			candidate = getMesh().isBoundary(candidate) ? getMesh().getTwin(candidate) : candidate;
+			if(isRightOf(x1, y1, candidate) && intersects(q, p, candidate)) {
+				return Optional.of(candidate);
 			}
-		}
 
-		return choosenFace;
+			candidate = getMesh().getPrev(next);
+			next = getMesh().getTwin(getMesh().getNext(next));
+		} while (edge != next);
+
+		return Optional.empty();
 	}
 
 	/**
@@ -689,57 +657,98 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @return
 	 */
 	default F straightWalk2D(final double x1, final double y1, final F startFace) {
-		VPoint q = getMesh().toTriangle(startFace).getIncenter();
+		return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
+	}
+
+	/**
+	 * Marching from a vertex which is the vertex of startVertex towards direction until the stopCondition is fulfilled.
+	 *
+	 * @param startVertex
+	 * @param direction
+	 * @param stopCondition
+	 * @return
+	 */
+	default F straightWalk2D(final E startVertex, final VPoint direction, final Predicate<E> stopCondition) {
+
+		E startEdge = getMesh().getPrev(startVertex);
+		VPoint p1 = getMesh().toPoint(startVertex);
+		VPoint p2 = p1.add(direction);
+
+		VPoint p3 = getMesh().toPoint(startEdge);
+		VPoint p4 = getMesh().toPoint(getMesh().getPrev(startEdge));
+
+		VPoint q = p1;
+		VPoint p = GeometryUtils.intersectionPoint(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY(), p4.getX(), p4.getY());
+
+		F face;
+		E edge;
+		if(isRightOf(p.getX(), p.getY(), startEdge)) {
+			edge = startEdge;
+			face = getMesh().getFace(edge);
+		}
+		else {
+			edge = getMesh().getTwin(startEdge);
+			face = getMesh().getFace(edge);
+		}
+
+		return straightWalk2D(q, p, face, edge, stopCondition);
+	}
+
+	default F straightWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
+		assert !getMesh().isBoundary(startFace);
+
+		// initialize
+		F face = startFace;
+		E edge = getMesh().getEdge(face);
+		VPoint q = getMesh().toTriangle(startFace).getIncenter(); // walk from q to p
 		VPoint p = new VPoint(x1, y1);
 
-		if(q.getX() == x1 && q.getY() == y1) {
-			return startFace;
-		}
+		return straightWalk2D(q, p, face, edge, stopCondition);
+	}
 
-		E intersectionEdge = getMesh().getTwin(getMesh()
-				.streamEdges(startFace)
-				.filter(edge -> intersects(q, p, edge)).findAny().get());
+	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
+		Optional<E> optEdge;
+		F face = startFace;
+		E edge = startEdge;
 
-		F face = getMesh().getFace(intersectionEdge);
+		do {
+			optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
 
-		while (!contains(x1, y1, face)) {
+			if(optEdge.isPresent()) {
+				edge = getMesh().getTwin(optEdge.get());
+				face = getMesh().getTwinFace(optEdge.get());
 
-			// default case i.e. checking a triangle
-			if(!getMesh().isBoundary(face)) {
-				E e1 = getMesh().getNext(intersectionEdge);
-				E e2 = getMesh().getNext(e1);
+				// special case: hitting the boundary
+				if(getMesh().isBoundary(face)) {
+					VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
+					optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
 
-				if(intersects(q, p, e1)){
-					intersectionEdge = getMesh().getTwin(e1);
-					face = getMesh().getFace(intersectionEdge);
-				}
-				else if(intersects(q, p, e2)) {
-					intersectionEdge = getMesh().getTwin(e2);
-					face = getMesh().getFace(intersectionEdge);
-				}
-				else {
-					if(isMember(face, x1, y1)) {
-						return face;
+					if(optEdge.isPresent()) {
+						VPoint p2 = getMesh().toPoint(getMesh().getVertex(optEdge.get()));
+
+						if(p.distance(p1) <= p.distance(p2)) {
+							return face;
+						}
 					}
 					else {
-						intersects(q, p, e1);
-						intersects(q, p, e2);
-						throw new IllegalArgumentException(e1 + " and " + e2 + " do not intersect " + q + "->" + p);
+						return face;
 					}
 				}
-			} // non-default case checking a convex! polygon.
-			else {
-				final E enteringEdge = intersectionEdge;
-				intersectionEdge = getMesh().getTwin(getMesh()
-						.streamEdges(face)
-						.filter(edge -> getMesh().getTwin(edge) != enteringEdge)
-						.filter(edge -> intersects(q, p, edge))
-						.findAny().get());
-				face = getMesh().getFace(intersectionEdge);
 			}
-		}
+		} while (optEdge.isPresent());
 
 		return face;
+	}
+
+	default boolean isOuterBoundary(final F face) {
+		if(getMesh().isBoundary(face)) {
+			E boundaryEdge = getMesh().getEdge(face);
+			VPoint p = getMesh().toPoint(getMesh().getVertex(getMesh().getNext(boundaryEdge)));
+			return isRightOf(p.getX(), p.getY(), boundaryEdge);
+		}
+		else {
+			return false;
+		}
 	}
 
 	/**
@@ -761,14 +770,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		while (true) {
 
 			if(getMesh().isBoundary(face)) {
-				F tmpFace = walkThroughHole(x1, y1, face);
-
-				if(getMesh().isBoundary(tmpFace)) {
-					assert tmpFace == face;
-					return tmpFace;
+				if(contains(x1, y1, face)) {
+					return face;
 				}
 				else {
-					face = tmpFace;
+					throw new IllegalArgumentException("marchRandom2D can not walk through holes.");
 				}
 			}
 

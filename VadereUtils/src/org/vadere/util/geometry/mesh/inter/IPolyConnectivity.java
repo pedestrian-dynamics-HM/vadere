@@ -279,7 +279,6 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	default boolean contains(final double x1, final double y1, final F face) {
-		assert !getMesh().isBoundary(face);
 		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x1, y1, edge));
 	}
 
