@@ -323,7 +323,7 @@ public class PSMeshing {
 
 	public void retriangulate() {
 		//Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
-		//removeLowQualityTriangles();
+		removeLowQualityTriangles();
 		triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
 		removeTrianglesInsideObstacles();
 		triangulation.finalize();
