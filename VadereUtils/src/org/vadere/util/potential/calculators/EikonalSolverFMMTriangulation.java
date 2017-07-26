@@ -181,7 +181,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 	public double getValue(final double x, final double y) {
 		Optional<F> optFace = triangulation.locateFace(x, y);
 
-		double result = 0.0;
+		double result = -1.0;
 		if(!optFace.isPresent()) {
 			logger.warn("no face found for coordinates (" + x + "," + y + ")");
 		}
