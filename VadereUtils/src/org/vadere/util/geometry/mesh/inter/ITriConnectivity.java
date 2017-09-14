@@ -5,12 +5,15 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
 //TODO: check unused methods!
@@ -37,6 +40,10 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	default void splitTriangleEvent(F original, F f1, F f2, F f3) {}
 
 	default void splitEdgeEvent(F original, F f1, F f2) {}
+
+	default Iterable<E> getRing1It(V vertex) {
+		return ()  -> new Ring1Iterator<>(getMesh(), getMesh().getEdge(vertex));
+	}
 
 	/**
 	 * Inserts a point into the mesh which is contained in the boundary. The point will be
@@ -280,6 +287,65 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return splitEdge(p, halfEdge, true);
 	}
 
+
+	/*default void flipLock(@NotNull final E edge) {
+
+	}*/
+
+	default void flipSync(@NotNull final E edge) {
+		IMesh<P, V, E, F> mesh = getMesh();
+
+		E a0 = edge;
+		E a1 = mesh.getNext(a0);
+		E a2 = mesh.getNext(a1);
+
+		E b0 = mesh.getTwin(edge);
+		E b1 = mesh.getNext(b0);
+
+		V v1 = mesh.getVertex(a0);
+		V v2 = mesh.getVertex(a1);
+		V v3 = mesh.getVertex(a2);
+		V v4 = mesh.getVertex(b1);
+
+		// TODO: a very first and simple aquire all locks implementation => improve it
+		while (true) {
+			// lock all 4 involved vertices
+			if (mesh.tryLock(v1)) {
+				if (mesh.tryLock(v2)) {
+					if (mesh.tryLock(v3)) {
+						if (mesh.tryLock(v4)) {
+							break;
+						}
+						else {
+							mesh.unlock(v3);
+							mesh.unlock(v2);
+							mesh.unlock(v1);
+						}
+					}
+					else {
+						mesh.unlock(v2);
+						mesh.unlock(v1);
+					}
+				} else {
+					mesh.unlock(v1);
+				}
+			}
+
+		}
+
+		try {
+			// if everything is locked flip
+			flip(edge);
+		}
+		// unlock all locks
+		finally {
+			mesh.unlock(v4);
+			mesh.unlock(v3);
+			mesh.unlock(v2);
+			mesh.unlock(v1);
+		}
+	}
+
 	/**
 	 * Flips an edge in the triangulation assuming the egdge which will be
 	 * created is not jet there.
@@ -288,6 +354,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param edge the edge which will be flipped.
 	 */
 	default void flip(@NotNull final E edge) {
+
 		IMesh<P, V, E, F> mesh = getMesh();
 
 		// 1. gather all the references required
@@ -343,6 +410,22 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		mesh.setFace(b1, fa);
 
 		flipEdgeEvent(fa, fb);
+	}
+
+	/**
+	 * Tests if the face is counter-clockwise oriented.
+	 * Assumption: The face is a triangle!
+	 *
+	 * @param triangleFace
+	 * @return
+	 */
+	default boolean isCCW(F triangleFace) {
+		E edge = getMesh().getEdge(triangleFace);
+		P p1 = getMesh().getPoint(edge);
+		P p2 = getMesh().getPoint(getMesh().getNext(edge));
+		P p3 = getMesh().getPoint(getMesh().getPrev(edge));
+
+		return GeometryUtils.isCCW(p1, p2, p3);
 	}
 
 	default boolean isTriangle(F face) {

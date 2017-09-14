@@ -29,6 +29,10 @@ public class IncidentEdgeIterator<P extends IPoint, V extends IVertex<P>, E exte
 	private boolean first;
 	int count = 0;
 
+	public IncidentEdgeIterator(final IMesh<P, V, E, F> mesh, final V vertex) {
+		this(mesh, mesh.getEdge(vertex));
+	}
+
 	public IncidentEdgeIterator(final IMesh<P, V, E, F> mesh, final E edge) {
 		this.mesh = mesh;
 		this.edge = edge;
