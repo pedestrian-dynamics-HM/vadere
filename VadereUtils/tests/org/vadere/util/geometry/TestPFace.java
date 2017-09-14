@@ -18,7 +18,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 
-public class TestFace {
+public class TestPFace {
 
 	/**
 	 * Building a geometry containing 2 triangles
@@ -65,7 +65,7 @@ public class TestFace {
 
 		// second triangle yxw
 		face2 = mesh.createFace();
-		w = mesh.createVertex(1.5,-1.5);
+		w = mesh.insertVertex(1.5,-1.5);
 
 		PHalfEdge yx = mesh.createEdge(x, face2);
 		PHalfEdge xw = mesh.createEdge(w, face2);

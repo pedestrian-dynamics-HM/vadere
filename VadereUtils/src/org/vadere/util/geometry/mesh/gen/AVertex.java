@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.mesh.gen;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -7,21 +8,21 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author Benedikt Zoennchen
- * @param <P>
+ * Created by bzoennchen on 06.09.17.
  */
-public class PVertex<P extends IPoint> implements IVertex<P> {
+public class AVertex<P extends IPoint> implements IVertex<P> {
 
 	private final Lock lock;
 	private final P point;
-	private PVertex<P> down;
-	private PHalfEdge<P> halfEdge;
+	private int down;
+	private int halfEdge;
+	private final int id;
 	private boolean destroyed;
 
-	public PVertex(final P point) {
+
+	public AVertex(@NotNull final int id, @NotNull final P point) {
 		this.point = point;
-		this.destroyed = false;
-		this.down = null;
+		this.id = id;
 		this.lock = new ReentrantLock();
 	}
 
@@ -30,21 +31,25 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		return point;
 	}
 
-	public PHalfEdge<P> getEdge() {
+	public int getEdge() {
 		return halfEdge;
 	}
 
-	public void setEdge(final PHalfEdge<P> halfEdge) {
+	public void setEdge(final int halfEdge) {
 		this.halfEdge = halfEdge;
 	}
 
-	public PVertex<P> getDown() {
+	public int getDown() {
 		return down;
 	}
 
-	public void setDown(final PVertex<P> down) {
+	public void setDown(final int down) {
 		this.down = down;
 	}
+
+	int getId() {
+	    return id;
+    }
 
 	@Override
 	public boolean equals(Object obj) {
@@ -56,7 +61,7 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 			return false;
 		}
 
-		return point.equals(((PVertex<P>)obj).getPoint());
+		return point.equals(((AVertex<P>)obj).getPoint());
 	}
 
 	public boolean isDestroyed() {

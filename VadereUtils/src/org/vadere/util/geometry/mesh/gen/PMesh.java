@@ -181,6 +181,16 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public boolean tryLock(@NotNull PVertex<P> vertex) {
+		return vertex.getLock().tryLock();
+	}
+
+	@Override
+	public void unlock(@NotNull PVertex<P> vertex) {
+		vertex.getLock().unlock();
+	}
+
+	@Override
 	public PHalfEdge<P> createEdge(@NotNull PVertex<P> vertex) {
 		PHalfEdge<P> edge = new PHalfEdge<>(vertex);
 		edges.add(edge);
@@ -273,11 +283,21 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public Stream<PHalfEdge<P>> streamEdges() {
-		return edges.stream();
+		return edges.stream().filter(e -> !isDestroyed(e));
 	}
 
 	@Override
-	public Stream<PVertex<P>> streamVertices() { return vertices.stream(); };
+	public Stream<PHalfEdge<P>> streamEdgesParallel() {
+		return edges.parallelStream().filter(e -> !isDestroyed(e));
+	}
+
+	@Override
+	public Stream<PVertex<P>> streamVertices() { return vertices.stream().filter(v -> !isDestroyed(v)); }
+
+	@Override
+	public Stream<PVertex<P>> streamVerticesParallel() {
+		return vertices.parallelStream().filter(v -> !isDestroyed(v));
+	}
 
 	@Override
 	public Iterable<PHalfEdge<P>> getEdgeIt() {
@@ -303,4 +323,8 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 		return faces.stream().filter(predicate);
 	}
 
+    @Override
+    public int getNumberOfEdges() {
+        return edges.size();
+    }
 }
