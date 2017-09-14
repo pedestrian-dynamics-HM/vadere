@@ -3,12 +3,16 @@ package org.vadere.util.geometry.mesh.gen;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author Benedikt Zoennchen
  * @param <P>
  */
 public class PVertex<P extends IPoint> implements IVertex<P> {
 
+	private final Lock lock;
 	private final P point;
 	private PVertex<P> down;
 	private PHalfEdge<P> halfEdge;
@@ -18,6 +22,7 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		this.point = point;
 		this.destroyed = false;
 		this.down = null;
+		this.lock = new ReentrantLock();
 	}
 
 	@Override
@@ -60,6 +65,10 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 
 	public void destroy() {
 		destroyed = true;
+	}
+
+	public Lock getLock() {
+		return lock;
 	}
 
 	@Override

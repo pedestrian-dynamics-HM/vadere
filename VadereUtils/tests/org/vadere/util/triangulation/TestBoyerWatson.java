@@ -8,9 +8,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PVertex;
-import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
@@ -138,7 +136,7 @@ public class TestBoyerWatson {
 		int height = 300;
 		Random r = new Random();
 		assert false;
-		int numberOfPoints = 100000;
+		int numberOfPoints = 1000000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
@@ -158,10 +156,14 @@ public class TestBoyerWatson {
 
 
 		long ms = System.currentTimeMillis();
-		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-		//delaunayTriangulation.finalize();
+		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> pdelaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+        pdelaunayTriangulation.finalize();
+		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy and a pointer-based data structure");
 
-		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-tree");
+        ms = System.currentTimeMillis();
+        ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> adelaunayTriangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+        adelaunayTriangulation.finalize();
+        log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy and a array-based data structure");
 
 		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(new VRectangle(0,0,width, height));
 		ms = System.currentTimeMillis();

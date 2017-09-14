@@ -8,15 +8,15 @@ import org.vadere.util.geometry.mesh.gen.PMesh;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.VPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 
 import static org.junit.Assert.assertEquals;
-
 
 public class TestPFace {
 
@@ -107,7 +107,6 @@ public class TestPFace {
 		List<PFace<VPoint>> incidentFaces = mesh.getAdjacentFaces(xy);;
 		assertEquals(incidentFaces.size(), 3);
 	}
-
 
 	@Test
 	public void testPointIterator() {
