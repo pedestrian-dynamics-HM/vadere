@@ -1,18 +1,16 @@
 package org.vadere.util.triangulation.adaptive;
 
-import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.ArrayList;
-
 import javax.swing.*;
+import java.util.ArrayList;
 
 /**
  * Created by Matimati-ka on 27.09.2016.
  */
-public class TestEnhancedVersion3 extends JFrame {
+public class TestEnhancedVersion4 extends JFrame {
 
-	private TestEnhancedVersion3() {
+	private TestEnhancedVersion4() {
 
 		//IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
 		//IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
@@ -29,7 +27,7 @@ public class TestEnhancedVersion3 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 6.0, bbox, new ArrayList<>());
+		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 6.0, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
@@ -44,6 +42,12 @@ public class TestEnhancedVersion3 extends JFrame {
 		int counter = 0;
 		long time = 0;
 
+        long ms = System.currentTimeMillis();
+        meshGenerator.step();
+        ms = System.currentTimeMillis() - ms;
+        time += ms;
+        System.out.println("Step-Time: " + ms);
+
 		while (counter <= 560) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
@@ -57,12 +61,7 @@ public class TestEnhancedVersion3 extends JFrame {
 			distmeshPanel.repaint();
 			counter++;
 
-			long ms = System.currentTimeMillis();
-			meshGenerator.stepParallel();
-			ms = System.currentTimeMillis() - ms;
-			time += ms;
-			System.out.println("Quality: " + meshGenerator.getQuality());
-			System.out.println("Step-Time: " + ms);
+
 		}
 		System.out.print("overall time: " + time);
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
@@ -75,6 +74,6 @@ public class TestEnhancedVersion3 extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new TestEnhancedVersion3();
+		new TestEnhancedVersion4();
 	}
 }

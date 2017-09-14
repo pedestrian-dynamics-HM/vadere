@@ -7,10 +7,10 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
+import org.vadere.util.geometry.mesh.gen.UniformRefinementTriangulation;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
-import org.vadere.util.geometry.mesh.gen.UniformRefinementTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -24,20 +24,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
  */
-public class PSMeshing implements IPSMeshing {
-	private static final Logger log = LogManager.getLogger(PSMeshing.class);
+public class PSMeshingOptimized {
+	private static final Logger log = LogManager.getLogger(PSMeshingOptimized.class);
 	private boolean illegalMovement = false;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
 	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
 	private Collection<? extends VShape> obstacleShapes;
-	private ArrayList<Pair<MeshPoint, MeshPoint>> edges;
 	private VRectangle bound;
 	private double scalingFactor;
 	private PriorityQueue<Pair<PFace<MeshPoint>, Double>> heap;
@@ -57,7 +55,7 @@ public class PSMeshing implements IPSMeshing {
 
 	private Object gobalAcessSynchronizer = new Object();
 
-	public PSMeshing(
+	public PSMeshingOptimized(
 			final IDistanceFunction distanceFunc,
 			final IEdgeLengthFunction edgeLengthFunc,
 			final double initialEdgeLen,
@@ -70,7 +68,6 @@ public class PSMeshing implements IPSMeshing {
 		this.edgeLengthFunc = edgeLengthFunc;
 		this.initialEdgeLen = initialEdgeLen;
 		this.obstacleShapes = obstacleShapes;
-		this.edges = new ArrayList<>();
 		this.deps = 1.4901e-8 * initialEdgeLen;
 		this.triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new MeshPoint(x, y, false));
 	}
@@ -83,16 +80,8 @@ public class PSMeshing implements IPSMeshing {
 		UniformRefinementTriangulation uniformRefinementTriangulation = new UniformRefinementTriangulation(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
 		uniformRefinementTriangulation.compute();
 		retriangulate();
-		gatherEdges();
 		initialized = true;
 		log.info("##### (end) compute a uniform refined triangulation #####");
-	}
-
-	private void gatherEdges() {
-		edges = new ArrayList<>();
-		for(PHalfEdge<MeshPoint> e : getMesh().getEdgeIt()) {
-			edges.add(Pair.of(getMesh().getPoint(e), getMesh().getPoint(getMesh().getPrev(e))));
-		}
 	}
 
 	public ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation() {
@@ -131,7 +120,7 @@ public class PSMeshing implements IPSMeshing {
 		}
 
 		computeScalingFactor();
-		computeForces();
+		computeForce();
 		computeDelta();
 		updateVertices();
 		retriangulate();
@@ -174,11 +163,7 @@ public class PSMeshing implements IPSMeshing {
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 		//log.info(scalingFactor);
-
-		//long ms = System.currentTimeMillis();
-		computeForces();
-		//ms = System.currentTimeMillis() - ms;
-		//log.info("ms: " + ms);
+		computeForce();
 		computeScalingFactor();
 		//computeDelta();
 		updateVertices();
@@ -190,9 +175,7 @@ public class PSMeshing implements IPSMeshing {
 		}
 
 		if(illegalMovement) {
-			//retriangulate();
-			while (flipEdges());
-
+			retriangulate();
 			numberOfRetriangulations++;
 		}
 		else {
@@ -204,10 +187,10 @@ public class PSMeshing implements IPSMeshing {
 		}
 
 		numberOfIterations++;
-		/*log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
+		log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
 		log.info("#retriangulations: " + numberOfRetriangulations);
 		log.info("#steps: " + numberOfIterations);
-		log.info("#points: " + getMesh().getVertices().size());*/
+		log.info("#points: " + getMesh().getVertices().size());
 	}
 
 	public boolean isMovementIllegal() {
@@ -220,53 +203,38 @@ public class PSMeshing implements IPSMeshing {
 	}
 
 	public void computeForcesParallel() {
-		edges.parallelStream().forEach(e -> computeForces(e));
+		getMesh().streamEdgesParallel().forEach(e -> computeForce(e));
 	}
 
-	private void computeForces(final PHalfEdge<MeshPoint> edge) {
+	private void computeForce(final PHalfEdge<MeshPoint> edge) {
 		MeshPoint p1 = getMesh().getPoint(edge);
-		MeshPoint p2 = getMesh().getPoint(getMesh().getPrev(edge));
+		for(PHalfEdge<MeshPoint> neighbour : getMesh().getIncidentEdgesIt(edge)) {
+			MeshPoint p2 = getMesh().getPoint(neighbour);
 
-		double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
-		double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
-		double lenDiff = Math.max(desiredLen - len, 0);
-		p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
-	}
-
-	// optimized computation
-	public void computeForces() {
-		for(Pair<MeshPoint, MeshPoint> line : edges) {
-			computeForces(line);
-
+			VLine line = new VLine(p2.toVPoint(), p1.toVPoint());
+			double len = line.length();
+			double desiredLen = edgeLengthFunc.apply(line.midPoint()) * Parameters.FSCALE * scalingFactor;
+			double lenDiff = Math.max(desiredLen - len, 0);
 
 			//maxMovement = Math.max(lenDiff / desiredLen, maxMovement);
-			//VPoint forceDirection = p1.toVPoint().subtract(p2.toVPoint());
-			//VPoint partlyForce = forceDirection.scalarMultiply((lenDiff / len));
+			VPoint forceDirection = p1.toVPoint().subtract(p2.toVPoint());
+			VPoint partlyForce = forceDirection.scalarMultiply((lenDiff / len));
 
 			//updatePoint(p1, partlyForce);
 			//updatePoint(p2, partlyForce.scalarMultiply(-1.0));
 			//synchronized (p1) {
-			//p1.increaseVelocity(partlyForce);
+				p1.increaseVelocity(partlyForce);
 			//}
 
 			//synchronized (p2) {
-			//p2.decreaseVelocity(partlyForce);
+				p2.decreaseVelocity(partlyForce);
 			//}
 
 		}
 	}
 
-	public void computeForces(final Pair<MeshPoint, MeshPoint> line ) {
-		MeshPoint p1 = line.getLeft();
-		MeshPoint p2 = line.getRight();
-
-		double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
-		double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
-		double lenDiff = Math.max(desiredLen - len, 0);
-		p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
-	}
-
-	/*public void computeForces() {
+	// optimized computation
+	public void computeForce() {
 		for(PHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
 			MeshPoint p1 = getMesh().getPoint(edge);
 			MeshPoint p2 = getMesh().getPoint(getMesh().getPrev(edge));
@@ -292,12 +260,12 @@ public class PSMeshing implements IPSMeshing {
 			//}
 
 		}
-	}*/
+	}
 
 
 	public void computeForceA() {
 		for(PHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
-			computeForces(edge);
+			computeForce(edge);
 		}
 	}
 
@@ -379,16 +347,14 @@ public class PSMeshing implements IPSMeshing {
 		getMesh().streamEdgesParallel().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flipSync(e));
 	}
 
-	public boolean flipEdges() {
-		boolean anyFlip = false;
+	public void flipEdges() {
+
 		// Careful, iterate over all half-edges means iterate over each "real" edge twice!
 		for(PHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
 			if(triangulation.isIllegal(edge)) {
 				triangulation.flip(edge);
-				anyFlip = true;
 			}
 		}
-		return anyFlip;
 	}
 
 	// TODO: parallize the whole triangulation
@@ -398,7 +364,6 @@ public class PSMeshing implements IPSMeshing {
 		triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
 		removeTrianglesInsideObstacles();
 		triangulation.finalize();
-		gatherEdges();
 	}
 
 	private boolean isFixedVertex(final PVertex<MeshPoint> vertex) {
@@ -481,18 +446,12 @@ public class PSMeshing implements IPSMeshing {
 	}
 
 	private void computeScalingFactorParallel() {
-		Pair<Double, Double> partialSums = edges.parallelStream()
+		Pair<Double, Double> partialSums = triangulation.getMesh().streamEdgesParallel()
+				.map(edge -> triangulation.getMesh().toLine(edge))
 				.map(line -> partialSum(line))
 				.reduce(Pair.of(0.0, 0.0), (p1, p2) -> Pair.of(p1.getLeft() + p2.getLeft(), p1.getRight() + p2.getRight()));
 		scalingFactor =  Math.sqrt(partialSums.getRight() / partialSums.getLeft());
 
-	}
-
-	private Pair<Double, Double> partialSum(final Pair<MeshPoint, MeshPoint> line ) {
-		VPoint midPoint = new VPoint((line.getLeft().getX() + line.getRight().getX()) * 0.5, (line.getLeft().getY() + line.getRight().getY()) * 0.5);
-		double desiredEdgeLength = edgeLengthFunc.apply(midPoint);
-		double len = midPoint.subtract(line.getLeft()).distanceToOrigin() * 2.0;
-		return Pair.of((desiredEdgeLength * desiredEdgeLength), (len * len));
 	}
 
 	private Pair<Double, Double> partialSum(final VLine line ) {
@@ -505,7 +464,8 @@ public class PSMeshing implements IPSMeshing {
 	 * Computation of the global scaling factor which is used to
 	 */
 	private void computeScalingFactor() {
-		Pair<Double, Double> partialSums = edges.stream()
+		Pair<Double, Double> partialSums = triangulation.getMesh().streamEdges()
+				.map(edge -> triangulation.getMesh().toLine(edge))
 				.map(line -> partialSum(line))
 				.reduce(Pair.of(0.0, 0.0), (p1, p2) -> Pair.of(p1.getLeft() + p2.getLeft(), p1.getRight() + p2.getRight()));
 		scalingFactor =  Math.sqrt(partialSums.getRight() / partialSums.getLeft());
@@ -547,7 +507,8 @@ public class PSMeshing implements IPSMeshing {
 		}
 	}
 
-	public double faceToQuality(final PFace<MeshPoint> face) {
+
+	private double faceToQuality(final PFace<MeshPoint> face) {
 
 		VLine[] lines = getMesh().toTriangle(face).getLines();
 		double a = lines[0].length();
@@ -593,25 +554,6 @@ public class PSMeshing implements IPSMeshing {
 				return -1;
 			}
 			else if(q1 > q2) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}
-	}
-
-	private class EdgeComperator implements Comparator<PHalfEdge<MeshPoint>> {
-
-		@Override
-		public int compare(final PHalfEdge<MeshPoint> o1, final PHalfEdge<MeshPoint> o2) {
-			double f1 = triangulation.getMesh().getPoint(o1).getVelocity().distanceToOrigin();
-			double f2 = triangulation.getMesh().getPoint(o2).getVelocity().distanceToOrigin();
-
-			if(f1 > f2) {
-				return -1;
-			}
-			else if(f1 < f2) {
 				return 1;
 			}
 			else {

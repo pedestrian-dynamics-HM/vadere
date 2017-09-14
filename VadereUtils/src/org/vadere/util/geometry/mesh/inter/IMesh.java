@@ -54,6 +54,15 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	E getTwin(@NotNull E halfEdge);
 	F getFace(@NotNull E halfEdge);
 
+	default F getNonBoundaryFace(@NotNull E halfEdge) {
+        if(!isBoundary(halfEdge)) {
+            return getFace(halfEdge);
+        }
+        else {
+            return getFace(getTwin(halfEdge));
+        }
+    }
+
 	default VLine toLine(@NotNull E halfEdge) {
 		return new VLine(new VPoint(getVertex(getPrev(halfEdge))), new VPoint(getVertex(halfEdge)));
 	}
@@ -87,17 +96,32 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 	F getFace();
 
+
+	default F getNonBoundaryFace(@NotNull V vertex) {
+		return getNonBoundaryFace(getEdge(vertex));
+	}
+
 	default F getFace(@NotNull V vertex) {
 		return getFace(getEdge(vertex));
 	}
 
 	/**
-	 * Returns true if the face is the boundar
+	 * Returns true if the face is the boundary
 	 *
 	 * @param face
 	 * @return
 	 */
 	boolean isBoundary(@NotNull F face);
+
+	/**
+	 * Returns true if the vertex is a boundary vertex.
+	 *
+	 * @param vertex
+	 * @return
+	 */
+	default boolean isAtBoundary(@NotNull V vertex) {
+		return streamEdges(vertex).anyMatch(e -> isAtBoundary(e));
+	}
 
 	default boolean isAtBoundary(@NotNull E edge) {
 		return isBoundary(edge) || isBoundary(getTwin(edge));
@@ -224,13 +248,29 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	Stream<F> streamFaces(@NotNull final Predicate<F> predicate);
 
+	default Stream<F> streamFacesParallel() {
+		return streamFaces(f -> true).parallel();
+	}
+
 	default Stream<F> streamFaces() {
 		return streamFaces(f -> true);
 	}
 
 	Stream<E> streamEdges();
 
+	Stream<E> streamEdgesParallel();
+
 	Stream<V> streamVertices();
+
+	Stream<V> streamVerticesParallel();
+
+	default Stream<P> streamPoints() {
+		return streamEdges().map(e -> getPoint(e));
+	}
+
+	default Stream<P> streamPointsParallel() {
+		return streamEdgesParallel().map(e -> getPoint(e));
+	}
 
 	default VPolygon toPolygon(F face) {
 		Path2D path2D = new Path2D.Double();
@@ -613,6 +653,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	int getNumberOfFaces();
 
+	int getNumberOfEdges();
+
 	static <P extends IPoint> IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPMesh(final IPointConstructor<P> pointConstructor) {
 		return new PMesh<>(pointConstructor);
 	}
@@ -628,6 +670,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 		return result;
 	}
+
+	boolean tryLock(@NotNull final V vertex);
+
+	void unlock(@NotNull final V vertex);
 
 	/**
 	 * Returns the edge of a given face which is the closest edge of the face in respect to the point defined

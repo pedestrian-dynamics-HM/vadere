@@ -17,12 +17,12 @@ import javax.swing.*;
  */
 public class PSMeshingPanel extends Canvas {
 
-	private PSMeshing meshGenerator;
+	private IPSMeshing meshGenerator;
 	private double width;
 	private double height;
 	private Collection<VTriangle> triangles;
 
-	public PSMeshingPanel(final PSMeshing meshGenerator, final double width, final double height) {
+	public PSMeshingPanel(final IPSMeshing meshGenerator, final double width, final double height) {
 		this.meshGenerator = meshGenerator;
 		this.width = width;
 		this.height = height;

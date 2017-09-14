@@ -9,6 +9,8 @@ import org.vadere.util.potential.calculators.PotentialPoint;
 public class MeshPoint extends MPoint implements PotentialPoint {
 	private boolean fixPoint;
 	private IPoint velocity;
+	private double maxTraveldistance;
+	private IPoint lastPosition;
 	private double potential;
 	private PathFindingTag tag;
 
@@ -18,6 +20,8 @@ public class MeshPoint extends MPoint implements PotentialPoint {
 		this.potential = Double.MAX_VALUE;
 		this.velocity = new VPoint(0,0);
 		this.tag = PathFindingTag.Undefined;
+		this.maxTraveldistance = 0;
+		this.lastPosition = new VPoint(x, y);
 	}
 
 	public MeshPoint(final IPoint point, boolean fixPoint){
@@ -46,6 +50,22 @@ public class MeshPoint extends MPoint implements PotentialPoint {
 
 	public boolean isFixPoint() {
 		return fixPoint;
+	}
+
+	public void setLastPosition(final IPoint lastPosition) {
+		this.lastPosition = lastPosition;
+	}
+
+	public IPoint getLastPosition() {
+		return lastPosition;
+	}
+
+	public void setMaxTraveldistance(double maxTraveldistance) {
+		this.maxTraveldistance = maxTraveldistance;
+	}
+
+	public double getMaxTraveldistance() {
+		return maxTraveldistance;
 	}
 
 	@Override
