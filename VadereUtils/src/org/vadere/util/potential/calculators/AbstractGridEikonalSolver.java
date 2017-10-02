@@ -27,11 +27,11 @@ public abstract class AbstractGridEikonalSolver implements EikonalSolver {
 		double gridPotentials[];
 		double weightOfKnown[] = new double[1];
 
-		if (x >= potentialField.getWidth()) {
+		if (x >= potentialField.getWidth() + potentialField.getMinY()) {
 			incX = 0;
 		}
 
-		if (y >= potentialField.getHeight()) {
+		if (y >= potentialField.getHeight() + potentialField.getMinY()) {
 			incY = 0;
 		}
 
