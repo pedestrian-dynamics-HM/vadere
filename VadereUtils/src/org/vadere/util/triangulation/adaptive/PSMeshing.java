@@ -129,13 +129,16 @@ public class PSMeshing implements IPSMeshing {
 			quality = getQuality();
 			log.info("quality = " + quality);
 		}
-
-		computeScalingFactor();
-		computeForces();
-		computeDelta();
-		updateVertices();
-		retriangulate();
+		finalize();
 	}
+
+	public void finalize() {
+        computeScalingFactor();
+        computeForces();
+        computeDelta();
+        updateVertices();
+        retriangulate();
+    }
 
 
 	public void stepParallel() {
@@ -176,10 +179,10 @@ public class PSMeshing implements IPSMeshing {
 		//log.info(scalingFactor);
 
 		//long ms = System.currentTimeMillis();
-		computeForces();
 		//ms = System.currentTimeMillis() - ms;
 		//log.info("ms: " + ms);
 		computeScalingFactor();
+        computeForces();
 		//computeDelta();
 		updateVertices();
 
@@ -189,9 +192,10 @@ public class PSMeshing implements IPSMeshing {
 			numberOfIllegalMovementTests++;
 		}
 
+        //retriangulate();
 		if(illegalMovement) {
-			//retriangulate();
-			while (flipEdges());
+			retriangulate();
+			//while (flipEdges());
 
 			numberOfRetriangulations++;
 		}
@@ -199,15 +203,15 @@ public class PSMeshing implements IPSMeshing {
 			flipEdges();
 		}
 
-		if(minDeltaTravelDistance < 0) {
+		if(minDeltaTravelDistance <= 0) {
 			computeMaxLegalMovements();
 		}
 
 		numberOfIterations++;
-		/*log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
+		log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
 		log.info("#retriangulations: " + numberOfRetriangulations);
 		log.info("#steps: " + numberOfIterations);
-		log.info("#points: " + getMesh().getVertices().size());*/
+		log.info("#points: " + getMesh().getVertices().size());
 	}
 
 	public boolean isMovementIllegal() {

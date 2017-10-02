@@ -751,30 +751,17 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param stopCondition
 	 * @return
 	 */
-	default F straightWalk2D(final E startVertex, final VPoint direction, final Predicate<E> stopCondition) {
+	default F straightWalk2D(final E startVertex, final F face, final VPoint direction, final Predicate<E> stopCondition) {
 
-		E startEdge = getMesh().getPrev(startVertex);
+        E edge = getMesh().getPrev(startVertex);
 		VPoint p1 = getMesh().toPoint(startVertex);
-		VPoint p2 = p1.add(direction);
 
-		VPoint p3 = getMesh().toPoint(startEdge);
-		VPoint p4 = getMesh().toPoint(getMesh().getPrev(startEdge));
 
-		VPoint q = p1;
-		VPoint p = GeometryUtils.intersectionPoint(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY(), p4.getX(), p4.getY());
-
-		F face;
-		E edge;
-		if(isRightOf(p.getX(), p.getY(), startEdge)) {
-			edge = startEdge;
-			face = getMesh().getFace(edge);
-		}
-		else {
-			edge = getMesh().getTwin(startEdge);
-			face = getMesh().getFace(edge);
-		}
-
-		return straightWalk2D(q, p, face, edge, stopCondition);
+		assert intersects(p1, p1.add(direction), edge);
+		assert getMesh().getEdges(face).contains(startVertex);
+		// TODO: quick solution!
+        VPoint q = p1.add(direction.scalarMultiply(Double.MAX_VALUE * 0.5));
+		return straightWalk2D(p1, q, face, edge, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
 	}
 
 	default F straightWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
@@ -789,6 +776,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return straightWalk2D(q, p, face, edge, stopCondition);
 	}
 
+    /**
+     * Walks along the line defined by q and p. The walking direction should be controlled by the stopCondition e.g.
+     * e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1) is on the left side of each edge which is the case if the
+     * point is inside the reached face. The walk starts at the startFace and continues in the direction of line defined
+     * by q and p using the any edge which does not fulfill the stopCondition.
+     *
+     * @param q
+     * @param p
+     * @param startFace
+     * @param startEdge
+     * @param stopCondition
+     * @return
+     */
 	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
 		Optional<E> optEdge;
 		F face = startFace;

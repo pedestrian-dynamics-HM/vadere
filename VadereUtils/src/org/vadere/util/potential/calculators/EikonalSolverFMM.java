@@ -14,6 +14,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 
 /**
  * EikonalSolverFMM initializes a potential field on basis
@@ -29,6 +30,8 @@ public class EikonalSolverFMM implements EikonalSolver {
 	protected CellGrid cellGrid;
 	protected List<Point> targetPoints;
 	protected List<VShape> targetShapes;
+	protected IDistanceFunction distFunc;
+
 	boolean isHighAccuracy = false;
 
 	/** only for logging */
@@ -68,13 +71,41 @@ public class EikonalSolverFMM implements EikonalSolver {
 		}
 	}
 
+    /**
+     * Initializes the FM potential calculator with a time cost function F > 0.
+     */
+    public EikonalSolverFMM(
+            final CellGrid potentialField,
+            final IDistanceFunction distFunc,
+            final boolean isHighAccuracy,
+            final ITimeCostFunction timeCostFunction,
+            final double unknownPenalty) {
+        super(potentialField, unknownPenalty);
+        this.cellGrid = potentialField;
+        this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
+                .collect(Collectors.toList());
+        this.distFunc = distFunc;
+        this.isHighAccuracy = isHighAccuracy;
+
+        ComparatorPotentialFieldValue comparator = new ComparatorPotentialFieldValue(
+                potentialField);
+        this.narrowBand = new PriorityQueue<>(50, comparator);
+        this.timeCostFunction = timeCostFunction;
+
+        if (targetPoints.size() == 0) {
+            logger.error("PotentialFieldInitializerFastMarching::Run(): "
+                    + "Warning, no target points given. Target missing or grid resolution too low.");
+            return;
+        }
+    }
+
 	@Override
 	public void initialize() {
 
 		for (Point point : targetPoints) {
-			if(!targetShapes.isEmpty()) {
-				setTargetNeighborsDistances(point);
-			}
+			//if(!targetShapes.isEmpty()) {
+            setTargetNeighborsDistances(point);
+			//}
 			narrowBand.add(point);
 		}
 
@@ -195,7 +226,7 @@ public class EikonalSolverFMM implements EikonalSolver {
 
 				cellGrid.setValue(
 						neighbor,
-						new CellState(minDistanceToTarget(cellGrid.pointToCoord(neighbor)),
+						new CellState(minDistanceToTarget(cellGrid.pointToCoord(neighbor)) / timeCostFunction.costAt(cellGrid.pointToCoord(neighbor)),
 								PathFindingTag.Reachable));
 				narrowBand.add(neighbor);
 			}
@@ -209,13 +240,23 @@ public class EikonalSolverFMM implements EikonalSolver {
 		// computed starting there.
 		VPoint dp = new VPoint(cellGrid.getWidth() / (cellGrid.getNumPointsX() - 1) / 2.0,
 				cellGrid.getHeight() / (cellGrid.getNumPointsY() - 1) / 2.0);
-		for (VShape targetShape : targetShapes) {
-			// negative distances are possible when point is inside the target
-			tmp = Math.max(0, targetShape.distance(point.add(dp)));
-			if (tmp < minDistance) {
-				minDistance = tmp;
-			}
-		}
+
+		if(targetShapes != null && !targetShapes.isEmpty()) {
+            for (VShape targetShape : targetShapes) {
+                // negative distances are possible when point is inside the target
+                tmp = Math.max(0, targetShape.distance(point.add(dp)));
+                if (tmp < minDistance) {
+                    minDistance = tmp;
+                }
+            }
+        }
+        else if(distFunc != null) {
+            tmp = Math.max(0, -distFunc.apply(point));
+            if (tmp < minDistance) {
+                minDistance = tmp;
+            }
+        }
+
 		return minDistance;
 	}
 }

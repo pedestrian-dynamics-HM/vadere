@@ -33,6 +33,10 @@ public class CellGrid {
 	/** Number of points along y axis. */
 	protected final int numPointsY;
 
+	protected final double xMin;
+
+	protected final double yMin;
+
 	protected CellState[][] values;
 
 	/**
@@ -40,10 +44,12 @@ public class CellGrid {
 	 * point values are initialized with 'value'.
 	 */
 	public CellGrid(double width, double height, double resolution,
-			CellState value) {
+			CellState value, double xMin, double yMin) {
 		this.width = width;
 		this.height = height;
 		this.resolution = resolution;
+		this.xMin = xMin;
+		this.yMin = yMin;
 
 		/* 0.001 avoids that numPointsX/Y are too small due to numerical errors. */
 		numPointsX = (int) Math.floor(width / resolution + 0.001) + 1;
@@ -53,6 +59,14 @@ public class CellGrid {
 
 		reset(value);
 	}
+
+    /**
+     * Creates an grid with the given width, height and resolution. All grid
+     * point values are initialized with 'value'.
+     */
+    public CellGrid(double width, double height, double resolution, CellState value) {
+        this(width, height, resolution, value, 0, 0);
+    }
 
 	/**
 	 * Creates a deep copy of the given grid.
@@ -64,6 +78,8 @@ public class CellGrid {
 		numPointsX = grid.numPointsX;
 		numPointsY = grid.numPointsY;
 		values = new CellState[numPointsX][numPointsY];
+		xMin = grid.xMin;
+		yMin = grid.yMin;
 
 		for (int row = 0; row < numPointsY; row++) {
 			for (int col = 0; col < numPointsX; col++) {
@@ -138,7 +154,7 @@ public class CellGrid {
 	 * Converts the matrix indices to coordinates.
 	 */
 	public VPoint pointToCoord(int pointX, int pointY) {
-		return new VPoint(pointX * resolution, pointY * resolution);
+		return new VPoint(xMin + pointX * resolution, yMin + pointY * resolution);
 	}
 
 	/**
@@ -183,20 +199,20 @@ public class CellGrid {
 	 * Returns the closest grid point (matrix index) to the given coordinates.
 	 */
 	public Point getNearestPoint(double x, double y) {
-		if (x < 0) {
-			x = 0;
+		if (x < xMin) {
+			x = xMin;
 		}
-		if (y < 0) {
-			y = 0;
+		if (y < yMin) {
+			y = yMin;
 		}
-		if (y > getHeight()) {
-			y = getHeight();
+		if (y > getHeight() + yMin) {
+			y = yMin+getHeight();
 		}
-		if (x > getWidth()) {
-			x = getWidth();
+		if (x > getWidth() + xMin) {
+			x = getWidth() + xMin;
 		}
-		return new Point((int) (x / resolution + 0.5),
-				(int) (y / resolution + 0.5));
+		return new Point((int) ((x - xMin) / resolution + 0.5),
+				(int) ((y - yMin) / resolution + 0.5));
 	}
 
 	/**
@@ -204,19 +220,19 @@ public class CellGrid {
 	 * towards origin.
 	 */
 	public Point getNearestPointTowardsOrigin(double x, double y) {
-		if (x < 0) {
-			x = 0;
-		}
-		if (y < 0) {
-			y = 0;
-		}
-		if (y > getHeight()) {
-			y = getHeight();
-		}
-		if (x > getWidth()) {
-			x = getWidth();
-		}
-		return new Point((int) (x / resolution), (int) (y / resolution));
+        if (x < xMin) {
+            x = xMin;
+        }
+        if (y < yMin) {
+            y = yMin;
+        }
+        if (y > getHeight() + yMin) {
+            y = yMin+getHeight();
+        }
+        if (x > getWidth() + xMin) {
+            x = getWidth() + xMin;
+        }
+		return new Point((int) ((x - xMin) / resolution), (int) ((y - yMin) / resolution));
 	}
 
 	/**
@@ -287,6 +303,10 @@ public class CellGrid {
 				.mapToObj(x -> IntStream.range(0, getNumPointsY()).mapToObj(y -> new Point(x, y)))
 				.flatMap(stream -> stream);
 	}
+
+	public double getMinX() { return xMin; }
+
+	public double getMinY() { return yMin; }
 
 	public boolean isValidPoint(Point point) {
 		Point p = (point);
