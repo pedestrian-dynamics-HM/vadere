@@ -288,6 +288,13 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return GeometryUtils.isRightOf(p1, p2, x1, y1);
 	}
 
+    /**
+     * Tests if the line-segment edge intersects the line defined by p1 and p2.
+     * @param p1
+     * @param p2
+     * @param edge
+     * @return
+     */
 	default boolean intersects(final IPoint p1, final IPoint p2, E edge) {
 		VPoint q1 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(edge)));
 		VPoint q2 = getMesh().toPoint(getMesh().getVertex(edge));
