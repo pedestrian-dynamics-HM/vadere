@@ -129,6 +129,5 @@ public class TrajectoryReader {
 	        logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
 	        throw e;
         }
-
 	}
 }
