@@ -74,9 +74,11 @@ public class ScenarioRun implements Runnable {
 			// prepare processors and simulation data writer
 			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
 
-			createAndSetOutputDirectory();
-
-			scenario.saveToOutputPath(outputPath);
+			// Only create output directory and write .scenario file if there is any output.
+			if(!processorManager.isEmpty()) {
+                createAndSetOutputDirectory();
+                scenario.saveToOutputPath(outputPath);
+            }
 
 			sealAllAttributes();
 

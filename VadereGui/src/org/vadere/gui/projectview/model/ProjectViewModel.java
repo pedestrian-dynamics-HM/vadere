@@ -18,6 +18,9 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class ProjectViewModel {
@@ -29,7 +32,8 @@ public class ProjectViewModel {
 	private final OutputFileTableModel outputTableModel;
 	private final VadereScenarioTableModel scenarioTableModel;
 	private String currentProjectPath;
-	private Thread refreshOutputThread;
+	private ExecutorService refreshOutputExecutor;
+
 
 	// these are also part of the model, because only they know the current selected row
 	private VTable scenarioTable;
@@ -45,7 +49,7 @@ public class ProjectViewModel {
 		this.outputRefreshListeners = new LinkedList<>();
 		this.projectChangeListeners = new LinkedList<>();
 		this.project = null;
-		this.refreshOutputThread = null;
+		this.refreshOutputExecutor = Executors.newSingleThreadExecutor();
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
@@ -123,17 +127,7 @@ public class ProjectViewModel {
 	}
 
 	public void refreshOutputTable() {
-		if (refreshOutputThread != null && refreshOutputThread.isAlive()) {
-			try {
-				logger.info("wait for output refresh to be finished, before restart again");
-				refreshOutputThread.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				logger.error(e.getLocalizedMessage());
-			}
-		}
-		refreshOutputThread = new Thread(new OutputRefresher());
-		refreshOutputThread.start();
+		refreshOutputExecutor.execute(new OutputRefresher());
 	}
 
 	public void addScenario(final Scenario scenario) {

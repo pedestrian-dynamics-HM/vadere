@@ -47,8 +47,7 @@ public abstract class IOOutput {
 	 * Returns all valid output directories of the project.
 	 */
 	public static List<File> listAllOutputDirs(final VadereProject project) {
-		return listAllDirs(project).stream().filter(f -> isValidOutputDirectory(project, f))
-				.collect(Collectors.toList());
+		return listAllDirs(project).stream().filter(f -> isValidOutputDirectory(project, f)).collect(Collectors.toList());
 	}
 
 	/**
@@ -59,19 +58,26 @@ public abstract class IOOutput {
 				.forEach(dir -> cleanDirectory(project, dir));
 	}
 
-	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project,
-			final Scenario scenario, final String directoryName) throws IOException {
-		TrajectoryReader reader = new TrajectoryReader(
-				getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
+	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project, final Scenario scenario, final String directoryName) throws IOException {
+		TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
 		return reader.readFile();
 	}
 
-	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath,
-			final Scenario scenario) throws IOException {
+	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath, final Scenario scenario) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(trajectoryFilePath, scenario);
 		Map<Step, List<Agent>> result = reader.readFile();
 		return result;
 	}
+
+    private static Optional<Map<Step, List<Agent>>> readTrajectories(final VadereProject project, final File directory) {
+        try {
+            TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
+            return Optional.of(reader.readFile());
+        } catch (IOException | VadereClassNotFoundException e) {
+            logger.error("Error in output file " + directory.getName());
+            return Optional.empty();
+        }
+    }
 
 	public static Scenario readScenarioRunManager(final VadereProject project, final String directoryName)
 			throws IOException {
@@ -190,7 +196,7 @@ public abstract class IOOutput {
 	}
 
 	private static boolean isValidOutputDirectory(final VadereProject project, final File directory) {
-		return readOutputFile(project, directory).isPresent();
+		return readOutputFile(project, directory).isPresent() && readTrajectories(project, directory).isPresent();
 	}
 
 	private static boolean isMatchingOutputDirectory(final VadereProject project, final File directory,

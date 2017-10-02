@@ -69,7 +69,7 @@ public class ProcessorManager {
 	}
 
 	public void setOutputPath(String directory) {
-		this.outputFiles.forEach(file -> file.setFileName(Paths.get(directory, String.format("%s", new File(file.getFileName()).getName())).toString()));
+		this.outputFiles.forEach(file -> file.setAbsoluteFileName(Paths.get(directory, String.format("%s", new File(file.getFileName()).getName())).toString()));
 	}
 
 	public void writeOutput() {
@@ -79,6 +79,14 @@ public class ProcessorManager {
     public JsonNode serializeToNode() throws JsonProcessingException {
     	return this.jsonManager.serializeToNode();
 	}
+
+    /**
+     * Returns true if there is no output to write, otherwise false.
+     * @return
+     */
+	public boolean isEmpty() {
+	    return processorMap.isEmpty();
+    }
 
     public void sealAllAttributes() {
     	processorMap.values().forEach(p -> p.sealAttributes());

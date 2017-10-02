@@ -1,6 +1,5 @@
 package org.vadere.simulator.projects.io;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -103,7 +102,7 @@ public class TrajectoryReader {
 
                 return Files.lines(this.trajectoryFilePath)
                         .skip(1) // Skip header line
-                        .map(line -> line.split(" "))
+                        .map(line -> line.split(SPLITTER))
                         .map(cells -> {
                             int step = Integer.parseInt(cells[stepIndex]);
                             int pedestrianId = Integer.parseInt(cells[pedIdIndex]);
