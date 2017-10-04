@@ -20,7 +20,6 @@ import org.vadere.state.scenario.Topography;
 public interface IGaussianFilter {
 
 	enum Type {
-		OpenCV, // old alternative
 		OpenCL, // default
 		NativeJava; // not jet implemented
 	}
@@ -87,17 +86,7 @@ public interface IGaussianFilter {
 				/ (2 * Math.PI * standardDerivation * standardDerivation);
 
 		switch (type) {
-			/*case OpenCV: {
-				throw new UnsupportedOperationException();
-
-				 return new PedestrianCVGaussianFilter(scenarioBounds, pedestrians, scale,
-				 scaleFactor, standardDerivation,
-				 loadingStrategy);
-
-			}
 			case OpenCL: {
-			    //TODO: fix this by usign another lib!
-                throw new UnsupportedOperationException();
 				try {
 					BiFunction<Integer, Integer, Float> f =
 							(centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
@@ -108,7 +97,7 @@ public interface IGaussianFilter {
 					// cannot go on, this should never happen!
 					throw new RuntimeException(e);
 				}
-			}*/
+			}
 			default:
                 BiFunction<Integer, Integer, Float> f =
                         (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
@@ -128,15 +117,8 @@ public interface IGaussianFilter {
 			final Topography scenario, final double scale,
 			final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
 		switch (type) {
-			/*case OpenCV: {
-				throw new UnsupportedOperationException();
-				return new ObstacleCVGaussianFilter(scenario, scale, scenarioHasBoundary,
-				standardDerivation);
 
-			}
 			case OpenCL: {
-                //TODO: fix this by usign another lib!
-                throw new UnsupportedOperationException();/*
 				try {
 					double varianz = standardDerivation * standardDerivation;
 					BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
@@ -147,7 +129,7 @@ public interface IGaussianFilter {
 					// cannot go on, this should never happen!
 					throw new RuntimeException(e);
 				}
-			}*/
+			}
 			default:
                 double varianz = standardDerivation * standardDerivation;
                 BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
