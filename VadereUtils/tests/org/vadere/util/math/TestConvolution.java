@@ -1,14 +1,9 @@
 package org.vadere.util.math;
 
-import com.nativelibs4java.opencl.*;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.logging.Timer;
-import org.vadere.util.math.CLConvolution;
-import org.vadere.util.math.Convolution;
 
 import java.io.IOException;
 
@@ -89,7 +84,7 @@ public class TestConvolution {
 
 		float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		CLConvolution clConvolution = new CLConvolution();
+        CLConvolution clConvolution = new CLConvolution();
 		float[] clOutput = clConvolution.convolveRow(input, inputWidth, inputHeight, rowVector, kernelWidth);
 
 		equalsMatrixValues(result, output, 0f);
@@ -106,7 +101,7 @@ public class TestConvolution {
 
 		float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		CLConvolution clConvolution = new CLConvolution();
+        CLConvolution clConvolution = new CLConvolution();
 		float[] clOutput = clConvolution.convolveRow(input, inputWidth, inputHeight, rowVector, kernelWidth);
 
 
@@ -126,15 +121,15 @@ public class TestConvolution {
 		float[] seperate = Convolution.convolveSeperate(input, seperateKernel, seperateKernel, inputWidth, inputHeight,
 				kernelWidth);
 
-		CLConvolution clGPUConvolution = new CLConvolution();
+        CLConvolution clGPUConvolution = new CLConvolution();
 		float[] clCPUOutput =
-				clGPUConvolution.convolveSperate(input, inputWidth, inputHeight, seperateKernel, kernelWidth);
+				clGPUConvolution.convolveSeparate(input, inputWidth, inputHeight, seperateKernel, kernelWidth);
 
 		equalsMatrixValues(seperate, nonSeperate, 0.00001f);
 		equalsMatrixValues(clCPUOutput, nonSeperate, 0.00001f);
 	}
 
-	@Test
+	/*@Test
 	public void testConvolutionPerformance() throws IOException {
 		int inputWidth = 500;
 		int inputHeight = 500;
@@ -144,9 +139,9 @@ public class TestConvolution {
 		float[] separateKernel = Convolution.floatGaussian1DKernel(kernelWidth, (float) Math.sqrt(0.7));
 		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-		CLConvolution clGPUConvolution = new CLConvolution();
-		CLConvolution clCPUConvolution =
-				new CLConvolution(CLPlatform.DeviceFeature.CPU, CLPlatform.DeviceFeature.MaxComputeUnits);
+        CLConvolve clGPUConvolution = new CLConvolve();
+        CLConvolve clCPUConvolution =
+				new CLConvolve(CLPlatform.DeviceFeature.CPU, CLPlatform.DeviceFeature.MaxComputeUnits);
 
 		// initial the .cl program
 		float[] clGPUOutput = clGPUConvolution.convolve(input, inputWidth, inputHeight, kernel, kernelWidth);
@@ -190,12 +185,12 @@ public class TestConvolution {
 		equalsMatrixValues(javaOutput, clCPUOutput, 0.00001f);
 		equalsMatrixValues(javaOutput, clGPUSeperateOutput, 0.00001f);
 
-	}
+	}*/
 
 	private static void equalsMatrixValues(final float[] m1, final float[] m2, final float epsilon) {
 		assertTrue(m1.length == m2.length);
 		for (int i = 0; i < m1.length; i++) {
-			assertTrue("computeGodunovDifference: " + i + ", " + m1[i] + ", " + m2[i] + ", " + Math.abs(m1[i] - m2[i]),
+			assertTrue("difference: " + i + ", " + m1[i] + ", " + m2[i] + ", " + Math.abs(m1[i] - m2[i]),
 					Math.abs(m1[i] - m2[i]) <= epsilon);
 		}
 	}

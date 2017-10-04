@@ -2,17 +2,12 @@ package org.vadere.util.potential;
 
 import java.awt.Point;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.bridj.util.Tuple;
-import org.vadere.util.data.Tupel;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.MathUtil;
 
 /**
