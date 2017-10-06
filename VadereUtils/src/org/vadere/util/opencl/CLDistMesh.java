@@ -12,8 +12,6 @@ import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.opencl.examples.IOUtil;
-import org.vadere.util.opencl.examples.InfoUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -108,7 +106,7 @@ public class CLDistMesh {
 
         programCB = CLProgramCallback.create((program, user_data) ->
         {
-            log.info("The cl_program [0x"+program+"] was built " + (InfoUtils.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+            log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
         });
     }
 
@@ -140,7 +138,7 @@ public class CLDistMesh {
                 .flip();
 
         clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
 
         clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
 
@@ -157,7 +155,7 @@ public class CLDistMesh {
 
         ByteBuffer source;
         try {
-            source = IOUtil.ioResourceToByteBuffer("DistMesh.cl", 4096);
+            source = CLUtils.ioResourceToByteBuffer("DistMesh.cl", 4096);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -169,7 +167,7 @@ public class CLDistMesh {
         clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
 
         int errcode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
-        InfoUtils.checkCLError(errcode);
+        CLInfo.checkCLError(errcode);
 
         clKernelLengths = clCreateKernel(clProgram, "computeLengths", errcode_ret);
         clKernelPartialSF = clCreateKernel(clProgram, "computePartialSF", errcode_ret);
@@ -362,11 +360,11 @@ public class CLDistMesh {
     }
 
     private static void printPlatformInfo(long platform, String param_name, int param) {
-        System.out.println("\t" + param_name + " = " + InfoUtils.getPlatformInfoStringUTF8(platform, param));
+        System.out.println("\t" + param_name + " = " + CLInfo.getPlatformInfoStringUTF8(platform, param));
     }
 
     private static void printDeviceInfo(long device, String param_name, int param) {
-        System.out.println("\t" + param_name + " = " + InfoUtils.getDeviceInfoStringUTF8(device, param));
+        System.out.println("\t" + param_name + " = " + CLInfo.getDeviceInfoStringUTF8(device, param));
     }
 
 

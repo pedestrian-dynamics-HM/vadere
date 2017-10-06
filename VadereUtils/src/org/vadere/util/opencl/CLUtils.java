@@ -1,25 +1,24 @@
 package org.vadere.util.opencl;
 
-import org.lwjgl.*;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.nio.file.*;
+import org.jetbrains.annotations.NotNull;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static org.lwjgl.BufferUtils.*;
+import static org.lwjgl.BufferUtils.createByteBuffer;
 
-public final class IOUtil {
 
-    private IOUtil() {
-    }
-
-    private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
-        ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
-        buffer.flip();
-        newBuffer.put(buffer);
-        return newBuffer;
-    }
+public class CLUtils {
 
     /**
      * Reads the specified resource and returns the raw data as a ByteBuffer.
@@ -44,7 +43,7 @@ public final class IOUtil {
             }
         } else {
             try (
-                    InputStream source = IOUtil.class.getClassLoader().getResourceAsStream(resource);
+                    InputStream source = CLUtils.class.getClassLoader().getResourceAsStream(resource);
                     ReadableByteChannel rbc = Channels.newChannel(source)
             ) {
                 buffer = createByteBuffer(bufferSize);
@@ -63,5 +62,29 @@ public final class IOUtil {
 
         buffer.flip();
         return buffer;
+    }
+
+    public static FloatBuffer toFloatBuffer(@NotNull final float[] floats) {
+        FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(floats.length);
+
+        for(int i = 0; i < floats.length; i++) {
+            floatBuffer.put(i, floats[i]);
+        }
+        return floatBuffer;
+    }
+
+    public static float[] toFloatArray(@NotNull FloatBuffer floatBuffer, final int size) {
+	    float[] result = new float[size];
+	    for(int i = 0; i < size; i++) {
+	        result[i] = floatBuffer.get(i);
+        }
+        return result;
+    }
+
+    private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
+        ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
+        buffer.flip();
+        newBuffer.put(buffer);
+        return newBuffer;
     }
 }
