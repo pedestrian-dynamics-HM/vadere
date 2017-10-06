@@ -4,7 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.function.BiFunction;
 
-import org.vadere.util.math.CLConvolution;
+import org.vadere.util.opencl.CLConvolution;
 
 class CLGaussianFilter extends GaussianFilter {
 

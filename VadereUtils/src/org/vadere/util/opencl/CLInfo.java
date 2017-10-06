@@ -13,11 +13,13 @@ import static org.lwjgl.system.MemoryUtil.memASCII;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
- * Created by bzoennchen on 06.10.17.
+ * Utility-class without a state. This class offers method to read OpenCL debug-information.
+ *
+ * @author Benedikt Zoennchen
  */
-public final class InfoUtils {
+public final class CLInfo {
 
-    private InfoUtils() {}
+    private CLInfo() {}
 
     public static String getPlatformInfoStringASCII(long cl_platform_id, int param_name) {
         try (MemoryStack stack = stackPush()) {

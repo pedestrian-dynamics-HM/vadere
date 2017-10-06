@@ -1,4 +1,4 @@
-package org.vadere.util.math;
+package org.vadere.util.opencl;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -7,8 +7,6 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
 import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.MemoryStack;
-import org.vadere.util.opencl.IOUtil;
-import org.vadere.util.opencl.InfoUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,12 +18,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
+ * Class to compute the (separate) convolutions on the GPU.
+ *
  * @author Benedikt Zoennchen
  */
 public class CLConvolution {
     private static Logger log = LogManager.getLogger(CLConvolution.class);
-
-    private Convolution gaussianFilter;
 
     // CL ids
     private MemoryStack stack;
@@ -206,7 +204,7 @@ public class CLConvolution {
 
         programCB = CLProgramCallback.create((program, user_data) ->
         {
-            log.info("The cl_program [0x"+program+"] was built " + (InfoUtils.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+            log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
         });
     }
 
@@ -238,7 +236,7 @@ public class CLConvolution {
                 .flip();
 
         clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
 
         clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
     }
@@ -249,7 +247,7 @@ public class CLConvolution {
 
         ByteBuffer source;
         try {
-            source = IOUtil.ioResourceToByteBuffer("Convolve.cl", 4096);
+            source = CLUtils.ioResourceToByteBuffer("Convolve.cl", 4096);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -261,17 +259,17 @@ public class CLConvolution {
         clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
 
         int errcode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
-        InfoUtils.checkCLError(errcode);
+        CLInfo.checkCLError(errcode);
         clKernelConvolve = clCreateKernel(clProgram, "convolve", errcode_ret);
         clKernelConvolveRow = clCreateKernel(clProgram, "convolveRow", errcode_ret);
         clKernelConvolveCol = clCreateKernel(clProgram, "convolveCol", errcode_ret);
     }
 
     private static void printPlatformInfo(long platform, String param_name, int param) {
-        System.out.println("\t" + param_name + " = " + InfoUtils.getPlatformInfoStringUTF8(platform, param));
+        System.out.println("\t" + param_name + " = " + CLInfo.getPlatformInfoStringUTF8(platform, param));
     }
 
     private static void printDeviceInfo(long device, String param_name, int param) {
-        System.out.println("\t" + param_name + " = " + InfoUtils.getDeviceInfoStringUTF8(device, param));
+        System.out.println("\t" + param_name + " = " + CLInfo.getDeviceInfoStringUTF8(device, param));
     }
 }
