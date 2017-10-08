@@ -189,6 +189,8 @@ public class CLConvolution {
         programCB.free();
         clReleaseMemObject(clInput);
         clReleaseMemObject(clOutput);
+        clReleaseMemObject(clGaussianKernel);
+
         clReleaseCommandQueue(clQueue);
         clReleaseProgram(clProgram);
         clReleaseContext(clContext);
