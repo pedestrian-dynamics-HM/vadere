@@ -25,7 +25,7 @@ public class IOVadere {
 
 	private static Logger logger = LogManager.getLogger(IOVadere.class);
 
-	public static Scenario fromJson(final String json) throws IOException {
+	public static Scenario fromJson(final String json) throws IOException, IllegalArgumentException {
 		return JsonConverter.deserializeScenarioRunManager(json);
 	}
 

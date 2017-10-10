@@ -189,7 +189,7 @@ public abstract class IOOutput {
 		try {
 			final Path pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
 			return Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
-		} catch (IOException | VadereClassNotFoundException e) {
+		} catch (IOException | VadereClassNotFoundException | IllegalArgumentException e ) {
 			logger.error("Error in output file " + directory.getName());
 			return Optional.empty();
 		}
