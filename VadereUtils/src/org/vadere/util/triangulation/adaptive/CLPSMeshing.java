@@ -103,6 +103,9 @@ public class CLPSMeshing implements IPSMeshing {
 		//log.info(scalingFactor);
 
 		clDistMesh.step();
+		retriangulate();
+
+		// get new cooridnates
 
 		// there might be some illegal movements
 		if(minDeltaTravelDistance < 0.0) {
@@ -133,7 +136,7 @@ public class CLPSMeshing implements IPSMeshing {
 
     public void retriangulate() {
         //Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
-        removeLowQualityTriangles();
+        //removeLowQualityTriangles();
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         triangulation.finalize();
@@ -210,6 +213,6 @@ public class CLPSMeshing implements IPSMeshing {
 
     @Override
     public Collection<VTriangle> getTriangles() {
-        return new ArrayList<>();
+		return triangulation.streamTriangles().collect(Collectors.toList());
     }
 }

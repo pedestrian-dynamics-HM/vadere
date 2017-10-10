@@ -52,6 +52,7 @@ public final class InfoUtils {
 		}
 	}
 
+
 	public static long getDeviceInfoLong(long cl_device_id, int param_name) {
 		try (MemoryStack stack = stackPush()) {
 			LongBuffer pl = stack.mallocLong(1);

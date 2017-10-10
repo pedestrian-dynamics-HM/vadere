@@ -21,6 +21,10 @@ public class MPoint implements IPoint{
 		return point.getY();
 	}
 
+	public void set(double x, double y) {
+		point = new VPoint(x, y);
+	}
+
 	@Override
 	public MPoint add(final IPoint point) {
 		this.point = this.point.add(point);

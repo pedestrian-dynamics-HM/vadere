@@ -5,7 +5,7 @@ import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
- * Created by bzoennchen on 06.09.17.
+ * @author Benedikt Zoennchen
  */
 public class AFace<P extends IPoint> implements IFace<P> {
 
@@ -46,10 +46,6 @@ public class AFace<P extends IPoint> implements IFace<P> {
 		this.id = id;
 	}
 
-	AFace() {
-		this.border = false;
-	}
-
 	boolean isBorder() {
 		return border;
 	}
@@ -64,8 +60,16 @@ public class AFace<P extends IPoint> implements IFace<P> {
 	 *
 	 * @param edge half-edge bordering this face
 	 */
-	void setEdge(final int edge) {
+	void setEdge(@NotNull final int edge) {
 		this.edge = edge;
+	}
+
+	/**
+	 * This method should only be called by the garbage collector in AMesh.
+	 * @param id
+	 */
+	void setId(@NotNull final int id) {
+		this.id = id;
 	}
 
 	int getEdge() {

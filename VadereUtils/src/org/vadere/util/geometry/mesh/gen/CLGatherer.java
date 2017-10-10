@@ -2,8 +2,10 @@ package org.vadere.util.geometry.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.shapes.IPoint;
 
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
@@ -13,11 +15,26 @@ import java.util.Collection;
  */
 public class CLGatherer {
 
-    public static <P extends IPoint> FloatBuffer getVertices(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
+    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
-        FloatBuffer vertexBuffer = stack.mallocFloat(vertices.size()*2);
+        DoubleBuffer vertexBuffer = MemoryUtil.memAllocDouble(vertices.size()*2);
         int index = 0;
         for(AVertex<P> vertex : vertices) {
+            assert index/2.0 == vertex.getId();
+            vertexBuffer.put(index, vertex.getX());
+            index++;
+            vertexBuffer.put(index, vertex.getY());
+            index++;
+        }
+        return vertexBuffer;
+    }
+
+    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
+        Collection<AVertex<P>> vertices = mesh.getVertices();
+        FloatBuffer vertexBuffer = MemoryUtil.memAllocFloat(vertices.size()*2);
+        int index = 0;
+        for(AVertex<P> vertex : vertices) {
+            assert index/2.0 == vertex.getId();
             vertexBuffer.put(index, (float)vertex.getX());
             index++;
             vertexBuffer.put(index, (float)vertex.getY());
@@ -28,7 +45,7 @@ public class CLGatherer {
 
     public static <P extends IPoint> IntBuffer getEdges(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
         Collection<AHalfEdge<P>> edges = mesh.getEdges();
-        IntBuffer edgeBuffer = stack.mallocInt(edges.size()*4);
+        IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size()*4);
         int index = 0;
         for(AHalfEdge<P> edge : edges) {
             edgeBuffer.put(index, mesh.getPrev(edge).getEnd());
@@ -45,7 +62,7 @@ public class CLGatherer {
 
     public static <P extends IPoint> IntBuffer getFaces(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
         Collection<AFace<P>> faces = mesh.getFaces();
-        IntBuffer faceBuffer = stack.mallocInt(faces.size()*4);
+        IntBuffer faceBuffer = MemoryUtil.memAllocInt(faces.size()*4);
         int index = 0;
         for(AFace<P> face : faces) {
             AHalfEdge<P> edge = mesh.getEdge(face);

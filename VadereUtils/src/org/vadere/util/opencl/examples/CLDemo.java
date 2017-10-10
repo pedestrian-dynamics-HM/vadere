@@ -80,12 +80,12 @@ public final class CLDemo {
 				CLCapabilities caps = CL.createDeviceCapabilities(device, platformCaps);
 
 				System.out.printf("\n\t** NEW DEVICE: [0x%X]\n", device);
-
 				System.out.println("\tCL_DEVICE_TYPE = " + InfoUtils.getDeviceInfoLong(device, CL_DEVICE_TYPE));
 				System.out.println("\tCL_DEVICE_VENDOR_ID = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_VENDOR_ID));
 				System.out.println("\tCL_DEVICE_MAX_COMPUTE_UNITS = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_MAX_COMPUTE_UNITS));
-				System.out
-						.println("\tCL_DEVICE_MAX_WORK_ITEM_DIMENSIONS = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS));
+				System.out.println("\tCL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE = " + InfoUtils.getDeviceInfoLong(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE));
+				//System.out.println("\tCL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE = " + InfoUtils.getDeviceInfoPointer(device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE));
+				System.out.println("\tCL_DEVICE_MAX_WORK_ITEM_DIMENSIONS = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS));
 				System.out.println("\tCL_DEVICE_MAX_WORK_GROUP_SIZE = " + InfoUtils.getDeviceInfoPointer(device, CL_DEVICE_MAX_WORK_GROUP_SIZE));
 				System.out.println("\tCL_DEVICE_MAX_CLOCK_FREQUENCY = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_MAX_CLOCK_FREQUENCY));
 				System.out.println("\tCL_DEVICE_ADDRESS_BITS = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_ADDRESS_BITS));
