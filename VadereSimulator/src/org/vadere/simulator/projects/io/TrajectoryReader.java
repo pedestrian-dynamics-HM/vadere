@@ -46,15 +46,41 @@ public class TrajectoryReader {
 		this.attributesPedestrian = new AttributesAgent();
 	}
 
+	// TODO [HiWi, BugFix]: the new outputprocessors are not working with the postvisualization, this has to be fixed!
 	public Map<Step, List<Agent>> readFile() throws IOException {
+
+	    int stepIndex = -1;
+	    int pedestrianIdIndex = -1;
+	    int xIndex = -1;
+	    int yIndex = -1;
+	    int targetIdIndex = -1;
+        String[] header = Files.lines(this.trajectoryFilePath).findFirst().get().split(" ");
+
+        for(int i = 0; i < header.length; i++) {
+            switch (header[i]) {
+                case "pedestrianId" : pedestrianIdIndex = i; break;
+                case "timeStep" : stepIndex = i; break;
+                case "x" : xIndex = i; break;
+                case "y" : yIndex = i; break;
+                case "targetId" : targetIdIndex = i; break;
+            }
+        }
+
+        final int stepIdi = stepIndex;
+        final int pedIdi = pedestrianIdIndex;
+        final int xIdi = xIndex;
+        final int yIdi = yIndex;
+        final int targetIdi = targetIdIndex;
+
+
 		return Files.lines(this.trajectoryFilePath)
 					.skip(1) // Skip header line
 					.map(line -> line.split(" "))
 					.map(cells -> {
-						int step = Integer.parseInt(cells[0]);
-						int pedestrianId = Integer.parseInt(cells[1]);
-						VPoint pos = new VPoint(Double.parseDouble(cells[2]), Double.parseDouble(cells[3]));
-						int targetId = Integer.parseInt(cells[4]);
+						int step = Integer.parseInt(cells[stepIdi]);
+						int pedestrianId = Integer.parseInt(cells[pedIdi]);
+						VPoint pos = new VPoint(Double.parseDouble(cells[xIdi]), Double.parseDouble(cells[yIdi]));
+						int targetId = targetIdi == -1 ? 0 : Integer.parseInt(cells[targetIdi]);
 
 						Pedestrian ped = new Pedestrian(new AttributesAgent(this.attributesPedestrian, pedestrianId), new Random());
 						ped.setPosition(pos);

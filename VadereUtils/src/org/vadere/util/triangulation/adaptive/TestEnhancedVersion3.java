@@ -2,6 +2,7 @@ package org.vadere.util.triangulation.adaptive;
 
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.tex.TexGraphGenerator;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,10 @@ public class TestEnhancedVersion3 extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
+        IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
+
 
 		//IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
@@ -29,7 +33,7 @@ public class TestEnhancedVersion3 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>());
+		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
@@ -56,19 +60,17 @@ public class TestEnhancedVersion3 extends JFrame {
 			distmeshPanel.update();
 			distmeshPanel.repaint();
 			counter++;
-			try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+
 			long ms = System.currentTimeMillis();
-			meshGenerator.step();
+			meshGenerator.stepParallel();
 			ms = System.currentTimeMillis() - ms;
 			time += ms;
 			System.out.println("Quality: " + meshGenerator.getQuality());
 			System.out.println("Step-Time: " + ms);
 		}
+		meshGenerator.finalize();
 		System.out.print("overall time: " + time);
+        System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
 
 		//System.out.print("finished:" + avgQuality);

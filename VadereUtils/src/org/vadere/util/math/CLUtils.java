@@ -1,21 +1,27 @@
 package org.vadere.util.math;
 
-import com.nativelibs4java.opencl.CLBuffer;
-import com.nativelibs4java.opencl.CLContext;
-import com.nativelibs4java.opencl.CLMem;
 
-import org.bridj.Pointer;
+import org.jetbrains.annotations.NotNull;
+import org.lwjgl.system.MemoryUtil;
+import java.nio.FloatBuffer;
 
-import static org.bridj.Pointer.allocateFloats;
 
 public class CLUtils {
 
-	public static CLBuffer<Float> doubleArrayToCLBuffer(float[] matrix, CLContext context) {
-		Pointer<Float> aPtr = allocateFloats(matrix.length).order(context.getByteOrder());
-		for (int i = 0; i < matrix.length; i++) {
-			aPtr.set(i, matrix[i]);
-		}
+    public static FloatBuffer toFloatBuffer(@NotNull final float[] floats) {
+        FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(floats.length);
 
-		return context.createFloatBuffer(CLMem.Usage.Input, aPtr);
-	}
+        for(int i = 0; i < floats.length; i++) {
+            floatBuffer.put(i, floats[i]);
+        }
+        return floatBuffer;
+    }
+
+    public static float[] toFloatArray(@NotNull FloatBuffer floatBuffer, final int size) {
+	    float[] result = new float[size];
+	    for(int i = 0; i < size; i++) {
+	        result[i] = floatBuffer.get(i);
+        }
+        return result;
+    }
 }

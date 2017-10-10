@@ -129,13 +129,16 @@ public class PSMeshing implements IPSMeshing {
 			quality = getQuality();
 			log.info("quality = " + quality);
 		}
-
-		computeScalingFactor();
-		computeForces();
-		computeDelta();
-		updateVertices();
-		retriangulate();
+		finalize();
 	}
+
+	public void finalize() {
+        computeScalingFactor();
+        computeForces();
+        computeDelta();
+        updateVertices();
+        retriangulate();
+    }
 
 
 	public void stepParallel() {
@@ -176,39 +179,39 @@ public class PSMeshing implements IPSMeshing {
 		//log.info(scalingFactor);
 
 		//long ms = System.currentTimeMillis();
-		computeForces();
 		//ms = System.currentTimeMillis() - ms;
 		//log.info("ms: " + ms);
 		computeScalingFactor();
-		log.info(scalingFactor);
+        computeForces();
 		//computeDelta();
 		updateVertices();
-		retriangulate();
+
 		// there might be some illegal movements
 		if(minDeltaTravelDistance < 0.0) {
 			illegalMovement = isMovementIllegal();
 			numberOfIllegalMovementTests++;
 		}
 
+        //retriangulate();
 		if(illegalMovement) {
-			//retriangulate();
+			retriangulate();
 			//while (flipEdges());
 
 			numberOfRetriangulations++;
 		}
 		else {
-			//flipEdges();
+			flipEdges();
 		}
 
-		if(minDeltaTravelDistance < 0) {
+		if(minDeltaTravelDistance <= 0) {
 			computeMaxLegalMovements();
 		}
 
 		numberOfIterations++;
-		/*log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
+		log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
 		log.info("#retriangulations: " + numberOfRetriangulations);
 		log.info("#steps: " + numberOfIterations);
-		log.info("#points: " + getMesh().getVertices().size());*/
+		log.info("#points: " + getMesh().getVertices().size());
 	}
 
 	public boolean isMovementIllegal() {
@@ -265,7 +268,6 @@ public class PSMeshing implements IPSMeshing {
 		double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
 		double lenDiff = Math.max(desiredLen - len, 0);
 		p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
-		//p1.increaseVelocity(new VPoint(1.0, 1.0));
 	}
 
 	/*public void computeForces() {
@@ -339,10 +341,8 @@ public class PSMeshing implements IPSMeshing {
 			IPoint movement = velocity.scalarMultiply(delta);
 
 			double desiredLen = edgeLengthFunc.apply(vertex) * Parameters.FSCALE * scalingFactor;
-
-			if(!projectBackVertex(vertex)) {
-				moveVertex(vertex, movement);
-			}
+			moveVertex(vertex, movement);
+			projectBackVertex(vertex);
 
 			//log.info(movement);
 
@@ -426,7 +426,7 @@ public class PSMeshing implements IPSMeshing {
 		return triangulation.getMesh();
 	}
 
-	private boolean projectBackVertex(final PVertex<MeshPoint> vertex) {
+	private void projectBackVertex(final PVertex<MeshPoint> vertex) {
 		MeshPoint position = getMesh().getPoint(vertex);
 		double distance = distanceFunc.apply(position);
 		if(distance > 0) {
@@ -434,9 +434,7 @@ public class PSMeshing implements IPSMeshing {
 			double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
 			VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
 			position.subtract(projection);
-			return true;
 		}
-		return false;
 	}
 
 	public PriorityQueue<PFace<MeshPoint>> getQuailties() {

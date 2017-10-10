@@ -1,4 +1,4 @@
-package org.vadere.util.opencl.examples;
+package org.vadere.util.opencl;
 
 import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.LogManager;
@@ -14,6 +14,8 @@ import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.opencl.examples.IOUtil;
+import org.vadere.util.opencl.examples.InfoUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -30,9 +32,13 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
- * Created by bzoennchen on 08.09.17.
+ * @author Benedikt Zoennchen
+ *
+ * DistMesh GPU implementation.
  */
 public class CLDistMesh {
+
+    private static Logger log = LogManager.getLogger(CLDistMesh.class);
 
     // CL ids
     private MemoryStack stack;
@@ -55,7 +61,7 @@ public class CLDistMesh {
     // CL callbacks
     private CLContextCallback contextCB;
     private CLProgramCallback programCB;
-    private static Logger log = LogManager.getLogger(CLDistMesh.class);
+
 
     // data on the host
     private DoubleBuffer vD;

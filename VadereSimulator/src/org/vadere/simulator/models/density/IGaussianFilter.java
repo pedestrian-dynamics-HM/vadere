@@ -20,7 +20,6 @@ import org.vadere.state.scenario.Topography;
 public interface IGaussianFilter {
 
 	enum Type {
-		OpenCV, // old alternative
 		OpenCL, // default
 		NativeJava; // not jet implemented
 	}
@@ -87,14 +86,6 @@ public interface IGaussianFilter {
 				/ (2 * Math.PI * standardDerivation * standardDerivation);
 
 		switch (type) {
-			case OpenCV: {
-				throw new UnsupportedOperationException();
-				/*
-				 * return new PedestrianCVGaussianFilter(scenarioBounds, pedestrians, scale,
-				 * scaleFactor, standardDerivation,
-				 * loadingStrategy);
-				 */
-			}
 			case OpenCL: {
 				try {
 					BiFunction<Integer, Integer, Float> f =
@@ -108,7 +99,11 @@ public interface IGaussianFilter {
 				}
 			}
 			default:
-				throw new IllegalArgumentException(type + " is not jet supported");
+                BiFunction<Integer, Integer, Float> f =
+                        (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
+                                * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
+                IGaussianFilter clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+                return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
 		}
 	}
 
@@ -122,13 +117,7 @@ public interface IGaussianFilter {
 			final Topography scenario, final double scale,
 			final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
 		switch (type) {
-			case OpenCV: {
-				throw new UnsupportedOperationException();
-				/*
-				 * return new ObstacleCVGaussianFilter(scenario, scale, scenarioHasBoundary,
-				 * standardDerivation);
-				 */
-			}
+
 			case OpenCL: {
 				try {
 					double varianz = standardDerivation * standardDerivation;
@@ -142,7 +131,11 @@ public interface IGaussianFilter {
 				}
 			}
 			default:
-				throw new IllegalArgumentException(type + " is not jet supported");
+                double varianz = standardDerivation * standardDerivation;
+                BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
+                        * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
+                IGaussianFilter clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
+                return new ObstacleGaussianFilter(scenario, clFilter);
 		}
 	}
 

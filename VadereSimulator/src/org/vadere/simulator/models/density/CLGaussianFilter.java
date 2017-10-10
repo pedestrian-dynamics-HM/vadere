@@ -18,6 +18,6 @@ class CLGaussianFilter extends GaussianFilter {
 
 	@Override
 	public void filterImage() {
-		outputMatrix = this.convolution.convolveSperate(inputMatrix, matrixWidth, matrixHeight, kernel, kernelWidth);
+		outputMatrix = this.convolution.convolveSeparate(inputMatrix, matrixWidth, matrixHeight, kernel, kernelWidth);
 	}
 }

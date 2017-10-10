@@ -3,16 +3,14 @@ package org.vadere.util.triangulation.adaptive;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.util.opencl.examples.CLDistMesh;
+import org.vadere.util.opencl.CLDistMesh;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
