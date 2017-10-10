@@ -19,7 +19,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 0.5;
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 
 		//IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
@@ -27,7 +27,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 6.0, bbox, new ArrayList<>());
+		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
@@ -42,13 +42,9 @@ public class TestEnhancedVersion4 extends JFrame {
 		int counter = 0;
 		long time = 0;
 
-        long ms = System.currentTimeMillis();
-        meshGenerator.step();
-        ms = System.currentTimeMillis() - ms;
-        time += ms;
-        System.out.println("Step-Time: " + ms);
 
-		while (counter <= 560) {
+
+		while (counter <= 1000) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
@@ -57,11 +53,17 @@ public class TestEnhancedVersion4 extends JFrame {
 				PFace<MeshPoint> face = priorityQueue.poll();
 				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
 			}*/
+
+
+			long ms = System.currentTimeMillis();
+			meshGenerator.step();
+			ms = System.currentTimeMillis() - ms;
+			time += ms;
+			System.out.println("Step-Time: " + ms);
+
 			distmeshPanel.update();
 			distmeshPanel.repaint();
 			counter++;
-
-
 		}
 		System.out.print("overall time: " + time);
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());

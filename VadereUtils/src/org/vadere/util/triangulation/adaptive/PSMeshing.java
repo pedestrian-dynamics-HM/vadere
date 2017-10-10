@@ -180,9 +180,10 @@ public class PSMeshing implements IPSMeshing {
 		//ms = System.currentTimeMillis() - ms;
 		//log.info("ms: " + ms);
 		computeScalingFactor();
+		log.info(scalingFactor);
 		//computeDelta();
 		updateVertices();
-
+		retriangulate();
 		// there might be some illegal movements
 		if(minDeltaTravelDistance < 0.0) {
 			illegalMovement = isMovementIllegal();
@@ -191,12 +192,12 @@ public class PSMeshing implements IPSMeshing {
 
 		if(illegalMovement) {
 			//retriangulate();
-			while (flipEdges());
+			//while (flipEdges());
 
 			numberOfRetriangulations++;
 		}
 		else {
-			flipEdges();
+			//flipEdges();
 		}
 
 		if(minDeltaTravelDistance < 0) {
@@ -264,6 +265,7 @@ public class PSMeshing implements IPSMeshing {
 		double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
 		double lenDiff = Math.max(desiredLen - len, 0);
 		p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
+		//p1.increaseVelocity(new VPoint(1.0, 1.0));
 	}
 
 	/*public void computeForces() {
@@ -337,8 +339,10 @@ public class PSMeshing implements IPSMeshing {
 			IPoint movement = velocity.scalarMultiply(delta);
 
 			double desiredLen = edgeLengthFunc.apply(vertex) * Parameters.FSCALE * scalingFactor;
-			moveVertex(vertex, movement);
-			projectBackVertex(vertex);
+
+			if(!projectBackVertex(vertex)) {
+				moveVertex(vertex, movement);
+			}
 
 			//log.info(movement);
 
@@ -422,7 +426,7 @@ public class PSMeshing implements IPSMeshing {
 		return triangulation.getMesh();
 	}
 
-	private void projectBackVertex(final PVertex<MeshPoint> vertex) {
+	private boolean projectBackVertex(final PVertex<MeshPoint> vertex) {
 		MeshPoint position = getMesh().getPoint(vertex);
 		double distance = distanceFunc.apply(position);
 		if(distance > 0) {
@@ -430,7 +434,9 @@ public class PSMeshing implements IPSMeshing {
 			double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
 			VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
 			position.subtract(projection);
+			return true;
 		}
+		return false;
 	}
 
 	public PriorityQueue<PFace<MeshPoint>> getQuailties() {

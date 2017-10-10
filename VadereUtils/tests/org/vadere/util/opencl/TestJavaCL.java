@@ -13,9 +13,9 @@ public class TestJavaCL {
 
 	@Test
 	public void testContext() {
-		CLDevice device = JavaCL.getBestDevice();
-		CLContext context = JavaCL.createContext(null, device);
-		/*for (int i = 0; i < devices.length; i++) {
+		CLDevice devices = JavaCL.getBestDevice();
+		/*CLContext context = JavaCL.createContext(null, device);
+		for (int i = 0; i < devices.length; i++) {
 			System.err.println(i+": "+devices[i]);
 		}*/
 		System.err.println("Now GC'ing");
