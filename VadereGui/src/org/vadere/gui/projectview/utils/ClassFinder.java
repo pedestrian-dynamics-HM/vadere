@@ -9,18 +9,12 @@ import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
@@ -51,14 +45,14 @@ public class ClassFinder {
 
 	public static Map<String, Class> getDataKeysOutputFileRelation() {
 		try {
-			return getClasses(DataKey.class.getPackage().getName())
+			return getClassesStream(DataKey.class.getPackage().getName())
 					.stream()
 					.filter(c -> !Modifier.isInterface(c.getModifiers()))
 					.filter(c -> DataKey.class.isAssignableFrom(c))
 					.map(c -> {
 						// Find corresponding outputfile class
 						try {
-							List<Class<?>> opClasses = getClasses(OutputFile.class.getPackage().getName());
+							List<Class<?>> opClasses = getClassesStream(OutputFile.class.getPackage().getName());
 
 							Optional<Class<?>> corrOpClass = opClasses
 									.stream()
@@ -112,9 +106,9 @@ public class ClassFinder {
 
 	private static List<Class<?>> findSubclassesInPackage(String packageName, Class<?> baseClassOrInterface) {
 		try {
-			return getClasses(packageName).stream()
+			return getClassesStream(packageName).stream()
 					.filter(c -> !c.isInterface()
-							&& baseClassOrInterface.isAssignableFrom(c) 
+							&& baseClassOrInterface.isAssignableFrom(c)
 							&& isNotAnInnerClass(c))
 					.collect(Collectors.toList());
 		} catch (ClassNotFoundException | IOException e) {
@@ -133,17 +127,23 @@ public class ClassFinder {
 	 * Scans all classes accessible from the context class loader which belong to the given package
 	 * and subpackages.
 	 *
+	 * Deprecated since this method does not work inside a jar file!
+	 *
 	 * @param packageName The base package
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
+	@Deprecated
 	private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		assert classLoader != null;
 		String path = packageName.replace('.', '/');
-		Enumeration<URL> resources = classLoader.getResources(path);
 		List<File> dirs = new ArrayList<>();
+
+		assert classLoader != null;
+		//String path = packageName.replace('.', '/');
+		Enumeration<URL> resources = classLoader.getResources(path);
+
 		while (resources.hasMoreElements()) {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
@@ -152,6 +152,50 @@ public class ClassFinder {
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
+		return classes;
+	}
+
+	/**
+	 * Scans all classes accessible from the context class loader which belong to the given package
+	 * and subpackages. Works inside a jar file.
+	 *
+	 *
+	 * @param packageName The base package
+	 * @return The classes
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	private static List<Class<?>> getClassesStream(String packageName) throws ClassNotFoundException, IOException {
+		List<Class<?>> classes = new ArrayList<>();
+
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		String path = packageName.replace('.', '/');
+		List<String> resources = new ArrayList<>();
+		LinkedList<String> dirs = new LinkedList<>();
+
+		dirs.add(path);
+
+		while(!dirs.isEmpty()) {
+			String currentDir = dirs.removeFirst();
+			String currentPackage = currentDir.replace('/', '.');
+
+			InputStream in = ClassFinder.class.getResourceAsStream("/" + currentDir);
+			BufferedReader rdr = new BufferedReader(new InputStreamReader(in));
+
+			String line; // line is either a .class file or a directory containing .class files or other directories
+			while ((line = rdr.readLine()) != null) {
+
+				// line is a filenamew
+				if(line.endsWith(".class")) {
+					classes.add(ClassFinder.class.forName(currentPackage + '.' + line.substring(0, line.length() - 6)));
+				}
+				else {
+					dirs.add(currentDir+'/'+line);
+				}
+			}
+			rdr.close();
+		}
+
 		return classes;
 	}
 

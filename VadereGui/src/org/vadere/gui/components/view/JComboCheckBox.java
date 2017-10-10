@@ -50,17 +50,28 @@ public class JComboCheckBox<E> extends JComboBox {
 					return label;
 				}
 
-				JCheckBox cb = new JCheckBox(value.toString());
-				cb.setSelected(memory.get(value));
-				if (isSelected) {
-					cb.setBackground(list.getSelectionBackground());
-					cb.setForeground(list.getSelectionForeground());
-				} else {
-					cb.setBackground(list.getBackground());
-					cb.setForeground(list.getForeground());
+				if(value != null) {
+					JCheckBox cb = new JCheckBox(value == null ? "" : value.toString());
+
+					if(value != null) {
+						cb.setSelected(memory.get(value));
+					}
+
+
+					if (isSelected) {
+						cb.setBackground(list.getSelectionBackground());
+						cb.setForeground(list.getSelectionForeground());
+					} else {
+						cb.setBackground(list.getBackground());
+						cb.setForeground(list.getForeground());
+					}
+
+					return cb;
+				}
+				else {
+					return this;
 				}
 
-				return cb;
 			}
 		});
 	}
