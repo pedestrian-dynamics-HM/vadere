@@ -1,3 +1,3 @@
-Copy all files "post-checkout", "post-merge", "post-applypatch" and "post-commit" to .git/hooks/
+Copy files "post-checkout", "post-merge", "post-applypatch" and "post-commit" to .git/hooks/
 
 The file "current_commit_hash.txt" will be created after a change to the current commit status. To create this file without changes to the current commit, you can choose "Switch/Checkout..." on the Repository folder.
