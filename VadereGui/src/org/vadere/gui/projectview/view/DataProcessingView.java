@@ -57,6 +57,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
+import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -86,7 +87,6 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 	private Scenario currentScenario;
 	private boolean isEditable;
-
 
 	DataProcessingView() {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
@@ -240,6 +240,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			JButton addFileBtn = new JButton(new AbstractAction("Add") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+
 					String filename = "out.txt";
 					int count = 1;
 					while (outputFileNameAlreadyExists(filename)) { // ensure unique suggested filename

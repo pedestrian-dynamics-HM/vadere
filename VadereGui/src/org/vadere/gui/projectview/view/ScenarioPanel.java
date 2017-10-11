@@ -50,6 +50,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 	private Scenario scenario;
 	private boolean initialized;
+	private ProjectViewModel model;
 
 	private static String activeJsonParsingErrorMsg = null;
 
@@ -58,6 +59,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
+        this.model = model;
 
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new CardLayout(0, 0));

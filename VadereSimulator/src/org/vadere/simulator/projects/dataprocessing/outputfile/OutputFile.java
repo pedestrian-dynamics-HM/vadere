@@ -45,7 +45,14 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void setRelativeFileName(final String fileName) {
-	    this.fileName = new File(this.fileName).getParentFile().toPath().resolve(fileName).toString();
+	    File file = new File(this.fileName);
+	    if(file.getParentFile() != null) {
+            this.fileName = new File(this.fileName).getParentFile().toPath().resolve(fileName).toString();
+        }
+        else {
+	        this.fileName = fileName;
+        }
+
     }
 
 	public void setProcessorIds(final List<Integer> processorIds) {
