@@ -104,7 +104,7 @@ public class ActionLoadProject extends AbstractAction {
 			projectViewModel.setProject(project);
 
 			projectViewModel.refreshOutputTable();
-			logger.info("refreshed output table");
+			logger.info("refreshed output table - 2");
 
 			// select and load first scenario from list
 			projectViewModel.setSelectedRowIndexInScenarioTable(0);

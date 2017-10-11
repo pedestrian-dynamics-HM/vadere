@@ -45,13 +45,14 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void setRelativeFileName(final String fileName) {
-	    File file = new File(this.fileName);
+	   /* File file = new File(this.fileName);
 	    if(file.getParentFile() != null) {
             this.fileName = new File(this.fileName).getParentFile().toPath().resolve(fileName).toString();
         }
         else {
 	        this.fileName = fileName;
-        }
+        }*/
+	   this.fileName = fileName;
 
     }
 

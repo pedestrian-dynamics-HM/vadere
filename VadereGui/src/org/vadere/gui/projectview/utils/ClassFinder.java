@@ -135,7 +135,7 @@ public class ClassFinder {
 	 * Scans all classes accessible from the context class loader which belong to the given package
 	 * and subpackages.
 	 *
-	 * Deprecated since this method does not work inside a jar file!
+	 * Deprecated since this method is slow if we have to access jar file, which is the case if we execute the project via vadere.jar!
 	 *
 	 * @param packageName The base package
 	 * @return The classes
@@ -179,52 +179,6 @@ public class ClassFinder {
                     classes.addAll(findClasses(directory, packageName));
                 }
             }
-		}
-
-		return classes;
-	}
-
-	/**
-	 * Scans all classes accessible from the context class loader which belong to the given package
-	 * and subpackages. Works inside a jar file.
-	 *
-	 *
-	 * @param packageName The base package
-	 * @return The classes
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 */
-	private static List<Class<?>> getClassesStream(String packageName) throws ClassNotFoundException, IOException {
-		List<Class<?>> classes = new ArrayList<>();
-
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		String path = packageName.replace('.', '/');
-		List<String> resources = new ArrayList<>();
-		LinkedList<String> dirs = new LinkedList<>();
-
-		dirs.add(path);
-
-		log.info(ClassFinder.class.forName(AttributesBHM.class.getName()));
-
-		while(!dirs.isEmpty()) {
-			String currentDir = dirs.removeFirst();
-			String currentPackage = currentDir.replace('/', '.');
-
-			InputStream in = ClassFinder.class.getResourceAsStream("/" + currentDir);
-			BufferedReader rdr = new BufferedReader(new InputStreamReader(in));
-
-			String line; // line is either a .class file or a directory containing .class files or other directories
-			while ((line = rdr.readLine()) != null) {
-
-				// line is a filenamew
-				if(line.endsWith(".class")) {
-					classes.add(ClassFinder.class.forName(currentPackage + '.' + line.substring(0, line.length() - 6)));
-				}
-				else {
-					dirs.add(currentDir+'/'+line);
-				}
-			}
-			rdr.close();
 		}
 
 		return classes;

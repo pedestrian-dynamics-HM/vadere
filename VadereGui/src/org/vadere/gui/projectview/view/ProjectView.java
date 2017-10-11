@@ -492,7 +492,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 				model.setCurrentScenario(bundle.getScenario());
                 logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
-				scenarioJPanel.setScenario(bundle.getScenario(), true);
+                scenarioJPanel.setScenario(bundle.getScenario(), true);
 
 				outputTableRenderer.setMarkedOutputFiles(bundle.getOutputDirectories());
 				outputTable.repaint(); // make cell renderer mark associated outputs

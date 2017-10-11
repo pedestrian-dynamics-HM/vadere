@@ -113,7 +113,6 @@ public class TextView extends JPanel implements IJsonView {
 		this.default_resource = default_resource;
 		this.attributeType = attributeType;
 		setLayout(new BorderLayout(0, 0));
-        logger.info("04");
 		panelTop = new JPanel();
 		add(panelTop, BorderLayout.NORTH);
 		panelTop.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
