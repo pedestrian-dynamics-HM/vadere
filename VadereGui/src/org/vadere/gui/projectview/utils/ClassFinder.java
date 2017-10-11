@@ -169,7 +169,6 @@ public class ClassFinder {
                         if(entry.startsWith(path) && entry.endsWith(".class")) {
                             String classPath = entry.substring(0, entry.length() - 6).replace('/', '.');
                             classes.add(ClassFinder.class.forName(classPath));
-                            log.info(classPath);
                         }
                     }
                 }
