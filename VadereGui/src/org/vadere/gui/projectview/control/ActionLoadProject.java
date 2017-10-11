@@ -99,22 +99,22 @@ public class ActionLoadProject extends AbstractAction {
 
 	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath) {
 		try {
-			VadereProject project = IOVadere. readProjectJson(projectFilePath);
+			VadereProject project = IOVadere.readProjectJson(projectFilePath);
 			projectViewModel.setCurrentProjectPath(projectFilePath);
 			projectViewModel.setProject(project);
 
 			projectViewModel.refreshOutputTable();
+			logger.info("refreshed output table");
 
 			// select and load first scenario from list
 			projectViewModel.setSelectedRowIndexInScenarioTable(0);
+            logger.info("selected the first scenario");
 
 			// change the default directory for searching files
 			Preferences.userNodeForPackage(VadereApplication.class).put("default_directory",
 					projectViewModel.getCurrentProjectPath());
-
 			addToRecentProjects(projectFilePath);
 			ProjectView.getMainWindow().setProjectSpecificActionsEnabled(true);
-
 			logger.info(String.format("project '%s' loaded.", projectViewModel.getProject().getName()));
 
 			// results from migration assistant if he was active
@@ -159,7 +159,7 @@ public class ActionLoadProject extends AbstractAction {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Migration assistant",
 					JOptionPane.ERROR_MESSAGE);
-			logger.error(e);
+			logger.error("could not load project: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

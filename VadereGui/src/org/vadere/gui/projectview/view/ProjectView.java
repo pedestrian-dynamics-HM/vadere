@@ -489,13 +489,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				Player.kill();
 
 				ScenarioBundle bundle = model.getSelectedScenarioBundle();
-				logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
 
 				model.setCurrentScenario(bundle.getScenario());
+                logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
 				scenarioJPanel.setScenario(bundle.getScenario(), true);
 
 				outputTableRenderer.setMarkedOutputFiles(bundle.getOutputDirectories());
 				outputTable.repaint(); // make cell renderer mark associated outputs
+                logger.info("repainted output table");
 			}
 		});
 		scenarioTable.setDefaultRenderer(Object.class, new ScenarioTableRenderer(model));

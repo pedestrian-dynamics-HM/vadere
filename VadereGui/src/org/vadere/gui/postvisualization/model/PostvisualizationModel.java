@@ -174,7 +174,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				return Optional.ofNullable(potentialContainer.getPotentialField(step.getStepNumber()));
 			} catch (IOException e) {
 				e.printStackTrace();
-				logger.error(e);
+				logger.error("could not load potential field "+ e.getMessage());
 				return Optional.empty();
 			}
 		}
@@ -345,7 +345,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			try {
 				potentialContainer.clear();
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error("could not clear potential Container: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

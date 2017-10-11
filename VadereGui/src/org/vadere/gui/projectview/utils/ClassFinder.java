@@ -1,23 +1,31 @@
 package org.vadere.gui.projectview.utils;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesOSM;
 
 import java.io.*;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
+
+    private static Logger log = LogManager.getLogger(ClassFinder.class);
 
 	public static List<String> getAttributesNames() {
 		// OSM ok for determining package name? use Object.class as tag instead?
@@ -45,14 +53,14 @@ public class ClassFinder {
 
 	public static Map<String, Class> getDataKeysOutputFileRelation() {
 		try {
-			return getClassesStream(DataKey.class.getPackage().getName())
+			return getClasses(DataKey.class.getPackage().getName())
 					.stream()
 					.filter(c -> !Modifier.isInterface(c.getModifiers()))
 					.filter(c -> DataKey.class.isAssignableFrom(c))
 					.map(c -> {
 						// Find corresponding outputfile class
 						try {
-							List<Class<?>> opClasses = getClassesStream(OutputFile.class.getPackage().getName());
+							List<Class<?>> opClasses = getClasses(OutputFile.class.getPackage().getName());
 
 							Optional<Class<?>> corrOpClass = opClasses
 									.stream()
@@ -106,7 +114,7 @@ public class ClassFinder {
 
 	private static List<Class<?>> findSubclassesInPackage(String packageName, Class<?> baseClassOrInterface) {
 		try {
-			return getClassesStream(packageName).stream()
+			return getClasses(packageName).stream()
 					.filter(c -> !c.isInterface()
 							&& baseClassOrInterface.isAssignableFrom(c)
 							&& isNotAnInnerClass(c))
@@ -139,19 +147,41 @@ public class ClassFinder {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		String path = packageName.replace('.', '/');
 		List<File> dirs = new ArrayList<>();
+        ArrayList<Class<?>> classes = new ArrayList<>();
 
 		assert classLoader != null;
-		//String path = packageName.replace('.', '/');
 		Enumeration<URL> resources = classLoader.getResources(path);
 
 		while (resources.hasMoreElements()) {
-			URL resource = resources.nextElement();
-			dirs.add(new File(resource.getFile()));
+			URL url = resources.nextElement();
+
+			/*
+			 * TODO[Issue #37, Bug]: Find a better solution! The problem is that one can not easily access class-files inside a packed jar!
+			 * this code runs if the project is started via a executable jar
+			 * it is slow, since the whole .jar will be unpacked.
+			 */
+			if(url.getProtocol() == "jar") {
+                JarURLConnection urlcon = (JarURLConnection) (url.openConnection());
+                try (JarFile jar = urlcon.getJarFile();) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        String entry = entries.nextElement().getName();
+                        if(entry.startsWith(path) && entry.endsWith(".class")) {
+                            String classPath = entry.substring(0, entry.length() - 6).replace('/', '.');
+                            classes.add(ClassFinder.class.forName(classPath));
+                            log.info(classPath);
+                        }
+                    }
+                }
+            } // this code is fine but will only be used if the project is started from an IDE!
+            else {
+                dirs.add(new File(url.getFile()));
+                for (File directory : dirs) {
+                    classes.addAll(findClasses(directory, packageName));
+                }
+            }
 		}
-		ArrayList<Class<?>> classes = new ArrayList<>();
-		for (File directory : dirs) {
-			classes.addAll(findClasses(directory, packageName));
-		}
+
 		return classes;
 	}
 
@@ -174,6 +204,8 @@ public class ClassFinder {
 		LinkedList<String> dirs = new LinkedList<>();
 
 		dirs.add(path);
+
+		log.info(ClassFinder.class.forName(AttributesBHM.class.getName()));
 
 		while(!dirs.isEmpty()) {
 			String currentDir = dirs.removeFirst();
