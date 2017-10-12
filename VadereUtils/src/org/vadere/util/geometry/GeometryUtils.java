@@ -533,7 +533,7 @@ public class GeometryUtils {
 
 		return new VRectangle(pMin.getX(), pMin.getY(), pMax.getX() - pMin.getX(), pMax.getY() - pMin.getY());
 	}
-    
+
 	/**
 	 * This method follows the construction from
 	 * https://proofwiki.org/wiki/Obtuse_Triangle_Divided_into_Acute_Triangles
@@ -590,6 +590,7 @@ public class GeometryUtils {
 			VPoint h = iPoints[0].equals(c, tolerance) ? iPoints[1] : iPoints[0];
 
 			iPoints = intersection(new VLine(a, b), circle);
+
 			VPoint f = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[0] : iPoints[1];
 			VPoint g = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[1] : iPoints[0];
 

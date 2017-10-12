@@ -8,8 +8,6 @@ import org.vadere.util.geometry.GeometryUtils;
 @SuppressWarnings("serial")
 public class VLine extends Line2D.Double {
 
-	private String identifier;
-
 	private VPoint p1;
 	private VPoint p2;
 
@@ -55,14 +53,6 @@ public class VLine extends Line2D.Double {
 			return getP1().equals(other.getP1()) && getP2().equals(other.getP2()) || getP1().equals(other.getP2()) && getP2().equals(other.getP1());
 		}
 		return false;
-	}
-
-	public String getIdentifier() {
-		return p1.identifier + ":" + p2.identifier;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
 	}
 
 	public Stream<VPoint> streamPoints() {

@@ -8,9 +8,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.DataPoint;
-import org.vadere.util.geometry.Geometry;
-import org.vadere.util.geometry.GeometryUtils;
+
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -67,6 +65,7 @@ public class TestGeometry {
 		VCircle circle = new VCircle(3, 4.1, 3);
 		VLine line = new VLine(3,4.1, 4, 5.1);
 		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
+
 		// computed with http://www.ambrsoft.com/TrigoCalc/Circles2/circlrLine_.htm
 		VPoint[] expectedIntersectionPoints = new VPoint[]{
 				new VPoint(5.121, 6.221),

@@ -183,8 +183,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 			potentialPoint.setPathFindingTag(PathFindingTag.Reached);
 			narrowBand.add(vertex);
 		}
-
-		calculate();
 	}
 
 	@Override

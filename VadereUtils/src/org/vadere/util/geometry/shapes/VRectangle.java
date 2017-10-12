@@ -1,6 +1,5 @@
 package org.vadere.util.geometry.shapes;
 
-import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
 import org.vadere.util.geometry.GeometryUtils;

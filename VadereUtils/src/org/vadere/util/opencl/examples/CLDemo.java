@@ -13,7 +13,6 @@ import org.lwjgl.*;
 import org.lwjgl.opencl.*;
 import org.lwjgl.system.*;
 import org.vadere.util.opencl.CLInfo;
-
 import java.nio.*;
 import java.util.concurrent.*;
 
@@ -108,6 +107,7 @@ public final class CLDemo {
 					System.err.println("[LWJGL] cl_context_callback");
 					System.err.println("\tInfo: " + memUTF8(errinfo));
 				}), NULL, errcode_ret);
+
 				CLInfo.checkCLError(errcode_ret);
 
 				long buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, 128, errcode_ret);
@@ -174,6 +174,7 @@ public final class CLDemo {
 					errcode = clEnqueueNativeKernel(queue, kernel = CLNativeKernel.create(
 							args -> System.out.println("\t\tKERNEL EXEC argument: " + memByteBuffer(args, 4).getInt(0) + ", should be 1337")
 					), kernelArgs, null, null, null, ev);
+
 					CLInfo.checkCLError(errcode);
 
 					long e = ev.get(0);

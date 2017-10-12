@@ -64,6 +64,7 @@ public class VPoint implements Cloneable, IPoint {
 		return new VPoint(x, y);
 	}
 
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

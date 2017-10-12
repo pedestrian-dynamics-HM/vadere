@@ -267,7 +267,6 @@ public class TestFFMNonUniformTriangulation {
 			e.printStackTrace();
 		}
 		log.info("max error: " + maxError);
-
         Stream<Point> resultPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag != PathFindingTag.Obstacle);
         double n = resultPoints.count();
 
