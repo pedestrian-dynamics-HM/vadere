@@ -2,6 +2,7 @@ package org.vadere.util.geometry.mesh.inter;
 
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -10,22 +11,22 @@ import org.vadere.util.geometry.shapes.VPoint;
  */
 public interface IFace<P extends IPoint> {
 
-    static AMesh<VPoint> createSimpleTriMesh() {
-        AMesh<VPoint> mesh;
-        AFace<VPoint> face1;
-        AFace<VPoint> face2;
-        AFace<VPoint> border;
-        AVertex<VPoint> x, y, z, w;
-        AHalfEdge<VPoint> zx ;
-        AHalfEdge<VPoint> xy;
-        AHalfEdge<VPoint> yz;
+    static AMesh<MPoint> createSimpleTriMesh() {
+        AMesh<MPoint> mesh;
+        AFace<MPoint> face1;
+        AFace<MPoint> face2;
+        AFace<MPoint> border;
+        AVertex<MPoint> x, y, z, w;
+        AHalfEdge<MPoint> zx ;
+        AHalfEdge<MPoint> xy;
+        AHalfEdge<MPoint> yz;
 
-        AHalfEdge<VPoint> wx;
-        AHalfEdge<VPoint> xz;
-        AHalfEdge<VPoint> yw;
-        AHalfEdge<VPoint> zy;
+        AHalfEdge<MPoint> wx;
+        AHalfEdge<MPoint> xz;
+        AHalfEdge<MPoint> yw;
+        AHalfEdge<MPoint> zy;
 
-        mesh = new AMesh<>((x1, y1) -> new VPoint(x1, y1));
+        mesh = new AMesh<>((x1, y1) -> new MPoint(x1, y1));
         border = mesh.createFace(true);
 
         // first triangle xyz
@@ -52,9 +53,9 @@ public interface IFace<P extends IPoint> {
         face2 = mesh.createFace();
         w = mesh.insertVertex(1.5,-1.5);
 
-        AHalfEdge<VPoint> yx = mesh.createEdge(x, face2);
-        AHalfEdge<VPoint> xw = mesh.createEdge(w, face2);
-        AHalfEdge<VPoint> wy = mesh.createEdge(y, face2);
+        AHalfEdge<MPoint> yx = mesh.createEdge(x, face2);
+        AHalfEdge<MPoint> xw = mesh.createEdge(w, face2);
+        AHalfEdge<MPoint> wy = mesh.createEdge(y, face2);
 
         mesh.setNext(yx, xw);
         mesh.setNext(xw, wy);

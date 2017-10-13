@@ -1,6 +1,5 @@
 package org.vadere.util.opencl;
 
-import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -8,13 +7,14 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.*;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.MPoint;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import static org.lwjgl.opencl.CL10.*;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
+import static org.lwjgl.opencl.CL11.CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
@@ -58,11 +59,15 @@ public class CLDistMesh {
 
 
     // data on the host
-    private FloatBuffer v;
-    private FloatBuffer scalingFactor;
+    private DoubleBuffer vD;
+    private DoubleBuffer scalingFactorD;
+
+    private FloatBuffer vF;
+    private FloatBuffer scalingFactorF;
+
     private IntBuffer e;
     private IntBuffer t;
-    private float delta = 0.5f;
+    private double delta = 0.02;
 
     // addresses to memory on the GPU
     private long clVertices;
@@ -73,6 +78,7 @@ public class CLDistMesh {
     private long clqLengths;
     private long clPartialSum;
     private long clScalingFactor;
+    private long clMutexes;
     private ArrayList<Long> clSizes = new ArrayList<>();
 
     // size
@@ -83,18 +89,48 @@ public class CLDistMesh {
 
     private long maxGroupSize;
     private long maxComputeUnits;
+    private long prefdWorkGroupSizeMultiple;
+
 
     private PointerBuffer clGlobalWorkSizeEdges;
     private PointerBuffer clGlobalWorkSizeVertices;
 
-    public CLDistMesh(@NotNull AMesh<? extends IPoint> mesh) {
+    private PointerBuffer clGloblWorkSizeSFPartial;
+    private PointerBuffer clLocalWorkSizeSFPartial;
+
+    private PointerBuffer clGloblWorkSizeSFComplete;
+    private PointerBuffer clLocalWorkSizeSFComplete;
+
+    private PointerBuffer clGlobalWorkSizeForces;
+    private PointerBuffer clLocalWorkSizeForces;
+
+    private IntBuffer mutexes;
+    private AMesh<? extends MPoint> mesh;
+
+    private boolean doublePrecision = true;
+
+    public CLDistMesh(@NotNull AMesh<? extends MPoint> mesh) {
+        this.mesh = mesh;
+        this.mesh.garbageCollection();
         this.stack = MemoryStack.stackPush();
-        this.v = CLGatherer.getVertices(mesh, stack);
-        this.e = CLGatherer.getEdges(mesh, stack);
-        this.t = CLGatherer.getFaces(mesh, stack);
+        if(doublePrecision) {
+            this.vD = CLGatherer.getVerticesD(mesh);
+        }
+        else {
+            this.vF = CLGatherer.getVerticesF(mesh);
+        }
+        this.e = CLGatherer.getEdges(mesh);
+        this.t = CLGatherer.getFaces(mesh);
         this.numberOfVertices = mesh.getNumberOfVertices();
         this.numberOfEdges = mesh.getNumberOfEdges();
         this.numberOfFaces = mesh.getNumberOfFaces();
+        this.mutexes =  MemoryUtil.memAllocInt(1);
+        this.mutexes.put(0, 0);
+        this.mutexes =  MemoryUtil.memAllocInt(numberOfVertices);
+        for(int i = 0; i < numberOfVertices; i++) {
+            this.mutexes.put(i, 0);
+        }
+
     }
 
     private void initCallbacks() {
@@ -107,6 +143,10 @@ public class CLDistMesh {
         programCB = CLProgramCallback.create((program, user_data) ->
         {
             log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+            String message = CLInfo.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
+            if (!message.isEmpty()) {
+                log.info("BUILD LOG:\n----\n"+message+"\n-----");
+            }
         });
     }
 
@@ -141,6 +181,7 @@ public class CLDistMesh {
         CLInfo.checkCLError(errcode_ret);
 
         clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
 
         PointerBuffer pp = stack.mallocPointer(1);
         clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
@@ -155,7 +196,12 @@ public class CLDistMesh {
 
         ByteBuffer source;
         try {
-            source = CLUtils.ioResourceToByteBuffer("DistMesh.cl", 4096);
+            if(doublePrecision) {
+                source = CLUtils.ioResourceToByteBuffer("DistMeshDouble.cl", 4096);
+            }
+            else {
+                source = CLUtils.ioResourceToByteBuffer("DistMesh.cl", 4096);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -177,31 +223,58 @@ public class CLDistMesh {
     }
 
     private void createMemory() {
-        clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, v, errcode_ret);
+        int factor = doublePrecision ? 8 : 4;
+        if(doublePrecision) {
+            clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vD, errcode_ret);
+        }
+        else {
+            clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vF, errcode_ret);
+        }
+        CLInfo.checkCLError(errcode_ret);
         clEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, e, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, t, errcode_ret);
-        clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * 2 * numberOfVertices, errcode_ret);
-        clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * 2 * numberOfEdges, errcode_ret);
-        clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * 2 * numberOfEdges, errcode_ret);
-
-        clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
-
-        //TODO: smaller
-        clPartialSum = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * 2 * numberOfEdges, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfVertices, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, mutexes, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
     }
 
     private void initialKernelArgs() {
+        int factor = doublePrecision ? 8 : 4;
+        int sizeSFPartial = numberOfEdges;
+        IntBuffer intBuffer = stack.callocInt(1);
+        clGetKernelWorkGroupInfo(clKernelPartialSF, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, intBuffer, null);
+        prefdWorkGroupSizeMultiple = intBuffer.get(0);
+
         clSetKernelArg1p(clKernelLengths, 0, clVertices);
         clSetKernelArg1p(clKernelLengths, 1, clEdges);
         clSetKernelArg1p(clKernelLengths, 2, clLengths);
         clSetKernelArg1p(clKernelLengths, 3, clqLengths);
 
+        clSetKernelArg1i(clKernelPartialSF, 0, sizeSFPartial);
         clSetKernelArg1p(clKernelPartialSF, 1, clqLengths);
-        clSetKernelArg(clKernelPartialSF, 2, 4 * 2 * numberOfEdges);
+        clSetKernelArg(clKernelPartialSF, 2, factor * 2 * maxGroupSize);
+        clPartialSum = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * prefdWorkGroupSizeMultiple, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clSetKernelArg1p(clKernelPartialSF, 3, clPartialSum);
 
-        clSetKernelArg1p(clKernelCompleteSF, 1, clqLengths);
-        clSetKernelArg(clKernelCompleteSF, 2, 4 * 2 * numberOfEdges);
+        int sizeSFComplete = Math.min((int)prefdWorkGroupSizeMultiple, numberOfEdges); // one item per work group
+        clSetKernelArg1i(clKernelCompleteSF, 0, sizeSFComplete);
+        if(numberOfEdges > prefdWorkGroupSizeMultiple) {
+            clSetKernelArg1p(clKernelCompleteSF, 1, clPartialSum);
+        }
+        else {
+            clSetKernelArg1p(clKernelCompleteSF, 1, clqLengths);
+        }
+        clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
         clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
 
         clSetKernelArg1p(clKernelForces, 0, clVertices);
@@ -209,12 +282,26 @@ public class CLDistMesh {
         clSetKernelArg1p(clKernelForces, 2, clLengths);
         clSetKernelArg1p(clKernelForces, 3, clScalingFactor);
         clSetKernelArg1p(clKernelForces, 4, clForces);
+        clSetKernelArg1p(clKernelForces, 5, clMutexes);
 
         clSetKernelArg1p(clKernelMove, 0, clVertices);
         clSetKernelArg1p(clKernelMove, 1, clForces);
-        clSetKernelArg1f(clKernelMove, 2, delta);
+        clSetKernelArg1d(clKernelMove, 2, delta);
 
+        clGloblWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
+        clLocalWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
+        clGloblWorkSizeSFPartial.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultiple));
+        clLocalWorkSizeSFPartial.put(0, (int)maxGroupSize);
 
+        clGloblWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
+        clLocalWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
+        clLocalWorkSizeForces = BufferUtils.createPointerBuffer(1);
+        clGlobalWorkSizeForces = BufferUtils.createPointerBuffer(1);
+
+        clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
+        clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
+        clLocalWorkSizeForces.put(0, 1);
+        clGlobalWorkSizeForces.put(0, numberOfEdges);
         clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeVertices = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeEdges.put(0, numberOfEdges);
@@ -229,71 +316,64 @@ public class CLDistMesh {
 		 * 3. update vertices;
          *
          */
-        int potGrpSize = (int)Math.ceil(MathUtils.log(2, maxGroupSize));
-        int potWorkLoad = (int)Math.ceil(MathUtils.log(2, numberOfEdges));
-        int rounds = potWorkLoad - potGrpSize;
-
         clEnqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
-
-        int size = numberOfEdges;
-        int globalWorkSize = (int)(maxGroupSize * maxComputeUnits);
-        int localWorkSize = (int)maxGroupSize;
-        PointerBuffer clGlobalWorkSize = BufferUtils.createPointerBuffer(1);
-        PointerBuffer clLocalWorkSize = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSize.put(0, globalWorkSize);
-        clLocalWorkSize.put(0, localWorkSize);
-
-        int index = 0;
-        while(maxGroupSize < size) {
-            IntBuffer clSize = BufferUtils.createIntBuffer(1);
-            clSize.put(0, size);
-            clSetKernelArg1i(clKernelPartialSF, 0, size);
-
-            clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null);
-
-            if(index == 0) {
-                size = (int)maxComputeUnits;
-            }
-            else {
-                size = (int)(Math.ceil(size * 1.0 / maxGroupSize));
-            }
-            index++;
+        if(numberOfEdges > prefdWorkGroupSizeMultiple) {
+            clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
         }
-        PointerBuffer clGlobalWorkSize2 = BufferUtils.createPointerBuffer(1);
-        PointerBuffer clLocalWorkSize2 = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSize2.put(0, ceilPowerOf2(size));
-        clLocalWorkSize2.put(0, ceilPowerOf2(size));
-        IntBuffer clSize = BufferUtils.createIntBuffer(1);
-        clSize.put(0, size);
-        clSetKernelArg1i(clKernelCompleteSF, 0, size);
-        clEnqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGlobalWorkSize2, clLocalWorkSize2, null, null);
 
-        clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, null, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
 
         clFinish(clQueue);
 
-        compareComputation();
-        printResult();
+        // TODO: remove, its only for testing!
+        readResult();
+        //printResult();
+        updateMesh();
     }
 
-    private void compareComputation() {
-        scalingFactor = stack.mallocFloat(1);
-        clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactor, null, null);
-        clEnqueueReadBuffer(clQueue, clVertices, true, 0, v, null, null);
-        System.out.println("scalingFactor:" + scalingFactor.get(0));
+    private void readResult() {
+        if(doublePrecision) {
+            scalingFactorD = stack.mallocDouble(1);
+            clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorD, null, null);
+            clEnqueueReadBuffer(clQueue, clVertices, true, 0, vD, null, null);
+        }
+        else {
+            scalingFactorF = stack.mallocFloat(1);
+            clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorF, null, null);
+            clEnqueueReadBuffer(clQueue, clVertices, true, 0, vF, null, null);
+        }
+
+    }
+
+    private void updateMesh(){
+        int i = 0;
+        if(doublePrecision) {
+            for(AVertex<? extends MPoint> vertex : mesh.getVertices()) {
+                vertex.getPoint().set(vD.get(i), vD.get(i+1));
+                i += 2;
+            }
+        }
+        else {
+            for(AVertex<? extends MPoint> vertex : mesh.getVertices()) {
+                vertex.getPoint().set(vF.get(i), vF.get(i+1));
+                i += 2;
+            }
+        }
     }
 
     private void printResult() {
         log.info("after");
-        for(int i = 0; i < numberOfVertices*2; i += 2) {
+        /*for(int i = 0; i < numberOfVertices*2; i += 2) {
             log.info(v.get(i) + ", " + v.get(i+1));
-        }
+        }*/
+        log.info("scalingFactor:" + (doublePrecision ? scalingFactorD.get(0) : scalingFactorF.get(0)));
     }
 
     private int ceilPowerOf2(int value) {
         int tmp = 1;
-        while (tmp < value) {
+        while (tmp <= value) {
             tmp = tmp << 1;
         }
         return tmp;
@@ -301,7 +381,7 @@ public class CLDistMesh {
 
     private long ceilPowerOf2(long value) {
         long tmp = 1;
-        while (tmp < value) {
+        while (tmp <= value) {
             tmp = tmp << 1;
         }
         return tmp;
@@ -318,6 +398,7 @@ public class CLDistMesh {
         clReleaseMemObject(clqLengths);
         clReleaseMemObject(clPartialSum);
         clReleaseMemObject(clScalingFactor);
+        clReleaseMemObject(clMutexes);
 
         clReleaseKernel(clKernelForces);
         clReleaseKernel(clKernelMove);
@@ -347,10 +428,10 @@ public class CLDistMesh {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) {
-        AMesh<VPoint> mesh = IFace.createSimpleTriMesh();
+        AMesh<MPoint> mesh = IFace.createSimpleTriMesh();
 
         log.info("before");
-        Collection<AVertex<VPoint>> vertices = mesh.getVertices();
+        Collection<AVertex<MPoint>> vertices = mesh.getVertices();
         log.info(vertices);
 
         CLDistMesh clDistMesh = new CLDistMesh(mesh);
