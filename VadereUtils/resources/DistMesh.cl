@@ -2,6 +2,10 @@
 //IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 // abs(6 - length(v))-4
 
+#pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics : enable
+#define LOCK(a) atomic_cmpxchg(a, 0, 1)
+#define UNLOCK(a) atomic_xchg(a, 0)
+
 inline void atomicAdd_g_f(volatile __global float2 *addr, float2 val) {
     union{
         unsigned int u32;
@@ -20,7 +24,8 @@ kernel void computeForces(
     __global int4* edges,
     __global float2* lengths,
     __global float* scalingFactor,
-    __global float2* forces)
+    __global float2* forces,
+    __global int* mutexes)
 {
     int i = get_global_id(0);
     int p1Index = edges[i].s0;
@@ -38,12 +43,15 @@ kernel void computeForces(
 
     float2 partialForce = v * lenDiff; // TODO;
 
-    atomicAdd_g_f(&forces[p1Index], partialForce.s0);
-    //atomicAdd_g_f(&forces[p1Index].s1, partialForce.s1);
+    volatile __global int* addr = &mutexes[p1Index];
 
-    //forces[edges[i].s0] = forces[edges[i].s0] + partialForce; // TODO sync
-    //forces[edges[i].s0] = (float2) (1.0f, 1.0f);
-    //forces[edges[i].s1] = forces[edges[i].s1] - partialForce; // TODO sync
+    //int waiting = 1;
+    //while (waiting) {
+    //    while (LOCK(addr)) {}
+        forces[p1Index] = forces[p1Index] + partialForce;
+    //    UNLOCK(addr);
+    //    waiting = 0;
+    //}
 }
 
 kernel void moveVertices(__global float2* vertices, __global float2* forces, const float delta) {
@@ -93,7 +101,6 @@ kernel void computeLengths(
     qLengths[i] = (float2) (length(v)*length(v), desiredLen*desiredLen);
 }
 
-
 // kernel for multiple work-groups
 kernel void computePartialSF(__const int size, __global float2* qlengths, __local float2* partialSums, __global float2* output) {
     int gid = get_global_id(0);
@@ -112,7 +119,7 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
         int group_size = get_local_size(0);
         float2 len = accumulator;
 
-        //float2 len = (float2)(1.f, 1.0f);
+        //float2 len = (float2)(1.0f, 1.0f);
         partialSums[lid] = len;
 
         barrier(CLK_LOCAL_MEM_FENCE);

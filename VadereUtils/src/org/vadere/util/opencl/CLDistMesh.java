@@ -107,7 +107,7 @@ public class CLDistMesh {
     private IntBuffer mutexes;
     private AMesh<? extends MPoint> mesh;
 
-    private boolean doublePrecision = true;
+    private boolean doublePrecision = false;
 
     public CLDistMesh(@NotNull AMesh<? extends MPoint> mesh) {
         this.mesh = mesh;
@@ -186,8 +186,10 @@ public class CLDistMesh {
         PointerBuffer pp = stack.mallocPointer(1);
         clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
         maxGroupSize = pp.get(0);
+        log.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + maxGroupSize);
         clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
         maxComputeUnits = pp.get(0);
+        log.info("CL_DEVICE_MAX_COMPUTE_UNITS = " + maxComputeUnits);
     }
 
     private void buildProgram() {
@@ -250,9 +252,11 @@ public class CLDistMesh {
     private void initialKernelArgs() {
         int factor = doublePrecision ? 8 : 4;
         int sizeSFPartial = numberOfEdges;
-        IntBuffer intBuffer = stack.callocInt(1);
+        IntBuffer intBuffer = stack.callocInt(2);
+        log.info("CL_DEVICE_TYPE = " + CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_TYPE));
         clGetKernelWorkGroupInfo(clKernelPartialSF, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, intBuffer, null);
         prefdWorkGroupSizeMultiple = intBuffer.get(0);
+        log.info("prefWorkGroupSizeMultiple = " + prefdWorkGroupSizeMultiple);
 
         clSetKernelArg1p(clKernelLengths, 0, clVertices);
         clSetKernelArg1p(clKernelLengths, 1, clEdges);
@@ -300,6 +304,7 @@ public class CLDistMesh {
 
         clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
         clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
+
         clLocalWorkSizeForces.put(0, 1);
         clGlobalWorkSizeForces.put(0, numberOfEdges);
         clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
@@ -328,9 +333,9 @@ public class CLDistMesh {
         clFinish(clQueue);
 
         // TODO: remove, its only for testing!
-        readResult();
+        //readResult();
         //printResult();
-        updateMesh();
+        //updateMesh();
     }
 
     private void readResult() {

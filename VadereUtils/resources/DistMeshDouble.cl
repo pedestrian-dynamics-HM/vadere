@@ -44,13 +44,14 @@ kernel void computeForces(
     volatile __global int* addr = &mutexes[p1Index];
 
     // TODO does this sync work properly? This syncs too much?
-    int waiting = 1;
-    while (waiting) {
-        while (LOCK(addr)) {}
+
+    //int waiting = 1;
+    //while (waiting) {
+    //    while (LOCK(addr)) {}
         forces[p1Index] = forces[p1Index] + partialForce;
-        UNLOCK(addr);
-        waiting = 0;
-    }
+    //    UNLOCK(addr);
+    //    waiting = 0;
+    //}
 }
 
 inline double dabs(double d) {return d < 0 ? -d : d;}
