@@ -42,7 +42,7 @@ public class CLPSMeshing implements IPSMeshing {
 
 	private Object gobalAcessSynchronizer = new Object();
 
-	private CLDistMesh clDistMesh;
+	private CLDistMesh<MeshPoint> clDistMesh;
 
 	public CLPSMeshing(
 			final IDistanceFunction distanceFunc,
@@ -103,7 +103,8 @@ public class CLPSMeshing implements IPSMeshing {
 		//log.info(scalingFactor);
 
 		clDistMesh.step();
-		retriangulate();
+		flipEdges();
+		//retriangulate();
 
 		// get new cooridnates
 
@@ -134,6 +135,43 @@ public class CLPSMeshing implements IPSMeshing {
 		log.info("#points: " + getMesh().getVertices().size());*/
 	}
 
+	public boolean flipEdges() {
+		refresh();
+		boolean anyFlip = false;
+		// Careful, iterate over all half-edges means iterate over each "real" edge twice!
+		/*for(AHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
+			if(triangulation.isIllegal(edge)) {
+				//triangulation.flip(edge);
+				anyFlip = true;
+			}
+		}*/
+
+		if(clDistMesh != null) {
+			clDistMesh.finish();
+		}
+		clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+		clDistMesh.init();
+		return anyFlip;
+	}
+
+	public void finish() {
+		if(clDistMesh != null) {
+			clDistMesh.finish();
+		}
+		triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
+		removeTrianglesInsideObstacles();
+		triangulation.finalize();
+	}
+
+	public void refresh() {
+		if(clDistMesh != null) {
+			clDistMesh.refresh();
+		}
+		triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
+		removeTrianglesInsideObstacles();
+		triangulation.finalize();
+	}
+
     public void retriangulate() {
         //Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
         //removeLowQualityTriangles();
@@ -144,7 +182,7 @@ public class CLPSMeshing implements IPSMeshing {
         if(clDistMesh != null) {
             clDistMesh.finish();
         }
-        clDistMesh = new CLDistMesh((AMesh<MeshPoint>) triangulation.getMesh());
+        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
         clDistMesh.init();
     }
 

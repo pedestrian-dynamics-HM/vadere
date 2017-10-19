@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public class CLGatherer {
 
-    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
+    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         DoubleBuffer vertexBuffer = MemoryUtil.memAllocDouble(vertices.size()*2);
         int index = 0;
@@ -29,7 +29,7 @@ public class CLGatherer {
         return vertexBuffer;
     }
 
-    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
+    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         FloatBuffer vertexBuffer = MemoryUtil.memAllocFloat(vertices.size()*2);
         int index = 0;
@@ -43,7 +43,7 @@ public class CLGatherer {
         return vertexBuffer;
     }
 
-    public static <P extends IPoint> IntBuffer getEdges(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
+    public static <P extends IPoint> IntBuffer getEdges(@NotNull final AMesh<P> mesh) {
         Collection<AHalfEdge<P>> edges = mesh.getEdges();
         IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size()*4);
         int index = 0;
@@ -60,7 +60,7 @@ public class CLGatherer {
         return edgeBuffer;
     }
 
-    public static <P extends IPoint> IntBuffer getFaces(@NotNull final AMesh<P> mesh, @NotNull MemoryStack stack) {
+    public static <P extends IPoint> IntBuffer getFaces(@NotNull final AMesh<P> mesh) {
         Collection<AFace<P>> faces = mesh.getFaces();
         IntBuffer faceBuffer = MemoryUtil.memAllocInt(faces.size()*4);
         int index = 0;

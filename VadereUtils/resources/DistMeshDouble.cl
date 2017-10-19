@@ -32,23 +32,22 @@ inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     return (double2) (x, y);
 }
 
-inline lock void(int3 ta, int3 tb) {}
-
+// TODO: lots of if/else which is bad for the GPU
 kernel void flip(__global double2* vertices,
                  __global int4* edges,
                  __global int3* triangles,
-                 __global int* mutexes,
+                 __global int* triMutexes,
                  __global int* R)
  {
     int edgeId = get_global_id(0);
     // check if edge is illegal
 
-    eps = 0.00001;
+    double eps = 0.00001;
 
-    int v0 = edges[edgeId][0];
-    int v1 = edges[edgeId][1];
-    int ta = edges[edgeId][2];
-    int tb = edges[edgeId][3];
+    int v0 = edges[edgeId].s0;
+    int v1 = edges[edgeId].s1;
+    int ta = edges[edgeId].s2;
+    int tb = edges[edgeId].s3;
 
     // edge is a non-boundary edge
     if(tb != -1) {
@@ -59,38 +58,20 @@ kernel void flip(__global double2* vertices,
         int tbU2 = -1;
 
         // search for v2 in ta
-        if(triangles[ta][0] != v0 && triangles[ta][0] != v1) {
-            u1 = triangles[ta][0];
-        } else if(triangles[ta][1] != v0 && triangles[ta][1] != v1) {
-            u1 = triangles[ta][1];
+        if(triangles[ta].s0 != v0 && triangles[ta].s0 != v1) {
+            u1 = triangles[ta].s0;
+        } else if(triangles[ta].s1 != v0 && triangles[ta].s1 != v1) {
+            u1 = triangles[ta].s1;
         } else {
-            u1 = triangles[ta][2];
+            u1 = triangles[ta].s2;
         }
 
-        if(triangles[tb][0] != v0 && triangles[tb][0] != v1) {
-            u2 = triangles[tb][0];
-        } else if(triangles[ta][1] != v0 && triangles[ta][1] != v1) {
-            u2 = triangles[tb][1];
+        if(triangles[tb].s0!= v0 && triangles[tb].s0 != v1) {
+            u2 = triangles[tb].s0;
+        } else if(triangles[ta].s1 != v0 && triangles[ta].s1 != v1) {
+            u2 = triangles[tb].s1;
         } else {
-            u2 = triangles[tb][2];
-        }
-
-        if(triangles[tb][0] == v0) {
-            tbV0 = 0;
-        } else if(triangles[tb][1] == v0) {
-           tbV0 = 1;
-        }
-        else {
-            tbV0 = 2;
-        }
-
-        if(triangles[ta][0] == v1) {
-            taV1 = 0;
-        } else if(triangles[ta][1] == v1) {
-           taV1 = 1;
-        }
-        else {
-            taV1 = 2;
+            u2 = triangles[tb].s2;
         }
 
 
@@ -101,55 +82,93 @@ kernel void flip(__global double2* vertices,
         // flip
         if(rad + eps < length(c-vertices[u2])) {
             // 1. lock ta and tb
-            lock(ta, tb);
-            triangles[ta][taV1] = u2;
-            triangles[tb][tbV0] = u1;
-            edges[0] = u1;
-            edges[1] = u2;
+            volatile __global int* addr1 = &triMutexes[ta];
+            volatile __global int* addr2 = &triMutexes[tb];
 
-            // save the relation of the changes
-            R[ta] = tb;
-            R[tb] = ta;
+            // we dont have both locks
+            if(!LOCK(addr1)) {
+                 if(!LOCK(addr2)) {
+                    if(triangles[ta].s0 == v1) {
+                        triangles[ta].s0 = u2;
+                    } else if(triangles[ta].s1  == v1) {
+                        triangles[ta].s1 = u2;
+                    }
+                    else {
+                        triangles[ta].s2 = u2;
+                    }
+
+                    if(triangles[tb].s0 == v0) {
+                        triangles[tb].s0 = u1;
+                    } else if(triangles[tb].s1 == v0) {
+                        triangles[tb].s1 = u1;
+                    }
+                    else {
+                        triangles[tb].s2 = u1;
+                    }
+
+                    edges[0] = u1;
+                    edges[1] = u2;
+
+                    // save the relation of the changes
+                    R[ta] = tb;
+                    R[tb] = ta;
+                    UNLOCK(addr1);
+                    UNLOCK(addr2);
+                 } else {
+                    UNLOCK(addr1);
+                 }
+            }
         }
     }
  }
 
- kernel void repair(
-                    __global int4* edges,
+ kernel void repair(__global int4* edges,
                     __global int3* triangles,
                     __global int* R)
   {
     int edgeId = get_global_id(0);
-    int v0 = edges[edgeId][0];
-    int v1 = edges[edgeId][1];
-    int ta = edges[edgeId][2];
-    int tb = edges[edgeId][3];
+    int v0 = edges[edgeId].s0;
+    int v1 = edges[edgeId].s1;
+    int ta = edges[edgeId].s2;
+    int tb = edges[edgeId].s3;
 
     int c = 0;
-    for(int i = 0; i <=3; i++) {
-        if(triangles[ta][i] == v0 || triangles[ta][i] == v1){
-            c++;
-        }
+    if(triangles[ta].s0 == v0 || triangles[ta].s0 == v1) {
+        c++;
+    }
+
+    if(triangles[ta].s1 == v0 || triangles[ta].s1 == v1) {
+        c++;
+    }
+
+    if(triangles[ta].s2 == v0 || triangles[ta].s2 == v1) {
+        c++;
     }
 
     // invalid
     if(c != 2) {
-        edges[edgeId][2] = R[ta];
+        edges[edgeId].s2 = R[ta];
     }
 
     c = 0;
-    for(int i = 0; i <=3; i++) {
-        if(triangles[tb][i] == v0 || triangles[tb][i] == v1){
-            c++;
-        }
+    if(triangles[tb].s0 == v0 || triangles[tb].s0 == v1) {
+        c++;
+    }
+
+    if(triangles[tb].s1 == v0 || triangles[tb].s1 == v1) {
+        c++;
+    }
+
+    if(triangles[tb].s2 == v0 || triangles[tb].s2 == v1) {
+        c++;
     }
 
     // invalid
     if(c != 2) {
-        edges[edgeId][2] = R[tb];
+        edges[edgeId].s3 = R[tb];
     }
 
-  }
+}
 
 
 kernel void computeForces(
