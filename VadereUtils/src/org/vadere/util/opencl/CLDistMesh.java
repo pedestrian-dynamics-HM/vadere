@@ -10,6 +10,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.lwjgl.opencl.CL10.*;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
@@ -31,7 +33,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  *
  * DistMesh GPU implementation.
  */
-public class CLDistMesh {
+public class CLDistMesh<P extends IPoint> {
 
     private static Logger log = LogManager.getLogger(CLDistMesh.class);
 
@@ -49,6 +51,8 @@ public class CLDistMesh {
     private long clKernelLengths;
     private long clKernelPartialSF;
     private long clKernelCompleteSF;
+    private long clKernelFlip;
+    private long clKernelRepair;
 
     // error code buffer
     private IntBuffer errcode_ret;
@@ -61,12 +65,12 @@ public class CLDistMesh {
     // data on the host
     private DoubleBuffer vD;
     private DoubleBuffer scalingFactorD;
-
     private FloatBuffer vF;
     private FloatBuffer scalingFactorF;
-
     private IntBuffer e;
     private IntBuffer t;
+    private IntBuffer mutexes;
+    private IntBuffer triMutexes;
     private double delta = 0.02;
 
     // addresses to memory on the GPU
@@ -79,6 +83,8 @@ public class CLDistMesh {
     private long clPartialSum;
     private long clScalingFactor;
     private long clMutexes;
+    private long clRelation;
+    private long clTriMutexes;
     private ArrayList<Long> clSizes = new ArrayList<>();
 
     // size
@@ -90,7 +96,6 @@ public class CLDistMesh {
     private long maxGroupSize;
     private long maxComputeUnits;
     private long prefdWorkGroupSizeMultiple;
-
 
     private PointerBuffer clGlobalWorkSizeEdges;
     private PointerBuffer clGlobalWorkSizeVertices;
@@ -104,33 +109,33 @@ public class CLDistMesh {
     private PointerBuffer clGlobalWorkSizeForces;
     private PointerBuffer clLocalWorkSizeForces;
 
-    private IntBuffer mutexes;
-    private AMesh<? extends MPoint> mesh;
+    private AMesh<P> mesh;
 
     private boolean doublePrecision = true;
 
-    public CLDistMesh(@NotNull AMesh<? extends MPoint> mesh) {
+    private Collection<P> result;
+
+    public CLDistMesh(@NotNull AMesh<P> mesh) {
         this.mesh = mesh;
         this.mesh.garbageCollection();
         this.stack = MemoryStack.stackPush();
         if(doublePrecision) {
-            this.vD = CLGatherer.getVerticesD(mesh, stack);
+            this.vD = CLGatherer.getVerticesD(mesh);
         }
         else {
-            this.vF = CLGatherer.getVerticesF(mesh, stack);
+            this.vF = CLGatherer.getVerticesF(mesh);
         }
-        this.e = CLGatherer.getEdges(mesh, stack);
-        this.t = CLGatherer.getFaces(mesh, stack);
+        this.e = CLGatherer.getEdges(mesh);
+        this.t = CLGatherer.getFaces(mesh);
         this.numberOfVertices = mesh.getNumberOfVertices();
         this.numberOfEdges = mesh.getNumberOfEdges();
         this.numberOfFaces = mesh.getNumberOfFaces();
-        this.mutexes =  MemoryUtil.memAllocInt(1);
-        this.mutexes.put(0, 0);
         this.mutexes =  MemoryUtil.memAllocInt(numberOfVertices);
+        this.triMutexes = MemoryUtil.memAllocInt(numberOfFaces);
         for(int i = 0; i < numberOfVertices; i++) {
             this.mutexes.put(i, 0);
         }
-
+        this.result = null;
     }
 
     private void initCallbacks() {
@@ -216,10 +221,19 @@ public class CLDistMesh {
         CLInfo.checkCLError(errcode);
 
         clKernelLengths = clCreateKernel(clProgram, "computeLengths", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clKernelPartialSF = clCreateKernel(clProgram, "computePartialSF", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clKernelCompleteSF = clCreateKernel(clProgram, "computeCompleteSF", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clKernelForces = clCreateKernel(clProgram, "computeForces", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clKernelMove = clCreateKernel(clProgram, "moveVertices", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clKernelFlip = clCreateKernel(clProgram, "flip", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clKernelRepair = clCreateKernel(clProgram, "repair", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
     }
 
     private void createMemory() {
@@ -244,6 +258,10 @@ public class CLDistMesh {
         clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
         clMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, mutexes, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clTriMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, triMutexes, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clRelation = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 8 * numberOfFaces, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
     }
 
@@ -288,6 +306,16 @@ public class CLDistMesh {
         clSetKernelArg1p(clKernelMove, 1, clForces);
         clSetKernelArg1d(clKernelMove, 2, delta);
 
+        clSetKernelArg1p(clKernelFlip, 0, clVertices);
+        clSetKernelArg1p(clKernelFlip, 1, clEdges);
+        clSetKernelArg1p(clKernelFlip, 2, clTriangles);
+        clSetKernelArg1p(clKernelFlip, 3, clTriMutexes);
+        clSetKernelArg1p(clKernelFlip, 4, clRelation);
+
+        clSetKernelArg1p(clKernelRepair, 0, clEdges);
+        clSetKernelArg1p(clKernelRepair, 1, clTriangles);
+        clSetKernelArg1p(clKernelRepair, 2, clRelation);
+
         clGloblWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
         clGloblWorkSizeSFPartial.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultiple));
@@ -325,15 +353,24 @@ public class CLDistMesh {
         clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
 
+       /* clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeForces, null, null, null);
+
+        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeForces, null, null, null);
+
+        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeForces, null, null, null);
+*/
         clFinish(clQueue);
 
         // TODO: remove, its only for testing!
-        readResult();
+        //readResult();
         //printResult();
-        updateMesh();
+        //updateMesh();
     }
 
-    private void readResult() {
+    private void readResultFromGPU() {
         if(doublePrecision) {
             scalingFactorD = stack.mallocDouble(1);
             clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorD, null, null);
@@ -347,21 +384,37 @@ public class CLDistMesh {
 
     }
 
-    private void updateMesh(){
+    private Collection<P> readResultFromHost() {
+        List<P> pointSet = new ArrayList<>(numberOfVertices);
+        if(doublePrecision) {
+            for(int i = 0; i < numberOfVertices; i+=2) {
+                pointSet.add(mesh.createPoint(vD.get(i), vD.get(i+1)));
+            }
+        }
+        else {
+            for(int i = 0; i < numberOfVertices; i+=2) {
+                pointSet.add(mesh.createPoint(vF.get(i), vF.get(i+1)));
+            }
+        }
+
+        return pointSet;
+    }
+
+    /*private void updateMesh(){
         int i = 0;
         if(doublePrecision) {
-            for(AVertex<? extends MPoint> vertex : mesh.getVertices()) {
+            for(AVertex<P> vertex : mesh.getVertices()) {
                 vertex.getPoint().set(vD.get(i), vD.get(i+1));
                 i += 2;
             }
         }
         else {
-            for(AVertex<? extends MPoint> vertex : mesh.getVertices()) {
+            for(AVertex<P> vertex : mesh.getVertices()) {
                 vertex.getPoint().set(vF.get(i), vF.get(i+1));
                 i += 2;
             }
         }
-    }
+    }*/
 
     private void printResult() {
         log.info("after");
@@ -399,16 +452,48 @@ public class CLDistMesh {
         clReleaseMemObject(clPartialSum);
         clReleaseMemObject(clScalingFactor);
         clReleaseMemObject(clMutexes);
+        clReleaseMemObject(clTriMutexes);
+        clReleaseMemObject(clRelation);
 
         clReleaseKernel(clKernelForces);
         clReleaseKernel(clKernelMove);
         clReleaseKernel(clKernelLengths);
         clReleaseKernel(clKernelPartialSF);
         clReleaseKernel(clKernelCompleteSF);
+        clReleaseKernel(clKernelFlip);
+        clReleaseKernel(clKernelRepair);
 
         clReleaseCommandQueue(clQueue);
         clReleaseProgram(clProgram);
         clReleaseContext(clContext);
+    }
+
+    private void clearHost() {
+        if(doublePrecision) {
+            MemoryUtil.memFree(vD);
+            MemoryUtil.memFree(scalingFactorD);
+        }
+        else {
+            MemoryUtil.memFree(vF);
+            MemoryUtil.memFree(scalingFactorF);
+        }
+
+        MemoryUtil.memFree(e);
+        MemoryUtil.memFree(t);
+        MemoryUtil.memFree(mutexes);
+        MemoryUtil.memFree(triMutexes);
+
+        /*MemoryUtil.memFree(clGlobalWorkSizeEdges);
+        MemoryUtil.memFree(clGlobalWorkSizeVertices);
+
+        MemoryUtil.memFree(clGloblWorkSizeSFPartial);
+        MemoryUtil.memFree(clLocalWorkSizeSFPartial);
+
+        MemoryUtil.memFree(clGloblWorkSizeSFComplete);
+        MemoryUtil.memFree(clLocalWorkSizeSFComplete);
+
+        MemoryUtil.memFree(clGlobalWorkSizeForces);
+        MemoryUtil.memFree(clLocalWorkSizeForces);*/
     }
 
     public void init() {
@@ -419,8 +504,20 @@ public class CLDistMesh {
         initialKernelArgs();
     }
 
+    public void refresh () {
+        readResultFromGPU();
+        result = readResultFromHost();
+    }
+
     public void finish() {
+        refresh();
+        //updateMesh();
         clearCL();
+        //clearHost();
+    }
+
+    public Collection<P> getResult() {
+        return result;
     }
 
     /*
