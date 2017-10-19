@@ -2,10 +2,6 @@
 //IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 // abs(6 - length(v))-4
 
-#pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics : enable
-#define LOCK(a) atomic_cmpxchg(a, 0, 1)
-#define UNLOCK(a) atomic_xchg(a, 0)
-
 inline void atomicAdd_g_f(volatile __global float2 *addr, float2 val) {
     union{
         unsigned int u32;
@@ -98,13 +94,13 @@ kernel void computeLengths(
     float desiredLen = 1.0f;
     float2 len = (float2) (length(v), desiredLen);
     lengths[i] = len;
-    qLengths[i] = (float2) (length(v)*length(v), desiredLen*desiredLen);
+    qLengths[i] = (float2) (v.s0*v.s0 + v.s1*v.s1, desiredLen*desiredLen);
 }
+
 
 // kernel for multiple work-groups
 kernel void computePartialSF(__const int size, __global float2* qlengths, __local float2* partialSums, __global float2* output) {
     int gid = get_global_id(0);
-    int lid = get_local_id(0);
 
     if(gid < size){
         int global_index = gid;
@@ -116,16 +112,15 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
             global_index += get_global_size(0);
         }
 
+        int lid = get_local_id(0);
         int group_size = get_local_size(0);
-        float2 len = accumulator;
-
-        //float2 len = (float2)(1.0f, 1.0f);
+        float2 len = qlengths[gid];
         partialSums[lid] = len;
 
         barrier(CLK_LOCAL_MEM_FENCE);
         // group_size has to be a power of 2!
         for(int i = group_size/2; i > 0; i>>=1){
-            if(lid < i && gid + i < size) {
+            if(lid < i && lid + i < size) {
                 partialSums[lid] += partialSums[lid + i];
             }
             barrier(CLK_LOCAL_MEM_FENCE);
@@ -133,11 +128,6 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
 
         if(lid == 0){
             output[get_group_id(0)] = partialSums[0];
-        }
-    }
-    else {
-        if(lid == 0){
-            output[get_group_id(0)] = (float2)(0.0f, 0.0f);
         }
     }
 }
@@ -162,8 +152,6 @@ kernel void computeCompleteSF(__const int size, __global float2* qlengths, __loc
 
 
         if(lid == 0) {
-          //*scaleFactor =  qlengths[10].s0;
-          //*scaleFactor =  partialSums[0].s0;
           *scaleFactor = sqrt(partialSums[0].s0 / partialSums[0].s1);
         }
     }

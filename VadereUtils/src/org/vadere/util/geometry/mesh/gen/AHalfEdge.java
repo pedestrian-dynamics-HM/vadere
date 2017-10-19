@@ -9,110 +9,110 @@ import org.vadere.util.geometry.shapes.IPoint;
  */
 public class AHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 
-    private int id;
+	private int id;
 
-    /**
-     * point at the end of the half edge.
-     */
-    private int end;
+	/**
+	 * point at the end of the half edge.
+	 */
+	private int end;
 
-    /**
-     * next half-edge around the face.
-     */
-    private int next;
+	/**
+	 * next half-edge around the face.
+	 */
+	private int next;
 
-    /**
-     * previous half-edge around the face.
-     */
-    private int previous;
+	/**
+	 * previous half-edge around the face.
+	 */
+	private int previous;
 
-    private int twin;
+	private int twin;
 
-    /**
-     * the face the half-edge borders.
-     */
-    private int face;
+	/**
+	 * the face the half-edge borders.
+	 */
+	private int face;
 
-    private boolean destroyed;
+	private boolean destroyed;
 
-    protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
-        this.id = id;
-        this.end = end;
-        this.face = face;
-        this.destroyed = false;
+	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
+		this.id = id;
+	    this.end = end;
+		this.face = face;
+		this.destroyed = false;
+	}
+
+	protected AHalfEdge(@NotNull final int id, @NotNull final int end) {
+		this.id = id;
+	    this.end = end;
+		this.face = -1;
+		this.destroyed = false;
+	}
+
+	int getFace() {
+		return face;
+	}
+
+	void setFace(final int face) {
+		this.face = face;
+	}
+
+	int getEnd() {
+		return end;
+	}
+
+	boolean hasNext() {
+		return next != -1;
+	}
+
+	int getNext() {
+		return next;
+	}
+
+	int getPrevious() {
+		return previous;
+	}
+
+	int getId() {
+		return id;
+	}
+
+	int getTwin() { return twin; }
+
+	/**
+	 * removes the cyclic pointer structure such that the GC can deleteBoundaryFace these objects.
+	 */
+	void destroy() {
+		setNext(-1);
+		setPrevious(-1);
+		setFace(-1);
+		destroyed = true;
+	}
+
+	boolean isValid() {
+		return next != -1 && previous != -1 && face != -1;
+	}
+
+
+	void setPrevious(final int previous) {
+		this.previous = previous;
+	}
+
+	void setNext(final int next) {
+		this.next = next;
+	}
+
+	void setTwin(final int twin) {
+	    this.twin = twin;
     }
 
-    protected AHalfEdge(@NotNull final int id, @NotNull final int end) {
-        this.id = id;
-        this.end = end;
-        this.face = -1;
-        this.destroyed = false;
-    }
+	void setEnd(final int end) {
+		this.end = end;
+	}
 
-    int getFace() {
-        return face;
-    }
-
-    void setFace(final int face) {
-        this.face = face;
-    }
-
-    int getEnd() {
-        return end;
-    }
-
-    boolean hasNext() {
-        return next != -1;
-    }
-
-    int getNext() {
-        return next;
-    }
-
-    int getPrevious() {
-        return previous;
-    }
-
-    int getId() {
-        return id;
-    }
-
-    int getTwin() { return twin; }
-
-    /**
-     * removes the cyclic pointer structure such that the GC can deleteBoundaryFace these objects.
-     */
-    void destroy() {
-        setNext(-1);
-        setPrevious(-1);
-        setFace(-1);
-        destroyed = true;
-    }
-
-    boolean isValid() {
-        return next != -1 && previous != -1 && face != -1;
-    }
-
-
-    void setPrevious(final int previous) {
-        this.previous = previous;
-    }
-
-    void setNext(final int next) {
-        this.next = next;
-    }
-
-    void setTwin(final int twin) {
-        this.twin = twin;
-    }
-
-    void setEnd(final int end) {
-        this.end = end;
-    }
-
-    public boolean isDestroyed() {
-        return destroyed;
-    }
+	public boolean isDestroyed() {
+		return destroyed;
+	}
 
     /**
      * This method should only be called by the garbage collector in AMesh.

@@ -107,20 +107,20 @@ public class CLDistMesh {
     private IntBuffer mutexes;
     private AMesh<? extends MPoint> mesh;
 
-    private boolean doublePrecision = false;
+    private boolean doublePrecision = true;
 
     public CLDistMesh(@NotNull AMesh<? extends MPoint> mesh) {
         this.mesh = mesh;
         this.mesh.garbageCollection();
         this.stack = MemoryStack.stackPush();
         if(doublePrecision) {
-            this.vD = CLGatherer.getVerticesD(mesh);
+            this.vD = CLGatherer.getVerticesD(mesh, stack);
         }
         else {
-            this.vF = CLGatherer.getVerticesF(mesh);
+            this.vF = CLGatherer.getVerticesF(mesh, stack);
         }
-        this.e = CLGatherer.getEdges(mesh);
-        this.t = CLGatherer.getFaces(mesh);
+        this.e = CLGatherer.getEdges(mesh, stack);
+        this.t = CLGatherer.getFaces(mesh, stack);
         this.numberOfVertices = mesh.getNumberOfVertices();
         this.numberOfEdges = mesh.getNumberOfEdges();
         this.numberOfFaces = mesh.getNumberOfFaces();
@@ -186,10 +186,8 @@ public class CLDistMesh {
         PointerBuffer pp = stack.mallocPointer(1);
         clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
         maxGroupSize = pp.get(0);
-        log.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + maxGroupSize);
         clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
         maxComputeUnits = pp.get(0);
-        log.info("CL_DEVICE_MAX_COMPUTE_UNITS = " + maxComputeUnits);
     }
 
     private void buildProgram() {
@@ -252,11 +250,9 @@ public class CLDistMesh {
     private void initialKernelArgs() {
         int factor = doublePrecision ? 8 : 4;
         int sizeSFPartial = numberOfEdges;
-        IntBuffer intBuffer = stack.callocInt(2);
-        log.info("CL_DEVICE_TYPE = " + CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_TYPE));
+        IntBuffer intBuffer = stack.callocInt(1);
         clGetKernelWorkGroupInfo(clKernelPartialSF, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, intBuffer, null);
         prefdWorkGroupSizeMultiple = intBuffer.get(0);
-        log.info("prefWorkGroupSizeMultiple = " + prefdWorkGroupSizeMultiple);
 
         clSetKernelArg1p(clKernelLengths, 0, clVertices);
         clSetKernelArg1p(clKernelLengths, 1, clEdges);
@@ -304,7 +300,6 @@ public class CLDistMesh {
 
         clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
         clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
-
         clLocalWorkSizeForces.put(0, 1);
         clGlobalWorkSizeForces.put(0, numberOfEdges);
         clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
@@ -323,7 +318,7 @@ public class CLDistMesh {
          */
         clEnqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
         if(numberOfEdges > prefdWorkGroupSizeMultiple) {
-            clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
+           clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
         }
 
         clEnqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
@@ -333,9 +328,9 @@ public class CLDistMesh {
         clFinish(clQueue);
 
         // TODO: remove, its only for testing!
-        //readResult();
+        readResult();
         //printResult();
-        //updateMesh();
+        updateMesh();
     }
 
     private void readResult() {
@@ -373,7 +368,7 @@ public class CLDistMesh {
         /*for(int i = 0; i < numberOfVertices*2; i += 2) {
             log.info(v.get(i) + ", " + v.get(i+1));
         }*/
-        log.info("scalingFactor:" + (doublePrecision ? scalingFactorD.get(0) : scalingFactorF.get(0)));
+       log.info("scalingFactor:" + (doublePrecision ? scalingFactorD.get(0) : scalingFactorF.get(0)));
     }
 
     private int ceilPowerOf2(int value) {
