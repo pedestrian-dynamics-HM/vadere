@@ -20,6 +20,138 @@ inline void atomicAdd_g_f(volatile __global double2 *addr, double2 val) {
     } while(current.u32 != expected.u32);
 }
 
+inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
+    double d = 2 * (p1.s0 * (p2.s1 - p3.s1) + p2.s0 * (p3.s1 - p1.s1) + p3.s0 * (p1.s1 - p2.s1));
+
+    double x = ((p1.s0 * p1.s0 + p1.s1 * p1.s1) * (p2.s1 - p3.s1)
+    				+ (p2.s0 * p2.s0 + p2.s1 * p2.s1) * (p3.s1 - p1.s1)
+    				+ (p3.s0 * p3.s0 + p3.s1 * p3.s1) * (p1.s1 - p2.s1)) / d;
+    		double y = ((p1.s0 * p1.s0 + p1.s1 * p1.s1) * (p3.s0 - p2.s0)
+    				+ (p2.s0 * p2.s0 + p2.s1 * p2.s1) * (p1.s0 - p3.s0)
+    				+ (p3.s0 * p3.s0 + p3.s1 * p3.s1) * (p2.s0 - p1.s0)) / d;
+    return (double2) (x, y);
+}
+
+inline lock void(int3 ta, int3 tb) {}
+
+kernel void flip(__global double2* vertices,
+                 __global int4* edges,
+                 __global int3* triangles,
+                 __global int* mutexes,
+                 __global int* R)
+ {
+    int edgeId = get_global_id(0);
+    // check if edge is illegal
+
+    eps = 0.00001;
+
+    int v0 = edges[edgeId][0];
+    int v1 = edges[edgeId][1];
+    int ta = edges[edgeId][2];
+    int tb = edges[edgeId][3];
+
+    // edge is a non-boundary edge
+    if(tb != -1) {
+        int u1 = -1;
+        int u2 = -1;
+        int tbV0 = -1;
+        int taU1 = -1;
+        int tbU2 = -1;
+
+        // search for v2 in ta
+        if(triangles[ta][0] != v0 && triangles[ta][0] != v1) {
+            u1 = triangles[ta][0];
+        } else if(triangles[ta][1] != v0 && triangles[ta][1] != v1) {
+            u1 = triangles[ta][1];
+        } else {
+            u1 = triangles[ta][2];
+        }
+
+        if(triangles[tb][0] != v0 && triangles[tb][0] != v1) {
+            u2 = triangles[tb][0];
+        } else if(triangles[ta][1] != v0 && triangles[ta][1] != v1) {
+            u2 = triangles[tb][1];
+        } else {
+            u2 = triangles[tb][2];
+        }
+
+        if(triangles[tb][0] == v0) {
+            tbV0 = 0;
+        } else if(triangles[tb][1] == v0) {
+           tbV0 = 1;
+        }
+        else {
+            tbV0 = 2;
+        }
+
+        if(triangles[ta][0] == v1) {
+            taV1 = 0;
+        } else if(triangles[ta][1] == v1) {
+           taV1 = 1;
+        }
+        else {
+            taV1 = 2;
+        }
+
+
+        // test the delaunay criteria
+        double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[u1]);
+        double rad = length(c-vertices[v0]);
+
+        // flip
+        if(rad + eps < length(c-vertices[u2])) {
+            // 1. lock ta and tb
+            lock(ta, tb);
+            triangles[ta][taV1] = u2;
+            triangles[tb][tbV0] = u1;
+            edges[0] = u1;
+            edges[1] = u2;
+
+            // save the relation of the changes
+            R[ta] = tb;
+            R[tb] = ta;
+        }
+    }
+ }
+
+ kernel void repair(
+                    __global int4* edges,
+                    __global int3* triangles,
+                    __global int* R)
+  {
+    int edgeId = get_global_id(0);
+    int v0 = edges[edgeId][0];
+    int v1 = edges[edgeId][1];
+    int ta = edges[edgeId][2];
+    int tb = edges[edgeId][3];
+
+    int c = 0;
+    for(int i = 0; i <=3; i++) {
+        if(triangles[ta][i] == v0 || triangles[ta][i] == v1){
+            c++;
+        }
+    }
+
+    // invalid
+    if(c != 2) {
+        edges[edgeId][2] = R[ta];
+    }
+
+    c = 0;
+    for(int i = 0; i <=3; i++) {
+        if(triangles[tb][i] == v0 || triangles[tb][i] == v1){
+            c++;
+        }
+    }
+
+    // invalid
+    if(c != 2) {
+        edges[edgeId][2] = R[tb];
+    }
+
+  }
+
+
 kernel void computeForces(
     __global double2* vertices,
     __global int4* edges,
