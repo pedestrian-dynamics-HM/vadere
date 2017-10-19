@@ -1,7 +1,6 @@
 package org.vadere.util.geometry.shapes;
 
 import org.jetbrains.annotations.NotNull;
-import org.omg.CORBA.portable.ValueOutputStream;
 import org.vadere.util.geometry.GeometryUtils;
 
 /**
@@ -61,7 +60,6 @@ public class VCone {
 		VPoint v3 = new VPoint(-direction.getY(), direction.getX());
 		double t1 = v2.crossProduct(v1) / v2.scalarProduct(v3);
 		double t2 = v1.scalarProduct(v3) / v2.scalarProduct(v3);
-		
 		assert Double.isFinite(t1) && Double.isFinite(t2);
 
 		// the line segment from a to b intersect the cone?

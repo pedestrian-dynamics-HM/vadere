@@ -12,17 +12,17 @@ import java.util.*;
  */
 public class TestEnhancedVersion extends JFrame {
 
-	ArrayList<VShape> obstacles;
+    ArrayList<VShape> obstacles;
 
     private TestEnhancedVersion()
     {
 //        VRectangle bbox = new VRectangle(0,0,100,100);
 //        ArrayList<VRectangle> obs = new ArrayList<VRectangle>() {{ add(new VRectangle(20,20,20,20));}};
-	    double h0 = 3.0;
+        double h0 = 3.0;
 
-	    long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
 
-	    VRectangle bbox = new VRectangle(0, 0, 300, 300);
+        VRectangle bbox = new VRectangle(0, 0, 300, 300);
 //        Path2D.Double test = new Path2D.Double();
 //        test.moveTo(30,30);
 //        test.lineTo(90,80);
@@ -32,36 +32,36 @@ public class TestEnhancedVersion extends JFrame {
 //        test.lineTo(30,30);
 //        VPolygon p = new VPolygon(test);
 
-	    double height = 300;
-	    double width = 300;
+        double height = 300;
+        double width = 300;
 
-	    java.util.List<VShape> boundingBox = new ArrayList<VShape>() {{
-		    add(new VRectangle(0, 0, 5, width));
-		    add(new VRectangle(0, 0, width, 5));
-		    add(new VRectangle(width-5, 0, 5, height));
-		    add(new VRectangle(0, height-5, 5, height));
-	    }};
+        java.util.List<VShape> boundingBox = new ArrayList<VShape>() {{
+            add(new VRectangle(0, 0, 5, width));
+            add(new VRectangle(0, 0, width, 5));
+            add(new VRectangle(width-5, 0, 5, height));
+            add(new VRectangle(0, height-5, 5, height));
+        }};
 
-	    PSDistmesh meshGenerator = new PSDistmesh(bbox, boundingBox, h0,false);
+        PSDistmesh meshGenerator = new PSDistmesh(bbox, boundingBox, h0,false);
 
         System.out.println(System.currentTimeMillis()-now);
         now = System.currentTimeMillis();
         System.out.println(System.currentTimeMillis()-now);
         PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800);
-	    JFrame frame = distmeshPanel.display();
-		frame.setVisible(true);
+        JFrame frame = distmeshPanel.display();
+        frame.setVisible(true);
         double quality = meshGenerator.qualityCheck();
 
         while (quality < 0.95) {
             System.out.println("quality:"+ quality);
-	        meshGenerator.step();
+            meshGenerator.step();
 	        /*try {
 		        Thread.sleep(5000);
 	        } catch (InterruptedException e) {
 		        e.printStackTrace();
 	        }*/
-	        distmeshPanel.repaint();
-	        quality = meshGenerator.qualityCheck();
+            distmeshPanel.repaint();
+            quality = meshGenerator.qualityCheck();
         }
     }
 

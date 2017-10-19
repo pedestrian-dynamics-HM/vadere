@@ -492,9 +492,9 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 1;
 			c.gridy = 0;
-			JTextField nameField = new JTextField(outputFile.getFileName());
+			JTextField nameField = new JTextField(outputFile.toString());
 			nameField.addActionListener(ae -> {
-				String oldName = outputFile.getFileName();
+				String oldName = outputFile.toString();
 				String newName = nameField.getText();
 				if (!oldName.equals(newName)) {
 					String msg = "";
@@ -505,7 +505,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 						msg = "File name is already in use";
 					}
 					if (msg.isEmpty()) {
-						outputFile.setFileName(newName);
+						outputFile.setRelativeFileName(newName);
 						outputFilesTable.repaint();
 						refreshGUI();
 					} else {

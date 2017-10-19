@@ -21,7 +21,7 @@ public interface IGaussianFilter {
 
 	enum Type {
 		OpenCL, // default
-		NativeJava; // not jet implemented
+		NativeJava // not jet implemented
 	}
 
 	/**
@@ -104,7 +104,7 @@ public interface IGaussianFilter {
                                 * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
                 IGaussianFilter clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
                 return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
-		}
+        }
 	}
 
 	static IGaussianFilter create(
@@ -117,7 +117,6 @@ public interface IGaussianFilter {
 			final Topography scenario, final double scale,
 			final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
 		switch (type) {
-
 			case OpenCL: {
 				try {
 					double varianz = standardDerivation * standardDerivation;
@@ -136,7 +135,7 @@ public interface IGaussianFilter {
                         * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
                 IGaussianFilter clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
                 return new ObstacleGaussianFilter(scenario, clFilter);
-		}
+        }
 	}
 
 	static IGaussianFilter create(

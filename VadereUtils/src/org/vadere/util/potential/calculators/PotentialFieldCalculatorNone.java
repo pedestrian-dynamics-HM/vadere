@@ -1,6 +1,5 @@
 package org.vadere.util.potential.calculators;
 
-
 public class PotentialFieldCalculatorNone implements EikonalSolver {
 
 	@Override
@@ -18,5 +17,4 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 	public double getValue(double x, double y) {
 		return 0;
 	}
-
 }

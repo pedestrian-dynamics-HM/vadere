@@ -117,8 +117,7 @@ public class VTriangle extends VPolygon {
 			double slope = -1 / ((p2.getY() - p1.getY()) / (p2.getX() - p1.getX()));
 			// y  = slope * (x - p3.x) + p3.y
 
-			double slope2 = -1 / ((p1.getY() - p3.getY()) / (p1.getX() - p3.getX()));
-			// y = slope2 * (x - p2.x) + p2.y
+			double slope2 = -1 / ((p1.getY() - p3.getY()) / (p1.getX() - p3.getX()));// y = slope2 * (x - p2.x) + p2.y
 
 			// slope2 * (x - p2.x) + p2.y  = slope * (x - p3.x) + p3.y
 			// slope2 * (x - p2.x) - slope * (x - p3.x)  =  + p3.y - p2.y
@@ -127,7 +126,6 @@ public class VTriangle extends VPolygon {
 			// x * (slope2 - slope) =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
 			double x = (p3.getY() - p2.getY() + slope2 * p2.getX() - slope * p3.getX()) / (slope2 - slope);
 			double y = slope * (x - p3.getX()) + p3.getY();
-
 			orthocenter = new VPoint(x, y);
 		}
 
@@ -191,10 +189,6 @@ public class VTriangle extends VPolygon {
 		return this.p1.equals(point) || this.p2.equals(point) || this.p3.equals(point);
 	}
 
-	public VLine[] getLines() {
-		return lines;
-	}
-
 	public Stream<VLine> getLineStream() {
 		return Arrays.stream(getLines());
 	}
@@ -204,6 +198,10 @@ public class VTriangle extends VPolygon {
 		max = Math.max(max, Math.max(Math.abs(p2.getX()), Math.abs(p2.getY())));
 		max = Math.max(max, Math.max(Math.abs(p3.getX()), Math.abs(p3.getY())));
 		return max;
+	}
+
+	public VLine[] getLines() {
+		return lines;
 	}
 
 	@Override

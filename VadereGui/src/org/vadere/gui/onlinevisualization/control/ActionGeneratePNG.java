@@ -11,8 +11,6 @@ import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.ImageGenerator;
 import org.vadere.gui.postvisualization.view.ImageSizeDialog;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,6 +18,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.prefs.Preferences;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class ActionGeneratePNG extends AbstractAction implements IRendererChangeListener {
 	private static Logger logger = LogManager.getLogger(ActionGeneratePNG.class);
@@ -40,21 +41,32 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 		ImageSizeDialog imageSizeDialog = new ImageSizeDialog(model);
 
 		if (imageSizeDialog.getState() == ImageSizeDialog.State.Ok) {
-			BufferedImage bi = generator.generateImage(imageSizeDialog.getImageBound());
+			JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", "."));
 
 			Date todaysDate = new java.util.Date();
 			SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("View.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
 
-			File outputfile = new File(
-					Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", ".")
-							+ System.getProperty("file.separator") + "pv_snapshot_" + formattedDate + ".png");
-			try {
-				ImageIO.write(bi, "png", outputfile);
-				logger.info("generate new png: " + outputfile.getAbsolutePath());
-			} catch (IOException e1) {
-				logger.error(e1.getMessage());
-				e1.printStackTrace();
+
+			File outputFile = new File("pv_snapshot_" + formattedDate + ".png");
+			fileChooser.setSelectedFile(outputFile);
+
+			int returnVal = fileChooser.showDialog(null, "Save");
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+				outputFile = fileChooser.getSelectedFile().toString().endsWith(".png") ? fileChooser.getSelectedFile()
+						: new File(fileChooser.getSelectedFile().toString() + ".png");
+
+				BufferedImage bi = generator.generateImage(imageSizeDialog.getImageBound());
+
+				try {
+					ImageIO.write(bi, "png", outputFile);
+					logger.info("generate new png: " + outputFile.getAbsolutePath());
+				} catch (IOException e1) {
+					logger.error(e1.getMessage());
+					e1.printStackTrace();
+				}
 			}
 		}
 	}

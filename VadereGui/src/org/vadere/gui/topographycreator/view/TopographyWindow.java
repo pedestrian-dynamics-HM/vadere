@@ -1,29 +1,7 @@
 package org.vadere.gui.topographycreator.view;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.beans.IntrospectionException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEditSupport;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
@@ -64,8 +42,16 @@ import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.types.ScenarioElementType;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEditSupport;
 
 public class TopographyWindow extends JPanel {
 	private static Resources resources = Resources.getInstance("topographycreator");
@@ -295,7 +281,7 @@ public class TopographyWindow extends JPanel {
 				/* pedestrians */
 				TopographyAction switchToPedestrianAction = new ActionSwitchCategory("switch to pedestrian", panelModel,
 						ScenarioElementType.PEDESTRIAN, selectDotModeAction);
-				TopographyAction closeDialogAction = new ActionCloseDrawOptionPanel("Pedestrain", new ImageIcon(
+				TopographyAction closeDialogAction = new ActionCloseDrawOptionPanel("Pedestrian", new ImageIcon(
 						Resources.class.getResource("/icons/pedestrians_icon.png")), panelModel,
 						switchToPedestrianAction);
 
@@ -309,9 +295,10 @@ public class TopographyWindow extends JPanel {
 						.getResource("/icons/source_icon.png")), panelModel, switchToSourceAction, sourceButton,
 						sourceDrawModes);
 
-				addActionToToolbar(toolbar, new ActionSelectSelectShape("select shape mode", new ImageIcon(
-						Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport),
-						"select_shape_tooltip");
+				ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
+						Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
+
+				addActionToToolbar(toolbar, selectShape,"select_shape_tooltip");
 				addActionToToolbar(
 						toolbar,
 						new ActionSwitchSelectionMode("erase mode", new ImageIcon(Resources.class
@@ -386,7 +373,7 @@ public class TopographyWindow extends JPanel {
 
 				// deselect selected element on esc
 				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
-				getActionMap().put("deselect", new ActionDeselect(panelModel, thisPanel));
+				getActionMap().put("deselect", new ActionDeselect(panelModel, thisPanel, selectShape));
 			}
 		});
 	}

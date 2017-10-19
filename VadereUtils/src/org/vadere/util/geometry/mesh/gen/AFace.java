@@ -5,7 +5,7 @@ import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
- * @author Benedikt Zoennchen
+ * Created by bzoennchen on 06.09.17.
  */
 public class AFace<P extends IPoint> implements IFace<P> {
 
@@ -64,17 +64,17 @@ public class AFace<P extends IPoint> implements IFace<P> {
 		this.edge = edge;
 	}
 
-	/**
-	 * This method should only be called by the garbage collector in AMesh.
-	 * @param id
-	 */
-	void setId(@NotNull final int id) {
-		this.id = id;
-	}
+    /**
+     * This method should only be called by the garbage collector in AMesh.
+     * @param id
+     */
+    void setId(@NotNull final int id) {
+        this.id = id;
+    }
 
-	int getEdge() {
-		return edge;
-	}
+    int getEdge() {
+        return edge;
+    }
 
 	int getId() {
 	    return id;

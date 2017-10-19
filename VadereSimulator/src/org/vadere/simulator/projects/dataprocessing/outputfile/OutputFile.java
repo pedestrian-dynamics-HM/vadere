@@ -4,10 +4,8 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UncheckedIOException;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -42,9 +40,13 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		this.dataProcessors = new ArrayList<>();
 	}
 
-	public void setFileName(final String fileName) {
+	public void setAbsoluteFileName(final String fileName) {
 		this.fileName = fileName;
 	}
+
+	public void setRelativeFileName(final String fileName) {
+	    this.fileName = new File(this.fileName).getParentFile().toPath().resolve(fileName).toString();
+    }
 
 	public void setProcessorIds(final List<Integer> processorIds) {
 		this.processorIds = processorIds;
@@ -77,6 +79,10 @@ public abstract class OutputFile<K extends DataKey<K>> {
             throw new UncheckedIOException(ex);
         }
 	}
+
+	public boolean isEmpty() {
+        return this.dataProcessors.isEmpty();
+    }
 
 	private List<String> getFieldHeaders() {
 		return composeLine(keyHeaders, p -> Arrays.stream(p.getHeaders()));
@@ -125,6 +131,6 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	@Override
 	public String toString() {
-		return fileName;
+		return new File(fileName).getName();
 	}
 }

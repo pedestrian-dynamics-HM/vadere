@@ -20,7 +20,8 @@ kernel void computeForces(
     __global int4* edges,
     __global float2* lengths,
     __global float* scalingFactor,
-    __global float2* forces)
+    __global float2* forces,
+    __global int* mutexes)
 {
     int i = get_global_id(0);
     int p1Index = edges[i].s0;
@@ -38,12 +39,15 @@ kernel void computeForces(
 
     float2 partialForce = v * lenDiff; // TODO;
 
-    atomicAdd_g_f(&forces[p1Index], partialForce.s0);
-    //atomicAdd_g_f(&forces[p1Index].s1, partialForce.s1);
+    volatile __global int* addr = &mutexes[p1Index];
 
-    //forces[edges[i].s0] = forces[edges[i].s0] + partialForce; // TODO sync
-    //forces[edges[i].s0] = (float2) (1.0f, 1.0f);
-    //forces[edges[i].s1] = forces[edges[i].s1] - partialForce; // TODO sync
+    //int waiting = 1;
+    //while (waiting) {
+    //    while (LOCK(addr)) {}
+        forces[p1Index] = forces[p1Index] + partialForce;
+    //    UNLOCK(addr);
+    //    waiting = 0;
+    //}
 }
 
 kernel void moveVertices(__global float2* vertices, __global float2* forces, const float delta) {
@@ -90,14 +94,13 @@ kernel void computeLengths(
     float desiredLen = 1.0f;
     float2 len = (float2) (length(v), desiredLen);
     lengths[i] = len;
-    qLengths[i] = (float2) (length(v)*length(v), desiredLen*desiredLen);
+    qLengths[i] = (float2) (v.s0*v.s0 + v.s1*v.s1, desiredLen*desiredLen);
 }
 
 
 // kernel for multiple work-groups
 kernel void computePartialSF(__const int size, __global float2* qlengths, __local float2* partialSums, __global float2* output) {
     int gid = get_global_id(0);
-    int lid = get_local_id(0);
 
     if(gid < size){
         int global_index = gid;
@@ -109,16 +112,15 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
             global_index += get_global_size(0);
         }
 
+        int lid = get_local_id(0);
         int group_size = get_local_size(0);
-        float2 len = accumulator;
-
-        //float2 len = (float2)(1.f, 1.0f);
+        float2 len = qlengths[gid];
         partialSums[lid] = len;
 
         barrier(CLK_LOCAL_MEM_FENCE);
         // group_size has to be a power of 2!
         for(int i = group_size/2; i > 0; i>>=1){
-            if(lid < i && gid + i < size) {
+            if(lid < i && lid + i < size) {
                 partialSums[lid] += partialSums[lid + i];
             }
             barrier(CLK_LOCAL_MEM_FENCE);
@@ -126,11 +128,6 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
 
         if(lid == 0){
             output[get_group_id(0)] = partialSums[0];
-        }
-    }
-    else {
-        if(lid == 0){
-            output[get_group_id(0)] = (float2)(0.0f, 0.0f);
         }
     }
 }
@@ -155,8 +152,6 @@ kernel void computeCompleteSF(__const int size, __global float2* qlengths, __loc
 
 
         if(lid == 0) {
-          //*scaleFactor =  qlengths[10].s0;
-          //*scaleFactor =  partialSums[0].s0;
           *scaleFactor = sqrt(partialSums[0].s0 / partialSums[0].s1);
         }
     }

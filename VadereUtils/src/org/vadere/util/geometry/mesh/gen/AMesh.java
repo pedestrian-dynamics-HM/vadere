@@ -356,90 +356,90 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	@Override
 	public void unlock(@NotNull AVertex<P> vertex) {
         vertex.getLock().unlock();
-	}
+    }
 
-	/**
-	 * removes all destroyed object from this mesh and re-arranges all indices.
-	 */
-	public void garbageCollection() {
-		Map<Integer, Integer> faceIdMap = new HashMap<>();
-		Map<Integer, Integer> edgeIdMap = new HashMap<>();
-		Map<Integer, Integer> vertexIdMap = new HashMap<>();
+    /**
+     * removes all destroyed object from this mesh and re-arranges all indices.
+     */
+    public void garbageCollection() {
+        Map<Integer, Integer> faceIdMap = new HashMap<>();
+        Map<Integer, Integer> edgeIdMap = new HashMap<>();
+        Map<Integer, Integer> vertexIdMap = new HashMap<>();
 
-		int i = 0;
-		int j = 0;
-		for(AFace<P> face : faces) {
-			if(face.isDestroyed()) {
-				j--;
-			}
-			else {
-				faceIdMap.put(i, j);
-			}
-			i++;
-			j++;
-		}
+        int i = 0;
+        int j = 0;
+        for(AFace<P> face : faces) {
+            if(face.isDestroyed()) {
+                j--;
+            }
+            else {
+                faceIdMap.put(i, j);
+            }
+            i++;
+            j++;
+        }
 
-		i = 0;
-		j = 0;
-		for(AHalfEdge<P> edge : edges) {
-			if(edge.isDestroyed()) {
-				j--;
-			}
-			else {
-				edgeIdMap.put(i, j);
-			}
-			i++;
-			j++;
-		}
+        i = 0;
+        j = 0;
+        for(AHalfEdge<P> edge : edges) {
+            if(edge.isDestroyed()) {
+                j--;
+            }
+            else {
+                edgeIdMap.put(i, j);
+            }
+            i++;
+            j++;
+        }
 
-		i = 0;
-		j = 0;
-		for(AVertex<P> vertex : vertices) {
-			if(vertex.isDestroyed()) {
-				j--;
-			}
-			else {
-				vertexIdMap.put(i, j);
-			}
-			i++;
-			j++;
-		}
+        i = 0;
+        j = 0;
+        for(AVertex<P> vertex : vertices) {
+            if(vertex.isDestroyed()) {
+                j--;
+            }
+            else {
+                vertexIdMap.put(i, j);
+            }
+            i++;
+            j++;
+        }
 
-		faces = faces.stream().filter(f -> !f.isDestroyed()).collect(Collectors.toList());
-		edges = edges.stream().filter(e -> !e.isDestroyed()).collect(Collectors.toList());
-		vertices = vertices.stream().filter(v -> !v.isDestroyed()).collect(Collectors.toList());
+        faces = faces.stream().filter(f -> !f.isDestroyed()).collect(Collectors.toList());
+        edges = edges.stream().filter(e -> !e.isDestroyed()).collect(Collectors.toList());
+        vertices = vertices.stream().filter(v -> !v.isDestroyed()).collect(Collectors.toList());
 
-		i = 0;
-		for(AFace<P> face : faces) {
-			face.setId(faceIdMap.get(face.getId()));
-			face.setEdge(edgeIdMap.get(face.getEdge()));
-			assert face.getId() == i;
-			i++;
-		}
+        i = 0;
+        for(AFace<P> face : faces) {
+            face.setId(faceIdMap.get(face.getId()));
+            face.setEdge(edgeIdMap.get(face.getEdge()));
+            assert face.getId() == i;
+            i++;
+        }
 
-		i = 0;
-		for(AVertex<P> vertex : vertices) {
-			vertex.setId(vertexIdMap.get(vertex.getId()));
-			vertex.setEdge(edgeIdMap.get(vertex.getEdge()));
-			assert vertex.getId() == i;
-			i++;
-		}
+        i = 0;
+        for(AVertex<P> vertex : vertices) {
+            vertex.setId(vertexIdMap.get(vertex.getId()));
+            vertex.setEdge(edgeIdMap.get(vertex.getEdge()));
+            assert vertex.getId() == i;
+            i++;
+        }
 
-		i = 0;
-		for(AHalfEdge<P> edge : edges) {
-			edge.setId(edgeIdMap.get(edge.getId()));
-			edge.setEnd(vertexIdMap.get(edge.getEnd()));
-			edge.setNext(edgeIdMap.get(edge.getNext()));
-			edge.setPrevious(edgeIdMap.get(edge.getPrevious()));
-			edge.setTwin(edgeIdMap.get(edge.getTwin()));
-			if(edge.getFace() != boundary.getId()) {
-				edge.setFace(faceIdMap.get(edge.getFace()));
-			}
+        i = 0;
+        for(AHalfEdge<P> edge : edges) {
+            edge.setId(edgeIdMap.get(edge.getId()));
+            edge.setEnd(vertexIdMap.get(edge.getEnd()));
+            edge.setNext(edgeIdMap.get(edge.getNext()));
+            edge.setPrevious(edgeIdMap.get(edge.getPrevious()));
+            edge.setTwin(edgeIdMap.get(edge.getTwin()));
+            if(edge.getFace() != boundary.getId()) {
+                edge.setFace(faceIdMap.get(edge.getFace()));
+            }
 
-			assert edge.getId() == i;
-			i++;
-		}
+            assert edge.getId() == i;
+            i++;
+        }
 
-		assert (getNumberOfVertices() == vertices.size()) && (getNumberOfEdges() == edges.size()) && (getNumberOfFaces() == faces.size());
-	}
+        assert (getNumberOfVertices() == vertices.size()) && (getNumberOfEdges() == edges.size()) && (getNumberOfFaces() == faces.size());
+    }
 }

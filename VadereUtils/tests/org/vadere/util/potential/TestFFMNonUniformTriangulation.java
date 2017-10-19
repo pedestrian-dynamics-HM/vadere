@@ -23,8 +23,6 @@ import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.PSDistmesh;
-import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
 import org.vadere.util.triangulation.adaptive.PSMeshing;
 
 import java.awt.*;
@@ -37,8 +35,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.*;
-
 
 public class TestFFMNonUniformTriangulation {
 
@@ -48,6 +44,7 @@ public class TestFFMNonUniformTriangulation {
 	private VRectangle bbox;
 	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
 	private IDistanceFunction distanceFunc;
+
 	@Before
 	public void setUp() {
 		//IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -79,6 +80,7 @@ public class TestGeometry {
 		VCircle circle = new VCircle(1, 1, 1);
 		VLine line = new VLine(3,0, 4, 0);
 		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
+
 		assertTrue(intersectionPoints.length == 1);
 
 		VPoint[] expectedIntersectionPoints = new VPoint[]{new VPoint(1, 0)};

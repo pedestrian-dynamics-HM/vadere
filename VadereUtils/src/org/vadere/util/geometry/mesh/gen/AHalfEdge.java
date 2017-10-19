@@ -114,18 +114,18 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 		return destroyed;
 	}
 
-	/**
-	 * This method should only be called by the garbage collector in AMesh.
-	 * @param id
-	 */
-	void setId(@NotNull final int id) {
-		this.id = id;
-	}
+    /**
+     * This method should only be called by the garbage collector in AMesh.
+     * @param id
+     */
+    void setId(@NotNull final int id) {
+        this.id = id;
+    }
 
-	@Override
-	public String toString() {
-		return ""+id;
-	}
+    @Override
+    public String toString() {
+        return ""+id;
+    }
 
 	/*
 	 * A half-edge is defined by its end vertex and its face. In a geometry there can not be more than

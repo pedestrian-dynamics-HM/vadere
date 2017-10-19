@@ -1,9 +1,14 @@
 package org.vadere.gui.topographycreator.control;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
+import javax.swing.*;
+import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 /**
@@ -16,6 +21,7 @@ public class ActionUndo extends AbstractAction {
 	private static final long serialVersionUID = 6022031098257929748L;
 	private final UndoManager undoManager;
 	private final TopographyAction action;
+	private static Logger logger = LogManager.getLogger(ActionUndo.class);
 
 	public ActionUndo(final String name, final ImageIcon icon, UndoManager undoManager, final TopographyAction action) {
 		super(name, icon);
@@ -25,7 +31,13 @@ public class ActionUndo extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		undoManager.undo();
+		try {
+			undoManager.undo();
+		} catch (CannotUndoException e) {
+			logger.log(Priority.DEBUG, "Cannot undo! List of edits is empty!");
+			Toolkit.getDefaultToolkit().beep();
+		}
+
 		action.actionPerformed(arg0);
 	}
 

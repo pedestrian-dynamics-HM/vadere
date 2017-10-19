@@ -275,7 +275,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 				potential = Math.min(computePotential(mesh.getPoint(vertex), face), potential);
 			}
 		}
-
 		return potential;
 	}
 

@@ -11,6 +11,7 @@ import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen

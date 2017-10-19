@@ -394,7 +394,7 @@ public class GeometryUtils {
 		return Math.abs(result) / 2.0;
 	}
 
-	public static double areaOfPolygon(final IPoint... vertices) {
+    public static double areaOfPolygon(final IPoint... vertices) {
 		double result = 0;
 
 		for (int i = 0; i < vertices.length - 1; i++) {
@@ -533,7 +533,6 @@ public class GeometryUtils {
 
 		return new VRectangle(pMin.getX(), pMin.getY(), pMax.getX() - pMin.getX(), pMax.getY() - pMin.getY());
 	}
-
 
 	/**
 	 * This method follows the construction from

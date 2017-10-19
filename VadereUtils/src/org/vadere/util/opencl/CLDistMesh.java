@@ -1,6 +1,5 @@
 package org.vadere.util.opencl;
 
-import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -11,11 +10,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.opencl.examples.IOUtil;
-import org.vadere.util.opencl.examples.InfoUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -147,8 +142,8 @@ public class CLDistMesh {
 
         programCB = CLProgramCallback.create((program, user_data) ->
         {
-            log.info("The cl_program [0x"+program+"] was built " + (InfoUtils.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-            String message = InfoUtils.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
+            log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+            String message = CLInfo.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
             if (!message.isEmpty()) {
                 log.info("BUILD LOG:\n----\n"+message+"\n-----");
             }
@@ -183,10 +178,10 @@ public class CLDistMesh {
                 .flip();
 
         clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
 
         clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
 
         PointerBuffer pp = stack.mallocPointer(1);
         clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
@@ -202,10 +197,10 @@ public class CLDistMesh {
         ByteBuffer source;
         try {
             if(doublePrecision) {
-                source = IOUtil.ioResourceToByteBuffer("DistMeshDouble.cl", 4096);
+                source = CLUtils.ioResourceToByteBuffer("DistMeshDouble.cl", 4096);
             }
             else {
-                source = IOUtil.ioResourceToByteBuffer("DistMesh.cl", 4096);
+                source = CLUtils.ioResourceToByteBuffer("DistMesh.cl", 4096);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -218,7 +213,7 @@ public class CLDistMesh {
         clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
 
         int errcode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
-        InfoUtils.checkCLError(errcode);
+        CLInfo.checkCLError(errcode);
 
         clKernelLengths = clCreateKernel(clProgram, "computeLengths", errcode_ret);
         clKernelPartialSF = clCreateKernel(clProgram, "computePartialSF", errcode_ret);
@@ -235,21 +230,21 @@ public class CLDistMesh {
         else {
             clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vF, errcode_ret);
         }
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, e, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, t, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfVertices, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, mutexes, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
     }
 
     private void initialKernelArgs() {
@@ -268,7 +263,7 @@ public class CLDistMesh {
         clSetKernelArg1p(clKernelPartialSF, 1, clqLengths);
         clSetKernelArg(clKernelPartialSF, 2, factor * 2 * maxGroupSize);
         clPartialSum = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * prefdWorkGroupSizeMultiple, errcode_ret);
-        InfoUtils.checkCLError(errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clSetKernelArg1p(clKernelPartialSF, 3, clPartialSum);
 
         int sizeSFComplete = Math.min((int)prefdWorkGroupSizeMultiple, numberOfEdges); // one item per work group
@@ -446,11 +441,11 @@ public class CLDistMesh {
     }
 
     private static void printPlatformInfo(long platform, String param_name, int param) {
-        System.out.println("\t" + param_name + " = " + InfoUtils.getPlatformInfoStringUTF8(platform, param));
+        System.out.println("\t" + param_name + " = " + CLInfo.getPlatformInfoStringUTF8(platform, param));
     }
 
     private static void printDeviceInfo(long device, String param_name, int param) {
-        System.out.println("\t" + param_name + " = " + InfoUtils.getDeviceInfoStringUTF8(device, param));
+        System.out.println("\t" + param_name + " = " + CLInfo.getDeviceInfoStringUTF8(device, param));
     }
 
 
