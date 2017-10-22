@@ -43,6 +43,7 @@ public class CLGatherer {
         return vertexBuffer;
     }
 
+    // TODO: maybe remove duplicated edges
     public static <P extends IPoint> IntBuffer getEdges(@NotNull final AMesh<P> mesh) {
         Collection<AHalfEdge<P>> edges = mesh.getEdges();
         IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size()*4);
