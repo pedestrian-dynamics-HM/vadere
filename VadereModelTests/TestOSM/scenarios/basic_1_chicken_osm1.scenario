@@ -3,8 +3,25 @@
   "description" : "",
   "release" : "0.2",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "/Users/bzoennchen/Development/workspaces/hmRepo/GitLab/vadere/VadereModelTests/TestOSM/output/basic_1_chicken_osm1_2017-10-20_17-13-42.805/out.txt",
+      "processors" : [ 1, 2 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityGaussianProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 2,
+        "scale" : 10.0,
+        "standardDerivation" : 0.7,
+        "obstacleDensity" : true
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 2
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
