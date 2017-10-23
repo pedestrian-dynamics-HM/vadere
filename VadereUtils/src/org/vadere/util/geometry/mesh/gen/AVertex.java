@@ -24,6 +24,7 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 		this.point = point;
 		this.id = id;
 		this.lock = new ReentrantLock();
+		this.destroyed = false;
 	}
 
 	@Override

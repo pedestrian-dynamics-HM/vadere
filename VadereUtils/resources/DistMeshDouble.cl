@@ -7,6 +7,7 @@
 #define LOCK(a) atomic_cmpxchg(a, 0, 1)
 #define UNLOCK(a) atomic_xchg(a, 0)
 
+// helper methods!
 inline void atomicAdd_g_f(volatile __global double2 *addr, double2 val) {
     union{
         unsigned int u32;
@@ -32,126 +33,159 @@ inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     return (double2) (x, y);
 }
 
-inline lock void(int3 ta, int3 tb) {}
+inline int getDiffVertex(int v0, int v1, int3 t,  __global int4* edges) {
+    if(edges[t.s0].s0 != v0 && !edges[t.s0].s0 == v1) {
+        return edges[t.s0].s0;
+    }
 
+    if(edges[t.s0].s1 != v0 && !edges[t.s0].s1 == v1) {
+        return edges[t.s0].s1;
+    }
+
+    if(edges[t.s1].s0 != v0 && !edges[t.s1].s0 == v1) {
+        return edges[t.s1].s0;
+    }
+
+    if(edges[t.s1].s1 != v0 && !edges[t.s1].s1 == v1) {
+        return edges[t.s1].s1;
+    }
+
+    if(edges[t.s2].s0 != v0 && !edges[t.s2].s0 == v1) {
+        return edges[t.s2].s0;
+    }
+
+    if(edges[t.s2].s1 != v0 && !edges[t.s2].s1 == v1) {
+        return edges[t.s2].s1;
+    }
+
+    return -1;
+}
+
+inline boolean isSmallesFlipper(int edgeId, int3 ta, int3 tb, __global int* labeledEdges){
+    if(ta.s0 < edgeId && labelEdges[ta.s0]) {
+        return false;
+    }
+
+    if(ta.s1 < edgeId && labelEdges[ta.s1]) {
+        return false;
+    }
+
+    if(ta.s2 < edgeId && labelEdges[ta.s2]) {
+        return false;
+    }
+
+    if(tb.s0 < edgeId && labelEdges[tb.s0]) {
+        return false;
+    }
+
+    if(tb.s1 < edgeId && labelEdges[tb.s1]) {
+        return false;
+    }
+
+    if(tb.s2 < edgeId && labelEdges[tb.s2]) {
+        return false;
+    }
+
+    return true;
+}
+
+inline boolean isPartOf(int edgeId, int3 t) {
+    return edgeId == t.s0 || edgeId == t.s1 || edgeId == t.s2;
+}
+// end helper
+
+// for each edge in parallel
+kernel void label(__global double2* vertices,
+                  __global int4* edges,
+                  __global int3* triangles,
+                  __global int* labeledEdges) {
+    int edgeId = get_global_id(0);
+    // check if edge is illegal
+
+    double eps = 0.00001;
+
+    int v0 = edges[edgeId].s0;
+    int v1 = edges[edgeId].s1;
+    int ta = edges[edgeId].s2;
+    int tb = edges[edgeId].s3;
+
+    // edge is a non-boundary edge
+    if(tb != -1) {
+
+        int v2 = getDiffVertex(v0, v1, triangles[ta], edges);
+        int p = getDiffVertex(v0, v1, triangles[tb], edges);
+
+        // test the delaunay criteria
+        double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+        double rad = length(c-vertices[v0]);
+
+        // require a flip?
+        if(rad + eps < length(c-vertices[p])) {
+            labeledEdges[edgeId] = 1;
+        }
+        else {
+            labeledEdges[edgeId] = 0;
+        }
+    } else {
+        labeledEdges[edgeId] = 0;
+    }
+}
+
+
+// for each edge in parallel
 kernel void flip(__global double2* vertices,
                  __global int4* edges,
                  __global int3* triangles,
-                 __global int* mutexes,
+                 __global int* labeledEdges,
                  __global int* R)
  {
     int edgeId = get_global_id(0);
     // check if edge is illegal
 
-    eps = 0.00001;
+    double eps = 0.00001;
 
-    int v0 = edges[edgeId][0];
-    int v1 = edges[edgeId][1];
-    int ta = edges[edgeId][2];
-    int tb = edges[edgeId][3];
+    int v0 = edges[edgeId].s0;
+    int v1 = edges[edgeId].s1;
+    int ta = edges[edgeId].s2;
+    int tb = edges[edgeId].s3;
 
     // edge is a non-boundary edge
-    if(tb != -1) {
-        int u1 = -1;
-        int u2 = -1;
-        int tbV0 = -1;
-        int taU1 = -1;
-        int tbU2 = -1;
+    if(tb != -1 && isSmallesFlipper(edgeId, triangles[ta], triangles[tb], labeledEdges)) {
 
-        // search for v2 in ta
-        if(triangles[ta][0] != v0 && triangles[ta][0] != v1) {
-            u1 = triangles[ta][0];
-        } else if(triangles[ta][1] != v0 && triangles[ta][1] != v1) {
-            u1 = triangles[ta][1];
-        } else {
-            u1 = triangles[ta][2];
-        }
+       int u0 = getDiffVertex(v0, v1, ta);
+       int u1 = getDiffVertex(v0, v1, tb);
 
-        if(triangles[tb][0] != v0 && triangles[tb][0] != v1) {
-            u2 = triangles[tb][0];
-        } else if(triangles[ta][1] != v0 && triangles[ta][1] != v1) {
-            u2 = triangles[tb][1];
-        } else {
-            u2 = triangles[tb][2];
-        }
+       edges[edgeId].s0 = u0;
+       edges[edgeId].s1 = u1;
 
-        if(triangles[tb][0] == v0) {
-            tbV0 = 0;
-        } else if(triangles[tb][1] == v0) {
-           tbV0 = 1;
-        }
-        else {
-            tbV0 = 2;
-        }
-
-        if(triangles[ta][0] == v1) {
-            taV1 = 0;
-        } else if(triangles[ta][1] == v1) {
-           taV1 = 1;
-        }
-        else {
-            taV1 = 2;
-        }
-
-
-        // test the delaunay criteria
-        double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[u1]);
-        double rad = length(c-vertices[v0]);
-
-        // flip
-        if(rad + eps < length(c-vertices[u2])) {
-            // 1. lock ta and tb
-            lock(ta, tb);
-            triangles[ta][taV1] = u2;
-            triangles[tb][tbV0] = u1;
-            edges[0] = u1;
-            edges[1] = u2;
-
-            // save the relation of the changes
-            R[ta] = tb;
-            R[tb] = ta;
-        }
+       // save the relation of the changes
+       R[ta] = tb;
+       R[tb] = ta;
     }
  }
 
- kernel void repair(
-                    __global int4* edges,
+ // for each edge in parallel
+ kernel void repair(__global int4* edges,
                     __global int3* triangles,
                     __global int* R)
   {
     int edgeId = get_global_id(0);
-    int v0 = edges[edgeId][0];
-    int v1 = edges[edgeId][1];
-    int ta = edges[edgeId][2];
-    int tb = edges[edgeId][3];
-
-    int c = 0;
-    for(int i = 0; i <=3; i++) {
-        if(triangles[ta][i] == v0 || triangles[ta][i] == v1){
-            c++;
-        }
-    }
+    int v0 = edges[edgeId].s0;
+    int v1 = edges[edgeId].s1;
+    int ta = edges[edgeId].s2;
+    int tb = edges[edgeId].s3;
 
     // invalid
-    if(c != 2) {
-        edges[edgeId][2] = R[ta];
+    if(!isPartOf(edgeId, triangles[ta])) {
+        edges[edgeId].s2 = R[ta];
     }
 
-    c = 0;
-    for(int i = 0; i <=3; i++) {
-        if(triangles[tb][i] == v0 || triangles[tb][i] == v1){
-            c++;
-        }
+    if(tb != -1 && !isPartOf(edgeId, triangles[tb])) {
+        edges[edgeId].s3 = R[tb];
     }
+}
 
-    // invalid
-    if(c != 2) {
-        edges[edgeId][2] = R[tb];
-    }
-
-  }
-
-
+// for each edge in parallel
 kernel void computeForces(
     __global double2* vertices,
     __global int4* edges,
@@ -176,6 +210,7 @@ kernel void computeForces(
     volatile __global int* addr = &mutexes[p1Index];
 
     // TODO does this sync work properly? This syncs too much?
+    // for each vertex in parallel
     int waiting = 1;
     while (waiting) {
         while (LOCK(addr)) {}

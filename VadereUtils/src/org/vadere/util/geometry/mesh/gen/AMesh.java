@@ -1,5 +1,7 @@
 package org.vadere.util.geometry.mesh.gen;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -14,7 +16,7 @@ import java.util.stream.Stream;
  * Created by bzoennchen on 06.09.17.
  */
 public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
-
+	private final static Logger log = LogManager.getLogger(AMesh.class);
 	private List<AFace<P>> faces;
 	private boolean elementRemoved;
 	private int numberOfVertices;
@@ -305,6 +307,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public Stream<AHalfEdge<P>> streamEdges() {
+    	log.info(edges.stream().filter(e -> !e.isDestroyed()).count());
 		return edges.stream().filter(e -> !e.isDestroyed());
 	}
 

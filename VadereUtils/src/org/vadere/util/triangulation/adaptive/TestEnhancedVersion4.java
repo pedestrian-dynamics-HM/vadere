@@ -44,7 +44,7 @@ public class TestEnhancedVersion4 extends JFrame {
 
 
 
-		while (counter <= 1000) {
+		while (counter <= 400) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
@@ -60,11 +60,14 @@ public class TestEnhancedVersion4 extends JFrame {
 			ms = System.currentTimeMillis() - ms;
 			time += ms;
 			System.out.println("Step-Time: " + ms);
-
+			meshGenerator.refresh();
 			distmeshPanel.update();
 			distmeshPanel.repaint();
 			counter++;
 		}
+		meshGenerator.finish();
+		distmeshPanel.update();
+		distmeshPanel.repaint();
 		System.out.print("overall time: " + time);
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
 
