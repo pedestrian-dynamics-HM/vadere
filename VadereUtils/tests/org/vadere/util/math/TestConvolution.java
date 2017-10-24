@@ -48,7 +48,7 @@ public class TestConvolution {
 		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
 		float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
-		CLConvolution clConvolution = new CLConvolution(inputWidth, inputHeight, kernelWidth, kernel);
+		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.NonSeparate, inputWidth, inputHeight, kernelWidth, kernel);
 		float[] clOutput = clConvolution.convolve(input);
         clConvolution.clearCL();
 		equalsMatrixValues(javaOutput, clOutput, 0.00001f);
@@ -66,7 +66,7 @@ public class TestConvolution {
 
 		float[] output = Convolution.convolveCol(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		CLConvolution clConvolution = new CLConvolution(inputWidth, inputHeight, kernelWidth, rowVector);
+		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Col, inputWidth, inputHeight, kernelWidth, rowVector);
 		float[] clOutput = clConvolution.convolve(input);
         clConvolution.clearCL();
 

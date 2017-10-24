@@ -107,6 +107,7 @@ public class CLConvolution {
         initCL();
         buildProgram();
 
+        hostGaussKernel = CLUtils.toFloatBuffer(kernel);
         hostScenario = MemoryUtil.memAllocFloat(matrixWidth * matrixHeight);
         output = MemoryUtil.memAllocFloat(matrixWidth * matrixHeight);
 
