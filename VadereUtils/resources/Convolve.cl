@@ -1,4 +1,49 @@
 //KERNEL_SIMPLE with crop strategy
+/*__kernel void convolve(const __global  float * pInput,
+                        __constant float * pFilter,
+                        __global  float * pOutput,
+                        const int nInWidth,
+                        const int nInHeight,
+                        const int nFilterWidth)
+{
+    int nWidth = get_global_size(0);
+
+    int xOut = get_global_id(0);
+    int yOut = get_global_id(1);
+
+    if(xOut < nInWidth && yOut < nInHeight) {
+        int bottomBorder = yOut + nFilterWidth / 2;
+        bottomBorder = bottomBorder < nInHeight ? bottomBorder : nInHeight-1;
+
+        int topBorder = yOut - (nFilterWidth / 2);
+        topBorder = topBorder > 0 ? topBorder : 0;
+
+        int rightBorder = xOut + nFilterWidth / 2;
+        rightBorder = rightBorder < nInWidth ? rightBorder : nInWidth - 1;
+
+        int leftBorder = xOut - (nFilterWidth / 2) > 0;
+        leftBorder = leftBorder > 0 ? leftBorder : 0;
+
+        float sum = 0;
+        int kernelX = 0;
+        int kernelY = 0;
+        for(int y = topBorder; y <= bottomBorder; y++) {
+            for(int x = leftBorder; x <= rightBorder; x++) {
+                int inputIndex  = y * nInWidth + x;
+                int kernelIndex = kernelY * nFilterWidth + kernelX;
+
+                sum += pFilter[kernelIndex] * pInput[inputIndex];
+
+                kernelX++;
+            }
+            kernelX = 0;
+            kernelY++;
+        }
+        int idxOut = yOut * nInWidth + xOut;
+        pOutput[idxOut] = sum;
+    }
+}*/
+
 __kernel void convolve(const __global  float * pInput,
                         __constant float * pFilter,
                         __global  float * pOutput,
@@ -68,10 +113,14 @@ __kernel void convolveRow(const __global  float * pInput,
         int idxF = (r + nFilterWidth / 2);
         int yIn = yInTopLeft * nInWidth;
         int idxIn = yIn + xInTopLeft + r * nInWidth;
-        sum += pFilter[idxF] * pInput[idxIn];
+        if(idxF >= 0 && idxF < nFilterWidth && idxIn >= 0 && idxIn < nInWidth * nInHeight) {
+            sum += pFilter[idxF] * pInput[idxIn];
+        }
     }
     int idxOut = yOut * nWidth + xOut;
-    pOutput[idxOut] = sum;
+    if(idxOut >= 0 && idxOut < nInWidth * nInHeight) {
+        pOutput[idxOut] = sum;
+    }
 }
 
 __kernel void convolveCol(const __global  float * pInput,
@@ -97,11 +146,17 @@ __kernel void convolveCol(const __global  float * pInput,
     float sum = 0;
     for (int r = -nFilterWidth / 2 - leftBorder; r <= nFilterWidth / 2 - rightBorder; r++)
     {
-        int idxF = (r + nFilterWidth / 2);
-        int yIn = yInTopLeft * nInWidth;
-        int idxIn = yIn + xInTopLeft + r;
-        sum += pFilter[idxF] * pInput[idxIn];
+         int idxF = (r + nFilterWidth / 2);
+         int yIn = yInTopLeft * nInWidth;
+         int idxIn = yIn + xInTopLeft + r;
+         if(idxF >= 0 && idxF < nFilterWidth && idxIn >= 0 && idxIn < nInWidth * nInHeight) {
+            sum += pFilter[idxF] * pInput[idxIn];
+         }
+
     }
+
     int idxOut = yOut * nWidth + xOut;
-    pOutput[idxOut] = sum;
+    if(idxOut >= 0 && idxOut < nInWidth * nInHeight) {
+        pOutput[idxOut] = sum;
+    }
 }
