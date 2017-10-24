@@ -14,10 +14,16 @@ class CLGaussianFilter extends GaussianFilter {
 			final boolean normalize) throws IOException {
 		super(scenarioBounds, scale, f, normalize);
 		this.convolution = new CLConvolution();
+		this.convolution.init();
 	}
 
 	@Override
 	public void filterImage() {
 		outputMatrix = this.convolution.convolveSeparate(inputMatrix, matrixWidth, matrixHeight, kernel, kernelWidth);
 	}
+
+    @Override
+    public void destroy() {
+        this.convolution.clearCL();
+    }
 }

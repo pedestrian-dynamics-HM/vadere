@@ -50,6 +50,7 @@ abstract class GaussianFilter implements IGaussianFilter {
 		kernelWidth = kernelWidth % 2 == 0 ? kernelWidth + 1 : kernelWidth;
 		kernelHeight = kernelWidth;
 		this.kernel = Convolution.floatGaussian1DKernel(kernelWidth, f, noramized);
+        //this.kernel = Convolution.generateFloatGaussianKernel(kernelWidth, 0.1f);
 	}
 
 	@Override

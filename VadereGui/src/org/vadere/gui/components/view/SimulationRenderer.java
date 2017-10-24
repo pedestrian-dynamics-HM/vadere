@@ -171,6 +171,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		g.drawImage(densityImage, 0, 0, null);
 		// g.drawImage(pedestrianDensity, 0, 0, null);
 		g.scale(model.config.getDensityScale(), model.config.getDensityScale());
+		densityCalculator.destroy();
 	}
 
 	private void renderPotentialField(final Graphics2D g, final int width, final int height) {

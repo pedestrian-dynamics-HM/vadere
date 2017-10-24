@@ -41,7 +41,7 @@ public class TimeCostPedestrianDensity implements ITimeCostFunction {
 		logger.info("timeCostFunction:  " + timeCostFunction);
 		logger.info("gaussianCalculator:  " + filter);
 
-		// the initial filtering (convolution)
+		// the initial filtering (convolution), TODO: we have to destroy the filter if it is no longer needed!
 		this.gaussianCalculator.filterImage();
 	}
 

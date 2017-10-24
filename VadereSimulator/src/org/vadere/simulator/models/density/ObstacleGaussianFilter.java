@@ -68,7 +68,12 @@ public class ObstacleGaussianFilter implements IGaussianFilter {
 		return filter.getMinFilteredValue();
 	}
 
-	private void setValues() {
+    @Override
+    public void destroy() {
+        this.filter.destroy();
+    }
+
+    private void setValues() {
 		for (int x = 0; x < getMatrixWidth(); x++) {
 			for (int y = 0; y < getMatrixHeight(); y++) {
 				double dx = x / getScale();

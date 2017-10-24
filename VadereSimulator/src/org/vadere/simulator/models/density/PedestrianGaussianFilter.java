@@ -68,7 +68,6 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
 
 	@Override
 	public void filterImage() {
-
 		setValues();
 		filter.filterImage();
 	}
@@ -98,7 +97,12 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
 		return filter.getMinFilteredValue();
 	}
 
-	private void setValue(E pedestrian) {
+    @Override
+    public void destroy() {
+        this.filter.destroy();
+    }
+
+    private void setValue(E pedestrian) {
 		VPoint position = pedestrian.getPosition();
 		VPoint filteredPosition = new VPoint(Math.max(0, position.x), Math.max(0, position.y));
 

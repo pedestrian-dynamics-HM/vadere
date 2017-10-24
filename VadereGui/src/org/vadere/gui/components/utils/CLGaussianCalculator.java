@@ -17,6 +17,7 @@ public class CLGaussianCalculator {
 	private SimulationModel<DefaultSimulationConfig> model;
 
 	private IGaussianFilter filterObstacles;
+	private IGaussianFilter filterPedestrians;
 
 	public CLGaussianCalculator(final SimulationModel model,
 			final double scale,
@@ -44,7 +45,7 @@ public class CLGaussianCalculator {
 				IGaussianFilter.Type.OpenCL);
 		filterPedestrians.filterImage();
 		filterObstacles.filterImage();
-
+        filterPedestrians.destroy();
 		return convertFilterToImage(filterPedestrians, filterObstacles);
 	}
 
@@ -79,6 +80,10 @@ public class CLGaussianCalculator {
 		}
 		return image;
 	}
+
+	public void destroy() {
+	    this.filterObstacles.destroy();
+    }
 
 	/**
 	 * Helper method which create a new standard BufferedImage with the needed

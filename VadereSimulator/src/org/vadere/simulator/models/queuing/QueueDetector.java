@@ -99,6 +99,7 @@ public class QueueDetector extends EikonalSolverFMM {
 			}
 		});
 		orderedPoints.clear();
+		filter.destroy();
 		super.initialize();
 	}
 

@@ -61,6 +61,11 @@ public interface IGaussianFilter {
 
 	double getMinFilteredValue();
 
+    /**
+     * This method has to be called if the Filter will no longer called!
+     */
+	void destroy();
+
 	static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
 			Collection<E> pedestrians, final double scale,
 			final double standardDerivation,
