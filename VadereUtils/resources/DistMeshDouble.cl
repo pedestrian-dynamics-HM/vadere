@@ -8,19 +8,6 @@
 #define UNLOCK(a) atomic_xchg(a, 0)
 
 // helper methods!
-inline void atomicAdd_g_f(volatile __global double2 *addr, double2 val) {
-    union{
-        unsigned int u32;
-        double2 f32;
-    } next, expected, current;
-   	current.f32 = *addr;
-    do{
-   	    expected.f32 = current.f32;
-        next.f32 = expected.f32 + val;
-   		current.u32 = atomic_cmpxchg( (volatile __global unsigned int *) addr, expected.u32, next.u32);
-    } while(current.u32 != expected.u32);
-}
-
 inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     double d = 2 * (p1.s0 * (p2.s1 - p3.s1) + p2.s0 * (p3.s1 - p1.s1) + p3.s0 * (p1.s1 - p2.s1));
 
@@ -33,7 +20,7 @@ inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     return (double2) (x, y);
 }
 
-inline int getDiffVertex(int v0, int v1, int3 t,  __global int4* edges) {
+inline int getDiffVertex(int v0, int v1, int3 t, __global int4* edges) {
     if(edges[t.s0].s0 != v0 && !edges[t.s0].s0 == v1) {
         return edges[t.s0].s0;
     }
@@ -59,34 +46,6 @@ inline int getDiffVertex(int v0, int v1, int3 t,  __global int4* edges) {
     }
 
     return -1;
-}
-
-inline boolean isSmallesFlipper(int edgeId, int3 ta, int3 tb, __global int* labeledEdges){
-    if(ta.s0 < edgeId && labelEdges[ta.s0]) {
-        return false;
-    }
-
-    if(ta.s1 < edgeId && labelEdges[ta.s1]) {
-        return false;
-    }
-
-    if(ta.s2 < edgeId && labelEdges[ta.s2]) {
-        return false;
-    }
-
-    if(tb.s0 < edgeId && labelEdges[tb.s0]) {
-        return false;
-    }
-
-    if(tb.s1 < edgeId && labelEdges[tb.s1]) {
-        return false;
-    }
-
-    if(tb.s2 < edgeId && labelEdges[tb.s2]) {
-        return false;
-    }
-
-    return true;
 }
 
 inline boolean isPartOf(int edgeId, int3 t) {
@@ -131,36 +90,82 @@ kernel void label(__global double2* vertices,
     }
 }
 
+inline waitGlobally(volatile __global int *g_mutex) {
+    int num_groups = get_num_groups(0);
+    int lid = get_local_id(0);
+
+    if(lid == 0) {
+        atomic_add(g_mutex, 1);
+
+        // spin-lock
+        while(g_mutex != num_groups) {}
+    }
+}
+
+inline waitLocally() {
+    barrier(CLK_GLOBAL_MEM_FENCE);
+}
 
 // for each edge in parallel
-kernel void flip(__global double2* vertices,
-                 __global int4* edges,
+kernel void flip(__global int4* edges,
                  __global int3* triangles,
                  __global int* labeledEdges,
+                 __global int* lockedTriangles,
                  __global int* R)
  {
-    int edgeId = get_global_id(0);
-    // check if edge is illegal
+    volatile __global int *g_mutex = 0;
+    __constant double eps = 0.00001;
 
-    double eps = 0.00001;
+    int ta = get_global_id(0);
+    int nTriangels = get_global_size(0);
+    int localSize = get_local_size(0);
 
-    int v0 = edges[edgeId].s0;
-    int v1 = edges[edgeId].s1;
-    int ta = edges[edgeId].s2;
-    int tb = edges[edgeId].s3;
+    int e1 = ta.s0;
+    int e2 = ta.s1;
+    int e3 = ta.s2;
 
-    // edge is a non-boundary edge
-    if(tb != -1 && isSmallesFlipper(edgeId, triangles[ta], triangles[tb], labeledEdges)) {
+    // get the first edges that is illegal
+    int e = labeledEdges[e1] ? e1 : (labelEdges[e2] ? e2 : (labeledEdges[e3] ? e3 : -1));
 
-       int u0 = getDiffVertex(v0, v1, ta);
-       int u1 = getDiffVertex(v0, v1, tb);
+    if(e != -1) {
 
-       edges[edgeId].s0 = u0;
-       edges[edgeId].s1 = u1;
+        // atomic lock
+        lockedTriangles[ta] = ta;
 
-       // save the relation of the changes
-       R[ta] = tb;
-       R[tb] = ta;
+        // barrier: wait for all work items globally
+        waitLocally();
+        waitGlobally(g_mutex);
+
+        int tb = edges[e].s2 != ta ? edges[e].s2 : edges[e].s3;
+
+        // atomic lock
+        lockedTriangles[tb] = ta;
+
+        // barrier: wait for all work items globally
+        waitLocally();
+        waitGlobally(g_mutex);
+
+        // swap if both triangles are locked by ta, i.e. by this thread
+        if(lockedTriangles[ta] == ta && lockedTriangles[tb] == ta) {
+            int v0 = edges[e].s0;
+            int v1 = edges[e].s1;
+
+            int u0 = getDiffVertex(v0, v1, ta);
+            int u1 = getDiffVertex(v0, v1, tb);
+
+            edges[edgeId].s0 = u0;
+            edges[edgeId].s1 = u1;
+
+            // save the relation of the changes
+            R[ta] = tb;
+            R[tb] = ta;
+        }
+    }
+    else {
+        waitLocally();
+        waitGlobally(g_mutex);
+        waitLocally();
+        waitGlobally(g_mutex);
     }
  }
 
@@ -184,6 +189,9 @@ kernel void flip(__global double2* vertices,
         edges[edgeId].s3 = R[tb];
     }
 }
+
+
+
 
 // for each edge in parallel
 kernel void computeForces(

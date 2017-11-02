@@ -5,22 +5,12 @@
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "/Users/bzoennchen/Development/workspaces/hmRepo/GitLab/vadere/VadereModelTests/TestOSM/output/basic_1_chicken_osm1_2017-10-20_17-13-42.805/out.txt",
-      "processors" : [ 1, 2 ]
+      "filename" : "/Users/bzoennchen/Development/workspaces/hmRepo/GitLab/vadere/VadereModelTests/TestOSM/output/basic_1_chicken_osm1_2017-10-26_09-12-02.222/out.txt",
+      "processors" : [ 1 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityGaussianProcessor",
-      "id" : 1,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 2,
-        "scale" : 10.0,
-        "standardDerivation" : 0.7,
-        "obstacleDensity" : true
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 2
+      "id" : 1
     } ],
     "isTimestamped" : true
   },
@@ -121,6 +111,78 @@
           "width" : 1.0,
           "height" : 20.0,
           "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 35.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 35.0001,
+            "y" : 0.5001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 0.5001
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 35.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 35.0001,
+            "y" : 60.0001
+          }, {
+            "x" : 34.4999,
+            "y" : 60.0001
+          }, {
+            "x" : 34.4999,
+            "y" : -1.0E-4
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 35.0001,
+            "y" : 60.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 60.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 59.4999
+          }, {
+            "x" : 35.0001,
+            "y" : 59.4999
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : 60.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : 60.0001
+          } ]
         },
         "id" : -1
       } ],
