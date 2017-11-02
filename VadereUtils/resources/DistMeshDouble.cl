@@ -51,13 +51,30 @@ inline int getDiffVertex(int v0, int v1, int3 t, __global int4* edges) {
 inline boolean isPartOf(int edgeId, int3 t) {
     return edgeId == t.s0 || edgeId == t.s1 || edgeId == t.s2;
 }
+
+inline waitGlobally(volatile __global int *g_mutex) {
+    int num_groups = get_num_groups(0);
+    int lid = get_local_id(0);
+
+    if(lid == 0) {
+        atomic_add(g_mutex, 1);
+
+        // spin-lock
+        while(g_mutex != num_groups) {}
+    }
+}
+
+inline waitLocally() {
+    barrier(CLK_GLOBAL_MEM_FENCE);
+}
 // end helper
 
 // for each edge in parallel
 kernel void label(__global double2* vertices,
                   __global int4* edges,
                   __global int3* triangles,
-                  __global int* labeledEdges) {
+                  __global int* labeledEdges,
+                  __global int* isLegal) {
     int edgeId = get_global_id(0);
     // check if edge is illegal
 
@@ -81,6 +98,7 @@ kernel void label(__global double2* vertices,
         // require a flip?
         if(rad + eps < length(c-vertices[p])) {
             labeledEdges[edgeId] = 1;
+            *isLegal = 0;
         }
         else {
             labeledEdges[edgeId] = 0;
@@ -90,20 +108,42 @@ kernel void label(__global double2* vertices,
     }
 }
 
-inline waitGlobally(volatile __global int *g_mutex) {
-    int num_groups = get_num_groups(0);
-    int lid = get_local_id(0);
+kernel void updateLabel(__global double2* vertices,
+                  __global int4* edges,
+                  __global int3* triangles,
+                  __global int* labeledEdges,
+                  __global int* isLegal) {
+    int edgeId = get_global_id(0);
+    // check if edge is illegal
 
-    if(lid == 0) {
-        atomic_add(g_mutex, 1);
+    double eps = 0.00001;
 
-        // spin-lock
-        while(g_mutex != num_groups) {}
+    int v0 = edges[edgeId].s0;
+    int v1 = edges[edgeId].s1;
+    int ta = edges[edgeId].s2;
+    int tb = edges[edgeId].s3;
+
+    // edge is a non-boundary edge
+    if(tb != -1 && labeledEdges[edgeId] == 1) {
+
+        int v2 = getDiffVertex(v0, v1, triangles[ta], edges);
+        int p = getDiffVertex(v0, v1, triangles[tb], edges);
+
+        // test the delaunay criteria
+        double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+        double rad = length(c-vertices[v0]);
+
+        // require a flip?
+        if(rad + eps < length(c-vertices[p])) {
+            labeledEdges[edgeId] = 1;
+            *isLegal = 0;
+        }
+        else {
+            labeledEdges[edgeId] = 0;
+        }
+    } else {
+        labeledEdges[edgeId] = 0;
     }
-}
-
-inline waitLocally() {
-    barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
 // for each edge in parallel
@@ -114,8 +154,6 @@ kernel void flip(__global int4* edges,
                  __global int* R)
  {
     volatile __global int *g_mutex = 0;
-    __constant double eps = 0.00001;
-
     int ta = get_global_id(0);
     int nTriangels = get_global_size(0);
     int localSize = get_local_size(0);
@@ -159,6 +197,7 @@ kernel void flip(__global int4* edges,
             // save the relation of the changes
             R[ta] = tb;
             R[tb] = ta;
+
         }
     }
     else {
@@ -167,6 +206,9 @@ kernel void flip(__global int4* edges,
         waitLocally();
         waitGlobally(g_mutex);
     }
+
+    // edge might be no longer illegal!
+    labeledEdges[e] = -1;
  }
 
  // for each edge in parallel
@@ -189,8 +231,6 @@ kernel void flip(__global int4* edges,
         edges[edgeId].s3 = R[tb];
     }
 }
-
-
 
 
 // for each edge in parallel

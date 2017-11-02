@@ -53,6 +53,7 @@ public class CLDistMesh<P extends IPoint> {
     private long clKernelCompleteSF;
     private long clKernelFlip;
     private long clKernelRepair;
+    private long clKernelLabelEdges;
 
     // error code buffer
     private IntBuffer errcode_ret;
@@ -70,7 +71,9 @@ public class CLDistMesh<P extends IPoint> {
     private IntBuffer e;
     private IntBuffer t;
     private IntBuffer mutexes;
-    private IntBuffer triMutexes;
+    private IntBuffer triLocks;
+    private IntBuffer edgeLabels;
+    private IntBuffer isLegal;
     private double delta = 0.02;
 
     // addresses to memory on the GPU
@@ -84,7 +87,9 @@ public class CLDistMesh<P extends IPoint> {
     private long clScalingFactor;
     private long clMutexes;
     private long clRelation;
-    private long clTriMutexes;
+    private long clEdgeLabels;
+    private long clTriLocks;
+    private long clIsLegal;
     private ArrayList<Long> clSizes = new ArrayList<>();
 
     // size
@@ -99,14 +104,13 @@ public class CLDistMesh<P extends IPoint> {
 
     private PointerBuffer clGlobalWorkSizeEdges;
     private PointerBuffer clGlobalWorkSizeVertices;
+    private PointerBuffer clGlobalWorkSizeTriangles;
 
     private PointerBuffer clGloblWorkSizeSFPartial;
     private PointerBuffer clLocalWorkSizeSFPartial;
 
     private PointerBuffer clGloblWorkSizeSFComplete;
     private PointerBuffer clLocalWorkSizeSFComplete;
-
-    private PointerBuffer clGlobalWorkSizeForces;
     private PointerBuffer clLocalWorkSizeForces;
 
     private AMesh<P> mesh;
@@ -131,10 +135,16 @@ public class CLDistMesh<P extends IPoint> {
         this.numberOfEdges = mesh.getNumberOfEdges();
         this.numberOfFaces = mesh.getNumberOfFaces();
         this.mutexes =  MemoryUtil.memAllocInt(numberOfVertices);
-        this.triMutexes = MemoryUtil.memAllocInt(numberOfFaces);
+        this.triLocks = MemoryUtil.memAllocInt(numberOfFaces);
         for(int i = 0; i < numberOfVertices; i++) {
             this.mutexes.put(i, 0);
         }
+        this.edgeLabels = MemoryUtil.memAllocInt(numberOfEdges);
+        for(int i = 0; i < numberOfEdges; i++) {
+            this.edgeLabels.put(i, 0);
+        }
+        this.isLegal = MemoryUtil.memAllocInt(1);
+        this.isLegal.put(0, 1);
         this.result = null;
     }
 
@@ -232,6 +242,8 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clKernelFlip = clCreateKernel(clProgram, "flip", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+        clKernelLabelEdges = clCreateKernel(clProgram, "label", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
         clKernelRepair = clCreateKernel(clProgram, "repair", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
     }
@@ -259,9 +271,13 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, mutexes, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
-        clTriMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, triMutexes, errcode_ret);
+        clTriLocks = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, triLocks, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
         clRelation = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 8 * numberOfFaces, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clEdgeLabels = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, edgeLabels, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clIsLegal = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, isLegal, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
     }
 
@@ -306,10 +322,16 @@ public class CLDistMesh<P extends IPoint> {
         clSetKernelArg1p(clKernelMove, 1, clForces);
         clSetKernelArg1d(clKernelMove, 2, delta);
 
-        clSetKernelArg1p(clKernelFlip, 0, clVertices);
-        clSetKernelArg1p(clKernelFlip, 1, clEdges);
-        clSetKernelArg1p(clKernelFlip, 2, clTriangles);
-        clSetKernelArg1p(clKernelFlip, 3, clTriMutexes);
+        clSetKernelArg1p(clKernelLabelEdges, 0, clVertices);
+        clSetKernelArg1p(clKernelLabelEdges, 1, clEdges);
+        clSetKernelArg1p(clKernelLabelEdges, 2, clTriangles);
+        clSetKernelArg1p(clKernelLabelEdges, 3, clEdgeLabels);
+        clSetKernelArg1p(clKernelLabelEdges, 4, clIsLegal);
+
+        clSetKernelArg1p(clKernelFlip, 0, clEdges);
+        clSetKernelArg1p(clKernelFlip, 1, clTriangles);
+        clSetKernelArg1p(clKernelFlip, 2, clEdgeLabels);
+        clSetKernelArg1p(clKernelFlip, 3, clTriLocks);
         clSetKernelArg1p(clKernelFlip, 4, clRelation);
 
         clSetKernelArg1p(clKernelRepair, 0, clEdges);
@@ -324,18 +346,19 @@ public class CLDistMesh<P extends IPoint> {
         clGloblWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeForces = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSizeForces = BufferUtils.createPointerBuffer(1);
 
         clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
         clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
         clLocalWorkSizeForces.put(0, 1);
-        clGlobalWorkSizeForces.put(0, numberOfEdges);
         clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeVertices = BufferUtils.createPointerBuffer(1);
+        clGlobalWorkSizeTriangles = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeEdges.put(0, numberOfEdges);
         clGlobalWorkSizeVertices.put(0, numberOfVertices);
+        clGlobalWorkSizeTriangles.put(0, numberOfFaces);
     }
 
+    // TODO: think about the use of only 1 work-group!!! It might be bad! solution: use global barrier?
     public void step() {
         /*
          * DistMesh-Loop
@@ -350,17 +373,28 @@ public class CLDistMesh<P extends IPoint> {
         }
 
         clEnqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, clLocalWorkSizeForces, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
 
-       /* clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeForces, null, null, null);
+        IntBuffer isLegal = stack.mallocInt(1);
+        // while there is any illegal edge, do: // TODO: this is not the same as in the java distmesh!
+        do  {
+            isLegal.put(0, 1);
+            clEnqueueWriteBuffer(clQueue, clIsLegal, true, 0, isLegal, null, null);
+            clEnqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            clEnqueueReadBuffer(clQueue, clIsLegal, true, 0, isLegal, null, null);
+        } while(isLegal.get(0) == 0);
 
-        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeForces, null, null, null);
+       /* clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
 
-        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeForces, clLocalWorkSizeForces, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeForces, null, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
+
+        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
 */
         clFinish(clQueue);
 
@@ -452,8 +486,10 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseMemObject(clPartialSum);
         clReleaseMemObject(clScalingFactor);
         clReleaseMemObject(clMutexes);
-        clReleaseMemObject(clTriMutexes);
+        clReleaseMemObject(clTriLocks);
         clReleaseMemObject(clRelation);
+        clReleaseMemObject(clEdgeLabels);
+        clReleaseMemObject(clIsLegal);
 
         clReleaseKernel(clKernelForces);
         clReleaseKernel(clKernelMove);
@@ -462,6 +498,7 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseKernel(clKernelCompleteSF);
         clReleaseKernel(clKernelFlip);
         clReleaseKernel(clKernelRepair);
+        clReleaseKernel(clKernelLabelEdges);
 
         clReleaseCommandQueue(clQueue);
         clReleaseProgram(clProgram);
@@ -481,7 +518,9 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(e);
         MemoryUtil.memFree(t);
         MemoryUtil.memFree(mutexes);
-        MemoryUtil.memFree(triMutexes);
+        MemoryUtil.memFree(triLocks);
+        MemoryUtil.memFree(edgeLabels);
+        MemoryUtil.memFree(isLegal);
 
         /*MemoryUtil.memFree(clGlobalWorkSizeEdges);
         MemoryUtil.memFree(clGlobalWorkSizeVertices);
@@ -492,7 +531,7 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(clGloblWorkSizeSFComplete);
         MemoryUtil.memFree(clLocalWorkSizeSFComplete);
 
-        MemoryUtil.memFree(clGlobalWorkSizeForces);
+        MemoryUtil.memFree(clGlobalWorkSizeEdes);
         MemoryUtil.memFree(clLocalWorkSizeForces);*/
     }
 
