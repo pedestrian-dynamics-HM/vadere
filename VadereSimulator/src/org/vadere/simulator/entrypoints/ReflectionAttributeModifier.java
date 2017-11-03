@@ -1,13 +1,11 @@
-package org.vadere.gui.components.control;
+package org.vadere.simulator.entrypoints;
 
 
 import java.lang.reflect.Field;
 
-import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.state.scenario.Topography;
 
 /**
  * Setter and getter implementation to modify Attributes. This class uses use of reflection.
@@ -16,6 +14,23 @@ import org.vadere.util.geometry.shapes.VShape;
  * 
  */
 public class ReflectionAttributeModifier {
+
+    /**
+     * Sets the attribute to the topography element. Use this method only in the control!
+     *
+     * @param element the topography element
+     * @param attributes the attributes
+     */
+    public static void setAttributes(final Topography element, final Attributes attributes) {
+        try {
+            Field field = element.getClass().getDeclaredField("attributes");
+            field.setAccessible(true);
+            field.set(element, attributes);
+
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 
 	/**
 	 * Sets the attribute to the topography element. Use this method only in the control!

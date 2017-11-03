@@ -31,7 +31,7 @@ public class ReflectionAttributeModifier {
 				((AgentWrapper) element).getAgentInitialStore().setPosition(new VPoint(x, y));
 			} else {
 				Attributes attributes =
-						org.vadere.gui.components.control.ReflectionAttributeModifier.getAttributes(element);
+						org.vadere.simulator.entrypoints.ReflectionAttributeModifier.getAttributes(element);
 				field = attributes.getClass().getDeclaredField("shape");
 				field.setAccessible(true);
 				field.set(attributes, shape);

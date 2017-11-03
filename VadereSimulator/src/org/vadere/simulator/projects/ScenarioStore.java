@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.data.FindByClass;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,4 +70,7 @@ public class ScenarioStore {
 		topography.sealAllAttributes();
 	}
 
+	public <T extends Attributes> T getAttributes(@NotNull final Class<T> clazz) {
+        return FindByClass.findSingleObjectOfClass(attributesList, clazz);
+    }
 }
