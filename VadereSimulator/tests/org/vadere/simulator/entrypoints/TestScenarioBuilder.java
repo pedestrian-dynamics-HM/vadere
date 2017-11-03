@@ -19,10 +19,6 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class TestScenarioBuilder {
 
-    private AttributesBuilder<AttributesAgent> attributesAgentAttributesBuilder;
-    private double radius = 0.195;
-
-
     @Test
     public void testChangeAttributes() throws IOException {
         // 1. read the scenario from a string
