@@ -2,6 +2,7 @@ package org.vadere.simulator.entrypoints;
 
 import org.junit.Test;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioRun;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesBuilder;
@@ -9,6 +10,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 
