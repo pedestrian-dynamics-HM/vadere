@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.mesh.inter;
 
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
@@ -31,9 +32,9 @@ public interface IFace<P extends IPoint> {
 
         // first triangle xyz
         face1 = mesh.createFace();
-        x = mesh.insertVertex(-30, 0);
-        y = mesh.insertVertex(30, 0);
-        z = mesh.insertVertex(1.5,3.0);
+        x = mesh.insertVertex(-100, 0);
+        y = mesh.insertVertex(100, 0);
+        z = mesh.insertVertex(0, 1);
 
         zx = mesh.createEdge(x, face1);
         mesh.setEdge(x, zx);
@@ -51,7 +52,7 @@ public interface IFace<P extends IPoint> {
 
         // second triangle yxw
         face2 = mesh.createFace();
-        w = mesh.insertVertex(1.5,-1.5);
+        w = mesh.insertVertex(0, -1);
 
         AHalfEdge<MPoint> yx = mesh.createEdge(x, face2);
         AHalfEdge<MPoint> xw = mesh.createEdge(w, face2);
@@ -86,6 +87,13 @@ public interface IFace<P extends IPoint> {
         mesh.setNext(wx, xz);
         mesh.setNext(xz, zy);
 
+        /*System.out.println(GeometryUtils.isInCircumscribedCycle(x, y, z, w));
+
+        System.out.println(GeometryUtils.isInCircumscribedCycle(x, w, y, z));
+        System.out.println(GeometryUtils.isInCircumscribedCycle(y, w, x, z));
+
+        System.out.println(GeometryUtils.isInCircumscribedCycle(x, w, z, y));
+        System.out.println(GeometryUtils.isInCircumscribedCycle(z, w, x, y));*/
         return mesh;
     }
 }

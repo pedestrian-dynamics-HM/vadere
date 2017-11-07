@@ -27,7 +27,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>());
+		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
@@ -56,14 +56,30 @@ public class TestEnhancedVersion4 extends JFrame {
 
 
 			long ms = System.currentTimeMillis();
-			meshGenerator.step();
+			if(counter < 100) {
+				meshGenerator.step(false);
+			}
+			else {
+				meshGenerator.step(true);
+			}
 			ms = System.currentTimeMillis() - ms;
 			time += ms;
 			System.out.println("Step-Time: " + ms);
+
 			meshGenerator.refresh();
 			distmeshPanel.update();
 			distmeshPanel.repaint();
+
+
+			if(counter < 100) {
+				meshGenerator.retriangulate();
+			}
 			counter++;
+			/*try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}*/
 		}
 		meshGenerator.finish();
 		distmeshPanel.update();

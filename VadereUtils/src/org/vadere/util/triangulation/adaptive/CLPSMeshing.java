@@ -98,11 +98,15 @@ public class CLPSMeshing implements IPSMeshing {
 	}
 
 	public void step() {
+		step(true);
+	}
+
+	public void step(boolean flipAll) {
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 		//log.info(scalingFactor);
 
-		clDistMesh.step();
+		clDistMesh.step(flipAll);
 		//flipEdges();
 		//retriangulate();
 
@@ -176,7 +180,7 @@ public class CLPSMeshing implements IPSMeshing {
         //Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
         //removeLowQualityTriangles();
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
-        removeTrianglesInsideObstacles();
+      //  removeTrianglesInsideObstacles();
         triangulation.finalize();
 
         if(clDistMesh != null) {
