@@ -103,7 +103,7 @@ public class CLPSMeshing implements IPSMeshing {
 		//log.info(scalingFactor);
 
 		clDistMesh.step();
-		flipEdges();
+		//flipEdges();
 		//retriangulate();
 
 		// get new cooridnates

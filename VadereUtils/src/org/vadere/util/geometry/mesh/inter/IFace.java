@@ -31,8 +31,8 @@ public interface IFace<P extends IPoint> {
 
         // first triangle xyz
         face1 = mesh.createFace();
-        x = mesh.insertVertex(0, 0);
-        y = mesh.insertVertex(3, 0);
+        x = mesh.insertVertex(-30, 0);
+        y = mesh.insertVertex(30, 0);
         z = mesh.insertVertex(1.5,3.0);
 
         zx = mesh.createEdge(x, face1);

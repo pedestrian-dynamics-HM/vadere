@@ -92,6 +92,6 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 
 	@Override
 	public String toString() {
-		return point.toString();
+		return id + ":" + point.toString();
 	}
 }
