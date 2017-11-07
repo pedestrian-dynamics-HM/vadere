@@ -64,11 +64,6 @@ public class CLConvolution {
 
     private boolean initialized;
 
-    private Enum Tyoe {
-        Seperate,
-
-    }
-
     public CLConvolution() {
         Configuration.DEBUG.set(true);
         Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);

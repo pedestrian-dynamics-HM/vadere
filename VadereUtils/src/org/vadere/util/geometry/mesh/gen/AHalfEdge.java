@@ -124,7 +124,7 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 
     @Override
     public String toString() {
-        return ""+id;
+        return "" + id + ":"+ previous+"(e)->" + end+"(v)";
     }
 
 	/*

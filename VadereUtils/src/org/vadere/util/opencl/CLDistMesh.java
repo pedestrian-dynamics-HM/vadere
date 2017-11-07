@@ -86,6 +86,7 @@ public class CLDistMesh<P extends IPoint> {
     private long clPartialSum;
     private long clScalingFactor;
     private long clMutexes;
+    private long clMutex;
     private long clRelation;
     private long clEdgeLabels;
     private long clTriLocks;
@@ -111,7 +112,7 @@ public class CLDistMesh<P extends IPoint> {
 
     private PointerBuffer clGloblWorkSizeSFComplete;
     private PointerBuffer clLocalWorkSizeSFComplete;
-    private PointerBuffer clLocalWorkSizeForces;
+    private PointerBuffer clLocalWorkSizeOne;
 
     private AMesh<P> mesh;
 
@@ -279,6 +280,8 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clIsLegal = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, isLegal, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+        clMutex = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
     }
 
     private void initialKernelArgs() {
@@ -333,6 +336,7 @@ public class CLDistMesh<P extends IPoint> {
         clSetKernelArg1p(clKernelFlip, 2, clEdgeLabels);
         clSetKernelArg1p(clKernelFlip, 3, clTriLocks);
         clSetKernelArg1p(clKernelFlip, 4, clRelation);
+        clSetKernelArg1p(clKernelFlip, 5, clMutex);
 
         clSetKernelArg1p(clKernelRepair, 0, clEdges);
         clSetKernelArg1p(clKernelRepair, 1, clTriangles);
@@ -345,11 +349,11 @@ public class CLDistMesh<P extends IPoint> {
 
         clGloblWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
-        clLocalWorkSizeForces = BufferUtils.createPointerBuffer(1);
+        clLocalWorkSizeOne = BufferUtils.createPointerBuffer(1);
 
         clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
         clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
-        clLocalWorkSizeForces.put(0, 1);
+        clLocalWorkSizeOne.put(0, 1);
         clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeVertices = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeTriangles = BufferUtils.createPointerBuffer(1);
@@ -373,7 +377,7 @@ public class CLDistMesh<P extends IPoint> {
         }
 
         clEnqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, clLocalWorkSizeOne, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
 
         IntBuffer isLegal = stack.mallocInt(1);
@@ -382,26 +386,22 @@ public class CLDistMesh<P extends IPoint> {
             isLegal.put(0, 1);
             clEnqueueWriteBuffer(clQueue, clIsLegal, true, 0, isLegal, null, null);
             clEnqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
-            clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdges, clLocalWorkSizeOne, null, null);
             clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
             clEnqueueReadBuffer(clQueue, clIsLegal, true, 0, isLegal, null, null);
+            log.info("isLegal = " + isLegal.get(0));
         } while(isLegal.get(0) == 0);
 
-       /* clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeForces, null, null);
+       /* clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeOne, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
 
-        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeOne, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
 
-        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeForces, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeOne, null, null);
         clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
 */
         clFinish(clQueue);
-
-        // TODO: remove, its only for testing!
-        //readResult();
-        //printResult();
-        //updateMesh();
     }
 
     private void readResultFromGPU() {
@@ -415,6 +415,8 @@ public class CLDistMesh<P extends IPoint> {
             clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorF, null, null);
             clEnqueueReadBuffer(clQueue, clVertices, true, 0, vF, null, null);
         }
+
+        clEnqueueReadBuffer(clQueue, clTriangles, true, 0, t, null, null);
 
     }
 
@@ -490,6 +492,7 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseMemObject(clRelation);
         clReleaseMemObject(clEdgeLabels);
         clReleaseMemObject(clIsLegal);
+        clReleaseMemObject(clMutex);
 
         clReleaseKernel(clKernelForces);
         clReleaseKernel(clKernelMove);
@@ -532,7 +535,7 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(clLocalWorkSizeSFComplete);
 
         MemoryUtil.memFree(clGlobalWorkSizeEdes);
-        MemoryUtil.memFree(clLocalWorkSizeForces);*/
+        MemoryUtil.memFree(clLocalWorkSizeOne);*/
     }
 
     public void init() {
@@ -559,20 +562,28 @@ public class CLDistMesh<P extends IPoint> {
         return result;
     }
 
+    private void printTri() {
+        for(int i = 0; i < numberOfFaces*4; i+=4) {
+            log.info("[" +t.get(i) + ", " + t.get(i+1) + ", " + t.get(i+2) + "]");
+        }
+    }
+
     /*
      *
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) {
         AMesh<MPoint> mesh = IFace.createSimpleTriMesh();
-
         log.info("before");
         Collection<AVertex<MPoint>> vertices = mesh.getVertices();
         log.info(vertices);
 
         CLDistMesh clDistMesh = new CLDistMesh(mesh);
         clDistMesh.init();
+
+        clDistMesh.printTri();
         clDistMesh.step();
+        clDistMesh.printTri();
         clDistMesh.finish();
     }
 
