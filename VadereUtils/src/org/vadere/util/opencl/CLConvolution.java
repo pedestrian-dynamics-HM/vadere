@@ -105,8 +105,8 @@ public class CLConvolution {
 
     public float[] convolveSeparate(final float[] input, final int matrixWidth, final int matrixHeight, final float[] kernel,
                                     final int kernelWidth) {
-        //init();
-        try (MemoryStack stack = stackPush()) {
+        init();
+        //try (MemoryStack stack = stackPush()) {
             assert matrixWidth * matrixHeight == input.length;
             hostScenario = CLUtils.toFloatBuffer(input);
             output = CLUtils.toFloatBuffer(input);
@@ -144,7 +144,6 @@ public class CLConvolution {
             clGlobalWorkSizeEdges.put(0, matrixWidth);
             clGlobalWorkSizeEdges.put(1, matrixHeight);
 
-            PointerBuffer ev = stack.callocPointer(1);
             // run the kernel and read the result
             clEnqueueNDRangeKernel(clQueue, clKernelConvolveCol, 2, null, clGlobalWorkSizeEdges, null, null, null);
             clEnqueueNDRangeKernel(clQueue, clKernelConvolveRow, 2, null, clGlobalWorkSizeEdges, null, null, null);
@@ -156,11 +155,22 @@ public class CLConvolution {
             MemoryUtil.memFree(hostScenario);
             MemoryUtil.memFree(output);
             MemoryUtil.memFree(hostGaussKernel);
+            MemoryUtil.memFree(errcode_ret);
 
-            //clReleaseKernel(clTmp);
-            //clearCL();
+            clReleaseMemObject(clTmp);
+            clReleaseMemObject(clInput);
+            clReleaseMemObject(clOutput);
+            clReleaseMemObject(clGaussianKernel);
+            clReleaseKernel(clKernelConvolveRow);
+            clReleaseKernel(clKernelConvolveCol);
+
+            log.info("release command queue: " + (clReleaseCommandQueue(clQueue) == CL_SUCCESS));
+            log.info("release program: " + (clReleaseProgram(clProgram) == CL_SUCCESS));
+            log.info("release context: " + (clReleaseContext(clContext) == CL_SUCCESS));
+            contextCB.free();
+            programCB.free();
             return foutput;
-        }
+        //}
     }
 
     private float[] convolve(final float[] input,
@@ -249,7 +259,7 @@ public class CLConvolution {
         try (MemoryStack stack = stackPush()) {
             // helper for the memory allocation in java
             //stack = MemoryStack.stackPush();
-            errcode_ret = stack.callocInt(1);
+            errcode_ret = MemoryUtil.memAllocInt(1);
 
             IntBuffer numberOfPlatforms = stack.mallocInt(1);
             clGetPlatformIDs(null, numberOfPlatforms);

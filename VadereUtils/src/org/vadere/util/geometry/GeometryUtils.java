@@ -289,15 +289,17 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Tests if the circle defined by three non-lin points (p1,p2,p3) contains the point r.
+	 * Tests if the circle defined by three non-lin points (p1,p2,p3) contains the point p.
 	 * The center of the circle is the circumcenter of the triangle and the radius is equalt to the
 	 * distance between the circumcenter and any point of {p1, p2, p3}.
+	 *
+	 * Assumtion: a, b, c are in ccw-order!
 	 *
 	 * @param a    point of the triangle
 	 * @param b    point of the triangle
 	 * @param c    point of the triangle
 	 * @param p    point which the circle might contain.
-	 * @return true, if the circle defined by three non-lin points (p1,p2,p3) contains the point r, otherwise false
+	 * @return true, if the circle defined by three non-lin points (p1,p2,p3) contains the point p, otherwise false
 	 */
 	public static boolean isInsideCircle(final IPoint a, final IPoint b, final IPoint c, final IPoint p) {
 		return isInsideCircle(a, b, c, p.getX(), p.getY());

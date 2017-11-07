@@ -53,9 +53,40 @@ public class CLGatherer {
             index++;
             edgeBuffer.put(index, edge.getEnd());
             index++;
-            edgeBuffer.put(index, mesh.getFace(edge).getId());
-            index++;
-            edgeBuffer.put(index, mesh.getFace(mesh.getTwin(edge)).getId());
+            if(mesh.isBoundary(mesh.getFace(edge))) {
+                edgeBuffer.put(index, mesh.getFace(mesh.getTwin(edge)).getId());
+                index++;
+                edgeBuffer.put(index, -1);
+                index++;
+                if(mesh.isBoundary(mesh.getFace(mesh.getTwin(edge)))) {
+                    throw new IllegalArgumentException("invalid mesh!");
+                }
+            }
+            else if(mesh.isBoundary(mesh.getFace(mesh.getTwin(edge)))) {
+                edgeBuffer.put(index, mesh.getFace(edge).getId());
+                index++;
+                edgeBuffer.put(index, -1);
+                index++;
+                if(mesh.isBoundary(mesh.getFace(edge))) {
+                    throw new IllegalArgumentException("invalid mesh!");
+                }
+            }
+            else {
+                edgeBuffer.put(index, mesh.getFace(edge).getId());
+                index++;
+                edgeBuffer.put(index, mesh.getFace(mesh.getTwin(edge)).getId());
+                index++;
+            }
+        }
+        return edgeBuffer;
+    }
+
+    public static <P extends IPoint> IntBuffer getTwins(@NotNull final AMesh<P> mesh) {
+        Collection<AHalfEdge<P>> edges = mesh.getEdges();
+        IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size());
+        int index = 0;
+        for(AHalfEdge<P> edge : edges) {
+            edgeBuffer.put(index, mesh.getTwin(edge).getId());
             index++;
         }
         return edgeBuffer;

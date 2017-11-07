@@ -20,36 +20,52 @@ inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     return (double2) (x, y);
 }
 
-inline int getDiffVertex(int v0, int v1, int3 t, __global int4* edges) {
-    if(edges[t.s0].s0 != v0 && edges[t.s0].s0 != v1) {
-        return edges[t.s0].s0;
+inline bool isCCW(double2 q, double2 p, double2 r) {
+    return -((q.x - p.x) * (r.y - p.y) - (r.x - p.x) * (q.y - p.y)) > 0;
+}
+
+inline bool isInCircle(double2 a, double2 b, double2 c, double x , double y) {
+    double adx = a.x - x;
+    double ady = a.y - y;
+    double bdx = b.x - x;
+    double bdy = b.y - y;
+    double cdx = c.x - x;
+    double cdy = c.y - y;
+
+    double abdet = adx * bdy - bdx * ady;
+    double bcdet = bdx * cdy - cdx * bdy;
+    double cadet = cdx * ady - adx * cdy;
+    double alift = adx * adx + ady * ady;
+    double blift = bdx * bdx + bdy * bdy;
+    double clift = cdx * cdx + cdy * cdy;
+
+    double disc = alift * bcdet + blift * cadet + clift * abdet;
+    bool ccw = isCCW(a, b, c);
+    return (disc > 0 && ccw) || (disc < 0 && !ccw);
+}
+
+
+inline int getDiffVertex(int v0, int v1, int3 t) {
+    if(t.s0 != v0 && t.s0 != v1) {
+        return t.s0;
     }
 
-    if(edges[t.s0].s1 != v0 && edges[t.s0].s1 != v1) {
-        return edges[t.s0].s1;
+    if(t.s1 != v0 && t.s1 != v1) {
+        return t.s1;
     }
 
-    if(edges[t.s1].s0 != v0 && edges[t.s1].s0 != v1) {
-        return edges[t.s1].s0;
-    }
-
-    if(edges[t.s1].s1 != v0 && edges[t.s1].s1 != v1) {
-        return edges[t.s1].s1;
-    }
-
-    if(edges[t.s2].s0 != v0 && edges[t.s2].s0 != v1) {
-        return edges[t.s2].s0;
-    }
-
-    if(edges[t.s2].s1 != v0 && edges[t.s2].s1 != v1) {
-        return edges[t.s2].s1;
+    if(t.s2 != v0 && t.s2 != v1) {
+        return t.s2;
     }
 
     return -1;
 }
 
-inline bool isPartOf(int edgeId, int3 t) {
-    return edgeId == t.s0 || edgeId == t.s1 || edgeId == t.s2;
+inline bool isPartOf(int v0, int v1, int3 t) {
+    return
+        (v0 == t.s0 && t.s1 == v1) || (v0 == t.s1 && t.s0 == v1) ||
+        (v0 == t.s1 && t.s2 == v1) || (v0 == t.s2 && t.s1 == v1) ||
+        (v0 == t.s2 && t.s0 == v1) || (v0 == t.s0 && t.s2 == v1);
 }
 
 inline void waitGlobally(volatile __global int *g_mutex) {
@@ -65,7 +81,7 @@ inline void waitGlobally(volatile __global int *g_mutex) {
 }
 
 inline void waitLocally() {
-    barrier(CLK_GLOBAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 }
 // end helper
 
@@ -78,7 +94,7 @@ kernel void label(__global double2* vertices,
     int edgeId = get_global_id(0);
     // check if edge is illegal
 
-    double eps = 0.00001;
+    double eps = 0.0001;
 
     int v0 = edges[edgeId].s0;
     int v1 = edges[edgeId].s1;
@@ -88,17 +104,13 @@ kernel void label(__global double2* vertices,
     // edge is a non-boundary edge
     if(tb != -1) {
 
-        int v2 = getDiffVertex(v0, v1, triangles[ta], edges);
-        int p = getDiffVertex(v0, v1, triangles[tb], edges);
-
-        // test the delaunay criteria
-        double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-        double rad = length(c-vertices[v0]);
+        int v2 = getDiffVertex(v0, v1, triangles[ta]);
+        int p = getDiffVertex(v0, v1, triangles[tb]);
 
         // require a flip?
-        if(rad + eps < length(c-vertices[p])) {
+        if(isInCircle(vertices[v0], vertices[v1], vertices[v2], vertices[p].x, vertices[p].y)) {
             labeledEdges[edgeId] = 1;
-            *isLegal = 0;
+            atomic_xchg(isLegal, 0);
         }
         else {
             labeledEdges[edgeId] = 0;
@@ -108,6 +120,7 @@ kernel void label(__global double2* vertices,
     }
 }
 
+// for each edge in parallel
 kernel void updateLabel(__global double2* vertices,
                   __global int4* edges,
                   __global int3* triangles,
@@ -125,18 +138,12 @@ kernel void updateLabel(__global double2* vertices,
 
     // edge is a non-boundary edge
     if(tb != -1 && labeledEdges[edgeId] == 1) {
+        int v2 = getDiffVertex(v0, v1, triangles[ta]);
+        int p = getDiffVertex(v0, v1, triangles[tb]);
 
-        int v2 = getDiffVertex(v0, v1, triangles[ta], edges);
-        int p = getDiffVertex(v0, v1, triangles[tb], edges);
-
-        // test the delaunay criteria
-        double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-        double rad = length(c-vertices[v0]);
-
-        // require a flip?
-        if(rad + eps < length(c-vertices[p])) {
+        if(isInCircle(vertices[v0], vertices[v1], vertices[v2], vertices[p].x, vertices[p].y)) {
             labeledEdges[edgeId] = 1;
-            *isLegal = 0;
+            atomic_xchg(isLegal, 0);
         }
         else {
             labeledEdges[edgeId] = 0;
@@ -152,67 +159,81 @@ kernel void flip(__global int4* edges,
                  __global int* labeledEdges,
                  __global int* lockedTriangles,
                  __global int* R,
-                 __global int* g_mutex)
+                 __global int* g_mutex,
+                 __global int* twins)
  {
-    int ta = get_global_id(0);
-    int nTriangels = get_global_size(0);
+    int e = get_global_id(0);
     int localSize = get_local_size(0);
 
-    int e1 = triangles[ta].s0;
-    int e2 = triangles[ta].s1;
-    int e3 = triangles[ta].s2;
+    // is the edge illegal
+    if(labeledEdges[e]) {
+        int ta = edges[e].s2;
+        int tb = edges[e].s3;
 
-    // get the first edges that is illegal
-    int e = labeledEdges[e1] ? e1 : (labeledEdges[e2] ? e2 : (labeledEdges[e3] ? e3 : -1));
-    int tb = edges[e].s2 != ta ? edges[e].s2 : edges[e].s3;
-
-    int tmp = min(ta, tb);
-
-    if(e != -1) {
+        int tmp = min(ta, tb);
+        tb = max(ta, tb);
+        ta = tmp;
 
         // atomic lock
-        lockedTriangles[ta] = ta;
-
-
-        // barrier: wait for all work items globally
-        waitLocally();
-        waitGlobally(g_mutex);
-
-
-
-        // atomic lock
-        lockedTriangles[tb] = ta;
+        lockedTriangles[ta] = e;
 
         // barrier: wait for all work items globally
-        waitLocally();
+        barrier(CLK_LOCAL_MEM_FENCE);
         waitGlobally(g_mutex);
 
-        // swap if both triangles are locked by ta, i.e. by this thread
-        if(lockedTriangles[ta] == ta && lockedTriangles[tb] == ta) {
-            int v0 = edges[e].s0;
-            int v1 = edges[e].s1;
+        if(lockedTriangles[ta] == e) {
+            // atomic lock
+            lockedTriangles[tb] = e;
 
-            int u0 = getDiffVertex(v0, v1, triangles[ta], edges);
-            int u1 = getDiffVertex(v0, v1, triangles[tb], edges);
+            // barrier: wait for all work items globally
+            barrier(CLK_LOCAL_MEM_FENCE);
+            waitGlobally(g_mutex);
 
-            edges[e].s0 = u0;
-            edges[e].s1 = u1;
+            // swap if both triangles are locked by ta, i.e. by this thread
+            if(lockedTriangles[ta] == e && lockedTriangles[tb] == e) {
+                int v0 = edges[e].s0;
+                int v1 = edges[e].s1;
 
-            // save the relation of the changes
-            R[ta] = tb;
-            R[tb] = ta;
+                int u0 = getDiffVertex(v0, v1, triangles[ta]);
+                int u1 = getDiffVertex(v0, v1, triangles[tb]);
 
+                // edge flip for the origin
+                edges[e].s0 = u0;
+                edges[e].s1 = u1;
+
+                // edge flip for the twin
+                edges[twins[e]].s0 = u1;
+                edges[twins[e]].s1 = u0;
+
+                triangles[ta].s0 = u0;
+                triangles[ta].s1 = u1;
+                triangles[ta].s2 = v0;
+
+                triangles[tb].s0 = u1;
+                triangles[tb].s1 = u0;
+                triangles[tb].s2 = v1;
+
+                // save the relation of the changes
+                R[ta] = tb;
+                R[tb] = ta;
+                //labeledEdges[e] = 0;
+                //labeledEdges[twins[e]] = 0;
+            }
+        }
+        else {
+            barrier(CLK_LOCAL_MEM_FENCE);
+            waitGlobally(g_mutex);
         }
     }
     else {
-        waitLocally();
+        barrier(CLK_LOCAL_MEM_FENCE);
         waitGlobally(g_mutex);
-        waitLocally();
+        barrier(CLK_LOCAL_MEM_FENCE);
         waitGlobally(g_mutex);
     }
 
     // edge might be no longer illegal!
-    labeledEdges[e] = -1;
+    //labeledEdges[e] = 0;
  }
 
  // for each edge in parallel
@@ -227,11 +248,11 @@ kernel void flip(__global int4* edges,
     int tb = edges[edgeId].s3;
 
     // invalid
-    if(!isPartOf(edgeId, triangles[ta])) {
+    if(!isPartOf(v0, v1, triangles[ta])) {
         edges[edgeId].s2 = R[ta];
     }
 
-    if(tb != -1 && !isPartOf(edgeId, triangles[tb])) {
+    if(tb != -1 && !isPartOf(v0, v1, triangles[tb])) {
         edges[edgeId].s3 = R[tb];
     }
 }
@@ -263,13 +284,15 @@ kernel void computeForces(
 
     // TODO does this sync work properly? This syncs too much?
     // for each vertex in parallel
+
+
     int waiting = 1;
-    while (waiting) {
-        while (LOCK(addr)) {}
+    //while (waiting) {
+    //    while (LOCK(addr)) {}
         forces[p1Index] = forces[p1Index] + partialForce;
-        UNLOCK(addr);
-        waiting = 0;
-    }
+    //    UNLOCK(addr);
+    //    waiting = 0;
+    //}
 }
 
 inline double dabs(double d) {return d < 0 ? -d : d;}
@@ -285,7 +308,7 @@ kernel void moveVertices(__global double2* vertices, __global double2* forces, c
     // project back if necessary
     double distance = dabs(6.0 - length(v))-4.0;
     if(distance <= 0) {
-        v = v + (force * 0.08);
+        v = v + (force * 0.05);
     }
     else {
         double deps = 0.0001;
