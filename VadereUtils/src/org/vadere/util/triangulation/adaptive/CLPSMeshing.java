@@ -101,12 +101,12 @@ public class CLPSMeshing implements IPSMeshing {
 		step(true);
 	}
 
-	public void step(boolean flipAll) {
+	public boolean step(boolean flipAll) {
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 		//log.info(scalingFactor);
 
-		clDistMesh.step(flipAll);
+
 		//flipEdges();
 		//retriangulate();
 
@@ -133,6 +133,7 @@ public class CLPSMeshing implements IPSMeshing {
 		}
 
 		numberOfIterations++;
+		return clDistMesh.step(flipAll);
 		/*log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
 		log.info("#retriangulations: " + numberOfRetriangulations);
 		log.info("#steps: " + numberOfIterations);
@@ -180,14 +181,17 @@ public class CLPSMeshing implements IPSMeshing {
         //Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
         //removeLowQualityTriangles();
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
-      //  removeTrianglesInsideObstacles();
+        removeTrianglesInsideObstacles();
         triangulation.finalize();
 
         if(clDistMesh != null) {
             clDistMesh.finish();
         }
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
-        clDistMesh.init();
+        else {
+
+		}
+		clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+		clDistMesh.init();
     }
 
     private void removeLowQualityTriangles() {
