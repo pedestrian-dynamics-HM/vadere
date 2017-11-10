@@ -48,7 +48,7 @@ public class TestEnhancedVersion3 extends JFrame {
 		int counter = 0;
 		long time = 0;
 
-		while (counter <= 1000) {
+		while (counter <= 300) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();

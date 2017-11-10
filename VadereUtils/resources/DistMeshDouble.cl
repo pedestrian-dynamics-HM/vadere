@@ -7,6 +7,21 @@
 #define LOCK(a) atomic_cmpxchg(a, 0, 1)
 #define UNLOCK(a) atomic_xchg(a, 0)
 
+inline void atomicAdd_g_f(volatile __global float *addr, float val)
+   {
+       union{
+           unsigned int u32;
+           float        f32;
+       } next, expected, current;
+   	current.f32    = *addr;
+       do{
+   	   expected.f32 = current.f32;
+           next.f32     = expected.f32 + val;
+   		current.u32  = atomic_cmpxchg( (volatile __global unsigned int *)addr,
+                               expected.u32, next.u32);
+       } while( current.u32 != expected.u32 );
+   }
+
 // helper methods!
 inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     double d = 2 * (p1.s0 * (p2.s1 - p3.s1) + p2.s0 * (p3.s1 - p1.s1) + p3.s0 * (p1.s1 - p2.s1));
@@ -135,6 +150,7 @@ kernel void updateLabel(__global double2* vertices,
     int v1 = edges[edgeId].s1;
     int ta = edges[edgeId].s2;
     int tb = edges[edgeId].s3;
+    printf("test");
 
     // edge is a non-boundary edge
     if(tb != -1 && labeledEdges[edgeId] == 1) {
@@ -143,6 +159,7 @@ kernel void updateLabel(__global double2* vertices,
 
         if(isInCircle(vertices[v0], vertices[v1], vertices[v2], vertices[p].x, vertices[p].y)) {
             labeledEdges[edgeId] = 1;
+            printf("[%d, %d, %d %d]\n", v0, v1, v2, p);
             atomic_xchg(isLegal, 0);
         }
         else {
@@ -267,6 +284,7 @@ kernel void computeForces(
     __global double2* forces,
     __global int* mutexes)
 {
+
     int i = get_global_id(0);
     int p1Index = edges[i].s0;
     double2 p1 = vertices[edges[i].s0];
@@ -289,6 +307,7 @@ kernel void computeForces(
     int waiting = 1;
     //while (waiting) {
     //    while (LOCK(addr)) {}
+
         forces[p1Index] = forces[p1Index] + partialForce;
     //    UNLOCK(addr);
     //    waiting = 0;
@@ -299,7 +318,6 @@ inline double dabs(double d) {return d < 0 ? -d : d;}
 
 kernel void moveVertices(__global double2* vertices, __global double2* forces, const double delta) {
     int i = get_global_id(0);
-
     //double2 force = (double2)(1.0, 1.0);
     double2 force = forces[i];
     double2 v = vertices[i];

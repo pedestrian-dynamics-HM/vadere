@@ -15,9 +15,8 @@ import java.util.Collection;
  */
 public class CLGatherer {
 
-    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh) {
+    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh, @NotNull final DoubleBuffer vertexBuffer) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
-        DoubleBuffer vertexBuffer = MemoryUtil.memAllocDouble(vertices.size()*2);
         int index = 0;
         for(AVertex<P> vertex : vertices) {
             assert index/2.0 == vertex.getId();
@@ -29,9 +28,14 @@ public class CLGatherer {
         return vertexBuffer;
     }
 
-    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh) {
+
+    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
-        FloatBuffer vertexBuffer = MemoryUtil.memAllocFloat(vertices.size()*2);
+        return getVerticesD(mesh, MemoryUtil.memAllocDouble(vertices.size()*2));
+    }
+
+    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh, @NotNull final FloatBuffer vertexBuffer) {
+        Collection<AVertex<P>> vertices = mesh.getVertices();
         int index = 0;
         for(AVertex<P> vertex : vertices) {
             assert index/2.0 == vertex.getId();
@@ -41,6 +45,11 @@ public class CLGatherer {
             index++;
         }
         return vertexBuffer;
+    }
+
+    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh) {
+        Collection<AVertex<P>> vertices = mesh.getVertices();
+        return getVerticesF(mesh, MemoryUtil.memAllocFloat(vertices.size()*2));
     }
 
     // TODO: maybe remove duplicated edges

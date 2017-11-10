@@ -44,7 +44,7 @@ public class TestEnhancedVersion4 extends JFrame {
 
 
 
-		while (counter <= 400) {
+		while (counter < 1) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
@@ -54,26 +54,32 @@ public class TestEnhancedVersion4 extends JFrame {
 				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
 			}*/
 
-
 			long ms = System.currentTimeMillis();
-			if(counter < 100) {
-				meshGenerator.step(false);
+			//meshGenerator.refresh();
+			//meshGenerator.retriangulate();
+			if(meshGenerator.step(true)) {
+				//meshGenerator.refresh();
+				meshGenerator.retriangulate();
 			}
-			else {
-				meshGenerator.step(true);
-			}
+			meshGenerator.refresh();
+
+			/*if(meshGenerator.step(true)) {
+				meshGenerator.refresh();
+				meshGenerator.retriangulate();
+			}*/
+
 			ms = System.currentTimeMillis() - ms;
 			time += ms;
 			System.out.println("Step-Time: " + ms);
 
-			meshGenerator.refresh();
+
 			distmeshPanel.update();
 			distmeshPanel.repaint();
 
 
-			if(counter < 100) {
+			/*if(counter < 50) {
 				meshGenerator.retriangulate();
-			}
+			}*/
 			counter++;
 			/*try {
 				Thread.sleep(2000);
