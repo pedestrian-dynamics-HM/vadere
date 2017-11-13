@@ -63,9 +63,9 @@ public class CLGatherer {
             edgeBuffer.put(index, edge.getEnd());
             index++;
             if(mesh.isBoundary(mesh.getFace(edge))) {
-                edgeBuffer.put(index, mesh.getFace(mesh.getTwin(edge)).getId());
-                index++;
                 edgeBuffer.put(index, -1);
+                index++;
+                edgeBuffer.put(index, mesh.getFace(mesh.getTwin(edge)).getId());
                 index++;
                 if(mesh.isBoundary(mesh.getFace(mesh.getTwin(edge)))) {
                     throw new IllegalArgumentException("invalid mesh!");
