@@ -61,6 +61,7 @@ public class CLDistMesh<P extends IPoint> {
     private long clKernelRepair;
     private long clKernelLabelEdges;
     private long clKernelLabelEdgesUpdate;
+    private long clKernelCheckTriangles;
 
     // error code buffer
     private IntBuffer errcode_ret;
@@ -81,7 +82,6 @@ public class CLDistMesh<P extends IPoint> {
     private IntBuffer mutexes;
     private IntBuffer triLocks;
     private IntBuffer edgeLabels;
-    private IntBuffer isLegal;
     private double delta = 0.02;
     private float fDelta = 0.02f;
 
@@ -100,7 +100,8 @@ public class CLDistMesh<P extends IPoint> {
     private long clRelation;
     private long clEdgeLabels;
     private long clTriLocks;
-    private long clIsLegal;
+    private long clIllegalEdges;
+    private long clIllegalTriangles;
     private ArrayList<Long> clSizes = new ArrayList<>();
 
     // size
@@ -148,6 +149,10 @@ public class CLDistMesh<P extends IPoint> {
         this.numberOfFaces = mesh.getNumberOfFaces();
         this.mutexes =  MemoryUtil.memAllocInt(numberOfVertices);
         this.triLocks = MemoryUtil.memAllocInt(numberOfFaces);
+        for(int i = 0; i < numberOfFaces; i++) {
+            this.triLocks.put(i, -1);
+        }
+
         for(int i = 0; i < numberOfVertices; i++) {
             this.mutexes.put(i, 0);
         }
@@ -155,8 +160,6 @@ public class CLDistMesh<P extends IPoint> {
         for(int i = 0; i < numberOfEdges; i++) {
             this.edgeLabels.put(i, 0);
         }
-        this.isLegal = MemoryUtil.memAllocInt(1);
-        this.isLegal.put(0, 1);
         this.result = null;
     }
 
@@ -275,6 +278,8 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clKernelRepair = clCreateKernel(clProgram, "repair", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+        clKernelCheckTriangles = clCreateKernel(clProgram, "checkTriangles", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
     }
 
     private void createMemory() {
@@ -306,7 +311,9 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clEdgeLabels = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, edgeLabels, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
-        clIsLegal = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, isLegal, errcode_ret);
+        clIllegalEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
+        clIllegalTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
         clMutex = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
@@ -357,18 +364,17 @@ public class CLDistMesh<P extends IPoint> {
             clSetKernelArg1f(clKernelMove, 2, fDelta);
         }
 
-
         clSetKernelArg1p(clKernelLabelEdges, 0, clVertices);
         clSetKernelArg1p(clKernelLabelEdges, 1, clEdges);
         clSetKernelArg1p(clKernelLabelEdges, 2, clTriangles);
         clSetKernelArg1p(clKernelLabelEdges, 3, clEdgeLabels);
-        clSetKernelArg1p(clKernelLabelEdges, 4, clIsLegal);
+        clSetKernelArg1p(clKernelLabelEdges, 4, clIllegalEdges);
 
         clSetKernelArg1p(clKernelLabelEdgesUpdate, 0, clVertices);
         clSetKernelArg1p(clKernelLabelEdgesUpdate, 1, clEdges);
         clSetKernelArg1p(clKernelLabelEdgesUpdate, 2, clTriangles);
         clSetKernelArg1p(clKernelLabelEdgesUpdate, 3, clEdgeLabels);
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 4, clIsLegal);
+        clSetKernelArg1p(clKernelLabelEdgesUpdate, 4, clIllegalEdges);
         clSetKernelArg1p(clKernelLabelEdgesUpdate, 5, clTriLocks);
 
         clSetKernelArg1p(clKernelFlip, 0, clEdges);
@@ -398,6 +404,10 @@ public class CLDistMesh<P extends IPoint> {
         clSetKernelArg1p(clKernelRepair, 0, clEdges);
         clSetKernelArg1p(clKernelRepair, 1, clTriangles);
         clSetKernelArg1p(clKernelRepair, 2, clRelation);
+
+        clSetKernelArg1p(clKernelCheckTriangles, 0, clVertices);
+        clSetKernelArg1p(clKernelCheckTriangles, 1, clTriangles);
+        clSetKernelArg1p(clKernelCheckTriangles, 2, clIllegalTriangles);
 
         clGloblWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
@@ -449,6 +459,8 @@ public class CLDistMesh<P extends IPoint> {
          * 1. compute scaling factor
 		 * 2. compute forces;
 		 * 3. update vertices;
+		 * 4. check for illegal triangles
+		 * 5. flip all
          *
          */
         clEnqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
@@ -465,41 +477,50 @@ public class CLDistMesh<P extends IPoint> {
 
         clEnqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
         log.info("move vertices");
+        clFinish(clQueue);
 
-        boolean requireRetriangulation = false;
+        IntBuffer illegalTriangles = stack.mallocInt(1);
+        illegalTriangles.put(0, 0);
+        clEnqueueWriteBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
+        clEnqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
+        clFinish(clQueue);
+        clEnqueueReadBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
+        log.info("check for illegal triangles");
+        if(illegalTriangles.get(0) == 1) {
+            log.info("illegal triangle found!");
+            return true;
+        }
 
+        // flip as long as there are no more flips possible
         if(flipAll) {
-            IntBuffer isLegal = stack.mallocInt(1);
+            IntBuffer illegalEdges = stack.mallocInt(1);
             // while there is any illegal edge, do: // TODO: this is not the same as in the java distmesh!
+
             clEnqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
-            int maxIt = 6;
-            int it = 0;
+            log.info("label illegal edges");
 
             do  {
-                it++;
-                isLegal.put(0, 1);
-                clEnqueueWriteBuffer(clQueue, clIsLegal, true, 0, isLegal, null, null);
-
-                //clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                illegalEdges.put(0, 0);
+                clEnqueueWriteBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
 
                 clEnqueueNDRangeKernel(clQueue, clKernelFlipStage1, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                clFinish(clQueue);
                 clEnqueueNDRangeKernel(clQueue, clKernelFlipStage2, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                clFinish(clQueue);
                 clEnqueueNDRangeKernel(clQueue, clKernelFlipStage3, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                log.info("flip some illegal edges");
 
                 clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                log.info("repair data structure");
 
-                clEnqueueReadBuffer(clQueue, clIsLegal, true, 0, isLegal, null, null);
-                log.info("isLegal = " + isLegal.get(0));
+               // clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                log.info("refresh old labels");
+                clFinish(clQueue);
 
-                break;
-                /*if(it >= maxIt) {
-                    requireRetriangulation = true;
-                    break;
-                }*/
-            } while(isLegal.get(0) == 0);
+                //clEnqueueReadBuffer(clQueue, clTriLocks, true, 0, triLocks, null, null);
+                //checkTriLocks();
+                clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
+                log.info("isLegal = " + illegalEdges.get(0));
+
+            } while(illegalEdges.get(0) == 1);
             log.info("flip all");
         }
 
@@ -514,7 +535,24 @@ public class CLDistMesh<P extends IPoint> {
 */
         clFinish(clQueue);
 
-        return requireRetriangulation;
+        return false;
+    }
+
+    private void checkTriLocks() {
+        for(int i = 0; i < numberOfFaces; i++) {
+            int lock = triLocks.get(i);
+
+            for(int j = i+1; j < numberOfFaces; j++) {
+                int lock2 = triLocks.get(j);
+
+                for(int h = j+1; h < numberOfFaces; h++) {
+                    int lock3 = triLocks.get(h);
+                    if(lock != -1 && lock == lock2 && lock2 == lock3) {
+                        throw new IllegalArgumentException(lock3 + ": the lock is wrong!");
+                    }
+                }
+            }
+        }
     }
 
     private void readResultFromGPU() {
@@ -610,7 +648,7 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseMemObject(clTriLocks);
         clReleaseMemObject(clRelation);
         clReleaseMemObject(clEdgeLabels);
-        clReleaseMemObject(clIsLegal);
+        clReleaseMemObject(clIllegalEdges);
         clReleaseMemObject(clMutex);
         clReleaseMemObject(clTwins);
 
@@ -653,7 +691,6 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(mutexes);
         MemoryUtil.memFree(triLocks);
         MemoryUtil.memFree(edgeLabels);
-        MemoryUtil.memFree(isLegal);
         MemoryUtil.memFree(twins);
 
         /*MemoryUtil.memFree(clGlobalWorkSizeEdges);

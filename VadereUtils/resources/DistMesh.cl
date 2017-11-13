@@ -25,14 +25,14 @@ inline void atomicAdd_g_f(volatile __global float *addr, float val)
 
 // helper methods!
 inline float2 getCircumcenter(float2 p1, float2 p2, float2 p3) {
-    float d = 2 * (p1.s0 * (p2.s1 - p3.s1) + p2.s0 * (p3.s1 - p1.s1) + p3.s0 * (p1.s1 - p2.s1));
+    float d = 2 * (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y));
 
-    float x = ((p1.s0 * p1.s0 + p1.s1 * p1.s1) * (p2.s1 - p3.s1)
-    				+ (p2.s0 * p2.s0 + p2.s1 * p2.s1) * (p3.s1 - p1.s1)
-    				+ (p3.s0 * p3.s0 + p3.s1 * p3.s1) * (p1.s1 - p2.s1)) / d;
-    		float y = ((p1.s0 * p1.s0 + p1.s1 * p1.s1) * (p3.s0 - p2.s0)
-    				+ (p2.s0 * p2.s0 + p2.s1 * p2.s1) * (p1.s0 - p3.s0)
-    				+ (p3.s0 * p3.s0 + p3.s1 * p3.s1) * (p2.s0 - p1.s0)) / d;
+    float x = ((p1.x * p1.x + p1.y * p1.y) * (p2.y - p3.y)
+    				+ (p2.x * p2.x + p2.y * p2.y) * (p3.y - p1.y)
+    				+ (p3.x * p3.x + p3.y * p3.y) * (p1.y - p2.y)) / d;
+    		float y = ((p1.x * p1.x + p1.y * p1.y) * (p3.x - p2.x)
+    				+ (p2.x * p2.x + p2.y * p2.y) * (p1.x - p3.x)
+    				+ (p3.x * p3.x + p3.y * p3.y) * (p2.x - p1.x)) / d;
     return (float2) (x, y);
 }
 
@@ -107,7 +107,7 @@ kernel void label(__global float2* vertices,
                   __global int4* edges,
                   __global int3* triangles,
                   __global int* labeledEdges,
-                  __global int* isLegal) {
+                  __global int* illegalEdge) {
     int edgeId = get_global_id(0);
     // check if edge is illegal
 
@@ -119,7 +119,7 @@ kernel void label(__global float2* vertices,
     int tb = edges[edgeId].s3;
 
     // edge is a non-boundary edge
-    if(tb != -1) {
+    if(ta != -1 && tb != -1) {
 
         int v2 = getDiffVertex(v0, v1, triangles[ta]);
         int p = getDiffVertex(v0, v1, triangles[tb]);
@@ -127,7 +127,8 @@ kernel void label(__global float2* vertices,
         // require a flip?
         if(length(c-vertices[p]) < length(c-vertices[v0])) {
             labeledEdges[edgeId] = 1;
-            atomic_xchg(isLegal, 0);
+            *illegalEdge = 1;
+            //atomic_xchg(illegalEdge, 1);
         }
         else {
             labeledEdges[edgeId] = 0;
@@ -142,12 +143,12 @@ kernel void updateLabel(__global float2* vertices,
                   __global int4* edges,
                   __global int3* triangles,
                   __global int* labeledEdges,
-                  __global int* isLegal,
+                  __global int* illegalEdge,
                   __global int* lockedTriangles) {
     int edgeId = get_global_id(0);
     // check if edge is illegal
 
-    float eps = 0.001f;
+    float eps = 0.000001f;
 
     int v0 = edges[edgeId].s0;
     int v1 = edges[edgeId].s1;
@@ -158,7 +159,7 @@ kernel void updateLabel(__global float2* vertices,
     //lockedTriangles[tb] = -1;
 
     // edge is a non-boundary edge
-    if(tb != -1 && labeledEdges[edgeId] == 1) {
+    if(ta != -1 && tb != -1 && labeledEdges[edgeId] == 1) {
         int v2 = getDiffVertex(v0, v1, triangles[ta]);
         int p = getDiffVertex(v0, v1, triangles[tb]);
 
@@ -166,9 +167,7 @@ kernel void updateLabel(__global float2* vertices,
          // require a flip?
          if(length(c-vertices[p]) < length(c-vertices[v0])) {
             labeledEdges[edgeId] = 1;
-            atomic_xchg(isLegal, 0);
-            //printf("%f\n", (length(c-vertices[p])- length(c-vertices[v0])));
-            //printf("[%d, %d, %d, %d], [%d, %d, %d],[%d, %d, %d]\n", v0, v1, v2, p, triangles[ta].x, triangles[ta].y, triangles[ta].z , triangles[tb].x, triangles[tb].y, triangles[tb].z);
+            *illegalEdge = 1;
         }
         else {
             labeledEdges[edgeId] = 0;
@@ -189,12 +188,10 @@ kernel void flipStage1(__global int4* edges,
         int ta = edges[e].s2;
         int tb = edges[e].s3;
 
-        int tmp = min(ta, tb);
-        tb = max(ta, tb);
-        ta = tmp;
-
-        // atomic lock
-        lockedTriangles[ta] = e;
+        // to avoid the twin from locking
+        if(ta < tb) {
+            lockedTriangles[ta] = e;
+        }
     }
 }
 
@@ -208,12 +205,8 @@ kernel void flipStage2(__global int4* edges,
         int ta = edges[e].s2;
         int tb = edges[e].s3;
 
-        int tmp = min(ta, tb);
-        tb = max(ta, tb);
-        ta = tmp;
-
-        if(lockedTriangles[ta] == e) {
-            // atomic lock
+        // to avoid the twin from locking
+        if(ta < tb && lockedTriangles[ta] == e) {
             lockedTriangles[tb] = e;
         }
     }
@@ -234,23 +227,20 @@ kernel void flipStage3(
         int ta = edges[e].s2;
         int tb = edges[e].s3;
 
-        int tmp = min(ta, tb);
-        tb = max(ta, tb);
-        ta = tmp;
-
         // swap if both triangles are locked by ta, i.e. by this thread
         if(lockedTriangles[ta] == e && lockedTriangles[tb] == e) {
-            printf("ta: %d, tb : %d \n", ta, tb);
             int v0 = edges[e].s0;
             int v1 = edges[e].s1;
 
             int u0 = getDiffVertex(v0, v1, triangles[ta]);
             int u1 = getDiffVertex(v0, v1, triangles[tb]);
 
-             float2 c1 = getCircumcenter(vertices[v0], vertices[v1], vertices[u0]);
-            if(length(c1-vertices[u1]) >= length(c1-vertices[v0])) {
-                printf("error2 - %d, %d \n", ta, tb);
-            }
+            //float2 c1 = getCircumcenter(vertices[v0], vertices[v1], vertices[u0]);
+            /*if(length(c1-vertices[u0]) < length(c1-vertices[u1])) {
+                printf("error2 %d [%f] - %d, %d \n", e, length(c1-vertices[u0])-length(c1-vertices[u1]), ta, tb);
+            }*/
+
+            // Here we keep the order in ccw assuming that everything is in ccw beforehand
 
             // edge flip for the origin
             edges[e].s0 = u0;
@@ -262,28 +252,28 @@ kernel void flipStage3(
 
             triangles[ta].s0 = u0;
             triangles[ta].s1 = u1;
-            triangles[ta].s2 = v0;
+            triangles[ta].s2 = v1;
 
             triangles[tb].s0 = u1;
             triangles[tb].s1 = u0;
-            triangles[tb].s2 = v1;
+            triangles[tb].s2 = v0;
 
             // save the relation of the changes
             R[ta] = tb;
             R[tb] = ta;
 
-            float2 c = getCircumcenter(vertices[u0], vertices[u1], vertices[v0]);
+            //float2 c = getCircumcenter(vertices[u0], vertices[u1], vertices[v0]);
             // require a flip?
-            if(length(c-vertices[v1]) < length(c-vertices[u0])) {
+            /*if(length(c-vertices[v1]) < length(c-vertices[u0])) {
                 printf("error [%f] - %d, %d \n", (length(c-vertices[v1]) - length(c-vertices[u0])), ta, tb);
-            }
+            }*/
             //labeledEdges[e] = 0;
             //labeledEdges[twins[e]] = 0;
         }
     }
 }
 
-// for each edge in parallel
+// for each edge in parallel, does not work!
 kernel void flip(__global int4* edges,
                  __global int3* triangles,
                  __global int* labeledEdges,
@@ -378,12 +368,29 @@ kernel void flip(__global int4* edges,
     int tb = edges[edgeId].s3;
 
     // invalid
-    if(!isPartOf(v0, v1, triangles[ta])) {
+    if(ta != -1 && !isPartOf(v0, v1, triangles[ta])) {
         edges[edgeId].s2 = R[ta];
     }
 
     if(tb != -1 && !isPartOf(v0, v1, triangles[tb])) {
         edges[edgeId].s3 = R[tb];
+    }
+}
+
+// for each triangle test its legality
+ kernel void checkTriangles(
+                     __global float2* vertices,
+                     __global int3* triangles,
+                    __global int* illegalTri)
+  {
+    int triangleId = get_global_id(0);
+    float2 v0 = vertices[triangles[triangleId].s0];
+    float2 v1 = vertices[triangles[triangleId].s1];
+    float2 v2 = vertices[triangles[triangleId].s2];
+
+    // triangle is illegal => re-triangulation is necessary!
+    if(*illegalTri != 1 && !isCCW(v0, v1, v2)) {
+        *illegalTri = 1;
     }
 }
 
@@ -452,7 +459,7 @@ kernel void moveVertices(__global float2* vertices, __global float2* forces, con
     if(distance <= 0) {
         v = v + (force * 0.2f);
     }
-    else {
+    /*else {
         float deps = 0.0001f;
         float2 dX = (deps, 0.0f);
         float2 dY = (0.0f, deps);
@@ -460,7 +467,7 @@ kernel void moveVertices(__global float2* vertices, __global float2* forces, con
         float dGradPY = ((fabs(6.0f - length(v + dY))-4.0f)-distance) / deps;
         float2 projection = (dGradPX * distance, dGradPY * distance);
         v = v - projection;
-    }
+    }*/
 
     // set force to 0.
     forces[i] = (0.0f, 0.0f);

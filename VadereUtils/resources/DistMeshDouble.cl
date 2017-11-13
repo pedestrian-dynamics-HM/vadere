@@ -424,8 +424,6 @@ kernel void computeCompleteSF(__const int size, __global double2* qlengths, __lo
 
 
         if(lid == 0) {
-          //*scaleFactor =  qlengths[10].s0;
-          //*scaleFactor =  partialSums[0].s0;
           *scaleFactor = sqrt(partialSums[0].s0 / partialSums[0].s1);
         }
     }

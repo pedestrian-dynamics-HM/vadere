@@ -39,5 +39,18 @@ public class TestGeometryUtils {
 		assertFalse(!GeometryUtils.isRightOf(p2, p1, t));
 	}
 
+	@Test
+	public void testCircumcenterOrder() {
+		double eps = 0.000001;
+		VPoint r = new VPoint(5, 0.5);
+		VPoint q = new VPoint(5, -0.5);
+		VPoint t = new VPoint(-5, -0.5);
 
+		VPoint c1 = GeometryUtils.getCircumcenter(r, q, t);
+		VPoint c2 = GeometryUtils.getCircumcenter(r, t, q);
+		VPoint c3 = GeometryUtils.getCircumcenter(t, r, q);
+
+		assertTrue(c1.distance(c2) < eps);
+		assertTrue(c2.distance(c3) < eps);
+	}
 }

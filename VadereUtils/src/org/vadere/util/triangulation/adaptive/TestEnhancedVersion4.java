@@ -44,7 +44,7 @@ public class TestEnhancedVersion4 extends JFrame {
 
 
 
-		while (counter < 1) {
+		while (counter < 100) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
@@ -57,7 +57,9 @@ public class TestEnhancedVersion4 extends JFrame {
 			long ms = System.currentTimeMillis();
 			//meshGenerator.refresh();
 			//meshGenerator.retriangulate();
-			if(meshGenerator.step(true)) {
+			boolean retriangulation = meshGenerator.step(true);
+			ms = System.currentTimeMillis() - ms;
+			if(retriangulation) {
 				//meshGenerator.refresh();
 				meshGenerator.retriangulate();
 			}
@@ -68,7 +70,7 @@ public class TestEnhancedVersion4 extends JFrame {
 				meshGenerator.retriangulate();
 			}*/
 
-			ms = System.currentTimeMillis() - ms;
+
 			time += ms;
 			System.out.println("Step-Time: " + ms);
 

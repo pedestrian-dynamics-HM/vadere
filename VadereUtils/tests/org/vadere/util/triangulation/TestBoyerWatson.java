@@ -8,13 +8,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.impl.VPTriangulation;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
-import org.vadere.util.geometry.mesh.inter.ITriangulation;
-import org.vadere.util.geometry.mesh.inter.IVertex;
+import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -117,8 +114,12 @@ public class TestBoyerWatson {
 		points.add(p3);
 
 		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y));
-
 		PFace<VPoint> face = delaunayTriangulation.locateFace(centerPoint).get();
+		IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh = delaunayTriangulation.getMesh();
+		PHalfEdge<VPoint> edge = mesh.getEdge(face);
+
+		// triangulations are always ccw ordered!
+		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
 
 		delaunayTriangulation.splitTriangle(face, centerPoint);
 		delaunayTriangulation.finalize();

@@ -175,6 +175,7 @@ public class CLPSMeshing implements IPSMeshing {
 		}
 		triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
 		removeTrianglesInsideObstacles();
+		removeLowQualityTriangles();
 		triangulation.finalize();
 	}
 
