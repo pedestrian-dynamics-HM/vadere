@@ -142,6 +142,94 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4,
+            "identifier" : -1
+          }, {
+            "x" : 35.0001,
+            "y" : -1.0E-4,
+            "identifier" : -1
+          }, {
+            "x" : 35.0001,
+            "y" : 0.5001,
+            "identifier" : -1
+          }, {
+            "x" : -1.0E-4,
+            "y" : 0.5001,
+            "identifier" : -1
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 35.0001,
+            "y" : -1.0E-4,
+            "identifier" : -1
+          }, {
+            "x" : 35.0001,
+            "y" : 30.0001,
+            "identifier" : -1
+          }, {
+            "x" : 34.4999,
+            "y" : 30.0001,
+            "identifier" : -1
+          }, {
+            "x" : 34.4999,
+            "y" : -1.0E-4,
+            "identifier" : -1
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 35.0001,
+            "y" : 30.0001,
+            "identifier" : -1
+          }, {
+            "x" : -1.0E-4,
+            "y" : 30.0001,
+            "identifier" : -1
+          }, {
+            "x" : -1.0E-4,
+            "y" : 29.4999,
+            "identifier" : -1
+          }, {
+            "x" : 35.0001,
+            "y" : 29.4999,
+            "identifier" : -1
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : 30.0001,
+            "identifier" : -1
+          }, {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4,
+            "identifier" : -1
+          }, {
+            "x" : 0.5001,
+            "y" : -1.0E-4,
+            "identifier" : -1
+          }, {
+            "x" : 0.5001,
+            "y" : 30.0001,
+            "identifier" : -1
+          } ]
+        },
+        "id" : -1
       } ],
       "stairs" : [ ],
       "targets" : [ {

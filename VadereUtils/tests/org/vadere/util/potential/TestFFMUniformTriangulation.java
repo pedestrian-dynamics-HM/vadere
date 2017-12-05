@@ -10,13 +10,10 @@ import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.potential.calculators.EikonalSolver;
-import org.vadere.util.potential.calculators.EikonalSolverFMMAcuteTriangulation;
 import org.vadere.util.potential.calculators.EikonalSolverFMMTriangulation;
 import org.vadere.util.potential.calculators.PotentialPoint;
-import org.vadere.util.geometry.mesh.gen.UniformTriangulation;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
@@ -33,7 +30,7 @@ public class TestFFMUniformTriangulation {
 
 	private static Logger log = LogManager.getLogger(TestFFMUniformTriangulation.class);
 
-	private UniformTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> uniformTriangulation;
+	private ITriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> uniformTriangulation;
 	private int width = 10;
 	private int height = 10;
 	private double minTriangleSideLength = 0.1;
@@ -42,13 +39,11 @@ public class TestFFMUniformTriangulation {
 	public void setUp() throws Exception {
 		IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
 		uniformTriangulation = ITriangulation.createUniformTriangulation(
-				IPointLocator.Type.BASE,
-				new VRectangle(0, 0, width, height),
+		        IPointLocator.Type.BASE,
+                new VRectangle(0, 0, width, height),
 				minTriangleSideLength,
 				pointConstructor
 				);
-		uniformTriangulation.compute();
-		uniformTriangulation.finalize();
 	}
 
 	@Test
@@ -57,7 +52,7 @@ public class TestFFMUniformTriangulation {
 		targetPoints.add(new MeshPoint(5,5, false));
 		//EikonalSolver solver = new EikonalSolverFMMAcuteTriangulation(targetPoints, new UnitTimeCostFunction(), uniformTriangulation);
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(targetPoints, new UnitTimeCostFunction(), uniformTriangulation);
+		EikonalSolver solver = new EikonalSolverFMMTriangulation(new UnitTimeCostFunction(), targetPoints, uniformTriangulation);
 		log.info("start FFM");
 		solver.initialize();
 		log.info("FFM finished");

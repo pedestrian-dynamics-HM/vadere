@@ -125,6 +125,7 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 		VPoint pedPos = pedestrian.getPosition();
 		VPoint newPos = new VPoint(pos[0], pos[1]);
 		double result = 100000;
+		// TODO: this is a dirty hack, fix it!
 		if (pedestrian.getAttributesOSM().isSeeSmallWalls()) {
 			List<Obstacle> obstacles = pedestrian.getTopography().getObstacles();
 			for (Obstacle obstacle : obstacles) {

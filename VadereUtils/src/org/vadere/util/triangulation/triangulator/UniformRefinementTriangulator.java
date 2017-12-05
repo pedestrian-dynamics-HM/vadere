@@ -1,4 +1,4 @@
-package org.vadere.util.geometry.mesh.gen;
+package org.vadere.util.triangulation.triangulator;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -9,7 +9,6 @@ import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -21,35 +20,44 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
 /**
- * Triangulation creator!
+ * Triangulation creator: This class is realises an algorithm which refine a given triangulation
+ * (which might be empty), by recursively splitting existing triangles (starting with the super triangle if
+ * the triangulation is empty) into parts. The class is a Functional.
  *
  * @author Benedikt Zoennchen
  *
  * @param <P>
  */
-public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
 	private final Collection<VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
 	private ITriangulation<P, V, E, F>  triangulation;
 	private Set<P> points;
 	private IMesh<P, V, E, F> mesh;
-	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulation.class);
+	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulator.class);
 	private final IDistanceFunction distFunc;
 	private final static Random random = new Random();
 
-	public UniformRefinementTriangulation(
+    /**
+     * @param triangulation an empty triangulation to fill
+     * @param bound         the bounding box containing all boundaries and the topography with respect to the distance function distFunc
+     * @param boundary      the boundaries e.g. obstacles
+     * @param lenFunc       a edge length function
+     * @param distFunc      a signed distance function
+     */
+	public UniformRefinementTriangulator(
 			final ITriangulation<P, V, E, F> triangulation,
 			final VRectangle bound,
 			final Collection<VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
 			final IDistanceFunction distFunc) {
-		this.distFunc = distFunc;
+
+	    this.distFunc = distFunc;
 		this.triangulation = triangulation;
 		this.mesh = triangulation.getMesh();
 		this.boundary = boundary;
@@ -58,10 +66,10 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 		this.points = new HashSet<>();
 	}
 
-	public void compute() {
+	public void generate() {
 		triangulation.init();
 
-		logger.info("start computation");
+		logger.info("start triangulation generation");
 		LinkedList<E> toRefineEdges = new LinkedList<>();
 
 		for(E edge : mesh.getEdgeIt(mesh.getBoundary())) {
@@ -82,7 +90,7 @@ public class UniformRefinementTriangulation<P extends IPoint, V extends IVertex<
 		removeTrianglesOutsideBBox();
 		removeTrianglesInsideObstacles();
 		triangulation.finalize();
-		logger.info("end computation");
+		logger.info("end triangulation generation");
 	}
 
 	private void removeTrianglesOutsideBBox() {

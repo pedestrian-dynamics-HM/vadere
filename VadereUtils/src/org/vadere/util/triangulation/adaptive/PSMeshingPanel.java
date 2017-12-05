@@ -1,9 +1,9 @@
 package org.vadere.util.triangulation.adaptive;
 
-import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.improver.IMeshImprover;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,12 +17,12 @@ import javax.swing.*;
  */
 public class PSMeshingPanel extends Canvas {
 
-	private IPSMeshing meshGenerator;
+	private IMeshImprover meshGenerator;
 	private double width;
 	private double height;
 	private Collection<VTriangle> triangles;
 
-	public PSMeshingPanel(final IPSMeshing meshGenerator, final double width, final double height) {
+	public PSMeshingPanel(final IMeshImprover meshGenerator, final double width, final double height) {
 		this.meshGenerator = meshGenerator;
 		this.width = width;
 		this.height = height;

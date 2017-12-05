@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm.optimization;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesOSM;
@@ -21,6 +22,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 
 	private final double movementThreshold;
 	private final Random random;
+	private final static Logger log = LogManager.getLogger(StepCircleOptimizerDiscrete.class);
 
 	public StepCircleOptimizerDiscrete(final double movementThreshold, Random random) {
 		this.movementThreshold = movementThreshold;
@@ -86,8 +88,12 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 		// if number of circle is negative, choose number of circles according to
 		// StepCircleResolution
 		if (attributesOSM.getNumberOfCircles() < 0) {
+		    throw new IllegalArgumentException("number of circles is negative ("+attributesOSM.getNumberOfCircles()+")");
+
+			/*
+			 * Intention of this code snippet is unclear, therefore not jet removed.‚
 			numberOfCircles = (int) Math.ceil(attributesOSM
-					.getStepCircleResolution() / (2 * Math.PI));
+					.getStepCircleResolution() / (2 * Math.PI));*/
 		}
 
 		// maximum possible angle of movement relative to ankerAngle
@@ -98,6 +104,12 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 
 		// compute maximum angle and corresponding anchor if appropriate
 		if (attributesOSM.getMovementType() == MovementType.DIRECTIONAL) {
+		    //TODO: this code snippet has to be understood and maybe reformulate / explained
+            /*
+             * velocity dependent choice of the walking direction i.e. if pedestrians move fast they can not
+             * change their direction much.
+             */
+            log.warn("use of unexplained code!");
 			angle = getMovementAngle(pedestrian);
 			Vector2D velocity = pedestrian.getVelocity();
 			anchorAngle = velocity.angleToZero() - angle;
@@ -137,6 +149,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 
 	/**
 	 * The maximum deviation from the last movement direction given the current speed.
+     * See seitz-2016 PhD-thesis equation 4.6
 	 */
 	private static double getMovementAngle(PedestrianOSM pedestrian) {
 

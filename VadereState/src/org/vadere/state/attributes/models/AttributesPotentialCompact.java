@@ -2,6 +2,10 @@ package org.vadere.state.attributes.models;
 
 import org.vadere.state.attributes.Attributes;
 
+/**
+ * reference: The effect of stepping on pedestrian trajectories (seitz-2015).
+ *
+ */
 public class AttributesPotentialCompact extends Attributes {
 
 	private double pedPotentialWidth = 0.5;

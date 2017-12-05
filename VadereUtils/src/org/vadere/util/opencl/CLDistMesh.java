@@ -321,8 +321,8 @@ public class CLDistMesh {
     public void step() {
         /*
          * DistMesh-Loop
-         * 1. compute scaling factor
-		 * 2. compute forces;
+         * 1. generate scaling factor
+		 * 2. generate forces;
 		 * 3. update vertices;
          *
          */

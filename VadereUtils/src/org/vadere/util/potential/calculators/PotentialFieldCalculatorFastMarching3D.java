@@ -141,7 +141,7 @@ public class PotentialFieldCalculatorFastMarching3D {
 		}
 
 		DistPoint3D nearPoint;
-		// while there are near points to compute the potential at, compute it
+		// while there are near points to generate the potential at, generate it
 		while (narrowBand.size() > 0) {
 			// get the point with lowest distance
 			nearPoint = narrowBand.pollFirst();
