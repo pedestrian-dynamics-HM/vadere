@@ -11,6 +11,8 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.triangulation.IPointConstructor;
+import org.vadere.util.triangulation.IncrementalTriangulation;
+import org.vadere.util.triangulation.triangulator.UniformTriangulator;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,6 +22,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A triangulation is the combination of a mesh (IMesh) and a point locator (IPointLocator).
+ *
+ * @param <P>
+ * @param <V>
+ * @param <E>
+ * @param <F>
+ */
 public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>, ITriConnectivity<P, V, E, F> {
 
 	void init();
@@ -102,19 +112,21 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 	}
 
 
-	static <P extends IPoint> UniformTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createUniformTriangulation(
+	static <P extends IPoint> ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createUniformTriangulation(
 			final IPointLocator.Type type,
 			final VRectangle bound,
 			final double minTriangleSideLen,
 			final IPointConstructor<P> pointConstructor
 	) {
 
-		UniformTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new UniformTriangulation<>(bound, minTriangleSideLen);
+	    IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(bound);
 		IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh = new PMesh<>(pointConstructor);
 		triangulation.setMesh(mesh);
 
 		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPPointLocator(type, triangulation, bound, pointConstructor);
 		triangulation.setPointLocator(pointLocator);
+		new UniformTriangulator<>(bound, minTriangleSideLen, triangulation).generate();
+
 		return triangulation;
 	}
 

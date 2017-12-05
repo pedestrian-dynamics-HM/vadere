@@ -9,6 +9,8 @@ import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
+import org.vadere.util.triangulation.improver.IMeshImprover;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  */
-public class CLPSMeshing implements IPSMeshing {
+public class CLPSMeshing implements IMeshImprover {
 	private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
 	private boolean illegalMovement = false;
 	private IDistanceFunction distanceFunc;
@@ -66,12 +68,12 @@ public class CLPSMeshing implements IPSMeshing {
 	 * Start with a uniform refined triangulation
 	 */
 	public void initialize() {
-		log.info("##### (start) compute a uniform refined triangulation #####");
-		UniformRefinementTriangulation uniformRefinementTriangulation = new UniformRefinementTriangulation(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
-		uniformRefinementTriangulation.compute();
+		log.info("##### (start) generate a uniform refined triangulation #####");
+		UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
+		uniformRefinementTriangulation.generate();
 		retriangulate();
 		initialized = true;
-		log.info("##### (end) compute a uniform refined triangulation #####");
+		log.info("##### (end) generate a uniform refined triangulation #####");
 	}
 
 	public ITriangulation<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> getTriangulation() {
@@ -262,5 +264,10 @@ public class CLPSMeshing implements IPSMeshing {
     @Override
     public Collection<VTriangle> getTriangles() {
 		return triangulation.streamTriangles().collect(Collectors.toList());
+    }
+
+    @Override
+    public void improve() {
+        step();
     }
 }

@@ -11,19 +11,16 @@ import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.EikonalSolverFMMTriangulation;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.PSMeshing;
+import org.vadere.util.triangulation.improver.PSMeshing;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -137,6 +134,78 @@ public class TestFFMNonUniformTriangulation {
 	}
 
     @Test
+    public void testTriangulationFMMCase3() {
+
+        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4) * 2, Math.abs(distanceFunc.apply(p)) * 2);
+        //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
+        IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
+        List<VRectangle> targetAreas = new ArrayList<>();
+        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
+        meshGenerator.execute();
+        triangulation = meshGenerator.getTriangulation();
+
+        //targetPoints.add(new MeshPoint(0, 0, false));
+
+
+        VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
+        targetAreas.add(rect);
+
+        List<PVertex<MeshPoint>> targetPoints = triangulation.getMesh().getVertices().stream()
+                .filter(v -> triangulation.getMesh().isAtBoundary(v))
+                .filter(p->  (Math.abs(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0)) < 2).collect(Collectors.toList());
+
+        log.info(targetPoints);
+
+        EikonalSolver solver = new EikonalSolverFMMTriangulation(
+                new UnitTimeCostFunction(),
+                triangulation,
+                targetPoints,
+                p -> -(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0));
+
+        log.info("start FFM");
+        solver.initialize();
+        log.info("FFM finished");
+        double maxError = 0;
+        double sum = 0;
+        int counter = 0;
+        try {
+            //System.out.println(getClass().getClassLoader().getResource("./potentialField.csv").getFile());
+            FileWriter writer = new FileWriter("./potentialField_uniform_1_0_s.csv");
+
+            for(double y = bbox.getMinY()+2; y <= bbox.getMaxY()-2; y += 0.1) {
+                for(double x = bbox.getMinX()+2; x < bbox.getMaxX()-2; x += 0.1) {
+                    double val = solver.getValue(x ,y);
+                    if(val >= 0.0) {
+                        double side = new VPoint(x, y).distanceToOrigin()-2.0;
+                        side = Math.max(side, 0.0);
+                        maxError = Math.max(maxError, Math.abs(val - side));
+                        sum +=  Math.abs(val - side) *  Math.abs(val - side);
+                        counter++;
+                    }
+                    writer.write(""+solver.getValue(x ,y) + " ");
+                }
+                writer.write("\n");
+            }
+            writer.flush();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        log.info(triangulation.getMesh().getVertices().size());
+        log.info("max edge length: " + triangulation.getMesh().streamEdges().map(e -> triangulation.getMesh().toLine(e).length()).max(Comparator.comparingDouble(d -> d)));
+        log.info("min edge length: " +triangulation.getMesh().streamEdges().map(e -> triangulation.getMesh().toLine(e).length()).min(Comparator.comparingDouble(d -> d)));
+        //log.info("L2-Error: " + computeL2Error(triangulation, distanceFunc));
+        log.info("max error: " + maxError);
+        log.info("L2-error: " + Math.sqrt(sum / counter));
+        log.info("max distance to boundary: " + triangulation.getMesh().getBoundaryVertices().stream().map(p -> Math.abs(distanceFunc.apply(p))).max(Comparator.comparingDouble(d -> d)));
+        //assertTrue(0.0 == solver.getValue(5, 5));
+        //assertTrue(0.0 < solver.getValue(1, 7));
+    }
+
+    @Test
     public void testTriangulationFMMCase2() {
 
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4) * 2, Math.abs(distanceFunc.apply(p)) * 2);
@@ -208,7 +277,8 @@ public class TestFFMNonUniformTriangulation {
         //assertTrue(0.0 < solver.getValue(1, 7));
     }
 
-	private double computeL2Error(@NotNull final ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation, final IDistanceFunction distanceFunc) {
+
+    private double computeL2Error(@NotNull final ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation, final IDistanceFunction distanceFunc) {
 	    double sum = 0.0;
 	    for(IVertex<MeshPoint> vertex : triangulation.getMesh().getVertices()) {
 	        double diff = vertex.getPoint().getPotential() + distanceFunc.apply(vertex);

@@ -1,18 +1,18 @@
 package org.vadere.util.triangulation.adaptive;
 
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.triangulation.improver.LaplacianSmother;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
-import java.util.ArrayList;
-
 import javax.swing.*;
+import java.util.ArrayList;
 
 /**
  * Created by Matimati-ka on 27.09.2016.
  */
-public class TestEnhancedVersion3 extends JFrame {
+public class TestEnhancedVersion5 extends JFrame {
 
-	private TestEnhancedVersion3() {
+	private TestEnhancedVersion5() {
 
 		//IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
 		//IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
@@ -20,8 +20,8 @@ public class TestEnhancedVersion3 extends JFrame {
 		//IDistanceFunction distanceFunc = p -> 2 - Math.max(Math.abs(p.getX()-3), Math.abs(p.getY()));
 		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin() / 10;
+		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
 
@@ -32,7 +32,7 @@ public class TestEnhancedVersion3 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
+		LaplacianSmother meshGenerator = new LaplacianSmother(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
 		JFrame frame = distmeshPanel.display();
@@ -46,7 +46,7 @@ public class TestEnhancedVersion3 extends JFrame {
 		int counter = 0;
 		long time = 0;
 
-		while (counter <= 300) {
+            while (counter <= 10000) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
@@ -63,7 +63,7 @@ public class TestEnhancedVersion3 extends JFrame {
 			meshGenerator.improve();
 			ms = System.currentTimeMillis() - ms;
 			time += ms;
-			System.out.println("Quality: " + meshGenerator.getQuality());
+			//System.out.println("Quality: " + meshGenerator.getQuality());
 			System.out.println("Step-Time: " + ms);
 		}
 		//meshGenerator.finalize();
@@ -79,6 +79,6 @@ public class TestEnhancedVersion3 extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new TestEnhancedVersion3();
+		new TestEnhancedVersion5();
 	}
 }

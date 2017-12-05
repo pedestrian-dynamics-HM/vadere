@@ -1,24 +1,21 @@
-package org.vadere.util.geometry.mesh.gen;
+package org.vadere.util.triangulation;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.impl.VPUniformRefinement;
+import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.mesh.iterators.AdjacentFaceIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 
@@ -67,8 +64,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private final Predicate<? extends E> illegalPredicate;
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
 
-	// constructors
-
+	// constructors using the triangulation without a triangulator
 	public IncrementalTriangulation(
 			final Collection<P> points,
 			final Predicate<? extends E> illegalPredicate) {
@@ -91,6 +87,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.finalized = false;
 	}
 
+    // constructors using the triangulation with a triangulator
 	public IncrementalTriangulation(final VRectangle bound) {
 		this(bound, halfEdge -> true);
 	}
@@ -130,6 +127,8 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			log.warn("the second initialization of the " + this.getClass().getSimpleName() + " has no effect.");
 		}
 	}
+
+
 
 	@Override
 	public List<V> getSuperVertices() {
@@ -605,7 +604,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				10.0,
 				(x, y) -> new VPoint(x, y));
 
-		uniformTriangulation.compute();
+		uniformTriangulation.generate();
 		Set<VLine> edges3 = uniformTriangulation.getEdges();
 
 		JFrame window3 = new JFrame();
@@ -622,7 +621,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
 				p -> 10.0);
 
-		uniformRefinement.compute();
+		uniformRefinement.generate();
 		Set<VLine> edges4 = triangulation.getEdges();
 
 		JFrame window4 = new JFrame();

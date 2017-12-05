@@ -7,7 +7,7 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
-import org.vadere.util.geometry.mesh.gen.UniformRefinementTriangulation;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
@@ -76,12 +76,12 @@ public class PSMeshingOptimized {
 	 * Start with a uniform refined triangulation
 	 */
 	public void initialize() {
-		log.info("##### (start) compute a uniform refined triangulation #####");
-		UniformRefinementTriangulation uniformRefinementTriangulation = new UniformRefinementTriangulation(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
-		uniformRefinementTriangulation.compute();
+		log.info("##### (start) generate a uniform refined triangulation #####");
+		UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
+		uniformRefinementTriangulation.generate();
 		retriangulate();
 		initialized = true;
-		log.info("##### (end) compute a uniform refined triangulation #####");
+		log.info("##### (end) generate a uniform refined triangulation #####");
 	}
 
 	public ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation() {

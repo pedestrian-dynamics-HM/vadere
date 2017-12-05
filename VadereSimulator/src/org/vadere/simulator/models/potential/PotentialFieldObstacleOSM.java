@@ -51,7 +51,7 @@ public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 			}
 
 			// TODO [priority=medium] [task=bugfix] [Error?]: shouldn't the potential of all obstacles be added instead of taking the maximum? see paper 'Natural discretization...'
-			// TODO [priority=medium] [task=feature] If this algorithm is chosen: first compute distance, choose closest, and then compute potential.
+			// TODO [priority=medium] [task=feature] If this algorithm is chosen: first generate distance, choose closest, and then generate potential.
 			if (repulsion > potential) {
 				potential = repulsion;
 			}

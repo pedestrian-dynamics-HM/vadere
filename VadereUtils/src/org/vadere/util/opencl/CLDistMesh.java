@@ -456,8 +456,8 @@ public class CLDistMesh<P extends IPoint> {
     public boolean step(final boolean flipAll) {
         /*
          * DistMesh-Loop
-         * 1. compute scaling factor
-		 * 2. compute forces;
+         * 1. generate scaling factor
+		 * 2. generate forces;
 		 * 3. update vertices;
 		 * 4. check for illegal triangles
 		 * 5. flip all

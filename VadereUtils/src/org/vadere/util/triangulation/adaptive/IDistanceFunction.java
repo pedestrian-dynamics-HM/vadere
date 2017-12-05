@@ -8,6 +8,14 @@ import org.vadere.util.geometry.shapes.VShape;
 import java.util.Collection;
 import java.util.function.Function;
 
+
+/**
+ * @author Benedikt Zoennchen
+ *
+ * A signed distance function d.
+ * d(x) > 0 => x is outside
+ * d(x) <= 0 => x is inside
+ */
 @FunctionalInterface
 public interface IDistanceFunction extends Function<IPoint, Double> {
 

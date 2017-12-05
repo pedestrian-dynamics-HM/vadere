@@ -41,7 +41,7 @@ public class TestVisual {
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
 				p -> 10.0);
 
-		uniformRefinement.compute();
+		uniformRefinement.generate();
 		//triangulation.finalize();
 		Set<VLine> edges4 = triangulation.getEdges();
 

@@ -1,9 +1,6 @@
-package org.vadere.util.geometry.mesh.gen;
+package org.vadere.util.triangulation.triangulator;
 
-import org.vadere.util.geometry.mesh.gen.IncrementalTriangulation;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IVertex;
+import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -12,17 +9,20 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class UniformTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, V, E, F> {
+public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
 
 	private double left;
 	private double top;
 	private double width;
 	private double height;
 	private double minTriangleSideLength;
+	private final ITriangulation<P, V, E, F> triangulation;
 
-	public UniformTriangulation(final VRectangle bound,
-								final double minTriangleSideLength) {
-		super(bound);
+	public UniformTriangulator(final VRectangle bound,
+                               final double minTriangleSideLength,
+                               final ITriangulation<P, V, E, F> triangulation
+                                ) {
+		this.triangulation = triangulation;
 		this.left = bound.getMinX();
 		this.top = bound.getMinY();
 		this.width = bound.getWidth();
@@ -30,18 +30,22 @@ public class UniformTriangulation<P extends IPoint, V extends IVertex<P>, E exte
 		this.minTriangleSideLength = minTriangleSideLength;
 	}
 
-	@Override
-	public void compute() {
-		init();
+    @Override
+    public void generate() {
+        triangulation.init();
 
-		List<P> pointList = new ArrayList<>(generatePointSet());
-		//Collections.shuffle(pointList);
+        List<P> pointList = new ArrayList<>(generatePointSet());
+        //Collections.shuffle(pointList);
 
-		for(P point : pointList) {
-			insert(point);
-		}
+        for(P point : pointList) {
+            triangulation.insert(point);
+        }
 
-		super.finalize();
+        triangulation.finalize();
+    }
+
+	private IMesh<P, V, E, F> getMesh() {
+        return triangulation.getMesh();
 	}
 
 	private Collection<P> generatePointSet() {
@@ -78,4 +82,5 @@ public class UniformTriangulation<P extends IPoint, V extends IVertex<P>, E exte
 		}
 		return pointSet;
 	}
+
 }
