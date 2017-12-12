@@ -1,10 +1,13 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.swing.*;
 
@@ -16,11 +19,13 @@ public class PSDistmeshPanel extends Canvas {
 	private PSDistmesh meshGenerator;
 	private double width;
 	private double height;
+	private final Predicate<PFace<MeshPoint>> alertPred;
 
-	public PSDistmeshPanel(final PSDistmesh meshGenerator, final double width, final double height) {
+	public PSDistmeshPanel(final PSDistmesh meshGenerator, final Predicate<PFace<MeshPoint>> alertPred, final double width, final double height) {
 		this.meshGenerator = meshGenerator;
 		this.width = width;
 		this.height = height;
+		this.alertPred = alertPred;
 	}
 
 	@Override
@@ -40,8 +45,12 @@ public class PSDistmeshPanel extends Canvas {
 	        }*/
 
 		graphics.setColor(Color.BLACK);
-		for(VTriangle triangle : meshGenerator.getTriangles()) {
-			if(triangle.isNonAcute()) {
+		Set<PFace<MeshPoint>> faceSet = meshGenerator.getTriangulation().getFaces();
+
+
+		for(PFace<MeshPoint> face : faceSet) {
+            VTriangle triangle = meshGenerator.getTriangulation().getMesh().toTriangle(face);
+		    if(alertPred.test(face)) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
 				graphics.setColor(Color.RED);

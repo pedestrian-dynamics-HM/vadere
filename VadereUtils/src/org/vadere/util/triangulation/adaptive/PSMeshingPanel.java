@@ -1,5 +1,10 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IHalfEdge;
+import org.vadere.util.geometry.mesh.inter.IVertex;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -9,28 +14,31 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.swing.*;
 
 /**
  * Created by bzoennchen on 29.05.17.
  */
-public class PSMeshingPanel extends Canvas {
+public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
 
 	private IMeshImprover meshGenerator;
 	private double width;
 	private double height;
-	private Collection<VTriangle> triangles;
+	private Collection<F> faces;
+    private final Predicate<F> alertPred;
 
-	public PSMeshingPanel(final IMeshImprover meshGenerator, final double width, final double height) {
-		this.meshGenerator = meshGenerator;
-		this.width = width;
-		this.height = height;
-		this.triangles = new ArrayList<>();
-	}
+    public PSMeshingPanel(final IMeshImprover<P, V, E, F> meshGenerator, final Predicate<F> alertPred, final double width, final double height) {
+        this.meshGenerator = meshGenerator;
+        this.width = width;
+        this.height = height;
+        this.alertPred = alertPred;
+    }
 
 	public void update() {
-		triangles = meshGenerator.getTriangles();
+		faces = meshGenerator.getTriangulation().getMesh().getFaces();
 	}
 
 	@Override
@@ -54,8 +62,8 @@ public class PSMeshingPanel extends Canvas {
 		graphics.scale(30, 30);
 		graphics.setStroke(new BasicStroke(0.003f));
 		graphics.setColor(Color.BLACK);
-		for(VTriangle triangle : triangles) {
-
+		for(F face : faces) {
+            VTriangle triangle = meshGenerator.getTriangulation().getMesh().toTriangle(face);
 			/*if(triangleToQuality(triangle) < 0.2) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
@@ -63,7 +71,7 @@ public class PSMeshingPanel extends Canvas {
 				graphics.fill(triangle);
 			}*/
 
-			if(triangle.isNonAcute()) {
+			if(alertPred.test(face)) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
 				graphics.setColor(Color.RED);
