@@ -47,7 +47,7 @@ public class TestEnhancedVersion extends JFrame {
         System.out.println(System.currentTimeMillis()-now);
         now = System.currentTimeMillis();
         System.out.println(System.currentTimeMillis()-now);
-        PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800);
+        PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute(), 1000, 800);
         JFrame frame = distmeshPanel.display();
         frame.setVisible(true);
         double quality = meshGenerator.qualityCheck();

@@ -1,9 +1,14 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
+import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import javax.swing.*;
 
@@ -34,7 +39,9 @@ public class TestEnhancedVersion3 extends JFrame {
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 		PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.2, bbox, new ArrayList<>());
 
-		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
+        Predicate<PFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
+
+		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 

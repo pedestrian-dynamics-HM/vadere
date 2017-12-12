@@ -1,11 +1,15 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.improver.LaplacianSmother;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 /**
  * Created by Matimati-ka on 27.09.2016.
@@ -34,7 +38,10 @@ public class TestEnhancedVersion5 extends JFrame {
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 		LaplacianSmother meshGenerator = new LaplacianSmother(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 
-		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
+
+        Predicate<PFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
+        PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
+
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 
