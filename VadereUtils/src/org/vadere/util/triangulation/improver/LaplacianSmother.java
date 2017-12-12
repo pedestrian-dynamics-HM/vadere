@@ -13,12 +13,12 @@ import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.Parameters;
 import org.vadere.util.triangulation.triangulator.RandomPointsSetTriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -36,6 +36,7 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
     private ArrayList<Pair<MeshPoint, MeshPoint>> edges;
     private final VRectangle bound;
     private final double initialEdgeLen;
+    private final double deps;
 
     private double delta = 0.5;
     private boolean runParallel = false;
@@ -51,6 +52,7 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
         this.bound = bound;
         this.distanceFunc = distanceFunc;
         this.edgeLengthFunc = edgeLengthFunc;
+        this.deps = 1.4901e-8 * initialEdgeLen;
         this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
         this.triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new MeshPoint(x, y, false));
@@ -64,6 +66,7 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
 
         RandomPointsSetTriangulator randomTriangulator = new RandomPointsSetTriangulator(triangulation, 3000, bound, distanceFunc);
         randomTriangulator.generate();
+        removeTrianglesInsideObstacles();
         log.info("##### (end) generate a uniform refined triangulation #####");
     }
 
@@ -75,8 +78,12 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
 
     @Override
     public void improve() {
-        streamVertices().forEach(v -> computeForce(v));
-        streamVertices().forEach(v -> applyLaplacian(v));
+        streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> shrinkForce(v));
+        streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> applyLaplacian(v));
+        //streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> inflateForce(v));
+        //streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> applyLaplacian(v));
+        retriangulate();
+        //streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> projectBackVertex(v));
     }
 
     @Override
@@ -84,28 +91,96 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
         return triangulation;
     }
 
-    private void computeForce(final PVertex<MeshPoint> vertex) {
+    private VPoint laplacian(final PVertex<MeshPoint> vertex) {
         VPoint p = getMesh().getPoint(vertex).toVPoint();
-
         long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
-        log.info("number of neighbours = " + numberOfNeighbours);
+
+        double weightsSum = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
+                .map(v -> getMesh().getPoint(v))
+                .map(m -> m.toVPoint())
+                .mapToDouble(m -> 1.0 / m.distance(p)).sum();
+
         VPoint laplacian = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
                 .map(v -> getMesh().getPoint(v))
                 .map(m -> m.toVPoint())
+                .map(m -> m.scalarMultiply(1.0 / m.distance(p)))
                 .reduce(new VPoint(0,0), (p1, p2) -> p1.add(p2))
+                .scalarMultiply(1.0 / weightsSum);
+
+        return laplacian;
+    }
+
+    private VPoint laplacianSquare(final PVertex<MeshPoint> vertex) {
+        VPoint laplacian = laplacian(vertex);
+
+        long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
+        VPoint laplacianSquare = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
+                .map(v -> laplacian(v).subtract(laplacian))
+                .reduce(new VPoint(0, 0), (p1, p2) -> p1.add(p2))
                 .scalarMultiply(1.0 / numberOfNeighbours);
-                //.subtract(p);
 
-        log.info(laplacian);
+        return laplacianSquare;
+    }
 
-        getMesh().getPoint(vertex).setVelocity(laplacian);
+    private void shrinkForce(final PVertex<MeshPoint> vertex) {
+        VPoint p = getMesh().getPoint(vertex).toVPoint();
+
+
+        double alpha = 0.05;
+        double beta = 0.5;
+
+        VPoint shrink = laplacian(vertex).subtract(p).scalarMultiply(alpha);
+        VPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
+
+        //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
+        getMesh().getPoint(vertex).setVelocity(p.add(shrink));
+    }
+
+    private void inflateForce(final PVertex<MeshPoint> vertex) {
+        VPoint p = getMesh().getPoint(vertex).toVPoint();
+
+
+        double alpha = 1;
+        double beta = 0.5;
+
+        VPoint shrink = laplacian(vertex).subtract(p).scalarMultiply(alpha);
+        VPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
+
+        //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
+        getMesh().getPoint(vertex).setVelocity(p.add(inflate));
     }
 
     private void applyLaplacian(final PVertex<MeshPoint> vertex) {
         VPoint p = getMesh().getPoint(vertex).toVPoint();
         IPoint force = getMesh().getPoint(vertex).getVelocity();
+
         getMesh().getPoint(vertex).set(force.getX(), force.getY());
 
+    }
+
+    /**
+     * projects the vertex back if it is no longer inside the boundary or inside an obstacle.
+     *
+     * @param vertex the vertex
+     */
+    private void projectBackVertex(final PVertex<MeshPoint> vertex) {
+        MeshPoint position = getMesh().getPoint(vertex);
+        double distance = distanceFunc.apply(position);
+        if(distance > 0) {
+            double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
+            double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
+            VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
+            position.subtract(projection);
+        }
+    }
+
+    private void removeTrianglesInsideObstacles() {
+        List<PFace<MeshPoint>> faces = triangulation.getMesh().getFaces();
+        for(PFace<MeshPoint> face : faces) {
+            if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
+                triangulation.removeFace(face, true);
+            }
+        }
     }
 
     // helper methods
@@ -119,5 +194,12 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
 
     private IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
         return triangulation.getMesh();
+    }
+
+    // TODO: parallize the whole triangulation
+    public void retriangulate() {
+        triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
+        removeTrianglesInsideObstacles();
+        triangulation.finalize();
     }
 }
