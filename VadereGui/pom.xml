@@ -36,6 +36,27 @@
       </testResource>
     </testResources>
     <plugins>
+    <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+            <execution>
+                <phase>prepare-package</phase>
+                <goals>
+                    <goal>java</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <mainClass>org.vadere.gui.compileScripts.ClassListGenerator</mainClass>
+            <arguments>
+                <argument>foo</argument>
+                <argument>bar</argument>
+            </arguments>
+        </configuration>
+    </plugin>
+
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.0</version>
