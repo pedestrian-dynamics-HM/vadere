@@ -5,7 +5,7 @@
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "/Users/bzoennchen/Development/workspaces/hmRepo/GitLab/vadere/VadereModelTests/TestOSM/output/queueing_floor_field_osm1_2017-10-24_14-50-26.402/postvis.trajectories",
+      "filename" : "postvis.trajectories",
       "processors" : [ 1, 2 ]
     } ],
     "processors" : [ {

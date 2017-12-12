@@ -2,37 +2,11 @@
   "name" : "rimea_01_pathway_gnm1",
   "description" : "",
   "release" : "0.2",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 34.0,
-        "maxEvacuationTimeMean" : 34.0,
-        "minEvacuationTime" : 26.0,
-        "minEvacuationTimeMean" : 26.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  }, {
-    "formatString" : "%s %s %s %s %s %s %s %s %s %s %s",
-    "columnNames" : [ "time", "id", "lastX", "lastY", "firstX", "firstY", "targetId", "sourceId", "startTime", "endTime", "evacTime" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "columnNames" : [ ],
-      "clazz" : "PedestrianLastPositionProcessor"
-    }
-  } ],
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
@@ -128,6 +102,7 @@
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1200.0,
         "spawnAtRandomPositions" : true,

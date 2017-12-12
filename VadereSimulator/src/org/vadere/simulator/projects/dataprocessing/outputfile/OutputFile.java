@@ -28,7 +28,16 @@ import java.util.stream.Stream;
 
 public abstract class OutputFile<K extends DataKey<K>> {
 	private String[] keyHeaders;
+
+    /**
+     * The file name without the path to the file
+     */
 	private String fileName;
+
+    /**
+     * Temporary absolute file name, this should not be serialized
+     */
+	private volatile String absoluteFileName;
 
 	private List<Integer> processorIds;
 	private List<DataProcessor<K, ?>> dataProcessors;
@@ -41,17 +50,10 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void setAbsoluteFileName(final String fileName) {
-		this.fileName = fileName;
+	    this.absoluteFileName = fileName;
 	}
 
 	public void setRelativeFileName(final String fileName) {
-	   /* File file = new File(this.fileName);
-	    if(file.getParentFile() != null) {
-            this.fileName = new File(this.fileName).getParentFile().toPath().resolve(fileName).toString();
-        }
-        else {
-	        this.fileName = fileName;
-        }*/
 	   this.fileName = fileName;
 
     }
@@ -75,7 +77,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void write() {
-		try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
+		try (PrintWriter out = new PrintWriter(new FileWriter(absoluteFileName))) {
 			printHeader(out);
 
 			this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())

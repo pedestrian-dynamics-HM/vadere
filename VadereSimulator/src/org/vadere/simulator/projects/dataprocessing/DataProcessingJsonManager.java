@@ -90,7 +90,7 @@ public class DataProcessingJsonManager {
 
     private OutputFile<?> instantiateOutputFile(final OutputFileStore fileStore) {
         OutputFile<?> file = outputFileInstantiator.createObject(fileStore.getType());
-        file.setAbsoluteFileName(fileStore.getFilename());
+        file.setRelativeFileName(fileStore.getFilename());
         file.setProcessorIds(fileStore.getProcessors());
         file.setSeparator(fileStore.getSeparator());
         return file;
