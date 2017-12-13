@@ -52,7 +52,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	private double sumOfqLengths;
 
 	private boolean initialized = false;
-	private boolean runParallel = false;
+	private boolean runParallel = true;
 
 	private int numberOfRetriangulations = 0;
 	private int numberOfIterations = 0;
@@ -90,7 +90,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	}
 
 	@Override
-    public void improve() {
+    public synchronized void improve() {
         step();
     }
 
@@ -111,7 +111,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        removeBoundaryLowQualityTriangles();
+        //removeBoundaryLowQualityTriangles();
         triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         triangulation.finalize();
@@ -132,7 +132,29 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 
-		//long ms = System.currentTimeMillis();
+        // there might be some illegal movements
+        if(minDeltaTravelDistance < 0.0) {
+           // illegalMovement = isMovementIllegal();
+            numberOfIllegalMovementTests++;
+        }
+
+        //retriangulate();
+        if(illegalMovement) {
+            retriangulate();
+            //while (flipEdges());
+
+            numberOfRetriangulations++;
+        }
+        else {
+            flipEdges();
+        }
+
+        if(minDeltaTravelDistance <= 0) {
+//			computeMaxLegalMovements();
+        }
+
+
+        //long ms = System.currentTimeMillis();
 		//ms = System.currentTimeMillis() - ms;
 		//log.info("ms: " + ms);
 		computeScalingFactor();
@@ -140,27 +162,6 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
         computeForces();
 		//computeDelta();
 		updateVertices();
-
-		// there might be some illegal movements
-		if(minDeltaTravelDistance < 0.0) {
-			illegalMovement = isMovementIllegal();
-			numberOfIllegalMovementTests++;
-		}
-
-        //retriangulate();
-		if(illegalMovement) {
-			retriangulate();
-			//while (flipEdges());
-
-			numberOfRetriangulations++;
-		}
-		else {
-			flipEdges();
-		}
-
-		if(minDeltaTravelDistance <= 0) {
-//			computeMaxLegalMovements();
-		}
 
 		numberOfIterations++;
 		log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
@@ -234,7 +235,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
     private void projectBackVertex(final PVertex<MeshPoint> vertex) {
         MeshPoint position = getMesh().getPoint(vertex);
         double distance = distanceFunc.apply(position);
-        if(distance > 0) {
+        if(distance > 0 || getMesh().isAtBoundary(vertex)) {
             double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
             double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
             VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
@@ -250,10 +251,10 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
     private boolean flipEdges() {
         boolean anyFlip = false;
         // there is still an illegal edge
-        while (streamEdges().anyMatch(e -> triangulation.isIllegal(e))) {
+        //while (streamEdges().anyMatch(e -> triangulation.isIllegal(e))) {
             streamEdges().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flip(e));
             anyFlip = true;
-        }
+        //}
         return anyFlip;
     }
 
@@ -428,19 +429,13 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	}
 
     private void removeBoundaryLowQualityTriangles() {
-        List<PFace<MeshPoint>> faces = getMesh().streamEdges().filter(e -> getMesh().isBoundary(e)).map(e -> getMesh().getTwinFace(e)).collect(Collectors.toList());
-
-        for(PFace<MeshPoint> face : faces) {
-            if(!getMesh().isDestroyed(face) && faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE) {
-                //Optional<PHalfEdge<MeshPoint>> optEdge = getMesh().getLinkToBoundary(face);
-
-                //if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
-                //PHalfEdge<MeshPoint> edge = getMesh().getNext(optEdge.get());
-                //projectToBoundary(getMesh().getVertex(edge));
-                triangulation.removeFace(face, true);
-                //}
-            }
-        };
+        streamEdges()
+                .filter(e -> getMesh().isBoundary(e))
+                .map(e -> getMesh().getTwinFace(e))
+                .filter(face -> !getMesh().isDestroyed(face))
+                .filter(face -> faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE)
+                .collect(Collectors.toList()) // we have to collect since we manipulate / remove faces
+                .forEach(face -> triangulation.removeFace(face, true));
     }
 
 	public double faceToQuality(final PFace<MeshPoint> face) {

@@ -6,7 +6,7 @@ package org.vadere.util.triangulation.adaptive;
 public class Parameters {
     public final static double TOL = .1;
     public final static double FSCALE = 1.2;
-    public final static double DELTAT = 0.06;
+    public final static double DELTAT = 0.3;
     public final static double MIN_QUALITY_TRIANGLE = 0.2;
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
