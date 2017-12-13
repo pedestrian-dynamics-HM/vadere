@@ -1,5 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
@@ -24,6 +26,7 @@ import javax.swing.*;
  */
 public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
 
+    private static final Logger log = LogManager.getLogger(PSMeshingPanel.class);
 	private IMeshImprover meshGenerator;
 	private double width;
 	private double height;
@@ -43,27 +46,30 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 
 	@Override
 	public void paint(Graphics g) {
-		Graphics2D graphics2D = (Graphics2D) g;
-		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-		Graphics2D graphics = (Graphics2D) image.getGraphics();
+        synchronized (meshGenerator) {
+            update();
+            Graphics2D graphics2D = (Graphics2D) g;
+            BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = (Graphics2D) image.getGraphics();
 
 
-		//graphics.scale(3, 3);
+            //graphics.scale(3, 3);
 
-		graphics.setColor(Color.WHITE);
-		graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
+            graphics.setColor(Color.WHITE);
+            graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
 
-		graphics.setColor(Color.GRAY);
+            graphics.setColor(Color.GRAY);
 	       /* for(VShape obstacle : obstacles) {
 		        graphics.fill(obstacle);
 	        }*/
 
-		graphics.translate(400, 400);
-		graphics.scale(30, 30);
-		graphics.setStroke(new BasicStroke(0.003f));
-		graphics.setColor(Color.BLACK);
-		for(F face : faces) {
-            VTriangle triangle = meshGenerator.getTriangulation().getMesh().toTriangle(face);
+            graphics.translate(400, 400);
+            graphics.scale(20, 20);
+            graphics.setStroke(new BasicStroke(0.003f));
+            graphics.setColor(Color.BLACK);
+            for(F face : faces) {
+                //log.info(face);
+                VTriangle triangle = meshGenerator.getTriangulation().getMesh().toTriangle(face);
 			/*if(triangleToQuality(triangle) < 0.2) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
@@ -71,19 +77,20 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 				graphics.fill(triangle);
 			}*/
 
-			if(alertPred.test(face)) {
-				graphics.setColor(Color.GRAY);
-				graphics.draw(triangle);
-				graphics.setColor(Color.RED);
-				graphics.fill(triangle);
-			} else {
-				graphics.setColor(Color.GRAY);
-				graphics.draw(triangle);
-			}
-		}
-		//graphics.translate(5,5);
-		graphics2D.drawImage(image, 0, 0, null);
-
+                if(alertPred.test(face)) {
+                    log.info("red triangle");
+                    graphics.setColor(Color.BLACK);
+                    graphics.draw(triangle);
+                    graphics.setColor(Color.RED);
+                    graphics.fill(triangle);
+                } else {
+                    graphics.setColor(Color.GRAY);
+                    graphics.draw(triangle);
+                }
+            }
+            //graphics.translate(5,5);
+            graphics2D.drawImage(image, 0, 0, null);
+        }
 
 //            graphics.setColor(Color.RED);
 //            tc.triangulation.getTriangles().parallelStream().forEach(graphics::draw);
