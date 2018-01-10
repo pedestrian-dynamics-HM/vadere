@@ -4,6 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.state.attributes.processor.AttributesMeanPedestrianEvacuationTimeProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,5 +44,14 @@ public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataK
         this.putValue(NoDataKey.key(), count > 0
                 ? nonNans.stream().reduce(0.0, (val1, val2) -> val1 + val2) / count
                 : Double.NaN);
+    }
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesMeanPedestrianEvacuationTimeProcessor());
+        }
+
+        return super.getAttributes();
     }
 }

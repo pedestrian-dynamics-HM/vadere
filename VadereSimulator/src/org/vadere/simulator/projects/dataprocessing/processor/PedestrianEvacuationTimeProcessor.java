@@ -4,6 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 /**
@@ -66,4 +67,12 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 				.forEach(key -> this.putValue(key, Double.NaN));
 	}
 
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesPedestrianEvacuationTimeProcessor());
+        }
+
+        return super.getAttributes();
+    }
 }

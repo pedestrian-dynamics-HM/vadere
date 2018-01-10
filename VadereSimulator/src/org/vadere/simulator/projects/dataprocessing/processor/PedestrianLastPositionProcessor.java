@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
@@ -44,4 +45,13 @@ public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdK
 
 		return new String[] { Double.toString(pos.x), Double.toString(pos.y) };
 	}
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesPedestrianLastPositionProcessor());
+        }
+
+        return super.getAttributes();
+    }
 }

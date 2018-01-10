@@ -10,6 +10,7 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
@@ -55,5 +56,14 @@ public class TargetFloorFieldProcessor extends DataProcessor<TimestepPositionKey
     public void init(final ProcessorManager manager) {
         this.att = (AttributesFloorFieldProcessor) this.getAttributes();
         this.targetId = att.getTargetId();
+    }
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesFloorFieldProcessor());
+        }
+
+        return super.getAttributes();
     }
 }

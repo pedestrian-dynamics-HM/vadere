@@ -9,6 +9,7 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepRowKey;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.FloorFieldGridRow;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -76,5 +77,14 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
     @Override
     public String[] toStrings(TimestepRowKey key) {
         return this.getValue(key).toStrings();
+    }
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesFloorFieldProcessor());
+        }
+
+        return super.getAttributes();
     }
 }
