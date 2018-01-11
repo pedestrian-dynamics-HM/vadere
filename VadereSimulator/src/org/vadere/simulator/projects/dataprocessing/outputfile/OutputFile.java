@@ -73,6 +73,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	@SuppressWarnings("unchecked")
 	public void init(final ProcessorManager manager) {
+		this.dataProcessors.clear();
 		processorIds.forEach(pid -> this.dataProcessors.add((DataProcessor<K, ?>) manager.getProcessor(pid)));
 	}
 
