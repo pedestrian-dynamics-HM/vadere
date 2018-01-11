@@ -61,7 +61,7 @@
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 5.0,
-          "pedestrianDynamicWeight" : 6.0,
+          "pedestrianDynamicWeight" : 1.0,
           "loadingType" : "CONSTANT"
         }
       }

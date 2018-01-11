@@ -6,16 +6,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.function.Function;
 
+import org.apache.tools.ant.taskdefs.Tar;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.scenario.TopographyIterator;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
+import org.vadere.state.scenario.*;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -24,7 +24,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	/**
 	 * Lists for thread safe data exchange between main and draw thread.
 	 */
-	private LinkedList<CellGrid> potentialFieldSnapshots;
 	private LinkedList<VoronoiDiagram> voronoiSnapshots;
 	private LinkedList<OnlineVisualization.ObservationAreaSnapshotData> observationAreaSnapshots;
 
@@ -33,7 +32,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	 * pontetial field of a certain pedestrian. See 'Simulation' for more
 	 * information. For debug purposes. Updated by popDrawData().
 	 */
-	private CellGrid potentialField = null;
+	private PotentialFieldTarget potentialField = null;
 
 	/**
 	 * Latest snapshot of the jts diagram to be displayed. Updated by
@@ -61,7 +60,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	public OnlineVisualizationModel() {
 		super(new DefaultSimulationConfig());
 		this.drawDataSynchronizer = new Object();
-		this.potentialFieldSnapshots = new LinkedList<>();
 		this.voronoiSnapshots = new LinkedList<>();
 		this.observationAreaSnapshots = new LinkedList<>();
 	}
@@ -109,6 +107,9 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 					observationAreaSnapshots.getFirst();
 			simTimeInSec = observationAreaSnapshot.simTimeInSec;
 
+			// potentialField might be null!
+			potentialField = observationAreaSnapshot.potentialFieldTarget;
+
 			/*
 			 * if(topography == null ||
 			 * !topography.getBounds().equals(observationAreaSnapshot.scenario.getBounds())) {
@@ -134,20 +135,15 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 				setSelectedElement(ped);
 			}
 
-
-			if (!potentialFieldSnapshots.isEmpty()) {
-				potentialField = potentialFieldSnapshots.getFirst();
-			}
-
 			if (!voronoiSnapshots.isEmpty()) {
 				voronoiDiagram = voronoiSnapshots.getFirst();
 			}
+
 			return true;
 		}
 	}
 
-	public void pushObersavtionAreaSnapshot(
-			final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
+	public void pushObersavtionAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
 		if (observationAreaSnapshots.size() > 0) {
 			observationAreaSnapshots.pop();
 		}
@@ -156,7 +152,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	public void reset() {
-		potentialFieldSnapshots.clear();
 		voronoiSnapshots.clear();
 		observationAreaSnapshots.clear();
 		selectedElement = null;
@@ -175,15 +170,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		return drawDataSynchronizer;
 	}
 
-
-	/**
-	 * Returns the list of potential field snapshots. Used for thread safe data
-	 * exchange between main thread and draw thread.
-	 */
-	public LinkedList<CellGrid> getPotentialFieldSnapshots() {
-		return potentialFieldSnapshots;
-	}
-
 	/**
 	 * Returns the list of jts diagram snapshots. Used for thread safe data
 	 * exchange between main thread and draw thread.
@@ -193,13 +179,22 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	@Override
-	public Optional<CellGrid> getPotentialField() {
-		return Optional.ofNullable(potentialField);
+	public Function<VPoint, Double> getPotentialField() {
+	    Function<VPoint, Double> f = pos -> 0.0;
+
+	    if(potentialField != null) {
+            if(getSelectedElement() instanceof Agent) {
+                Agent selectedAgent = (Agent)getSelectedElement();
+                f = pos -> potentialField.getTargetPotential(pos, selectedAgent);
+            }
+        }
+
+		return f;
 	}
 
 	@Override
 	public boolean isFloorFieldAvailable() {
-		return getPotentialField().isPresent();
+		return true;
 	}
 
 	public double getSimTimeInSec() {

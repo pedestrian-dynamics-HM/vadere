@@ -51,8 +51,7 @@ public interface PotentialFieldAgent extends Model {
 	 *        the pedestrian in the center of the relevant area. It can be
 	 *        used to determine if some pedestrians have special relation
 	 *        (like group member) that would change the potential value.
-	 * @param scenario
-	 *        the current scenario to enable the
+	 * @param topography the current topography to enable the
 	 *        {@link PotentialFieldAgent} to search for the relevant
 	 *        pedestrians.
 	 * @return

@@ -3,11 +3,13 @@ package org.vadere.util.potential;
 import java.awt.Point;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 
 /**
@@ -298,4 +300,40 @@ public class CellGrid {
 		}
 		return true;
 	}
+
+    /**
+     * Returns a function VPoint (x,y-coordinate) -> Double (potential) which
+     * computes the bilinearInterpolated potential for a given coordinate.
+     *
+     * @return  a function VPoint (x,y-coordinate) -> Double (potential)
+     */
+	public Function<VPoint, Double> getInterpolationFunction() {
+        return pos -> {
+            int incX = 1;
+            int incY = 1;
+
+            Point gridPoint = getNearestPointTowardsOrigin(pos);
+
+            if (gridPoint.x + 1 >= getNumPointsX()) {
+                incX = 0;
+            }
+
+            if (gridPoint.y + 1 >= getNumPointsY()) {
+                incY = 0;
+            }
+
+
+            VPoint gridPointCoord = pointToCoord(gridPoint);
+
+            double z1 = getValue(gridPoint).potential;
+            double z2 = getValue(new Point(gridPoint.x + incX, gridPoint.y)).potential;
+            double z3 = getValue(new Point(gridPoint.x + incX, gridPoint.y + incY)).potential;
+            double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
+
+            double t = (pos.x - gridPointCoord.x) / getResolution();
+            double u = (pos.y - gridPointCoord.y) / getResolution();
+
+            return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
+        };
+    }
 }

@@ -24,7 +24,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 
 	protected static double EPSILON_SIM_TIME = 1e-100; // TODO [priority=medium] [task=fix] 1e-100 comparisons with values that are O(1e-8) are dangerous. Better use 1e-8 here.
 	protected double lastUpdateTimestamp;
-	private Topography topography;
+	protected Topography topography;
 	private boolean wasUpdated;
 	private static Logger logger = LogManager.getLogger(AbstractPotentialFieldTarget.class);
 
@@ -237,4 +237,15 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialTargetGr
 			return Optional.empty();
 		}
 	}
+
+    @Override
+    public AbstractPotentialFieldTarget clone() {
+        try {
+            AbstractPotentialFieldTarget clone = (AbstractPotentialFieldTarget) super.clone();
+            clone.topography = topography.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
 }

@@ -3,6 +3,7 @@ package org.vadere.simulator.models.queuing;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -153,7 +154,12 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialTargetGrid, Dy
 		throw new UnsupportedOperationException("method not implemented jet.");
 	}
 
-	@Override
+    @Override
+    public PotentialFieldTargetQueuingGrid clone() {
+        throw new UnsupportedOperationException("this method is not jet implemented");
+    }
+
+    @Override
 	public void preLoop(double simTimeInSec) {
 		competitiveField.preLoop(simTimeInSec);
 		gentleField.preLoop(simTimeInSec);
