@@ -13,11 +13,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.function.Function;
 
 import org.vadere.gui.components.model.IDefaultModel;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
@@ -225,6 +228,77 @@ public abstract class DefaultRenderer {
 	protected float getLineWidth() {
 		return (float) (2.0 / defaultModel.getScaleFactor());
 	}
+
+    /*protected void paintPotentialField(final Graphics2D g, final Function<VPoint, Double> potentialField, final VRectangle bound) {
+        float norm;
+
+        if (potentialField == null) {
+            return;
+        }
+
+        double pixToW = 1.0 / defaultModel.getScaleFactor();
+        double potOld, maxPotential = 0, invPotential;
+        double maxBorder = Math.max(bound.getWidth(), bound.getHeight());
+
+
+
+        for (double y = bound.getMinY(); y < bound.getMaxY(); y += pixToW) {
+            for (double x = bound.getMinX(); x < bound.getMaxX(); x += pixToW) {
+                potOld = potentialField.apply(new VPoint(x,y));
+
+                if ((potOld > maxPotential) && (potOld != Double.MAX_VALUE)) {
+                    maxPotential = potOld;
+                }
+            }
+        }
+
+        for (double y = bound.getMinY(); y < bound.getMaxY(); y += pixToW) {
+            for (double x = bound.getMinX(); x < bound.getMaxX(); x += pixToW) {
+                double contourDist = 0.02f;
+                boolean isContourLine = false;
+                double potential[] = new double[3];
+
+                if (!isContourLine) {
+                    invPotential = 1 - potential[0];
+
+                    if (invPotential < 1 / 7.0) {
+                        norm = (float) (invPotential * 6.0);
+                        g.setColor(new Color(0.14285f - norm * 7 / 6.0f * 0.14285f, 0.14285f - norm * 7 / 6.0f
+                                * 0.14285f, norm + 0.14285f));
+                    }
+                    else if (invPotential < 2 / 7.0) {
+                        norm = (float) ((invPotential - 1.0 / 7.0) * 6.0 + 0.14285f);
+                        g.setColor(new Color(norm, 0, 1.0f));
+                    }
+                    else if (invPotential < 3 / 7.0) {
+                        norm = (float) ((invPotential - 2.0 / 7.0) * 7.0);
+                        g.setColor(new Color(1.0f, 0, 1.0f - norm));
+                    }
+                    else if (invPotential < 4 / 7.0) {
+                        norm = (float) ((invPotential - 3.0 / 7.0) * 7.0);
+                        g.setColor(new Color(1.0f, norm, 0));
+                    }
+                    else if (invPotential < 5 / 7.0) {
+                        norm = (float) ((invPotential - 4.0 / 7.0) * 7.0);
+                        g.setColor(new Color(1.0f - norm, 1.0f, 0));
+                    }
+                    else if (invPotential < 6 / 7.0) {
+                        norm = (float) ((invPotential - 5.0 / 7.0) * 7.0);
+                        g.setColor(new Color(0, 1.0f, norm));
+                    }
+                    else {
+                        norm = (float) ((invPotential - 6.0 / 7.0) * 7.0);
+                        g.setColor(new Color(norm, 1.0f, 1.0f));
+                    }
+                }
+                else {
+                    g.setColor(new Color(0.3f, 0.3f, 0.3f));
+                }
+
+                g.fill(new Rectangle2D.Double(x, y, pixToW, pixToW));
+            }
+        }
+    }*/
 
 	protected void paintPotentialField(final Graphics2D g, final CellGrid potentialField) {
 		float norm;

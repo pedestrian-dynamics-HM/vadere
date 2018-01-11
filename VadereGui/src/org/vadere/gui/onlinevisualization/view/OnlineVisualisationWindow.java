@@ -17,6 +17,7 @@ import org.vadere.gui.components.view.ScenarioScrollPane;
 import org.vadere.gui.components.view.SimulationInfoPanel;
 import org.vadere.gui.onlinevisualization.control.ActionGeneratePNG;
 import org.vadere.gui.onlinevisualization.control.ActionGenerateSVG;
+import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 
 import java.awt.*;
@@ -149,8 +150,14 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				new OnlinevisualizationRenderer(model),
 				model);
 
+        ActionShowPotentialField showPotentialField = new ActionShowPotentialField(
+                "showPotentialField",
+                resources.getIcon("potentialField.png", iconWidth, iconHeight),
+                model);
+
 		mainPanel.addRendererChangeListener(generatePNG);
 		mainPanel.addRendererChangeListener(generateSVG);
+		mainPanel.addRendererChangeListener(showPotentialField);
 
 
 		SwingUtils.addActionToToolbar(toolbar, paintPedestriansAction,
@@ -169,6 +176,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		SwingUtils.addActionToToolbar(toolbar, generatePNG, Messages.getString("PostVis.btnPNGSnapshot.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, generateSVG, Messages.getString("PostVis.btnSVGSnapshot.tooltip"));
+        SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
 
 		add(toolbar, cc.xyw(2, 2, 3));
 		add(scrollPane, cc.xy(2, 4));

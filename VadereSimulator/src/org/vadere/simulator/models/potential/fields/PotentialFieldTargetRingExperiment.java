@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid {
 
-	private final AttributesPotentialRingExperiment attributes;
+	private AttributesPotentialRingExperiment attributes;
 
 	public PotentialFieldTargetRingExperiment(AttributesPotentialRingExperiment attributes) {
 		this.attributes = attributes;
@@ -79,7 +79,18 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 		return tangent;
 	}
 
-	@Override
+    @Override
+    public PotentialFieldTargetRingExperiment clone() {
+        try {
+            PotentialFieldTargetRingExperiment clone = (PotentialFieldTargetRingExperiment)super.clone();
+            clone.attributes = (AttributesPotentialRingExperiment) attributes.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
+
+    @Override
 	public HashMap<Integer, CellGrid> getCellGrids() {
 		// TODO Auto-generated method stub
 		return null;

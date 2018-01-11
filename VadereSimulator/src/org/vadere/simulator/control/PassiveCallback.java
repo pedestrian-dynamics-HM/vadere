@@ -1,5 +1,6 @@
 package org.vadere.simulator.control;
 
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.scenario.Topography;
 
 /**
@@ -18,4 +19,6 @@ public interface PassiveCallback {
 	void postUpdate(double simTimeInSec);
 
 	void setTopography(Topography scenario);
+
+	default void setPotentialFieldTarget(PotentialFieldTarget potentialFieldTarget){}
 }

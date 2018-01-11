@@ -5,10 +5,12 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public interface PotentialFieldTarget extends Model {
+public interface PotentialFieldTarget extends Model, Cloneable {
 	boolean needsUpdate();
 
 	double getTargetPotential(final VPoint pos, final Agent ped);
 
 	Vector2D getTargetPotentialGradient(final VPoint pos, final Agent ped);
+
+    PotentialFieldTarget clone();
 }
