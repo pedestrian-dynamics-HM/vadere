@@ -2,6 +2,7 @@ package org.vadere.simulator.dataprocessing;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -23,7 +24,7 @@ public class TestOutputFileAfterMultipleRuns {
 	public void setup() {
 		try {
 			String json = IOUtils
-					.readTextFile(getClass().getResource("/data/basic_1_chicken_osm1.scenario").getPath());
+					.readTextFile(new File(getClass().getResource("/data/basic_1_chicken_osm1.scenario").toURI()).getAbsolutePath());
 			testScenario = JsonConverter.deserializeScenarioRunManager(json);
 			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore());
 			modelBuilder.createModelAndRandom();
