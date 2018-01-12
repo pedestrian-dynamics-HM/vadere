@@ -5,7 +5,7 @@
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "out.txt",
+      "filename" : "postvis.trajectories",
       "processors" : [ 1 ]
     } ],
     "processors" : [ {

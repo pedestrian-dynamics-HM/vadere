@@ -78,16 +78,19 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void write() {
-		try (PrintWriter out = new PrintWriter(new FileWriter(absoluteFileName))) {
-			printHeader(out);
+	    // if there is something to write i.e. absoluteFileName != null
+	    if(!isEmpty()) {
+            try (PrintWriter out = new PrintWriter(new FileWriter(absoluteFileName))) {
+                printHeader(out);
 
-			this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
-					.distinct().sorted()
-					.forEach(key -> printRow(out, key));
+                this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
+                        .distinct().sorted()
+                        .forEach(key -> printRow(out, key));
 
-			out.flush();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
+                out.flush();
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
         }
 	}
 
