@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.calculators.EikonalSolver;
+import org.vadere.util.potential.calculators.cartesian.AbstractGridEikonalSolver;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ public abstract class AbstractGridPotentialFieldTarget implements IPotentialFiel
 	 * of the outer map equals the id of the floor, the key of the inner map
 	 * equals the id of the target (there is a floor field per target).
 	 */
-	protected final HashMap<Integer, PotentialFieldAndInitializer> targetPotentialFields;
+	protected final HashMap<Integer, EikonalSolver> targetPotentialFields;
 
 	public AbstractGridPotentialFieldTarget(final Topography topography) {
 		this.topography = topography;
@@ -74,27 +75,25 @@ public abstract class AbstractGridPotentialFieldTarget implements IPotentialFiel
 		}
 
 		/* Find minimal potential of given targets. */
-		Optional<PotentialFieldAndInitializer> optionalPotentialFieldAndAnalyser = getPotentialFieldAndInitializer(targetId);
+		Optional<EikonalSolver> optEikonalSolver = getSolver(targetId);
 
 		// no target exist
-		if (!optionalPotentialFieldAndAnalyser.isPresent()) {
+		if (!optEikonalSolver.isPresent()) {
 			logger.error("no target potential field for target = " + targetId + ", was found!");
 			return 0.0;
 		}
 
-		PotentialFieldAndInitializer potentialFieldAndAnalyser = optionalPotentialFieldAndAnalyser.get();
-		AttributesFloorField attributesFloorField = potentialFieldAndAnalyser.attributesFloorField;
-		return potentialFieldAndAnalyser.eikonalSolver.getPotential(pos, attributesFloorField.getObstacleGridPenalty(), attributesFloorField.getTargetAttractionStrength());
+		EikonalSolver eikonalSolver = optEikonalSolver.get();
+		return eikonalSolver.getPotential(pos);
 	}
 
 
     @Override
     public IPotentialField copyFields() {
         final Map<Integer, Function<VPoint, Double>> map = new HashMap<>();
-        for (Map.Entry<Integer, PotentialFieldAndInitializer> entry : targetPotentialFields.entrySet()) {
-            AttributesFloorField attributes = entry.getValue().attributesFloorField;
-            EikonalSolver eikonalSolver = entry.getValue().eikonalSolver;
-            map.put(entry.getKey(), eikonalSolver.getSolution(attributes.getObstacleGridPenalty(), attributes.getTargetAttractionStrength()));
+        for (Map.Entry<Integer, EikonalSolver> entry : targetPotentialFields.entrySet()) {
+            EikonalSolver eikonalSolver = entry.getValue();
+            map.put(entry.getKey(), eikonalSolver.getPotentialField());
         }
         return (pos, agent) -> map.get(agent.getNextTargetId()).apply(pos);
     }
@@ -119,7 +118,7 @@ public abstract class AbstractGridPotentialFieldTarget implements IPotentialFiel
 		}
 
 		if (targetPotentialFields.containsKey(target.getId())) {
-			targetPotentialFields.get(target.getId()).eikonalSolver.update();
+			targetPotentialFields.get(target.getId()).update();
 		} else {
 			logger.warn("potential field for target " + target.getId() + " is not contained in " + this);
 		}
@@ -136,10 +135,6 @@ public abstract class AbstractGridPotentialFieldTarget implements IPotentialFiel
 	 */
 	protected boolean wasUpdated() {
 		return wasUpdated;
-	}
-
-	protected Map<Integer, PotentialFieldAndInitializer> getPotentialFieldMap() {
-		return targetPotentialFields;
 	}
 
 	@Override
@@ -170,16 +165,18 @@ public abstract class AbstractGridPotentialFieldTarget implements IPotentialFiel
 	public HashMap<Integer, CellGrid> getCellGrids() {
 		HashMap<Integer, CellGrid> map = new HashMap<>();
 
-
-		for (Map.Entry<Integer, PotentialFieldAndInitializer> entry2 : targetPotentialFields
-				.entrySet()) {
-			map.put(entry2.getKey(), entry2.getValue().eikonalSolver.getPotentialField());
+		for (Map.Entry<Integer, EikonalSolver> entry : targetPotentialFields.entrySet()) {
+		    Integer targetId = entry.getKey();
+		    EikonalSolver eikonalSolver = entry.getValue();
+		    if(eikonalSolver instanceof AbstractGridEikonalSolver) {
+                map.put(targetId, ((AbstractGridEikonalSolver)eikonalSolver.getPotentialField()).getCellGrid());
+            }
 		}
 
 		return map;
 	}
 
-	protected Optional<PotentialFieldAndInitializer> getPotentialFieldAndInitializer(final int targetId) {
+	protected Optional<EikonalSolver> getSolver(final int targetId) {
 		if (targetPotentialFields.containsKey(targetId)) {
 			return Optional.of(targetPotentialFields.get(targetId));
 		} else {

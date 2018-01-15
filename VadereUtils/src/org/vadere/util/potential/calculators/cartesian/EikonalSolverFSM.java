@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -7,6 +7,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
+import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFSM implements EikonalSolver {
+public class EikonalSolverFSM extends AbstractGridEikonalSolver {
 	private CellGrid cellGrid;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFSM.class);
 	private ITimeCostFunction timeCostFunction;
@@ -45,8 +46,9 @@ public class EikonalSolverFSM implements EikonalSolver {
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-            final double weight,
-            final double unknownPenalty) {
+            final double unknownPenalty,
+            final double weight) {
+	    super(cellGrid, unknownPenalty, weight);
         this.weight = weight;
         this.unknownPenalty = unknownPenalty;
 		this.timeCostFunction = timeCostFunction;
@@ -175,20 +177,6 @@ public class EikonalSolverFSM implements EikonalSolver {
 			}
 		}
 	}
-
-    @Override
-    public CellGrid getPotentialField() {
-        return cellGrid;
-    }
-
-    @Override
-    public double getValue(double x, double y) {
-        return getPotential(new VPoint(x,y), unknownPenalty, weight);
-    }
-
-    public boolean isValidPoint(Point point) {
-        return cellGrid.isValidPoint(point);
-    }
 
 	@Override
 	public ITimeCostFunction getTimeCostFunction() {

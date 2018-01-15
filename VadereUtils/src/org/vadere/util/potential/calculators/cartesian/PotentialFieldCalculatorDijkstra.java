@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Point;
 import java.util.LinkedList;
@@ -18,8 +18,9 @@ public class PotentialFieldCalculatorDijkstra extends AbstractGridEikonalSolver 
 	PotentialFieldCalculatorDijkstra(
 			final CellGrid potentialField,
 			final LinkedList<Point> targetPoints,
-			final double unknownPenalty) {
-		super(potentialField, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+		super(potentialField, unknownPenalty, weight);
 		this.potentialField = potentialField;
 		this.targetPoints = targetPoints;
 	}

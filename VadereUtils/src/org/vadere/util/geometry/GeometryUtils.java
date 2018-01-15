@@ -523,19 +523,6 @@ public class GeometryUtils {
 		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
 	}
 
-
-	public static <P extends IPoint> VRectangle bound(final Collection<P> points) {
-
-		if(points.isEmpty()) {
-			throw new IllegalArgumentException("the point collection is empty.");
-		}
-
-		VPoint pMax = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()))).get();
-		VPoint pMin = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()))).get();
-
-		return new VRectangle(pMin.getX(), pMin.getY(), pMax.getX() - pMin.getX(), pMax.getY() - pMin.getY());
-	}
-
 	public static double sign(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
 		return (x1 - x3) * (y2 - y3) - (x2 -x3) * (y1 - y3);
 	}

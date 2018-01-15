@@ -1,26 +1,38 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 
 public abstract class AbstractGridEikonalSolver implements EikonalSolver {
 	protected CellGrid potentialField;
-	private double unknownPenalty;
+	private final double unknownPenalty;
+	private final double weight;
 
-	public AbstractGridEikonalSolver(final CellGrid potentialField, final double unknownPenalty) {
+	public AbstractGridEikonalSolver(final CellGrid potentialField, final double unknownPenalty, final double weight) {
 		this.potentialField = potentialField;
 		this.unknownPenalty = unknownPenalty;
+		this.weight = weight;
 	}
 
-	@Override
-	public double getValue(final double x, final double y) {
+    public Function<VPoint, Double> getPotentialField() {
+        return null;
+    }
+
+    public CellGrid getCellGrid() {
+	    return potentialField;
+    }
+
+    @Override
+	public double getPotential(final double x, final double y) {
 
 		Point gridPoint = potentialField.getNearestPointTowardsOrigin(x, y);
 		VPoint gridPointCoord = potentialField.pointToCoord(gridPoint);
@@ -51,6 +63,7 @@ public abstract class AbstractGridEikonalSolver implements EikonalSolver {
 
 		double tmpPotential = result.getLeft();
 		double weightOfKnown = result.getRight();
+
 		/*
 		 * If at least one node is known, a specialized version of
 		 * interpolation is used: If the divisor weightOfKnown[ 0 ] would
@@ -62,9 +75,7 @@ public abstract class AbstractGridEikonalSolver implements EikonalSolver {
 		 * direction of the unknown, the higher the penalty becomes.
 		 */
 		if (weightOfKnown > 0.00001) {
-			tmpPotential = tmpPotential / weightOfKnown
-					+ (1 - weightOfKnown)
-					* unknownPenalty;
+			tmpPotential = (tmpPotential / weightOfKnown + (1 - weightOfKnown) * unknownPenalty) * weight;
 		} else /* If all values are maximal, set potential to maximum. */
 		{
 			tmpPotential = Double.MAX_VALUE;
@@ -73,11 +84,7 @@ public abstract class AbstractGridEikonalSolver implements EikonalSolver {
 		return tmpPotential;
 	}
 
-	public CellGrid getPotentialField() {
-		return potentialField;
-	}
-
-	public boolean isValidPoint(Point point) {
+	public boolean isValidPoint(final Point point) {
 		return potentialField.isValidPoint(point);
 	}
 

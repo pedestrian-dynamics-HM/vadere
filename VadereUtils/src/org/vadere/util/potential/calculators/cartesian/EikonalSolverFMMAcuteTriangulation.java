@@ -1,15 +1,25 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
-public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver  {
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.potential.calculators.EikonalSolver;
+
+import java.util.function.Function;
+
+public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver {
 	@Override
 	public void initialize() {
 
 	}
 
-	@Override
-	public double getValue(double x, double y) {
-		return 0;
-	}
+    @Override
+    public Function<VPoint, Double> getPotentialField() {
+        return null;
+    }
+
+    @Override
+    public double getPotential(double x, double y) {
+        return 0;
+    }
 
 	/*private ITimeCostFunction timeCostFunction;
 	private ITriangulation<? extends PotentialPoint> triangulation;

@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -7,11 +7,13 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
+import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFIM implements EikonalSolver {
+public class EikonalSolverFIM extends AbstractGridEikonalSolver {
 
 	private List<VShape> targetShapes;
 	private List<Point> targetPoints;
@@ -36,8 +38,6 @@ public class EikonalSolverFIM implements EikonalSolver {
     private final CellGrid cellGrid;
 	private final double epsilon;
 
-	private final double weight;
-	private final double unknownPenalty;
 
 	private LinkedList<Point> activeList;
 
@@ -46,11 +46,10 @@ public class EikonalSolverFIM implements EikonalSolver {
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-            final double weight,
-            final double unknownPenalty) {
+            final double unknownPenalty,
+            final double weight) {
+	    super(cellGrid, unknownPenalty, weight);
 	    this.cellGrid = cellGrid;
-	    this.weight = weight;
-	    this.unknownPenalty = unknownPenalty;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
@@ -156,22 +155,8 @@ public class EikonalSolverFIM implements EikonalSolver {
 	}
 
     @Override
-    public CellGrid getPotentialField() {
-        return cellGrid;
-    }
-
-    @Override
-    public double getValue(double x, double y) {
-        return getPotential(new VPoint(x,y), unknownPenalty, weight);
-    }
-
-    @Override
 	public ITimeCostFunction getTimeCostFunction() {
 		return timeCostFunction;
-	}
-
-	public boolean isValidPoint(Point point) {
-		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

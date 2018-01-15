@@ -20,7 +20,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.FloorDiscretizer;
 import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.potential.calculators.EikonalSolverFMM;
+import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 public class QueueDetector extends EikonalSolverFMM {

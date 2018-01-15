@@ -13,123 +13,122 @@ import static org.junit.Assert.assertTrue;
 
 public class TestConvolution {
 
-	private static Logger logger = LogManager.getLogger(TestConvolution.class);
+    private static Logger logger = LogManager.getLogger(TestConvolution.class);
 
-	@Before
-	public void setUp() throws Exception {}
+    @Before
+    public void setUp() throws Exception {}
 
-	@Test
-	public void testSingleStepConvolution() {
-		float[] kernel = new float[] {
-				1, 2, 3,
-				4, 5, 6,
-				7, 8, 9
-		};
+    @Test
+    public void testSingleStepConvolution() {
+        float[] kernel = new float[] {
+                1, 2, 3,
+                4, 5, 6,
+                7, 8, 9
+        };
 
-		float[] inMatrix = new float[] {
-				2, 1, 1, 1,
-				1, 1, 1, -1,
-				1, 1, 1, 1,
-				1, 1, 1, 0
-		};
+        float[] inMatrix = new float[] {
+                2, 1, 1, 1,
+                1, 1, 1, -1,
+                1, 1, 1, 1,
+                1, 1, 1, 0
+        };
 
-		assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 1, 1) == 2 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9.0);
-		assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 2, 2) == 1 + 2 - 3 + 4 + 5 + 6 + 7 + 8);
-		assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 3, 3) == 4 + 1 + 2);
-		assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 0, 0) == 8 + 10 + 9 + 6);
-	}
+        assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 1, 1) == 2 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9.0);
+        assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 2, 2) == 1 + 2 - 3 + 4 + 5 + 6 + 7 + 8);
+        assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 3, 3) == 4 + 1 + 2);
+        assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 0, 0) == 8 + 10 + 9 + 6);
+    }
 
-	@Test
-	public void testConvolution() throws IOException {
-		int inputWidth = 1000;
-		int inputHeight = 1000;
-		int kernelWidth = 31;
-		float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, (float) Math.sqrt(0.7));
-		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
+    @Test
+    public void testConvolution() throws IOException {
+        int inputWidth = 1000;
+        int inputHeight = 1000;
+        int kernelWidth = 31;
+        float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, (float) Math.sqrt(0.7));
+        float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-		float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
-		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.NonSeparate, inputWidth, inputHeight, kernelWidth, kernel);
-		float[] clOutput = clConvolution.convolve(input);
-        clConvolution.clearCL();
-		equalsMatrixValues(javaOutput, clOutput, 0.00001f);
-	}
+        float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
+        CLConvolution clConvolution = new CLConvolution();
+        float[] clOutput = clConvolution.convolve(input, inputWidth, inputHeight, kernel, kernelWidth);
 
-	@Test
-	public void testSmallConvolutionCol() throws IOException {
-		int inputWidth = 6;
-		int inputHeight = 1;
-		int kernelWidth = 3;
+        equalsMatrixValues(javaOutput, clOutput, 0.00001f);
+    }
 
-		float[] rowVector = new float[] {0.5f, 0.2f, 0.3f};
-		float[] input = new float[] {1f, 1f, 1f, 0f, 0f, 0f};
-		float[] result = new float[] {0.5f, 1.0f, 0.7f, 0.5f, 0f, 0f};
+    @Test
+    public void testSmallConvolutionCol() throws IOException {
+        int inputWidth = 6;
+        int inputHeight = 1;
+        int kernelWidth = 3;
 
-		float[] output = Convolution.convolveCol(input, rowVector, inputWidth, inputHeight, kernelWidth);
+        float[] rowVector = new float[] {0.5f, 0.2f, 0.3f};
+        float[] input = new float[] {1f, 1f, 1f, 0f, 0f, 0f};
+        float[] result = new float[] {0.5f, 1.0f, 0.7f, 0.5f, 0f, 0f};
 
-		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Col, inputWidth, inputHeight, kernelWidth, rowVector);
-		float[] clOutput = clConvolution.convolve(input);
-        clConvolution.clearCL();
+        float[] output = Convolution.convolveCol(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		equalsMatrixValues(result, output, 0f);
-		equalsMatrixValues(result, clOutput, 0f);
-	}
+        CLConvolution clConvolution = new CLConvolution();
+        float[] clOutput = clConvolution.convolveCol(input, inputWidth, inputHeight, rowVector, kernelWidth);
 
-	@Test
-	public void testSmallConvolutionRow() throws IOException {
-		int inputWidth = 1;
-		int inputHeight = 6;
-		int kernelWidth = 3;
+        equalsMatrixValues(result, output, 0f);
+        equalsMatrixValues(result, clOutput, 0f);
+    }
 
-		float[] rowVector = new float[] {0.5f, 0.2f, 0.3f};
-		float[] input = new float[] {1f, 1f, 1f, 0f, 0f, 0f};
-		float[] result = new float[] {0.5f, 1.0f, 0.7f, 0.5f, 0f, 0f};
+    @Test
+    public void testSmallConvolutionRow() throws IOException {
+        int inputWidth = 1;
+        int inputHeight = 6;
+        int kernelWidth = 3;
 
-		float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
+        float[] rowVector = new float[] {0.5f, 0.2f, 0.3f};
+        float[] input = new float[] {1f, 1f, 1f, 0f, 0f, 0f};
+        float[] result = new float[] {0.5f, 1.0f, 0.7f, 0.5f, 0f, 0f};
 
-        CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Row, inputWidth, inputHeight, kernelWidth, rowVector);
-		float[] clOutput = clConvolution.convolve(input);
-        clConvolution.clearCL();
+        float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		equalsMatrixValues(result, output, 0f);
-		equalsMatrixValues(result, clOutput, 0f);
-	}
+        CLConvolution clConvolution = new CLConvolution();
+        float[] clOutput = clConvolution.convolveRow(input, inputWidth, inputHeight, rowVector, kernelWidth);
 
-	@Test
-	public void testConvolutionRow() throws IOException {
-		int inputWidth = 500;
-		int inputHeight = 300;
-		int kernelWidth = 31;
-		float[] rowVector = Convolution.floatGaussian1DKernel(kernelWidth, (float) Math.sqrt(0.7));
-		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
+        equalsMatrixValues(result, output, 0f);
+        equalsMatrixValues(result, clOutput, 0f);
+    }
 
-		float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
+    @Test
+    public void testConvolutionRow() throws IOException {
+        int inputWidth = 500;
+        int inputHeight = 300;
+        int kernelWidth = 31;
+        float[] rowVector = Convolution.floatGaussian1DKernel(kernelWidth, (float) Math.sqrt(0.7));
+        float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-        CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Row, inputWidth, inputHeight, kernelWidth, rowVector);
-		float[] clOutput = clConvolution.convolve(input);
-        clConvolution.clearCL();
+        float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		equalsMatrixValues(output, clOutput, 0.00001f);
-	}
+        CLConvolution clConvolution = new CLConvolution();
+        float[] clOutput = clConvolution.convolveRow(input, inputWidth, inputHeight, rowVector, kernelWidth);
 
-	@Test
-	public void testConvolutionSeparate() throws IOException {
-		int inputWidth = 500;
-		int inputHeight = 300;
-		int kernelWidth = 31;
-		float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, 0.7f);
-		float[] seperateKernel = Convolution.floatGaussian1DKernel(kernelWidth, 0.7f);
-		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-		float[] nonSeperate = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
-		float[] seperate = Convolution.convolveSeperate(input, seperateKernel, seperateKernel, inputWidth, inputHeight,
-				kernelWidth);
+        equalsMatrixValues(output, clOutput, 0.00001f);
+    }
 
-        CLConvolution clGPUConvolution = new CLConvolution(CLConvolution.KernelType.Separate, inputWidth, inputHeight, kernelWidth, seperateKernel);
-		float[] clCPUOutput = clGPUConvolution.convolve(input);
+    @Test
+    public void testConvolutionSeperate() throws IOException {
+        int inputWidth = 500;
+        int inputHeight = 300;
+        int kernelWidth = 31;
+        float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, 0.7f);
+        float[] seperateKernel = Convolution.floatGaussian1DKernel(kernelWidth, 0.7f);
+        float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-		equalsMatrixValues(seperate, nonSeperate, 0.00001f);
-		equalsMatrixValues(clCPUOutput, nonSeperate, 0.00001f);
-	}
+        float[] nonSeperate = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
+        float[] seperate = Convolution.convolveSeperate(input, seperateKernel, seperateKernel, inputWidth, inputHeight,
+                kernelWidth);
+
+        CLConvolution clGPUConvolution = new CLConvolution();
+        float[] clCPUOutput =
+                clGPUConvolution.convolveSeparate(input, inputWidth, inputHeight, seperateKernel, kernelWidth);
+
+        equalsMatrixValues(seperate, nonSeperate, 0.00001f);
+        equalsMatrixValues(clCPUOutput, nonSeperate, 0.00001f);
+    }
 
 	/*@Test
 	public void testConvolutionPerformance() throws IOException {
@@ -189,25 +188,25 @@ public class TestConvolution {
 
 	}*/
 
-	private static void equalsMatrixValues(final float[] m1, final float[] m2, final float epsilon) {
-		assertTrue(m1.length == m2.length);
-		for (int i = 0; i < m1.length; i++) {
-			assertTrue("difference: " + i + ", " + m1[i] + ", " + m2[i] + ", " + Math.abs(m1[i] - m2[i]),
-					Math.abs(m1[i] - m2[i]) <= epsilon);
-		}
-	}
+    private static void equalsMatrixValues(final float[] m1, final float[] m2, final float epsilon) {
+        assertTrue(m1.length == m2.length);
+        for (int i = 0; i < m1.length; i++) {
+            assertTrue("difference: " + i + ", " + m1[i] + ", " + m2[i] + ", " + Math.abs(m1[i] - m2[i]),
+                    Math.abs(m1[i] - m2[i]) <= epsilon);
+        }
+    }
 
-	private static int countUnEqualsMatrixValues(final float[] m1, final float[] m2) {
-		assertTrue(m1.length == m2.length);
-		int count = 0;
-		for (int i = 0; i < m1.length; i++) {
-			if (m1[i] != m2[i]) {
-				count++;
-			}
-		}
+    private static int countUnEqualsMatrixValues(final float[] m1, final float[] m2) {
+        assertTrue(m1.length == m2.length);
+        int count = 0;
+        for (int i = 0; i < m1.length; i++) {
+            if (m1[i] != m2[i]) {
+                count++;
+            }
+        }
 
-		return count;
-	}
+        return count;
+    }
 
 
 }

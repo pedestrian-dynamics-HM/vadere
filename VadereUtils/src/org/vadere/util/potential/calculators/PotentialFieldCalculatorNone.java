@@ -1,9 +1,9 @@
 package org.vadere.util.potential.calculators;
 
 
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.geometry.shapes.VPoint;
 
-import java.awt.*;
+import java.util.function.Function;
 
 public class PotentialFieldCalculatorNone implements EikonalSolver {
 
@@ -19,16 +19,12 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 	}
 
     @Override
-    public CellGrid getPotentialField() {
-        throw new UnsupportedOperationException("not jet implemented.");
+    public Function<VPoint, Double> getPotentialField() {
+        return p -> 0.0;
     }
 
     @Override
-	public double getValue(double x, double y) {
-		return 0;
-	}
-
-	public boolean isValidPoint(Point point) {
-		return false;
-	}
+    public double getPotential(double x, double y) {
+        return 0;
+    }
 }

@@ -9,6 +9,7 @@ import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 /**
  * The default IPotentialTargetGrid, that creates for each target the same floor field type
@@ -61,17 +62,17 @@ public class PotentialFieldTargetGrid extends AbstractGridPotentialFieldTarget {
 
 	private void createMissingPotentialFieldAndInitializers() {
 		Map<Integer, List<VShape>> mergeMap = topography.getTargetShapes();
-		topography.getTargets().stream().filter(t -> !getPotentialFieldAndInitializer(t.getId()).isPresent())
+		topography.getTargets().stream().filter(t -> !getSolver(t.getId()).isPresent())
 				.forEach(t -> createNewPotentialFieldAndInitializer(t.getId(), mergeMap.get(t.getId())));
 	}
 
 	@Override
 	protected void createNewPotentialFieldAndInitializer(final int targetId, final List<VShape> shapes) {
-		PotentialFieldAndInitializer potentialFieldAndInitializer = PotentialFieldAndInitializer.create(topography,
+		EikonalSolver eikonalSolver = IPotentialField.create(topography,
 				targetId, shapes, this.attributesPedestrian, this.attributes);
 		potentialFieldsNeedUpdate =
-				potentialFieldsNeedUpdate || potentialFieldAndInitializer.eikonalSolver.needsUpdate();
-		targetPotentialFields.put(targetId, potentialFieldAndInitializer);
+				potentialFieldsNeedUpdate || eikonalSolver.needsUpdate();
+		targetPotentialFields.put(targetId, eikonalSolver);
 	}
 
 	@Override

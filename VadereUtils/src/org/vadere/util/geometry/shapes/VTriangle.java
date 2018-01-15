@@ -210,10 +210,6 @@ public class VTriangle extends VPolygon {
 		return this.p1.equals(point) || this.p2.equals(point) || this.p3.equals(point);
 	}
 
-	public VLine[] getLines() {
-		return lines;
-	}
-
 	public Stream<VLine> getLineStream() {
 		return Arrays.stream(getLines());
 	}

@@ -14,11 +14,12 @@ import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.FloorDiscretizer;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.calculators.*;
+import org.vadere.util.potential.calculators.cartesian.EikonalSolverFIM;
+import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
+import org.vadere.util.potential.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,13 +79,13 @@ class PotentialFieldAndInitializer {
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
 			case FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getTargetAttractionStrength(), attributesPotential.getObstacleGridPenalty());
+				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 				break;
 			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getTargetAttractionStrength(), attributesPotential.getObstacleGridPenalty());
+				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 				break;
 			default:
-				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getTargetAttractionStrength(), attributesPotential.getObstacleGridPenalty());
+				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 		}
 
 		long ms = System.currentTimeMillis();

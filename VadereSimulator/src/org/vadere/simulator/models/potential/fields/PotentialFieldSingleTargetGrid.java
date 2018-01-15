@@ -13,6 +13,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 /**
  * A IPotentialTargetGrid, that creates for a single target the a floor field
@@ -44,8 +45,8 @@ public class PotentialFieldSingleTargetGrid extends AbstractGridPotentialFieldTa
 
 	@Override
 	public boolean needsUpdate() {
-		return (getPotentialFieldAndInitializer(targetId).isPresent()
-				&& getPotentialFieldAndInitializer(targetId).get().eikonalSolver.needsUpdate())
+		return (getSolver(targetId).isPresent()
+				&& getSolver(targetId).get().needsUpdate())
 				|| topography.containsTarget(t -> t.isMovingTarget() || t.isTargetPedestrian(), targetId);
 	}
 
@@ -56,7 +57,7 @@ public class PotentialFieldSingleTargetGrid extends AbstractGridPotentialFieldTa
 
 	@Override
 	public void preLoop(double simTimeInSec) {
-		if (!getPotentialFieldAndInitializer(targetId).isPresent()) {
+		if (!getSolver(targetId).isPresent()) {
 			List<Target> targets = topography.getTargets(targetId);
 			List<VShape> shapes = targets.stream().map(t -> t.getShape()).collect(Collectors.toList());
 			createNewPotentialFieldAndInitializer(targetId, shapes);
@@ -66,9 +67,9 @@ public class PotentialFieldSingleTargetGrid extends AbstractGridPotentialFieldTa
 	@Override
 	protected void createNewPotentialFieldAndInitializer(final int targetId, final List<VShape> shapes) {
 		if (targetId == this.targetId) {
-			PotentialFieldAndInitializer potentialFieldAndInitializer = PotentialFieldAndInitializer.create(topography,
+			EikonalSolver eikonalSolver = IPotentialField.create(topography,
 					targetId, shapes, this.attributesPedestrian, this.attributesFloorField);
-			targetPotentialFields.put(targetId, potentialFieldAndInitializer);
+			targetPotentialFields.put(targetId, eikonalSolver);
 		}
 	}
 

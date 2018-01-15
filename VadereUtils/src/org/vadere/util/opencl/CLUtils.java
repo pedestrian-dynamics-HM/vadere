@@ -4,7 +4,6 @@ package org.vadere.util.opencl;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -18,11 +17,7 @@ import java.nio.file.Paths;
 
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
-/**
- * Utility-class without a state. This class offers method to interact with OpenCL e.g. memory management methods.
- *
- * @author Benedikt Zoennchen
- */
+
 public class CLUtils {
 
     /**
@@ -30,7 +25,9 @@ public class CLUtils {
      *
      * @param resource   the resource to read
      * @param bufferSize the initial buffer size
+     *
      * @return the resource data
+     *
      * @throws IOException if an IO error occurs
      */
     public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
@@ -69,10 +66,7 @@ public class CLUtils {
 
     public static FloatBuffer toFloatBuffer(@NotNull final float[] floats) {
         FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(floats.length);
-        return toFloatBuffer(floats, floatBuffer);
-    }
 
-    public static FloatBuffer toFloatBuffer(@NotNull final float[] floats, @NotNull final FloatBuffer floatBuffer) {
         for(int i = 0; i < floats.length; i++) {
             floatBuffer.put(i, floats[i]);
         }
@@ -80,9 +74,9 @@ public class CLUtils {
     }
 
     public static float[] toFloatArray(@NotNull FloatBuffer floatBuffer, final int size) {
-	    float[] result = new float[size];
-	    for(int i = 0; i < size; i++) {
-	        result[i] = floatBuffer.get(i);
+        float[] result = new float[size];
+        for(int i = 0; i < size; i++) {
+            result[i] = floatBuffer.get(i);
         }
         return result;
     }

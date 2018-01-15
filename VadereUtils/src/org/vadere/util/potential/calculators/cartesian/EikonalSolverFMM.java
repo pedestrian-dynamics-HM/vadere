@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Point;
 import java.util.List;
@@ -23,7 +23,7 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
  * Hence, the initializer may be used to realize static floor fields.
  * 
  */
-public class EikonalSolverFMM implements EikonalSolver {
+public class EikonalSolverFMM extends AbstractGridEikonalSolver {
 	protected final PriorityQueue<Point> narrowBand;
 	protected final ITimeCostFunction timeCostFunction;
 
@@ -38,9 +38,6 @@ public class EikonalSolverFMM implements EikonalSolver {
 	protected static Logger logger = LogManager.getLogger(EikonalSolverFMM.class);
 	protected long runtime = 0;
 
-    private final double weight;
-    private final double unknownPenalty;
-
 	/**
 	 * Initializes the FM potential calculator with a time cost function F > 0.
 	 */
@@ -49,10 +46,9 @@ public class EikonalSolverFMM implements EikonalSolver {
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-            final double weight,
-            final double unknownPenalty) {
-        this.unknownPenalty = unknownPenalty;
-        this.weight = weight;
+            final double unknownPenalty,
+            final double weight) {
+	    super(potentialField, unknownPenalty, weight);
 		this.cellGrid = potentialField;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
@@ -79,8 +75,9 @@ public class EikonalSolverFMM implements EikonalSolver {
             final IDistanceFunction distFunc,
             final boolean isHighAccuracy,
             final ITimeCostFunction timeCostFunction,
-            final double unknownPenalty) {
-        super(potentialField, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+        super(potentialField, unknownPenalty, weight);
         this.cellGrid = potentialField;
         this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
                 .collect(Collectors.toList());
@@ -177,20 +174,6 @@ public class EikonalSolverFMM implements EikonalSolver {
 	@Override
 	public boolean needsUpdate() {
 		return timeCostFunction.needsUpdate();
-	}
-
-    @Override
-    public CellGrid getPotentialField() {
-        return cellGrid;
-    }
-
-    @Override
-    public double getValue(double x, double y) {
-        return getPotential(new VPoint(x,y), unknownPenalty, weight);
-    }
-
-    public boolean isValidPoint(Point point) {
-		return cellGrid.isValidPoint(point);
 	}
 
 	protected void setNeighborDistances(final Point point) {
