@@ -7,10 +7,9 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.onlinevisualization.view.MainPanel;
 import org.vadere.gui.onlinevisualization.view.OnlineVisualisationWindow;
-import org.vadere.gui.onlinevisualization.view.OnlinevisualizationRenderer;
 import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Topography;
 
 public class OnlineVisualization implements PassiveCallback {
@@ -24,9 +23,9 @@ public class OnlineVisualization implements PassiveCallback {
 	public class ObservationAreaSnapshotData {
 		public final double simTimeInSec;
 		public final Topography scenario;
-		public final PotentialFieldTarget potentialFieldTarget;
+		public final IPotentialField potentialFieldTarget;
 
-		public ObservationAreaSnapshotData(double simTimeInSec, @NotNull Topography scenario, @Nullable PotentialFieldTarget potentialFieldTarget) {
+		public ObservationAreaSnapshotData(double simTimeInSec, @NotNull Topography scenario, @Nullable IPotentialField potentialFieldTarget) {
 			this.simTimeInSec = simTimeInSec;
 			this.scenario = scenario;
 			this.potentialFieldTarget = potentialFieldTarget;
@@ -37,7 +36,7 @@ public class OnlineVisualization implements PassiveCallback {
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
 	private Topography scenario;
-	private PotentialFieldTarget potentialFieldTarget;
+	private IPotentialFieldTarget potentialFieldTarget;
 	private boolean enableVisualization;
 
 	public OnlineVisualization(boolean enableVisualization) {
@@ -56,7 +55,7 @@ public class OnlineVisualization implements PassiveCallback {
 	}
 
     @Override
-	public void setPotentialFieldTarget(final PotentialFieldTarget potentialFieldTarget) {
+	public void setPotentialFieldTarget(final IPotentialFieldTarget potentialFieldTarget) {
 	    this.potentialFieldTarget = potentialFieldTarget;
     }
 
@@ -92,7 +91,10 @@ public class OnlineVisualization implements PassiveCallback {
 		synchronized (model.getDataSynchronizer()) {
 			/* Push new snapshot of the observation area to the draw thread. */
 			model.pushObersavtionAreaSnapshot(
-					new ObservationAreaSnapshotData(simTimeInSec, scenario.clone(), model.config.isShowPotentialField() ? potentialFieldTarget.clone() : null));
+					new ObservationAreaSnapshotData(
+					        simTimeInSec,
+                            scenario.clone(),
+                            model.config.isShowPotentialField() ? potentialFieldTarget.copyFields() : null));
 		}
 	}
 

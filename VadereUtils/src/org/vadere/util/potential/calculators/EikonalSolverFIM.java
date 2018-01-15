@@ -118,7 +118,7 @@ public class EikonalSolverFIM implements EikonalSolver {
 		}
 	}
 
-	@Override
+    @Override
 	public void initialize() {
 		init();
 		loop();

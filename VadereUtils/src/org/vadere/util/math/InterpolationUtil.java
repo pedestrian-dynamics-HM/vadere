@@ -1,6 +1,11 @@
 package org.vadere.util.math;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.CellGrid;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Interpolation utilities not covered by java.lang.Math
@@ -48,31 +53,38 @@ public class InterpolationUtil {
 		return result;
 	}
 
-	/**
-	 * Computes bilinear interpolation while nodes may be undefined
-	 * (=Double.MAX_VALUE). See bilinearInterpolation for further information
-	 * about the basic method. In contrast to the original
-	 * bilinearInterpolation(), bilinearInterpolationWithUnkown() just
-	 * accumulates the nodes whose values are known multiplied by its weight.
-	 * The accumulated weight of the known values are stored in the parameter
-	 * weightOfKnown.
-	 */
-	public static double bilinearInterpolationWithUnkown(double z[], double t,
-			double u, double weightOfKnown[]) {
+    /**
+     * Computes bilinear interpolation for (x,y) while nodes may be undefined
+     * (=Double.MAX_VALUE).
+     *
+     * See bilinearInterpolation for further information
+     * about the basic method. In contrast to the original
+     * bilinearInterpolation(), bilinearInterpolationWithUnkown() just
+     * accumulates the nodes whose values are known multiplied by its weight.
+     * The accumulated weight of the known values are stored in the parameter
+     * weightOfKnown. see https://en.wikipedia.org/wiki/Bilinear_interpolation (Unit square)
+     *
+     * @param z             the values of the 4 grid points which convex hull contains (x,y) in the following order:
+     *                      (0,0), (1,0), (0,1), (1,1) with respect to (x,y)
+     * @param dx            x - x1 where (x1,y1) is the point at the left below corner of the four points
+     * @param dy            y - y1 where (x1,y1) is the point at the left below corner of the four points
+     * @return a pair (bilinear interpolated value, accumulated weights of known)
+     */
+	public static Pair<Double, Double> bilinearInterpolationWithUnkown(double z[], double dx, double dy) {
 		double result = 0;
-		double weight[] = {(1 - t) * (1 - u), t * (1 - u), t * u, (1 - t) * u};
-
-		weightOfKnown[0] = 0.0;
+		double knownWeights = 0;
+		double weight[] = {(1 - dx) * (1 - dy), dx * (1 - dy), dx * dy, (1 - dx) * dy};
 
 		for (int i = 0; i < 4; ++i) {
 			if (z[i] != Double.MAX_VALUE) {
 				result += weight[i] * z[i];
-				weightOfKnown[0] += weight[i];
+                knownWeights += weight[i];
 			}
 		}
 
-		return result;
+		return Pair.of(result, knownWeights);
 	}
+
 
 	/**
 	 * Get the potential value based on a triangulation of the grid.

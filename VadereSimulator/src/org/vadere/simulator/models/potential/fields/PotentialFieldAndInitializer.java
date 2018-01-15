@@ -27,8 +27,8 @@ import java.util.List;
  *
  */
 class PotentialFieldAndInitializer {
-	protected final EikonalSolver eikonalSolver;
-	protected final AttributesFloorField attributesFloorField;
+	protected EikonalSolver eikonalSolver;
+	protected AttributesFloorField attributesFloorField;
 	private static Logger logger = LogManager.getLogger(PotentialFieldAndInitializer.class);
 
 	protected PotentialFieldAndInitializer(
@@ -92,15 +92,5 @@ class PotentialFieldAndInitializer {
 		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 
 		return new PotentialFieldAndInitializer(eikonalSolver, attributesPotential);
-	}
-
-	public double[] getGridPotentials(List<Point> points) {
-		double[] result = new double[points.size()];
-
-		for (int i = 0; i < points.size(); i++) {
-			result[i] = this.eikonalSolver.getPotentialField().getValue(points.get(i)).potential;
-		}
-
-		return result;
 	}
 }

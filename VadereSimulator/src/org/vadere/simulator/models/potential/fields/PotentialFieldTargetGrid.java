@@ -55,16 +55,6 @@ public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
 	}
 
     @Override
-    public PotentialFieldTargetGrid clone() {
-        PotentialFieldTargetGrid clone = (PotentialFieldTargetGrid) super.clone();
-
-        // this is for security reasons: Attributes are immutable however we might break this using reflection.
-        clone.attributes = (AttributesFloorField)attributes.clone();
-        clone.attributesPedestrian = (AttributesAgent) attributesPedestrian.clone();
-        return clone;
-    }
-
-    @Override
 	public void preLoop(final double simTimeInSec) {
 		createMissingPotentialFieldAndInitializers();
 	}

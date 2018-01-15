@@ -17,10 +17,10 @@ import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
 import org.vadere.simulator.models.osm.updateScheme.ParallelWorkerOSM;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -66,7 +66,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private AttributesAgent attributesPedestrian;
 	private Random random;
 	private StepCircleOptimizer stepCircleOptimizer;
-	private PotentialFieldTarget potentialFieldTarget;
+	private IPotentialFieldTarget potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<SpeedAdjuster> speedAdjusters;
@@ -97,7 +97,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
 		subModelBuilder.addBuildedSubModelsToList(models);
 
-		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
+		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
@@ -151,7 +151,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private StepCircleOptimizer createStepCircleOptimizer(
 			AttributesOSM attributesOSM, Random random, Topography topography,
-			IPotentialTargetGrid potentialFieldTarget) {
+			IPotentialFieldTargetGrid potentialFieldTarget) {
 
 		StepCircleOptimizer result;
 		double movementThreshold = attributesOSM.getMovementThreshold();
@@ -297,7 +297,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	}
 
 	@Override
-	public PotentialFieldTarget getPotentialFieldTarget() {
+	public IPotentialFieldTarget getPotentialFieldTarget() {
 		return potentialFieldTarget;
 	}
 

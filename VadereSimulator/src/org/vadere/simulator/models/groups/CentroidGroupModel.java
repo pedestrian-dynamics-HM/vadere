@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -22,7 +22,7 @@ public class CentroidGroupModel implements GroupModel {
 	private Map<ScenarioElement, CentroidGroup> pedestrianGroupData;
 
 	private Topography topography;
-	private PotentialFieldTarget potentialFieldTarget;
+	private IPotentialFieldTarget potentialFieldTarget;
 	private AttributesCGM attributesCGM;
 
 	private int nextFreeGroupId = 0;
@@ -41,7 +41,7 @@ public class CentroidGroupModel implements GroupModel {
 		this.topography = topography;
 	}
 
-	public void setPotentialFieldTarget(PotentialFieldTarget potentialFieldTarget) {
+	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
 		this.potentialFieldTarget = potentialFieldTarget;
 	}
 

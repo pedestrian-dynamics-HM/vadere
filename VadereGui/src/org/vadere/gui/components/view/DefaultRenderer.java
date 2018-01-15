@@ -13,14 +13,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
@@ -58,13 +54,12 @@ public abstract class DefaultRenderer {
 	}
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
-		/*
-		 * if(doubleBuffering) {
-		 * targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
-		 * } else {
-		 */
-		targetGraphics2D.translate(x, y);
-		renderGraphics(targetGraphics2D, width, height);
+
+		 //if(doubleBuffering) {
+		 targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+         //} else {
+		//targetGraphics2D.translate(x, y);
+		//renderGraphics(targetGraphics2D, width, height);
 		// }
 		targetGraphics2D.dispose();
 	}
@@ -86,7 +81,6 @@ public abstract class DefaultRenderer {
 		Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
 
 		renderGraphics(bufferGraphics2D, width, height);
-
 		return image;
 	}
 

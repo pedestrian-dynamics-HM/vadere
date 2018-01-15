@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -25,10 +25,10 @@ public class CentroidGroup implements Group {
 	private final List<Pedestrian> lostMembers;
 	private Map<Pedestrian, Map<Pedestrian, VPoint>> lastVision;
 	private final Map<Pedestrian, Integer> noVisionOfLeaderCount;
-	private final PotentialFieldTarget potentialFieldTarget;
+	private final IPotentialFieldTarget potentialFieldTarget;
 
 	public CentroidGroup(int id, int size,
-			PotentialFieldTarget potentialFieldTarget) {
+			IPotentialFieldTarget potentialFieldTarget) {
 		this.id = id;
 		this.size = size;
 		this.potentialFieldTarget = potentialFieldTarget;
@@ -198,8 +198,8 @@ public class CentroidGroup implements Group {
 		double result;
 		VPoint pedLocation = ped.getPosition();
 
-		double pedDistance = potentialFieldTarget.getTargetPotential(pedLocation, ped);
-		double centroidDistance = potentialFieldTarget.getTargetPotential(getCentroidOthers(ped), ped);
+		double pedDistance = potentialFieldTarget.getPotential(pedLocation, ped);
+		double centroidDistance = potentialFieldTarget.getPotential(getCentroidOthers(ped), ped);
 
 		result = centroidDistance - pedDistance;
 
@@ -213,10 +213,10 @@ public class CentroidGroup implements Group {
 	public Pedestrian getLeader(Pedestrian ped) {
 		Pedestrian result = members.get(0);
 
-		double smallestDistance = potentialFieldTarget.getTargetPotential(result.getPosition(), ped);
+		double smallestDistance = potentialFieldTarget.getPotential(result.getPosition(), ped);
 
 		for (Pedestrian p : members) {
-			double pedDistance = potentialFieldTarget.getTargetPotential(p.getPosition(), p);
+			double pedDistance = potentialFieldTarget.getPotential(p.getPosition(), p);
 			if (pedDistance < smallestDistance) {
 				result = p;
 				smallestDistance = pedDistance;

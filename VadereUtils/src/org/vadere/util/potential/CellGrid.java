@@ -269,7 +269,7 @@ public class CellGrid {
 
 	/** Returns a copy of the grid. See copy constructor for more information. */
 	@Override
-	public Object clone() {
+	public CellGrid clone() {
 		return new CellGrid(this);
 	}
 

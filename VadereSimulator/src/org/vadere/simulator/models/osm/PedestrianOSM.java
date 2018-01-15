@@ -16,7 +16,7 @@ import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeSequential;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetRingExperiment;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -35,7 +35,7 @@ public class PedestrianOSM extends Pedestrian {
 	private final transient StepCircleOptimizer stepCircleOptimizer;
 	private final transient UpdateSchemeOSM updateScheme;
 
-	private transient PotentialFieldTarget potentialFieldTarget;
+	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
 
@@ -66,7 +66,7 @@ public class PedestrianOSM extends Pedestrian {
 	@SuppressWarnings("unchecked")
 	PedestrianOSM(AttributesOSM attributesOSM,
 			AttributesAgent attributesPedestrian, Topography topography,
-			Random random, PotentialFieldTarget potentialFieldTarget,
+			Random random, IPotentialFieldTarget potentialFieldTarget,
 			PotentialFieldObstacle potentialFieldObstacle,
 			PotentialFieldAgent potentialFieldPedestrian,
 			List<SpeedAdjuster> speedAdjusters,
@@ -217,7 +217,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	public double getPotential(VPoint newPos) {
 
-		double targetPotential = potentialFieldTarget.getTargetPotential(newPos, this);
+		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
 
 		double pedestrianPotential = potentialFieldPedestrian
 				.getAgentPotential(newPos, this, relevantPedestrians);
@@ -235,10 +235,10 @@ public class PedestrianOSM extends Pedestrian {
 	// Getters...
 
 	public double getTargetPotential(VPoint pos) {
-		return potentialFieldTarget.getTargetPotential(pos, this);
+		return potentialFieldTarget.getPotential(pos, this);
 	}
 
-	public PotentialFieldTarget getPotentialFieldTarget() {
+	public IPotentialFieldTarget getPotentialFieldTarget() {
 		return potentialFieldTarget;
 	}
 

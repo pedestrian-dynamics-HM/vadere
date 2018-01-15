@@ -6,7 +6,7 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -86,7 +86,7 @@ public class Simulation {
 
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
-        PotentialFieldTarget pft = null;
+        IPotentialFieldTarget pft = null;
         if(mainModel instanceof PotentialFieldModel) {
             pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
         }

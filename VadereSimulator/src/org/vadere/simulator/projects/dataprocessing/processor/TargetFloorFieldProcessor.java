@@ -3,18 +3,10 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.potential.PotentialFieldModel;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
-import org.vadere.util.geometry.shapes.VPoint;
-
-import java.awt.*;
-import java.util.Optional;
 
 /**
  * @author Mario Teixeira Parente

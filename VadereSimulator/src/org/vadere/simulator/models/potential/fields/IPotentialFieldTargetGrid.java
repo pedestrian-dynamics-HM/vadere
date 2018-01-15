@@ -15,16 +15,36 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
-public interface IPotentialTargetGrid extends PotentialFieldTarget {
-	public HashMap<Integer, CellGrid> getCellGrids();
+/**
+ * A static (needsUpdate returns always false) or dynamic target potential field which uses a
+ * Cartesian grid for discretization.
+ */
+public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
 
-	public static IPotentialTargetGrid createPotentialField(List<Attributes> modelAttributesList,
-			Topography topography, AttributesAgent attributesPedestrian, String className) {
+    /**
+     * Returns the Cartesian grid which contains the calculated values.
+     * @return  the Cartesian grid
+     */
+	HashMap<Integer, CellGrid> getCellGrids();
 
-		DynamicClassInstantiator<IPotentialTargetGrid> instantiator = new DynamicClassInstantiator<>();
-		Class<? extends IPotentialTargetGrid> type = instantiator.getClassFromName(className);
+    /**
+     * A factory method to create different target potential fields which use a Cartesian grid.
+     *
+     * @param modelAttributesList   list of model attributes (models pick their attributes themselves)
+     * @param topography            the topography
+     * @param attributesPedestrian  the attributes of pedestrians
+     * @param className             the name of the class of the field which will be created
+     * @return target potential fields which use a Cartesian grid
+     */
+	static IPotentialFieldTargetGrid createPotentialField(final List<Attributes> modelAttributesList,
+                                                          final Topography topography,
+                                                          final AttributesAgent attributesPedestrian, String className) {
 
-		IPotentialTargetGrid result;
+		DynamicClassInstantiator<IPotentialFieldTargetGrid> instantiator = new DynamicClassInstantiator<>();
+
+		Class<? extends IPotentialFieldTargetGrid> type = instantiator.getClassFromName(className);
+
+		IPotentialFieldTargetGrid result;
 
 		if (type == PotentialFieldTargetGrid.class) {
 			AttributesFloorField attributesFloorField =

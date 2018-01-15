@@ -5,18 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.tools.ant.taskdefs.Tar;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.CellGrid;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationConfig> {
@@ -32,7 +29,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	 * pontetial field of a certain pedestrian. See 'Simulation' for more
 	 * information. For debug purposes. Updated by popDrawData().
 	 */
-	private PotentialFieldTarget potentialField = null;
+	private IPotentialField potentialField = null;
 
 	/**
 	 * Latest snapshot of the jts diagram to be displayed. Updated by
@@ -108,7 +105,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			simTimeInSec = observationAreaSnapshot.simTimeInSec;
 
 			// potentialField might be null!
-			potentialField = observationAreaSnapshot.potentialFieldTarget;
+            potentialField = observationAreaSnapshot.potentialFieldTarget;
 
 			/*
 			 * if(topography == null ||
@@ -144,11 +141,11 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	public void pushObersavtionAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
-		if (observationAreaSnapshots.size() > 0) {
-			observationAreaSnapshots.pop();
-		}
-		observationAreaSnapshots.push(observationAreaSnapshotData);
-		setChanged();
+        if (observationAreaSnapshots.size() > 0) {
+            observationAreaSnapshots.pop();
+        }
+        observationAreaSnapshots.push(observationAreaSnapshotData);
+        setChanged();
 	}
 
 	public void reset() {
@@ -185,7 +182,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	    if(potentialField != null) {
             if(getSelectedElement() instanceof Agent) {
                 Agent selectedAgent = (Agent)getSelectedElement();
-                f = pos -> potentialField.getTargetPotential(pos, selectedAgent);
+                f = pos -> potentialField.getPotential(pos, selectedAgent);
             }
         }
 
