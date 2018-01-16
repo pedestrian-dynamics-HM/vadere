@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AVertex<P extends IPoint> implements IVertex<P> {
 
     private final Lock lock;
-    private final P point;
+    private P point;
     private int down;
     private int halfEdge;
     private int id;
@@ -25,6 +25,10 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 		this.id = id;
 		this.lock = new ReentrantLock();
 		this.destroyed = false;
+	}
+
+	protected void setPoint(@NotNull final P point) {
+		this.point = point;
 	}
 
 	@Override

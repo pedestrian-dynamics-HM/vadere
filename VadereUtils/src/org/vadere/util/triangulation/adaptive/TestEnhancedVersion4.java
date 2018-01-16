@@ -41,10 +41,10 @@ public class TestEnhancedVersion4 extends JFrame {
 		long obscuteTriangles = -1;
 		int counter = 0;
 		long time = 0;
+		int numberOfRetriangulations = 0;
+		long triangulationTime = 0;
 
-
-
-		while (counter < 100) {
+		while (counter < 200) {
 			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
 			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
 			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
@@ -58,13 +58,13 @@ public class TestEnhancedVersion4 extends JFrame {
 			//meshGenerator.refresh();
 			//meshGenerator.retriangulate();
 			boolean retriangulation = meshGenerator.step(true);
-			ms = System.currentTimeMillis() - ms;
 			if(retriangulation) {
-				//meshGenerator.refresh();
+				long tms = System.currentTimeMillis();
 				meshGenerator.retriangulate();
+				triangulationTime += System.currentTimeMillis() - tms;
+				numberOfRetriangulations++;
 			}
-			meshGenerator.refresh();
-
+			ms = System.currentTimeMillis() - ms;
 			/*if(meshGenerator.step(true)) {
 				meshGenerator.refresh();
 				meshGenerator.retriangulate();
@@ -92,7 +92,9 @@ public class TestEnhancedVersion4 extends JFrame {
 		meshGenerator.finish();
 		distmeshPanel.update();
 		distmeshPanel.repaint();
-		System.out.print("overall time: " + time);
+		System.out.println("overall time: " + time);
+		System.out.println("#retriangulations: " + numberOfRetriangulations);
+		System.out.println("triangulation-time: " + triangulationTime);
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
 
 		//System.out.print("finished:" + avgQuality);

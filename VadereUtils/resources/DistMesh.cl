@@ -159,7 +159,7 @@ kernel void updateLabel(__global float2* vertices,
     //lockedTriangles[tb] = -1;
 
     // edge is a non-boundary edge
-    if(ta != -1 && tb != -1 && labeledEdges[edgeId] == 1) {
+    if(ta != -1 && tb != -1) {
         int v2 = getDiffVertex(v0, v1, triangles[ta]);
         int p = getDiffVertex(v0, v1, triangles[tb]);
 
@@ -457,17 +457,17 @@ kernel void moveVertices(__global float2* vertices, __global float2* forces, con
     // project back if necessary
     float distance = fabs(6.0f - length(v))-4.0f;
     if(distance <= 0) {
-        v = v + (force * 0.2f);
+        v = v + (force * 0.02f);
     }
-    /*else {
-        float deps = 0.0001f;
+    else {
+        float deps = 0.00001f;
         float2 dX = (deps, 0.0f);
         float2 dY = (0.0f, deps);
         float dGradPX = ((fabs(6.0f - length(v + dX))-4.0f)-distance) / deps;
         float dGradPY = ((fabs(6.0f - length(v + dY))-4.0f)-distance) / deps;
         float2 projection = (dGradPX * distance, dGradPY * distance);
         v = v - projection;
-    }*/
+    }
 
     // set force to 0.
     forces[i] = (0.0f, 0.0f);

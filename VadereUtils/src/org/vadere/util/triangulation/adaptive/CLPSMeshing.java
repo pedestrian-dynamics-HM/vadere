@@ -44,6 +44,7 @@ public class CLPSMeshing implements IPSMeshing {
 	private Object gobalAcessSynchronizer = new Object();
 
 	private CLDistMesh<MeshPoint> clDistMesh;
+	private boolean hasToRead = true;
 
 	public CLPSMeshing(
 			final IDistanceFunction distanceFunc,
@@ -69,7 +70,8 @@ public class CLPSMeshing implements IPSMeshing {
 		log.info("##### (start) compute a uniform refined triangulation #####");
 		UniformRefinementTriangulation uniformRefinementTriangulation = new UniformRefinementTriangulation(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
 		uniformRefinementTriangulation.compute();
-		retriangulate();
+		clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+		clDistMesh.init();
 		initialized = true;
 		log.info("##### (end) compute a uniform refined triangulation #####");
 	}
@@ -103,6 +105,7 @@ public class CLPSMeshing implements IPSMeshing {
 	}
 
 	public boolean step(boolean flipAll) {
+		hasToRead = true;
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 		//log.info(scalingFactor);
@@ -142,7 +145,6 @@ public class CLPSMeshing implements IPSMeshing {
 	}
 
 	public boolean flipEdges() {
-		refresh();
 		boolean anyFlip = false;
 		// Careful, iterate over all half-edges means iterate over each "real" edge twice!
 		/*for(AHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
@@ -169,21 +171,11 @@ public class CLPSMeshing implements IPSMeshing {
 		triangulation.finalize();
 	}
 
-	public void refresh() {
-		if(clDistMesh != null) {
-			clDistMesh.refresh();
-		}
-		triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
-		removeTrianglesInsideObstacles();
-		removeLowQualityTriangles();
-		triangulation.finalize();
-	}
 
     public void retriangulate() {
-        //Set<MeshPoint> points = getMesh().getVertices().stream().map(vertex -> getMesh().getPoint(vertex)).collect(Collectors.toSet());
-        //removeLowQualityTriangles();
-        triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
+        triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
+        removeLowQualityTriangles();
         triangulation.finalize();
 
         if(clDistMesh != null) {
@@ -261,6 +253,10 @@ public class CLPSMeshing implements IPSMeshing {
 
     @Override
     public Collection<VTriangle> getTriangles() {
+		if(hasToRead) {
+			hasToRead = false;
+			((AMesh<MeshPoint>)triangulation.getMesh()).setPositions(clDistMesh.getResult());
+		}
 		return triangulation.streamTriangles().collect(Collectors.toList());
     }
 }

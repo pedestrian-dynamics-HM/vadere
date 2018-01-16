@@ -265,7 +265,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	Stream<V> streamVerticesParallel();
 
 	default Stream<P> streamPoints() {
-		return streamEdges().map(e -> getPoint(e));
+		return streamVertices().map(v -> getPoint(v));
 	}
 
 	default Stream<P> streamPointsParallel() {

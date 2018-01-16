@@ -21,6 +21,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.lwjgl.opencl.CL10.*;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
@@ -129,7 +130,8 @@ public class CLDistMesh<P extends IPoint> {
 
     private boolean doublePrecision = false;
 
-    private Collection<P> result;
+    private List<P> result;
+    private boolean hasToRead = false;
 
     public CLDistMesh(@NotNull AMesh<P> mesh) {
         this.mesh = mesh;
@@ -160,7 +162,7 @@ public class CLDistMesh<P extends IPoint> {
         for(int i = 0; i < numberOfEdges; i++) {
             this.edgeLabels.put(i, 0);
         }
-        this.result = null;
+        this.result = mesh.streamPoints().collect(Collectors.toList());
     }
 
     private void initCallbacks() {
@@ -463,6 +465,7 @@ public class CLDistMesh<P extends IPoint> {
 		 * 5. flip all
          *
          */
+        hasToRead = true;
         clEnqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
         if(numberOfEdges > prefdWorkGroupSizeMultiple) {
            clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
@@ -572,7 +575,7 @@ public class CLDistMesh<P extends IPoint> {
 
     }
 
-    private Collection<P> readResultFromHost() {
+    private List<P> readResultFromHost() {
         List<P> pointSet = new ArrayList<>(numberOfVertices);
         if(doublePrecision) {
             for(int i = 0; i < numberOfVertices*2; i+=2) {
@@ -714,9 +717,12 @@ public class CLDistMesh<P extends IPoint> {
         initialKernelArgs();
     }
 
-    public void refresh () {
-        readResultFromGPU();
-        result = readResultFromHost();
+    private void refresh () {
+        if(hasToRead) {
+            readResultFromGPU();
+            result = readResultFromHost();
+            hasToRead = false;
+        }
         //printResult();
     }
 
@@ -727,7 +733,8 @@ public class CLDistMesh<P extends IPoint> {
         //clearHost();
     }
 
-    public Collection<P> getResult() {
+    public List<P> getResult() {
+        refresh();
         return result;
     }
 

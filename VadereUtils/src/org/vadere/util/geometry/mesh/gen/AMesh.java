@@ -361,6 +361,21 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         vertex.getLock().unlock();
     }
 
+    public void setPositions(final List<P> positions) {
+    	assert positions.size() == numberOfVertices;
+    	if(positions.size() != numberOfVertices) {
+    		throw new IllegalArgumentException("not equally many positions than vertices: " + positions.size() + " != " + numberOfVertices);
+		}
+
+    	int j = 0;
+    	for(int i = 0; i < vertices.size(); i++) {
+			if(!vertices.get(i).isDestroyed()) {
+				vertices.get(i).setPoint(positions.get(j));
+				j++;
+			}
+		}
+	}
+
     /**
      * removes all destroyed object from this mesh and re-arranges all indices.
      */
