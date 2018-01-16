@@ -236,6 +236,11 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
     }
 
     @Override
+    public Optional<F> locate(double x, double y) {
+        return locate(base.getMesh().createPoint(x, y));
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("");
         for(int i = 0; i < hierarchySets.size(); i++) {

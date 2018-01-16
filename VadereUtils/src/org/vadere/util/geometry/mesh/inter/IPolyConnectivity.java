@@ -301,6 +301,39 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return GeometryUtils.intersectLine(p1, p2, q1, q2);
 	}
 
+    /**
+     * Merges this IPolyConnectivity with another IPolyConnectivity by inserting
+     * the other one into a hole / face.
+     *
+     * Assumption: the other IPolyConnectivity does not contain any holes and it
+     * fits perfectly into the hole.
+     *
+     * @param edge the boundary edge (i.e. hole edge of the face)
+     * @param poly
+     */
+	default void insertIntoHole(E edge, IPolyConnectivity<P, V, E, F> poly) {
+        F oBoundary = poly.getMesh().getBoundary();
+
+        // search for the correct edge. The hole is ccw while the boundary of the poly is cw!
+        Optional<E> optOEdge = poly.getMesh().streamEdges(oBoundary).filter(e ->
+            poly.getMesh().getPoint(e).equals(getMesh().getPoint(getMesh().getPrev(edge))) &&
+                    poly.getMesh().getPoint(poly.getMesh().getPrev(e)).equals(getMesh().getPoint(edge))
+        ).findAny();
+
+        if(!optOEdge.isPresent()) {
+            throw new IllegalArgumentException("the two IPolyConnectivity do not fit");
+        }
+
+        E oEdge = optOEdge.get();
+        E nEdge = null;
+
+        throw new UnsupportedOperationException("not jet implemented.");
+        /*do {
+            getMesh().cre
+
+        } while(!edge.equals(nEdge));*/
+    }
+
 	/*default void fill_hole (final V v, final List<E> deletedEdges)
 	{
 		// uses the fact that the hole is starshaped

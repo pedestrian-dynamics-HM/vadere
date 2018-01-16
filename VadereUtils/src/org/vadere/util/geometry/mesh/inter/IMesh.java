@@ -49,7 +49,7 @@ import java.util.stream.StreamSupport;
  * @param <F> the type of the faces
  */
 public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F> {
-	E getNext(@NotNull E halfEdge);
+    E getNext(@NotNull E halfEdge);
 	E getPrev(@NotNull E halfEdge);
 	E getTwin(@NotNull E halfEdge);
 	F getFace(@NotNull E halfEdge);

@@ -61,26 +61,26 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	protected F superTriangle;
 	private F borderFace;
-	private final Predicate<? extends E> illegalPredicate;
+	private final Predicate<E> illegalPredicate;
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
 
 	// constructors using the triangulation without a triangulator
 	public IncrementalTriangulation(
 			final Collection<P> points,
-			final Predicate<? extends E> illegalPredicate) {
+			final Predicate<E> illegalPredicate) {
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
 		this.bound = GeometryUtils.bound(points);
 		this.finalized = false;
 	}
 
-	public IncrementalTriangulation(final Set<P> points) {
+	public IncrementalTriangulation(final Collection<P> points) {
 		this(points, halfEdge -> true);
 	}
 
 	public IncrementalTriangulation(
 			final VRectangle bound,
-			final Predicate<? extends E> illegalPredicate) {
+			final Predicate<E> illegalPredicate) {
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = bound;
@@ -200,6 +200,10 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			insert(p);
 		}
 	}
+
+	protected IPointLocator<P, V, E, F> getPointLocator() {
+	    return pointLocator;
+    }
 
 	/**
 	 * Removes the super triangle from the mesh data structure.
@@ -383,7 +387,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 */
 	@Override
 	public boolean isIllegal(E edge, V p) {
-		if(!mesh.isAtBoundary(edge)) {
+		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
 			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 			//V p = mesh.getVertex(mesh.getNext(edge));
 			E t0 = mesh.getTwin(edge);

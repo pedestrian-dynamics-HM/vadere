@@ -72,7 +72,12 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 		return Optional.of(locatePoint(point, false));
 	}
 
-	@Override
+    @Override
+    public Optional<F> locate(double x, double y) {
+        return locate(mesh.createPoint(x, y));
+    }
+
+    @Override
 	public void splitTriangleEvent(F original, F f1, F f2, F f3) {
 		checkRoot();
 		DAG<DAGElement<P, F>> faceDag = map.remove(original);
