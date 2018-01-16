@@ -11,13 +11,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Benedikt Zoennchen
  */
 public class AVertex<P extends IPoint> implements IVertex<P> {
-
-	private final Lock lock;
-	private final P point;
-	private int down;
-	private int halfEdge;
-	private int id;
-	private boolean destroyed;
+    private final Lock lock;
+    private final P point;
+    private int down;
+    private int halfEdge;
+    private int id;
+    private boolean destroyed;
 
 
 	public AVertex(@NotNull final int id, @NotNull final P point) {
@@ -76,6 +75,7 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 	public boolean isDestroyed() {
 		return destroyed;
 	}
+
 
 	public void destroy() {
 		destroyed = true;

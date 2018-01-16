@@ -29,17 +29,17 @@ import java.util.function.Supplier;
  * @param <F>
  */
 public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F>  {
-    private static Logger log = LogManager.getLogger(DelaunayHierarchy.class);
+	private static Logger log = LogManager.getLogger(DelaunayHierarchy.class);
 
-    private List<ITriangulation<P, V, E, F>> hierarchySets;
+	private List<ITriangulation<P, V, E, F>> hierarchySets;
 
-    private List<Map<V, V>> hierarchyConnector;
+	private List<Map<V, V>> hierarchyConnector;
 
-    private ITriangulation<P, V, E, F> base;
+	private ITriangulation<P, V, E, F> base;
 
-    private Supplier<ITriangulation<P, V, E, F>> triangulationSupplier;
+	private Supplier<ITriangulation<P, V, E, F>> triangulationSupplier;
 
-    // see delaunay-hierarchy paper!
+	// see delaunay-hierarchy paper!
 	/*private double alpha = 30;
 	private int maxLevel = 5;
 	private int minSize = 20;*/
@@ -256,5 +256,5 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
     public V getNearestPoint(final ITriangulation<P, V, E, F> triangulation, final F face, final P point) {
         IMesh<P, V, E, F> mesh = triangulation.getMesh();
         return mesh.streamEdges(face).map(edge -> mesh.getVertex(edge)).reduce((p1, p2) -> p1.distance(point) > p2.distance(point) ? p2 : p1).get();
-    }
+	}
 }

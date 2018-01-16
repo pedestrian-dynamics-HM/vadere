@@ -1,18 +1,12 @@
 package org.vadere.util.potential.calculators;
 
-import org.apache.commons.lang3.tuple.Pair;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.InterpolationUtil;
-import org.vadere.util.math.MathUtil;
-import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 
-import java.util.*;
-import java.awt.Point;
 import java.util.function.Function;
 
 /**
@@ -62,7 +56,6 @@ public interface EikonalSolver {
     }
 
     double getPotential(final double x, final double y);
-
 
 	default boolean isHighAccuracy() {
 		return true;

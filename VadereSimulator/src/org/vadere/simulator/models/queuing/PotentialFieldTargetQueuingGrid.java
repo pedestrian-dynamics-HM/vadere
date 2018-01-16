@@ -156,8 +156,8 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	}
 
     @Override
-    public IPotentialField copyFields() {
-        throw new UnsupportedOperationException("method not implemented jet.");
+    public IPotentialField getSolution() {
+        return null;
     }
 
     @Override

@@ -79,6 +79,11 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 		return tangent;
 	}
 
+    @Override
+    public IPotentialField getSolution() {
+        throw new UnsupportedOperationException("not jet implemented.");
+    }
+
 
     @Override
     public PotentialFieldTargetRingExperiment clone() {
@@ -89,11 +94,6 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
         }
-    }
-
-    @Override
-    public IPotentialField copyFields() {
-        throw new UnsupportedOperationException("not jet implemented.");
     }
 
     @Override

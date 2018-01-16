@@ -46,12 +46,12 @@ public class TestEnhancedVersion5 extends JFrame {
         frame.setVisible(true);
 
 
-        //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-        //double maxLen = meshGenerator.step();
-        double avgQuality = 0.0;
-        long obscuteTriangles = -1;
-        int counter = 0;
-        long time = 0;
+		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
+		//double maxLen = meshGenerator.step();
+		double avgQuality = 0.0;
+		long obscuteTriangles = -1;
+		int counter = 0;
+		long time = 0;
 
         while (counter <= 2000) {
             //obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
@@ -66,24 +66,24 @@ public class TestEnhancedVersion5 extends JFrame {
             distmeshPanel.repaint();
             counter++;
 
-            long ms = System.currentTimeMillis();
-            meshGenerator.improve();
-            ms = System.currentTimeMillis() - ms;
-            time += ms;
-            //System.out.println("Quality: " + meshGenerator.getQuality());
-            System.out.println("Step-Time: " + ms);
-        }
-        //meshGenerator.finalize();
-        System.out.print("overall time: " + time);
+			long ms = System.currentTimeMillis();
+			meshGenerator.improve();
+			ms = System.currentTimeMillis() - ms;
+			time += ms;
+			//System.out.println("Quality: " + meshGenerator.getQuality());
+			System.out.println("Step-Time: " + ms);
+		}
+		//meshGenerator.finalize();
+		System.out.print("overall time: " + time);
         //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-        //System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
+		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
 
-        //System.out.print("finished:" + avgQuality);
-        //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-        //if(counter == 1) {
-        //
-        //}
-    }
+		//System.out.print("finished:" + avgQuality);
+		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
+		//if(counter == 1) {
+		//
+		//}
+	}
 
     public static void main(String[] args) {
         new TestEnhancedVersion5();

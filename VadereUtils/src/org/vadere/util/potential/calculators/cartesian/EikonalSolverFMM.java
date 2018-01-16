@@ -23,7 +23,7 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
  * Hence, the initializer may be used to realize static floor fields.
  * 
  */
-public class EikonalSolverFMM extends AbstractGridEikonalSolver {
+public class EikonalSolverFMM extends AGridEikonalSolver {
 	protected final PriorityQueue<Point> narrowBand;
 	protected final ITimeCostFunction timeCostFunction;
 

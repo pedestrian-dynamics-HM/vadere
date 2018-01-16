@@ -38,14 +38,14 @@ public interface PotentialFieldObstacle extends Model {
 	default void update(double simTimeInSec) {
 	}
 
-	public double getObstaclePotential(VPoint pos, Agent pedestrian);
+	double getObstaclePotential(VPoint pos, Agent pedestrian);
 
-	public Vector2D getObstaclePotentialGradient(VPoint pos,
+	Vector2D getObstaclePotentialGradient(VPoint pos,
 			Agent pedestrian);
 
-	public PotentialFieldObstacle copy();
+	PotentialFieldObstacle copy();
 
-	public static PotentialFieldObstacle createPotentialField(List<Attributes> modelAttributesList,
+	static PotentialFieldObstacle createPotentialField(List<Attributes> modelAttributesList,
 			Topography topography, Random random, String className) {
 
 		DynamicClassInstantiator<PotentialFieldObstacle> instantiator = new DynamicClassInstantiator<>();

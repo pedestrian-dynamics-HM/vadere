@@ -2,6 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.queuing.PotentialFieldTargetQueuingGrid;
@@ -18,14 +19,19 @@ import org.vadere.util.reflection.VadereClassNotFoundException;
 /**
  * A static (needsUpdate returns always false) or dynamic target potential field which uses a
  * Cartesian grid for discretization.
+ *
+ * @author Benedikt Zoennchen
  */
 public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
 
     /**
-     * Returns the Cartesian grid which contains the calculated values.
-     * @return  the Cartesian grid
+     * Returns a Map: targetId -> CellGrid (reference). The CellGrid (a Cartesian grid) contains the current values of the potential field
+     * for its grid points. For performance reason only a reference, i.e. no deep copy, of CellGrids are returned. If the potential field
+     * is dynamic these values will change during the simulation run!
+     *
+     * @return  a Map: targetId -> CellGrid (reference)
      */
-	HashMap<Integer, CellGrid> getCellGrids();
+	Map<Integer, CellGrid> getCellGrids();
 
     /**
      * A factory method to create different target potential fields which use a Cartesian grid.

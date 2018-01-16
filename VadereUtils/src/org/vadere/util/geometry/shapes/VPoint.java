@@ -17,7 +17,6 @@ public class VPoint implements Cloneable, IPoint {
 
 	public double x;
 	public double y;
-	public int identifier = -1;
 
 	public VPoint() {}
 
@@ -28,13 +27,7 @@ public class VPoint implements Cloneable, IPoint {
 	public VPoint(double x, double y) {
 		this.x = x;
 		this.y = y;
-	}
-
-	public VPoint(double x, double y, int identifier) {
-		this.x = x;
-		this.y = y;
-		this.identifier = identifier;
-	}
+    }
 
 	public VPoint(Point2D.Double copy) {
 		this.x = copy.x;
@@ -63,6 +56,7 @@ public class VPoint implements Cloneable, IPoint {
 	public VPoint clone() {
 		return new VPoint(x, y);
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {

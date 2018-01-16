@@ -74,7 +74,7 @@
                         <outputDirectory>${project.reporting.outputDirectory}/coverage-reports</outputDirectory>
                     </configuration>
                 </execution>
-            </executions>    
+            </executions>
         </plugin>
         <plugin>
             <!-- Maven Surefire is used to execute unit tests. -->
@@ -91,6 +91,20 @@
                     <exclude></exclude>
                 </excludes>
             </configuration>
+        </plugin>
+        <plugin>
+            <groupId>com.googlecode.mavennatives</groupId>
+            <artifactId>maven-nativedependencies-plugin</artifactId>
+            <version>0.0.5</version>
+            <executions>
+                <execution>
+                    <id>unpacknatives</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>copy</goal>
+                    </goals>
+                </execution>
+            </executions>
         </plugin>
     </plugins>
   </build>

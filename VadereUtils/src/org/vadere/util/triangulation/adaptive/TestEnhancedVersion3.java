@@ -41,17 +41,17 @@ public class TestEnhancedVersion3 extends JFrame {
 
         Predicate<PFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 
-        PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
-        JFrame frame = distmeshPanel.display();
-        frame.setVisible(true);
+		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
+		JFrame frame = distmeshPanel.display();
+		frame.setVisible(true);
 
 
-        //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-        //double maxLen = meshGenerator.step();
-        double avgQuality = 0.0;
-        long obscuteTriangles = -1;
-        int counter = 0;
-        long time = 0;
+		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
+		//double maxLen = meshGenerator.step();
+		double avgQuality = 0.0;
+		long obscuteTriangles = -1;
+		int counter = 0;
+		long time = 0;
 
         while (counter <= 300) {
             //obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
@@ -80,14 +80,14 @@ public class TestEnhancedVersion3 extends JFrame {
         //meshGenerator.finalize();
         System.out.print("overall time: " + time);
         //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-        //System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
+		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
 
-        //System.out.print("finished:" + avgQuality);
-        //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-        //if(counter == 1) {
-        //
-        //}
-    }
+		//System.out.print("finished:" + avgQuality);
+		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
+		//if(counter == 1) {
+		//
+		//}
+	}
 
     public static void main(String[] args) {
         new TestEnhancedVersion3();

@@ -12,12 +12,12 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractGridEikonalSolver implements EikonalSolver {
+public abstract class AGridEikonalSolver implements EikonalSolver {
 	protected CellGrid potentialField;
 	private final double unknownPenalty;
 	private final double weight;
 
-	public AbstractGridEikonalSolver(final CellGrid potentialField, final double unknownPenalty, final double weight) {
+	public AGridEikonalSolver(final CellGrid potentialField, final double unknownPenalty, final double weight) {
 		this.potentialField = potentialField;
 		this.unknownPenalty = unknownPenalty;
 		this.weight = weight;

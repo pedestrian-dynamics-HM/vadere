@@ -4,9 +4,8 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.calculators.cartesian.AbstractGridEikonalSolver;
 
-public class PotentialFieldCalculatorAirLine extends AbstractGridEikonalSolver {
+public class PotentialFieldCalculatorAirLine extends AGridEikonalSolver {
 
 	private CellGrid potentialField;
 	private LinkedList<Point> targetPoints;
@@ -49,9 +48,5 @@ public class PotentialFieldCalculatorAirLine extends AbstractGridEikonalSolver {
 	@Override
 	public boolean needsUpdate() {
 		return false;
-	}
-
-	public boolean isValidPoint(Point point) {
-		return potentialField.isValidPoint(point);
 	}
 }

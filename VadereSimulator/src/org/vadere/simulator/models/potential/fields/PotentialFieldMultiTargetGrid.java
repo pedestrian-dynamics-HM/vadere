@@ -22,7 +22,7 @@ import org.vadere.util.potential.calculators.EikonalSolver;
  *
  *         Not finiehsed!
  */
-public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGridPotentialFieldTarget {
+public class PotentialFieldMultiTargetGrid<T extends Agent> extends APotentialFieldTargetGrid {
 
 	private static double EPSILON_SIM_TIME = 1e-100;
 	private final Map<Integer, AttributesFloorField> attributesByTarget;
@@ -45,7 +45,7 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGrid
 	protected void updatePotentialField(final double simTimeInSec, final Target target,
 			final List<VShape> targetShapes) {
 		lastUpdateTimestamp = simTimeInSec;
-		targetPotentialFields.get(target.getId()).update();
+		eikonalSolvers.get(target.getId()).update();
 	}
 
 	@Override
@@ -72,11 +72,11 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGrid
 		Map<Integer, List<VShape>> mergeMap = topography.getTargetShapes();
 		attributesByTarget.keySet().stream()
 				.filter(targetId -> !getSolver(targetId).isPresent())
-				.forEach(targetId -> createNewPotentialFieldAndInitializer(targetId, mergeMap.get(targetId)));
+				.forEach(targetId -> addEikonalSolver(targetId, mergeMap.get(targetId)));
 	}
 
 	@Override
-	protected void createNewPotentialFieldAndInitializer(final int targetId, final List<VShape> shapes) {
+	protected void addEikonalSolver(final int targetId, final List<VShape> shapes) {
 	    EikonalSolver eikonalSolver = IPotentialField.create(
 	            topography,
                 targetId,
@@ -86,7 +86,7 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGrid
 
 		potentialFieldsNeedUpdate =
 				potentialFieldsNeedUpdate || eikonalSolver.needsUpdate();
-		targetPotentialFields.put(targetId, eikonalSolver);
+		eikonalSolvers.put(targetId, eikonalSolver);
 	}
 
 	@Override

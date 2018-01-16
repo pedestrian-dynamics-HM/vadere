@@ -5,7 +5,11 @@ import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
+<<<<<<< HEAD
  * @author Benedikt Zoennchen
+=======
+ * Created by bzoennchen on 06.09.17.
+>>>>>>> 9b651d7a4176c56b6db64784eea66e9e6d9556b0
  */
 public class AFace<P extends IPoint> implements IFace<P> {
 

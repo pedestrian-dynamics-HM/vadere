@@ -94,7 +94,7 @@ public class OnlineVisualization implements PassiveCallback {
 					new ObservationAreaSnapshotData(
 					        simTimeInSec,
                             scenario.clone(),
-                            model.config.isShowPotentialField() ? potentialFieldTarget.copyFields() : null));
+                            model.config.isShowPotentialField() ? potentialFieldTarget.getSolution() : null));
 		}
 	}
 

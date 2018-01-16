@@ -10,7 +10,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 
-public class PotentialFieldCalculatorDijkstra extends AbstractGridEikonalSolver {
+public class PotentialFieldCalculatorDijkstra extends AGridEikonalSolver {
 
 	private CellGrid potentialField;
 	private LinkedList<Point> targetPoints;
@@ -82,9 +82,5 @@ public class PotentialFieldCalculatorDijkstra extends AbstractGridEikonalSolver 
 	@Override
 	public boolean needsUpdate() {
 		return false;
-	}
-
-	public boolean isValidPoint(Point point) {
-		return potentialField.isValidPoint(point);
 	}
 }

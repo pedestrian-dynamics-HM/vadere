@@ -8,7 +8,6 @@ import org.vadere.util.potential.calculators.PotentialPoint;
 
 import java.util.List;
 
-
 /**
  * Interpolation utilities not covered by java.lang.Math
  * 
@@ -104,6 +103,7 @@ public class InterpolationUtil {
 
 		return result;
 	}
+
 
     /**
      * Computes bilinear interpolation for (x,y) while nodes may be undefined

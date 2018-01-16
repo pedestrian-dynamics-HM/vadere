@@ -7,7 +7,6 @@ import org.vadere.util.geometry.GeometryUtils;
 
 @SuppressWarnings("serial")
 public class VLine extends Line2D.Double {
-
     private VPoint p1;
     private VPoint p2;
 

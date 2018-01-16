@@ -538,7 +538,7 @@ public class GeometryUtils {
 
 		return new VRectangle(pMin.getX(), pMin.getY(), pMax.getX() - pMin.getX(), pMax.getY() - pMin.getY());
 	}
-    
+
 	/**
 	 * This method follows the construction from
 	 * https://proofwiki.org/wiki/Obtuse_Triangle_Divided_into_Acute_Triangles

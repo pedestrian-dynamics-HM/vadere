@@ -92,8 +92,7 @@
         "treadCount" : 133,
         "upwardDirection" : {
           "x" : 1.0,
-          "y" : 0.0,
-          "identifier" : -1
+          "y" : 0.0
         }
       } ],
       "targets" : [ {

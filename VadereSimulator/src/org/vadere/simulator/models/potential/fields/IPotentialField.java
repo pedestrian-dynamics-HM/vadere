@@ -26,13 +26,16 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 /**
+ * A potential field for some agents: ((x,y), agent) -> potential.
+ *
  * @author Benedikt Zoennchen
  */
 @FunctionalInterface
 public interface IPotentialField {
 
     /**
-     * Returns a potential at pos for the agent. This can be any potential.
+     * Returns a potential at pos for the agent. This can be any potential:
+     * ((x,y), agent) -> potential
      *
      * @param pos   the position for which the potential will be evaluated
      * @param agent the agent for which the potential will be evaluated
@@ -41,8 +44,18 @@ public interface IPotentialField {
     double getPotential(final VPoint pos, final Agent agent);
 
 
-    static Logger logger = LogManager.getLogger(IPotentialField.class);
+    Logger logger = LogManager.getLogger(IPotentialField.class);
 
+    /**
+     * Factory method to construct an EikonalSolver for agents of target defined by targetShapes and targetId.
+     *
+     * @param topography            the topography
+     * @param targetId              the
+     * @param targetShapes          the area where T = 0
+     * @param attributesPedestrian  pedestrian configuration
+     * @param attributesPotential   potential field configuration (dynamic or static, parameters and so on...)
+     * @return an EikonalSolver for a specific target
+     */
     static EikonalSolver create(
             final Topography topography,
             final int targetId,

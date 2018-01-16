@@ -142,13 +142,11 @@
         "targetIds" : [ 1 ],
         "position" : {
           "x" : 4.3,
-          "y" : 4.6,
-          "identifier" : -1
+          "y" : 4.6
         },
         "velocity" : {
           "x" : 0.0,
-          "y" : 0.0,
-          "identifier" : -1
+          "y" : 0.0
         },
         "nextTargetListIndex" : -1,
         "freeFlowSpeed" : 1.34,

@@ -47,7 +47,6 @@ public class VCone {
 	/*
 	 * TODO: test
 	 */
-
 	public boolean overlapLineSegment(final VLine line) {
 		VPoint a = new VPoint(line.getX1(), line.getY1());
 		VPoint b = new VPoint(line.getX2(), line.getY2());
@@ -61,7 +60,6 @@ public class VCone {
 		VPoint v3 = new VPoint(-direction.getY(), direction.getX());
 		double t1 = v2.crossProduct(v1) / v2.scalarProduct(v3);
 		double t2 = v1.scalarProduct(v3) / v2.scalarProduct(v3);
-
 		assert Double.isFinite(t1) && Double.isFinite(t2);
 
 		// the line segment from a to b intersect the cone?

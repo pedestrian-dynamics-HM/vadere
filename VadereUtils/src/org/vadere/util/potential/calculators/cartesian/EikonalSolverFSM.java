@@ -2,12 +2,10 @@ package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
@@ -28,7 +26,7 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFSM extends AbstractGridEikonalSolver {
+public class EikonalSolverFSM extends AGridEikonalSolver {
 	private CellGrid cellGrid;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFSM.class);
 	private ITimeCostFunction timeCostFunction;
@@ -176,6 +174,11 @@ public class EikonalSolverFSM extends AbstractGridEikonalSolver {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isValidPoint(Point point) {
+		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

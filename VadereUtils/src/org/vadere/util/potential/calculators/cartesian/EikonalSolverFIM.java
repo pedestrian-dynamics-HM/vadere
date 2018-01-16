@@ -2,18 +2,15 @@ package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -27,7 +24,7 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFIM extends AbstractGridEikonalSolver {
+public class EikonalSolverFIM extends AGridEikonalSolver {
 
 	private List<VShape> targetShapes;
 	private List<Point> targetPoints;

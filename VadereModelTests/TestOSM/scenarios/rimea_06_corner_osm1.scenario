@@ -3,15 +3,8 @@
   "description" : "",
   "release" : "0.2",
   "processWriters" : {
-    "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "out.trajectories",
-      "processors" : [ 1 ]
-    } ],
-    "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
-    } ],
+    "files" : [ ],
+    "processors" : [ ],
     "isTimestamped" : true
   },
   "scenario" : {

@@ -3,6 +3,7 @@ package org.vadere.util.potential.gradients;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.vadere.util.math.InterpolationUtil;
@@ -40,7 +41,7 @@ public class FloorGradientProviderDiscrete implements GradientProvider {
 	 * @param targets
 	 */
 	public FloorGradientProviderDiscrete(
-			HashMap<Integer, CellGrid> potentialFields,
+			Map<Integer, CellGrid> potentialFields,
 			Rectangle2D scenarioBounds, Collection<Integer> targetIds) {
 		for (Integer targetID : targetIds) {
 			this.grids.put(targetID, potentialFields.get(targetID));
