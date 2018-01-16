@@ -31,21 +31,24 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	private double width;
 	private double height;
 	private Collection<F> faces;
-    private final Predicate<F> alertPred;
+    private final Predicate<VTriangle> alertPred;
+    private Collection<VTriangle> triangles;
 
-    public PSMeshingPanel(final IMeshImprover<P, V, E, F> meshGenerator, final Predicate<F> alertPred, final double width, final double height) {
+    public PSMeshingPanel(final IMeshImprover<P, V, E, F> meshGenerator, final Predicate<VTriangle> alertPred, final double width, final double height) {
         this.meshGenerator = meshGenerator;
         this.width = width;
         this.height = height;
         this.alertPred = alertPred;
+        this.triangles = new ArrayList<>();
     }
 
-	public void update() {
-		faces = meshGenerator.getTriangulation().getMesh().getFaces();
-	}
+    public void update() {
+        triangles = meshGenerator.getTriangles();
+    }
 
 	@Override
 	public void paint(Graphics g) {
+
         synchronized (meshGenerator) {
             update();
             Graphics2D graphics2D = (Graphics2D) g;
@@ -67,9 +70,8 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
             graphics.scale(20, 20);
             graphics.setStroke(new BasicStroke(0.003f));
             graphics.setColor(Color.BLACK);
-            for(F face : faces) {
+            for(VTriangle  triangle : triangles) {
                 //log.info(face);
-                VTriangle triangle = meshGenerator.getTriangulation().getMesh().toTriangle(face);
 			/*if(triangleToQuality(triangle) < 0.2) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(triangle);
@@ -77,8 +79,8 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 				graphics.fill(triangle);
 			}*/
 
-                if(alertPred.test(face)) {
-                    log.info("red triangle");
+                if(alertPred.test(triangle)) {
+                    //log.info("red triangle");
                     graphics.setColor(Color.BLACK);
                     graphics.draw(triangle);
                     graphics.setColor(Color.RED);

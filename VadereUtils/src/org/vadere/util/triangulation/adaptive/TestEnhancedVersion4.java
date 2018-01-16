@@ -3,6 +3,7 @@ package org.vadere.util.triangulation.adaptive;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VTriangle;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 
-        Predicate<AFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
+        Predicate<VTriangle> predicate = triangle -> triangle.isNonAcute();
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
@@ -48,6 +49,8 @@ public class TestEnhancedVersion4 extends JFrame {
 		int numberOfRetriangulations = 0;
 		long triangulationTime = 0;
 
+		while (counter < 1000) {
+
 			/*for(int i = 0; i < 100 && !priorityQueue.isEmpty(); i++) {
 				PFace<MeshPoint> face = priorityQueue.poll();
 				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
@@ -57,9 +60,9 @@ public class TestEnhancedVersion4 extends JFrame {
 			//meshGenerator.refresh();
 			//meshGenerator.retriangulate();
 			boolean retriangulation = meshGenerator.step(true);
-			if(retriangulation) {
+			if (retriangulation) {
 				long tms = System.currentTimeMillis();
-				meshGenerator.retriangulate();
+				//?meshGenerator.refresh();
 				triangulationTime += System.currentTimeMillis() - tms;
 				numberOfRetriangulations++;
 			}
@@ -69,23 +72,24 @@ public class TestEnhancedVersion4 extends JFrame {
 			}*/
 
 
-            time += ms;
-            System.out.println("Step-Time: " + ms);
+			time += ms;
+			System.out.println("Step-Time: " + ms);
 
 
-            distmeshPanel.update();
-            distmeshPanel.repaint();
+			distmeshPanel.update();
+			distmeshPanel.repaint();
 
 
 			/*if(counter < 50) {
 				meshGenerator.retriangulate();
 			}*/
-            counter++;
+			counter++;
 			/*try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
+		}
 		meshGenerator.finish();
 		distmeshPanel.update();
 		distmeshPanel.repaint();

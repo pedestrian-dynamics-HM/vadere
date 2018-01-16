@@ -9,8 +9,8 @@ import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 import org.vadere.util.triangulation.improver.IMeshImprover;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +46,7 @@ public class CLPSMeshing implements IMeshImprover {
     private Object gobalAcessSynchronizer = new Object();
 
     private CLDistMesh<MeshPoint> clDistMesh;
-	private boolean hasToRead = true;
+    private boolean hasToRead = true;
 
     public CLPSMeshing(
             final IDistanceFunction distanceFunc,
@@ -69,18 +69,20 @@ public class CLPSMeshing implements IMeshImprover {
      * Start with a uniform refined triangulation
      */
     public void initialize() {
-        log.info("##### (start) generate a uniform refined triangulation #####");
+        log.info("##### (start) compute a uniform refined triangulation #####");
         UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         uniformRefinementTriangulation.generate();
-        retriangulate();
+        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+        clDistMesh.init();
         initialized = true;
-        log.info("##### (end) generate a uniform refined triangulation #####");
+        log.info("##### (end) compute a uniform refined triangulation #####");
     }
+
     public ITriangulation<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> getTriangulation() {
         return triangulation;
     }
 
-	public void execute() {
+    public void execute() {
 
 		/*if(!initialized) {
 			initialize();
@@ -104,10 +106,12 @@ public class CLPSMeshing implements IMeshImprover {
         step(true);
     }
 
-		hasToRead = true;
-		minDeltaTravelDistance = Double.MAX_VALUE;
-		illegalMovement = false;
-		//log.info(scalingFactor);
+    public boolean step(boolean flipAll) {
+        hasToRead = true;
+        minDeltaTravelDistance = Double.MAX_VALUE;
+        illegalMovement = false;
+        //log.info(scalingFactor);
+
 
         //flipEdges();
         //retriangulate();
@@ -142,7 +146,11 @@ public class CLPSMeshing implements IMeshImprover {
 		log.info("#points: " + getMesh().getVertices().size());*/
     }
 
-		// Careful, iterate over all half-edges means iterate over each "real" edge twice!		/*for(AHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
+    public boolean flipEdges() {
+        //? refresh();
+        boolean anyFlip = false;
+        // Careful, iterate over all half-edges means iterate over each "real" edge twice!
+		/*for(AHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
 			if(triangulation.isIllegal(edge)) {
 				//triangulation.flip(edge);
 				anyFlip = true;
@@ -166,11 +174,21 @@ public class CLPSMeshing implements IMeshImprover {
         triangulation.finalize();
     }
 
-	}
+    //?
+    public void refresh() {
+        if(clDistMesh != null) {
+            //? clDistMesh.refresh();
+        }
+        triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
+        removeTrianglesInsideObstacles();
+        removeLowQualityTriangles(); //?
+        triangulation.finalize();
+    }
+
     public void retriangulate() {
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
-        removeLowQualityTriangles();
+        removeLowQualityTriangles(); //?
         triangulation.finalize();
 
         if(clDistMesh != null) {
@@ -248,11 +266,12 @@ public class CLPSMeshing implements IMeshImprover {
 
     @Override
     public Collection<VTriangle> getTriangles() {
-			if(hasToRead) {
-			hasToRead = false;
-			((AMesh<MeshPoint>)triangulation.getMesh()).setPositions(clDistMesh.getResult());
-		}
-		return triangulation.streamTriangles().collect(Collectors.toList());    }
+        if(hasToRead) {
+            hasToRead = false;
+            ((AMesh<MeshPoint>)triangulation.getMesh()).setPositions(clDistMesh.getResult());
+        }
+        return triangulation.streamTriangles().collect(Collectors.toList());
+    }
 
     @Override
     public void improve() {
