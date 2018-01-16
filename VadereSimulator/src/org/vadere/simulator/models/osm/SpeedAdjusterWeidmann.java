@@ -49,11 +49,11 @@ public class SpeedAdjusterWeidmann implements SpeedAdjuster {
 	 * 
 	 * HashSet<ScenarioElement> visiblePedestrians = new
 	 * HashSet<ScenarioElement>(); double targetPotentialPed =
-	 * potentialFieldTarget.getTargetPotential(targetIds, ped.getPosition());
+	 * potentialFieldTarget.getPotential(targetIds, ped.getPosition());
 	 * 
 	 * for (Pedestrian neighbor : closePedestrians) { double
 	 * targetPotentialNeighbor =
-	 * potentialFieldTarget.getTargetPotential(targetIds,
+	 * potentialFieldTarget.getPotential(targetIds,
 	 * neighbor.getPosition());
 	 * 
 	 * // See OSM Paper if (targetPotentialPed - 0.1 > targetPotentialNeighbor)

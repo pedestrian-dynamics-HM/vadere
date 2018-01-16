@@ -31,7 +31,7 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 
 	/** only for logging. */
 	private static Logger logger = LogManager
-			.getLogger(TimeCostPedestrianDensity.class);
+			.getLogger(TimeCostPedestrianDensityQueuing.class);
 	private double highestCost = 0.0;
 	private long runtime = 0;
 

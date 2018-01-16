@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Point;
 import java.util.LinkedList;
@@ -10,7 +10,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 
-public class PotentialFieldCalculatorDijkstra extends AbstractGridEikonalSolver {
+public class PotentialFieldCalculatorDijkstra extends AGridEikonalSolver {
 
 	private CellGrid potentialField;
 	private LinkedList<Point> targetPoints;
@@ -18,8 +18,9 @@ public class PotentialFieldCalculatorDijkstra extends AbstractGridEikonalSolver 
 	PotentialFieldCalculatorDijkstra(
 			final CellGrid potentialField,
 			final LinkedList<Point> targetPoints,
-			final double unknownPenalty) {
-		super(potentialField, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+		super(potentialField, unknownPenalty, weight);
 		this.potentialField = potentialField;
 		this.targetPoints = targetPoints;
 	}
@@ -81,10 +82,5 @@ public class PotentialFieldCalculatorDijkstra extends AbstractGridEikonalSolver 
 	@Override
 	public boolean needsUpdate() {
 		return false;
-	}
-
-	@Override
-	public boolean isValidPoint(Point point) {
-		return potentialField.isValidPoint(point);
 	}
 }

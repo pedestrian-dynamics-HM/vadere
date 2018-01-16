@@ -1,11 +1,9 @@
 package org.vadere.simulator.models.potential.timeCostFunction.loading;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -39,7 +37,7 @@ class PedestrianLoadingStrategyPotentialDifference implements
 	private final int targetId;
 	private final Topography floor;
 	private final double divider;
-	private final IPotentialTargetGrid baseField;
+	private final IPotentialFieldTargetGrid baseField;
 	private final Map<Integer, VPoint> prevPedestrianPositions;
 	private final double EPSILON = 0.0000001;
 
@@ -63,7 +61,7 @@ class PedestrianLoadingStrategyPotentialDifference implements
 			final int targetId,
 			final double loading,
 			final double meanSpeed,
-			final IPotentialTargetGrid baseField) {
+			final IPotentialFieldTargetGrid baseField) {
 		this.loading = loading;
 		this.meanSpeed = meanSpeed;
 		this.targetId = targetId;

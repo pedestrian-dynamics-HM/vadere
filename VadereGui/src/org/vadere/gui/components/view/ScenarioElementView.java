@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
-import org.vadere.gui.components.control.ReflectionAttributeModifier;
+import org.vadere.simulator.entrypoints.ReflectionAttributeModifier;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -89,7 +89,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			Theme syntaxTheme = Theme.load(in);
 			syntaxTheme.apply(textAreaLocal);
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error("could not load theme" + e.getMessage());
 		}
 
 		txtrTextfiletextarea = textAreaLocal;

@@ -3,6 +3,7 @@ package org.vadere.gui.projectview.view;
 import javax.swing.*;
 
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Resources;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -21,8 +22,7 @@ public class JsonValidIndicator extends JPanel {
 
 		labelJsonValid = new JLabel(Messages.getString("TextView.lbljsonvalid.text"));
 		add(labelJsonValid);
-		labelJsonValid.setIcon(new ImageIcon(
-				TextView.class.getResource("/com/sun/java/swing/plaf/windows/icons/Inform.gif")));
+		labelJsonValid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.gif")));
 
 		// INVALID
 
@@ -30,8 +30,7 @@ public class JsonValidIndicator extends JPanel {
 				" <font color=gray size=-1><a href=#>" + Messages.getString("TextView.lbljsoninvalid.showErrorText")
 				+ "</a></font></html>");
 		add(labelJsonInvalid);
-		labelJsonInvalid.setIcon(new ImageIcon(TextView.class
-				.getResource("/com/sun/java/swing/plaf/windows/icons/Error.gif")));
+		labelJsonInvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.gif")));
 		labelJsonInvalid.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {

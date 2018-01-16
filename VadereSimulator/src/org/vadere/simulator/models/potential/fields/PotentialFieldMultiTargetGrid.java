@@ -13,6 +13,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 /**
  * A IPotentialTargetGrid, that creates for each target another floor field type
@@ -21,7 +22,7 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  *         Not finiehsed!
  */
-public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGridPotentialFieldTarget {
+public class PotentialFieldMultiTargetGrid<T extends Agent> extends APotentialFieldTargetGrid {
 
 	private static double EPSILON_SIM_TIME = 1e-100;
 	private final Map<Integer, AttributesFloorField> attributesByTarget;
@@ -44,7 +45,7 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGrid
 	protected void updatePotentialField(final double simTimeInSec, final Target target,
 			final List<VShape> targetShapes) {
 		lastUpdateTimestamp = simTimeInSec;
-		targetPotentialFields.get(target.getId()).eikonalSolver.update();
+		eikonalSolvers.get(target.getId()).update();
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGrid
 		throw new UnsupportedOperationException("method not jet implemented.");
 	}
 
-	@Override
+    @Override
 	public void preLoop(double simTimeInSec) {
 		createMissingPotentialFieldAndInitializers();
 	}
@@ -70,17 +71,22 @@ public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractGrid
 	private void createMissingPotentialFieldAndInitializers() {
 		Map<Integer, List<VShape>> mergeMap = topography.getTargetShapes();
 		attributesByTarget.keySet().stream()
-				.filter(targetId -> !getPotentialFieldAndInitializer(targetId).isPresent())
-				.forEach(targetId -> createNewPotentialFieldAndInitializer(targetId, mergeMap.get(targetId)));
+				.filter(targetId -> !getSolver(targetId).isPresent())
+				.forEach(targetId -> addEikonalSolver(targetId, mergeMap.get(targetId)));
 	}
 
 	@Override
-	protected void createNewPotentialFieldAndInitializer(final int targetId, final List<VShape> shapes) {
-		PotentialFieldAndInitializer potentialFieldAndInitializer = PotentialFieldAndInitializer.create(topography,
-				targetId, shapes, this.attributesPedestrian, attributesByTarget.get(targetId));
+	protected void addEikonalSolver(final int targetId, final List<VShape> shapes) {
+	    EikonalSolver eikonalSolver = IPotentialField.create(
+	            topography,
+                targetId,
+                shapes,
+                this.attributesPedestrian,
+                attributesByTarget.get(targetId));
+
 		potentialFieldsNeedUpdate =
-				potentialFieldsNeedUpdate || potentialFieldAndInitializer.eikonalSolver.needsUpdate();
-		targetPotentialFields.put(targetId, potentialFieldAndInitializer);
+				potentialFieldsNeedUpdate || eikonalSolver.needsUpdate();
+		eikonalSolvers.put(targetId, eikonalSolver);
 	}
 
 	@Override

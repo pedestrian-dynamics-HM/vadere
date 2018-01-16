@@ -458,8 +458,8 @@ public class CLDistMesh<P extends IPoint> {
     public boolean step(final boolean flipAll) {
         /*
          * DistMesh-Loop
-         * 1. compute scaling factor
-		 * 2. compute forces;
+         * 1. generate scaling factor
+		 * 2. generate forces;
 		 * 3. update vertices;
 		 * 4. check for illegal triangles
 		 * 5. flip all
@@ -468,7 +468,7 @@ public class CLDistMesh<P extends IPoint> {
         hasToRead = true;
         clEnqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
         if(numberOfEdges > prefdWorkGroupSizeMultiple) {
-           clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
+            clEnqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
         }
 
         clEnqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
@@ -514,7 +514,7 @@ public class CLDistMesh<P extends IPoint> {
                 clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
                 log.info("repair data structure");
 
-               // clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                // clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
                 log.info("refresh old labels");
                 clFinish(clQueue);
 

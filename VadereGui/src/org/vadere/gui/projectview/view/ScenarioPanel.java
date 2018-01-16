@@ -50,6 +50,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 	private Scenario scenario;
 	private boolean initialized;
+	private ProjectViewModel model;
 
 	private static String activeJsonParsingErrorMsg = null;
 
@@ -58,6 +59,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		this.scenarioName = scenarioName;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
+        this.model = model;
 
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new CardLayout(0, 0));
@@ -70,7 +72,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		// Edit card...
 		JPanel editCard = new JPanel();
-
 		editCard.setBorder(new EmptyBorder(5, 5, 5, 5));
 		editCard.setLayout(new BorderLayout(0, 0));
 		editCard.setBounds(0, 0, 500, 100);
@@ -91,9 +92,9 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				setTopography(scenario.getTopography());
 			}
 		});
-
 		attributesSimulationView =
 				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);
+
 		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), attributesSimulationView);
 
 		attributesModelView = new TextView("/attributes", "default_directory_attributes", AttributeType.MODEL);
@@ -103,6 +104,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
 		menusInTabs.add(mnPresetMenu);
+
 		ModelPresets.getPresets().forEach(
 				modelDefinition -> mnPresetMenu.add(new JMenuItem(new AbstractAction(modelDefinition.getMainModel()) {
 					private static final long serialVersionUID = 1L;
@@ -138,7 +140,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						}
 					}
 				})));
-
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
 		menusInTabs.add(mnModelNameMenu);
@@ -158,16 +159,13 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
 				})));
-
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftest position instead of the rightest
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
-
 		dataProcessingGUIview = new DataProcessingView();
 		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
-
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 
@@ -179,7 +177,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		// Add panels
 		super.add(editCard, editCardName);
 		super.add(visualizationCard, visualizationCardName);
-
 	}
 
 	public void showVisualization() {
@@ -202,6 +199,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	public void setScenario(Scenario scenario, boolean isEditable) {
 		this.scenario = scenario;
 		this.scenarioName.setText(scenario.getDisplayName());
+
 		if (!initialized) {
 			initialize();
 		}

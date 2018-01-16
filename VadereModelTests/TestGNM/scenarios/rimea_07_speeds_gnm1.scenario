@@ -2,60 +2,11 @@
   "name" : "rimea_07_speeds_gnm1",
   "description" : "",
   "release" : "0.2",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 140.0,
-        "maxEvacuationTimeMean" : 140.0,
-        "minEvacuationTime" : 48.0,
-        "minEvacuationTimeMean" : 48.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  }, {
-    "formatString" : "%s %s %s %s %s %s %s %s %s",
-    "columnNames" : [ "time", "id", "lastX", "lastY", "firstX", "firstY", "startTime", "endTime", "evacTime" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "columnNames" : [ ],
-      "clazz" : "PedestrianLastPositionProcessor"
-    }
-  }, {
-    "formatString" : "%s %s %s %s %s",
-    "columnNames" : [ "id", "time", "speed", "y", "x" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "attributes" : {
-        "maxAcceptedVelocity" : 3.0,
-        "backSteps" : 1,
-        "onlyXDirection" : false
-      },
-      "pedestrianPositionProcessor" : {
-        "attributes" : {
-          "ignoreEqualPositions" : false
-        },
-        "columnNames" : [ "sourceId", "targetId", "x", "y", "step", "id", "time" ],
-        "clazz" : "PedestrianPositionProcessor"
-      },
-      "columnNames" : [ ],
-      "clazz" : "PedestrianVelocityProcessor"
-    }
-  } ],
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
@@ -151,6 +102,7 @@
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 20.0 ],
         "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
         "spawnAtRandomPositions" : true,

@@ -5,10 +5,10 @@ import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -33,7 +33,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private AttributesGNM attributes;
 	private GradientProvider floorGradient;
 	private Map<Integer, Target> targets;
-	private IPotentialTargetGrid potentialFieldTarget;
+	private IPotentialFieldTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private int pedestrianIdCounter;
@@ -44,7 +44,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 			final AttributesGNM attributes,
 			final PotentialFieldObstacle potentialFieldObstacle,
 			final PotentialFieldAgent potentialFieldPedestrian,
-			final IPotentialTargetGrid potentialFieldTarget,
+			final IPotentialFieldTargetGrid potentialFieldTarget,
 			final AttributesAgent attributesPedestrian, final Random random) {
 		super(Pedestrian.class, scenario, IntegratorFactory.createFirstOrderIntegrator(attributes
 				.getAttributesODEIntegrator()), new GNMEquations(),
@@ -78,7 +78,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 						attributes.getAttributesODEIntegrator()),
 				new GNMEquations(), attributesPedestrian, topography, random);
 
-		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
+		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
@@ -169,7 +169,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public PotentialFieldTarget getPotentialFieldTarget() {
+	public IPotentialFieldTarget getPotentialFieldTarget() {
 		return potentialFieldTarget;
 	}
 

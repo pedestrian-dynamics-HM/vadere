@@ -5,9 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
@@ -20,12 +18,12 @@ import org.vadere.util.potential.gradients.GradientProvider;
 public class StepCircleOptimizerGradient implements StepCircleOptimizer {
 
 	private final AttributesOSM attributesOSM;
-	private final IPotentialTargetGrid potentialFieldTarget;
+	private final IPotentialFieldTargetGrid potentialFieldTarget;
 	private final List<Integer> targetIds;
 	private final Topography topography;
 
 	public StepCircleOptimizerGradient(Topography topography,
-			IPotentialTargetGrid potentialFieldTarget,
+			IPotentialFieldTargetGrid potentialFieldTarget,
 			AttributesOSM attributesOSM) {
 
 		this.attributesOSM = attributesOSM;

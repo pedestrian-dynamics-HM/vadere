@@ -205,9 +205,9 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		g.drawImage(potentialFieldImage, 0, 0, null);
 	}
 
-	protected abstract void renderSimulationContent(final Graphics2D g);
+    protected abstract void renderSimulationContent(final Graphics2D g);
 
-	private float getGridLineWidth() {
-		return (float) (0.5 / model.getScaleFactor());
-	}
+    private float getGridLineWidth() {
+        return (float) (0.5 / model.getScaleFactor());
+    }
 }

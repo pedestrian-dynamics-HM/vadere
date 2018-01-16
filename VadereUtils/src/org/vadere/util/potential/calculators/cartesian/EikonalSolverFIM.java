@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -24,17 +24,17 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFIM extends AbstractGridEikonalSolver {
+public class EikonalSolverFIM extends AGridEikonalSolver {
 
-	private CellGrid cellGrid;
 	private List<VShape> targetShapes;
 	private List<Point> targetPoints;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFIM.class);
 	private ITimeCostFunction timeCostFunction;
 	private boolean isHighAccuracy;
 	private boolean isActiveList[][];
-
+    private final CellGrid cellGrid;
 	private final double epsilon;
+
 
 	private LinkedList<Point> activeList;
 
@@ -43,14 +43,15 @@ public class EikonalSolverFIM extends AbstractGridEikonalSolver {
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-			final double unknownPenalty) {
-		super(cellGrid, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+	    super(cellGrid, unknownPenalty, weight);
+	    this.cellGrid = cellGrid;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
-		this.cellGrid = cellGrid;
 		this.activeList = new LinkedList<>();
 		this.epsilon = cellGrid.getResolution() / 100;
 
@@ -120,7 +121,7 @@ public class EikonalSolverFIM extends AbstractGridEikonalSolver {
 		}
 	}
 
-	@Override
+    @Override
 	public void initialize() {
 		init();
 		loop();
@@ -150,14 +151,9 @@ public class EikonalSolverFIM extends AbstractGridEikonalSolver {
 		return false;
 	}
 
-	@Override
+    @Override
 	public ITimeCostFunction getTimeCostFunction() {
 		return timeCostFunction;
-	}
-
-	@Override
-	public boolean isValidPoint(Point point) {
-		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

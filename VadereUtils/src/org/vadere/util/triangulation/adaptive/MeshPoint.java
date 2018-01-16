@@ -78,7 +78,6 @@ public class MeshPoint extends MPoint implements PotentialPoint {
 		this.potential = potential;
 	}
 
-
 	@Override
 	public void setPathFindingTag(final PathFindingTag tag) {
 		this.tag = tag;

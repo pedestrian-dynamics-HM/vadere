@@ -9,6 +9,7 @@ import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -743,6 +744,10 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
 	}
 
+    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, final F startFace) {
+        return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
+    }
+
 	/**
 	 * Marching from a vertex which is the vertex of startVertex towards direction until the stopCondition is fulfilled.
 	 *
@@ -765,16 +770,20 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	default F straightWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
-		assert !getMesh().isBoundary(startFace);
-
-		// initialize
-		F face = startFace;
-		E edge = getMesh().getEdge(face);
-		VPoint q = getMesh().toTriangle(startFace).getIncenter(); // walk from q to p
-		VPoint p = new VPoint(x1, y1);
-
-		return straightWalk2D(q, p, face, edge, stopCondition);
+		return straightGatherWalk2D(x1, y1, startFace, stopCondition).peekLast();
 	}
+
+    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
+        assert !getMesh().isBoundary(startFace);
+
+        // initialize
+        F face = startFace;
+        E edge = getMesh().getEdge(face);
+        VPoint q = getMesh().toTriangle(startFace).getIncenter(); // walk from q to p
+        VPoint p = new VPoint(x1, y1);
+
+        return straightGatherWalk2D(q, p, face, edge, stopCondition);
+    }
 
     /**
      * Walks along the line defined by q and p. The walking direction should be controlled by the stopCondition e.g.
@@ -790,38 +799,49 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
      * @return
      */
 	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
-		Optional<E> optEdge;
-		F face = startFace;
-		E edge = startEdge;
-
-		do {
-			optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
-
-			if(optEdge.isPresent()) {
-				edge = getMesh().getTwin(optEdge.get());
-				face = getMesh().getTwinFace(optEdge.get());
-
-				// special case: hitting the boundary
-				if(getMesh().isBoundary(face)) {
-					VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
-					optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
-
-					if(optEdge.isPresent()) {
-						VPoint p2 = getMesh().toPoint(getMesh().getVertex(optEdge.get()));
-
-						if(p.distance(p1) <= p.distance(p2)) {
-							return face;
-						}
-					}
-					else {
-						return face;
-					}
-				}
-			}
-		} while (optEdge.isPresent());
-
-		return face;
+        return straightGatherWalk2D(q, p, startFace, startEdge, stopCondition).peekLast();
 	}
+
+    // TODO: choose a better name
+    default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
+	    LinkedList<F> visitedFaces = new LinkedList<>();
+	    visitedFaces.addLast(startFace);
+
+        Optional<E> optEdge;
+        F face = startFace;
+        E edge = startEdge;
+
+        do {
+            optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
+
+            if(optEdge.isPresent()) {
+                edge = getMesh().getTwin(optEdge.get());
+                face = getMesh().getTwinFace(optEdge.get());
+                visitedFaces.addLast(face);
+
+                // special case: hitting the boundary, this might be the outer boundary or a hole!
+                if(getMesh().isBoundary(face)) {
+                    VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
+                    optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
+
+                    if(optEdge.isPresent()) {
+                        VPoint p2 = getMesh().toPoint(getMesh().getVertex(optEdge.get()));
+
+                        // Indicator that we reached the outer boundary: TODO: this test is not fully stable!
+                        if(p.distance(p1) <= p.distance(p2)) {
+                            break;
+                        }
+                        // else: we walk through a hole!
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+        } while (optEdge.isPresent());
+
+        return visitedFaces;
+    }
 
 	default boolean isOuterBoundary(final F face) {
 		if(getMesh().isBoundary(face)) {

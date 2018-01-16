@@ -1,6 +1,6 @@
 package org.vadere.gui.postvisualization.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +28,7 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
 import org.vadere.util.potential.CellGrid;
@@ -170,23 +172,23 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	@Override
-	public Optional<CellGrid> getPotentialField() {
-		if (potentialContainer == null || step == null) {
-			return Optional.empty();
-		} else {
-			try {
-				return Optional.ofNullable(potentialContainer.getPotentialField(step.getStepNumber()));
-			} catch (IOException e) {
-				e.printStackTrace();
-				logger.error(e);
-				return Optional.empty();
-			}
-		}
+	public Function<VPoint, Double> getPotentialField() {
+        Function<VPoint, Double> f = p -> 0.0;
+        try {
+            if (potentialContainer != null && step != null) {
+                final CellGrid potentialField = potentialContainer.getPotentialField(step.getStepNumber());
+                f = potentialField.getInterpolationFunction();
+            }
+        } catch (IOException e) {
+            logger.warn("could not load potential field from file.");
+            e.printStackTrace();
+        }
+        return f;
 	}
 
 	@Override
 	public boolean isFloorFieldAvailable() {
-		return getPotentialField().isPresent();
+		return potentialContainer != null && step != null;
 	}
 
 	@Override
@@ -349,7 +351,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			try {
 				potentialContainer.clear();
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error("could not clear potential Container: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

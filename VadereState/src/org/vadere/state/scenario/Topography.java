@@ -1,5 +1,6 @@
 package org.vadere.state.scenario;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
+@JsonIgnoreProperties(value = {"allOtherAttributes"})
 public class Topography {
 
 	/** Transient to prevent JSON serialization. */

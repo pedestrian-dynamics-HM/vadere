@@ -25,7 +25,7 @@ public class IOVadere {
 
 	private static Logger logger = LogManager.getLogger(IOVadere.class);
 
-	public static Scenario fromJson(final String json) throws IOException {
+	public static Scenario fromJson(final String json) throws IOException, IllegalArgumentException {
 		return JsonConverter.deserializeScenarioRunManager(json);
 	}
 
@@ -42,6 +42,8 @@ public class IOVadere {
 
 	public static VadereProject readProject(final String folderpath) throws IOException {
 		String name = IOUtils.readTextFile(Paths.get(folderpath, IOUtils.VADERE_PROJECT_FILENAME).toString());
+		logger.info("read .project file");
+
 		List<Scenario> scenarios = new ArrayList<>();
 		Set<String> scenarioNames = new HashSet<>();
 		Path p = Paths.get(folderpath, IOUtils.SCENARIO_DIR);
@@ -49,7 +51,7 @@ public class IOVadere {
 		if (Files.isDirectory(p)) {
 
 			migrationStats = MigrationAssistant.analyzeProject(folderpath);
-
+            logger.info("analysed .scenario files");
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				try {
 					Scenario scenario =
@@ -70,6 +72,7 @@ public class IOVadere {
 		VadereProject project = new VadereProject(name, scenarios);
 		project.setMigrationStats(migrationStats); // TODO [priority=low] [task=refactoring] better way to tunnel those results to the GUI?
 		project.setOutputDir(Paths.get(folderpath, IOUtils.OUTPUT_DIR));
+        logger.info("project loaded: " + project.getName());
 		return project;
 	}
 

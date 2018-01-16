@@ -1,16 +1,18 @@
 package org.vadere.util.potential.calculators;
 
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.MathUtil;
-import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 
-import java.awt.*;
+import java.util.function.Function;
 
+/**
+ * The eikonal solver, solves the eikonal equation on a Cartesian grid. In case of a changing F the
+ * solver re-computes the solution if update is called.
+ */
 public interface EikonalSolver {
 
 	Logger logger = LogManager.getLogger(EikonalSolver.class);
@@ -41,22 +43,19 @@ public interface EikonalSolver {
 		return false;
 	}
 
-	/**
-	 *
-	 * @param point
-	 * @return
-	 */
-	/*default double getValue(final Point point, final CellGrid cellGrid) {
-		return cellGrid.getValue(point).potential;
-	}*/
 
-	//CellGrid getPotentialField();
+    /**
+     * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.
+     *
+     * @return a copy of the current solution of the eikonal equation
+     */
+    Function<VPoint, Double> getPotentialField();
 
-	double getValue(final double x, final double y);
+    default double getPotential(final VPoint pos) {
+        return getPotential(pos.getX(), pos.getY());
+    }
 
-	default double getValue(final IPoint position) {
-		return getValue(position.getX(), position.getY());
-	}
+    double getPotential(final double x, final double y);
 
 	default boolean isHighAccuracy() {
 		return true;

@@ -1,11 +1,11 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Point;
 import java.util.LinkedList;
 
 import org.vadere.util.potential.CellGrid;
 
-public class PotentialFieldCalculatorAirLine extends AbstractGridEikonalSolver {
+public class PotentialFieldCalculatorAirLine extends AGridEikonalSolver {
 
 	private CellGrid potentialField;
 	private LinkedList<Point> targetPoints;
@@ -13,8 +13,9 @@ public class PotentialFieldCalculatorAirLine extends AbstractGridEikonalSolver {
 	PotentialFieldCalculatorAirLine(
 			final CellGrid potentialField,
 			final LinkedList<Point> targetPoints,
-			final double knownPenalty) {
-		super(potentialField, knownPenalty);
+			final double knownPenalty,
+            final double weight) {
+		super(potentialField, knownPenalty, weight);
 		this.potentialField = potentialField;
 		this.targetPoints = targetPoints;
 	}
@@ -47,10 +48,5 @@ public class PotentialFieldCalculatorAirLine extends AbstractGridEikonalSolver {
 	@Override
 	public boolean needsUpdate() {
 		return false;
-	}
-
-	@Override
-	public boolean isValidPoint(Point point) {
-		return potentialField.isValidPoint(point);
 	}
 }

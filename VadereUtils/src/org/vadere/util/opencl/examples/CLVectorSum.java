@@ -181,11 +181,11 @@ public class CLVectorSum {
         clReleaseContext(clContext);
     }
 
-	/*
-	 *
-	 * Assumption: There is only one Platform with a GPU.
-	 */
-	public static void main(String... args) {
+    /*
+     *
+     * Assumption: There is only one Platform with a GPU.
+     */
+    public static void main(String... args) {
         CLVectorSum sum = new CLVectorSum(4);
         sum.initCallbacks();
         sum.initCL();
@@ -194,9 +194,9 @@ public class CLVectorSum {
         sum.runKernel();
         sum.printResult();
         sum.clearCL();
-	}
+    }
 
-	private static void printPlatformInfo(long platform, String param_name, int param) {
+    private static void printPlatformInfo(long platform, String param_name, int param) {
         System.out.println("\t" + param_name + " = " + CLInfo.getPlatformInfoStringUTF8(platform, param));
     }
 

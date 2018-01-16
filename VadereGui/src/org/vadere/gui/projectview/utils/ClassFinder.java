@@ -1,29 +1,31 @@
 package org.vadere.gui.projectview.utils;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesOSM;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
+
+    private static Logger log = LogManager.getLogger(ClassFinder.class);
 
 	public static List<String> getAttributesNames() {
 		// OSM ok for determining package name? use Object.class as tag instead?
@@ -114,7 +116,7 @@ public class ClassFinder {
 		try {
 			return getClasses(packageName).stream()
 					.filter(c -> !c.isInterface()
-							&& baseClassOrInterface.isAssignableFrom(c) 
+							&& baseClassOrInterface.isAssignableFrom(c)
 							&& isNotAnInnerClass(c))
 					.collect(Collectors.toList());
 		} catch (ClassNotFoundException | IOException e) {
@@ -133,25 +135,52 @@ public class ClassFinder {
 	 * Scans all classes accessible from the context class loader which belong to the given package
 	 * and subpackages.
 	 *
+	 * Deprecated since this method is slow if we have to access jar file, which is the case if we execute the project via vadere.jar!
+	 *
 	 * @param packageName The base package
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
+	@Deprecated
 	private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		assert classLoader != null;
 		String path = packageName.replace('.', '/');
-		Enumeration<URL> resources = classLoader.getResources(path);
 		List<File> dirs = new ArrayList<>();
+        ArrayList<Class<?>> classes = new ArrayList<>();
+
+		assert classLoader != null;
+		Enumeration<URL> resources = classLoader.getResources(path);
+
 		while (resources.hasMoreElements()) {
-			URL resource = resources.nextElement();
-			dirs.add(new File(resource.getFile()));
+			URL url = resources.nextElement();
+
+			/*
+			 * TODO[Issue #37, Bug]: Find a better solution! The problem is that one can not easily access class-files inside a packed jar!
+			 * this code runs if the project is started via a executable jar
+			 * it is slow, since the whole .jar will be unpacked.
+			 */
+			if(url.getProtocol() == "jar") {
+                JarURLConnection urlcon = (JarURLConnection) (url.openConnection());
+                try (JarFile jar = urlcon.getJarFile();) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        String entry = entries.nextElement().getName();
+                        if(entry.startsWith(path) && entry.endsWith(".class")) {
+                            String classPath = entry.substring(0, entry.length() - 6).replace('/', '.');
+                            classes.add(ClassFinder.class.forName(classPath));
+                        }
+                    }
+                }
+            } // this code is fine but will only be used if the project is started from an IDE!
+            else {
+                dirs.add(new File(url.getFile()));
+                for (File directory : dirs) {
+                    classes.addAll(findClasses(directory, packageName));
+                }
+            }
 		}
-		ArrayList<Class<?>> classes = new ArrayList<>();
-		for (File directory : dirs) {
-			classes.addAll(findClasses(directory, packageName));
-		}
+
 		return classes;
 	}
 

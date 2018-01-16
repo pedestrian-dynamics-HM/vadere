@@ -1,54 +1,69 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 
-public abstract class AbstractGridEikonalSolver implements EikonalSolver {
+public abstract class AGridEikonalSolver implements EikonalSolver {
 	protected CellGrid potentialField;
-	private double unknownPenalty;
+	private final double unknownPenalty;
+	private final double weight;
 
-	public AbstractGridEikonalSolver(final CellGrid potentialField, final double unknownPenalty) {
+	public AGridEikonalSolver(final CellGrid potentialField, final double unknownPenalty, final double weight) {
 		this.potentialField = potentialField;
 		this.unknownPenalty = unknownPenalty;
+		this.weight = weight;
 	}
 
-	@Override
-	public double getValue(final double x, final double y) {
+    public Function<VPoint, Double> getPotentialField() {
+        CellGrid clone = potentialField.clone();
+        return p -> getPotential(clone, p.getX(), p.getY());
+    }
 
-		Point gridPoint = potentialField.getNearestPointTowardsOrigin(x, y);
-		VPoint gridPointCoord = potentialField.pointToCoord(gridPoint);
-		int incX = 1, incY = 1;
-		double gridPotentials[];
-		double weightOfKnown[] = new double[1];
+    public CellGrid getCellGrid() {
+	    return potentialField;
+    }
 
-		if (x >= potentialField.getWidth() + potentialField.getMinY()) {
-			incX = 0;
-		}
+    private double getPotential(final CellGrid cellGrid, final double x, final double y) {
 
-		if (y >= potentialField.getHeight() + potentialField.getMinY()) {
-			incY = 0;
-		}
+        Point gridPoint = cellGrid.getNearestPointTowardsOrigin(x, y);
+        VPoint gridPointCoord = cellGrid.pointToCoord(gridPoint);
+        int incX = 1, incY = 1;
+        double gridPotentials[];
 
-		java.util.List<Point> points = new LinkedList<>();
-		points.add(gridPoint);
-		points.add(new Point(gridPoint.x + incX, gridPoint.y));
-		points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
-		points.add(new Point(gridPoint.x, gridPoint.y + incY));
-		gridPotentials = getGridPotentials(points);
+        if (x >= cellGrid.getWidth() + cellGrid.getMinY()) {
+            incX = 0;
+        }
+
+        if (y >= cellGrid.getHeight() + cellGrid.getMinY()) {
+            incY = 0;
+        }
+
+        java.util.List<Point> points = new LinkedList<>();
+        points.add(gridPoint);
+        points.add(new Point(gridPoint.x + incX, gridPoint.y));
+        points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
+        points.add(new Point(gridPoint.x, gridPoint.y + incY));
+        gridPotentials = getGridPotentials(cellGrid, points);
 
 				/* Interpolate the known (potential < Double.MAX_VALUE) values. */
-		double tmpPotential =  InterpolationUtil.bilinearInterpolationWithUnknown(gridPotentials,
-				(x - gridPointCoord.x)
-						/ potentialField.getResolution(),
-				(y - gridPointCoord.y)
-						/ potentialField.getResolution(),
-				weightOfKnown);
+        Pair<Double, Double> result =  InterpolationUtil.bilinearInterpolationWithUnkown(gridPotentials,
+                (x - gridPointCoord.x)
+                        / cellGrid.getResolution(),
+                (y - gridPointCoord.y)
+                        / cellGrid.getResolution());
+
+        double tmpPotential = result.getLeft();
+        double weightOfKnown = result.getRight();
+
 		/*
 		 * If at least one node is known, a specialized version of
 		 * interpolation is used: If the divisor weightOfKnown[ 0 ] would
@@ -59,31 +74,30 @@ public abstract class AbstractGridEikonalSolver implements EikonalSolver {
 		 * additional penalty. The more the interpolated value moves into
 		 * direction of the unknown, the higher the penalty becomes.
 		 */
-		if (weightOfKnown[0] > 0.00001) {
-			tmpPotential = tmpPotential / weightOfKnown[0]
-					+ (1 - weightOfKnown[0])
-					* unknownPenalty;
-		} else /* If all values are maximal, set potential to maximum. */
-		{
-			tmpPotential = Double.MAX_VALUE;
-		}
+        if (weightOfKnown > 0.00001) {
+            tmpPotential = (tmpPotential / weightOfKnown + (1 - weightOfKnown) * unknownPenalty) * weight;
+        } else /* If all values are maximal, set potential to maximum. */
+        {
+            tmpPotential = Double.MAX_VALUE;
+        }
 
-		return tmpPotential;
+        return tmpPotential;
+    }
+
+    @Override
+	public double getPotential(final double x, final double y) {
+        return getPotential(potentialField, x, y);
 	}
 
-	public CellGrid getPotentialField() {
-		return potentialField;
-	}
-
-	public boolean isValidPoint(Point point) {
+	public boolean isValidPoint(final Point point) {
 		return potentialField.isValidPoint(point);
 	}
 
-	private double[] getGridPotentials(final List<Point> points) {
+	private double[] getGridPotentials(final CellGrid cellGrid, final List<Point> points) {
 		double[] result = new double[points.size()];
 
 		for (int i = 0; i < points.size(); i++) {
-			result[i] = potentialField.getValue(points.get(i)).potential;
+			result[i] = cellGrid.getValue(points.get(i)).potential;
 		}
 
 		return result;

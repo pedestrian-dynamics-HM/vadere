@@ -127,5 +127,4 @@ public class MPoint implements IPoint{
     public double distanceToOrigin() {
         return this.point.distanceToOrigin();
     }
-
 }

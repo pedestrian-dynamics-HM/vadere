@@ -31,7 +31,7 @@ public interface Model {
 
 	void update(final double simTimeInSec);
 
-	public static <T extends Attributes> T findAttributes(List<Attributes> attributesList, final Class<T> type) {
+	static <T extends Attributes> T findAttributes(List<Attributes> attributesList, final Class<T> type) {
 		try {
 			final T a = FindByClass.findSingleObjectOfClass(attributesList, type);
 			if (a != null) {

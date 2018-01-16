@@ -4,6 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -64,4 +65,13 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 		return posNow.subtract(posBefore).scalarMultiply(1 / (currentSimTime - this.lastSimTimes.getFirst()))
 				.distanceToOrigin();
 	}
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesPedestrianVelocityProcessor());
+        }
+
+        return super.getAttributes();
+    }
 }

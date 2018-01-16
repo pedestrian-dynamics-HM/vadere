@@ -6,6 +6,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Resources;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
@@ -34,7 +35,7 @@ public class JSONView extends JPanel {
 			Theme syntaxTheme = Theme.load(in);
 			syntaxTheme.apply(textAreaLocal);
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error("could not apply theme: " + e.getMessage());
 		}
 
 		JPanel panelTop = new JPanel();
@@ -46,11 +47,9 @@ public class JSONView extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 
 		lbljsoninvalid = new JLabel(Messages.getString("TextView.lbljsoninvalid.text"));
-		lbljsoninvalid
-				.setIcon(new ImageIcon(TextView.class.getResource("/com/sun/java/swing/plaf/windows/icons/Error.gif")));
+		lbljsoninvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.gif")));
 		lbljsonvalid = new JLabel(Messages.getString("TextView.lbljsonvalid.text"));
-		lbljsonvalid.setIcon(
-				new ImageIcon(TextView.class.getResource("/com/sun/java/swing/plaf/windows/icons/Inform.gif")));
+		lbljsonvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.gif")));
 
 		panelTop.add(lbljsoninvalid);
 		panelTop.add(lbljsonvalid);

@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonConverter {
 	
-	public static Scenario deserializeScenarioRunManager(String json) throws IOException {
+	public static Scenario deserializeScenarioRunManager(String json) throws IOException, IllegalArgumentException {
 		return deserializeScenarioRunManagerFromNode(StateJsonConverter.readTree(json));
 	}
 	
-	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException {
+	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException, IllegalArgumentException {
 		JsonNode rootNode = node;
 		String name = rootNode.get("name").asText();
 		JsonNode scenarioNode = rootNode.get(StateJsonConverter.SCENARIO_KEY);

@@ -1568,8 +1568,7 @@
         "treadCount" : 13,
         "upwardDirection" : {
           "x" : -1.0,
-          "y" : 0.0,
-          "identifier" : -1
+          "y" : 0.0
         }
       }, {
         "shape" : {
@@ -1583,8 +1582,7 @@
         "treadCount" : 13,
         "upwardDirection" : {
           "x" : 1.0,
-          "y" : 0.0,
-          "identifier" : -1
+          "y" : 0.0
         }
       } ],
       "targets" : [ {

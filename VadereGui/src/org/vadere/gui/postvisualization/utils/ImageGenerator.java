@@ -33,7 +33,7 @@ public class ImageGenerator<T extends DefaultSimulationConfig> {
 				bi = renderer.renderImage(ImageGenerator.calculateOptimalWidth(model),
 						ImageGenerator.calculateOptimalHeight(model));
 			} catch (Exception e) {
-				logger.error(e);
+				logger.error("could not render image " + e.getMessage());
 			} finally {
 				model.setScale(oldScale);
 			}

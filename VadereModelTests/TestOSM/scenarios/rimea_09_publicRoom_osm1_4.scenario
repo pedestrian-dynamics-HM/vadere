@@ -151,36 +151,28 @@
           "type" : "POLYGON",
           "points" : [ {
             "x" : 31.0,
-            "y" : 27.0,
-            "identifier" : -1
+            "y" : 27.0
           }, {
             "x" : 2.0,
-            "y" : 27.0,
-            "identifier" : -1
+            "y" : 27.0
           }, {
             "x" : 2.0,
-            "y" : 29.0,
-            "identifier" : -1
+            "y" : 29.0
           }, {
             "x" : 33.0,
-            "y" : 29.0,
-            "identifier" : -1
+            "y" : 29.0
           }, {
             "x" : 33.0,
-            "y" : 2.0,
-            "identifier" : -1
+            "y" : 2.0
           }, {
             "x" : 2.0,
-            "y" : 2.0,
-            "identifier" : -1
+            "y" : 2.0
           }, {
             "x" : 2.0,
-            "y" : 4.0,
-            "identifier" : -1
+            "y" : 4.0
           }, {
             "x" : 31.0,
-            "y" : 4.0,
-            "identifier" : -1
+            "y" : 4.0
           } ]
         },
         "waitingTime" : 0.0,

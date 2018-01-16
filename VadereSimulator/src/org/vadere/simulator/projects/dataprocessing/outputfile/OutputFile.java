@@ -28,7 +28,16 @@ import java.util.stream.Stream;
 
 public abstract class OutputFile<K extends DataKey<K>> {
 	private String[] keyHeaders;
+
+    /**
+     * The file name without the path to the file
+     */
 	private String fileName;
+
+    /**
+     * Temporary absolute file name, this should not be serialized
+     */
+	private volatile String absoluteFileName;
 
 	private List<Integer> processorIds;
 	private List<DataProcessor<K, ?>> dataProcessors;
@@ -41,11 +50,12 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void setAbsoluteFileName(final String fileName) {
-		this.fileName = fileName;
+	    this.absoluteFileName = fileName;
 	}
 
 	public void setRelativeFileName(final String fileName) {
-	    this.fileName = new File(this.fileName).getParentFile().toPath().resolve(fileName).toString();
+	   this.fileName = fileName;
+
     }
 
 	public void setProcessorIds(final List<Integer> processorIds) {
@@ -63,20 +73,24 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	@SuppressWarnings("unchecked")
 	public void init(final ProcessorManager manager) {
+		this.dataProcessors.clear();
 		processorIds.forEach(pid -> this.dataProcessors.add((DataProcessor<K, ?>) manager.getProcessor(pid)));
 	}
 
 	public void write() {
-		try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
-			printHeader(out);
+	    // if there is something to write i.e. absoluteFileName != null
+	    if(!isEmpty()) {
+            try (PrintWriter out = new PrintWriter(new FileWriter(absoluteFileName))) {
+                printHeader(out);
 
-			this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
-					.distinct().sorted()
-					.forEach(key -> printRow(out, key));
+                this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
+                        .distinct().sorted()
+                        .forEach(key -> printRow(out, key));
 
-			out.flush();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
+                out.flush();
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
         }
 	}
 

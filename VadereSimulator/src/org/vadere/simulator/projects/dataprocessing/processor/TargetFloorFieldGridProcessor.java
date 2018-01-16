@@ -5,10 +5,11 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepRowKey;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.FloorFieldGridRow;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -33,7 +34,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 		Optional<MainModel> optMainModel = state.getMainModel();
 
 		if(optMainModel.isPresent() && optMainModel.get() instanceof PotentialFieldModel) {
-			PotentialFieldTarget pft = ((PotentialFieldModel) optMainModel.get()).getPotentialFieldTarget();
+			IPotentialFieldTarget pft = ((PotentialFieldModel) optMainModel.get()).getPotentialFieldTarget();
 			Rectangle.Double bound = state.getTopography().getBounds();
 
 			/**
@@ -52,7 +53,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 						FloorFieldGridRow floorFieldGridRow = new FloorFieldGridRow((int)Math.floor(bound.width / att.getResolution()));
 						int col = 0;
 						for (double x = bound.x; x < bound.x + bound.width; x += att.getResolution()) {
-							floorFieldGridRow.setValue(col++, pft.getTargetPotential(new VPoint(x, y), optPed.get()));
+							floorFieldGridRow.setValue(col++, pft.getPotential(new VPoint(x, y), optPed.get()));
 						}
 						this.putValue(new TimestepRowKey(state.getStep(), row++), floorFieldGridRow);
 					}
@@ -76,5 +77,14 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
     @Override
     public String[] toStrings(TimestepRowKey key) {
         return this.getValue(key).toStrings();
+    }
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesFloorFieldProcessor());
+        }
+
+        return super.getAttributes();
     }
 }

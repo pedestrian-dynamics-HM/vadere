@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Shape;
 import java.util.LinkedList;
@@ -10,6 +10,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellStateFD;
+import org.vadere.util.potential.calculators.PotentialFieldCalculatorFastMarching3D;
 import org.vadere.util.potential.timecost.TimeCost2D1ConfigurationSpace;
 
 /**

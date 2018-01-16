@@ -4,7 +4,7 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
@@ -31,7 +31,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private AttributesSFM attributes;
 	private GradientProvider floorGradient;
 	private Map<Integer, Target> targets;
-	private IPotentialTargetGrid potentialFieldTarget;
+	private IPotentialFieldTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<Model> models = new LinkedList<>();
@@ -42,7 +42,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	public SocialForceModel(Topography scenario, AttributesSFM attributes,
 			PotentialFieldObstacle potentialFieldObstacle,
 			PotentialFieldAgent potentialFieldPedestrian,
-			IPotentialTargetGrid potentialFieldTarget,
+			IPotentialFieldTargetGrid potentialFieldTarget,
 			AttributesAgent attributesPedestrian, Random random) {
 		super(Pedestrian.class, scenario, IntegratorFactory.createFirstOrderIntegrator(attributes
 				.getAttributesODEIntegrator()), new SFMEquations(),
@@ -79,7 +79,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 						GradientProviderType.FLOOR_EUCLIDEAN_CONTINUOUS,
 						topography, targets, null);
 
-		IPotentialTargetGrid iPotentialTargetGrid = IPotentialTargetGrid.createPotentialField(
+		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
 				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;

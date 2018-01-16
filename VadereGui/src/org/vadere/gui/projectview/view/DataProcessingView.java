@@ -57,6 +57,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
+import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -87,7 +88,6 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private Scenario currentScenario;
 	private boolean isEditable;
 
-
 	DataProcessingView() {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
 
@@ -109,7 +109,6 @@ class DataProcessingView extends JPanel implements IJsonView {
 		JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		togglePanel.add(switchJsonViewModeLabel);
 		add(togglePanel, BorderLayout.SOUTH);
-
 		switchMode();
 	}
 
@@ -119,23 +118,26 @@ class DataProcessingView extends JPanel implements IJsonView {
 				+ "</b> mode</u></font></span></html>");
 		Preferences.userNodeForPackage(DataProcessingView.class).put("dataProcessingViewMode",
 				inGuiViewMode ? guiViewMode : jsonViewMode);
-
 		viewPanel.removeAll();
 
 		if (inGuiViewMode) {
+            logger.info("switch to gui view");
 			GuiView guiView = new GuiView();
 			activeJsonView = guiView;
 			viewPanel.add(guiView);
 		} else {
+            logger.info("switch to expert view");
 			TextView expertView = buildExpertView();
 			activeJsonView = expertView;
 			viewPanel.add(expertView);
 		}
 
+
 		if (currentScenario != null) {
 			activeJsonView.setVadereScenario(currentScenario);
 			activeJsonView.isEditable(isEditable);
 		}
+
 
 		revalidate();
 		repaint();
@@ -145,36 +147,34 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 	private TextView buildExpertView() {
 		TextView panel = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
-
 		JMenuBar processorsMenuBar = new JMenuBar();
 		processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		processorsMenu.setEnabled(isEditable);
 		processorsMenuBar.add(processorsMenu);
 
 		try {
-			File[] templateFiles = new File(this.getClass().getResource("/outputTemplates/").getPath()).listFiles();
-			for (File templateFile : Arrays.stream(templateFiles).filter(File::isFile).collect(Collectors.toList())) {
-				String templateFileName = templateFile.getName();
-				String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/" + templateFileName), "UTF-8");
-				processorsMenu.add(new JMenuItem(new AbstractAction(templateFileName) {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-								Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
-								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-							try {
-								panel.setText(templateJson);
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-						}
-					}
-				}));
-			}
+		    //TODO [bug, jar]: the file name is hard coded and it is not possible to add more presets! This is because listFile() does not work inside a jar.
+            String fileName = "output_default";
+            String templateJson = org.apache.commons.io.IOUtils.toString(this.getClass().getResourceAsStream("/outputTemplates/"+fileName+".json"), "UTF-8");
+            processorsMenu.add(new JMenuItem(new AbstractAction(fileName) {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
+                            Messages.getString("Tab.Model.confirmLoadTemplate.text"),
+                            Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+                            JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                        try {
+                            panel.setText(templateJson);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            }));
 			panel.getPanelTop().add(processorsMenuBar, 0);
 		} catch (IOException e) {
 			e.printStackTrace();
+            logger.error("could not initialize output processor expert view: " + e.getMessage());
 		}
 		return panel;
 	}
@@ -240,6 +240,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			JButton addFileBtn = new JButton(new AbstractAction("Add") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+
 					String filename = "out.txt";
 					int count = 1;
 					while (outputFileNameAlreadyExists(filename)) { // ensure unique suggested filename

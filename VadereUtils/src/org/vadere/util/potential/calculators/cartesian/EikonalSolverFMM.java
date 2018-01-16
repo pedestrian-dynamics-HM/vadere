@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Point;
 import java.util.List;
@@ -23,7 +23,7 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
  * Hence, the initializer may be used to realize static floor fields.
  * 
  */
-public class EikonalSolverFMM extends AbstractGridEikonalSolver {
+public class EikonalSolverFMM extends AGridEikonalSolver {
 	protected final PriorityQueue<Point> narrowBand;
 	protected final ITimeCostFunction timeCostFunction;
 
@@ -46,8 +46,9 @@ public class EikonalSolverFMM extends AbstractGridEikonalSolver {
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-			final double unknownPenalty) {
-		super(potentialField, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+	    super(potentialField, unknownPenalty, weight);
 		this.cellGrid = potentialField;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
@@ -74,8 +75,9 @@ public class EikonalSolverFMM extends AbstractGridEikonalSolver {
             final IDistanceFunction distFunc,
             final boolean isHighAccuracy,
             final ITimeCostFunction timeCostFunction,
-            final double unknownPenalty) {
-        super(potentialField, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+        super(potentialField, unknownPenalty, weight);
         this.cellGrid = potentialField;
         this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
                 .collect(Collectors.toList());
@@ -172,11 +174,6 @@ public class EikonalSolverFMM extends AbstractGridEikonalSolver {
 	@Override
 	public boolean needsUpdate() {
 		return timeCostFunction.needsUpdate();
-	}
-
-	@Override
-	public boolean isValidPoint(Point point) {
-		return cellGrid.isValidPoint(point);
 	}
 
 	protected void setNeighborDistances(final Point point) {

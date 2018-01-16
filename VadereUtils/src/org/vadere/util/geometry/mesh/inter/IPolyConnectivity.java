@@ -301,6 +301,39 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return GeometryUtils.intersectLine(p1, p2, q1, q2);
 	}
 
+    /**
+     * Merges this IPolyConnectivity with another IPolyConnectivity by inserting
+     * the other one into a hole / face.
+     *
+     * Assumption: the other IPolyConnectivity does not contain any holes and it
+     * fits perfectly into the hole.
+     *
+     * @param edge the boundary edge (i.e. hole edge of the face)
+     * @param poly
+     */
+	default void insertIntoHole(E edge, IPolyConnectivity<P, V, E, F> poly) {
+        F oBoundary = poly.getMesh().getBoundary();
+
+        // search for the correct edge. The hole is ccw while the boundary of the poly is cw!
+        Optional<E> optOEdge = poly.getMesh().streamEdges(oBoundary).filter(e ->
+            poly.getMesh().getPoint(e).equals(getMesh().getPoint(getMesh().getPrev(edge))) &&
+                    poly.getMesh().getPoint(poly.getMesh().getPrev(e)).equals(getMesh().getPoint(edge))
+        ).findAny();
+
+        if(!optOEdge.isPresent()) {
+            throw new IllegalArgumentException("the two IPolyConnectivity do not fit");
+        }
+
+        E oEdge = optOEdge.get();
+        E nEdge = null;
+
+        throw new UnsupportedOperationException("not jet implemented.");
+        /*do {
+            getMesh().cre
+
+        } while(!edge.equals(nEdge));*/
+    }
+
 	/*default void fill_hole (final V v, final List<E> deletedEdges)
 	{
 		// uses the fact that the hole is starshaped
@@ -370,12 +403,11 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
 		 */
 	default void removeFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
-		assert !getMesh().isDestroyed(face);
+		if(!getMesh().isDestroyed(face)) {
+            List<E> delEdges = new ArrayList<>();
+            List<V> vertices = new ArrayList<>();
 
-		List<E> delEdges = new ArrayList<>();
-		List<V> vertices = new ArrayList<>();
-
-		F boundary = getMesh().createFace(true);
+            F boundary = getMesh().createFace(true);
 
 		/*for(E edge : getMesh().getEdgeIt(face)) {
 			if(getMesh().isBoundary(getMesh().getTwin(edge))) {
@@ -389,73 +421,74 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 			boundary = getMesh().createFace(true);
 		}*/
 
-		for(E edge : getMesh().getEdgeIt(face)) {
-			getMesh().setFace(edge, boundary);
-			if(getMesh().isBoundary(getMesh().getTwin(edge))) {
-				delEdges.add(edge);
-			}
-			else {
-				// update the edge of the boundary since it might be deleted!
-				getMesh().setEdge(boundary, edge);
-			}
+            for(E edge : getMesh().getEdgeIt(face)) {
+                getMesh().setFace(edge, boundary);
+                if(getMesh().isBoundary(getMesh().getTwin(edge))) {
+                    delEdges.add(edge);
+                }
+                else {
+                    // update the edge of the boundary since it might be deleted!
+                    getMesh().setEdge(boundary, edge);
+                }
 
-			vertices.add(getMesh().getVertex(edge));
-		}
+                vertices.add(getMesh().getVertex(edge));
+            }
 
-		if(!delEdges.isEmpty()) {
-			E h0, h1, next0, next1, prev0, prev1;
-			V v0, v1;
+            if(!delEdges.isEmpty()) {
+                E h0, h1, next0, next1, prev0, prev1;
+                V v0, v1;
 
-			for(E delEdge : delEdges) {
-				h0 = delEdge;
-				v0 = getMesh().getVertex(delEdge);
-				next0 = getMesh().getNext(h0);
-				prev0 = getMesh().getPrev(h0);
+                for(E delEdge : delEdges) {
+                    h0 = delEdge;
+                    v0 = getMesh().getVertex(delEdge);
+                    next0 = getMesh().getNext(h0);
+                    prev0 = getMesh().getPrev(h0);
 
-				h1    = getMesh().getTwin(delEdge);
-				v1    = getMesh().getVertex(h1);
-				next1 = getMesh().getNext(h1);
-				prev1 = getMesh().getPrev(h1);
+                    h1    = getMesh().getTwin(delEdge);
+                    v1    = getMesh().getVertex(h1);
+                    next1 = getMesh().getNext(h1);
+                    prev1 = getMesh().getPrev(h1);
 
-				boolean isolated0 = isSimpleConnected(v0);
-				boolean isolated1 = isSimpleConnected(v1);
+                    boolean isolated0 = isSimpleConnected(v0);
+                    boolean isolated1 = isSimpleConnected(v1);
 
-				// adjust next and prev half-edges
-				getMesh().setNext(prev0, next1);
-				getMesh().setNext(prev1, next0);
+                    // adjust next and prev half-edges
+                    getMesh().setNext(prev0, next1);
+                    getMesh().setNext(prev1, next0);
 
-				//boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
-				//boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
+                    //boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
+                    //boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
 
-				//boolean isolated0 = getMesh().getTwin(h0) == getMesh().getNext(h0) || getMesh().getTwin(h0) == getMesh().getPrev(h0);
-				//boolean isolated1 = getMesh().getTwin(h1) == getMesh().getNext(h1) || getMesh().getTwin(h1) == getMesh().getPrev(h1);
+                    //boolean isolated0 = getMesh().getTwin(h0) == getMesh().getNext(h0) || getMesh().getTwin(h0) == getMesh().getPrev(h0);
+                    //boolean isolated1 = getMesh().getTwin(h1) == getMesh().getNext(h1) || getMesh().getTwin(h1) == getMesh().getPrev(h1);
 
-				// adjust vertices
-				if(getMesh().getEdge(v0) == h0 && !isolated0) {
-					getMesh().setEdge(v0, prev1);
-				}
+                    // adjust vertices
+                    if(getMesh().getEdge(v0) == h0 && !isolated0) {
+                        getMesh().setEdge(v0, prev1);
+                    }
 
-				if(deleteIsolatedVertices && isolated0) {
-					getMesh().destroyVertex(v0);
-				}
+                    if(deleteIsolatedVertices && isolated0) {
+                        getMesh().destroyVertex(v0);
+                    }
 
-				if(getMesh().getEdge(v1) == h1 && !isolated1) {
-					getMesh().setEdge(v1, prev0);
-				}
+                    if(getMesh().getEdge(v1) == h1 && !isolated1) {
+                        getMesh().setEdge(v1, prev0);
+                    }
 
-				if(deleteIsolatedVertices && isolated1) {
-					getMesh().destroyVertex(v1);
-				}
+                    if(deleteIsolatedVertices && isolated1) {
+                        getMesh().destroyVertex(v1);
+                    }
 
-				// mark edge deleted if the mesh has a edge status
-				getMesh().destroyEdge(h0);
-				getMesh().destroyEdge(h1);
+                    // mark edge deleted if the mesh has a edge status
+                    getMesh().destroyEdge(h0);
+                    getMesh().destroyEdge(h1);
 
-				// TODO: do we need this?
-				//vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
-			}
-		}
-		getMesh().destroyFace(face);
+                    // TODO: do we need this?
+                    //vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
+                }
+            }
+            getMesh().destroyFace(face);
+        }
 	}
 
 	/**

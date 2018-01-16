@@ -1,4 +1,4 @@
-package org.vadere.util.potential.calculators;
+package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -26,13 +26,16 @@ import java.util.stream.Collectors;
  *
  *
  */
-public class EikonalSolverFSM extends AbstractGridEikonalSolver {
+public class EikonalSolverFSM extends AGridEikonalSolver {
 	private CellGrid cellGrid;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFSM.class);
 	private ITimeCostFunction timeCostFunction;
 	private boolean isHighAccuracy;
 	private List<Point> targetPoints;
 	private List<VShape> targetShapes;
+
+    private final double weight;
+    private final double unknownPenalty;
 
 	private static final double EPSILON = 0.001;
 
@@ -41,8 +44,11 @@ public class EikonalSolverFSM extends AbstractGridEikonalSolver {
 			final List<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-			final double unknownPenalty) {
-		super(cellGrid, unknownPenalty);
+            final double unknownPenalty,
+            final double weight) {
+	    super(cellGrid, unknownPenalty, weight);
+        this.weight = weight;
+        this.unknownPenalty = unknownPenalty;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
@@ -79,7 +85,7 @@ public class EikonalSolverFSM extends AbstractGridEikonalSolver {
 		 */
 	}
 
-	private void init() {
+    private void init() {
 		// set distances of the target neighbor points
 		targetPoints.stream()
 				.flatMap(p -> cellGrid.getLegitNeumannNeighborhood(p).stream())

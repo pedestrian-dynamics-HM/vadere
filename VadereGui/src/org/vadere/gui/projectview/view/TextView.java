@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.prefs.Preferences;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,6 +27,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -98,7 +100,7 @@ public class TextView extends JPanel implements IJsonView {
 				String content = IOUtils.readTextFile(path);
 				txtrTextfiletextarea.setText(content);
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error("could not load from file: " + e.getMessage());
 			}
 		}
 	};
@@ -107,43 +109,36 @@ public class TextView extends JPanel implements IJsonView {
 	 * Create the panel.
 	 */
 	public TextView(String default_folder, String default_resource, final AttributeType attributeType) {
-		this.default_folder = default_folder;
+	    this.default_folder = default_folder;
 		this.default_resource = default_resource;
 		this.attributeType = attributeType;
 		setLayout(new BorderLayout(0, 0));
-
 		panelTop = new JPanel();
 		add(panelTop, BorderLayout.NORTH);
 		panelTop.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JButton btnSaveToFile = new JButton(Messages.getString("TextFileView.btnSaveToFile.text"));
 		btnSaveToFile.addActionListener(saveToFileActionListener);
-		btnSaveToFile.setIcon(new ImageIcon(TextView.class
-				.getResource("/javax/swing/plaf/metal/icons/ocean/floppy.gif")));
+        btnSaveToFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
 		panelTop.add(btnSaveToFile);
-
 		btnLoadFromFile = new JButton(Messages.getString("TextView.btnLoadFromFile.text"));
-		btnLoadFromFile.addActionListener(loadFromFileActionListener);
-		btnLoadFromFile.setIcon(new ImageIcon(
-				TextView.class.getResource("/javax/swing/plaf/metal/icons/ocean/floppy.gif")));
-		panelTop.add(btnLoadFromFile);
+        btnLoadFromFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
+        panelTop.add(btnLoadFromFile);
 
-		jsonValidIndicator = new JsonValidIndicator();
+        jsonValidIndicator = new JsonValidIndicator();
 		panelTop.add(jsonValidIndicator);
-
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
 
 		RSyntaxTextArea textAreaLocal = new RSyntaxTextArea();
 		textAreaLocal.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
-
 		// set other color theme for text area...
 		InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
 		try {
 			Theme syntaxTheme = Theme.load(in);
 			syntaxTheme.apply(textAreaLocal);
-		} catch (IOException e) {
-			logger.error(e);
+		} catch (Exception e) {
+			logger.error("could not loead theme " + e.getMessage());
 		}
 
 		txtrTextfiletextarea = textAreaLocal;

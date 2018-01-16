@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -190,8 +191,13 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 		calculate();
 	}
 
-	@Override
-	public double getValue(final double x, final double y) {
+    @Override
+    public Function<VPoint, Double> getPotentialField() {
+        throw new UnsupportedOperationException("not jet implemented.");
+    }
+
+    @Override
+	public double getPotential(final double x, final double y) {
 		Optional<F> optFace = triangulation.locateFace(x, y);
 
 		double result = -1.0;

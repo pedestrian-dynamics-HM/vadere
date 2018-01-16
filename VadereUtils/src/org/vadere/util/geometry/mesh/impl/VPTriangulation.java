@@ -1,6 +1,6 @@
 package org.vadere.util.geometry.mesh.impl;
 
-import org.vadere.util.geometry.mesh.gen.IncrementalTriangulation;
+import org.vadere.util.triangulation.IncrementalTriangulation;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
  */
 public class VPTriangulation extends IncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> {
 
-	public VPTriangulation(final Collection<VPoint> points, final Predicate<? extends PHalfEdge<VPoint>> illegalPredicate) {
+	public VPTriangulation(final Collection<VPoint> points, final Predicate<PHalfEdge<VPoint>> illegalPredicate) {
 		super(points, illegalPredicate);
 	}
 
@@ -27,7 +27,7 @@ public class VPTriangulation extends IncrementalTriangulation<VPoint, PVertex<VP
 	}
 
 	public VPTriangulation(final VRectangle bound,
-	                       final Predicate<? extends PHalfEdge<VPoint>> illegalPredicate){
+	                       final Predicate<PHalfEdge<VPoint>> illegalPredicate){
 		super(bound, illegalPredicate);
 	}
 

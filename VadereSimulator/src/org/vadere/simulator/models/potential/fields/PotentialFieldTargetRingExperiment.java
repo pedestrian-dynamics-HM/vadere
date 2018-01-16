@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid {
+public class PotentialFieldTargetRingExperiment implements IPotentialFieldTargetGrid {
 
-	private final AttributesPotentialRingExperiment attributes;
+	private AttributesPotentialRingExperiment attributes;
 
 	public PotentialFieldTargetRingExperiment(AttributesPotentialRingExperiment attributes) {
 		this.attributes = attributes;
@@ -44,7 +44,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 	 * Afterwards, rate "pos" and check if it lies in the same direction as tangent vector.
 	 */
 	@Override
-	public double getTargetPotential(VPoint pos, Agent ped) {
+	public double getPotential(VPoint pos, Agent ped) {
 		Vector2D pedestrian = new Vector2D(ped.getPosition());
 		Vector2D center = new Vector2D(attributes.getCenter());
 
@@ -79,10 +79,26 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 		return tangent;
 	}
 
-	@Override
+    @Override
+    public IPotentialField getSolution() {
+        throw new UnsupportedOperationException("not jet implemented.");
+    }
+
+
+    @Override
+    public PotentialFieldTargetRingExperiment clone() {
+        try {
+            PotentialFieldTargetRingExperiment clone = (PotentialFieldTargetRingExperiment)super.clone();
+            clone.attributes = (AttributesPotentialRingExperiment) attributes.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
+
+    @Override
 	public HashMap<Integer, CellGrid> getCellGrids() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	@Override

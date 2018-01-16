@@ -1,16 +1,19 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 /**
  * Created by Matimati-ka on 27.09.2016.
  */
 public class TestEnhancedVersion4 extends JFrame {
 
-	private TestEnhancedVersion4() {
+    private TestEnhancedVersion4() {
 
 		//IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
 		//IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
@@ -30,7 +33,8 @@ public class TestEnhancedVersion4 extends JFrame {
 		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 
-		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, 1000, 800);
+        Predicate<AFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
+		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 
@@ -44,11 +48,6 @@ public class TestEnhancedVersion4 extends JFrame {
 		int numberOfRetriangulations = 0;
 		long triangulationTime = 0;
 
-		while (counter < 200) {
-			//obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
-			//PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
-			//avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
-			//System.out.println("Average quality (" + counter + "):" + avgQuality);
 			/*for(int i = 0; i < 100 && !priorityQueue.isEmpty(); i++) {
 				PFace<MeshPoint> face = priorityQueue.poll();
 				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
@@ -64,31 +63,29 @@ public class TestEnhancedVersion4 extends JFrame {
 				triangulationTime += System.currentTimeMillis() - tms;
 				numberOfRetriangulations++;
 			}
-			ms = System.currentTimeMillis() - ms;
-			/*if(meshGenerator.step(true)) {
+			ms = System.currentTimeMillis() - ms;			/*if(meshGenerator.step(true)) {
 				meshGenerator.refresh();
 				meshGenerator.retriangulate();
 			}*/
 
 
-			time += ms;
-			System.out.println("Step-Time: " + ms);
+            time += ms;
+            System.out.println("Step-Time: " + ms);
 
 
-			distmeshPanel.update();
-			distmeshPanel.repaint();
+            distmeshPanel.update();
+            distmeshPanel.repaint();
 
 
 			/*if(counter < 50) {
 				meshGenerator.retriangulate();
 			}*/
-			counter++;
+            counter++;
 			/*try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
-		}
 		meshGenerator.finish();
 		distmeshPanel.update();
 		distmeshPanel.repaint();
@@ -96,7 +93,6 @@ public class TestEnhancedVersion4 extends JFrame {
 		System.out.println("#retriangulations: " + numberOfRetriangulations);
 		System.out.println("triangulation-time: " + triangulationTime);
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
-
 		//System.out.print("finished:" + avgQuality);
 		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
 		//if(counter == 1) {
@@ -104,7 +100,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		//}
 	}
 
-	public static void main(String[] args) {
-		new TestEnhancedVersion4();
-	}
+    public static void main(String[] args) {
+        new TestEnhancedVersion4();
+    }
 }

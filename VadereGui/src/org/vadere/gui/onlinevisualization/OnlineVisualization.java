@@ -2,11 +2,14 @@ package org.vadere.gui.onlinevisualization;
 
 import javax.swing.JPanel;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.onlinevisualization.view.MainPanel;
 import org.vadere.gui.onlinevisualization.view.OnlineVisualisationWindow;
-import org.vadere.gui.onlinevisualization.view.OnlinevisualizationRenderer;
 import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Topography;
 
 public class OnlineVisualization implements PassiveCallback {
@@ -20,10 +23,12 @@ public class OnlineVisualization implements PassiveCallback {
 	public class ObservationAreaSnapshotData {
 		public final double simTimeInSec;
 		public final Topography scenario;
+		public final IPotentialField potentialFieldTarget;
 
-		public ObservationAreaSnapshotData(double simTimeInSec, Topography scenario) {
+		public ObservationAreaSnapshotData(double simTimeInSec, @NotNull Topography scenario, @Nullable IPotentialField potentialFieldTarget) {
 			this.simTimeInSec = simTimeInSec;
 			this.scenario = scenario;
+			this.potentialFieldTarget = potentialFieldTarget;
 		}
 	}
 
@@ -31,6 +36,7 @@ public class OnlineVisualization implements PassiveCallback {
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
 	private Topography scenario;
+	private IPotentialFieldTarget potentialFieldTarget;
 	private boolean enableVisualization;
 
 	public OnlineVisualization(boolean enableVisualization) {
@@ -47,6 +53,11 @@ public class OnlineVisualization implements PassiveCallback {
 	public void setTopography(final Topography scenario) {
 		this.scenario = scenario;
 	}
+
+    @Override
+	public void setPotentialFieldTarget(final IPotentialFieldTarget potentialFieldTarget) {
+	    this.potentialFieldTarget = potentialFieldTarget;
+    }
 
 	@Override
 	public void preLoop(double simTimeInSec) {
@@ -80,7 +91,10 @@ public class OnlineVisualization implements PassiveCallback {
 		synchronized (model.getDataSynchronizer()) {
 			/* Push new snapshot of the observation area to the draw thread. */
 			model.pushObersavtionAreaSnapshot(
-					new ObservationAreaSnapshotData(simTimeInSec, scenario.clone()));
+					new ObservationAreaSnapshotData(
+					        simTimeInSec,
+                            scenario.clone(),
+                            model.config.isShowPotentialField() ? potentialFieldTarget.getSolution() : null));
 		}
 	}
 

@@ -29,16 +29,21 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 
 	@Override
 	public void render(final Graphics2D targetGraphics2D, int x, int y, int width, int height) {
-		if (model.popDrawData()) {
-			super.render(targetGraphics2D, x, y, width, height);
-		}
+	    synchronized (model.getDataSynchronizer()) {
+            if (model.popDrawData()) {
+                super.render(targetGraphics2D, x, y, width, height);
+            }
+        }
+
 	}
 
 	@Override
 	public void render(final Graphics2D targetGraphics2D, int width, int height) {
-		if (model.popDrawData()) {
-			super.render(targetGraphics2D, width, height);
-		}
+        synchronized (model.getDataSynchronizer()) {
+            if (model.popDrawData()) {
+                super.render(targetGraphics2D, width, height);
+            }
+        }
 	}
 
 	@Override

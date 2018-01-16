@@ -8,10 +8,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by bzoennchen on 06.09.17.
+ * @author Benedikt Zoennchen
  */
 public class AVertex<P extends IPoint> implements IVertex<P> {
-
     private final Lock lock;
     private P point;
     private int down;
@@ -69,17 +68,18 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 		return point.equals(((AVertex<P>)obj).getPoint());
 	}
 
-    /**
-     * This method should only be called by the garbage collector in AMesh.
-     * @param id
-     */
-    void setId(@NotNull final int id) {
-        this.id = id;
-    }
+	/**
+	 * This method should only be called by the garbage collector in AMesh.
+	 * @param id
+	 */
+	void setId(@NotNull final int id) {
+		this.id = id;
+	}
 
-    public boolean isDestroyed() {
-        return destroyed;
-    }
+	public boolean isDestroyed() {
+		return destroyed;
+	}
+
 
 	public void destroy() {
 		destroyed = true;

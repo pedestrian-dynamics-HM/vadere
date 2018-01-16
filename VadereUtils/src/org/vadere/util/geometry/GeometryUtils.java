@@ -523,6 +523,9 @@ public class GeometryUtils {
 		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
 	}
 
+	public static double sign(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
+		return (x1 - x3) * (y2 - y3) - (x2 -x3) * (y1 - y3);
+	}
 
 	public static <P extends IPoint> VRectangle bound(final Collection<P> points) {
 
@@ -592,7 +595,6 @@ public class GeometryUtils {
 			VPoint h = iPoints[0].equals(c, tolerance) ? iPoints[1] : iPoints[0];
 
 			iPoints = intersection(new VLine(a, b), circle);
-
 			VPoint f = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[0] : iPoints[1];
 			VPoint g = iPoints[0].distance(a) < iPoints[1].distance(a) ? iPoints[1] : iPoints[0];
 

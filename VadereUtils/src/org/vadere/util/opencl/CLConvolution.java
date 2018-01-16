@@ -2,6 +2,7 @@ package org.vadere.util.opencl;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -62,9 +63,40 @@ public class CLConvolution {
     private long clKernelConvolveRow;
     private long clKernelConvolveCol;
 
-    private boolean initialized;
+    private long clKernel;
 
-    public CLConvolution() {
+    private int matrixWidth;
+    private int matrixHeight;
+    private int kernelWidth;
+    private float[] kernel;
+    private KernelType type;
+
+    public enum KernelType {
+        Separate,
+        Col,
+        Row,
+        NonSeparate
+    }
+
+    public CLConvolution(
+            final int matrixWidth,
+            final int matrixHeight,
+            final int kernelWidth, @NotNull final float[] kernel) {
+        this(KernelType.Separate, matrixWidth, matrixHeight, kernelWidth, kernel);
+    }
+
+    public CLConvolution(
+            @NotNull final KernelType type,
+            final int matrixWidth,
+            final int matrixHeight,
+            final int kernelWidth, @NotNull final float[] kernel) {
+        this.type = type;
+        this.matrixHeight = matrixHeight;
+        this.matrixWidth = matrixWidth;
+        this.kernelWidth = kernelWidth;
+        this.kernel = kernel;
+
+        init();
         Configuration.DEBUG.set(true);
         Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
         Configuration.DEBUG_STACK.set(true);
@@ -74,114 +106,69 @@ public class CLConvolution {
         initCallbacks();
         initCL();
         buildProgram();
+
+        hostGaussKernel = CLUtils.toFloatBuffer(kernel);
+        hostScenario = MemoryUtil.memAllocFloat(matrixWidth * matrixHeight);
+        output = MemoryUtil.memAllocFloat(matrixWidth * matrixHeight);
+
+        switch (type) {
+            case NonSeparate: clKernel = clKernelConvolve; break;
+            case Col: clKernel = clKernelConvolveCol; break;
+            case Row: clKernel = clKernelConvolveRow; break;
+            case Separate: clKernel = -1; break;
+            default: throw new IllegalArgumentException("unsupported kernel type = " + type);
+        }
+
+        if(type != KernelType.Separate) {
+            setArguments(clKernel);
+        }
+        else {
+            setArguments(clKernelConvolveCol, clKernelConvolveRow);
+        }
     }
 
-    public float[] convolve(final float[] input,
-                            final int matrixWidth,
-                            final int matrixHeight,
-                            final float[] kernel,
-                            final int kernelWidth) {
-        init();
-        float[] result = convolve(input, matrixWidth, matrixHeight, kernel, kernelWidth, clKernelConvolve);
-        clearCL();
-        return result;
+    public float[] convolve(final float[] input) {
+        // 1. write input to native-c-like-memory
+        CLUtils.toFloatBuffer(input, hostScenario);
+
+        // 2. write this memory to the GPU
+        clEnqueueWriteBuffer(clQueue, clInput, true, 0, hostScenario, null, null);
+
+        // 2. convolve
+        switch (type) {
+            case NonSeparate: convolve(clKernelConvolve); break;
+            case Col: convolve(clKernelConvolveCol); break;
+            case Row: convolve(clKernelConvolveRow); break;
+            case Separate: convolveSeparate(); break;
+            default: throw new IllegalArgumentException("unsupported kernel type = " + type);
+        }
+
+        // 4. read result from the GPU to a native-c-like-memory
+        clEnqueueReadBuffer(clQueue, clOutput, true, 0, output, null, null);
+
+        // 5. read this memory and transform it back into a java array.
+        float[] foutput = CLUtils.toFloatArray(output, matrixWidth * matrixHeight);
+        return foutput;
     }
 
-    public float[] convolveRow(final float[] input, final int matrixWidth, final int matrixHeight, final float[] kernel,
-                               final int kernelWidth) {
-        init();
-        float[] result = convolve(input, matrixWidth, matrixHeight, kernel, kernelWidth, clKernelConvolveRow);
-        clearCL();
-        return result;
-    }
 
-    public float[] convolveCol(final float[] input, final int matrixWidth, final int matrixHeight, final float[] kernel,
-                               final int kernelWidth) {
-        init();
-        float[] result = convolve(input, matrixWidth, matrixHeight, kernel, kernelWidth, clKernelConvolveCol);
-        clearCL();
-        return result;
-    }
-
-    public float[] convolveSeparate(final float[] input, final int matrixWidth, final int matrixHeight, final float[] kernel,
-                                    final int kernelWidth) {
-        init();
-        //try (MemoryStack stack = stackPush()) {
-            assert matrixWidth * matrixHeight == input.length;
-            hostScenario = CLUtils.toFloatBuffer(input);
-            output = CLUtils.toFloatBuffer(input);
-            hostGaussKernel = CLUtils.toFloatBuffer(kernel);
-
-            if(!initialized) {
-                // host memory to gpu memory
-                clInput = clCreateBuffer(clContext, CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, hostScenario, errcode_ret);
-                clTmp = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * input.length, errcode_ret);
-                clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, 4 * input.length, errcode_ret);
-                clGaussianKernel = clCreateBuffer(clContext, CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, hostGaussKernel, errcode_ret);
-
-                clSetKernelArg1p(clKernelConvolveCol, 0, clInput);
-                clSetKernelArg1p(clKernelConvolveCol, 1, clGaussianKernel);
-                clSetKernelArg1p(clKernelConvolveCol, 2, clTmp);
-                clSetKernelArg1i(clKernelConvolveCol, 3, matrixWidth);
-                clSetKernelArg1i(clKernelConvolveCol, 4, matrixHeight);
-                clSetKernelArg1i(clKernelConvolveCol, 5, kernelWidth);
-
-                clSetKernelArg1p(clKernelConvolveRow, 0, clTmp);
-                clSetKernelArg1p(clKernelConvolveRow, 1, clGaussianKernel);
-                clSetKernelArg1p(clKernelConvolveRow, 2, clOutput);
-                clSetKernelArg1i(clKernelConvolveRow, 3, matrixWidth);
-                clSetKernelArg1i(clKernelConvolveRow, 4, matrixHeight);
-                clSetKernelArg1i(clKernelConvolveRow, 5, kernelWidth);
-                initialized = true;
-            }
-            else {
-                clEnqueueWriteBuffer(clQueue, clInput, true, 0, hostScenario, null, null);
-                clEnqueueWriteBuffer(clQueue, clGaussianKernel, true, 0, hostGaussKernel, null, null);
-                //clEnqueueWriteBuffer(clQueue, clInput, true, 0, hostScenario, null, null);
-            }
+    private void convolveSeparate() {
+        //init();
+        try (MemoryStack stack = stackPush()) {
 
             PointerBuffer clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(2);
             clGlobalWorkSizeEdges.put(0, matrixWidth);
             clGlobalWorkSizeEdges.put(1, matrixHeight);
 
+            PointerBuffer ev = stack.callocPointer(1);
             // run the kernel and read the result
             clEnqueueNDRangeKernel(clQueue, clKernelConvolveCol, 2, null, clGlobalWorkSizeEdges, null, null, null);
             clEnqueueNDRangeKernel(clQueue, clKernelConvolveRow, 2, null, clGlobalWorkSizeEdges, null, null, null);
             clFinish(clQueue);
-            clEnqueueReadBuffer(clQueue, clOutput, true, 0, output, null, null);
-
-            float[] foutput = CLUtils.toFloatArray(output, input.length);
-
-            MemoryUtil.memFree(hostScenario);
-            MemoryUtil.memFree(output);
-            MemoryUtil.memFree(hostGaussKernel);
-            MemoryUtil.memFree(errcode_ret);
-
-            clReleaseMemObject(clTmp);
-            clReleaseMemObject(clInput);
-            clReleaseMemObject(clOutput);
-            clReleaseMemObject(clGaussianKernel);
-            clReleaseKernel(clKernelConvolveRow);
-            clReleaseKernel(clKernelConvolveCol);
-
-            log.info("release command queue: " + (clReleaseCommandQueue(clQueue) == CL_SUCCESS));
-            log.info("release program: " + (clReleaseProgram(clProgram) == CL_SUCCESS));
-            log.info("release context: " + (clReleaseContext(clContext) == CL_SUCCESS));
-            contextCB.free();
-            programCB.free();
-            return foutput;
-        //}
+        }
     }
 
-    private float[] convolve(final float[] input,
-                             final int matrixWidth,
-                             final int matrixHeight,
-                             final float[] kernel,
-                             final int kernelWidth, final long clKernel) {
-        assert matrixWidth * matrixHeight == input.length;
-
-        setArguments(input, matrixWidth, matrixHeight, kernel, kernelWidth, clKernel);
-
+    private void convolve(final long clKernel) {
         PointerBuffer clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(2);
         clGlobalWorkSizeEdges.put(0, matrixWidth);
         clGlobalWorkSizeEdges.put(1, matrixHeight);
@@ -189,20 +176,12 @@ public class CLConvolution {
         // run the kernel and read the result
         clEnqueueNDRangeKernel(clQueue, clKernel, 2, null, clGlobalWorkSizeEdges, null, null, null);
         clFinish(clQueue);
-        clEnqueueReadBuffer(clQueue, clOutput, true, 0, output, null, null);
-
-        float[] foutput = CLUtils.toFloatArray(output, input.length);
-        return foutput;
     }
 
-    private void setArguments(final float[] input, final int matrixWidth, final int matrixHeight, final float[] kernel, final int kernelWidth, final long clKernel) {
-        hostScenario = CLUtils.toFloatBuffer(input);
-        output = CLUtils.toFloatBuffer(input);
-        hostGaussKernel = CLUtils.toFloatBuffer(kernel);
-
+    private void setArguments(final long clKernel) {
         // host memory to gpu memory
-        clInput = clCreateBuffer(clContext, CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, hostScenario, errcode_ret);
-        clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, 4 * input.length, errcode_ret);
+        clInput = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * matrixWidth * matrixHeight, errcode_ret);
+        clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, 4 * matrixWidth * matrixHeight, errcode_ret);
         clGaussianKernel = clCreateBuffer(clContext, CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, hostGaussKernel, errcode_ret);
 
         clSetKernelArg1p(clKernel, 0, clInput);
@@ -213,12 +192,37 @@ public class CLConvolution {
         clSetKernelArg1i(clKernel, 5, kernelWidth);
     }
 
+    private void setArguments(final long clKernelConvolveCol, final long clKernelConvolveRow) {
+        clTmp = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * matrixWidth * matrixHeight, errcode_ret);
+        clInput = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * matrixWidth * matrixHeight, errcode_ret);
+        clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, 4 * matrixWidth * matrixHeight, errcode_ret);
+        clGaussianKernel = clCreateBuffer(clContext, CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, hostGaussKernel, errcode_ret);
+
+        clSetKernelArg1p(clKernelConvolveCol, 0, clInput);
+        clSetKernelArg1p(clKernelConvolveCol, 1, clGaussianKernel);
+        clSetKernelArg1p(clKernelConvolveCol, 2, clTmp);
+        clSetKernelArg1i(clKernelConvolveCol, 3, matrixWidth);
+        clSetKernelArg1i(clKernelConvolveCol, 4, matrixHeight);
+        clSetKernelArg1i(clKernelConvolveCol, 5, kernelWidth);
+
+        clSetKernelArg1p(clKernelConvolveRow, 0, clTmp);
+        clSetKernelArg1p(clKernelConvolveRow, 1, clGaussianKernel);
+        clSetKernelArg1p(clKernelConvolveRow, 2, clOutput);
+        clSetKernelArg1i(clKernelConvolveRow, 3, matrixWidth);
+        clSetKernelArg1i(clKernelConvolveRow, 4, matrixHeight);
+        clSetKernelArg1i(clKernelConvolveRow, 5, kernelWidth);
+    }
+
     private void clearMemory() {
         // release memory and devices
 
         clReleaseMemObject(clInput);
         clReleaseMemObject(clOutput);
         clReleaseMemObject(clGaussianKernel);
+
+        if(type == KernelType.Separate) {
+            clReleaseMemObject(clTmp);
+        }
 
         clReleaseKernel(clKernelConvolve);
         clReleaseKernel(clKernelConvolveRow);
@@ -259,7 +263,7 @@ public class CLConvolution {
         try (MemoryStack stack = stackPush()) {
             // helper for the memory allocation in java
             //stack = MemoryStack.stackPush();
-            errcode_ret = MemoryUtil.memAllocInt(1);
+            errcode_ret = stack.callocInt(1);
 
             IntBuffer numberOfPlatforms = stack.mallocInt(1);
             clGetPlatformIDs(null, numberOfPlatforms);

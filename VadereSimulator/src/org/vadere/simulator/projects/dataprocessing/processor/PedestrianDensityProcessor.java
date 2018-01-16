@@ -4,6 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 /**
@@ -36,4 +37,13 @@ public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepP
 		this.pedPosProc =
 				(PedestrianPositionProcessor) manager.getProcessor(attDensProc.getPedestrianPositionProcessorId());
 	}
+
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesPedestrianDensityProcessor());
+        }
+
+        return super.getAttributes();
+    }
 }
