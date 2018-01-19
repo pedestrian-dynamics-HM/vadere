@@ -181,6 +181,16 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	}
 
 	public void addObstacle(final Obstacle obstacle) {
+
+		Iterator<Obstacle> iter = getObstacleIterator();
+		while (iter.hasNext()){
+			Obstacle o = iter.next();
+			if (obstacle.getShape().contains(o.getShape().getBounds2D())){
+				this.topographyElements.remove(o);
+				iter.remove();
+			}
+		}
+
 		this.topographyElements.add(obstacle);
 		this.obstacles.add(obstacle);
 	}
