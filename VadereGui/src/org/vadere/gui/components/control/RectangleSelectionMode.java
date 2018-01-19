@@ -22,9 +22,14 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 			super.mousePressed(event);
 		} else {
 			panelModel.setStartSelectionPoint(event.getPoint());
-			panelModel
-					.setSelectionShape(new VRectangle(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
-							0.0001 * panelModel.getScaleFactor(), 0.0001 * panelModel.getScaleFactor()));
+
+			// Set default dimension of selection shape to current GridResolution.
+			// If mouse is dragged smaller selection shapes are still possible.
+			double width = panelModel.getGridResolution();
+			double height = width;
+			VRectangle shape = new VRectangle(panelModel.getMousePosition().x,
+					panelModel.getMousePosition().y, width, height);
+			panelModel.setSelectionShape(shape);
 			panelModel.showSelection();
 		}
 		panelModel.notifyObservers();
