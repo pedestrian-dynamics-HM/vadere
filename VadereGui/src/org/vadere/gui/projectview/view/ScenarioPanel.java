@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -140,26 +142,42 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						}
 					}
 				})));
+		
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
 		menusInTabs.add(mnModelNameMenu);
+		
+		JMenu submenuMainModels = new JMenu(Messages.getString("Tab.Model.insertModelNameSubMenu.title"));
+		mnModelNameMenu.add(submenuMainModels);
+		
 		ClassFinder.getMainModelNames().stream()
 				.sorted()
-				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className + " (MainModel)") {
+				.forEach(className -> submenuMainModels.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
-				})));
-		ClassFinder.getModelNames().stream()
-				.sorted()
-				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className) {
+				}
+				)));
+		
+		Map<String, List<String>> groupedPackages = ClassFinder.groupPackages(ClassFinder.getModelNames());
+		
+		for (Map.Entry<String, List<String>> entry : groupedPackages.entrySet()) {
+			JMenu currentSubMenu = new JMenu(entry.getKey());
+			
+			for (String className : entry.getValue()) {
+				currentSubMenu.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
-				})));
-		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftest position instead of the rightest
+			}));
+			}
+			
+			mnModelNameMenu.add(currentSubMenu);
+		}
+	
+		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);

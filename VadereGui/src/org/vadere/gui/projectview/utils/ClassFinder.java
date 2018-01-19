@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
@@ -42,6 +43,12 @@ public class ClassFinder {
 		List<String> modelNames = getClassNamesWithTagInPackage(Model.class.getPackage().getName(), Model.class);
 		modelNames.removeAll(getMainModelNames());
 		return modelNames;
+	}
+	
+	public static Map<String, List<String>> groupPackages(List<String> classNamesInPackageNotation) {
+		List<String> groupNames = deriveGroupNamesFromPackageNames(classNamesInPackageNotation);
+		Map<String, List<String>> groupNamesToMembers = sortClassNamesIntoGroups(classNamesInPackageNotation, groupNames);
+		return groupNamesToMembers;
 	}
 
 	// all output file classes
@@ -221,5 +228,38 @@ public class ClassFinder {
 		}
 
 		return null;
+	}
+	
+	private static List<String> deriveGroupNamesFromPackageNames(List<String> classNamesInPackageNotation) {
+		List<String> groupNames = new ArrayList<String>();
+		
+		// Use characters until last dot as group names.
+		for (String classNameInPackageNotation : classNamesInPackageNotation) {
+			int lastDotPosition = classNameInPackageNotation.lastIndexOf(".");
+			
+			if (lastDotPosition >= 0) {
+				String groupName = classNameInPackageNotation.substring(0, lastDotPosition);
+				groupNames.add(groupName);
+			}
+		}
+		
+		return groupNames;
+	}
+	
+	private static Map<String, List<String>> sortClassNamesIntoGroups(List<String> classNamesInPackageNotation, List<String> groupNames) {
+		TreeMap<String, List<String>> groupNamesToMembers = new TreeMap<>();
+		
+		for (String groupName : groupNames) {
+			List<String> groupMembers = classNamesInPackageNotation.stream().filter(name -> name.startsWith(groupName)).sorted().collect(Collectors.toList());
+			groupNamesToMembers.put(groupName, groupMembers);
+		}
+		
+		List<String> modelNamesWithoutPackage = classNamesInPackageNotation.stream().filter(name -> name.lastIndexOf(".") == -1).sorted().collect(Collectors.toList());
+		
+		if (modelNamesWithoutPackage.size() > 0) {
+			groupNamesToMembers.put("...", modelNamesWithoutPackage);
+		}
+		
+		return groupNamesToMembers;
 	}
 }
