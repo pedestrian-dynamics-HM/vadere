@@ -36,7 +36,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
+		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 0.1, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
@@ -47,7 +47,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		int counter = 0;
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		while (counter < 300) {
+		while (counter < 10) {
 			boolean retriangulation = meshGenerator.step(true);
 			overAllTime.suspend();
 

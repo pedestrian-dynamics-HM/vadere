@@ -52,7 +52,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	private double sumOfqLengths;
 
 	private boolean initialized = false;
-	private boolean runParallel = true;
+	private boolean runParallel = false;
 
 	private int numberOfRetriangulations = 0;
 	private int numberOfIterations = 0;
@@ -85,7 +85,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
         log.info("##### (start) generate a uniform refined triangulation #####");
         UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         uniformRefinementTriangulation.generate();
-        retriangulate();
+        //retriangulate();
         log.info("##### (end) generate a uniform refined triangulation #####");
 	}
 
@@ -128,7 +128,9 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	}
 
 	private void step() {
-        removeBoundaryLowQualityTriangles();
+        // TODO: implement removeBoundaryLowQualityTriangles on the GPU!
+		removeBoundaryLowQualityTriangles();
+
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 
@@ -140,7 +142,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
         //retriangulate();
         if(illegalMovement) {
-            retriangulate();
+            //retriangulate();
             //while (flipEdges());
 
             numberOfRetriangulations++;
@@ -158,16 +160,16 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 		//ms = System.currentTimeMillis() - ms;
 		//log.info("ms: " + ms);
 		computeScalingFactor();
-		log.info(scalingFactor);
+		//log.info(scalingFactor);
         computeForces();
 		//computeDelta();
 		updateVertices();
 
 		numberOfIterations++;
-		log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
-		log.info("#retriangulations: " + numberOfRetriangulations);
-		log.info("#steps: " + numberOfIterations);
-		log.info("#points: " + getMesh().getVertices().size());
+		//log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
+		//log.info("#retriangulations: " + numberOfRetriangulations);
+		//log.info("#steps: " + numberOfIterations);
+		//log.info("#points: " + getMesh().getVertices().size());
 	}
 
     /**

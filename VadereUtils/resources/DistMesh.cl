@@ -128,7 +128,6 @@ kernel void label(__global float2* vertices,
         if(length(c-vertices[p]) < length(c-vertices[v0])) {
             labeledEdges[edgeId] = 1;
             *illegalEdge = 1;
-            //atomic_xchg(illegalEdge, 1);
         }
         else {
             labeledEdges[edgeId] = 0;
@@ -234,11 +233,6 @@ kernel void flipStage3(
 
             int u0 = getDiffVertex(v0, v1, triangles[ta]);
             int u1 = getDiffVertex(v0, v1, triangles[tb]);
-
-            //float2 c1 = getCircumcenter(vertices[v0], vertices[v1], vertices[u0]);
-            /*if(length(c1-vertices[u0]) < length(c1-vertices[u1])) {
-                printf("error2 %d [%f] - %d, %d \n", e, length(c1-vertices[u0])-length(c1-vertices[u1]), ta, tb);
-            }*/
 
             // Here we keep the order in ccw assuming that everything is in ccw beforehand
 
@@ -426,10 +420,15 @@ kernel void computeForces(
     //    while (LOCK(addr)) {}
     //printf("before %f \n", forces[p1Index].x);
     //float2 tmp = forces[p1Index];
+
+
     // TODO this might be slow!
     global float* forceP = (global float*)(&forces[p1Index]);
     atomicAdd_g_f(forceP, partialForce.x);
     atomicAdd_g_f((forceP+1), partialForce.y);
+    //forces[p1Index] += partialForce;
+
+
     //forces[p1Index] = forces[p1Index] + partialForce;
     //    UNLOCK(addr);
     //    waiting = 0;
