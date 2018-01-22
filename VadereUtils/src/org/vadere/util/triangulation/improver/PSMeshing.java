@@ -111,7 +111,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        //removeBoundaryLowQualityTriangles();
+        removeBoundaryLowQualityTriangles();
         triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         triangulation.finalize();
@@ -358,7 +358,8 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 		getMesh().getPoint(vertex).add(dX);
 	}
 
-	private IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
+	@Override
+	public IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
 		return triangulation.getMesh();
 	}
 

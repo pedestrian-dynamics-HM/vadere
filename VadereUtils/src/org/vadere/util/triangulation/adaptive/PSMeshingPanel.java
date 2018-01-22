@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 
@@ -31,10 +32,10 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	private double width;
 	private double height;
 	private Collection<F> faces;
-    private final Predicate<VTriangle> alertPred;
+    private final Predicate<F> alertPred;
     private Collection<VTriangle> triangles;
 
-    public PSMeshingPanel(final IMeshImprover<P, V, E, F> meshGenerator, final Predicate<VTriangle> alertPred, final double width, final double height) {
+    public PSMeshingPanel(final IMeshImprover<P, V, E, F> meshGenerator, final Predicate<F> alertPred, final double width, final double height) {
         this.meshGenerator = meshGenerator;
         this.width = width;
         this.height = height;
@@ -43,7 +44,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
     }
 
     public void update() {
-        triangles = meshGenerator.getTriangles();
+        faces = meshGenerator.getMesh().getFaces();
     }
 
 	@Override
@@ -70,7 +71,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
             graphics.scale(20, 20);
             graphics.setStroke(new BasicStroke(0.003f));
             graphics.setColor(Color.BLACK);
-            for(VTriangle  triangle : triangles) {
+            for(F face : faces) {
                 //log.info(face);
 			/*if(triangleToQuality(triangle) < 0.2) {
 				graphics.setColor(Color.GRAY);
@@ -78,17 +79,17 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 				graphics.setColor(Color.RED);
 				graphics.fill(triangle);
 			}*/
-
-                if(alertPred.test(triangle)) {
+                VTriangle triangle = meshGenerator.getMesh().toTriangle(face);
+                if(alertPred.test(face)) {
                     //log.info("red triangle");
                     graphics.setColor(Color.BLACK);
                     graphics.draw(triangle);
                     graphics.setColor(Color.RED);
                     graphics.fill(triangle);
                 } else {
-                    graphics.setColor(Color.GRAY);
+                    graphics.setColor(Color.BLACK);
                     graphics.draw(triangle);
-                }
+               }
             }
             //graphics.translate(5,5);
             graphics2D.drawImage(image, 0, 0, null);

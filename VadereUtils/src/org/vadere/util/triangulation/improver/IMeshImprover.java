@@ -19,6 +19,13 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
     Collection<VTriangle> getTriangles();
 
     /**
+     * returns the current mesh (reference) i.e. with the current state of improvement.
+     *
+     * @return  the current mesh (reference)
+     */
+    IMesh<P, V, E, F> getMesh();
+
+    /**
      * improves the current triangulation / mesh.
      *
      */

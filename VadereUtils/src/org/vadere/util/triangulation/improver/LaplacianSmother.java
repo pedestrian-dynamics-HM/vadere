@@ -192,7 +192,8 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
         return runParallel ? getMesh().streamVerticesParallel() : getMesh().streamVertices();
     }
 
-    private IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
+    @Override
+    public IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
         return triangulation.getMesh();
     }
 

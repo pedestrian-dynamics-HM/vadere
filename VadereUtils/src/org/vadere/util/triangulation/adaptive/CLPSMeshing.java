@@ -46,7 +46,7 @@ public class CLPSMeshing implements IMeshImprover {
     private Object gobalAcessSynchronizer = new Object();
 
     private CLDistMesh<MeshPoint> clDistMesh;
-    private boolean hasToRead = true;
+    private boolean hasToRead = false;
 
     public CLPSMeshing(
             final IDistanceFunction distanceFunc,
@@ -166,12 +166,12 @@ public class CLPSMeshing implements IMeshImprover {
     }
 
     public void finish() {
-        if(clDistMesh != null) {
+        /*if(clDistMesh != null) {
             clDistMesh.finish();
         }
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
-        triangulation.finalize();
+        triangulation.finalize();*/
     }
 
     //?
@@ -225,6 +225,10 @@ public class CLPSMeshing implements IMeshImprover {
     }
 
     public IMesh<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> getMesh() {
+        if(hasToRead) {
+            hasToRead = false;
+            ((AMesh<MeshPoint>)triangulation.getMesh()).setPositions(clDistMesh.getResult());
+        }
         return triangulation.getMesh();
     }
 
@@ -266,10 +270,7 @@ public class CLPSMeshing implements IMeshImprover {
 
     @Override
     public Collection<VTriangle> getTriangles() {
-        if(hasToRead) {
-            hasToRead = false;
-            ((AMesh<MeshPoint>)triangulation.getMesh()).setPositions(clDistMesh.getResult());
-        }
+        ((AMesh<MeshPoint>)getMesh()).setPositions(clDistMesh.getResult());
         return triangulation.streamTriangles().collect(Collectors.toList());
     }
 

@@ -1,5 +1,8 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
@@ -16,6 +19,8 @@ import javax.swing.*;
  * Created by Matimati-ka on 27.09.2016.
  */
 public class TestEnhancedVersion3 extends JFrame {
+
+    private static final Logger log = LogManager.getLogger(TestEnhancedVersion3.class);
 
     private TestEnhancedVersion3() {
 
@@ -53,40 +58,21 @@ public class TestEnhancedVersion3 extends JFrame {
 		int counter = 0;
 		long time = 0;
 
+        StopWatch overAllTime = new StopWatch();
+        overAllTime.start();
         while (counter <= 300) {
-            //obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
-            //PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
-            //avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
-            //System.out.println("Average quality (" + counter + "):" + avgQuality);
-			/*for(int i = 0; i < 100 && !priorityQueue.isEmpty(); i++) {
-				PFace<MeshPoint> face = priorityQueue.poll();
-				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
-			}*/
-            distmeshPanel.repaint();
-           /*try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
-            counter++;
-
-            long ms = System.currentTimeMillis();
             meshGenerator.improve();
-            ms = System.currentTimeMillis() - ms;
-            time += ms;
-            System.out.println("Quality: " + meshGenerator.getQuality());
-            System.out.println("Step-Time: " + ms);
-        }
-        //meshGenerator.finalize();
-        System.out.print("overall time: " + time);
-        //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
+            overAllTime.suspend();
 
-		//System.out.print("finished:" + avgQuality);
-		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-		//if(counter == 1) {
-		//
-		//}
+            distmeshPanel.repaint();
+            counter++;
+            System.out.println("Quality: " + meshGenerator.getQuality());
+            overAllTime.resume();
+        }
+        overAllTime.stop();
+        log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
+        log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+        log.info("overall time: " + overAllTime.getTime());
 	}
 
     public static void main(String[] args) {
