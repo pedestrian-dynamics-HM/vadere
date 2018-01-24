@@ -53,6 +53,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	E getPrev(@NotNull E halfEdge);
 	E getTwin(@NotNull E halfEdge);
 	F getFace(@NotNull E halfEdge);
+	IPointConstructor<P> getPointConstructor();
 
 	default F getNonBoundaryFace(@NotNull E halfEdge) {
         if(!isBoundary(halfEdge)) {

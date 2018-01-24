@@ -42,13 +42,14 @@ public class TestEnhancedVersion3 extends JFrame {
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>());
+        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
 
         Predicate<PFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 
 		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
+		frame.setTitle("CPU");
 
 
 		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
@@ -60,10 +61,15 @@ public class TestEnhancedVersion3 extends JFrame {
 
         StopWatch overAllTime = new StopWatch();
         overAllTime.start();
-        while (counter <= 10) {
+        while (counter <= 100) {
             meshGenerator.improve();
             overAllTime.suspend();
 
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             distmeshPanel.repaint();
             counter++;
             //System.out.println("Quality: " + meshGenerator.getQuality());

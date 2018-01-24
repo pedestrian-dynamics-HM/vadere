@@ -57,6 +57,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public IPointConstructor<P> getPointConstructor() {
+		return pointConstructor;
+	}
+
+	@Override
 	public PHalfEdge<P> getEdge(@NotNull PVertex<P> vertex) {
 		return vertex.getEdge();
 	}

@@ -9,6 +9,7 @@ import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
+import org.vadere.util.opencl.CLDistMeshHE;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 
@@ -18,8 +19,8 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  */
-public class CLPSMeshing implements IMeshImprover {
-    private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
+public class CLPSMeshingHE implements IMeshImprover {
+    private static final Logger log = LogManager.getLogger(CLPSMeshingHE.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
@@ -45,10 +46,10 @@ public class CLPSMeshing implements IMeshImprover {
 
     private Object gobalAcessSynchronizer = new Object();
 
-    private CLDistMesh<MeshPoint> clDistMesh;
+    private CLDistMeshHE<MeshPoint> clDistMesh;
     private boolean hasToRead = false;
 
-    public CLPSMeshing(
+    public CLPSMeshingHE(
             final IDistanceFunction distanceFunc,
             final IEdgeLengthFunction edgeLengthFunc,
             final double initialEdgeLen,
@@ -72,7 +73,7 @@ public class CLPSMeshing implements IMeshImprover {
         log.info("##### (start) compute a uniform refined triangulation #####");
         UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         uniformRefinementTriangulation.generate();
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE<>((AMesh<MeshPoint>) triangulation.getMesh());
         clDistMesh.init();
         initialized = true;
         log.info("##### (end) compute a uniform refined triangulation #####");
@@ -160,7 +161,7 @@ public class CLPSMeshing implements IMeshImprover {
         if(clDistMesh != null) {
             clDistMesh.finish();
         }
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE<>((AMesh<MeshPoint>) triangulation.getMesh());
         clDistMesh.init();
         return anyFlip;
     }
@@ -198,7 +199,7 @@ public class CLPSMeshing implements IMeshImprover {
         else {
 
         }
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE<>((AMesh<MeshPoint>) triangulation.getMesh());
         clDistMesh.init();
     }
 

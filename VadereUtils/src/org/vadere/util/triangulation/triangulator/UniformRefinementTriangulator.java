@@ -163,7 +163,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		VTriangle triangle = mesh.toTriangle(face);
 		VLine line = mesh.toLine(edge);
 
-		return (line.length() <= lenFunc.apply(line.midPoint()) && random.nextDouble() < 0.96)
+		return (line.length() <= lenFunc.apply(line.midPoint())/* && random.nextDouble() < 0.96*/)
 				|| (!triangle.intersect(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersect(bbox)))
 				|| boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.isBoundary(twin) && shape.contains(mesh.toTriangle(twin).getBounds2D())));
 	}

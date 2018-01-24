@@ -129,7 +129,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
 	private void step() {
         // TODO: implement removeBoundaryLowQualityTriangles on the GPU!
-		removeBoundaryLowQualityTriangles();
+		//removeBoundaryLowQualityTriangles();
 
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
@@ -274,6 +274,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
                 .map(line -> line.midPoint())
                 .mapToDouble(midPoint -> edgeLengthFunc.apply(midPoint)).sum();
         scalingFactor =  Math.sqrt((edgeLengthSum * edgeLengthSum) / (desiredEdgeLenSum * desiredEdgeLenSum));
+        log.info("scale factor = " + scalingFactor);
     }
 
 
@@ -367,7 +368,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
 	/*public PriorityQueue<PFace<MeshPoint>> getQuailties() {
 		PriorityQueue<PFace<MeshPoint>> heap = new PriorityQueue<>(new FaceComparator());
-		heap.addAll(getMesh().getFaces());
+		heap.addAll(getMesh().getTriangles());
 		return heap;
 	}
 

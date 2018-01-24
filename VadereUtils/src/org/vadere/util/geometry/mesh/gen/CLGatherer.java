@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.triangulation.IPointConstructor;
 
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
@@ -50,6 +51,48 @@ public class CLGatherer {
     public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         return getVerticesF(mesh, MemoryUtil.memAllocFloat(vertices.size()*2));
+    }
+
+    public static <P extends IPoint> IntBuffer getHalfEdges(@NotNull final AMesh<P> mesh) {
+        Collection<AHalfEdge<P>> edges = mesh.getEdges();
+        IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size()*4);
+
+        int index = 0;
+        for(AHalfEdge<P> edge : edges) {
+            edgeBuffer.put(index, edge.getEnd());
+            edgeBuffer.put(index+1, edge.getNext());
+            edgeBuffer.put(index+2, edge.getTwin());
+            edgeBuffer.put(index+3, edge.getFace());
+            index += 4;
+        }
+        return edgeBuffer;
+    }
+
+    public static <P extends IPoint> IntBuffer getFaces(@NotNull final AMesh<P> mesh) {
+        Collection<AFace<P>> faces = mesh.getFaces();
+        IntBuffer faceBuffer =  MemoryUtil.memAllocInt(faces.size()*2);
+
+        int index = 0;
+        for(AFace<P> face : faces) {
+            faceBuffer.put(index, face.getEdge());
+            faceBuffer.put(index+1, -1);
+            index += 2;
+        }
+        return faceBuffer;
+    }
+
+    // TODO: better name
+    public static <P extends IPoint> IntBuffer getVertexToEdge(@NotNull final AMesh<P> mesh) {
+        Collection<AVertex<P>> vertices = mesh.getVertices();
+        IntBuffer vertexBuffer =  MemoryUtil.memAllocInt(vertices.size());
+
+        int index = 0;
+        for(AVertex<P> vertex : vertices) {
+            index++;
+            assert vertex.getId() == index;
+            vertexBuffer.put(index, vertex.getEdge());
+        }
+        return vertexBuffer;
     }
 
     // TODO: maybe remove duplicated edges
@@ -101,7 +144,7 @@ public class CLGatherer {
         return edgeBuffer;
     }
 
-    public static <P extends IPoint> IntBuffer getFaces(@NotNull final AMesh<P> mesh) {
+    public static <P extends IPoint> IntBuffer getTriangles(@NotNull final AMesh<P> mesh) {
         Collection<AFace<P>> faces = mesh.getFaces();
         IntBuffer faceBuffer = MemoryUtil.memAllocInt(faces.size()*4);
         int index = 0;
