@@ -222,7 +222,7 @@ public class CLDistMeshHE<P extends IPoint> {
         ByteBuffer source;
         try {
             if(doublePrecision) {
-                source = CLUtils.ioResourceToByteBuffer("DistMeshDoubleHE.cl", 4096);
+                source = CLUtils.ioResourceToByteBuffer("DistMeshHE.cl", 4096);
             }
             else {
                 source = CLUtils.ioResourceToByteBuffer("DistMeshHE.cl", 4096);
@@ -447,7 +447,7 @@ public class CLDistMeshHE<P extends IPoint> {
         log.info("computed scale factor");
 
         // force to use only 1 work group => local size = local size
-        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, null, null, null);
+        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeVertices, null, null, null);
         log.info("computed forces");
 
         enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
@@ -456,7 +456,7 @@ public class CLDistMeshHE<P extends IPoint> {
         IntBuffer illegalTriangles = stack.mallocInt(1);
         illegalTriangles.put(0, 0);
         clEnqueueWriteBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
-        enqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
+        //enqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
         clFinish(clQueue);
         clEnqueueReadBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
         log.info("check for illegal triangles");
@@ -466,7 +466,7 @@ public class CLDistMeshHE<P extends IPoint> {
         }
 
         // flip as long as there are no more flips possible
-        if(flipAll) {
+        if(flipAll && false) {
             IntBuffer illegalEdges = stack.mallocInt(1);
             // while there is any illegal edge, do: // TODO: this is not the same as in the java distmesh!
 
@@ -543,7 +543,7 @@ public class CLDistMeshHE<P extends IPoint> {
 
         clEnqueueReadBuffer(clQueue, clFaces, true, 0, t, null, null);
         clEnqueueReadBuffer(clQueue, clEdges, true, 0, e, null, null);
-
+        clEnqueueReadBuffer(clQueue, clVtoE, true, 0, vToE, null, null);
     }
 
     private void readResultFromHost() {
@@ -561,56 +561,11 @@ public class CLDistMeshHE<P extends IPoint> {
             }
         }
 
+        // scatter data
         mesh.setPositions(pointSet);
-        List<AHalfEdge<P>> edges = mesh.getEdges();
-        List<AVertex<P>> vertices = mesh.getVertices();
-        List<AFace<P>> faces = mesh.getFaces();
-
-        Map<Integer, LinkedList<AHalfEdge<P>>> triangles = new HashMap<>();
-
-        for(int i = 0; i < numberOfFaces; i++) {
-            triangles.put(i, new LinkedList<>());
-        }
-
-        for(int edgeId = 0; edgeId < numberOfEdges; edgeId++) {
-            int prefId = e.get(edgeId * 4);
-            int nextId = e.get(edgeId * 4 + 1);
-            int ta = e.get(edgeId * 4 +2);
-            int tb = e.get(edgeId * 4 +3);
-
-            //log.info("nextId: " + nextId);
-            mesh.setVertex(edges.get(edgeId), vertices.get(nextId));
-            mesh.setEdge(vertices.get(nextId), edges.get(edgeId));
-
-            if(ta != -1) {
-                mesh.setFace(edges.get(edgeId), faces.get(ta));
-                mesh.setEdge(faces.get(ta), edges.get(edgeId));
-                LinkedList<AHalfEdge<P>> tri = triangles.get(ta);
-                if(tri.isEmpty()) {
-                    tri.addLast(edges.get(edgeId));
-                }
-                else {
-                    if(mesh.getPoint(tri.peekLast()).equals(mesh.getPoint(vertices.get(prefId)))) {
-                        tri.addLast(edges.get(edgeId));
-                    }
-                    else {
-                        tri.addFirst(edges.get(edgeId));
-                    }
-                }
-            }
-            else {
-                assert mesh.isBoundary(edges.get(edgeId));
-            }
-        }
-
-        for(int i = 0; i < numberOfFaces; i++) {
-            List<AHalfEdge<P>> tri = triangles.get(i);
-            assert tri.size() == 3;
-
-            mesh.setNext(tri.get(0), tri.get(1));
-            mesh.setNext(tri.get(1), tri.get(2));
-            mesh.setNext(tri.get(2), tri.get(0));
-        }
+        CLGatherer.scatterFaces(mesh, t);
+        CLGatherer.scatterHalfEdges(mesh, e);
+        CLGatherer.scatterVertexToEdge(mesh, vToE);
     }
 
     /*private void updateMesh(){

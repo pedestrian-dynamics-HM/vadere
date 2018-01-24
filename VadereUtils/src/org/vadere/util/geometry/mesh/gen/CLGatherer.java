@@ -10,6 +10,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Benedikt Zoennchen
@@ -53,6 +54,27 @@ public class CLGatherer {
         return getVerticesF(mesh, MemoryUtil.memAllocFloat(vertices.size()*2));
     }
 
+    public static <P extends IPoint> void scatterHalfEdges(@NotNull final AMesh<P> mesh, @NotNull final IntBuffer edgeBuffer) {
+        List<AHalfEdge<P>> edges = mesh.getEdges();
+
+        int index = 0;
+        for(AHalfEdge<P> edge : edges) {
+            int edgeId = index / 4;
+            int vertexId = edgeBuffer.get(index);
+            int nextId = edgeBuffer.get(index+1);
+            int twinId = edgeBuffer.get(index+2);
+            int faceId = edgeBuffer.get(index+3);
+
+            edge.setEnd(vertexId);
+            edge.setNext(nextId);
+            edge.setTwin(twinId);
+            edge.setFace(faceId);
+
+            edges.get(nextId).setPrevious(edgeId);
+            index += 4;
+        }
+    }
+
     public static <P extends IPoint> IntBuffer getHalfEdges(@NotNull final AMesh<P> mesh) {
         Collection<AHalfEdge<P>> edges = mesh.getEdges();
         IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size()*4);
@@ -68,6 +90,16 @@ public class CLGatherer {
         return edgeBuffer;
     }
 
+    public static <P extends IPoint> void scatterFaces(@NotNull final AMesh<P> mesh, @NotNull final IntBuffer faceBuffer) {
+        Collection<AFace<P>> faces = mesh.getFaces();
+
+        int index = 0;
+        for(AFace<P> face : faces) {
+            face.setEdge(faceBuffer.get(index));
+            index += 2;
+        }
+    }
+
     public static <P extends IPoint> IntBuffer getFaces(@NotNull final AMesh<P> mesh) {
         Collection<AFace<P>> faces = mesh.getFaces();
         IntBuffer faceBuffer =  MemoryUtil.memAllocInt(faces.size()*2);
@@ -81,6 +113,17 @@ public class CLGatherer {
         return faceBuffer;
     }
 
+    public static <P extends IPoint> void scatterVertexToEdge(@NotNull final AMesh<P> mesh, @NotNull final  IntBuffer vertexBuffer) {
+        Collection<AVertex<P>> vertices = mesh.getVertices();
+
+        int index = 0;
+        for(AVertex<P> vertex : vertices) {
+            assert vertex.getId() == index;
+            vertex.setEdge(vertexBuffer.get(index));
+            index++;
+        }
+    }
+
     // TODO: better name
     public static <P extends IPoint> IntBuffer getVertexToEdge(@NotNull final AMesh<P> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
@@ -88,9 +131,9 @@ public class CLGatherer {
 
         int index = 0;
         for(AVertex<P> vertex : vertices) {
-            index++;
             assert vertex.getId() == index;
             vertexBuffer.put(index, vertex.getEdge());
+            index++;
         }
         return vertexBuffer;
     }
