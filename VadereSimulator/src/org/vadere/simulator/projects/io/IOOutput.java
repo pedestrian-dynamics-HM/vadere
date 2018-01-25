@@ -1,8 +1,11 @@
 package org.vadere.simulator.projects.io;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.SimulationOutput;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
@@ -183,6 +186,42 @@ public abstract class IOOutput {
 		} catch (IOException e1) {
 			logger.error(e1);
 		}
+	}
+
+	/**
+	 * Returns {@link SimulationOutput} if supplied directory is a valid output directory.
+	 * @param project     VadereProject
+	 * @param directory   Directory containing a simulated data
+	 * @return            SimulationOutput contained in selected directory
+	 */
+	public static Optional<SimulationOutput> getSimulationOutput(final VadereProject project, final File directory ){
+		Optional<Scenario> scenario = readOutputFile(project, directory);
+		Optional<Map<Step, List<Agent>>>  trajectories =  readTrajectories(project, directory);
+		if (scenario.isPresent() && trajectories.isPresent()){
+			return Optional.of(new SimulationOutput(directory.toPath(), scenario.get()));
+		} else {
+			//if directory is not a valid OutputDirectory
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Returns valid {@link SimulationOutput} of {@link VadereProject}
+	 * @param project   VadereProject
+	 * @return          All valid {@link SimulationOutput}s found in selected project.
+	 */
+	public static ConcurrentMap<String, SimulationOutput> getSimulationOutputs(final VadereProject project){
+		List<File> simOutDir = IOOutput.listAllDirs(project);
+		ConcurrentMap<String, SimulationOutput> simulationOutputs = new ConcurrentHashMap<>();
+		simOutDir.forEach( f -> {
+			Optional<Scenario> scenario = readOutputFile(project, f);
+			Optional<Map<Step, List<Agent>>>  trajectories =  readTrajectories(project, f);
+			if (scenario.isPresent() && trajectories.isPresent()){
+				SimulationOutput out = new SimulationOutput(f.toPath(), scenario.get());
+				simulationOutputs.put(f.getName(), out);
+			}
+		});
+		return simulationOutputs;
 	}
 
 	private static Optional<Scenario> readOutputFile(final VadereProject project, final File directory) {
