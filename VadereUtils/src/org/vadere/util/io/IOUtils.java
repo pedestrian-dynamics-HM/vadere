@@ -1,11 +1,14 @@
 package org.vadere.util.io;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,10 +16,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -150,17 +153,20 @@ public class IOUtils {
 		}
 	}
 
+	public static BufferedReader defaultBufferedReader(Path filePath) throws FileNotFoundException {
+		return new BufferedReader(new InputStreamReader(
+				new FileInputStream(filePath.toFile()), StandardCharsets.UTF_8),8192*1);
+	}
+
 	/** Reads all text of a given file and store it in a string. */
-	public static String readTextFile(Path filePath) throws IOException {
-		List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < lines.size(); i++) {
-			sb.append(lines.get(i));
-			if (i < lines.size() - 1) {
-				sb.append(System.lineSeparator());
-			}
+	public static String readTextFile(Path filePath) throws IOException{
+		StringJoiner sb = new StringJoiner(System.lineSeparator());
+		try(BufferedReader inputStream = IOUtils.defaultBufferedReader(filePath)){
+				String line;
+				while ((line = inputStream.readLine()) != null)
+					sb.add(line);
+				return sb.toString();
 		}
-		return sb.toString();
 	}
 
 	public static String readTextFile(String filePath) throws IOException {
