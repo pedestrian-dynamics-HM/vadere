@@ -197,14 +197,14 @@ public class ProjectViewModel {
 
 	public ScenarioBundle getRunningScenario() {
 		Scenario scenarioRM = project.getCurrentScenario();
-		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
+		List<String> outputDirectories = project.getProjectOutput().listSelectedOutputDirs(scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
 
 	public ScenarioBundle getSelectedScenarioBundle() {
 		Scenario scenarioRM = getSelectedScenarioRunManager();
-		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
+		List<String> outputDirectories = project.getProjectOutput().listSelectedOutputDirs(scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
@@ -264,7 +264,7 @@ public class ProjectViewModel {
 		@Override
 		public void run() {
 			fireRefreshOutputStarted();
-			IOOutput.cleanOutputDirs(project);
+			project.getProjectOutput().cleanOutputDirs();
 			outputTableModel.init(project);
 			fireRefreshOutputCompleted();
 		}
