@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.io;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.projects.ProjectOutput;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
@@ -72,6 +73,8 @@ public class IOVadere {
 		VadereProject project = new VadereProject(name, scenarios);
 		project.setMigrationStats(migrationStats); // TODO [priority=low] [task=refactoring] better way to tunnel those results to the GUI?
 		project.setOutputDir(Paths.get(folderpath, IOUtils.OUTPUT_DIR));
+		ProjectOutput projectOutput = new ProjectOutput(project);
+		project.setProjectOutput(projectOutput);
         logger.info("project loaded: " + project.getName());
 		return project;
 	}

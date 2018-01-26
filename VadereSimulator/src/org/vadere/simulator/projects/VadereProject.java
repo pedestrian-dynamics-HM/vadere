@@ -35,6 +35,7 @@ public class VadereProject {
 			new LinkedBlockingQueue<>();
 	private LinkedBlockingDeque<Scenario> scenariosLeft;
 	private Path outputDirectory;
+	private ProjectOutput projectOutput; //TODO initialize and wire up with rest ....
 
 	// TODO should be encapsulated in a class (we are not programming in C):
 	private int[] migrationStats; // scenarios: [0] total, [1] legacy'ed, [2] nonmigratable
@@ -268,6 +269,8 @@ public class VadereProject {
 		public void finished(Runnable runnable) {
 			notifyScenarioRMListenerAboutPostRun(getCurrentScenario());
 
+			projectOutput.update();
+
 			if (scenariosLeft.isEmpty()) {
 				for (ProjectFinishedListener listener : projectFinishedListener) {
 					listener.postProjectRun(VadereProject.this);
@@ -278,4 +281,11 @@ public class VadereProject {
 		}
 	};
 
+	public ProjectOutput getProjectOutput() {
+		return projectOutput;
+	}
+
+	public void setProjectOutput(ProjectOutput projectOutput) {
+		this.projectOutput = projectOutput;
+	}
 }
