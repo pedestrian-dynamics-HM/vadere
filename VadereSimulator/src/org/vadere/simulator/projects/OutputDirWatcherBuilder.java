@@ -65,7 +65,7 @@ public class OutputDirWatcherBuilder {
 		return outputDirWatcher;
 	}
 
-	private void addDefaultEventHandler() {
+	public void addDefaultEventHandler() {
 
 		WatchEventHandler simulationOutputDirCreated = (dir, ev) -> {
 			if ((ev.length == 1) && (ev[0].kind() == ENTRY_CREATE)) {
@@ -129,6 +129,12 @@ public class OutputDirWatcherBuilder {
 		return this;
 	}
 
+
+	public void register(List<Path> dirs, WatchEvent.Kind<?>... events) throws IOException {
+		for(Path dir : dirs){
+			register(dir, events);
+		}
+	}
 
 	public void register(Path dir, WatchEvent.Kind<?>... events) throws IOException {
 		WatchEvent.Kind<?>[] selectedEvents;

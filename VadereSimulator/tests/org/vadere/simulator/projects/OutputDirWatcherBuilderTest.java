@@ -13,6 +13,8 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -49,7 +51,7 @@ public class OutputDirWatcherBuilderTest {
 		assertEquals("There should be three default Handlers",
 				5,builder.getHandlers().size());
 		assertEquals("There should be 15 directories in the watch list",
-				14, builder.getKeys().size());
+				15, builder.getKeys().size());
 
 		Path corruptedDir = project.getOutputDir().resolve(IOUtils.CORRUPT_DIR);
 		builder.getKeys().forEach((k,v) -> {
@@ -97,7 +99,17 @@ public class OutputDirWatcherBuilderTest {
 	public void registerAll() throws Exception {
 		builder.initOutputDirWatcher(project).registerAll(project.getOutputDir());
 		assertEquals("There should be 15 directories in the watch list",
-				14, builder.getKeys().size());
+				15, builder.getKeys().size());
 	}
 
+	@Test
+	public void register1() throws Exception {
+		List<Path> paths = new ArrayList<>();
+		paths.add(project.getOutputDir().resolve("test_postvis_2018-01-17_16-57-06.272"));
+		paths.add(project.getOutputDir().resolve("test_postvis_2018-01-19_13-23-14.675"));
+
+		builder.initOutputDirWatcher(project).register(paths);
+		assertEquals("", 2, builder.getKeys().size());
+
+	}
 }
