@@ -1,5 +1,8 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
@@ -16,6 +19,8 @@ import javax.swing.*;
  * Created by Matimati-ka on 27.09.2016.
  */
 public class TestEnhancedVersion3 extends JFrame {
+
+    private static final Logger log = LogManager.getLogger(TestEnhancedVersion3.class);
 
     private TestEnhancedVersion3() {
 
@@ -37,13 +42,14 @@ public class TestEnhancedVersion3 extends JFrame {
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
+        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
 
         Predicate<PFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 
 		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
+		frame.setTitle("CPU");
 
 
 		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
@@ -53,40 +59,26 @@ public class TestEnhancedVersion3 extends JFrame {
 		int counter = 0;
 		long time = 0;
 
-        while (counter <= 300) {
-            //obscuteTriangles = meshGenerator.getTriangles().stream().filter(tri -> tri.isNonAcute()).count();
-            //PriorityQueue<PFace<MeshPoint>> priorityQueue = meshGenerator.getQuailties();
-            //avgQuality = priorityQueue.stream().reduce(0.0, (aDouble, meshPointPFace) -> aDouble + meshGenerator.faceToQuality(meshPointPFace), (d1, d2) -> d1 + d2) / priorityQueue.size();
-            //System.out.println("Average quality (" + counter + "):" + avgQuality);
-			/*for(int i = 0; i < 100 && !priorityQueue.isEmpty(); i++) {
-				PFace<MeshPoint> face = priorityQueue.poll();
-				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
-			}*/
-            distmeshPanel.repaint();
-           /*try {
-                Thread.sleep(5000);
+        StopWatch overAllTime = new StopWatch();
+        overAllTime.start();
+        while (counter <= 100) {
+            meshGenerator.improve();
+            overAllTime.suspend();
+
+            try {
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
+            distmeshPanel.repaint();
             counter++;
-
-            long ms = System.currentTimeMillis();
-            meshGenerator.improve();
-            ms = System.currentTimeMillis() - ms;
-            time += ms;
-            System.out.println("Quality: " + meshGenerator.getQuality());
-            System.out.println("Step-Time: " + ms);
+            //System.out.println("Quality: " + meshGenerator.getQuality());
+            overAllTime.resume();
         }
-        //meshGenerator.finalize();
-        System.out.print("overall time: " + time);
-        //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());
-
-		//System.out.print("finished:" + avgQuality);
-		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-		//if(counter == 1) {
-		//
-		//}
+        overAllTime.stop();
+        log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
+        log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+        log.info("overall time: " + overAllTime.getTime());
 	}
 
     public static void main(String[] args) {

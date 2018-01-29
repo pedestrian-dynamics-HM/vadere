@@ -5,7 +5,7 @@ import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
- * Created by bzoennchen on 06.09.17.
+ * @author Benedikt Zoennchen
  */
 public class AHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 

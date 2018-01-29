@@ -43,6 +43,11 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
+	public IPointConstructor<P> getPointConstructor() {
+		return pointConstructor;
+	}
+
+	@Override
 	public AHalfEdge<P> getNext(@NotNull AHalfEdge<P> halfEdge) {
 		return edges.get(halfEdge.getNext());
 	}
@@ -328,7 +333,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public Collection<AVertex<P>> getVertices() {
+	public List<AVertex<P>> getVertices() {
 		return streamVertices().collect(Collectors.toList());
 	}
 
@@ -371,6 +376,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 			}
 		}
 	}
+
 
 	/**
 	 * removes all destroyed object from this mesh and re-arranges all indices.

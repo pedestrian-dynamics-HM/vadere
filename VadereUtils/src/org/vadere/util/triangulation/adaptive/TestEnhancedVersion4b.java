@@ -4,9 +4,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.AFace;
-import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VTriangle;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -15,11 +13,11 @@ import java.util.function.Predicate;
 /**
  * Created by Matimati-ka on 27.09.2016.
  */
-public class TestEnhancedVersion4 extends JFrame {
+public class TestEnhancedVersion4b extends JFrame {
 
-	private static final Logger log = LogManager.getLogger(TestEnhancedVersion4.class);
+	private static final Logger log = LogManager.getLogger(TestEnhancedVersion4b.class);
 
-    private TestEnhancedVersion4() {
+    private TestEnhancedVersion4b() {
 
 		//IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
 		//IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
@@ -36,7 +34,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
+		CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
@@ -74,6 +72,6 @@ public class TestEnhancedVersion4 extends JFrame {
 	}
 
     public static void main(String[] args) {
-        new TestEnhancedVersion4();
+        new TestEnhancedVersion4b();
     }
 }

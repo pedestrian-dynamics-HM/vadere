@@ -52,7 +52,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	private double sumOfqLengths;
 
 	private boolean initialized = false;
-	private boolean runParallel = true;
+	private boolean runParallel = false;
 
 	private int numberOfRetriangulations = 0;
 	private int numberOfIterations = 0;
@@ -85,7 +85,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
         log.info("##### (start) generate a uniform refined triangulation #####");
         UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         uniformRefinementTriangulation.generate();
-        retriangulate();
+        //retriangulate();
         log.info("##### (end) generate a uniform refined triangulation #####");
 	}
 
@@ -111,7 +111,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        //removeBoundaryLowQualityTriangles();
+        removeBoundaryLowQualityTriangles();
         triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         triangulation.finalize();
@@ -128,7 +128,9 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	}
 
 	private void step() {
-        removeBoundaryLowQualityTriangles();
+        // TODO: implement removeBoundaryLowQualityTriangles on the GPU!
+		//removeBoundaryLowQualityTriangles();
+
 		minDeltaTravelDistance = Double.MAX_VALUE;
 		illegalMovement = false;
 
@@ -140,7 +142,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
         //retriangulate();
         if(illegalMovement) {
-            retriangulate();
+            //retriangulate();
             //while (flipEdges());
 
             numberOfRetriangulations++;
@@ -158,16 +160,16 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 		//ms = System.currentTimeMillis() - ms;
 		//log.info("ms: " + ms);
 		computeScalingFactor();
-		log.info(scalingFactor);
+		//log.info(scalingFactor);
         computeForces();
 		//computeDelta();
 		updateVertices();
 
 		numberOfIterations++;
-		log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
-		log.info("#retriangulations: " + numberOfRetriangulations);
-		log.info("#steps: " + numberOfIterations);
-		log.info("#points: " + getMesh().getVertices().size());
+		//log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
+		//log.info("#retriangulations: " + numberOfRetriangulations);
+		//log.info("#steps: " + numberOfIterations);
+		//log.info("#points: " + getMesh().getVertices().size());
 	}
 
     /**
@@ -272,6 +274,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
                 .map(line -> line.midPoint())
                 .mapToDouble(midPoint -> edgeLengthFunc.apply(midPoint)).sum();
         scalingFactor =  Math.sqrt((edgeLengthSum * edgeLengthSum) / (desiredEdgeLenSum * desiredEdgeLenSum));
+        log.info("scale factor = " + scalingFactor);
     }
 
 
@@ -358,13 +361,14 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 		getMesh().getPoint(vertex).add(dX);
 	}
 
-	private IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
+	@Override
+	public IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
 		return triangulation.getMesh();
 	}
 
 	/*public PriorityQueue<PFace<MeshPoint>> getQuailties() {
 		PriorityQueue<PFace<MeshPoint>> heap = new PriorityQueue<>(new FaceComparator());
-		heap.addAll(getMesh().getFaces());
+		heap.addAll(getMesh().getTriangles());
 		return heap;
 	}
 
