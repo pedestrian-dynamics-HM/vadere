@@ -29,46 +29,33 @@ public class ProjectOutput {
 	private final VadereProject project;
 	private ConcurrentMap<String, SimulationOutput> simulationOutputs;
 
-	private OutputDirWatcher watcher;
 
-	public ProjectOutput(VadereProject project) {
+	public ProjectOutput(final VadereProject project) {
 		this.project = project;
-
 		this.simulationOutputs = IOOutput.getSimulationOutputs(project);
-
-
-		// add watched directories manually to ensure only valid  output directories
-		// and the root output directory are added.
-		// TODO exceptions?
-		try {
-			OutputDirWatcherBuilder builder = new OutputDirWatcherBuilder();
-			builder.initOutputDirWatcher(project);
-			builder.register(project.getOutputDir());
-			builder.addDefaultEventHandler();
-			Path out = project.getOutputDir();
-			List<Path> outputs = simulationOutputs.keySet().stream()
-					.map(k -> out.resolve(k))
-					.collect(Collectors.toList());
-			builder.register(outputs);
-			this.watcher = builder.build();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-
 	}
 
+	/**
+	 * Returns cached output directories. This function does not check if cached {@link SimulationOutput}
+	 * is marked dirty. It is assumed {@link #update()} was called prior to this function.
+	 *
+	 * @return	list of output directories corresponding to cached {@link SimulationOutput}
+	 */
 	public List<File> getAllOutputDirs() {
-		System.out.println("No FS Touch!");
 		Path out = project.getOutputDir();
-		// Keys of concurrentMap are the output directories for each simulation run.
-		// Resolve them against the project output dir gets you the needed paths/files.
 		List<File> outputs = simulationOutputs.keySet().stream()
 				.map(k -> out.resolve(k).toFile())
 				.collect(Collectors.toList());
 		return outputs;
 	}
 
+	/**
+	 * This function does not check if cached {@link SimulationOutput}
+	 * is dirty. It is assumed {@link #update()} was called prior to this function.
+	 *
+	 * @param scenario		Prior runs to this {@link Scenario}
+	 * @return				List of prior simulation runs matching selected {@link Scenario}
+	 */
 	public List<File> listSelectedOutputDirs(final Scenario scenario) {
 		List<File> out = new ArrayList<>();
 		try {
@@ -86,62 +73,61 @@ public class ProjectOutput {
 		return out;
 	}
 
-	synchronized public void reloadData() {
-
-	}
-
-	synchronized public void markDirty(String outputDir) {
-		Optional.ofNullable(this.simulationOutputs.get(outputDir)).ifPresent(SimulationOutput::setDirty);
-	}
-
-	public ConcurrentMap<String, SimulationOutput> getSimulationOutputs() {
-		return simulationOutputs;
-	}
-
-	public void setSimulationOutputs(ConcurrentMap<String, SimulationOutput> simulationOutputs) {
-		this.simulationOutputs = simulationOutputs;
+	/**
+	 * If the output directory is present it is marked dirty and will be re-check
+	 * in the next call of {@link #update()}
+	 *
+	 * @param dirName	directory name of {@link SimulationOutput}
+	 */
+	synchronized public void markDirty(String dirName) {
+		getSimulationOutput(dirName).ifPresent(SimulationOutput::setDirty);
 	}
 
 	public Optional<SimulationOutput> getSimulationOutput(String dirName) {
 		return Optional.ofNullable(simulationOutputs.get(dirName));
 	}
 
-	public void cleanOutputDirs() {
-		Iterator<Map.Entry<String, SimulationOutput>> iter = this.simulationOutputs.entrySet().iterator();
-		while (iter.hasNext()) {
-			Map.Entry<String, SimulationOutput> entry = iter.next();
-			if (entry.getValue().isDirty()) {
-				Optional<SimulationOutput> updated =
-						IOOutput.getSimulationOutput(project, entry.getValue().getOutputDir());
-				if (updated.isPresent()) {
-					entry.setValue(updated.get());
-				} else {
-					//existing dir went invalid.
-					iter.remove();
-				}
-			}
-		}
-
+	public Scenario getScenario(String dirName){
+		return getSimulationOutput(dirName).get().getSimulatedScenario();
 	}
 
+	/**
+	 * re-check dirty {@link SimulationOutput} and add new valid output dirs to {@link ProjectOutput}
+	 */
 	public void update() {
-		List<File> existingOutputDirs = getAllOutputDirs();
 		try {
 			Files.walkFileTree(project.getOutputDir(), new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
 						throws IOException {
 
-					if (dir.endsWith(IOUtils.CORRUPT_DIR)) {
-						return FileVisitResult.SKIP_SUBTREE;
-					}
+					String dirName = dir.toFile().getName();
 
-					if (!existingOutputDirs.contains(dir.toFile())) {
+					//ignore corrupt directory and the subtree
+					if (dir.endsWith(IOUtils.CORRUPT_DIR))
+						return FileVisitResult.SKIP_SUBTREE;
+
+					//ignore output directory but continue with subtree
+					if (dir.endsWith(IOUtils.OUTPUT_DIR))
+						return FileVisitResult.CONTINUE;
+
+					Optional<SimulationOutput> outDir = getSimulationOutput(dirName);
+
+					// only re-check existing SimulationOutput if they are dirty
+					if (outDir.isPresent() && outDir.get().isDirty()) {
+						Optional<SimulationOutput> newSim = IOOutput.getSimulationOutput(project, dir.toFile());
+						if (newSim.isPresent()){
+							simulationOutputs.put(dirName, newSim.get());
+						} else {
+							simulationOutputs.remove(dirName);
+						}
+					} else {
+						// if new directory try to read it or move it corrupt if not valid.
 						Optional<SimulationOutput> newSim = IOOutput.getSimulationOutput(project, dir.toFile());
 						newSim.ifPresent(out -> simulationOutputs.put(dir.toFile().getName(), out));
 					}
 
-					return FileVisitResult.CONTINUE;
+					return FileVisitResult.SKIP_SUBTREE;
 				}
 
 			});

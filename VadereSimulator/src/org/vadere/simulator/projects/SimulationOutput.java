@@ -44,15 +44,8 @@ public class SimulationOutput {
 		return isDirty;
 	}
 
-	public void setDirty(boolean dirty) {
-		isDirty = dirty;
-	}
-
 	public void setDirty() {
 		isDirty = true;
 	}
 
-	public File getOutputDir() {
-		return outputDirectory.toFile();
-	}
 }

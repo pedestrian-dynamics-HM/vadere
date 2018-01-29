@@ -264,7 +264,7 @@ public class ProjectViewModel {
 		@Override
 		public void run() {
 			fireRefreshOutputStarted();
-			project.getProjectOutput().cleanOutputDirs();
+			project.getProjectOutput().update();
 			outputTableModel.init(project);
 			fireRefreshOutputCompleted();
 		}
@@ -317,6 +317,10 @@ public class ProjectViewModel {
 
 		public Collection<File> getOutputDirectories() {
 			return outputDirectories;
+		}
+
+		public Scenario getScenarioRM(){
+			return project.getProjectOutput().getScenario(directory.getName());
 		}
 	}
 

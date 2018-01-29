@@ -33,19 +33,23 @@ public class ProjectOutputTest {
 		projectOutput = new ProjectOutput(project);
 	}
 
-	@After
-	public void cleanup() throws URISyntaxException, IOException {
-		if (!Files.exists(project.getOutputDir().resolve("testOutput2"))) {
-			Path backup = Paths.get(getClass().getResource("/data/testOutput2").toURI());
-			FileUtils.copyDirectoryToDirectory(backup.toFile(), project.getOutputDir().toFile());
-			IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("corrupt/testOutput2").toFile());
-		}
-	}
 
 	@Test
 	public void getAllOutputDirs() throws Exception {
 		List<File> out = projectOutput.getAllOutputDirs();
 		assertEquals("There should be 14 output directories", 14, out.size());
+	}
+
+	@Test
+	public void listSelectedOutputDirs(){
+		Optional<SimulationOutput> simOut = projectOutput.getSimulationOutput("testOutput2");
+		assertTrue(simOut.isPresent());
+		Scenario scenario = simOut.get().getSimulatedScenario();
+
+		List<File> selectedOutputDirs = projectOutput.listSelectedOutputDirs(scenario);
+		assertEquals("There should be one match", 1, selectedOutputDirs.size());
+		assertEquals("The directory name is false",
+				"testOutput2", selectedOutputDirs.get(0).getName());
 	}
 
 	@Test
@@ -57,48 +61,30 @@ public class ProjectOutputTest {
 	}
 
 	@Test
-	public void cleanOutputDirs() throws IOException {
+	public void updateWithDirty() throws IOException, URISyntaxException {
 		projectOutput.markDirty("testOutput2");
 		Files.delete(project.getOutputDir().resolve(Paths.get("testOutput2", "test_postvis.scenario")));
-		projectOutput.cleanOutputDirs();
+		projectOutput.update();
 		assertFalse(projectOutput.getSimulationOutput("testOutput2").isPresent());
 		assertFalse(Files.exists(project.getOutputDir().resolve("testOutput2")));
+
+		//cleanup
+		Path backup = Paths.get(getClass().getResource("/data/testOutput2").toURI());
+		FileUtils.copyDirectoryToDirectory(backup.toFile(), project.getOutputDir().toFile());
+		IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("corrupt/testOutput2").toFile());
 	}
 
 	@Test
-	@Ignore
-	public void readTest() throws IOException {
+	public void updateWithNew() throws IOException, URISyntaxException {
+		Path backup = Paths.get(getClass().getResource("/data/testOutput2").toURI());
+		FileUtils.copyDirectory(backup.toFile(), project.getOutputDir().resolve("testOutput3").toFile());
 
-//		for(int i = 0 ; i < 3; i++) {
-//			long startTime = System.nanoTime();
-//			String text1 = IOUtils.readTextFile(simOutDir.resolve("postvis.trajectories"));
-//			long endTime = System.nanoTime();
-//			long duration = (endTime - startTime);
-//			System.out.format("(postvis.trajectories)  readTextFile:  %10d%n", duration);
-//
-//			startTime = System.nanoTime();
-//			String text2 = IOUtils.readTextFile2(simOutDir.resolve("postvis.trajectories"));
-//			endTime = System.nanoTime();
-//			duration = (endTime - startTime);
-//			System.out.format("(postvis.trajectories)  readTextFile2: %10d%n", duration);
-//
-//			startTime = System.nanoTime();
-//			String text3 = IOUtils.readTextFile(simOutDir.resolve("test_postvis.scenario"));
-//			endTime = System.nanoTime();
-//			duration = (endTime - startTime);
-//			System.out.format("(test_postvis.scenario) readTextFile3: %10d%n", duration);
-//
-//			startTime = System.nanoTime();
-//			String text4 = IOUtils.readTextFile2(simOutDir.resolve("test_postvis.scenario"));
-//			endTime = System.nanoTime();
-//			duration = (endTime - startTime);
-//			System.out.format("(test_postvis.scenario) readTextFile4: %10d%n", duration);
-//			System.out.println("--------------------------------------------------------");
-//
-//			assertEquals(text1,text2);
-//			assertEquals(text3,text4);
-//		}
+		projectOutput.update();
+		List<File> out = projectOutput.getAllOutputDirs();
+		assertEquals("There should be 15 output directories", 15, out.size());
+		assertTrue(projectOutput.getSimulationOutput("testOutput3").isPresent());
 
-
+		//cleanup
+		IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("testOutput3").toFile());
 	}
 }
