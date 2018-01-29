@@ -25,10 +25,10 @@ public class TestEnhancedVersion3 extends JFrame {
         //IDistanceFunction distanceFunc = p -> 2 - Math.max(Math.abs(p.getX()-3), Math.abs(p.getY()));
         IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
         //IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
-        IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
+        IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
 
 
         //IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
@@ -37,7 +37,7 @@ public class TestEnhancedVersion3 extends JFrame {
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
+        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 
         Predicate<PFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 

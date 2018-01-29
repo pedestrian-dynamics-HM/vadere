@@ -30,7 +30,6 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	private IMeshImprover meshGenerator;
 	private double width;
 	private double height;
-	private Collection<F> faces;
     private final Predicate<VTriangle> alertPred;
     private Collection<VTriangle> triangles;
 
@@ -79,16 +78,16 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 				graphics.fill(triangle);
 			}*/
 
-                if(alertPred.test(triangle)) {
+                /*if(alertPred.test(triangle)) {
                     //log.info("red triangle");
                     graphics.setColor(Color.BLACK);
                     graphics.draw(triangle);
                     graphics.setColor(Color.RED);
                     graphics.fill(triangle);
-                } else {
+                } else {*/
                     graphics.setColor(Color.GRAY);
                     graphics.draw(triangle);
-                }
+                //}
             }
             //graphics.translate(5,5);
             graphics2D.drawImage(image, 0, 0, null);

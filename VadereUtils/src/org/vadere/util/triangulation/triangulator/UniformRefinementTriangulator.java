@@ -177,7 +177,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		}
 		else {
 			points.add(p);
-			E createdEdge = triangulation.splitEdge(p, edge, false);
+			E createdEdge = triangulation.splitEdge(p, edge, false).getLeft();
 			return mesh.getIncidentEdges(createdEdge);
 		}
 	}

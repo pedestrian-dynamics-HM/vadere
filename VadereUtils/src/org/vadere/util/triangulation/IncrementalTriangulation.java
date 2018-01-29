@@ -171,7 +171,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		}
 		if(GeometryUtils.isOnEdge(p1, p2, point, edgeCoincidenceTolerance)) {
 			//log.info("splitEdge()");
-			E newEdge = splitEdge(point, edge, true);
+			E newEdge = splitEdge(point, edge, true).getLeft();
 			insertEvent(newEdge);
 			return newEdge;
 		}

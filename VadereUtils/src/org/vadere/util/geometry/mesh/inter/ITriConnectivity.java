@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.mesh.inter;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -133,12 +134,15 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 *
 	 * @param p         the split point
 	 * @param halfEdge  the half-edge which will be split
-	 * @return an newly created half-edge which has p as its end-point
-	 */
-	default E splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
+	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
+     *         edges and their twins are the faces which took part / where modified / added by the split.
+     */
+	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
 		IMesh<P, V, E, F> mesh = getMesh();
 		V v = mesh.createVertex(p);
 		mesh.insertVertex(v);
+
+		Pair<E, E> result;
 
 		/*
 		 * Situation: h0 = halfEdge
@@ -178,6 +182,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 		mesh.setTwin(e1, t1);
 
+        E t0 = mesh.createEdge(v, f0);
+        E t2 = mesh.createEdge(v);
+
+        E e0 = null;
+
+
 		/*
 		 * These two operations are strongly connected.
 		 * Before these operations the vertex of o0 is v2.
@@ -196,8 +206,8 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			E h2 = mesh.getNext(h1);
 
 			V v1 = mesh.getVertex(h1);
-			E e0 = mesh.createEdge(v1, f1);
-			E t0 = mesh.createEdge(v, f0);
+			e0 = mesh.createEdge(v1, f1);
+
 
 			mesh.setTwin(e0, t0);
 
@@ -233,10 +243,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 			V v3 = mesh.getVertex(o1);
 			F f2 = mesh.createFace();
+			mesh.setFace(t2, f2);
 
 			// face
 			E e2 = mesh.createEdge(v3, mesh.getFace(o0));
-			E t2 = mesh.createEdge(v, f2);
+
 			mesh.setTwin(e2, t2);
 
 			mesh.setEdge(f2, o1);
@@ -281,10 +292,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			}
 		}
 
-		return t1;
+		if(mesh.isBoundary(h0)) {
+		    return Pair.of(e0, null);
+        }
+        else if(mesh.isAtBoundary(o0)) {
+		    return Pair.of(t1, null);
+        }
+        else {
+		    return Pair.of(e0, t1);
+        }
+
 	}
 
-	default E splitEdge(@NotNull P p, @NotNull E halfEdge) {
+	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge) {
 		return splitEdge(p, halfEdge, true);
 	}
 
