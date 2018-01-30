@@ -3,16 +3,9 @@ package org.vadere.util.triangulation.triangulator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.mesh.inter.ITriangulation;
-import org.vadere.util.geometry.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.geometry.mesh.gen.*;
+import org.vadere.util.geometry.mesh.inter.*;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
@@ -27,17 +20,16 @@ import java.util.*;
  *
  * @param <P>
  */
-public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
+public class AUniformRefinementTriangulator<P extends IPoint> implements ITriangulator {
 	private final Collection<VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
-	private ITriangulation<P, V, E, F>  triangulation;
+	private ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation;
 	private Set<P> points;
-	private IMesh<P, V, E, F> mesh;
-	private  LinkedList<F> toRefineEdges;
-	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulator.class);
+	private IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> mesh;
+	private LinkedList<AFace<P>> toRefineEdges;
+	private static final Logger logger = LogManager.getLogger(AUniformRefinementTriangulator.class);
 	private final IDistanceFunction distFunc;
-	private final Map<P,Integer> creationOrder;
 
     /**
      * @param triangulation an empty triangulation to fill
@@ -46,8 +38,8 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
      * @param lenFunc       a edge length function
      * @param distFunc      a signed distance function
      */
-	public UniformRefinementTriangulator(
-			final ITriangulation<P, V, E, F> triangulation,
+	public AUniformRefinementTriangulator(
+			final ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation,
 			final VRectangle bound,
 			final Collection<VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -61,19 +53,66 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		this.bbox = bound;
 		this.points = new HashSet<>();
         this.toRefineEdges = new LinkedList<>();
-        this.creationOrder = new HashMap<>();
         toRefineEdges.addAll(mesh.getFaces());
 	}
 
+	private class FaceComparator implements Comparator<AFace<P>> {
+
+        @Override
+        public int compare(AFace<P> f1, AFace<P> f2) {
+
+            int s1 = mesh.streamVertices(f1).mapToInt(v -> getIndex(v)).sum();
+            int s2 = mesh.streamVertices(f2).mapToInt(v -> getIndex(v)).sum();
+
+            if(s1 < s2) {
+                return 1;
+            }
+            else if(s1 > s2) {
+                return -1;
+            }
+            else {
+                int min1 = mesh.streamVertices(f1).mapToInt(v -> getIndex(v)).min().getAsInt();
+                int min2 = mesh.streamVertices(f2).mapToInt(v -> getIndex(v)).min().getAsInt();
+
+                if(min2 < min1) {
+                    return 1;
+                }
+                else if(min2 > min1) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            }
+        }
+
+        private int getIndex(final AVertex<P> vertex) {
+            return vertex.getId();
+        }
+
+    }
+
     public void init() {
-        triangulation.init();
+        synchronized (mesh) {
+            triangulation.init();
+        }
+    }
+
+    public void finalize() {
+        synchronized (mesh) {
+            triangulation.finalize();
+        }
+    }
+
+    public boolean isFinished() {
+	    return toRefineEdges.isEmpty();
     }
 
     public void step() {
 	    synchronized (mesh) {
             if (!toRefineEdges.isEmpty()) {
-                F face = toRefineEdges.removeFirst();
-                E edge = getLongestEdge(face);
+                AFace<P> face = toRefineEdges.removeFirst();
+                AHalfEdge<P> edge = getLongestEdge(face);
 
                 if(!isCompleted(edge)) {
                     refine(edge);
@@ -82,33 +121,33 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
         }
     }
 
-    public boolean isFinished() {
-        return toRefineEdges.isEmpty();
-    }
-
 	public void generate() {
-        logger.info("start triangulation generation");
-        init();
+        triangulation.init();
 
-		while (!isFinished()) {
-			step();
+		logger.info("start triangulation generation");
+
+		while (!toRefineEdges.isEmpty()) {
+            AFace<P> face = toRefineEdges.removeFirst();
+			AHalfEdge<P> edge = getLongestEdge(face);
+
+			if(!isCompleted(edge)) {
+			    // refine adds elements to toRefinedEdges.
+			    refine(edge);
+            }
 		}
 
-        finalize();
+		//removeTrianglesOutsideBBox();
+		//removeTrianglesInsideObstacles();
+		//triangulation.finalize();
 		logger.info("end triangulation generation");
 	}
 
-    public void finalize() {
-        synchronized (mesh) {
-            removeTrianglesOutsideBBox();
-            removeTrianglesInsideObstacles();
-            triangulation.finalize();
-        }
+	private AHalfEdge<P> getLongestEdge(AFace<P> face) {
+	    return mesh.streamEdges(face).reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2).get();
     }
 
-
-    private E getLongestEdge(F face) {
-	    return mesh.streamEdges(face).reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2).get();
+    private AHalfEdge<P> getLatestEdge(AFace<P> face) {
+        return mesh.streamEdges(face).reduce((e1, e2) -> mesh.getVertex(e1).getId() + mesh.getVertex(mesh.getPrev(e1)).getId() > mesh.getVertex(e2).getId() + mesh.getVertex(mesh.getPrev(e2)).getId() ? e1 : e2).get();
     }
 
 	private void removeTrianglesOutsideBBox() {
@@ -117,8 +156,8 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		while (removedSome) {
 			removedSome = false;
 
-			List<F> candidates = mesh.getFaces(mesh.getBoundary());
-			for(F face : candidates) {
+			List<AFace<P>> candidates = mesh.getFaces(mesh.getBoundary());
+			for(AFace<P> face : candidates) {
 				if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
 					triangulation.removeFace(face, true);
 					removedSome = true;
@@ -128,8 +167,8 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 	}
 
 	private void removeTrianglesInsideObstacles() {
-		List<F> faces = triangulation.getMesh().getFaces();
-		for(F face : faces) {
+		List<AFace<P>> faces = triangulation.getMesh().getFaces();
+		for(AFace<P> face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
 				triangulation.removeFace(face, true);
 			}
@@ -170,41 +209,38 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		return shape.intersects(line) || shape.contains(line.getP1()) || shape.contains(line.getP2());
 	}
 
-	private boolean isCompleted(E edge) {
+	private boolean isCompleted(AHalfEdge<P> edge) {
 		if(mesh.isBoundary(edge)){
 			edge = mesh.getTwin(edge);
 		}
 
-		F face = mesh.getFace(edge);
-		F twin = mesh.getTwinFace(edge);
+        AFace<P> face = mesh.getFace(edge);
+        AFace<P> twin = mesh.getTwinFace(edge);
 
 		VTriangle triangle = mesh.toTriangle(face);
 		VLine line = mesh.toLine(edge);
 
-		return (line.length() <= lenFunc.apply(line.midPoint())/* && random.nextDouble() < 0.96*/)
+		return (line.length() <= lenFunc.apply(line.midPoint())); /*
 				|| (!triangle.intersect(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersect(bbox)))
 				|| boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.isBoundary(twin) && shape.contains(mesh.toTriangle(twin).getBounds2D())));
+	*/
 	}
 
-    private void refine(final E edge) {
-        IPoint midPoint = mesh.toLine(edge).midPoint();
-        P p = mesh.createPoint(midPoint.getX(), midPoint.getY());
+	private void refine(final AHalfEdge<P> edge) {
+		IPoint midPoint = mesh.toLine(edge).midPoint();
+		P p = mesh.createPoint(midPoint.getX(), midPoint.getY());
 
-        if(!points.contains(p)) {
+		if(!points.contains(p)) {
             points.add(p);
-            creationOrder.put(p, points.size()-1);
-            Pair<E, E> createdEdges = triangulation.splitEdge(p, edge, true);
-            List<F> createdFaces = new ArrayList<>(4);
+            Pair<AHalfEdge<P>, AHalfEdge<P>> createdEdges = triangulation.splitEdge(p, edge, true);
+            List<AFace<P>> createdFaces = new ArrayList<>(4);
 
 
             if(createdEdges.getLeft() != null) {
-                E e1 = createdEdges.getLeft();
-                E e2 = mesh.getTwin(createdEdges.getLeft());
+                AHalfEdge<P> e1 = createdEdges.getLeft();
+                AHalfEdge<P> e2 = mesh.getTwin(createdEdges.getLeft());
 
-                Integer index1 = creationOrder.get(mesh.getPoint(mesh.getNext(e1)));
-                Integer index2 = creationOrder.get(mesh.getPoint(mesh.getNext(e2)));
-
-                if(index2 == null || (index1 != null && index2 > index1)) {
+                if(mesh.getVertex(mesh.getNext(e1)).getId() > mesh.getVertex(mesh.getNext(e2)).getId()) {
                     toRefineEdges.addFirst(mesh.getFace(e2));
                     toRefineEdges.addFirst(mesh.getFace(e1));
                 }
@@ -227,11 +263,11 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
             }*/
 
             if(createdEdges.getRight() != null) {
-                E e1 = createdEdges.getRight();
-                E e2 = mesh.getTwin(createdEdges.getRight());
+                AHalfEdge<P> e1 = createdEdges.getRight();
+                AHalfEdge<P> e2 = mesh.getTwin(createdEdges.getRight());
 
-                F f1 = mesh.getFace(e1);
-                F f2 = mesh.getFace(e2);
+                AFace<P> f1 = mesh.getFace(e1);
+                AFace<P> f2 = mesh.getFace(e2);
 
                 int index1 = toRefineEdges.indexOf(f1);
                 int index2 = toRefineEdges.indexOf(f2);
@@ -245,8 +281,8 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
                     toRefineEdges.add(index2+1, f1);
                 }
             }
-        }
-    }
+		}
+	}
 
 	/*private IPoint midPoint(final E edge) {
 		P p1 = mesh.getPoint(edge);

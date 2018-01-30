@@ -51,7 +51,7 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 		this.down = down;
 	}
 
-	int getId() {
+	public int getId() {
 	    return id;
     }
 
@@ -96,6 +96,6 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 
 	@Override
 	public String toString() {
-		return id + ":" + point.toString();
+		return id+"";
 	}
 }

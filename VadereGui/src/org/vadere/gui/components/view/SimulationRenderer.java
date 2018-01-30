@@ -14,7 +14,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
-import org.vadere.gui.components.utils.ColorHelper;
+import org.vadere.util.color.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;

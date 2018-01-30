@@ -1,4 +1,4 @@
-package org.vadere.gui.components.utils;
+package org.vadere.util.color;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColorHelper {
+public class GrayColorHelper {
 
 	private final static int LOW = 0;
 	private final static int HIGH = 255;
@@ -20,7 +20,7 @@ public class ColorHelper {
 
 	private int maxValue;
 
-	public ColorHelper(final int maxValue) {
+	public GrayColorHelper(final int maxValue) {
 		this.maxValue = maxValue;
 	}
 
@@ -63,33 +63,8 @@ public class ColorHelper {
 
 		int count = 0;
 		// 1276 steps
-		while (true) {
-			localMap.put(count++, new Color(r, g, b));
-			if (b == HIGH) {
-				gF = 1; // increment green
-			}
-			if (g == HIGH) {
-				bF = -1; // decrement blue
-				// rF = +1; // increment red
-			}
-			if (b == LOW) {
-				rF = +1; // increment red
-			}
-			if (r == HIGH) {
-				gF = -1; // decrement green
-			}
-			if (g == LOW && b == LOW) {
-				rF = -1; // decrement red
-			}
-			if (r < HALF && g == LOW && b == LOW) {
-				break; // finish
-			}
-			r += rF;
-			g += gF;
-			b += bF;
-			r = rangeCheck(r);
-			g = rangeCheck(g);
-			b = rangeCheck(b);
+		for (int i = 0; i < 255; i++) {
+			localMap.put(i, new Color(i, i, i));
 		}
 		initList(localMap);
 		return localMap;

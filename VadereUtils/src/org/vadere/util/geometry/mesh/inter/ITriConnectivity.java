@@ -127,6 +127,16 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
+
+    default E getAnyEdge(Pair<E, E> pair) {
+        if(pair.getLeft() != null) {
+            return pair.getLeft();
+        }
+        else {
+            return pair.getRight();
+        }
+    }
+
 	/**
 	 * Splits the half-edge at point p, preserving a valid triangulation.
 	 * Assumption: p is located on the edge!
@@ -174,7 +184,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         // faces correct?
         //mesh.createEdge(v2, mesh.getFace(o0));
         E e1 = mesh.createEdge(v2, mesh.getFace(o0));
-
+        E t2 = null;
         E t1 = mesh.createEdge(v, mesh.getFace(h0));
         mesh.setEdge(v, t1);
 
@@ -238,7 +248,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
             // face
             E e2 = mesh.createEdge(v3, mesh.getFace(o0));
-            E t2 = mesh.createEdge(v, f2);
+            t2 = mesh.createEdge(v, f2);
             mesh.setTwin(e2, t2);
 
             mesh.setEdge(f2, o1);
@@ -283,17 +293,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
             }
         }
 
-        // TODO:
-		if(mesh.isBoundary(h0)) {
-		    return Pair.of(t1, null);
-        }
-        else if(mesh.isAtBoundary(o0)) {
-		    return Pair.of(t1, null);
-        }
-        else {
-		    return Pair.of(t1, e1);
-        }
-
+        return Pair.of(t1, t2);
 	}
 
 	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge) {

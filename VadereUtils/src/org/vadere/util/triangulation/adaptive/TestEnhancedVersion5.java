@@ -40,7 +40,7 @@ public class TestEnhancedVersion5 extends JFrame {
 
 
         Predicate<PFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
-        PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator, predicate, 1000, 800);
+        PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800);
 
         JFrame frame = distmeshPanel.display();
         frame.setVisible(true);
