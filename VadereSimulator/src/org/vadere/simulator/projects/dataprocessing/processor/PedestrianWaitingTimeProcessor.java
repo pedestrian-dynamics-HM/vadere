@@ -21,7 +21,7 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 
     public PedestrianWaitingTimeProcessor() {
         super("waitingTime");
-
+        setAttributes(new AttributesPedestrianWaitingTimeProcessor());
         this.lastSimTime = 0.0;
     }
 
@@ -46,6 +46,7 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) this.getAttributes();
         this.waitingArea = att.getWaitingArea();
     }

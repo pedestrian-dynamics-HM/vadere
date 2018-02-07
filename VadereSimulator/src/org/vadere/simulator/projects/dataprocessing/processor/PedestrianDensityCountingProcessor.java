@@ -11,13 +11,18 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 
 public class PedestrianDensityCountingProcessor extends PedestrianDensityProcessor {
 
+	public PedestrianDensityCountingProcessor(){
+		super();
+		setAttributes(new AttributesPedestrianDensityCountingProcessor());
+	}
+
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		AttributesPedestrianDensityCountingProcessor attDensCountProc =
 				(AttributesPedestrianDensityCountingProcessor) this.getAttributes();
 		this.setAlgorithm(new PointDensityCountingAlgorithm(attDensCountProc.getRadius()));
 
-		super.init(manager);
 	}
 
     @Override

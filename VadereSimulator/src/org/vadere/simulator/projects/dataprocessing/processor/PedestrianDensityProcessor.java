@@ -32,6 +32,7 @@ public abstract class PedestrianDensityProcessor extends DataProcessor<TimestepP
 
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		AttributesPedestrianDensityProcessor attDensProc = (AttributesPedestrianDensityProcessor) this.getAttributes();
 
 		this.pedPosProc =

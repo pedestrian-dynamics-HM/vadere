@@ -19,6 +19,7 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 
     public PedestrianOverlapProcessor() {
         super("overlaps");
+        setAttributes(new AttributesPedestrianOverlapProcessor());
     }
 
     @Override
@@ -30,6 +31,7 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         AttributesPedestrianOverlapProcessor att = (AttributesPedestrianOverlapProcessor) this.getAttributes();
 
         this.pedRadius = att.getPedRadius();

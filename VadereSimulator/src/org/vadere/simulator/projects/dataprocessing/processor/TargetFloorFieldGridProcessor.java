@@ -27,6 +27,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 
 	public TargetFloorFieldGridProcessor() {
 		super("potential");
+		setAttributes(new AttributesFloorFieldProcessor());
 	}
 
 	@Override
@@ -69,9 +70,11 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		this.att = (AttributesFloorFieldProcessor) this.getAttributes();
 		this.targetIds = new ArrayList<>();
 		this.targetIds.add(att.getTargetId());
+		this.hasOnceProcessed = false;
 	}
 
     @Override

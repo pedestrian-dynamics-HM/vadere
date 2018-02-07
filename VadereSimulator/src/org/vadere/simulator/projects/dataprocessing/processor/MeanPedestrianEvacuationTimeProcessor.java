@@ -19,6 +19,7 @@ public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataK
 
     public MeanPedestrianEvacuationTimeProcessor() {
         super("meanEvacuationTime");
+        setAttributes(new AttributesMeanPedestrianEvacuationTimeProcessor());
     }
 
     @Override
@@ -28,6 +29,7 @@ public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataK
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         AttributesMeanPedestrianEvacuationTimeProcessor att = (AttributesMeanPedestrianEvacuationTimeProcessor) this.getAttributes();
         this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
     }

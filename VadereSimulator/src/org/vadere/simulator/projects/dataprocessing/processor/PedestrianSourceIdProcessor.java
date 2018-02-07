@@ -32,6 +32,6 @@ public class PedestrianSourceIdProcessor extends DataProcessor<PedestrianIdKey, 
 
 	@Override
 	public void init(final ProcessorManager manager) {
-		// No initialization needed
+		super.init(manager);
 	}
 }

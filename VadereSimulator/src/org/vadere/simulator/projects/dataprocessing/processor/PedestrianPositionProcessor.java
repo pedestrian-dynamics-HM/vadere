@@ -42,7 +42,10 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 	}
 
 	@Override
-	public void init(final ProcessorManager manager) {}
+	public void init(final ProcessorManager manager) {
+		super.init(manager);
+		System.out.println("hi");
+	}
 
 	@Override
 	public String[] toStrings(TimestepPedestrianIdKey key) {

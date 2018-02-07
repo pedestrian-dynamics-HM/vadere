@@ -20,6 +20,7 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
 
     public PedestrianWaitingEndTimeProcessor() {
         super("waitingEndTime");
+        setAttributes(new AttributesPedestrianWaitingEndTimeProcessor());
     }
 
     @Override
@@ -39,6 +40,7 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         AttributesPedestrianWaitingEndTimeProcessor att = (AttributesPedestrianWaitingEndTimeProcessor) this.getAttributes();
         this.waitingArea = att.getWaitingArea();
     }

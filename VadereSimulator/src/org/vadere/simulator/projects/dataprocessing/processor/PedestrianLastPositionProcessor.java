@@ -20,6 +20,7 @@ public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdK
 
 	public PedestrianLastPositionProcessor() {
 		super("lastX", "lastY");
+		setAttributes(new AttributesPedestrianLastPositionProcessor());
 	}
 
 	@Override
@@ -33,6 +34,7 @@ public class PedestrianLastPositionProcessor extends DataProcessor<PedestrianIdK
 
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		AttributesPedestrianLastPositionProcessor attLastPosProc =
 				(AttributesPedestrianLastPositionProcessor) this.getAttributes();
 		this.pedPosProc =

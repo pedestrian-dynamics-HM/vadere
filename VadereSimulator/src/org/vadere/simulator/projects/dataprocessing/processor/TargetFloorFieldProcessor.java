@@ -19,6 +19,7 @@ public class TargetFloorFieldProcessor extends DataProcessor<TimestepPositionKey
 
     public TargetFloorFieldProcessor() {
         super("potential");
+        setAttributes(new AttributesFloorFieldProcessor());
     }
 
     @Override
@@ -46,6 +47,7 @@ public class TargetFloorFieldProcessor extends DataProcessor<TimestepPositionKey
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         this.att = (AttributesFloorFieldProcessor) this.getAttributes();
         this.targetId = att.getTargetId();
     }
