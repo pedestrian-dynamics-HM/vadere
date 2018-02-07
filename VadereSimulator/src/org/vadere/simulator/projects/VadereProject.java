@@ -44,6 +44,7 @@ public class VadereProject {
 		this.name = name;
 		scenarios.forEach(scenario -> addScenario(scenario));
 		this.outputDirectory = Paths.get("output");
+		this.projectOutput = new ProjectOutput(this);
 	}
 
 	public void saveChanges() {

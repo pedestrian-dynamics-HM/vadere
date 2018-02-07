@@ -2,6 +2,8 @@ package org.vadere.simulator.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
 
@@ -26,6 +28,9 @@ import java.util.stream.Collectors;
  * @author Stefan Schuhbäck
  */
 public class ProjectOutput {
+
+	private static final Logger logger = LogManager.getLogger(ProjectOutput.class);
+
 	private final VadereProject project;
 	private ConcurrentMap<String, SimulationOutput> simulationOutputs;
 
@@ -98,8 +103,7 @@ public class ProjectOutput {
 		try {
 			Files.walkFileTree(project.getOutputDir(), new SimpleFileVisitor<Path>() {
 				@Override
-				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-						throws IOException {
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs){
 
 					String dirName = dir.toFile().getName();
 
@@ -132,7 +136,7 @@ public class ProjectOutput {
 
 			});
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.info(String.format("output directory '%s' of project '%s' is not valid.", project.getOutputDir(), project.getName()));
 		}
 
 	}

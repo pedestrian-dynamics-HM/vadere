@@ -14,11 +14,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ProjectOutputTest {
@@ -86,5 +89,11 @@ public class ProjectOutputTest {
 
 		//cleanup
 		IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("testOutput3").toFile());
+	}
+
+	@Test
+	public void projectOutputSet(){
+		VadereProject proj = new VadereProject("test", new LinkedList<>());
+		assertNotNull(proj.getProjectOutput());
 	}
 }
