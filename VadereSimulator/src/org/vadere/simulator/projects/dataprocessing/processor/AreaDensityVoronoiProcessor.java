@@ -10,6 +10,12 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
  */
 
 public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
+
+    public AreaDensityVoronoiProcessor(){
+        super();
+        setAttributes(new AttributesAreaDensityVoronoiProcessor());
+    }
+
     @Override
     public void init(final ProcessorManager manager) {
         super.init(manager);
