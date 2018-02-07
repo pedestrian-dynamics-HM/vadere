@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -51,6 +52,30 @@ public class GeometryUtils {
 
 		return new VPoint(x,y);
 	}
+
+	public static VPoint getCentroid(@NotNull final List<? extends IPoint> polygon){
+        double area = 0;
+        double xValue = 0;
+        double yValue = 0;
+
+        assert polygon.size() > 2;
+
+        for (int i = 0; i < polygon.size() - 1; i++) {
+            area += polygon.get(i).getX() * polygon.get(i + 1).getY()
+                    - polygon.get(i).getY() * polygon.get(i + 1).getX();
+            xValue += (polygon.get(i).getX() + polygon.get(i + 1).getX())
+                    * (polygon.get(i).getX() * polygon.get(i + 1).getY()
+                    - polygon.get(i).getY() * polygon.get(i + 1).getX());
+            yValue += (polygon.get(i).getY() + polygon.get(i + 1).getY())
+                    * (polygon.get(i).getX() * polygon.get(i + 1).getY()
+                    - polygon.get(i).getY() * polygon.get(i + 1).getX());
+        }
+        area /= 2;
+        xValue /= (6 * area);
+        yValue /= (6 * area);
+
+        return new VPoint(xValue, yValue);
+    }
 
 	public static boolean collectionContains(
 			Collection<? extends VShape> collection, VPoint point) {

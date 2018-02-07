@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
+public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 
 	private double left;
 	private double top;
@@ -31,7 +31,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	}
 
     @Override
-    public void generate() {
+    public ITriangulation<P, V, E, F> generate() {
         triangulation.init();
 
         List<P> pointList = new ArrayList<>(generatePointSet());
@@ -41,7 +41,8 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
             triangulation.insert(point);
         }
 
-        triangulation.finalize();
+        triangulation.finish();
+        return triangulation;
     }
 
 	private IMesh<P, V, E, F> getMesh() {

@@ -34,16 +34,16 @@ public class TestVisual {
 
 
 	public static void testUniformRefinement() {
-		ITriangulation triangulation = ITriangulation.createVPTriangulation(bound);
+
 		VPUniformRefinement uniformRefinement = new VPUniformRefinement(
-				triangulation,
+                () -> ITriangulation.createVPTriangulation(bound),
 				bound,
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
 				p -> 10.0);
 
-		uniformRefinement.generate();
-		//triangulation.finalize();
-		Set<VLine> edges4 = triangulation.getEdges();
+		//triangulation.finish();
+        ITriangulation triangulation = uniformRefinement.generate();
+        Set<VLine> edges4 = triangulation.getEdges();
 
 		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -67,7 +67,7 @@ public class TestVisual {
 
 		VPTriangulation triangulation = ITriangulation.createVPTriangulation(bound);
 		triangulation.insert(points);
-		triangulation.finalize();
+		triangulation.finish();
 		Set<VLine> edges = triangulation.getEdges();
 
 		JFrame window = new JFrame();

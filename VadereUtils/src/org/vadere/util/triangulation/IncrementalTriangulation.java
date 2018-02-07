@@ -44,22 +44,22 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private V p0;
 	private V p1;
 	private V p2;
-	private E he0;
-	private E he1;
-	private E he2;
+    private V p3;
+
 	private final VRectangle bound;
 	private boolean finalized = false;
 	private IMesh<P, V, E, F> mesh;
 	private IPointLocator<P, V, E, F> pointLocator;
 	private boolean initialized = false;
-	private List<V> superEdges;
+	private List<V> virtualVertices;
 	private int maxDepth = 0;
+
+	private static double BUFFER_PERCENTAGE = 0.01;
 
 	// TODO this epsilon it hard coded!!! => replace it with a user choice
 	private double epsilon = 0.0001;
 	private double edgeCoincidenceTolerance = 0.0001;
 
-	protected F superTriangle;
 	private F borderFace;
 	private final Predicate<E> illegalPredicate;
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
@@ -105,22 +105,59 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	@Override
 	public void init() {
 		if(!initialized) {
-			double gap = 1.0;
-			double max = Math.max(bound.getWidth(), bound.getHeight())*2;
-			p0 = mesh.insertVertex(bound.getX() - max - gap, bound.getY() - gap);
-			p1 = mesh.insertVertex(bound.getX() + 2 * max + gap, bound.getY() - gap);
-			p2 = mesh.insertVertex(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max + gap);
+            double max = Math.max(bound.getWidth(), bound.getHeight());
+		    double epsilon = BUFFER_PERCENTAGE * max; // 1% gap
+
+            double xMin = bound.getMinX() - epsilon;
+            double yMin = bound.getMinY() - epsilon;
+
+            double xMax = bound.getMaxX() + epsilon;
+            double yMax = bound.getMaxY() + epsilon;
+
+
+			p0 = mesh.insertVertex(xMin, yMin);
+			p1 = mesh.insertVertex(xMax, yMin);
+			p2 = mesh.insertVertex(xMin, yMax);
+			p3 = mesh.insertVertex(xMax, yMax);
 
 			// counter clockwise!
-			superTriangle = mesh.createFace(p0, p1, p2);
-			borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
+			F square = mesh.createFace(p0, p1, p3, p2);
+			F tri = mesh.createFace(false);
 
-			List<E> borderEdges = mesh.getEdges(borderFace);
-			he0 = borderEdges.get(0);
-			he1 = borderEdges.get(1);
-			he2 = borderEdges.get(2);
+			// start divide the square into 2 triangles
+			E edge = mesh.createEdge(p1);
+			E twin = mesh.createEdge(p2);
 
-			this.superEdges = Arrays.asList(p0, p1, p2);
+			mesh.setTwin(edge, twin);
+
+			E start = mesh.getEdge(p2);
+			if(mesh.isBoundary(start)) {
+                start = mesh.getPrev(mesh.getTwin(start));
+            }
+
+            E next = mesh.getNext(start);
+			E prev = mesh.getPrev(start);
+			E nnext = mesh.getNext(next);
+
+            mesh.setPrev(edge, start);
+            mesh.setNext(edge, prev);
+
+            mesh.setNext(twin, next);
+            mesh.setPrev(twin, nnext);
+
+            mesh.setFace(edge, square);
+            mesh.setFace(twin, tri);
+            mesh.setFace(mesh.getNext(twin), tri);
+            mesh.setFace(mesh.getPrev(twin), tri);
+
+			borderFace = mesh.getTwinFace(mesh.getEdge(square));
+			mesh.setEdge(borderFace, mesh.getTwin(start));
+
+            mesh.setEdge(tri, twin);
+            mesh.setEdge(square, edge);
+            // end divide the square into 2 triangles
+
+			this.virtualVertices = Arrays.asList(p0, p1, p2, p3);
 			this.initialized = true;
 		}
 		else {
@@ -129,10 +166,9 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	}
 
 
-
 	@Override
-	public List<V> getSuperVertices() {
-		return superEdges;
+	public List<V> getVirtualVertices() {
+		return virtualVertices;
 	}
 
 
@@ -146,10 +182,17 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		}
 
 		// 2. remove super triangle
-		finalize();
+		finish();
 	}
 
-	@Override
+    @Override
+    public void recompute() {
+        initialized = false;
+        finalized = false;
+        compute();
+    }
+
+    @Override
 	public E insert(@NotNull P point, @NotNull F face) {
 		if(!initialized) {
 			init();
@@ -208,7 +251,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	/**
 	 * Removes the super triangle from the mesh data structure.
 	 */
-	/*public void finalize() {
+	/*public void finish() {
 		if(!finalized) {
 			// we have to use other halfedges than he1 and he2 since they might be deleted
 			// if we deleteBoundaryFace he0!
@@ -229,18 +272,21 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		}
 	}*/
 
-	public void finalize() {
+	@Override
+	public void finish() {
 		if(!finalized) {
 			// we have to use other halfedges than he1 and he2 since they might be deleted
 			// if we deleteBoundaryFace he0!
 
-			if(!mesh.isDestroyed(p0)) {
-				List<F> faces1 = mesh.getFaces(p0);
-				faces1.removeIf(f -> mesh.isBoundary(f));
-				faces1.forEach(f -> removeFace(f, true));
-			}
+            for(V virtualPoint : virtualVertices) {
+                if(!mesh.isDestroyed(virtualPoint)) {
+                    List<F> faces1 = mesh.getFaces(virtualPoint);
+                    faces1.removeIf(f -> mesh.isBoundary(f));
+                    faces1.forEach(f -> removeFace(f, true));
+                }
+            }
 
-			if(!mesh.isDestroyed(p1)) {
+			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
 				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
 				faces2.forEach(f -> removeFace(f, true));
@@ -250,7 +296,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				List<F> faces3 = mesh.getFaces(p2);
 				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
 				faces3.forEach(f -> removeFace(f, true));
-			}
+			}*/
 
 			finalized = true;
 		}
@@ -563,7 +609,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				IPointLocator.Type.DELAUNAY_HIERARCHY,
 				points,
 				pointConstructor);
-		bw.finalize();
+		bw.finish();
 		System.out.println(System.currentTimeMillis() - ms);
         Set<VLine> edges = bw.getEdges();
 
@@ -579,7 +625,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
                 IPointLocator.Type.DELAUNAY_HIERARCHY,
                 points,
                 pointConstructor);
-        bw2.finalize();
+        bw2.finish();
         System.out.println(System.currentTimeMillis() - ms);
 
         Set<VLine> edges2 = bw2.getEdges();

@@ -4,16 +4,15 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.color.ColorHelper;
 import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.math.SpaceFillingCurve;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 
 import java.awt.*;
@@ -38,13 +37,18 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	private Collection<F> faces;
     private final Predicate<F> alertPred;
     private Collection<VTriangle> triangles;
+    private VRectangle bound;
+    private final double scale;
 
-    public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height) {
+    public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound) {
         this.mesh = mesh;
         this.width = width;
         this.height = height;
         this.alertPred = alertPred;
         this.triangles = new ArrayList<>();
+        this.bound = bound;
+        this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+
     }
 
     public void update() {
@@ -73,24 +77,39 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		        graphics.fill(obstacle);
 	        }*/
 
-            graphics.translate(600, 200);
-            graphics.scale(8, 8);
+            graphics.scale(scale, scale);
+            graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
+
             graphics.setStroke(new BasicStroke(0.003f));
             graphics.setColor(Color.BLACK);
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
             int max = 0;
+            double maxX = Double.MIN_VALUE;
+            double maxY = Double.MIN_VALUE;
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
 
             for(F face : faces) {
-                if(face instanceof AFace) {
-                    int sum = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).sum();
+                VTriangle triangle = mesh.toTriangle(face);
+                /*if(face instanceof AFace) {
+                    int sum = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).max().getAsInt();
                     max = Math.max(sum, max);
-                }
+                }*/
+
+                VPoint incenter = triangle.getIncenter();
+
+                maxX = Math.max(maxX, incenter.getX());
+                maxY = Math.max(maxY, incenter.getY());
+
+                minX = Math.min(minX, incenter.getX());
+                minY = Math.min(minY, incenter.getY());
             }
 
-            ColorHelper colorHelper = new ColorHelper(max);
-
+            int groupSize = 64;
+            ColorHelper colorHelper = new ColorHelper(faces.size() / groupSize);
+//            SpaceFillingCurve curve = new SpaceFillingCurve(new VRectangle(minX, minY, maxX-minX, maxY-minY));
 
             for(F face : faces) {
                 VTriangle triangle = mesh.toTriangle(face);
@@ -103,46 +122,29 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 
 
                 } else {
-                    graphics.setColor(Color.GRAY);
-                    graphics.draw(triangle);
                     if(face instanceof AFace) {
-                        int sum = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).sum();
-                        graphics.setColor(colorHelper.numberToColor(sum));
-                        graphics.fill(triangle);
+                        int tMax = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).max().getAsInt();
+                        int tMin = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).min().getAsInt();
+
+                        int bucket = tMin / groupSize;
+
+                        if(bucket * groupSize + groupSize < tMax) {
+                            graphics.setColor(Color.GRAY);
+                        }
+                        else {
+                            graphics.setColor(colorHelper.numberToColor(bucket));
+                        }
+
+                        //graphics.fill(triangle);
                     }
-
                 }
+
+                graphics.setColor(Color.BLACK);
+                graphics.draw(triangle);
             }
-            /*graphics.setColor(Color.BLACK);
-            Collection<V> points = mesh.getVertices();
-            int id = 0;
 
-            for(V v : points) {
-                float dx = 0f;
-                float delta = 0.6f;
-                P p = mesh.getPoint(v);
-                if(id >= 100) {
-                    graphics.drawString((id / 100)+"", (float)p.getX()+dx, (float)p.getY());
-                    dx += delta;
-                }
-
-                if(id >= 10) {
-                    graphics.drawString(((id % 100) / 10)+"", (float)p.getX()+dx, (float)p.getY());
-                    dx += delta;
-                }
-
-                graphics.drawString((id % 10)+"", (float)p.getX()+dx, (float)p.getY());
-
-
-                id++;
-            }*/
-
-            //graphics.translate(5,5);
             graphics2D.drawImage(image, 0, 0, null);
         }
-
-//            graphics.setColor(Color.RED);
-//            tc.triangulation.getTriangles().parallelStream().forEach(graphics::draw);
 	}
 
 	public double triangleToQuality(final VTriangle triangle) {

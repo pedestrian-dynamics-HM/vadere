@@ -40,7 +40,7 @@ public class TestEnhancedVersion5 extends JFrame {
 
 
         Predicate<PFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
-        PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800);
+        PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
 
         JFrame frame = distmeshPanel.display();
         frame.setVisible(true);
@@ -73,7 +73,7 @@ public class TestEnhancedVersion5 extends JFrame {
 			//System.out.println("Quality: " + meshGenerator.getQuality());
 			System.out.println("Step-Time: " + ms);
 		}
-		//meshGenerator.finalize();
+		//meshGenerator.finish();
 		System.out.print("overall time: " + time);
         //System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
 		//System.out.print("finished:" + meshGenerator.getMesh().getVertices().stream().filter(v -> !meshGenerator.getMesh().isDestroyed(v)).count());

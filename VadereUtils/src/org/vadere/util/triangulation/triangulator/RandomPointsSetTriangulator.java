@@ -20,7 +20,7 @@ import java.util.Random;
  * @param <E>
  * @param <F>
  */
-public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
+public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 
     private final ITriangulation<P, V, E, F> triangulation;
     private final int numberOfPoints;
@@ -40,7 +40,7 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
     }
 
     @Override
-    public void generate() {
+    public ITriangulation<P, V, E, F> generate() {
         triangulation.init();
         int numberOfInsertedPoints = 0;
 
@@ -53,7 +53,8 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
             }
         }
 
-        triangulation.finalize();
+        triangulation.finish();
+        return triangulation;
     }
 
     private P randomPoint() {

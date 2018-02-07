@@ -1,6 +1,6 @@
 package org.vadere.util.geometry.shapes;
 
-public interface IPoint {
+public interface IPoint extends Cloneable {
 
 	double getX();
 
@@ -33,4 +33,6 @@ public interface IPoint {
 	default double crossProduct(IPoint point) {
 		return getX() * point.getY() - point.getX() * getY();
 	}
+
+	IPoint clone();
 }

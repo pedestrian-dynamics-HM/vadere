@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * @author Benedikt Zoennchen
  */
-public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
+public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
     private final Collection<VShape> boundary;
     private final VRectangle bbox;
     private final IEdgeLengthFunction lenFunc;
@@ -49,7 +49,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
         this.sortedFaces = new LinkedList<>();
     }
 
-    public void generate() {
+    public ITriangulation<P, V, E, F> generate() {
         triangulation.init();
 
         logger.info("start triangulation generation");
@@ -84,8 +84,9 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
 
         removeTrianglesOutsideBBox();
         removeTrianglesInsideObstacles();
-        triangulation.finalize();
+        triangulation.finish();
         logger.info("end triangulation generation");
+        return triangulation;
     }
 
     private void generate(E edge) {

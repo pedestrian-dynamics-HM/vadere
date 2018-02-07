@@ -39,7 +39,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
 		meshGenerator.initialize();
 		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
-		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800);
+		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("GPU");

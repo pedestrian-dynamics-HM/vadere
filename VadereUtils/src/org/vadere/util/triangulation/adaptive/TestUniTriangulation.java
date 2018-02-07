@@ -8,10 +8,12 @@ import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
+import org.vadere.util.triangulation.ITriangulationSupplier;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by bzoennchen on 30.01.18.
@@ -25,13 +27,13 @@ public class TestUniTriangulation extends JFrame {
 
         IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
         VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-        ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bbox, (x, y) -> new VPoint(x, y));
-        UniformRefinementTriangulator<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulator<>(triangulation, bbox, new ArrayList<>(), p -> 10.0, distanceFunc);
+        ITriangulationSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bbox, (x, y) -> new VPoint(x, y));
 
+        UniformRefinementTriangulatorCFS<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
+                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 5.0, distanceFunc);
 
         PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel =
-                new PSMeshingPanel(triangulation.getMesh(), f -> false, 1000, 800);
+                new PSMeshingPanel(uniformRefinementTriangulation.init().getMesh(), f -> false, 1000, 800, bbox);
         JFrame frame = distmeshPanel.display();
         frame.setVisible(true);
         frame.setTitle("CPU");
@@ -45,24 +47,29 @@ public class TestUniTriangulation extends JFrame {
 
         StopWatch overAllTime = new StopWatch();
         overAllTime.start();
-        uniformRefinementTriangulation.init();
+
         while (!uniformRefinementTriangulation.isFinished()) {
-            uniformRefinementTriangulation.step();
+
             //meshGenerator.improve();
             overAllTime.suspend();
-
             try {
-                Thread.sleep(100);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+	        uniformRefinementTriangulation.step();
             distmeshPanel.repaint();
             counter++;
             //System.out.println("Quality: " + meshGenerator.getQuality());
             overAllTime.resume();
+
+            boolean removedSome = true;
         }
-        uniformRefinementTriangulation.finalize();
+        //uniformRefinementTriangulation.finish();
+
+        distmeshPanel.repaint();
         overAllTime.stop();
+        log.info("rdy");
     }
 
     public static void main(String[] args) {

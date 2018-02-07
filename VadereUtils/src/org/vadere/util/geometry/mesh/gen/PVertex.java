@@ -80,4 +80,9 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 	public String toString() {
 		return point.toString();
 	}
+
+    @Override
+    public IPoint clone() {
+        throw new UnsupportedOperationException("clone of this pointer based object is not jet possible.");
+    }
 }

@@ -7,7 +7,11 @@ import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.triangulation.ITriangleConstructor;
+import org.vadere.util.triangulation.ITriangulationSupplier;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
 import java.util.ArrayList;
@@ -42,11 +46,23 @@ public class TestEnhancedVersion3 extends JFrame {
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 1.5, bbox, new ArrayList<>());
+
+        ITriangulationSupplier<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> supplier = () -> ITriangulation.createPTriangulation(
+                IPointLocator.Type.DELAUNAY_HIERARCHY,
+                bbox,
+                (x, y) -> new MeshPoint(x, y,
+                        false));
+
+        PSMeshing<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> meshGenerator = new PSMeshing<>(
+                distanceFunc,
+                edgeLengthFunc,
+                1,
+                bbox, new ArrayList<>(),
+                supplier);
 
         Predicate<PFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 
-		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800);
+		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("CPU");
@@ -62,7 +78,7 @@ public class TestEnhancedVersion3 extends JFrame {
         StopWatch overAllTime = new StopWatch();
         overAllTime.start();
         while (counter <= 100) {
-            //meshGenerator.improve();
+            meshGenerator.improve();
             overAllTime.suspend();
 
             try {

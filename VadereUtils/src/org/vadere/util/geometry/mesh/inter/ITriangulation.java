@@ -34,9 +34,10 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 
 	void init();
 	void compute();
-	void finalize();
+	void finish();
+	void recompute();
 
-	List<V> getSuperVertices();
+	List<V> getVirtualVertices();
 
 	Stream<F> streamFaces();
 	Set<F> getFaces();

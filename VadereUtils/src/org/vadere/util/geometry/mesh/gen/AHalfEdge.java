@@ -7,7 +7,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 /**
  * @author Benedikt Zoennchen
  */
-public class AHalfEdge<P extends IPoint> implements IHalfEdge<P> {
+public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 
 	private int id;
 
@@ -124,10 +124,19 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 
     @Override
     public String toString() {
-        return "" + id + ":"+ previous+"(e)->" + end+"(v)";
+        return "" + id + ":"+ previous+"(e)->"+next+"(e), " + end+"(v)";
     }
 
-	/*
+    @Override
+    protected AHalfEdge<P> clone() {
+        try {
+            return (AHalfEdge<P>)super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
+
+    /*
 	 * A half-edge is defined by its end vertex and its face. In a geometry there can not be more than
 	 * one half-edge part of face and ending at end.
 	 */

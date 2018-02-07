@@ -2,6 +2,7 @@ package org.vadere.util.geometry.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -409,29 +410,46 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
             F boundary = getMesh().createFace(true);
 
-		/*for(E edge : getMesh().getEdgeIt(face)) {
-			if(getMesh().isBoundary(getMesh().getTwin(edge))) {
-				boundary = getMesh().getTwinFace(edge);
-				break;
-			}
-		}
 
-		// no boundary around
-		if(boundary == null) {
-			boundary = getMesh().createFace(true);
-		}*/
-
+            int count = 0;
             for(E edge : getMesh().getEdgeIt(face)) {
-                getMesh().setFace(edge, boundary);
+
+                count++;
                 if(getMesh().isBoundary(getMesh().getTwin(edge))) {
                     delEdges.add(edge);
                 }
                 else {
                     // update the edge of the boundary since it might be deleted!
                     getMesh().setEdge(boundary, edge);
+                    getMesh().setFace(edge, boundary);
                 }
 
                 vertices.add(getMesh().getVertex(edge));
+            }
+
+            //TODO: this might be computational expensive!
+            // special case: all edges will be deleted => adjust the border edge
+            E borderEdge = null;
+            if(delEdges.size() == count) {
+
+                // all edges are border edges!
+                borderEdge = getMesh().getTwin(getMesh().getEdge(face));
+                EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), borderEdge);
+
+                // walk away from this faces
+                F twinFace = getMesh().getTwinFace(borderEdge);
+                while (edgeIterator.hasNext() && twinFace == face) {
+                    borderEdge = edgeIterator.next();
+                    twinFace = getMesh().getTwinFace(borderEdge);
+                }
+
+                if(getMesh().getTwinFace(borderEdge) == face) {
+                    borderEdge = getMesh().streamEdges().filter(e -> getMesh().getTwinFace(e) != face).filter(e -> getMesh().isBoundary(e)).findAny().get();
+                    //throw new IllegalArgumentException("could not adjust border edge! Deletion of " + face + " is not allowed.");
+                }
+
+                getMesh().setFace(borderEdge, boundary);
+                getMesh().setEdge(boundary, borderEdge);
             }
 
             if(!delEdges.isEmpty()) {
@@ -451,6 +469,8 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
                     boolean isolated0 = isSimpleConnected(v0);
                     boolean isolated1 = isSimpleConnected(v1);
+
+                    //getMesh().setEdge(boundary, prev1);
 
                     // adjust next and prev half-edges
                     getMesh().setNext(prev0, next1);
@@ -484,7 +504,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                     getMesh().destroyEdge(h1);
 
                     // TODO: do we need this?
-                    //vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
+                    vertices.stream().filter(getMesh()::isAlive).forEach(this::adjustVertex);
                 }
             }
             getMesh().destroyFace(face);

@@ -127,4 +127,9 @@ public class MPoint implements IPoint{
     public double distanceToOrigin() {
         return this.point.distanceToOrigin();
     }
+
+    @Override
+    public MPoint clone() {
+        return new MPoint(getX(), getY());
+    }
 }

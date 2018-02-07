@@ -20,6 +20,7 @@ import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.improver.PPSMeshing;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
 import java.awt.*;
@@ -67,7 +68,7 @@ public class TestFFMNonUniformTriangulation {
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 0.5;
         List<VRectangle> targetAreas = new ArrayList<>();
         List<IPoint> targetPoints = new ArrayList<>();
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
+        PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
         meshGenerator.execute();
         triangulation = meshGenerator.getTriangulation();
 
@@ -140,7 +141,7 @@ public class TestFFMNonUniformTriangulation {
         //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
+        PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
         meshGenerator.execute();
         triangulation = meshGenerator.getTriangulation();
 
@@ -212,7 +213,7 @@ public class TestFFMNonUniformTriangulation {
         //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
-        PSMeshing meshGenerator = new PSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
+        PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
         meshGenerator.execute();
         triangulation = meshGenerator.getTriangulation();
 

@@ -63,7 +63,7 @@ public class TestBoyerWatson {
 		triangulationList.add(ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y)));
 
 		for(ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation : triangulationList) {
-			delaunayTriangulation.finalize();
+			delaunayTriangulation.finish();
 			Set<VTriangle> triangulation = delaunayTriangulation.streamTriangles().collect(Collectors.toSet());
 
 			Set<VPoint> triangle1 = new HashSet<>();
@@ -122,7 +122,7 @@ public class TestBoyerWatson {
 		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
 
 		delaunayTriangulation.splitTriangle(face, centerPoint);
-		delaunayTriangulation.finalize();
+		delaunayTriangulation.finish();
 
 		Set<VTriangle> triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toSet());
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
@@ -158,12 +158,12 @@ public class TestBoyerWatson {
 
 		long ms = System.currentTimeMillis();
 		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> pdelaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-        pdelaunayTriangulation.finalize();
+        pdelaunayTriangulation.finish();
 		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy and a pointer-based data structure");
 
         ms = System.currentTimeMillis();
         ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> adelaunayTriangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-        adelaunayTriangulation.finalize();
+        adelaunayTriangulation.finish();
         log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy and a array-based data structure");
 
 		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(new VRectangle(0,0,width, height));
@@ -191,7 +191,7 @@ public class TestBoyerWatson {
 
 		ms = System.currentTimeMillis();
 		//ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-		//delaunayTriangulation.finalize();
+		//delaunayTriangulation.finish();
 		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy");
 
 		/*log.info("start checking the delaunay property, this can take some time");
@@ -237,7 +237,7 @@ public class TestBoyerWatson {
 
 		VPTriangulation vpTriangulation = ITriangulation.createVPTriangulation(new VRectangle(0, 0, width, height));
 		vpTriangulation.insert(points);
-		vpTriangulation.finalize();
+		vpTriangulation.finish();
 
 		assertTrue(hasCorrectEdgeVertexRealtion(vpTriangulation));
 	}

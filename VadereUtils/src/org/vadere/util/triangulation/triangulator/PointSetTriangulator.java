@@ -13,7 +13,7 @@ import java.util.Collection;
  *
  * A default triangulator.
  */
-public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator {
+public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 
     private final ITriangulation<P, V, E, F> triangulation;
     private final Collection<P> points;
@@ -24,9 +24,10 @@ public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E exte
     }
 
     @Override
-    public void generate() {
+    public ITriangulation<P, V, E, F> generate() {
         triangulation.init();
         triangulation.insert(points);
-        triangulation.finalize();
+        triangulation.finish();
+        return triangulation;
     }
 }

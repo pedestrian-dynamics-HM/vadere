@@ -77,8 +77,8 @@ public class PSMeshingOptimized {
 	 */
 	public void initialize() {
 		log.info("##### (start) generate a uniform refined triangulation #####");
-		UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
-		uniformRefinementTriangulation.generate();
+		//UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
+		//uniformRefinementTriangulation.generate();
 		retriangulate();
 		initialized = true;
 		log.info("##### (end) generate a uniform refined triangulation #####");
@@ -363,7 +363,7 @@ public class PSMeshingOptimized {
 		removeLowQualityTriangles();
 		triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
 		removeTrianglesInsideObstacles();
-		triangulation.finalize();
+		triangulation.finish();
 	}
 
 	private boolean isFixedVertex(final PVertex<MeshPoint> vertex) {

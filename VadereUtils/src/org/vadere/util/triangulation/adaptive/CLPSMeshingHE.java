@@ -8,7 +8,6 @@ import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.util.opencl.CLDistMesh;
 import org.vadere.util.opencl.CLDistMeshHE;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
@@ -71,8 +70,8 @@ public class CLPSMeshingHE implements IMeshImprover {
      */
     public void initialize() {
         log.info("##### (start) compute a uniform refined triangulation #####");
-        UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
-        uniformRefinementTriangulation.generate();
+        //UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
+        //uniformRefinementTriangulation.generate();
         clDistMesh = new CLDistMeshHE<>((AMesh<MeshPoint>) triangulation.getMesh());
         clDistMesh.init();
         initialized = true;
@@ -172,7 +171,7 @@ public class CLPSMeshingHE implements IMeshImprover {
         }
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
-        triangulation.finalize();*/
+        triangulation.finish();*/
         clDistMesh.refresh();
     }
 
@@ -184,14 +183,14 @@ public class CLPSMeshingHE implements IMeshImprover {
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         removeLowQualityTriangles(); //?
-        triangulation.finalize();
+        triangulation.finish();
     }
 
     public void retriangulate() {
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         removeLowQualityTriangles(); //?
-        triangulation.finalize();
+        triangulation.finish();
 
         if(clDistMesh != null) {
             clDistMesh.finish();

@@ -3,8 +3,12 @@ package org.vadere.util.geometry.mesh.gen;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.math.SpaceFillingCurve;
 import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.*;
@@ -13,9 +17,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by bzoennchen on 06.09.17.
+ * @author Benedikt Zoennchen
  */
-public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
+public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, Cloneable {
 	private final static Logger log = LogManager.getLogger(AMesh.class);
 	private List<AFace<P>> faces;
 	private boolean elementRemoved;
@@ -308,7 +312,6 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public Stream<AHalfEdge<P>> streamEdges() {
-		log.info(edges.stream().filter(e -> !e.isDestroyed()).count());
 		return edges.stream().filter(e -> !e.isDestroyed());
 	}
 
@@ -362,6 +365,29 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		vertex.getLock().unlock();
 	}
 
+	@Override
+    protected AMesh<P> clone() {
+        try {
+            AMesh<P> clone = (AMesh<P>)super.clone();
+
+            List<AFace<P>> cFaces = faces.stream().map(f -> f.clone()).collect(Collectors.toList());
+            List<AHalfEdge<P>> cEdges = edges.stream().map(e -> e.clone()).collect(Collectors.toList());
+            List<AVertex<P>> cVertices = vertices.stream().map(v -> v.clone()).collect(Collectors.toList());
+
+            clone.faces = cFaces;
+            clone.edges = cEdges;
+            clone.vertices = cVertices;
+
+            // here we assume that the point-constructor is stateless!
+            clone.pointConstructor = pointConstructor;
+            clone.boundary = boundary.clone();
+            return clone;
+
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
+
 	public void setPositions(final List<P> positions) {
 		assert positions.size() == numberOfVertices;
 		if (positions.size() != numberOfVertices) {
@@ -377,9 +403,162 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		}
 	}
 
+    /**
+     * Rearranges all indices of faces, vertices and halfEdges of the mesh according to
+     * the {@link Iterable} faceOrder. All indices start at 0 and will be incremented one by one.
+     * For example, the vertices of the first face of faceOrder will receive id 0,1 and 2.
+     *
+     * Note: that any mapping id -> vertex or id -> halfEdge or id -> face has to be recomputed!
+     * Assumption: faceOrder contains all faces of this mesh.
+     * Invariant: the geometry i.e. the connectivity and the vertex positions will not change.
+     *
+     * @param faceOrder the new order
+     */
+    public void rearrange(@NotNull Iterable<AFace<P>> faceOrder){
+        // clone the old one!
+        AMesh<P> cMesh = clone();
+
+        // merge some of them?
+        int nullIdentifier = -2;
+
+        // rebuild
+        faces.clear();
+        edges.clear();
+        vertices.clear();
+
+        int[] edgeMap = new int[cMesh.edges.size()];
+        int[] vertexMap = new int[cMesh.vertices.size()];
+        int[] faceMap = new int[cMesh.faces.size()];
+
+        Arrays.fill(edgeMap, nullIdentifier);
+        Arrays.fill(vertexMap, nullIdentifier);
+        Arrays.fill(faceMap, nullIdentifier);
+
+        // adjust all id's
+        //for(List<AFace<P>> bucket : buckets) {
+        for(AFace<P> face : faceOrder) {
+            AFace<P> fClone = face.clone();
+
+            // 1. face
+            faceMap[face.getId()] = faces.size();
+            fClone.setId(faces.size());
+            faces.add(fClone);
+
+            // 2. vertices
+            for(AVertex<P> v : cMesh.getVertexIt(face)) {
+                if(vertexMap[v.getId()] == nullIdentifier) {
+                    vertexMap[v.getId()] = vertices.size();
+                    AVertex<P> cVertex = v.clone();
+                    cVertex.setId(vertices.size());
+                    vertices.add(cVertex);
+                }
+            }
+
+            // 3. edges
+            for(AHalfEdge<P> halfEdge : cMesh.getEdgeIt(face)) {
+
+                // origin
+                if(edgeMap[halfEdge.getId()] == nullIdentifier) {
+                    edgeMap[halfEdge.getId()] = edges.size();
+                    AHalfEdge<P> cHalfEdge = halfEdge.clone();
+                    cHalfEdge.setId(edges.size());
+                    edges.add(cHalfEdge);
+                }
+
+                // twin
+                halfEdge = cMesh.getTwin(halfEdge);
+                if(edgeMap[halfEdge.getId()] == nullIdentifier) {
+                    // origin
+                    edgeMap[halfEdge.getId()] = edges.size();
+                    AHalfEdge<P> cHalfEdge = halfEdge.clone();
+                    cHalfEdge.setId(edges.size());
+                    edges.add(cHalfEdge);
+                }
+            }
+        }
+        //}
+
+        // repair the rest
+        for(AFace<P> face : faces) {
+            face.setEdge(edgeMap[face.getEdge()]);
+        }
+
+        for(AHalfEdge<P> halfEdge : edges) {
+            halfEdge.setEnd(vertexMap[halfEdge.getEnd()]);
+
+            // boundary face
+            if(halfEdge.getFace() != boundary.getId()) {
+                halfEdge.setFace(faceMap[halfEdge.getFace()]);
+            }
+            else {
+                halfEdge.setFace(boundary.getId());
+            }
+
+            halfEdge.setTwin(edgeMap[halfEdge.getTwin()]);
+            halfEdge.setPrevious(edgeMap[halfEdge.getPrevious()]);
+            halfEdge.setNext(edgeMap[halfEdge.getNext()]);
+        }
+
+        for(AVertex<P> vertex : vertices) {
+            vertex.setDown(vertexMap[vertex.getDown()]);
+            vertex.setEdge(edgeMap[vertex.getEdge()]);
+        }
+
+        boundary.setEdge(edgeMap[boundary.getEdge()]);
+    }
+
+    /**
+     * This method rearranges the indices of faces, vertices and edges according to their positions.
+     * After the call, neighbouring faces are near arrange inside the face {@link ArrayList}.
+     *
+     * Note: that any mapping id -> vertex or id -> halfEdge or id -> face has to be recomputed!
+     */
+    public void spatialSort() {
+        // get the bound for the space filling curve!
+        double maxX = Double.MIN_VALUE;
+        double maxY = Double.MIN_VALUE;
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+
+        List<VPoint> centroids = new ArrayList<>(this.numberOfFaces);
+
+        for(int i = 0; i < this.faces.size(); i++) {
+            VPoint incenter = GeometryUtils.getCentroid(this.getVertices(faces.get(i)));
+            centroids.add(incenter);
+            maxX = Math.max(maxX, incenter.getX());
+            maxY = Math.max(maxY, incenter.getY());
+
+            minX = Math.min(minX, incenter.getX());
+            minY = Math.min(minY, incenter.getY());
+        }
+
+        SpaceFillingCurve spaceFillingCurve = new SpaceFillingCurve(new VRectangle(minX, minY, maxX-minX, maxY-minY));
+
+        // TODO: implement faster sorting using radix sort see: http://www.diss.fu-berlin.de/diss/servlets/MCRFileNodeServlet/FUDISS_derivate_000000003494/2_kap2.pdf?hosts=
+        // page 18
+        List<AFace<P>> sortedFaces = new ArrayList<>(faces.size());
+        sortedFaces.addAll(this.faces);
+        Collections.sort(sortedFaces, (f1, f2) -> {
+            double i1 = spaceFillingCurve.compute(centroids.get(f1.getId()));
+            double i2 = spaceFillingCurve.compute(centroids.get(f2.getId()));
+
+            if (i1 < i2) {
+                return -1;
+            } else if (i1 > i2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        rearrange(sortedFaces);
+    }
+
+
 
 	/**
 	 * removes all destroyed object from this mesh and re-arranges all indices.
+     *
+     * Note: that any mapping id -> vertex or id -> halfEdge or id -> face has to be recomputed!
 	 */
 	public void garbageCollection() {
 		Map<Integer, Integer> faceIdMap = new HashMap<>();
