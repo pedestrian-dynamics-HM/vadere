@@ -1,8 +1,5 @@
 package org.vadere.simulator.projects.dataprocessing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
@@ -16,19 +13,16 @@ import java.util.Map;
 
 /**
  * @author Mario Teixeira Parente
- *
  */
 
 public class ProcessorManager {
-	private DataProcessingJsonManager jsonManager;
 
 	private MainModel mainModel;
 
 	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
 
-	public ProcessorManager(DataProcessingJsonManager jsonManager, List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles, MainModel mainModel) {
-		this.jsonManager = jsonManager;
+	public ProcessorManager(List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles, MainModel mainModel) {
 		this.mainModel = mainModel;
 
 		this.outputFiles = outputFiles;
@@ -45,11 +39,11 @@ public class ProcessorManager {
 	}
 
 	public void initOutputFiles() {
-		outputFiles.forEach(file -> file.init(this));
+		outputFiles.forEach(file -> file.init(processorMap));
 	}
 
 	public DataProcessor<?, ?> getProcessor(int id) {
-		return this.processorMap.containsKey(id) ? this.processorMap.get(id) : null;
+		return this.processorMap.getOrDefault(id, null);
 	}
 
 	public MainModel getMainModel() {
@@ -73,22 +67,18 @@ public class ProcessorManager {
 	}
 
 	public void writeOutput() {
-        this.outputFiles.forEach(file -> file.write());
-    }
-
-    public JsonNode serializeToNode() throws JsonProcessingException {
-    	return this.jsonManager.serializeToNode();
+		this.outputFiles.forEach(file -> file.write());
 	}
 
-    /**
-     * Returns true if there is no output to write, otherwise false.
-     * @return
-     */
-	public boolean isEmpty() {
-	    return processorMap.isEmpty();
-    }
 
-    public void sealAllAttributes() {
-    	processorMap.values().forEach(p -> p.sealAttributes());
+	/**
+	 * Returns true if there is no output to write, otherwise false.
+	 */
+	public boolean isEmpty() {
+		return processorMap.isEmpty();
+	}
+
+	public void sealAllAttributes() {
+		processorMap.values().forEach(p -> p.sealAttributes());
 	}
 }

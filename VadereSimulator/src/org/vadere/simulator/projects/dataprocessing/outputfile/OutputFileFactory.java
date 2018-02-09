@@ -3,6 +3,8 @@ package org.vadere.simulator.projects.dataprocessing.outputfile;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
+import java.util.Arrays;
+
 public class OutputFileFactory {
 	private final DynamicClassInstantiator<OutputFile<?>> outputFileInstantiator;
 
@@ -37,4 +39,9 @@ public class OutputFileFactory {
 		return createOutputfile(type.getCanonicalName());
 	}
 
+	public OutputFile<?> createOutputfile(Class type, Integer... processorsIds) {
+		OutputFile<?> file = createOutputfile(type.getCanonicalName());
+		file.setProcessorIds(Arrays.asList(processorsIds));
+		return file;
+	}
 }

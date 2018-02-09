@@ -1,15 +1,19 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.VadereFileWriter;
+import org.vadere.simulator.projects.dataprocessing.VadereWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
-import java.io.*;
-import java.nio.file.Path;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,32 +21,31 @@ import java.util.stream.Stream;
 /**
  * Base class for all types of output files.
  *
- * This class knows all the data processors of which the data should be saved.
- * It writes the data with the specified <tt>separator</tt> sign into a file specified by <tt>filename</tt>.
+ * This class knows all the data processors of which the data should be saved. It writes the data
+ * with the specified <tt>separator</tt> sign into a file specified by <tt>filename</tt>.
  *
  * @param <K> key type
- * 
  * @author Mario Teixeira Parente
- *
  */
 
 public abstract class OutputFile<K extends DataKey<K>> {
 	private String[] keyHeaders;
 
-    /**
-     * The file name without the path to the file
-     */
+	/**
+	 * The file name without the path to the file
+	 */
 	private String fileName;
 
-    /**
-     * Temporary absolute file name, this should not be serialized
-     */
+	/**
+	 * Temporary absolute file name, this should not be serialized
+	 */
 	private volatile String absoluteFileName;
 
 	private List<Integer> processorIds;
 	private List<DataProcessor<K, ?>> dataProcessors;
 
-    private String separator;
+	private String separator;
+	private VadereWriter writer;
 
 	protected OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
@@ -50,17 +53,12 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void setAbsoluteFileName(final String fileName) {
-	    this.absoluteFileName = fileName;
+		this.absoluteFileName = fileName;
 	}
 
 	public void setRelativeFileName(final String fileName) {
-	   this.fileName = fileName;
+		this.fileName = fileName;
 
-    }
-
-	public void setProcessorIds(final List<Integer> processorIds) {
-		this.processorIds = processorIds;
-		this.dataProcessors.clear();
 	}
 
 	public String getSeparator() {
@@ -72,37 +70,42 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void init(final ProcessorManager manager) {
+	public void init(final Map<Integer, DataProcessor<?, ?>> processorMap) {
 		this.dataProcessors.clear();
-		processorIds.forEach(pid -> this.dataProcessors.add((DataProcessor<K, ?>) manager.getProcessor(pid)));
+		processorIds.forEach(pid -> {
+			Optional.ofNullable(processorMap.get(pid))
+					.ifPresent(p -> dataProcessors.add((DataProcessor<K, ?>) p));
+		});
 	}
 
 	public void write() {
-	    // if there is something to write i.e. absoluteFileName != null
-	    if(!isEmpty()) {
-            try (PrintWriter out = new PrintWriter(new FileWriter(absoluteFileName))) {
-                printHeader(out);
+		// if there is something to write i.e. absoluteFileName != null
+		if (!isEmpty()) {
+			VadereWriter out = getWriter();
+			printHeader(out);
 
-                this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
-                        .distinct().sorted()
-                        .forEach(key -> printRow(out, key));
+			this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
+					.distinct().sorted()
+					.forEach(key -> printRow(out, key));
 
-                out.flush();
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
-        }
+			out.flush();
+			try {
+				out.close();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
 	}
 
 	public boolean isEmpty() {
-        return this.dataProcessors.isEmpty();
-    }
+		return this.dataProcessors.isEmpty();
+	}
 
 	private List<String> getFieldHeaders() {
 		return composeLine(keyHeaders, p -> Arrays.stream(p.getHeaders()));
 	}
 
-	public void printHeader(PrintWriter out) {
+	public void printHeader(VadereWriter out) {
 		writeLine(out, getFieldHeaders());
 	}
 
@@ -110,9 +113,8 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return String.join(this.separator, getFieldHeaders());
 	}
 
-	private void printRow(final PrintWriter out, final K key) {
-		@SuppressWarnings("unchecked")
-		final List<String> fields = composeLine(toStrings(key), p -> Arrays.stream(p.toStrings(key)));
+	private void printRow(final VadereWriter out, final K key) {
+		@SuppressWarnings("unchecked") final List<String> fields = composeLine(toStrings(key), p -> Arrays.stream(p.toStrings(key)));
 		writeLine(out, fields);
 	}
 
@@ -125,14 +127,16 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		fields.addAll(processorFields);
 		return fields;
 	}
-	
-	private void writeLine(PrintWriter out, final List<String> fields) {
+
+	private void writeLine(VadereWriter out, final List<String> fields) {
 		out.println(String.join(this.separator, fields));
 	}
 
-	/** Return the column headers as string or the empty array. */
+	/**
+	 * Return the column headers as string or the empty array.
+	 */
 	public String[] toStrings(K key) {
-		return new String[] { key.toString() };
+		return new String[]{key.toString()};
 	}
 
 	public String getFileName() {
@@ -143,8 +147,29 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return processorIds;
 	}
 
+	public void setProcessorIds(final List<Integer> processorIds) {
+		this.processorIds = processorIds;
+		this.dataProcessors.clear();
+	}
+
 	@Override
 	public String toString() {
 		return new File(fileName).getName();
+	}
+
+	private VadereWriter getWriter() {
+		if (this.writer == null) {
+			this.writer = new VadereFileWriter(absoluteFileName);
+		}
+		return writer;
+	}
+
+	public void setVadereWriter(VadereWriter vadereWriter) {
+		this.writer = vadereWriter;
+	}
+
+	public void addDataProcessor(DataProcessor p) {
+		dataProcessors.add(p);
+		processorIds.add(p.getId());
 	}
 }
