@@ -4,22 +4,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.tests.reflection.ReflectionHelper;
 
-/**
- * Tests for {@link PedestrianStartTimeProcessorTest} for Test data see {@link
- * PedestrianStartTimeProcessorTestEnv}
- *
- * @author Stefan Schuhbäck
- */
-public class PedestrianStartTimeProcessorTest extends ProcessorTest {
+public class PedestrianStateProcessorTest extends ProcessorTest {
 
 	@Before
 	public void setup() {
-		processorTestEnv = new PedestrianStartTimeProcessorTestEnv();
+		processorTestEnv = new PedestrianStateProcessorTestEnv();
 		processorTestEnv.loadDefaultSimulationStateMocks();
 		processorTestEnv.init();
 		p = processorTestEnv.getTestedProcessor();
 		r = ReflectionHelper.create(p);
 	}
+
+	@Test
+	public void init() throws Exception {
+		super.init();
+	}
+
 
 	@Test
 	public void doUpdate() throws Exception {

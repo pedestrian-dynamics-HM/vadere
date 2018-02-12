@@ -2,9 +2,9 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.tests.reflection.ReflectionHelper;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.tests.reflection.ReflectionHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +18,7 @@ public abstract class ProcessorTest {
 
 	DataProcessor p;
 	ReflectionHelper r;
-	ProcessorTestEnv processorTestEnv;
+	ProcessorTestEnv<?, ?> processorTestEnv;
 
 	/**
 	 * After a call to {@link DataProcessor#init(ProcessorManager)} the data map and the step count
@@ -44,7 +44,7 @@ public abstract class ProcessorTest {
 
 		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());
 		assertTrue(processorTestEnv.getHeader().contains(header));
-		assertEquals(processorTestEnv.getExpectedOutput(), processorTestEnv.getOutput());
+		assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput());
 	}
 
 	/**

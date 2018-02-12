@@ -1,15 +1,20 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.projects.dataprocessing.VadereStringWriter;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import static org.mockito.Mockito.when;
 
-public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv {
+public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, VPoint> {
 
 	PedestrianPositionProcessorTestEnv() {
 		super();
@@ -27,11 +32,8 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv {
 	private void addToExpectedOutput(Integer step, Map<Integer, VPoint> m) {
 		m.entrySet().stream().distinct().sorted(Map.Entry.comparingByKey()).forEach((v) -> {
 			super.addToExpectedOutput(
-					Integer.toString(step),
-					Integer.toString(v.getKey()),
-					Double.toString(v.getValue().x),
-					Double.toString(v.getValue().y)
-			);
+					new TimestepPedestrianIdKey(step, v.getKey()),
+					v.getValue());
 		});
 
 	}
@@ -75,5 +77,22 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv {
 				when(state.getPedestrianPositionMap()).thenReturn(m);
 			}
 		});
+	}
+
+	@Override
+	List<String> getExpectedOutputAsList() {
+		List<String> outputList = new ArrayList<>();
+		expectedOutput.entrySet()
+				.stream()
+				.sorted(Comparator.comparing(Map.Entry::getKey))
+				.forEach(e -> {
+					StringJoiner sj = new StringJoiner(getDelimiter());
+					sj.add(Integer.toString(e.getKey().getTimestep()))
+							.add(Integer.toString(e.getKey().getPedestrianId()))
+							.add(Double.toString(e.getValue().x))
+							.add(Double.toString(e.getValue().y));
+					outputList.add(sj.toString());
+				});
+		return outputList;
 	}
 }

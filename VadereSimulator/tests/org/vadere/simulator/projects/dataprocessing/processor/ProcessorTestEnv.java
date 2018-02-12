@@ -1,11 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.tests.reflection.ReflectionHelper;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.VadereStringWriter;
+import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
+import org.vadere.tests.reflection.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,53 +23,47 @@ import static org.mockito.Mockito.mock;
  *
  * @author Stefan Schuhbäck
  */
-public abstract class ProcessorTestEnv {
+public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 
 	/**
 	 * processor under test
 	 */
 	DataProcessor<?, ?> testedProcessor;
-
-	/**
-	 * Needed for DataProcessor doUpdate call. (mocked)
-	 */
-	private ProcessorManager manager;
-
 	/**
 	 * List of {@link SimulationState}s used for test. (mocked)
 	 */
 	List<SimulationStateMock> states;
-
 	/**
 	 * Ids of {@link DataProcessor}s
 	 */
 	int nextProcessorId;
-
-	/**
-	 * If {@link #testedProcessor} has dependencies to other {@link DataProcessor}s
-	 */
-	private Map<Integer, DataProcessor<?, ?>> requiredProcessors;
-
 	/**
 	 * Corresponding {@link OutputFile} needed by {@link #testedProcessor}
 	 */
 	OutputFile outputFile;
-	private String delimiter;
-
-	private List<String> expectedOutput;
-
+	Map<K, V> expectedOutput;
 	/**
 	 * Factories
 	 */
 	DataProcessorFactory processorFactory;
 	OutputFileFactory outputFileFactory;
+	/**
+	 * Needed for DataProcessor doUpdate call. (mocked)
+	 */
+	private ProcessorManager manager;
+	/**
+	 * If {@link #testedProcessor} has dependencies to other {@link DataProcessor}s
+	 */
+	private Map<Integer, DataProcessor<?, ?>> requiredProcessors;
+	private String delimiter;
 
 
 	ProcessorTestEnv() {
 		manager = mock(ProcessorManager.class);
 		states = new ArrayList<>();
 		nextProcessorId = 1;
-		expectedOutput = new ArrayList<>();
+		expectedOutput = new HashMap<>();
+		new ArrayList<>();
 		delimiter = " ";
 		testedProcessor = null;
 		outputFile = null;
@@ -95,13 +90,15 @@ public abstract class ProcessorTestEnv {
 		return states.stream().map(s -> s.state).collect(Collectors.toList());
 	}
 
-	void addToExpectedOutput(String... elements) {
-		expectedOutput.add(String.join(delimiter, elements));
+	void addToExpectedOutput(K dataKey, V value) {
+		expectedOutput.put(dataKey, value);
 	}
 
-	List<String> getExpectedOutput() {
+	Map<K, V> getExpectedOutput() {
 		return expectedOutput;
 	}
+
+	abstract List<String> getExpectedOutputAsList();
 
 	ProcessorManager getManager() {
 		return manager;
@@ -139,5 +136,9 @@ public abstract class ProcessorTestEnv {
 		ReflectionHelper r = ReflectionHelper.create(outputFile);
 		VadereStringWriter writer = (VadereStringWriter) r.valOfField("writer");
 		return writer.getOutput().get(0);
+	}
+
+	int nextProcessorId() {
+		return nextProcessorId++;
 	}
 }

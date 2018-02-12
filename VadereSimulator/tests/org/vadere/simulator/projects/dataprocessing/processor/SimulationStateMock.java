@@ -4,6 +4,7 @@ import org.mockito.Mockito;
 import org.vadere.simulator.control.SimulationState;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -17,6 +18,12 @@ public abstract class SimulationStateMock {
 
 	SimulationStateMock() {
 		this.state = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
+		mockIt();
+	}
+
+	SimulationStateMock(int simStep) {
+		this.state = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
+		when(state.getStep()).thenReturn(simStep);
 		mockIt();
 	}
 
