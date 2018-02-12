@@ -11,10 +11,10 @@ inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
     double x = ((p1.x * p1.x + p1.y * p1.y) * (p2.y - p3.y)
     				+ (p2.x * p2.x + p2.y * p2.y) * (p3.y - p1.y)
     				+ (p3.x * p3.x + p3.y * p3.y) * (p1.y - p2.y)) / d;
-    		float y = ((p1.x * p1.x + p1.y * p1.y) * (p3.x - p2.x)
+    double y = ((p1.x * p1.x + p1.y * p1.y) * (p3.x - p2.x)
     				+ (p2.x * p2.x + p2.y * p2.y) * (p1.x - p3.x)
     				+ (p3.x * p3.x + p3.y * p3.y) * (p2.x - p1.x)) / d;
-    return (x, y);
+    return (double2)(x, y);
 }
 
 inline bool isCCW(double2 q, double2 p, double2 r) {
@@ -88,10 +88,10 @@ inline bool faceAlive(int2 face) {
     return face.s0 != -1;
 }
 
-inline float dabs(double d) {return d < 0 ? -d : d;}
+inline double dabs(double d) {if(d < 0){ return -d; }else{ return d;}}
 
-inline isAtBoundary(int4 edge, __global int4* edges){
-    return getFace(edge) == -1 || getFace(edges[getTwin(edge)]);
+inline bool isAtBoundary(int4 edge, __global int4* edges){
+    return getFace(edge) == -1 || getFace(edges[getTwin(edge)]) == -1;
 }
 
 inline int getVertex(int4 edge) {
@@ -123,7 +123,7 @@ inline void setFace(int4 edge, int faceId) {
 }
 
 inline double dist(double2 v) {
-
+    return dabs(6.0 - length(v))-4.0;
 }
 // end helper
 
@@ -135,7 +135,7 @@ kernel void removeTriangles(__global double2* vertices,
 
     // edge is alive?
     if(alive(edges[edgeId])){
-        float eps = 0.000001f;
+        double eps = 0.000001;
 
         int ta = edges[edgeId].s2;
         int tb = edges[edgeId].s3;
@@ -179,11 +179,12 @@ kernel void label(__global double2* vertices,
     int4 edge = edges[edgeId];
 
     if(alive(edge)){
-        float eps = 0.0001;
+        double eps = 0.0001;
 
         int v0 = getVertex(edge);
 
         // edge is a non-boundary edge
+        //getFace(edge) == -1 || getFace(edges[getTwin(edge)]) == -1
         if(!isAtBoundary(edge, edges)) {
             int4 nextEdge = edges[getNext(edge)];
             int4 prefEdge = edges[getNext(nextEdge)];
@@ -206,6 +207,9 @@ kernel void label(__global double2* vertices,
             labeledEdges[edgeId] = 0;
         }
     }
+    else {
+        labeledEdges[edgeId] = 0;
+    }
 }
 
 // for each edge in parallel, label illegal edges
@@ -224,10 +228,6 @@ kernel void updateLabel(__global double2* vertices,
     int4 edge = edges[edgeId];
 
     if(alive(edge)){
-
-        // TODO:
-        //lockedTriangles[ta] = -1;
-        //lockedTriangles[tb] = -1;
         double eps = 0.00001;
         int v0 = getVertex(edge);
 
@@ -287,7 +287,7 @@ kernel void flipStage2(__global int4* edges,
         int faceId = getFace(edges[edgeId]);
 
         // to avoid the twin from locking
-        if(edgeId < getTwin(edge) && faces[faceId].s1 == edgeId) {
+        if(faces[faceId].s1 == edgeId) {
             faces[getFace(twinEdge)].s1 = edgeId;
         }
     }
@@ -301,7 +301,7 @@ kernel void flipStage3(__global double2* vertices,
                        __global int2* faces) {
     int edgeId = get_global_id(0);
 
-    if(labeledEdges[edgeId] == 1) {
+    if(labeledEdges[edgeId] == 1 /*&& edgeId == 6*/) {
         int4 edge = edges[edgeId];
         int4 twinEdge = edges[getTwin(edge)];
 
@@ -333,39 +333,37 @@ kernel void flipStage3(__global double2* vertices,
             int va0Id = getVertex(a0);
             int vb0Id = getVertex(b0);
 
-            //if(mesh.getEdge(fb).equals(b1)) {
+            if(faces[fbId].s0 == b1Id) {
                 faces[fbId].s0 = a1Id;
-            //	mesh.setEdge(fb, a1);
-            //}
+            }
 
-            //if(mesh.getEdge(fa).equals(a1)) {
+            if(faces[faId].s0 == a1Id) {
                 faces[faId].s0 = b1Id;
-            //	mesh.setEdge(fa, b1);
-            //}
+            }
 
-            //if(mesh.getEdge(va0).equals(a0)) {
+            if(vertexToEdge[va0Id] == a0Id) {
                 vertexToEdge[va0Id] = b2Id;
-            //	mesh.setEdge(va0, b2);
-            //}
+            }
 
-            //if(mesh.getEdge(vb0).equals(b0)) {
+            if(vertexToEdge[vb0Id] == b0Id) {
                 vertexToEdge[vb0Id] = a2Id;
-            //	mesh.setEdge(vb0, a2);
-            //}
+            }
 
-            setVertex(a0, va1Id);
-            setVertex(b0, vb1Id);
+            a0.s0 = va1Id;
+            b0.s0 = vb1Id;
 
-            setNext(a0, a2Id);
-            setNext(a2, b1Id);
-            setNext(b1, a0Id);
+            a0.s1 = a2Id;
+            a2.s1 = b1Id;
+            b1.s1 = a0Id;
 
-            setNext(b0, b2Id);
-            setNext(b2, a1Id);
-            setNext(a1, b0Id);
+            b0.s1 = b2Id;
+            b2.s1 = a1Id;
+            a1.s1 = b0Id;
 
-            setFace(a1, fbId);
-            setFace(b1, faId);
+            a1.s3 = fbId;
+
+            //setFace(b1, faId);
+            b1.s3 = faId;
 
             // copy to global mem
             edges[a0Id] = a0;
@@ -376,10 +374,16 @@ kernel void flipStage3(__global double2* vertices,
             edges[b1Id] = b1;
             edges[b2Id] = b2;
 
-            labeledEdges[edgeId] = 0;
-            labeledEdges[getTwin(edge)] = 0;
+            labeledEdges[a0Id] = 0;
+            labeledEdges[b0Id] = 0;
         }
     }
+}
+
+kernel void unlockFaces(
+                       __global int2* faces) {
+    int faceId = get_global_id(0);
+    faces[faceId].s1 = -1;
 }
 
 // for each triangle test its legality TODO
@@ -422,62 +426,66 @@ kernel void computeForces(__global double2* vertices,
 {
     int vertexId = get_global_id(0);
     int edgeId = vertexToEdge[vertexId];
-    int4 edge = edges[edgeId];
-    int nextEdgeId = edgeId;
-    int4 nextEdge = edge;
-    bool first = true;
-    double2 force = (0.0, 0.0);
+    if(edgeId != -1){
+        int4 edge = edges[edgeId];
+        int twinId = edgeId;
+        int4 twinEdge = edge;
+        bool first = true;
+        double2 force = (double2)(0.0, 0.0);
+        double2 p0 = vertices[vertexId];
 
-    while(first || edgeId != nextEdgeId){
-        first = true;
+        while(first || (edgeId != twinId)){
+            first = false;
 
-        // compute force
-        int4 twinEdge = edges[getTwin(edge)];
-        double2 p0 = vertices[getVertex(twinEdge)];
-        double2 p1 = vertices[getVertex(edge)];
+            // compute force
+            int nextId = getNext(twinEdge);
+            int4 nextEdge = edges[nextId];
+            double2 p1 = vertices[getVertex(nextEdge)];
 
-        double2 v = normalize(p0-p1);
-        double len = lengths[edgeId].s0;
-        double desiredLen = lengths[edgeId].s1 * (*scalingFactor) * 1.2f;
-        double lenDiff = (desiredLen - len);
-        lenDiff = lenDiff > 0 ? lenDiff : 0;
-        double2 partialForce = v * lenDiff;
+            double2 v = normalize(p0-p1);
+            double len = lengths[nextId].s0;
+            double desiredLen = lengths[nextId].s1 * (*scalingFactor) * 1.2;
+            double lenDiff = (desiredLen - len);
+            lenDiff = max(lenDiff, 0.0);
+            double2 partialForce = v * lenDiff;
+            force = force + partialForce;
 
-        force = force + partialForce;
+            // go on
+            twinId = getTwin(nextEdge);
+            twinEdge = edges[twinId];
+        }
 
-        // go on
-        nextEdgeId = getNext(edge);
-        nextEdge = edges[nextEdgeId];
+        forces[vertexId] = force;
     }
-
-    forces[vertexId] = force;
 }
 
 // for each vertex
 kernel void moveVertices(__global double2* vertices,
+                         __global int* borderVertices,
                          __global double2* forces,
                          const double delta) {
     int vertexId = get_global_id(0);
 
-    double deps = 1.4901e-8f;
+    double deps = 0.0001;
     double2 force = forces[vertexId];
     double2 v = vertices[vertexId];
 
-    v = v + (force * 0.3f);
+    v = v + (force * 0.3);
 
     // project back if necessary
     double distance = dist(v);
-    if(distance > 0.0) {
-        double2 dX = (deps, 0.0);
-        double2 dY = (0.0, deps);
-        double dGradPX = (dist(v + dX) - distance) / deps;
-        double dGradPY = (dist(v + dY) - distance) / deps;
-        double2 projection = (dGradPX * distance, dGradPY * distance);
+    if(distance > 0.0 || borderVertices[vertexId] == 1) {
+        double2 dX = (double2)(deps, 0.0);
+        double2 dY = (double2)(0.0, deps);
+        double2 vx = (double2)(v + dX);
+        double2 vy = (double2)(v + dY);
+        double dGradPX = (dist(vx) - distance) / deps;
+        double dGradPY = (dist(vy) - distance) / deps;
+        double2 projection = (double2)(dGradPX * distance, dGradPY * distance);
         v = v - projection;
     }
 
-    // set force to 0.
-    forces[vertexId] = (0.0f, 0.0f);
+    forces[vertexId] = (double2)(0.0, 0.0);
     vertices[vertexId] = v;
 }
 
@@ -498,9 +506,9 @@ kernel void computeLengths(
 
     //TODO: desiredLenfunction required
     double desiredLen = 1.0;
-    double2 len = (length(v), desiredLen);
+    double2 len = (double2)(length(v), desiredLen);
     lengths[edgeId] = len;
-    qLengths[edgeId] = (length(v)*length(v), desiredLen*desiredLen);
+    qLengths[edgeId] = (double2)(length(v)*length(v), desiredLen*desiredLen);
 }
 
 
@@ -521,8 +529,6 @@ kernel void computePartialSF(__const int size, __global double2* qlengths, __loc
 
         int group_size = get_local_size(0);
         double2 len = accumulator;
-
-        //float2 len = (float2)(1.0, 1.0);
         partialSums[lid] = len;
 
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -540,7 +546,7 @@ kernel void computePartialSF(__const int size, __global double2* qlengths, __loc
     }
     else {
         if(lid == 0){
-            output[get_group_id(0)] = (0.0, 0.0);
+            output[get_group_id(0)] = (double2)(0.0, 0.0);
         }
     }
 }

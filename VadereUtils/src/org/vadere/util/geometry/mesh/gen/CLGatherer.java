@@ -85,6 +85,9 @@ public class CLGatherer {
             edgeBuffer.put(index+1, edge.getNext());
             edgeBuffer.put(index+2, edge.getTwin());
             edgeBuffer.put(index+3, edge.getFace());
+            /*if(edge.getFace()==-1){
+                System.out.println("border edge" + (index / 4));
+            }*/
             index += 4;
         }
         return edgeBuffer;
@@ -133,6 +136,19 @@ public class CLGatherer {
         for(AVertex<P> vertex : vertices) {
             assert vertex.getId() == index;
             vertexBuffer.put(index, vertex.getEdge());
+            index++;
+        }
+        return vertexBuffer;
+    }
+
+    public static <P extends IPoint> IntBuffer getBorderVertices(@NotNull final AMesh<P> mesh) {
+        Collection<AVertex<P>> vertices = mesh.getVertices();
+        IntBuffer vertexBuffer =  MemoryUtil.memAllocInt(vertices.size());
+
+        int index = 0;
+        for(AVertex<P> vertex : vertices) {
+            assert vertex.getId() == index;
+            vertexBuffer.put(index, mesh.isAtBoundary(vertex) ? 1 : 0);
             index++;
         }
         return vertexBuffer;

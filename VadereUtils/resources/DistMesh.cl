@@ -40,6 +40,10 @@ inline bool isCCW(float2 q, float2 p, float2 r) {
     return ((p.y - q.y) * (r.x - p.x) - (p.x - q.x) * (r.y - p.y)) < 0;
 }
 
+inline float dist(float2 v) {
+    return fabs(6.0f - length(v))-4.0f;
+}
+
 inline float quality(float2 p, float2 q, float2 r) {
     float a = length(p-q);
     float b = length(p-r);
@@ -392,7 +396,7 @@ kernel void computeForces(
     float len = lengths[i].s0;
     float desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2f;
     float lenDiff = (desiredLen - len);
-    lenDiff = lenDiff > 0 ? lenDiff : 0;
+    lenDiff = lenDiff > 0.0f ? lenDiff : 0.0f;
     float2 partialForce = v * lenDiff;
 
     //volatile __global int* addr = &mutexes[p1Index];
@@ -405,7 +409,6 @@ kernel void computeForces(
 
 
     // TODO this might be slow!
-
     global float* forceP = (global float*)(&forces[p1Index]);
     atomicAdd_g_f(forceP, partialForce.x);
     atomicAdd_g_f((forceP+1), partialForce.y);
@@ -426,9 +429,7 @@ kernel void computeForces(
     //printf("test-y: %f == %f \n", (tmp + partialForce).y, forces[p1Index].y);
 }
 
-//inline float fabs(float d) {return d < 0 ? -d : d;}
-
-inline float dabs(double d) {return d < 0 ? -d : d;}
+//inline float fabs(float d) {return if(d < 0){return -d;}else{return d;}}
 
 inline double float2double (float a){
     unsigned int ia = __float_as_int (a);
@@ -436,28 +437,31 @@ inline double float2double (float a){
 }
 
 kernel void moveVertices(__global float2* vertices, __global float2* forces, const float delta) {
-    int i = get_global_id(0);
-    float2 force = forces[i];
-    float2 v = vertices[i];
+    int vertexId = get_global_id(0);
 
-    v = v + (force * 0.3f);
+        float deps = 0.0001f;
+        float2 force = forces[vertexId];
+        float2 v = vertices[vertexId];
 
-    // project back if necessary
-    float distance = fabs(6.0f - length(v))-4.0f;
-    if(distance > 0.2f) {
-        //float deps = 1.4901e-8f;
-        float deps = 0.001f;
-        float2 dX = (deps, 0.0f);
-        float2 dY = (0.0f, deps);
-        float dGradPX = ((fabs(6.0f - length(v + dX))-4.0f)-distance) / deps;
-        float dGradPY = ((fabs(6.0f - length(v + dY))-4.0f)-distance) / deps;
-        float2 projection = (dGradPX * distance, dGradPY * distance);
-        v = v - projection;
-    }
+        v = v + (force * 0.3f);
 
-    // set force to 0.
-    forces[i] = (0.0f, 0.0f);
-    vertices[i] = v;
+        // project back if necessary
+        float distance = dist(v);
+        if(distance > 0.0) {
+            float2 dX = (float2)(deps, 0.0f);
+            float2 dY = (float2)(0.0f, deps);
+            float2 vx = (float2)(v + dX);
+            float2 vy = (float2)(v + dY);
+            float dGradPX = (dist(vx) - distance) / deps;
+            float dGradPY = (dist(vy) - distance) / deps;
+            float2 projection = (float2)(dGradPX * distance, dGradPY * distance);
+            v = v - projection;
+        }
+
+        // set force to 0.
+        //printf("vertex( %d ) with force( %f, %f )\n", vertexId, force.x, force.y);
+        forces[vertexId] = (float2)(0.0, 0.0);
+        vertices[vertexId] = v;
 }
 
 // computation of the scaling factor:
