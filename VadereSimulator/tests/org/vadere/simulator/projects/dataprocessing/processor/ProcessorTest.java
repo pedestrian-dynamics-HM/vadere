@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -19,6 +20,14 @@ public abstract class ProcessorTest {
 	DataProcessor p;
 	ReflectionHelper r;
 	ProcessorTestEnv<?, ?> processorTestEnv;
+
+	@Before
+	public void setup(){
+		processorTestEnv.loadDefaultSimulationStateMocks();
+		processorTestEnv.init();
+		p = processorTestEnv.getTestedProcessor();
+		r = ReflectionHelper.create(p);
+	}
 
 	/**
 	 * After a call to {@link DataProcessor#init(ProcessorManager)} the data map and the step count

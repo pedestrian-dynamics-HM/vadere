@@ -15,10 +15,7 @@ public class PedestrianStartTimeProcessorTest extends ProcessorTest {
 	@Before
 	public void setup() {
 		processorTestEnv = new PedestrianStartTimeProcessorTestEnv();
-		processorTestEnv.loadDefaultSimulationStateMocks();
-		processorTestEnv.init();
-		p = processorTestEnv.getTestedProcessor();
-		r = ReflectionHelper.create(p);
+		super.setup();
 	}
 
 	@Test
