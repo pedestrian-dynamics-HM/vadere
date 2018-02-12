@@ -38,7 +38,7 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
     }
 
     private int calculateOverlaps(final Map<Integer, VPoint> pedPosMap, VPoint pos) {
-        return (int) pedPosMap.values().stream().filter(pedPos -> pedPos.distance(pos) < 2*this.pedRadius).count();
+        return (int) pedPosMap.values().stream().filter(pedPos -> pedPos.distance(pos) < 2*this.pedRadius).count() -1;
     }
 
     @Override
