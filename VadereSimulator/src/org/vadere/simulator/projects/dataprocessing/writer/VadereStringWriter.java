@@ -1,4 +1,4 @@
-package org.vadere.simulator.projects.dataprocessing;
+package org.vadere.simulator.projects.dataprocessing.writer;
 
 import java.io.IOException;
 import java.util.ArrayList;

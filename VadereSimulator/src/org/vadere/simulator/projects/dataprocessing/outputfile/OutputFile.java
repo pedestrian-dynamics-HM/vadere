@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
-import org.vadere.simulator.projects.dataprocessing.VadereFileWriter;
-import org.vadere.simulator.projects.dataprocessing.VadereWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereWriter;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,11 +45,13 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private List<DataProcessor<K, ?>> dataProcessors;
 
 	private String separator;
+	private VadereWriterFactory writerFactory;
 	private VadereWriter writer;
 
 	protected OutputFile(final String... keyHeaders) {
 		this.keyHeaders = keyHeaders;
 		this.dataProcessors = new ArrayList<>();
+		this.writerFactory = VadereWriterFactory.getFileWriterFactory();
 	}
 
 	public void setAbsoluteFileName(final String fileName) {
@@ -79,18 +81,16 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void write() {
-		// if there is something to write i.e. absoluteFileName != null
 		if (!isEmpty()) {
-			VadereWriter out = getWriter();
-			printHeader(out);
+			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
+				writer = out;
+				printHeader(out);
 
-			this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
-					.distinct().sorted()
-					.forEach(key -> printRow(out, key));
+				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
+						.distinct().sorted()
+						.forEach(key -> printRow(out, key));
 
-			out.flush();
-			try {
-				out.close();
+				out.flush();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -157,15 +157,8 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return new File(fileName).getName();
 	}
 
-	private VadereWriter getWriter() {
-		if (this.writer == null) {
-			this.writer = new VadereFileWriter(absoluteFileName);
-		}
-		return writer;
-	}
-
-	public void setVadereWriter(VadereWriter vadereWriter) {
-		this.writer = vadereWriter;
+	public void setVadereWriterFactory(VadereWriterFactory writerFactory) {
+		this.writerFactory = writerFactory;
 	}
 
 	public void addDataProcessor(DataProcessor p) {
