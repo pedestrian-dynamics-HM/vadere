@@ -33,7 +33,7 @@ public abstract class ProcessorTest {
 	 * After a call to {@link DataProcessor#init(ProcessorManager)} the data map and the step count
 	 * must be reset.
 	 */
-	private void assertInit(DataProcessor p) throws NoSuchFieldException, IllegalAccessException {
+	public void assertInit(DataProcessor p) throws NoSuchFieldException, IllegalAccessException {
 		assertEquals("Must be zero after init.", 0, p.getData().size());
 		assertEquals("Must be zero after init.", 0, (int) r.valOfField("lastStep"));
 	}

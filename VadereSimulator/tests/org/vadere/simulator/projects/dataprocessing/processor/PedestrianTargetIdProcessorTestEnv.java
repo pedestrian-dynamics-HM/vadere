@@ -1,17 +1,14 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.vadere.simulator.projects.dataprocessing.VadereStringWriter;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,7 +23,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
 				TimestepPedestrianIdKey.class,
 				testedProcessor.getId());
-		outputFile.setVadereWriter(new VadereStringWriter());
+		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
 	List<Pedestrian> getPeds(Integer[] ids, Integer[] targets){

@@ -1,8 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.vadere.simulator.projects.dataprocessing.VadereStringWriter;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -26,7 +27,7 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 		outputFile = outputFileFactory.createOutputfile(
 				TimestepPedestrianIdOutputFile.class,
 				testedProcessor.getId());
-		outputFile.setVadereWriter(new VadereStringWriter());
+		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
 	private List<Pedestrian> getPeds(Integer... ids) {
