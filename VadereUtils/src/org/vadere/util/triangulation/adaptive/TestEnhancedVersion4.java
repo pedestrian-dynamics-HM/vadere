@@ -4,9 +4,14 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AHalfEdge;
+import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.ITriangulationSupplier;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -28,7 +33,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+		IEdgeLengthFunction edgeLengthFunc = p -> 0.1;
 
 		//IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
@@ -36,7 +41,15 @@ public class TestEnhancedVersion4 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>());
+
+		ITriangulationSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> ITriangulation.createATriangulation(
+				IPointLocator.Type.DELAUNAY_HIERARCHY,
+				bbox,
+				(x, y) -> new MeshPoint(x, y,
+						false));
+
+
+		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
@@ -48,14 +61,15 @@ public class TestEnhancedVersion4 extends JFrame {
 		int counter = 0;
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		while (counter < 100) {
+		while (counter < 1) {
 			boolean retriangulation = meshGenerator.step(true);
 			overAllTime.suspend();
 
+			meshGenerator.refresh();
 			distmeshPanel.update();
 			distmeshPanel.repaint();
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

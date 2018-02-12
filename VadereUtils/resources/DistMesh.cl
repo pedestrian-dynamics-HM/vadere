@@ -8,20 +8,20 @@
 #define LOCK(a) atomic_cmpxchg(a, 0, 1)
 #define UNLOCK(a) atomic_xchg(a, 0)
 
-inline void atomicAdd_g_f(volatile __global float *addr, float val)
-   {
-       union{
-           unsigned int u32;
-           float        f32;
-       } next, expected, current;
-   	current.f32    = *addr;
-       do{
-   	   expected.f32 = current.f32;
-           next.f32     = expected.f32 + val;
-   		current.u32  = atomic_cmpxchg( (volatile __global unsigned int *)addr,
-                               expected.u32, next.u32);
-       } while( current.u32 != expected.u32 );
-   }
+inline void atomicAdd_g_f(volatile __global float *addr, float val) {
+	// see OpelCL specification of union to understand the code!
+	union {
+	   unsigned int u32;
+	   float f32;
+	} next, expected, current;
+   	
+	current.f32 = *addr;
+    do {
+		expected.f32 = current.f32;
+		next.f32 = expected.f32 + val;
+   		current.u32 = atomic_cmpxchg( (volatile __global unsigned int *)addr, expected.u32, next.u32);
+    } while(current.u32 != expected.u32);
+}
 
 // helper methods!
 inline float2 getCircumcenter(float2 p1, float2 p2, float2 p3) {
@@ -48,13 +48,7 @@ inline float quality(float2 p, float2 q, float2 r) {
     float a = length(p-q);
     float b = length(p-r);
     float c = length(q-r);
-    float part = 0.0;
-
-    //if(a != 0.0 && b != 0.0 && c != 0.0) {
-        part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-    //}
-
-    return part;
+    return ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
 }
 
 
@@ -103,27 +97,11 @@ inline bool isPartOf(int v0, int v1, int3 t) {
         (v0 == t.s2 && t.s0 == v1) || (v0 == t.s0 && t.s2 == v1);
 }
 
-inline void waitGlobally(volatile __global int *g_mutex) {
-    int num_groups = get_num_groups(0);
-    int lid = get_local_id(0);
-
-    if(lid == 0) {
-        atom_inc(g_mutex);
-
-        // spin-lock
-        //while(*g_mutex != num_groups) {}
-    }
-}
-
-inline void waitLocally() {
-    barrier(CLK_LOCAL_MEM_FENCE);
-}
-
-inline bool alive(int4 edge) {
+inline bool isEdgeAlive(int4 edge) {
     return edge.s0 != -1;
 }
 
-inline bool triAlive(int3 triangle) {
+inline bool isTriAlive(int3 triangle) {
     return triangle.s0 != -1;
 }
 // end helper
@@ -135,7 +113,7 @@ kernel void removeTriangles(__global float2* vertices,
     int edgeId = get_global_id(0);
 
     // edge is alive?
-    if(alive(edges[edgeId])){
+    if(isEdgeAlive(edges[edgeId])){
         float eps = 0.000001f;
 
         int ta = edges[edgeId].s2;
@@ -171,8 +149,8 @@ kernel void label(__global float2* vertices,
                   __global int* labeledEdges,
                   __global int* illegalEdge) {
     int edgeId = get_global_id(0);
-    if(alive(edges[edgeId])){
-        float eps = 0.0001;
+    if(isEdgeAlive(edges[edgeId])){
+        float eps = 0.0001f;
 
         int v0 = edges[edgeId].s0;
         int v1 = edges[edgeId].s1;
@@ -201,13 +179,13 @@ kernel void label(__global float2* vertices,
 
 // for each edge in parallel
 kernel void updateLabel(__global float2* vertices,
-                  __global int4* edges,
-                  __global int3* triangles,
-                  __global int* labeledEdges,
-                  __global int* illegalEdge,
-                  __global int* lockedTriangles) {
+                        __global int4* edges,
+						__global int3* triangles,
+						__global int* labeledEdges,
+						__global int* illegalEdge,
+						__global int* lockedTriangles) {
     int edgeId = get_global_id(0);
-    if(alive(edges[edgeId])){
+    if(isEdgeAlive(edges[edgeId])){
         float eps = 0.000001f;
 
         int v0 = edges[edgeId].s0;
@@ -240,8 +218,8 @@ kernel void updateLabel(__global float2* vertices,
 }
 
 kernel void flipStage1(__global int4* edges,
-                 __global int* labeledEdges,
-                 __global int* lockedTriangles) {
+					   __global int* labeledEdges,
+					   __global int* lockedTriangles) {
     int e = get_global_id(0);
 
     // is the edge illegal
@@ -259,8 +237,8 @@ kernel void flipStage1(__global int4* edges,
 }
 
 kernel void flipStage2(__global int4* edges,
-                 __global int* labeledEdges,
-                 __global int* lockedTriangles) {
+					   __global int* labeledEdges,
+					   __global int* lockedTriangles) {
     int e = get_global_id(0);
 
     if(labeledEdges[e] == 1) {
@@ -337,7 +315,7 @@ kernel void flipStage3(
                     __global int* R)
 {
     int edgeId = get_global_id(0);
-    if(alive(edges[edgeId])){
+    if(isEdgeAlive(edges[edgeId])){
         int v0 = edges[edgeId].s0;
         int v1 = edges[edgeId].s1;
         int ta = edges[edgeId].s2;
@@ -362,7 +340,7 @@ kernel void flipStage3(
                      __global int* illegalTri)
 {
     int triangleId = get_global_id(0);
-    if(triAlive(triangles[triangleId])) {
+    if(isTriAlive(triangles[triangleId])) {
         float2 v0 = vertices[triangles[triangleId].s0];
         float2 v1 = vertices[triangles[triangleId].s1];
         float2 v2 = vertices[triangles[triangleId].s2];

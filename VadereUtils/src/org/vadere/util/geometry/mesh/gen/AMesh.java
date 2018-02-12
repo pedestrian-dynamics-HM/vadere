@@ -189,7 +189,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		int id = edges.size();
 		AHalfEdge<P> edge = new AHalfEdge<>(id, vertex.getId());
 		edges.add(edge);
-		numberOfFaces++;
+		numberOfEdges++;
 		return edge;
 	}
 
@@ -291,7 +291,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public List<AFace<P>> getFaces() {
+	public synchronized List<AFace<P>> getFaces() {
 		return streamFaces().filter(f -> !f.isDestroyed()).collect(Collectors.toList());
 	}
 

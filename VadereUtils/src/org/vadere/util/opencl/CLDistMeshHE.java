@@ -104,6 +104,7 @@ public class CLDistMeshHE<P extends IPoint> {
     private long maxGroupSize;
     private long maxComputeUnits;
     private long prefdWorkGroupSizeMultiple;
+    private long prefdWorkGroupSizeMultipleForces;
 
     private PointerBuffer clGlobalWorkSizeEdges;
     private PointerBuffer clGlobalWorkSizeVertices;
@@ -111,6 +112,8 @@ public class CLDistMeshHE<P extends IPoint> {
 
     private PointerBuffer clGloblWorkSizeSFPartial;
     private PointerBuffer clLocalWorkSizeSFPartial;
+    private PointerBuffer clGloblWorkSizeForces;
+    private PointerBuffer clLocalWorkSizeForces;
 
     private PointerBuffer clGloblWorkSizeSFComplete;
     private PointerBuffer clLocalWorkSizeSFComplete;
@@ -124,7 +127,7 @@ public class CLDistMeshHE<P extends IPoint> {
 
     private AMesh<P> mesh;
 
-    private boolean doublePrecision = true;
+    private boolean doublePrecision = false;
     private boolean profiling = true;
 
     private boolean hasToRead = false;
@@ -255,8 +258,13 @@ public class CLDistMeshHE<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clKernelCompleteSF = clCreateKernel(clProgram, "computeCompleteSF", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+
         clKernelForces = clCreateKernel(clProgram, "computeForces", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+        clGetKernelWorkGroupInfo(clKernelForces, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
+        prefdWorkGroupSizeMultipleForces = pp.get(0);
+        log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultipleForces + " (forces)");
+
         clKernelMove = clCreateKernel(clProgram, "moveVertices", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
 
@@ -337,12 +345,13 @@ public class CLDistMeshHE<P extends IPoint> {
         clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
         clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
 
-        clSetKernelArg1p(clKernelForces, 0, clVertices);
-        clSetKernelArg1p(clKernelForces, 1, clEdges);
-        clSetKernelArg1p(clKernelForces, 2, clVtoE);
-        clSetKernelArg1p(clKernelForces, 3, clLengths);
-        clSetKernelArg1p(clKernelForces, 4, clScalingFactor);
-        clSetKernelArg1p(clKernelForces, 5, clForces);
+        clSetKernelArg1p(clKernelForces, 0, numberOfVertices);
+        clSetKernelArg1p(clKernelForces, 1, clVertices);
+        clSetKernelArg1p(clKernelForces, 2, clEdges);
+        clSetKernelArg1p(clKernelForces, 3, clVtoE);
+        clSetKernelArg1p(clKernelForces, 4, clLengths);
+        clSetKernelArg1p(clKernelForces, 5, clScalingFactor);
+        clSetKernelArg1p(clKernelForces, 6, clForces);
 
 
         clSetKernelArg1p(clKernelMove, 0, clVertices);
@@ -390,6 +399,11 @@ public class CLDistMeshHE<P extends IPoint> {
         clLocalWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
         clGloblWorkSizeSFPartial.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultiple));
         clLocalWorkSizeSFPartial.put(0, (int)maxGroupSize);
+
+        clGloblWorkSizeForces = BufferUtils.createPointerBuffer(1);
+        clLocalWorkSizeForces = BufferUtils.createPointerBuffer(1);
+        clGloblWorkSizeForces.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultipleForces));
+        clLocalWorkSizeForces.put(0, (int)maxGroupSize);
 
         clGloblWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
@@ -459,7 +473,7 @@ public class CLDistMeshHE<P extends IPoint> {
         log.info("computed scale factor");
 
         // force to use only 1 work group => local size = local size
-        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeVertices, null, null, null);
+        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGloblWorkSizeForces, clLocalWorkSizeForces, null, null);
         log.info("computed forces");
 
         enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);

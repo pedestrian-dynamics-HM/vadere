@@ -3,6 +3,9 @@ package org.vadere.util.triangulation.adaptive;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AHalfEdge;
+import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
@@ -35,7 +38,7 @@ public class TestEnhancedVersion3 extends JFrame {
         IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
         //IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-        IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+        IEdgeLengthFunction edgeLengthFunc = p -> 0.5;
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
 
@@ -47,22 +50,22 @@ public class TestEnhancedVersion3 extends JFrame {
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
         VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 
-        ITriangulationSupplier<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> supplier = () -> ITriangulation.createPTriangulation(
+        ITriangulationSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> ITriangulation.createATriangulation(
                 IPointLocator.Type.DELAUNAY_HIERARCHY,
                 bbox,
                 (x, y) -> new MeshPoint(x, y,
                         false));
 
-        PSMeshing<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> meshGenerator = new PSMeshing<>(
+        PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
                 distanceFunc,
                 edgeLengthFunc,
                 1,
                 bbox, new ArrayList<>(),
                 supplier);
 
-        Predicate<PFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
+        Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 
-		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
+		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("CPU");
@@ -77,12 +80,12 @@ public class TestEnhancedVersion3 extends JFrame {
 
         StopWatch overAllTime = new StopWatch();
         overAllTime.start();
-        while (counter <= 100) {
+        while (counter <= 500) {
             meshGenerator.improve();
             overAllTime.suspend();
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

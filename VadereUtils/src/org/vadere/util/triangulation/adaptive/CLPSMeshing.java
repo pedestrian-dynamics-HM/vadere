@@ -4,13 +4,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.*;
-import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
+import org.vadere.util.triangulation.ITriangulationSupplier;
 import org.vadere.util.triangulation.improver.IMeshImprover;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,12 +17,13 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  */
-public class CLPSMeshing implements IMeshImprover {
+public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
     private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private ITriangulation<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> triangulation;
+    private final ITriangulationSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulationSupplier;
+    private ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<MeshPoint, MeshPoint>> edges;
     private VRectangle bound;
@@ -45,7 +45,7 @@ public class CLPSMeshing implements IMeshImprover {
 
     private Object gobalAcessSynchronizer = new Object();
 
-    private CLDistMesh<MeshPoint> clDistMesh;
+    private CLDistMesh<P> clDistMesh;
     private boolean hasToRead = false;
 
     public CLPSMeshing(
@@ -53,16 +53,17 @@ public class CLPSMeshing implements IMeshImprover {
             final IEdgeLengthFunction edgeLengthFunc,
             final double initialEdgeLen,
             final VRectangle bound,
-            final Collection<? extends VShape> obstacleShapes) {
+            final Collection<? extends VShape> obstacleShapes,
+            final ITriangulationSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulationSupplier) {
 
         this.bound = bound;
         this.distanceFunc = distanceFunc;
         this.edgeLengthFunc = edgeLengthFunc;
         this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
+        this.triangulationSupplier = triangulationSupplier;
         this.edges = new ArrayList<>();
         this.deps = 1.4901e-8 * initialEdgeLen;
-        this.triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new MeshPoint(x, y, false));
     }
 
     /**
@@ -72,13 +73,27 @@ public class CLPSMeshing implements IMeshImprover {
         log.info("##### (start) compute a uniform refined triangulation #####");
         //UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         //uniformRefinementTriangulation.generate();
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
-        clDistMesh.init();
-        initialized = true;
+
         log.info("##### (end) compute a uniform refined triangulation #####");
+
+        log.info("##### (start) generate a triangulation #####");
+        UniformRefinementTriangulatorCFS<P, AVertex<P>, AHalfEdge<P>, AFace<P>> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
+                triangulationSupplier,
+                bound,
+                obstacleShapes,
+                p -> edgeLengthFunc.apply(p) * initialEdgeLen,
+                distanceFunc);
+        triangulation = uniformRefinementTriangulation.generate();
+
+        // TODO: dirty cast.
+        clDistMesh = new CLDistMesh<P>((AMesh<P>)triangulation.getMesh());
+        clDistMesh.init();
+        clDistMesh.refresh();
+        initialized = true;
+        log.info("##### (end) generate a triangulation #####");
     }
 
-    public ITriangulation<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> getTriangulation() {
+    public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> getTriangulation() {
         return triangulation;
     }
 
@@ -146,69 +161,39 @@ public class CLPSMeshing implements IMeshImprover {
 		log.info("#points: " + getMesh().getVertices().size());*/
     }
 
-    public boolean flipEdges() {
-        //? refresh();
-        boolean anyFlip = false;
-        // Careful, iterate over all half-edges means iterate over each "real" edge twice!
-		/*for(AHalfEdge<MeshPoint> edge : getMesh().getEdgeIt()) {
-			if(triangulation.isIllegal(edge)) {
-				//triangulation.flip(edge);
-				anyFlip = true;
-			}
-		}*/
-
-        if(clDistMesh != null) {
-            clDistMesh.finish();
-        }
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
-        clDistMesh.init();
-        return anyFlip;
-    }
-
     public void finish() {
-        /*if(clDistMesh != null) {
-            clDistMesh.finish();
-        }
-        triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
-        removeTrianglesInsideObstacles();
-        triangulation.finish();*/
-        clDistMesh.refresh();
+        clDistMesh.finish();
     }
 
-    //?
     public void refresh() {
         if(clDistMesh != null) {
-            //? clDistMesh.refresh();
+            clDistMesh.refresh();
         }
-        triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
-        removeTrianglesInsideObstacles();
-        removeLowQualityTriangles(); //?
-        triangulation.finish();
     }
 
     public void retriangulate() {
-        triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
-        removeTrianglesInsideObstacles();
-        removeLowQualityTriangles(); //?
-        triangulation.finish();
-
         if(clDistMesh != null) {
             clDistMesh.finish();
+            Collection<P> points = triangulation.getMesh().getPoints();
+            triangulation = triangulationSupplier.get();
+            triangulation.insert(points);
+            removeTrianglesInsideObstacles();
+            removeLowQualityTriangles(); //?
+            triangulation.finish();
         }
-        else {
 
-        }
-        clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
+        // TODO: dirty casting
+        clDistMesh = new CLDistMesh<>((AMesh<P>) triangulation.getMesh());
         clDistMesh.init();
     }
 
     private void removeLowQualityTriangles() {
-        List<AFace<MeshPoint>> faces = getMesh().getFaces();
-        for(AFace<MeshPoint> face : faces) {
+        List<AFace<P>> faces = getMesh().getFaces();
+        for(AFace<P> face : faces) {
             if(faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE) {
-                Optional<AHalfEdge<MeshPoint>> optEdge = getMesh().getLinkToBoundary(face);
+                Optional<AHalfEdge<P>> optEdge = getMesh().getLinkToBoundary(face);
                 if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
-                    AHalfEdge<MeshPoint> edge = getMesh().getNext(optEdge.get());
+                    AHalfEdge<P> edge = getMesh().getNext(optEdge.get());
                     projectToBoundary(getMesh().getVertex(edge));
                     triangulation.removeFace(face, true);
                 }
@@ -217,7 +202,7 @@ public class CLPSMeshing implements IMeshImprover {
     }
 
     public boolean isMovementIllegal() {
-        for(AFace<MeshPoint> face : getMesh().getFaces()) {
+        for(AFace<P> face : getMesh().getFaces()) {
             if(!getMesh().isBoundary(face) && !getMesh().isDestroyed(face) && !triangulation.isCCW(face)) {
                 return true;
             }
@@ -225,15 +210,16 @@ public class CLPSMeshing implements IMeshImprover {
         return false;
     }
 
-    public synchronized IMesh<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> getMesh() {
+    public synchronized AMesh<P> getMesh() {
         if(hasToRead) {
             hasToRead = false;
             clDistMesh.refresh();
         }
-        return triangulation.getMesh();
+        // TODO: dirty casting
+        return (AMesh<P>) triangulation.getMesh();
     }
 
-    public double faceToQuality(final AFace<MeshPoint> face) {
+    public double faceToQuality(final AFace<P> face) {
 
         VLine[] lines = getMesh().toTriangle(face).getLines();
         double a = lines[0].length();
@@ -249,8 +235,8 @@ public class CLPSMeshing implements IMeshImprover {
         return part;
     }
 
-    private void projectToBoundary(final AVertex<MeshPoint> vertex) {
-        MeshPoint position = getMesh().getPoint(vertex);
+    private void projectToBoundary(final AVertex<P> vertex) {
+        P position = getMesh().getPoint(vertex);
         double distance = distanceFunc.apply(position);
         if(distance < 0) {
             double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps,0))) - distance) / deps;
@@ -261,8 +247,8 @@ public class CLPSMeshing implements IMeshImprover {
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<AFace<MeshPoint>> faces = triangulation.getMesh().getFaces();
-        for(AFace<MeshPoint> face : faces) {
+        List<AFace<P>> faces = triangulation.getMesh().getFaces();
+        for(AFace<P> face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
                 triangulation.removeFace(face, true);
             }

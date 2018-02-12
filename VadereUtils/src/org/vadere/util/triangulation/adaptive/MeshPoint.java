@@ -6,7 +6,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.calculators.PotentialPoint;
 
-public class MeshPoint extends MPoint implements PotentialPoint {
+public class MeshPoint extends MPoint implements PotentialPoint, Cloneable {
 	private boolean fixPoint;
 	private IPoint velocity;
 	private double maxTraveldistance;
@@ -91,5 +91,13 @@ public class MeshPoint extends MPoint implements PotentialPoint {
 	@Override
 	public String toString() {
 		return super.toString() + "/" + tag + "/" + potential;
+	}
+
+	@Override
+	public MeshPoint clone() {
+		MeshPoint clone = (MeshPoint) super.clone();
+		clone.lastPosition = lastPosition.clone();
+		clone.velocity = velocity.clone();
+		return clone;
 	}
 }

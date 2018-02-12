@@ -498,7 +498,7 @@ public class CLDistMesh<P extends IPoint> {
 
         // force to use only 1 work group => local size = local size
         enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, null, null, null);
-        log.info("computed forces");
+        log.info("(default) computed forces");
 
         enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
         log.info("move vertices");
@@ -535,7 +535,7 @@ public class CLDistMesh<P extends IPoint> {
                 enqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
                 log.info("repair data structure");
 
-                clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                enqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
                 log.info("refresh old labels");
                 clFinish(clQueue);
 

@@ -30,7 +30,7 @@ public class TestUniTriangulation extends JFrame {
         ITriangulationSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bbox, (x, y) -> new VPoint(x, y));
 
         UniformRefinementTriangulatorCFS<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 5.0, distanceFunc);
+                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 0.1, distanceFunc);
 
         PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel =
                 new PSMeshingPanel(uniformRefinementTriangulation.init().getMesh(), f -> false, 1000, 800, bbox);
@@ -53,11 +53,12 @@ public class TestUniTriangulation extends JFrame {
             //meshGenerator.improve();
             overAllTime.suspend();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-	        uniformRefinementTriangulation.nextSFCLevel();
+	        uniformRefinementTriangulation.step();
             distmeshPanel.repaint();
             counter++;
             //System.out.println("Quality: " + meshGenerator.getQuality());
@@ -65,7 +66,7 @@ public class TestUniTriangulation extends JFrame {
 
             boolean removedSome = true;
         }
-        uniformRefinementTriangulation.finish();
+       uniformRefinementTriangulation.finish();
 
         distmeshPanel.repaint();
         overAllTime.stop();
