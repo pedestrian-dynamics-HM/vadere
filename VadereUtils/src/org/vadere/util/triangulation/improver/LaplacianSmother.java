@@ -14,7 +14,6 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.triangulator.RandomPointsSetTriangulator;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -201,6 +200,6 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
     public void retriangulate() {
         triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
-        triangulation.finalize();
+        triangulation.finish();
     }
 }

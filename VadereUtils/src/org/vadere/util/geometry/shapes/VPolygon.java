@@ -405,25 +405,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	@Override
 	public VPoint getCentroid() {
-		List<VPoint> pointList = getPoints();
-		double area = 0;
-		double xValue = 0;
-		double yValue = 0;
-		for (int i = 0; i < pointList.size() - 1; i++) {
-			area += pointList.get(i).getX() * pointList.get(i + 1).getY()
-					- pointList.get(i).getY() * pointList.get(i + 1).getX();
-			xValue += (pointList.get(i).getX() + pointList.get(i + 1).getX())
-					* (pointList.get(i).getX() * pointList.get(i + 1).getY()
-							- pointList.get(i).getY() * pointList.get(i + 1).getX());
-			yValue += (pointList.get(i).getY() + pointList.get(i + 1).getY())
-					* (pointList.get(i).getX() * pointList.get(i + 1).getY()
-							- pointList.get(i).getY() * pointList.get(i + 1).getX());
-		}
-		area /= 2;
-		xValue /= (6 * area);
-		yValue /= (6 * area);
-
-		return new VPoint(xValue, yValue);
+	    return GeometryUtils.getCentroid(getPoints());
 	}
 
 	public VPolygon rotate(IPoint anchor, double angle) {

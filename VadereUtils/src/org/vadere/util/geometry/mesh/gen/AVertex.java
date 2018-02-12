@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Benedikt Zoennchen
  */
-public class AVertex<P extends IPoint> implements IVertex<P> {
+public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
     private final Lock lock;
     private P point;
     private int down;
@@ -51,7 +51,7 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 		this.down = down;
 	}
 
-	int getId() {
+	public int getId() {
 	    return id;
     }
 
@@ -96,6 +96,17 @@ public class AVertex<P extends IPoint> implements IVertex<P> {
 
 	@Override
 	public String toString() {
-		return id + ":" + point.toString();
+		return id+"";
 	}
+
+    @Override
+    public AVertex<P> clone() {
+        try {
+            AVertex clone = (AVertex<P>)super.clone();
+            clone.point = point.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
 }

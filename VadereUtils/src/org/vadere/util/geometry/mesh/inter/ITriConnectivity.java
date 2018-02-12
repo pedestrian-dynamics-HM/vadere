@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.mesh.inter;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -126,6 +127,16 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
+
+    default E getAnyEdge(Pair<E, E> pair) {
+        if(pair.getLeft() != null) {
+            return pair.getLeft();
+        }
+        else {
+            return pair.getRight();
+        }
+    }
+
 	/**
 	 * Splits the half-edge at point p, preserving a valid triangulation.
 	 * Assumption: p is located on the edge!
@@ -133,12 +144,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 *
 	 * @param p         the split point
 	 * @param halfEdge  the half-edge which will be split
-	 * @return an newly created half-edge which has p as its end-point
-	 */
-	default E splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
-		IMesh<P, V, E, F> mesh = getMesh();
-		V v = mesh.createVertex(p);
-		mesh.insertVertex(v);
+	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
+     *         edges and their twins are the faces which took part / where modified / added by the split.
+     */
+	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
+        IMesh<P, V, E, F> mesh = getMesh();
+        V v = mesh.createVertex(p);
+        mesh.insertVertex(v);
 
 		/*
 		 * Situation: h0 = halfEdge
@@ -159,24 +171,24 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		 *       f3
 		 */
 
-		//h0,(t0),t1
-		//e2,(o0,
+        //h0,(t0),t1
+        //e2,(o0,
 
-		E h0 = halfEdge;
-		E o0 = mesh.getTwin(h0);
+        E h0 = halfEdge;
+        E o0 = mesh.getTwin(h0);
 
-		V v2 = mesh.getVertex(o0);
-		F f0 = mesh.getFace(h0);
-		F f3 = mesh.getFace(o0);
+        V v2 = mesh.getVertex(o0);
+        F f0 = mesh.getFace(h0);
+        F f3 = mesh.getFace(o0);
 
-		// faces correct?
-		//mesh.createEdge(v2, mesh.getFace(o0));
-		E e1 = mesh.createEdge(v2, mesh.getFace(o0));
+        // faces correct?
+        //mesh.createEdge(v2, mesh.getFace(o0));
+        E e1 = mesh.createEdge(v2, mesh.getFace(o0));
+        E t2 = null;
+        E t1 = mesh.createEdge(v, mesh.getFace(h0));
+        mesh.setEdge(v, t1);
 
-		E t1 = mesh.createEdge(v, mesh.getFace(h0));
-		mesh.setEdge(v, t1);
-
-		mesh.setTwin(e1, t1);
+        mesh.setTwin(e1, t1);
 
 		/*
 		 * These two operations are strongly connected.
@@ -184,107 +196,107 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		 * If the edge of v2 is equal to o0, the edge becomes
 		 * invalid after calling mesh.setVertex(o0, v);
 		 */
-		mesh.setVertex(o0, v);
-		if(mesh.getEdge(v2).equals(o0)) {
-			mesh.setEdge(v2, e1);
-		}
+        mesh.setVertex(o0, v);
+        if(mesh.getEdge(v2).equals(o0)) {
+            mesh.setEdge(v2, e1);
+        }
 
-		if(!mesh.isBoundary(h0)) {
-			F f1 = mesh.createFace();
+        if(!mesh.isBoundary(h0)) {
+            F f1 = mesh.createFace();
 
-			E h1 = mesh.getNext(h0);
-			E h2 = mesh.getNext(h1);
+            E h1 = mesh.getNext(h0);
+            E h2 = mesh.getNext(h1);
 
-			V v1 = mesh.getVertex(h1);
-			E e0 = mesh.createEdge(v1, f1);
-			E t0 = mesh.createEdge(v, f0);
+            V v1 = mesh.getVertex(h1);
+            E e0 = mesh.createEdge(v1, f1);
+            E t0 = mesh.createEdge(v, f0);
 
-			mesh.setTwin(e0, t0);
+            mesh.setTwin(e0, t0);
 
-			mesh.setEdge(f0, h0);
-			mesh.setEdge(f1, h2);
+            mesh.setEdge(f0, h0);
+            mesh.setEdge(f1, h2);
 
-			mesh.setFace(h1, f0);
-			mesh.setFace(t0, f0);
-			mesh.setFace(h0, f0);
+            mesh.setFace(h1, f0);
+            mesh.setFace(t0, f0);
+            mesh.setFace(h0, f0);
 
-			mesh.setFace(h2, f1);
-			mesh.setFace(t1, f1);
-			mesh.setFace(e0, f1);
+            mesh.setFace(h2, f1);
+            mesh.setFace(t1, f1);
+            mesh.setFace(e0, f1);
 
-			mesh.setNext(h0, h1);
-			mesh.setNext(h1, t0);
-			mesh.setNext(t0, h0);
+            mesh.setNext(h0, h1);
+            mesh.setNext(h1, t0);
+            mesh.setNext(t0, h0);
 
-			mesh.setNext(e0, h2);
-			mesh.setNext(h2, t1);
-			mesh.setNext(t1, e0);
+            mesh.setNext(e0, h2);
+            mesh.setNext(h2, t1);
+            mesh.setNext(t1, e0);
 
-			splitEdgeEvent(f0, f0, f1);
-		}
-		else {
-			mesh.setNext(mesh.getPrev(h0), t1);
-			mesh.setNext(t1, h0);
-		}
+            splitEdgeEvent(f0, f0, f1);
+        }
+        else {
+            mesh.setNext(mesh.getPrev(h0), t1);
+            mesh.setNext(t1, h0);
+        }
 
-		if(!mesh.isBoundary(o0)) {
-			E o1 = mesh.getNext(o0);
-			E o2 = mesh.getNext(o1);
+        if(!mesh.isBoundary(o0)) {
+            E o1 = mesh.getNext(o0);
+            E o2 = mesh.getNext(o1);
 
-			V v3 = mesh.getVertex(o1);
-			F f2 = mesh.createFace();
+            V v3 = mesh.getVertex(o1);
+            F f2 = mesh.createFace();
 
-			// face
-			E e2 = mesh.createEdge(v3, mesh.getFace(o0));
-			E t2 = mesh.createEdge(v, f2);
-			mesh.setTwin(e2, t2);
+            // face
+            E e2 = mesh.createEdge(v3, mesh.getFace(o0));
+            t2 = mesh.createEdge(v, f2);
+            mesh.setTwin(e2, t2);
 
-			mesh.setEdge(f2, o1);
-			mesh.setEdge(f3, o0);
+            mesh.setEdge(f2, o1);
+            mesh.setEdge(f3, o0);
 
-			mesh.setFace(o1, f2);
-			mesh.setFace(t2, f2);
-			mesh.setFace(e1, f2);
+            mesh.setFace(o1, f2);
+            mesh.setFace(t2, f2);
+            mesh.setFace(e1, f2);
 
-			mesh.setFace(o2, f3);
-			mesh.setFace(o0, f3);
-			mesh.setFace(e2, f3);
+            mesh.setFace(o2, f3);
+            mesh.setFace(o0, f3);
+            mesh.setFace(e2, f3);
 
-			mesh.setNext(e1, o1);
-			mesh.setNext(o1, t2);
-			mesh.setNext(t2, e1);
+            mesh.setNext(e1, o1);
+            mesh.setNext(o1, t2);
+            mesh.setNext(t2, e1);
 
-			mesh.setNext(o0, e2);
-			mesh.setNext(e2, o2);
-			mesh.setNext(o2, o0);
+            mesh.setNext(o0, e2);
+            mesh.setNext(e2, o2);
+            mesh.setNext(o2, o0);
 
-			splitEdgeEvent(f3, f3, f2);
-		}
-		else {
-			mesh.setNext(e1, mesh.getNext(o0));
-			mesh.setNext(o0, e1);
-		}
+            splitEdgeEvent(f3, f3, f2);
+        }
+        else {
+            mesh.setNext(e1, mesh.getNext(o0));
+            mesh.setNext(o0, e1);
+        }
 
-		if(legalize) {
-			if(!mesh.isBoundary(h0)) {
-				E h1 = mesh.getNext(h0);
-				E h2 = mesh.getPrev(t1);
-				legalize(h1, v);
-				legalize(h2, v);
-			}
+        if(legalize) {
+            if(!mesh.isBoundary(h0)) {
+                E h1 = mesh.getNext(h0);
+                E h2 = mesh.getPrev(t1);
+                legalize(h1, v);
+                legalize(h2, v);
+            }
 
-			if(!mesh.isBoundary(o0)) {
-				E o1 = mesh.getNext(e1);
-				E o2 = mesh.getPrev(o0);
-				legalize(o1, v);
-				legalize(o2, v);
-			}
-		}
+            if(!mesh.isBoundary(o0)) {
+                E o1 = mesh.getNext(e1);
+                E o2 = mesh.getPrev(o0);
+                legalize(o1, v);
+                legalize(o2, v);
+            }
+        }
 
-		return t1;
+        return Pair.of(t1, t2);
 	}
 
-	default E splitEdge(@NotNull P p, @NotNull E halfEdge) {
+	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge) {
 		return splitEdge(p, halfEdge, true);
 	}
 

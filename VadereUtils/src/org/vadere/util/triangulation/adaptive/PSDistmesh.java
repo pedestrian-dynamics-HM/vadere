@@ -121,7 +121,7 @@ public class  PSDistmesh {
 
 			System.out.println("triangulation started");
 			bowyerWatson = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new MeshPoint(x, y, false));
-			bowyerWatson.finalize();
+			bowyerWatson.finish();
 			System.out.println("triangulation finished");
 
 			IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> mesh = bowyerWatson.getMesh();

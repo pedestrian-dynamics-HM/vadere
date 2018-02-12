@@ -2,14 +2,17 @@ package org.vadere.util.triangulation.adaptive;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.color.ColorHelper;
+import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AMesh;
+import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
+import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.math.SpaceFillingCurve;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 
 import java.awt.*;
@@ -28,29 +31,34 @@ import javax.swing.*;
 public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
 
     private static final Logger log = LogManager.getLogger(PSMeshingPanel.class);
-	private IMeshImprover meshGenerator;
+	private IMesh<P, V, E, F> mesh;
 	private double width;
 	private double height;
 	private Collection<F> faces;
     private final Predicate<F> alertPred;
     private Collection<VTriangle> triangles;
+    private VRectangle bound;
+    private final double scale;
 
-    public PSMeshingPanel(final IMeshImprover<P, V, E, F> meshGenerator, final Predicate<F> alertPred, final double width, final double height) {
-        this.meshGenerator = meshGenerator;
+    public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound) {
+        this.mesh = mesh;
         this.width = width;
         this.height = height;
         this.alertPred = alertPred;
         this.triangles = new ArrayList<>();
+        this.bound = bound;
+        this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+
     }
 
     public void update() {
-        faces = meshGenerator.getMesh().getFaces();
+        faces = mesh.getFaces();
     }
 
 	@Override
 	public void paint(Graphics g) {
 
-        synchronized (meshGenerator) {
+        synchronized (mesh) {
             update();
             Graphics2D graphics2D = (Graphics2D) g;
             BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -61,42 +69,74 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 
             graphics.setColor(Color.WHITE);
             graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
-
+            Font currentFont = graphics.getFont();
+            Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
+            graphics.setFont(newFont);
             graphics.setColor(Color.GRAY);
 	       /* for(VShape obstacle : obstacles) {
 		        graphics.fill(obstacle);
 	        }*/
 
-            graphics.translate(400, 400);
-            graphics.scale(20, 20);
+            graphics.scale(scale, scale);
+            graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
+
             graphics.setStroke(new BasicStroke(0.003f));
             graphics.setColor(Color.BLACK);
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int max = 0;
+            double maxX = Double.MIN_VALUE;
+            double maxY = Double.MIN_VALUE;
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+
             for(F face : faces) {
-                //log.info(face);
-			/*if(triangleToQuality(triangle) < 0.2) {
-				graphics.setColor(Color.GRAY);
-				graphics.draw(triangle);
-				graphics.setColor(Color.RED);
-				graphics.fill(triangle);
-			}*/
-                VTriangle triangle = meshGenerator.getMesh().toTriangle(face);
+                VTriangle triangle = mesh.toTriangle(face);
+                /*if(face instanceof AFace) {
+                    int sum = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).max().getAsInt();
+                    max = Math.max(sum, max);
+                }*/
+
+                VPoint incenter = triangle.getIncenter();
+
+                maxX = Math.max(maxX, incenter.getX());
+                maxY = Math.max(maxY, incenter.getY());
+
+                minX = Math.min(minX, incenter.getX());
+                minY = Math.min(minY, incenter.getY());
+            }
+
+            int groupSize = 64;
+            ColorHelper colorHelper = new ColorHelper(faces.size());
+//            SpaceFillingCurve curve = new SpaceFillingCurve(new VRectangle(minX, minY, maxX-minX, maxY-minY));
+
+            for(F face : faces) {
+                VTriangle triangle = mesh.toTriangle(face);
                 if(alertPred.test(face)) {
                     //log.info("red triangle");
-                    graphics.setColor(Color.BLACK);
+                    graphics.setColor(Color.GRAY);
                     graphics.draw(triangle);
                     graphics.setColor(Color.RED);
                     graphics.fill(triangle);
+
+
                 } else {
-                    graphics.setColor(Color.BLACK);
-                    graphics.draw(triangle);
-               }
+                    if(face instanceof AFace) {
+
+                        int bucket = ((AFace)face).getId() / groupSize;
+
+	                    graphics.setColor(colorHelper.numberToColor(((AFace)face).getId()));
+                        graphics.fill(triangle);
+                    }
+                }
+
+                graphics.setColor(Color.BLACK);
+                graphics.draw(triangle);
             }
-            //graphics.translate(5,5);
+
             graphics2D.drawImage(image, 0, 0, null);
         }
-
-//            graphics.setColor(Color.RED);
-//            tc.triangulation.getTriangles().parallelStream().forEach(graphics::draw);
 	}
 
 	public double triangleToQuality(final VTriangle triangle) {

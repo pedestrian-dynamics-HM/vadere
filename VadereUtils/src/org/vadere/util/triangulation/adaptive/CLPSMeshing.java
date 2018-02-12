@@ -70,8 +70,8 @@ public class CLPSMeshing implements IMeshImprover {
      */
     public void initialize() {
         log.info("##### (start) compute a uniform refined triangulation #####");
-        UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
-        uniformRefinementTriangulation.generate();
+        //UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
+        //uniformRefinementTriangulation.generate();
         clDistMesh = new CLDistMesh<>((AMesh<MeshPoint>) triangulation.getMesh());
         clDistMesh.init();
         initialized = true;
@@ -171,7 +171,7 @@ public class CLPSMeshing implements IMeshImprover {
         }
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, clDistMesh.getResult(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
-        triangulation.finalize();*/
+        triangulation.finish();*/
         clDistMesh.refresh();
     }
 
@@ -183,14 +183,14 @@ public class CLPSMeshing implements IMeshImprover {
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         removeLowQualityTriangles(); //?
-        triangulation.finalize();
+        triangulation.finish();
     }
 
     public void retriangulate() {
         triangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         removeLowQualityTriangles(); //?
-        triangulation.finalize();
+        triangulation.finish();
 
         if(clDistMesh != null) {
             clDistMesh.finish();

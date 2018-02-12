@@ -7,10 +7,8 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
-import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
-import org.vadere.util.geometry.mesh.inter.ITriangulation;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
+import org.vadere.util.geometry.mesh.inter.*;
+import org.vadere.util.triangulation.ITriangulationSupplier;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -21,72 +19,65 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.Parameters;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.PriorityQueue;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * @author Benedikt Zoennchen
  */
-public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> {
-	private static final Logger log = LogManager.getLogger(PSMeshing.class);
+public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IMeshImprover<P, V, E, F> {
+
 	private boolean illegalMovement = false;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
-	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
-	private Collection<? extends VShape> obstacleShapes;
-	private ArrayList<Pair<MeshPoint, MeshPoint>> edges;
+	private ITriangulation<P, V, E, F> triangulation;
 	private VRectangle bound;
 	private double scalingFactor;
-	private PriorityQueue<Pair<PFace<MeshPoint>, Double>> heap;
-
-	private double initialEdgeLen = 0.4;
 	private double deps;
-	private double sumOfqDesiredEdgeLength;
-	private double sumOfqLengths;
 
-	private boolean initialized = false;
 	private boolean runParallel = false;
-
-	private int numberOfRetriangulations = 0;
-	private int numberOfIterations = 0;
-	private int numberOfIllegalMovementTests = 0;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
 
-	private Object gobalAcessSynchronizer = new Object();
+    private Object gobalAcessSynchronizer = new Object();
+
+	// only for logging
+    private static final Logger log = LogManager.getLogger(PSMeshing.class);
+	private int numberOfIllegalMovementTests;
+	private int numberOfRetriangulations;
+	private int numberOfIterations;
 
 	public PSMeshing(
-			final IDistanceFunction distanceFunc,
-			final IEdgeLengthFunction edgeLengthFunc,
-			final double initialEdgeLen,
-			final VRectangle bound,
-			final Collection<? extends VShape> obstacleShapes) {
+            final IDistanceFunction distanceFunc,
+            final IEdgeLengthFunction edgeLengthFunc,
+            final double initialEdgeLen,
+            final VRectangle bound,
+            final Collection<? extends VShape> obstacleShapes,
+            final ITriangulationSupplier<P, V, E, F> triangulationSupplier) {
 
 		this.bound = bound;
-		this.heap = new PriorityQueue<>(new FacePairComparator());
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
-		this.initialEdgeLen = initialEdgeLen;
-		this.obstacleShapes = obstacleShapes;
-		this.edges = new ArrayList<>();
 		this.deps = 1.4901e-8 * initialEdgeLen;
-		this.triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new MeshPoint(x, y, false));
 
-        /**
-         * Start with a uniform refined triangulation
-         */
-        log.info("##### (start) generate a uniform refined triangulation #####");
-        UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
-        uniformRefinementTriangulation.generate();
-        //retriangulate();
-        log.info("##### (end) generate a uniform refined triangulation #####");
+        log.info("##### (start) generate a triangulation #####");
+        UniformRefinementTriangulatorCFS<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
+                triangulationSupplier,
+                bound,
+                obstacleShapes,
+                p -> edgeLengthFunc.apply(p) * initialEdgeLen,
+                distanceFunc);
+        triangulation = uniformRefinementTriangulation.generate();
+        log.info("##### (end) generate a triangulation #####");
 	}
 
 	@Override
@@ -95,7 +86,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
     }
 
     @Override
-    public ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getTriangulation() {
+    public ITriangulation<P, V, E, F> getTriangulation() {
         return triangulation;
     }
 
@@ -105,16 +96,15 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
     }
 
     public double getQuality() {
-        Collection<PFace<MeshPoint>> faces = getMesh().getFaces();
+        Collection<F> faces = getMesh().getFaces();
         return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> d1 + d2).get() / faces.size();
     }
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
         removeBoundaryLowQualityTriangles();
-        triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new MeshPoint(x, y, false));
+        triangulation.recompute();
         removeTrianglesInsideObstacles();
-        triangulation.finalize();
     }
 
 	public void execute() {
@@ -184,7 +174,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
      *
      * @param edge
      */
-    private void computeForces(final PHalfEdge<MeshPoint> edge) {
+    private void computeForces(final E edge) {
         MeshPoint p1 = getMesh().getPoint(edge);
         MeshPoint p2 = getMesh().getPoint(getMesh().getPrev(edge));
 
@@ -207,7 +197,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
      *
      * @param vertex
      */
-    private void updateVertex(final PVertex<MeshPoint> vertex) {
+    private void updateVertex(final V vertex) {
 		if(!isFixedVertex(vertex)) {
 			MeshPoint meshPoint = getMesh().getPoint(vertex);
 			IPoint velocity = getVelocity(vertex);
@@ -234,7 +224,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
      *
      * @param vertex the vertex
      */
-    private void projectBackVertex(final PVertex<MeshPoint> vertex) {
+    private void projectBackVertex(final V vertex) {
         MeshPoint position = getMesh().getPoint(vertex);
         double distance = distanceFunc.apply(position);
         if(distance > 0 || getMesh().isAtBoundary(vertex)) {
@@ -285,17 +275,17 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
 
     // helper methods
-    private Stream<PHalfEdge<MeshPoint>> streamEdges() {
+    private Stream<E> streamEdges() {
         return runParallel ? getMesh().streamEdgesParallel() : getMesh().streamEdges();
     }
 
-    private Stream<PVertex<MeshPoint>> streamVertices() {
+    private Stream<V> streamVertices() {
         return runParallel ? getMesh().streamVerticesParallel() : getMesh().streamVertices();
     }
 
     private void computeDelta() {
         delta = Parameters.DELTAT;
-        for(PVertex<MeshPoint> vertex : getMesh().getVertices()) {
+        for(V vertex : getMesh().getVertices()) {
             if(!isFixedVertex(vertex)) {
                 MeshPoint meshPoint = getMesh().getPoint(vertex);
                 IPoint velocity = getVelocity(vertex);
@@ -309,12 +299,12 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
     private boolean isMovementIllegal() {
         boolean result = false;
-        for(PFace<MeshPoint> face : getMesh().getFaces()) {
+        for(F face : getMesh().getFaces()) {
             if(!getMesh().isBoundary(face) && !getMesh().isDestroyed(face) && !triangulation.isCCW(face)) {
                 result = true;
 
                 // is this a triangle at the boundary+
-                for(PHalfEdge<MeshPoint> edge : getMesh().getEdgeIt(face)) {
+                for(E edge : getMesh().getEdgeIt(face)) {
                     if(getMesh().isAtBoundary(edge)) {
                         log.info("illegal face at the boundary.");
                     }
@@ -328,41 +318,21 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
         return result;
     }
 
-	private void computeMaxLegalMovementsParallel() {
-		getMesh().streamVerticesParallel().forEach(v -> computeMaxLegalMovement(v));
-	}
 
-	private void computeMaxLegalMovements() {
-		for(PVertex<MeshPoint> vertex : getMesh().getVertices()) {
-			computeMaxLegalMovement(vertex);
-		}
-	}
-
-	private void computeMaxLegalMovement(final PVertex<MeshPoint> vertex) {
-		double maxTravelDistance = Double.MAX_VALUE;
-		for(PHalfEdge<MeshPoint> edge : triangulation.getRing1It(vertex)) {
-			IPoint p1 = getMesh().getVertex(edge);
-			IPoint p2 = getMesh().getVertex(getMesh().getPrev(edge));
-			maxTravelDistance = Math.min(maxTravelDistance, GeometryUtils.distanceToLineSegment(p1, p2, vertex));
-		}
-		getMesh().getPoint(vertex).setLastPosition(new VPoint(vertex.getX(), vertex.getY()));
-		getMesh().getPoint(vertex).setMaxTraveldistance(maxTravelDistance * 0.5);
-	}
-
-	private boolean isFixedVertex(final PVertex<MeshPoint> vertex) {
+	private boolean isFixedVertex(final V vertex) {
 		return getMesh().getPoint(vertex).isFixPoint();
 	}
 
-	private IPoint getVelocity(final PVertex<MeshPoint> vertex) {
+	private IPoint getVelocity(final V vertex) {
 		return getMesh().getPoint(vertex).getVelocity();
 	}
 
-	private void moveVertex(final PVertex<MeshPoint> vertex, final IPoint dX) {
+	private void moveVertex(final V vertex, final IPoint dX) {
 		getMesh().getPoint(vertex).add(dX);
 	}
 
 	@Override
-	public IMesh<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> getMesh() {
+	public IMesh<P, V, E, F> getMesh() {
 		return triangulation.getMesh();
 	}
 
@@ -410,8 +380,8 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 
 
 	private void removeTrianglesInsideObstacles() {
-		List<PFace<MeshPoint>> faces = triangulation.getMesh().getFaces();
-		for(PFace<MeshPoint> face : faces) {
+		List<F> faces = triangulation.getMesh().getFaces();
+		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
 				triangulation.removeFace(face, true);
 			}
@@ -419,12 +389,12 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 	}
 
 	private void removeLowQualityTriangles() {
-		List<PFace<MeshPoint>> faces = getMesh().getFaces();
-		for(PFace<MeshPoint> face : faces) {
+		List<F> faces = getMesh().getFaces();
+		for(F face : faces) {
 			if(faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE) {
-				Optional<PHalfEdge<MeshPoint>> optEdge = getMesh().getLinkToBoundary(face);
+				Optional<E> optEdge = getMesh().getLinkToBoundary(face);
 				if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
-					PHalfEdge<MeshPoint> edge = getMesh().getNext(optEdge.get());
+					E edge = getMesh().getNext(optEdge.get());
 					projectBackVertex(getMesh().getVertex(edge));
 					triangulation.removeFace(face, true);
 				}
@@ -442,7 +412,7 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
                 .forEach(face -> triangulation.removeFace(face, true));
     }
 
-	public double faceToQuality(final PFace<MeshPoint> face) {
+	public double faceToQuality(final F face) {
 
 		VLine[] lines = getMesh().toTriangle(face).getLines();
 		double a = lines[0].length();
@@ -456,43 +426,5 @@ public class PSMeshing implements IMeshImprover<MeshPoint, PVertex<MeshPoint>, P
 			throw new IllegalArgumentException(face + " is not a feasible triangle!");
 		}
 		return part;
-	}
-
-	private class FacePairComparator implements Comparator<Pair<PFace<MeshPoint>, Double>> {
-
-		@Override
-		public int compare(Pair<PFace<MeshPoint>, Double> o1, Pair<PFace<MeshPoint>, Double> o2) {
-			Double q1 = o1.getRight();
-			Double q2 = o2.getRight();
-
-			if(q1 < q2) {
-				return -1;
-			}
-			else if(q1 > q2) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}
-	}
-
-	private class FaceComparator implements Comparator<PFace<MeshPoint>> {
-
-		@Override
-		public int compare(PFace<MeshPoint> o1, PFace<MeshPoint> o2) {
-			Double q1 = faceToQuality(o1);
-			Double q2 = faceToQuality(o2);
-
-			if(q1 < q2) {
-				return -1;
-			}
-			else if(q1 > q2) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}
 	}
 }

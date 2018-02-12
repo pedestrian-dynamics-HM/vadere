@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 /**
  * Created by bzoennchen on 16.01.18.
  */
-public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator{
+public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F>{
 
     private final ITriangulation<P, V, E, F> triangulation;
     private final Collection<VLine> constrains;
@@ -34,7 +34,7 @@ public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E ext
 
     // TODO: not finished jet
     @Override
-    public void generate() {
+    public ITriangulation<P, V, E, F> generate() {
         triangulation.init();
         Collection<P> allPoints = new ArrayList<>();
         IMesh<P, V, E, F> mesh = triangulation.getMesh();

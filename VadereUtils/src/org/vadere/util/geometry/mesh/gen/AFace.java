@@ -7,7 +7,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 /**
  * @author Benedikt Zoennchen
  */
-public class AFace<P extends IPoint> implements IFace<P> {
+public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 
 	/**
 	 * One of the half-edges bordering this face.
@@ -76,7 +76,7 @@ public class AFace<P extends IPoint> implements IFace<P> {
 		return edge;
 	}
 
-	int getId() {
+	public int getId() {
 	    return id;
     }
 
@@ -84,4 +84,12 @@ public class AFace<P extends IPoint> implements IFace<P> {
 		return destroyed;
 	}
 
+    @Override
+    protected AFace<P> clone()  {
+        try {
+            return (AFace<P>) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
 }

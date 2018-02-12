@@ -1,4 +1,4 @@
-package org.vadere.gui.components.utils;
+package org.vadere.util.color;
 
 import java.util.List;
 
@@ -103,7 +103,7 @@ public class ColorHelper {
 		Collections.sort(list);
 		Integer min = list.get(0);
 		Integer max = list.get(list.size() - 1);
-		factor = max + 1;
+		factor = max+1;
 	}
 
 	/**

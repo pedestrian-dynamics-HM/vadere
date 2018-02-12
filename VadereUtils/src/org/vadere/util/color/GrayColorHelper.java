@@ -1,4 +1,4 @@
-package org.vadere.gui.components.utils;
+package org.vadere.util.color;
 
 import java.util.List;
 

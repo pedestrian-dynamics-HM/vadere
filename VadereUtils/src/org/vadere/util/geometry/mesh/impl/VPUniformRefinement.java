@@ -4,6 +4,7 @@ import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.triangulation.ITriangulationSupplier;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -17,10 +18,10 @@ import java.util.Collection;
  */
 public class VPUniformRefinement extends UniformRefinementTriangulator<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> {
 	public VPUniformRefinement(
-			final ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> triangulation,
+			final ITriangulationSupplier<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> supplier,
 			final VRectangle bound,
 			final Collection<VShape> boundary,
 			final IEdgeLengthFunction lenFunc) {
-		super(triangulation, bound, boundary, lenFunc, p -> -1.0);
+		super(supplier, bound, boundary, lenFunc, p -> -1.0);
 	}
 }

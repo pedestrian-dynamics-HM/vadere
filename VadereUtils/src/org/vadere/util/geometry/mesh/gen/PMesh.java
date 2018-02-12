@@ -1,15 +1,14 @@
 package org.vadere.util.geometry.mesh.gen;
 
+import org.apache.commons.collections.ArrayStack;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.triangulation.IPointConstructor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -332,4 +331,5 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
     public int getNumberOfEdges() {
         return edges.size();
     }
+
 }

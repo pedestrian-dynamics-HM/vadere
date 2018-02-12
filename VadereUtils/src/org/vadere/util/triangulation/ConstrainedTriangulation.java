@@ -32,9 +32,9 @@ public class ConstrainedTriangulation<P extends IPoint, V extends IVertex<P>, E 
     }
 
     @Override
-    public void finalize() {
+    public void finish() {
         // remove super triangles
-        super.finalize();
+        super.finish();
 
         // add all constrained lines
         constrains.stream().forEach(line -> addConstrain(line));

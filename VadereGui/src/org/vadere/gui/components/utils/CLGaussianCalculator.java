@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.ColorHelper;
+import org.vadere.util.color.ColorHelper;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 

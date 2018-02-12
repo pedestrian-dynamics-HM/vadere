@@ -77,8 +77,8 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             triangulation.init();
             hierarchySets.add(triangulation);
 
-            List<V> superTriangleVertices = triangulation.getSuperVertices();
-            List<V> superTrianglesLastVertices = getLevel(i-1).getSuperVertices();
+            List<V> superTriangleVertices = triangulation.getVirtualVertices();
+            List<V> superTrianglesLastVertices = getLevel(i-1).getVirtualVertices();
 
             for(int j = 0; j < superTriangleVertices.size(); j++) {
                 //i -> i -1
