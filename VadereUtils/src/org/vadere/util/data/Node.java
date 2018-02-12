@@ -17,6 +17,8 @@ public class Node<E> {
      */
     private E element;
 
+    private boolean alive;
+
     /**
      * The pointer right to this pointer (possibly null).
      */
@@ -41,6 +43,7 @@ public class Node<E> {
     Node(final NodeLinkedList list, final E element) {
         this.element = element;
         this.list = list;
+        this.alive = true;
     }
 
     /**
@@ -79,6 +82,7 @@ public class Node<E> {
             list.tail = prev;
         }
         disconnect();
+        alive = false;
     }
 
     /**
@@ -95,7 +99,11 @@ public class Node<E> {
         }
     }
 
-    /**
+	public boolean isAlive() {
+		return alive;
+	}
+
+	/**
      * Inserts an element to the left of the pointer.
      *
      * @param element the element that will be inserted

@@ -1,5 +1,6 @@
 package org.vadere.util.triangulation.triangulator;
 
+import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -34,10 +35,12 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	private ITriangulation<P, V, E, F>  triangulation;
 	private Set<P> points;
 	private IMesh<P, V, E, F> mesh;
+	private ArrayList<Pair<Direction, E>> sierpinskyCurve;
 	private LinkedList<Node<Pair<Direction, E>>> toRefineEdges;
     private NodeLinkedList<Pair<Direction, E>> orderedFaces;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorCFS.class);
 	private final IDistanceFunction distFunc;
+	private int counter = 0;
 
 	enum Direction {
 	    FORWARD,
@@ -71,10 +74,11 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		this.points = new HashSet<>();
         this.toRefineEdges = new LinkedList<>();
         this.orderedFaces = new NodeLinkedList<>();
+        this.sierpinskyCurve = new ArrayList<>(2);
 
         E halfEdge = getLongestEdge(mesh.getFace());
-        orderedFaces.add(Pair.of(Direction.FORWARD, halfEdge));
-        toRefineEdges.add(orderedFaces.getHead());
+        sierpinskyCurve.add(Pair.of(Direction.FORWARD, halfEdge));
+        sierpinskyCurve.add(Pair.of(Direction.FORWARD, mesh.getTwin(halfEdge)));
 	}
 
     public ITriangulation<P, V, E, F> init() {
@@ -82,27 +86,72 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
         return triangulation;
     }
 
+    public void nextSFCLevel() {
+		counter++;
+		ArrayList<Pair<Direction, E>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
+
+	    for(Pair<Direction, E> pair : sierpinskyCurve) {
+		    E edge = pair.getRight();
+		    Direction dir = pair.getLeft();
+		    E t1 = mesh.getNext(edge);
+		    E t2 = mesh.getPrev(edge);
+
+		    Pair<Direction, E> element1 = Pair.of(dir.next(), t1);
+		    Pair<Direction, E> element2 = Pair.of(dir.next(), t2);
+
+		    if(dir == Direction.FORWARD) {
+			    newSierpinskiCurve.add(element2);
+			    newSierpinskiCurve.add(element1);
+		    }
+		    else {
+			    newSierpinskiCurve.add(element1);
+			    newSierpinskiCurve.add(element2);
+		    }
+	    }
+
+	    for(Pair<Direction, E> pair : sierpinskyCurve) {
+		    E edge = pair.getRight();
+		    if(validEdge(edge)) {
+				refine(edge);
+		    }
+	    }
+
+	    sierpinskyCurve = newSierpinskiCurve;
+    }
+
     public void step() {
-	    synchronized (mesh) {
+	    /*synchronized (mesh) {
             if (!toRefineEdges.isEmpty()) {
                 Node<Pair<Direction, E>> node = toRefineEdges.removeFirst();
-                Pair<Direction, E> splitCandidate = node.getElement();
 
-                Direction dir = splitCandidate.getLeft();
-                E halfEdge = splitCandidate.getRight();
+                if(node.isAlive()) {
+	                Pair<Direction, E> splitCandidate = node.getElement();
 
-                if(!isCompleted(halfEdge)) {
-                    addEdge(dir, halfEdge, node);
+	                Direction dir = splitCandidate.getLeft();
+	                E halfEdge = splitCandidate.getRight();
 
-                    if(!mesh.isBoundary(mesh.getTwin(halfEdge))) {
-                        addEdge(dir, mesh.getTwin(halfEdge), node);
-                    }
+	                if(node.hasNext() && mesh.getTwinFace(node.getNext().getElement().getRight()) == mesh.getFace(node.getElement().getRight())) {
+		                node.getNext().remove();
+	                }
 
-                    node.remove();
-                    refine(halfEdge);
+	                if(node.hasPrev() && mesh.getTwinFace(node.getPrev().getElement().getRight()) == mesh.getFace(node.getElement().getRight())) {
+		                node.remove();
+	                }
+	                else {
+		                if(!isCompleted(halfEdge)) {
+			                addEdge(dir, halfEdge, node);
+
+			                if(!mesh.isBoundary(mesh.getTwin(halfEdge))) {
+				                addEdge(dir, mesh.getTwin(halfEdge), node);
+			                }
+
+			                node.remove();
+			                refine(halfEdge);
+		                }
+	                }
                 }
             }
-        }
+        }*/
     }
 
     private void addEdge(Direction dir, E edge, Node<Pair<Direction, E>> node) {
@@ -112,30 +161,54 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
         Pair<Direction, E> element3 = Pair.of(dir.next(), t1);
         Pair<Direction, E> element4 = Pair.of(dir.next(), t2);
 
-        if(dir == Direction.BACKWARD) {
+        if(dir == Direction.FORWARD) {
             Pair<Direction, E> tmp = element3;
             element3 = element4;
             element4 = tmp;
         }
 
         // avoid duplicates due to twins
-        if(validEdge(element3.getRight())) {
+        if(validEdge(element3.getRight(), node)) {
             Node<Pair<Direction, E>> node3 = orderedFaces.insertNext(element3, node);
             toRefineEdges.addLast(node3);
         }
 
-        if(validEdge(element4.getRight())){
+        if(validEdge(element4.getRight(), node)){
             Node<Pair<Direction, E>> node4 = orderedFaces.insertNext(element4, node);
             toRefineEdges.addLast(node4);
         }
     }
 
-    private boolean validEdge(@NotNull E edge) {
-	    return mesh.isAtBoundary(edge) || mesh.getPoint(edge).distanceToOrigin() > mesh.getPoint(mesh.getPrev(edge)).distanceToOrigin();
+	private boolean validEdge(@NotNull E edge) {
+		P p1 = mesh.getPoint(mesh.getPrev(edge));
+		P p2 = mesh.getPoint(edge);
+		return mesh.isAtBoundary(edge) || (p1.getX() > p2.getX() || (p1.getX() == p2.getX() && p1.getY() > p2.getY()));
+	}
+
+    private boolean validEdge(@NotNull E edge, @NotNull Node<Pair<Direction, E>> node) {
+		/*if(mesh.isAtBoundary(edge)) {
+			return true;
+		}
+		else {
+			if(!node.hasPrev()) {
+				return true;
+			}
+			else {
+				return mesh.getFace(node.getPrev().getElement().getRight()) == mesh.getTwinFace(edge);
+				/*if(node.getElement().getLeft() == Direction.FORWARD) {
+					return mesh.getTwinFace(mesh.getNext(edge)) == mesh.getFaces(node.getNext().getElement().getRight());
+				}
+				else {
+					return mesh.getTwinFace(mesh.getPrev(edge)) == mesh.getFaces(node.getNext().getElement().getRight());
+				}
+			}
+		}*/
+		//return mesh.isAtBoundary(edge) || mesh.getPoint(edge).distanceToOrigin() > mesh.getPoint(mesh.getPrev(edge)).distanceToOrigin();
+	    return true;
     }
 
     public boolean isFinished() {
-        return toRefineEdges.isEmpty();
+        return counter > 12;
     }
 
 	public ITriangulation<P, V, E, F> generate() {
@@ -159,16 +232,16 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	public void finish() {
         synchronized (mesh) {
             //triangulation.finish();
-            removeTrianglesOutsideBBox();
-            removeTrianglesInsideObstacles();
-            triangulation.finish();
+            //removeTrianglesOutsideBBox();
+            //removeTrianglesInsideObstacles();
+            //triangulation.finish();
 
             // TODO: dirty type casting?
             if(mesh instanceof AMesh) {
                 List<AFace<P>> faceOrder = new ArrayList<>(mesh.getNumberOfFaces());
                 AMesh<P> aMesh = ((AMesh<P>)mesh);
 
-                for(Pair<Direction, E> element : orderedFaces.elementIterable()) {
+                for(Pair<Direction, E> element : sierpinskyCurve) {
                     AHalfEdge<P> halfEdge = (AHalfEdge<P>) element.getRight();
 
                     // due to triangulation.finish();

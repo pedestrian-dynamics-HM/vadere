@@ -76,7 +76,7 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 		return edge;
 	}
 
-	int getId() {
+	public int getId() {
 	    return id;
     }
 

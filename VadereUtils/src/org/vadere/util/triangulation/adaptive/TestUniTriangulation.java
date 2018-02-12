@@ -53,11 +53,11 @@ public class TestUniTriangulation extends JFrame {
             //meshGenerator.improve();
             overAllTime.suspend();
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-	        uniformRefinementTriangulation.step();
+	        uniformRefinementTriangulation.nextSFCLevel();
             distmeshPanel.repaint();
             counter++;
             //System.out.println("Quality: " + meshGenerator.getQuality());
@@ -65,7 +65,7 @@ public class TestUniTriangulation extends JFrame {
 
             boolean removedSome = true;
         }
-        //uniformRefinementTriangulation.finish();
+        uniformRefinementTriangulation.finish();
 
         distmeshPanel.repaint();
         overAllTime.stop();

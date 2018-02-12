@@ -108,7 +108,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
             }
 
             int groupSize = 64;
-            ColorHelper colorHelper = new ColorHelper(faces.size() / groupSize);
+            ColorHelper colorHelper = new ColorHelper(faces.size());
 //            SpaceFillingCurve curve = new SpaceFillingCurve(new VRectangle(minX, minY, maxX-minX, maxY-minY));
 
             for(F face : faces) {
@@ -123,19 +123,11 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 
                 } else {
                     if(face instanceof AFace) {
-                        int tMax = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).max().getAsInt();
-                        int tMin = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).min().getAsInt();
 
-                        int bucket = tMin / groupSize;
+                        int bucket = ((AFace)face).getId() / groupSize;
 
-                        if(bucket * groupSize + groupSize < tMax) {
-                            graphics.setColor(Color.GRAY);
-                        }
-                        else {
-                            graphics.setColor(colorHelper.numberToColor(bucket));
-                        }
-
-                        //graphics.fill(triangle);
+	                    graphics.setColor(colorHelper.numberToColor(((AFace)face).getId()));
+                        graphics.fill(triangle);
                     }
                 }
 
