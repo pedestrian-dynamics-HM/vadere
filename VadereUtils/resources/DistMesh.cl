@@ -201,9 +201,9 @@ kernel void updateLabel(__global float2* vertices,
             int v2 = getDiffVertex(v0, v1, triangles[ta]);
             int p = getDiffVertex(v0, v1, triangles[tb]);
 
-             float2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+            float2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
              // require a flip?
-             if(length(c-vertices[p]) < length(c-vertices[v0])) {
+            if(length(c-vertices[p]) < length(c-vertices[v0])) {
                 labeledEdges[edgeId] = 1;
                 *illegalEdge = 1;
                 //("found illegal edge!!!! %i \n", edgeId);
@@ -355,56 +355,74 @@ kernel void flipStage3(
 
 // for each edge in parallel
 kernel void computeForces(
+	__const int size,
     __global float2* vertices,
     __global int4* edges,
     __global float2* lengths,
     __global float* scalingFactor,
     __global float2* forces,
-    __global int* mutexes)
+    __global int* isBoundary)
 {
-    int i = get_global_id(0);
-    int p1Index = edges[i].s0;
+
+	int gid = get_global_id(0);
+	int gsize = get_global_size(0);
+	int lid = get_local_id(0);
+	int lsize = size / gsize;
+	
+	if(gid < gsize-1) {}
+	else {lsize += 1;}
+	
+	for(int i = gid*lsize; i < gid*lsize+lsize && i < size; i++) {
+		int p1Index = edges[i].s0;
 
 
-    float2 p1 = vertices[edges[i].s0];
-    float2 p2 = vertices[edges[i].s1];
-    float2 v = normalize(p1-p2);
+		float2 p1 = vertices[edges[i].s0];
+		float2 p2 = vertices[edges[i].s1];
+		float2 v = normalize(p1-p2);
 
-    // F= ...
-    float len = lengths[i].s0;
-    float desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2f;
-    float lenDiff = (desiredLen - len);
-    lenDiff = lenDiff > 0.0f ? lenDiff : 0.0f;
-    float2 partialForce = v * lenDiff;
+		// update boundary array
+		int boundary = (edges[i].s2 == -1 || edges[i].s3 == -1) ? 1 : 0;
+		isBoundary[edges[i].s0] = boundary;
+		isBoundary[edges[i].s1] = boundary;
+		
+		// F= ...
+		float len = lengths[i].s0;
+		float desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2f;
+		float lenDiff = (desiredLen - len);
+		lenDiff = lenDiff > 0.0f ? lenDiff : 0.0f;
+		float2 partialForce = v * lenDiff;
 
-    //volatile __global int* addr = &mutexes[p1Index];
+		//volatile __global int* addr = &mutexes[p1Index];
 
-    //int waiting = 1;
-    //while (waiting) {
-    //    while (LOCK(addr)) {}
-    //printf("before %f \n", forces[p1Index].x);
-    //float2 tmp = forces[p1Index];
+		//int waiting = 1;
+		//while (waiting) {
+		//    while (LOCK(addr)) {}
+		//printf("before %f \n", forces[p1Index].x);
+		//float2 tmp = forces[p1Index];
 
 
-    // TODO this might be slow!
-    global float* forceP = (global float*)(&forces[p1Index]);
-    atomicAdd_g_f(forceP, partialForce.x);
-    atomicAdd_g_f((forceP+1), partialForce.y);
-    //forces[p1Index] += partialForce;
+		// TODO this might be slow!
+		global float* forceP = (global float*)(&forces[p1Index]);
+		atomicAdd_g_f(forceP, partialForce.x);
+		atomicAdd_g_f((forceP+1), partialForce.y);
+		//forces[p1Index] += partialForce;
 
-    //global float* forceP = (global float*)(&forces[p1Index]);
-    //atomicAdd_g_f(forceP, 0.1);
-    //atomicAdd_g_f((forceP+1), 0.1);
+		//global float* forceP = (global float*)(&forces[p1Index]);
+		//atomicAdd_g_f(forceP, 0.1);
+		//atomicAdd_g_f((forceP+1), 0.1);
 
-    //forces[p1Index] = forces[p1Index] + partialForce;
-    //    UNLOCK(addr);
-    //    waiting = 0;
-    //}
-    //printf("adder-x [%d] %f \n", p1Index, partialForce.x);
-    //printf("adder-y [%d] %f \n", p1Index, partialForce.y);
-    //printf("after-x %f \n", forces[p1Index].x);
-    //printf("test-x: %f == %f \n", (tmp + partialForce).x, forces[p1Index].x);
-    //printf("test-y: %f == %f \n", (tmp + partialForce).y, forces[p1Index].y);
+		//forces[p1Index] = forces[p1Index] + partialForce;
+		//    UNLOCK(addr);
+		//    waiting = 0;
+		//}
+		//printf("adder-x [%d] %f \n", p1Index, partialForce.x);
+		//printf("adder-y [%d] %f \n", p1Index, partialForce.y);
+		//printf("after-x %f \n", forces[p1Index].x);
+		//printf("test-x: %f == %f \n", (tmp + partialForce).x, forces[p1Index].x);
+		//printf("test-y: %f == %f \n", (tmp + partialForce).y, forces[p1Index].y);
+	}
+
+    
 }
 
 //inline float fabs(float d) {return if(d < 0){return -d;}else{return d;}}
@@ -414,32 +432,32 @@ inline double float2double (float a){
     return __hiloint2double (__byte_perm (ia >> 3, ia, 0x7210), ia << 29);
 }
 
-kernel void moveVertices(__global float2* vertices, __global float2* forces, const float delta) {
+kernel void moveVertices(__global float2* vertices, __global float2* forces, __global int* isBoundary, const float delta) {
     int vertexId = get_global_id(0);
 
-        float deps = 0.0001f;
-        float2 force = forces[vertexId];
-        float2 v = vertices[vertexId];
+	float deps = 0.0001f;
+	float2 force = forces[vertexId];
+	float2 v = vertices[vertexId];
 
-        v = v + (force * 0.3f);
+	v = v + (force * 0.3f);
 
-        // project back if necessary
-        float distance = dist(v);
-        if(distance > 0.0) {
-            float2 dX = (float2)(deps, 0.0f);
-            float2 dY = (float2)(0.0f, deps);
-            float2 vx = (float2)(v + dX);
-            float2 vy = (float2)(v + dY);
-            float dGradPX = (dist(vx) - distance) / deps;
-            float dGradPY = (dist(vy) - distance) / deps;
-            float2 projection = (float2)(dGradPX * distance, dGradPY * distance);
-            v = v - projection;
-        }
+	// project back if necessary
+	float d = dist(v);
+	if(d > 0.0 || isBoundary[vertexId] == 1) {
+		float2 dX = (float2)(deps, 0.0f);
+		float2 dY = (float2)(0.0f, deps);
+		float2 vx = (float2)(v + dX);
+		float2 vy = (float2)(v + dY);
+		float dGradPX = (dist(vx) - d) / deps;
+		float dGradPY = (dist(vy) - d) / deps;
+		float2 projection = (float2)(dGradPX * d, dGradPY * d);
+		v = v - projection;
+	}
 
-        // set force to 0.
-        //printf("vertex( %d ) with force( %f, %f )\n", vertexId, force.x, force.y);
-        forces[vertexId] = (float2)(0.0, 0.0);
-        vertices[vertexId] = v;
+	// set force to 0.
+	//printf("vertex( %d ) with force( %f, %f )\n", vertexId, force.x, force.y);
+	forces[vertexId] = (float2)(0.0, 0.0);
+	vertices[vertexId] = v;
 }
 
 // computation of the scaling factor:

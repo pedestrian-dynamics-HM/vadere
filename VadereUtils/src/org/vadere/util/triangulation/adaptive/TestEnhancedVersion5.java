@@ -62,7 +62,6 @@ public class TestEnhancedVersion5 extends JFrame {
 				PFace<MeshPoint> face = priorityQueue.poll();
 				System.out.println("lowest quality ("+counter+"):"+ meshGenerator.faceToQuality(face));
 			}*/
-            distmeshPanel.update();
             distmeshPanel.repaint();
             counter++;
 

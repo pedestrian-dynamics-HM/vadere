@@ -80,12 +80,12 @@ public class TestEnhancedVersion3 extends JFrame {
 
         StopWatch overAllTime = new StopWatch();
         overAllTime.start();
-        while (counter <= 500) {
+        while (counter < 200) {
             meshGenerator.improve();
             overAllTime.suspend();
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

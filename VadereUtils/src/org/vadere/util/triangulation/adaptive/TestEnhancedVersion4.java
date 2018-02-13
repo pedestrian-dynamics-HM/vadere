@@ -33,7 +33,7 @@ public class TestEnhancedVersion4 extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 0.1;
+		IEdgeLengthFunction edgeLengthFunc = p -> 0.3;
 
 		//IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
@@ -49,7 +49,7 @@ public class TestEnhancedVersion4 extends JFrame {
 						false));
 
 
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>(), supplier);
+		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
@@ -66,10 +66,9 @@ public class TestEnhancedVersion4 extends JFrame {
 			overAllTime.suspend();
 
 			meshGenerator.refresh();
-			distmeshPanel.update();
 			distmeshPanel.repaint();
 			try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -80,7 +79,6 @@ public class TestEnhancedVersion4 extends JFrame {
 		overAllTime.stop();
 
 		meshGenerator.finish();
-		distmeshPanel.update();
 		distmeshPanel.repaint();
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());

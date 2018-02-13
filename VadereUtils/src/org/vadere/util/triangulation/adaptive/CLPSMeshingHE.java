@@ -124,42 +124,8 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
 
     public boolean step(boolean flipAll) {
         hasToRead = true;
-        minDeltaTravelDistance = Double.MAX_VALUE;
-        illegalMovement = false;
-        //log.info(scalingFactor);
-
-
-        //flipEdges();
-        //retriangulate();
-
-        // get new cooridnates
-
-        // there might be some illegal movements
-        if(minDeltaTravelDistance < 0.0) {
-            illegalMovement = isMovementIllegal();
-            numberOfIllegalMovementTests++;
-        }
-
-        if(illegalMovement) {
-            //retriangulate();
-//			while (flipEdges());
-
-            numberOfRetriangulations++;
-        }
-        else {
-//			flipEdges();
-        }
-
-        if(minDeltaTravelDistance < 0) {
-//			computeMaxLegalMovements();
-        }
-
         numberOfIterations++;
         return clDistMesh.step(flipAll);
-		/*log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
-		log.info("#retriangulations: " + numberOfRetriangulations);
-		log.info("#steps: " + numberOfIterations);
-		log.info("#points: " + getMesh().getVertices().size());*/
     }
 
     public void finish() {

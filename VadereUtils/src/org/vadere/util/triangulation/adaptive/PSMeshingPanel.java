@@ -51,13 +51,15 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 
     }
 
-    public void update() {
-        faces = mesh.getFaces();
-    }
+	@Override
+	public void update(Graphics g) {
+    	// TODO clone it!
+		faces = mesh.getFaces();
+		super.update(g);
+	}
 
 	@Override
 	public void paint(Graphics g) {
-		update();
 		Graphics2D graphics2D = (Graphics2D) g;
 		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();

@@ -304,9 +304,9 @@ public class CLDistMeshHE<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfVertices, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
-        clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
+        clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges / 2, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
-        clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
+        clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges / 2, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
         clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
@@ -320,7 +320,7 @@ public class CLDistMeshHE<P extends IPoint> {
 
     private void initialKernelArgs() {
         int factor = doublePrecision ? 8 : 4;
-        int sizeSFPartial = numberOfEdges;
+        int sizeSFPartial = numberOfEdges / 2;
 
         clSetKernelArg1p(clKernelLengths, 0, clVertices);
         clSetKernelArg1p(clKernelLengths, 1, clEdges);
@@ -334,9 +334,9 @@ public class CLDistMeshHE<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clSetKernelArg1p(clKernelPartialSF, 3, clPartialSum);
 
-        int sizeSFComplete = Math.min((int)prefdWorkGroupSizeMultiple, numberOfEdges); // one item per work group
+        int sizeSFComplete = Math.min((int)prefdWorkGroupSizeMultiple, numberOfEdges / 2); // one item per work group
         clSetKernelArg1i(clKernelCompleteSF, 0, sizeSFComplete);
-        if(numberOfEdges > prefdWorkGroupSizeMultiple) {
+        if(numberOfEdges / 2 > prefdWorkGroupSizeMultiple) {
             clSetKernelArg1p(clKernelCompleteSF, 1, clPartialSum);
         }
         else {
@@ -415,7 +415,7 @@ public class CLDistMeshHE<P extends IPoint> {
         clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeVertices = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeTriangles = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSizeEdges.put(0, numberOfEdges);
+        clGlobalWorkSizeEdges.put(0, numberOfEdges / 2);
         clGlobalWorkSizeVertices.put(0, numberOfVertices);
         clGlobalWorkSizeTriangles.put(0, numberOfFaces);
 
@@ -465,7 +465,7 @@ public class CLDistMeshHE<P extends IPoint> {
         enqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
         log.info("computed edge lengths");
 
-        if(numberOfEdges > prefdWorkGroupSizeMultiple) {
+        if(numberOfEdges / 2 > prefdWorkGroupSizeMultiple) {
             enqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
         }
 
@@ -479,17 +479,18 @@ public class CLDistMeshHE<P extends IPoint> {
         enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
         log.info("move vertices");
 
-        IntBuffer illegalTriangles = stack.mallocInt(1);
-        illegalTriangles.put(0, 0);
+       // IntBuffer illegalTriangles = stack.mallocInt(1);
+       // illegalTriangles.put(0, 0);
+
         //clEnqueueWriteBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
         //enqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
         //clFinish(clQueue);
         //clEnqueueReadBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
         log.info("check for illegal triangles");
-        if(illegalTriangles.get(0) == 1) {
-            log.info("illegal triangle found!");
-            //return true;
-        }
+
+        //if(illegalTriangles.get(0) == 1) {
+         //   log.info("illegal triangle found!");
+        //}
 
         // flip as long as there are no more flips possible
         if(flipAll) {
@@ -499,7 +500,7 @@ public class CLDistMeshHE<P extends IPoint> {
             enqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
             log.info("label illegal edges");
 
-            do  {
+            do {
                 illegalEdges.put(0, 0);
                 clEnqueueWriteBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
 
@@ -515,10 +516,10 @@ public class CLDistMeshHE<P extends IPoint> {
 
                 //clEnqueueReadBuffer(clQueue, clTriLocks, true, 0, triLocks, null, null);
                 //checkTriLocks();
-                //clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
+                clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
                 log.info("isLegal = " + illegalEdges.get(0));
 
-            } while(illegalEdges.get(0) == 1);
+            } while (illegalEdges.get(0) == 1);
             //log.info("flip all");
         }
 

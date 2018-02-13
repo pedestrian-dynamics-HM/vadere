@@ -44,7 +44,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private double scalingFactor;
 	private double deps;
 
-	private boolean runParallel = false;
+	private boolean runParallel = true;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
 

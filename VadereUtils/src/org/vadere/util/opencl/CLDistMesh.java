@@ -78,7 +78,7 @@ public class CLDistMesh<P extends IPoint> {
     private IntBuffer e;
     private IntBuffer t;
     private IntBuffer twins;
-    private IntBuffer mutexes;
+    private IntBuffer boundaryVertices;
     private IntBuffer triLocks;
     private IntBuffer edgeLabels;
     private double delta = 0.02;
@@ -94,7 +94,7 @@ public class CLDistMesh<P extends IPoint> {
     private long clqLengths;
     private long clPartialSum;
     private long clScalingFactor;
-    private long clMutexes;
+    private long clIsBoundaryVertex;
     private long clMutex;
     private long clRelation;
     private long clEdgeLabels;
@@ -114,6 +114,7 @@ public class CLDistMesh<P extends IPoint> {
     private long maxGroupSize;
     private long maxComputeUnits;
     private long prefdWorkGroupSizeMultiple;
+    private long prefdWorkGroupSizeMultipleForces;
 
     private PointerBuffer clGlobalWorkSizeEdges;
     private PointerBuffer clGlobalWorkSizeVertices;
@@ -121,6 +122,9 @@ public class CLDistMesh<P extends IPoint> {
 
     private PointerBuffer clGloblWorkSizeSFPartial;
     private PointerBuffer clLocalWorkSizeSFPartial;
+
+    private PointerBuffer clGloblWorkSizeForces;
+    private PointerBuffer clLocalWorkSizeForces;
 
     private PointerBuffer clGloblWorkSizeSFComplete;
     private PointerBuffer clLocalWorkSizeSFComplete;
@@ -156,14 +160,14 @@ public class CLDistMesh<P extends IPoint> {
         this.numberOfVertices = mesh.getNumberOfVertices();
         this.numberOfEdges = mesh.getNumberOfEdges();
         this.numberOfFaces = mesh.getNumberOfFaces();
-        this.mutexes =  MemoryUtil.memAllocInt(numberOfVertices);
+        this.boundaryVertices =  MemoryUtil.memAllocInt(numberOfVertices);
         this.triLocks = MemoryUtil.memAllocInt(numberOfFaces);
         for(int i = 0; i < numberOfFaces; i++) {
             this.triLocks.put(i, -1);
         }
 
         for(int i = 0; i < numberOfVertices; i++) {
-            this.mutexes.put(i, 0);
+            this.boundaryVertices.put(i, 0);
         }
         this.edgeLabels = MemoryUtil.memAllocInt(numberOfEdges);
         for(int i = 0; i < numberOfEdges; i++) {
@@ -273,8 +277,13 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clKernelCompleteSF = clCreateKernel(clProgram, "computeCompleteSF", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+
         clKernelForces = clCreateKernel(clProgram, "computeForces", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+        clGetKernelWorkGroupInfo(clKernelForces, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
+        prefdWorkGroupSizeMultipleForces = pp.get(0);
+        log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultipleForces + " (forces)");
+
         clKernelMove = clCreateKernel(clProgram, "moveVertices", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
         /*clKernelFlip = clCreateKernel(clProgram, "flip", errcode_ret);
@@ -318,7 +327,7 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
-        clMutexes = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, mutexes, errcode_ret);
+        clIsBoundaryVertex = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, boundaryVertices, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
         clTriLocks = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, triLocks, errcode_ret);
         CLInfo.checkCLError(errcode_ret);
@@ -363,20 +372,22 @@ public class CLDistMesh<P extends IPoint> {
         clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
         clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
 
-        clSetKernelArg1p(clKernelForces, 0, clVertices);
-        clSetKernelArg1p(clKernelForces, 1, clEdges);
-        clSetKernelArg1p(clKernelForces, 2, clLengths);
-        clSetKernelArg1p(clKernelForces, 3, clScalingFactor);
-        clSetKernelArg1p(clKernelForces, 4, clForces);
-        clSetKernelArg1p(clKernelForces, 5, clMutexes);
+        clSetKernelArg1p(clKernelForces, 0, numberOfEdges);
+        clSetKernelArg1p(clKernelForces, 1, clVertices);
+        clSetKernelArg1p(clKernelForces, 2, clEdges);
+        clSetKernelArg1p(clKernelForces, 3, clLengths);
+        clSetKernelArg1p(clKernelForces, 4, clScalingFactor);
+        clSetKernelArg1p(clKernelForces, 5, clForces);
+        clSetKernelArg1p(clKernelForces, 6, clIsBoundaryVertex);
 
         clSetKernelArg1p(clKernelMove, 0, clVertices);
         clSetKernelArg1p(clKernelMove, 1, clForces);
+        clSetKernelArg1p(clKernelMove, 2, clIsBoundaryVertex);
         if(doublePrecision) {
-            clSetKernelArg1d(clKernelMove, 2, delta);
+            clSetKernelArg1d(clKernelMove, 3, delta);
         }
         else {
-            clSetKernelArg1f(clKernelMove, 2, fDelta);
+            clSetKernelArg1f(clKernelMove, 3, fDelta);
         }
 
         clSetKernelArg1p(clKernelLabelEdges, 0, clVertices);
@@ -428,6 +439,11 @@ public class CLDistMesh<P extends IPoint> {
         clLocalWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
         clGloblWorkSizeSFPartial.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultiple));
         clLocalWorkSizeSFPartial.put(0, (int)maxGroupSize);
+
+        clGloblWorkSizeForces = BufferUtils.createPointerBuffer(1);
+        clLocalWorkSizeForces = BufferUtils.createPointerBuffer(1);
+        clGloblWorkSizeForces.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultipleForces));
+        clLocalWorkSizeForces.put(0, (int)maxGroupSize);
 
         clGloblWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
         clLocalWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
@@ -497,7 +513,7 @@ public class CLDistMesh<P extends IPoint> {
         log.info("computed scale factor");
 
         // force to use only 1 work group => local size = local size
-        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, null, null, null);
+        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGloblWorkSizeForces, clLocalWorkSizeForces, null, null);
         log.info("(default) computed forces");
 
         enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
@@ -739,7 +755,7 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseMemObject(clqLengths);
         clReleaseMemObject(clPartialSum);
         clReleaseMemObject(clScalingFactor);
-        clReleaseMemObject(clMutexes);
+        clReleaseMemObject(clIsBoundaryVertex);
         clReleaseMemObject(clTriLocks);
         clReleaseMemObject(clRelation);
         clReleaseMemObject(clEdgeLabels);
@@ -753,7 +769,7 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseKernel(clKernelPartialSF);
         clReleaseKernel(clKernelCompleteSF);
 
-        clReleaseKernel(clKernelFlip);
+        //clReleaseKernel(clKernelFlip);
 
         clReleaseKernel(clKernelFlipStage1);
         clReleaseKernel(clKernelFlipStage2);
@@ -783,12 +799,12 @@ public class CLDistMesh<P extends IPoint> {
 
         MemoryUtil.memFree(e);
         MemoryUtil.memFree(t);
-        MemoryUtil.memFree(mutexes);
+        MemoryUtil.memFree(boundaryVertices);
         MemoryUtil.memFree(triLocks);
         MemoryUtil.memFree(edgeLabels);
         MemoryUtil.memFree(twins);
 
-        /*MemoryUtil.memFree(clGlobalWorkSizeEdges);
+        MemoryUtil.memFree(clGlobalWorkSizeEdges);
         MemoryUtil.memFree(clGlobalWorkSizeVertices);
 
         MemoryUtil.memFree(clGloblWorkSizeSFPartial);
@@ -797,8 +813,10 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(clGloblWorkSizeSFComplete);
         MemoryUtil.memFree(clLocalWorkSizeSFComplete);
 
-        MemoryUtil.memFree(clGlobalWorkSizeEdes);
-        MemoryUtil.memFree(clLocalWorkSizeOne);*/
+        MemoryUtil.memFree(clGloblWorkSizeForces);
+        MemoryUtil.memFree(clLocalWorkSizeForces);
+
+        MemoryUtil.memFree(clLocalWorkSizeOne);
     }
 
     public void init() {

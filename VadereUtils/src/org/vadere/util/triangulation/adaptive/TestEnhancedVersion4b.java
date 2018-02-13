@@ -31,7 +31,7 @@ public class TestEnhancedVersion4b extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 0.1;
+		IEdgeLengthFunction edgeLengthFunc = p -> 0.3;
 
 		//IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
@@ -46,7 +46,7 @@ public class TestEnhancedVersion4b extends JFrame {
 				(x, y) -> new MeshPoint(x, y,
 						false));
 
-		CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, edgeLengthFunc, 2.0, bbox, new ArrayList<>(), supplier);
+		CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
 		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
@@ -54,6 +54,7 @@ public class TestEnhancedVersion4b extends JFrame {
 		frame.setVisible(true);
 		frame.setTitle("GPU");
 
+		log.info("number of points: " + meshGenerator.getMesh().getNumberOfVertices());
 
 		int counter = 0;
 		StopWatch overAllTime = new StopWatch();
@@ -62,10 +63,10 @@ public class TestEnhancedVersion4b extends JFrame {
 			boolean retriangulation = meshGenerator.step(true);
 			overAllTime.suspend();
 
-			distmeshPanel.update();
+			meshGenerator.refresh();
 			distmeshPanel.repaint();
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -76,7 +77,6 @@ public class TestEnhancedVersion4b extends JFrame {
 		overAllTime.stop();
 
 		meshGenerator.finish();
-		distmeshPanel.update();
 		distmeshPanel.repaint();
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
