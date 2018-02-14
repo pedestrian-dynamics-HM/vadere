@@ -17,22 +17,33 @@ public class PedestrianListBuilder {
 		this.out = new LinkedList<>();
 	}
 
-	public PedestrianListBuilder add(int id){
+	public PedestrianListBuilder add(int id) {
 		out.add(new Pedestrian(new AttributesAgent(id), new Random()));
 		return this;
 	}
 
-	public PedestrianListBuilder add(int id, VPoint pos){
+	public PedestrianListBuilder add(int id, VPoint pos) {
 		Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
 		p.setPosition(pos);
 		out.add(p);
 		return this;
 	}
 
-	public PedestrianListBuilder clear(){
+	public PedestrianListBuilder add(Integer... ids) {
+		for (Integer id : ids) {
+			Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
+			out.add(p);
+		}
+		return this;
+	}
+
+	public PedestrianListBuilder clear() {
 		out = new LinkedList<>();
 		return this;
 	}
-	public List<Pedestrian> getList(){ return out;}
+
+	public List<Pedestrian> getList() {
+		return out;
+	}
 
 }

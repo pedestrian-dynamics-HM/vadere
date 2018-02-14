@@ -1,6 +1,5 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
@@ -26,10 +25,15 @@ import static org.mockito.Mockito.when;
 public class PedestrianStartTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
 	PedestrianStartTimeProcessorTestEnv() {
+		this(1);
+	}
+
+	PedestrianStartTimeProcessorTestEnv(int nextProcessorId) {
 		super();
 
 		testedProcessor = processorFactory.createDataProcessor(PedestrianStartTimeProcessor.class);
-		testedProcessor.setId(nextProcessorId++);
+		testedProcessor.setId(nextProcessorId);
+		this.nextProcessorId = nextProcessorId++;
 
 		outputFile = outputFileFactory.createOutputfile(
 				PedestrianIdOutputFile.class,
