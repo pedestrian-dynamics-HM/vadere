@@ -617,12 +617,14 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                     vertices.stream().filter(getMesh()::isAlive).forEach(v -> adjustVertex(v));
                 }
             }
-            if(!createHole) {
+
+			getMesh().destroyFace(face);
+            /*if(!createHole) {
 	            getMesh().destroyFace(face);
             }
 			{
 				getMesh().createHole(face);
-			}
+			}*/
 
         }
 	}

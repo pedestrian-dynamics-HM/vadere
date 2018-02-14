@@ -30,7 +30,7 @@ public class TestUniTriangulation extends JFrame {
         ITriangulationSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bbox, (x, y) -> new VPoint(x, y));
 
         UniformRefinementTriangulatorCFS<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 1.0, distanceFunc);
+                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 0.5, distanceFunc);
 
         PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel =
                 new PSMeshingPanel(uniformRefinementTriangulation.init().getMesh(), f -> false, 1000, 800, bbox);

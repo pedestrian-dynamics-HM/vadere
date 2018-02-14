@@ -168,11 +168,11 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
 			sierpinksyFaceOrder.removeIf(face -> mesh.isDestroyed(face));
 	        List<F> holes = mesh.streamHoles().collect(Collectors.toList());
-			sierpinksyFaceOrder.addAll(holes);
+			//sierpinksyFaceOrder.addAll(holes);
 			logger.info(sierpinksyFaceOrder.size() + ", " + mesh.getNumberOfFaces());
 
 			// TODO: dirty type casting?
-			//((AMesh<P>)mesh).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
+			((AMesh<P>)mesh).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
         }
     }
 
@@ -189,7 +189,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			for(F face : candidates) {
 
 				if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
-				    triangulation.removeFace(face, true);
+				    triangulation.removeBorderFace(face, true);
 					removedSome = true;
 				}
 
@@ -201,7 +201,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-				triangulation.removeFace(face, true);
+				triangulation.removeBorderFace(face, true);
 			}
 		}
 	}
