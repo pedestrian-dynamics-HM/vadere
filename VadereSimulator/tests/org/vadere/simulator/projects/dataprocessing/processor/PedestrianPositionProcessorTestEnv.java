@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriterFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -31,14 +32,13 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 	}
 
 
-	private void addToExpectedOutput(Integer step, Map<Integer, VPoint> m) {
-		m.entrySet().stream().distinct().sorted(Map.Entry.comparingByKey()).forEach((v) -> {
-			super.addToExpectedOutput(
-					new TimestepPedestrianIdKey(step, v.getKey()),
-					v.getValue());
+	private void addToExpectedOutput(Integer step, List<Pedestrian> m) {
+		m.forEach(p -> {
+			addToExpectedOutput(new TimestepPedestrianIdKey(step, p.getId()), p.getPosition());
 		});
-
 	}
+
+	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {
@@ -47,12 +47,13 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(1);
-				Map<Integer, VPoint> m = new HashMap<>();
-				m.put(1, new VPoint(1.435346, 1.0));
-				m.put(2, new VPoint(2.0, 2.0));
-				m.put(3, new VPoint(3.0, 3.0));
-				addToExpectedOutput(state.getStep(), m);
-				when(state.getPedestrianPositionMap()).thenReturn(m);
+
+				b.clear().add(1, new VPoint(1.435346, 1.0))
+						.add(2, new VPoint(2.0, 2.0))
+						.add(3, new VPoint(3.0, 3.0));
+				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				addToExpectedOutput(state.getStep(), b.getList());
+
 			}
 		});
 
@@ -60,12 +61,11 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(2);
-				Map<Integer, VPoint> m = new HashMap<>();
-				m.put(4, new VPoint(1.0, 1.0));
-				m.put(2, new VPoint(5.0, 5.0));
-				m.put(3, new VPoint(6.0, 6.0));
-				addToExpectedOutput(state.getStep(), m);
-				when(state.getPedestrianPositionMap()).thenReturn(m);
+				b.clear().add(4, new VPoint(1.0, 1.0))
+						.add(2, new VPoint(5.0, 5.0))
+						.add(3, new VPoint(6.0, 6.0));
+				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				addToExpectedOutput(state.getStep(), b.getList());
 			}
 		});
 
@@ -73,10 +73,9 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(3);
-				Map<Integer, VPoint> m = new HashMap<>();
-				m.put(4, new VPoint(5.0, 5.0));
-				addToExpectedOutput(state.getStep(), m);
-				when(state.getPedestrianPositionMap()).thenReturn(m);
+				b.clear().add(4, new VPoint(5.0, 5.0));
+				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				addToExpectedOutput(state.getStep(), b.getList());
 			}
 		});
 	}

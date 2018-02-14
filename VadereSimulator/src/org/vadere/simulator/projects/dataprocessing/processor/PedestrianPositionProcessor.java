@@ -5,10 +5,10 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
@@ -30,13 +30,8 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		Integer timeStep = state.getStep();
-		Map<Integer, VPoint> pedPosMap = state.getPedestrianPositionMap();
-
-		for (Entry<Integer, VPoint> entry : pedPosMap.entrySet()) {
-			Integer pedId = entry.getKey();
-			VPoint pos = entry.getValue();
-
-			this.putValue(new TimestepPedestrianIdKey(timeStep, pedId), pos);
+		for (Pedestrian p : state.getTopography().getElements(Pedestrian.class)) {
+			this.putValue(new TimestepPedestrianIdKey(timeStep, p.getId()), p.getPosition());
 		}
 	}
 

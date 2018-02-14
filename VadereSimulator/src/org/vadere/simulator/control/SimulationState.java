@@ -69,6 +69,7 @@ public class SimulationState {
 		return step;
 	}
 
+	@Deprecated
 	public Map<Integer, VPoint> getPedestrianPositionMap() {
 		return pedestrianPositionMap;
 	}
