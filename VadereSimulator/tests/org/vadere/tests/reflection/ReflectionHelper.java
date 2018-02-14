@@ -16,10 +16,21 @@ public class ReflectionHelper {
 		return new ReflectionHelper(o);
 	}
 
-	public <T> T valOfField(String member) throws NoSuchFieldException, IllegalAccessException {
+	public <T> void setValOfFile(String member, T value) throws NoSuchFieldException, IllegalAccessException {
+		Field field = getField(member);
+
+		if (field.isAccessible()) {
+			field.set(o, value);
+		} else {
+			field.setAccessible(true);
+			field.set(o, value);
+			field.setAccessible(false);
+		}
+	}
+
+	public Field getField (String member)throws NoSuchFieldException, IllegalAccessException{
 		Field field = null;
 		Class c = concreetClass;
-		T val;
 
 		while ((field == null) && (c != null)) {
 			try {
@@ -32,6 +43,13 @@ public class ReflectionHelper {
 
 		if (field == null)
 			throw new NoSuchFieldException(concreetClass.getCanonicalName() + "has not member: " + member);
+
+		return field;
+	}
+
+	public <T> T valOfField(String member) throws NoSuchFieldException, IllegalAccessException {
+		Field field = getField(member);
+		T val;
 
 		if (field.isAccessible()) {
 			val = (T) field.get(o);
