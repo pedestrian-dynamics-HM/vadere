@@ -18,6 +18,7 @@ VadereGui/*.png
 VadereGui/*.svg
 VadereGui/*.mov
 VadereUtils/testreports/*.txt
+VadereUtils/output/*
 VadereSimulator/resources/current_commit_hash.txt
 
 #model test output
@@ -36,3 +37,7 @@ VadereGui/output/
 
 #mac osx files
 .DS_Store
+
+#kde dolphin file explorere dot files
+**/*.directory
+
