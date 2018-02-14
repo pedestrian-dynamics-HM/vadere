@@ -1,16 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriterFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -19,11 +16,17 @@ import static org.mockito.Mockito.when;
 
 public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, VPoint> {
 
-	PedestrianPositionProcessorTestEnv() {
-		super();
+	PedestrianListBuilder b = new PedestrianListBuilder();
 
+	PedestrianPositionProcessorTestEnv() {
+		this(1);
+	}
+
+	PedestrianPositionProcessorTestEnv(int processorId) {
+		super();
 		testedProcessor = processorFactory.createDataProcessor(PedestrianPositionProcessor.class);
-		testedProcessor.setId(nextProcessorId++);
+		testedProcessor.setId(processorId);
+		this.nextProcessorId = processorId++;
 
 		outputFile = outputFileFactory.createOutputfile(
 				TimestepPedestrianIdOutputFile.class,
@@ -31,14 +34,11 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
-
 	private void addToExpectedOutput(Integer step, List<Pedestrian> m) {
 		m.forEach(p -> {
 			addToExpectedOutput(new TimestepPedestrianIdKey(step, p.getId()), p.getPosition());
 		});
 	}
-
-	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {

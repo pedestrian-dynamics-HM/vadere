@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.mockito.Mockito;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
@@ -50,7 +51,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	/**
 	 * Needed for DataProcessor doUpdate call. (mocked)
 	 */
-	private ProcessorManager manager;
+	ProcessorManager manager;
 	/**
 	 * If {@link #testedProcessor} has dependencies to other {@link DataProcessor}s
 	 */
@@ -59,7 +60,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 
 
 	ProcessorTestEnv() {
-		manager = mock(ProcessorManager.class);
+		manager = mock(ProcessorManager.class, Mockito.RETURNS_DEEP_STUBS);
 		states = new ArrayList<>();
 		nextProcessorId = 1;
 		expectedOutput = new HashMap<>();
@@ -85,6 +86,10 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	 * Overwrite to add {@link SimulationStateMock}s needed for test.
 	 */
 	public abstract void loadDefaultSimulationStateMocks();
+
+	public void addSimState(SimulationStateMock mock){
+		states.add(mock);
+	}
 
 	List<SimulationState> getSimStates() {
 		return states.stream().map(s -> s.state).collect(Collectors.toList());
