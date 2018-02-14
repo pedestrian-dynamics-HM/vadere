@@ -1,12 +1,7 @@
 package org.vadere.util.triangulation.improver;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.triangulation.ITriangulationSupplier;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -19,15 +14,11 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.Parameters;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -383,7 +374,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-				triangulation.removeFace(face, true);
+				triangulation.removeBorderFace(face, true);
 			}
 		}
 	}
@@ -396,7 +387,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 				if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
 					E edge = getMesh().getNext(optEdge.get());
 					projectBackVertex(getMesh().getVertex(edge));
-					triangulation.removeFace(face, true);
+					triangulation.removeBorderFace(face, true);
 				}
 			}
 		}
@@ -409,7 +400,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 .filter(face -> !getMesh().isDestroyed(face))
                 .filter(face -> faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE)
                 .collect(Collectors.toList()) // we have to collect since we manipulate / remove faces
-                .forEach(face -> triangulation.removeFace(face, true));
+                .forEach(face -> triangulation.removeBorderFace(face, true));
     }
 
 	public double faceToQuality(final F face) {

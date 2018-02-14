@@ -28,7 +28,7 @@ public interface IFace<P extends IPoint> {
         AHalfEdge<MPoint> zy;
 
         mesh = new AMesh<>((x1, y1) -> new MPoint(x1, y1));
-        border = mesh.createFace(true);
+        border = mesh.getBoundary();
 
         // first triangle xyz
         face1 = mesh.createFace();

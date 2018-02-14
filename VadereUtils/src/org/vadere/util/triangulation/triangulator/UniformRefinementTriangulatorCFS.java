@@ -167,10 +167,12 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			removeTrianglesInsideObstacles();
 
 			sierpinksyFaceOrder.removeIf(face -> mesh.isDestroyed(face));
+	        List<F> holes = mesh.streamHoles().collect(Collectors.toList());
+			sierpinksyFaceOrder.addAll(holes);
 			logger.info(sierpinksyFaceOrder.size() + ", " + mesh.getNumberOfFaces());
 
 			// TODO: dirty type casting?
-			((AMesh<P>)mesh).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
+			//((AMesh<P>)mesh).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
         }
     }
 
@@ -253,7 +255,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 						mesh.streamFaces(face)
 								//.filter(f -> !face.equals(f)).distinct()
 								.forEach(candidate -> candidates.addFirst(candidate));
-						triangulation.removeFace(face, true);
+						triangulation.removeBorderFace(face, true);
 					}
 				}
 			}

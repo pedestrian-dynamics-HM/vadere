@@ -57,6 +57,10 @@ public class PFace<P extends IPoint> implements IFace<P> {
 		destroyed = true;
 	}
 
+	public void setBorder(boolean border) {
+		this.border = border;
+	}
+
 	/**
 	 * Sets one of the half-edges bordering this face.
 	 *

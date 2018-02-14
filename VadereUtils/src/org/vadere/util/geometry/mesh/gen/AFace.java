@@ -84,7 +84,11 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 		return destroyed;
 	}
 
-    @Override
+	public void setBorder(boolean border) {
+		this.border = border;
+	}
+
+	@Override
     protected AFace<P> clone()  {
         try {
             return (AFace<P>) super.clone();

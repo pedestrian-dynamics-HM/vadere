@@ -48,13 +48,15 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
         this.triangles = new ArrayList<>();
         this.bound = bound;
         this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-
+	    this.faces = new ArrayList<>();
     }
 
 	@Override
 	public void update(Graphics g) {
     	// TODO clone it!
-		faces = mesh.getFaces();
+		synchronized (mesh) {
+			faces = mesh.clone().getFaces();
+		}
 		super.update(g);
 	}
 

@@ -177,7 +177,7 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
         List<PFace<MeshPoint>> faces = triangulation.getMesh().getFaces();
         for(PFace<MeshPoint> face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeFace(face, true);
+                triangulation.removeBorderFace(face, true);
             }
         }
     }

@@ -26,7 +26,8 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	private int numberOfVertices;
 	private int numberOfEdges;
 	private int numberOfFaces;
-	//private List<PFace<P>> borderFaces;
+	private int numberOfHoles;
+	private List<AFace<P>> holes;
 	private AFace<P> boundary;
 	private List<AHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
@@ -34,16 +35,16 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	public AMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
-		//this.borderFaces = new ArrayList<>();
+		this.holes = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new ArrayList<>();
 		this.boundary = new AFace<>(-1, true);
-		//this.faces.add(boundary);
 		this.pointConstructor = pointConstructor;
 		this.elementRemoved = false;
 		this.numberOfFaces = 0;
 		this.numberOfEdges = 0;
 		this.numberOfVertices = 0;
+		this.numberOfHoles = 0;
 	}
 
 	@Override
@@ -118,17 +119,22 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public AFace<P> getFace() {
-		return faces.stream().filter(f -> !isDestroyed(f)).findAny().get();
+		return faces.stream().filter(f -> !isDestroyed(f)).filter(f -> !isBoundary(f)).findAny().get();
 	}
 
 	@Override
 	public boolean isBoundary(@NotNull AFace<P> face) {
-		return face == boundary;
+		return face.isBorder();
 	}
 
 	@Override
 	public boolean isBoundary(@NotNull AHalfEdge<P> halfEdge) {
-		return halfEdge.getFace() == boundary.getId();
+		return halfEdge.getFace() == boundary.getId() || isBoundary(getFace(halfEdge));
+	}
+
+	@Override
+	public boolean isHole(@NotNull AFace<P> face) {
+		return isBoundary(face) && face != boundary;
 	}
 
 	@Override
@@ -204,20 +210,22 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public AFace<P> createFace() {
-		int id = faces.size();
-		AFace<P> face = new AFace<>(id, -1);
-		faces.add(face);
-		numberOfFaces++;
-		return face;
+		return createFace(false);
 	}
 
 	@Override
-	public AFace<P> createFace(boolean boundary) {
-		if (boundary) {
-			return this.boundary;
-		} else {
-			return createFace();
+	public AFace<P> createFace(boolean hole) {
+		int id = faces.size();
+		AFace<P> face = new AFace<>(id, -1, hole);
+		faces.add(face);
+		if(!hole) {
+			numberOfFaces++;
 		}
+		else {
+			holes.add(face);
+			numberOfHoles++;
+		}
+		return face;
 	}
 
 	@Override
@@ -262,12 +270,25 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		}
 	}
 
+	@Override
+	public void createHole(@NotNull AFace<P> face) {
+		assert !isDestroyed(face) && !isHole(face);
+		holes.add(face);
+		face.setBorder(true);
+		numberOfHoles++;
+	}
+
 	// these methods assume that all elements are contained in the mesh!
 	@Override
 	public void destroyFace(@NotNull final AFace<P> face) {
 		if (!isDestroyed(face)) {
 			elementRemoved = true;
 			numberOfFaces--;
+
+			if(isHole(face)) {
+				numberOfHoles--;
+			}
+
 			face.destroy();
 		}
 	}
@@ -292,7 +313,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public synchronized List<AFace<P>> getFaces() {
-		return streamFaces().filter(f -> !f.isDestroyed()).collect(Collectors.toList());
+		return streamFaces().filter(f -> !isDestroyed(f)).filter(f -> !isBoundary(f)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -307,12 +328,17 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public Stream<AFace<P>> streamFaces(@NotNull Predicate<AFace<P>> predicate) {
-		return faces.stream().filter(f -> !f.isDestroyed()).filter(predicate);
+		return faces.stream().filter(f -> !f.isDestroyed()).filter(f -> !isBoundary(f)).filter(predicate);
+	}
+
+	@Override
+	public Stream<AFace<P>> streamHoles() {
+		return holes.stream().filter(f -> !isDestroyed(f));
 	}
 
 	@Override
 	public Stream<AHalfEdge<P>> streamEdges() {
-		return edges.stream().filter(e -> !e.isDestroyed());
+		return edges.stream().filter(e -> !isDestroyed(e));
 	}
 
 	@Override
@@ -366,7 +392,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-    protected AMesh<P> clone() {
+    public synchronized AMesh<P> clone() {
         try {
             AMesh<P> clone = (AMesh<P>)super.clone();
 
@@ -425,6 +451,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         faces.clear();
         edges.clear();
         vertices.clear();
+        holes.clear();
 
         int[] edgeMap = new int[cMesh.edges.size()];
         int[] vertexMap = new int[cMesh.vertices.size()];
@@ -435,7 +462,6 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         Arrays.fill(faceMap, nullIdentifier);
 
         // adjust all id's
-        //for(List<AFace<P>> bucket : buckets) {
         for(AFace<P> face : faceOrder) {
             AFace<P> fClone = face.clone();
 
@@ -443,6 +469,10 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
             faceMap[face.getId()] = faces.size();
             fClone.setId(faces.size());
             faces.add(fClone);
+
+            if(cMesh.isBoundary(fClone) && fClone != cMesh.getBoundary()) {
+            	holes.add(fClone);
+            }
 
             // 2. vertices
             for(AVertex<P> v : cMesh.getVertexIt(face)) {
@@ -476,7 +506,6 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
                 }
             }
         }
-        //}
 
         // repair the rest
         for(AFace<P> face : faces) {

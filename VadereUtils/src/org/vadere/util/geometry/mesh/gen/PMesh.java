@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
 
 	private List<PFace<P>> faces;
-	//private List<PFace<P>> borderFaces;
+	private List<PFace<P>> holes;
 	private PFace<P> boundary;
 	private List<PHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
@@ -27,11 +27,10 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
-		//this.borderFaces = new ArrayList<>();
+		this.holes = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new HashSet<>();
 		this.boundary = new PFace<>(true);
-		//this.faces.add(boundary);
 		this.pointConstructor = pointConstructor;
 	}
 
@@ -87,12 +86,17 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public PFace<P> getFace() {
-		return faces.stream().filter(face -> !face.isDestroyed()).findAny().get();
+		return faces.stream().filter(face -> !isDestroyed(face)).filter(f -> !isBoundary(f)).findAny().get();
 	}
 
 	@Override
 	public boolean isBoundary(@NotNull PFace<P> face) {
 		return face.isBorder();
+	}
+
+	@Override
+	public boolean isHole(@NotNull PFace<P> face) {
+		return isBoundary(face) && face != boundary;
 	}
 
 	@Override
@@ -144,7 +148,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	public void setEdge(@NotNull PVertex<P> vertex, @NotNull PHalfEdge<P> edge) {
 		assert edge.getEnd().equals(vertex);
 		if(!edge.getEnd().equals(vertex)) {
-			System.out.println("end of the edge is not equals to the vertex.");
+			throw new IllegalArgumentException("end of the edge is not equals to the vertex.");
 		}
 		vertex.setEdge(edge);
 	}
@@ -181,7 +185,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public int getNumberOfFaces() {
-		return faces.size();
+		return faces.size()-holes.size();
 	}
 
 	@Override
@@ -192,6 +196,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public void unlock(@NotNull PVertex<P> vertex) {
 		vertex.getLock().unlock();
+	}
+
+	@Override
+	public IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> clone() {
+		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	@Override
@@ -214,15 +223,14 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public PFace<P> createFace(boolean boundary) {
-		if(!boundary) {
-			PFace<P> face = new PFace<>();
-			faces.add(face);
-			return face;
+	public PFace<P> createFace(boolean hole) {
+		PFace<P> face = new PFace<>(hole);
+		faces.add(face);
+
+		if(hole) {
+			holes.add(face);
 		}
-		else {
-			return this.boundary;
-		}
+		return face;
 	}
 
 	@Override
@@ -258,8 +266,18 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public void createHole(@NotNull PFace<P> face) {
+		assert !isDestroyed(face) && !isHole(face);
+		holes.add(face);
+		face.setBorder(true);
+	}
+
+	@Override
 	public void destroyFace(@NotNull PFace<P> face) {
 		faces.remove(face);
+		if(isHole(face)) {
+			holes.remove(face);
+		}
 		face.destroy();
 	}
 
@@ -319,15 +337,20 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 	@Override
 	public List<PVertex<P>> getBoundaryVertices() {
-		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).map(edge -> getVertex(edge)).collect(Collectors.toList());
+		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> isDestroyed(edge)).map(edge -> getVertex(edge)).collect(Collectors.toList());
 	}
 
 	@Override
 	public Stream<PFace<P>> streamFaces(@NotNull Predicate<PFace<P>> predicate) {
-		return faces.stream().filter(predicate);
+		return faces.stream().filter(f -> isHole(f)).filter(predicate);
 	}
 
-    @Override
+	@Override
+	public Stream<PFace<P>> streamHoles() {
+		return holes.stream();
+	}
+
+	@Override
     public int getNumberOfEdges() {
         return edges.size();
     }

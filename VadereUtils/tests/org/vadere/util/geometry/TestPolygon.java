@@ -30,7 +30,6 @@ public class TestPolygon {
 				new VPoint(roomSideLen, 0),
 				new VPoint(roomSideLen, roomSideLen),
 				new VPoint(0, roomSideLen));
-
 		testTriangle = new VTriangle(new VPoint(30, 50), new VPoint(0, 0),
 				new VPoint(80, 0));
 	}
@@ -47,7 +46,10 @@ public class TestPolygon {
 				testPolygon.contains(new VPoint(-5, 0)));
 
 		assertEquals("The triangle should not contain this point.", false,
-				testTriangle.contains(new VPoint(40, 40)));
+				testTriangle.contains(new VPoint(40, 40.000000001)));
+
+		assertEquals("The triangle should not contain this point.", true,
+				testTriangle.contains(new VPoint(40, 39.999999999)));
 	}
 
 	@Test

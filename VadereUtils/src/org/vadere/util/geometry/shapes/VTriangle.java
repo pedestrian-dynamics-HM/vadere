@@ -59,6 +59,7 @@ public class VTriangle extends VPolygon {
     @Override
     public boolean contains(final IPoint point) {
         return GeometryUtils.triangleContains(p1, p2, p3, point);
+
     }
 
     // TODO: find better name

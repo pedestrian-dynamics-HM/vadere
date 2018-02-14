@@ -122,7 +122,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 			// counter clockwise!
 			F square = mesh.createFace(p0, p1, p3, p2);
-			F tri = mesh.createFace(false);
+			F tri = mesh.createFace();
 
 			// start divide the square into 2 triangles
 			E edge = mesh.createEdge(p1);
@@ -282,20 +282,20 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
                 if(!mesh.isDestroyed(virtualPoint)) {
                     List<F> faces1 = mesh.getFaces(virtualPoint);
                     faces1.removeIf(f -> mesh.isBoundary(f));
-                    faces1.forEach(f -> removeFace(f, true));
+                    faces1.forEach(f -> removeBorderFace(f, true));
                 }
             }
 
 			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
 				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces2.forEach(f -> removeFace(f, true));
+				faces2.forEach(f -> removeBorderFace(f, true));
 			}
 
 			if(!mesh.isDestroyed(p2)) {
 				List<F> faces3 = mesh.getFaces(p2);
 				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces3.forEach(f -> removeFace(f, true));
+				faces3.forEach(f -> removeBorderFace(f, true));
 			}*/
 
 			finalized = true;

@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.util.opencl.CLDistMesh;
 import org.vadere.util.opencl.CLDistMeshHE;
 import org.vadere.util.triangulation.ITriangulationSupplier;
 import org.vadere.util.triangulation.improver.IMeshImprover;
@@ -162,7 +161,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
                 if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
                     AHalfEdge<P> edge = getMesh().getNext(optEdge.get());
                     projectToBoundary(getMesh().getVertex(edge));
-                    triangulation.removeFace(face, true);
+                    triangulation.removeBorderFace(face, true);
                 }
             }
         }
@@ -217,7 +216,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
         List<AFace<P>> faces = triangulation.getMesh().getFaces();
         for(AFace<P> face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeFace(face, true);
+                triangulation.removeBorderFace(face, true);
             }
         }
     }

@@ -114,6 +114,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 */
 	boolean isBoundary(@NotNull F face);
 
+	boolean isHole(@NotNull F face);
+
 	/**
 	 * Returns true if the vertex is a boundary vertex.
 	 *
@@ -176,7 +178,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	E createEdge(@NotNull V vertex);
 	E createEdge(@NotNull V vertex, @NotNull F face);
 	F createFace();
-	F createFace(boolean boundary);
+	F createFace(boolean hole);
 	P createPoint(double x, double y);
 	V createVertex(double x, double y);
 	V createVertex(P point);
@@ -194,13 +196,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	// TODO: name?
 	default F createFace(V... points) {
-		F superTriangle = createFace();
-		F borderFace = createFace(true);
+		F face = createFace();
+		F borderFace = getBoundary();
 
 		LinkedList<E> edges = new LinkedList<>();
 		LinkedList<E> borderEdges = new LinkedList<>();
 		for(V p : points) {
-			E edge = createEdge(p, superTriangle);
+			E edge = createEdge(p, face);
 			setEdge(p, edge);
 			E borderEdge = createEdge(p, borderFace);
 			edges.add(edge);
@@ -231,12 +233,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 			setTwin(halfEdge, twin);
 		}
 
-		setEdge(superTriangle, edges.peekFirst());
+		setEdge(face, edges.peekFirst());
 		setEdge(borderFace, borderEdges.peekFirst());
 
-		return superTriangle;
+		return face;
 	}
 
+	void createHole(@NotNull F face);
 	void destroyFace(@NotNull F face);
 	void destroyEdge(@NotNull E edge);
 	void destroyVertex(@NotNull V vertex);
@@ -256,6 +259,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	default Stream<F> streamFaces() {
 		return streamFaces(f -> true);
 	}
+
+	/**
+	 * Returns a Stream of holes.
+	 *
+	 * @return a Stream of holes.
+	 */
+	Stream<F> streamHoles();
 
 	Stream<E> streamEdges();
 
@@ -696,4 +706,6 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 		return result;
 	}
+
+	IMesh<P, V, E, F> clone();
 }
