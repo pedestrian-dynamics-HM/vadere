@@ -49,6 +49,8 @@ public abstract class ProcessorTest {
 		for (SimulationState s : processorTestEnv.getSimStates()) {
 			p.update(s);
 		}
+		int l = processorTestEnv.getSimStates().size();
+		p.postLoop(processorTestEnv.getSimStates().get(l-1));
 		processorTestEnv.getOutputFile().write();
 
 		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());
