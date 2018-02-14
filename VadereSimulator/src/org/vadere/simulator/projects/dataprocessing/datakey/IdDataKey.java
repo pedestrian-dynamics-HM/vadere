@@ -1,10 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+import org.vadere.simulator.projects.dataprocessing.outputfile.IdOutputFile;
+
 /**
  * Data key for custom data aggregators when the keys timestep and/or pedestrian
  * ID are not enough.
  * 
  */
+@OutputFileMap(outputFileClass = IdOutputFile.class)
 public class IdDataKey implements DataKey<IdDataKey> {
 	private final int id;
 

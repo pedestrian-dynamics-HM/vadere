@@ -1,10 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile;
+
 /**
  * @author Mario Teixeira Parente
  *
  */
-
+@OutputFileMap(outputFileClass = TimestepOutputFile.class)
 public class TimestepKey implements DataKey<TimestepKey> {
 	private final int timestep;
     public TimestepKey(int timestep) {
