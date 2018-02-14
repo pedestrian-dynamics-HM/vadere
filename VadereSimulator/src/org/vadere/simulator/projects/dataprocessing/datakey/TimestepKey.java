@@ -22,6 +22,10 @@ public class TimestepKey implements DataKey<TimestepKey> {
         return "timeStep";
     }
 
+	public Integer getTimestep() {
+		return timestep;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
