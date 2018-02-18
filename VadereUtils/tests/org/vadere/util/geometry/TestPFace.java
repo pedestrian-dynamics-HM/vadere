@@ -99,6 +99,7 @@ public class TestPFace {
 		mesh.setNext(xz, zy);
 	}
 
+
 	@Test
 	public void testFaceIterator() {
 		mesh.getAdjacentFacesIt(xy);

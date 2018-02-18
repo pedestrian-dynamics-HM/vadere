@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -246,7 +248,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public AFace<P> getBoundary() {
+	public AFace<P> getBorder() {
 		return boundary;
 	}
 
@@ -271,11 +273,13 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public void createHole(@NotNull AFace<P> face) {
-		assert !isDestroyed(face) && !isHole(face);
-		holes.add(face);
-		face.setBorder(true);
-		numberOfHoles++;
+	public void toHole(@NotNull AFace<P> face) {
+		assert !isDestroyed(face);
+		if(!isHole(face)) {
+			holes.add(face);
+			face.setBorder(true);
+			numberOfHoles++;
+		}
 	}
 
 	// these methods assume that all elements are contained in the mesh!
@@ -317,6 +321,11 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
+	public List<AFace<P>> getFacesWithHoles() {
+		return streamFaces().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+	}
+
+	@Override
 	public List<AHalfEdge<P>> getBoundaryEdges() {
 		return streamEdges().filter(edge -> isBoundary(edge)).collect(Collectors.toList());
 	}
@@ -328,7 +337,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public Stream<AFace<P>> streamFaces(@NotNull Predicate<AFace<P>> predicate) {
-		return faces.stream().filter(f -> !f.isDestroyed()).filter(f -> !isBoundary(f)).filter(predicate);
+		return faces.stream().filter(f -> !f.isDestroyed()).filter(predicate);
 	}
 
 	@Override
@@ -414,6 +423,11 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         }
     }
 
+	@Override
+	public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> toTriangulation() {
+		return ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, this);
+	}
+
 	public void setPositions(final List<P> positions) {
 		assert positions.size() == numberOfVertices;
 		if (positions.size() != numberOfVertices) {
@@ -470,7 +484,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
             fClone.setId(faces.size());
             faces.add(fClone);
 
-            if(cMesh.isBoundary(fClone) && fClone != cMesh.getBoundary()) {
+            if(cMesh.isBoundary(fClone) && fClone != cMesh.getBorder()) {
             	holes.add(fClone);
             }
 

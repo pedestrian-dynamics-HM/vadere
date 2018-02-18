@@ -3,9 +3,8 @@ package org.vadere.util.triangulation.improver;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
+import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
-import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
@@ -25,6 +24,6 @@ public class APSMeshing extends PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEd
             @NotNull VRectangle bound,
             @NotNull Collection<? extends VShape> obstacleShapes) {
         super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
-                () -> ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new MeshPoint(x, y, false)));
+		        () -> new AMesh<>((x, y) -> new MeshPoint(x, y, false)));
     }
 }

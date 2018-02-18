@@ -63,11 +63,11 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		this.points = new HashSet<>();
         this.toRefineEdges = new LinkedList<>();
         this.creationOrder = new HashMap<>();
-        toRefineEdges.addAll(mesh.getFaces());
 	}
 
     public void init() {
         triangulation.init();
+	    toRefineEdges.addAll(triangulation.getMesh().getFaces());
     }
 
     public void step() {
@@ -119,10 +119,10 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		while (removedSome) {
 			removedSome = false;
 
-			List<F> candidates = mesh.getFaces(mesh.getBoundary());
+			List<F> candidates = mesh.getFaces(mesh.getBorder());
 			for(F face : candidates) {
 				if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
-					triangulation.removeBorderFace(face, true);
+					triangulation.removeSingleFace(face, true);
 					removedSome = true;
 				}
 			}
@@ -133,7 +133,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-				triangulation.removeBorderFace(face, true);
+				triangulation.removeFace(face, true);
 			}
 		}
 	}
@@ -158,7 +158,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 						mesh.streamFaces(face)
 								//.filter(f -> !face.equals(f)).distinct()
 								.forEach(candidate -> candidates.addFirst(candidate));
-						triangulation.removeBorderFace(face, true);
+						triangulation.removeSingleFace(face, true);
 					}
 				}
 			}

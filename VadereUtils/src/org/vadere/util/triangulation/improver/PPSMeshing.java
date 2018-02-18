@@ -24,6 +24,6 @@ public class PPSMeshing extends PSMeshing<MeshPoint, PVertex<MeshPoint>, PHalfEd
             @NotNull VRectangle bound,
             @NotNull Collection<? extends VShape> obstacleShapes) {
         super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
-                () -> ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new MeshPoint(x, y, false)));
+		        () -> new PMesh<>((x, y) -> new MeshPoint(x, y, false)));
     }
 }

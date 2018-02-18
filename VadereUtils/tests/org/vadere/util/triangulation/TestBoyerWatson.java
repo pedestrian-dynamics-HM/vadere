@@ -16,6 +16,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestBoyerWatson {
@@ -121,12 +121,41 @@ public class TestBoyerWatson {
 		// triangulations are always ccw ordered!
 		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
 
-		delaunayTriangulation.splitTriangle(face, centerPoint);
+		delaunayTriangulation.splitTriangle(face, centerPoint, false);
 		delaunayTriangulation.finish();
 
 		Set<VTriangle> triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toSet());
 		Set<VTriangle> expectedResult = new HashSet<>(Arrays.asList(new VTriangle(p1, p2, centerPoint), new VTriangle(p2, p3, centerPoint), new VTriangle(p1, p3, centerPoint)));
-		assertTrue(testTriangulationEquality(triangles, expectedResult));
+
+		assertTrue(CollectionUtils.isEqualCollection(triangles, expectedResult, new VTriangleEquator()));
+	}
+
+	private class VTriangleEquator implements CollectionUtils.IEquator<VTriangle> {
+
+		@Override
+		public boolean equate(final VTriangle a, final VTriangle b) {
+			List<VPoint> aPoints = a.getPoints();
+			List<VPoint> bPoints = b.getPoints();
+			return CollectionUtils.isEqualCollection(aPoints, bPoints, new VPointEquator());
+		}
+
+		@Override
+		public int hash(VTriangle a) {
+			return 0;
+		}
+	}
+
+	private class VPointEquator implements CollectionUtils.IEquator<VPoint> {
+
+		@Override
+		public boolean equate(final VPoint a, final VPoint b) {
+			return a.equals(b);
+		}
+
+		@Override
+		public int hash(VPoint a) {
+			return a.hashCode();
+		}
 	}
 
 
@@ -137,7 +166,7 @@ public class TestBoyerWatson {
 		int height = 300;
 		Random r = new Random();
 		assert false;
-		int numberOfPoints = 1000000;
+		int numberOfPoints = 100000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());

@@ -30,7 +30,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.io.ListUtils;
+import org.vadere.util.io.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -216,7 +216,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
 				parallelCall(timeStepInSec);
 			} else {
-				List<PedestrianOSM> pedestrians = ListUtils.select(
+				List<PedestrianOSM> pedestrians = CollectionUtils.select(
 						topography.getElements(Pedestrian.class), PedestrianOSM.class);
 
 				// random shuffle update
@@ -241,7 +241,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 		for (CallMethod callMethod : callMethods) {
 			futures = new LinkedList<>();
-			for (final PedestrianOSM pedestrian : ListUtils.select(
+			for (final PedestrianOSM pedestrian : CollectionUtils.select(
 					topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
 				Runnable worker = new ParallelWorkerOSM(callMethod, pedestrian,
 						timeStepInSec);

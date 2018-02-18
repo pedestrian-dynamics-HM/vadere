@@ -66,6 +66,7 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 			final IPointLocator.Type type,
 			final VRectangle bound,
 			final IPointConstructor<P> pointConstructor) {
+
 		IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(bound);
 		IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh = new PMesh<>(pointConstructor);
 		triangulation.setMesh(mesh);
@@ -75,11 +76,32 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 		return triangulation;
 	}
 
-    static <P extends IPoint> ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> createATriangulation(
+
+	static <P extends IPoint> ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPTriangulation(
+			final IPointLocator.Type type,
+			final IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>>  mesh) {
+
+		IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(mesh);
+		triangulation.setMesh(mesh);
+
+		double minX = mesh.streamPoints().mapToDouble(p -> p.getX()).min().getAsDouble();
+		double maxX = mesh.streamPoints().mapToDouble(p -> p.getX()).max().getAsDouble();
+
+		double minY = mesh.streamPoints().mapToDouble(p -> p.getY()).min().getAsDouble();
+		double maxY = mesh.streamPoints().mapToDouble(p -> p.getY()).max().getAsDouble();
+
+		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPPointLocator(type, triangulation, new VRectangle(minX, minY, maxX-minX, maxY-minY), (x, y) -> mesh.createPoint(x, y));
+		triangulation.setPointLocator(pointLocator);
+		return triangulation;
+	}
+
+
+	static <P extends IPoint> ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> createATriangulation(
             final IPointLocator.Type type,
             final VRectangle bound,
             final IPointConstructor<P> pointConstructor) {
-        IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(bound);
+
+		IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(bound);
         IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> mesh = new AMesh<>(pointConstructor);
         triangulation.setMesh(mesh);
 
@@ -87,6 +109,33 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
         triangulation.setPointLocator(pointLocator);
         return triangulation;
     }
+
+
+	/**
+	 * Creates a triangulation where the bound of it is determined by the mesh
+	 *
+	 * @param type
+	 * @param mesh
+	 * @param <P>
+	 * @return
+	 */
+	static <P extends IPoint> ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> createATriangulation(
+			final IPointLocator.Type type,
+			final IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>  mesh) {
+
+		IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(mesh);
+		triangulation.setMesh(mesh);
+
+		double minX = mesh.streamPoints().mapToDouble(p -> p.getX()).min().getAsDouble();
+		double maxX = mesh.streamPoints().mapToDouble(p -> p.getX()).max().getAsDouble();
+
+		double minY = mesh.streamPoints().mapToDouble(p -> p.getY()).min().getAsDouble();
+		double maxY = mesh.streamPoints().mapToDouble(p -> p.getY()).max().getAsDouble();
+
+		IPointLocator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> pointLocator = createAPointLocator(type, triangulation, new VRectangle(minX, minY, maxX-minX, maxY-minY), (x, y) -> mesh.createPoint(x, y));
+		triangulation.setPointLocator(pointLocator);
+		return triangulation;
+	}
 
 	static <P extends IPoint> ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPTriangulation(
 			final IPointLocator.Type type,
@@ -101,7 +150,8 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
             final IPointLocator.Type type,
             final Collection<P> points,
             final IPointConstructor<P> pointConstructor) {
-        ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = createATriangulation(type, GeometryUtils.bound(points), pointConstructor);
+
+		ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = createATriangulation(type, GeometryUtils.bound(points), pointConstructor);
         triangulation.insert(points);
         return triangulation;
     }

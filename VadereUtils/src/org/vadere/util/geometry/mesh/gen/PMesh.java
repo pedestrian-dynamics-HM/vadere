@@ -1,11 +1,10 @@
 package org.vadere.util.geometry.mesh.gen;
 
-import org.apache.commons.collections.ArrayStack;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IMesh;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.triangulation.IPointConstructor;
 
 import java.util.*;
@@ -251,7 +250,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public PFace<P> getBoundary() {
+	public PFace<P> getBorder() {
 		return boundary;
 	}
 
@@ -266,10 +265,12 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public void createHole(@NotNull PFace<P> face) {
-		assert !isDestroyed(face) && !isHole(face);
-		holes.add(face);
-		face.setBorder(true);
+	public void toHole(@NotNull PFace<P> face) {
+		assert !isHole(face);
+		if(!isHole(face)) {
+			holes.add(face);
+			face.seBoundary(true);
+		}
 	}
 
 	@Override
@@ -332,6 +333,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public List<PFace<P>> getFacesWithHoles() {
+		return streamFaces().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+	}
+
+	@Override
 	public List<PHalfEdge<P>> getBoundaryEdges() {
 		return streamEdges().filter(edge -> edge.isBoundary()).filter(edge -> !edge.isDestroyed()).collect(Collectors.toList());
 	}
@@ -342,7 +348,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public Stream<PFace<P>> streamFaces(@NotNull Predicate<PFace<P>> predicate) {
-		return faces.stream().filter(f -> isHole(f)).filter(predicate);
+		return faces.stream().filter(predicate);
 	}
 
 	@Override
@@ -355,4 +361,8 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
         return edges.size();
     }
 
+	@Override
+	public ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> toTriangulation() {
+		return ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, this);
+	}
 }

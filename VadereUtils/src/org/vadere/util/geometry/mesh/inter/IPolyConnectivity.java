@@ -2,6 +2,7 @@ package org.vadere.util.geometry.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +23,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Returns the mesh of this IPolyConnectivity.
+	 *
 	 * Non mesh changing method.
 	 *
 	 * @return the mesh of this IPolyConnectivity
@@ -34,6 +37,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Searches and returns the face containing the point (x,y).
+	 *
 	 * Non mesh changing method.
 	 *
 	 * @param x x-coordinate of the location point
@@ -52,6 +56,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Searches and returns the face containing the point (x,y).
+	 *
 	 * Non mesh changing method.
 	 *
 	 * @param point the location point
@@ -61,20 +66,11 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return locateFace(point.getX(), point.getY());
 	}
 
-	/**
-	 * Tests if the face share any boundary edge.
-	 * Non mesh changing method.
-	 *
-	 * @param face  the face
-	 * @return true if the face share any boundary edge, otherwise false
-	 */
-	default boolean isAtBoundary(@NotNull final F face) {
-		return getMesh().getEdges(face).stream().anyMatch(edge -> isAtBoundary(edge));
-	}
 
 	/**
-	 * If there is an half-edge e which is at the boundary and has the vertex v
+	 * If there is an half-edge e which is at the boundary (i.e. hole or border) and has the vertex v
 	 * as its end point, this method will set the half-edge of v to e.
+	 *
 	 * Non mesh changing method.
 	 *
 	 * @param vertex v
@@ -102,6 +98,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	/**
 	 * Tests if the half-edge is the only link (of the face of the half-edge)
 	 * between the face of the half-edge and the face of its twin.
+	 *
 	 * Non mesh changing method.
 	 *
 	 * @param halfEdge a half-edge to test
@@ -126,6 +123,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	/**
 	 * Tests if there is any face which shares more than one edge with the face
 	 * we are checking.
+	 *
 	 * Non mesh changing method.
 	 *
 	 * @param face the face we are checking
@@ -151,7 +149,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Splitting the face i.e. a polygon into as many faces as the face has edges.
+	 *
 	 * Assumption: the vertex is valid i.e. it is contained any face.
+	 *
 	 * Mesh changing method.
 	 *
 	 * @param vertex the vertex which spilts the face which triangleContains the vertex. It has to be contained any face.
@@ -167,7 +167,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Splitting the face i.e. a polygon into as many faces as the face has edges.
+	 * This will essentially triangulate the polygon.
+	 *
 	 * Assumption: the vertex is valid i.e. it is contained in the face.
+	 *
 	 * Mesh changing method.
 	 *
 	 * @param face      the face to be split into n faces, where n is the number of edges of the face
@@ -217,34 +220,43 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Removes all links between the face and the otherFace. This essentially merges these two
-	 * faces  together if and only if there share a common edge. If one of these faces is the outer
-	 * boundary the other one will be deleted.
+	 * faces together if and only if there share a common edge. If one of these faces is the outer
+	 * boundary i.e. border the other one will be deleted.
 	 *
-	 * @param face
-	 * @param otherFace
+	 * Assumption: both faces aren't destroyed.
+	 *
+	 * @param face      face one
+	 * @param otherFace face two
 	 * @return the remaining face (which might be face or otherFace)
 	 */
 	default F removeEdges(@NotNull final F face, @NotNull F otherFace, final boolean deleteIsolatedVertices) {
-		List<E> toDeleteEdges = getMesh().streamEdges(otherFace).filter(e -> getMesh().getTwinFace(e).equals(face)).collect(Collectors.toList());
+		assert !getMesh().isDestroyed(face) && !getMesh().isDestroyed(otherFace);
+
+		F delFace = otherFace;
+		F remFace = face;
+
+		if(getMesh().isBorder(delFace) || (getMesh().isHole(delFace) && !getMesh().isBorder(remFace))) {
+			F tmp = delFace;
+			delFace = remFace;
+			remFace = tmp;
+		}
+		final F finalFace = delFace;
+		List<E> toDeleteEdges = getMesh().streamEdges(remFace).filter(e -> getMesh().getTwinFace(e).equals(finalFace)).collect(Collectors.toList());
 
 		// face and otherFace share no common edge.
 		if(toDeleteEdges.isEmpty()) {
 			return face;
 		}
 
-		F delFace = null;
-		F remFace = null;
+		boolean print = ((AFace)delFace).getId() == 1401;
+
+
+		if(print) {
+			System.out.println(toDeleteEdges);
+		}
 
 		for(E edge : toDeleteEdges) {
 			E twin = getMesh().getTwin(edge);
-			delFace = getMesh().getFace(edge);
-			remFace = getMesh().getFace(twin);
-
-			if(getMesh().getBoundary().equals(delFace)) {
-				F tmp = delFace;
-				delFace = remFace;
-				remFace = tmp;
-			}
 
 			assert !getMesh().isDestroyed(delFace);
 
@@ -296,9 +308,30 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 
+	default F mergeFaces(F face, final Predicate<F> mergeCondition) {
+		boolean modified = true;
+		F currentFace = face;
+
+		while (modified) {
+			modified = false;
+			for(E edge : getMesh().getEdges(currentFace)) {
+				F neighbouringFace = getMesh().getTwinFace(edge);
+				if(mergeCondition.test(neighbouringFace)) {
+					currentFace = removeEdge(edge);
+				}
+			}
+		}
+
+		return currentFace;
+	}
+
+
 	/**
-	 * Removes a simple link. This will be done by merging two faces into one remaining face.
+	 * Removes a simple link. This will be done by merging two faces into one remaining face. One of
+	 * the face will be destroyed and the other one returned.
+	 *
 	 * Assumption: the edge is a simple link
+	 *
 	 * Mesh changing method.
 	 *
 	 * @param edge the simple link
@@ -354,11 +387,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return remFace;
 	}
 
-	default void makeHole(final V vertex) {
+	default void remove(final V vertex, final boolean deleteIsolatedVertices) {
 		List<F> toDeleteFaces = getMesh().getFaces(vertex);
-
 		for(F face : toDeleteFaces) {
-			removeBorderFace(face, true);
+			removeFace(face, deleteIsolatedVertices);
 		}
 	}
 
@@ -384,39 +416,6 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		VPoint q2 = getMesh().toPoint(getMesh().getVertex(edge));
 		return GeometryUtils.intersectLine(p1, p2, q1, q2);
 	}
-
-    /**
-     * Merges this IPolyConnectivity with another IPolyConnectivity by inserting
-     * the other one into a hole / face.
-     *
-     * Assumption: the other IPolyConnectivity does not contain any holes and it
-     * fits perfectly into the hole.
-     *
-     * @param edge the boundary edge (i.e. hole edge of the face)
-     * @param poly
-     */
-	default void insertIntoHole(E edge, IPolyConnectivity<P, V, E, F> poly) {
-        F oBoundary = poly.getMesh().getBoundary();
-
-        // search for the correct edge. The hole is ccw while the boundary of the poly is cw!
-        Optional<E> optOEdge = poly.getMesh().streamEdges(oBoundary).filter(e ->
-            poly.getMesh().getPoint(e).equals(getMesh().getPoint(getMesh().getPrev(edge))) &&
-                    poly.getMesh().getPoint(poly.getMesh().getPrev(e)).equals(getMesh().getPoint(edge))
-        ).findAny();
-
-        if(!optOEdge.isPresent()) {
-            throw new IllegalArgumentException("the two IPolyConnectivity do not fit");
-        }
-
-        E oEdge = optOEdge.get();
-        E nEdge = null;
-
-        throw new UnsupportedOperationException("not jet implemented.");
-        /*do {
-            getMesh().cre
-
-        } while(!edge.equals(nEdge));*/
-    }
 
 	/*default void fill_hole (final V v, final List<E> deletedEdges)
 	{
@@ -478,9 +477,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 
 	/**
-	 * Removes a face from the mesh by removing all boundary edges of the face.
-	 * If there are no boundary edges the face will be converted to be a hole. If
-	 * there are any neighbouring holes
+	 * Removes a face from the mesh by removing all border edges of the face.
+	 * If there are no border edges the face will be converted to be a hole. If
+	 * there are any neighbouring holes, all of the will be merged together.
 	 *
 	 * Mesh changing method.
 	 *
@@ -488,36 +487,71 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
 	 */
 	default void removeFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
-		if(!getMesh().isDestroyed(face)) {
-			F remainingFace = getMesh()
-					.streamEdges(face)
-					.map(e -> getMesh().getTwinFace(e))
-					.filter(f -> getMesh().isHole(f))
-					.distinct().reduce(face, (f1, f2) -> removeEdges(f1, f2, deleteIsolatedVertices));
 
-			removeBorderFace(remainingFace, deleteIsolatedVertices);
-		}
+
+		//if(!getMesh().getPoint(getMesh().getEdge(face)).equals(new VPoint(1.375, 0.0))) {
+			if(!getMesh().isDestroyed(face)) {
+				boolean print = ((AFace)face).getId() == 1401;
+				if(print) {
+					System.out.println(face + " " + getMesh().getEdge(face));
+					for(E e : getMesh().getEdgeIt(face)) {
+						System.out.println(e);
+					}
+				}
+
+				List<F> mergeFaces = getMesh()
+						.streamEdges(face)
+						.map(e -> getMesh().getTwinFace(e))
+						.filter(f -> getMesh().isHole(f))
+						.distinct()
+						.collect(Collectors.toList());
+
+
+
+				F remainingFace = face;
+
+				for(F nFace : mergeFaces) {
+					if(print) {
+						System.out.println(nFace + " " + getMesh().getEdge(nFace));
+						for(E e : getMesh().getEdgeIt(nFace)) {
+							System.out.println(e);
+						}
+					}
+					remainingFace = removeEdges(remainingFace, nFace, deleteIsolatedVertices);
+				}
+
+				if(print) {
+					System.out.println(remainingFace);
+				}
+
+				removeSingleFace(remainingFace, deleteIsolatedVertices);
+			}
+		//}
+
 	}
 
 
 	/**
-	 * Removes a face from the mesh by removing all boundary edges of the face.
-	 * If there are no boundary edges the face will be converted to be a part of the boundary
-	 * itself i.e. a hole.
+	 * Removes a single face from the mesh by removing all border edges of the face.
+	 * If there are no border edges the face will be converted to be a hole
+	 *
 	 * Mesh changing method.
 	 *
-	 * Assumption: the face is at the outer boundary.
+	 * Assumption: there is no hole neighbouring the face.
 	 *
 	 * @param face                      the face that will be removed from the mesh
 	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
 	 */
-	default void removeBorderFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
-		if(!getMesh().isDestroyed(face)) {
+	default void removeSingleFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
+		if(!getMesh().isDestroyed(face) /* && !getMesh().isHole(face)*/) {
+			assert !getMesh().isNeighbourHole(face);
 
+			boolean createHole = !getMesh().isNeighbourBorder(face);
 			List<E> delEdges = new ArrayList<>();
             List<V> vertices = new ArrayList<>();
 
-            F boundary = getMesh().getBoundary();
+            // we only need the boundary if the face isNeighbourBorder
+            F boundary = getMesh().getBorder();
 
             int count = 0;
             for(E edge : getMesh().getEdgeIt(face)) {
@@ -526,7 +560,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                 if(twinFace.equals(boundary)) {
                     delEdges.add(edge);
                 }
-                else {
+                else if(!createHole) {
                     // update the edge of the boundary since it might be deleted!
                     getMesh().setEdge(boundary, edge);
                     getMesh().setFace(edge, boundary);
@@ -535,18 +569,19 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                 vertices.add(getMesh().getVertex(edge));
             }
 
-            boolean createHole = delEdges.size() == 0;
+            assert (delEdges.size() == 0 && createHole) || (delEdges.size() != 0 && !createHole);
+
 
             //TODO: this might be computational expensive!
             // special case: all edges will be deleted => adjust the border edge
             E borderEdge = null;
-            if(delEdges.size() == count) {
+            if(getMesh().getTwinFace(getMesh().getEdge(boundary)) == face && delEdges.size() == count) {
 
                 // all edges are border edges!
                 borderEdge = getMesh().getTwin(getMesh().getEdge(face));
                 EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), borderEdge);
 
-                // walk away from this faces
+                // walk along the border away from this faces to get another edge which won't be deleted
                 F twinFace = getMesh().getTwinFace(borderEdge);
                 while (edgeIterator.hasNext() && twinFace == face) {
                     borderEdge = edgeIterator.next();
@@ -618,13 +653,12 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                 }
             }
 
-			getMesh().destroyFace(face);
-            /*if(!createHole) {
+            if(!createHole) {
 	            getMesh().destroyFace(face);
             }
-			{
-				getMesh().createHole(face);
-			}*/
+			else if(!getMesh().isHole(face)) {
+				getMesh().toHole(face);
+			}
 
         }
 	}

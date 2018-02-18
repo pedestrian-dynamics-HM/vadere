@@ -96,4 +96,9 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
             throw new InternalError(e.getMessage());
         }
     }
+
+	@Override
+	public String toString() {
+		return id + "," + border +"," + destroyed;
+	}
 }

@@ -1,7 +1,6 @@
 package org.vadere.util.geometry.mesh.inter;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
@@ -114,6 +113,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 */
 	boolean isBoundary(@NotNull F face);
 
+	default boolean isBorder(@NotNull F face) {
+		return isBoundary(face) && !isHole(face);
+	}
+
 	boolean isHole(@NotNull F face);
 
 	/**
@@ -126,13 +129,41 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return streamEdges(vertex).anyMatch(e -> isAtBoundary(e));
 	}
 
+	default boolean isAtBorder(@NotNull V vertex) {
+		return streamEdges(vertex).anyMatch(e -> isAtBorder(e));
+	}
+
+	default boolean isAtBorder(@NotNull E edge) {
+		return isBorder(edge) || isBorder(getTwin(edge));
+	}
+
 	default boolean isAtBoundary(@NotNull E edge) {
 		return isBoundary(edge) || isBoundary(getTwin(edge));
+	}
+
+	default boolean isNeighbourBorder(@NotNull F face){
+		for(F neighbourFace : getFaceIt(face)) {
+			if(isBorder(neighbourFace)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	default boolean isNeighbourBoundary(@NotNull F face){
 		for(F neighbourFace : getFaceIt(face)) {
 			if(isBoundary(neighbourFace)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	default boolean isNeighbourHole(@NotNull F face){
+		for(F neighbourFace : getFaceIt(face)) {
+			if(isHole(neighbourFace)) {
 				return true;
 			}
 		}
@@ -151,6 +182,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	boolean isBoundary(@NotNull E halfEdge);
+
+	default boolean isBorder(@NotNull E halfEdge) {
+		return isBorder(getFace(halfEdge));
+	}
 
 	boolean isDestroyed(@NotNull F face);
 	boolean isDestroyed(@NotNull E edge);
@@ -182,7 +217,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	P createPoint(double x, double y);
 	V createVertex(double x, double y);
 	V createVertex(P point);
-	F getBoundary();
+	F getBorder();
 
 	void insert(V vertex);
 
@@ -197,7 +232,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	// TODO: name?
 	default F createFace(V... points) {
 		F face = createFace();
-		F borderFace = getBoundary();
+		F borderFace = getBorder();
 
 		LinkedList<E> edges = new LinkedList<>();
 		LinkedList<E> borderEdges = new LinkedList<>();
@@ -239,12 +274,14 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return face;
 	}
 
-	void createHole(@NotNull F face);
+	void toHole(@NotNull F face);
 	void destroyFace(@NotNull F face);
 	void destroyEdge(@NotNull E edge);
 	void destroyVertex(@NotNull V vertex);
 
 	List<F> getFaces();
+
+	List<F> getFacesWithHoles();
 
 	List<E> getBoundaryEdges();
 
@@ -708,4 +745,6 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	IMesh<P, V, E, F> clone();
+
+	ITriangulation<P, V, E, F> toTriangulation();
 }

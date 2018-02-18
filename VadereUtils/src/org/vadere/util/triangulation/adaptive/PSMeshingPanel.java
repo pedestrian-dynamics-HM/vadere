@@ -26,7 +26,12 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 
 /**
- * Created by bzoennchen on 29.05.17.
+ * @author Benedikt Zoennchen
+ *
+ * @param <P>
+ * @param <V>
+ * @param <E>
+ * @param <F>
  */
 public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
 
@@ -55,19 +60,18 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	public void update(Graphics g) {
     	// TODO clone it!
 		synchronized (mesh) {
-			faces = mesh.clone().getFaces();
+			//faces = mesh.streamHoles().collect(Collectors.toList());
+			faces = mesh.getFacesWithHoles();
 		}
 		super.update(g);
 	}
 
 	@Override
 	public void paint(Graphics g) {
+    	// double buffering => draw into an image
 		Graphics2D graphics2D = (Graphics2D) g;
 		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
-
-
-		//graphics.scale(3, 3);
 
 		graphics.setColor(Color.WHITE);
 		graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
@@ -75,66 +79,44 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
 		graphics.setFont(newFont);
 		graphics.setColor(Color.GRAY);
-	   /* for(VShape obstacle : obstacles) {
-			graphics.fill(obstacle);
-		}*/
-
 		graphics.scale(scale, scale);
 		graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
-
 		graphics.setStroke(new BasicStroke(0.003f));
 		graphics.setColor(Color.BLACK);
-		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		int max = 0;
-		double maxX = Double.MIN_VALUE;
-		double maxY = Double.MIN_VALUE;
-		double minX = Double.MAX_VALUE;
-		double minY = Double.MAX_VALUE;
-
-		for(F face : faces) {
-			VTriangle triangle = mesh.toTriangle(face);
-			/*if(face instanceof AFace) {
-				int sum = mesh.streamVertices(face).map(v -> (AVertex)v).mapToInt(v -> v.getId()).max().getAsInt();
-				max = Math.max(sum, max);
-			}*/
-
-			VPoint incenter = triangle.getIncenter();
-
-			maxX = Math.max(maxX, incenter.getX());
-			maxY = Math.max(maxY, incenter.getY());
-
-			minX = Math.min(minX, incenter.getX());
-			minY = Math.min(minY, incenter.getY());
-		}
 
 		int groupSize = 64;
 		ColorHelper colorHelper = new ColorHelper(faces.size());
-//            SpaceFillingCurve curve = new SpaceFillingCurve(new VRectangle(minX, minY, maxX-minX, maxY-minY));
 
 		for(F face : faces) {
-			VTriangle triangle = mesh.toTriangle(face);
-			if(alertPred.test(face)) {
-				//log.info("red triangle");
-				graphics.setColor(Color.GRAY);
-				graphics.draw(triangle);
-				graphics.setColor(Color.RED);
-				graphics.fill(triangle);
+			try {
+				VPolygon polygon = mesh.toPolygon(face);
+				if(alertPred.test(face)) {
+					//log.info("red triangle");
 
+					graphics.setColor(Color.BLACK);
+					graphics.fill(polygon);
+					graphics.setColor(Color.WHITE);
+					graphics.draw(polygon);
 
-			} else {
-				if(face instanceof AFace) {
+				} else {
+					if(face instanceof AFace) {
 
-					int bucket = ((AFace)face).getId() / groupSize;
+						int bucket = ((AFace)face).getId() / groupSize;
 
-					graphics.setColor(colorHelper.numberToColor(((AFace)face).getId()));
-					graphics.fill(triangle);
+						graphics.setColor(colorHelper.numberToColor(((AFace)face).getId()));
+						graphics.fill(polygon);
+					}
 				}
+
+				graphics.setColor(Color.BLACK);
+				graphics.draw(polygon);
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				log.error("could not paint a face + " + face);
 			}
 
-			graphics.setColor(Color.BLACK);
-			graphics.draw(triangle);
 		}
 
 		graphics2D.drawImage(image, 0, 0, null);

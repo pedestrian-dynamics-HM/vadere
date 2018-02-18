@@ -1,10 +1,8 @@
 package org.vadere.util.geometry.mesh.inter;
 
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * @author Benedikt Zoennchen
@@ -28,7 +26,7 @@ public interface IFace<P extends IPoint> {
         AHalfEdge<MPoint> zy;
 
         mesh = new AMesh<>((x1, y1) -> new MPoint(x1, y1));
-        border = mesh.getBoundary();
+        border = mesh.getBorder();
 
         // first triangle xyz
         face1 = mesh.createFace();

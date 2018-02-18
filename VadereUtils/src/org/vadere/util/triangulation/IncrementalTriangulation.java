@@ -44,7 +44,6 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private V p0;
 	private V p1;
 	private V p2;
-    private V p3;
 
 	private final VRectangle bound;
 	private boolean finalized = false;
@@ -87,6 +86,20 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.finalized = false;
 	}
 
+	public IncrementalTriangulation(final IMesh<P, V, E, F> mesh, final Predicate<E> illegalPredicate) {
+		this.points = new HashSet<>();
+		this.illegalPredicate = illegalPredicate;
+		this.bound = null;
+		this.initialized = true;
+		this.finalized = false;
+		this.mesh = mesh;
+		this.virtualVertices = new ArrayList<>(mesh.getVertices());
+	}
+
+	public IncrementalTriangulation(final IMesh<P, V, E, F> mesh) {
+		this(mesh, halfEdge -> true);
+	}
+
     // constructors using the triangulation with a triangulator
 	public IncrementalTriangulation(final VRectangle bound) {
 		this(bound, halfEdge -> true);
@@ -106,58 +119,29 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	public void init() {
 		if(!initialized) {
             double max = Math.max(bound.getWidth(), bound.getHeight());
+            double min = Math.min(bound.getWidth(), bound.getHeight());
+
+
 		    double epsilon = BUFFER_PERCENTAGE * max; // 1% gap
 
             double xMin = bound.getMinX() - epsilon;
             double yMin = bound.getMinY() - epsilon;
 
-            double xMax = bound.getMaxX() + epsilon;
-            double yMax = bound.getMaxY() + epsilon;
+            double xMax = bound.getMinX() + bound.getWidth() * 2 + epsilon;
+            double yMax = bound.getMinY() + bound.getHeight() * 2 + epsilon;
+
 
 
 			p0 = mesh.insertVertex(xMin, yMin);
 			p1 = mesh.insertVertex(xMax, yMin);
 			p2 = mesh.insertVertex(xMin, yMax);
-			p3 = mesh.insertVertex(xMax, yMax);
 
-			// counter clockwise!
-			F square = mesh.createFace(p0, p1, p3, p2);
-			F tri = mesh.createFace();
-
-			// start divide the square into 2 triangles
-			E edge = mesh.createEdge(p1);
-			E twin = mesh.createEdge(p2);
-
-			mesh.setTwin(edge, twin);
-
-			E start = mesh.getEdge(p2);
-			if(mesh.isBoundary(start)) {
-                start = mesh.getPrev(mesh.getTwin(start));
-            }
-
-            E next = mesh.getNext(start);
-			E prev = mesh.getPrev(start);
-			E nnext = mesh.getNext(next);
-
-            mesh.setPrev(edge, start);
-            mesh.setNext(edge, prev);
-
-            mesh.setNext(twin, next);
-            mesh.setPrev(twin, nnext);
-
-            mesh.setFace(edge, square);
-            mesh.setFace(twin, tri);
-            mesh.setFace(mesh.getNext(twin), tri);
-            mesh.setFace(mesh.getPrev(twin), tri);
-
-			borderFace = mesh.getTwinFace(mesh.getEdge(square));
-			mesh.setEdge(borderFace, mesh.getTwin(start));
-
-            mesh.setEdge(tri, twin);
-            mesh.setEdge(square, edge);
+			// construct super triangle
+			F superTriangle = mesh.createFace(p0, p1, p2);
+			borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
             // end divide the square into 2 triangles
 
-			this.virtualVertices = Arrays.asList(p0, p1, p2, p3);
+			this.virtualVertices = Arrays.asList(p0, p1, p2);
 			this.initialized = true;
 		}
 		else {
@@ -282,20 +266,20 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
                 if(!mesh.isDestroyed(virtualPoint)) {
                     List<F> faces1 = mesh.getFaces(virtualPoint);
                     faces1.removeIf(f -> mesh.isBoundary(f));
-                    faces1.forEach(f -> removeBorderFace(f, true));
+                    faces1.forEach(f -> removeSingleFace(f, true));
                 }
             }
 
 			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
 				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces2.forEach(f -> removeBorderFace(f, true));
+				faces2.forEach(f -> removeSingleFace(f, true));
 			}
 
 			if(!mesh.isDestroyed(p2)) {
 				List<F> faces3 = mesh.getFaces(p2);
 				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces3.forEach(f -> removeBorderFace(f, true));
+				faces3.forEach(f -> removeSingleFace(f, true));
 			}*/
 
 			finalized = true;
@@ -596,7 +580,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		points.add(new VPoint(80,70));*/
 
 		Random r = new Random();
-		for(int i=0; i< 10000; i++) {
+		for(int i=0; i< 200; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
@@ -635,33 +619,19 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
         window2.getContentPane().add(new Lines(edges2, points, max));
         window2.setVisible(true);
 
-		/*ms = System.currentTimeMillis();
-		BowyerWatsonSlow<VPoint> bw2 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
-		bw2.execute();
-		Set<VLine> edges2 = bw2.getTriangles().stream()
+		ms = System.currentTimeMillis();
+		BowyerWatsonSlow<VPoint> bw3 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
+		bw3.execute();
+		Set<VLine> edges3 = bw3.getTriangles().stream()
 				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
 		System.out.println(System.currentTimeMillis() - ms);
-
-		JFrame window2 = new JFrame();
-		window2.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		window2.setBounds(0, 0, max, max);
-		window2.getContentPane().add(new Lines(edges2, points, max));
-		window2.setVisible(true);
-
-		UniformTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> uniformTriangulation = ITriangulation.createUniformTriangulation(
-				IPointLocator.Type.DELAUNAY_TREE,
-				new VRectangle(0, 0, width, height),
-				10.0,
-				(x, y) -> new VPoint(x, y));
-
-		uniformTriangulation.generate();
-		Set<VLine> edges3 = uniformTriangulation.getEdges();
 
 		JFrame window3 = new JFrame();
 		window3.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window3.setBounds(0, 0, max, max);
-		window3.getContentPane().add(new Lines(edges3, edges3.stream().flatMap(edge -> edge.streamPoints()).collect(Collectors.toSet()), max));
-		window3.setVisible(true);*/
+		window3.getContentPane().add(new Lines(edges3, points, max));
+		window3.setVisible(true);
+
 
 		/*VRectangle bound = new VRectangle(0, 0, width, height);
 		ITriangulation triangulation = ITriangulation.createVPTriangulation(bound);

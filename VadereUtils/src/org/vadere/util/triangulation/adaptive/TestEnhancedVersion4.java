@@ -5,12 +5,15 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
+import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.ITriangulationSupplier;
 
 import javax.swing.*;
@@ -42,12 +45,8 @@ public class TestEnhancedVersion4 extends JFrame {
 		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
 		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 
-		ITriangulationSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> ITriangulation.createATriangulation(
-				IPointLocator.Type.DELAUNAY_HIERARCHY,
-				bbox,
-				(x, y) -> new MeshPoint(x, y,
-						false));
-
+	    IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
+	    IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 
 		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();

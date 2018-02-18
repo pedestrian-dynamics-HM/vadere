@@ -39,9 +39,8 @@ public class TestVisual {
                 () -> ITriangulation.createVPTriangulation(bound),
 				bound,
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
-				p -> 10.0);
+				p -> 40.0);
 
-		//triangulation.finish();
         ITriangulation triangulation = uniformRefinement.generate();
         Set<VLine> edges4 = triangulation.getEdges();
 

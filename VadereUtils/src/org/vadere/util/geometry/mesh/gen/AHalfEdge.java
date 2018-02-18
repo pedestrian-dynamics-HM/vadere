@@ -124,7 +124,7 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 
     @Override
     public String toString() {
-        return "" + id + ":"+ previous+"(e)->"+next+"(e), " + end+"(v)";
+        return "" + id+"(e)->"+next+"(e), " + end+"(v)";
     }
 
     @Override
