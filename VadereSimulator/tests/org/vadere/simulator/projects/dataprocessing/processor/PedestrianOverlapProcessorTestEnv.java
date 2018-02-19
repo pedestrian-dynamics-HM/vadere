@@ -1,22 +1,22 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriterFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
 public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Integer> {
 
-	PedestrianOverlapProcessorTestEnv(){
+	private PedestrianListBuilder b = new PedestrianListBuilder();
+
+	PedestrianOverlapProcessorTestEnv() {
 		testedProcessor = processorFactory.createDataProcessor(PedestrianOverlapProcessor.class);
 		testedProcessor.setId(nextProcessorId());
 
@@ -31,12 +31,11 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
-				Map<Integer, VPoint> pedPosMap = new HashMap<>();
-				pedPosMap.put(1, new VPoint(1.0, 1.0));
-				pedPosMap.put(2, new VPoint(1.5, 1.5));
-				pedPosMap.put(3, new VPoint(1.5, 1.0));
-				pedPosMap.put(4, new VPoint(1.0, 1.5));
-				Mockito.when(state.getPedestrianPositionMap()).thenReturn(pedPosMap);
+				b.clear().add(1, new VPoint(1.0, 1.0));
+				b.add(2, new VPoint(1.5, 1.5));
+				b.add(3, new VPoint(1.5, 1.0));
+				b.add(4, new VPoint(1.0, 1.5));
+				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 0);
@@ -49,13 +48,13 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
-				Map<Integer, VPoint> pedPosMap = new HashMap<>();
-				pedPosMap.put(1, new VPoint(1.0, 1.0));
-				pedPosMap.put(2, new VPoint(1.5, 1.5));
-				pedPosMap.put(3, new VPoint(1.2, 1.0));
-				pedPosMap.put(4, new VPoint(1.0, 1.5));
-				pedPosMap.put(5, new VPoint(0.8, 0.8));
-				Mockito.when(state.getPedestrianPositionMap()).thenReturn(pedPosMap);
+
+				b.clear().add(1, new VPoint(1.0, 1.0));
+				b.add(2, new VPoint(1.5, 1.5));
+				b.add(3, new VPoint(1.2, 1.0));
+				b.add(4, new VPoint(1.0, 1.5));
+				b.add(5, new VPoint(0.8, 0.8));
+				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 2);
@@ -69,12 +68,11 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
-				Map<Integer, VPoint> pedPosMap = new HashMap<>();
-				pedPosMap.put(1, new VPoint(1.0, 1.0));
-				pedPosMap.put(2, new VPoint(1.0, 1.0));
-				pedPosMap.put(3, new VPoint(1.0, 1.0));
-				pedPosMap.put(4, new VPoint(1.0, 1.0));
-				Mockito.when(state.getPedestrianPositionMap()).thenReturn(pedPosMap);
+				b.clear().add(1, new VPoint(1.0, 1.0));
+				b.add(2, new VPoint(1.0, 1.0));
+				b.add(3, new VPoint(1.0, 1.0));
+				b.add(4, new VPoint(1.0, 1.0));
+				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 3);
