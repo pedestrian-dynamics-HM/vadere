@@ -137,6 +137,20 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         }
     }
 
+	default F createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
+		Predicate<F> notAtBorder = f -> !getMesh().isAtBorder(f);
+		Predicate<F> predicate = notAtBorder.and(mergeCondition);
+
+		if(predicate.test(face)) {
+			F remainingFace = IPolyConnectivity.super.mergeFaces(face, predicate, deleteIsoletedVertices);
+			getMesh().toHole(remainingFace);
+			return remainingFace;
+		}
+		else {
+			return face;
+		}
+	}
+
 	/**
 	 * Splits the half-edge at point p, preserving a valid triangulation.
 	 * Assumption: p is located on the edge!
@@ -752,11 +766,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param startFace the face where the march start containing (x1,y1).
 	 * @return
 	 */
-	default F straightWalk2D(final double x1, final double y1, final F startFace) {
+	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace) {
 		return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
 	}
 
-    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, final F startFace) {
+    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
         return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
     }
 
@@ -781,7 +795,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return straightWalk2D(p1, q, face, edge, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
 	}
 
-	default F straightWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
+	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
 		return straightGatherWalk2D(x1, y1, startFace, stopCondition).peekLast();
 	}
 

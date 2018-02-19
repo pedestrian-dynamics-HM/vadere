@@ -57,7 +57,7 @@ public class PFace<P extends IPoint> implements IFace<P> {
 		destroyed = true;
 	}
 
-	public void seBoundary(boolean border) {
+	public void setBoundary(boolean border) {
 		this.border = border;
 	}
 

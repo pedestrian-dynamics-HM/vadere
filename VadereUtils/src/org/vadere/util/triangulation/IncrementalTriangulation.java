@@ -212,7 +212,9 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	@Override
 	public E insert(P point) {
+		log.info("start location");
 		F face = this.pointLocator.locatePoint(point, true);
+		log.info("end location");
 		return insert(point, face);
 	}
 
@@ -266,20 +268,20 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
                 if(!mesh.isDestroyed(virtualPoint)) {
                     List<F> faces1 = mesh.getFaces(virtualPoint);
                     faces1.removeIf(f -> mesh.isBoundary(f));
-                    faces1.forEach(f -> removeSingleFace(f, true));
+                    faces1.forEach(f -> removeFaceAtBorder(f, true));
                 }
             }
 
 			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
 				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces2.forEach(f -> removeSingleFace(f, true));
+				faces2.forEach(f -> removeFaceAtBorder(f, true));
 			}
 
 			if(!mesh.isDestroyed(p2)) {
 				List<F> faces3 = mesh.getFaces(p2);
 				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces3.forEach(f -> removeSingleFace(f, true));
+				faces3.forEach(f -> removeFaceAtBorder(f, true));
 			}*/
 
 			finalized = true;

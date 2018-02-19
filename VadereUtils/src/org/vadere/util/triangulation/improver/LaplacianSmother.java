@@ -90,7 +90,7 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
         return triangulation;
     }
 
-    private VPoint laplacian(final PVertex<MeshPoint> vertex) {
+	private VPoint laplacian(final PVertex<MeshPoint> vertex) {
         VPoint p = getMesh().getPoint(vertex).toVPoint();
         long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
 
@@ -177,7 +177,7 @@ public class LaplacianSmother implements IMeshImprover<MeshPoint, PVertex<MeshPo
         List<PFace<MeshPoint>> faces = triangulation.getMesh().getFaces();
         for(PFace<MeshPoint> face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeSingleFace(face, true);
+                triangulation.removeFaceAtBorder(face, true);
             }
         }
     }

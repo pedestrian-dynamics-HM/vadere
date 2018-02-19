@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.shapes;
 
 import java.awt.Shape;
+import java.util.List;
 
 import org.vadere.util.geometry.ShapeType;
 
@@ -28,5 +29,7 @@ public interface VShape extends Shape, Cloneable {
 	ShapeType getType();
 
 	boolean intersect(VShape shape);
+
+	List<VPoint> getPath();
 
 }

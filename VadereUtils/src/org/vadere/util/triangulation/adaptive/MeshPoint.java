@@ -24,6 +24,10 @@ public class MeshPoint extends MPoint implements PotentialPoint, Cloneable {
 		this.lastPosition = new VPoint(x, y);
 	}
 
+	public void setFixPoint(boolean fixPoint) {
+		this.fixPoint = fixPoint;
+	}
+
 	public MeshPoint(final IPoint point, boolean fixPoint){
 		this(point.getX(), point.getY(), fixPoint);
 	}

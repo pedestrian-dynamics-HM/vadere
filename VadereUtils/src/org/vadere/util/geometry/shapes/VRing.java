@@ -225,4 +225,9 @@ public class VRing implements VShape {
 		throw new UnsupportedOperationException("not yet implemented.");
 	}
 
+	@Override
+	public List<VPoint> getPath() {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
 }

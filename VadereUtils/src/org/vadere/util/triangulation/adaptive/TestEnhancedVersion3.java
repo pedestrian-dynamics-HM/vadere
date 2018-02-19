@@ -64,7 +64,8 @@ public class TestEnhancedVersion3 extends JFrame {
                 bbox, new ArrayList<>(),
                 supplier);
 
-        Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
+        //Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
+	    Predicate<AFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().isHole(face);
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();

@@ -35,6 +35,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 
 		if(optMainModel.isPresent() && optMainModel.get() instanceof PotentialFieldModel) {
 			IPotentialFieldTarget pft = ((PotentialFieldModel) optMainModel.get()).getPotentialFieldTarget();
+
 			Rectangle.Double bound = state.getTopography().getBounds();
 
 			/**

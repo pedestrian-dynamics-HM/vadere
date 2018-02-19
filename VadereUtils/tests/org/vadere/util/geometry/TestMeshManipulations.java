@@ -12,6 +12,9 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import javax.swing.*;
 
 /**
@@ -39,6 +42,9 @@ public class TestMeshManipulations {
 		triangulation.insert(new VPoint(10, 0));
 		triangulation.insert(new VPoint(0, 10));
 		triangulation.insert(new VPoint(6, 8));
+		triangulation.insert(new VPoint(7, 6));
+		triangulation.insert(new VPoint(7.8, 3));
+		triangulation.insert(new VPoint(5.7, 4));
 		triangulation.finish();
 	}
 
@@ -55,10 +61,23 @@ public class TestMeshManipulations {
 			e.printStackTrace();
 		}
 
-		test.triangulation.removeFace(test.triangulation.locateFace(3, 5).get(), true);
+		/*test.triangulation.removeFace(test.triangulation.locateFace(3, 5).get(), true);
 		test.triangulation.removeFace(test.triangulation.locateFace(8, 3).get(), true);
 		test.triangulation.removeFace(test.triangulation.locateFace(4, 5).get(), true);
-		test.triangulation.removeFace(test.triangulation.locateFace(4, 9).get(), true);
+		test.triangulation.removeFace(test.triangulation.locateFace(4, 9).get(), true);*/
+
+		PFace<VPoint> face = test.triangulation.locateFace(4, 5).get();
+		List<VPoint> points = test.triangulation.getMesh().getPoints(face);
+		VPoint incetner = GeometryUtils.getIncenter(points.get(0), points.get(1), points.get(2));
+
+		Predicate<PFace<VPoint>> mergePredicate = f -> {
+			List<VPoint> pList = test.triangulation.getMesh().getPoints(f);
+			VPoint icetner = GeometryUtils.getIncenter(pList.get(0), pList.get(1), pList.get(2));
+			return icetner.distance(incetner) < 500;
+		};
+
+		//GeometryUtils.getCentroid()
+		test.triangulation.createHole(test.triangulation.locateFace(4, 5).get(), mergePredicate, true);
 		//PFace<VPoint> face = ;
 		PSMeshingPanel<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> panel = new PSMeshingPanel<>(test.triangulation.getMesh(),
 				f -> test.triangulation.getMesh().isHole(f), 800, 800, test.bound);

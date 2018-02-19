@@ -6,6 +6,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.vadere.util.geometry.ShapeType;
 import org.vadere.util.geometry.Vector2D;
@@ -192,5 +194,19 @@ public class VCircle implements VShape {
 	@Override
 	public boolean intersect(final VShape shape) {
 		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	@Override
+	public List<VPoint> getPath() {
+		// approximate the circle!
+		int numberOfSegments = 10;
+		List<VPoint> points = new ArrayList<>();
+		for(int i = 0; i < numberOfSegments; i++) {
+			double rad = 2*Math.PI * i / numberOfSegments;
+			double x = Math.cos(rad);
+			double y = Math.sin(rad);
+			points.add(center.add(new VPoint(x, y)));
+		}
+		return points;
 	}
 }

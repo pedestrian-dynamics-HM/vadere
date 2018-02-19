@@ -133,6 +133,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return streamEdges(vertex).anyMatch(e -> isAtBorder(e));
 	}
 
+	default boolean isAtBorder(@NotNull F face) {
+		return streamEdges(face).anyMatch(e -> isAtBorder(e));
+	}
+
 	default boolean isAtBorder(@NotNull E edge) {
 		return isBorder(edge) || isBorder(getTwin(edge));
 	}

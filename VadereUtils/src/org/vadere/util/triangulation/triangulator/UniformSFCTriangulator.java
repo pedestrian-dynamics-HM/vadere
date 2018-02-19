@@ -145,7 +145,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
             List<F> candidates = mesh.getFaces(mesh.getBorder());
             for(F face : candidates) {
                 if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
-                    triangulation.removeSingleFace(face, true);
+                    triangulation.removeFaceAtBorder(face, true);
                     removedSome = true;
                 }
             }
@@ -156,7 +156,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
         List<F> faces = triangulation.getMesh().getFaces();
         for(F face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeSingleFace(face, true);
+                triangulation.removeFaceAtBorder(face, true);
             }
         }
     }
@@ -181,7 +181,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
 						mesh.streamFaces(face)
 								//.filter(f -> !face.equals(f)).distinct()
 								.forEach(candidate -> candidates.addFirst(candidate));
-						triangulation.removeSingleFace(face, true);
+						triangulation.removeFaceAtBorder(face, true);
 					}
 				}
 			}

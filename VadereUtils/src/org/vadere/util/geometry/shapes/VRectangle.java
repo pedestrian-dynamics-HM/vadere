@@ -2,6 +2,8 @@ package org.vadere.util.geometry.shapes;
 
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
+import java.util.List;
 
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
@@ -136,4 +138,9 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
             throw new UnsupportedOperationException("not yet implemented");
         }
     }
+
+	@Override
+	public List<VPoint> getPath() {
+		return Arrays.asList(new VPoint(x,y), new VPoint(x+width, y), new VPoint(x+width, y+height), new VPoint(x, y+height));
+	}
 }

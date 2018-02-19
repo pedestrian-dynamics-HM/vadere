@@ -76,10 +76,10 @@ public class TestUniTriangulation extends JFrame {
 	    log.info("rdy");
 
 	    counter = 0;
-        while (counter < 5000) {
+        while (counter < 1) {
         	counter++;
 	        try {
-	        	uniformRefinementTriangulation.removeTrianglesInsideObstacles();
+	        	uniformRefinementTriangulation.finish();
 
 		        Thread.sleep(1);
 

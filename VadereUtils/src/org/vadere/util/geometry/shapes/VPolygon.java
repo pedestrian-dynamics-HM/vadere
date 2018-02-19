@@ -431,4 +431,9 @@ public class VPolygon extends Path2D.Double implements VShape {
 			throw new UnsupportedOperationException("not yet implemented");
 		}
 	}
+
+	@Override
+	public List<VPoint> getPath() {
+		return getPoints();
+	}
 }

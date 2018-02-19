@@ -189,7 +189,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             //TODO: SE-Architecture dirty here!
             if(v == null) {
                 if(level == 0) {
-                    face = tri.marchRandom2D(point.getX(), point.getY(), tri.getMesh().getFace());
+                    face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace());
                 }
                 else {
                     face = tri.locateFace(point).get();
@@ -205,7 +205,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 
                 //TODO: SE-Architecture dirty here!
                 if(level == 0) {
-                    face = tri.marchRandom2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
+                    face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
                 }
                 else {
                     face = tri.locateFace(point, tri.getMesh().getFace(v)).get();

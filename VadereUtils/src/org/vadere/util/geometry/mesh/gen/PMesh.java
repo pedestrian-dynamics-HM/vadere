@@ -269,7 +269,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 		assert !isHole(face);
 		if(!isHole(face)) {
 			holes.add(face);
-			face.seBoundary(true);
+			face.setBoundary(true);
 		}
 	}
 
@@ -301,6 +301,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public void destroyVertex(@NotNull PVertex<P> vertex) {
 		vertices.remove(vertex);
+		System.out.println("destroy vertex!");
 		vertex.destroy();
 	}
 

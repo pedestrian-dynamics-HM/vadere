@@ -4,12 +4,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
+import java.awt.geom.PathIterator;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -211,74 +214,66 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
         synchronized (getMesh()) {
 			List<F> sierpinksyFaceOrder = sierpinskyCurve.stream().map(e -> getMesh().getFace(e.getRight())).collect(Collectors.toList());
 
-			//triangulation.finish();
-			//removeTrianglesOutsideBBox();
+			triangulation.finish();
+			removeTrianglesOutsideBBox();
 			removeTrianglesInsideObstacles();
 
-			sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face));
-	        List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
-			logger.info("#holes:" + holes.size());
-	        //sierpinksyFaceOrder.addAll(holes);
-			logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
-
 			// TODO: dirty type casting?
-			//((AMesh<P>)mesh).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
+	        if(getMesh() instanceof AMesh) {
+		        sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face));
+		        List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
+		        logger.info("#holes:" + holes.size());
+		        sierpinksyFaceOrder.addAll(holes);
+		        logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
+
+		        ((AMesh<P>)getMesh()).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
+	        }
         }
     }
-
 
     private E getLongestEdge(F face) {
 	    return getMesh().streamEdges(face).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
     }
 
-	private void removeTrianglesOutsideBBox() {
-		boolean removedSome = true;
-		while (removedSome) {
-			removedSome = false;
-            List<F> candidates = getMesh().getFaces(getMesh().getBorder());
-			for(F face : candidates) {
-
-				if(!getMesh().isDestroyed(face) && getMesh().streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
-				    triangulation.removeFace(face, true);
-					removedSome = true;
-				}
-
-			}
-		}
+	public void removeTrianglesOutsideBBox() {
+		triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 	}
 
 	public void removeTrianglesInsideObstacles() {
 		List<F> faces = triangulation.getMesh().getFaces();
-
 		for(F face : faces) {
-			try {
-			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-					triangulation.removeFace(face, true);
-					return;
-				}
-
-			}
-			catch (ArrayIndexOutOfBoundsException e) {
-				//logger.error(e.getMessage() + ", " + triangulation.getMesh().getEdge(face));
+			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
+				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 			}
 		}
-
 	}
 
 	private boolean isCompleted(E edge) {
 		if(getMesh().isBoundary(edge)){
 			edge = getMesh().getTwin(edge);
 		}
+		return isSmallEnough(edge) /*|| isEdgeOutsideBBox(edge) || isEdgeInsideHole(edge);*/;
+	}
 
+	private boolean isSmallEnough(@NotNull final E edge) {
+		VLine line = getMesh().toLine(edge);
+		return (line.length() <= lenFunc.apply(line.midPoint()));
+	}
+
+	private boolean isEdgeOutsideBBox(@NotNull final E edge) {
 		F face = getMesh().getFace(edge);
 		F twin = getMesh().getTwinFace(edge);
 
 		VTriangle triangle = getMesh().toTriangle(face);
-		VLine line = getMesh().toLine(edge);
+		return (!triangle.intersect(bbox) && (getMesh().isBoundary(twin) || !getMesh().toTriangle(twin).intersect(bbox)));
+	}
 
-		return (line.length() <= lenFunc.apply(line.midPoint()))
-				|| (!triangle.intersect(bbox) && (getMesh().isBoundary(twin) || !getMesh().toTriangle(twin).intersect(bbox)))
-				|| boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!getMesh().isBoundary(twin) && shape.contains(getMesh().toTriangle(twin).getBounds2D())));
+	private boolean isEdgeInsideHole(@NotNull final E edge) {
+		F face = getMesh().getFace(edge);
+		F twin = getMesh().getTwinFace(edge);
+
+		VTriangle triangle = getMesh().toTriangle(face);
+		return boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!getMesh().isBoundary(twin) && shape.contains(getMesh().toTriangle(twin).getBounds2D())));
 	}
 
     private void refine(final E edge) {
@@ -287,10 +282,11 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
         if(!points.contains(p)) {
             points.add(p);
-            triangulation.splitEdge(p, edge, false);
+            E newEdge = triangulation.getAnyEdge( triangulation.splitEdge(p, edge, true));
+	        triangulation.insertEvent(newEdge);
         }
         else {
-            throw new IllegalStateException("point already exist.");
+            throw new IllegalStateException(p + " point already exist.");
         }
     }
 
@@ -314,7 +310,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 						mesh.streamFaces(face)
 								//.filter(f -> !face.equals(f)).distinct()
 								.forEach(candidate -> candidates.addFirst(candidate));
-						triangulation.removeSingleFace(face, true);
+						triangulation.removeFaceAtBorder(face, true);
 					}
 				}
 			}

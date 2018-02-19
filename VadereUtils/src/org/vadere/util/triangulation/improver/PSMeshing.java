@@ -16,8 +16,10 @@ import org.vadere.util.triangulation.adaptive.Parameters;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,9 +36,10 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private double scalingFactor;
 	private double deps;
 
-	private boolean runParallel = true;
+	private boolean runParallel = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
+	private final Collection<? extends VShape> obstacleShapes;
 
     private Object gobalAcessSynchronizer = new Object();
 
@@ -58,6 +61,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
 		this.deps = 1.4901e-8 * initialEdgeLen;
+		this.obstacleShapes = obstacleShapes;
 
         log.info("##### (start) generate a triangulation #####");
         UniformRefinementTriangulatorCFS<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
@@ -67,7 +71,22 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 p -> edgeLengthFunc.apply(p) * initialEdgeLen,
                 distanceFunc);
         triangulation = uniformRefinementTriangulation.generate();
+        insertFixPoints();
         log.info("##### (end) generate a triangulation #####");
+	}
+
+	private void insertFixPoints() {
+		Set<P> pointSet = new HashSet<>();
+		for(VShape shape : obstacleShapes) {
+			pointSet.addAll(shape.getPath().stream().map(p ->  getMesh().createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
+		}
+
+		for(P p : pointSet) {
+			p.setFixPoint(true);
+		}
+		log.info("##### (start) insert fix points #####");
+		triangulation.insert(pointSet);
+		log.info("##### (end) insert fix points #####");
 	}
 
 	@Override
@@ -83,11 +102,6 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
     @Override
     public synchronized Collection<VTriangle> getTriangles() {
         return triangulation.streamTriangles().collect(Collectors.toList());
-    }
-
-    public double getQuality() {
-        Collection<F> faces = getMesh().getFaces();
-        return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> d1 + d2).get() / faces.size();
     }
 
     // TODO: parallize the whole triangulation
@@ -373,7 +387,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-				triangulation.removeSingleFace(face, true);
+				triangulation.removeFaceAtBorder(face, true);
 			}
 		}
 	}
@@ -386,7 +400,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 				if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
 					E edge = getMesh().getNext(optEdge.get());
 					projectBackVertex(getMesh().getVertex(edge));
-					triangulation.removeSingleFace(face, true);
+					triangulation.removeFaceAtBorder(face, true);
 				}
 			}
 		}
@@ -399,22 +413,6 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 .filter(face -> !getMesh().isDestroyed(face))
                 .filter(face -> faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE)
                 .collect(Collectors.toList()) // we have to collect since we manipulate / remove faces
-                .forEach(face -> triangulation.removeSingleFace(face, true));
+                .forEach(face -> triangulation.removeFaceAtBorder(face, true));
     }
-
-	public double faceToQuality(final F face) {
-
-		VLine[] lines = getMesh().toTriangle(face).getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part = 0.0;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-		}
-		else {
-			throw new IllegalArgumentException(face + " is not a feasible triangle!");
-		}
-		return part;
-	}
 }

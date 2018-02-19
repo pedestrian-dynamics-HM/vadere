@@ -113,27 +113,15 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 	    return mesh.streamEdges(face).reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2).get();
     }
 
-	private void removeTrianglesOutsideBBox() {
-		boolean removedSome = true;
-
-		while (removedSome) {
-			removedSome = false;
-
-			List<F> candidates = mesh.getFaces(mesh.getBorder());
-			for(F face : candidates) {
-				if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
-					triangulation.removeSingleFace(face, true);
-					removedSome = true;
-				}
-			}
-		}
+	public void removeTrianglesOutsideBBox() {
+		triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 	}
 
-	private void removeTrianglesInsideObstacles() {
+	public void removeTrianglesInsideObstacles() {
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
-			if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-				triangulation.removeFace(face, true);
+			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
+				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 			}
 		}
 	}
@@ -158,7 +146,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 						mesh.streamFaces(face)
 								//.filter(f -> !face.equals(f)).distinct()
 								.forEach(candidate -> candidates.addFirst(candidate));
-						triangulation.removeSingleFace(face, true);
+						triangulation.removeFaceAtBorder(face, true);
 					}
 				}
 			}

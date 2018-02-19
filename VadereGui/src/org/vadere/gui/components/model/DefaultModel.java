@@ -8,11 +8,20 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AHalfEdge;
+import org.vadere.util.geometry.mesh.gen.AVertex;
+import org.vadere.util.geometry.mesh.gen.PMesh;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.triangulation.adaptive.DistanceFunction;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
+import org.vadere.util.triangulation.improver.IMeshImprover;
+import org.vadere.util.triangulation.improver.PSMeshing;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
@@ -515,25 +524,31 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
 			obstacles.addAll(getTopography().getObstacles());
 
-			PSDistmesh psDistmesh = new PSDistmesh(
-					bound,
-					obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList()),
-					Math.max(0.1, Math.max(bound.getWidth(), bound.getHeight())) / 100,
-					false
-			);
+			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
+
+			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+
+			IMeshImprover<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshImprover = new PSMeshing<>(
+					distanceFunc,
+					p -> Math.abs(distanceFunc.apply(p)) + 1.0,
+					0.5,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+					() -> new PMesh((x, y) -> new MeshPoint(x, y, false)));
 
 			Thread t = new Thread(
 				() -> {
-					while (!psDistmesh.hasConverged() && !psDistmesh.hasMaximalSteps()) {
-						psDistmesh.step();
+					int counter = 0;
+					while (meshImprover.getQuality() < 0.94 && counter < 200) {
+						counter++;
+						meshImprover.improve();
 						synchronized (triangulation) {
-							triangulation = psDistmesh.getTriangles();
+							triangulation = meshImprover.getTriangles();
 							setChanged();
 							fireChangeViewportEvent(bound);
 						}
 					}
-					psDistmesh.cleanUp();
-					triangulation = psDistmesh.getTriangles();
+					System.out.println("rdy");
+					triangulation = meshImprover.getTriangles();
 					setChanged();
 					fireChangeViewportEvent(bound);
 				});

@@ -2,6 +2,7 @@ package org.vadere.util.triangulation.improver;
 
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.Collection;
@@ -37,5 +38,29 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
      * @return
      */
     ITriangulation<P, V, E, F> getTriangulation();
+
+	/**
+	 *
+	 * @return
+	 */
+	default double getQuality() {
+		Collection<F> faces = getMesh().getFaces();
+		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> d1 + d2).get() / faces.size();
+	}
+
+	default double faceToQuality(final F face) {
+		VLine[] lines = getMesh().toTriangle(face).getLines();
+		double a = lines[0].length();
+		double b = lines[1].length();
+		double c = lines[2].length();
+		double part = 0.0;
+		if(a != 0.0 && b != 0.0 && c != 0.0) {
+			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+		}
+		else {
+			throw new IllegalArgumentException(face + " is not a feasible triangle!");
+		}
+		return part;
+	}
 
 }

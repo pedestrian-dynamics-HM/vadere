@@ -179,7 +179,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
                 if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
                     AHalfEdge<P> edge = getMesh().getNext(optEdge.get());
                     projectToBoundary(getMesh().getVertex(edge));
-                    triangulation.removeSingleFace(face, true);
+                    triangulation.removeFaceAtBorder(face, true);
                 }
             }
         }
@@ -234,7 +234,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
         List<AFace<P>> faces = triangulation.getMesh().getFaces();
         for(AFace<P> face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeSingleFace(face, true);
+                triangulation.removeFaceAtBorder(face, true);
             }
         }
     }
