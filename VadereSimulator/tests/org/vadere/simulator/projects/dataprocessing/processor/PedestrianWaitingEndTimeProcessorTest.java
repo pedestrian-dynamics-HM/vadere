@@ -11,7 +11,7 @@ public class PedestrianWaitingEndTimeProcessorTest extends ProcessorTest {
 
 	@Before
 	public void setup(){
-		processorTestEnv = new PedestrianWaitingEndTimeProcessorEnv();
+		processorTestEnv = new PedestrianWaitingEndTimeProcessorTestEnv();
 		super.setup();
 	}
 

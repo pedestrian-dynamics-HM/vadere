@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
@@ -16,27 +17,32 @@ import static org.mockito.Mockito.when;
 
 public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<TimestepPedestrianIdKey, Double>{
 
-	private DataProcessor pedPosProc;
-	private PedestrianPositionProcessorTestEnv pedPosProcEnv;
 
 	PedestrianVelocityProcessorTestEnv(){
 		testedProcessor = processorFactory.createDataProcessor(PedestrianVelocityProcessor.class);
 		testedProcessor.setId(nextProcessorId());
+
+		DataProcessor pedPosProc;
+		PedestrianPositionProcessorTestEnv pedPosProcEnv;
+		int pedPosProcId = nextProcessorId();
+
+		//add ProcessorId of required Processors to current Processor under test
 		AttributesPedestrianVelocityProcessor attr =
 				(AttributesPedestrianVelocityProcessor) testedProcessor.getAttributes();
-		attr.setPedestrianPositionProcessorId(99);
+		attr.setPedestrianPositionProcessorId(pedPosProcId);
 
-
-		pedPosProcEnv = new PedestrianPositionProcessorTestEnv(99);
-		pedPosProcEnv.init();
+		//create required Processor enviroment and add it to current Processor under test
+		pedPosProcEnv = new PedestrianPositionProcessorTestEnv(pedPosProcId);
 		pedPosProc = pedPosProcEnv.getTestedProcessor();
+		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
+		addRequiredProcessors(pedPosProcEnv);
 
+		//setup output file with different VadereWriter impl for test
 		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
 				TimestepPedestrianIdKey.class,
 				testedProcessor.getId()
 		);
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-		when(manager.getProcessor(99)).thenReturn(pedPosProc);
 	}
 
 	PedestrianListBuilder b = new PedestrianListBuilder();
@@ -44,14 +50,13 @@ public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<Timest
 	SimulationStateMock state2;
 
 	public void loadSimulationStateMocksWithBackstep2(){
-		states.clear();
-		pedPosProcEnv.getSimStates().clear();
+		clearStates();
 
-		states.add(state1);
+		addSimState(state1);
 
-		states.add(state2);
+		addSimState(state2);
 
-		states.add(new SimulationStateMock(3) {
+		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
 
@@ -67,8 +72,6 @@ public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<Timest
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 5.0);
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 0.0);
 
-
-				pedPosProcEnv.addSimState(this);
 			}
 		});
 	}
@@ -91,11 +94,9 @@ public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<Timest
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 0.0);
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 0.0);
 
-
-				pedPosProcEnv.addSimState(this);
 			}
 		};
-		states.add(state1);
+		addSimState(state1);
 
 		state2 = new SimulationStateMock(2) {
 			@Override
@@ -113,13 +114,11 @@ public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<Timest
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 5.0);
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 0.0);
 
-
-				pedPosProcEnv.addSimState(this);
 			}
 		};
-		states.add(state2);
+		addSimState(state2);
 
-		states.add(new SimulationStateMock(3) {
+		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
 
@@ -135,8 +134,6 @@ public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<Timest
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 0.0);
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 0.0);
 
-
-				pedPosProcEnv.addSimState(this);
 			}
 		});
 	}

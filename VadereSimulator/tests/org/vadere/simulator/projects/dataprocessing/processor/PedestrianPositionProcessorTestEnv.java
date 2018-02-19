@@ -26,7 +26,7 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 		super();
 		testedProcessor = processorFactory.createDataProcessor(PedestrianPositionProcessor.class);
 		testedProcessor.setId(processorId);
-		this.nextProcessorId = processorId++;
+		this.nextProcessorId = processorId + 1;
 
 		outputFile = outputFileFactory.createOutputfile(
 				TimestepPedestrianIdOutputFile.class,
@@ -43,7 +43,7 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 	@Override
 	public void loadDefaultSimulationStateMocks() {
 
-		states.add(new SimulationStateMock() {
+		addSimState(new SimulationStateMock() {
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(1);
@@ -57,7 +57,7 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			}
 		});
 
-		states.add(new SimulationStateMock() {
+		addSimState(new SimulationStateMock() {
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(2);
@@ -69,7 +69,7 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			}
 		});
 
-		states.add(new SimulationStateMock() {
+		addSimState(new SimulationStateMock() {
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(3);

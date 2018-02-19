@@ -53,7 +53,7 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 			peds[id] = new Pedestrian(new AttributesAgent(id), new Random());
 		}
 
-		states.add(new SimulationStateMock(1) {
+		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
 				List<Pedestrian> peds = getPeds(1, 2, 3, 4, 5);
@@ -65,7 +65,7 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 		});
 
 
-		states.add(new SimulationStateMock(2) {
+		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
 				List<Pedestrian> peds = getPeds(1, 2, 3, 4, 5, 7, 8);
@@ -77,7 +77,7 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 			}
 		});
 
-		states.add(new SimulationStateMock(3) {
+		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
 				List<Pedestrian> peds = getPeds(4, 5, 7, 8, 9);

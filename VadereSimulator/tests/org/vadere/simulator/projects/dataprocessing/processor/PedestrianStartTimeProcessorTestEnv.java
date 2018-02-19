@@ -43,7 +43,7 @@ public class PedestrianStartTimeProcessorTestEnv extends ProcessorTestEnv<Pedest
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {
-		states.add(new SimulationStateMock() {
+		addSimState(new SimulationStateMock() {
 			@Override
 			public void mockIt() {
 
@@ -60,7 +60,7 @@ public class PedestrianStartTimeProcessorTestEnv extends ProcessorTestEnv<Pedest
 			}
 		});
 
-		states.add(new SimulationStateMock() {
+		addSimState(new SimulationStateMock() {
 			@Override
 			public void mockIt() {
 
@@ -78,7 +78,7 @@ public class PedestrianStartTimeProcessorTestEnv extends ProcessorTestEnv<Pedest
 			}
 		});
 
-		states.add(new SimulationStateMock() {
+		addSimState(new SimulationStateMock() {
 			@Override
 			public void mockIt() {
 

@@ -12,6 +12,7 @@ import org.vadere.tests.reflection.ReflectionHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	/**
 	 * List of {@link SimulationState}s used for test. (mocked)
 	 */
-	List<SimulationStateMock> states;
+	private List<SimulationStateMock> states;
 	/**
 	 * Ids of {@link DataProcessor}s
 	 */
@@ -55,7 +56,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	/**
 	 * If {@link #testedProcessor} has dependencies to other {@link DataProcessor}s
 	 */
-	private Map<Integer, DataProcessor<?, ?>> requiredProcessors;
+	private List<ProcessorTestEnv> requiredProcessors;
 	private String delimiter;
 
 
@@ -68,18 +69,20 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 		delimiter = " ";
 		testedProcessor = null;
 		outputFile = null;
-		requiredProcessors = new HashMap<>();
+		requiredProcessors = new LinkedList<>();
 		processorFactory = new DataProcessorFactory();
 		outputFileFactory = new OutputFileFactory();
 	}
 
 	/**
-	 * Initialize {@link DataProcessor} and {@link OutputFile}
+	 * Initialize {@link DataProcessor}, {@link OutputFile} and initialize all requiredProcessors
+	 * if needed.
 	 */
 	void init() {
 		delimiter = outputFile.getSeparator();
 		outputFile.init(getProcessorMap());
 		testedProcessor.init(manager);
+		requiredProcessors.forEach(env -> env.init());
 	}
 
 	/**
@@ -87,8 +90,15 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	 */
 	public abstract void loadDefaultSimulationStateMocks();
 
+	/**
+	 * Add Mocked SimulationsState to current Processor under test and all its required
+	 * {@link DataProcessor}
+	 * @param mock
+	 */
 	public void addSimState(SimulationStateMock mock){
 		states.add(mock);
+		if (!requiredProcessors.isEmpty())
+			requiredProcessors.forEach(e -> e.addSimState(mock));
 	}
 
 	List<SimulationState> getSimStates() {
@@ -117,12 +127,25 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 		return delimiter;
 	}
 
+	public void clearStates(){
+		states.clear();
+		requiredProcessors.forEach(env -> env.clearStates());
+	}
 
+	public void addRequiredProcessors(ProcessorTestEnv env){
+		requiredProcessors.add(env);
+	}
+
+	/**
+	 * Return the ProcessorMap for the current Test.
+	 * @return
+	 */
 	private Map<Integer, DataProcessor<?, ?>> getProcessorMap() {
 		Map<Integer, DataProcessor<?, ?>> processorMap = new LinkedHashMap<>();
 		processorMap.put(testedProcessor.getId(), testedProcessor);
 		if (requiredProcessors != null && requiredProcessors.size() > 0)
-			processorMap.putAll(requiredProcessors);
+			requiredProcessors.forEach((e) ->
+					processorMap.put(e.getTestedProcessor().getId(), e.getTestedProcessor()));
 
 		return processorMap;
 	}

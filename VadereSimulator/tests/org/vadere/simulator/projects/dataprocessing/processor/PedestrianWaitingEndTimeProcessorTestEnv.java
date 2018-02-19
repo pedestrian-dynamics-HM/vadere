@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class PedestrianWaitingEndTimeProcessorEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
+public class PedestrianWaitingEndTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
-	PedestrianWaitingEndTimeProcessorEnv(){
+	PedestrianWaitingEndTimeProcessorTestEnv(){
 		testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingEndTimeProcessor.class);
 		testedProcessor.setId(nextProcessorId());
 

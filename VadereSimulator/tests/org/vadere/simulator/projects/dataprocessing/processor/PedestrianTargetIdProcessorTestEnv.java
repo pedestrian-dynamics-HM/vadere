@@ -39,7 +39,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {
-		states.add(new SimulationStateMock(1) {
+		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
 				List<Pedestrian> peds = getPeds(new Integer[]{12,33,40, 2}, new Integer[]{1,1,2, 2});
@@ -53,7 +53,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 			}
 		});
 
-		states.add(new SimulationStateMock(2) {
+		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
 				List<Pedestrian> peds = getPeds(new Integer[]{12,33,40, 9}, new Integer[]{1,2,3, 1});
@@ -67,7 +67,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 			}
 		});
 
-		states.add(new SimulationStateMock(3) {
+		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
 				List<Pedestrian> peds = getPeds(new Integer[]{ 10, 9 }, new Integer[]{1, 1});

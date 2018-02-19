@@ -16,21 +16,31 @@ import static org.mockito.Mockito.when;
 
 public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
-	DataProcessor pedStartTimeProc;
-	PedestrianStartTimeProcessorTestEnv pedStartTimeProcEnv;
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
-	PedestrianEvacuationTimeProcessorTestEnv() {
+	PedestrianEvacuationTimeProcessorTestEnv(){this(1);}
+
+	PedestrianEvacuationTimeProcessorTestEnv(int nextProcesorId) {
 		testedProcessor = processorFactory.createDataProcessor(PedestrianEvacuationTimeProcessor.class);
-		testedProcessor.setId(nextProcessorId());
+		testedProcessor.setId(nextProcesorId);
+		this.nextProcessorId = nextProcesorId + 1;
+
+		DataProcessor pedStartTimeProc;
+		PedestrianStartTimeProcessorTestEnv pedStartTimeProcEnv;
+		int pedStartTimeProcId = nextProcessorId();
+
+		//add ProcessorId of required Processors to current Processor under test
 		AttributesPedestrianEvacuationTimeProcessor attr =
 				(AttributesPedestrianEvacuationTimeProcessor) testedProcessor.getAttributes();
-		attr.setPedestrianStartTimeProcessorId(99);
+		attr.setPedestrianStartTimeProcessorId(pedStartTimeProcId);
 
-		pedStartTimeProcEnv = new PedestrianStartTimeProcessorTestEnv(99);
+		//create required Processor enviroment and add it to current Processor under test
+		pedStartTimeProcEnv = new PedestrianStartTimeProcessorTestEnv(pedStartTimeProcId);
 		pedStartTimeProc = pedStartTimeProcEnv.getTestedProcessor();
-		Mockito.when(manager.getProcessor(99)).thenReturn(pedStartTimeProc);
+		Mockito.when(manager.getProcessor(pedStartTimeProcId)).thenReturn(pedStartTimeProc);
+		addRequiredProcessors(pedStartTimeProcEnv);
 
+		//setup output file with different VadereWriter impl for test
 		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
 				PedestrianIdKey.class,
 				testedProcessor.getId()
@@ -41,7 +51,7 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {
-		states.add(new SimulationStateMock(1) {
+		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
 
@@ -54,11 +64,10 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 				addToExpectedOutput(new PedestrianIdKey(3), 0.0);
 				addToExpectedOutput(new PedestrianIdKey(4), 0.0);
 
-				pedStartTimeProcEnv.addSimState(this);
 			}
 		});
 
-		states.add(new SimulationStateMock(2) {
+		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
 
@@ -73,11 +82,10 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 				addToExpectedOutput(new PedestrianIdKey(5), 0.0);
 				addToExpectedOutput(new PedestrianIdKey(8), 0.0);
 
-				pedStartTimeProcEnv.addSimState(this);
 			}
 		});
 
-		states.add(new SimulationStateMock(3) {
+		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
 
@@ -90,12 +98,11 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 				addToExpectedOutput(new PedestrianIdKey(5), 34.7 - 12.8);
 				addToExpectedOutput(new PedestrianIdKey(8), 34.7 - 12.8);
 
-				pedStartTimeProcEnv.addSimState(this);
 			}
 		});
 
 
-		states.add(new SimulationStateMock(4) {
+		addSimState(new SimulationStateMock(4) {
 			@Override
 			public void mockIt() {
 
@@ -106,7 +113,6 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 
 				addToExpectedOutput(new PedestrianIdKey(1), Double.NaN);
 
-				pedStartTimeProcEnv.addSimState(this);
 			}
 		});
 	}

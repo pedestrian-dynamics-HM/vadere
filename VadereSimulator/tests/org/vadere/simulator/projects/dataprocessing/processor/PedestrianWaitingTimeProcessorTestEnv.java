@@ -35,7 +35,7 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 		/**
 		 * Ped 1,2,3 start within WaitingArea and 4 never enters Area.
 		 */
-		states.add(new SimulationStateMock(1) {
+		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
 				Map<Integer, VPoint> pedPosMap = new HashMap<>();
@@ -54,7 +54,7 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 			}
 		});
 
-		states.add(new SimulationStateMock(2) {
+		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
 				Map<Integer, VPoint> pedPosMap = new HashMap<>();
@@ -71,7 +71,7 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 			}
 		});
 
-		states.add(new SimulationStateMock(3) {
+		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
 				Map<Integer, VPoint> pedPosMap = new HashMap<>();
@@ -87,7 +87,7 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 			}
 		});
 
-		states.add(new SimulationStateMock(4) {
+		addSimState(new SimulationStateMock(4) {
 			@Override
 			public void mockIt() {
 				Map<Integer, VPoint> pedPosMap = new HashMap<>();
