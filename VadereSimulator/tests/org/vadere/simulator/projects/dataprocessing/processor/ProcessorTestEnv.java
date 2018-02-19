@@ -3,10 +3,10 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.tests.reflection.ReflectionHelper;
 
 import java.util.ArrayList;
@@ -32,10 +32,6 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	 */
 	DataProcessor<?, ?> testedProcessor;
 	/**
-	 * List of {@link SimulationState}s used for test. (mocked)
-	 */
-	private List<SimulationStateMock> states;
-	/**
 	 * Ids of {@link DataProcessor}s
 	 */
 	int nextProcessorId;
@@ -53,6 +49,10 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	 * Needed for DataProcessor doUpdate call. (mocked)
 	 */
 	ProcessorManager manager;
+	/**
+	 * List of {@link SimulationState}s used for test. (mocked)
+	 */
+	private List<SimulationStateMock> states;
 	/**
 	 * If {@link #testedProcessor} has dependencies to other {@link DataProcessor}s
 	 */
@@ -75,14 +75,15 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	}
 
 	/**
-	 * Initialize {@link DataProcessor}, {@link OutputFile} and initialize all requiredProcessors
-	 * if needed.
+	 * Initialize {@link DataProcessor}, {@link OutputFile} and initialize all requiredProcessors if
+	 * needed.
 	 */
+	@SuppressWarnings("unchecked")
 	void init() {
 		delimiter = outputFile.getSeparator();
 		outputFile.init(getProcessorMap());
 		testedProcessor.init(manager);
-		requiredProcessors.forEach(env -> env.init());
+		requiredProcessors.forEach(ProcessorTestEnv::init);
 	}
 
 	/**
@@ -91,14 +92,12 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	public abstract void loadDefaultSimulationStateMocks();
 
 	/**
-	 * Add Mocked SimulationsState to current Processor under test and all its required
-	 * {@link DataProcessor}
-	 * @param mock
+	 * Add Mocked SimulationsState to current Processor under test and all its required {@link
+	 * DataProcessor}
 	 */
-	public void addSimState(SimulationStateMock mock){
+	public void addSimState(SimulationStateMock mock) {
 		states.add(mock);
-		if (!requiredProcessors.isEmpty())
-			requiredProcessors.forEach(e -> e.addSimState(mock));
+		requiredProcessors.forEach(e -> e.addSimState(mock));
 	}
 
 	List<SimulationState> getSimStates() {
@@ -127,18 +126,22 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 		return delimiter;
 	}
 
-	public void clearStates(){
-		states.clear();
-		requiredProcessors.forEach(env -> env.clearStates());
+	void removeState(int index) {
+		states.remove(index);
+		requiredProcessors.forEach(env -> env.removeState(index));
 	}
 
-	public void addRequiredProcessors(ProcessorTestEnv env){
+	void clearStates() {
+		states.clear();
+		requiredProcessors.forEach(ProcessorTestEnv::clearStates);
+	}
+
+	void addRequiredProcessors(ProcessorTestEnv env) {
 		requiredProcessors.add(env);
 	}
 
 	/**
 	 * Return the ProcessorMap for the current Test.
-	 * @return
 	 */
 	private Map<Integer, DataProcessor<?, ?>> getProcessorMap() {
 		Map<Integer, DataProcessor<?, ?>> processorMap = new LinkedHashMap<>();
@@ -156,13 +159,13 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 
 	List<String> getOutput() throws NoSuchFieldException, IllegalAccessException {
 		ReflectionHelper r = ReflectionHelper.create(outputFile);
-		VadereStringWriter writer = (VadereStringWriter) r.valOfField("writer");
+		VadereStringWriter writer = r.valOfField("writer");
 		return writer.getOutput().subList(1, writer.getOutput().size());
 	}
 
 	String getHeader() throws NoSuchFieldException, IllegalAccessException {
 		ReflectionHelper r = ReflectionHelper.create(outputFile);
-		VadereStringWriter writer = (VadereStringWriter) r.valOfField("writer");
+		VadereStringWriter writer = r.valOfField("writer");
 		return writer.getOutput().get(0);
 	}
 
