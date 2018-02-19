@@ -15,12 +15,21 @@ import java.util.StringJoiner;
 
 import static org.mockito.Mockito.when;
 
-public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<TimestepPedestrianIdKey, Double>{
+public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Double> {
 
+	private PedestrianListBuilder b = new PedestrianListBuilder();
+	private SimulationStateMock state1;
+	private SimulationStateMock state2;
 
-	PedestrianVelocityProcessorTestEnv(){
+	PedestrianVelocityProcessorTestEnv() {
+		this(1);
+	}
+
+	@SuppressWarnings("unchecked")
+	PedestrianVelocityProcessorTestEnv(int nextProcessorId) {
 		testedProcessor = processorFactory.createDataProcessor(PedestrianVelocityProcessor.class);
-		testedProcessor.setId(nextProcessorId());
+		testedProcessor.setId(nextProcessorId);
+		this.nextProcessorId = nextProcessorId + 1;
 
 		DataProcessor pedPosProc;
 		PedestrianPositionProcessorTestEnv pedPosProcEnv;
@@ -45,11 +54,7 @@ public class PedestrianVelocityProcessorTestEnv extends  ProcessorTestEnv<Timest
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
-	PedestrianListBuilder b = new PedestrianListBuilder();
-	SimulationStateMock state1;
-	SimulationStateMock state2;
-
-	public void loadSimulationStateMocksWithBackstep2(){
+	void loadSimulationStateMocksWithBackstep2() {
 		clearStates();
 
 		addSimState(state1);

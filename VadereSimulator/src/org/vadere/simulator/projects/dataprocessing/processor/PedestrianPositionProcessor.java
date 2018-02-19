@@ -21,10 +21,10 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 		super("x", "y");
 	}
 
-	public Map<PedestrianIdKey, VPoint> getPositions(TimestepKey timestepKey) {
+	Map<PedestrianIdKey, VPoint> getPositions(TimestepKey timestepKey) {
 		return this.getData().entrySet().stream()
-				.filter(e -> e.getKey().equals(timestepKey))
-				.collect(Collectors.toMap(e -> new PedestrianIdKey(e.getKey().getPedestrianId()), e -> e.getValue()));
+				.filter(e -> e.getKey().getTimestep().equals(timestepKey.getTimestep()))
+				.collect(Collectors.toMap(e -> new PedestrianIdKey(e.getKey().getPedestrianId()), Map.Entry::getValue));
 	}
 
 	@Override
