@@ -24,6 +24,22 @@ import java.util.function.Supplier;
 /**
  * @author Benedikt Zoennchen
  *
+ * The Delaunay-Hierarchy is a data structure which accelerates the point location problem i.e.
+ * given a point p=(x,y) find the triangle which contains p. Let P be the set of all points of the
+ * triangulation. The Delaunay-Hierarchy is a hierachy of Delaunay-Triangulations T_0, T_1, ..., T_k
+ * of point sets P_0, P_1, ..., P_k such that P_0 = P, P_k is a subset of P_{k-1}.
+ *
+ * To find the triangle t which contains p the algorithm starts at the hierarchy k and
+ * finds the triangle t_k which contains p (by starting from some t_k' triangle of T_k and walking towards t_k).
+ * By using some point p_k of t_k the next search (walk) starts from triangle t_{k-1}' which has p_k as its point
+ * towards t_{k-1}. This will be repeated until the hierachy 0 and t is reached.
+ *
+ * For more informations see devillers-2002 (The Delaunay Hierarchy).
+ *
+ * Note that any insertion / deletion of a point into / from the triangulation has to be propagated to its Delaunay-Hierarchy.
+ *
+ * In the current state the Delaunay-Hierarchy does only support triangulations without holes.
+ *
  * @param <P>
  * @param <E>
  * @param <F>
@@ -40,10 +56,6 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	private Supplier<ITriangulation<P, V, E, F>> triangulationSupplier;
 
 	// see delaunay-hierarchy paper!
-	/*private double alpha = 30;
-	private int maxLevel = 5;
-	private int minSize = 20;*/
-
     private double alpha = 30;
     private int maxLevel = 5;
     private int minSize = 20;
@@ -56,7 +68,9 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 
     private Random random;
 
-    public DelaunayHierarchy(final ITriangulation<P, V, E, F> base, final Supplier<ITriangulation<P, V, E, F>> triangulationSupplier) {
+    public DelaunayHierarchy(
+    		@NotNull final ITriangulation<P, V, E, F> base,
+		    @NotNull final Supplier<ITriangulation<P, V, E, F>> triangulationSupplier) {
         this.hierarchySets = new ArrayList<>(maxLevel);
         this.hierarchyConnector = new ArrayList<>(maxLevel);
         this.random = new Random();
@@ -66,6 +80,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         this.prevLocationResult = null;
         this.init();
     }
+
 
     private void init() {
         base.init();
@@ -85,6 +100,11 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
                 setDown(superTriangleVertices.get(j), superTrianglesLastVertices.get(j), i);
             }
             hierarchyConnector.add(new HashMap<>());
+        }
+
+        // if the triangulation does already contain points => insert them!
+        for(V v : base.getMesh().getVertices()) {
+			insertEvent(v);
         }
     }
 

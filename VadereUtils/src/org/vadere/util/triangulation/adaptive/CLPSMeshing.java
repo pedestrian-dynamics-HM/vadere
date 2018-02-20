@@ -82,7 +82,8 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
                 bound,
                 obstacleShapes,
                 p -> edgeLengthFunc.apply(p) * initialEdgeLen,
-                distanceFunc);
+                distanceFunc,
+		        new ArrayList());
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.

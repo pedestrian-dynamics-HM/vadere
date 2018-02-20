@@ -155,6 +155,10 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		return virtualVertices;
 	}
 
+	@Override
+	public List<V> getVertices() {
+		return getMesh().streamVertices().filter(v -> !virtualVertices.contains(v)).collect(Collectors.toList());
+	}
 
 	@Override
 	public void compute() {

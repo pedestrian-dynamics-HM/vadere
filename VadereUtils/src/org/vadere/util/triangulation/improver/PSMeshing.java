@@ -69,24 +69,22 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 bound,
                 obstacleShapes,
                 p -> edgeLengthFunc.apply(p) * initialEdgeLen,
-                distanceFunc);
+                distanceFunc,
+		        getFixPoints(meshSupplier.get()));
         triangulation = uniformRefinementTriangulation.generate();
-        insertFixPoints();
         log.info("##### (end) generate a triangulation #####");
 	}
 
-	private void insertFixPoints() {
+	private Set<P> getFixPoints(final IMesh<P, V, E, F> mesh) {
 		Set<P> pointSet = new HashSet<>();
 		for(VShape shape : obstacleShapes) {
-			pointSet.addAll(shape.getPath().stream().map(p ->  getMesh().createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
+			pointSet.addAll(shape.getPath().stream().map(p ->  mesh.createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
 		}
 
 		for(P p : pointSet) {
 			p.setFixPoint(true);
 		}
-		log.info("##### (start) insert fix points #####");
-		triangulation.insert(pointSet);
-		log.info("##### (end) insert fix points #####");
+		return pointSet;
 	}
 
 	@Override

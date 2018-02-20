@@ -37,7 +37,20 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 	void finish();
 	void recompute();
 
+	/**
+	 * Returns a list of virtual vertices. Virtual vertices support the construction of the triangulation
+	 * but they are not part of the (finished) triangulation.
+	 *
+	 * @return a list of virtual vertices
+	 */
 	List<V> getVirtualVertices();
+
+	/**
+	 * Returns a list of vertices (excluding virtual vertices) of the current triangulation.
+	 *
+	 * @return a list of vertices (excluding virtual vertices) of the current triangulation.
+	 */
+	List<V> getVertices();
 
 	Stream<F> streamFaces();
 	Set<F> getFaces();

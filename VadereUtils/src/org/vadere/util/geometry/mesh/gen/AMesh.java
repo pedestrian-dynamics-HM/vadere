@@ -475,58 +475,27 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         Arrays.fill(vertexMap, nullIdentifier);
         Arrays.fill(faceMap, nullIdentifier);
 
-        // adjust all id's
+        // adjust all id's in order of faceOrder
         for(AFace<P> face : faceOrder) {
-            AFace<P> fClone = face.clone();
-
-            // 1. face
-            faceMap[face.getId()] = faces.size();
-            fClone.setId(faces.size());
-            faces.add(fClone);
-
-            if(cMesh.isBoundary(fClone) && fClone != cMesh.getBorder()) {
-            	holes.add(fClone);
-            }
-
-            // 2. vertices
-            for(AVertex<P> v : cMesh.getVertexIt(face)) {
-                if(vertexMap[v.getId()] == nullIdentifier) {
-                    vertexMap[v.getId()] = vertices.size();
-                    AVertex<P> cVertex = v.clone();
-                    cVertex.setId(vertices.size());
-                    vertices.add(cVertex);
-                }
-            }
-
-            // 3. edges
-            for(AHalfEdge<P> halfEdge : cMesh.getEdgeIt(face)) {
-
-                // origin
-                if(edgeMap[halfEdge.getId()] == nullIdentifier) {
-                    edgeMap[halfEdge.getId()] = edges.size();
-                    AHalfEdge<P> cHalfEdge = halfEdge.clone();
-                    cHalfEdge.setId(edges.size());
-                    edges.add(cHalfEdge);
-                }
-
-                // twin
-                halfEdge = cMesh.getTwin(halfEdge);
-                if(edgeMap[halfEdge.getId()] == nullIdentifier) {
-                    // origin
-                    edgeMap[halfEdge.getId()] = edges.size();
-                    AHalfEdge<P> cHalfEdge = halfEdge.clone();
-                    cHalfEdge.setId(edges.size());
-                    edges.add(cHalfEdge);
-                }
-            }
+            copyFace(face, vertexMap, edgeMap, faceMap, cMesh);
         }
+
+	    // adjust all id's not contained in faceOrder in any order
+	    for(AFace<P> face : cMesh.faces) {
+        	if(!isDestroyed(face)) {
+		        copyFace(face, vertexMap, edgeMap, faceMap, cMesh);
+	        }
+	    }
 
         // repair the rest
         for(AFace<P> face : faces) {
-            face.setEdge(edgeMap[face.getEdge()]);
+	        face.setEdge(edgeMap[face.getEdge()]);
         }
 
         for(AHalfEdge<P> halfEdge : edges) {
+        	if(vertexMap[halfEdge.getEnd()] == nullIdentifier) {
+		        vertexMap[halfEdge.getEnd()] = vertices.size();
+	        }
             halfEdge.setEnd(vertexMap[halfEdge.getEnd()]);
 
             // boundary face
@@ -547,7 +516,59 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
             vertex.setEdge(edgeMap[vertex.getEdge()]);
         }
 
+        // fix the boundary
         boundary.setEdge(edgeMap[boundary.getEdge()]);
+    }
+
+    private void copyFace(@NotNull final AFace<P> face, @NotNull int[] vertexMap, @NotNull int[] edgeMap, @NotNull int[] faceMap, @NotNull final AMesh<P> cMesh) {
+	    // merge some of them?
+	    int nullIdentifier = -2;
+
+	    // face not jet copied
+	    if(faceMap[face.getId()] == nullIdentifier) {
+		    AFace<P> fClone = face.clone();
+
+		    // 1. face
+		    faceMap[face.getId()] = faces.size();
+		    fClone.setId(faces.size());
+		    faces.add(fClone);
+
+		    if(cMesh.isBoundary(fClone) && fClone != cMesh.getBorder()) {
+			    holes.add(fClone);
+		    }
+
+		    // 2. vertices
+		    for(AVertex<P> v : cMesh.getVertexIt(face)) {
+			    if(vertexMap[v.getId()] == nullIdentifier) {
+				    vertexMap[v.getId()] = vertices.size();
+				    AVertex<P> cVertex = v.clone();
+				    cVertex.setId(vertices.size());
+				    vertices.add(cVertex);
+			    }
+		    }
+
+		    // 3. edges
+		    for(AHalfEdge<P> halfEdge : cMesh.getEdgeIt(face)) {
+
+			    // origin
+			    if(edgeMap[halfEdge.getId()] == nullIdentifier) {
+				    edgeMap[halfEdge.getId()] = edges.size();
+				    AHalfEdge<P> cHalfEdge = halfEdge.clone();
+				    cHalfEdge.setId(edges.size());
+				    edges.add(cHalfEdge);
+			    }
+
+			    // twin
+			    halfEdge = cMesh.getTwin(halfEdge);
+			    if(edgeMap[halfEdge.getId()] == nullIdentifier) {
+				    // origin
+				    edgeMap[halfEdge.getId()] = edges.size();
+				    AHalfEdge<P> cHalfEdge = halfEdge.clone();
+				    cHalfEdge.setId(edges.size());
+				    edges.add(cHalfEdge);
+			    }
+		    }
+	    }
     }
 
     /**

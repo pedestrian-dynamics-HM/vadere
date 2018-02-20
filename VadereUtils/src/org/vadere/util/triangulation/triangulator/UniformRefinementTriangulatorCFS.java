@@ -37,6 +37,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	private final IDistanceFunction distFunc;
 	private int counter = 0;
 	private boolean finished;
+	private final Collection<P> fixPoints;
 
 	enum Direction {
 	    FORWARD,
@@ -59,13 +60,15 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
-			final IDistanceFunction distFunc) {
+			final IDistanceFunction distFunc,
+			final Collection<P> fixPoints) {
 
 		this.meshSupplier = meshSupplier;
 	    this.distFunc = distFunc;
 		this.boundary = boundary;
 		this.lenFunc = lenFunc;
 		this.bbox = bound;
+		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
 	}
 
@@ -214,6 +217,9 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
         synchronized (getMesh()) {
 			List<F> sierpinksyFaceOrder = sierpinskyCurve.stream().map(e -> getMesh().getFace(e.getRight())).collect(Collectors.toList());
 
+			// insert special fix points
+	        // TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
+			triangulation.insert(fixPoints);
 			triangulation.finish();
 			removeTrianglesOutsideBBox();
 			removeTrianglesInsideObstacles();
