@@ -11,4 +11,9 @@ public class AttributesPedestrianOverlapProcessor extends AttributesProcessor {
     public double getPedRadius() {
         return pedRadius;
     }
+
+	public void setPedRadius(double pedRadius) {
+    	checkSealed();
+		this.pedRadius = pedRadius;
+	}
 }

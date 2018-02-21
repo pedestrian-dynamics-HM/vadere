@@ -12,8 +12,8 @@ public class AttributesPedestrianLastPositionProcessor extends AttributesProcess
 		return this.pedestrianPositionProcessorId;
 	}
 
-	public void setPedestrianPositionProcessorId(int id){
+	public void setPedestrianPositionProcessorId(int pedestrianPositionProcessorId) {
 		checkSealed();
-		this.pedestrianPositionProcessorId = id;
+		this.pedestrianPositionProcessorId = pedestrianPositionProcessorId;
 	}
 }

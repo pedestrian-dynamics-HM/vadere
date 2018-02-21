@@ -12,17 +12,18 @@ public class AttributesAreaSpeedProcessor extends AttributesAreaProcessor {
 		return this.pedestrianPositionProcessorId;
 	}
 
-	public void setPedestrianPositionProcessorId(int id) {
-		checkSealed();
-		this.pedestrianPositionProcessorId = id;
-	}
 
-	public int getPedestrianVelocityProcessorId() {
-		return this.pedestrianVelocityProcessorId;
-	}
+    public int getPedestrianVelocityProcessorId() {
+        return this.pedestrianVelocityProcessorId;
+    }
 
-	public void setPedestrianVelocityProcessorId(int id) {
-		checkSealed();
-		this.pedestrianVelocityProcessorId = id;
-	}
+    public void setPedestrianPositionProcessorId(int pedestrianPositionProcessorId) {
+        checkSealed();
+        this.pedestrianPositionProcessorId = pedestrianPositionProcessorId;
+    }
+
+    public void setPedestrianVelocityProcessorId(int pedestrianVelocityProcessorId) {
+        checkSealed();
+        this.pedestrianVelocityProcessorId = pedestrianVelocityProcessorId;
+    }
 }
