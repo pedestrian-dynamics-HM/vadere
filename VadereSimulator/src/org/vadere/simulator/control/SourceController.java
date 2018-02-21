@@ -25,6 +25,12 @@ import org.vadere.util.math.MathUtil;
 
 public class SourceController {
 
+	// marion
+	boolean MARION_QUICK_RANDOM_TARGET = true;
+	int marion_calls = 0;
+	int pLeft;
+	int pStraight ;
+
 	protected final Source source;
 	protected DynamicElementFactory dynamicElementFactory;
 	protected final Topography topography;
@@ -186,7 +192,47 @@ public class SourceController {
 		// TODO [priority=high] [task=refactoring] why only if he has no targets? because the createElement method
 		// might add some.
 		if (newElement.getTargets().isEmpty()) {
-			newElement.setTargets(new LinkedList<>(sourceAttributes.getTargetIds()));
+			// quick & dirty: hard coded random target ! only for machine learning. Target IDs 1-3
+
+
+
+			if (MARION_QUICK_RANDOM_TARGET) {
+				Random marion_random = new Random();
+				int rand = marion_random.nextInt(100 ); // random number in [0,100]
+				int target;
+
+				if (marion_calls % 20 == 0 ) {
+
+					pLeft = marion_random.nextInt(100 ) ;
+					pStraight = marion_random.nextInt(100-pLeft ) ;
+				}
+
+
+				if (rand < pLeft){
+					target = 1;
+				}else{
+					if (rand < pLeft + pStraight){
+						target = 2;
+					}else{
+						target = 3;
+					}
+				}
+
+				//target = random.nextInt(3)+1;
+
+
+				List <Integer> targetIds = new LinkedList<Integer>();
+				targetIds.add(target);
+				newElement.setTargets(new LinkedList<>(targetIds));
+				marion_calls++;
+
+			}else {
+				List<Integer> targetIds = sourceAttributes.getTargetIds();
+				newElement.setTargets(new LinkedList<>(targetIds));
+			}
+
+
+
 		}
 
 		topography.addElement(newElement);

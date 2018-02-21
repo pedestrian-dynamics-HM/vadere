@@ -89,7 +89,7 @@ class PotentialFieldAndInitializer {
 
 		long ms = System.currentTimeMillis();
 		eikonalSolver.initialize();
-		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+		// logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 
 		return new PotentialFieldAndInitializer(eikonalSolver, attributesPotential);
 	}
