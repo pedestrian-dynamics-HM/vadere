@@ -11,4 +11,9 @@ public class AttributesPedestrianEvacuationTimeProcessor extends AttributesProce
     public int getPedestrianStartTimeProcessorId() {
         return this.pedestrianStartTimeProcessorId;
     }
+
+    public void setPedestrianStartTimeProcessorId(int pedestrianStartTimeProcessorId) {
+        checkSealed();
+        this.pedestrianStartTimeProcessorId = pedestrianStartTimeProcessorId;
+    }
 }

@@ -36,4 +36,23 @@ public class AttributesLogEventProcessor extends AttributesProcessor {
 		return firstLogEventId;
 	}
 
+	public void setCompartmentIndex(int compartmentIndex) {
+		checkSealed();
+		this.compartmentIndex = compartmentIndex;
+	}
+
+	public void setSurveyId(int surveyId) {
+		checkSealed();
+		this.surveyId = surveyId;
+	}
+
+	public void setPersonIdOffset(int personIdOffset) {
+		checkSealed();
+		this.personIdOffset = personIdOffset;
+	}
+
+	public void setFirstLogEventId(int firstLogEventId) {
+		checkSealed();
+		this.firstLogEventId = firstLogEventId;
+	}
 }

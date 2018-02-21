@@ -11,4 +11,9 @@ public class AttributesMeanPedestrianEvacuationTimeProcessor extends AttributesP
     public int getPedestrianEvacuationTimeProcessorId() {
         return this.pedestrianEvacuationTimeProcessorId;
     }
+
+    public void setPedestrianEvacuationTimeProcessorId(int pedestrianEvacuationTimeProcessorId) {
+        checkSealed();
+        this.pedestrianEvacuationTimeProcessorId = pedestrianEvacuationTimeProcessorId;
+    }
 }

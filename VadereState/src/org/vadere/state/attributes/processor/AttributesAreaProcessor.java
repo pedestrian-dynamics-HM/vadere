@@ -13,4 +13,9 @@ public class AttributesAreaProcessor extends AttributesProcessor {
     public VRectangle getMeasurementArea() {
         return this.measurementArea;
     }
+
+    public void setMeasurementArea(VRectangle measurementArea) {
+        checkSealed();
+        this.measurementArea = measurementArea;
+    }
 }
