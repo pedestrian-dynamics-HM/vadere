@@ -17,11 +17,16 @@ public class PedestrianDensityCountingProcessorTestEnv extends ProcessorTestEnv<
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
-	@SuppressWarnings("unchecked")
 	PedestrianDensityCountingProcessorTestEnv() {
+		this(1);
+	}
+
+	@SuppressWarnings("unchecked")
+	PedestrianDensityCountingProcessorTestEnv(int nextProcessorId) {
 		testedProcessor = processorFactory.createDataProcessor(PedestrianDensityCountingProcessor.class);
 		testedProcessor.setAttributes(new AttributesPedestrianDensityCountingProcessor());
-		testedProcessor.setId(nextProcessorId());
+		testedProcessor.setId(nextProcessorId);
+		this.nextProcessorId = nextProcessorId + 1;
 
 		int pedPosProcId = nextProcessorId();
 		AttributesPedestrianDensityCountingProcessor attr =
@@ -51,10 +56,12 @@ public class PedestrianDensityCountingProcessorTestEnv extends ProcessorTestEnv<
 			@Override
 			public void mockIt() {
 
-				b.add(1, new VPoint(1.0, 1.0));
+				b.clear().add(1, new VPoint(1.0, 1.0));
 				b.add(2, new VPoint(1.2, 1.2));
 				b.add(3, new VPoint(1.4, 1.4));
-				b.add(4, new VPoint(1.4 + Math.sqrt(radius) - 0.001, 1.4 + Math.sqrt(radius) - 0.001));
+				VPoint p = new VPoint(1.4, 1.4);
+				p = p.addPrecise(new VPoint(Math.sqrt(radius) - 0.001, Math.sqrt(radius) - 0.001));
+				b.add(4, p);
 				b.add(5, new VPoint(10.0, 10.0));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
