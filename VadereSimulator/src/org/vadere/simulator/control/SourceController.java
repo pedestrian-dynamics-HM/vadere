@@ -198,13 +198,14 @@ public class SourceController {
 
 			if (MARION_QUICK_RANDOM_TARGET) {
 				Random marion_random = new Random();
-				int rand = marion_random.nextInt(100 ); // random number in [0,100]
+				int rand = marion_random.nextInt(101 ); // random number in [0,100]
 				int target;
 
-				if (marion_calls % 20 == 0 ) {
 
-					pLeft = marion_random.nextInt(100 ) ;
-					pStraight = marion_random.nextInt(100-pLeft ) ;
+				if (marion_calls % 50 == 0 ) {
+
+					pLeft = marion_random.nextInt(101 ) ;
+					pStraight = marion_random.nextInt(101-pLeft ) ;
 				}
 
 

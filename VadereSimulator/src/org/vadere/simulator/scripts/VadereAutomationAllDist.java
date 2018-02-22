@@ -1,24 +1,19 @@
 package org.vadere.simulator.scripts;
-import java.util.*;
-import java.lang.*;
 
-import org.vadere.simulator.control.SourceController;
 import org.vadere.simulator.entrypoints.ScenarioBuilder;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
-import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 
 /* Works only for three targets */
 
-public class VadereAutomation {
+public class VadereAutomationAllDist {
 
 
     public static final String SCENARIO_NAME = "Kreuzung3_Unit";
