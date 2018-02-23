@@ -12,8 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PVertex<P extends IPoint> implements IVertex<P> {
 
-	private final Lock lock;
-	private final P point;
+	private Lock lock;
+	private P point;
 	private PVertex<P> down;
 	private PHalfEdge<P> halfEdge;
 	private boolean destroyed;
@@ -81,8 +81,22 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		return point.toString();
 	}
 
+
+	// TODO: make it protected since it is a non-deep copy. Therefore the IVertex should maybe not be a IPoint!?
+	/**
+	 * Non-deep cloning.
+	 *
+	 * @return
+	 */
     @Override
-    public IPoint clone() {
-        throw new UnsupportedOperationException("clone of this pointer based object is not jet possible.");
+    public PVertex<P> clone() {
+	    try {
+		    PVertex<P> clone = (PVertex<P>)super.clone();
+		    clone.point = (P)point.clone();
+		    clone.lock = new ReentrantLock();
+		    return clone;
+	    } catch (CloneNotSupportedException e) {
+		    throw new InternalError(e.getMessage());
+	    }
     }
 }

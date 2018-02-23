@@ -53,9 +53,11 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private boolean finalized = false;
 	private IMesh<P, V, E, F> mesh;
 	private IPointLocator<P, V, E, F> pointLocator;
-	private boolean initialized = false;
+	private boolean initialized;
 	private List<V> virtualVertices;
 	private int maxDepth = 0;
+
+	private IMesh<P, V, E, F> baseMesh;
 
 	private static double BUFFER_PERCENTAGE = 0.01;
 
@@ -81,6 +83,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.illegalPredicate = illegalPredicate;
 		this.bound = GeometryUtils.bound(points);
 		this.finalized = false;
+		this.initialized = false;
 		this.mesh = mesh;
 		this.setPointLocator(type);
 	}
@@ -94,10 +97,12 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		assert mesh.getNumberOfVertices() == 0;
 
 		this.mesh = mesh;
+		this.baseMesh = mesh.clone();
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = bound;
 		this.finalized = false;
+		this.initialized = false;
 		this.setPointLocator(type);
 	}
 
@@ -112,7 +117,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = GeometryUtils.bound(mesh.getPoints());
-		this.initialized = true;
+		this.initialized = false;
 		this.finalized = false;
 		this.virtualVertices = new ArrayList<>(mesh.getVertices());
 		this.setPointLocator(type);
@@ -149,7 +154,13 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				}
 				pointLocator = new DelaunayTree<>(this); break;
 			case DELAUNAY_HIERARCHY:
-				Supplier<ITriangulation<P, V, E, F>> supplier = () -> new IncrementalTriangulation<>(mesh.construct(), BASE, bound, illegalPredicate);
+				Supplier<ITriangulation<P, V, E, F>> supplier;
+				if(baseMesh != null) {
+					supplier = () -> new IncrementalTriangulation<>(baseMesh.clone(), BASE, illegalPredicate);
+				}
+				else {
+					supplier = () -> new IncrementalTriangulation<>(mesh.construct(), BASE, bound, illegalPredicate);
+				}
 				pointLocator = new DelaunayHierarchy<>(this, supplier);
 			default: pointLocator = new BasePointLocator<>(this);
 		}
@@ -158,29 +169,40 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	@Override
 	public void init() {
 		if(!initialized) {
-            double max = Math.max(bound.getWidth(), bound.getHeight());
-            double min = Math.min(bound.getWidth(), bound.getHeight());
+
+			if(mesh.getNumberOfVertices() == 0) {
+				double max = Math.max(bound.getWidth(), bound.getHeight());
+				double min = Math.min(bound.getWidth(), bound.getHeight());
 
 
-		    double epsilon = BUFFER_PERCENTAGE * max; // 1% gap
+				double epsilon = BUFFER_PERCENTAGE * max; // 1% gap
 
-            double xMin = bound.getMinX() - epsilon;
-            double yMin = bound.getMinY() - epsilon;
+				double xMin = bound.getMinX() - epsilon;
+				double yMin = bound.getMinY() - epsilon;
 
-            double xMax = bound.getMinX() + bound.getWidth() * 2 + epsilon;
-            double yMax = bound.getMinY() + bound.getHeight() * 2 + epsilon;
+				double xMax = bound.getMinX() + bound.getWidth() * 2 + epsilon;
+				double yMax = bound.getMinY() + bound.getHeight() * 2 + epsilon;
 
-			p0 = mesh.insertVertex(xMin, yMin);
-			p1 = mesh.insertVertex(xMax, yMin);
-			p2 = mesh.insertVertex(xMin, yMax);
+				p0 = mesh.insertVertex(xMin, yMin);
+				p1 = mesh.insertVertex(xMax, yMin);
+				p2 = mesh.insertVertex(xMin, yMax);
 
-			// construct super triangle
-			F superTriangle = mesh.createFace(p0, p1, p2);
-			borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
-            // end divide the square into 2 triangles
+				// construct super triangle
+				F superTriangle = mesh.createFace(p0, p1, p2);
+				borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
+				// end divide the square into 2 triangles
 
-			this.virtualVertices = Arrays.asList(p0, p1, p2);
-			this.initialized = true;
+				this.virtualVertices = Arrays.asList(p0, p1, p2);
+				this.initialized = true;
+			}
+			else {
+				assert mesh.getNumberOfVertices() >= 3;
+				borderFace = mesh.getBorder();
+				// end divide the square into 2 triangles
+
+				this.virtualVertices = mesh.streamVertices().collect(Collectors.toList());
+				this.initialized = true;
+			}
 		}
 		else {
 			log.warn("the second initialization of the " + this.getClass().getSimpleName() + " has no effect.");
@@ -254,9 +276,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	@Override
 	public E insert(P point) {
-		log.info("start location");
 		F face = this.pointLocator.locatePoint(point, true);
-		log.info("end location");
 		return insert(point, face);
 	}
 

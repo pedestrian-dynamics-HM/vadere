@@ -137,18 +137,18 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             	preBase = triangulation;
             }
 
-            List<V> superTriangleVertices = triangulation.getVirtualVertices();
-            List<V> superTrianglesLastVertices = getLevel(i-1).getVirtualVertices();
+            List<V> virtualVertices = triangulation.getVirtualVertices();
+            List<V> virtualVerticesLast = getLevel(i-1).getVirtualVertices();
 
-            for(int j = 0; j < superTriangleVertices.size(); j++) {
+            for(int j = 0; j < virtualVertices.size(); j++) {
                 //i -> i -1
-                setDown(superTriangleVertices.get(j), superTrianglesLastVertices.get(j), i);
+                setDown(virtualVertices.get(j), virtualVerticesLast.get(j), i);
             }
             hierarchyConnector.add(new HashMap<>());
         }
 
         // if the triangulation does already contain points => insert them!
-        for(V v : base.getMesh().getVertices()) {
+        for(V v : base.getVertices()) {
 			postInsertEvent(v);
         }
     }

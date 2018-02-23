@@ -6,7 +6,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
+public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 
 	/**
 	 * point at the end of the half edge.
@@ -136,6 +136,16 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P> {
 	@Override
 	public String toString() {
 		return getEnd().toString();
+	}
+
+	@Override
+	protected PHalfEdge<P> clone() throws CloneNotSupportedException {
+		try {
+			PHalfEdge<P> clone = (PHalfEdge<P>)super.clone();
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
 	}
 
 	/*

@@ -39,7 +39,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private static final int MAX_STEPS = 300;
 	private int nSteps;
 
-	private boolean runParallel = false;
+	private boolean runParallel = true;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
 	private final Collection<? extends VShape> obstacleShapes;
@@ -84,9 +84,11 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	@Override
 	public ITriangulation<P, V, E, F> generate() {
 		double quality = getQuality();
+		log.info("quality: " + quality);
 		while (quality < Parameters.qualityMeasurement && nSteps < MAX_STEPS) {
 			improve();
 			quality = getQuality();
+			log.info("quality: " + quality);
 		}
 
 		return getTriangulation();
@@ -246,7 +248,6 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 .map(line -> line.midPoint())
                 .mapToDouble(midPoint -> edgeLengthFunc.apply(midPoint)).sum();
         scalingFactor =  Math.sqrt((edgeLengthSum * edgeLengthSum) / (desiredEdgeLenSum * desiredEdgeLenSum));
-        log.info("scale factor = " + scalingFactor);
     }
 
 

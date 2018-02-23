@@ -99,7 +99,7 @@ public class MainPanel extends ScaleablePanel implements Observer {
 	 * }
 	 * 
 	 * voronoiGeometry = geoFac.createGeometryCollection(geoArray);
-	 * //voronoiGeometry = voronoiGeometry.difference(polygon.getBorder());
+	 * //voronoiGeometry = voronoiGeometry.difference(polygon.getBoundary());
 	 * 
 	 * 
 	 * }

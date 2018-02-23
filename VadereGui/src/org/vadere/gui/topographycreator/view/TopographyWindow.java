@@ -351,12 +351,12 @@ public class TopographyWindow extends JPanel {
 						"insert-copied-element");
 				getActionMap().put("insert-copied-element", insertCopiedElementAction);
 
-				// deleteEdge element
+				// delete element
 				TopographyAction deleteElement =
-						new ActionDeleteElement("deleteEdge element", panelModel, undoSupport, basicAction);
+						new ActionDeleteElement("delete element", panelModel, undoSupport, basicAction);
 				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-						"deleteEdge-element");
-				getActionMap().put("deleteEdge-element", deleteElement);
+						"delete-element");
+				getActionMap().put("delete-element", deleteElement);
 
 				// undo
 				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(

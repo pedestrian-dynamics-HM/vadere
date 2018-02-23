@@ -332,7 +332,7 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 	@Override
 	public VShape translateElement(ScenarioElement element, VPoint vector) {
-		// double factor = Math.bound(10,1/getGridResulution()); // ?? related to scaleTopography?
+		// double factor = Math.max(10,1/getGridResulution()); // ?? related to scaleTopography?
 		return element.getShape().translatePrecise(alignToGrid(vector));
 	}
 

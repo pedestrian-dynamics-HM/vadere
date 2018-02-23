@@ -56,7 +56,7 @@ public class ProjectViewModel {
 		Arrays.stream(rows)
 				.mapToObj(row -> getOutputTableModel().getValue(row))
 				.filter(dir -> IOOutput.deleteOutputDirectory(dir))
-				.forEach(dir -> logger.info("deleteEdge output directory: " + dir.getName()));
+				.forEach(dir -> logger.info("delete output directory: " + dir.getName()));
 	}
 
 	public void deleteScenarios(final int[] rows) {

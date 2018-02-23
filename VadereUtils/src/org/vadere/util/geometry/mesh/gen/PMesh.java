@@ -1,5 +1,7 @@
 package org.vadere.util.geometry.mesh.gen;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
@@ -16,6 +18,8 @@ import java.util.stream.Stream;
  * @author Benedikt Zoennchen
  */
 public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
+
+	private static Logger log = LogManager.getLogger(PMesh.class);
 
 	private List<PFace<P>> faces;
 	private List<PFace<P>> holes;
@@ -34,7 +38,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> construct() {
+	public PMesh<P> construct() {
 		return new PMesh<>(pointConstructor);
 	}
 
@@ -203,11 +207,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> clone() {
-		throw new UnsupportedOperationException("not jet implemented.");
-	}
-
-	@Override
 	public PHalfEdge<P> createEdge(@NotNull PVertex<P> vertex) {
 		PHalfEdge<P> edge = new PHalfEdge<>(vertex);
 		edges.add(edge);
@@ -306,7 +305,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public void destroyVertex(@NotNull PVertex<P> vertex) {
 		vertices.remove(vertex);
-		System.out.println("destroy vertex!");
 		vertex.destroy();
 	}
 
@@ -374,6 +372,63 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder) {
-		throw new UnsupportedOperationException("not jet implemented.");
+		try {
+			throw new UnsupportedOperationException("not jet implemented.");
+		} catch (UnsupportedOperationException e) {
+			log.warn(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> clone() {
+		try {
+			PMesh<P> cMesh = construct();
+			Map<PVertex<P>, PVertex<P>> vertexMap = new HashMap<>();
+			Map<PHalfEdge<P>, PHalfEdge<P>> edgeMap = new HashMap<>();
+			Map<PFace<P>, PFace<P>> faceMap = new HashMap<>();
+
+			// faces are not complete: missing edge
+			for(PVertex<P> v : vertices) {
+				PVertex<P> cV = v.clone();
+				cMesh.insert(cV);
+				vertexMap.put(v, cV);
+			}
+
+			// edges are not complete: missing next, prev, twin, face
+			for(PHalfEdge<P> e : edges) {
+				PHalfEdge<P> eC = e.clone();
+				edgeMap.put(e, eC);
+				e.setEnd(vertexMap.get(e.getEnd()));
+				cMesh.edges.add(eC);
+			}
+
+			// faces are complete
+			for(PFace<P> f : faces) {
+				PFace<P> fC = f.clone();
+				faceMap.put(f, fC);
+				f.setEdge(edgeMap.get(f.getEdge()));
+			}
+
+			for(PVertex<P> cV : cMesh.vertices) {
+				cV.setEdge(edgeMap.get(cV.getEdge()));
+				cV.setDown(null);
+			}
+
+			for(PHalfEdge<P> eV : cMesh.edges) {
+				eV.setFace(faceMap.get(eV.getFace()));
+				eV.setNext(edgeMap.get(eV.getNext()));
+				eV.setPrevious(edgeMap.get(eV.getPrevious()));
+				eV.setTwin(edgeMap.get(eV.getTwin()));
+			}
+
+			// here we assume that the point-constructor is stateless!
+			cMesh.pointConstructor = pointConstructor;
+			cMesh.boundary = boundary.clone();
+			return cMesh;
+
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
 	}
 }

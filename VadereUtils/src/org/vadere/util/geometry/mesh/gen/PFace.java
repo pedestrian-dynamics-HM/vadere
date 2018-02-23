@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.IPoint;
  * @author Benedikt Zoennchen
  * @param <P> the type of the coordinates the face uses.
  */
-public class PFace<P extends IPoint> implements IFace<P> {
+public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 
 	/**
 	 * One of the half-edges bordering this face.
@@ -90,5 +90,20 @@ public class PFace<P extends IPoint> implements IFace<P> {
 		}
 		builder.append(current);
 		return builder.toString();
+	}
+
+	/**
+	 * non-deep cloning!
+	 * @return
+	 * @throws CloneNotSupportedException
+	 */
+	@Override
+	protected PFace<P> clone() throws CloneNotSupportedException {
+		try {
+			PFace<P> clone = (PFace<P>)super.clone();
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
 	}
 }

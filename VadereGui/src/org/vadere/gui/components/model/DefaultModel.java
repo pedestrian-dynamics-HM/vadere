@@ -530,8 +530,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 			PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshImprover = new PSMeshing<>(
 					distanceFunc,
-					p -> Math.abs(distanceFunc.apply(p)) + 1.0,
-					0.5,
+					p -> 1.0,
+					3.0,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 					() -> new PMesh((x, y) -> new MeshPoint(x, y, false)));
 

@@ -102,8 +102,8 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
     @Override
     public AVertex<P> clone() {
         try {
-            AVertex clone = (AVertex<P>)super.clone();
-            clone.point = point.clone();
+            AVertex<P> clone = (AVertex<P>)super.clone();
+            clone.point = (P)point.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
