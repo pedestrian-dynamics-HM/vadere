@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.Random;
 
+import java.util.concurrent.TimeUnit;
+
 
 /* Works only for three targets */
 
@@ -22,11 +24,12 @@ public class VadereAutomation {
 
 
     public static final String SCENARIO_NAME = "Kreuzung3_Unit";
-    public static final String SCENARIO_PATH = "D:/marion/Arbeit/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
+    public static final String SCENARIO_PATH = "D:/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
     public static final int N_SIMULATIONS = 20;
     public static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
+    // ThreadPoolExecuter !
 
 
 
@@ -62,7 +65,6 @@ public class VadereAutomation {
         // run simulations
         int amount = N_SIMULATIONS;
         for (int i =0; i < amount; i++) {
-            System.out.println("Start of " + i);
             startAutomatic(final_scenario);
         }
 
@@ -125,6 +127,8 @@ public class VadereAutomation {
             Thread thread = new Thread(new ScenarioRun(scenario, s -> System.out.print(s + "finished")));
             thread.start();
             arrThreads.add(thread);
+
+            TimeUnit.MILLISECONDS.sleep(2); // make sure they don't have the same name
 
 
             //Process pr = rt.exec("java -jar /Users/Do/Documents/Vadere/Vadere.jar");

@@ -204,15 +204,26 @@ public class SourceController {
 
 				if (marion_calls % 50 == 0 ) {
 
-					pLeft = marion_random.nextInt(101 ) ;
-					pStraight = marion_random.nextInt(101-pLeft ) ;
+					// pLeft = marion_random.nextInt(101 ) ;
+					// pStraight = marion_random.nextInt(101-pLeft ) ;
+
+					double u_left = marion_random.nextDouble();
+					pLeft =  (int) Math.floor(101 * (1-Math.sqrt(1-u_left)));
+					if (pLeft == 101) {
+						pLeft = 100;
+					}
+					pStraight = marion_random.nextInt(100-pLeft+1);
+
+
+
+					//System.out.println(pLeft + " " + pStraight + " " + (100-pLeft-pStraight)+";");
 				}
 
 
-				if (rand < pLeft){
+				if (rand <= pLeft){
 					target = 1;
 				}else{
-					if (rand < pLeft + pStraight){
+					if (rand <= pLeft + pStraight){
 						target = 2;
 					}else{
 						target = 3;
