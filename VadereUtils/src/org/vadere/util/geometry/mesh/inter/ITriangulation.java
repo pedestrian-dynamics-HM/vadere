@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.mesh.inter;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.impl.VPMesh;
@@ -58,6 +59,8 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 	void insert(final Collection<P> points);
 	void remove(final P point);
 
+	void setPointLocator(@NotNull final IPointLocator.Type type);
+
 	Stream<VTriangle> streamTriangles();
 
 	default Set<VLine> getEdges() {
@@ -67,44 +70,24 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 
 	// factory methods
 
-	static VPTriangulation createVPTriangulation(final VRectangle bound) {
+	static VPTriangulation createVPTriangulation(@NotNull final VRectangle bound) {
 		VPTriangulation vpTriangulation = new VPTriangulation(bound);
-		VPMesh mesh = new VPMesh();
-		vpTriangulation.setMesh(mesh);
-		vpTriangulation.setPointLocator(createPPointLocator(IPointLocator.Type.DELAUNAY_HIERARCHY, vpTriangulation, bound, (x,y) -> mesh.createPoint(x, y)));
 		return vpTriangulation;
 	}
 
 	static <P extends IPoint> ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPTriangulation(
-			final IPointLocator.Type type,
-			final VRectangle bound,
-			final IPointConstructor<P> pointConstructor) {
-
-		IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(bound);
+			@NotNull final IPointLocator.Type type,
+			@NotNull final VRectangle bound,
+			@NotNull final IPointConstructor<P> pointConstructor) {
 		IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh = new PMesh<>(pointConstructor);
-		triangulation.setMesh(mesh);
-
-		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPPointLocator(type, triangulation, bound, pointConstructor);
-		triangulation.setPointLocator(pointLocator);
-		return triangulation;
+		return new IncrementalTriangulation<>(mesh, type, bound);
 	}
 
 
 	static <P extends IPoint> ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPTriangulation(
-			final IPointLocator.Type type,
-			final IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>>  mesh) {
-
-		IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(mesh);
-		triangulation.setMesh(mesh);
-
-		double minX = mesh.streamPoints().mapToDouble(p -> p.getX()).min().getAsDouble();
-		double maxX = mesh.streamPoints().mapToDouble(p -> p.getX()).max().getAsDouble();
-
-		double minY = mesh.streamPoints().mapToDouble(p -> p.getY()).min().getAsDouble();
-		double maxY = mesh.streamPoints().mapToDouble(p -> p.getY()).max().getAsDouble();
-
-		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPPointLocator(type, triangulation, new VRectangle(minX, minY, maxX-minX, maxY-minY), (x, y) -> mesh.createPoint(x, y));
-		triangulation.setPointLocator(pointLocator);
+			@NotNull final IPointLocator.Type type,
+			@NotNull final IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>>  mesh) {
+		IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(mesh, type);
 		return triangulation;
 	}
 
@@ -113,13 +96,8 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
             final IPointLocator.Type type,
             final VRectangle bound,
             final IPointConstructor<P> pointConstructor) {
-
-		IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(bound);
-        IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> mesh = new AMesh<>(pointConstructor);
-        triangulation.setMesh(mesh);
-
-        IPointLocator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> pointLocator = createAPointLocator(type, triangulation, bound, pointConstructor);
-        triangulation.setPointLocator(pointLocator);
+		IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> mesh = new AMesh<>(pointConstructor);
+		IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(mesh, type, bound);
         return triangulation;
     }
 
@@ -135,18 +113,7 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 	static <P extends IPoint> ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> createATriangulation(
 			final IPointLocator.Type type,
 			final IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>  mesh) {
-
-		IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(mesh);
-		triangulation.setMesh(mesh);
-
-		double minX = mesh.streamPoints().mapToDouble(p -> p.getX()).min().getAsDouble();
-		double maxX = mesh.streamPoints().mapToDouble(p -> p.getX()).max().getAsDouble();
-
-		double minY = mesh.streamPoints().mapToDouble(p -> p.getY()).min().getAsDouble();
-		double maxY = mesh.streamPoints().mapToDouble(p -> p.getY()).max().getAsDouble();
-
-		IPointLocator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> pointLocator = createAPointLocator(type, triangulation, new VRectangle(minX, minY, maxX-minX, maxY-minY), (x, y) -> mesh.createPoint(x, y));
-		triangulation.setPointLocator(pointLocator);
+		IncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = new IncrementalTriangulation<>(mesh, type);
 		return triangulation;
 	}
 
@@ -163,7 +130,6 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
             final IPointLocator.Type type,
             final Collection<P> points,
             final IPointConstructor<P> pointConstructor) {
-
 		ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = createATriangulation(type, GeometryUtils.bound(points), pointConstructor);
         triangulation.insert(points);
         return triangulation;
@@ -182,16 +148,9 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 			final double minTriangleSideLen,
 			final IPointConstructor<P> pointConstructor
 	) {
-
-	    IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(bound);
 		IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh = new PMesh<>(pointConstructor);
-		triangulation.setMesh(mesh);
-
-		IPointLocator<P, PVertex<P>, PHalfEdge<P>, PFace<P>> pointLocator = createPPointLocator(type, triangulation, bound, pointConstructor);
-		triangulation.setPointLocator(pointLocator);
-		new UniformTriangulator<>(bound, minTriangleSideLen, triangulation).generate();
-
-		return triangulation;
+	    IncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = new IncrementalTriangulation<>(mesh, type, bound);
+		return new UniformTriangulator<>(bound, minTriangleSideLen, triangulation).generate();
 	}
 
 	static ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> generateRandomTriangulation(final long numberOfPoints) {
@@ -209,12 +168,8 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 		}
 
 		IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh = new PMesh<>(IPointConstructor.pointConstructorVPoint);
-
-		IncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> triangulation = new IncrementalTriangulation<>(points);
-		triangulation.setMesh(mesh);
-		triangulation.setPointLocator(new DelaunayTree<>(triangulation));
+		IncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> triangulation = new IncrementalTriangulation<>(mesh, IPointLocator.Type.DELAUNAY_HIERARCHY, points);
 		triangulation.compute();
-
 		return triangulation;
 	}
 

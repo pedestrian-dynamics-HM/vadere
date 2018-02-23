@@ -69,7 +69,7 @@ public class TestFFMNonUniformTriangulation {
         List<VRectangle> targetAreas = new ArrayList<>();
         List<IPoint> targetPoints = new ArrayList<>();
         PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
-        meshGenerator.execute();
+        meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
         //targetPoints.add(new MeshPoint(0, 0, false));
@@ -142,7 +142,7 @@ public class TestFFMNonUniformTriangulation {
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
         PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
-        meshGenerator.execute();
+        meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
         //targetPoints.add(new MeshPoint(0, 0, false));
@@ -214,7 +214,7 @@ public class TestFFMNonUniformTriangulation {
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
         PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
-        meshGenerator.execute();
+        meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
         //targetPoints.add(new MeshPoint(0, 0, false));

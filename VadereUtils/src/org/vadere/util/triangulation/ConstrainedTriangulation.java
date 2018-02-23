@@ -20,8 +20,9 @@ public class ConstrainedTriangulation<P extends IPoint, V extends IVertex<P>, E 
     private Set<E> constrainedHE;
     private Collection<VLine> constrains;
 
+    // TODO: not finished
     public ConstrainedTriangulation(final Collection<VLine> constrains, final Collection<P> points){
-        super(points);
+        super(null, null, points);
         this.constrainedHE = new HashSet<>();
         this.constrains = constrains;
     }

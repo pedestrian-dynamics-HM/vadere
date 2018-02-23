@@ -1,5 +1,7 @@
 package org.vadere.util.geometry.mesh.impl;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.triangulation.IncrementalTriangulation;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
@@ -18,20 +20,22 @@ import java.util.function.Predicate;
  */
 public class VPTriangulation extends IncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> {
 
-	public VPTriangulation(final Collection<VPoint> points, final Predicate<PHalfEdge<VPoint>> illegalPredicate) {
-		super(points, illegalPredicate);
+	public VPTriangulation(
+			@NotNull final Collection<VPoint> points,
+			@NotNull final Predicate<PHalfEdge<VPoint>> illegalPredicate) {
+		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, points, illegalPredicate);
 	}
 
 	public VPTriangulation(final Set<VPoint> points) {
-		super(points);
+		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, points);
 	}
 
 	public VPTriangulation(final VRectangle bound,
 	                       final Predicate<PHalfEdge<VPoint>> illegalPredicate){
-		super(bound, illegalPredicate);
+		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, bound, illegalPredicate);
 	}
 
 	public VPTriangulation(final VRectangle bound) {
-		super(bound);
+		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, bound);
 	}
 }

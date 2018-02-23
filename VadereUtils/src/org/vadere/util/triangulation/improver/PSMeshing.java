@@ -13,6 +13,7 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.Parameters;
+import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import java.util.Collection;
@@ -26,7 +27,7 @@ import java.util.stream.Stream;
 /**
  * @author Benedikt Zoennchen
  */
-public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IMeshImprover<P, V, E, F> {
+public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IMeshImprover<P, V, E, F>, ITriangulator<P, V, E, F> {
 
 	private boolean illegalMovement = false;
 	private IDistanceFunction distanceFunc;
@@ -35,6 +36,8 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
+	private static final int MAX_STEPS = 300;
+	private int nSteps;
 
 	private boolean runParallel = false;
 	private double minDeltaTravelDistance = 0.0;
@@ -45,9 +48,6 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
 	// only for logging
     private static final Logger log = LogManager.getLogger(PSMeshing.class);
-	private int numberOfIllegalMovementTests;
-	private int numberOfRetriangulations;
-	private int numberOfIterations;
 
 	public PSMeshing(
             final IDistanceFunction distanceFunc,
@@ -62,9 +62,10 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.edgeLengthFunc = edgeLengthFunc;
 		this.deps = 1.4901e-8 * initialEdgeLen;
 		this.obstacleShapes = obstacleShapes;
+		this.nSteps = 0;
 
         log.info("##### (start) generate a triangulation #####");
-        UniformRefinementTriangulatorCFS<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
+        ITriangulator<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
 		        meshSupplier,
                 bound,
                 obstacleShapes,
@@ -72,29 +73,52 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 distanceFunc,
 		        getFixPoints(meshSupplier.get()));
         triangulation = uniformRefinementTriangulation.generate();
+
+        /**
+		 *  We move points and flip edges. Therefore only the BASE pointlocator is feasible.
+		 */
+        triangulation.setPointLocator(IPointLocator.Type.BASE);
         log.info("##### (end) generate a triangulation #####");
 	}
 
-	private Set<P> getFixPoints(final IMesh<P, V, E, F> mesh) {
-		Set<P> pointSet = new HashSet<>();
-		for(VShape shape : obstacleShapes) {
-			pointSet.addAll(shape.getPath().stream().map(p ->  mesh.createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
+	@Override
+	public ITriangulation<P, V, E, F> generate() {
+		double quality = getQuality();
+		while (quality < Parameters.qualityMeasurement && nSteps < MAX_STEPS) {
+			improve();
+			quality = getQuality();
 		}
 
-		for(P p : pointSet) {
-			p.setFixPoint(true);
-		}
-		return pointSet;
+		return getTriangulation();
 	}
 
 	@Override
-    public synchronized void improve() {
-        step();
+	public IMesh<P, V, E, F> getMesh() {
+		return triangulation.getMesh();
+	}
+
+	@Override
+    public void improve() {
+		synchronized (getMesh()) {
+			illegalMovement = false;
+
+			if(illegalMovement) {
+				retriangulate();
+			}
+			else {
+				flipEdges();
+			}
+
+			computeScalingFactor();
+			computeForces();
+			updateVertices();
+			nSteps++;
+		}
     }
 
     @Override
     public ITriangulation<P, V, E, F> getTriangulation() {
-        return triangulation;
+		return triangulation;
     }
 
     @Override
@@ -109,7 +133,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
         removeTrianglesInsideObstacles();
     }
 
-	public void execute() {
+	/*public void execute() {
 		double quality = getQuality();
 		while (quality < Parameters.qualityMeasurement) {
 			improve();
@@ -117,52 +141,8 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			log.info("quality = " + quality);
 		}
 		retriangulate();
-	}
+	}*/
 
-	private void step() {
-        // TODO: implement removeBoundaryLowQualityTriangles on the GPU!
-		//removeBoundaryLowQualityTriangles();
-
-		minDeltaTravelDistance = Double.MAX_VALUE;
-		illegalMovement = false;
-
-        // there might be some illegal movements
-        if(minDeltaTravelDistance < 0.0) {
-           // illegalMovement = isMovementIllegal();
-            numberOfIllegalMovementTests++;
-        }
-
-        //retriangulate();
-        if(illegalMovement) {
-            //retriangulate();
-            //while (flipEdges());
-
-            numberOfRetriangulations++;
-        }
-        else {
-            flipEdges();
-        }
-
-        if(minDeltaTravelDistance <= 0) {
-//			computeMaxLegalMovements();
-        }
-
-
-        //long ms = System.currentTimeMillis();
-		//ms = System.currentTimeMillis() - ms;
-		//log.info("ms: " + ms);
-		computeScalingFactor();
-		//log.info(scalingFactor);
-        computeForces();
-		//computeDelta();
-		updateVertices();
-
-		numberOfIterations++;
-		//log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
-		//log.info("#retriangulations: " + numberOfRetriangulations);
-		//log.info("#steps: " + numberOfIterations);
-		//log.info("#points: " + getMesh().getVertices().size());
-	}
 
     /**
      * computes the edge forces / velocities for all half-edge i.e. for each edge twice!
@@ -333,9 +313,16 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		getMesh().getPoint(vertex).add(dX);
 	}
 
-	@Override
-	public IMesh<P, V, E, F> getMesh() {
-		return triangulation.getMesh();
+	private Set<P> getFixPoints(final IMesh<P, V, E, F> mesh) {
+		Set<P> pointSet = new HashSet<>();
+		for(VShape shape : obstacleShapes) {
+			pointSet.addAll(shape.getPath().stream().map(p ->  mesh.createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
+		}
+
+		for(P p : pointSet) {
+			p.setFixPoint(true);
+		}
+		return pointSet;
 	}
 
 	/*public PriorityQueue<PFace<MeshPoint>> getQuailties() {

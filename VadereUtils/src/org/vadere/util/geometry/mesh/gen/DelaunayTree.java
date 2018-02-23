@@ -78,7 +78,7 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
     }
 
     @Override
-	public void splitTriangleEvent(F original, F f1, F f2, F f3) {
+	public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {
 		checkRoot();
 		DAG<DAGElement<P, F>> faceDag = map.remove(original);
 
@@ -102,7 +102,7 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	}
 
 	@Override
-	public void splitEdgeEvent(F original, F f1, F f2) {
+	public void postSplitHalfEdgeEvent(F original, F f1, F f2) {
 		checkRoot();
 		DAG<DAGElement<P, F>> faceDag = map.remove(original);
 
@@ -120,7 +120,7 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	}
 
 	@Override
-	public void flipEdgeEvent(final F f1, final F f2) {
+	public void postFlipEdgeEvent(final F f1, final F f2) {
 		checkRoot();
 		DAG<DAGElement<P, F>> f1Dag = map.remove(f1);
 		DAG<DAGElement<P, F>> f2Dag = map.remove(f2);
@@ -141,12 +141,5 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	}
 
 	@Override
-	public void insertEvent(V vertex) {}
-
-	@Override
-	public void deleteBoundaryFace(F face) {
-		checkRoot();
-		assert mesh.isBoundary(face);
-		map.remove(face);
-	}
+	public void postInsertEvent(V vertex) {}
 }

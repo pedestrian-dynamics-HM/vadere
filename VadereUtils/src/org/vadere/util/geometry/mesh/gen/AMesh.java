@@ -50,6 +50,11 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
+	public IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> construct() {
+		return new AMesh<>(pointConstructor);
+	}
+
+	@Override
 	public IPointConstructor<P> getPointConstructor() {
 		return pointConstructor;
 	}
@@ -454,7 +459,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
      *
      * @param faceOrder the new order
      */
-    public void rearrange(@NotNull Iterable<AFace<P>> faceOrder){
+    public void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder) {
         // clone the old one!
         AMesh<P> cMesh = clone();
 
@@ -614,7 +619,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
                 return 0;
             }
         });
-        rearrange(sortedFaces);
+        arrangeMemory(sortedFaces);
     }
 
 

@@ -30,11 +30,15 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.swing.*;
+
+import static org.vadere.util.geometry.mesh.inter.IPointLocator.Type.BASE;
+import static org.vadere.util.geometry.mesh.inter.IPointLocator.Type.DELAUNAY_TREE;
 
 public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, V, E, F> {
 
@@ -65,54 +69,90 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	// constructors using the triangulation without a triangulator
 	public IncrementalTriangulation(
-			final Collection<P> points,
-			final Predicate<E> illegalPredicate) {
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IPointLocator.Type type,
+			@NotNull final Collection<P> points,
+			@NotNull final Predicate<E> illegalPredicate) {
+
+		assert mesh.getNumberOfVertices() == 0;
+
+		this.mesh = mesh;
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
 		this.bound = GeometryUtils.bound(points);
 		this.finalized = false;
-	}
-
-	public IncrementalTriangulation(final Collection<P> points) {
-		this(points, halfEdge -> true);
+		this.mesh = mesh;
+		this.setPointLocator(type);
 	}
 
 	public IncrementalTriangulation(
-			final VRectangle bound,
-			final Predicate<E> illegalPredicate) {
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IPointLocator.Type type,
+			@NotNull final VRectangle bound,
+			@NotNull final Predicate<E> illegalPredicate) {
+
+		assert mesh.getNumberOfVertices() == 0;
+
+		this.mesh = mesh;
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = bound;
 		this.finalized = false;
+		this.setPointLocator(type);
 	}
 
-	public IncrementalTriangulation(final IMesh<P, V, E, F> mesh, final Predicate<E> illegalPredicate) {
+	public IncrementalTriangulation(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IPointLocator.Type type,
+			@NotNull final Predicate<E> illegalPredicate) {
+
+		assert mesh.getNumberOfVertices() >= 3;
+
+		this.mesh = mesh;
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
-		this.bound = null;
+		this.bound = GeometryUtils.bound(mesh.getPoints());
 		this.initialized = true;
 		this.finalized = false;
-		this.mesh = mesh;
 		this.virtualVertices = new ArrayList<>(mesh.getVertices());
+		this.setPointLocator(type);
 	}
 
-	public IncrementalTriangulation(final IMesh<P, V, E, F> mesh) {
-		this(mesh, halfEdge -> true);
+	public IncrementalTriangulation(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IPointLocator.Type type,
+			@NotNull final Collection<P> points) {
+		this(mesh, type, points, halfEdge -> true);
+	}
+
+	public IncrementalTriangulation(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IPointLocator.Type type) {
+		this(mesh, type, halfEdge -> true);
 	}
 
     // constructors using the triangulation with a triangulator
-	public IncrementalTriangulation(final VRectangle bound) {
-		this(bound, halfEdge -> true);
+    public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh,
+	                                @NotNull final IPointLocator.Type type,
+	                                @NotNull final VRectangle bound) {
+		this(mesh, type, bound, halfEdge -> true);
 	}
 
 	// end constructors
 
-	public void setPointLocator(final IPointLocator<P, V, E, F> pointLocator) {
-		this.pointLocator = pointLocator;
-	}
-
-	public void setMesh(final IMesh<P, V, E, F> mesh) {
-		this.mesh = mesh;
+	@Override
+	public void setPointLocator(@NotNull final IPointLocator.Type type) {
+		switch (type) {
+			case DELAUNAY_TREE:
+				if(!points.isEmpty()) {
+					throw new IllegalArgumentException(DELAUNAY_TREE + " is only supported for empty triangulations.");
+				}
+				pointLocator = new DelaunayTree<>(this); break;
+			case DELAUNAY_HIERARCHY:
+				Supplier<ITriangulation<P, V, E, F>> supplier = () -> new IncrementalTriangulation<>(mesh.construct(), BASE, bound, illegalPredicate);
+				pointLocator = new DelaunayHierarchy<>(this, supplier);
+			default: pointLocator = new BasePointLocator<>(this);
+		}
 	}
 
 	@Override
@@ -129,8 +169,6 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
             double xMax = bound.getMinX() + bound.getWidth() * 2 + epsilon;
             double yMax = bound.getMinY() + bound.getHeight() * 2 + epsilon;
-
-
 
 			p0 = mesh.insertVertex(xMin, yMin);
 			p1 = mesh.insertVertex(xMax, yMin);
@@ -545,22 +583,22 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
-		pointLocator.flipEdgeEvent(f1, f2);
+		pointLocator.postFlipEdgeEvent(f1, f2);
 	}
 
 	@Override
 	public void splitTriangleEvent(final F original, final F f1, F f2, F f3) {
-		pointLocator.splitTriangleEvent(original, f1, f2, f3);
+		pointLocator.postSplitTriangleEvent(original, f1, f2, f3);
 	}
 
 	@Override
 	public void splitEdgeEvent(F original, F f1, F f2) {
-		pointLocator.splitEdgeEvent(original, f1, f2);
+		pointLocator.postSplitHalfEdgeEvent(original, f1, f2);
 	}
 
 	@Override
 	public void insertEvent(@NotNull final E halfEdge) {
-		pointLocator.insertEvent(getMesh().getVertex(halfEdge));
+		pointLocator.postInsertEvent(getMesh().getVertex(halfEdge));
 	}
 
 	@Override

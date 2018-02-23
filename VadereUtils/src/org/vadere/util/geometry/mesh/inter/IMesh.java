@@ -4,6 +4,7 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PMesh;
@@ -48,7 +49,13 @@ import java.util.stream.StreamSupport;
  * @param <F> the type of the faces
  */
 public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F> {
-    E getNext(@NotNull E halfEdge);
+	/**
+	 * construct a new empty mesh.
+	 * @return
+	 */
+	IMesh<P, V, E, F> construct();
+
+	E getNext(@NotNull E halfEdge);
 	E getPrev(@NotNull E halfEdge);
 	E getTwin(@NotNull E halfEdge);
 	F getFace(@NotNull E halfEdge);
@@ -504,6 +511,11 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return StreamSupport.stream(iterable.spliterator(), false);
 	}
 
+	default Stream<F> streamFaces(V vertex) {
+		Iterable<F> iterable = getFaceIt(vertex);
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
+
 	/**
 	 * Returns a Stream consisting of all edges which are incident to the edge
 	 *
@@ -751,4 +763,16 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	IMesh<P, V, E, F> clone();
 
 	ITriangulation<P, V, E, F> toTriangulation();
+
+	/**
+	 * Rearranges the memory location of faces, vertices and halfEdges of the mesh according to
+	 * the {@link Iterable} faceOrder. I.e. edges, vertices and faces which are close the faceOrder
+	 * will be close in the memory!
+	 *
+	 * Assumption: faceOrder contains all faces of this mesh.
+	 * Invariant: the geometry i.e. the connectivity and the vertex positions will not change.
+	 *
+	 * @param faceOrder the new order
+	 */
+	void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder);
 }

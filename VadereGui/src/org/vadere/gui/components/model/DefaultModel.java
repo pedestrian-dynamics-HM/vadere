@@ -528,31 +528,18 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
 
-			IMeshImprover<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshImprover = new PSMeshing<>(
+			PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshImprover = new PSMeshing<>(
 					distanceFunc,
 					p -> Math.abs(distanceFunc.apply(p)) + 1.0,
 					0.5,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 					() -> new PMesh((x, y) -> new MeshPoint(x, y, false)));
 
-			Thread t = new Thread(
-				() -> {
-					int counter = 0;
-					while (meshImprover.getQuality() < 0.94 && counter < 200) {
-						counter++;
-						meshImprover.improve();
-						synchronized (triangulation) {
-							triangulation = meshImprover.getTriangles();
-							setChanged();
-							fireChangeViewportEvent(bound);
-						}
-					}
-					System.out.println("rdy");
-					triangulation = meshImprover.getTriangles();
-					setChanged();
-					fireChangeViewportEvent(bound);
-				});
-
+			Thread t = new Thread(() -> {
+				meshImprover.generate();
+				triangulation = meshImprover.getTriangles();
+				setChanged();
+			});
 			t.start();
 		}
 	}

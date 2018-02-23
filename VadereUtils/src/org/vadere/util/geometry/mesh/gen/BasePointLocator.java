@@ -32,19 +32,16 @@ public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends 
 	}
 
 	@Override
-	public void splitTriangleEvent(F original, F f1, F f2, F f3) {}
+	public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {}
 
 	@Override
-	public void splitEdgeEvent(F original, F f1, F f2) {}
+	public void postSplitHalfEdgeEvent(F original, F f1, F f2) {}
 
 	@Override
-	public void flipEdgeEvent(final F f1, final F f2) {}
+	public void postFlipEdgeEvent(final F f1, final F f2) {}
 
 	@Override
-	public void insertEvent(V vertex) {}
-
-	@Override
-	public void deleteBoundaryFace(final F face) {}
+	public void postInsertEvent(V vertex) {}
 
 	@Override
 	public F locatePoint(final P point, boolean insertion) {

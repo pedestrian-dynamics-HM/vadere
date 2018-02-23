@@ -20,8 +20,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 
 	public UniformTriangulator(final VRectangle bound,
                                final double minTriangleSideLength,
-                               final ITriangulation<P, V, E, F> triangulation
-                                ) {
+                               final ITriangulation<P, V, E, F> triangulation) {
 		this.triangulation = triangulation;
 		this.left = bound.getMinX();
 		this.top = bound.getMinY();

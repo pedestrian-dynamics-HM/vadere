@@ -4,7 +4,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.inter.*;
@@ -12,7 +11,6 @@ import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
-import java.awt.geom.PathIterator;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +40,6 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	enum Direction {
 	    FORWARD,
         BACKWARD;
-
         public Direction next() {
 	        return this == FORWARD ? BACKWARD : FORWARD;
         }
@@ -209,10 +206,6 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		return triangulation;
 	}
 
-	public ITriangulation<P, V, E, F> getTri(){
-	    return triangulation;
-    }
-
 	public void finish() {
         synchronized (getMesh()) {
 			List<F> sierpinksyFaceOrder = sierpinskyCurve.stream().map(e -> getMesh().getFace(e.getRight())).collect(Collectors.toList());
@@ -224,16 +217,13 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			removeTrianglesOutsideBBox();
 			removeTrianglesInsideObstacles();
 
-			// TODO: dirty type casting?
-	        if(getMesh() instanceof AMesh) {
-		        sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face));
-		        List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
-		        logger.info("#holes:" + holes.size());
-		        sierpinksyFaceOrder.addAll(holes);
-		        logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
+	        sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face));
+	        List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
+	        logger.info("#holes:" + holes.size());
+	        sierpinksyFaceOrder.addAll(holes);
+	        logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
 
-		        ((AMesh<P>)getMesh()).rearrange(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
-	        }
+		     getMesh().arrangeMemory(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
         }
     }
 
@@ -288,7 +278,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
         if(!points.contains(p)) {
             points.add(p);
-            E newEdge = triangulation.getAnyEdge( triangulation.splitEdge(p, edge, true));
+            E newEdge = triangulation.getAnyEdge( triangulation.splitEdge(p, edge, false));
 	        triangulation.insertEvent(newEdge);
         }
         else {

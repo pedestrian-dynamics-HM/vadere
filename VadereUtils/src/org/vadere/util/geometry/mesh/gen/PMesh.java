@@ -34,6 +34,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> construct() {
+		return new PMesh<>(pointConstructor);
+	}
+
+	@Override
 	public PHalfEdge<P> getNext(final PHalfEdge<P> halfEdge) {
 		return halfEdge.getNext();
 	}
@@ -365,5 +370,10 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> toTriangulation() {
 		return ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, this);
+	}
+
+	@Override
+	public void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder) {
+		throw new UnsupportedOperationException("not jet implemented.");
 	}
 }

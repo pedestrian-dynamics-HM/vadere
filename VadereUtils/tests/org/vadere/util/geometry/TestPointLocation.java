@@ -20,7 +20,7 @@ import java.util.Iterator;
 import static org.junit.Assert.assertEquals;
 
 /**
- * This test class triangleContains tests for the point location problem for a mesh i.e.
+ * This test class tests for the point location problem for a mesh i.e.
  * given a point (x,y) find the face which triangleContains (x,y) or find the nearest vertex
  * of the mesh.
  */
