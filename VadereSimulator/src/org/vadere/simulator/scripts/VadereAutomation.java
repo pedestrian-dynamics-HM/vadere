@@ -21,7 +21,8 @@ import java.util.Random;
 public class VadereAutomation {
 
 
-    public static final String SCENARIO_NAME = "Kreuzung3_Unit";
+    //public static final String SCENARIO_NAME = "Kreuzung3_Unit";
+    public static final String SCENARIO_NAME = "Kreuzung_Studenten";
     public static final String SCENARIO_PATH = "D:/marion/Arbeit/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
     public static final int N_SIMULATIONS = 20;
     public static Scenario final_scenario;
