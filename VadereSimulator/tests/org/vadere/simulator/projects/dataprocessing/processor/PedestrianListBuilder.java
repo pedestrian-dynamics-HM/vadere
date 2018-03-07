@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -46,4 +47,7 @@ public class PedestrianListBuilder {
 		return out;
 	}
 
+	public List<Agent> getAgentList() {
+		return new LinkedList<>(out);
+	}
 }
