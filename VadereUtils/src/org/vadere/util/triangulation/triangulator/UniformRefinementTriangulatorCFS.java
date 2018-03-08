@@ -278,7 +278,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
         if(!points.contains(p)) {
             points.add(p);
-            E newEdge = triangulation.getAnyEdge( triangulation.splitEdge(p, edge, false));
+            E newEdge = triangulation.getAnyEdge( triangulation.splitEdge(p, edge, true));
 	        triangulation.insertEvent(newEdge);
         }
         else {

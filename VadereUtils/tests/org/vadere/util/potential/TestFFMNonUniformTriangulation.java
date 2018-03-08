@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,7 +69,11 @@ public class TestFFMNonUniformTriangulation {
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 0.5;
         List<VRectangle> targetAreas = new ArrayList<>();
         List<IPoint> targetPoints = new ArrayList<>();
-        PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
+
+	    /**
+	     * We use the pointer based implementation
+	     */
+	    PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, edgeLengthFunc, 0.6, bbox, new ArrayList<>());
         meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
@@ -78,10 +83,12 @@ public class TestFFMNonUniformTriangulation {
         VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
         targetAreas.add(rect);
 
+	    List<PVertex<MeshPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+
         EikonalSolver solver = new EikonalSolverFMMTriangulation(
                 new UnitTimeCostFunction(),
                 triangulation,
-                triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList()),
+		        targetVertices,
                 distanceFunc);
 
         log.info("start FFM");

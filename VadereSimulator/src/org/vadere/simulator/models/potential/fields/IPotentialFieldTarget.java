@@ -12,7 +12,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  *
  * @author Benedikt Zoennchen
  */
-public interface  IPotentialFieldTarget extends IPotentialField, Model {
+public interface IPotentialFieldTarget extends IPotentialField, Model {
 
     /**
      * Returns true if the field is dynamic, false otherwise.

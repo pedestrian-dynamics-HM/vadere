@@ -93,7 +93,7 @@ public abstract class AGridEikonalSolver implements EikonalSolver {
 		return potentialField.isValidPoint(point);
 	}
 
-	private double[] getGridPotentials(final CellGrid cellGrid, final List<Point> points) {
+	private static double[] getGridPotentials(final CellGrid cellGrid, final List<Point> points) {
 		double[] result = new double[points.size()];
 
 		for (int i = 0; i < points.size(); i++) {

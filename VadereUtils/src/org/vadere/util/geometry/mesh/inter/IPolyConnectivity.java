@@ -452,10 +452,54 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x1, y1, edge));
 	}
 
+	/*default boolean contains(final double x1, final double y1, final F face, boolean onBoundary) {
+		if(!onBoundary) {
+			return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x1, y1, edge));
+		}
+		else {
+
+		}
+	}*/
+
+	default boolean isMember(final double x1, final double y1, final F face) {
+		return getMemberEdge(face, x1, y1).isPresent();
+	}
+
+	default boolean isMember(final double x1, final double y1, final F face, double epsilon) {
+		return getMemberEdge(face, x1, y1, epsilon).isPresent();
+	}
+
+	default Optional<E> getMemberEdge(@NotNull final F face, final double x1, final double y1) {
+		for(E e : getMesh().getEdgeIt(face)) {
+			P p = getMesh().getPoint(e);
+			if(p.getX() == x1 && p.getY() == y1) {
+				return Optional.of(e);
+			}
+		}
+		return Optional.empty();
+	}
+
+	default Optional<E> getMemberEdge(@NotNull final F face, double x1, double y1, double epsilon) {
+		assert epsilon > 0;
+		for(E e : getMesh().getEdgeIt(face)) {
+			P p = getMesh().getPoint(e);
+			if(p.distance(x1, y1) <= epsilon) {
+				return Optional.of(e);
+			}
+		}
+		return Optional.empty();
+	}
+
 	default boolean isRightOf(final double x1, final double y1, final E edge) {
 		VPoint p1 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(edge)));
 		VPoint p2 = getMesh().toPoint(getMesh().getVertex(edge));
 		return GeometryUtils.isRightOf(p1, p2, x1, y1);
+	}
+
+	default boolean isLeftOf(final double x1, final double y1, final E edge) {
+		VPoint p1 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(edge)));
+		VPoint p2 = getMesh().toPoint(getMesh().getVertex(edge));
+		return GeometryUtils.isLeftOf(p1, p2, x1, y1);
 	}
 
     /**

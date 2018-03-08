@@ -31,12 +31,14 @@ import java.util.stream.Stream;
  * @param <E>
  * @param <F>
  */
-public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>, ITriConnectivity<P, V, E, F> {
+public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>, ITriConnectivity<P, V, E, F>, Cloneable {
 
 	void init();
 	void compute();
 	void finish();
 	void recompute();
+
+	ITriangulation<P, V, E, F> clone();
 
 	/**
 	 * Returns a list of virtual vertices. Virtual vertices support the construction of the triangulation

@@ -61,7 +61,12 @@ public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends 
         return locate(triConnectivity.getMesh().createPoint(x, y));
     }
 
-    @Override
+	@Override
+	public Type getType() {
+		return Type.BASE;
+	}
+
+	@Override
 	public Optional<F> locate(final IPoint point) {
 		return triConnectivity.locateFace(point.getX(), point.getY());
 	}

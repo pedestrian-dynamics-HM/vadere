@@ -48,7 +48,7 @@ import java.util.stream.StreamSupport;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F> {
+public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>, Cloneable {
 	/**
 	 * construct a new empty mesh.
 	 * @return
@@ -325,6 +325,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	default Stream<P> streamPoints() {
 		return streamVertices().map(v -> getPoint(v));
+	}
+
+	default Stream<P> streamPoints(F face) {
+		return streamVertices(face).map(v -> getPoint(v));
 	}
 
 	default Stream<P> streamPointsParallel() {
@@ -750,10 +754,12 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 */
 	default E closestEdge(final F face, final double x, final double y) {
 		E result = null;
-		double distance = Double.MAX_VALUE;
+		double minDistance = Double.MAX_VALUE;
 		for (E edge : getEdgeIt(face)) {
-			if(GeometryUtils.distanceToLineSegment(getPoint(getPrev(edge)), getPoint(edge), x, y) < distance) {
+			double distance = GeometryUtils.distanceToLineSegment(getPoint(getPrev(edge)), getPoint(edge), x, y);
+			if(distance < minDistance) {
 				result = edge;
+				minDistance = distance;
 			}
 		}
 
@@ -775,4 +781,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param faceOrder the new order
 	 */
 	void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder);
+
+
+	// methods for log informations
+	default String toPath(final F face) {
+		return streamPoints(face).map(p -> p.toString()).reduce((s1, s2) -> s1 + " -> " + s2).orElse("");
+	}
 }

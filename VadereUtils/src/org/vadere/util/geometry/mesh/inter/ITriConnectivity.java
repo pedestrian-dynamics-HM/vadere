@@ -5,7 +5,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -14,9 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 //TODO: check unused methods!
 /**
@@ -30,6 +28,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	Logger log = LogManager.getLogger(ITriConnectivity.class);
 	Random random = new Random();
+
 
 	/**
 	 * Non mesh changing method.
@@ -800,12 +799,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
     default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
-        assert !getMesh().isBoundary(startFace);
+        assert !getMesh().isBorder(startFace);
 
         // initialize
         F face = startFace;
         E edge = getMesh().getEdge(face);
-        VPoint q = getMesh().toTriangle(startFace).getIncenter(); // walk from q to p
+        VPoint q = getMesh().toPolygon(startFace).getCentroid(); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
         return straightGatherWalk2D(q, p, face, edge, stopCondition);
@@ -828,46 +827,180 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         return straightGatherWalk2D(q, p, startFace, startEdge, stopCondition).peekLast();
 	}
 
+	/**
+	 *
+	 *
+	 * @param face
+	 * @param q
+	 * @param p
+	 * @param stopCondition
+	 * @return
+	 */
+	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition) {
+		List<E> intersectionEdges = getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).collect(Collectors.toList());
+
+		/**
+		 * General case (1): The line defined by (q,p) intersects 2 edges of the convex polygon.
+		 */
+		if(intersectionEdges.size() == 2) {
+			//log.debug("straight walk: general case");
+			return intersectionEdges.stream().filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
+		}
+		/**
+		 * Special case (2): There is one or two points of the polygon which are collinear with the line defined by (q,p).
+		 */
+		else {
+			// the unimportant point is collinear => n.p.
+			/**
+			 * Good case (2.1): There is only one collinear point and the exit edge of the polygon exist.
+			 */
+			if(intersectionEdges.stream().filter(e -> !stopCondition.test(e)).count() >= 1) {
+				return intersectionEdges.stream().filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
+			}
+			// q, the exit point and p are collinear :( or the point lies inside the face :)
+			else {
+				/**
+				 * Good case (2.2) There are two collinear points but the face contains p => p lies on an edge of the face.
+				 */
+				if(contains(p.getX(), p.getY(), face) || getMesh().isMember(face, p.getX(), p.getY())) {
+					return Optional.empty();
+				}
+				/**
+				 * Bad case (2.3): This which should not happen in general: q, the exit point v and p are collinear, therefore there is no exit intersection line!
+				 * We continue the search with the face which centroid is closest to p! v has to be the closest p as well.
+				 */
+				else {
+					//log.debug("straight walk: no exit edge found due to collinear exit point.");
+					V v = getMesh().streamVertices(face).min((v1, v2) -> Double.compare(p.distance(v1), p.distance(v2))).get();
+					Optional<F> closestFace = getMesh().streamFaces(v)
+							.filter(f -> !getMesh().isBorder(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
+					return closestFace;
+				}
+			}
+		}
+	}
+
     // TODO: choose a better name
     default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
-	    LinkedList<F> visitedFaces = new LinkedList<>();
+	    //log.debug("start walk: from " + q + " to " + p);
+		LinkedList<F> visitedFaces = new LinkedList<>();
 	    visitedFaces.addLast(startFace);
 
-        Optional<E> optEdge;
+        Optional<F> optFace;
         F face = startFace;
-        E edge = startEdge;
 
         do {
-            optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
+        	//log.debug(getMesh().toPath(face));
+	        optFace = getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
 
-            if(optEdge.isPresent()) {
-                edge = getMesh().getTwin(optEdge.get());
-                face = getMesh().getTwinFace(optEdge.get());
+	        if(!optFace.isPresent()) {
+	        	//log.info("expensive fix");
+		        //optFace = straightWalkNext(face, q, p, stopCondition);
+	        }
+	        else {
+	        	//log.info("fast");
+	        }
+
+            if(optFace.isPresent()) {
+                face = optFace.get();
                 visitedFaces.addLast(face);
 
-                // special case: hitting the boundary, this might be the outer boundary or a hole!
-                if(getMesh().isBoundary(face)) {
-                    VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
-                    optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
-
-                    if(optEdge.isPresent()) {
-                        VPoint p2 = getMesh().toPoint(getMesh().getVertex(optEdge.get()));
-
-                        // Indicator that we reached the outer boundary: TODO: this test is not fully stable!
-                        if(p.distance(p1) <= p.distance(p2)) {
-                            break;
-                        }
-                        // else: we walk through a hole!
-                    }
-                    else {
-                        break;
-                    }
+                // special case (1): hitting the border i.e. outer boundary
+	            // special case (2): hitting a hole
+                if(getMesh().isBorder(face)) {
+                   //log.debug("walked towards the border!");
+                   // return the border
+	               // log.debug(getMesh().toPath(face));
+                   break;
+                }
+                else if(getMesh().isHole(face)) {
+	                //log.debug("walked towards a hole!");
+	                // just go on with the normal straight walk which works for CONVEX polygons!
                 }
             }
-        } while (optEdge.isPresent());
+        } while (optFace.isPresent());
 
+        assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
+	    //log.debug("end walk");
         return visitedFaces;
     }
+
+
+    /*default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
+		log.info("start walk: from " + q + " to " + p);
+		LinkedList<F> visitedFaces = new LinkedList<>();
+		visitedFaces.addLast(startFace);
+
+		Optional<E> optEdge;
+		F face = startFace;
+
+		do {
+			log.info(getMesh().toPath(face));
+			log.info("intersections: " + getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).count());
+			log.info("intersections & on the right: " + getMesh().streamEdges(face).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).count());
+			optEdge = getMesh().streamEdges(face).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
+
+			if(optEdge.isPresent()) {
+				face = getMesh().getTwinFace(optEdge.get());
+				visitedFaces.addLast(face);
+
+				// special case (1): hitting the border i.e. outer boundary
+				// special case (2): hitting a hole
+				if(getMesh().isBorder(face)) {
+					log.info("walked towards the border!");
+					// return the border
+					log.info(getMesh().toPath(face));
+					break;
+				}
+				else if(getMesh().isHole(face)) {
+					log.info("walked towards a hole!");
+					// just go on with the normal straight walk which works for CONVEX polygons!
+				}
+			}
+		} while (optEdge.isPresent());
+
+		assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
+		log.info("end walk");
+		return visitedFaces;
+	}*/
+
+	/*default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
+		log.info("start walk: from " + q + " to " + p);
+		LinkedList<F> visitedFaces = new LinkedList<>();
+		visitedFaces.addLast(startFace);
+
+		Optional<E> optEdge;
+		F face = startFace;
+		E edge = startEdge;
+
+		do {
+			log.info(getMesh().toPath(face));
+			optEdge = getMesh().streamEdges(edge).filter(e -> !stopCondition.test(e) && intersects(q, p, e)).findAny();
+
+			if(optEdge.isPresent()) {
+				edge = getMesh().getTwin(optEdge.get());
+				face = getMesh().getTwinFace(optEdge.get());
+				visitedFaces.addLast(face);
+
+				// special case (1): hitting the border i.e. outer boundary
+				// special case (2): hitting a hole
+				if(getMesh().isBorder(face)) {
+					log.info("walked towards the border!");
+					// return the border
+					log.info(getMesh().toPath(face));
+					break;
+				}
+				else if(getMesh().isHole(face)) {
+					log.info("walked towards a hole!");
+					// just go on with the normal straight walk which works for CONVEX polygons!
+				}
+			}
+		} while (optEdge.isPresent());
+
+		assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
+		log.info("end walk");
+		return visitedFaces;
+	}*/
 
 	default boolean isOuterBoundary(final F face) {
 		if(getMesh().isBoundary(face)) {
@@ -1274,59 +1407,4 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			return Optional.empty();
 		}
 	}
-
-	default boolean isMember(F face, double x, double y, double epsilon) {
-		return getMemberEdge(face, x, y, epsilon).isPresent();
-	}
-
-	default Optional<E> getMemberEdge(F face, double x, double y,  double epsilon) {
-		E e1 = getMesh().getEdge(face);
-		E e2 = getMesh().getNext(e1);
-		E e3 = getMesh().getNext(e2);
-
-		if(getMesh().getPoint(e1).distance(x, y) < epsilon) {
-			return Optional.of(e1);
-		}
-
-		if(getMesh().getPoint(e2).distance(x, y) < epsilon) {
-			return Optional.of(e2);
-		}
-
-		if(getMesh().getPoint(e3).distance(x, y) < epsilon) {
-			return Optional.of(e3);
-		}
-
-		return Optional.empty();
-	}
-
-	default boolean isMember(F face, double x, double y) {
-		return getMemberEdge(face, x, y).isPresent();
-	}
-
-	default Optional<E> getMemberEdge(F face, double x, double y) {
-		assert !getMesh().isBoundary(face);
-		E e1 = getMesh().getEdge(face);
-		P p1 = getMesh().getPoint(e1);
-
-		if(p1.getX() == x && p1.getY() == y) {
-			return Optional.of(e1);
-		}
-
-		E e2 = getMesh().getNext(e1);
-		P p2 = getMesh().getPoint(e2);
-
-		if(p2.getX() == x && p2.getY() == y) {
-			return Optional.of(e2);
-		}
-
-		E e3 = getMesh().getNext(e2);
-		P p3 = getMesh().getPoint(e3);
-
-		if(p3.getX() == x && p3.getY() == y) {
-			return Optional.of(e3);
-		}
-
-		return Optional.empty();
-	}
-
 }

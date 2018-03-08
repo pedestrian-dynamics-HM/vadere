@@ -21,6 +21,7 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
 import org.vadere.util.triangulation.improver.IMeshImprover;
+import org.vadere.util.triangulation.improver.PPSMeshing;
 import org.vadere.util.triangulation.improver.PSMeshing;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -527,13 +528,11 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
 
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
-
-			PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshImprover = new PSMeshing<>(
+			PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
 					p -> 1.0,
 					3.0,
-					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-					() -> new PMesh((x, y) -> new MeshPoint(x, y, false)));
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
 
 			Thread t = new Thread(() -> {
 				meshImprover.generate();

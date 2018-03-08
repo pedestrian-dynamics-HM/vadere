@@ -1,10 +1,12 @@
 package org.vadere.util.triangulation;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
+import org.vadere.util.geometry.mesh.inter.ITriConnectivity;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
 import org.vadere.util.geometry.mesh.inter.IFace;
@@ -43,21 +45,13 @@ import static org.vadere.util.geometry.mesh.inter.IPointLocator.Type.DELAUNAY_TR
 public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, V, E, F> {
 
 	protected Collection<P> points;
-
-	// TODO: use symbolic for the super-triangle points instead of real points!
-	private V p0;
-	private V p1;
-	private V p2;
-
 	private final VRectangle bound;
 	private boolean finalized = false;
 	private IMesh<P, V, E, F> mesh;
 	private IPointLocator<P, V, E, F> pointLocator;
 	private boolean initialized;
 	private List<V> virtualVertices;
-	private int maxDepth = 0;
-
-	private IMesh<P, V, E, F> baseMesh;
+	private boolean useMeshForBound;
 
 	private static double BUFFER_PERCENTAGE = 0.01;
 
@@ -65,11 +59,22 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private double epsilon = 0.0001;
 	private double edgeCoincidenceTolerance = 0.0001;
 
-	private F borderFace;
 	private final Predicate<E> illegalPredicate;
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
 
-	// constructors using the triangulation without a triangulator
+	static {
+		ITriConnectivity.log.setLevel(Level.INFO);
+	}
+
+	/**
+	 * Construct a triangulation using an empty mesh.
+	 *
+	 * @param mesh              the empty mesh
+	 * @param type              the type of the point location algorithm
+	 * @param points            points to be inserted, which also specify the bounding box
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
+	 */
 	public IncrementalTriangulation(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
@@ -78,6 +83,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 		assert mesh.getNumberOfVertices() == 0;
 
+		this.useMeshForBound = false;
 		this.mesh = mesh;
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
@@ -88,6 +94,15 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.setPointLocator(type);
 	}
 
+	/**
+	 * Construct a triangulation using an empty mesh.
+	 *
+	 * @param mesh              the empty mesh
+	 * @param type              the type of the point location algorithm
+	 * @param bound             the bound of the triangulation, i.e. there will be no points outside the bound to be inserted into the triangulation
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
+	 */
 	public IncrementalTriangulation(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
@@ -96,8 +111,8 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 		assert mesh.getNumberOfVertices() == 0;
 
+		this.useMeshForBound = false;
 		this.mesh = mesh;
-		this.baseMesh = mesh.clone();
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = bound;
@@ -106,6 +121,29 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.setPointLocator(type);
 	}
 
+	/**
+	 * Construct a triangulation using an empty mesh.
+	 *
+	 * @param mesh              the empty mesh
+	 * @param type              the type of the point location algorithm
+	 * @param bound             the bound of the triangulation, i.e. there will be no points outside the bound to be inserted into the triangulation
+	 */
+	public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh,
+	                                @NotNull final IPointLocator.Type type,
+	                                @NotNull final VRectangle bound) {
+		this(mesh, type, bound, halfEdge -> true);
+	}
+
+	/**
+	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
+	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
+	 * the bound i.e. outside the mesh.
+	 *
+	 * @param mesh              the non-empty mesh which will be used and which specifies the bound
+	 * @param type              the type of the used point location algorithm
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
+	 */
 	public IncrementalTriangulation(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
@@ -113,16 +151,26 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 		assert mesh.getNumberOfVertices() >= 3;
 
+		this.useMeshForBound = true;
 		this.mesh = mesh;
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
-		this.bound = GeometryUtils.bound(mesh.getPoints());
+		this.bound = GeometryUtils.bound(mesh.getPoints(mesh.getBorder()));
 		this.initialized = false;
 		this.finalized = false;
 		this.virtualVertices = new ArrayList<>(mesh.getVertices());
 		this.setPointLocator(type);
 	}
 
+	/**
+	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
+	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
+	 * the bound i.e. outside the mesh.
+	 *
+	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
+	 * @param type      the type of the used point location algorithm
+	 * @param points    points to be inserted, which also specify the bounding box
+	 */
 	public IncrementalTriangulation(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
@@ -130,38 +178,47 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this(mesh, type, points, halfEdge -> true);
 	}
 
+	/**
+	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
+	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
+	 * the bound i.e. outside the mesh.
+	 *
+	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
+	 * @param type      the type of the used point location algorithm
+	 */
 	public IncrementalTriangulation(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type) {
 		this(mesh, type, halfEdge -> true);
 	}
 
-    // constructors using the triangulation with a triangulator
-    public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh,
-	                                @NotNull final IPointLocator.Type type,
-	                                @NotNull final VRectangle bound) {
-		this(mesh, type, bound, halfEdge -> true);
-	}
-
 	// end constructors
 
 	@Override
 	public void setPointLocator(@NotNull final IPointLocator.Type type) {
+
+		/**
+		 * This method is somehow recursive. The Delaunay-Hierarchy is a hierarchy of triangulations using the base point
+		 * location algorithm. Therefore if the type is equal to the Delaunay-Hierarchy a supplier is required which
+		 * construct triangulations based on this triangulation i.e. with the same "starting" mesh or bound!
+		 */
 		switch (type) {
 			case DELAUNAY_TREE:
 				if(!points.isEmpty()) {
 					throw new IllegalArgumentException(DELAUNAY_TREE + " is only supported for empty triangulations.");
 				}
-				pointLocator = new DelaunayTree<>(this); break;
+				pointLocator = new DelaunayTree<>(this);
+				break;
 			case DELAUNAY_HIERARCHY:
 				Supplier<ITriangulation<P, V, E, F>> supplier;
-				if(baseMesh != null) {
-					supplier = () -> new IncrementalTriangulation<>(baseMesh.clone(), BASE, illegalPredicate);
+				if(useMeshForBound) {
+					supplier = () -> new IncrementalTriangulation<>(mesh.clone(), BASE, illegalPredicate);
 				}
 				else {
 					supplier = () -> new IncrementalTriangulation<>(mesh.construct(), BASE, bound, illegalPredicate);
 				}
 				pointLocator = new DelaunayHierarchy<>(this, supplier);
+				break;
 			default: pointLocator = new BasePointLocator<>(this);
 		}
 	}
@@ -183,13 +240,13 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				double xMax = bound.getMinX() + bound.getWidth() * 2 + epsilon;
 				double yMax = bound.getMinY() + bound.getHeight() * 2 + epsilon;
 
-				p0 = mesh.insertVertex(xMin, yMin);
-				p1 = mesh.insertVertex(xMax, yMin);
-				p2 = mesh.insertVertex(xMin, yMax);
+				V p0 = mesh.insertVertex(xMin, yMin);
+				V p1 = mesh.insertVertex(xMax, yMin);
+				V p2 = mesh.insertVertex(xMin, yMax);
 
 				// construct super triangle
 				F superTriangle = mesh.createFace(p0, p1, p2);
-				borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
+				F borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
 				// end divide the square into 2 triangles
 
 				this.virtualVertices = Arrays.asList(p0, p1, p2);
@@ -197,10 +254,10 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			}
 			else {
 				assert mesh.getNumberOfVertices() >= 3;
-				borderFace = mesh.getBorder();
+				F borderFace = mesh.getBorder();
 				// end divide the square into 2 triangles
 
-				this.virtualVertices = mesh.streamVertices().collect(Collectors.toList());
+				this.virtualVertices = mesh.streamVertices(borderFace).collect(Collectors.toList());
 				this.initialized = true;
 			}
 		}
@@ -209,6 +266,9 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		}
 	}
 
+	public double getEdgeCoincidenceTolerance() {
+		return edgeCoincidenceTolerance;
+	}
 
 	@Override
 	public List<V> getVirtualVertices() {
@@ -256,7 +316,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		 *      2) point lies on an edge of a face => split the edge
 		 *      3) point lies in the interior of the face => split the face (this should be the main case)
 		 */
-		if(isMember(face, point.getX(), point.getY(), edgeCoincidenceTolerance)) {
+		if(isMember(point.getX(), point.getY(), face, edgeCoincidenceTolerance)) {
 			log.info("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
 			return edge;
 		}
@@ -268,6 +328,8 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		}
 		else {
 			//log.info("splitTriangle()");
+			assert contains(point.getX(), point.getY(), face);
+
 			E newEdge = splitTriangle(face, point,  true);
 			insertEvent(newEdge);
 			return newEdge;
@@ -628,6 +690,38 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	public Stream<F> stream() {
 		return StreamSupport.stream(this.spliterator(), false);
+	}
+
+	@Override
+	public IncrementalTriangulation<P, V, E, F> clone() {
+		try {
+			IncrementalTriangulation<P, V, E, F> clone = (IncrementalTriangulation<P, V, E, F>)super.clone();
+			clone.mesh = mesh.clone();
+
+			List<V> cVirtualVertices = new ArrayList<>();
+			for(V v : virtualVertices) {
+				for(V cV : clone.mesh.getVertices()) {
+					if(v.getPoint().equals(cV.getPoint())) {
+						cVirtualVertices.add(cV);
+						break;
+					}
+				}
+			}
+
+			assert cVirtualVertices.size() == virtualVertices.size();
+			clone.virtualVertices = cVirtualVertices;
+
+			/**
+			 * The point locator is not cloned but reconstructed. Cloning the Delaunay-Hierarchy or the Delaunay-Tree seems impossible with
+			 * respect to the performance. However, the reconstruction is also expensive O(n * log(n)) where n is the number of vertices.
+			 */
+			clone.setPointLocator(pointLocator.getType());
+
+			return clone;
+
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.getMessage());
+		}
 	}
 
 	// TODO: the following code can be deleted, this is only for visual checks

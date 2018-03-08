@@ -189,6 +189,10 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public void setEdge(@NotNull AVertex<P> vertex, @NotNull AHalfEdge<P> edge) {
+		assert edge.getEnd() == vertex.getId();
+		if(edge.getEnd() != vertex.getId()) {
+			throw new IllegalArgumentException("end of the edge is not equals to the vertex:" + vertex.getId() + " != " + edge.getEnd());
+		}
 		vertex.setEdge(edge.getId());
 	}
 

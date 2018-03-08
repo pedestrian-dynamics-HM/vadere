@@ -6,9 +6,20 @@ import org.vadere.state.types.EikonalSolverType;
 public class AttributesFloorField extends Attributes {
 
 	private EikonalSolverType createMethod = EikonalSolverType.HIGH_ACCURACY_FAST_MARCHING;
+
+	/**
+	 * These attribute values should only be used if createMethod.isUsingCellGrid() == true.
+	 *
+	 * TODO [refactoring]: However potentialFieldResolution is also used for the {@link org.vadere.util.potential.timecost.ITimeCostFunction}
+	 * for the density computation, i.e. it is the resolution of the matrix used in the discrete convolution. This should be changed!
+	 */
 	private double potentialFieldResolution = 0.1;
 	private double obstacleGridPenalty = 0.1;
+
+
+
 	private double targetAttractionStrength = 1.0;
+
 	private AttributesTimeCost timeCostAttributes;
 
 	public AttributesFloorField() {

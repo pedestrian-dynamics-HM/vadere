@@ -20,7 +20,7 @@ import org.vadere.util.potential.calculators.EikonalSolver;
  * based on the AttributesFloorField.
  *
  */
-public class PotentialFieldSingleTargetGrid extends APotentialFieldTargetGrid {
+public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 
     /**
      * configuration of the potential fields.
@@ -41,7 +41,7 @@ public class PotentialFieldSingleTargetGrid extends APotentialFieldTargetGrid {
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential,
 			final int targetId) {
-		super(topography);
+		super(topography, attributesPedestrian, attributesPotential);
 		this.attributesFloorField = attributesPotential;
 		this.attributesPedestrian = attributesPedestrian;
 		this.targetId = targetId;

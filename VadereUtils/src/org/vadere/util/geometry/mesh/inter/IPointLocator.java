@@ -20,6 +20,8 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 
 	Optional<F> locate(final double x, final double y);
 
+	Type getType();
+
 	enum Type {
 		DELAUNAY_TREE,
 		DELAUNAY_HIERARCHY,

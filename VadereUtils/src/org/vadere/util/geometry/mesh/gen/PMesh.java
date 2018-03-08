@@ -156,7 +156,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	public void setEdge(@NotNull PVertex<P> vertex, @NotNull PHalfEdge<P> edge) {
 		assert edge.getEnd().equals(vertex);
 		if(!edge.getEnd().equals(vertex)) {
-			throw new IllegalArgumentException("end of the edge is not equals to the vertex.");
+			throw new IllegalArgumentException("end of the edge is not equals to the vertex:" + vertex + " != " + edge.getEnd());
 		}
 		vertex.setEdge(edge);
 	}

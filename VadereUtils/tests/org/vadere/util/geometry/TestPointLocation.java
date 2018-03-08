@@ -43,7 +43,7 @@ public class TestPointLocation {
 		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
 		face1 = mesh.createFace();
 		face2 = mesh.createFace();
-		border = mesh.createFace(true);
+		border = mesh.getBorder();
 
 		PVertex<VPoint> x = mesh.insertVertex(0, 0);
 		PVertex<VPoint> y = mesh.insertVertex(1.5,3.0);

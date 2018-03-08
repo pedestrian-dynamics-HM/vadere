@@ -19,7 +19,18 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 
+import static org.vadere.util.geometry.GeometryUtils.Orientation.CCW;
+import static org.vadere.util.geometry.GeometryUtils.Orientation.COLLINEAR;
+import static org.vadere.util.geometry.GeometryUtils.Orientation.CW;
+
 public class GeometryUtils {
+
+	enum Orientation {
+		CCW,
+		CW,
+		COLLINEAR;
+	}
+
 	/**
 	 * Constant for comparison of double values. Everything below this is
 	 * considered equal.
@@ -54,25 +65,34 @@ public class GeometryUtils {
 	}
 
 	public static VPoint getCentroid(@NotNull final List<? extends IPoint> polygon){
-        double area = 0;
+        double area = areaOfPolygon(polygon);
         double xValue = 0;
         double yValue = 0;
 
         assert polygon.size() > 2;
 
-        for (int i = 0; i < polygon.size() - 1; i++) {
-            area += polygon.get(i).getX() * polygon.get(i + 1).getY()
-                    - polygon.get(i).getY() * polygon.get(i + 1).getX();
-            xValue += (polygon.get(i).getX() + polygon.get(i + 1).getX())
-                    * (polygon.get(i).getX() * polygon.get(i + 1).getY()
-                    - polygon.get(i).getY() * polygon.get(i + 1).getX());
-            yValue += (polygon.get(i).getY() + polygon.get(i + 1).getY())
-                    * (polygon.get(i).getX() * polygon.get(i + 1).getY()
-                    - polygon.get(i).getY() * polygon.get(i + 1).getX());
+        int j = 0;
+        for (int i = 0; i < polygon.size(); i++) {
+        	if(i < polygon.size() - 1) {
+        		j = i + 1;
+	        }
+	        else {
+        		j = 0;
+	        }
+
+            xValue += (polygon.get(i).getX() + polygon.get(j).getX())
+                    * (polygon.get(i).getX() * polygon.get(j).getY()
+                    - polygon.get(i).getY() * polygon.get(j).getX());
+            yValue += (polygon.get(i).getY() + polygon.get(j).getY())
+                    * (polygon.get(i).getX() * polygon.get(j).getY()
+                    - polygon.get(i).getY() * polygon.get(j).getX());
         }
-        area /= 2;
         xValue /= (6 * area);
         yValue /= (6 * area);
+
+        if(xValue == Double.NaN || yValue == Double.NaN || area == 0 || area == Double.NaN) {
+        	throw new IllegalArgumentException("invalid point list");
+        }
 
         return new VPoint(xValue, yValue);
     }
@@ -230,6 +250,19 @@ public class GeometryUtils {
 
 	public static boolean isCW(final IPoint p1, final IPoint p2, final IPoint p3) {
 		return ccw(p1, p2, p3) < 0;
+	}
+
+	public static Orientation orientation(final IPoint p1, final IPoint p2, final IPoint p3) {
+		double ccw = ccw(p1, p2, p3);
+		if(ccw < 0) {
+			return CW;
+		}
+		else if(ccw > 0) {
+			return CCW;
+		}
+		else {
+			return COLLINEAR;
+		}
 	}
 
 	/**
@@ -417,16 +450,6 @@ public class GeometryUtils {
 			}
 			int n = vertices.size() - 1;
 			result += vertices.get(n).getX() * vertices.get(0).getY() - vertices.get(0).getX() * vertices.get(n).getY();
-		}
-		return Math.abs(result) / 2.0;
-	}
-
-    public static double areaOfPolygon(final IPoint... vertices) {
-		double result = 0;
-
-		for (int i = 0; i < vertices.length - 1; i++) {
-			result += (vertices[i].getY() + vertices[i + 1].getY())
-					* (vertices[i].getX() - vertices[i + 1].getX());
 		}
 		return Math.abs(result) / 2.0;
 	}

@@ -58,14 +58,13 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
     private boolean calculationFinished;
     private PriorityQueue<V> narrowBand;
     private Collection<VRectangle> targetAreas;
-    private IMesh<P, V, E, F> mesh;
 
     /**
      * Comparator for the heap. Vertices of points with small potentials are at the top of the heap.
      */
     private Comparator<V> pointComparator = (v1, v2) -> {
-        P p1 = mesh.getPoint(v1);
-        P p2 = mesh.getPoint(v2);
+        P p1 = getMesh().getPoint(v1);
+        P p2 = getMesh().getPoint(v2);
         if (p1.getPotential() < p2.getPotential()) {
             return -1;
         } else if(p1.getPotential() > p2.getPotential()) {
@@ -92,7 +91,6 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
-        this.mesh = triangulation.getMesh();
 
         for(IPoint point : targetPoints) {
             F face = triangulation.locateFace(point.getX(), point.getY()).get();
@@ -114,12 +112,11 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
-        this.mesh = triangulation.getMesh();
 
         for(VShape shape : targetShapes) {
-            mesh.streamFaces()
-                    .filter(f -> !mesh.isBoundary(f))
-                    .filter(f -> shape.intersect(mesh.toTriangle(f)))
+            getMesh().streamFaces()
+                    .filter(f -> !getMesh().isBoundary(f))
+                    .filter(f -> shape.intersect(getMesh().toTriangle(f)))
                     .forEach(f -> initialFace(f, p -> Math.max(shape.distance(p), 0)));
         }
     }
@@ -140,10 +137,9 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
         this.timeCostFunction = timeCostFunction;
         this.targetAreas = new ArrayList<>();
         this.narrowBand = new PriorityQueue<>(pointComparator);
-        this.mesh = triangulation.getMesh();
 
         for(V vertex : targetVertices) {
-            P potentialPoint = mesh.getPoint(vertex);
+            P potentialPoint = getMesh().getPoint(vertex);
             double distance = -distFunc.apply(potentialPoint);
 
             if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
@@ -156,7 +152,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 
             for(V v : triangulation.getMesh().getAdjacentVertexIt(vertex)) {
                 if(!narrowBand.contains(v)) {
-                    P potentialP = mesh.getPoint(v);
+                    P potentialP = getMesh().getPoint(v);
 
                     double dist = Math.max(-distFunc.apply(potentialP), 0);
                     logger.info(dist);
@@ -174,8 +170,8 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
      * @param distanceFunction  the distance function
      */
     private void initialFace(@NotNull final F face, @NotNull final IDistanceFunction distanceFunction) {
-        for(V vertex : mesh.getVertexIt(face)) {
-            P potentialPoint = mesh.getPoint(vertex);
+        for(V vertex : getMesh().getVertexIt(face)) {
+            P potentialPoint = getMesh().getPoint(vertex);
             double distance = distanceFunction.apply(potentialPoint);
 
             if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
@@ -188,47 +184,55 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
         }
     }
 
+	/**
+	 * Calculate the fast marching solution. This is called only once,
+	 * subsequent calls only return the result of the first.
+	 */
     @Override
     public void initialize() {
-        calculate();
+	    if (!calculationFinished) {
+		    while (this.narrowBand.size() > 0) {
+			    V vertex = this.narrowBand.poll();
+			    getMesh().getPoint(vertex).setPathFindingTag(PathFindingTag.Reached);
+			    updatePotentialOfNeighbours(vertex);
+		    }
+		    this.calculationFinished = true;
+	    }
     }
 
     @Override
     public Function<VPoint, Double> getPotentialField() {
-        return null;
+	    ITriangulation<P, V, E, F> clone = triangulation.clone();
+	    return p -> getPotential(clone, p.getX(), p.getY());
     }
 
     @Override
     public double getPotential(final double x, final double y) {
-        Optional<F> optFace = triangulation.locateFace(x, y);
-
-        double result = -1.0;
-        if(!optFace.isPresent()) {
-            //logger.warn("no face found for coordinates (" + x + "," + y + ")");
-        }
-        else if(optFace.isPresent() && triangulation.getMesh().isBoundary(optFace.get())) {
-            //	logger.warn("no triangle found for coordinates (" + x + "," + y + ")");
-        }
-        else {
-            result = InterpolationUtil.barycentricInterpolation(mesh.getPoints(optFace.get()), x, y);
-        }
-        return result;
+        return getPotential(triangulation, x, y);
     }
 
+    private static <P extends PotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double getPotential(
+    		@NotNull final ITriangulation<P, V, E, F> triangulation,
+		    final double x,
+		    final double y) {
 
-    /**
-     * Calculate the fast marching solution. This is called only once,
-     * subsequent calls only return the result of the first.
-     */
-    private void calculate() {
-        if (!calculationFinished) {
-            while (this.narrowBand.size() > 0) {
-                V vertex = this.narrowBand.poll();
-                mesh.getPoint(vertex).setPathFindingTag(PathFindingTag.Reached);
-                updatePotentialOfNeighbours(vertex);
-            }
-            this.calculationFinished = true;
-        }
+	    Optional<F> optFace = triangulation.locateFace(x, y);
+
+	    double result = -1.0;
+	    if(!optFace.isPresent()) {
+		    //logger.warn("no face found for coordinates (" + x + "," + y + ")");
+	    }
+	    else if(optFace.isPresent() && triangulation.getMesh().isBoundary(optFace.get())) {
+		    //	logger.warn("no triangle found for coordinates (" + x + "," + y + ")");
+	    }
+	    else {
+		    result = InterpolationUtil.barycentricInterpolation(triangulation.getMesh().getPoints(optFace.get()), x, y);
+	    }
+	    return result;
+    }
+
+    private IMesh<P, V, E, F> getMesh() {
+    	return triangulation.getMesh();
     }
 
     /**
@@ -237,7 +241,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
      * @param vertex    the vertex
      */
     private void updatePotentialOfNeighbours(@NotNull final V vertex) {
-        for(V neighbour : mesh.getAdjacentVertexIt(vertex)) {
+        for(V neighbour : getMesh().getAdjacentVertexIt(vertex)) {
             updatePotential(neighbour);
         }
     }
@@ -248,7 +252,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
      */
     private void updatePotential(@NotNull final V vertex) {
         double potential = recomputePotential(vertex);
-        P potentialPoint = mesh.getPoint(vertex);
+        P potentialPoint = getMesh().getPoint(vertex);
         if(potential < potentialPoint.getPotential()) {
             if(potentialPoint.getPathFindingTag() == PathFindingTag.Reachable) {
                 narrowBand.remove(vertex);
@@ -278,9 +282,9 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
         // value accordingly
         double potential = Double.MAX_VALUE;
 
-        for(F face : mesh.getAdjacentFacesIt(vertex)) {
-            if(!mesh.isBoundary(face)) {
-                potential = Math.min(computePotential(mesh.getPoint(vertex), face), potential);
+        for(F face : getMesh().getAdjacentFacesIt(vertex)) {
+            if(!getMesh().isBoundary(face)) {
+                potential = Math.min(computePotential(getMesh().getPoint(vertex), face), potential);
             }
         }
         return potential;
@@ -288,9 +292,9 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 
 
     public boolean isNonAcute(@NotNull final E edge) {
-        VPoint p1 = mesh.toPoint(mesh.getPrev(edge));
-        VPoint p2 = mesh.toPoint(edge);
-        VPoint p3 = mesh.toPoint(mesh.getNext(edge));
+        VPoint p1 = getMesh().toPoint(getMesh().getPrev(edge));
+        VPoint p2 = getMesh().toPoint(edge);
+        VPoint p3 = getMesh().toPoint(getMesh().getNext(edge));
 
         double angle1 = GeometryUtils.angle(p1, p2, p3);
 
@@ -308,14 +312,14 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
      */
     private double computePotential(@NotNull final P point, @NotNull final F face) {
         // check whether the triangle does contain useful data
-        List<E> edges = mesh.getEdges(face);
-        E halfEdge = edges.stream().filter(e -> mesh.getPoint(e).equals(point)).findAny().get();
-        edges.removeIf(edge -> mesh.getPoint(edge).equals(point));
+        List<E> edges = getMesh().getEdges(face);
+        E halfEdge = edges.stream().filter(e -> getMesh().getPoint(e).equals(point)).findAny().get();
+        edges.removeIf(edge -> getMesh().getPoint(edge).equals(point));
 
         assert edges.size() == 2;
 
-        P p1 = mesh.getPoint(edges.get(0));
-        P p2 = mesh.getPoint(edges.get(1));
+        P p1 = getMesh().getPoint(edges.get(0));
+        P p2 = getMesh().getPoint(edges.get(1));
 
         if(isFeasibleForComputation(p1) && isFeasibleForComputation(p2)) {
             if(!isNonAcute(halfEdge)) {
@@ -350,14 +354,14 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
     }
 
     private Optional<P> walkToFeasiblePoint(@NotNull final E halfEdge, @NotNull final F face) {
-        assert mesh.toTriangle(face).isNonAcute();
+        assert getMesh().toTriangle(face).isNonAcute();
 
-        E next = mesh.getNext(halfEdge);
-        E prev = mesh.getPrev(halfEdge);
+        E next = getMesh().getNext(halfEdge);
+        E prev = getMesh().getPrev(halfEdge);
 
-        VPoint p = new VPoint(mesh.getVertex(halfEdge));
-        VPoint pNext = new VPoint(mesh.getVertex(next));
-        VPoint pPrev = new VPoint(mesh.getVertex(prev));
+        VPoint p = new VPoint(getMesh().getVertex(halfEdge));
+        VPoint pNext = new VPoint(getMesh().getVertex(next));
+        VPoint pPrev = new VPoint(getMesh().getVertex(prev));
 
         VPoint direction1 = pNext.subtract(p).rotate(+Math.PI/2);
         VPoint direction2 = pPrev.subtract(p).rotate(-Math.PI/2);
@@ -367,19 +371,19 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 
         Predicate<E> isPointInCone = e ->
         {
-            VPoint point = mesh.toPoint(e);
+            VPoint point = getMesh().toPoint(e);
             return  GeometryUtils.isLeftOf(p, p.add(direction2), point) &&
                     GeometryUtils.isRightOf(p, p.add(direction1), point);
         };
 
-        Predicate<E> isEdgeInCone = e -> isPointInCone.test(e) || isPointInCone.test(mesh.getPrev(e));
+        Predicate<E> isEdgeInCone = e -> isPointInCone.test(e) || isPointInCone.test(getMesh().getPrev(e));
 
         F destination = triangulation.straightWalk2D(halfEdge, face, direction1, isEdgeInCone);
 
         assert !destination.equals(face);
 
-        if(!mesh.isBoundary(destination)) {
-            return mesh.streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> mesh.getPoint(v)).findAny();
+        if(!getMesh().isBoundary(destination)) {
+            return getMesh().streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> getMesh().getPoint(v)).findAny();
         }
         else {
             logger.warn("walked to boundary");
@@ -404,7 +408,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
     }
 
     private E findIntersectionPoint(final E halfEdge, final P acceptedPoint, final P unacceptedPoint) {
-        P point = mesh.getPoint(halfEdge);
+        P point = getMesh().getPoint(halfEdge);
         VTriangle triangle = new VTriangle(new VPoint(point), new VPoint(acceptedPoint), new VPoint(unacceptedPoint));
 
         // 1. construct the acute cone
@@ -435,18 +439,18 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 
 
         // 2. search for the nearest point inside the cone
-        FaceIterator<P, V, E, F> faceIterator = new FaceIterator<>(mesh);
+        FaceIterator<P, V, E, F> faceIterator = new FaceIterator<>(getMesh());
         while (faceIterator.hasNext()) {
             F face = faceIterator.next();
-            List<E> pointList = mesh.getEdges(face).stream()
-                    .filter(he -> isFeasibleForComputation(mesh.getPoint(he)))
-                    .filter(he -> !mesh.getVertex(he).equals(acceptedPoint))
-                    .filter(he -> !mesh.getVertex(he).equals(point))
+            List<E> pointList = getMesh().getEdges(face).stream()
+                    .filter(he -> isFeasibleForComputation(getMesh().getPoint(he)))
+                    .filter(he -> !getMesh().getVertex(he).equals(acceptedPoint))
+                    .filter(he -> !getMesh().getVertex(he).equals(point))
                     .collect(Collectors.toList());
 
             for(E he : pointList) {
-                if(cone.contains(new VPoint(mesh.getVertex(he)))) {
-                    if(minHe == null || mesh.getPoint(minHe).getPotential() > mesh.getPoint(he).getPotential()) {
+                if(cone.contains(new VPoint(getMesh().getVertex(he)))) {
+                    if(minHe == null || getMesh().getPoint(minHe).getPotential() > getMesh().getPoint(he).getPotential()) {
                         minHe = he;
                         return minHe;
                     }
@@ -460,7 +464,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 
     //TODO: refactoring!
     private E findPointInCone(final E halfEdge, final P p1, final P p2) {
-        P point = mesh.getPoint(halfEdge);
+        P point = getMesh().getPoint(halfEdge);
         VTriangle triangle = new VTriangle(new VPoint(point), new VPoint(p1), new VPoint(p2));
 
         // 1. construct the acute cone
@@ -473,53 +477,53 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
         Set<F> visitedFaces = new HashSet<>();
         LinkedList<E> pointList = new LinkedList<>();
 
-        E edge = mesh.getNext(mesh.getTwin(mesh.getPrev(halfEdge)));
+        E edge = getMesh().getNext(getMesh().getTwin(getMesh().getPrev(halfEdge)));
         pointList.add(edge);
-        visitedFaces.add(mesh.getFace(edge));
+        visitedFaces.add(getMesh().getFace(edge));
 
         while (!pointList.isEmpty()) {
             E candidate = pointList.removeFirst();
 
             // we can not search further since we reach the boundary.
-            if (!mesh.isBoundary(candidate)) {
-                P vertex = mesh.getPoint(candidate);
+            if (!getMesh().isBoundary(candidate)) {
+                P vertex = getMesh().getPoint(candidate);
                 if (isFeasibleForComputation(vertex) && cone.contains(new VPoint(vertex))) {
                     return candidate;
                 } else if(cone.contains(new VPoint(vertex))) {
-                    E newCandidate = mesh.getNext(mesh.getTwin(candidate));
-                    if (!visitedFaces.contains(mesh.getFace(newCandidate))) {
-                        visitedFaces.add(mesh.getFace(newCandidate));
+                    E newCandidate = getMesh().getNext(getMesh().getTwin(candidate));
+                    if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
+                        visitedFaces.add(getMesh().getFace(newCandidate));
                         pointList.add(newCandidate);
                     }
 
-                    newCandidate = mesh.getNext(mesh.getTwin(mesh.getNext(candidate)));
-                    if (!visitedFaces.contains(mesh.getFace(newCandidate))) {
-                        visitedFaces.add(mesh.getFace(newCandidate));
+                    newCandidate = getMesh().getNext(getMesh().getTwin(getMesh().getNext(candidate)));
+                    if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
+                        visitedFaces.add(getMesh().getFace(newCandidate));
                         pointList.add(newCandidate);
                     }
                 }
                 else {
-                    P v1 = mesh.getPoint(candidate);
-                    P v2 = mesh.getPoint(mesh.getPrev(candidate));
-                    P v3 = mesh.getPoint(mesh.getNext(candidate));
+                    P v1 = getMesh().getPoint(candidate);
+                    P v2 = getMesh().getPoint(getMesh().getPrev(candidate));
+                    P v3 = getMesh().getPoint(getMesh().getNext(candidate));
 
                     VLine line1 = new VLine(new VPoint(v1), new VPoint(v2));
                     VLine line2 = new VLine(new VPoint(v1), new VPoint(v3));
 
                     if (cone.overlapLineSegment(line1)) {
-                        E newCandidate = mesh.getNext(mesh.getTwin(candidate));
+                        E newCandidate = getMesh().getNext(getMesh().getTwin(candidate));
 
-                        if (!visitedFaces.contains(mesh.getFace(newCandidate))) {
-                            visitedFaces.add(mesh.getFace(newCandidate));
+                        if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
+                            visitedFaces.add(getMesh().getFace(newCandidate));
                             pointList.add(newCandidate);
                         }
                     }
 
                     if (cone.overlapLineSegment(line2)) {
-                        E newCandidate = mesh.getNext(mesh.getTwin(mesh.getNext(candidate)));
+                        E newCandidate = getMesh().getNext(getMesh().getTwin(getMesh().getNext(candidate)));
 
-                        if (!visitedFaces.contains(mesh.getFace(newCandidate))) {
-                            visitedFaces.add(mesh.getFace(newCandidate));
+                        if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
+                            visitedFaces.add(getMesh().getFace(newCandidate));
                             pointList.add(newCandidate);
                         }
                     }

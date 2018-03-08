@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.potential.fields;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
