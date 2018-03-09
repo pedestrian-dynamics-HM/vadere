@@ -6,5 +6,6 @@ unit_tests_with_coverage:
   # Here you can execute arbitrate terminal commands.
   # If any of the commands returns a non zero exit code the job fails.
   script:
+    - mvn clean
     - mvn test
     
