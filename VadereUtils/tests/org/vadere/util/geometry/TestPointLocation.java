@@ -29,7 +29,7 @@ public class TestPointLocation {
 	private static PFace face1;
 	private static PFace face2;
 	private static PFace border;
-	private static double EPSILON = 1.0e-10;
+	private static double EPSILON = 1.0e-6;
 	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
 	private ITriConnectivity<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> triConnectivity;
 

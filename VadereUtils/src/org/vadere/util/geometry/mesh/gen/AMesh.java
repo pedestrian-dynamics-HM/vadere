@@ -433,8 +433,8 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
     }
 
 	@Override
-	public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> toTriangulation() {
-		return ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, this);
+	public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
+		return ITriangulation.createATriangulation(type, this);
 	}
 
 	public void setPositions(final List<P> positions) {

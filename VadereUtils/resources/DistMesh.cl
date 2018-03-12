@@ -1,3 +1,11 @@
+/**
+ * The implementation of DistMesh using the half-edge data structure using single float precision.
+ * Forces are computed for edge in parallel using the atomic_add operation.
+ * Edge flips are done via a three stages (for each edge in parallel):
+ * (1) Lock the first triangle A for edge e
+ * (2) Lock the second triangle B for edge e if e holds the lock of A
+ * (3) Flip edge e if e holds the lock for A and B
+ */
 
 //IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 // abs(6 - length(v))-4

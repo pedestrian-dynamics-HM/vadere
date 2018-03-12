@@ -54,7 +54,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	private static Logger log = LogManager.getLogger(DelaunayHierarchy.class);
 
 	static {
-		log.setLevel(Level.INFO);
+		log.setLevel(Level.DEBUG);
 	}
 
 	/**
@@ -265,6 +265,8 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             level--;
         }
 
+        //log.debug("locateAll starting at level " + level);
+
         LinkedList<F> faces = new LinkedList<>();
         V v = null;
         F face;
@@ -303,13 +305,21 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	        level--;
         }
 
+        //log.debug("locateAll end");
+
+        assert getLevel(1).contains(point.getX(), point.getY(), faces.peekFirst());
+
 	    /**
 	     * At this point we have v_1 of T_1 which coordinates (x,y). The face we are searching is
 	     * connected to v_0!
 	     */
 	    assert level == 0;
 	    v = getDown(v, level+1);
-	    ITriangulation<P, V, E, F> tri = getLevel(level);
+
+		/**
+		 * Now get the face containing point for T_0 which might contains holes.
+		 */
+		ITriangulation<P, V, E, F> tri = getLevel(level);
 
 	    /**
 	     * Contains should also work for holes!

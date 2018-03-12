@@ -189,6 +189,28 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Computes area (it maybe a negative area) of the parallelogram defined by p, q, r.
+	 *
+	 * @param pX x-coordinate of p
+	 * @param pY y-coordinate of p
+	 * @param qX x-coordinate of q
+	 * @param qY y-coordinate of q
+	 * @param rX x-coordinate of r
+	 * @param rY y-coordinate of r
+	 * @return
+	 */
+	public static double ccwRobust(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
+		double result = -((qX - pX) * (rY - pY) - (rX - pX) * (qY - pY));
+		if(Math.abs(result) <= DOUBLE_EPS) {
+			return 0.0;
+		}
+		else {
+			return result;
+		}
+	}
+
+
+	/**
 	 * Returns true if q is right of the oriented-line defined by (p1, p2).
 	 * @param p1
 	 * @param p2
@@ -233,11 +255,11 @@ public class GeometryUtils {
 	 * @return ccw(p1 p2 p3)
 	 */
 	public static double ccw(final IPoint p1, final IPoint p2, final IPoint p3) {
-		return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) - (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
+		return ccwRobust(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
 
 	public static boolean isCCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
-		return ccw(qX, qY, pX, pY, rX, rY) > 0;
+		return ccwRobust(qX, qY, pX, pY, rX, rY) > 0;
 	}
 
 	public static boolean isCCW(final IPoint p1, final IPoint p2, final IPoint p3) {
@@ -245,7 +267,7 @@ public class GeometryUtils {
 	}
 
 	public static boolean isCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
-		return ccw(qX, qY, pX, pY, rX, rY) < 0;
+		return ccwRobust(qX, qY, pX, pY, rX, rY) < 0;
 	}
 
 	public static boolean isCW(final IPoint p1, final IPoint p2, final IPoint p3) {

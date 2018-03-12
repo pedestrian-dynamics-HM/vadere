@@ -1,4 +1,6 @@
 
+
+// TODO: old use the float version
 //IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 // abs(6 - length(v))-4
 

@@ -855,6 +855,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			 * Good case (2.1): There is only one collinear point and the exit edge of the polygon exist.
 			 */
 			if(intersectionEdges.stream().filter(e -> !stopCondition.test(e)).count() >= 1) {
+				//log.debug("straight walk: only one intersection line");
 				return intersectionEdges.stream().filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
 			}
 			// q, the exit point and p are collinear :( or the point lies inside the face :)
@@ -863,6 +864,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				 * Good case (2.2) There are two collinear points but the face contains p => p lies on an edge of the face.
 				 */
 				if(contains(p.getX(), p.getY(), face) || getMesh().isMember(face, p.getX(), p.getY())) {
+					//log.debug("no intersection line and not contained.");
 					return Optional.empty();
 				}
 				/**
@@ -882,16 +884,18 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
     // TODO: choose a better name
     default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
-	    //log.debug("start walk: from " + q + " to " + p);
 		LinkedList<F> visitedFaces = new LinkedList<>();
 	    visitedFaces.addLast(startFace);
+
+	    assert contains(q.getX(), q.getY(), startFace);
 
         Optional<F> optFace;
         F face = startFace;
 
         do {
         	//log.debug(getMesh().toPath(face));
-	        optFace = getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
+	        // TODO: this might be slow
+	        optFace = straightWalkNext(face, q, p, stopCondition);
 
 	        if(!optFace.isPresent()) {
 	        	//log.info("expensive fix");
@@ -920,8 +924,14 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
             }
         } while (optFace.isPresent());
 
-        assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
-	    //log.debug("end walk");
+
+	    //log.debug("start walk: from " + q + " to " + p + " by walking through:");
+	    //visitedFaces.forEach(f -> log.debug(getMesh().toPath(f)));
+
+	    /*if(!(getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast()))) {
+		    boolean test = contains(p.getX(), p.getY(), visitedFaces.peekLast());
+	    }*/
+	    assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
         return visitedFaces;
     }
 

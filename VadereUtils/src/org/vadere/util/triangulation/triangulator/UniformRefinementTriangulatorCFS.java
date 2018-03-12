@@ -123,7 +123,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	    mesh.setEdge(square, edge);
 		// end divide the square into 2 triangles
 
-	    this.triangulation = mesh.toTriangulation();
+	    this.triangulation = mesh.toTriangulation(IPointLocator.Type.BASE);
 	    E halfEdge = getLongestEdge(mesh.getFace());
 	    this.sierpinskyCurve = new ArrayList<>();
 	    this.sierpinskyCurve.add(Pair.of(Direction.FORWARD, halfEdge));

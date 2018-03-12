@@ -34,7 +34,7 @@ public class TestUniTriangulation extends JFrame {
 	    IMeshSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> new AMesh<>(pointConstructor);
 
         UniformRefinementTriangulatorCFS<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 0.5, distanceFunc, new ArrayList<>());
+                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 1.5, distanceFunc, new ArrayList<>());
 
 	    ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
         PSMeshingPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> distmeshPanel =
@@ -58,13 +58,13 @@ public class TestUniTriangulation extends JFrame {
             //meshGenerator.improve();
             overAllTime.suspend();
            /* try {
-                Thread.sleep(10);
+                Thread.sleep(1000);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }*/
 	        uniformRefinementTriangulation.step();
-            //distmeshPanel.repaint();
+            distmeshPanel.repaint();
             counter++;
             //System.out.println("Quality: " + meshGenerator.getQuality());
             overAllTime.resume();

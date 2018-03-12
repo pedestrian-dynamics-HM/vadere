@@ -702,19 +702,6 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return streamEdges(face).filter(e -> getVertex(e).distance(x, y) <= epsilon).findAny();
 	}
 
-	// TODO: rename?
-	default Optional<E> getEdgeCloseToVertex(F face, double x, double y, double epsilon) {
-		for(E halfEdge : getEdgeIt(face)) {
-			V p1 = getVertex(halfEdge);
-			V p2 = getVertex(getPrev(halfEdge));
-
-			if(Math.abs(GeometryUtils.ccw(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y)) < epsilon) {
-				return Optional.of(halfEdge);
-			}
-		}
-		return Optional.empty();
-	}
-
 	Collection<V> getVertices();
 
 	int getNumberOfVertices();
@@ -768,7 +755,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	IMesh<P, V, E, F> clone();
 
-	ITriangulation<P, V, E, F> toTriangulation();
+	ITriangulation<P, V, E, F> toTriangulation(final @NotNull IPointLocator.Type type);
 
 	/**
 	 * Rearranges the memory location of faces, vertices and halfEdges of the mesh according to

@@ -100,7 +100,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 					graphics.setColor(Color.WHITE);
 					graphics.draw(polygon);
 
-				} else {
+				} else if(!mesh.isBoundary(face)) {
 					if(face instanceof AFace) {
 
 						int bucket = ((AFace)face).getId() / groupSize;

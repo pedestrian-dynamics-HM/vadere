@@ -366,8 +366,8 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
     }
 
 	@Override
-	public ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> toTriangulation() {
-		return ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, this);
+	public ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
+		return ITriangulation.createPTriangulation(type, this);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package org.vadere.util.triangulation.adaptive;
+package org.vadere.util.triangulation.adaptive.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
@@ -7,42 +7,57 @@ import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PVertex;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
-import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.triangulation.IPointConstructor;
-import org.vadere.util.triangulation.ITriangleConstructor;
-import org.vadere.util.triangulation.ITriangulationSupplier;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 import javax.swing.*;
 
 /**
- * Created by Matimati-ka on 27.09.2016.
+ * @author Benedikt Zoennchen
  */
-public class TestEnhancedVersion3 extends JFrame {
+public class RunTimeCPU extends JFrame {
 
-    private static final Logger log = LogManager.getLogger(TestEnhancedVersion3.class);
+    private static final Logger log = LogManager.getLogger(RunTimeCPU.class);
 
-    private TestEnhancedVersion3() {
+    private RunTimeCPU() {
 
-        //IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
+	    VRectangle bbox = new VRectangle(-11, -11, 22, 22);
+
+	    //IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
         //IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
         //IDistanceFunction distanceFunc = p -> -10+Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY());
         //IDistanceFunction distanceFunc = p -> 2 - Math.max(Math.abs(p.getX()-3), Math.abs(p.getY()));
-        IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
-        //IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
+
+
+	    //IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+	    //IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.max(Math.abs(p.getX()), Math.abs(p.getY()))) - 3;
+	    VRectangle rect = new VRectangle(-4, -4, 8, 8);
+	    VPolygon hexagon = VShape.generateHexagon(4.0);
+	    //IDistanceFunction distanceFunc = IDistanceFunction.create(bbox, rect);
+
+	    //IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10;
+		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, rect));
+
+	    List<VShape> obstacles = new ArrayList<>();
+	    //obstacles.add(rect);
+
+	    obstacles.add(rect);
+
+	    //IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-        IEdgeLengthFunction edgeLengthFunc = p -> 0.5;
+        IEdgeLengthFunction edgeLengthFunc = p -> 0.7;
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
 
@@ -52,16 +67,16 @@ public class TestEnhancedVersion3 extends JFrame {
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-        VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 
-	    IPointConstructor<MeshPoint> pointConstructor = (x,y) -> new MeshPoint(x, y, false);
+
+	    IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
         IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 
         PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
                 distanceFunc,
                 edgeLengthFunc,
-                1,
-                bbox, new ArrayList<>(),
+                2.0,
+                bbox, obstacles,
                 supplier);
 
         //Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
@@ -103,6 +118,6 @@ public class TestEnhancedVersion3 extends JFrame {
 	}
 
     public static void main(String[] args) {
-        new TestEnhancedVersion3();
+        new RunTimeCPU();
     }
 }

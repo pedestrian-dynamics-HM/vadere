@@ -1,22 +1,25 @@
-package org.vadere.util.triangulation.adaptive;
+package org.vadere.util.triangulation.adaptive.plots;
 
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 import org.vadere.util.triangulation.improver.LaplacianSmother;
-import org.vadere.util.triangulation.improver.PSMeshing;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
 /**
- * Created by Matimati-ka on 27.09.2016.
+ * @author Benedikt Zoennchen
  */
-public class TestEnhancedVersion5 extends JFrame {
+public class CPULaplacianSmoothing extends JFrame {
 
-    private TestEnhancedVersion5() {
+    private CPULaplacianSmoothing() {
 
         //IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
         //IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
@@ -85,6 +88,6 @@ public class TestEnhancedVersion5 extends JFrame {
 	}
 
     public static void main(String[] args) {
-        new TestEnhancedVersion5();
+        new CPULaplacianSmoothing();
     }
 }

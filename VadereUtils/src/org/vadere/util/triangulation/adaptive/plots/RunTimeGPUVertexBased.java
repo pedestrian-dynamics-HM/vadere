@@ -1,4 +1,4 @@
-package org.vadere.util.triangulation.adaptive;
+package org.vadere.util.triangulation.adaptive.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
@@ -8,24 +8,26 @@ import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
-import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.IPointConstructor;
-import org.vadere.util.triangulation.ITriangulationSupplier;
+import org.vadere.util.triangulation.adaptive.CLPSMeshingHE;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
 /**
- * Created by Matimati-ka on 27.09.2016.
+ * @author Benedikt Zoennchen
  */
-public class TestEnhancedVersion4b extends JFrame {
+public class RunTimeGPUVertexBased extends JFrame {
 
-	private static final Logger log = LogManager.getLogger(TestEnhancedVersion4b.class);
+	private static final Logger log = LogManager.getLogger(RunTimeGPUVertexBased.class);
 
-    private TestEnhancedVersion4b() {
+    private RunTimeGPUVertexBased() {
 
 		//IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
 		//IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
@@ -85,6 +87,6 @@ public class TestEnhancedVersion4b extends JFrame {
 	}
 
     public static void main(String[] args) {
-        new TestEnhancedVersion4b();
+        new RunTimeGPUVertexBased();
     }
 }

@@ -1,5 +1,5 @@
 /**
- * The implementation of DistMesh using the half-edge data structure.
+ * The implementation of DistMesh using the half-edge data structure using single float precision.
  * Forces are computed for each vertex in parallel instead of for each 
  * edge in parallel. Edge flips are done via a three stages (for each edge in parallel):
  * (1) Lock the first triangle A for edge e
