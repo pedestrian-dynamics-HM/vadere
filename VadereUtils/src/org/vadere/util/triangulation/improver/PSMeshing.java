@@ -84,14 +84,18 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	@Override
 	public ITriangulation<P, V, E, F> generate() {
 		double quality = getQuality();
-		log.info("quality: " + quality);
+		//log.info("quality: " + quality);
 		while (quality < Parameters.qualityMeasurement && nSteps < MAX_STEPS) {
 			improve();
 			quality = getQuality();
-			log.info("quality: " + quality);
+			//log.info("quality: " + quality);
 		}
 
 		return getTriangulation();
+	}
+
+	public boolean isFinished() {
+		return getQuality() >= Parameters.qualityMeasurement || nSteps >= MAX_STEPS;
 	}
 
 	@Override

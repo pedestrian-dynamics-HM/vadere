@@ -31,93 +31,101 @@ public class RunTimeCPU extends JFrame {
 
     private static final Logger log = LogManager.getLogger(RunTimeCPU.class);
 
-    private RunTimeCPU() {
+	/**
+	 * Each geometry is contained this bounding box.
+	 */
+	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
+	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
+	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
+	private static final double initialEdgeLength = 1.5;
 
-	    VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 
-	    //IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
-        //IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
-        //IDistanceFunction distanceFunc = p -> -10+Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY());
-        //IDistanceFunction distanceFunc = p -> 2 - Math.max(Math.abs(p.getX()-3), Math.abs(p.getY()));
-
-
-	    //IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
-	    //IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.max(Math.abs(p.getX()), Math.abs(p.getY()))) - 3;
-	    VRectangle rect = new VRectangle(-4, -4, 8, 8);
-	    VPolygon hexagon = VShape.generateHexagon(4.0);
-	    //IDistanceFunction distanceFunc = IDistanceFunction.create(bbox, rect);
-
-	    //IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10;
-		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, rect));
-
+    private static void overallUniformRing() {
+	    IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+	    IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 	    List<VShape> obstacles = new ArrayList<>();
-	    //obstacles.add(rect);
 
-	    obstacles.add(rect);
+	    double initialEdgeLength = 1.5;
+	    double minInitialEdgeLength = 0.03;
 
-	    //IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-        IEdgeLengthFunction edgeLengthFunc = p -> 0.7;
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
+	    while (initialEdgeLength >= minInitialEdgeLength) {
+		    PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
+				    distanceFunc,
+				    uniformEdgeLength,
+				    initialEdgeLength,
+				    bbox, obstacles,
+				    supplier);
 
+		    StopWatch overAllTime = new StopWatch();
+		    overAllTime.start();
+		    meshGenerator.generate();
+		    overAllTime.stop();
 
-        //IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
-        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+		    log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
+		    log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
+		    log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		    log.info("quality" + meshGenerator.getQuality());
+		    log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
+		    PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		    JFrame frame = distmeshPanel.display();
+		    frame.setVisible(true);
+		    frame.setTitle("uniformRing()");
+		    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		    distmeshPanel.repaint();
 
-	    IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-        IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		    initialEdgeLength = initialEdgeLength * 0.5;
+	    }
+	}
 
-        PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
-                distanceFunc,
-                edgeLengthFunc,
-                2.0,
-                bbox, obstacles,
-                supplier);
+	private static void stepUniformRing() {
+		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		List<VShape> obstacles = new ArrayList<>();
 
-        //Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
-	    Predicate<AFace<MeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().isHole(face);
+		double initialEdgeLength = 1.5;
+		double minInitialEdgeLength = 0.05;
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
-		JFrame frame = distmeshPanel.display();
-		frame.setVisible(true);
-		frame.setTitle("CPU");
+		while (initialEdgeLength >= minInitialEdgeLength) {
+			PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
+					distanceFunc,
+					uniformEdgeLength,
+					initialEdgeLength,
+					bbox, obstacles,
+					supplier);
 
+			StopWatch overAllTime = new StopWatch();
 
-		//System.out.print(TexGraphGenerator.meshToGraph(meshGenerator.getMesh()));
-		//double maxLen = meshGenerator.step();
-		double avgQuality = 0.0;
-		long obscuteTriangles = -1;
-		int counter = 0;
-		long time = 0;
+			int steps = 0;
+			overAllTime.start();
+			overAllTime.suspend();
+			do {
+				overAllTime.resume();
+				meshGenerator.improve();
+				overAllTime.suspend();
+				steps++;
+			} while (!meshGenerator.isFinished());
 
-        StopWatch overAllTime = new StopWatch();
-        overAllTime.start();
-        while (counter < 200) {
-            meshGenerator.improve();
-            overAllTime.suspend();
+			log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
+			log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
+			log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			log.info("quality: " + meshGenerator.getQuality());
+			log.info("#step: " + steps);
+			log.info("overall time: " + overAllTime.getTime() + "[ms]");
+			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]");
 
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            distmeshPanel.repaint();
-            counter++;
-            //System.out.println("Quality: " + meshGenerator.getQuality());
-            overAllTime.resume();
-        }
-        overAllTime.stop();
-        log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-        log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
-        log.info("overall time: " + overAllTime.getTime());
+			PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+			JFrame frame = distmeshPanel.display();
+			frame.setVisible(true);
+			frame.setTitle("uniformRing()");
+			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			distmeshPanel.repaint();
+
+			initialEdgeLength = initialEdgeLength * 0.5;
+		}
 	}
 
     public static void main(String[] args) {
-        new RunTimeCPU();
+	    stepUniformRing();
     }
 }

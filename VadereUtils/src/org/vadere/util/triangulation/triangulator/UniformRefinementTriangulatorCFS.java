@@ -36,6 +36,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	private int counter = 0;
 	private boolean finished;
 	private final Collection<P> fixPoints;
+	private final Random random = new Random();
 
 	enum Direction {
 	    FORWARD,
@@ -135,13 +136,15 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
     	return triangulation.getMesh();
     }
 
-    private void nextSFCLevel() {
+    private void nextSFCLevel(double ran) {
 		ArrayList<Pair<Direction, E>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
+		ArrayList<E> toRefineEdges = new ArrayList<>();
 
 		boolean tFinished = true;
 	    for(Pair<Direction, E> pair : sierpinskyCurve) {
 		    E edge = pair.getRight();
-		    if(!isCompleted(edge)) {
+		    if(!isCompleted(edge) || random.nextDouble() < ran) {
+			    toRefineEdges.add(edge);
 		    	tFinished = false;
 				Direction dir = pair.getLeft();
 				E t1 = getMesh().getNext(edge);
@@ -164,9 +167,8 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			}
 	    }
 
-	    for(Pair<Direction, E> pair : sierpinskyCurve) {
-		    E edge = pair.getRight();
-		    if(!isCompleted(edge) && validEdge(edge)) {
+	    for(E edge : toRefineEdges) {
+		    if(validEdge(edge)) {
 				refine(edge);
 		    }
 	    }
@@ -175,7 +177,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
     }
 
     public void step() {
-		nextSFCLevel();
+		nextSFCLevel(0.0);
     }
 
 	private boolean validEdge(@NotNull E edge) {
@@ -200,6 +202,9 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		while (!isFinished()) {
 			step();
 		}
+
+		nextSFCLevel(0.05);
+		finished = true;
 
         finish();
 		logger.info("end triangulation generation");
@@ -248,6 +253,8 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		if(getMesh().isBoundary(edge)){
 			edge = getMesh().getTwin(edge);
 		}
+		double ran = random.nextDouble();
+
 		return isSmallEnough(edge) /*|| isEdgeOutsideBBox(edge) || isEdgeInsideHole(edge);*/;
 	}
 
