@@ -314,9 +314,9 @@ public class CLDistMeshHE<P extends IPoint> {
             CLInfo.checkCLError(errcode_ret);
             clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfVertices, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
-            clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges / 2, errcode_ret);
+            clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
-            clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges / 2, errcode_ret);
+            clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
             clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
@@ -334,7 +334,7 @@ public class CLDistMeshHE<P extends IPoint> {
         try (MemoryStack stack = stackPush()) {
             IntBuffer errcode_ret = stack.callocInt(1);
             int factor = doublePrecision ? 8 : 4;
-            int sizeSFPartial = numberOfEdges / 2;
+            int sizeSFPartial = numberOfEdges;
 
             clSetKernelArg1p(clKernelLengths, 0, clVertices);
             clSetKernelArg1p(clKernelLengths, 1, clEdges);
@@ -348,9 +348,9 @@ public class CLDistMeshHE<P extends IPoint> {
             CLInfo.checkCLError(errcode_ret);
             clSetKernelArg1p(clKernelPartialSF, 3, clPartialSum);
 
-            int sizeSFComplete = Math.min((int) prefdWorkGroupSizeMultiple, numberOfEdges / 2); // one item per work group
+            int sizeSFComplete = Math.min((int) prefdWorkGroupSizeMultiple, numberOfEdges); // one item per work group
             clSetKernelArg1i(clKernelCompleteSF, 0, sizeSFComplete);
-            if (numberOfEdges / 2 > prefdWorkGroupSizeMultiple) {
+            if (numberOfEdges > prefdWorkGroupSizeMultiple) {
                 clSetKernelArg1p(clKernelCompleteSF, 1, clPartialSum);
             } else {
                 clSetKernelArg1p(clKernelCompleteSF, 1, clqLengths);
@@ -427,7 +427,7 @@ public class CLDistMeshHE<P extends IPoint> {
             clGlobalWorkSizeEdges = MemoryUtil.memAllocPointer(1);
             clGlobalWorkSizeVertices = MemoryUtil.memAllocPointer(1);
             clGlobalWorkSizeTriangles = MemoryUtil.memAllocPointer(1);
-            clGlobalWorkSizeEdges.put(0, numberOfEdges / 2);
+            clGlobalWorkSizeEdges.put(0, numberOfEdges);
 
             clGlobalWorkSizeVertices.put(0, numberOfVertices);
             clGlobalWorkSizeTriangles.put(0, numberOfFaces);
@@ -480,7 +480,7 @@ public class CLDistMeshHE<P extends IPoint> {
             enqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
             //log.info("computed edge lengths");
 
-            if(numberOfEdges / 2 > prefdWorkGroupSizeMultiple) {
+            if(numberOfEdges > prefdWorkGroupSizeMultiple) {
                 enqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
             }
 
