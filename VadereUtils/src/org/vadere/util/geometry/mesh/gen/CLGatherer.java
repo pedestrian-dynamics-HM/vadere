@@ -1,10 +1,8 @@
 package org.vadere.util.geometry.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.triangulation.IPointConstructor;
 
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;

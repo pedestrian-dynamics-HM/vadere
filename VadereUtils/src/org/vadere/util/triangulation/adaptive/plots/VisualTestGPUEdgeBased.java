@@ -29,7 +29,7 @@ public class VisualTestGPUEdgeBased {
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static final double initialEdgeLength = 1.0;
+	private static final double initialEdgeLength =  1.5 * 0.5 * 0.5 * 0.5;
 
 	private static void overallUniformRing() {
 
@@ -55,7 +55,7 @@ public class VisualTestGPUEdgeBased {
 			meshGenerator.improve();
 			meshGenerator.refresh();
 			try {
-				Thread.sleep(200);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

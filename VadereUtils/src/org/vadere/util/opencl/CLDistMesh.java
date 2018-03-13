@@ -3,9 +3,9 @@ package org.vadere.util.opencl;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.*;
+import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.mesh.gen.*;
@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import static org.lwjgl.opencl.CL10.*;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL11.CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
@@ -38,7 +39,6 @@ public class CLDistMesh<P extends IPoint> {
     private static Logger log = LogManager.getLogger(CLDistMesh.class);
 
     // CL ids
-    private MemoryStack stack;
     private long clPlatform;
     private long clDevice;
     private long clContext;
@@ -61,11 +61,9 @@ public class CLDistMesh<P extends IPoint> {
     private long clKernelRepair;
     private long clKernelLabelEdges;
     private long clKernelLabelEdgesUpdate;
-    private long clKernelRemoveTriangles;
-    private long clKernelCheckTriangles;
 
-    // error code buffer
-    private IntBuffer errcode_ret;
+    //private long clKernelRemoveTriangles;
+    //private long clKernelCheckTriangles;
 
     // CL callbacks
     private CLContextCallback contextCB;
@@ -74,9 +72,7 @@ public class CLDistMesh<P extends IPoint> {
 
     // data on the host
     private DoubleBuffer vD;
-    private DoubleBuffer scalingFactorD;
     private FloatBuffer vF;
-    private FloatBuffer scalingFactorF;
     private IntBuffer e;
     private IntBuffer t;
     private IntBuffer twins;
@@ -97,15 +93,11 @@ public class CLDistMesh<P extends IPoint> {
     private long clPartialSum;
     private long clScalingFactor;
     private long clIsBoundaryVertex;
-    private long clMutex;
     private long clRelation;
     private long clEdgeLabels;
     private long clTriLocks;
     private long clIllegalEdges;
     private long clIllegalTriangles;
-
-
-    private ArrayList<Long> clSizes = new ArrayList<>();
 
     // size
     private int n;
@@ -121,6 +113,8 @@ public class CLDistMesh<P extends IPoint> {
     private PointerBuffer clGlobalWorkSizeEdges;
     private PointerBuffer clGlobalWorkSizeVertices;
     private PointerBuffer clGlobalWorkSizeTriangles;
+
+    private ByteBuffer source;
 
     private PointerBuffer clGloblWorkSizeSFPartial;
     private PointerBuffer clLocalWorkSizeSFPartial;
@@ -147,9 +141,15 @@ public class CLDistMesh<P extends IPoint> {
     private boolean hasToRead = false;
 
     public CLDistMesh(@NotNull AMesh<P> mesh) {
+        if(profiling) {
+            Configuration.DEBUG.set(true);
+            Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
+            Configuration.DEBUG_STACK.set(true);
+            Configuration.DEBUG_STACK.set(true);
+        }
+
         this.mesh = mesh;
         this.mesh.garbageCollection();
-        this.stack = MemoryStack.stackPush();
         if(doublePrecision) {
             this.vD = CLGatherer.getVerticesD(mesh);
         }
@@ -201,284 +201,328 @@ public class CLDistMesh<P extends IPoint> {
     }
 
     private void initCL() {
-        // helper for the memory allocation in java
-        //stack = MemoryStack.stackPush();
-        errcode_ret = MemoryUtil.memAllocInt(1);
+        try (MemoryStack stack = stackPush()) {
+            // helper for the memory allocation in java
+            //stack = MemoryStack.stackPush();
+            IntBuffer errcode_ret = stack.callocInt(1);
 
-        IntBuffer numberOfPlatforms = stack.mallocInt(1);
-        clGetPlatformIDs(null, numberOfPlatforms);
-        PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
-        clGetPlatformIDs(platformIDs, numberOfPlatforms);
+            IntBuffer numberOfPlatforms = stack.mallocInt(1);
+            clGetPlatformIDs(null, numberOfPlatforms);
+            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
+            clGetPlatformIDs(platformIDs, numberOfPlatforms);
 
-        clPlatform = platformIDs.get(0);
+            clPlatform = platformIDs.get(0);
 
-        IntBuffer numberOfDevices = stack.mallocInt(1);
-        clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
-        PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-        clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
+            IntBuffer numberOfDevices = stack.mallocInt(1);
+            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
+            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
+            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
 
-        clDevice = deviceIDs.get(0);
+            clDevice = deviceIDs.get(0);
 
-        printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);
+            printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);
 
-        PointerBuffer ctxProps = stack.mallocPointer(3);
-        ctxProps.put(CL_CONTEXT_PLATFORM)
-                .put(clPlatform)
-                .put(NULL)
-                .flip();
+            PointerBuffer ctxProps = stack.mallocPointer(3);
+            ctxProps.put(CL_CONTEXT_PLATFORM)
+                    .put(clPlatform)
+                    .put(NULL)
+                    .flip();
 
-        clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
+            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
 
-        if(profiling) {
-            clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
+            if(profiling) {
+                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
+            }
+            else {
+                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+            }
+
+            CLInfo.checkCLError(errcode_ret);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+            maxGroupSize = pp.get(0);
+            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
+            maxComputeUnits = pp.get(0);
+            log.info("MAX_GRP_SIZE = " + maxGroupSize);
+            log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
         }
-        else {
-            clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-        }
-
-        CLInfo.checkCLError(errcode_ret);
-
-        PointerBuffer pp = stack.mallocPointer(1);
-        clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-        maxGroupSize = pp.get(0);
-        clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
-        maxComputeUnits = pp.get(0);
-        log.info("MAX_GRP_SIZE = " + maxGroupSize);
-        log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
     }
 
     private void buildProgram() {
-        PointerBuffer strings = BufferUtils.createPointerBuffer(1);
-        PointerBuffer lengths = BufferUtils.createPointerBuffer(1);
+        try (MemoryStack stack = stackPush()) {
+            // helper for the memory allocation in java
+            //stack = MemoryStack.stackPush();
+            IntBuffer errcode_ret = stack.mallocInt(1);
 
-        ByteBuffer source;
-        try {
-            if(doublePrecision) {
-                source = CLUtils.ioResourceToByteBuffer("DistMeshDouble.cl", 4096);
+            IntBuffer numberOfPlatforms = stack.mallocInt(1);
+            clGetPlatformIDs(null, numberOfPlatforms);
+            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
+            clGetPlatformIDs(platformIDs, numberOfPlatforms);
+
+            clPlatform = platformIDs.get(0);
+
+            IntBuffer numberOfDevices = stack.mallocInt(1);
+            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
+            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
+            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
+
+            clDevice = deviceIDs.get(0);
+
+            printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);
+
+            PointerBuffer ctxProps = stack.mallocPointer(3);
+            ctxProps.put(CL_CONTEXT_PLATFORM)
+                    .put(clPlatform)
+                    .put(NULL)
+                    .flip();
+
+            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+
+            if (profiling) {
+                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
+            } else {
+                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
             }
-            else {
-                source = CLUtils.ioResourceToByteBuffer("DistMesh.cl", 4096);
+
+            CLInfo.checkCLError(errcode_ret);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+            maxGroupSize = pp.get(0);
+            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
+            maxComputeUnits = pp.get(0);
+            log.info("MAX_GRP_SIZE = " + maxGroupSize);
+            log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
+            PointerBuffer clProgramStrings = stack.mallocPointer(1);
+            PointerBuffer clProgramLengths = stack.mallocPointer(1);
+
+            try {
+                if (doublePrecision) {
+                    source = CLUtils.ioResourceToByteBuffer("DistMeshDouble.cl", 4096);
+                } else {
+                    source = CLUtils.ioResourceToByteBuffer("DistMesh.cl", 4096);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+
+            clProgramStrings.put(0, source);
+            clProgramLengths.put(0, source.remaining());
+
+            clProgram = clCreateProgramWithSource(clContext, clProgramStrings, clProgramLengths, errcode_ret);
+
+            int errcode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
+            CLInfo.checkCLError(errcode);
+
+            clKernelLengths = clCreateKernel(clProgram, "computeLengths", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+
+            clGetKernelWorkGroupInfo(clKernelLengths, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
+            prefdWorkGroupSizeMultiple = pp.get(0);
+            log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultiple);
+
+            clKernelPartialSF = clCreateKernel(clProgram, "computePartialSF", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clKernelCompleteSF = clCreateKernel(clProgram, "computeCompleteSF", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+
+            clKernelForces = clCreateKernel(clProgram, "computeForces", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clGetKernelWorkGroupInfo(clKernelForces, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
+            prefdWorkGroupSizeMultipleForces = pp.get(0);
+            log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultipleForces + " (forces)");
+
+            clKernelMove = clCreateKernel(clProgram, "moveVertices", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            /*clKernelFlip = clCreateKernel(clProgram, "flip", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);*/
+
+            clKernelFlipStage1 = clCreateKernel(clProgram, "flipStage1", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clKernelFlipStage2 = clCreateKernel(clProgram, "flipStage2", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clKernelFlipStage3 = clCreateKernel(clProgram, "flipStage3", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+
+            clKernelLabelEdges = clCreateKernel(clProgram, "label", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clKernelLabelEdgesUpdate = clCreateKernel(clProgram, "updateLabel", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clKernelRepair = clCreateKernel(clProgram, "repair", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            /*clKernelCheckTriangles = clCreateKernel(clProgram, "checkTriangles", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+
+            clKernelRemoveTriangles = clCreateKernel(clProgram, "removeTriangles", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);*/
         }
-
-
-        strings.put(0, source);
-        lengths.put(0, source.remaining());
-
-        clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
-
-        int errcode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
-        CLInfo.checkCLError(errcode);
-
-        clKernelLengths = clCreateKernel(clProgram, "computeLengths", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        PointerBuffer pp = stack.mallocPointer(1);
-        clGetKernelWorkGroupInfo(clKernelLengths, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
-        prefdWorkGroupSizeMultiple = pp.get(0);
-        log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultiple);
-
-        clKernelPartialSF = clCreateKernel(clProgram, "computePartialSF", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clKernelCompleteSF = clCreateKernel(clProgram, "computeCompleteSF", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-
-        clKernelForces = clCreateKernel(clProgram, "computeForces", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clGetKernelWorkGroupInfo(clKernelForces, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
-        prefdWorkGroupSizeMultipleForces = pp.get(0);
-        log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultipleForces + " (forces)");
-
-        clKernelMove = clCreateKernel(clProgram, "moveVertices", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        /*clKernelFlip = clCreateKernel(clProgram, "flip", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);*/
-
-        clKernelFlipStage1 = clCreateKernel(clProgram, "flipStage1", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clKernelFlipStage2 = clCreateKernel(clProgram, "flipStage2", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clKernelFlipStage3 = clCreateKernel(clProgram, "flipStage3", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-
-        clKernelLabelEdges = clCreateKernel(clProgram, "label", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clKernelLabelEdgesUpdate = clCreateKernel(clProgram, "updateLabel", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clKernelRepair = clCreateKernel(clProgram, "repair", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clKernelCheckTriangles = clCreateKernel(clProgram, "checkTriangles", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-
-        clKernelRemoveTriangles = clCreateKernel(clProgram, "removeTriangles", errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
     }
 
     private void createMemory() {
-        int factor = doublePrecision ? 8 : 4; // 8 or 4 byte for a floating point
-        if(doublePrecision) {
-            clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vD, errcode_ret);
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer errcode_ret = stack.mallocInt(1);
+
+            int factor = doublePrecision ? 8 : 4; // 8 or 4 byte for a floating point
+            if(doublePrecision) {
+                clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vD, errcode_ret);
+            }
+            else {
+                clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vF, errcode_ret);
+            }
+            CLInfo.checkCLError(errcode_ret);
+            clEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, e, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, t, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfVertices, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clIsBoundaryVertex = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, boundaryVertices, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clTriLocks = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, triLocks, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clRelation = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfFaces, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clEdgeLabels = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, edgeLabels, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clIllegalEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clIllegalTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clTwins = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, twins, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
         }
-        else {
-            clVertices = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vF, errcode_ret);
-        }
-        CLInfo.checkCLError(errcode_ret);
-        clEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, e, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, t, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clForces = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfVertices, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clqLengths = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * numberOfEdges, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clScalingFactor = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clIsBoundaryVertex = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, boundaryVertices, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clTriLocks = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, triLocks, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clRelation = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfFaces, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clEdgeLabels = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, edgeLabels, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clIllegalEdges = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clIllegalTriangles = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clMutex = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clTwins = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, twins, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
+
     }
 
     private void initialKernelArgs() {
-        int factor = doublePrecision ? 8 : 4;
-        int sizeSFPartial = numberOfEdges;
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer errcode_ret = stack.mallocInt(1);
+            int factor = doublePrecision ? 8 : 4;
+            int sizeSFPartial = numberOfEdges;
 
-        clSetKernelArg1p(clKernelLengths, 0, clVertices);
-        clSetKernelArg1p(clKernelLengths, 1, clEdges);
-        clSetKernelArg1p(clKernelLengths, 2, clLengths);
-        clSetKernelArg1p(clKernelLengths, 3, clqLengths);
+            clSetKernelArg1p(clKernelLengths, 0, clVertices);
+            clSetKernelArg1p(clKernelLengths, 1, clEdges);
+            clSetKernelArg1p(clKernelLengths, 2, clLengths);
+            clSetKernelArg1p(clKernelLengths, 3, clqLengths);
 
-        clSetKernelArg1i(clKernelPartialSF, 0, sizeSFPartial);
-        clSetKernelArg1p(clKernelPartialSF, 1, clqLengths);
-        clSetKernelArg(clKernelPartialSF, 2, factor * 2 * maxGroupSize);
-        clPartialSum = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * prefdWorkGroupSizeMultiple, errcode_ret);
-        CLInfo.checkCLError(errcode_ret);
-        clSetKernelArg1p(clKernelPartialSF, 3, clPartialSum);
+            clSetKernelArg1i(clKernelPartialSF, 0, sizeSFPartial);
+            clSetKernelArg1p(clKernelPartialSF, 1, clqLengths);
+            clSetKernelArg(clKernelPartialSF, 2, factor * 2 * maxGroupSize);
+            clPartialSum = clCreateBuffer(clContext, CL_MEM_READ_WRITE, factor * 2 * prefdWorkGroupSizeMultiple, errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
+            clSetKernelArg1p(clKernelPartialSF, 3, clPartialSum);
 
-        int sizeSFComplete = Math.min((int)prefdWorkGroupSizeMultiple, numberOfEdges); // one item per work group
-        clSetKernelArg1i(clKernelCompleteSF, 0, sizeSFComplete);
-        if(numberOfEdges > prefdWorkGroupSizeMultiple) {
-            clSetKernelArg1p(clKernelCompleteSF, 1, clPartialSum);
+            int sizeSFComplete = Math.min((int)prefdWorkGroupSizeMultiple, numberOfEdges); // one item per work group
+            clSetKernelArg1i(clKernelCompleteSF, 0, sizeSFComplete);
+            if(numberOfEdges > prefdWorkGroupSizeMultiple) {
+                clSetKernelArg1p(clKernelCompleteSF, 1, clPartialSum);
+            }
+            else {
+                clSetKernelArg1p(clKernelCompleteSF, 1, clqLengths);
+            }
+            clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
+            clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
+
+            clSetKernelArg1p(clKernelForces, 0, numberOfEdges);
+            clSetKernelArg1p(clKernelForces, 1, clVertices);
+            clSetKernelArg1p(clKernelForces, 2, clEdges);
+            clSetKernelArg1p(clKernelForces, 3, clLengths);
+            clSetKernelArg1p(clKernelForces, 4, clScalingFactor);
+            clSetKernelArg1p(clKernelForces, 5, clForces);
+            clSetKernelArg1p(clKernelForces, 6, clIsBoundaryVertex);
+
+            clSetKernelArg1p(clKernelMove, 0, clVertices);
+            clSetKernelArg1p(clKernelMove, 1, clForces);
+            clSetKernelArg1p(clKernelMove, 2, clIsBoundaryVertex);
+            if(doublePrecision) {
+                clSetKernelArg1d(clKernelMove, 3, delta);
+            }
+            else {
+                clSetKernelArg1f(clKernelMove, 3, fDelta);
+            }
+
+            clSetKernelArg1p(clKernelLabelEdges, 0, clVertices);
+            clSetKernelArg1p(clKernelLabelEdges, 1, clEdges);
+            clSetKernelArg1p(clKernelLabelEdges, 2, clTriangles);
+            clSetKernelArg1p(clKernelLabelEdges, 3, clEdgeLabels);
+            clSetKernelArg1p(clKernelLabelEdges, 4, clIllegalEdges);
+
+            clSetKernelArg1p(clKernelLabelEdgesUpdate, 0, clVertices);
+            clSetKernelArg1p(clKernelLabelEdgesUpdate, 1, clEdges);
+            clSetKernelArg1p(clKernelLabelEdgesUpdate, 2, clTriangles);
+            clSetKernelArg1p(clKernelLabelEdgesUpdate, 3, clEdgeLabels);
+            clSetKernelArg1p(clKernelLabelEdgesUpdate, 4, clIllegalEdges);
+            clSetKernelArg1p(clKernelLabelEdgesUpdate, 5, clTriLocks);
+
+            clSetKernelArg1p(clKernelFlipStage1, 0, clEdges);
+            clSetKernelArg1p(clKernelFlipStage1, 1, clEdgeLabels);
+            clSetKernelArg1p(clKernelFlipStage1, 2, clTriLocks);
+
+            clSetKernelArg1p(clKernelFlipStage2, 0, clEdges);
+            clSetKernelArg1p(clKernelFlipStage2, 1, clEdgeLabels);
+            clSetKernelArg1p(clKernelFlipStage2, 2, clTriLocks);
+
+            clSetKernelArg1p(clKernelFlipStage3, 0, clEdges);
+            clSetKernelArg1p(clKernelFlipStage3, 1, clTriangles);
+            clSetKernelArg1p(clKernelFlipStage3, 2, clEdgeLabels);
+            clSetKernelArg1p(clKernelFlipStage3, 3, clTriLocks);
+            clSetKernelArg1p(clKernelFlipStage3, 4, clRelation);
+            clSetKernelArg1p(clKernelFlipStage3, 5, clTwins);
+            clSetKernelArg1p(clKernelFlipStage3, 6, clVertices);
+
+            clSetKernelArg1p(clKernelRepair, 0, clEdges);
+            clSetKernelArg1p(clKernelRepair, 1, clTriangles);
+            clSetKernelArg1p(clKernelRepair, 2, clRelation);
+
+            /*clSetKernelArg1p(clKernelRemoveTriangles, 0, clVertices);
+            clSetKernelArg1p(clKernelRemoveTriangles, 1, clEdges);
+            clSetKernelArg1p(clKernelRemoveTriangles, 2, clTriangles);
+
+            clSetKernelArg1p(clKernelCheckTriangles, 0, clVertices);
+            clSetKernelArg1p(clKernelCheckTriangles, 1, clTriangles);
+            clSetKernelArg1p(clKernelCheckTriangles, 2, clIllegalTriangles);*/
+
+            clGloblWorkSizeSFPartial = MemoryUtil.memAllocPointer(1);
+            clLocalWorkSizeSFPartial = MemoryUtil.memAllocPointer(1);
+            clGloblWorkSizeSFPartial.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultiple));
+            clLocalWorkSizeSFPartial.put(0, (int)maxGroupSize);
+
+            clGloblWorkSizeForces = MemoryUtil.memAllocPointer(1);
+            clLocalWorkSizeForces = MemoryUtil.memAllocPointer(1);
+            clGloblWorkSizeForces.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultipleForces));
+            clLocalWorkSizeForces.put(0, (int)maxGroupSize);
+
+            clGloblWorkSizeSFComplete = MemoryUtil.memAllocPointer(1);
+            clLocalWorkSizeSFComplete = MemoryUtil.memAllocPointer(1);
+            clLocalWorkSizeOne = MemoryUtil.memAllocPointer(1);
+
+            clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
+            clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
+            clLocalWorkSizeOne.put(0, 1);
+            clGlobalWorkSizeEdges = MemoryUtil.memAllocPointer(1);
+            clGlobalWorkSizeVertices = MemoryUtil.memAllocPointer(1);
+            clGlobalWorkSizeTriangles = MemoryUtil.memAllocPointer(1);
+            clGlobalWorkSizeEdges.put(0, numberOfEdges);
+            clGlobalWorkSizeVertices.put(0, numberOfVertices);
+            clGlobalWorkSizeTriangles.put(0, numberOfFaces);
+
+            clEvent = MemoryUtil.memAllocPointer(1);
+            startTime = MemoryUtil.memAlloc(8);
+            endTime = MemoryUtil.memAlloc(8);
+            retSize = MemoryUtil.memAllocPointer(1);
+
+            retSize.put(0, 8);
         }
-        else {
-            clSetKernelArg1p(clKernelCompleteSF, 1, clqLengths);
-        }
-        clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
-        clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
-
-        clSetKernelArg1p(clKernelForces, 0, numberOfEdges);
-        clSetKernelArg1p(clKernelForces, 1, clVertices);
-        clSetKernelArg1p(clKernelForces, 2, clEdges);
-        clSetKernelArg1p(clKernelForces, 3, clLengths);
-        clSetKernelArg1p(clKernelForces, 4, clScalingFactor);
-        clSetKernelArg1p(clKernelForces, 5, clForces);
-        clSetKernelArg1p(clKernelForces, 6, clIsBoundaryVertex);
-
-        clSetKernelArg1p(clKernelMove, 0, clVertices);
-        clSetKernelArg1p(clKernelMove, 1, clForces);
-        clSetKernelArg1p(clKernelMove, 2, clIsBoundaryVertex);
-        if(doublePrecision) {
-            clSetKernelArg1d(clKernelMove, 3, delta);
-        }
-        else {
-            clSetKernelArg1f(clKernelMove, 3, fDelta);
-        }
-
-        clSetKernelArg1p(clKernelLabelEdges, 0, clVertices);
-        clSetKernelArg1p(clKernelLabelEdges, 1, clEdges);
-        clSetKernelArg1p(clKernelLabelEdges, 2, clTriangles);
-        clSetKernelArg1p(clKernelLabelEdges, 3, clEdgeLabels);
-        clSetKernelArg1p(clKernelLabelEdges, 4, clIllegalEdges);
-
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 0, clVertices);
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 1, clEdges);
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 2, clTriangles);
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 3, clEdgeLabels);
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 4, clIllegalEdges);
-        clSetKernelArg1p(clKernelLabelEdgesUpdate, 5, clTriLocks);
-
-/*        clSetKernelArg1p(clKernelFlip, 0, clEdges);
-        clSetKernelArg1p(clKernelFlip, 1, clTriangles);
-        clSetKernelArg1p(clKernelFlip, 2, clEdgeLabels);
-        clSetKernelArg1p(clKernelFlip, 3, clTriLocks);
-        clSetKernelArg1p(clKernelFlip, 4, clRelation);
-        clSetKernelArg1p(clKernelFlip, 5, clMutex);
-        clSetKernelArg1p(clKernelFlip, 6, clTwins);*/
-
-        clSetKernelArg1p(clKernelFlipStage1, 0, clEdges);
-        clSetKernelArg1p(clKernelFlipStage1, 1, clEdgeLabels);
-        clSetKernelArg1p(clKernelFlipStage1, 2, clTriLocks);
-
-        clSetKernelArg1p(clKernelFlipStage2, 0, clEdges);
-        clSetKernelArg1p(clKernelFlipStage2, 1, clEdgeLabels);
-        clSetKernelArg1p(clKernelFlipStage2, 2, clTriLocks);
-
-        clSetKernelArg1p(clKernelFlipStage3, 0, clEdges);
-        clSetKernelArg1p(clKernelFlipStage3, 1, clTriangles);
-        clSetKernelArg1p(clKernelFlipStage3, 2, clEdgeLabels);
-        clSetKernelArg1p(clKernelFlipStage3, 3, clTriLocks);
-        clSetKernelArg1p(clKernelFlipStage3, 4, clRelation);
-        clSetKernelArg1p(clKernelFlipStage3, 5, clTwins);
-        clSetKernelArg1p(clKernelFlipStage3, 6, clVertices);
-
-        clSetKernelArg1p(clKernelRepair, 0, clEdges);
-        clSetKernelArg1p(clKernelRepair, 1, clTriangles);
-        clSetKernelArg1p(clKernelRepair, 2, clRelation);
-
-        clSetKernelArg1p(clKernelRemoveTriangles, 0, clVertices);
-        clSetKernelArg1p(clKernelRemoveTriangles, 1, clEdges);
-        clSetKernelArg1p(clKernelRemoveTriangles, 2, clTriangles);
-
-        clSetKernelArg1p(clKernelCheckTriangles, 0, clVertices);
-        clSetKernelArg1p(clKernelCheckTriangles, 1, clTriangles);
-        clSetKernelArg1p(clKernelCheckTriangles, 2, clIllegalTriangles);
-
-        clGloblWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
-        clLocalWorkSizeSFPartial = BufferUtils.createPointerBuffer(1);
-        clGloblWorkSizeSFPartial.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultiple));
-        clLocalWorkSizeSFPartial.put(0, (int)maxGroupSize);
-
-        clGloblWorkSizeForces = BufferUtils.createPointerBuffer(1);
-        clLocalWorkSizeForces = BufferUtils.createPointerBuffer(1);
-        clGloblWorkSizeForces.put(0, (int)(maxGroupSize * prefdWorkGroupSizeMultipleForces));
-        clLocalWorkSizeForces.put(0, (int)maxGroupSize);
-
-        clGloblWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
-        clLocalWorkSizeSFComplete = BufferUtils.createPointerBuffer(1);
-        clLocalWorkSizeOne = BufferUtils.createPointerBuffer(1);
-
-        clGloblWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
-        clLocalWorkSizeSFComplete.put(0, ceilPowerOf2(sizeSFComplete));
-        clLocalWorkSizeOne.put(0, 1);
-        clGlobalWorkSizeEdges = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSizeVertices = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSizeTriangles = BufferUtils.createPointerBuffer(1);
-        clGlobalWorkSizeEdges.put(0, numberOfEdges);
-        clGlobalWorkSizeVertices.put(0, numberOfVertices);
-        clGlobalWorkSizeTriangles.put(0, numberOfFaces);
-
-        clEvent = BufferUtils.createPointerBuffer(1);
-        startTime = BufferUtils.createByteBuffer(8);
-        endTime = BufferUtils.createByteBuffer(8);
-        retSize = BufferUtils.createPointerBuffer(1);
-
-        retSize.put(0, 8);
     }
 
   /*  public void refreshPoints() {
@@ -506,84 +550,87 @@ public class CLDistMesh<P extends IPoint> {
 
     // TODO: think about the use of only 1 work-group!!! It might be bad! solution: use global barrier? force computation? flip hangs after some time?
     public boolean step(final boolean flipAll) {
-        /*
-         * DistMesh-Loop
-         * 1. generate scaling factor
-		 * 2. generate forces;
-		 * 3. update vertices;
-		 * 4. check for illegal triangles
-		 * 5. flip all
-         *
-         */
-        hasToRead = true;
-        enqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
-        log.info("computed edge lengths");
+        try (MemoryStack stack = stackPush()) {
+             /*
+             * DistMesh-Loop
+             * 1. generate scaling factor
+             * 2. generate forces;
+             * 3. update vertices;
+             * 4. check for illegal triangles
+             * 5. flip all
+             *
+             */
+            hasToRead = true;
+            enqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            //log.info("computed edge lengths");
 
-        if(numberOfEdges > prefdWorkGroupSizeMultiple) {
-            enqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
+            if(numberOfEdges > prefdWorkGroupSizeMultiple) {
+                enqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
+            }
+
+            enqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
+            //log.info("computed scale factor");
+
+            // force to use only 1 work group => local size = local size
+            enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGloblWorkSizeForces, clLocalWorkSizeForces, null, null);
+            //log.info("(default) computed forces");
+
+            enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
+            //log.info("move vertices");
+
+            //enqueueNDRangeKernel(clQueue, clKernelRemoveTriangles, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            //log.info("remove low quality triangles");
+
+            /*IntBuffer illegalTriangles = stack.mallocInt(1);
+            illegalTriangles.put(0, 0);
+            clEnqueueWriteBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
+            enqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
+            clFinish(clQueue);
+
+           clEnqueueReadBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
+            log.info("check for illegal triangles");
+            if(illegalTriangles.get(0) == 1) {
+                log.info("illegal triangle found!");
+                //return true;
+            }*/
+
+            // flip as long as there are no more flips possible
+            if(flipAll) {
+                IntBuffer illegalEdges = stack.mallocInt(1);
+                // while there is any illegal edge, do: // TODO: this is not the same as in the java distmesh!
+
+                enqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                //log.info("label illegal edges");
+
+                do  {
+                    illegalEdges.put(0, 0);
+                    clEnqueueWriteBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
+
+                    enqueueNDRangeKernel(clQueue, clKernelFlipStage1, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    enqueueNDRangeKernel(clQueue, clKernelFlipStage2, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    enqueueNDRangeKernel(clQueue, clKernelFlipStage3, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    //log.info("flip some illegal edges");
+
+                    enqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    //log.info("repair data structure");
+
+                    enqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    //log.info("refresh old labels");
+                    clFinish(clQueue);
+
+                    //clEnqueueReadBuffer(clQueue, clTriLocks, true, 0, triLocks, null, null);
+                    //checkTriLocks();
+                    clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
+                    //log.info("isLegal = " + illegalEdges.get(0));
+
+                } while(illegalEdges.get(0) == 1);
+                //log.info("flip all");
+            }
+
+            clFinish(clQueue);
+
+            return false;
         }
-
-        enqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
-        log.info("computed scale factor");
-
-        // force to use only 1 work group => local size = local size
-        enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGloblWorkSizeForces, clLocalWorkSizeForces, null, null);
-        log.info("(default) computed forces");
-
-        enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
-        log.info("move vertices");
-
-        //enqueueNDRangeKernel(clQueue, clKernelRemoveTriangles, 1, null, clGlobalWorkSizeEdges, null, null, null);
-        log.info("remove low quality triangles");
-
-        IntBuffer illegalTriangles = stack.mallocInt(1);
-        illegalTriangles.put(0, 0);
-        clEnqueueWriteBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
-        enqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
-        clFinish(clQueue);
-        clEnqueueReadBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
-        log.info("check for illegal triangles");
-        if(illegalTriangles.get(0) == 1) {
-            log.info("illegal triangle found!");
-            //return true;
-        }
-
-        // flip as long as there are no more flips possible
-        if(flipAll) {
-            IntBuffer illegalEdges = stack.mallocInt(1);
-            // while there is any illegal edge, do: // TODO: this is not the same as in the java distmesh!
-
-            enqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
-            log.info("label illegal edges");
-
-            do  {
-                illegalEdges.put(0, 0);
-                clEnqueueWriteBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
-
-                enqueueNDRangeKernel(clQueue, clKernelFlipStage1, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                enqueueNDRangeKernel(clQueue, clKernelFlipStage2, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                enqueueNDRangeKernel(clQueue, clKernelFlipStage3, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                log.info("flip some illegal edges");
-
-                enqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                log.info("repair data structure");
-
-                enqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                log.info("refresh old labels");
-                clFinish(clQueue);
-
-                //clEnqueueReadBuffer(clQueue, clTriLocks, true, 0, triLocks, null, null);
-                //checkTriLocks();
-                clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
-                log.info("isLegal = " + illegalEdges.get(0));
-
-            } while(illegalEdges.get(0) == 1);
-            //log.info("flip all");
-        }
-
-        clFinish(clQueue);
-
-        return false;
     }
 
     private long enqueueNDRangeKernel(long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
@@ -623,22 +670,23 @@ public class CLDistMesh<P extends IPoint> {
     }
 
     private void readResultFromGPU() {
-        if(doublePrecision) {
-            scalingFactorD = stack.mallocDouble(1);
-            clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorD, null, null);
-            clEnqueueReadBuffer(clQueue, clVertices, true, 0, vD, null, null);
-            log.info("scale factor = " + scalingFactorD.get(0));
-        }
-        else {
-            scalingFactorF = stack.mallocFloat(1);
-            clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorF, null, null);
-            clEnqueueReadBuffer(clQueue, clVertices, true, 0, vF, null, null);
-            log.info("scale factor = " + scalingFactorF.get(0));
-        }
+        try (MemoryStack stack = stackPush()) {
+            if(doublePrecision) {
+                DoubleBuffer scalingFactorD = stack.mallocDouble(1);
+                clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorD, null, null);
+                clEnqueueReadBuffer(clQueue, clVertices, true, 0, vD, null, null);
+                log.info("scale factor = " + scalingFactorD.get(0));
+            }
+            else {
+                FloatBuffer scalingFactorF = stack.mallocFloat(1);
+                clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorF, null, null);
+                clEnqueueReadBuffer(clQueue, clVertices, true, 0, vF, null, null);
+                log.info("scale factor = " + scalingFactorF.get(0));
+            }
 
-        clEnqueueReadBuffer(clQueue, clTriangles, true, 0, t, null, null);
-        clEnqueueReadBuffer(clQueue, clEdges, true, 0, e, null, null);
-
+            clEnqueueReadBuffer(clQueue, clTriangles, true, 0, t, null, null);
+            clEnqueueReadBuffer(clQueue, clEdges, true, 0, e, null, null);
+        }
     }
 
     private void readResultFromHost() {
@@ -676,6 +724,9 @@ public class CLDistMesh<P extends IPoint> {
 
             //log.info(nextVertexId + "," + prefVertexId + "," + ta + "," + tb);
             // if the edge is not destroyed
+            if(prefVertexId == -1 || nextVertexId == -1) {
+                log.info(nextVertexId + "," + prefVertexId + "," + ta + "," + tb);
+            }
             if(prefVertexId != -1) {
                 //log.info("nextId: " + nextId);
                 mesh.setVertex(edges.get(edgeId), vertices.get(nextVertexId));
@@ -778,7 +829,7 @@ public class CLDistMesh<P extends IPoint> {
             }
         }
 
-        log.info("scalingFactor:" + (doublePrecision ? scalingFactorD.get(0) : scalingFactorF.get(0)));
+        //log.info("scalingFactor:" + (doublePrecision ? scalingFactorD.get(0) : scalingFactorF.get(0)));
     }
 
     private int ceilPowerOf2(int value) {
@@ -800,6 +851,7 @@ public class CLDistMesh<P extends IPoint> {
     private void clearCL() {
         clReleaseMemObject(clVertices);
         clReleaseMemObject(clEdges);
+        clReleaseMemObject(clTwins);
         clReleaseMemObject(clTriangles);
         clReleaseMemObject(clForces);
         clReleaseMemObject(clLengths);
@@ -807,45 +859,37 @@ public class CLDistMesh<P extends IPoint> {
         clReleaseMemObject(clPartialSum);
         clReleaseMemObject(clScalingFactor);
         clReleaseMemObject(clIsBoundaryVertex);
-        clReleaseMemObject(clTriLocks);
         clReleaseMemObject(clRelation);
         clReleaseMemObject(clEdgeLabels);
+        clReleaseMemObject(clTriLocks);
         clReleaseMemObject(clIllegalEdges);
-        clReleaseMemObject(clMutex);
-        clReleaseMemObject(clTwins);
 
         clReleaseKernel(clKernelForces);
         clReleaseKernel(clKernelMove);
         clReleaseKernel(clKernelLengths);
         clReleaseKernel(clKernelPartialSF);
         clReleaseKernel(clKernelCompleteSF);
-
-        //clReleaseKernel(clKernelFlip);
-
         clReleaseKernel(clKernelFlipStage1);
         clReleaseKernel(clKernelFlipStage2);
         clReleaseKernel(clKernelFlipStage3);
-
         clReleaseKernel(clKernelRepair);
         clReleaseKernel(clKernelLabelEdges);
         clReleaseKernel(clKernelLabelEdgesUpdate);
 
-
-        contextCB.free();
-        programCB.free();
-        clReleaseCommandQueue(clQueue);
         clReleaseProgram(clProgram);
+        clReleaseCommandQueue(clQueue);
         clReleaseContext(clContext);
+
+        contextCB.close();
+        programCB.close();
     }
 
     private void clearHost() {
         if(doublePrecision) {
             MemoryUtil.memFree(vD);
-            MemoryUtil.memFree(scalingFactorD);
         }
         else {
             MemoryUtil.memFree(vF);
-            MemoryUtil.memFree(scalingFactorF);
         }
 
         MemoryUtil.memFree(e);
@@ -867,7 +911,14 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(clGloblWorkSizeForces);
         MemoryUtil.memFree(clLocalWorkSizeForces);
 
+        MemoryUtil.memFree(clGlobalWorkSizeTriangles);
+
         MemoryUtil.memFree(clLocalWorkSizeOne);
+        MemoryUtil.memFree(clEvent);
+        MemoryUtil.memFree(startTime);
+        MemoryUtil.memFree(endTime);
+        MemoryUtil.memFree(retSize);
+        MemoryUtil.memFree(source);
     }
 
     public void init() {
@@ -889,9 +940,9 @@ public class CLDistMesh<P extends IPoint> {
 
     public void finish() {
         refresh();
-        //updateMesh();
+        clearHost();
         clearCL();
-        //clearHost();
+
     }
 
     private void printTri() {

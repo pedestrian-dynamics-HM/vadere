@@ -90,7 +90,7 @@ inline int getFace(int4 edge) {
 }
 
 inline float dist(float2 v) {
-    return dabs(6.0 - length(v))-4.0;
+    return dabs(7.0 - length(v))-3.0;
 }
 // end helper
 

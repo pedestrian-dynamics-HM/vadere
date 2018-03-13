@@ -125,7 +125,24 @@ public final class CLInfo {
 
     public static void checkCLError(int errcode) {
         if (errcode != CL_SUCCESS) {
-            throw new RuntimeException(String.format("OpenCL error [0x%X]", errcode));
+            String errorString = "";
+            if(errcode == CL_DEVICE_NOT_AVAILABLE) {
+                errorString = "CL_DEVICE_NOT_AVAILABLE";
+            }
+            else if(errcode == CL_OUT_OF_RESOURCES) {
+                errorString = "CL_OUT_OF_RESOURCES";
+            } else if(errcode == CL_DEVICE_NOT_FOUND) {
+                errorString = "CL_DEVICE_NOT_FOUND";
+            } else if(errcode == CL_DEVICE_NOT_AVAILABLE) {
+                errorString = "CL_DEVICE_NOT_AVAILABLE";
+            } else if(errcode == CL_COMPILER_NOT_AVAILABLE) {
+                errorString = "CL_COMPILER_NOT_AVAILABLE";
+            } else if(errcode == CL_MEM_OBJECT_ALLOCATION_FAILURE) {
+                errorString = "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+            } else if(errcode == CL_OUT_OF_HOST_MEMORY) {
+                errorString = "CL_OUT_OF_HOST_MEMORY";
+            }
+            throw new RuntimeException(String.format("OpenCL error [0x%d] - "+errorString, errcode));
         }
     }
 

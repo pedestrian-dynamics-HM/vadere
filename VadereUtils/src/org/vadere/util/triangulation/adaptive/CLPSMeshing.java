@@ -114,21 +114,22 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
             //log.info("quality: " + quality);
         }
         refresh();
-
+        finish();
         return triangulation;
     }
-
 
     public void execute() {
         if(!initialized) {
 			initialize();
 		}
 
-		double quality = getQuality();
-		while (quality < Parameters.qualityMeasurement) {
+		while (!isFinished()) {
 			step();
-			quality = getQuality();
 		}
+    }
+
+    public boolean isFinished() {
+        return nSteps >= MAX_STEPS;
     }
 
     public void step() {

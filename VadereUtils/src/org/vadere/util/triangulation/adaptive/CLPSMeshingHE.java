@@ -44,7 +44,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
     private double minDeltaTravelDistance = 0.0;
     private double delta = Parameters.DELTAT;
 
-    private final static int MAX_STEPS = 10;
+    private final static int MAX_STEPS = 200;
     private int nSteps;
 
     private Object gobalAcessSynchronizer = new Object();
@@ -94,7 +94,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.
-        clDistMesh = new CLDistMeshHE<P>((AMesh<P>)triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE<>((AMesh<P>)triangulation.getMesh());
         clDistMesh.init();
         clDistMesh.refresh();
         initialized = true;
@@ -108,16 +108,20 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
     @Override
     public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
 
-        // TODO: quality check!
-        while (nSteps < MAX_STEPS) {
-            improve();
-            //log.info("quality: " + quality);
+        if(!initialized) {
+            initialize();
         }
-        refresh();
+
+        while (!isFinished()) {
+            step();
+        }
 
         return triangulation;
     }
 
+    public boolean isFinished() {
+        return nSteps >= MAX_STEPS;
+    }
 
     public void step() {
         step(true);

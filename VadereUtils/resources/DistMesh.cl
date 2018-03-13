@@ -366,7 +366,7 @@ kernel void computeForces(
     __global int4* edges,
     __global float2* lengths,
     __global float* scalingFactor,
-    __global float2* forces,
+    __global float* forces,
     __global int* isBoundary)
 {
 
@@ -390,9 +390,8 @@ kernel void computeForces(
             float2 partialForce = v * lenDiff;
 
             // TODO this might be slow!
-            global float* forceP = (global float*)(&forces[p1Index]);
-            atomicAdd_g_f(forceP, partialForce.x);
-            atomicAdd_g_f((forceP+1), partialForce.y);
+            atomicAdd_g_f((global double*)(&forces[p1Index*2]), partialForce.x);
+            atomicAdd_g_f((global double*)(&forces[p1Index*2+1]), partialForce.y);
 	    }
 	}
 }
@@ -411,7 +410,7 @@ kernel void moveVertices(__global float2* vertices, __global float2* forces, __g
 	float2 force = forces[vertexId];
 	float2 v = vertices[vertexId];
 
-	v = v + (force * 0.3f);
+	v = v + (force * 0.2f);
 
 	// project back if necessary
 	float d = dist(v);

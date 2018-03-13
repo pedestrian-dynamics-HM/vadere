@@ -2,7 +2,6 @@ package org.vadere.util.opencl;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
@@ -39,17 +38,15 @@ public class CLUtils {
         Path path = Paths.get(resource);
         if (Files.isReadable(path)) {
             try (SeekableByteChannel fc = Files.newByteChannel(path)) {
-                buffer = BufferUtils.createByteBuffer((int)fc.size() + 1);
-                while (fc.read(buffer) != -1) {
-                    ;
-                }
+                buffer = MemoryUtil.memAlloc((int)fc.size() + 1);
+                while (fc.read(buffer) != -1) {}
             }
         } else {
             try (
                     InputStream source = CLUtils.class.getClassLoader().getResourceAsStream(resource);
                     ReadableByteChannel rbc = Channels.newChannel(source)
             ) {
-                buffer = createByteBuffer(bufferSize);
+                buffer =  MemoryUtil.memAlloc(bufferSize);
 
                 while (true) {
                     int bytes = rbc.read(buffer);
@@ -87,10 +84,11 @@ public class CLUtils {
         return result;
     }
 
-    private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
-        ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
+    private static ByteBuffer resizeBuffer(@NotNull ByteBuffer buffer, int newCapacity) {
+        ByteBuffer newBuffer = MemoryUtil.memAlloc(newCapacity);
         buffer.flip();
         newBuffer.put(buffer);
+        MemoryUtil.memFree(buffer);
         return newBuffer;
     }
 }
