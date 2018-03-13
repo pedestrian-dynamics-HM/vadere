@@ -9,7 +9,9 @@ import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.triangulation.IPointConstructor;
+import org.vadere.util.triangulation.adaptive.CLPSMeshing;
 import org.vadere.util.triangulation.adaptive.CLPSMeshingHE;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
@@ -18,6 +20,7 @@ import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -26,67 +29,48 @@ import java.util.function.Predicate;
 public class RunTimeGPUVertexBased extends JFrame {
 
 	private static final Logger log = LogManager.getLogger(RunTimeGPUVertexBased.class);
+	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
+	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
+	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
+	private static final double initialEdgeLength = 1.5;
 
-    private RunTimeGPUVertexBased() {
+	private static void overallUniformRing() {
 
-		//IDistanceFunction distanceFunc1 = p -> 2 - Math.sqrt((p.getX()-1) * (p.getX()-1) + p.getY() * p.getY());
-		//IDistanceFunction distanceFunc3 = p -> 2 - Math.sqrt((p.getX()-5) * (p.getX()-5) + p.getY() * p.getY());
-		//IDistanceFunction distanceFunc = p -> -10+Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY());
-		//IDistanceFunction distanceFunc = p -> 2 - Math.max(Math.abs(p.getX()-3), Math.abs(p.getY()));
-		IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
-		//IDistanceFunction distanceFunc4 = p -> Math.max(Math.abs(p.getY()) - 4, Math.abs(p.getX()) - 25);
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		IEdgeLengthFunction edgeLengthFunc = p -> 0.3;
+		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		List<VShape> obstacles = new ArrayList<>();
 
-		//IDistanceFunction distanceFunc = p -> Math.max(Math.max(Math.max(distanceFunc1.apply(p), distanceFunc2.apply(p)), distanceFunc3.apply(p)), distanceFunc4.apply(p));
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p))/2;
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + p.distanceToOrigin();
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-		VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-
-	    IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	    IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		double initialEdgeLength = 0.5;
+		double minInitialEdgeLength = 0.5;
 
 
-	    CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, edgeLengthFunc, 1.0, bbox, new ArrayList<>(), supplier);
-		meshGenerator.initialize();
-		Predicate<AFace<MeshPoint>> predicate = face -> !meshGenerator.getTriangulation().isCCW(face);
-		PSMeshingPanel distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
-		JFrame frame = distmeshPanel.display();
-		frame.setVisible(true);
-		frame.setTitle("GPU");
+		while (initialEdgeLength >= minInitialEdgeLength) {
+			//CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
-		log.info("number of points: " + meshGenerator.getMesh().getNumberOfVertices());
+			StopWatch overAllTime = new StopWatch();
+			overAllTime.start();
+			meshGenerator.generate();
+			overAllTime.stop();
 
-		int counter = 0;
-		StopWatch overAllTime = new StopWatch();
-		overAllTime.start();
-		while (counter < 1) {
-			boolean retriangulation = meshGenerator.step(true);
-			overAllTime.suspend();
+			log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
+			log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
+			log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			log.info("quality" + meshGenerator.getQuality());
+			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-			meshGenerator.refresh();
+			PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+			JFrame frame = distmeshPanel.display();
+			frame.setVisible(true);
+			frame.setTitle("uniformRing()");
+			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			distmeshPanel.repaint();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			counter++;
 
-			overAllTime.resume();
+			initialEdgeLength = initialEdgeLength * 0.5;
 		}
-		overAllTime.stop();
-
-		meshGenerator.finish();
-		distmeshPanel.repaint();
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
-		log.info("overall time: " + overAllTime.getTime());
 	}
 
-    public static void main(String[] args) {
-        new RunTimeGPUVertexBased();
-    }
+	public static void main(String[] args) {
+		overallUniformRing();
+	}
 }

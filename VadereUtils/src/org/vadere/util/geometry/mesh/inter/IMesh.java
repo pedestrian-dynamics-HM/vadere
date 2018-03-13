@@ -315,6 +315,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 */
 	Stream<F> streamHoles();
 
+	default List<F> getHoles() {
+		return streamHoles().collect(Collectors.toList());
+	}
+
 	Stream<E> streamEdges();
 
 	Stream<E> streamEdgesParallel();
@@ -767,7 +771,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 *
 	 * @param faceOrder the new order
 	 */
-	void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder);
+	void arrangeMemory(@NotNull Iterable<F> faceOrder);
 
 
 	// methods for log informations

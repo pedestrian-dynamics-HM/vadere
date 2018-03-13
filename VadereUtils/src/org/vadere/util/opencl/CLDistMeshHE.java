@@ -416,6 +416,7 @@ public class CLDistMeshHE<P extends IPoint> {
         clGlobalWorkSizeVertices = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeTriangles = BufferUtils.createPointerBuffer(1);
         clGlobalWorkSizeEdges.put(0, numberOfEdges / 2);
+
         clGlobalWorkSizeVertices.put(0, numberOfVertices);
         clGlobalWorkSizeTriangles.put(0, numberOfFaces);
 
@@ -476,7 +477,7 @@ public class CLDistMeshHE<P extends IPoint> {
         enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGloblWorkSizeForces, clLocalWorkSizeForces, null, null);
         log.info("computed forces");
 
-        enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
+//        enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
         log.info("move vertices");
 
        // IntBuffer illegalTriangles = stack.mallocInt(1);
@@ -510,16 +511,16 @@ public class CLDistMeshHE<P extends IPoint> {
                 enqueueNDRangeKernel(clQueue, clKernelUnlockFaces, 1, null, clGlobalWorkSizeTriangles, null, null, null);
                 log.info("flip some illegal edges");
 
-                clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
+               // clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
                 log.info("refresh old labels");
                 clFinish(clQueue);
 
                 //clEnqueueReadBuffer(clQueue, clTriLocks, true, 0, triLocks, null, null);
                 //checkTriLocks();
-                clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
+                //clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
                 log.info("isLegal = " + illegalEdges.get(0));
 
-            } while (illegalEdges.get(0) == 1);
+            } while (illegalEdges.get(0) == 1 && false);
             //log.info("flip all");
         }
 

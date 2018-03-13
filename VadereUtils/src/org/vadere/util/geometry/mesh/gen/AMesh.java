@@ -288,6 +288,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 			holes.add(face);
 			face.setBorder(true);
 			numberOfHoles++;
+			numberOfFaces--;
 		}
 	}
 
@@ -542,9 +543,9 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		    fClone.setId(faces.size());
 		    faces.add(fClone);
 
-		    if(cMesh.isBoundary(fClone) && fClone != cMesh.getBorder()) {
-			    holes.add(fClone);
-		    }
+		    if(cMesh.isHole(face)){
+		    	holes.add(fClone);
+			}
 
 		    // 2. vertices
 		    for(AVertex<P> v : cMesh.getVertexIt(face)) {
@@ -709,6 +710,6 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 			i++;
 		}
 
-		assert (getNumberOfVertices() == vertices.size()) && (getNumberOfEdges() == edges.size()) && (getNumberOfFaces() == faces.size());
+		assert (getNumberOfVertices() == vertices.size()) && (getNumberOfEdges() == edges.size()) && (getNumberOfFaces() == faces.size()-holes.size());
 	}
 }

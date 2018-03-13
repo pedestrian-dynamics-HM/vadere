@@ -371,7 +371,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder) {
+	public void arrangeMemory(@NotNull Iterable<PFace<P>> faceOrder) {
 		try {
 			throw new UnsupportedOperationException("not jet implemented.");
 		} catch (UnsupportedOperationException e) {

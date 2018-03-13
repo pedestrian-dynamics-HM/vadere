@@ -10,6 +10,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 
@@ -60,6 +61,7 @@ public class CLDistMesh<P extends IPoint> {
     private long clKernelRepair;
     private long clKernelLabelEdges;
     private long clKernelLabelEdgesUpdate;
+    private long clKernelRemoveTriangles;
     private long clKernelCheckTriangles;
 
     // error code buffer
@@ -138,8 +140,8 @@ public class CLDistMesh<P extends IPoint> {
 
     private AMesh<P> mesh;
 
-    private boolean doublePrecision = false;
-    private boolean profiling = true;
+    private boolean doublePrecision = true;
+    private boolean profiling = false;
 
     private List<P> result;
     private boolean hasToRead = false;
@@ -166,9 +168,14 @@ public class CLDistMesh<P extends IPoint> {
             this.triLocks.put(i, -1);
         }
 
-        for(int i = 0; i < numberOfVertices; i++) {
-            this.boundaryVertices.put(i, 0);
+        int j = 0;
+        for(AVertex<P> vertex : mesh.getVertices()) {
+            int isBoundary = mesh.isAtBoundary(vertex) ? 1 : 0;
+            this.boundaryVertices.put(vertex.getId(), isBoundary);
+            assert j == vertex.getId();
+            j++;
         }
+
         this.edgeLabels = MemoryUtil.memAllocInt(numberOfEdges);
         for(int i = 0; i < numberOfEdges; i++) {
             this.edgeLabels.put(i, 0);
@@ -304,6 +311,9 @@ public class CLDistMesh<P extends IPoint> {
         CLInfo.checkCLError(errcode_ret);
         clKernelCheckTriangles = clCreateKernel(clProgram, "checkTriangles", errcode_ret);
         CLInfo.checkCLError(errcode_ret);
+
+        clKernelRemoveTriangles = clCreateKernel(clProgram, "removeTriangles", errcode_ret);
+        CLInfo.checkCLError(errcode_ret);
     }
 
     private void createMemory() {
@@ -431,6 +441,10 @@ public class CLDistMesh<P extends IPoint> {
         clSetKernelArg1p(clKernelRepair, 1, clTriangles);
         clSetKernelArg1p(clKernelRepair, 2, clRelation);
 
+        clSetKernelArg1p(clKernelRemoveTriangles, 0, clVertices);
+        clSetKernelArg1p(clKernelRemoveTriangles, 1, clEdges);
+        clSetKernelArg1p(clKernelRemoveTriangles, 2, clTriangles);
+
         clSetKernelArg1p(clKernelCheckTriangles, 0, clVertices);
         clSetKernelArg1p(clKernelCheckTriangles, 1, clTriangles);
         clSetKernelArg1p(clKernelCheckTriangles, 2, clIllegalTriangles);
@@ -519,6 +533,9 @@ public class CLDistMesh<P extends IPoint> {
         enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
         log.info("move vertices");
 
+        //enqueueNDRangeKernel(clQueue, clKernelRemoveTriangles, 1, null, clGlobalWorkSizeEdges, null, null, null);
+        log.info("remove low quality triangles");
+
         IntBuffer illegalTriangles = stack.mallocInt(1);
         illegalTriangles.put(0, 0);
         clEnqueueWriteBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
@@ -564,15 +581,6 @@ public class CLDistMesh<P extends IPoint> {
             //log.info("flip all");
         }
 
-       /* clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeOne, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
-
-        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeOne, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
-
-        clEnqueueNDRangeKernel(clQueue, clKernelFlip, 1, null, clGlobalWorkSizeEdes, clLocalWorkSizeOne, null, null);
-        clEnqueueNDRangeKernel(clQueue, clKernelRepair, 1, null, clGlobalWorkSizeEdes, null, null, null);
-*/
         clFinish(clQueue);
 
         return false;
@@ -619,6 +627,7 @@ public class CLDistMesh<P extends IPoint> {
             scalingFactorD = stack.mallocDouble(1);
             clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorD, null, null);
             clEnqueueReadBuffer(clQueue, clVertices, true, 0, vD, null, null);
+            log.info("scale factor = " + scalingFactorD.get(0));
         }
         else {
             scalingFactorF = stack.mallocFloat(1);
@@ -653,50 +662,92 @@ public class CLDistMesh<P extends IPoint> {
         List<AFace<P>> faces = mesh.getFaces();
 
         Map<Integer, LinkedList<AHalfEdge<P>>> triangles = new HashMap<>();
+        Set<AHalfEdge<P>> toRemoveEdges = new HashSet<>();
 
         for(int i = 0; i < numberOfFaces; i++) {
             triangles.put(i, new LinkedList<>());
         }
 
         for(int edgeId = 0; edgeId < numberOfEdges; edgeId++) {
-            int prefId = e.get(edgeId * 4);
-            int nextId = e.get(edgeId * 4 + 1);
+            int prefVertexId = e.get(edgeId * 4);
+            int nextVertexId = e.get(edgeId * 4 + 1);
             int ta = e.get(edgeId * 4 +2);
             int tb = e.get(edgeId * 4 +3);
 
-            //log.info("nextId: " + nextId);
-            mesh.setVertex(edges.get(edgeId), vertices.get(nextId));
-            mesh.setEdge(vertices.get(nextId), edges.get(edgeId));
+            //log.info(nextVertexId + "," + prefVertexId + "," + ta + "," + tb);
+            // if the edge is not destroyed
+            if(prefVertexId != -1) {
+                //log.info("nextId: " + nextId);
+                mesh.setVertex(edges.get(edgeId), vertices.get(nextVertexId));
+                mesh.setEdge(vertices.get(nextVertexId), edges.get(edgeId));
 
-            if(ta != -1) {
-                mesh.setFace(edges.get(edgeId), faces.get(ta));
-                mesh.setEdge(faces.get(ta), edges.get(edgeId));
-                LinkedList<AHalfEdge<P>> tri = triangles.get(ta);
-                if(tri.isEmpty()) {
-                    tri.addLast(edges.get(edgeId));
-                }
-                else {
-                    if(mesh.getPoint(tri.peekLast()).equals(mesh.getPoint(vertices.get(prefId)))) {
+                if(ta != -1) {
+                    mesh.setFace(edges.get(edgeId), faces.get(ta));
+                    mesh.setEdge(faces.get(ta), edges.get(edgeId));
+                    LinkedList<AHalfEdge<P>> tri = triangles.get(ta);
+                    if(tri.isEmpty()) {
                         tri.addLast(edges.get(edgeId));
                     }
                     else {
-                        tri.addFirst(edges.get(edgeId));
+                        if(mesh.getPoint(tri.peekLast()).equals(mesh.getPoint(vertices.get(prefVertexId)))) {
+                            tri.addLast(edges.get(edgeId));
+                        }
+                        else {
+                            tri.addFirst(edges.get(edgeId));
+                        }
                     }
                 }
+                else {
+                    assert mesh.isBoundary(edges.get(edgeId));
+                }
             }
-            else {
-                assert mesh.isBoundary(edges.get(edgeId));
-            }
+           /* else {
+                toRemoveEdges.add(edges.get(edgeId));
+            }*/
         }
+
+       /* for(AHalfEdge<P> rEdge : toRemoveEdges) {
+            if(!mesh.isDestroyed(rEdge)) {
+                assert mesh.isAtBoundary(mesh.getTwin(rEdge));
+                AFace<P> face = mesh.getFace(rEdge);
+
+                if(!mesh.isBoundary(face) && !mesh.isDestroyed(face)) {
+                    removeFaceAtBorder(face);
+                }
+            }
+        }*/
+
 
         for(int i = 0; i < numberOfFaces; i++) {
             List<AHalfEdge<P>> tri = triangles.get(i);
+            // face still exist
             assert tri.size() == 3;
-
             mesh.setNext(tri.get(0), tri.get(1));
             mesh.setNext(tri.get(1), tri.get(2));
             mesh.setNext(tri.get(2), tri.get(0));
         }
+    }
+
+
+    private void fixBorderFace(@NotNull final AFace<P> borderFace, @NotNull final Set<AHalfEdge<P>> toRemoveEdges) {
+        // 1. get edge which is not destroyed
+
+        AHalfEdge<P> startEdge = mesh.getEdge(borderFace);
+        while (toRemoveEdges.contains(startEdge)) {
+            startEdge = mesh.getNext(startEdge);
+        }
+
+        AHalfEdge<P> edge = startEdge;
+        do {
+            if(toRemoveEdges.contains(edge)) {
+                AFace<P> twinFace = mesh.getTwinFace(edge);
+                if(mesh.isDestroyed(twinFace)) {
+                    removeFaceAtBorder(twinFace);
+                }
+            }
+            edge = mesh.getNext(edge);
+        } while (edge != startEdge);
+
     }
 
     /*private void updateMesh(){
@@ -894,4 +945,108 @@ public class CLDistMesh<P extends IPoint> {
     }
 
 
+    private AMesh<P> getMesh() {
+        return mesh;
+    }
+
+    private void removeFaceAtBorder(@NotNull final AFace<P> face) {
+        if(!getMesh().isDestroyed(face)) {
+            List<AHalfEdge<P>> delEdges = new ArrayList<>();
+            List<AVertex<P>> vertices = new ArrayList<>();
+
+            // we only need the boundary if the face isNeighbourBorder
+            AFace<P> boundary = getMesh().getBorder();
+
+            int count = 0;
+            for(AHalfEdge<P> edge : getMesh().getEdgeIt(face)) {
+                AFace<P>  twinFace = getMesh().getTwinFace(edge);
+                count++;
+                if(twinFace.equals(boundary)) {
+                    delEdges.add(edge);
+                }
+                else {
+                    // update the edge of the boundary since it might be deleted!
+                    getMesh().setEdge(boundary, edge);
+                    getMesh().setFace(edge, boundary);
+                }
+
+                vertices.add(getMesh().getVertex(edge));
+            }
+
+
+            //TODO: this might be computational expensive!
+            // special case: all edges will be deleted => adjust the border edge
+            AHalfEdge<P> borderEdge = null;
+            if(getMesh().getTwinFace(getMesh().getEdge(boundary)) == face && delEdges.size() == count) {
+
+                // all edges are border edges!
+                borderEdge = getMesh().getTwin(getMesh().getEdge(face));
+                EdgeIterator<P, AVertex<P>, AHalfEdge<P>, AFace<P> > edgeIterator = new EdgeIterator<>(getMesh(), borderEdge);
+
+                // walk along the border away from this faces to get another edge which won't be deleted
+                AFace<P>  twinFace = getMesh().getTwinFace(borderEdge);
+                while (edgeIterator.hasNext() && twinFace == face) {
+                    borderEdge = edgeIterator.next();
+                    twinFace = getMesh().getTwinFace(borderEdge);
+                }
+
+                if(getMesh().getTwinFace(borderEdge) == face) {
+                    borderEdge = getMesh().streamEdges().filter(e -> getMesh().getTwinFace(e) != face).filter(e -> getMesh().isBoundary(e)).findAny().get();
+                    //throw new IllegalArgumentException("could not adjust border edge! Deletion of " + face + " is not allowed.");
+                }
+
+                getMesh().setFace(borderEdge, boundary);
+                getMesh().setEdge(boundary, borderEdge);
+            }
+
+            if(!delEdges.isEmpty()) {
+                AHalfEdge<P> h0, h1, next0, next1, prev0, prev1;
+                AVertex<P> v0, v1;
+
+                for(AHalfEdge<P> delEdge : delEdges) {
+                    h0 = delEdge;
+                    v0 = getMesh().getVertex(delEdge);
+                    next0 = getMesh().getNext(h0);
+                    prev0 = getMesh().getPrev(h0);
+
+                    h1    = getMesh().getTwin(delEdge);
+                    v1    = getMesh().getVertex(h1);
+                    next1 = getMesh().getNext(h1);
+                    prev1 = getMesh().getPrev(h1);
+
+                    //getMesh().setEdge(hole, prev1);
+
+                    // adjust next and prev half-edges
+                    getMesh().setNext(prev0, next1);
+                    getMesh().setNext(prev1, next0);
+
+                    //boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
+                    //boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
+
+                    //boolean isolated0 = getMesh().getTwin(h0) == getMesh().getNext(h0) || getMesh().getTwin(h0) == getMesh().getPrev(h0);
+                    //boolean isolated1 = getMesh().getTwin(h1) == getMesh().getNext(h1) || getMesh().getTwin(h1) == getMesh().getPrev(h1);
+
+                    // adjust vertices
+                    if(getMesh().getEdge(v0) == h0) {
+                        getMesh().setEdge(v0, prev1);
+                    }
+
+                    if(getMesh().getEdge(v1) == h1) {
+                        getMesh().setEdge(v1, prev0);
+                    }
+
+
+                    // mark edge deleted if the mesh has a edge status
+                    getMesh().destroyEdge(h0);
+                    getMesh().destroyEdge(h1);
+                }
+            }
+            if(count > 0) {
+                getMesh().destroyFace(face);
+            }
+            else {
+                log.warn("could not delete face " + face + ". It is not at the border!");
+            }
+        }
+    }
 }

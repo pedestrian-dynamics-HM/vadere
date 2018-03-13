@@ -109,7 +109,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			illegalMovement = false;
 
 			if(illegalMovement) {
-				retriangulate();
+				//retriangulate();
 			}
 			else {
 				flipEdges();
@@ -168,7 +168,8 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
         double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
         double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
-        double lenDiff = Math.max(desiredLen - len, 0);
+
+		double lenDiff = Math.max(desiredLen - len, 0);
         p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
     }
 

@@ -216,7 +216,7 @@ kernel void flipStage1(__global int4* edges,
     if(labeledEdges[edgeId] == 1) {
         int4 edge = edges[edgeId];
         int face = getFace(edges[edgeId]);
-		 faces[face].s1 = edgeId;
+		faces[face].s1 = edgeId;
     }
 }
 
@@ -243,7 +243,7 @@ kernel void flipStage3(__global float2* vertices,
                        __global int* labeledEdges,
                        __global int2* faces) {
     
-	int edgeId = get_global_id(0)*2;
+	int edgeId = get_global_id(0) * 2;
 
     if(labeledEdges[edgeId] == 1) {
         int4 edge = edges[edgeId];
@@ -251,20 +251,30 @@ kernel void flipStage3(__global float2* vertices,
 		
         // swap if both triangles are locked by ta, i.e. by this thread
         if(faces[getFace(edge)].s1 == edgeId && faces[getFace(twinEdge)].s1 == edgeId) {
+
             // flip and repair ds
             // 1. gather all the references required
             int a0Id = edgeId;
             int4 a0 = edge;
-            int a1Id = getNext(a0);
+
+            // getNext(a0);
+            int a1Id = a0.s1;
+
             int4 a1 = edges[a1Id];
-            int a2Id = getNext(a1);
-            int4 a2 = edges[getNext(a1)];
+
+            //  getNext(a1)
+            int a2Id = a1.s1;
+            int4 a2 = edges[a2Id];
 
             int b0Id = getTwin(edge);
             int4 b0 = edges[b0Id];
-            int b1Id = getNext(b0);
+
+            // getNext(b0)
+            int b1Id = b0.s1;
             int4 b1 = edges[b1Id];
-            int b2Id = getNext(b1);
+
+            // getNext(b1)
+            int b2Id = b1.s1;
             int4 b2 = edges[b2Id];
 
             int faId = getFace(a0);
@@ -295,7 +305,7 @@ kernel void flipStage3(__global float2* vertices,
 				// setEdge(vb0,a2);
                 vertexToEdge[vb0Id] = a2Id;
             }
-			
+
 			/**
 			 * edge.s0 = edge.vertexId
 			 * edge.s1 = edge.nextId

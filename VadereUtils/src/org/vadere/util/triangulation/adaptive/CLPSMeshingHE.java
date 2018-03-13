@@ -9,6 +9,7 @@ import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMeshHE;
 import org.vadere.util.triangulation.improver.IMeshImprover;
+import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import java.util.*;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  */
-public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
+public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
     private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
@@ -43,6 +44,9 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
     private double minDeltaTravelDistance = 0.0;
     private double delta = Parameters.DELTAT;
 
+    private final static int MAX_STEPS = 10;
+    private int nSteps;
+
     private Object gobalAcessSynchronizer = new Object();
 
     private CLDistMeshHE<P> clDistMesh;
@@ -64,6 +68,9 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
         this.meshSupplier = meshSupplier;
         this.edges = new ArrayList<>();
         this.deps = 1.4901e-8 * initialEdgeLen;
+        this.nSteps = 0;
+
+        initialize();
     }
 
     /**
@@ -98,25 +105,19 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
         return triangulation;
     }
 
-    public void execute() {
+    @Override
+    public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
 
-		/*if(!initialized) {
-			initialize();
-		}
+        // TODO: quality check!
+        while (nSteps < MAX_STEPS) {
+            improve();
+            //log.info("quality: " + quality);
+        }
+        refresh();
 
-		double quality = getQuality();
-		while (quality < Parameters.qualityMeasurement) {
-			step();
-			quality = getQuality();
-			log.info("quality = " + quality);
-		}
-
-		computeScalingFactor();
-		computeForces();
-		computeDelta();
-		updateVertices();
-		retriangulate();*/
+        return triangulation;
     }
+
 
     public void step() {
         step(true);
@@ -124,7 +125,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
 
     public boolean step(boolean flipAll) {
         hasToRead = true;
-        numberOfIterations++;
+        nSteps++;
         return clDistMesh.step(flipAll);
     }
 
@@ -216,4 +217,5 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
     public void improve() {
         step();
     }
+
 }

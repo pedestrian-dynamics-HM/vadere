@@ -1,47 +1,68 @@
+/**
+ * The implementation of DistMesh using the half-edge data structure using single double precision.
+ * Forces are computed for edge in parallel using the atomic_add operation.
+ * Edge flips are done via a three stages (for each edge in parallel):
+ * (1) Lock the first triangle A for edge e
+ * (2) Lock the second triangle B for edge e if e holds the lock of A
+ * (3) Flip edge e if e holds the lock for A and B
+ */
 
-
-// TODO: old use the float version
 //IDistanceFunction distanceFunc = p -> Math.abs(6 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 4;
 // abs(6 - length(v))-4
 
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics : enable
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
+#pragma OPENCL EXTENSION cl_amd_printf : enable
 #define LOCK(a) atomic_cmpxchg(a, 0, 1)
 #define UNLOCK(a) atomic_xchg(a, 0)
 
-inline void atomicAdd_g_f(volatile __global float *addr, float val)
-   {
-       union{
-           unsigned int u32;
-           float        f32;
-       } next, expected, current;
-   	current.f32    = *addr;
-       do{
-   	   expected.f32 = current.f32;
-           next.f32     = expected.f32 + val;
-   		current.u32  = atomic_cmpxchg( (volatile __global unsigned int *)addr,
-                               expected.u32, next.u32);
-       } while( current.u32 != expected.u32 );
-   }
+inline void atomicAdd_g_f(volatile __global double *addr, double val) {
+	// see OpelCL specification of union to understand the code!
+	union {
+	   unsigned long u64;
+	   double f64;
+	} next, expected, current;
+   	
+	current.f64 = *addr;
+    do {
+		expected.f64 = current.f64;
+		next.f64 = expected.f64 + val;
+   		current.u64 = atomic_cmpxchg( (volatile __global unsigned long *)addr, expected.u64, next.u64);
+    } while(current.u64 != expected.u64);
+}
 
 // helper methods!
 inline double2 getCircumcenter(double2 p1, double2 p2, double2 p3) {
-    double d = 2 * (p1.s0 * (p2.s1 - p3.s1) + p2.s0 * (p3.s1 - p1.s1) + p3.s0 * (p1.s1 - p2.s1));
+    double d = 2 * (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y));
 
-    double x = ((p1.s0 * p1.s0 + p1.s1 * p1.s1) * (p2.s1 - p3.s1)
-    				+ (p2.s0 * p2.s0 + p2.s1 * p2.s1) * (p3.s1 - p1.s1)
-    				+ (p3.s0 * p3.s0 + p3.s1 * p3.s1) * (p1.s1 - p2.s1)) / d;
-    		double y = ((p1.s0 * p1.s0 + p1.s1 * p1.s1) * (p3.s0 - p2.s0)
-    				+ (p2.s0 * p2.s0 + p2.s1 * p2.s1) * (p1.s0 - p3.s0)
-    				+ (p3.s0 * p3.s0 + p3.s1 * p3.s1) * (p2.s0 - p1.s0)) / d;
+    double x = ((p1.x * p1.x + p1.y * p1.y) * (p2.y - p3.y)
+    				+ (p2.x * p2.x + p2.y * p2.y) * (p3.y - p1.y)
+    				+ (p3.x * p3.x + p3.y * p3.y) * (p1.y - p2.y)) / d;
+    		double y = ((p1.x * p1.x + p1.y * p1.y) * (p3.x - p2.x)
+    				+ (p2.x * p2.x + p2.y * p2.y) * (p1.x - p3.x)
+    				+ (p3.x * p3.x + p3.y * p3.y) * (p2.x - p1.x)) / d;
     return (double2) (x, y);
 }
 
 inline bool isCCW(double2 q, double2 p, double2 r) {
-    return -((q.x - p.x) * (r.y - p.y) - (r.x - p.x) * (q.y - p.y)) > 0;
+    return ((p.y - q.y) * (r.x - p.x) - (p.x - q.x) * (r.y - p.y)) < 0;
 }
 
+inline double dist(double2 v) {
+    return fabs(7.0f - length(v))-3.0f;
+}
+
+inline double quality(double2 p, double2 q, double2 r) {
+    double a = length(p-q);
+    double b = length(p-r);
+    double c = length(q-r);
+    return ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+}
+
+
 inline bool isInCircle(double2 a, double2 b, double2 c, double x , double y) {
+    double eps = 0.00001f;
     double adx = a.x - x;
     double ady = a.y - y;
     double bdx = b.x - x;
@@ -58,7 +79,7 @@ inline bool isInCircle(double2 a, double2 b, double2 c, double x , double y) {
 
     double disc = alift * bcdet + blift * cadet + clift * abdet;
     bool ccw = isCCW(a, b, c);
-    return (disc > 0 && ccw) || (disc < 0 && !ccw);
+    return (disc-eps > 0 && ccw) || (disc+eps < 0 && !ccw);
 }
 
 
@@ -85,264 +106,332 @@ inline bool isPartOf(int v0, int v1, int3 t) {
         (v0 == t.s2 && t.s0 == v1) || (v0 == t.s0 && t.s2 == v1);
 }
 
-inline void waitGlobally(volatile __global int *g_mutex) {
-    int num_groups = get_num_groups(0);
-    int lid = get_local_id(0);
-
-    if(lid == 0) {
-        atom_inc(g_mutex);
-
-        // spin-lock
-        //while(*g_mutex != num_groups) {}
-    }
+inline bool isEdgeAlive(int4 edge) {
+    return edge.s0 != -1;
 }
 
-inline void waitLocally() {
-    barrier(CLK_LOCAL_MEM_FENCE);
+inline bool isTriAlive(int3 triangle) {
+    return triangle.s0 != -1;
 }
 // end helper
 
-// for each edge in parallel
+// remove low quality triangles on the boundary
+kernel void removeTriangles(__global double2* vertices,
+                            __global int4* edges,
+                            __global int3* triangles) {
+    int edgeId = get_global_id(0);
+
+    // edge is alive?
+    if(isEdgeAlive(edges[edgeId])){
+        int ta = edges[edgeId].s2;
+        int tb = edges[edgeId].s3;
+
+        // edge is a boundary edge
+        if(ta == -1 || tb == -1) {
+            ta = max(ta, tb);
+            int3 tri = triangles[ta];
+            double2 v0 = vertices[tri.s0];
+            double2 v1 = vertices[tri.s1];
+            double2 v2 = vertices[tri.s2];
+
+            if(quality(v0, v1, v2) < 0.2f) {
+                // destroy edge i.e. disconnect edge
+                edges[edgeId].s0 = -1;
+                edges[edgeId].s1 = -1;
+
+                // destroy triangle
+                tri.s0 = -1;
+                tri.s1 = -1;
+                tri.s2 = -1;
+            }
+        }
+
+    }
+}
+
+// for each edge in parallel, label illegal edges
 kernel void label(__global double2* vertices,
                   __global int4* edges,
                   __global int3* triangles,
                   __global int* labeledEdges,
-                  __global int* isLegal) {
+                  __global int* illegalEdge) {
     int edgeId = get_global_id(0);
-    // check if edge is illegal
+    if(isEdgeAlive(edges[edgeId])){
+        double eps = 0.0001f;
 
-    double eps = 0.0001;
+        int v0 = edges[edgeId].s0;
+        int v1 = edges[edgeId].s1;
+        int ta = edges[edgeId].s2;
+        int tb = edges[edgeId].s3;
 
-    int v0 = edges[edgeId].s0;
-    int v1 = edges[edgeId].s1;
-    int ta = edges[edgeId].s2;
-    int tb = edges[edgeId].s3;
+        // edge is a non-boundary edge
+        if(ta != -1 && tb != -1 && ta < tb) {
 
-    // edge is a non-boundary edge
-    if(tb != -1) {
-
-        int v2 = getDiffVertex(v0, v1, triangles[ta]);
-        int p = getDiffVertex(v0, v1, triangles[tb]);
-
-        // require a flip?
-        if(isInCircle(vertices[v0], vertices[v1], vertices[v2], vertices[p].x, vertices[p].y)) {
-            labeledEdges[edgeId] = 1;
-            atomic_xchg(isLegal, 0);
-        }
-        else {
+            int v2 = getDiffVertex(v0, v1, triangles[ta]);
+            int p = getDiffVertex(v0, v1, triangles[tb]);
+            double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+            // require a flip?
+            if(length(c-vertices[p]) < length(c-vertices[v0])) {
+                labeledEdges[edgeId] = 1;
+                *illegalEdge = 1;
+            }
+            else {
+                labeledEdges[edgeId] = 0;
+            }
+        } else {
             labeledEdges[edgeId] = 0;
         }
-    } else {
-        labeledEdges[edgeId] = 0;
     }
 }
 
 // for each edge in parallel
 kernel void updateLabel(__global double2* vertices,
-                  __global int4* edges,
-                  __global int3* triangles,
-                  __global int* labeledEdges,
-                  __global int* isLegal) {
+                        __global int4* edges,
+						__global int3* triangles,
+						__global int* labeledEdges,
+						__global int* illegalEdge,
+						__global int* lockedTriangles) {
     int edgeId = get_global_id(0);
-    // check if edge is illegal
+    if(isEdgeAlive(edges[edgeId])){
+        double eps = 0.000001;
 
-    double eps = 0.00001;
+        int v0 = edges[edgeId].s0;
+        int v1 = edges[edgeId].s1;
+        int ta = edges[edgeId].s2;
+        int tb = edges[edgeId].s3;
 
-    int v0 = edges[edgeId].s0;
-    int v1 = edges[edgeId].s1;
-    int ta = edges[edgeId].s2;
-    int tb = edges[edgeId].s3;
-    printf("test");
+        lockedTriangles[ta] = -1;
+        lockedTriangles[tb] = -1;
+//        labeledEdges[edgeId] = 0;
+        // edge is a non-boundary edge
+        if(ta != -1 && tb != -1 && ta < tb && labeledEdges[edgeId] == 1) {
+            int v2 = getDiffVertex(v0, v1, triangles[ta]);
+            int p = getDiffVertex(v0, v1, triangles[tb]);
 
-    // edge is a non-boundary edge
-    if(tb != -1 && labeledEdges[edgeId] == 1) {
-        int v2 = getDiffVertex(v0, v1, triangles[ta]);
-        int p = getDiffVertex(v0, v1, triangles[tb]);
-
-        if(isInCircle(vertices[v0], vertices[v1], vertices[v2], vertices[p].x, vertices[p].y)) {
-            labeledEdges[edgeId] = 1;
-            printf("[%d, %d, %d %d]\n", v0, v1, v2, p);
-            atomic_xchg(isLegal, 0);
-        }
-        else {
+            double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+             // require a flip?
+            if(length(c-vertices[p]) < length(c-vertices[v0])) {
+                labeledEdges[edgeId] = 1;
+                *illegalEdge = 1;
+                //("found illegal edge!!!! %i \n", edgeId);
+            }
+            else {
+                labeledEdges[edgeId] = 0;
+            }
+        } else {
             labeledEdges[edgeId] = 0;
         }
-    } else {
-        labeledEdges[edgeId] = 0;
     }
 }
 
-// for each edge in parallel
-kernel void flip(__global int4* edges,
+kernel void flipStage1(__global int4* edges,
+					   __global int* labeledEdges,
+					   __global int* lockedTriangles) {
+    int e = get_global_id(0);
+
+    // is the edge illegal
+    if(labeledEdges[e] == 1) {
+        int ta = edges[e].s2;
+        int tb = edges[e].s3;
+
+        //printf("stage 1: lock ta %i for edge %i, tb = %i  \n", ta, e, tb);
+
+        // to avoid the twin from locking
+        if(ta < tb) {
+            lockedTriangles[ta] = e;
+        }
+    }
+}
+
+kernel void flipStage2(__global int4* edges,
+					   __global int* labeledEdges,
+					   __global int* lockedTriangles) {
+    int e = get_global_id(0);
+
+    if(labeledEdges[e] == 1) {
+        int ta = edges[e].s2;
+        int tb = edges[e].s3;
+
+        // to avoid the twin from locking
+        if(ta < tb && lockedTriangles[ta] == e) {
+            lockedTriangles[tb] = e;
+            //printf("stage 2: lock tri %i for edge %i \n", tb, e);
+        }
+    }
+}
+
+kernel void flipStage3(
+                 __global int4* edges,
                  __global int3* triangles,
                  __global int* labeledEdges,
                  __global int* lockedTriangles,
                  __global int* R,
-                 __global int* g_mutex,
-                 __global int* twins)
- {
+                 __global int* twins,
+                 __global double2* vertices) {
     int e = get_global_id(0);
-    int localSize = get_local_size(0);
 
-    // is the edge illegal
-    if(labeledEdges[e]) {
+    if(labeledEdges[e] == 1) {
         int ta = edges[e].s2;
         int tb = edges[e].s3;
 
-        int tmp = min(ta, tb);
-        tb = max(ta, tb);
-        ta = tmp;
+        // swap if both triangles are locked by ta, i.e. by this thread
+        if(lockedTriangles[ta] == e && lockedTriangles[tb] == e) {
+            //printf("stage 3: lock tris: %i, %i for edge %i \n", ta, tb, e);
+            int v0 = edges[e].s0;
+            int v1 = edges[e].s1;
 
-        // atomic lock
-        lockedTriangles[ta] = e;
+            int u0 = getDiffVertex(v0, v1, triangles[ta]);
+            int u1 = getDiffVertex(v0, v1, triangles[tb]);
 
-        // barrier: wait for all work items globally
-        barrier(CLK_LOCAL_MEM_FENCE);
-        waitGlobally(g_mutex);
+            // Here we keep the order in ccw assuming that everything is in ccw beforehand
 
-        if(lockedTriangles[ta] == e) {
-            // atomic lock
-            lockedTriangles[tb] = e;
+            // edge flip for the origin
+            edges[e].s0 = u0;
+            edges[e].s1 = u1;
 
-            // barrier: wait for all work items globally
-            barrier(CLK_LOCAL_MEM_FENCE);
-            waitGlobally(g_mutex);
+            // edge flip for the twin
+            edges[twins[e]].s0 = u1;
+            edges[twins[e]].s1 = u0;
 
-            // swap if both triangles are locked by ta, i.e. by this thread
-            if(lockedTriangles[ta] == e && lockedTriangles[tb] == e) {
-                int v0 = edges[e].s0;
-                int v1 = edges[e].s1;
+            triangles[ta].s0 = u0;
+            triangles[ta].s1 = u1;
+            triangles[ta].s2 = v1;
 
-                int u0 = getDiffVertex(v0, v1, triangles[ta]);
-                int u1 = getDiffVertex(v0, v1, triangles[tb]);
+            triangles[tb].s0 = u1;
+            triangles[tb].s1 = u0;
+            triangles[tb].s2 = v0;
 
-                // edge flip for the origin
-                edges[e].s0 = u0;
-                edges[e].s1 = u1;
+            // save the relation of the changes
+            R[ta] = tb;
+            R[tb] = ta;
 
-                // edge flip for the twin
-                edges[twins[e]].s0 = u1;
-                edges[twins[e]].s1 = u0;
-
-                triangles[ta].s0 = u0;
-                triangles[ta].s1 = u1;
-                triangles[ta].s2 = v0;
-
-                triangles[tb].s0 = u1;
-                triangles[tb].s1 = u0;
-                triangles[tb].s2 = v1;
-
-                // save the relation of the changes
-                R[ta] = tb;
-                R[tb] = ta;
-                //labeledEdges[e] = 0;
-                //labeledEdges[twins[e]] = 0;
-            }
-        }
-        else {
-            barrier(CLK_LOCAL_MEM_FENCE);
-            waitGlobally(g_mutex);
+            double2 c = getCircumcenter(vertices[u0], vertices[u1], vertices[v0]);
+            // require a flip?
+            //if(length(c-vertices[v1]) < length(c-vertices[u0])) {
+            //    printf("error [%f] - %d, %d, edge: %d \n", (length(c-vertices[v1]) - length(c-vertices[u0])), ta, tb, e);
+            //}
+            labeledEdges[e] = 0;
+            labeledEdges[twins[e]] = 0;
         }
     }
-    else {
-        barrier(CLK_LOCAL_MEM_FENCE);
-        waitGlobally(g_mutex);
-        barrier(CLK_LOCAL_MEM_FENCE);
-        waitGlobally(g_mutex);
-    }
-
-    // edge might be no longer illegal!
-    //labeledEdges[e] = 0;
- }
+}
 
  // for each edge in parallel
  kernel void repair(__global int4* edges,
                     __global int3* triangles,
                     __global int* R)
-  {
+{
     int edgeId = get_global_id(0);
-    int v0 = edges[edgeId].s0;
-    int v1 = edges[edgeId].s1;
-    int ta = edges[edgeId].s2;
-    int tb = edges[edgeId].s3;
+    if(isEdgeAlive(edges[edgeId])){
+        int v0 = edges[edgeId].s0;
+        int v1 = edges[edgeId].s1;
+        int ta = edges[edgeId].s2;
+        int tb = edges[edgeId].s3;
 
-    // invalid
-    if(!isPartOf(v0, v1, triangles[ta])) {
-        edges[edgeId].s2 = R[ta];
+        // invalid
+        if(ta != -1 && !isPartOf(v0, v1, triangles[ta])) {
+            edges[edgeId].s2 = R[ta];
+        }
+
+        if(tb != -1 && !isPartOf(v0, v1, triangles[tb])) {
+            edges[edgeId].s3 = R[tb];
+        }
     }
 
-    if(tb != -1 && !isPartOf(v0, v1, triangles[tb])) {
-        edges[edgeId].s3 = R[tb];
+}
+
+// for each triangle test its legality
+ kernel void checkTriangles(
+                     __global double2* vertices,
+                     __global int3* triangles,
+                     __global int* illegalTri)
+{
+    int triangleId = get_global_id(0);
+    if(isTriAlive(triangles[triangleId])) {
+        double2 v0 = vertices[triangles[triangleId].s0];
+        double2 v1 = vertices[triangles[triangleId].s1];
+        double2 v2 = vertices[triangles[triangleId].s2];
+
+        // triangle is illegal => re-triangulation is necessary!
+        if(*illegalTri != 1 && !isCCW(v0, v1, v2)) {
+            *illegalTri = 1;
+        }
     }
 }
 
 
 // for each edge in parallel
 kernel void computeForces(
+	__const int size,
     __global double2* vertices,
     __global int4* edges,
     __global double2* lengths,
     __global double* scalingFactor,
-    __global double2* forces,
-    __global int* mutexes)
+    __global double* forces,
+    __global int* isBoundary)
 {
 
-    int i = get_global_id(0);
-    int p1Index = edges[i].s0;
-    double2 p1 = vertices[edges[i].s0];
-    double2 p2 = vertices[edges[i].s1];
-    double2 v = normalize(p1-p2);
+	int gid = get_global_id(0);
+	int gsize = get_global_size(0);
+	int lid = get_local_id(0);
+	int lsize = size / gsize + 1;
 
-    // F= ...
-    double len = lengths[i].s0;
-    double desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2;
-    double lenDiff = (desiredLen - len);
-    lenDiff = lenDiff > 0 ? lenDiff : 0;
-    double2 partialForce = v * lenDiff;
+	for(int i = gid*lsize; i < gid*lsize+lsize && i < size; i++) {
+	    if(isEdgeAlive(edges[i])) {
+	        int p1Index = edges[i].s0;
+            double2 p1 = vertices[edges[i].s0];
+            double2 p2 = vertices[edges[i].s1];
+            double2 v = normalize(p1-p2);
 
-    volatile __global int* addr = &mutexes[p1Index];
+            // F= ...
+            double len = lengths[i].s0;
+            double desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2;
+            double lenDiff = (desiredLen - len);
+            lenDiff = lenDiff > 0.0 ? lenDiff : 0.0;
+            double2 partialForce = v * lenDiff;
 
-    // TODO does this sync work properly? This syncs too much?
-    // for each vertex in parallel
+            // TODO this might be slow!
+            atomicAdd_g_f((global double*)(&forces[p1Index*2]), partialForce.x);
+            atomicAdd_g_f((global double*)(&forces[p1Index*2+1]), partialForce.y);
 
-
-    int waiting = 1;
-    //while (waiting) {
-    //    while (LOCK(addr)) {}
-
-        forces[p1Index] = forces[p1Index] + partialForce;
-    //    UNLOCK(addr);
-    //    waiting = 0;
-    //}
+            //printf("partialForce %f, %f \n force %f, %f \n", partialForce.x, partialForce.y, forces[p1Index*2], forces[p1Index*2+1]);
+	    }
+	}
 }
 
-inline double dabs(double d) {return d < 0 ? -d : d;}
+//inline double fabs(double d) {return if(d < 0){return -d;}else{return d;}}
 
-kernel void moveVertices(__global double2* vertices, __global double2* forces, const double delta) {
-    int i = get_global_id(0);
-    //double2 force = (double2)(1.0, 1.0);
-    double2 force = forces[i];
-    double2 v = vertices[i];
+inline double double2double (double a){
+    unsigned int ia = __double_as_int (a);
+    return __hiloint2double (__byte_perm (ia >> 3, ia, 0x7210), ia << 29);
+}
 
+kernel void moveVertices(__global double2* vertices, __global double2* forces, __global int* isBoundary, const double delta) {
+    int vertexId = get_global_id(0);
 
-    // project back if necessary
-    double distance = dabs(6.0 - length(v))-4.0;
-    if(distance <= 0) {
-        v = v + (force * 0.05);
-    }
-    else {
-        double deps = 0.0001;
-        double2 dX = (deps, 0.0);
-        double2 dY = (0.0, deps);
-        double dGradPX = ((dabs(6.0 - length(v + dX))-4.0)-distance) / deps;
-        double dGradPY = ((dabs(6.0 - length(v + dY))-4.0)-distance) / deps;
-        double2 projection = (dGradPX * distance, dGradPY * distance);
-        v = v - projection;
-    }
+	double deps = 1.4901e-8;
+	double2 force = forces[vertexId];
+	double2 v = vertices[vertexId];
 
-    // set force to 0.
-    forces[i] = (0.0, 0.0);
-    vertices[i] = v;
+	v = v + (force * 0.3);
+
+	// project back if necessary
+	double d = dist(v);
+	if(d > 0.0 || isBoundary[vertexId] == 1) {
+		double2 dX = (double2)(deps, 0.0);
+		double2 dY = (double2)(0.0, deps);
+		double2 vx = (double2)(v + dX);
+		double2 vy = (double2)(v + dY);
+		double dGradPX = (dist(vx) - d) / deps;
+		double dGradPY = (dist(vy) - d) / deps;
+		double2 projection = (double2)(dGradPX * d, dGradPY * d);
+		v = v - projection;
+	}
+
+	// set force to 0.
+	//printf("vertex( %d ) with force( %f, %f )\n", vertexId, force.x, force.y);
+	forces[vertexId] = (double2)(0.0, 0.0);
+	vertices[vertexId] = v;
 }
 
 // computation of the scaling factor:
@@ -426,6 +515,8 @@ kernel void computeCompleteSF(__const int size, __global double2* qlengths, __lo
 
 
         if(lid == 0) {
+          //*scaleFactor =  qlengths[10].s0;
+          //*scaleFactor =  partialSums[0].s0;
           *scaleFactor = sqrt(partialSums[0].s0 / partialSums[0].s1);
         }
     }

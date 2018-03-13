@@ -9,6 +9,7 @@ import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
 import org.vadere.util.triangulation.improver.IMeshImprover;
+import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
 import java.util.*;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  */
-public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
+public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
     private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
@@ -47,6 +48,8 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
 
     private CLDistMesh<P> clDistMesh;
     private boolean hasToRead = false;
+    private int nSteps;
+    private final static int MAX_STEPS = 200;
 
     public CLPSMeshing(
             final IDistanceFunction distanceFunc,
@@ -64,6 +67,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
         this.meshSupplier = meshSupplier;
         this.edges = new ArrayList<>();
         this.deps = 1.4901e-8 * initialEdgeLen;
+        this.nSteps = 0;
     }
 
     /**
@@ -87,9 +91,9 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.
-        clDistMesh = new CLDistMesh<P>((AMesh<P>)triangulation.getMesh());
+        clDistMesh = new CLDistMesh<>((AMesh<P>)triangulation.getMesh());
         clDistMesh.init();
-        clDistMesh.refresh();
+        //clDistMesh.refresh();
         initialized = true;
         log.info("##### (end) generate a triangulation #####");
     }
@@ -98,9 +102,25 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
         return triangulation;
     }
 
-    public void execute() {
+    @Override
+    public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
+        if(!initialized) {
+            initialize();
+        }
 
-		/*if(!initialized) {
+        // TODO: quality check!
+        while (nSteps < MAX_STEPS) {
+            improve();
+            //log.info("quality: " + quality);
+        }
+        refresh();
+
+        return triangulation;
+    }
+
+
+    public void execute() {
+        if(!initialized) {
 			initialize();
 		}
 
@@ -108,14 +128,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
 		while (quality < Parameters.qualityMeasurement) {
 			step();
 			quality = getQuality();
-			log.info("quality = " + quality);
 		}
-
-		computeScalingFactor();
-		computeForces();
-		computeDelta();
-		updateVertices();
-		retriangulate();*/
     }
 
     public void step() {
@@ -169,6 +182,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
     public void refresh() {
         if(clDistMesh != null) {
             clDistMesh.refresh();
+            hasToRead = false;
         }
     }
 
@@ -196,10 +210,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
     }
 
     public synchronized AMesh<P> getMesh() {
-        if(hasToRead) {
-            hasToRead = false;
-            clDistMesh.refresh();
-        }
+        refresh();
         // TODO: dirty casting
         return (AMesh<P>) triangulation.getMesh();
     }
@@ -242,12 +253,13 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
 
     @Override
     public Collection<VTriangle> getTriangles() {
-        clDistMesh.refresh();
+        refresh();
         return triangulation.streamTriangles().collect(Collectors.toList());
     }
 
     @Override
     public void improve() {
         step();
+        nSteps++;
     }
 }

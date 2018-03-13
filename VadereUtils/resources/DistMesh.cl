@@ -49,7 +49,7 @@ inline bool isCCW(float2 q, float2 p, float2 r) {
 }
 
 inline float dist(float2 v) {
-    return fabs(6.0f - length(v))-4.0f;
+    return fabs(7.0f - length(v))-3.0f;
 }
 
 inline float quality(float2 p, float2 q, float2 r) {
@@ -122,8 +122,6 @@ kernel void removeTriangles(__global float2* vertices,
 
     // edge is alive?
     if(isEdgeAlive(edges[edgeId])){
-        float eps = 0.000001f;
-
         int ta = edges[edgeId].s2;
         int tb = edges[edgeId].s3;
 
@@ -375,62 +373,28 @@ kernel void computeForces(
 	int gid = get_global_id(0);
 	int gsize = get_global_size(0);
 	int lid = get_local_id(0);
-	int lsize = size / gsize;
-	
-	if(gid < gsize-1) {}
-	else {lsize += 1;}
-	
+	int lsize = size / gsize + 1;
+
 	for(int i = gid*lsize; i < gid*lsize+lsize && i < size; i++) {
-		int p1Index = edges[i].s0;
+	    if(isEdgeAlive(edges[i])) {
+	        int p1Index = edges[i].s0;
+            float2 p1 = vertices[edges[i].s0];
+            float2 p2 = vertices[edges[i].s1];
+            float2 v = normalize(p1-p2);
 
+            // F= ...
+            float len = lengths[i].s0;
+            float desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2f;
+            float lenDiff = (desiredLen - len);
+            lenDiff = lenDiff > 0.0f ? lenDiff : 0.0f;
+            float2 partialForce = v * lenDiff;
 
-		float2 p1 = vertices[edges[i].s0];
-		float2 p2 = vertices[edges[i].s1];
-		float2 v = normalize(p1-p2);
-
-		// update boundary array
-		int boundary = (edges[i].s2 == -1 || edges[i].s3 == -1) ? 1 : 0;
-		isBoundary[edges[i].s0] = boundary;
-		isBoundary[edges[i].s1] = boundary;
-		
-		// F= ...
-		float len = lengths[i].s0;
-		float desiredLen = lengths[i].s1 * (*scalingFactor) * 1.2f;
-		float lenDiff = (desiredLen - len);
-		lenDiff = lenDiff > 0.0f ? lenDiff : 0.0f;
-		float2 partialForce = v * lenDiff;
-
-		//volatile __global int* addr = &mutexes[p1Index];
-
-		//int waiting = 1;
-		//while (waiting) {
-		//    while (LOCK(addr)) {}
-		//printf("before %f \n", forces[p1Index].x);
-		//float2 tmp = forces[p1Index];
-
-
-		// TODO this might be slow!
-		global float* forceP = (global float*)(&forces[p1Index]);
-		atomicAdd_g_f(forceP, partialForce.x);
-		atomicAdd_g_f((forceP+1), partialForce.y);
-		//forces[p1Index] += partialForce;
-
-		//global float* forceP = (global float*)(&forces[p1Index]);
-		//atomicAdd_g_f(forceP, 0.1);
-		//atomicAdd_g_f((forceP+1), 0.1);
-
-		//forces[p1Index] = forces[p1Index] + partialForce;
-		//    UNLOCK(addr);
-		//    waiting = 0;
-		//}
-		//printf("adder-x [%d] %f \n", p1Index, partialForce.x);
-		//printf("adder-y [%d] %f \n", p1Index, partialForce.y);
-		//printf("after-x %f \n", forces[p1Index].x);
-		//printf("test-x: %f == %f \n", (tmp + partialForce).x, forces[p1Index].x);
-		//printf("test-y: %f == %f \n", (tmp + partialForce).y, forces[p1Index].y);
+            // TODO this might be slow!
+            global float* forceP = (global float*)(&forces[p1Index]);
+            atomicAdd_g_f(forceP, partialForce.x);
+            atomicAdd_g_f((forceP+1), partialForce.y);
+	    }
 	}
-
-    
 }
 
 //inline float fabs(float d) {return if(d < 0){return -d;}else{return d;}}
@@ -443,7 +407,7 @@ inline double float2double (float a){
 kernel void moveVertices(__global float2* vertices, __global float2* forces, __global int* isBoundary, const float delta) {
     int vertexId = get_global_id(0);
 
-	float deps = 0.0001f;
+	float deps = 0.00001f;
 	float2 force = forces[vertexId];
 	float2 v = vertices[vertexId];
 
@@ -464,7 +428,7 @@ kernel void moveVertices(__global float2* vertices, __global float2* forces, __g
 
 	// set force to 0.
 	//printf("vertex( %d ) with force( %f, %f )\n", vertexId, force.x, force.y);
-	forces[vertexId] = (float2)(0.0, 0.0);
+	forces[vertexId] = (float2)(0.0f, 0.0f);
 	vertices[vertexId] = v;
 }
 
@@ -495,7 +459,7 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
 
     if(gid < size){
         int global_index = gid;
-        float2 accumulator = (float2)(0, 0);
+        float2 accumulator = (float2)(0.0f, 0.0f);
         // Loop sequentially over chunks of input vector
         while (global_index < size) {
             float2 element = qlengths[global_index];

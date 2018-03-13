@@ -203,7 +203,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			step();
 		}
 
-		nextSFCLevel(0.05);
+	//	nextSFCLevel(0.05);
 		finished = true;
 
         finish();
@@ -222,13 +222,13 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			removeTrianglesOutsideBBox();
 			removeTrianglesInsideObstacles();
 
-	        sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face));
+	        sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));
 	        List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
 	        logger.info("#holes:" + holes.size());
 	        sierpinksyFaceOrder.addAll(holes);
 	        logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
 
-		     getMesh().arrangeMemory(() -> (Iterator<AFace<P>>) sierpinksyFaceOrder.iterator());
+		     getMesh().arrangeMemory(sierpinksyFaceOrder);
         }
     }
 
