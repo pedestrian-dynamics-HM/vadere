@@ -166,7 +166,7 @@ public class CLDistMeshHE<P extends IPoint> {
         contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
         {
             log.warn("[LWJGL] cl_context_callback");
-            log.warn("\tInfo: " + memUTF8(errinfo));
+            log.warn("\tInfo: " + memUTF8(errinfo) + " / " + memUTF8(private_info));
         });
 
         programCB = CLProgramCallback.create((program, user_data) ->
@@ -358,7 +358,7 @@ public class CLDistMeshHE<P extends IPoint> {
             clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
             clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
 
-            clSetKernelArg1p(clKernelForces, 0, numberOfVertices);
+            clSetKernelArg1i(clKernelForces, 0, numberOfVertices);
             clSetKernelArg1p(clKernelForces, 1, clVertices);
             clSetKernelArg1p(clKernelForces, 2, clEdges);
             clSetKernelArg1p(clKernelForces, 3, clVtoE);
@@ -521,6 +521,7 @@ public class CLDistMeshHE<P extends IPoint> {
                     enqueueNDRangeKernel(clQueue, clKernelFlipStage2, 1, null, clGlobalWorkSizeEdges, null, null, null);
                     enqueueNDRangeKernel(clQueue, clKernelFlipStage3, 1, null, clGlobalWorkSizeEdges, null, null, null);
                     enqueueNDRangeKernel(clQueue, clKernelUnlockFaces, 1, null, clGlobalWorkSizeTriangles, null, null, null);
+
                     //log.info("flip some illegal edges");
 
                     // clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
@@ -656,6 +657,7 @@ public class CLDistMeshHE<P extends IPoint> {
         clReleaseMemObject(clEdges);
         clReleaseMemObject(clVtoE);
         clReleaseMemObject(clFaces);
+        clReleaseMemObject(clForces);
         clReleaseMemObject(clLengths);
         clReleaseMemObject(clqLengths);
         clReleaseMemObject(clPartialSum);
@@ -669,20 +671,20 @@ public class CLDistMeshHE<P extends IPoint> {
         clReleaseKernel(clKernelLengths);
         clReleaseKernel(clKernelPartialSF);
         clReleaseKernel(clKernelCompleteSF);
-
         clReleaseKernel(clKernelFlipStage1);
         clReleaseKernel(clKernelFlipStage2);
         clReleaseKernel(clKernelFlipStage3);
         clReleaseKernel(clKernelUnlockFaces);
-
         clReleaseKernel(clKernelLabelEdges);
         clReleaseKernel(clKernelLabelEdgesUpdate);
+        clReleaseKernel(clKernelCheckTriangles);
 
-        contextCB.free();
-        programCB.free();
-        clReleaseCommandQueue(clQueue);
         clReleaseProgram(clProgram);
+        clReleaseCommandQueue(clQueue);
         clReleaseContext(clContext);
+
+        contextCB.close();
+        programCB.close();
     }
 
     private void clearHost() {
@@ -738,48 +740,6 @@ public class CLDistMeshHE<P extends IPoint> {
         refresh();
         clearCL();
         clearHost();
-    }
-
-    private void printTri() {
-        for(int i = 0; i < numberOfFaces*4; i+=4) {
-            log.info("[" +t.get(i) + ", " + t.get(i+1) + ", " + t.get(i+2) + "]");
-        }
-    }
-
-    private void printEdges() {
-        for(int i = 0; i < numberOfEdges*4; i+=4) {
-            log.info("[v0=" +e.get(i) + ", v1=" + e.get(i+1) + ", t_a=" + e.get(i+2) +", t_b=" + e.get(i+3) +  "]");
-        }
-    }
-
-    /*
-     *
-     * Assumption: There is only one Platform with a GPU.
-     */
-    public static void main(String... args) {
-        AMesh<MPoint> mesh = IFace.createSimpleTriMesh();
-        log.info("before");
-        Collection<AVertex<MPoint>> vertices = mesh.getVertices();
-        log.info(vertices);
-
-        CLDistMeshHE clDistMesh = new CLDistMeshHE(mesh);
-        clDistMesh.init();
-
-        clDistMesh.printTri();
-        clDistMesh.printEdges();
-        clDistMesh.step();
-
-        /*clDistMesh.refresh();
-
-        clDistMesh.printTri();
-        clDistMesh.printEdges();
-        clDistMesh.step();*/
-
-        clDistMesh.refresh();
-        clDistMesh.printTri();
-        clDistMesh.printEdges();
-
-        clDistMesh.finish();
     }
 
     private static void printPlatformInfo(long platform, String param_name, int param) {

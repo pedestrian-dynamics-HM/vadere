@@ -15,8 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.lwjgl.BufferUtils.createByteBuffer;
-
 /**
  * Utility-class without a state. This class offers method to interact with OpenCL e.g. memory management methods.
  *

@@ -433,7 +433,7 @@ public class CLDistMesh<P extends IPoint> {
             clSetKernelArg(clKernelCompleteSF, 2, factor * 2 * sizeSFComplete);
             clSetKernelArg1p(clKernelCompleteSF, 3, clScalingFactor);
 
-            clSetKernelArg1p(clKernelForces, 0, numberOfEdges);
+            clSetKernelArg1i(clKernelForces, 0, numberOfEdges);
             clSetKernelArg1p(clKernelForces, 1, clVertices);
             clSetKernelArg1p(clKernelForces, 2, clEdges);
             clSetKernelArg1p(clKernelForces, 3, clLengths);

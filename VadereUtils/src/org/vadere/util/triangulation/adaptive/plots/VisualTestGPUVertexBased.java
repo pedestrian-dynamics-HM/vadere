@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.CLPSMeshing;
+import org.vadere.util.triangulation.adaptive.CLPSMeshingHE;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
@@ -22,8 +23,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-public class VisualTestGPUEdgeBased {
-
+public class VisualTestGPUVertexBased {
 	private static final Logger log = LogManager.getLogger(RunTimeGPUEdgeBased.class);
 
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
@@ -37,7 +37,7 @@ public class VisualTestGPUEdgeBased {
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
@@ -55,7 +55,7 @@ public class VisualTestGPUEdgeBased {
 			meshGenerator.improve();
 			meshGenerator.refresh();
 			try {
-				Thread.sleep(100);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -68,11 +68,10 @@ public class VisualTestGPUEdgeBased {
 		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
 		log.info("quality" + meshGenerator.getQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
-
+		meshGenerator.finish();
 	}
 
 	public static void main(String[] args) {
 		overallUniformRing();
 	}
-
 }

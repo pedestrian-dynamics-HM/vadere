@@ -69,8 +69,6 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
         this.edges = new ArrayList<>();
         this.deps = 1.4901e-8 * initialEdgeLen;
         this.nSteps = 0;
-
-        initialize();
     }
 
     /**

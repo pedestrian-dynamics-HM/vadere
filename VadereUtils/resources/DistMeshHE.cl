@@ -215,8 +215,8 @@ kernel void flipStage1(__global int4* edges,
     // is the edge illegal
     if(labeledEdges[edgeId] == 1) {
         int4 edge = edges[edgeId];
-        int face = getFace(edges[edgeId]);
-		faces[face].s1 = edgeId;
+        int faceId = getFace(edges[edgeId]);
+		faces[faceId].s1 = edgeId;
     }
 }
 
@@ -228,11 +228,14 @@ kernel void flipStage2(__global int4* edges,
     int edgeId = get_global_id(0)*2;
 
     // is the edge illegal
-    if(labeledEdges[edgeId] == 1) {
+    if(labeledEdges[edgeId] ==  1) {
         int4 edge = edges[edgeId];
         int4 twinEdge = edges[getTwin(edge)];
         int faceId = getFace(edges[edgeId]);
-		faces[getFace(twinEdge)].s1 = edgeId;
+
+        if(faces[faceId].s1 == edgeId) {
+            faces[getFace(twinEdge)].s1 = edgeId;
+        }
     }
 }
 
@@ -247,7 +250,7 @@ kernel void flipStage3(__global float2* vertices,
 
     if(labeledEdges[edgeId] == 1) {
         int4 edge = edges[edgeId];
-        int4 twinEdge = edges[getTwin(edge)];
+        int4 twinEdge = edges[edge.s2];
 		
         // swap if both triangles are locked by ta, i.e. by this thread
         if(faces[getFace(edge)].s1 == edgeId && faces[getFace(twinEdge)].s1 == edgeId) {
@@ -256,6 +259,7 @@ kernel void flipStage3(__global float2* vertices,
             // 1. gather all the references required
             int a0Id = edgeId;
             int4 a0 = edge;
+
 
             // getNext(a0);
             int a1Id = a0.s1;
@@ -329,6 +333,14 @@ kernel void flipStage3(__global float2* vertices,
             b1.s3 = faId;
 
             // copy to global mem
+            //printf("%d, %d, %d, %d, %d, %d \n", a0.s0, a0.s1, a0.s3, b0Id, b1Id, a2Id);
+
+
+            //edges[0] = (int4) (0,0,0,0);
+            /*edges[a0Id].s1 = a0.s0;
+            edges[a0Id].s2 = a0.s2;
+            edges[a0Id].s3 = a0.s3;*/
+
             edges[a0Id] = a0;
             edges[a1Id] = a1;
             edges[a2Id] = a2;
@@ -490,7 +502,7 @@ kernel void computePartialSF(__const int size,
 
     if(gid < size){
         int global_index = gid;
-        float2 accumulator = (0.0f, 0.0f);
+        float2 accumulator = (float2)(0.0f, 0.0f);
         // Loop sequentially over chunks of input vector
         while (global_index < size) {
             float2 element = qlengths[global_index];
