@@ -2,7 +2,7 @@
 
 /**
  * The implementation of DistMesh using the half-edge data structure.
- * Forces are computed for each vertex in parallel instead of for each 
+ * Forces are computed for each vertex in parallel instead of for each
  * edge in parallel. Edge flips are done via a three stages (for each edge in parallel):
  * (1) Lock the first triangle A for edge e
  * (2) Lock the second triangle B for edge e if e holds the lock of A
@@ -92,7 +92,7 @@ inline int getFace(int4 edge) {
 }
 
 inline double dist(double2 v) {
-    return dabs(6.0 - length(v))-4.0;
+    return dabs(7.0 - length(v))-3.0;
 }
 // end helper
 
@@ -158,7 +158,7 @@ kernel void label(__global double2* vertices,
 
 		// test delaunay criteria
 		double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-		if(length(c-vertices[p]) < length(c-vertices[v0])) {
+		if(length(c-vertices[p]) + eps < length(c-vertices[v0])) {
 			labeledEdges[edgeId] = 1;
 			*illegalEdge = 1;
 		} else {
@@ -185,7 +185,7 @@ kernel void updateLabel(__global double2* vertices,
     int4 edge = edges[edgeId];
 
     if(isEdgeAlive(edge) && labeledEdges[edgeId] == 1 && !isAtBoundary(edge, edges)){
-        double eps = 0.00001;
+        double eps = 0.0001;
         int v0 = getVertex(edge);
 		int4 nextEdge = edges[getNext(edge)];
 		int4 prefEdge = edges[getNext(nextEdge)];
@@ -197,12 +197,15 @@ kernel void updateLabel(__global double2* vertices,
 
 		// test delaunay criteria
 		double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-		if(length(c-vertices[p]) < length(c-vertices[v0])) {
+		if(length(c-vertices[p]) + eps < length(c-vertices[v0])) {
 			labeledEdges[edgeId] = 1;
 			*illegalEdge = 1;
         } else {
             labeledEdges[edgeId] = 0;
         }
+    }
+    else {
+        labeledEdges[edgeId] = 0;
     }
 }
 
@@ -244,7 +247,7 @@ kernel void flipStage2(__global int4* edges,
     }
 }
 
-// flip 
+// flip
 kernel void flipStage3(__global double2* vertices,
                        __global int* vertexToEdge,
                        __global int4* edges,
@@ -303,7 +306,7 @@ kernel void flipStage3(__global double2* vertices,
 				// setEdge(vb0,a2);
                 vertexToEdge[vb0Id] = a2Id;
             }
-			
+
 			/**
 			 * edge.s0 = edge.vertexId
 			 * edge.s1 = edge.nextId
@@ -427,7 +430,7 @@ kernel void moveVertices(__global double2* vertices,
                          const double delta) {
     int vertexId = get_global_id(0);
 
-    double deps = 0.0001;
+    double deps = 1.4901e-8;
     double2 force = forces[vertexId];
     double2 v = vertices[vertexId];
 
@@ -445,6 +448,7 @@ kernel void moveVertices(__global double2* vertices,
         double2 projection = (double2)(dGradPX * distance, dGradPY * distance);
         v = v - projection;
     }
+
 
     forces[vertexId] = (double2)(0.0, 0.0);
     vertices[vertexId] = v;

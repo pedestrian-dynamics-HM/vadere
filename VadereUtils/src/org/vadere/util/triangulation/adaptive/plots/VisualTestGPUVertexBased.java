@@ -29,7 +29,7 @@ public class VisualTestGPUVertexBased {
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static final double initialEdgeLength =  4.0;
+	private static final double initialEdgeLength =  0.2;
 
 	private static void overallUniformRing() {
 
@@ -49,10 +49,13 @@ public class VisualTestGPUVertexBased {
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
+		overAllTime.suspend();
 		int nSteps = 0;
 		while (nSteps < 300) {
 			nSteps++;
+			overAllTime.resume();
 			meshGenerator.improve();
+			overAllTime.suspend();
 			meshGenerator.refresh();
 			try {
 				Thread.sleep(10);
@@ -62,13 +65,13 @@ public class VisualTestGPUVertexBased {
 			distmeshPanel.repaint();
 		}
 		overAllTime.stop();
+		meshGenerator.finish();
 
 		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
 		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
-		log.info("quality" + meshGenerator.getQuality());
+		log.info("quality: " + meshGenerator.getQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
-		meshGenerator.finish();
 	}
 
 	public static void main(String[] args) {

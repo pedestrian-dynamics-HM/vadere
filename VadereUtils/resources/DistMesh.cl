@@ -390,8 +390,8 @@ kernel void computeForces(
             float2 partialForce = v * lenDiff;
 
             // TODO this might be slow!
-            atomicAdd_g_f((global double*)(&forces[p1Index*2]), partialForce.x);
-            atomicAdd_g_f((global double*)(&forces[p1Index*2+1]), partialForce.y);
+            atomicAdd_g_f((global float*)(&forces[p1Index*2]), partialForce.x);
+            atomicAdd_g_f((global float*)(&forces[p1Index*2+1]), partialForce.y);
 	    }
 	}
 }

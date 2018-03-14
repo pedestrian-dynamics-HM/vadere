@@ -228,7 +228,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	        sierpinksyFaceOrder.addAll(holes);
 	        logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
 
-		     getMesh().arrangeMemory(sierpinksyFaceOrder);
+		    getMesh().arrangeMemory(sierpinksyFaceOrder);
         }
     }
 

@@ -75,12 +75,8 @@ public class RunTimeGPUVertexBased extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		//double initialEdgeLength = 1.125;
-		//double minInitialEdgeLength = 0.125;
-
-		double initialEdgeLength = 3.0;
-		double minInitialEdgeLength = 3.0;
-
+		double initialEdgeLength = 1.125;
+		double minInitialEdgeLength = 0.125;
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
