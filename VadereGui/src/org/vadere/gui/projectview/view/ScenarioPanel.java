@@ -232,8 +232,10 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 				topographyCreatorView = new TopographyWindow(scenario);
 				tabbedPane.addTab(Messages.getString("Tab.TopographyCreator.title"), topographyCreatorView);
-				setTopography(scenario.getTopography());
+				tabbedPane.validate();
+				tabbedPane.repaint();
 				tabbedPane.setSelectedIndex(index);
+				setTopography(scenario.getTopography());
 
 			} catch (IOException | IntrospectionException e) {
 				e.printStackTrace();
@@ -252,7 +254,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					tabbedPane.setSelectedComponent(postVisualizationView);
 				}
 			}
+			tabbedPane.validate();
+			tabbedPane.repaint();
+			postVisualizationView.revalidate();
 			postVisualizationView.repaint(); // force a repaint, otherwise it sometimes only repaints when the mouse moves from the output table to the postvis-view
+			postVisualizationView.getDefaultModel().resetTopographySize();
 		}
 
 		this.attributesModelView.setVadereScenario(scenario);

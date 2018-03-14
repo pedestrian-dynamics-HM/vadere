@@ -54,20 +54,16 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEditSupport;
 
 public class TopographyWindow extends JPanel {
-	private static Resources resources = Resources.getInstance("topographycreator");
 	private static final long serialVersionUID = -2472077480081283655L;
-	private IDrawPanelModel panelModel;
+	private static Resources resources = Resources.getInstance("topographycreator");
 	// private JScrollPane scrollpane;
 	private final ScenarioToolBar toolbar;
+	private IDrawPanelModel panelModel;
 	private InfoPanel infoPanel;
 	private TopographyPanel mainPanel;
 	private JLabelObserver selectedElementLabel;
 	private UndoableEditSupport undoSupport;
 	private UndoManager undoManager;
-
-	public IDrawPanelModel getPanelModel() {
-		return panelModel;
-	}
 
 	public TopographyWindow(final Scenario currentScenario) throws IOException, IntrospectionException {
 
@@ -90,7 +86,7 @@ public class TopographyWindow extends JPanel {
 	}
 
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
-			final String toolTipProperty) {
+											  final String toolTipProperty) {
 		JButton button = toolbar.add(action);
 		button.setBorderPainted(false);
 		button.setToolTipText(Messages.getString(toolTipProperty));
@@ -98,7 +94,7 @@ public class TopographyWindow extends JPanel {
 	}
 
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action, final String toolTipProperty,
-			final JButton button) {
+											  final JButton button) {
 		button.setAction(action);
 		button.setText("");
 		toolbar.add(button);
@@ -119,263 +115,265 @@ public class TopographyWindow extends JPanel {
 
 		final JPanel thisPanel = this;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
 
-				// 1. get data from the user screen
-				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-				int windowHeight = screenSize.height - 250;
-				int windowWidth = screenSize.width - 250;
+		// 1. get data from the user screen
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int windowHeight = screenSize.height - 250;
+		int windowWidth = screenSize.width - 250;
 
-				JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
-				infoButton.setBorderPainted(false);
-				infoButton.addActionListener(e -> {
-					JOptionPane.showMessageDialog(null,
-							"Scenario Creator\nVersion: 2.0\nCooperation: Hochschule München", "About",
-							JOptionPane.INFORMATION_MESSAGE);
-				});
-
-				/* basic action */
-				final TopographyAction basicAction = new ActionBasic("notify", panelModel);
-
-				Action zoomInAction = new ActionZoomIn("zoom in", new ImageIcon(Resources.class
-						.getResource("/icons/zoom_in_icon.png")), panelModel);
-				Action zoomOutAction = new ActionZoomOut("zoom out", new ImageIcon(Resources.class
-						.getResource("/icons/zoom_out_icon.png")), panelModel);
-				/*
-				 * Action scrollAction = new ActionScroll("scroll", new ImageIcon(Resources.class
-				 * .getResource("/icons/scroll_icon.png")), panelModel);
-				 */
-				Action selectCutAction = new ActionSelectCut("select zoom", new ImageIcon(Resources.class
-						.getResource("/icons/zoom_icon.png")), panelModel, undoSupport);
-
-				Action maximizeAction = new ActionMaximizeSize("maximize", new ImageIcon(Resources.class
-						.getResource("/icons/maximize_icon.png")), panelModel);
-				/*
-				 * Action minimizeAction = new ActionMinimizeSize("minimize", new
-				 * ImageIcon(Resources.class
-				 * .getResource("/icons/minimize_icon.png")), panelModel);
-				 */
-				Action resetScenarioAction = new ActionResetTopography("reset scenario", new ImageIcon(Resources.class
-						.getResource("/icons/reset_scenario_icon.png")), panelModel, undoSupport);
-				Action saveScenarioAction = new ActionQuickSaveTopography("save scenario", new ImageIcon(Resources.class
-						.getResource("/icons/save_icon.png")), panelModel);
-
-				Action undoAction = new ActionUndo("undo", new ImageIcon(Resources.class
-						.getResource("/icons/undo_icon.png")), undoManager, basicAction);
-				Action redoAction = new ActionRedo("redo", new ImageIcon(Resources.class
-						.getResource("/icons/redo_icon.png")), undoManager, basicAction);
-
-				FormLayout layout = new FormLayout("2dlu, default:grow(0.75), 2dlu, default:grow(0.25), 2dlu", // col
-						"2dlu, default, 2dlu, default, 2dlu, default, 2dlu"); // rows
-				thisPanel.setLayout(layout);
-
-
-				CellConstraints cc = new CellConstraints();
-
-				// construct the scrollpanel
-				JScrollPane scrollPane = new JScrollPane();
-				scrollPane.getViewport()
-						.addChangeListener(new JViewportChangeListener(panelModel, scrollPane.getVerticalScrollBar()));
-				scrollPane.setPreferredSize(new Dimension(1, windowHeight));
-				IViewportChangeListener viewportChangeListener = new ViewportChangeListener(panelModel, scrollPane);
-				panelModel.addViewportChangeListener(viewportChangeListener);
-				panelModel.addScrollPane(scrollPane);
-
-				// mainPanel.setPreferredSize(new Dimension(windowWidth, windowHeight));
-				mainPanel = new TopographyPanel(panelModel, new TopographyCreatorRenderer(panelModel), scrollPane);
-				mainPanel.addComponentListener(new PanelResizeListener(panelModel));
-				mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
-				panelModel.addScaleChangeListener(mainPanel);
-				panelModel.addObserver(mainPanel);
-				scrollPane.setViewportView(mainPanel);
-
-				/*
-				 * JPanel textViewPanel = new JPanel();
-				 * BorderLayout layoutManagerTextViewPanel = new BorderLayout();
-				 * textViewPanel.setLayout(layoutManagerTextViewPanel);
-				 */
-
-				selectedElementLabel.setPanelModel(panelModel);
-
-				// textViewPanel.add(selectedElementLabel, BorderLayout.PAGE_START);
-				// textViewPanel.add(textView, BorderLayout.CENTER);
-
-				panelModel.addObserver(infoPanel);
-				textView.setPreferredSize(new Dimension(1, windowHeight));
-
-				panelModel.addObserver(selectedElementLabel);
-
-				thisPanel.add(toolbar, cc.xyw(2, 2, 4));
-				thisPanel.add(scrollPane, cc.xy(2, 4));
-				thisPanel.add(infoPanel, cc.xyw(2, 6, 4));
-				// thisPanel.add(textViewPanel, cc.xy(4, 4));
-				thisPanel.add(textView, cc.xy(4, 4));
-
-				/* close dialog action */
-
-				/* select dot action */
-				TopographyAction selectDotModeAction = new ActionSwitchSelectionMode("dot selection mode", panelModel,
-						new DrawDotMode(panelModel, undoSupport), basicAction);
-
-				/* select rect action */
-				TopographyAction selectRectangleAction =
-						new ActionSwitchSelectionMode("rect selection mode", panelModel,
-								new DrawRectangleMode(panelModel, undoSupport), basicAction);
-
-				/* switch category to obstacle action */
-				TopographyAction switchToObstacleAction = new ActionSwitchCategory("switch to obstacle", panelModel,
-						ScenarioElementType.OBSTACLE, selectRectangleAction);
-
-				/* switch category to target action */
-				TopographyAction switchToTargetAction = new ActionSwitchCategory("switch to targets", panelModel,
-						ScenarioElementType.TARGET, selectRectangleAction);
-
-				/* switch category to stairs action */
-				TopographyAction switchToStairsAction = new ActionSwitchCategory("switch to stairs", panelModel,
-						ScenarioElementType.STAIRS, selectRectangleAction);
-
-
-				/* list of actions for the sub-dialog */
-				Action pen = new ActionSwitchSelectionMode("Pen", new ImageIcon(Resources.class
-						.getResource("/icons/paint_method_pen_icon.png")), panelModel, new DrawPolygonMode(panelModel,
-								undoSupport),
-						basicAction);
-				Action rectangle = new ActionSwitchSelectionMode("Rectangle", new ImageIcon(Resources.class
-						.getResource("/icons/paint_method_rectangle_icon.png")), panelModel, new DrawRectangleMode(
-								panelModel, undoSupport),
-						basicAction);
-				Action dot = new ActionSwitchSelectionMode("Circle", new ImageIcon(Resources.class
-						.getResource("/icons/paint_method_dot_icon.png")), panelModel, new DrawDotMode(panelModel,
-								undoSupport),
-						basicAction);
-
-				List<Action> obstacleAndTargetDrawModes = new ArrayList<Action>();
-				List<Action> sourceDrawModes = new ArrayList<Action>();
-
-				obstacleAndTargetDrawModes.add(rectangle);
-				obstacleAndTargetDrawModes.add(pen);
-
-				sourceDrawModes.add(rectangle);
-				sourceDrawModes.add(dot);
-
-				/* open obstacle paint method dialog action */
-				JButton obsButton = new JButton();
-				TopographyAction openObstacleDialog = new ActionOpenDrawOptionMenu("Obstacle", new ImageIcon(
-						Resources.class.getResource("/icons/obstacle_icon.png")), panelModel, switchToObstacleAction,
-						obsButton, obstacleAndTargetDrawModes);
-
-				/* open target paint method dialog action */
-				JButton targetButton = new JButton();
-				TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target", new ImageIcon(Resources.class
-						.getResource("/icons/target_icon.png")), panelModel, switchToTargetAction, targetButton,
-						obstacleAndTargetDrawModes);
-
-				/* open stairs paint method dialog action */
-				JButton stairsButton = new JButton();
-				TopographyAction openStairsDialog = new ActionOpenDrawOptionMenu("Stairs", new ImageIcon(Resources.class
-						.getResource("/icons/stairs_icon.png")), panelModel, switchToStairsAction, stairsButton,
-						obstacleAndTargetDrawModes);
-
-				/* pedestrians */
-				TopographyAction switchToPedestrianAction = new ActionSwitchCategory("switch to pedestrian", panelModel,
-						ScenarioElementType.PEDESTRIAN, selectDotModeAction);
-				TopographyAction closeDialogAction = new ActionCloseDrawOptionPanel("Pedestrian", new ImageIcon(
-						Resources.class.getResource("/icons/pedestrians_icon.png")), panelModel,
-						switchToPedestrianAction);
-
-				/* switch category to source action */
-				TopographyAction switchToSourceAction = new ActionSwitchCategory("switch to source", panelModel,
-						ScenarioElementType.SOURCE, selectDotModeAction);
-
-				/* source */
-				JButton sourceButton = new JButton();
-				TopographyAction openSourceDialog = new ActionOpenDrawOptionMenu("Source", new ImageIcon(Resources.class
-						.getResource("/icons/source_icon.png")), panelModel, switchToSourceAction, sourceButton,
-						sourceDrawModes);
-
-				ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
-						Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
-
-				addActionToToolbar(toolbar, selectShape,"select_shape_tooltip");
-				addActionToToolbar(
-						toolbar,
-						new ActionSwitchSelectionMode("erase mode", new ImageIcon(Resources.class
-								.getResource("/icons/eraser_icon.png")), panelModel, new EraserMode(panelModel,
-										undoSupport),
-								basicAction),
-						"TopographyCreator.btnErase.tooltip");
-				toolbar.addSeparator(new Dimension(5, 50));
-				addActionToToolbar(toolbar, openSourceDialog, "TopographyCreator.btnInsertSource.tooltip",
-						sourceButton);
-				addActionToToolbar(toolbar, openTargetDialog, "TopographyCreator.btnInsertTarget.tooltip",
-						targetButton);
-				toolbar.addSeparator(new Dimension(5, 50));
-				addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
-						obsButton);
-				addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
-				addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
-						stairsButton);
-				toolbar.addSeparator(new Dimension(5, 50));
-				// addActionToToolbar(toolbar, scrollAction, "TopographyCreator.btnScroll.tooltip");
-				addActionToToolbar(toolbar, zoomInAction, "TopographyCreator.btnZoomIn.tooltip");
-				addActionToToolbar(toolbar, zoomOutAction, "TopographyCreator.btnZoomOut.tooltip");
-				// addActionToToolbar(toolbar, minimizeAction,
-				// "TopographyCreator.btnMinimizeTopography.tooltip");
-				addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
-				toolbar.addSeparator(new Dimension(5, 50));
-				addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
-				addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
-				addActionToToolbar(toolbar, saveScenarioAction, "TopographyCreator.btnQuickSave.tooltip");
-				toolbar.addSeparator(new Dimension(5, 50));
-				addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
-				addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
-				toolbar.add(Box.createHorizontalGlue());
-				toolbar.add(infoButton);
-				infoButton.setToolTipText("About");
-
-				mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
-
-				// copy element
-				TopographyAction copyElementAction = new ActionCopyElement("copy element", panelModel);
-				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-						KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-						"copy-element");
-				getActionMap().put("copy-element", copyElementAction);
-
-				TopographyAction insertCopiedElementAction =
-						new ActionInsertCopiedElement("insert copied element", panelModel, undoSupport);
-				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-						KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-						"insert-copied-element");
-				getActionMap().put("insert-copied-element", insertCopiedElementAction);
-
-				// delete element
-				TopographyAction deleteElement =
-						new ActionDeleteElement("delete element", panelModel, undoSupport, basicAction);
-				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-						"delete-element");
-				getActionMap().put("delete-element", deleteElement);
-
-				// undo
-				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-						KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-						"undo");
-				getActionMap().put("undo", undoAction);
-
-				// redo
-				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-						KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-								Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK),
-						"redo");
-				getActionMap().put("redo", redoAction);
-
-				// deselect selected element on esc
-				getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
-				getActionMap().put("deselect", new ActionDeselect(panelModel, thisPanel, selectShape));
-			}
+		JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
+		infoButton.setBorderPainted(false);
+		infoButton.addActionListener(e -> {
+			JOptionPane.showMessageDialog(null,
+					"Scenario Creator\nVersion: 2.0\nCooperation: Hochschule München", "About",
+					JOptionPane.INFORMATION_MESSAGE);
 		});
+
+		/* basic action */
+		final TopographyAction basicAction = new ActionBasic("notify", panelModel);
+
+		Action zoomInAction = new ActionZoomIn("zoom in", new ImageIcon(Resources.class
+				.getResource("/icons/zoom_in_icon.png")), panelModel);
+		Action zoomOutAction = new ActionZoomOut("zoom out", new ImageIcon(Resources.class
+				.getResource("/icons/zoom_out_icon.png")), panelModel);
+		/*
+		 * Action scrollAction = new ActionScroll("scroll", new ImageIcon(Resources.class
+		 * .getResource("/icons/scroll_icon.png")), panelModel);
+		 */
+		Action selectCutAction = new ActionSelectCut("select zoom", new ImageIcon(Resources.class
+				.getResource("/icons/zoom_icon.png")), panelModel, undoSupport);
+
+		Action maximizeAction = new ActionMaximizeSize("maximize", new ImageIcon(Resources.class
+				.getResource("/icons/maximize_icon.png")), panelModel);
+		/*
+		 * Action minimizeAction = new ActionMinimizeSize("minimize", new
+		 * ImageIcon(Resources.class
+		 * .getResource("/icons/minimize_icon.png")), panelModel);
+		 */
+		Action resetScenarioAction = new ActionResetTopography("reset scenario", new ImageIcon(Resources.class
+				.getResource("/icons/reset_scenario_icon.png")), panelModel, undoSupport);
+		Action saveScenarioAction = new ActionQuickSaveTopography("save scenario", new ImageIcon(Resources.class
+				.getResource("/icons/save_icon.png")), panelModel);
+
+		Action undoAction = new ActionUndo("undo", new ImageIcon(Resources.class
+				.getResource("/icons/undo_icon.png")), undoManager, basicAction);
+		Action redoAction = new ActionRedo("redo", new ImageIcon(Resources.class
+				.getResource("/icons/redo_icon.png")), undoManager, basicAction);
+
+		FormLayout layout = new FormLayout("2dlu, default:grow(0.75), 2dlu, default:grow(0.25), 2dlu", // col
+				"2dlu, default, 2dlu, default, 2dlu, default, 2dlu"); // rows
+		thisPanel.setLayout(layout);
+
+
+		CellConstraints cc = new CellConstraints();
+
+		// construct the scrollpanel
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.getViewport()
+				.addChangeListener(new JViewportChangeListener(panelModel, scrollPane.getVerticalScrollBar()));
+		scrollPane.setPreferredSize(new Dimension(1, windowHeight));
+		IViewportChangeListener viewportChangeListener = new ViewportChangeListener(panelModel, scrollPane);
+		panelModel.addViewportChangeListener(viewportChangeListener);
+		panelModel.addScrollPane(scrollPane);
+
+		// mainPanel.setPreferredSize(new Dimension(windowWidth, windowHeight));
+		mainPanel = new TopographyPanel(panelModel, new TopographyCreatorRenderer(panelModel), scrollPane);
+		mainPanel.addComponentListener(new PanelResizeListener(panelModel));
+		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
+		panelModel.addScaleChangeListener(mainPanel);
+		panelModel.addObserver(mainPanel);
+		scrollPane.setViewportView(mainPanel);
+
+		/*
+		 * JPanel textViewPanel = new JPanel();
+		 * BorderLayout layoutManagerTextViewPanel = new BorderLayout();
+		 * textViewPanel.setLayout(layoutManagerTextViewPanel);
+		 */
+
+		selectedElementLabel.setPanelModel(panelModel);
+
+		// textViewPanel.add(selectedElementLabel, BorderLayout.PAGE_START);
+		// textViewPanel.add(textView, BorderLayout.CENTER);
+
+		panelModel.addObserver(infoPanel);
+		textView.setPreferredSize(new Dimension(1, windowHeight));
+
+		panelModel.addObserver(selectedElementLabel);
+
+		thisPanel.add(toolbar, cc.xyw(2, 2, 4));
+		thisPanel.add(scrollPane, cc.xy(2, 4));
+		thisPanel.add(infoPanel, cc.xyw(2, 6, 4));
+		// thisPanel.add(textViewPanel, cc.xy(4, 4));
+		thisPanel.add(textView, cc.xy(4, 4));
+
+
+
+
+		/* close dialog action */
+
+		/* select dot action */
+		TopographyAction selectDotModeAction = new ActionSwitchSelectionMode("dot selection mode", panelModel,
+				new DrawDotMode(panelModel, undoSupport), basicAction);
+
+		/* select rect action */
+		TopographyAction selectRectangleAction =
+				new ActionSwitchSelectionMode("rect selection mode", panelModel,
+						new DrawRectangleMode(panelModel, undoSupport), basicAction);
+
+		/* switch category to obstacle action */
+		TopographyAction switchToObstacleAction = new ActionSwitchCategory("switch to obstacle", panelModel,
+				ScenarioElementType.OBSTACLE, selectRectangleAction);
+
+		/* switch category to target action */
+		TopographyAction switchToTargetAction = new ActionSwitchCategory("switch to targets", panelModel,
+				ScenarioElementType.TARGET, selectRectangleAction);
+
+		/* switch category to stairs action */
+		TopographyAction switchToStairsAction = new ActionSwitchCategory("switch to stairs", panelModel,
+				ScenarioElementType.STAIRS, selectRectangleAction);
+
+
+		/* list of actions for the sub-dialog */
+		Action pen = new ActionSwitchSelectionMode("Pen", new ImageIcon(Resources.class
+				.getResource("/icons/paint_method_pen_icon.png")), panelModel, new DrawPolygonMode(panelModel,
+				undoSupport),
+				basicAction);
+		Action rectangle = new ActionSwitchSelectionMode("Rectangle", new ImageIcon(Resources.class
+				.getResource("/icons/paint_method_rectangle_icon.png")), panelModel, new DrawRectangleMode(
+				panelModel, undoSupport),
+				basicAction);
+		Action dot = new ActionSwitchSelectionMode("Circle", new ImageIcon(Resources.class
+				.getResource("/icons/paint_method_dot_icon.png")), panelModel, new DrawDotMode(panelModel,
+				undoSupport),
+				basicAction);
+
+		List<Action> obstacleAndTargetDrawModes = new ArrayList<Action>();
+		List<Action> sourceDrawModes = new ArrayList<Action>();
+
+		obstacleAndTargetDrawModes.add(rectangle);
+		obstacleAndTargetDrawModes.add(pen);
+
+		sourceDrawModes.add(rectangle);
+		sourceDrawModes.add(dot);
+
+		/* open obstacle paint method dialog action */
+		JButton obsButton = new JButton();
+		TopographyAction openObstacleDialog = new ActionOpenDrawOptionMenu("Obstacle", new ImageIcon(
+				Resources.class.getResource("/icons/obstacle_icon.png")), panelModel, switchToObstacleAction,
+				obsButton, obstacleAndTargetDrawModes);
+
+		/* open target paint method dialog action */
+		JButton targetButton = new JButton();
+		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target", new ImageIcon(Resources.class
+				.getResource("/icons/target_icon.png")), panelModel, switchToTargetAction, targetButton,
+				obstacleAndTargetDrawModes);
+
+		/* open stairs paint method dialog action */
+		JButton stairsButton = new JButton();
+		TopographyAction openStairsDialog = new ActionOpenDrawOptionMenu("Stairs", new ImageIcon(Resources.class
+				.getResource("/icons/stairs_icon.png")), panelModel, switchToStairsAction, stairsButton,
+				obstacleAndTargetDrawModes);
+
+		/* pedestrians */
+		TopographyAction switchToPedestrianAction = new ActionSwitchCategory("switch to pedestrian", panelModel,
+				ScenarioElementType.PEDESTRIAN, selectDotModeAction);
+		TopographyAction closeDialogAction = new ActionCloseDrawOptionPanel("Pedestrian", new ImageIcon(
+				Resources.class.getResource("/icons/pedestrians_icon.png")), panelModel,
+				switchToPedestrianAction);
+
+		/* switch category to source action */
+		TopographyAction switchToSourceAction = new ActionSwitchCategory("switch to source", panelModel,
+				ScenarioElementType.SOURCE, selectDotModeAction);
+
+		/* source */
+		JButton sourceButton = new JButton();
+		TopographyAction openSourceDialog = new ActionOpenDrawOptionMenu("Source", new ImageIcon(Resources.class
+				.getResource("/icons/source_icon.png")), panelModel, switchToSourceAction, sourceButton,
+				sourceDrawModes);
+
+		ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
+				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
+
+		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
+		addActionToToolbar(
+				toolbar,
+				new ActionSwitchSelectionMode("erase mode", new ImageIcon(Resources.class
+						.getResource("/icons/eraser_icon.png")), panelModel, new EraserMode(panelModel,
+						undoSupport),
+						basicAction),
+				"TopographyCreator.btnErase.tooltip");
+		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, openSourceDialog, "TopographyCreator.btnInsertSource.tooltip",
+				sourceButton);
+		addActionToToolbar(toolbar, openTargetDialog, "TopographyCreator.btnInsertTarget.tooltip",
+				targetButton);
+		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
+				obsButton);
+		addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
+		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
+				stairsButton);
+		toolbar.addSeparator(new Dimension(5, 50));
+		// addActionToToolbar(toolbar, scrollAction, "TopographyCreator.btnScroll.tooltip");
+		addActionToToolbar(toolbar, zoomInAction, "TopographyCreator.btnZoomIn.tooltip");
+		addActionToToolbar(toolbar, zoomOutAction, "TopographyCreator.btnZoomOut.tooltip");
+		// addActionToToolbar(toolbar, minimizeAction,
+		// "TopographyCreator.btnMinimizeTopography.tooltip");
+		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
+		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
+		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
+		addActionToToolbar(toolbar, saveScenarioAction, "TopographyCreator.btnQuickSave.tooltip");
+		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
+		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
+		toolbar.add(Box.createHorizontalGlue());
+		toolbar.add(infoButton);
+		infoButton.setToolTipText("About");
+
+		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
+
+		// copy element
+		TopographyAction copyElementAction = new ActionCopyElement("copy element", panelModel);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				"copy-element");
+		getActionMap().put("copy-element", copyElementAction);
+
+		TopographyAction insertCopiedElementAction =
+				new ActionInsertCopiedElement("insert copied element", panelModel, undoSupport);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				"insert-copied-element");
+		getActionMap().put("insert-copied-element", insertCopiedElementAction);
+
+		// delete element
+		TopographyAction deleteElement =
+				new ActionDeleteElement("delete element", panelModel, undoSupport, basicAction);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+				"delete-element");
+		getActionMap().put("delete-element", deleteElement);
+
+		// undo
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				"undo");
+		getActionMap().put("undo", undoAction);
+
+		// redo
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+						Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK),
+				"redo");
+		getActionMap().put("redo", redoAction);
+
+		// deselect selected element on esc
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
+		getActionMap().put("deselect", new ActionDeselect(panelModel, thisPanel, selectShape));
+
 	}
 
+	public IDrawPanelModel getPanelModel() {
+		return panelModel;
+	}
 }
