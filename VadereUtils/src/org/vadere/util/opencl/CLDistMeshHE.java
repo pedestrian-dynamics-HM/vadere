@@ -122,7 +122,7 @@ public class CLDistMeshHE<P extends IPoint> {
     private AMesh<P> mesh;
 
     private boolean doublePrecision = true;
-    private boolean profiling = true;
+    private boolean profiling = false;
 
     private boolean hasToRead = false;
 

@@ -78,16 +78,13 @@ public class RunTimeCPU extends JFrame {
 	    }
 	}
 
-	private static void stepUniformRing() {
+	private static void stepUniformRing(double startLen, double endLen, double stepLen) {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		//double initialEdgeLength = 0.125;
-		//double minInitialEdgeLength = 0.05;
-
-		double initialEdgeLength = 1.125;
-		double minInitialEdgeLength = 0.125;
+		double initialEdgeLength = startLen;
+		double minInitialEdgeLength = endLen;
 
 		List<Integer> nVertices = new ArrayList<>();
 		List<Long> runTimes = new ArrayList<>();
@@ -132,8 +129,7 @@ public class RunTimeCPU extends JFrame {
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			distmeshPanel.repaint();
 
-			//initialEdgeLength = initialEdgeLength - 0.05;
-			initialEdgeLength = initialEdgeLength - 0.15;
+			initialEdgeLength = initialEdgeLength - stepLen;
 
 		}
 
@@ -145,6 +141,6 @@ public class RunTimeCPU extends JFrame {
 	}
 
     public static void main(String[] args) {
-	    stepUniformRing();
+		stepUniformRing(0.05, 0.05, 0.05);
     }
 }

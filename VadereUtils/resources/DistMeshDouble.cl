@@ -169,9 +169,11 @@ kernel void label(__global double2* vertices,
 
             int v2 = getDiffVertex(v0, v1, triangles[ta]);
             int p = getDiffVertex(v0, v1, triangles[tb]);
-            double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+            double2 pp = vertices[p];
+            //double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
             // require a flip?
-            if(length(c-vertices[p]) < length(c-vertices[v0])) {
+
+            if(isInCircle(vertices[v0], vertices[v1], vertices[v2], pp.x, pp.y)) {
                 labeledEdges[edgeId] = 1;
                 *illegalEdge = 1;
             }
@@ -208,9 +210,10 @@ kernel void updateLabel(__global double2* vertices,
             int v2 = getDiffVertex(v0, v1, triangles[ta]);
             int p = getDiffVertex(v0, v1, triangles[tb]);
 
-            double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+            double2 pp = vertices[p];
+            //double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
              // require a flip?
-            if(length(c-vertices[p]) < length(c-vertices[v0])) {
+            if(isInCircle(vertices[v0], vertices[v1], vertices[v2], pp.x, pp.y)) {
                 labeledEdges[edgeId] = 1;
                 *illegalEdge = 1;
                 //("found illegal edge!!!! %i \n", edgeId);

@@ -1,5 +1,6 @@
 package org.vadere.util.triangulation.improver;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.inter.*;
@@ -39,7 +40,8 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private static final int MAX_STEPS = 200;
 	private int nSteps;
 
-	private boolean runParallel = true;
+	private boolean runParallel = false;
+	private boolean profiling = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
 	private final Collection<? extends VShape> obstacleShapes;
@@ -105,21 +107,38 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
 	@Override
     public void improve() {
-		synchronized (getMesh()) {
+		//synchronized (getMesh()) {
 			illegalMovement = false;
+			StopWatch watch = new StopWatch();
 
-			if(illegalMovement) {
-				//retriangulate();
-			}
-			else {
-				flipEdges();
-			}
+			watch.start();
+			flipEdges();
+			watch.stop();
+			if(profiling)
+				log.info("flip edges:" + watch.getNanoTime());
 
+			watch.reset();
+			watch.start();
 			computeScalingFactor();
+			watch.stop();
+			if(profiling)
+				log.info("compute scale factor:" + watch.getNanoTime());
+
+			watch.reset();
+			watch.start();
 			computeForces();
+			watch.stop();
+			if(profiling)
+				log.info("compute forces:" + watch.getNanoTime());
+
+			watch.reset();
+			watch.start();
 			updateVertices();
+			watch.stop();
+			if(profiling)
+				log.info("move vertices:" + watch.getNanoTime());
 			nSteps++;
-		}
+		//}
     }
 
     @Override

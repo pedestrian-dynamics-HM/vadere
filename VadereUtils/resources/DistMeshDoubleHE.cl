@@ -154,13 +154,14 @@ kernel void label(__global double2* vertices,
 		int v1 = getVertex(nextEdge);
 		int v2 = getVertex(prefEdge);
 
-		// test delaunay criteria
-		double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-		if(length(c-vertices[p]) + eps < length(c-vertices[v0])) {
-			labeledEdges[edgeId] = 1;
-			*illegalEdge = 1;
-		} else {
-            labeledEdges[edgeId] = 0;
+        double2 pp = vertices[p];
+        //double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+         // require a flip?
+        if(isInCircle(vertices[v0], vertices[v1], vertices[v2], pp.x, pp.y)) {
+            labeledEdges[edgeId] = 1;
+            *illegalEdge = 1;
+        } else {
+             labeledEdges[edgeId] = 0;
         }
     }
     else {
@@ -194,12 +195,15 @@ kernel void updateLabel(__global double2* vertices,
 		int v2 = getVertex(prefEdge);
 
 		// test delaunay criteria
-		double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-		if(length(c-vertices[p]) + eps < length(c-vertices[v0])) {
-			labeledEdges[edgeId] = 1;
-			*illegalEdge = 1;
+		//double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+		double2 pp = vertices[p];
+        //double2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
+         // require a flip?
+        if(isInCircle(vertices[v0], vertices[v1], vertices[v2], pp.x, pp.y)) {
+            labeledEdges[edgeId] = 1;
+            *illegalEdge = 1;
         } else {
-            labeledEdges[edgeId] = 0;
+             labeledEdges[edgeId] = 0;
         }
     }
     else {

@@ -206,7 +206,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 			step();
 		}
 
-	//	nextSFCLevel(0.05);
+		nextSFCLevel(0.05);
 		finished = true;
 
         finish();
