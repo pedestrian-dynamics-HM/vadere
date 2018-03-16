@@ -1,5 +1,6 @@
 package org.vadere.util.tex;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IFace;
 import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
@@ -7,10 +8,15 @@ import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TexGraphGenerator {
 
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String meshToGraph(final IMesh<P, V, E, F> mesh){
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
+			@NotNull final IMesh<P, V, E, F> mesh){
 		StringBuilder builder = new StringBuilder();
 		builder.append("\\begin{tikzpicture}[scale=1.0]\n");
 
@@ -28,6 +34,59 @@ public class TexGraphGenerator {
 
 		builder.append("\\end{tikzpicture}");
 
+		return builder.toString();
+	}
+
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final List<F> faces) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("\\begin{tikzpicture}[scale=1.0]\n");
+
+		builder.append("\\draw[gray, thick] ");
+
+		for(F face : faces) {
+			List<VLine> lines = mesh.streamEdges(face).map(e -> mesh.toLine(e)).collect(Collectors.toList());
+
+			for(VLine line : lines) {
+				builder.append("("+line.getX1()+","+line.getY1()+") -- ("+line.getX2()+","+line.getY2()+")\n");
+			}
+		}
+
+		builder.append(";\n");
+		builder.append("\n");
+
+		builder.append("\\draw[black, thick] ");
+		VPoint prefIncenter = null;
+		VLine firstLine = null;
+		VLine lastLine = null;
+		for(F face : faces) {
+			List<E> edges = mesh.getEdges(face);
+
+			// is triangle
+			if(edges.size() == 3) {
+				VTriangle triangle = mesh.toTriangle(face);
+				VPoint incenter = triangle.getIncenter();
+
+				if(prefIncenter != null) {
+					builder.append("("+prefIncenter.getX()+","+prefIncenter.getY()+") -- ("+incenter.getX()+","+incenter.getY()+")\n");
+					if(firstLine == null) {
+						firstLine = new VLine(prefIncenter, incenter);
+					}
+
+					lastLine = new VLine(prefIncenter, incenter);
+				}
+
+				prefIncenter = incenter;
+			}
+		}
+
+		builder.append(";\n");
+		if(firstLine != null && lastLine != null) {
+			builder.append("\\draw[-{Latex[length=3mm]}]("+firstLine.getX1()+","+firstLine.getY1()+") -- ("+firstLine.getX2()+","+firstLine.getY2()+");\n");
+			builder.append("\\draw[-{Latex[length=3mm]}]("+lastLine.getX1()+","+lastLine.getY1()+") -- ("+lastLine.getX2()+","+lastLine.getY2()+");\n");
+		}
+		builder.append("\\end{tikzpicture}");
 		return builder.toString();
 	}
 

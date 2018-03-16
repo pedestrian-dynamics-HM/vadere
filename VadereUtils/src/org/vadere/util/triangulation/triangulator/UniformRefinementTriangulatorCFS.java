@@ -4,10 +4,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.tex.TexGraphGenerator;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
@@ -137,6 +139,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
     }
 
     private void nextSFCLevel(double ran) {
+		//System.out.println(curveToTikz());
 		ArrayList<Pair<Direction, E>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
 		ArrayList<E> toRefineEdges = new ArrayList<>();
 
@@ -291,6 +294,10 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
         else {
             throw new IllegalStateException(p + " point already exist.");
         }
+    }
+
+    private String curveToTikz() {
+		return TexGraphGenerator.toTikz(getMesh(), sierpinskyCurve.stream().map(pair -> getMesh().getFace(pair.getRight())).collect(Collectors.toList()));
     }
 
 	/*private void removeTrianglesInsideObstacles() {
