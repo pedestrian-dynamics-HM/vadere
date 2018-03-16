@@ -7,8 +7,6 @@
  * (3) Flip edge e if e holds the lock for A and B
  */
 
-
-#pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics : enable
 #pragma OPENCL EXTENSION cl_amd_printf : enable
 #define LOCK(a) atomic_cmpxchg(a, 0, 1)
@@ -35,7 +33,7 @@ inline float quality(float2 p, float2 q, float2 r) {
     float a = length(p-q);
     float b = length(p-r);
     float c = length(q-r);
-    return ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+    return (float)((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
 }
 
 inline bool isInCircle(float2 a, float2 b, float2 c, float x , float y) {
@@ -90,7 +88,7 @@ inline int getFace(int4 edge) {
 }
 
 inline float dist(float2 v) {
-    return dabs(6.0 - length(v))-4.0;
+    return dabs(7.0f - length(v))-3.0f;
 }
 // end helper
 
@@ -102,7 +100,7 @@ kernel void removeTriangles(__global float2* vertices,
 
     // edge is alive?
     if(isEdgeAlive(edges[edgeId])){
-        float eps = 0.000001f;
+        float eps = 0.00001f;
 
         int ta = edges[edgeId].s2;
         int tb = edges[edgeId].s3;
@@ -140,7 +138,7 @@ kernel void label(__global float2* vertices,
      * edge.s2 = edge.twinId
      * edge.s3 = edge.faceId
      */
-	int edgeId = get_global_id(0);
+	 int edgeId = get_global_id(0);
     int4 edge = edges[edgeId];
     if(isEdgeAlive(edge) && !isAtBoundary(edge, edges)){
         float eps = 0.0001f;
@@ -156,7 +154,7 @@ kernel void label(__global float2* vertices,
 
 		// test delaunay criteria
 		float2 c = getCircumcenter(vertices[v0], vertices[v1], vertices[v2]);
-		if(length(c-vertices[p]) < length(c-vertices[v0])) {
+		if(length(c-vertices[p]) + eps < length(c-vertices[v0])) {
 			labeledEdges[edgeId] = 1;
 			*illegalEdge = 1;
 		} else {
@@ -183,7 +181,7 @@ kernel void updateLabel(__global float2* vertices,
     int4 edge = edges[edgeId];
 
     if(isEdgeAlive(edge) && labeledEdges[edgeId] == 1 && !isAtBoundary(edge, edges)){
-        float eps = 0.00001f;
+        float eps = 0.0001f;
         int v0 = getVertex(edge);
 		int4 nextEdge = edges[getNext(edge)];
 		int4 prefEdge = edges[getNext(nextEdge)];
@@ -201,6 +199,9 @@ kernel void updateLabel(__global float2* vertices,
         } else {
             labeledEdges[edgeId] = 0;
         }
+    }
+    else {
+        labeledEdges[edgeId] = 0;
     }
 }
 
@@ -375,54 +376,47 @@ kernel void unlockFaces(__global int2* faces) {
 }
 
 
-// for each vertex in parallel, TODO: Test it
-kernel void computeForces(__const int size,
-						  __global float2* vertices,
+// for each vertex in parallel
+kernel void computeForces(__global float2* vertices,
                           __global int4* edges,
                           __global int* vertexToEdge,
                           __global float2* lengths,
                           __global float* scalingFactor,
                           __global float2* forces)
 {
-    int gid = get_global_id(0);
-	int gsize = get_global_size(0);
-	int lid = get_local_id(0);
-	int lsize = size / gsize + 1;
+    int vertexId = get_global_id(0);
+    int edgeId = vertexToEdge[vertexId];
+    if(edgeId != -1){
+        int4 edge = edges[edgeId];
+        int twinId = edgeId;
+        int4 twinEdge = edge;
+        bool first = true;
+        float2 force = (float2)(0.0f, 0.0f);
+        float2 p0 = vertices[vertexId];
 
-	for(int i = lid*lsize; i < lid*lsize+lsize && i < size; i++) {
-		int vertexId = i;;
-		int edgeId = vertexToEdge[vertexId];
+        while(first || (edgeId != twinId)){
+            first = false;
 
-		if(edgeId != -1){
-			int4 edge = edges[edgeId];
-			int twinId = edgeId;
-			int4 twinEdge = edge;
-			bool first = true;
-			float2 force = (float2)(0.0f, 0.0f);
-			float2 p0 = vertices[vertexId];
+            // compute force
+            int nextId = getNext(twinEdge);
+            int4 nextEdge = edges[nextId];
+            float2 p1 = vertices[getVertex(nextEdge)];
 
-			do {
-				// compute force
-				int nextId = getNext(twinEdge);
-				int4 nextEdge = edges[nextId];
-				float2 p1 = vertices[getVertex(nextEdge)];
+            float2 v = normalize(p0-p1);
+            float len = lengths[nextId].s0;
+            float desiredLen = lengths[nextId].s1 * (*scalingFactor) * 1.2f;
+            float lenDiff = (desiredLen - len);
+            lenDiff = max(lenDiff, 0.0f);
+            float2 partialForce = v * lenDiff;
+            force = force + partialForce;
 
-				float2 v = normalize(p0-p1);
-				float len = lengths[nextId].s0;
-				float desiredLen = lengths[nextId].s1 * (*scalingFactor) * 1.2;
-				float lenDiff = (desiredLen - len);
-				lenDiff = max(lenDiff, 0.0f);
-				float2 partialForce = v * lenDiff;
-				force = force + partialForce;
+            // go on
+            twinId = getTwin(nextEdge);
+            twinEdge = edges[twinId];
+        }
 
-				// go on
-				twinId = getTwin(nextEdge);
-				twinEdge = edges[twinId];
-			} while(edgeId != twinId);
-
-			forces[vertexId] = force;
-		}
-	}
+        forces[vertexId] = force;
+    }
 }
 
 // for each vertex
@@ -431,8 +425,7 @@ kernel void moveVertices(__global float2* vertices,
                          __global float2* forces,
                          const float delta) {
     int vertexId = get_global_id(0);
-
-    float deps = 0.0001f;
+    float deps = 0.00001f;
     float2 force = forces[vertexId];
     float2 v = vertices[vertexId];
 
@@ -440,7 +433,7 @@ kernel void moveVertices(__global float2* vertices,
 
     // project back if necessary
     float distance = dist(v);
-    if(distance > 0.0 || borderVertices[vertexId] == 1) {
+    if(distance > 0.0f || borderVertices[vertexId] == 1) {
         float2 dX = (float2)(deps, 0.0f);
         float2 dY = (float2)(0.0f, deps);
         float2 vx = (float2)(v + dX);
@@ -479,10 +472,7 @@ kernel void computeLengths(
 
 
 // kernel for multiple work-groups
-kernel void computePartialSF(__const int size,
-							 __global float2* qlengths,
-							 __local float2* partialSums,
-							 __global float2* output) {
+kernel void computePartialSF(__const int size, __global float2* qlengths, __local float2* partialSums, __global float2* output) {
     int gid = get_global_id(0);
     int lid = get_local_id(0);
 
@@ -521,10 +511,7 @@ kernel void computePartialSF(__const int size,
 }
 
 // kernel for 1 work-group
-kernel void computeCompleteSF(__const int size,
-							  __global float2* qlengths,
-							  __local float2* partialSums,
-							  __global float* scaleFactor) {
+kernel void computeCompleteSF(__const int size, __global float2* qlengths, __local float2* partialSums, __global float* scaleFactor) {
     int gid = get_global_id(0);
     int lid = get_local_id(0);
     if(lid < size){

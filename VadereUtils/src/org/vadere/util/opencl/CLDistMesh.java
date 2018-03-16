@@ -1,5 +1,6 @@
 package org.vadere.util.opencl;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -141,12 +142,12 @@ public class CLDistMesh<P extends IPoint> {
     private boolean hasToRead = false;
 
     public CLDistMesh(@NotNull AMesh<P> mesh) {
-        if(profiling) {
+        /*if(profiling) {
             Configuration.DEBUG.set(true);
             Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
             Configuration.DEBUG_STACK.set(true);
             Configuration.DEBUG_STACK.set(true);
-        }
+        }*/
 
         this.mesh = mesh;
         this.mesh.garbageCollection();
@@ -575,6 +576,9 @@ public class CLDistMesh<P extends IPoint> {
             enqueueNDRangeKernel("compute forces", clQueue, clKernelForces, 1, null, clGloblWorkSizeForces, clLocalWorkSizeForces, null, null);
             //log.info("(default) computed forces");
 
+            //enqueueNDRangeKernel("compute forces", clQueue, clKernelForces, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            //log.info("(default) computed forces");
+
             enqueueNDRangeKernel("move vertices", clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
             //log.info("move vertices");
 
@@ -623,7 +627,7 @@ public class CLDistMesh<P extends IPoint> {
                     clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
                     //log.info("isLegal = " + illegalEdges.get(0));
 
-                } while(illegalEdges.get(0) == 1);
+                } while(illegalEdges.get(0) == 1  && false);
                 //log.info("flip all");
             }
 
@@ -922,11 +926,15 @@ public class CLDistMesh<P extends IPoint> {
     }
 
     public void init() {
+        StopWatch watch = new StopWatch();
         initCallbacks();
         initCL();
         buildProgram();
+        watch.start();
         createMemory();
         initialKernelArgs();
+        watch.stop();
+        log.info("initCL time:" + watch.getTime() + "[ms]");
     }
 
     public void refresh () {

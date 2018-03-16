@@ -83,10 +83,18 @@ public class RunTimeCPU extends JFrame {
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		double initialEdgeLength = 1.5;
-		double minInitialEdgeLength = 0.05;
+		//double initialEdgeLength = 0.125;
+		//double minInitialEdgeLength = 0.05;
+
+		double initialEdgeLength = 1.125;
+		double minInitialEdgeLength = 0.125;
+
+		List<Integer> nVertices = new ArrayList<>();
+		List<Long> runTimes = new ArrayList<>();
+		List<Double> initlialEdgeLengths = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
+			initlialEdgeLengths.add(initialEdgeLength);
 			PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
 					distanceFunc,
 					uniformEdgeLength,
@@ -114,6 +122,9 @@ public class RunTimeCPU extends JFrame {
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]");
 
+			nVertices.add(meshGenerator.getMesh().getVertices().size());
+			runTimes.add( overAllTime.getTime());
+
 			PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
@@ -121,8 +132,16 @@ public class RunTimeCPU extends JFrame {
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			distmeshPanel.repaint();
 
-			initialEdgeLength = initialEdgeLength * 0.5;
+			//initialEdgeLength = initialEdgeLength - 0.05;
+			initialEdgeLength = initialEdgeLength - 0.15;
+
 		}
+
+		// 200 steps
+		System.out.println("print overall runtimes for CPU");
+		System.out.println("#vertices: [" + nVertices.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("runtime in ms: [" + runTimes.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("init edge lengths: [" + initlialEdgeLengths.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 	}
 
     public static void main(String[] args) {

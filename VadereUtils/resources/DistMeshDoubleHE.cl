@@ -1,5 +1,3 @@
-//TODO: get the code from DistMeshHE.cl!
-
 /**
  * The implementation of DistMesh using the half-edge data structure.
  * Forces are computed for each vertex in parallel instead of for each

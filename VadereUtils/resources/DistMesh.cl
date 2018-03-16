@@ -12,6 +12,7 @@
 
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics : enable
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
 #pragma OPENCL EXTENSION cl_amd_printf : enable
 #define LOCK(a) atomic_cmpxchg(a, 0, 1)
 #define UNLOCK(a) atomic_xchg(a, 0)
@@ -19,16 +20,16 @@
 inline void atomicAdd_g_f(volatile __global float *addr, float val) {
 	// see OpelCL specification of union to understand the code!
 	union {
-	   unsigned int u32;
-	   float f32;
+	   unsigned int u64;
+	   float f64;
 	} next, expected, current;
    	
-	current.f32 = *addr;
+	current.f64 = *addr;
     do {
-		expected.f32 = current.f32;
-		next.f32 = expected.f32 + val;
-   		current.u32 = atomic_cmpxchg( (volatile __global unsigned int *)addr, expected.u32, next.u32);
-    } while(current.u32 != expected.u32);
+		expected.f64 = current.f64;
+		next.f64 = expected.f64 + val;
+   		current.u64 = atomic_cmpxchg( (volatile __global unsigned int *)addr, expected.u64, next.u64);
+    } while(current.u64 != expected.u64);
 }
 
 // helper methods!
@@ -392,15 +393,17 @@ kernel void computeForces(
             // TODO this might be slow!
             atomicAdd_g_f((global float*)(&forces[p1Index*2]), partialForce.x);
             atomicAdd_g_f((global float*)(&forces[p1Index*2+1]), partialForce.y);
+
+            //printf("partialForce %f, %f \n force %f, %f \n", partialForce.x, partialForce.y, forces[p1Index*2], forces[p1Index*2+1]);
 	    }
 	}
 }
 
 //inline float fabs(float d) {return if(d < 0){return -d;}else{return d;}}
 
-inline double float2double (float a){
+inline float float2float (float a){
     unsigned int ia = __float_as_int (a);
-    return __hiloint2double (__byte_perm (ia >> 3, ia, 0x7210), ia << 29);
+    return __hiloint2float (__byte_perm (ia >> 3, ia, 0x7210), ia << 29);
 }
 
 kernel void moveVertices(__global float2* vertices, __global float2* forces, __global int* isBoundary, const float delta) {
@@ -410,7 +413,7 @@ kernel void moveVertices(__global float2* vertices, __global float2* forces, __g
 	float2 force = forces[vertexId];
 	float2 v = vertices[vertexId];
 
-	v = v + (force * 0.2f);
+	v = v + (force * 0.3f);
 
 	// project back if necessary
 	float d = dist(v);
@@ -469,7 +472,7 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
         int group_size = get_local_size(0);
         float2 len = accumulator;
 
-        //float2 len = (float2)(1.0, 1.0);
+        //float2 len = (float2)(1.0f, 1.0f);
         partialSums[lid] = len;
 
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -487,7 +490,7 @@ kernel void computePartialSF(__const int size, __global float2* qlengths, __loca
     }
     else {
         if(lid == 0){
-            output[get_group_id(0)] = (float2)(0.0, 0.0);
+            output[get_group_id(0)] = (float2)(0.0f, 0.0f);
         }
     }
 }

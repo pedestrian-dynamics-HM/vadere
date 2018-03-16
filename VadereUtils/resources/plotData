@@ -1,0 +1,70 @@
+# Runtimes of edge based GPU version (double, for loop):
+#vertices: [640,640,1228,2368,2368,4680,18280,36308,144148]
+runtime in ms: [91,79,96,101,97,124,261,422,1322]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999,0.5249999999999999,0.3749999999999999,0.2249999999999999,0.125,0.075]
+
+nEdges: 144148
+initCL: 423 ms
+initMem/Args: 25 ms
+edge len computation: 4401152 ns
+partial sum scaling: 287744 ns
+sum scaling factor: 9216 ns
+
+compute forces: 5768192 ns
+move vertices: 274432 ns
+label edge: 14613504 ns
+flip 1: 902144 ns
+flip 2: 900096 ns
+flip 3: 893952 ns
+repair ds: 1424384 ns
+re-label: 1095680 ns
+
+
+
+# Runtimes of edge based GPU version (float, for loop):
+#vertices: [640,640,1228,2368,2368,4680,18280]
+runtime in ms: [82,68,70,84,83,96,145]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999]
+
+
+# Runtimes of vertex based GPU version (double):
+#vertices: [640,640,1228,2368,2368,4680,18280,36308,144148]
+runtime in ms: [87,76,93,95,104,124,271,398,2905]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999,0.5249999999999999,0.3749999999999999,0.2249999999999999,0.125,0.075]
+
+nEdges: 144148
+initCL: 423 ms
+initMem/Args: 25 ms
+compute edge lengths: 5224448 ns
+compute partial sum: 286720 ns
+compute sum: 9216 ns
+
+compute forces: 3657728 ns
+move vertices: 294912 ns
+
+label edges: 16409600 ns
+flip 1 event: 891904 ns
+flip 2 event: 891904 ns
+flip 3 event: 890880 ns
+unlock faces: 125952 ns
+
+# Runtimes of sequential CPU version (double):
+#vertices: [640,640,1228,2368,2368,4680,18280,36308,144148]
+runtime in ms: [438,439,834,1632,1626,3268,13872,28112,111300]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999,0.5249999999999999,0.3749999999999999,0.2249999999999999,0.125,0.075]
+
+// none cache friendly
+#vertices: [640,640,1228,2368,2368,4680,18280,36308,144148]
+runtime in ms: [475,480,904,1825,1818,3719,19027,41041,172248]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999,0.5249999999999999,0.3749999999999999,0.2249999999999999,0.125,0.075]
+
+
+# Runtimes of parallel CPU version (double):
+#vertices: [640,640,1228,2368,2368,4680,18280,36308,144148]
+runtime in ms: [208,243,330,625,678,1240,4766,9485,37663]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999,0.5249999999999999,0.3749999999999999,0.2249999999999999,0.125,0.075]
+
+// none cache friendly
+#vertices: [640,640,1228,2368,2368,4680,18280,36308,144148]
+runtime in ms: [228,244,376,696,682,1478,6519,15487,61572]
+init edge lengths: [1.125,0.975,0.825,0.6749999999999999,0.5249999999999999,0.3749999999999999,0.2249999999999999,0.125,0.075]

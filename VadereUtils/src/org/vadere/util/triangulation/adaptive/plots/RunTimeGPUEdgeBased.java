@@ -43,7 +43,8 @@ public class RunTimeGPUEdgeBased extends JFrame {
 
 		double initialEdgeLength = 2.0;
 		double minInitialEdgeLength = 0.7;
-
+		List<Integer> nVertices = new ArrayList<>();
+		List<Long> runTimes = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
@@ -59,6 +60,9 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			log.info("quality" + meshGenerator.getQuality());
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
+			nVertices.add(meshGenerator.getMesh().getVertices().size());
+			runTimes.add( overAllTime.getTime());
+
 			PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
@@ -68,17 +72,27 @@ public class RunTimeGPUEdgeBased extends JFrame {
 
 			initialEdgeLength = initialEdgeLength - 0.05;
 		}
+
+		// print results
+
 	}
 
-	private static void stepUniformRing() {
+	private static void stepUniformRing(double startLen, double endLen, double stepLen) {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		double initialEdgeLength = 1.125;
-		double minInitialEdgeLength = 0.125;
+		double initialEdgeLength = startLen;
+		double minInitialEdgeLength = endLen;
+
+		//double initialEdgeLength = 1.125;
+		//double minInitialEdgeLength = 0.125;
+		List<Integer> nVertices = new ArrayList<>();
+		List<Long> runTimes = new ArrayList<>();
+		List<Double> initlialEdgeLengths = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
+			initlialEdgeLengths.add(initialEdgeLength);
 			CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 			meshGenerator.initialize();
 
@@ -105,6 +119,9 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			log.info("step avg time: " + (double)overAllTime.getNanoTime() / steps + "[ns]");
 			log.info("step avg time: " + (double)overAllTime.getTime() / steps + "[ms]");
 
+			nVertices.add(meshGenerator.getMesh().getVertices().size());
+			runTimes.add( overAllTime.getTime());
+
 			PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
@@ -112,11 +129,23 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			distmeshPanel.repaint();
 
-			initialEdgeLength = initialEdgeLength - 0.15;
+			initialEdgeLength = initialEdgeLength - stepLen;
+			//initialEdgeLength = initialEdgeLength - 0.15;
 		}
-	}
+
+		System.out.println("print result for edge based GPU version");
+		System.out.println("#vertices: [" + nVertices.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("runtime in ms: [" + runTimes.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("init edge lengths: [" + initlialEdgeLengths.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+    }
 
     public static void main(String[] args) {
-        stepUniformRing();
+		double initialEdgeLength = 0.125;
+		double minInitialEdgeLength = 0.05;
+
+		//double initialEdgeLength = 1.125;
+		//double minInitialEdgeLength = 0.125;
+
+    	stepUniformRing(0.05, 0.05, 0.05);
     }
 }

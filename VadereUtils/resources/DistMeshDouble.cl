@@ -50,7 +50,7 @@ inline bool isCCW(double2 q, double2 p, double2 r) {
 }
 
 inline double dist(double2 v) {
-    return fabs(7.0f - length(v))-3.0f;
+    return fabs(7.0 - length(v))-3.0;
 }
 
 inline double quality(double2 p, double2 q, double2 r) {
@@ -62,7 +62,7 @@ inline double quality(double2 p, double2 q, double2 r) {
 
 
 inline bool isInCircle(double2 a, double2 b, double2 c, double x , double y) {
-    double eps = 0.00001f;
+    double eps = 0.00001;
     double adx = a.x - x;
     double ady = a.y - y;
     double bdx = b.x - x;
@@ -157,7 +157,7 @@ kernel void label(__global double2* vertices,
                   __global int* illegalEdge) {
     int edgeId = get_global_id(0);
     if(isEdgeAlive(edges[edgeId])){
-        double eps = 0.0001f;
+        double eps = 0.0001;
 
         int v0 = edges[edgeId].s0;
         int v1 = edges[edgeId].s1;
@@ -399,8 +399,6 @@ kernel void computeForces(
 	}
 }
 
-//inline double fabs(double d) {return if(d < 0){return -d;}else{return d;}}
-
 inline double double2double (double a){
     unsigned int ia = __double_as_int (a);
     return __hiloint2double (__byte_perm (ia >> 3, ia, 0x7210), ia << 29);
@@ -447,7 +445,7 @@ kernel void computeLengths(
     double2 v = p1-p2;
 
     //TODO: desiredLenfunction required
-    double desiredLen = 1.0f;
+    double desiredLen = 1.0;
     double2 len = (double2) (length(v), desiredLen);
     lengths[i] = len;
     qLengths[i] = (double2) (length(v)*length(v), desiredLen*desiredLen);

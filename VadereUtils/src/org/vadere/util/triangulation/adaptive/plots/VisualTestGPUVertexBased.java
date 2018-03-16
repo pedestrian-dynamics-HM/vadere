@@ -29,7 +29,7 @@ public class VisualTestGPUVertexBased {
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static final double initialEdgeLength =  0.2;
+	private static final double initialEdgeLength =  0.5;
 
 	private static void overallUniformRing() {
 

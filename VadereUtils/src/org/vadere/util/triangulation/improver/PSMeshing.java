@@ -36,7 +36,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
-	private static final int MAX_STEPS = 300;
+	private static final int MAX_STEPS = 200;
 	private int nSteps;
 
 	private boolean runParallel = true;
@@ -95,7 +95,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	}
 
 	public boolean isFinished() {
-		return getQuality() >= Parameters.qualityMeasurement || nSteps >= MAX_STEPS;
+		return /*getQuality() >= Parameters.qualityMeasurement ||*/ nSteps >= MAX_STEPS;
 	}
 
 	@Override

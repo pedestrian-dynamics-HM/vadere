@@ -227,7 +227,7 @@ public class CLDistMeshHE<P extends IPoint> {
                     source = CLUtils.ioResourceToByteBuffer("DistMeshDoubleHE.cl", 4096);
                 }
                 else {
-                    source = CLUtils.ioResourceToByteBuffer("DistMeshDoubleHE.cl", 4096);
+                    source = CLUtils.ioResourceToByteBuffer("DistMeshHE.cl", 4096);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -347,7 +347,7 @@ public class CLDistMeshHE<P extends IPoint> {
             clSetKernelArg1p(clKernelForces, 4, clScalingFactor);
             clSetKernelArg1p(clKernelForces, 5, clForces);
 
-
+           // clSetKernelArg1i(clKernelMove, 0, numberOfVertices);
             clSetKernelArg1p(clKernelMove, 0, clVertices);
             clSetKernelArg1p(clKernelMove, 1, clBorderVertices);
             clSetKernelArg1p(clKernelMove, 2, clForces);
@@ -453,22 +453,22 @@ public class CLDistMeshHE<P extends IPoint> {
              *
              */
             hasToRead = true;
-            enqueueNDRangeKernel(clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
-            log.info("computed edge lengths");
+            enqueueNDRangeKernel("compute edge lengths", clQueue, clKernelLengths, 1, null, clGlobalWorkSizeEdges, null, null, null);
+            //log.info("computed edge lengths");
 
             if (numberOfEdges > prefdWorkGroupSizeMultiple) {
-                enqueueNDRangeKernel(clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
+                enqueueNDRangeKernel("compute partial sum", clQueue, clKernelPartialSF, 1, null, clGloblWorkSizeSFPartial, clLocalWorkSizeSFPartial, null, null);
             }
 
-            enqueueNDRangeKernel(clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
-            log.info("computed scale factor");
+            enqueueNDRangeKernel("compute sum",clQueue, clKernelCompleteSF, 1, null, clGloblWorkSizeSFComplete, clLocalWorkSizeSFComplete, null, null);
+            //log.info("computed scale factor");
 
             // force to use only 1 work group => local size = local size
-            enqueueNDRangeKernel(clQueue, clKernelForces, 1, null, clGlobalWorkSizeVertices, null, null, null);
-            log.info("computed forces");
+            enqueueNDRangeKernel("compute forces", clQueue, clKernelForces, 1, null, clGlobalWorkSizeVertices, null, null, null);
+            //log.info("computed forces");
 
-            enqueueNDRangeKernel(clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
-            log.info("move vertices");
+            enqueueNDRangeKernel("move vertices",clQueue, clKernelMove, 1, null, clGlobalWorkSizeVertices, null, null, null);
+            //log.info("move vertices");
 
             IntBuffer illegalTriangles = stack.mallocInt(1);
             illegalTriangles.put(0, 0);
@@ -476,7 +476,7 @@ public class CLDistMeshHE<P extends IPoint> {
             //enqueueNDRangeKernel(clQueue, clKernelCheckTriangles, 1, null, clGlobalWorkSizeTriangles, null, null, null);
             //clFinish(clQueue);
             //clEnqueueReadBuffer(clQueue, clIllegalTriangles, true, 0, illegalTriangles, null, null);
-            log.info("check for illegal triangles");
+            //log.info("check for illegal triangles");
             if (illegalTriangles.get(0) == 1) {
                 log.info("illegal triangle found!");
                 //return true;
@@ -487,27 +487,27 @@ public class CLDistMeshHE<P extends IPoint> {
                 IntBuffer illegalEdges = stack.mallocInt(1);
                 // while there is any illegal edge, do: // TODO: this is not the same as in the java distmesh!
 
-                enqueueNDRangeKernel(clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                log.info("label illegal edges");
+                enqueueNDRangeKernel("label edges",clQueue, clKernelLabelEdges, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                //log.info("label illegal edges");
 
                 do {
                     illegalEdges.put(0, 0);
                     clEnqueueWriteBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
 
-                    enqueueNDRangeKernel(clQueue, clKernelFlipStage1, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                    enqueueNDRangeKernel(clQueue, clKernelFlipStage2, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                    enqueueNDRangeKernel(clQueue, clKernelFlipStage3, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                    enqueueNDRangeKernel(clQueue, clKernelUnlockFaces, 1, null, clGlobalWorkSizeTriangles, null, null, null);
-                    log.info("flip some illegal edges");
+                    enqueueNDRangeKernel("flip 1",clQueue, clKernelFlipStage1, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    enqueueNDRangeKernel("flip 2",clQueue, clKernelFlipStage2, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    enqueueNDRangeKernel("flip 3",clQueue, clKernelFlipStage3, 1, null, clGlobalWorkSizeEdges, null, null, null);
+                    enqueueNDRangeKernel("unlock faces",clQueue, clKernelUnlockFaces, 1, null, clGlobalWorkSizeTriangles, null, null, null);
+                    //log.info("flip some illegal edges");
 
                     clEnqueueNDRangeKernel(clQueue, clKernelLabelEdgesUpdate, 1, null, clGlobalWorkSizeEdges, null, null, null);
-                    log.info("refresh old labels");
+                    //log.info("refresh old labels");
                     clFinish(clQueue);
 
                     //clEnqueueReadBuffer(clQueue, clTriLocks, true, 0, triLocks, null, null);
                     //checkTriLocks();
                     clEnqueueReadBuffer(clQueue, clIllegalEdges, true, 0, illegalEdges, null, null);
-                    log.info("isLegal = " + illegalEdges.get(0));
+                    //log.info("isLegal = " + illegalEdges.get(0));
 
                 } while (illegalEdges.get(0) == 1 && false);
                 //log.info("flip all");
@@ -519,7 +519,7 @@ public class CLDistMeshHE<P extends IPoint> {
         return false;
     }
 
-    private long enqueueNDRangeKernel(long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
+    private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
         if(profiling) {
             long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
             clWaitForEvents(clEvent);
@@ -528,7 +528,7 @@ public class CLDistMeshHE<P extends IPoint> {
             clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, retSize);
             clEvent.clear();
             // in nanaSec
-            System.out.println("event time " + "0x"+eventAddr + ": " + (endTime.getLong() - startTime.getLong()) + " ns");
+            log.info(name + " event time " + "0x"+eventAddr + ": " + (endTime.getLong() - startTime.getLong()) + " ns");
             endTime.clear();
             startTime.clear();
             return result;
@@ -544,6 +544,7 @@ public class CLDistMeshHE<P extends IPoint> {
                 DoubleBuffer scalingFactorD = stack.mallocDouble(1);
                 clEnqueueReadBuffer(clQueue, clScalingFactor, true, 0, scalingFactorD, null, null);
                 clEnqueueReadBuffer(clQueue, clVertices, true, 0, vD, null, null);
+                log.info("scale factor = " + scalingFactorD.get(0));
             }
             else {
                 FloatBuffer scalingFactorF = stack.mallocFloat(1);
