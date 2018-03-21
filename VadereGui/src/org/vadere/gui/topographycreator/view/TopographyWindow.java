@@ -23,6 +23,7 @@ import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
 import org.vadere.gui.topographycreator.control.ActionQuickSaveTopography;
 import org.vadere.gui.topographycreator.control.ActionRedo;
 import org.vadere.gui.topographycreator.control.ActionResetTopography;
+import org.vadere.gui.topographycreator.control.ActionResizeTopographyBound;
 import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
@@ -65,7 +66,7 @@ public class TopographyWindow extends JPanel {
 	private UndoableEditSupport undoSupport;
 	private UndoManager undoManager;
 
-	public TopographyWindow(final Scenario currentScenario) throws IOException, IntrospectionException {
+	public TopographyWindow(final Scenario currentScenario) {
 
 		toolbar = new ScenarioToolBar("Toolbar");
 		int toolbarSize = Integer.parseInt(resources.getProperty("Toolbar.size"));
@@ -247,8 +248,8 @@ public class TopographyWindow extends JPanel {
 				undoSupport),
 				basicAction);
 
-		List<Action> obstacleAndTargetDrawModes = new ArrayList<Action>();
-		List<Action> sourceDrawModes = new ArrayList<Action>();
+		List<Action> obstacleAndTargetDrawModes = new ArrayList<>();
+		List<Action> sourceDrawModes = new ArrayList<>();
 
 		obstacleAndTargetDrawModes.add(rectangle);
 		obstacleAndTargetDrawModes.add(pen);
@@ -294,6 +295,11 @@ public class TopographyWindow extends JPanel {
 		ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
 				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
 
+		/* resize Topography */
+		TopographyAction resizeTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
+				new ImageIcon(Resources.class.getResource("/icons/paint_method_rectangle_icon.png")),
+				panelModel, selectShape);
+
 		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
 		addActionToToolbar(
 				toolbar,
@@ -311,6 +317,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
 				obsButton);
 		addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
+		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
 		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
 				stairsButton);
 		toolbar.addSeparator(new Dimension(5, 50));
