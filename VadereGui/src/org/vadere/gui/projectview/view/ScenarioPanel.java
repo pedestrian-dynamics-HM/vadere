@@ -16,7 +16,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -224,7 +223,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		if (isEditable) {
 			menusInTabs.forEach(menu -> menu.setEnabled(true));
-			try {
+
 				int index = tabbedPane.getSelectedIndex();
 				if (topographyCreatorView != null && tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
 					tabbedPane.removeTabAt(tabbedPane.indexOfComponent(topographyCreatorView));
@@ -237,10 +236,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				tabbedPane.setSelectedIndex(index);
 				setTopography(scenario.getTopography());
 
-			} catch (IOException | IntrospectionException e) {
-				e.printStackTrace();
-				logger.error(e.getLocalizedMessage());
-			}
 		} else {
 			menusInTabs.forEach(menu -> menu.setEnabled(false));
 			boolean topoWasSelected = false;

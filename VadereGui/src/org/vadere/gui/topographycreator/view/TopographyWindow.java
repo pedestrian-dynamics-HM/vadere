@@ -297,7 +297,7 @@ public class TopographyWindow extends JPanel {
 
 		/* resize Topography */
 		TopographyAction resizeTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
-				new ImageIcon(Resources.class.getResource("/icons/paint_method_rectangle_icon.png")),
+				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
 				panelModel, selectShape);
 
 		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
@@ -317,7 +317,6 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
 				obsButton);
 		addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
-		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
 		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
 				stairsButton);
 		toolbar.addSeparator(new Dimension(5, 50));
@@ -327,6 +326,7 @@ public class TopographyWindow extends JPanel {
 		// addActionToToolbar(toolbar, minimizeAction,
 		// "TopographyCreator.btnMinimizeTopography.tooltip");
 		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
+		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
