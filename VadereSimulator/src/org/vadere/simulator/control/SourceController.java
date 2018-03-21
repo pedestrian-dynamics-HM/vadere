@@ -202,11 +202,20 @@ public class SourceController {
 				int target;
 
 
-				if (marion_calls % 50 == 0 ) {
+				if (marion_calls % 100 == 0 ) {
 
-					pLeft = marion_random.nextInt(101 ) ;
-					pStraight = marion_random.nextInt(101-pLeft ) ;
+					// pLeft = marion_random.nextInt(101 ) ;
+					// pStraight = marion_random.nextInt(101-pLeft ) ;
+
+					double z1 = marion_random.nextDouble();
+					double z2 = marion_random.nextDouble();
+					pLeft = (int) (100 * (1 - Math.sqrt(1-z1)));
+					pStraight = (int) ((100 - pLeft)*z2);
+
+					// System.out.println(pLeft + "-" + pStraight + "-" + (100-pLeft-pStraight));
+
 				}
+
 
 
 				if (rand < pLeft){
@@ -224,6 +233,12 @@ public class SourceController {
 
 				List <Integer> targetIds = new LinkedList<Integer>();
 				targetIds.add(target);
+
+				List<Integer> targetIds2 = sourceAttributes.getTargetIds();
+
+				// System.out.println(marion_calls);
+
+
 				newElement.setTargets(new LinkedList<>(targetIds));
 				marion_calls++;
 
