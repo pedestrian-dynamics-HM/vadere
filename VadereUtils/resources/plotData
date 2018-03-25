@@ -106,7 +106,7 @@ quality: [0.8284271247462112,0.7993753516257371,0.8474171242090487,0.85757391642
 
 
 
-# CPU paper
+# CPU paper: Prozessor	Intel(R) Core(TM) i5-7400 CPU @ 3.00GHz, 3000 MHz, 4 Kern(e), 4 logische(r) Prozessor(en)
 
 EikMesh:
 #vertices: [294,1101,4145,15855,61998]
