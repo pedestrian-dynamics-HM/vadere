@@ -81,7 +81,7 @@ public class RunTimeCPU extends JFrame {
 	private static void stepAdaptiveRingEikMesh(double startLen, double endLen, double stepLen) {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
-		IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 2.0;
+		IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;
 		List<VShape> obstacles = new ArrayList<>();
 
 		double initialEdgeLength = startLen;
@@ -95,7 +95,7 @@ public class RunTimeCPU extends JFrame {
 			initlialEdgeLengths.add(initialEdgeLength);
 			PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
 					distanceFunc,
-					uniformEdgeLength,
+					adaptiveEdgeLength,
 					initialEdgeLength,
 					bbox, obstacles,
 					supplier);
@@ -123,14 +123,14 @@ public class RunTimeCPU extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+			/*PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			distmeshPanel.repaint();
+			distmeshPanel.repaint();*/
 
-			initialEdgeLength = initialEdgeLength - stepLen;
+			initialEdgeLength = initialEdgeLength * 0.5;
 
 		}
 
@@ -144,7 +144,7 @@ public class RunTimeCPU extends JFrame {
 	private static void stepAdaptiveRingDistMesh(double startLen, double endLen, double stepLen) {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
-		IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 2.0;
+		IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;
 		List<VShape> obstacles = new ArrayList<>();
 
 		double initialEdgeLength = startLen;
@@ -183,14 +183,14 @@ public class RunTimeCPU extends JFrame {
 			nVertices.add(meshGenerator.getPoints().size());
 			runTimes.add( overAllTime.getTime());
 
-			PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox, t -> false);
+			/*PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox, t -> false);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			distmeshPanel.repaint();
+			distmeshPanel.repaint();*/
 
-			initialEdgeLength = initialEdgeLength - stepLen;
+			initialEdgeLength = initialEdgeLength * 0.5;
 
 		}
 
@@ -202,8 +202,7 @@ public class RunTimeCPU extends JFrame {
 	}
 
     public static void main(String[] args) {
-
-    	//stepAdaptiveRingDistMesh(0.1, 0.005, 0.005);
-	    stepAdaptiveRingEikMesh(0.1, 0.01, 0.005);
+		stepAdaptiveRingDistMesh(0.1, 0.005, 0.01);
+	    //stepAdaptiveRingEikMesh(0.1, 0.005, 0.01);
     }
 }
