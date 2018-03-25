@@ -53,7 +53,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private List<V> virtualVertices;
 	private boolean useMeshForBound;
 
-	private static double BUFFER_PERCENTAGE = 0.01;
+	private static double BUFFER_PERCENTAGE = 0.0001;
 
 	// TODO this epsilon it hard coded!!! => replace it with a user choice
 	private double epsilon = 0.0001;
@@ -652,7 +652,6 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 					flips++;
 					its++;
 				}
-
 				its++;
 
 				currentEdge = mesh.getTwin(mesh.getPrev(currentEdge));

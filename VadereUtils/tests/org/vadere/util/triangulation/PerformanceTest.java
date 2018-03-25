@@ -41,7 +41,7 @@ public class PerformanceTest {
 		int height = 300;
 		Random r = new Random();
 		assert false;
-		int numberOfPoints = 100000;
+		int numberOfPoints = 8000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());

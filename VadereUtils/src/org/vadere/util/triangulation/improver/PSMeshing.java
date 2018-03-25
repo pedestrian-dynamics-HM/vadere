@@ -17,6 +17,7 @@ import org.vadere.util.triangulation.adaptive.Parameters;
 import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -37,10 +38,10 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
-	private static final int MAX_STEPS = 200;
+	private static final int MAX_STEPS = 100;
 	private int nSteps;
 
-	private boolean runParallel = false;
+	private boolean runParallel = true;
 	private boolean profiling = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
@@ -62,7 +63,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.bound = bound;
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
-		this.deps = 1.4901e-8 * initialEdgeLen;
+		this.deps = 1.4901e-13 * initialEdgeLen;
 		this.obstacleShapes = obstacleShapes;
 		this.nSteps = 0;
 
@@ -109,35 +110,14 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
     public void improve() {
 		//synchronized (getMesh()) {
 			illegalMovement = false;
-			StopWatch watch = new StopWatch();
-
-			watch.start();
 			flipEdges();
-			watch.stop();
-			if(profiling)
-				log.info("flip edges:" + watch.getNanoTime());
-
-			watch.reset();
-			watch.start();
 			computeScalingFactor();
-			watch.stop();
-			if(profiling)
-				log.info("compute scale factor:" + watch.getNanoTime());
-
-			watch.reset();
-			watch.start();
-			computeForces();
-			watch.stop();
-			if(profiling)
-				log.info("compute forces:" + watch.getNanoTime());
-
-			watch.reset();
-			watch.start();
+			computeVertexForces();
 			updateVertices();
-			watch.stop();
-			if(profiling)
-				log.info("move vertices:" + watch.getNanoTime());
+			//removeBoundaryLowQualityTriangles();
 			nSteps++;
+			//log.info("quality: " + getQuality());
+			//log.info("min-quality: " + getMinQuality());
 		//}
     }
 
@@ -176,6 +156,23 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	    streamEdges().forEach(e -> computeForces(e));
 	}
 
+	private void computeVertexForces() {
+    	streamVertices().forEach(v -> computeForce(v));
+	}
+
+	private void computeForce(final V vertex) {
+		MeshPoint p1 = getMesh().getPoint(vertex);
+		for(V v2 : getMesh().getAdjacentVertexIt(vertex)) {
+			MeshPoint p2 = getMesh().getPoint(v2);
+
+			double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+			double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
+
+			double lenDiff = Math.max(desiredLen - len, 0);
+			p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
+		}
+	}
+
     /**
      * computes the edge force / velocity for a single half-edge and adds it to its end vertex.
      *
@@ -192,6 +189,16 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
         p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len)));
     }
 
+	private void computeForcesBossan(final E edge) {
+		MeshPoint p1 = getMesh().getPoint(edge);
+		MeshPoint p2 = getMesh().getPoint(getMesh().getPrev(edge));
+
+		double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+		double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
+
+		double lenDiff = Math.max(desiredLen - len, 0);
+		p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / (len / desiredLen)), (p1.getY() - p2.getY()) * (lenDiff / (len / desiredLen))));
+	}
     /**
      * moves (which may include a back projection) each vertex according to their forces / velocity
      * and resets their forces / velocities.
@@ -208,10 +215,16 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
     private void updateVertex(final V vertex) {
 		if(!isFixedVertex(vertex)) {
 			MeshPoint meshPoint = getMesh().getPoint(vertex);
-			IPoint velocity = getVelocity(vertex);
-			IPoint movement = velocity.scalarMultiply(delta);
-			moveVertex(vertex, movement);
+			double distance = distanceFunc.apply(meshPoint);
+
+			//if(distance < 0) {
+				IPoint velocity = getVelocity(vertex);
+				IPoint movement = velocity.scalarMultiply(delta);
+				moveVertex(vertex, movement);
+			//}
+
 			projectBackVertex(vertex);
+
 
 			//log.info(movement);
 
@@ -250,10 +263,35 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
      */
     private boolean flipEdges() {
         boolean anyFlip = false;
+	    streamEdges().filter(e -> triangulation.isIllegal(e))
+			    .forEach(e -> triangulation.flipSync(e));
+        /*if(runParallel) {
+	        streamEdges().filter(e -> triangulation.isIllegal(e))
+			        .forEach(e -> triangulation.flipSync(e));
+        }
+        else {
+	        //streamEdges().filter(e -> triangulation.isIllegal(e))
+	        //.forEach(e -> triangulation.flip(e));
+	        List<E> illegalEdges = streamEdges().filter(e -> triangulation.isIllegal(e)).collect(Collectors.toList());
+
+	        for(E edge : illegalEdges) {
+		        if(triangulation.isIllegal(edge)) {
+			        triangulation.flip(edge);
+		        }
+	        }
+        }*/
         // there is still an illegal edge
-        //while (streamEdges().anyMatch(e -> triangulation.isIllegal(e))) {
-            streamEdges().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flip(e));
-            anyFlip = true;
+	    /*streamEdges().filter(e -> triangulation.isIllegal(e)).collect(Collectors.toList());
+
+	    for(E edge : illegalEdges) {
+	    	if(triangulation.isIllegal(edge)) {
+	    		triangulation.flipSync(edge);
+		    }
+	    }*/
+
+	    //while (streamEdges().anyMatch(e -> triangulation.isIllegal(e))) {
+            //.forEach(e -> triangulation.flip(e));
+            //anyFlip = true;
         //}
         return anyFlip;
     }
@@ -273,12 +311,6 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
                 .mapToDouble(midPoint -> edgeLengthFunc.apply(midPoint)).sum();
         scalingFactor =  Math.sqrt((edgeLengthSum * edgeLengthSum) / (desiredEdgeLenSum * desiredEdgeLenSum));
     }
-
-
-
-
-
-
 
 
     // helper methods
@@ -417,12 +449,21 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	}
 
     private void removeBoundaryLowQualityTriangles() {
-        streamEdges()
-                .filter(e -> getMesh().isBoundary(e))
-                .map(e -> getMesh().getTwinFace(e))
-                .filter(face -> !getMesh().isDestroyed(face))
-                .filter(face -> faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE)
-                .collect(Collectors.toList()) // we have to collect since we manipulate / remove faces
-                .forEach(face -> triangulation.removeFaceAtBorder(face, true));
+		if(runParallel) {
+			streamEdges()
+					.filter(e -> getMesh().isBoundary(e))
+					.map(e -> getMesh().getTwinFace(e))
+					.filter(face -> !getMesh().isDestroyed(face))
+					.filter(face -> faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE)
+					.findAny().ifPresent(face -> triangulation.removeFaceAtBorder(face, true));
+		}
+		else {
+			streamEdges()
+					.filter(e -> getMesh().isBoundary(e))
+					.map(e -> getMesh().getTwinFace(e))
+					.filter(face -> !getMesh().isDestroyed(face))
+					.filter(face -> faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE)
+					.forEach(face -> triangulation.removeFaceAtBorder(face, true));
+		}
     }
 }

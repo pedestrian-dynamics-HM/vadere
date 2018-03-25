@@ -16,6 +16,8 @@ import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.adaptive.PSDistmesh;
+import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
@@ -26,13 +28,10 @@ import java.util.function.Predicate;
 import javax.swing.*;
 
 /**
- * This class generates some nice Meshes for different geometries / distance functions.
- *
- * @author Benedikt Zoennchen
+ * Created by bzoennchen on 23.03.18.
  */
-public class MeshPlots {
-
-	private static final Logger log = LogManager.getLogger(MeshPlots.class);
+public class DistMeshPlotsSmall {
+	private static final Logger log = LogManager.getLogger(RunTimeCPU.class);
 
 	/**
 	 * Each geometry is contained this bounding box.
@@ -40,38 +39,32 @@ public class MeshPlots {
 	private static final VRectangle bbox = new VRectangle(-1.01, -1.01, 2.02, 2.02);
 	private static IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static double initialEdgeLength = 1.5;
+	private static double initialEdgeLength = 0.06;
 
 	/**
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void uniformCircle(final double initialEdgeLength) {
-		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1;
 		List<VShape> obstacles = new ArrayList<>();
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
 
-		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
-				distanceFunc,
-				uniformEdgeLength,
+		PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
+				edgeLengthFunc,
 				initialEdgeLength,
-				bbox, obstacles,
-				supplier);
+				bbox, obstacles);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		meshGenerator.generate();
+		meshGenerator.execute();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getPoints().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("quality:" + meshGenerator.getQuality());
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		Predicate<AFace<MeshPoint>> predicate = f ->  meshGenerator.faceToQuality(f) < 0.9;
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(),
-				predicate, 1000, 800, bbox);
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
@@ -83,176 +76,193 @@ public class MeshPlots {
 		//System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
-
 	/**
 	 * A ring innter radius 4.0 and outer radius 10.0 meshed using a uniform mesh.
 	 */
-	private static void uniformRing() {
-		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+	private static void adaptedRing() {
+		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
-		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
 
-		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
-				distanceFunc,
+		PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
-				bbox, obstacles,
-				supplier);
+				bbox, obstacles);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		meshGenerator.generate();
+		meshGenerator.execute();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getPoints().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("quality:" + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
-		frame.setTitle("uniformRing()");
+		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		distmeshPanel.repaint();
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+	}
+
+
+	/**
+	 * A ring innter radius 4.0 and outer radius 10.0 meshed using a uniform mesh.
+	 */
+	private static void uniformRing() {
+		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
+		List<VShape> obstacles = new ArrayList<>();
+		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
+
+		PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
+				edgeLengthFunc,
+				initialEdgeLength,
+				bbox, obstacles);
+
+		StopWatch overAllTime = new StopWatch();
+		overAllTime.start();
+		meshGenerator.execute();
+		overAllTime.stop();
+
+		log.info("#vertices:" + meshGenerator.getPoints().size());
+		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("quality:" + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
+
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox);
+		JFrame frame = distmeshPanel.display();
+		frame.setVisible(true);
+		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		distmeshPanel.repaint();
+
+		System.out.println();
+		System.out.println();
 	}
 
 	/**
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void adaptiveRing(final double initialEdgeLength) {
-		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
-		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p)) * 0.5;
-
-		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
-				distanceFunc,
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2.0;
+		PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
-				bbox, obstacles,
-				supplier);
+				bbox, obstacles);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		meshGenerator.generate();
+		meshGenerator.execute();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getPoints().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("quality:" + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
-		frame.setTitle("adaptiveCircle("+ initialEdgeLength + ")");
+		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		distmeshPanel.repaint();
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
 	/**
 	 * A a rectangular "ring".
 	 */
 	private static void uniformRect() {
-		VRectangle rect = new VRectangle(-4, -4, 8, 8);
-
-		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 10, IDistanceFunction.create(bbox, rect));
+		VRectangle rect = new VRectangle(-0.4, -0.4, 0.8, 0.8);
+		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0, IDistanceFunction.create(bbox, rect));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
 
 		obstacles.add(rect);
 
-		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
-				distanceFunc,
+		PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
-				bbox, obstacles,
-				supplier);
+				bbox, obstacles);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		meshGenerator.generate();
+		meshGenerator.execute();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getPoints().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("quality:" + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
-		frame.setTitle("uniformRect()");
+		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		distmeshPanel.repaint();
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
 	/**
 	 * A a rectangular "ring".
 	 */
 	private static void uniformHex() {
-		VPolygon hex = VShape.generateHexagon(4.0);
+		VPolygon hex = VShape.generateHexagon(0.4);
 
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
+		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
 
 		obstacles.add(hex);
 
-		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
-				distanceFunc,
+		PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
-				bbox, obstacles,
-				supplier);
+				bbox, obstacles);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		meshGenerator.generate();
+		meshGenerator.execute();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getPoints().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("quality:" + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
-		frame.setTitle("uniformHex()");
+		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		distmeshPanel.repaint();
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
-	}
-
-	private MeshPlots() {
-
 	}
 
 	public static void main(String[] args) {
-		uniformCircle(0.1);
+		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
-		//uniformRing();
+		adaptiveRing(0.04);
+		// /uniformRing();
 		//uniformRect();
 		//uniformHex();
 		//adaptiveRing(initialEdgeLength / 2.0);
 	}
-
 
 }

@@ -92,26 +92,32 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		for(F face : faces) {
 			try {
 				VPolygon polygon = mesh.toPolygon(face);
-				if(alertPred.test(face)) {
+				//if(alertPred.test(face)) {
 					//log.info("red triangle");
 
-					graphics.setColor(Color.BLACK);
+					double qualitiy = faceToQuality(face);
+					graphics.setColor(new Color((float)qualitiy, (float)qualitiy, (float)qualitiy));
 					graphics.fill(polygon);
-					graphics.setColor(Color.WHITE);
 					graphics.draw(polygon);
+					graphics.setColor(Color.BLACK);
+					graphics.draw(polygon);
+					//graphics.setColor(Color.WHITE);
+					//graphics.draw(polygon);
 
-				} else if(!mesh.isBoundary(face)) {
-					if(face instanceof AFace) {
+				//} /*else if(!mesh.isBoundary(face)) {
+					/*if(face instanceof AFace) {
 
 						int bucket = ((AFace)face).getId() / groupSize;
 
 						graphics.setColor(colorHelper.numberToColor(((AFace)face).getId()));
 						graphics.fill(polygon);
 					}
-				}
+				}*/
+				/*else {
+					graphics.setColor(Color.BLACK);
+					graphics.draw(polygon);
+				}*/
 
-				graphics.setColor(Color.BLACK);
-				graphics.draw(polygon);
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
 				log.error("could not paint a face + " + face);
@@ -120,6 +126,21 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		}
 
 		graphics2D.drawImage(image, 0, 0, null);
+	}
+
+	private double faceToQuality(final F face) {
+		VLine[] lines = mesh.toTriangle(face).getLines();
+		double a = lines[0].length();
+		double b = lines[1].length();
+		double c = lines[2].length();
+		double part = 0.0;
+		if(a != 0.0 && b != 0.0 && c != 0.0) {
+			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+		}
+		else {
+			throw new IllegalArgumentException(face + " is not a feasible triangle!");
+		}
+		return part;
 	}
 
 	public double triangleToQuality(final VTriangle triangle) {

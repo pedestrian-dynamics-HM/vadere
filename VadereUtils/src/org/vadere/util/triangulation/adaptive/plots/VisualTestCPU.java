@@ -8,6 +8,7 @@ import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.triangulation.IPointConstructor;
@@ -33,9 +34,11 @@ public class VisualTestCPU {
 	private static final double initialEdgeLength = 1.0;
 
 	private static void overallUniformRing() {
-
+		VPolygon hex = VShape.generateHexagon(4.0);
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+
+		//IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 
 		PSMeshing meshGenerator = new PSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
@@ -53,19 +56,24 @@ public class VisualTestCPU {
 		while (nSteps < 300) {
 			nSteps++;
 			meshGenerator.improve();
+			overAllTime.suspend();
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			distmeshPanel.repaint();
+			log.info("quality: " + meshGenerator.getQuality());
+			log.info("min-quality: " + meshGenerator.getMinQuality());
+			overAllTime.resume();
 		}
 		overAllTime.stop();
 
 		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
 		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
-		log.info("quality" + meshGenerator.getQuality());
+		log.info("quality: " + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
 	}

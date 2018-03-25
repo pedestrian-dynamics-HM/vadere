@@ -30,9 +30,9 @@ import javax.swing.*;
  *
  * @author Benedikt Zoennchen
  */
-public class MeshPlots {
+public class MeshPlotsSmall {
 
-	private static final Logger log = LogManager.getLogger(MeshPlots.class);
+	private static final Logger log = LogManager.getLogger(RunTimeCPU.class);
 
 	/**
 	 * Each geometry is contained this bounding box.
@@ -40,7 +40,7 @@ public class MeshPlots {
 	private static final VRectangle bbox = new VRectangle(-1.01, -1.01, 2.02, 2.02);
 	private static IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static double initialEdgeLength = 1.5;
+	private static double initialEdgeLength = 0.1;
 
 	/**
 	 * A circle with radius 10.0 meshed using a uniform mesh.
@@ -49,11 +49,11 @@ public class MeshPlots {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1;
 		List<VShape> obstacles = new ArrayList<>();
-		//IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
 
 		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
 				distanceFunc,
-				uniformEdgeLength,
+				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
 				supplier);
@@ -89,7 +89,7 @@ public class MeshPlots {
 	 */
 	private static void uniformRing() {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
 
@@ -108,6 +108,7 @@ public class MeshPlots {
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
@@ -118,7 +119,7 @@ public class MeshPlots {
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		//System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
 	/**
@@ -126,9 +127,9 @@ public class MeshPlots {
 	 */
 	private static void adaptiveRing(final double initialEdgeLength) {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
-		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p)) * 0.5;
+		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p));
 
 		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
 				distanceFunc,
@@ -145,6 +146,7 @@ public class MeshPlots {
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
@@ -155,17 +157,17 @@ public class MeshPlots {
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		//System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
 	/**
 	 * A a rectangular "ring".
 	 */
 	private static void uniformRect() {
-		VRectangle rect = new VRectangle(-4, -4, 8, 8);
+		VRectangle rect = new VRectangle(-0.4, -0.4, 0.8, 0.8);
 
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 10, IDistanceFunction.create(bbox, rect));
+		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0, IDistanceFunction.create(bbox, rect));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
 
@@ -186,6 +188,7 @@ public class MeshPlots {
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
@@ -203,10 +206,10 @@ public class MeshPlots {
 	 * A a rectangular "ring".
 	 */
 	private static void uniformHex() {
-		VPolygon hex = VShape.generateHexagon(4.0);
+		VPolygon hex = VShape.generateHexagon(0.4);
 
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
+		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
 
@@ -227,6 +230,7 @@ public class MeshPlots {
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("min-quality: " + meshGenerator.getMinQuality());
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
@@ -240,12 +244,12 @@ public class MeshPlots {
 		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
-	private MeshPlots() {
+	private MeshPlotsSmall() {
 
 	}
 
 	public static void main(String[] args) {
-		uniformCircle(0.1);
+		adaptiveRing(0.2);
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
 		//uniformRing();

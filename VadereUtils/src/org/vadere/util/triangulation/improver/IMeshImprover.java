@@ -48,6 +48,11 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
 		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> d1 + d2).get() / faces.size();
 	}
 
+	default double getMinQuality() {
+		Collection<F> faces = getMesh().getFaces();
+		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> Math.min(d1, d2)).get();
+	}
+
 	default double faceToQuality(final F face) {
 		VLine[] lines = getMesh().toTriangle(face).getLines();
 		double a = lines[0].length();
