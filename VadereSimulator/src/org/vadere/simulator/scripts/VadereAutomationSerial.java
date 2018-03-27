@@ -1,26 +1,20 @@
 package org.vadere.simulator.scripts;
-import java.util.*;
-import java.lang.*;
 
-import org.vadere.simulator.control.SourceController;
 import org.vadere.simulator.entrypoints.ScenarioBuilder;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
-import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
 import java.util.Random;
-
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 
 /* Works only for three targets */
 
-public class VadereAutomation {
+public class VadereAutomationSerial {
 
 
 
@@ -28,7 +22,7 @@ public class VadereAutomation {
     public static final String SCENARIO_NAME = "Kreuzung_Studenten_lang_NAVIGATION";
     // public static final String SCENARIO_PATH = "D:/marion/Arbeit/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
     public static final String SCENARIO_PATH = "D:/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
-    public static final int N_SIMULATIONS = 1;
+    public static final int N_SIMULATIONS = 10;
     public static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
@@ -69,21 +63,23 @@ public class VadereAutomation {
         int amount = N_SIMULATIONS;
         for (int i =0; i < amount; i++) {
             startAutomatic(final_scenario);
-        }
 
-        /* wait for all threads to finish
-        try {
-            for (int i = 0; i < arrThreads.size(); i++) {
-                arrThreads.get(i).join();
+            //  wait for all threads to finish
+            try {
+                for (int ii = 0; ii < arrThreads.size(); ii++) {
+                    arrThreads.get(ii).join();
+                }
+            }catch(InterruptedException ie){
+                System.out.println(ie);
             }
-        }catch(InterruptedException ie){
-            System.out.println(ie);
+
+            // time
+            long stop_time = (System.currentTimeMillis() - start_time ) / 1000; // seconds
+            System.out.println("*** Simulations took " + stop_time + " seconds ****");
+
+
         }
 
-        // time
-        long stop_time = (System.currentTimeMillis() - start_time ) / 1000; // seconds
-        System.out.println("*** Simulations took " + stop_time + " seconds ****");
-        */
     }
 
     public static int randomCalc(int min, int max) {
@@ -123,8 +119,8 @@ public class VadereAutomation {
 
             scenario = builder.build();
             scenario.saveChanges();
-           //  scenario.setName(target_distribution+"_Distribution");
-           scenario.setName("x_Distribution");
+            //  scenario.setName(target_distribution+"_Distribution");
+            scenario.setName("x_Distribution");
 
 
 
