@@ -119,7 +119,7 @@ public class MeshPlotsSmall {
 
 		System.out.println();
 		System.out.println();
-		//System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
 	/**
@@ -244,15 +244,59 @@ public class MeshPlotsSmall {
 		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
+	/**
+	 * A a rectangular "ring".
+	 */
+	private static void adaptiveRect(final double initialEdgeLength) {
+		VPolygon hex = VShape.generateHexagon(0.4);
+
+		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY()))- 1.0, IDistanceFunction.create(bbox, hex));
+		List<VShape> obstacles = new ArrayList<>();
+		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;
+
+		obstacles.add(hex);
+		obstacles.add(new VRectangle(-1, -1, 2, 2));
+
+		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
+				distanceFunc,
+				edgeLengthFunction,
+				initialEdgeLength,
+				bbox, obstacles,
+				supplier);
+
+		StopWatch overAllTime = new StopWatch();
+		overAllTime.start();
+		meshGenerator.generate();
+		overAllTime.stop();
+
+		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
+		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		log.info("min-quality: " + meshGenerator.getMinQuality());
+
+		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		JFrame frame = distmeshPanel.display();
+		frame.setVisible(true);
+		frame.setTitle("uniformHex()");
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		distmeshPanel.repaint();
+
+		System.out.println();
+		System.out.println();
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+	}
+
 	private MeshPlotsSmall() {
 
 	}
 
 	public static void main(String[] args) {
-		adaptiveRing(0.2);
+		//adaptiveRect(0.05);
+		//adaptiveRing(0.2);
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
-		//uniformRing();
+		uniformRing();
 		//uniformRect();
 		//uniformHex();
 		//adaptiveRing(initialEdgeLength / 2.0);

@@ -38,10 +38,10 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
-	private static final int MAX_STEPS = 100;
+	private static final int MAX_STEPS = 500;
 	private int nSteps;
 
-	private boolean runParallel = true;
+	private boolean runParallel = false;
 	private boolean profiling = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
@@ -63,7 +63,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.bound = bound;
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
-		this.deps = 1.4901e-13 * initialEdgeLen;
+		this.deps = 0.000001 * initialEdgeLen;
 		this.obstacleShapes = obstacleShapes;
 		this.nSteps = 0;
 
@@ -114,7 +114,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			computeScalingFactor();
 			computeVertexForces();
 			updateVertices();
-			//removeBoundaryLowQualityTriangles();
+			removeBoundaryLowQualityTriangles();
 			nSteps++;
 			//log.info("quality: " + getQuality());
 			//log.info("min-quality: " + getMinQuality());

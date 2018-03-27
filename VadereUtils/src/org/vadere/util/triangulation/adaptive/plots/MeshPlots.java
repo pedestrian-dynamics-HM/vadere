@@ -19,8 +19,10 @@ import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.swing.*;
@@ -80,7 +82,12 @@ public class MeshPlots {
 
 		System.out.println();
 		System.out.println();
-		//System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+
+		Function<AFace<MeshPoint>, Color> colorFunction = f -> {
+			float grayVal = (float)meshGenerator.faceToQuality(f);
+			return new Color(grayVal, grayVal, grayVal);
+		};
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh(), 10.0f));
 	}
 
 
@@ -126,9 +133,9 @@ public class MeshPlots {
 	 */
 	private static void adaptiveRing(final double initialEdgeLength) {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
-		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
+		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
-		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p)) * 0.5;
+		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p));
 
 		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
 				distanceFunc,
@@ -245,13 +252,13 @@ public class MeshPlots {
 	}
 
 	public static void main(String[] args) {
-		uniformCircle(0.1);
+		//uniformCircle(0.2);
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
 		//uniformRing();
 		//uniformRect();
 		//uniformHex();
-		//adaptiveRing(initialEdgeLength / 2.0);
+		adaptiveRing(0.3);
 	}
 
 

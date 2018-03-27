@@ -10,15 +10,17 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
+import java.awt.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TexGraphGenerator {
 
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh){
+			@NotNull final IMesh<P, V, E, F> mesh, final float scaling){
 		StringBuilder builder = new StringBuilder();
-		builder.append("\\begin{tikzpicture}[scale=1.0]\n");
+		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
 
 		for(VPoint point : mesh.getUniquePoints()) {
 			//builder.append("\\draw[fill=black] ("+point.getX()+","+point.getY()+") circle (3pt); \n");
@@ -34,6 +36,38 @@ public class TexGraphGenerator {
 
 		builder.append("\\end{tikzpicture}");
 
+		return builder.toString();
+	}
+
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
+			@NotNull final IMesh<P, V, E, F> mesh){
+		return toTikz(mesh, 1.0f);
+	}
+
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final Function<F, Color> coloring,
+	final float scaling) {
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
+
+		for(F face : mesh.getFaces()) {
+			Color c = coloring.apply(face);
+			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+			V first = mesh.streamVertices(face).findFirst().get();
+			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
+
+			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
+			builder.append("\\filldraw[color=black,fill="+tikzColor+"]" + poly + ";\n");
+		}
+
+		/*for(F face : mesh.getFaces()) {
+			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get();
+			builder.append("\\draw[black,thick]" + poly + ";\n");
+		}*/
+
+		builder.append("\\end{tikzpicture}");
 		return builder.toString();
 	}
 

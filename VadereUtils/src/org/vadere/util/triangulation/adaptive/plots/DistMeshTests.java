@@ -52,7 +52,7 @@ public class DistMeshTests extends JFrame {
 
 
 	    PSDistmesh meshGenerator = new PSDistmesh(distanceFunc,
-			    edgeLengthFunction,
+			    p -> 1.0,
 			    initialEdgeLength,
 			    bbox, obstacles);
 
