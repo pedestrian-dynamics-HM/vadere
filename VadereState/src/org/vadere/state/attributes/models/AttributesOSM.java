@@ -25,8 +25,8 @@ public class AttributesOSM extends Attributes {
 	private boolean seeSmallWalls = false;
 	private boolean minimumStepLength = false;
 	private String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
-	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact";
-	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact";
+	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell";
+	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
 	private List<String> submodels = new LinkedList<>();
 
 	public AttributesOSM() {}
