@@ -256,9 +256,9 @@ public class MeshPlots {
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
 		//uniformRing();
-		//uniformRect();
+		uniformRect();
 		//uniformHex();
-		adaptiveRing(0.3);
+		//adaptiveRing(0.3);
 	}
 
 
