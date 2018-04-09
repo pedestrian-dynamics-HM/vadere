@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.OutputFileMap;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
@@ -67,15 +68,8 @@ public class ClassFinder {
 					.map(c -> {
 						// Find corresponding outputfile class
 						try {
-							List<Class<?>> opClasses = getClasses(OutputFile.class.getPackage().getName());
-
-							Optional<Class<?>> corrOpClass = opClasses
-									.stream()
-									.filter(opc -> !Modifier.isAbstract(opc.getModifiers()))
-									.filter(opc -> ((ParameterizedType) opc.getGenericSuperclass()).getActualTypeArguments()[0].getTypeName().equals(c.getName()))
-									.findFirst();
-
-							return Pair.of((Class) c, corrOpClass);
+							OutputFileMap annotation = c.getAnnotation(OutputFileMap.class);
+							return Pair.of((Class) c, Optional.of(annotation.outputFileClass()));
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}

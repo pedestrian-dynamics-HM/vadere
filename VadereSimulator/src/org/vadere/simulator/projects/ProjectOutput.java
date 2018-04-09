@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,10 +40,11 @@ public class ProjectOutput {
 	}
 
 	/**
-	 * Returns cached output directories. This function does not check if cached {@link SimulationOutput}
-	 * is marked dirty. It is assumed {@link #update()} was called prior to this function.
+	 * Returns cached output directories. This function does not check if cached {@link
+	 * SimulationOutput} is marked dirty. It is assumed {@link #update()} was called prior to this
+	 * function.
 	 *
-	 * @return	list of output directories corresponding to cached {@link SimulationOutput}
+	 * @return list of output directories corresponding to cached {@link SimulationOutput}
 	 */
 	public List<File> getAllOutputDirs() {
 		Path out = project.getOutputDir();
@@ -55,11 +55,11 @@ public class ProjectOutput {
 	}
 
 	/**
-	 * This function does not check if cached {@link SimulationOutput}
-	 * is dirty. It is assumed {@link #update()} was called prior to this function.
+	 * This function does not check if cached {@link SimulationOutput} is dirty. It is assumed
+	 * {@link #update()} was called prior to this function.
 	 *
-	 * @param scenario		Prior runs to this {@link Scenario}
-	 * @return				List of prior simulation runs matching selected {@link Scenario}
+	 * @param scenario Prior runs to this {@link Scenario}
+	 * @return List of prior simulation runs matching selected {@link Scenario}
 	 */
 	public List<File> listSelectedOutputDirs(final Scenario scenario) {
 		List<File> out = new ArrayList<>();
@@ -79,10 +79,10 @@ public class ProjectOutput {
 	}
 
 	/**
-	 * If the output directory is present it is marked dirty and will be re-check
-	 * in the next call of {@link #update()}
+	 * If the output directory is present it is marked dirty and will be re-check in the next call
+	 * of {@link #update()}
 	 *
-	 * @param dirName	directory name of {@link SimulationOutput}
+	 * @param dirName directory name of {@link SimulationOutput}
 	 */
 	synchronized public void markDirty(String dirName) {
 		getSimulationOutput(dirName).ifPresent(SimulationOutput::setDirty);
@@ -92,18 +92,19 @@ public class ProjectOutput {
 		return Optional.ofNullable(simulationOutputs.get(dirName));
 	}
 
-	public Scenario getScenario(String dirName){
+	public Scenario getScenario(String dirName) {
 		return getSimulationOutput(dirName).get().getSimulatedScenario();
 	}
 
 	/**
-	 * re-check dirty {@link SimulationOutput} and add new valid output dirs to {@link ProjectOutput}
+	 * re-check dirty {@link SimulationOutput} and add new valid output dirs to {@link
+	 * ProjectOutput}
 	 */
 	public void update() {
 		try {
 			Files.walkFileTree(project.getOutputDir(), new SimpleFileVisitor<Path>() {
 				@Override
-				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs){
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
 
 					String dirName = dir.toFile().getName();
 
@@ -118,9 +119,12 @@ public class ProjectOutput {
 					Optional<SimulationOutput> outDir = getSimulationOutput(dirName);
 
 					// only re-check existing SimulationOutput if they are dirty
-					if (outDir.isPresent() && outDir.get().isDirty()) {
+					if (outDir.isPresent()) {
+						if (!outDir.get().isDirty())
+							return FileVisitResult.CONTINUE;
+
 						Optional<SimulationOutput> newSim = IOOutput.getSimulationOutput(project, dir.toFile());
-						if (newSim.isPresent()){
+						if (newSim.isPresent()) {
 							simulationOutputs.put(dirName, newSim.get());
 						} else {
 							simulationOutputs.remove(dirName);

@@ -29,7 +29,7 @@ public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdKey, D
 
     @Override
     public void init(final ProcessorManager manager) {
-        // No initialization needed
+       super.init(manager);
     }
 
     private void setValues(Collection<Pedestrian> peds, double value) {

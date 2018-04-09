@@ -26,10 +26,12 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 
 	public PedestrianEvacuationTimeProcessor() {
 		super("evacuationTime");
+		setAttributes(new AttributesPedestrianEvacuationTimeProcessor());
 	}
 	
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		AttributesPedestrianEvacuationTimeProcessor att = (AttributesPedestrianEvacuationTimeProcessor) this.getAttributes();
 		pedStartTimeProc = (PedestrianStartTimeProcessor) manager.getProcessor(att.getPedestrianStartTimeProcessorId());
 	}

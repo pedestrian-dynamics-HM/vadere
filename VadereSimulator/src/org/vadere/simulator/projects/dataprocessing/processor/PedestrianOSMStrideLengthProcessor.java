@@ -3,67 +3,52 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mario Teixeira Parente
- *
  */
 
 public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
-    private OptimalStepsModel osm;
+	private OptimalStepsModel osm;
 
-    public PedestrianOSMStrideLengthProcessor() {
-        super("strideLength");
+	public PedestrianOSMStrideLengthProcessor() {
+		super("strideLength");
 
-        this.osm = null;
-    }
+		this.osm = null;
+	}
 
-    @Override
-    protected void doUpdate(final SimulationState state) {
-        Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
-        // TODO: if osm != null then compute stridelength
-        peds.forEach(ped -> this.putValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), this.osm == null ? Double.NaN : 0.0));
+	@Override
+	protected void doUpdate(final SimulationState state) {
 
-        // TODO Use this comment from the old implementation for this implementation
-//        @Override
-//        public Map<String, Table> getOutputTables() {
-//            outputTables.clear();
-//
-//            List<PedestrianOSM> pedestrians = ListUtils.select(
-//                    topography.getElements(Pedestrian.class), PedestrianOSM.class);
-//            for (PedestrianOSM pedestrian : pedestrians) {
-//
-//                List<Double>[] pedStrides = pedestrian.getStrides();
-//                if (pedStrides.length > 0 && !pedStrides[0].isEmpty()) {
-//
-//                    Table strides = new Table("strideLength", "strideTime");
-//
-//                    for (int i = 0; i < pedStrides[0].size(); i++) {
-//                        strides.addRow();
-//                        strides.addColumnEntry("strideLength", pedStrides[0].get(i));
-//                        strides.addColumnEntry("strideTime", pedStrides[1].get(i));
-//                    }
-//
-//                    outputTables.put(String.valueOf(pedestrian.getId()), strides);
-//                }
-//
-//                pedestrian.clearStrides();
-//
-//            }
-//
-//            return outputTables;
-//        }
-    }
+		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
+		if (osm != null) {
+			List<PedestrianOSM> osmPeds = peds.stream().map(p -> ((PedestrianOSM) p)).collect(Collectors.toList());
+			osmPeds.forEach(ped -> {
 
-    @Override
-    public void init(final ProcessorManager manager) {
-        Model model = manager.getMainModel();
-        if (model instanceof OptimalStepsModel)
-            this.osm = (OptimalStepsModel) model;
-    }
+				LinkedList<Double> strideLengths = ped.getStrides()[0];
+				double length = strideLengths.isEmpty() ? 0.0 : strideLengths.getLast();
+
+				this.putValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), length);
+			});
+		} else {
+			peds.forEach(ped -> this.putValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), Double.NaN));
+		}
+	}
+
+	@Override
+	public void init(final ProcessorManager manager) {
+		super.init(manager);
+		Model model = manager.getMainModel();
+		if (model instanceof OptimalStepsModel)
+			this.osm = (OptimalStepsModel) model;
+	}
 }

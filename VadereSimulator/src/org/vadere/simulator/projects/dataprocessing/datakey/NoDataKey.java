@@ -1,10 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
+
 /**
  * @author Mario Teixeira Parente
  *
  */
-
+@OutputFileMap(outputFileClass = NoDataKeyOutputFile.class)
 public final class NoDataKey implements DataKey<NoDataKey> {
 
     private static NoDataKey key;

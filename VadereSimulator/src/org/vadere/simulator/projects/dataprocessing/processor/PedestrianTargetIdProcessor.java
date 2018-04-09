@@ -26,8 +26,4 @@ public class PedestrianTargetIdProcessor extends DataProcessor<TimestepPedestria
 				p.getTargets().isEmpty() ? -1 : p.getTargets().getFirst()));
 	}
 
-	@Override
-	public void init(final ProcessorManager manager) {
-		// No initialization needed
-	}
 }

@@ -20,6 +20,7 @@ public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdK
 
     public PedestrianFlowProcessor() {
         super("flow");
+        setAttributes(new AttributesPedestrianFlowProcessor());
     }
 
     @Override
@@ -39,6 +40,7 @@ public class PedestrianFlowProcessor extends DataProcessor<TimestepPedestrianIdK
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         AttributesPedestrianFlowProcessor att = (AttributesPedestrianFlowProcessor) this.getAttributes();
 
         this.pedVelProc = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());

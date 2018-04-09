@@ -1,22 +1,16 @@
 package org.vadere.simulator.models.osm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeEventDriven;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
+import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeParallel;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeSequential;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetRingExperiment;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -29,23 +23,25 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 public class PedestrianOSM extends Pedestrian {
 
 	private final AttributesOSM attributesOSM;
 	private final transient StepCircleOptimizer stepCircleOptimizer;
 	private final transient UpdateSchemeOSM updateScheme;
-
+	private final transient Topography topography;
+	private final double stepLength;
+	private final double stepDeviation;
+	private final double minStepLength;
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
-
-	private final transient Topography topography;
-
-	private final double stepLength;
-	private final double stepDeviation;
 	private List<SpeedAdjuster> speedAdjusters;
-	private final double minStepLength;
-
 	private double durationNextStep;
 	private VPoint nextPosition;
 	private VPoint lastPosition;
@@ -60,17 +56,17 @@ public class PedestrianOSM extends Pedestrian {
 	// calculated by (current position - last position)/(period of time).
 	private double speedByAbsoluteDistance;
 
-	private List<Double>[] strides;
+	private LinkedList<Double>[] strides;    // strides[0] = length strides[1] = time
 	private StairStepOptimizer stairStepOptimizer;
 
 	@SuppressWarnings("unchecked")
 	PedestrianOSM(AttributesOSM attributesOSM,
-			AttributesAgent attributesPedestrian, Topography topography,
-			Random random, IPotentialFieldTarget potentialFieldTarget,
-			PotentialFieldObstacle potentialFieldObstacle,
-			PotentialFieldAgent potentialFieldPedestrian,
-			List<SpeedAdjuster> speedAdjusters,
-			StepCircleOptimizer stepCircleOptimizer) {
+				  AttributesAgent attributesPedestrian, Topography topography,
+				  Random random, IPotentialFieldTarget potentialFieldTarget,
+				  PotentialFieldObstacle potentialFieldObstacle,
+				  PotentialFieldAgent potentialFieldPedestrian,
+				  List<SpeedAdjuster> speedAdjusters,
+				  StepCircleOptimizer stepCircleOptimizer) {
 
 		super(attributesPedestrian, random);
 
@@ -98,9 +94,9 @@ public class PedestrianOSM extends Pedestrian {
 			this.minStepLength = 0;
 		}
 
-		this.strides = (ArrayList<Double>[]) (new ArrayList<?>[2]);
-		this.strides[0] = new ArrayList<>();
-		this.strides[1] = new ArrayList<>();
+		this.strides = (LinkedList<Double>[]) (new LinkedList<?>[2]);
+		this.strides[0] = new LinkedList<>();
+		this.strides[1] = new LinkedList<>();
 	}
 
 	private static UpdateSchemeOSM createUpdateScheme(UpdateType updateType, PedestrianOSM pedestrian) {
@@ -198,7 +194,7 @@ public class PedestrianOSM extends Pedestrian {
 		if (attributesOSM.isDynamicStepLength()) {
 			return attributesOSM.getStepLengthIntercept()
 					+ attributesOSM.getStepLengthSlopeSpeed()
-							* getDesiredSpeed()
+					* getDesiredSpeed()
 					+ stepDeviation;
 		} else {
 			return stepLength;
@@ -259,17 +255,36 @@ public class PedestrianOSM extends Pedestrian {
 		return timeOfNextStep;
 	}
 
+	public void setTimeOfNextStep(double timeOfNextStep) {
+		this.timeOfNextStep = timeOfNextStep;
+	}
+
 	public VPoint getNextPosition() {
 		return nextPosition;
+	}
+
+	public void setNextPosition(VPoint nextPosition) {
+		this.nextPosition = nextPosition;
 	}
 
 	public VPoint getLastPosition() {
 		return lastPosition;
 	}
 
+	public void setLastPosition(VPoint lastPosition) {
+		this.lastPosition = lastPosition;
+	}
+
 	public double getTimeCredit() {
 		return timeCredit;
 	}
+
+	public void setTimeCredit(double timeCredit) {
+		this.timeCredit = timeCredit;
+	}
+
+
+	// Setters...
 
 	public Collection<? extends Agent> getRelevantPedestrians() {
 		return relevantPedestrians;
@@ -279,35 +294,16 @@ public class PedestrianOSM extends Pedestrian {
 		return durationNextStep;
 	}
 
+	public void setDurationNextStep(double durationNextStep) {
+		this.durationNextStep = durationNextStep;
+	}
+
 	public AttributesOSM getAttributesOSM() {
 		return attributesOSM;
 	}
 
-	public List<Double>[] getStrides() {
+	public LinkedList<Double>[] getStrides() {
 		return strides;
-	}
-
-
-	// Setters...
-
-	public void setNextPosition(VPoint nextPosition) {
-		this.nextPosition = nextPosition;
-	}
-
-	public void setLastPosition(VPoint lastPosition) {
-		this.lastPosition = lastPosition;
-	}
-
-	public void setTimeCredit(double timeCredit) {
-		this.timeCredit = timeCredit;
-	}
-
-	public void setTimeOfNextStep(double timeOfNextStep) {
-		this.timeOfNextStep = timeOfNextStep;
-	}
-
-	public void setDurationNextStep(double durationNextStep) {
-		this.durationNextStep = durationNextStep;
 	}
 
 	public Topography getTopography() {
@@ -317,7 +313,7 @@ public class PedestrianOSM extends Pedestrian {
 	public double getMinStepLength() {
 		return minStepLength;
 	}
-	
+
 	@Override
 	public PedestrianOSM clone() {
 		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
