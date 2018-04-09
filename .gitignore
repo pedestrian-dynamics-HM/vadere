@@ -30,6 +30,7 @@ VadereModelTests/TestOSM/processed output/*
 VadereModelTests/TestSFM/processed output/*
 VadereModelTests/TestGNM/processed output/*
 VadereModelTests/TestOVM/processed output/*
+VadereUtils/output/*
 
 #deprecated: can potentially be removed
 bin/
@@ -38,6 +39,5 @@ VadereGui/output/
 #mac osx files
 .DS_Store
 
-#kde dolphin file explorere dot files
-**/*.directory
-
+#linux deskopt dotfiles
+**/.directory

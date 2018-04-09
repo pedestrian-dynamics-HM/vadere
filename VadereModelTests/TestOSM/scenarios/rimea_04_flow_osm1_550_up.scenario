@@ -10,14 +10,15 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
-        "pedPotentialWidth" : 0.5,
-        "pedPotentialHeight" : 12.6,
-        "obstPotentialWidth" : 0.25,
-        "obstPotentialHeight" : 20.1,
-        "useHardBodyShell" : false,
-        "obstDistanceDeviation" : 0.0,
-        "visionFieldRadius" : 5.0
+      "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
+        "pedPotentialIntimateSpaceWidth" : 0.45,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialHeight" : 50.0,
+        "obstPotentialWidth" : 0.8,
+        "obstPotentialHeight" : 6.0,
+        "intimateSpaceFactor" : 1.2,
+        "personalSpacePower" : 1,
+        "intimateSpacePower" : 1
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
@@ -34,8 +35,8 @@
         "seeSmallWalls" : false,
         "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
-        "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",
-        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
+        "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
+        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
         "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
@@ -79,7 +80,79 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 45.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 45.0001,
+            "y" : 0.5001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 0.5001
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 45.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 45.0001,
+            "y" : 5.0001
+          }, {
+            "x" : 44.4999,
+            "y" : 5.0001
+          }, {
+            "x" : 44.4999,
+            "y" : -1.0E-4
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 45.0001,
+            "y" : 5.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 5.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 4.4999
+          }, {
+            "x" : 45.0001,
+            "y" : 4.4999
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : 5.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : 5.0001
+          } ]
+        },
+        "id" : -1
+      } ],
       "stairs" : [ {
         "shape" : {
           "x" : 2.6,

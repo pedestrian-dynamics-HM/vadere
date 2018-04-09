@@ -16,7 +16,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -224,7 +223,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		if (isEditable) {
 			menusInTabs.forEach(menu -> menu.setEnabled(true));
-			try {
+
 				int index = tabbedPane.getSelectedIndex();
 				if (topographyCreatorView != null && tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
 					tabbedPane.removeTabAt(tabbedPane.indexOfComponent(topographyCreatorView));
@@ -232,13 +231,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 				topographyCreatorView = new TopographyWindow(scenario);
 				tabbedPane.addTab(Messages.getString("Tab.TopographyCreator.title"), topographyCreatorView);
-				setTopography(scenario.getTopography());
+				tabbedPane.validate();
+				tabbedPane.repaint();
 				tabbedPane.setSelectedIndex(index);
+				setTopography(scenario.getTopography());
 
-			} catch (IOException | IntrospectionException e) {
-				e.printStackTrace();
-				logger.error(e.getLocalizedMessage());
-			}
 		} else {
 			menusInTabs.forEach(menu -> menu.setEnabled(false));
 			boolean topoWasSelected = false;
@@ -252,7 +249,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					tabbedPane.setSelectedComponent(postVisualizationView);
 				}
 			}
+			tabbedPane.validate();
+			tabbedPane.repaint();
+			postVisualizationView.revalidate();
 			postVisualizationView.repaint(); // force a repaint, otherwise it sometimes only repaints when the mouse moves from the output table to the postvis-view
+			postVisualizationView.getDefaultModel().resetTopographySize();
 		}
 
 		this.attributesModelView.setVadereScenario(scenario);
