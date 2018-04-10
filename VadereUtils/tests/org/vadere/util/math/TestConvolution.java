@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.opencl.CLConvolution;
+import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
 
@@ -40,7 +41,7 @@ public class TestConvolution {
 	}
 
 	@Test
-	public void testConvolution() throws IOException {
+	public void testConvolution() throws IOException, OpenCLException {
 		int inputWidth = 1000;
 		int inputHeight = 1000;
 		int kernelWidth = 31;
@@ -48,14 +49,15 @@ public class TestConvolution {
 		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
 		float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
+
 		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.NonSeparate, inputWidth, inputHeight, kernelWidth, kernel);
 		float[] clOutput = clConvolution.convolve(input);
-        clConvolution.clearCL();
+		clConvolution.clearCL();
 		equalsMatrixValues(javaOutput, clOutput, 0.00001f);
 	}
 
 	@Test
-	public void testSmallConvolutionCol() throws IOException {
+	public void testSmallConvolutionCol() throws IOException, OpenCLException {
 		int inputWidth = 6;
 		int inputHeight = 1;
 		int kernelWidth = 3;
@@ -75,7 +77,7 @@ public class TestConvolution {
 	}
 
 	@Test
-	public void testSmallConvolutionRow() throws IOException {
+	public void testSmallConvolutionRow() throws IOException, OpenCLException {
 		int inputWidth = 1;
 		int inputHeight = 6;
 		int kernelWidth = 3;
@@ -95,7 +97,7 @@ public class TestConvolution {
 	}
 
 	@Test
-	public void testConvolutionRow() throws IOException {
+	public void testConvolutionRow() throws IOException, OpenCLException {
 		int inputWidth = 500;
 		int inputHeight = 300;
 		int kernelWidth = 31;
@@ -112,7 +114,7 @@ public class TestConvolution {
 	}
 
 	@Test
-	public void testConvolutionSeparate() throws IOException {
+	public void testConvolutionSeparate() throws IOException, OpenCLException {
 		int inputWidth = 500;
 		int inputHeight = 300;
 		int kernelWidth = 31;

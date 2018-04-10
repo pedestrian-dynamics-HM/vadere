@@ -21,7 +21,7 @@ public final class CLInfo {
 
     private CLInfo() {}
 
-    public static String getPlatformInfoStringASCII(long cl_platform_id, int param_name) {
+    public static String getPlatformInfoStringASCII(long cl_platform_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
             checkCLError(clGetPlatformInfo(cl_platform_id, param_name, (ByteBuffer)null, pp));
@@ -34,7 +34,7 @@ public final class CLInfo {
         }
     }
 
-    public static String getPlatformInfoStringUTF8(long cl_platform_id, int param_name) {
+    public static String getPlatformInfoStringUTF8(long cl_platform_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
             checkCLError(clGetPlatformInfo(cl_platform_id, param_name, (ByteBuffer)null, pp));
@@ -47,7 +47,7 @@ public final class CLInfo {
         }
     }
 
-    public static int getDeviceInfoInt(long cl_device_id, int param_name) {
+    public static int getDeviceInfoInt(long cl_device_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             IntBuffer pl = stack.mallocInt(1);
             checkCLError(clGetDeviceInfo(cl_device_id, param_name, pl, null));
@@ -55,7 +55,7 @@ public final class CLInfo {
         }
     }
 
-    public static long getDeviceInfoLong(long cl_device_id, int param_name) {
+    public static long getDeviceInfoLong(long cl_device_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             LongBuffer pl = stack.mallocLong(1);
             checkCLError(clGetDeviceInfo(cl_device_id, param_name, pl, null));
@@ -63,7 +63,7 @@ public final class CLInfo {
         }
     }
 
-    public static long getDeviceInfoPointer(long cl_device_id, int param_name) {
+    public static long getDeviceInfoPointer(long cl_device_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
             checkCLError(clGetDeviceInfo(cl_device_id, param_name, pp, null));
@@ -71,7 +71,7 @@ public final class CLInfo {
         }
     }
 
-    public static String getDeviceInfoStringUTF8(long cl_device_id, int param_name) {
+    public static String getDeviceInfoStringUTF8(long cl_device_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
             checkCLError(clGetDeviceInfo(cl_device_id, param_name, (ByteBuffer)null, pp));
@@ -84,7 +84,7 @@ public final class CLInfo {
         }
     }
 
-    public static long getMemObjectInfoPointer(long cl_mem, int param_name) {
+    public static long getMemObjectInfoPointer(long cl_mem, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
             checkCLError(clGetMemObjectInfo(cl_mem, param_name, pp, null));
@@ -92,7 +92,7 @@ public final class CLInfo {
         }
     }
 
-    public static long getMemObjectInfoInt(long cl_mem, int param_name) {
+    public static long getMemObjectInfoInt(long cl_mem, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             IntBuffer pi = stack.mallocInt(1);
             checkCLError(clGetMemObjectInfo(cl_mem, param_name, pi, null));
@@ -100,7 +100,7 @@ public final class CLInfo {
         }
     }
 
-    public static int getProgramBuildInfoInt(long cl_program_id, long cl_device_id, int param_name) {
+    public static int getProgramBuildInfoInt(long cl_program_id, long cl_device_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             IntBuffer pl = stack.mallocInt(1);
             checkCLError(clGetProgramBuildInfo(cl_program_id, cl_device_id, param_name, pl, null));
@@ -108,7 +108,7 @@ public final class CLInfo {
         }
     }
 
-    public static String getProgramBuildInfoStringASCII(long cl_program_id, long cl_device_id, int param_name) {
+    public static String getProgramBuildInfoStringASCII(long cl_program_id, long cl_device_id, int param_name) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
             checkCLError(clGetProgramBuildInfo(cl_program_id, cl_device_id, param_name, (ByteBuffer)null, pp));
@@ -121,13 +121,13 @@ public final class CLInfo {
         }
     }
 
-    public static void checkCLError(IntBuffer errcode) {
+    public static void checkCLError(IntBuffer errcode) throws OpenCLException {
         checkCLError(errcode.get(errcode.position()));
     }
 
-    public static void checkCLError(int errcode) {
+    public static void checkCLError(int errcode) throws OpenCLException {
         if (errcode != CL_SUCCESS) {
-            throw new RuntimeException(String.format("OpenCL error [0x%X]", errcode));
+            throw new OpenCLException(String.format("OpenCL error [0x%X]", errcode));
         }
     }
 
