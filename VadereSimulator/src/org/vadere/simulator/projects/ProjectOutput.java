@@ -55,6 +55,24 @@ public class ProjectOutput {
 	}
 
 	/**
+	 * removes the output-dirs from ProjectOutput but not from the hard drive!
+	 * @param dirNames
+	 */
+	public void removeOutputDirs(final String... dirNames) {
+		for(String dirName : dirNames) {
+			simulationOutputs.remove(dirName);
+		}
+	}
+
+	/**
+	 * removes the output-dir from ProjectOutput but not from the hard drive!
+	 * @param dirName
+	 */
+	public void removeOutputDir(final String dirName) {
+		simulationOutputs.remove(dirName);
+	}
+
+	/**
 	 * This function does not check if cached {@link SimulationOutput} is dirty. It is assumed
 	 * {@link #update()} was called prior to this function.
 	 *

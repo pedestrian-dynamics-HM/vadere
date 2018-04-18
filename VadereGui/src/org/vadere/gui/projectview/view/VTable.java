@@ -3,20 +3,23 @@ package org.vadere.gui.projectview.view;
 import org.apache.commons.lang3.ArrayUtils;
 import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
 import org.vadere.gui.projectview.model.ProjectViewModel;
+import org.vadere.gui.projectview.model.VadereTableModelSorted;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class VTable extends JTable {
+public class VTable<D> extends JTable {
 
 	private static final long serialVersionUID = 1L;
 
 	public ProjectViewModel projectViewModel;
 
-	public VTable(final DefaultTableModel model) {
+	public VTable(final VadereTableModelSorted<D> model) {
 		super(model);
 	}
 
@@ -66,4 +69,8 @@ public class VTable extends JTable {
 				comp.setEnabled(enabled);
 	}
 
+	@Override
+	public VadereTableModelSorted<D> getModel() {
+		return (VadereTableModelSorted<D> )super.getModel();
+	}
 }
