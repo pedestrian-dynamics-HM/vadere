@@ -98,7 +98,7 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 				+ floor.getElements(Pedestrian.class).size());
 		runtime = 0;
 
-		logger.info(++updateCount + " pedestrian density cost: " + heighestCost);
+		// logger.info(++updateCount + " pedestrian density cost: " + heighestCost);
 	}
 
 	@Override

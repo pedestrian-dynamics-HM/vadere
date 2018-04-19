@@ -37,6 +37,7 @@ public interface Model {
 			if (a != null) {
 				return a;
 			}
+			System.out.println(type);
 			throw new AttributesNotFoundException(type);
 		} catch (IllegalArgumentException e) {
 			throw new AttributesMultiplyDefinedException(type);

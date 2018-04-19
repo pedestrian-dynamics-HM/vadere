@@ -25,7 +25,8 @@ public class VadereAutomation {
 
 
     //public static final String SCENARIO_NAME = "Kreuzung3_Unit";
-    public static final String SCENARIO_NAME = "Kreuzung_Studenten_lang_NAVIGATION";
+    //public static final String SCENARIO_NAME = "Kreuzung_Studenten_lang_NAVIGATION";
+    public static final String SCENARIO_NAME = "Kreuzung_lang_Potential_asymm";
     // public static final String SCENARIO_PATH = "D:/marion/Arbeit/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
     public static final String SCENARIO_PATH = "D:/repo_checkout/PersMarionGoedel/material/canwelearn/data/";
     public static final int N_SIMULATIONS = 1;
