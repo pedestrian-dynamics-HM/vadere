@@ -836,7 +836,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param stopCondition
 	 * @return
 	 */
-	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition) {
+	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition, LinkedList<F> visitedFaces) {
 		List<E> intersectionEdges = getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).collect(Collectors.toList());
 
 		/**
@@ -875,7 +875,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 					//log.debug("straight walk: no exit edge found due to collinear exit point.");
 					V v = getMesh().streamVertices(face).min((v1, v2) -> Double.compare(p.distance(v1), p.distance(v2))).get();
 					Optional<F> closestFace = getMesh().streamFaces(v)
-							.filter(f -> !getMesh().isBorder(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
+							.filter(f -> !getMesh().isBorder(f)).filter(f -> !visitedFaces.contains(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
 					return closestFace;
 				}
 			}
@@ -895,7 +895,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         do {
         	//log.debug(getMesh().toPath(face));
 	        // TODO: this might be slow
-	        optFace = straightWalkNext(face, q, p, stopCondition);
+	        optFace = straightWalkNext(face, q, p, stopCondition, visitedFaces);
 
 	        if(!optFace.isPresent()) {
 	        	//log.info("expensive fix");
