@@ -1,11 +1,10 @@
 package org.vadere.util.color;
 
-import java.util.List;
-
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ColorHelper {
@@ -14,28 +13,12 @@ public class ColorHelper {
 	private final static int HIGH = 255;
 	private final static int HALF = (HIGH + 1) / 2;
 	// public final static int MAX_VALUE = 60;
-
-	private final static Map<Integer, Color> map = initNumberToColorMap();
 	private static int factor;
-
+	private final static Map<Integer, Color> map = initNumberToColorMap();
 	private int maxValue;
 
 	public ColorHelper(final int maxValue) {
 		this.maxValue = maxValue;
-	}
-
-	public Color numberToColor(final double value) {
-		if (value < 0) {
-			return numberToColorPercentage(0);
-		} else if (value > maxValue) {
-			return numberToColorPercentage(1);
-		} else {
-			return numberToColorPercentage(value / maxValue);
-		}
-	}
-
-	public int getMaxValue() {
-		return maxValue;
 	}
 
 	public static Color numberToColorPercentage(final double value) {
@@ -103,7 +86,7 @@ public class ColorHelper {
 		Collections.sort(list);
 		Integer min = list.get(0);
 		Integer max = list.get(list.size() - 1);
-		factor = max+1;
+		factor = max + 1;
 	}
 
 	/**
@@ -117,5 +100,29 @@ public class ColorHelper {
 			return LOW;
 		}
 		return value;
+	}
+
+	/**
+	 * @param c Base color
+	 * @return Color which has enough contrast to be distinct from the base color
+	 */
+	public static Color getContrasColor(final Color c) {
+		return new Color(Math.abs(190 - c.getRed()),
+				Math.abs(190 - c.getGreen()),
+				Math.abs(190 - c.getBlue()));
+	}
+
+	public Color numberToColor(final double value) {
+		if (value < 0) {
+			return numberToColorPercentage(0);
+		} else if (value > maxValue) {
+			return numberToColorPercentage(1);
+		} else {
+			return numberToColorPercentage(value / maxValue);
+		}
+	}
+
+	public int getMaxValue() {
+		return maxValue;
 	}
 }

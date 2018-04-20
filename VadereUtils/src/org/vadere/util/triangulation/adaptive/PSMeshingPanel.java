@@ -3,6 +3,7 @@ package org.vadere.util.triangulation.adaptive;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.color.ColorHelper;
+import org.vadere.util.debug.gui.ColorFunctions;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
@@ -44,6 +45,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
     private Collection<VTriangle> triangles;
     private VRectangle bound;
     private final double scale;
+    private ColorFunctions<P, V, E, F> colorFunctions;
 
     public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound) {
         this.mesh = mesh;
@@ -54,6 +56,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
         this.bound = bound;
         this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
 	    this.faces = new ArrayList<>();
+	    this.colorFunctions = new ColorFunctions<>();
     }
 
 	@Override
@@ -95,8 +98,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 				//if(alertPred.test(face)) {
 					//log.info("red triangle");
 
-					double qualitiy = faceToQuality(face);
-					graphics.setColor(new Color((float)qualitiy, (float)qualitiy, (float)qualitiy));
+					graphics.setColor(colorFunctions.qualityToGrayScale(mesh, face));
 					graphics.fill(polygon);
 					graphics.draw(polygon);
 					graphics.setColor(Color.BLACK);
@@ -128,20 +130,6 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		graphics2D.drawImage(image, 0, 0, null);
 	}
 
-	private double faceToQuality(final F face) {
-		VLine[] lines = mesh.toTriangle(face).getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part = 0.0;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-		}
-		else {
-			throw new IllegalArgumentException(face + " is not a feasible triangle!");
-		}
-		return part;
-	}
 
 	public double triangleToQuality(final VTriangle triangle) {
 
