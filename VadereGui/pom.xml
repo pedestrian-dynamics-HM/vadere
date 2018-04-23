@@ -224,6 +224,12 @@
 	<artifactId>batik-svggen</artifactId>
 	<version>1.7</version>
   </dependency>
+ <!-- codec for the svg -->
+  <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-codec</artifactId>
+      <version>1.7</version>
+  </dependency>
   <dependency>
 	<groupId>org.apache.xmlgraphics</groupId>
 	<artifactId>batik-svg-dom</artifactId>
