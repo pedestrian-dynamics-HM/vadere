@@ -62,16 +62,18 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialFieldTar
 		int targetId = agent.getNextTargetId();
 
 		// the agent has reached his current target
-		if (topography.getTarget(targetId).getShape().contains(pos)) {
+		// TODO: expensive operation
+		/*if (topography.getTarget(targetId).getShape().contains(pos)) {
 			return 0.0;
-		}
+		}*/
 
 		// the agent is inside an obstacle
-		for (ScenarioElement b : topography.getObstacles()) {
+		// TODO: expensive operation
+		/*for (ScenarioElement b : topography.getObstacles()) {
 			if (b.getShape().contains(pos)) {
 				return Double.MAX_VALUE;
 			}
-		}
+		}*/
 
 		/* Find minimal potential of given targets. */
 		Optional<PotentialFieldAndInitializer> optionalPotentialFieldAndAnalyser = getPotentialFieldAndInitializer(targetId);

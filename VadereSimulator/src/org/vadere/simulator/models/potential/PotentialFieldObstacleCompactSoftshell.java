@@ -24,25 +24,27 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 	private double width;
 	private double height;
 	private Collection<Obstacle> obstacles;
+	private Topography topography;
 
 	public PotentialFieldObstacleCompactSoftshell(AttributesPotentialCompactSoftshell attributesPotential,
-			Collection<Obstacle> obstacles, Random random) {
+			Topography topography, Random random) {
 		this.attributes = attributesPotential;
 		this.random = random;
 
 		this.width = attributesPotential.getObstPotentialWidth();
 		this.height = attributesPotential.getObstPotentialHeight();
-
-		this.obstacles = obstacles;
+		this.topography = topography;
+		this.obstacles = topography.getObstacles();
 	}
 
 	@Override
 	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
 
 		double potential = 0;
-		for (Obstacle obstacle : obstacles) {
+		//for (Obstacle obstacle : obstacles) {
 
-			double distance = obstacle.getShape().distance(pos);
+			//double distance = obstacle.getShape().distance(pos);
+			double distance = topography.distanceToObstacle(pos);
 
 			double radius = pedestrian.getRadius();
 			double currentPotential = 0;
@@ -56,7 +58,7 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 
 			if (potential < currentPotential)
 				potential = currentPotential;
-		}
+		//}
 
 		return potential;
 	}
@@ -69,7 +71,7 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 
 	@Override
 	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleCompactSoftshell(attributes, new LinkedList<>(obstacles), random);
+		return new PotentialFieldObstacleCompactSoftshell(attributes, topography, random);
 	}
 
 	@Override

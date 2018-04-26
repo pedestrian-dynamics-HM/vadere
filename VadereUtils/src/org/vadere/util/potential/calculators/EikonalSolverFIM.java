@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class EikonalSolverFIM implements EikonalSolver {
 
 	private CellGrid cellGrid;
-	private List<VShape> targetShapes;
+	private Collection<VShape> targetShapes;
 	private List<Point> targetPoints;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFIM.class);
 	private ITimeCostFunction timeCostFunction;
@@ -40,7 +40,7 @@ public class EikonalSolverFIM implements EikonalSolver {
 	private LinkedList<Point> activeList;
 
 	public EikonalSolverFIM(final CellGrid cellGrid,
-			final List<VShape> targetShapes,
+			final Collection<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction) {
 		this.timeCostFunction = timeCostFunction;
