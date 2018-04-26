@@ -80,7 +80,7 @@ public interface EikonalSolver {
         Point gridPoint = potentialField.getNearestPointTowardsOrigin(pos);
         VPoint gridPointCoord = potentialField.pointToCoord(gridPoint);
         int incX = 1, incY = 1;
-        double gridPotentials[];
+        double gridPotentials[] = new double[4];
 
         if (pos.x >= potentialField.getWidth()) {
             incX = 0;
@@ -90,12 +90,11 @@ public interface EikonalSolver {
             incY = 0;
         }
 
-        java.util.List<Point> points = new LinkedList<>();
-        points.add(gridPoint);
-        points.add(new Point(gridPoint.x + incX, gridPoint.y));
-        points.add(new Point(gridPoint.x + incX, gridPoint.y + incY));
-        points.add(new Point(gridPoint.x, gridPoint.y + incY));
-        gridPotentials = getGridPotentials(points, potentialField);
+	    gridPotentials[0] = potentialField.getValue(gridPoint).potential;
+	    gridPotentials[1] = potentialField.getValue(gridPoint.x + incX, gridPoint.y).potential;
+	    gridPotentials[2] = potentialField.getValue(gridPoint.x + incX, gridPoint.y + incY).potential;
+	    gridPotentials[3] = potentialField.getValue(gridPoint.x, gridPoint.y + incY).potential;
+
 
 		/* Interpolate the known (potential < Double.MAX_VALUE) values. */
         Pair<Double, Double> result = InterpolationUtil.bilinearInterpolationWithUnkown(

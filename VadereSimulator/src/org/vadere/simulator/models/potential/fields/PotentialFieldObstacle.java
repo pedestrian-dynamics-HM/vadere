@@ -77,7 +77,7 @@ public interface PotentialFieldObstacle extends Model {
 			AttributesPotentialCompactSoftshell attributesPotentialCompactSoftshell =
 					Model.findAttributes(modelAttributesList, AttributesPotentialCompactSoftshell.class);
 			result = new PotentialFieldObstacleCompactSoftshell(attributesPotentialCompactSoftshell,
-					topography.getObstacles(), random);
+					topography, random);
 		} else {
 			throw new VadereClassNotFoundException();
 		}

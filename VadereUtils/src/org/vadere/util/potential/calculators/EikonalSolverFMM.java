@@ -2,6 +2,7 @@ package org.vadere.util.potential.calculators;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class EikonalSolverFMM implements EikonalSolver {
 
 	protected CellGrid cellGrid;
 	protected List<Point> targetPoints;
-	protected List<VShape> targetShapes;
+	protected Collection<VShape> targetShapes;
 	boolean isHighAccuracy = false;
 
 	/** only for logging */
@@ -40,7 +41,7 @@ public class EikonalSolverFMM implements EikonalSolver {
 	 * Initializes the FM potential calculator with a time cost function F > 0.
 	 */
 	public EikonalSolverFMM(CellGrid potentialField,
-			List<VShape> targetShapes,
+	                        Collection<VShape> targetShapes,
 			boolean isHighAccuracy,
 			ITimeCostFunction timeCostFunction) {
 		this.cellGrid = potentialField;

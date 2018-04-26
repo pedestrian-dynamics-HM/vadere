@@ -47,25 +47,29 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	@Override
 	public double getAgentPotential(VPoint pos, Agent pedestrian,
 			Agent otherPedestrian) {
-		double distance = otherPedestrian.getPosition().distance(pos);
-
-		int intPower = this.attributes.getIntimateSpacePower();
-		int perPower = this.attributes.getPersonalSpacePower();
-		double factor = this.attributes.getIntimateSpaceFactor();
-
-		double potential = 0;
 
 		double radii = pedestrian.getRadius() + otherPedestrian.getRadius();
+		double potential = 0;
+		double distnaceSq = otherPedestrian.getPosition().distanceSq(pos);
+		double maxDistanceSq = (Math.max(personalWidth, intimateWidth)  + radii) * (Math.max(personalWidth, intimateWidth)  + radii);
 
-		if (distance < personalWidth + radii) {
-			potential += this.height * Math.exp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
-		}
-		if (distance < this.intimateWidth + radii) {
-			potential += this.height / factor
-					* Math.exp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1));
-		}
-		if (distance < radii) {
-			potential += 1000 * Math.exp(1 / (Math.pow(distance / radii, 4) - 1));
+		if(distnaceSq < maxDistanceSq) {
+			double distance = otherPedestrian.getPosition().distance(pos);
+
+			int intPower = this.attributes.getIntimateSpacePower();
+			int perPower = this.attributes.getPersonalSpacePower();
+			double factor = this.attributes.getIntimateSpaceFactor();
+
+			if (distance < personalWidth + radii) {
+				potential += this.height * Math.exp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
+			}
+			if (distance < this.intimateWidth + radii) {
+				potential += this.height / factor
+						* Math.exp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1));
+			}
+			if (distance < radii) {
+				potential += 1000 * Math.exp(1 / (Math.pow(distance / radii, 4) - 1));
+			}
 		}
 		return potential;
 
