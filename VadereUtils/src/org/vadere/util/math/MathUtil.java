@@ -42,6 +42,13 @@ public class MathUtil {
 		return result;
 	}
 
+	public static double expAp(final double y) {
+		double x = 1d + y / 256d;
+		x *= x; x *= x; x *= x; x *= x;
+		x *= x; x *= x; x *= x; x *= x;
+		return x;
+	}
+
 	/**
 	 * The value of the gradient of the 2D smooth function with compact support
 	 * given by exp(1/((x/cut)^2-1)).

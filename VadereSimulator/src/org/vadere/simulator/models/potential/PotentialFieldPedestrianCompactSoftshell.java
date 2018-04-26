@@ -15,6 +15,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.MathUtil;
 
 public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldAgent {
 
@@ -61,14 +62,14 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 			double factor = this.attributes.getIntimateSpaceFactor();
 
 			if (distance < personalWidth + radii) {
-				potential += this.height * Math.exp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
+				potential += this.height * MathUtil.expAp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
 			}
 			if (distance < this.intimateWidth + radii) {
 				potential += this.height / factor
-						* Math.exp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1));
+						* MathUtil.expAp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1));
 			}
 			if (distance < radii) {
-				potential += 1000 * Math.exp(1 / (Math.pow(distance / radii, 4) - 1));
+				potential += 1000 * MathUtil.expAp(1 / (Math.pow(distance / radii, 4) - 1));
 			}
 		}
 		return potential;
