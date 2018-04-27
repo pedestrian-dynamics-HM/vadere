@@ -4,11 +4,13 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
+import org.vadere.annotation.factories.processor.DataProcessorClass;
+
 /**
  * @author Mario Teixeira Parente
  *
  */
-
+@DataProcessorClass(name = "AreaDensityVoronoiProcessor")
 public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
 
     public AreaDensityVoronoiProcessor(){
