@@ -21,6 +21,7 @@
     <module>./VadereSimulator</module>
     <module>./VadereState</module>
     <module>./VadereUtils</module>
+    <module>./annotationprocessing</module>
   </modules>
   
 <!-- global dependencies! -->
