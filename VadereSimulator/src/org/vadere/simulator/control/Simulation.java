@@ -11,14 +11,13 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
 
 public class Simulation {
 
@@ -181,6 +180,7 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
+				assert assertAllPedestrianInBounds();
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 				processorManager.update(this.simulationState);
@@ -213,6 +213,12 @@ public class Simulation {
 			processorManager.writeOutput();
 			logger.info("Finished writing all output files");
 		}
+	}
+
+	private boolean assertAllPedestrianInBounds() {
+		Rectangle2D.Double bounds = topography.getBounds();
+		Collection<Pedestrian> peds = topography.getElements(Pedestrian.class);
+		return peds.stream().map(ped -> ped.getPosition()).anyMatch(pos -> !bounds.contains(pos.getX(), pos.getY()));
 	}
 
 	private SimulationState initialSimulationState() {
