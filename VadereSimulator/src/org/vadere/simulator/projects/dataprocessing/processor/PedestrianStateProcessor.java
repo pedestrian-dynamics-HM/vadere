@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.vadere.annotation.factories.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
@@ -19,6 +20,7 @@ import org.vadere.state.scenario.Pedestrian;
  * @author  Florian Künzner
  *
  */
+@DataProcessorClass()
 public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianIdKey, String> {
 
 	public PedestrianStateProcessor() {

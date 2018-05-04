@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.OutputFileMap;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 import org.vadere.util.reflection.VadereNoOutputfileForDataKeyException;
@@ -55,31 +56,7 @@ public class OutputFileFactory {
 
 	public OutputFile<?> createDefaultOutputfileByDataKey(Class<? extends DataKey<?>> keyType) {
 
-		String simpleName = keyType.getSimpleName();
-
-		if (simpleName.equals("IdDataKey"))
-			return createOutputfile(IdOutputFile.class);
-
-		if (simpleName.equals("NoDataKey"))
-			return createOutputfile(NoDataKeyOutputFile.class);
-
-		if (simpleName.equals("PedestrianIdKey"))
-			return createOutputfile(PedestrianIdOutputFile.class);
-
-		if (simpleName.equals("TimestepKey"))
-			return createOutputfile(TimestepOutputFile.class);
-
-		if (simpleName.equals("TimestepPedestrianIdKey"))
-			return createOutputfile(TimestepPedestrianIdOutputFile.class);
-
-		if (simpleName.equals("TimestepPositionKey"))
-			return createOutputfile(TimestepPositionOutputFile.class);
-
-		if (simpleName.equals("TimestepRowKey"))
-			return createOutputfile(TimestepRowOutputFile.class);
-
-
-		throw new VadereNoOutputfileForDataKeyException(
-				"No Ouputfile defined for DataKey: " + keyType.getCanonicalName());
+		OutputFileMap outputFileMap = keyType.getAnnotation(OutputFileMap.class);
+		return createOutputfile(outputFileMap.outputFileClass());
 	}
 }

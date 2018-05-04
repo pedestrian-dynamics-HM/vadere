@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
@@ -14,7 +15,7 @@ import java.util.Collection;
 /**
  * @author Mario Teixeira Parente
  */
-
+@DataProcessorClass()
 public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
 	private VRectangle waitingArea;
 

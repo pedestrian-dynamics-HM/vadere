@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.DataProcessorClass;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
@@ -8,7 +9,7 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
  * @author Mario Teixeira Parente
  *
  */
-
+@DataProcessorClass()
 public class PedestrianDensityCountingProcessor extends PedestrianDensityProcessor {
 
 	public PedestrianDensityCountingProcessor(){

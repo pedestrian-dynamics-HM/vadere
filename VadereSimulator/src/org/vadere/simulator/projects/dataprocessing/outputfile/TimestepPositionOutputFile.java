@@ -1,7 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
+import org.vadere.annotation.factories.OutputFileClass;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
 
+@OutputFileClass()
 public class TimestepPositionOutputFile extends OutputFile<TimestepPositionKey> {
     public TimestepPositionOutputFile() {
         super(TimestepPositionKey.getHeaders());

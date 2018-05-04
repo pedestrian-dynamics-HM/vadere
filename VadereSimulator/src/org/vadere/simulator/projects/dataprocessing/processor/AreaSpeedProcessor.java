@@ -11,13 +11,13 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
 
-import org.vadere.annotation.factories.processor.DataProcessorClass;
+import org.vadere.annotation.factories.DataProcessorClass;
 
 /**
  * @author Mario Teixeira Parente
  *
  */
-@DataProcessorClass(name = "AreaSpeedProcessor")
+@DataProcessorClass(label = "AreaSpeedProcessor")
 public class AreaSpeedProcessor extends AreaDataProcessor<Double> {
     private PedestrianPositionProcessor pedPosProc;
     private PedestrianVelocityProcessor pedVelProc;
