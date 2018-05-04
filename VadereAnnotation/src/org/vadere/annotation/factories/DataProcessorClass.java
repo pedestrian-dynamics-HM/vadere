@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 		factoryImports = {
 				"org.vadere.simulator.projects.dataprocessing.processor.DataProcessor"
 		},
-		factoryName = "DataProcessorFactoryXX",
+		factoryName = "DataProcessorFactory",
 		factoryPackage = "org.vadere.simulator.projects.dataprocessing.processor"
 )
 public @interface DataProcessorClass {

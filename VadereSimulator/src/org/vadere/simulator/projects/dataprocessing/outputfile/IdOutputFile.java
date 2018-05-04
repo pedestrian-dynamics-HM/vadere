@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.outputfile;
 import org.vadere.annotation.factories.OutputFileClass;
 import org.vadere.simulator.projects.dataprocessing.datakey.IdDataKey;
 
-@OutputFileClass()
+@OutputFileClass(dataKeyMapping = IdDataKey.class)
 public class IdOutputFile extends OutputFile<IdDataKey> {
 
 	public IdOutputFile() {

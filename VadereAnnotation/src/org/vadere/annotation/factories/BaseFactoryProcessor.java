@@ -20,6 +20,11 @@ public abstract class BaseFactoryProcessor extends AbstractProcessor {
 	protected String factoryClassName;
 	protected String factoryPackage;
 	protected String[] factoryImports;
+	protected String baseClass;
+
+	public BaseFactoryProcessor(){
+		baseClass = "BaseFactory";
+	}
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -66,6 +71,8 @@ public abstract class BaseFactoryProcessor extends AbstractProcessor {
 
 	protected abstract void addImports(Set<? extends Element> elements, PrintWriter writer);
 	protected abstract void addLast(Set<? extends Element> elements, PrintWriter writer);
+	protected abstract void addMembers(Set<? extends Element> elements, PrintWriter writer);
+	protected abstract void addLastConstructor(Set<? extends Element> elements, PrintWriter writer);
 
 	private void writeFactory(Set<? extends Element> elements) throws IOException {
 		JavaFileObject jFile = processingEnv.getFiler().createSourceFile(factoryClassName);
@@ -89,7 +96,10 @@ public abstract class BaseFactoryProcessor extends AbstractProcessor {
 
 			out.println();
 			out.println();
-			out.append("public class ").append(factoryClassName).append(" extends BaseFactory<").append(factoryType).append("> {").println();
+			out.append("public class ").append(factoryClassName).append(" extends ").append(baseClass).append("<").append(factoryType).append("> {").println();
+//			out.append("public class ").append(factoryClassName).append(" extends BaseFactory<").append(factoryType).append("> {").println();
+			out.println();
+			addMembers(elements, out);
 			out.println();
 
 			Util.createSingletone(factoryClassName, out);
@@ -99,21 +109,23 @@ public abstract class BaseFactoryProcessor extends AbstractProcessor {
 			out.append("	private ").append(factoryClassName).append("(){").println();
 
 
-			out.println("// add Members to Factory");
+			out.println("	// add Members to Factory");
 			for (Element e : elements) {
-				out.append("	addMember(");
+				out.append("		addMember(");
 					out.append(e.getSimpleName().toString()).append(".class, ");
 					out.append("this::").append("get").append(name(e)).append(", ");
 					out.append(Util.quote(label(e))).append(", ");
 					out.append(Util.quote(descr(e))).append(");");
 					out.println();
 			}
+			out.println();
+			addLastConstructor(elements, out);
 			out.println("	}");
 			out.println();
 
 			out.println();
 
-			out.println("// Getters");
+			out.println("	// Getters");
 			for (Element element : elements) {
 				TypeElement p = (TypeElement)element;
 				out.append("	public ").append(p.getSimpleName())

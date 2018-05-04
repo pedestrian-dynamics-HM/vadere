@@ -10,11 +10,17 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
 
 @SupportedAnnotationTypes("org.vadere.annotation.factories.OutputFileClass")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
 public class OutputFileFactoryProcessor extends BaseFactoryProcessor {
+
+	public OutputFileFactoryProcessor(){
+		baseClass = "OutputFileBaseFactory";
+	}
 
 	protected String label(Element element){
 		OutputFileClass dataProcessorClass = element.getAnnotation(OutputFileClass.class);
@@ -33,7 +39,30 @@ public class OutputFileFactoryProcessor extends BaseFactoryProcessor {
 		writer.println("import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;");
 		writer.println("import org.vadere.simulator.projects.dataprocessing.datakey.OutputFileMap;");
 		writer.println("import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;");
+		writer.println("import org.vadere.util.factory.OutputFileBaseFactory;");
 		writer.println("import java.util.Arrays;");
+		writer.println("import java.util.HashMap;");
+	}
+
+
+	@Override
+	protected void addLastConstructor(Set<? extends Element> elements, PrintWriter writer) {
+
+		for (Element e : elements) {
+			OutputFileClass annotation = e.getAnnotation(OutputFileClass.class);
+			String classValue;
+			try{
+				classValue =annotation.dataKeyMapping().getName();
+			} catch (MirroredTypeException ex){
+				classValue = ex.getTypeMirror().toString();
+			}
+			int lastPoint = classValue.lastIndexOf('.');
+			TypeElement p = (TypeElement)e;
+			writer.append("		addExistingKey(")
+					.append(Util.quote(classValue.substring(lastPoint+1))).append(", ")
+					.append(Util.quote(p.getQualifiedName().toString()))
+					.println(");");
+		}
 	}
 
 	@Override
@@ -82,6 +111,11 @@ public class OutputFileFactoryProcessor extends BaseFactoryProcessor {
 		writer.println("		OutputFileMap outputFileMap = keyType.getAnnotation(OutputFileMap.class);");
 		writer.println("		return createOutputfile(outputFileMap.outputFileClass());");
 		writer.println("	}");
+	}
+
+	@Override
+	protected void addMembers(Set<? extends Element> elements, PrintWriter writer) {
+
 	}
 
 

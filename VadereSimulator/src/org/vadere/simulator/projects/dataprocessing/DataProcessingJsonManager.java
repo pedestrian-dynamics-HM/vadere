@@ -65,8 +65,8 @@ public class DataProcessingJsonManager {
 		this.outputFiles = new ArrayList<>();
 		this.dataProcessors = new ArrayList<>();
 		this.isTimestamped = true;
-		this.outputFileFactory = new OutputFileFactory();
-		this.processorFactory = new DataProcessorFactory();
+		this.outputFileFactory = OutputFileFactory.instance();
+		this.processorFactory = DataProcessorFactory.instance();
 	}
 
 	private static JsonNode serializeOutputFile(final OutputFile<?> outputFile) {

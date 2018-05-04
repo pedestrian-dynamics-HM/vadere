@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.outputfile;
 import org.vadere.annotation.factories.OutputFileClass;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepRowKey;
 
-@OutputFileClass()
+@OutputFileClass(dataKeyMapping = TimestepRowKey.class)
 public class TimestepRowOutputFile extends OutputFile<TimestepRowKey> {
     public TimestepRowOutputFile() {
         super("timeStep", "row");

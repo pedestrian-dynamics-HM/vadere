@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
  * @author Mario Teixeira Parente
  *
  */
-@OutputFileClass()
+@OutputFileClass(dataKeyMapping = TimestepPedestrianIdKey.class)
 public class TimestepPedestrianIdOutputFile extends OutputFile<TimestepPedestrianIdKey> {
 
 	public TimestepPedestrianIdOutputFile() {

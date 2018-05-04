@@ -34,6 +34,17 @@ public class DataProcessorFactoryProcessor extends BaseFactoryProcessor {
 	}
 
 	@Override
+	protected void addMembers(Set<? extends Element> elements, PrintWriter writer) {
+
+	}
+
+	@Override
+	protected void addLastConstructor(Set<? extends Element> elements, PrintWriter writer) {
+
+	}
+
+
+	@Override
 	protected void addLast(Set<? extends Element> elements, PrintWriter writer) {
 		writer.println("	public DataProcessor<?, ?> createDataProcessor(DataProcessorStore dataProcessorStore) {");
 		writer.println("		DataProcessor<?, ?> processor = getInstanceOf(dataProcessorStore.getType());");

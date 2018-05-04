@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
  * @author Mario Teixeira Parente
  *
  */
-@OutputFileClass()
+@OutputFileClass(dataKeyMapping = NoDataKey.class)
 public class NoDataKeyOutputFile extends OutputFile<NoDataKey> {
     public NoDataKeyOutputFile() {
         super(new String[] { });
