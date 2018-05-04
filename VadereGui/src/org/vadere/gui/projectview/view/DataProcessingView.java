@@ -62,7 +62,9 @@ import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.util.StateJsonConverter;
@@ -282,20 +284,21 @@ class DataProcessingView extends JPanel implements IJsonView {
 			JButton addProcessorBtn = new JButton(new AbstractAction("Add") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Map<String, Class> processorNameToClass = ClassFinder.getProcessorClassesWithNames();
-					JComboBox processorOptions = new JComboBox<>(processorNameToClass.keySet().toArray());
+					DataProcessorFactory factory = DataProcessorFactory.instance();
+					// map label of processors to class string
+					Map<String, String> processorLableToClass = factory.getLabelMap();
+					JComboBox processorOptions = new JComboBox<>(processorLableToClass.keySet().toArray());
+
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
-							"Choose data processor", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-						try {
-							DataProcessor newDataProcessor = (DataProcessor) processorNameToClass.get(processorOptions.getSelectedItem()).newInstance();
-							newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
-							currentScenario.getDataProcessingJsonManager().addInstantiatedProcessor(newDataProcessor);
-							updateDataProcessorsTable();
-							int index = dataProcessorsTable.getRowCount() - 1;
-							dataProcessorsTable.setRowSelectionInterval(index, index);
-						} catch (InstantiationException | IllegalAccessException ex) {
-							ex.printStackTrace();
-						}
+						"Choose data processor", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						String processorClass = processorLableToClass.get(processorOptions.getSelectedItem());
+//						System.out.println("Selected Processor is: " + processorClass);
+						DataProcessor newDataProcessor =  factory.getInstanceOf(processorClass);
+						newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
+						currentScenario.getDataProcessingJsonManager().addInstantiatedProcessor(newDataProcessor);
+						updateDataProcessorsTable();
+						int index = dataProcessorsTable.getRowCount() - 1;
+						dataProcessorsTable.setRowSelectionInterval(index, index);
 					}
 					refreshGUI();
 				}
@@ -528,7 +531,8 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridy = 1;
 			String outputFileDataKeyName = extractSimpleName(outputFileDataKey);
 
-			Map<String, Class> dataKeysOutputFiles = ClassFinder.getDataKeysOutputFileRelation();
+			Map<String, String> dataKeysOutputFiles = OutputFileFactory.instance().getDataKeyOutputFileMap();
+//			Map<String, Class> dataKeysOutputFiles = ClassFinder.getDataKeysOutputFileRelation();
 			JComboBox dataKeysChooser = new JComboBox<>(dataKeysOutputFiles.keySet().toArray());
 
 			dataKeysChooser.setSelectedItem(outputFileDataKeyName);
@@ -537,7 +541,8 @@ class DataProcessingView extends JPanel implements IJsonView {
 				if (!newDataKey.equals(outputFileDataKeyName)) {
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(outputFile.getFileName());
-					outputFileStore.setType(dataKeysOutputFiles.get(newDataKey).getName()); // Choose corresponding outputfile type
+					System.out.println("Selected KeyFile: " + newDataKey + " | " + dataKeysOutputFiles.get(newDataKey));
+					outputFileStore.setType(dataKeysOutputFiles.get(newDataKey)); // Choose corresponding outputfile type
 					int index = currentScenario.getDataProcessingJsonManager().replaceOutputFile(outputFileStore);
 					updateOutputFilesTable();
 					outputFilesTable.setRowSelectionInterval(index, index);
