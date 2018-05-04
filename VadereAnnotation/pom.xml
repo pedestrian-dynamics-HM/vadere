@@ -10,8 +10,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>annotation-processing</artifactId>
-    <name>Annotation Processing</name>
+    <artifactId>annotation</artifactId>
+    <name>Vadere Annotation</name>
 
     <dependencies>
 
@@ -38,7 +38,6 @@
                 <directory>resources</directory>
             </resource>
         </resources>
-
         <testResources>
             <testResource>
                 <directory>testResources</directory>
@@ -50,9 +49,9 @@
                 </excludes>
             </testResource>
         </testResources>
-
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler.version}</version>
                 <configuration>
@@ -61,5 +60,7 @@
                 </configuration>
             </plugin>
         </plugins>
+
     </build>
+
 </project>
