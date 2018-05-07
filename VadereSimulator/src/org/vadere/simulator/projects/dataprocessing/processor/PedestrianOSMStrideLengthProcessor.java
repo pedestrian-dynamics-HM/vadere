@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
@@ -34,8 +35,8 @@ public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPe
 			List<PedestrianOSM> osmPeds = peds.stream().map(p -> ((PedestrianOSM) p)).collect(Collectors.toList());
 			osmPeds.forEach(ped -> {
 
-				LinkedList<Double> strideLengths = ped.getStrides()[0];
-				double length = strideLengths.isEmpty() ? 0.0 : strideLengths.getLast();
+				LinkedList<Pair<Double, Double>> strideLengths = ped.getStrides();
+				double length = strideLengths.isEmpty() ? 0.0 : strideLengths.getLast().getLeft();
 
 				this.putValue(new TimestepPedestrianIdKey(state.getStep(), ped.getId()), length);
 			});

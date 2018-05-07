@@ -12,6 +12,9 @@ import org.vadere.util.geometry.shapes.VPoint;
  * 
  */
 public class MathUtil {
+
+	private final static List<Point> neumannNeighborhood = getNeumannNeighborhood(new Point(0, 0));
+
 	/**
 	 * The two-norm of a vector.
 	 * 
@@ -340,12 +343,10 @@ public class MathUtil {
 	 */
 	public static List<Point> getNeumannNeighborhood(final Point p) {
 		List<Point> neumannNeighborhood = new LinkedList<>();
-
 		neumannNeighborhood.add(new Point(p.x - 1, p.y));
 		neumannNeighborhood.add(new Point(p.x + 1, p.y));
 		neumannNeighborhood.add(new Point(p.x, p.y - 1));
 		neumannNeighborhood.add(new Point(p.x, p.y + 1));
-
 		return neumannNeighborhood;
 	}
 
@@ -354,7 +355,7 @@ public class MathUtil {
 	 * neighborhood.
 	 */
 	public static List<Point> getRelativeNeumannNeighborhood() {
-		return getNeumannNeighborhood(new Point(0, 0));
+		return neumannNeighborhood;
 	}
 
 	/**
@@ -385,6 +386,28 @@ public class MathUtil {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns the max real solutions of the quadratic equation ax^2+bx+c=0 or Double.MAX_VALUE if there is no solution.
+	 */
+	public static double solveQuadraticMax(double a, double b, double c) {
+		if (a != 0) {
+			double discr = (b * b) - (4 * a * c);
+
+			// one solution
+			if (discr == 0) {
+				return -b / (2.0 * a);
+			} else if (discr > 0) {
+				return Math.max((-b + Math.sqrt(discr)) / (2.0 * a), (-b - Math.sqrt(discr)) / (2.0 * a));
+			}
+		} else if (c != 0) {
+			return -c / b;
+		} else {
+			throw new IllegalArgumentException("ax^2 + bx + c = 0 is not a valid quadratic equation for a=b=0.");
+		}
+
+		return Double.MAX_VALUE;
 	}
 
 	/**

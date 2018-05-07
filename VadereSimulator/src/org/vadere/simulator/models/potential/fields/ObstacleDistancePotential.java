@@ -17,6 +17,7 @@ import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFIM;
 import org.vadere.util.potential.calculators.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.EikonalSolverFSM;
+import org.vadere.util.potential.calculators.EikonalSolverSFMM;
 import org.vadere.util.potential.calculators.PotentialFieldCalculatorNone;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 
@@ -54,7 +55,7 @@ public class ObstacleDistancePotential implements IPotentialField {
 				eikonalSolver = new EikonalSolverFSM(cellGrid, obstacles, isHighAccuracyFM, new UnitTimeCostFunction());
 				break;
 			default:
-				eikonalSolver = new EikonalSolverFMM(cellGrid, obstacles, isHighAccuracyFM, new UnitTimeCostFunction());
+				eikonalSolver = new EikonalSolverSFMM(cellGrid, obstacles, isHighAccuracyFM, new UnitTimeCostFunction());
 		}
 
 		long ms = System.currentTimeMillis();

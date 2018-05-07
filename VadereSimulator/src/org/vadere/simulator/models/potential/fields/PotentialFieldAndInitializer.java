@@ -84,7 +84,7 @@ class PotentialFieldAndInitializer {
 				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
 				break;
 			default:
-				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverSFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
 		}
 
 		long ms = System.currentTimeMillis();
