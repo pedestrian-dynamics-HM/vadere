@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.mockito.Mockito;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
@@ -82,10 +83,10 @@ public class PedestrianOSMStrideLengthProcessorTestEnv extends ProcessorTestEnv<
 	private PedestrianOSM getPedMock(int id, Double... strides) {
 		PedestrianOSM ped = mock(PedestrianOSM.class, Mockito.RETURNS_DEEP_STUBS);
 		when(ped.getId()).thenReturn(id);
-		LinkedList<Double> strideList = new LinkedList<>(Arrays.asList(strides));
-		LinkedList<Double>[] tmp = (LinkedList<Double>[]) (new LinkedList<?>[2]);
-		tmp[0] = strideList;
-		when(ped.getStrides()).thenReturn(tmp);
+		LinkedList<Pair<Double, Double>> strideList = new LinkedList<>();
+
+		Arrays.stream(strides).forEach(stide -> strideList.add(Pair.of(stide, 0.2)));
+		when(ped.getStrides()).thenReturn(strideList);
 		return ped;
 	}
 

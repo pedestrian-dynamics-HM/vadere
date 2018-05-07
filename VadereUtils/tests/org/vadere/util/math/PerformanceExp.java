@@ -12,9 +12,12 @@ import org.openjdk.jmh.annotations.State;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by bzoennchen on 26.04.18.
+ * @author Benedikt Zoennchen
+ *
+ * A simple example how to write a performance test. We compare two different
+ * implementations of solutions of the approximation of the exponential function.
  */
-public class TestExp {
+public class PerformanceExp {
 
 	@State(Scope.Thread)
 	public static class RandomDouble {

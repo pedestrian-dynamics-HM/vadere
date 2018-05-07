@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
@@ -19,7 +21,7 @@ import org.vadere.util.math.MathUtil;
 
 public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObstacle {
 
-
+	private static Logger log = LogManager.getLogger(PotentialFieldObstacleCompactSoftshell.class);
 	private AttributesPotentialCompactSoftshell attributes;
 	private Random random;
 	private double width;

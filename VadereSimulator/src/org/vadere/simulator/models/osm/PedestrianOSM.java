@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
@@ -56,7 +57,7 @@ public class PedestrianOSM extends Pedestrian {
 	// calculated by (current position - last position)/(period of time).
 	private double speedByAbsoluteDistance;
 
-	private LinkedList<Double>[] strides;    // strides[0] = length strides[1] = time
+	private LinkedList<Pair<Double, Double>> strides; // left = length, right = time
 	private StairStepOptimizer stairStepOptimizer;
 
 	@SuppressWarnings("unchecked")
@@ -94,9 +95,7 @@ public class PedestrianOSM extends Pedestrian {
 			this.minStepLength = 0;
 		}
 
-		this.strides = (LinkedList<Double>[]) (new LinkedList<?>[2]);
-		this.strides[0] = new LinkedList<>();
-		this.strides[1] = new LinkedList<>();
+		this.strides = new LinkedList<>();
 	}
 
 	private static UpdateSchemeOSM createUpdateScheme(UpdateType updateType, PedestrianOSM pedestrian) {
@@ -121,9 +120,14 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
+		double lastSimTimeInSec = currentTimeInSec - timeStepInSec;
+
+		// clear the old strides to avoid large linked lists
+		if(!strides.isEmpty() && lastSimTimeInSec < strides.peekFirst().getRight()) {
+			clearStrides();
+		}
 
 		this.updateScheme.update(timeStepInSec, currentTimeInSec, callMethod);
-
 	}
 
 	public void updateNextPosition() {
@@ -183,10 +187,9 @@ public class PedestrianOSM extends Pedestrian {
 			// compute velocity by forward difference
 			setVelocity(new Vector2D(nextPosition.x - currentPosition.x,
 					nextPosition.y - currentPosition.y).multiply(1.0 / stepTime));
-
 		}
-		strides[0].add(currentPosition.distance(nextPosition));
-		strides[1].add(this.getTimeOfNextStep());
+
+		strides.add(Pair.of(currentPosition.distance(nextPosition), getTimeOfNextStep()));
 	}
 
 	public double getStepSize() {
@@ -224,8 +227,7 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public void clearStrides() {
-		strides[0].clear();
-		strides[1].clear();
+		strides.clear();
 	}
 
 	// Getters...
@@ -302,7 +304,7 @@ public class PedestrianOSM extends Pedestrian {
 		return attributesOSM;
 	}
 
-	public LinkedList<Double>[] getStrides() {
+	public LinkedList<Pair<Double, Double>> getStrides() {
 		return strides;
 	}
 
