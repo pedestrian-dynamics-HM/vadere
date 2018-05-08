@@ -31,4 +31,21 @@ public class AttributesObstacle extends Attributes {
 		return id;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		AttributesObstacle that = (AttributesObstacle) o;
+
+		if (id != that.id) return false;
+		return shape != null ? shape.equals(that.shape) : that.shape == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = shape != null ? shape.hashCode() : 0;
+		result = 31 * result + id;
+		return result;
+	}
 }

@@ -147,6 +147,7 @@ public class Simulation {
 		}
 
 		processorManager.postLoop(this.simulationState);
+		topographyController.postLoop(this.simTimeInSec);
 	}
 
 	/**
