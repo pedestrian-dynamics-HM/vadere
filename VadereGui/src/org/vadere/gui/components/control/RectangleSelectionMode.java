@@ -17,7 +17,6 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 	@Override
 	public void mousePressed(final MouseEvent event) {
 		panelModel.setMousePosition(event.getPoint());
-
 		if (SwingUtilities.isMiddleMouseButton(event)) {
 			super.mousePressed(event);
 		} else {
@@ -30,7 +29,6 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 			VRectangle shape = new VRectangle(panelModel.getMousePosition().x,
 					panelModel.getMousePosition().y, width, height);
 			panelModel.setSelectionShape(shape);
-			panelModel.showSelection();
 		}
 		panelModel.notifyObservers();
 	}
@@ -44,6 +42,7 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 	@Override
 	public void mouseDragged(MouseEvent event) {
 		panelModel.setMousePosition(event.getPoint());
+		panelModel.showSelection();
 
 		if (SwingUtilities.isMiddleMouseButton(event)) {
 			super.mouseDragged(event);
