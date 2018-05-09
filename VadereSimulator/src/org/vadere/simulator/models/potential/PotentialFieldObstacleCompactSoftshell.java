@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.Model;
@@ -74,9 +75,17 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 	}
 
 	@Override
-	public Vector2D getObstaclePotentialGradient(VPoint pos,
-			Agent pedestrian) {
-		throw new UnsupportedOperationException("this method is not jet implemented.");
+	public Vector2D getObstaclePotentialGradient(VPoint pos, Agent pedestrian) {
+		throw new UnsupportedOperationException("not jet implemented.");
+		/*double epsilon = 0.0000001;
+		VPoint dxPos = pos.add(new VPoint(pos.getX() + MathUtils.EPSILON, pos.getY()));
+		VPoint dyPos = pos.add(new VPoint(pos.getX(), pos.getY() + MathUtils.EPSILON));
+
+		double potential = getObstaclePotential(pos, pedestrian);
+		double dx = (getObstaclePotential(dxPos, pedestrian) - potential) / epsilon;
+		double dy = (getObstaclePotential(dyPos, pedestrian) - potential) / epsilon;
+
+		return new Vector2D(dx, dy);*/
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math.util.MathUtils;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
@@ -39,14 +40,9 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	@Override
 	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography scenario) {
-		List<Pedestrian> result = new LinkedList<>();
-
 		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
 				.getObjects(relevantArea.getCenter(), this.personalWidth + 0.5);
-
-		result = closePedestrians;
-
-		return result;
+		return closePedestrians;
 	}
 
 	@Override
@@ -98,6 +94,18 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	public Vector2D getAgentPotentialGradient(VPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> otherPedestrians) {
-		throw new UnsupportedOperationException("this method is not jet implemented.");
+		throw new UnsupportedOperationException("not jet implemented.");
+		/*double epsilon = 0.001;
+		double dx = 0;
+		double dy = 0;
+
+		VPoint dxPos = pos.add(new VPoint(pos.getX() + MathUtils.EPSILON, pos.getY()));
+		VPoint dyPos = pos.add(new VPoint(pos.getX(), pos.getY() + MathUtils.EPSILON));
+
+		double potential = getAgentPotential(pos, pedestrian, otherPedestrians);
+		dx = (getAgentPotential(dxPos, pedestrian, otherPedestrians) - potential) / epsilon;
+		dy = (getAgentPotential(dyPos, pedestrian, otherPedestrians) - potential) / epsilon;
+
+		return new Vector2D(dx, dy);*/
 	}
 }
