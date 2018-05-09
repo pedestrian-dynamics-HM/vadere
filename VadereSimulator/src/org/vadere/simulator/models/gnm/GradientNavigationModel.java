@@ -85,10 +85,10 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, random, attributes.getObstaclePotentialModel());
+				modelAttributesList, topography, attributesPedestrian, random, attributes.getObstaclePotentialModel());
 
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributes.getPedestrianPotentialModel());
+				modelAttributesList, topography, attributesPedestrian, random, attributes.getPedestrianPotentialModel());
 
 		models.add(this);
 	}

@@ -103,11 +103,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
-		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, random, attributesOSM.getObstaclePotentialModel());
-
-		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesOSM.getPedestrianPotentialModel());
+		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
+		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
 		
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 			filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel)ac).findAny();

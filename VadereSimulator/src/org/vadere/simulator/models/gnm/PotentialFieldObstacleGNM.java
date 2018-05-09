@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialGNM;
@@ -27,14 +28,20 @@ public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFie
 
 	private Collection<Obstacle> obstacles;
 
+	private Topography topography;
+
 	private double epsDV = 1e-10;
 
-	private final AttributesPotentialGNM attributesPotential;
+	private AttributesPotentialGNM attributesPotential;
 
-	public PotentialFieldObstacleGNM(Collection<Obstacle> obstacles,
-			AttributesPotentialGNM attributesDynamicPotentialGNM) {
-		this.obstacles = obstacles;
-		this.attributesPotential = attributesDynamicPotentialGNM;
+	public PotentialFieldObstacleGNM() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributesPotential = Model.findAttributes(attributesList, AttributesPotentialGNM.class);
+		this.obstacles = topography.getObstacles();
+		this.topography = topography;
 	}
 
 	@Override
@@ -55,6 +62,7 @@ public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFie
 		completeGrad[0] = 0;
 		completeGrad[1] = 0;
 
+		// we could save the closest obstacle in the grid.
 		for (Obstacle obstacle : obstacles) {
 			closest = new VPoint(0, 0);
 
@@ -116,13 +124,10 @@ public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFie
 
 	@Override
 	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleGNM(new LinkedList<>(obstacles), attributesPotential);
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
+		PotentialFieldObstacleGNM potentialFieldObstacleGNM = new PotentialFieldObstacleGNM();
+		potentialFieldObstacleGNM.attributesPotential = attributesPotential;
+		potentialFieldObstacleGNM.obstacles = new LinkedList<>(topography.getObstacles());
+		return potentialFieldObstacleGNM;
 	}
 
 }

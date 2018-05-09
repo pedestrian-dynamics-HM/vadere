@@ -1,19 +1,19 @@
 package org.vadere.simulator.models.potential;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -29,16 +29,23 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 	private Collection<Obstacle> obstacles;
 	private Topography topography;
 
-	public PotentialFieldObstacleCompactSoftshell(AttributesPotentialCompactSoftshell attributesPotential,
-			Topography topography, Random random) {
-		this.attributes = attributesPotential;
-		this.random = random;
+	public PotentialFieldObstacleCompactSoftshell() {}
 
-		this.width = attributesPotential.getObstPotentialWidth();
-		this.height = attributesPotential.getObstPotentialHeight();
-		this.topography = topography;
-		this.obstacles = topography.getObstacles();
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		init(Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class), topography, random);
 	}
+
+	private void init(AttributesPotentialCompactSoftshell attributes, Topography topography, Random random){
+		this.attributes = attributes;
+		this.width = attributes.getObstPotentialWidth();
+		this.height = attributes.getObstPotentialHeight();
+		this.random = random;
+		this.obstacles = new ArrayList<>(topography.getObstacles());
+		this.topography = topography;
+	}
+
 
 	@Override
 	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
@@ -74,13 +81,8 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 
 	@Override
 	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleCompactSoftshell(attributes, topography, random);
+		PotentialFieldObstacleCompactSoftshell potentialFieldObstacle = new PotentialFieldObstacleCompactSoftshell();
+		potentialFieldObstacle.init(attributes, topography, random);
+		return potentialFieldObstacle;
 	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
 }

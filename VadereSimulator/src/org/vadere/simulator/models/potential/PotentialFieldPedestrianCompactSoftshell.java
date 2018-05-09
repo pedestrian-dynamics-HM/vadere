@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
@@ -19,14 +20,17 @@ import org.vadere.util.math.MathUtil;
 
 public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldAgent {
 
-
 	private AttributesPotentialCompactSoftshell attributes;
 	private double intimateWidth;
 	private double personalWidth;
 	private double height;
 
-	public PotentialFieldPedestrianCompactSoftshell(AttributesPotentialCompactSoftshell attributes) {
-		this.attributes = attributes;
+	public PotentialFieldPedestrianCompactSoftshell() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributes = Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class);
 		this.intimateWidth = attributes.getPedPotentialIntimateSpaceWidth();
 		this.personalWidth = attributes.getPedPotentialPersonalSpaceWidth();
 		this.height = attributes.getPedPotentialHeight();
@@ -96,11 +100,4 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 			Collection<? extends Agent> otherPedestrians) {
 		throw new UnsupportedOperationException("this method is not jet implemented.");
 	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
 }
