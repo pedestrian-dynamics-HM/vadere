@@ -2,30 +2,31 @@ package org.vadere.util.factory;
 
 import java.util.function.Supplier;
 
+/**
+ * Base factory object which provides {@link Supplier} for Type T
+ * @param <T>
+ */
 public class FactoryObject<T> {
 
-	private final Class clazz;
-	private final String  label;
-	private final String description;
-	private Supplier<T> supplier;
+	protected final Class<? extends T> clazz;
+	protected Supplier<T> supplier;
 
-	public FactoryObject(Class clazz, String label, String description, Supplier<T> supplier){
-		this.clazz = clazz;
-		this.label = label;
-		this.description = description;
+	public FactoryObject(Class<? extends T> clazz, Supplier<T> supplier) {
 		this.supplier = supplier;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	//todo: this should be locale with Messages.
-	public String getDescription() {
-		return description;
+		this.clazz = clazz;
 	}
 
 	public Supplier<T> getSupplier() {
 		return supplier;
 	}
+
+	public Class<? extends T> getClazz() {
+		return clazz;
+	}
+
+	public T getInstance(){
+		return supplier.get();
+	}
+
+
 }
