@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.annotation.factories.DataProcessorClass;
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.potential.PotentialFieldModel;

@@ -12,12 +12,20 @@ import java.util.StringJoiner;
 public class PedestrianWaitingEndTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
 	PedestrianWaitingEndTimeProcessorTestEnv(){
-		testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingEndTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingEndTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

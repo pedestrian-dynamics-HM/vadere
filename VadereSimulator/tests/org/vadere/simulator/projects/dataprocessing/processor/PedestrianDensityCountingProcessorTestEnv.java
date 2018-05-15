@@ -23,7 +23,11 @@ public class PedestrianDensityCountingProcessorTestEnv extends ProcessorTestEnv<
 
 	@SuppressWarnings("unchecked")
 	PedestrianDensityCountingProcessorTestEnv(int nextProcessorId) {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianDensityCountingProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianDensityCountingProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setAttributes(new AttributesPedestrianDensityCountingProcessor());
 		testedProcessor.setId(nextProcessorId);
 		this.nextProcessorId = nextProcessorId + 1;
@@ -39,10 +43,14 @@ public class PedestrianDensityCountingProcessorTestEnv extends ProcessorTestEnv<
 		addRequiredProcessors(pedPosProcEnv);
 		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepPedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepPedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}

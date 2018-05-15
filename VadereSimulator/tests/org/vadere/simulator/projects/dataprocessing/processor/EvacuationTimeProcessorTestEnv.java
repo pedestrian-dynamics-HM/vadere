@@ -24,7 +24,11 @@ public class EvacuationTimeProcessorTestEnv extends ProcessorTestEnv<NoDataKey, 
 
 	@SuppressWarnings("unchecked")
 	private EvacuationTimeProcessorTestEnv(int nextProcessorId) {
-		testedProcessor = processorFactory.createDataProcessor(EvacuationTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(EvacuationTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId);
 		this.nextProcessorId = nextProcessorId + 1;
 
@@ -44,10 +48,14 @@ public class EvacuationTimeProcessorTestEnv extends ProcessorTestEnv<NoDataKey, 
 		addRequiredProcessors(pedEvacTimeProcEnv);
 
 		//setup output file with different VadereWriter impl for test
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				NoDataKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					NoDataKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}

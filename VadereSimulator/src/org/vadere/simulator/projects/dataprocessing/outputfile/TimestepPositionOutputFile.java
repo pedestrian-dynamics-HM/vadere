@@ -1,7 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
-import org.vadere.annotation.factories.OutputFileClass;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.annotation.factories.outputfiles.OutputFileClass;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
 
 @OutputFileClass(dataKeyMapping = TimestepPositionKey.class)

@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.IntegratorType;
 
@@ -11,6 +12,7 @@ import org.vadere.state.types.IntegratorType;
  * 
  * 
  */
+@ModelAttributeClass
 public class AttributesODEIntegrator extends Attributes {
 	private IntegratorType solverType = IntegratorType.DORMAND_PRINCE_45;
 	private double stepSizeMin = 1e-4;

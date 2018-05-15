@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
@@ -22,6 +23,7 @@ import org.vadere.util.potential.gradients.GradientProvider;
  * (Helbing 1995).
  * 
  */
+@ModelClass
 public class PotentialFieldObstacleSFM implements GradientProvider,
 		PotentialFieldObstacle {
 

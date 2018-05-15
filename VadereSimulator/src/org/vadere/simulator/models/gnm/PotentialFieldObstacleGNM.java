@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialGNM;
@@ -23,6 +24,7 @@ import org.vadere.util.potential.gradients.GradientProvider;
  * calculating the distance to that point.
  * 
  */
+@ModelClass
 public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFieldObstacle {
 
 	private Collection<Obstacle> obstacles;

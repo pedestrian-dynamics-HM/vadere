@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	/**

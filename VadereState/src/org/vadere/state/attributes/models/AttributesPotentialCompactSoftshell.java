@@ -1,7 +1,9 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
+@ModelAttributeClass
 public class AttributesPotentialCompactSoftshell extends Attributes {
 
 	private double pedPotentialIntimateSpaceWidth = 0.45;

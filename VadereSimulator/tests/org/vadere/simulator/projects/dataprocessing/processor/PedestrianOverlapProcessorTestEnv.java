@@ -17,12 +17,20 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
 	PedestrianOverlapProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianOverlapProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianOverlapProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepPedestrianIdKey.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepPedestrianIdKey.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

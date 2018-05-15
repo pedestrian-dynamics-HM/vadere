@@ -18,7 +18,11 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 
 	@SuppressWarnings("unchecked")
 	MeanPedestrianEvacuationTimeProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(MeanPedestrianEvacuationTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(MeanPedestrianEvacuationTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
 		DataProcessor pedEvacTimeProc;
@@ -37,10 +41,14 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 		addRequiredProcessors(pedEvacTimeProcEnv);
 
 		//setup output file with different VadereWriter impl for test
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				NoDataKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					NoDataKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}

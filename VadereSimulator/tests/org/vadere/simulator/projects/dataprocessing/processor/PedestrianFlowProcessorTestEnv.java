@@ -21,7 +21,11 @@ public class PedestrianFlowProcessorTestEnv extends ProcessorTestEnv<TimestepPed
 
 	@SuppressWarnings("unchecked")
 	PedestrianFlowProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianFlowProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianFlowProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
 		AttributesPedestrianFlowProcessor attr =
@@ -43,10 +47,14 @@ public class PedestrianFlowProcessorTestEnv extends ProcessorTestEnv<TimestepPed
 		addRequiredProcessors(pedVelProcEnv);
 		addRequiredProcessors(pedDensCountProcEnv);
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepPedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepPedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}

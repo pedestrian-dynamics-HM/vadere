@@ -23,13 +23,21 @@ import static org.mockito.Mockito.when;
 public class PedestrianOSMStrideLengthProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Double> {
 
 	PedestrianOSMStrideLengthProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianOSMStrideLengthProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianOSMStrideLengthProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepPedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepPedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

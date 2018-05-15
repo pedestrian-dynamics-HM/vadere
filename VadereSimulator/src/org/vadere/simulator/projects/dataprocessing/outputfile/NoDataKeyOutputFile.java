@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
-import org.vadere.annotation.factories.OutputFileClass;
+import org.vadere.annotation.factories.outputfiles.OutputFileClass;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 
 /**
@@ -10,7 +10,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 @OutputFileClass(dataKeyMapping = NoDataKey.class)
 public class NoDataKeyOutputFile extends OutputFile<NoDataKey> {
     public NoDataKeyOutputFile() {
-        super(new String[] { });
+        super();
     }
 
     @Override

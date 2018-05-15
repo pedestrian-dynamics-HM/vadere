@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -21,6 +22,7 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  *         Not finiehsed!
  */
+@ModelClass
 public class PotentialFieldMultiTargetGrid<T extends Agent> extends AbstractPotentialFieldTarget {
 
 	private static double EPSILON_SIM_TIME = 1e-100;

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
@@ -15,6 +16,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 
+@ModelClass
 public class CentroidGroupModel implements GroupModel {
 
 	private GroupSizeDeterminator groupSizeDeterminator;
