@@ -52,6 +52,9 @@ public class CentroidGroup implements Group {
 	@Override
 	public boolean equals(Group o) {
 		boolean result = false;
+		if (o == null){
+			return result;
+		}
 
 		if (this == o) {
 			result = true;

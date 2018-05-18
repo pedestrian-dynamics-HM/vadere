@@ -3,6 +3,8 @@ package org.vadere.simulator.models.groups;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.state.scenario.Pedestrian;
 
+
+//verhalten.... (update step)
 public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 
 	private final CentroidGroupModel groupCollection;

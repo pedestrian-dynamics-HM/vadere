@@ -60,6 +60,10 @@ public class Pedestrian extends Agent {
 		}
 	}
 
+	public void addGroupId(int groupId){
+		groupIds.add(groupId);
+	}
+
 	public <T extends ModelPedestrian> T getModelPedestrian(Class<? extends T> modelType) {
 		return (T) modelPedestrianMap.get(modelType);
 	}

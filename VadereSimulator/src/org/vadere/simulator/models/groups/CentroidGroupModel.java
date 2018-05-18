@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
@@ -27,11 +28,12 @@ public class CentroidGroupModel implements GroupModel {
 	private IPotentialFieldTarget potentialFieldTarget;
 	private AttributesCGM attributesCGM;
 
-	private int nextFreeGroupId = 0;
+	private AtomicInteger nextFreeGroupId;
 	
 	public CentroidGroupModel() {
 		this.groupFactories = new TreeMap<>();
 		this.pedestrianGroupData = new HashMap<>();
+		this.nextFreeGroupId = new AtomicInteger(0);
 	}
 	
 	@Override
@@ -48,11 +50,7 @@ public class CentroidGroupModel implements GroupModel {
 	}
 
 	protected int getFreeGroupId() {
-		int result = nextFreeGroupId;
-
-		nextFreeGroupId++;
-
-		return result;
+		return nextFreeGroupId.getAndIncrement();
 	}
 
 	@Override
@@ -79,6 +77,16 @@ public class CentroidGroupModel implements GroupModel {
 	}
 
 	@Override
+	public CentroidGroup removeMember(ScenarioElement ped) {
+		return pedestrianGroupData.remove(ped);
+	}
+
+
+	public Map<ScenarioElement, CentroidGroup> getPedestrianGroupData() {
+		return pedestrianGroupData;
+	}
+
+	@Override
 	public CentroidGroup getNewGroup(final int size) {
 		CentroidGroup result = new CentroidGroup(getFreeGroupId(), size,
 				this.potentialFieldTarget);
@@ -87,11 +95,15 @@ public class CentroidGroupModel implements GroupModel {
 
 	@Override
 	public void preLoop(final double simTimeInSec) {
-		topography.addElementAddedListener(Pedestrian.class, getGroupFactory(-1));
+		topography.getSources().stream().forEach( source -> {
+			topography.addElementAddedListener(Pedestrian.class, getGroupFactory(source.getId()));
+			topography.addElementRemovedListener(Pedestrian.class, getGroupFactory(source.getId()));
+		});
 	}
 
 	@Override
-	public void postLoop(final double simTimeInSec) {}
+	public void postLoop(final double simTimeInSec) {
+	}
 
 	@Override
 	public void update(final double simTimeInSec) {}

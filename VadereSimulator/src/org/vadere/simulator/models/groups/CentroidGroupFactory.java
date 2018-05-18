@@ -2,7 +2,7 @@ package org.vadere.simulator.models.groups;
 
 import org.vadere.state.scenario.Pedestrian;
 
-public class CentroidGroupFactory implements GroupFactory {
+public class CentroidGroupFactory extends GroupFactory {
 
 	private CentroidGroupModel groupCollection;
 	private GroupSizeDeterminator groupSizeDeterminator;
@@ -22,6 +22,7 @@ public class CentroidGroupFactory implements GroupFactory {
 
 	private void assignToGroup(Pedestrian ped) {
 		currentGroup.addMember(ped);
+		ped.addGroupId(currentGroup.getID());
 		groupCollection.registerMember(ped, currentGroup);
 	}
 
@@ -42,11 +43,17 @@ public class CentroidGroupFactory implements GroupFactory {
 				.nextGroupSize());
 	}
 
-	@Override
+	@Override //listener methode (aufruf
 	public void elementAdded(Pedestrian pedestrian) {
 		if (requiresNewGroup()) {
 			createNewGroup();
 		}
 		assignToGroup(pedestrian);
+	}
+
+	@Override
+	public void elementRemoved(Pedestrian ped) {
+		CentroidGroup group = groupCollection.removeMember(ped);
+		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group.getID());
 	}
 }
