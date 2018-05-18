@@ -10,7 +10,7 @@ public class CentroidGroupFactory extends GroupFactory {
 	private CentroidGroup currentGroup;
 
 	public CentroidGroupFactory(CentroidGroupModel groupCollection,
-			GroupSizeDeterminator groupSizeDet) {
+								GroupSizeDeterminator groupSizeDet) {
 		this.groupCollection = groupCollection;
 		this.groupSizeDeterminator = groupSizeDet;
 	}
@@ -43,7 +43,7 @@ public class CentroidGroupFactory extends GroupFactory {
 				.nextGroupSize());
 	}
 
-	@Override //listener methode (aufruf
+	//listener methode (aufruf
 	public void elementAdded(Pedestrian pedestrian) {
 		if (requiresNewGroup()) {
 			createNewGroup();
@@ -51,9 +51,8 @@ public class CentroidGroupFactory extends GroupFactory {
 		assignToGroup(pedestrian);
 	}
 
-	@Override
 	public void elementRemoved(Pedestrian ped) {
 		CentroidGroup group = groupCollection.removeMember(ped);
-		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group.getID());
+		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group != null ? group.getID() : "noGroup");
 	}
 }

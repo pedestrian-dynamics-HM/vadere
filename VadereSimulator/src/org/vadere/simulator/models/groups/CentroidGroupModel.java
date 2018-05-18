@@ -1,5 +1,17 @@
 package org.vadere.simulator.models.groups;
 
+import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesCGM;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.DynamicElementAddListener;
+import org.vadere.state.scenario.DynamicElementRemoveListener;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Topography;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,18 +19,9 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesCGM;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
-
 @ModelClass
-public class CentroidGroupModel implements GroupModel {
+public class CentroidGroupModel
+		implements GroupModel, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
 
 	private GroupSizeDeterminator groupSizeDeterminator;
 	private Map<Integer, CentroidGroupFactory> groupFactories;
@@ -29,16 +32,16 @@ public class CentroidGroupModel implements GroupModel {
 	private AttributesCGM attributesCGM;
 
 	private AtomicInteger nextFreeGroupId;
-	
+
 	public CentroidGroupModel() {
 		this.groupFactories = new TreeMap<>();
 		this.pedestrianGroupData = new HashMap<>();
 		this.nextFreeGroupId = new AtomicInteger(0);
 	}
-	
+
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random) {
 		this.attributesCGM = Model.findAttributes(attributesList, AttributesCGM.class);
 		this.groupSizeDeterminator = new GroupSizeDeterminatorRandom(
 				attributesCGM.getGroupSizeDistribution(), random);
@@ -95,10 +98,8 @@ public class CentroidGroupModel implements GroupModel {
 
 	@Override
 	public void preLoop(final double simTimeInSec) {
-		topography.getSources().stream().forEach( source -> {
-			topography.addElementAddedListener(Pedestrian.class, getGroupFactory(source.getId()));
-			topography.addElementRemovedListener(Pedestrian.class, getGroupFactory(source.getId()));
-		});
+		topography.addElementAddedListener(Pedestrian.class, this);
+		topography.addElementRemovedListener(Pedestrian.class, this);
 	}
 
 	@Override
@@ -106,10 +107,21 @@ public class CentroidGroupModel implements GroupModel {
 	}
 
 	@Override
-	public void update(final double simTimeInSec) {}
+	public void update(final double simTimeInSec) {
+	}
 
 	public AttributesCGM getAttributesCGM() {
 		return attributesCGM;
 	}
-	
+
+	@Override
+	public void elementAdded(Pedestrian pedestrian) {
+		// call GroupFactory for selected Source
+		getGroupFactory(pedestrian.getSource().getId()).elementAdded(pedestrian);
+	}
+
+	@Override
+	public void elementRemoved(Pedestrian pedestrian) {
+		getGroupFactory(pedestrian.getSource().getId()).elementRemoved(pedestrian);
+	}
 }

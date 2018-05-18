@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.groups;
 
 import org.vadere.simulator.models.Model;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 
 public interface GroupModel extends Model {
