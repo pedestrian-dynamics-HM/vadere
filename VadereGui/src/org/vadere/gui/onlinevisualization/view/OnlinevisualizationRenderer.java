@@ -58,7 +58,8 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 		g.setColor(model.config.getPedestrianDefaultColor());
 		for (Agent ped : model.getAgents()) {
 			VPoint position = ped.getPosition();
-			g.fill(ped.getShape());
+//			g.fill(ped.getShape());
+			ped.render(g);
 
 			if (!pedestrianPositions.containsKey(ped.getId())) {
 				pedestrianPositions.put(ped.getId(), new LinkedList());

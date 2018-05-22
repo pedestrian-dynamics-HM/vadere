@@ -1,5 +1,6 @@
 package org.vadere.state.scenario;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Random;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.renderer.AgentDefaultRenderer;
+import org.vadere.state.scenario.renderer.Renderer;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,6 +35,7 @@ public abstract class Agent extends DynamicElement {
 	private double freeFlowSpeed;
 
 	private final AttributesAgent attributes;
+	private Renderer renderer;
 
 	public Agent(AttributesAgent attributesAgent) {
 		position = new VPoint(0, 0);
@@ -40,7 +44,21 @@ public abstract class Agent extends DynamicElement {
 		nextTargetListIndex = 0;
 
 		attributes = attributesAgent;
+		setRenderer(new AgentDefaultRenderer());
 	}
+
+	public void setRenderer(Renderer render){
+		this.renderer = render;
+	}
+
+	public void render(Graphics2D g){
+		renderer.render(this, g);
+	}
+
+	public void render(Graphics2D g, Color c){
+		renderer.render(this, g, c);
+	}
+
 
 	public Agent(AttributesAgent attributesAgent, Random random) {
 		this(attributesAgent);
@@ -69,7 +87,6 @@ public abstract class Agent extends DynamicElement {
 		this.velocity = other.velocity;
 		this.freeFlowSpeed = other.freeFlowSpeed;
 	}
-
 	public LinkedList<Integer> getTargets() {
 		return targetIds;
 	}

@@ -1,10 +1,16 @@
 package org.vadere.state.scenario;
 
-import java.util.*;
-
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.renderer.AgentGlyphRenderer;
+import org.vadere.state.scenario.renderer.PedestrianGroupRenderer;
+import org.vadere.state.scenario.renderer.PedestrianTriangleRenderer;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
 
 public class Pedestrian extends Agent {
 
@@ -40,6 +46,7 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		groupIds = new LinkedList<>();
+		setRenderer(new PedestrianGroupRenderer());
 	}
 
 	/**
