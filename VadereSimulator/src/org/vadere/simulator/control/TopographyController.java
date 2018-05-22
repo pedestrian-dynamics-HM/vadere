@@ -1,11 +1,18 @@
 package org.vadere.simulator.control;
 
 import java.util.LinkedList;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class TopographyController extends OfflineTopographyController {
 
