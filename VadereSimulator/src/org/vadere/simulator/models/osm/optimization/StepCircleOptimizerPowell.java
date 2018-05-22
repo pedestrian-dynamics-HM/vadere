@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.math3.optimization.direct.BOBYQAOptimizer;
@@ -38,7 +39,7 @@ public class StepCircleOptimizerPowell implements StepCircleOptimizer {
 
 		PointValuePair newMinimum = new PointValuePair(position, potentialEvaluationFunction.value(position));
 
-		LinkedList<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
 
 		try {
 			newMinimum = optimizer.optimize(1000, (MultivariateFunction) potentialEvaluationFunction, GoalType.MINIMIZE,
