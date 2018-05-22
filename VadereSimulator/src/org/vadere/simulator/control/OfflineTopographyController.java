@@ -1,13 +1,20 @@
 package org.vadere.simulator.control;
 
 import java.util.Collection;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class OfflineTopographyController {
 
@@ -39,6 +46,14 @@ public class OfflineTopographyController {
 				this.topography.addBoundary(obstacle);
 			}
 		}
+
+		// calculate distance after the boundary was added!
+		IPotentialField distanceField = new ObstacleDistancePotential(
+				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+				new VRectangle(topography.getBounds()),
+				new AttributesFloorField());
+		Function<VPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
+		this.topography.setObstacleDistanceFunction(obstacleDistance);
 	}
 
 	/**

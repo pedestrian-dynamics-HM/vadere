@@ -80,14 +80,6 @@ public class Simulation {
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
 		this.topography = scenarioStore.topography;
-
-		IPotentialField distanceField = new ObstacleDistancePotential(
-				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-				new VRectangle(topography.getBounds()),
-				new AttributesFloorField());
-		Function<VPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
-		this.topography.setObstacleDistanceFunction(obstacleDistance);
-
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
@@ -106,7 +98,6 @@ public class Simulation {
         if(mainModel instanceof PotentialFieldModel) {
             pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
         }
-
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
