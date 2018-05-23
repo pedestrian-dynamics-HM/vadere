@@ -1,5 +1,6 @@
 package org.vadere.state.scenario;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.renderer.AgentGlyphRenderer;
 import org.vadere.state.scenario.renderer.PedestrianGroupRenderer;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
+@JsonIgnoreProperties(value={"renderer"})
 public class Pedestrian extends Agent {
 
 	/** Target ID if the pedestrian represents a target, -1 otherwise. */
