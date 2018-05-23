@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
-@JsonIgnoreProperties(value={"renderer"})
 public class Pedestrian extends Agent {
 
 	/** Target ID if the pedestrian represents a target, -1 otherwise. */
