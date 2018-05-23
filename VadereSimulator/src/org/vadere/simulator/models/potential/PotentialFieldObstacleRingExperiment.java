@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
@@ -28,13 +29,21 @@ import org.vadere.util.geometry.shapes.VPoint;
 @ModelClass
 public class PotentialFieldObstacleRingExperiment implements PotentialFieldObstacle {
 
-	private final AttributesPotentialRingExperiment attributes;
+	private AttributesPotentialRingExperiment attributes;
 
-	private final VPoint center;
-	private final double radiusInnerCircle;
-	private final double radiusOuterCircle;
+	private VPoint center;
+	private double radiusInnerCircle;
+	private double radiusOuterCircle;
 
-	public PotentialFieldObstacleRingExperiment(AttributesPotentialRingExperiment attributes) {
+	public PotentialFieldObstacleRingExperiment() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		init(Model.findAttributes(attributesList, AttributesPotentialRingExperiment.class));
+	}
+
+	private void init(final AttributesPotentialRingExperiment attributes) {
 		this.attributes = attributes;
 		center = attributes.getCenter();
 
@@ -78,13 +87,8 @@ public class PotentialFieldObstacleRingExperiment implements PotentialFieldObsta
 
 	@Override
 	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleRingExperiment(attributes);
+		PotentialFieldObstacleRingExperiment potentialFieldObstacleRingExperiment = new PotentialFieldObstacleRingExperiment();
+		potentialFieldObstacleRingExperiment.init(attributes);
+		return potentialFieldObstacleRingExperiment;
 	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
 }

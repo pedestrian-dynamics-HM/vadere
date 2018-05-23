@@ -30,7 +30,7 @@ public class UnitTimeCostFunction implements ITimeCostFunction {
 
     @Override
     public ITimeCostFunction clone() {
-        return null;
+        return new UnitTimeCostFunction();
     }
 
 }

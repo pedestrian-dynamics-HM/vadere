@@ -10,6 +10,10 @@ import java.util.List;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
 
+/**
+ * Note: A polygon which has the same points as a rectangle is not
+ * equals to the rectangle.
+ */
 public class VPolygon extends Path2D.Double implements VShape {
 	private static final long serialVersionUID = 6534837112398242609L;
 

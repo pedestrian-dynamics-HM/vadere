@@ -1,12 +1,13 @@
 package org.vadere.util.potential.calculators;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -18,14 +19,16 @@ import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 /**
- * EikonalSolverFMM initializes a potential field on basis
- * of the fast marching algorithm. The potential field is static and therefor
- * not updated by update() (see PotentialFieldInitializerFastMarchingAdaptive).
- * Hence, the initializer may be used to realize static floor fields.
- * 
+ * EikonalSolverSFMM is almost identical to EikonalSolverFMM avoiding
+ * the update of values inside the priority queue. Instead the queue contains
+ * duplicates.
+ *
+ * See: jones-2006 (3D distance fields: a survey of techniques and applications)
+ * See: gomez-2015 (Fast Methods for Eikonal Equations: an Experimental Survey)
+ *
  */
-public class EikonalSolverFMM implements EikonalSolver {
-	protected final PriorityQueue<Point> narrowBand;
+public class EikonalSolverSFMM implements EikonalSolver {
+	protected final PriorityQueue<Pair<Point, Double>> narrowBand;
 	protected final ITimeCostFunction timeCostFunction;
 
 	protected CellGrid cellGrid;
@@ -40,19 +43,19 @@ public class EikonalSolverFMM implements EikonalSolver {
 	/**
 	 * Initializes the FM potential calculator with a time cost function F > 0.
 	 */
-	public EikonalSolverFMM(CellGrid potentialField,
-	                        Collection<VShape> targetShapes,
-			boolean isHighAccuracy,
-			ITimeCostFunction timeCostFunction) {
+	public EikonalSolverSFMM(
+							final CellGrid potentialField,
+	                        final Collection<VShape> targetShapes,
+	                        final boolean isHighAccuracy,
+	                        final ITimeCostFunction timeCostFunction) {
 		this.cellGrid = potentialField;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
 		this.targetShapes = targetShapes;
 		this.isHighAccuracy = isHighAccuracy;
 
-		ComparatorPotentialFieldValue comparator = new ComparatorPotentialFieldValue(
-				potentialField);
-		this.narrowBand = new PriorityQueue<Point>(50, comparator);
+		ComparatorPotentialFieldValueSFMM comparator = new ComparatorPotentialFieldValueSFMM();
+		this.narrowBand = new PriorityQueue<>(50, comparator);
 		this.timeCostFunction = timeCostFunction;
 
 		if (targetPoints.size() == 0) {
@@ -71,29 +74,35 @@ public class EikonalSolverFMM implements EikonalSolver {
 		/**
 		 * Create whole Floor Field at the beginning.
 		 */
-		// TODO [priority=low] [task=feature] remove this part to enable on demand computation from the
-		// beginning.
-		// Be aware that in this case, the function "getValue" MUST be called,
-		// it is not possible to work with the cellGrid directly.
 		while (!narrowBand.isEmpty()) {
-			Point tmpPoint = narrowBand.poll();
-			cellGrid.getValue(tmpPoint).tag = PathFindingTag.Reached;
-			setNeighborDistances(tmpPoint);
+			Pair<Point, Double> pair = narrowBand.poll();
+
+			Point tmpPoint = pair.getKey();
+			double value = pair.getValue();
+
+			if(value <= cellGrid.getValue(tmpPoint).potential) {
+				cellGrid.getValue(tmpPoint).tag = PathFindingTag.Reached;
+				setNeighborDistances(tmpPoint);
+			}
 		}
 	}
 
 	/**
 	 * Method to support calculation on demand (to improve the performance).
-	 * 
+	 *
 	 * @param point
 	 */
 	private void furtherRun(final Point point) {
-		Point tmpPoint;
-		while (!narrowBand.isEmpty()
-				&& cellGrid.getValue(point).tag == PathFindingTag.Undefined) {
-			tmpPoint = narrowBand.poll();
-			cellGrid.getValue(tmpPoint).tag = PathFindingTag.Reached;
-			setNeighborDistances(tmpPoint);
+		while (!narrowBand.isEmpty() && cellGrid.getValue(point).tag == PathFindingTag.Undefined) {
+			Pair<Point, Double> pair = narrowBand.poll();
+			Point tmpPoint = pair.getKey();
+			double value = pair.getValue();
+
+			// this might be an old value
+			if(value <= cellGrid.getValue(tmpPoint).potential) {
+				cellGrid.getValue(tmpPoint).tag = PathFindingTag.Reached;
+				setNeighborDistances(tmpPoint);
+			}
 		}
 	}
 
@@ -143,24 +152,27 @@ public class EikonalSolverFMM implements EikonalSolver {
 	}
 
 	protected void setNeighborDistances(final Point point) {
-		List<Point> neighbors = MathUtil.getNeumannNeighborhood(point);
 		double distance;
 
+		List<Point> neighbors = MathUtil.getRelativeNeumannNeighborhood();
+
 		for (Point neighbor : neighbors) {
+			int x = point.x + neighbor.x;
+			int y = point.y + neighbor.y;
 
-			if (cellGrid.isValidPoint(neighbor)) {
-				if (cellGrid.getValue(neighbor).tag == PathFindingTag.Undefined) {
-					distance = computeGodunovDifference(neighbor, cellGrid);
-					cellGrid.setValue(neighbor, new CellState(distance,
+			if (cellGrid.isValidPoint(x, y)) {
+				if (cellGrid.getValue(x, y).tag == PathFindingTag.Undefined) {
+					distance = computeGodunovDifference(x, y, cellGrid);
+					cellGrid.setValue(x, y, new CellState(distance,
 							PathFindingTag.Reachable));
-					narrowBand.add(neighbor);
-				} else if (cellGrid.getValue(neighbor).tag == PathFindingTag.Reachable) {
-					distance = computeGodunovDifference(neighbor, cellGrid);
+					narrowBand.add(Pair.create(new Point(x, y), cellGrid.getValue(x, y).potential));
+				} else if (cellGrid.getValue(x, y).tag == PathFindingTag.Reachable) {
+					distance = computeGodunovDifference(x, y, cellGrid);
 
-					if (distance < cellGrid.getValue(neighbor).potential) {
-						narrowBand.remove(neighbor);
-						cellGrid.getValue(neighbor).potential = distance;
-						narrowBand.add(neighbor);
+					if (distance < cellGrid.getValue(x, y).potential) {
+						//narrowBand.remove(neighbor);
+						cellGrid.getValue(x, y).potential = distance;
+						narrowBand.add(Pair.create(new Point(x, y), cellGrid.getValue(x, y).potential));
 					}
 				}
 			}
@@ -168,16 +180,18 @@ public class EikonalSolverFMM implements EikonalSolver {
 	}
 
 	protected void setTargetNeighborsDistances(final Point point) {
-		List<Point> neighbors = cellGrid.getLegitNeumannNeighborhood(point);
+		List<Point> neighbors = MathUtil.getRelativeNeumannNeighborhood();
 
 		for (Point neighbor : neighbors) {
-			if (cellGrid.getValue(neighbor).tag == PathFindingTag.Undefined) {
+			int x = point.x + neighbor.x;
+			int y = point.y + neighbor.y;
 
+			if (cellGrid.isValidPoint(x, y) && cellGrid.getValue(x, y).tag == PathFindingTag.Undefined) {
 				cellGrid.setValue(
-						neighbor,
-						new CellState(minDistanceToTarget(cellGrid.pointToCoord(neighbor)),
+						x, y,
+						new CellState(minDistanceToTarget(cellGrid.pointToCoord(x, y)),
 								PathFindingTag.Reachable));
-				narrowBand.add(neighbor);
+				narrowBand.add(Pair.create(new Point(x, y), cellGrid.getValue(x, y).potential));
 			}
 		}
 	}
@@ -197,5 +211,12 @@ public class EikonalSolverFMM implements EikonalSolver {
 			}
 		}
 		return minDistance;
+	}
+
+	private class ComparatorPotentialFieldValueSFMM implements Comparator<Pair<Point, Double>> {
+		@Override
+		public int compare(final Pair<Point, Double> o1, final Pair<Point, Double> o2) {
+			return Double.compare(o1.getValue(), o2.getValue());
+		}
 	}
 }

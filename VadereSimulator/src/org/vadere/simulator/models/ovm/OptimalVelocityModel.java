@@ -34,7 +34,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	/**
 	 * Constructor for OptimalVelocityModel used in the ModelCreator
 	 */
-	@Deprecated
+	/*@Deprecated
 	public OptimalVelocityModel(Topography scenario,
 								OVMEquations ovmEquations,
 								AttributesOVM attributesOVM,
@@ -55,7 +55,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 
 		ovmEquations.setModelAttributes(attributesOVM);
 		ovmEquations.setGradients(null, null, null, scenario);
-	}
+	}*/
 
 	public OptimalVelocityModel() {
 	}
@@ -65,7 +65,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 						   AttributesAgent attributesPedestrian, Random random) {
 
 		this.attributesOVM = Model.findAttributes(modelAttributesList, AttributesOVM.class);
-		AttributesCar elementAttributes = topography.getAttributesCar();// Model.findAttributes(modelAttributesList, AttributesCar.class);
+		this.elementAttributes = topography.getAttributesCar();// Model.findAttributes(modelAttributesList, AttributesCar.class);
 
 		this.ovmEquations = new OVMEquations();
 

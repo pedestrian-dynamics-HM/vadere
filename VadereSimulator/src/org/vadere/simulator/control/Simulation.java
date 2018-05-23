@@ -6,19 +6,28 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Simulation {
 
@@ -71,7 +80,6 @@ public class Simulation {
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
 		this.topography = scenarioStore.topography;
-
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
@@ -90,7 +98,6 @@ public class Simulation {
         if(mainModel instanceof PotentialFieldModel) {
             pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
         }
-
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
@@ -148,6 +155,7 @@ public class Simulation {
 		}
 
 		processorManager.postLoop(this.simulationState);
+		topographyController.postLoop(this.simTimeInSec);
 	}
 
 	/**
@@ -181,6 +189,7 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
+				assert assertAllPedestrianInBounds();
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 				processorManager.update(this.simulationState);
@@ -213,6 +222,12 @@ public class Simulation {
 			processorManager.writeOutput();
 			logger.info("Finished writing all output files");
 		}
+	}
+
+	private boolean assertAllPedestrianInBounds() {
+		Rectangle2D.Double bounds = topography.getBounds();
+		Collection<Pedestrian> peds = topography.getElements(Pedestrian.class);
+		return peds.stream().map(ped -> ped.getPosition()).anyMatch(pos -> !bounds.contains(pos.getX(), pos.getY()));
 	}
 
 	private SimulationState initialSimulationState() {

@@ -89,12 +89,18 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
+<<<<<<< HEAD
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
 				modelAttributesList, topography, random, attributesOSM.getObstaclePotentialModel());
 
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, topography, attributesOSM.getPedestrianPotentialModel());
 
+=======
+		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
+		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
+		
+>>>>>>> develop
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
 
@@ -188,18 +194,19 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	@Override
 	public void update(final double simTimeInSec) {
 
+		final double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
 		// event driven update
 		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN
 				&& !pedestrianEventsQueue.isEmpty()) {
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < simTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
-				ped.update(-1, simTimeInSec, CallMethod.EVENT_DRIVEN);
+				ped.update(timeStepInSec, simTimeInSec, CallMethod.EVENT_DRIVEN);
 				pedestrianEventsQueue.add(ped);
 			}
 
 		} else {
 			// time step length
-			final double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
+
 
 			// parallel update
 			if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {

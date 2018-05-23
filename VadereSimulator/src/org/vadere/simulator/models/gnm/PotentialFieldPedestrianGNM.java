@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialGNM;
@@ -21,11 +22,14 @@ import org.vadere.util.math.MathUtil;
 @ModelClass
 public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 
-	private final AttributesPotentialGNM attributes;
+	private AttributesPotentialGNM attributes;
 
-	public PotentialFieldPedestrianGNM(
-			AttributesPotentialGNM attributesPotential) {
-		this.attributes = attributesPotential;
+	public PotentialFieldPedestrianGNM() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributes = Model.findAttributes(attributesList, AttributesPotentialGNM.class);
 	}
 
 	@Override
@@ -108,11 +112,4 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 
 		return closePedestrians;
 	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
 }

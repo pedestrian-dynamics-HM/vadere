@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -44,13 +45,16 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 		}
 	}
 
-	private final AttributesPotentialCompact attributes;
+	private AttributesPotentialCompact attributes;
+	private double width;
+	private double height;
 
-	private final double width;
-	private final double height;
+	public PotentialFieldPedestrianCompact() {}
 
-	public PotentialFieldPedestrianCompact(AttributesPotentialCompact attributes) {
-		this.attributes = attributes;
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributes  = Model.findAttributes(attributesList, AttributesPotentialCompact.class);
 		this.width = attributes.getPedPotentialWidth();
 		this.height = attributes.getPedPotentialHeight();
 	}
@@ -146,11 +150,5 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 			result = new Vector2D(0, 0);
 		}
 		return result;
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
 	}
 }

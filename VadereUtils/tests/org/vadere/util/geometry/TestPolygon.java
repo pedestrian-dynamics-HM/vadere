@@ -21,12 +21,18 @@ import org.vadere.util.io.IOUtils;
  */
 public class TestPolygon {
 	private VPolygon testPolygon;
+	private VPolygon copyTestPolygon;
 	private VTriangle testTriangle;
 	private final double roomSideLen = 100;
 
 	@Before
 	public void setUp() throws Exception {
 		testPolygon = GeometryUtils.polygonFromPoints2D(new VPoint(0, 0),
+				new VPoint(roomSideLen, 0),
+				new VPoint(roomSideLen, roomSideLen),
+				new VPoint(0, roomSideLen));
+
+		copyTestPolygon = GeometryUtils.polygonFromPoints2D(new VPoint(0, 0),
 				new VPoint(roomSideLen, 0),
 				new VPoint(roomSideLen, roomSideLen),
 				new VPoint(0, roomSideLen));
@@ -93,6 +99,11 @@ public class TestPolygon {
 		String g2string = GeometryPrinter.grid2string(grid);
 		IOUtils.printDataFile(Paths.get("testreports", "test_polygon2d_closestPoint"),
 				g2string);
+	}
+
+	@Test
+	public void testEquals() {
+		assertEquals("equals() does not work properly.", testPolygon, copyTestPolygon);
 	}
 
 }

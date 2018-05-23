@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
@@ -19,10 +20,14 @@ import org.vadere.util.math.MathUtil;
 @ModelClass
 public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 
-	private final AttributesPotentialSFM attributes;
+	private AttributesPotentialSFM attributes;
 
-	public PotentialFieldPedestrianSFM(AttributesPotentialSFM attributes) {
-		this.attributes = attributes;
+	public PotentialFieldPedestrianSFM() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributes  = Model.findAttributes(attributesList, AttributesPotentialSFM.class);
 	}
 
 	@Override
@@ -132,12 +137,6 @@ public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 		// TODO [priority=medium] [task=bugfix] [Error?] dont call it recognition distance here. call it exp_sigma or sth. else. +3 = magic number?
 
 		return closePedestrians;
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
 	}
 
 	@Override
