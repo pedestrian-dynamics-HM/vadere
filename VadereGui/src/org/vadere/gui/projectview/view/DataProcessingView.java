@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -257,7 +258,8 @@ class DataProcessingView extends JPanel implements IJsonView {
 					DataProcessorFactory factory = DataProcessorFactory.instance();
 					// map label of processors to class string
 					Map<String, String> processorLableToClass = factory.getLabelMap();
-					JComboBox processorOptions = new JComboBox<>(processorLableToClass.keySet().toArray());
+					String[] processors = processorLableToClass.keySet().stream().sorted().toArray(String[]::new);
+					JComboBox processorOptions = new JComboBox<>(processors);
 
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
 						"Choose data processor", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -269,6 +271,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 						} catch (ClassNotFoundException e1) {
 							e1.printStackTrace();
 						}
+						assert newDataProcessor != null;
 						newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
 						currentScenario.getDataProcessingJsonManager().addInstantiatedProcessor(newDataProcessor);
 						updateDataProcessorsTable();
@@ -513,6 +516,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			dataKeysChooser.setSelectedItem(outputFileDataKeyName);
 			dataKeysChooser.addActionListener(ae -> {
 				String newDataKey = (String) dataKeysChooser.getSelectedItem();
+				assert newDataKey != null;
 				if (!newDataKey.equals(outputFileDataKeyName)) {
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(outputFile.getFileName());
@@ -685,7 +689,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 		private boolean outputFileNameAlreadyExists(String filename) {
 			return currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
-					.filter(oFile -> oFile.getFileName().equals(filename)).findAny().isPresent();
+					.anyMatch(oFile -> oFile.getFileName().equals(filename));
 		}
 	}
 }
