@@ -4,8 +4,8 @@ import org.vadere.state.scenario.Pedestrian;
 
 public class CentroidGroupFactory extends GroupFactory {
 
-	private CentroidGroupModel groupCollection;
-	private GroupSizeDeterminator groupSizeDeterminator;
+	transient private CentroidGroupModel groupCollection;
+	transient private GroupSizeDeterminator groupSizeDeterminator;
 
 	private CentroidGroup currentGroup;
 

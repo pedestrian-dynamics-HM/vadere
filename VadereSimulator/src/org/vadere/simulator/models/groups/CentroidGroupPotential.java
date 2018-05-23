@@ -1,5 +1,7 @@
 package org.vadere.simulator.models.groups;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
@@ -18,6 +20,8 @@ import java.util.Random;
 
 @ModelClass
 public class CentroidGroupPotential implements PotentialFieldAgent {
+
+	private static Logger logger = LogManager.getLogger(CentroidGroupPotential.class);
 
 	private final AttributesCGM attributesCGM;
 	private final CentroidGroupModel groupCollection;
@@ -55,7 +59,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		Pedestrian leader = null;
 
 		if (group != null) {
-			leader = group.getLeader(ped);
+			leader = group.getPacemaker(ped);
 		}
 
 		if (leader != null) {

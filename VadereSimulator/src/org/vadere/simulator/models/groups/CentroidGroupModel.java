@@ -34,7 +34,7 @@ public class CentroidGroupModel
 	private AtomicInteger nextFreeGroupId;
 
 	public CentroidGroupModel() {
-		this.groupFactories = new TreeMap<>();
+		this.groupFactories = new HashMap<>();
 		this.pedestrianGroupData = new HashMap<>();
 		this.nextFreeGroupId = new AtomicInteger(0);
 	}

@@ -24,6 +24,7 @@ public class AgentRender implements Renderer {
 		this.model = model;
 		this.defaultColor = model.config.getPedestrianDefaultColor();
 		this.colorMap = new ConcurrentHashMap<>();
+		this.colorMap.put(-1, defaultColor);
 	}
 
 	@Override
@@ -75,6 +76,8 @@ public class AgentRender implements Renderer {
 
 	private VShape getShape(Pedestrian ped) {
 		if (ped.getGroupIds().isEmpty()) {
+			return ped.getShape();
+		} else if (ped.getGroupIds().getFirst() == 1) {
 			return ped.getShape();
 		} else {
 			return FormHelper.getShape(ped.getGroupIds().getFirst(), ped.getPosition(), ped.getRadius());
