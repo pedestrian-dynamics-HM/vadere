@@ -204,6 +204,17 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				}, "View.btnShowWalkingDirection.tooltip");
 
 		addActionToToolbar(toolbar,
+				new ActionVisualization("show_groups",
+						resources.getIcon("group.png", iconWidth, iconHeight), model) {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						model.config.setShowGroups(!model.config.isShowGroups());
+						model.notifyObservers();
+					}
+				}, "View.btnShowGroupInformation.tooltip");
+
+		addActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
 						resources.getIcon("voronoi.png", iconWidth, iconHeight), model),
 				"View.btnDrawVoronoiDiagram.tooltip");
@@ -332,6 +343,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
+		//todo
 		model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
 		model.notifyObservers();
 	}

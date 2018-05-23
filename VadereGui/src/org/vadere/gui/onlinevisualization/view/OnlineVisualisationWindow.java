@@ -101,6 +101,15 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 			}
 		};
 
+		AbstractAction showGroupInformationAction = new AbstractAction("showGroupInformationAction",
+				resources.getIcon("group.png", iconWidth, iconHeight)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.config.setShowGroups(!model.config.isShowGroups());
+				model.notifyObservers();
+			}
+		};
+
 		AbstractAction paintGridAction = new AbstractAction("paintGridAction",
 				resources.getIcon("grid.png", iconWidth, iconHeight)) {
 
@@ -166,6 +175,8 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				Messages.getString("View.btnShowTrajectories.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintArrowAction,
 				Messages.getString("View.btnShowWalkingDirection.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, showGroupInformationAction,
+				Messages.getString("View.btnShowGroupInformation.tooltip"));
 
 		toolbar.addSeparator();
 
