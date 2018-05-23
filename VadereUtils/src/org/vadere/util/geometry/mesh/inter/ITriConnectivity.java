@@ -4,11 +4,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.debug.gui.DebugGui;
+import org.vadere.util.debug.gui.canvas.SimpleTriCanvas;
+import org.vadere.util.debug.gui.canvas.WalkCanvas;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -836,7 +840,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param stopCondition
 	 * @return
 	 */
-	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition) {
+	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition, LinkedList<F> visitedFaces) {
 		List<E> intersectionEdges = getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).collect(Collectors.toList());
 
 		/**
@@ -872,10 +876,15 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				 * We continue the search with the face which centroid is closest to p! v has to be the closest p as well.
 				 */
 				else {
-					//log.debug("straight walk: no exit edge found due to collinear exit point.");
+//					log.debug("straight walk: no exit edge found due to collinear exit point.");
 					V v = getMesh().streamVertices(face).min((v1, v2) -> Double.compare(p.distance(v1), p.distance(v2))).get();
+
+					SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+					DebugGui.showAndWait(canvas);
+
 					Optional<F> closestFace = getMesh().streamFaces(v)
-							.filter(f -> !getMesh().isBorder(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
+							.filter(f -> !getMesh().isBorder(f)).filter(f -> !visitedFaces.contains(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
 					return closestFace;
 				}
 			}
@@ -893,9 +902,20 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         F face = startFace;
 
         do {
-        	//log.debug(getMesh().toPath(face));
+
+        	if (getMesh().getFacesWithHoles().size() >= 5)
+				DebugGui.showAndWait(WalkCanvas.getDefault(
+						getMesh(),
+						q,
+						p,
+						startFace,
+						startEdge,
+						visitedFaces));
+
+
+//			log.debug(getMesh().toPath(face));
 	        // TODO: this might be slow
-	        optFace = straightWalkNext(face, q, p, stopCondition);
+	        optFace = straightWalkNext(face, q, p, stopCondition, visitedFaces);
 
 	        if(!optFace.isPresent()) {
 	        	//log.info("expensive fix");

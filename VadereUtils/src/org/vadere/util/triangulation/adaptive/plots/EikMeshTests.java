@@ -1,7 +1,5 @@
 package org.vadere.util.triangulation.adaptive.plots;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
-
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
