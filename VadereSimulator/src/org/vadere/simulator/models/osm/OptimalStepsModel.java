@@ -89,18 +89,11 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
-<<<<<<< HEAD
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, random, attributesOSM.getObstaclePotentialModel());
-
+				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesOSM.getPedestrianPotentialModel());
+				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
 
-=======
-		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
-		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
-		
->>>>>>> develop
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
 
