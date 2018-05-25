@@ -682,6 +682,21 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return points;
 	}
 
+	// TODO: find better name
+	default boolean isSame(E e1, E e2) {
+		if(e1.equals(e2)) {
+			return true;
+		}
+
+		P p11 = getPoint(e1);
+		P p12 = getPoint(getPrev(e1));
+
+		P p21 = getPoint(e2);
+		P p22 = getPoint(getPrev(e2));
+
+		return p11.equals(p21) && p12.equals(p22) || p11.equals(p22) && p12.equals(p21);
+	}
+
 	/**
 	 * Tests whether the point (x,y) is a vertex of the face.
 	 *

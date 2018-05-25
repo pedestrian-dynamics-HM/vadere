@@ -1,12 +1,9 @@
 package org.vadere.util.triangulation.triangulator;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.gen.AFace;
-import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.tex.TexGraphGenerator;
@@ -32,21 +29,14 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	private ITriangulation<P, V, E, F> triangulation;
 	private final IMeshSupplier<P, V, E, F> meshSupplier;
 	private Set<P> points;
-	private ArrayList<Pair<Direction, E>> sierpinskyCurve;
+	private ArrayList<CFSNode<P, V, E, F>> sierpinskyCurve;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorCFS.class);
 	private final IDistanceFunction distFunc;
 	private int counter = 0;
 	private boolean finished;
 	private final Collection<P> fixPoints;
 	private final Random random = new Random();
-
-	enum Direction {
-	    FORWARD,
-        BACKWARD;
-        public Direction next() {
-	        return this == FORWARD ? BACKWARD : FORWARD;
-        }
-    }
+	private final Map<E, CFSNode<P, V, E, F>> edgeToNode;
 
     /**
      * @param meshSupplier          a {@link IMeshSupplier}
@@ -70,6 +60,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		this.bbox = bound;
 		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
+		this.edgeToNode = new HashedMap();
 	}
 
     public ITriangulation<P, V, E, F> init() {
@@ -129,8 +120,15 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	    this.triangulation = mesh.toTriangulation(IPointLocator.Type.BASE);
 	    E halfEdge = getLongestEdge(mesh.getFace());
 	    this.sierpinskyCurve = new ArrayList<>();
-	    this.sierpinskyCurve.add(Pair.of(Direction.FORWARD, halfEdge));
-	    this.sierpinskyCurve.add(Pair.of(Direction.FORWARD, getMesh().getTwin(halfEdge)));
+
+	    CFSNode<P, V, E, F> node1 = new CFSNode<>(halfEdge, CFSDirection.FORWARD);
+	    CFSNode<P, V, E, F> node2 = new CFSNode<>(getMesh().getTwin(halfEdge), CFSDirection.FORWARD);
+
+	    this.sierpinskyCurve.add(node1);
+	    this.sierpinskyCurve.add(node2);
+
+	    this.edgeToNode.put(halfEdge, node1);
+	    this.edgeToNode.put(getMesh().getTwin(halfEdge), node2);
 	    return triangulation;
     }
 
@@ -140,23 +138,24 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
     private void nextSFCLevel(double ran) {
 		//System.out.println(curveToTikz());
-		ArrayList<Pair<Direction, E>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
-		ArrayList<E> toRefineEdges = new ArrayList<>();
+		ArrayList<CFSNode<P, V, E ,F>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
+	    Map<E, CFSNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
 
+		ArrayList<E> toRefineEdges = new ArrayList<>();
 		boolean tFinished = true;
-	    for(Pair<Direction, E> pair : sierpinskyCurve) {
-		    E edge = pair.getRight();
+	    for(CFSNode<P, V, E ,F> node : sierpinskyCurve) {
+		    E edge = node.getEdge();
 		    if(!isCompleted(edge) || random.nextDouble() < ran) {
 			    toRefineEdges.add(edge);
 		    	tFinished = false;
-				Direction dir = pair.getLeft();
+			    CFSDirection dir = node.getDirection();
 				E t1 = getMesh().getNext(edge);
 				E t2 = getMesh().getPrev(edge);
 
-				Pair<Direction, E> element1 = Pair.of(dir.next(), t1);
-				Pair<Direction, E> element2 = Pair.of(dir.next(), t2);
+			    CFSNode<P, V, E ,F> element1 = new CFSNode<>(t1, dir.next());
+			    CFSNode<P, V, E ,F> element2 = new CFSNode<>(t2, dir.next());
 
-				if(dir == Direction.FORWARD) {
+				if(dir == CFSDirection.FORWARD) {
 					newSierpinskiCurve.add(element2);
 					newSierpinskiCurve.add(element1);
 				}
@@ -164,9 +163,13 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 					newSierpinskiCurve.add(element1);
 					newSierpinskiCurve.add(element2);
 				}
+
+				newEdgeToNode.put(t1, element1);
+				newEdgeToNode.put(t2, element2);
 			}
 			else {
-				newSierpinskiCurve.add(pair);
+				newSierpinskiCurve.add(node);
+				newEdgeToNode.put(edge, node);
 			}
 	    }
 
@@ -179,14 +182,47 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	    sierpinskyCurve = newSierpinskiCurve;
     }
 
+    private void addToCurve(@NotNull final CFSNode<P, V, E, F> node, @NotNull final ArrayList<CFSNode<P, V, E, F>> sierpinskyCurve, final double ran) {
+	    E edge = node.getEdge();
+
+	    if(!isCompleted(edge) || random.nextDouble() < ran) {
+			E twin = getMesh().getTwin(edge);
+		    CFSDirection dir = node.getDirection();
+		    E t1 = getMesh().getNext(edge);
+		    E t2 = getMesh().getPrev(edge);
+
+		    CFSNode<P, V, E ,F> element1 = new CFSNode<>(t1, dir.next());
+		    CFSNode<P, V, E ,F> element2 = new CFSNode<>(t2, dir.next());
+
+		    if(dir == CFSDirection.FORWARD) {
+			    sierpinskyCurve.add(element2);
+			    sierpinskyCurve.add(element1);
+		    }
+		    else {
+			    sierpinskyCurve.add(element1);
+			    sierpinskyCurve.add(element2);
+		    }
+	    }
+
+
+    }
+
     public void step() {
 		nextSFCLevel(0.0);
     }
 
 	private boolean validEdge(@NotNull E edge) {
-		P p1 = getMesh().getPoint(getMesh().getPrev(edge));
-		P p2 = getMesh().getPoint(edge);
-		return getMesh().isAtBoundary(edge) || (p1.getX() > p2.getX() || (p1.getX() == p2.getX() && p1.getY() > p2.getY()));
+		if(isLongestEdge(edge)) {
+			if(getMesh().isAtBoundary(edge)) {
+				return true;
+			}
+			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
+			P p2 = getMesh().getPoint(edge);
+			return (p1.getX() > p2.getX() || (p1.getX() == p2.getX() && p1.getY() > p2.getY()));
+		}
+		else {
+			return false;
+		}
 	}
 
 
@@ -216,7 +252,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
 	public void finish() {
         synchronized (getMesh()) {
-			List<F> sierpinksyFaceOrder = sierpinskyCurve.stream().map(e -> getMesh().getFace(e.getRight())).collect(Collectors.toList());
+			List<F> sierpinksyFaceOrder = sierpinskyCurve.stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 
 			// insert special fix points
 	        // TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
@@ -239,6 +275,22 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	    return getMesh().streamEdges(face).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
     }
 
+    private boolean isLongestEdge(E edge) {
+		if(!getMesh().isAtBorder(edge)) {
+			E longestEdge1 = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
+			E longestEdge2 = getMesh().streamEdges(getMesh().getTwinFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
+			return getMesh().isSame(longestEdge1, edge) && getMesh().isSame(longestEdge2, edge);
+		}
+	    else {
+			if(getMesh().isBoundary(edge)) {
+				edge = getMesh().getTwin(edge);
+			}
+
+			E longestEdge = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
+			return getMesh().isSame(longestEdge, edge);
+		}
+    }
+
 	public void removeTrianglesOutsideBBox() {
 		triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 	}
@@ -252,11 +304,16 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 		}
 	}
 
+	/**
+	 * Tests if a specific edge is complete i.e. it should not be split into two edges.
+	 *
+	 * @param edge the half-edge representing the edge of the mesh.
+	 * @return true, if the edge should not be split, false otherwise
+	 */
 	private boolean isCompleted(E edge) {
 		if(getMesh().isBoundary(edge)){
 			edge = getMesh().getTwin(edge);
 		}
-		double ran = random.nextDouble();
 
 		return isSmallEnough(edge) /*|| isEdgeOutsideBBox(edge) || isEdgeInsideHole(edge);*/;
 	}
@@ -297,7 +354,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
     }
 
     private String curveToTikz() {
-		return TexGraphGenerator.toTikz(getMesh(), sierpinskyCurve.stream().map(pair -> getMesh().getFace(pair.getRight())).collect(Collectors.toList()));
+		return TexGraphGenerator.toTikz(getMesh(), sierpinskyCurve.stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList()));
     }
 
 	/*private void removeTrianglesInsideObstacles() {
