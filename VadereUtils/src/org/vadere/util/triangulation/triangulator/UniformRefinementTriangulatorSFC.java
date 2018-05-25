@@ -22,21 +22,21 @@ import java.util.stream.Collectors;
  *
  * @param <P>
  */
-public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 	private final Collection<? extends VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
 	private ITriangulation<P, V, E, F> triangulation;
 	private final IMeshSupplier<P, V, E, F> meshSupplier;
 	private Set<P> points;
-	private ArrayList<CFSNode<P, V, E, F>> sierpinskyCurve;
-	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorCFS.class);
+	private ArrayList<SFCNode<P, V, E, F>> sierpinskyCurve;
+	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorSFC.class);
 	private final IDistanceFunction distFunc;
 	private int counter = 0;
 	private boolean finished;
 	private final Collection<P> fixPoints;
 	private final Random random = new Random();
-	private final Map<E, CFSNode<P, V, E, F>> edgeToNode;
+	private final Map<E, SFCNode<P, V, E, F>> edgeToNode;
 
     /**
      * @param meshSupplier          a {@link IMeshSupplier}
@@ -45,7 +45,7 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
      * @param lenFunc               a edge length function
      * @param distFunc              a signed distance function
      */
-	public UniformRefinementTriangulatorCFS(
+	public UniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
@@ -121,8 +121,8 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	    E halfEdge = getLongestEdge(mesh.getFace());
 	    this.sierpinskyCurve = new ArrayList<>();
 
-	    CFSNode<P, V, E, F> node1 = new CFSNode<>(halfEdge, CFSDirection.FORWARD);
-	    CFSNode<P, V, E, F> node2 = new CFSNode<>(getMesh().getTwin(halfEdge), CFSDirection.FORWARD);
+	    SFCNode<P, V, E, F> node1 = new SFCNode<>(halfEdge, SFCDirection.FORWARD);
+	    SFCNode<P, V, E, F> node2 = new SFCNode<>(getMesh().getTwin(halfEdge), SFCDirection.FORWARD);
 
 	    this.sierpinskyCurve.add(node1);
 	    this.sierpinskyCurve.add(node2);
@@ -138,24 +138,24 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 
     private void nextSFCLevel(double ran) {
 		//System.out.println(curveToTikz());
-		ArrayList<CFSNode<P, V, E ,F>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
-	    Map<E, CFSNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
+		ArrayList<SFCNode<P, V, E ,F>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
+	    Map<E, SFCNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
 
 		ArrayList<E> toRefineEdges = new ArrayList<>();
 		boolean tFinished = true;
-	    for(CFSNode<P, V, E ,F> node : sierpinskyCurve) {
+	    for(SFCNode<P, V, E ,F> node : sierpinskyCurve) {
 		    E edge = node.getEdge();
 		    if(!isCompleted(edge) || random.nextDouble() < ran) {
 			    toRefineEdges.add(edge);
 		    	tFinished = false;
-			    CFSDirection dir = node.getDirection();
+			    SFCDirection dir = node.getDirection();
 				E t1 = getMesh().getNext(edge);
 				E t2 = getMesh().getPrev(edge);
 
-			    CFSNode<P, V, E ,F> element1 = new CFSNode<>(t1, dir.next());
-			    CFSNode<P, V, E ,F> element2 = new CFSNode<>(t2, dir.next());
+			    SFCNode<P, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
+			    SFCNode<P, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
 
-				if(dir == CFSDirection.FORWARD) {
+				if(dir == SFCDirection.FORWARD) {
 					newSierpinskiCurve.add(element2);
 					newSierpinskiCurve.add(element1);
 				}
@@ -182,19 +182,19 @@ public class UniformRefinementTriangulatorCFS<P extends IPoint, V extends IVerte
 	    sierpinskyCurve = newSierpinskiCurve;
     }
 
-    private void addToCurve(@NotNull final CFSNode<P, V, E, F> node, @NotNull final ArrayList<CFSNode<P, V, E, F>> sierpinskyCurve, final double ran) {
+    private void addToCurve(@NotNull final SFCNode<P, V, E, F> node, @NotNull final ArrayList<SFCNode<P, V, E, F>> sierpinskyCurve, final double ran) {
 	    E edge = node.getEdge();
 
 	    if(!isCompleted(edge) || random.nextDouble() < ran) {
 			E twin = getMesh().getTwin(edge);
-		    CFSDirection dir = node.getDirection();
+		    SFCDirection dir = node.getDirection();
 		    E t1 = getMesh().getNext(edge);
 		    E t2 = getMesh().getPrev(edge);
 
-		    CFSNode<P, V, E ,F> element1 = new CFSNode<>(t1, dir.next());
-		    CFSNode<P, V, E ,F> element2 = new CFSNode<>(t2, dir.next());
+		    SFCNode<P, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
+		    SFCNode<P, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
 
-		    if(dir == CFSDirection.FORWARD) {
+		    if(dir == SFCDirection.FORWARD) {
 			    sierpinskyCurve.add(element2);
 			    sierpinskyCurve.add(element1);
 		    }

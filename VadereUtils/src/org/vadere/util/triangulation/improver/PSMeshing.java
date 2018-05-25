@@ -1,11 +1,9 @@
 package org.vadere.util.triangulation.improver;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -15,9 +13,8 @@ import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.Parameters;
 import org.vadere.util.triangulation.triangulator.ITriangulator;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -68,7 +65,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.nSteps = 0;
 
         log.info("##### (start) generate a triangulation #####");
-        ITriangulator<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
+        ITriangulator<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
 		        meshSupplier,
                 bound,
                 obstacleShapes,

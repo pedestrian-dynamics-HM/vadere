@@ -5,17 +5,14 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
-import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.triangulation.IPointConstructor;
-import org.vadere.util.triangulation.ITriangulationSupplier;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by bzoennchen on 30.01.18.
@@ -33,8 +30,8 @@ public class TestUniTriangulation extends JFrame {
 	    IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
 	    IMeshSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> new AMesh<>(pointConstructor);
 
-        UniformRefinementTriangulatorCFS<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorCFS<>(supplier, bbox, new ArrayList<>(), p -> 1.5, distanceFunc, new ArrayList<>());
+        UniformRefinementTriangulatorSFC<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
+                new UniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 1.5, distanceFunc, new ArrayList<>());
 
 	    ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
         PSMeshingPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> distmeshPanel =

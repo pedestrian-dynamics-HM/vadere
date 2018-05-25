@@ -1,6 +1,5 @@
 package org.vadere.util.triangulation.adaptive.plots;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.gen.AFace;
@@ -16,16 +15,12 @@ import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
-import org.vadere.util.triangulation.improver.PSMeshing;
-import org.vadere.util.triangulation.triangulator.ITriangulator;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
-
-import javafx.scene.shape.Mesh;
 
 /**
  * Created by bzoennchen on 15.03.18.
@@ -50,7 +45,7 @@ public class SierpinskyPlot {
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p));
 
-		UniformRefinementTriangulatorCFS<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
+		UniformRefinementTriangulatorSFC<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
 				supplier,
 				bbox,
 				obstacles,

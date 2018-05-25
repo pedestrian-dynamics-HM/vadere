@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMeshHE;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 import org.vadere.util.triangulation.triangulator.ITriangulator;
-import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorCFS;
+import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,7 +82,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
         log.info("##### (end) compute a uniform refined triangulation #####");
 
         log.info("##### (start) generate a triangulation #####");
-        UniformRefinementTriangulatorCFS<P, AVertex<P>, AHalfEdge<P>, AFace<P>> uniformRefinementTriangulation = new UniformRefinementTriangulatorCFS(
+        UniformRefinementTriangulatorSFC<P, AVertex<P>, AHalfEdge<P>, AFace<P>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
 		        meshSupplier,
                 bound,
                 obstacleShapes,

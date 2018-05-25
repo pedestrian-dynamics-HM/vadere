@@ -9,18 +9,18 @@ import org.vadere.util.geometry.shapes.IPoint;
 /**
  * Created by bzoennchen on 25.05.18.
  */
-public class CFSNode<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class SFCNode<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
 	private final E edge;
-	private final CFSDirection direction;
+	private final SFCDirection direction;
 	private boolean refine;
 
-	public CFSNode(@NotNull final E edge, @NotNull final CFSDirection direction, final boolean refine) {
+	public SFCNode(@NotNull final E edge, @NotNull final SFCDirection direction, final boolean refine) {
 		this.edge = edge;
 		this.direction = direction;
 		this.refine = refine;
 	}
 
-	public CFSNode(@NotNull final E edge, @NotNull final CFSDirection direction) {
+	public SFCNode(@NotNull final E edge, @NotNull final SFCDirection direction) {
 		this.edge = edge;
 		this.direction = direction;
 		this.refine = false;
@@ -30,7 +30,7 @@ public class CFSNode<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge
 		return edge;
 	}
 
-	public CFSDirection getDirection() {
+	public SFCDirection getDirection() {
 		return direction;
 	}
 
