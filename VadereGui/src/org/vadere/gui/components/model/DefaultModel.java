@@ -532,15 +532,15 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
 
 			triangulation = meshImprover.getTriangulation();
-			meshImprover.improve();
+		//	meshImprover.improve();
 			Thread t = new Thread(() -> {
 				while(!meshImprover.isFinished()) {
-					//meshImprover.improve();
-					try {
+					meshImprover.improve();
+					/*try {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-					}
+					}*/
 					setChanged();
 					notifyObservers();
 				}

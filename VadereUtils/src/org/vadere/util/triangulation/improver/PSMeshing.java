@@ -108,6 +108,8 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		//synchronized (getMesh()) {
 			illegalMovement = false;
 			flipEdges();
+			//removeTrianglesInsideObstacles();
+			//retriangulate();
 			computeScalingFactor();
 			computeVertexForces();
 			updateVertices();
@@ -130,7 +132,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        removeBoundaryLowQualityTriangles();
+//        removeBoundaryLowQualityTriangles();
         triangulation.recompute();
         removeTrianglesInsideObstacles();
     }
@@ -243,14 +245,40 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
      * @param vertex the vertex
      */
     private void projectBackVertex(final V vertex) {
+
+    	//TODO: refactoring
         MeshPoint position = getMesh().getPoint(vertex);
         double distance = distanceFunc.apply(position);
-        if(distance > 0 || (Math.abs(distance) <= deps && getMesh().isAtBoundary(vertex))) {
-            double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
-            double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
-            VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
-            position.subtract(projection);
+
+        if(getMesh().isAtBorder(vertex)) {
+        	List<E> bNeighbours = getMesh().streamEdges(vertex).filter(edge -> getMesh().isAtBorder(edge)).collect(Collectors.toList());
+        	assert bNeighbours.size() == 2;
+
+        	V n1 = getMesh().getVertex(getMesh().getTwin(bNeighbours.get(0)));
+        	V n2 = getMesh().getVertex(getMesh().getTwin(bNeighbours.get(1)));
+	        if(distanceFunc.apply(getMesh().toPoint(n1)) > distance && distanceFunc.apply(getMesh().toPoint(n2)) > distance) {
+	        	VPoint dir = new VPoint((n1.getX() + n2.getX()) * 0.5, (n1.getY() + n2.getY()) * 0.5).subtract(getMesh().toPoint(vertex));
+		        position.add(dir.scalarMultiply(delta));
+	        }
+	        else {
+		        if(distance > 0 || (Math.abs(distance) <= deps && getMesh().isAtBoundary(vertex))) {
+			        double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
+			        double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
+			        VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
+			        position.subtract(projection);
+		        }
+	        }
         }
+        else {
+	        if(distance > 0 || (Math.abs(distance) <= deps && getMesh().isAtBoundary(vertex))) {
+		        double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
+		        double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
+		        VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
+		        position.subtract(projection);
+	        }
+        }
+
+
     }
 
     /**
