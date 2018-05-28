@@ -128,7 +128,7 @@ public class PotentialFieldObstacleCompact implements PotentialFieldObstacle {
 	@Override
 	public PotentialFieldObstacle copy() {
 		PotentialFieldObstacleCompact potentialFieldObstacleCompact = new PotentialFieldObstacleCompact();
-		init(attributes, topography, random);
+		potentialFieldObstacleCompact.init(attributes, topography, random);
 		return potentialFieldObstacleCompact;
 	}
 
