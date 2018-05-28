@@ -35,11 +35,11 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	private JFrame frame;    //contains canvas
 	private JMenuBar menuBar = new JMenuBar();    // Menu bar with supported actions.
 	private boolean debugOn;
+	private boolean initialized;
 
 	private DebugGui() {
 		o = new Object();
 		debugOn = false;
-		initComponents();
 	}
 
 	//Statics
@@ -110,61 +110,70 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 * Add Menu and shortcut for actions
 	 */
 	private void initComponents() {
-		try {
-			SwingUtilities.invokeAndWait(() -> {
-				frame = new JFrame();
-				frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		Runnable runner = () -> {
+			frame = new JFrame();
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-				JMenu menu = new JMenu("Edit");
+			JMenu menu = new JMenu("Edit");
 
-				// Wake up waiting thread and continue with execution.
-				JMenuItem nextStepItem = new JMenuItem("Next Step");
-				menu.add(nextStepItem);
-				nextStepItem.setAccelerator(KeyStroke.getKeyStroke('n'));
-				nextStepItem.addActionListener(e -> {
-					frame.setVisible(false);
-					synchronized (o) {
-						o.notifyAll();
-					}
-				});
-
-				// Stop DebugGui and wake up waiting threads.
-				JMenuItem stopDebugItem = new JMenuItem("Stop Debugging Gui");
-				menu.add(stopDebugItem);
-				stopDebugItem.setAccelerator(KeyStroke.getKeyStroke('q'));
-				stopDebugItem.addActionListener(e -> {
-					frame.setVisible(false);
-					get().stopDebugging();
-				});
-
-				// Create Tikz drawing for current state of the mesh
-				JMenuItem printTikzOutputItem = new JMenuItem("print Tikz output");
-				menu.add(printTikzOutputItem);
-				printTikzOutputItem.setAccelerator(KeyStroke.getKeyStroke('p'));
-				printTikzOutputItem.addActionListener(e -> {
-					System.out.println("%%%%%%%%%%%%");
-					System.out.println("");
-					canvas.getTexGraphBuilder().generateGraph();
-					System.out.println(canvas.getTexGraphBuilder().returnString());
-					System.out.println("");
-					System.out.println("%%%%%%%%%%%%");
-				});
-
-				// Print State information provided via a StringBuilder consumer.
-				JMenuItem printMeshItem = new JMenuItem("Print State Info");
-				menu.add(printMeshItem);
-				printMeshItem.setAccelerator(KeyStroke.getKeyStroke('s'));
-				printMeshItem.addActionListener(e -> {
-					StringBuilder sb = new StringBuilder();
-					canvas.getStateLog().accept(sb);
-					System.out.println(sb.toString());
-				});
-
-				menuBar.add(menu);
-				frame.setJMenuBar(menuBar);
+			// Wake up waiting thread and continue with execution.
+			JMenuItem nextStepItem = new JMenuItem("Next Step");
+			menu.add(nextStepItem);
+			nextStepItem.setAccelerator(KeyStroke.getKeyStroke('n'));
+			nextStepItem.addActionListener(e -> {
+				frame.setVisible(false);
+				synchronized (o) {
+					o.notifyAll();
+				}
 			});
-		} catch (InterruptedException | InvocationTargetException e) {
-			e.printStackTrace();
+
+			// Stop DebugGui and wake up waiting threads.
+			JMenuItem stopDebugItem = new JMenuItem("Stop Debugging Gui");
+			menu.add(stopDebugItem);
+			stopDebugItem.setAccelerator(KeyStroke.getKeyStroke('q'));
+			stopDebugItem.addActionListener(e -> {
+				frame.setVisible(false);
+				get().stopDebugging();
+			});
+
+			// Create Tikz drawing for current state of the mesh
+			JMenuItem printTikzOutputItem = new JMenuItem("print Tikz output");
+			menu.add(printTikzOutputItem);
+			printTikzOutputItem.setAccelerator(KeyStroke.getKeyStroke('p'));
+			printTikzOutputItem.addActionListener(e -> {
+				System.out.println("%%%%%%%%%%%%");
+				System.out.println("");
+				canvas.getTexGraphBuilder().generateGraph();
+				System.out.println(canvas.getTexGraphBuilder().returnString());
+				System.out.println("");
+				System.out.println("%%%%%%%%%%%%");
+			});
+
+			// Print State information provided via a StringBuilder consumer.
+			JMenuItem printMeshItem = new JMenuItem("Print State Info");
+			menu.add(printMeshItem);
+			printMeshItem.setAccelerator(KeyStroke.getKeyStroke('s'));
+			printMeshItem.addActionListener(e -> {
+				StringBuilder sb = new StringBuilder();
+				canvas.getStateLog().accept(sb);
+				System.out.println(sb.toString());
+			});
+
+			menuBar.add(menu);
+			frame.setJMenuBar(menuBar);
+		};
+
+		if(SwingUtilities.isEventDispatchThread()) {
+			runner.run();
+		}
+		else {
+			try {
+				SwingUtilities.invokeAndWait(runner);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -174,20 +183,34 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 * @param canvas new {@link TriCanvas} implementation used to show current state.
 	 */
 	private void updateGui(TriCanvas canvas) {
+		if(!initialized) {
+			initComponents();
+		}
+
 		this.canvas = canvas;
-		try {
-			SwingUtilities.invokeAndWait(() -> {
-				frame.getContentPane().removeAll();
-				frame.setSize((int) canvas.width, (int) canvas.height);
-				frame.add(canvas);
-				frame.setVisible(true);
-				frame.revalidate();
-				frame.repaint();
-				if (canvas.logOnGuiUpdate() != null && canvas.logOnGuiUpdate().length() > 0)
-					System.out.println(canvas.logOnGuiUpdate().toString());
-			});
-		} catch (InterruptedException | InvocationTargetException e) {
-			e.printStackTrace();
+
+		Runnable runner = () -> {
+			frame.getContentPane().removeAll();
+			frame.setSize((int) canvas.width, (int) canvas.height);
+			frame.add(canvas);
+			frame.setVisible(true);
+			frame.revalidate();
+			frame.repaint();
+			if (canvas.logOnGuiUpdate() != null && canvas.logOnGuiUpdate().length() > 0)
+				System.out.println(canvas.logOnGuiUpdate().toString());
+		};
+
+		if(SwingUtilities.isEventDispatchThread()) {
+			runner.run();
+		}
+		else {
+			try {
+				SwingUtilities.invokeAndWait(runner);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -196,6 +219,10 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 * isDebugOn is true.
 	 */
 	private void waitForClick() {
+		if(!initialized) {
+			initComponents();
+		}
+
 		synchronized (o) {
 			try {
 				o.wait();
@@ -209,6 +236,10 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 * Deactivate Debugging, dispose frame and notify all waiting threads.
 	 */
 	private void stopDebugging() {
+		if(!initialized) {
+			initComponents();
+		}
+
 		setDebugOn(false);
 		frame.dispose();
 		frame = null;

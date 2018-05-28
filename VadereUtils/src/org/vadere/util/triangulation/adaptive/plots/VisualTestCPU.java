@@ -31,7 +31,7 @@ public class VisualTestCPU {
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static final double initialEdgeLength = 1.0;
+	private static final double initialEdgeLength = 0.7;
 
 	private static void overallUniformRing() {
 		VPolygon hex = VShape.generateHexagon(4.0);
@@ -41,7 +41,7 @@ public class VisualTestCPU {
 		//IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 
-		PSMeshing meshGenerator = new PSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		PSMeshing meshGenerator = new PSMeshing(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();

@@ -32,6 +32,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	Logger log = LogManager.getLogger(ITriConnectivity.class);
 	Random random = new Random();
+	boolean debug = false;
 
 
 	/**
@@ -881,7 +882,9 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 					SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
 					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
-					DebugGui.showAndWait(canvas);
+					if(DebugGui.isDebugOn()) {
+						DebugGui.showAndWait(canvas);
+					}
 
 					Optional<F> closestFace = getMesh().streamFaces(v)
 							.filter(f -> !getMesh().isBorder(f)).filter(f -> !visitedFaces.contains(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
@@ -903,14 +906,16 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
         do {
 
-        	if (getMesh().getFacesWithHoles().size() >= 5)
-				DebugGui.showAndWait(WalkCanvas.getDefault(
-						getMesh(),
-						q,
-						p,
-						startFace,
-						startEdge,
-						visitedFaces));
+        	if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
+		        DebugGui.showAndWait(WalkCanvas.getDefault(
+				        getMesh(),
+				        q,
+				        p,
+				        startFace,
+				        startEdge,
+				        visitedFaces));
+	        }
+
 
 
 //			log.debug(getMesh().toPath(face));

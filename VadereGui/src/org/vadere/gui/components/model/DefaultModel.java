@@ -8,10 +8,10 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.mesh.gen.AFace;
-import org.vadere.util.geometry.mesh.gen.AHalfEdge;
-import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.mesh.gen.PMesh;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
+import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -19,10 +19,7 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.PSDistmesh;
-import org.vadere.util.triangulation.improver.IMeshImprover;
 import org.vadere.util.triangulation.improver.PPSMeshing;
-import org.vadere.util.triangulation.improver.PSMeshing;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
@@ -76,7 +73,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	public Collection<VTriangle> triangulation;
+	public ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
 
 	protected boolean triangulationTriggered = false;
 
@@ -94,7 +91,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();
 		this.scaleChangeListeners = new ArrayList<>();
-		this.triangulation = new ArrayList<>();
+		this.triangulation = null;
 	}
 
 	@Override
@@ -530,20 +527,32 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
 			PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
-					p -> 1.0,
-					3.0,
+					p -> 1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2) * 0.9,
+					0.4,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
 
+			triangulation = meshImprover.getTriangulation();
+			meshImprover.improve();
 			Thread t = new Thread(() -> {
-				meshImprover.generate();
-				triangulation = meshImprover.getTriangles();
-				setChanged();
+				while(!meshImprover.isFinished()) {
+					//meshImprover.improve();
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					setChanged();
+					notifyObservers();
+				}
 			});
 			t.start();
 		}
 	}
 
-	public Collection<VTriangle> getTriangulation() {
-		return triangulation;
+	public Collection<VTriangle> getTriangles() {
+		if(triangulation == null) {
+			return Collections.EMPTY_LIST;
+		}
+		return triangulation.streamTriangles().collect(Collectors.toList());
 	}
 }

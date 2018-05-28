@@ -60,7 +60,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.bound = bound;
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
-		this.deps = 0.000001 * initialEdgeLen;
+		this.deps = 0.00001 * initialEdgeLen;
 		this.obstacleShapes = obstacleShapes;
 		this.nSteps = 0;
 
@@ -111,7 +111,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			computeScalingFactor();
 			computeVertexForces();
 			updateVertices();
-			removeBoundaryLowQualityTriangles();
+			//removeBoundaryLowQualityTriangles();
 			nSteps++;
 			//log.info("quality: " + getQuality());
 			//log.info("min-quality: " + getMinQuality());
@@ -245,7 +245,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
     private void projectBackVertex(final V vertex) {
         MeshPoint position = getMesh().getPoint(vertex);
         double distance = distanceFunc.apply(position);
-        if(distance > 0 || getMesh().isAtBoundary(vertex)) {
+        if(distance > 0 || (Math.abs(distance) <= deps && getMesh().isAtBoundary(vertex))) {
             double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
             double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
             VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
@@ -370,12 +370,13 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private Set<P> getFixPoints(final IMesh<P, V, E, F> mesh) {
 		Set<P> pointSet = new HashSet<>();
 		for(VShape shape : obstacleShapes) {
-			pointSet.addAll(shape.getPath().stream().map(p ->  mesh.createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
+			pointSet.addAll(shape.getPath().stream().filter(p -> bound.contains(p)).map(p ->  mesh.createPoint(p.getX(), p.getY())).collect(Collectors.toList()));
 		}
 
 		for(P p : pointSet) {
 			p.setFixPoint(true);
 		}
+
 		return pointSet;
 	}
 

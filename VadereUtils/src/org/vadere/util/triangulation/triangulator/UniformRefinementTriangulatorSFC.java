@@ -29,7 +29,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	private ITriangulation<P, V, E, F> triangulation;
 	private final IMeshSupplier<P, V, E, F> meshSupplier;
 	private Set<P> points;
-	private ArrayList<SFCNode<P, V, E, F>> sierpinskyCurve;
+	private ArrayList<SFCNode<P, V, E, F>> candidates;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorSFC.class);
 	private final IDistanceFunction distFunc;
 	private int counter = 0;
@@ -37,8 +37,10 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	private final Collection<P> fixPoints;
 	private final Random random = new Random();
 	private final Map<E, SFCNode<P, V, E, F>> edgeToNode;
+	private final SpaceFillingCurve<P, V, E, F> sfc;
+	private final IMesh<P, V, E, F> mesh;
 
-    /**
+	/**
      * @param meshSupplier          a {@link IMeshSupplier}
      * @param bound                 the bounding box containing all boundaries and the topography with respect to the distance function distFunc
      * @param boundary              the boundaries e.g. obstacles
@@ -61,11 +63,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
 		this.edgeToNode = new HashedMap();
+		this.candidates = new ArrayList<>();
+		this.sfc = new SpaceFillingCurve<>();
+		this.mesh = meshSupplier.get();
 	}
 
     public ITriangulation<P, V, E, F> init() {
-
-    	IMesh<P, V, E, F> mesh = meshSupplier.get();
     	double xMin = bbox.getMinX();
 	    double yMin = bbox.getMinY();
 
@@ -117,35 +120,36 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	    mesh.setEdge(square, edge);
 		// end divide the square into 2 triangles
 
-	    this.triangulation = mesh.toTriangulation(IPointLocator.Type.BASE);
 	    E halfEdge = getLongestEdge(mesh.getFace());
-	    this.sierpinskyCurve = new ArrayList<>();
-
 	    SFCNode<P, V, E, F> node1 = new SFCNode<>(halfEdge, SFCDirection.FORWARD);
 	    SFCNode<P, V, E, F> node2 = new SFCNode<>(getMesh().getTwin(halfEdge), SFCDirection.FORWARD);
 
-	    this.sierpinskyCurve.add(node1);
-	    this.sierpinskyCurve.add(node2);
-
-	    this.edgeToNode.put(halfEdge, node1);
-	    this.edgeToNode.put(getMesh().getTwin(halfEdge), node2);
+	    candidates.add(node1);
+	    candidates.add(node2);
+	    sfc.insertFirst(node1);
+	    sfc.insertNext(node2, node1);
+	    triangulation = mesh.toTriangulation(IPointLocator.Type.BASE);
+	    edgeToNode.put(halfEdge, node1);
+	    edgeToNode.put(getMesh().getTwin(halfEdge), node2);
 	    return triangulation;
     }
 
     private IMesh<P, V, E, F> getMesh() {
-    	return triangulation.getMesh();
+    	return mesh;
     }
 
     private void nextSFCLevel(double ran) {
 		//System.out.println(curveToTikz());
-		ArrayList<SFCNode<P, V, E ,F>> newSierpinskiCurve = new ArrayList<>(sierpinskyCurve.size() * 2);
+		ArrayList<SFCNode<P, V, E ,F>> newCandidates = new ArrayList<>(candidates.size() * 2);
 	    Map<E, SFCNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
 
-		ArrayList<E> toRefineEdges = new ArrayList<>();
+	    ArrayList<E> toRefineEdges = new ArrayList<>();
 		boolean tFinished = true;
-	    for(SFCNode<P, V, E ,F> node : sierpinskyCurve) {
+
+		// 1. update CFS before refinement!
+		for(SFCNode<P, V, E ,F> node : candidates) {
 		    E edge = node.getEdge();
-		    if(!isCompleted(edge) || random.nextDouble() < ran) {
+		    if((!isCompleted(edge) || random.nextDouble() < ran) && isLongestEdge(edge)) {
 			    toRefineEdges.add(edge);
 		    	tFinished = false;
 			    SFCDirection dir = node.getDirection();
@@ -156,30 +160,33 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			    SFCNode<P, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
 
 				if(dir == SFCDirection.FORWARD) {
-					newSierpinskiCurve.add(element2);
-					newSierpinskiCurve.add(element1);
+					newCandidates.add(element2);
+					newCandidates.add(element1);
+					sfc.replace(element2, element1, node);
 				}
 				else {
-					newSierpinskiCurve.add(element1);
-					newSierpinskiCurve.add(element2);
+					newCandidates.add(element1);
+					newCandidates.add(element2);
+					sfc.replace(element1, element2, node);
 				}
 
 				newEdgeToNode.put(t1, element1);
 				newEdgeToNode.put(t2, element2);
 			}
 			else {
-				newSierpinskiCurve.add(node);
 				newEdgeToNode.put(edge, node);
 			}
 	    }
 
+	    // 2. refine
 	    for(E edge : toRefineEdges) {
+			// to avoid 2x split
 		    if(validEdge(edge)) {
 				refine(edge);
 		    }
 	    }
 		finished = tFinished;
-	    sierpinskyCurve = newSierpinskiCurve;
+	    candidates = newCandidates;
     }
 
     private void addToCurve(@NotNull final SFCNode<P, V, E, F> node, @NotNull final ArrayList<SFCNode<P, V, E, F>> sierpinskyCurve, final double ran) {
@@ -203,8 +210,6 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			    sierpinskyCurve.add(element2);
 		    }
 	    }
-
-
     }
 
     public void step() {
@@ -212,17 +217,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     }
 
 	private boolean validEdge(@NotNull E edge) {
-		if(isLongestEdge(edge)) {
-			if(getMesh().isAtBoundary(edge)) {
-				return true;
-			}
-			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
-			P p2 = getMesh().getPoint(edge);
-			return (p1.getX() > p2.getX() || (p1.getX() == p2.getX() && p1.getY() > p2.getY()));
+		if (getMesh().isAtBoundary(edge)) {
+			return true;
 		}
-		else {
-			return false;
-		}
+		P p1 = getMesh().getPoint(getMesh().getPrev(edge));
+		P p2 = getMesh().getPoint(edge);
+		return (p1.getX() > p2.getX() || (p1.getX() == p2.getX() && p1.getY() > p2.getY()));
 	}
 
 
@@ -242,9 +242,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			step();
 		}
 
-		nextSFCLevel(0.05);
-		finished = true;
-
+		nextSFCLevel(0.4);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;
@@ -252,7 +250,8 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 
 	public void finish() {
         synchronized (getMesh()) {
-			List<F> sierpinksyFaceOrder = sierpinskyCurve.stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
+	        finished = true;
+			List<F> sierpinksyFaceOrder = candidates.stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 
 			// insert special fix points
 	        // TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
@@ -299,7 +298,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
-				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0.01, true);
 			}
 		}
 	}
@@ -354,7 +353,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     }
 
     private String curveToTikz() {
-		return TexGraphGenerator.toTikz(getMesh(), sierpinskyCurve.stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList()));
+		return TexGraphGenerator.toTikz(getMesh(), sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList()));
     }
 
 	/*private void removeTrianglesInsideObstacles() {

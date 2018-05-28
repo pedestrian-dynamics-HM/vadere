@@ -34,7 +34,7 @@ public class SierpinskyPlot {
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
 	private static IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
-	private static double initialEdgeLength = 1.0;
+	private static double initialEdgeLength = 0.3;
 
 	/**
 	 * A circle with radius 10.0 meshed using a uniform mesh.
@@ -43,7 +43,7 @@ public class SierpinskyPlot {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10;
 		List<VShape> obstacles = new ArrayList<>();
-		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p));
+		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + (Math.abs(distanceFunc.apply(p)) * Math.abs(distanceFunc.apply(p)));
 
 		UniformRefinementTriangulatorSFC<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
 				supplier,

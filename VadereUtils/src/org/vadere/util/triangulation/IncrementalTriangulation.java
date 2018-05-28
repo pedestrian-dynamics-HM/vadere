@@ -342,8 +342,13 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	@Override
 	public E insert(P point) {
-		F face = this.pointLocator.locatePoint(point, true);
-		return insert(point, face);
+		if(bound.contains(point)) {
+			F face = this.pointLocator.locatePoint(point, true);
+			return insert(point, face);
+		}
+		else {
+			throw new IllegalArgumentException(point + " is not contained in " + bound);
+		}
 	}
 
 	@Override

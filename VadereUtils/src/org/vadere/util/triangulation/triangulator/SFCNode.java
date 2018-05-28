@@ -14,6 +14,9 @@ public class SFCNode<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge
 	private final SFCDirection direction;
 	private boolean refine;
 
+	SFCNode<P, V, E, F> next = null;
+	SFCNode<P, V, E, F> prev = null;
+
 	public SFCNode(@NotNull final E edge, @NotNull final SFCDirection direction, final boolean refine) {
 		this.edge = edge;
 		this.direction = direction;
@@ -40,5 +43,15 @@ public class SFCNode<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge
 
 	public boolean isRefine() {
 		return refine;
+	}
+
+	void destroy() {
+		next = null;
+		prev = null;
+	}
+
+	@Override
+	public String toString() {
+		return edge.toString();
 	}
 }
