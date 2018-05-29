@@ -74,8 +74,12 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	void setViewportBound(final Rectangle2D.Double viewportBound);
 
 	/**
+	 * resets the scenarioSize to the original scenario size.
+	 */
+	void resetTopographySize();
+
+	/**
 	 *
-	 * @param viewportBound
 	 */
 	void fireChangeViewportEvent(final Rectangle2D.Double viewportBound);
 
@@ -89,8 +93,7 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 
 	/**
 	 * Sets the window bound.
-	 * 
-	 * @param windowBound
+	 *
 	 */
 	void setWindowBound(final Rectangle2D.Double windowBound);
 
@@ -103,8 +106,7 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 
 	/**
 	 * Tells the model that a element has been changed.
-	 * 
-	 * @param element
+	 *
 	 */
 	void setElementHasChanged(final ScenarioElement element);
 

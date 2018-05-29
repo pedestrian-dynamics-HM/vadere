@@ -21,6 +21,7 @@ import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesOVM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
+import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.models.AttributesPotentialGNM;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
 import org.vadere.state.attributes.models.AttributesReynolds;
@@ -48,7 +49,7 @@ public class ModelPresets {
 		// Optimal Steps Model
 		list.clear();
 		list.add(AttributesOSM.class);
-		list.add(AttributesPotentialCompact.class);
+		list.add(AttributesPotentialCompactSoftshell.class);
 		list.add(AttributesFloorField.class);
 		registerModelPreset(OptimalStepsModel.class, list);
 

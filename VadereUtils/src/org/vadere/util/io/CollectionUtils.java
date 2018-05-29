@@ -1,6 +1,9 @@
 package org.vadere.util.io;
 
+import com.google.common.collect.Iterables;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -36,7 +39,7 @@ public class CollectionUtils {
 	public static <T> boolean isEqualCollection(final Collection<? extends T> a, final Collection<? extends T> b, final IEquator<T> equator) {
 		Collection<EquatorWrapper<T>> ewA = a.stream().map(obj -> new EquatorWrapper<>(equator, obj)).collect(Collectors.toList());
 		Collection<EquatorWrapper<T>> ewB = b.stream().map(obj -> new EquatorWrapper<>(equator, obj)).collect(Collectors.toList());
-		return org.apache.commons.collections.CollectionUtils.isEqualCollection(ewA, ewB);
+		return Iterables.elementsEqual(ewA, ewB);
 	}
 
 	public interface IEquator<T> {

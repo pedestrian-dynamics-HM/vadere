@@ -10,6 +10,7 @@ import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.CLPSMeshing;
 import org.vadere.util.triangulation.adaptive.CLPSMeshingHE;
@@ -71,7 +72,7 @@ public class RunTimeGPUVertexBased extends JFrame {
 		}
 	}
 
-	private static void stepUniformRing(double startLen, double endLen, double stepLen) {
+	private static void stepUniformRing(double startLen, double endLen, double stepLen) throws OpenCLException {
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
@@ -139,7 +140,7 @@ public class RunTimeGPUVertexBased extends JFrame {
 		System.out.println("init edge lengths: [" + initlialEdgeLengths.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws OpenCLException {
 		stepUniformRing(0.05, 0.05, 0.05);
 	}
 }

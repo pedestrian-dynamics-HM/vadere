@@ -24,7 +24,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 
 	public PedestrianVelocityProcessor() {
 		super("velocity");
-
+		setAttributes(new AttributesPedestrianVelocityProcessor());
 		this.lastSimTimes = new LinkedList<>();
 		this.lastSimTimes.add(0.0);
 	}
@@ -46,11 +46,14 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		AttributesPedestrianVelocityProcessor attVelProc = (AttributesPedestrianVelocityProcessor) getAttributes();
 
 		this.pedPosProc =
 				(PedestrianPositionProcessor) manager.getProcessor(attVelProc.getPedestrianPositionProcessorId());
 		this.backSteps = attVelProc.getBackSteps();
+		this.lastSimTimes = new LinkedList<>();
+		this.lastSimTimes.add(0.0);
 	}
 
 	private Double getVelocity(int timeStep, double currentSimTime, int pedId) {

@@ -2,11 +2,11 @@ package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 
 import java.awt.*;
 import java.util.List;
@@ -27,33 +27,26 @@ import java.util.stream.Collectors;
  *
  */
 public class EikonalSolverFSM extends AGridEikonalSolver {
-	private CellGrid cellGrid;
+	private final CellGrid cellGrid;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFSM.class);
-	private ITimeCostFunction timeCostFunction;
+	private final ITimeCostFunction timeCostFunction;
 	private boolean isHighAccuracy;
 	private List<Point> targetPoints;
-	private List<VShape> targetShapes;
-
-    private final double weight;
-    private final double unknownPenalty;
-
+	private final IDistanceFunction distFunc;
 	private static final double EPSILON = 0.001;
 
 	public EikonalSolverFSM(
 			final CellGrid cellGrid,
-			final List<VShape> targetShapes,
+			final IDistanceFunction distFunc,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
-            final double unknownPenalty,
-            final double weight) {
+			final double unknownPenalty,
+			final double weight) {
 	    super(cellGrid, unknownPenalty, weight);
-        this.weight = weight;
-        this.unknownPenalty = unknownPenalty;
+	    this.distFunc = distFunc;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
-		this.targetShapes = targetShapes;
-		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
-				.collect(Collectors.toList());
+		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target).collect(Collectors.toList());
 		this.cellGrid = cellGrid;
 
 		if (targetPoints.size() == 0) {
@@ -85,14 +78,14 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 		 */
 	}
 
-    private void init() {
+	private void init() {
 		// set distances of the target neighbor points
 		targetPoints.stream()
 				.flatMap(p -> cellGrid.getLegitNeumannNeighborhood(p).stream())
 				.filter(neighbor -> cellGrid.getValue(neighbor).tag != PathFindingTag.Obstacle)
-				.forEach(neighbor -> cellGrid.setValue(neighbor, new CellState(targetShapes.stream()
-						.map(shape -> Math.max(0, shape.distance(cellGrid.pointToCoord(neighbor))))
-						.reduce(Double.MAX_VALUE, Math::min), PathFindingTag.Target)));
+				.forEach(neighbor -> {
+					cellGrid.setValue(neighbor, new CellState(Math.max(0, distFunc.apply(cellGrid.pointToCoord(neighbor))), PathFindingTag.NARROW));
+				});
 	}
 
 	private void loop() {
@@ -174,11 +167,6 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 				}
 			}
 		}
-	}
-
-	@Override
-	public boolean isValidPoint(Point point) {
-		return cellGrid.isValidPoint(point);
 	}
 
 	@Override

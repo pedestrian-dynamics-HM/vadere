@@ -193,15 +193,20 @@ public class CLDistMesh<P extends IPoint> {
 
         programCB = CLProgramCallback.create((program, user_data) ->
         {
-            log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-            String message = CLInfo.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
-            if (!message.isEmpty()) {
-                log.info("BUILD LOG:\n----\n"+message+"\n-----");
-            }
+        	try {
+		        log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+		        String message = CLInfo.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
+		        if (!message.isEmpty()) {
+			        log.info("BUILD LOG:\n----\n"+message+"\n-----");
+		        }
+	        }
+	        catch (OpenCLException e) {
+        		log.error(e.getMessage());
+	        }
         });
     }
 
-    private void initCL() {
+    private void initCL() throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             // helper for the memory allocation in java
             //stack = MemoryStack.stackPush();
@@ -251,7 +256,7 @@ public class CLDistMesh<P extends IPoint> {
         }
     }
 
-    private void buildProgram() {
+    private void buildProgram() throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             // helper for the memory allocation in java
             //stack = MemoryStack.stackPush();
@@ -363,7 +368,7 @@ public class CLDistMesh<P extends IPoint> {
         }
     }
 
-    private void createMemory() {
+    private void createMemory() throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             IntBuffer errcode_ret = stack.mallocInt(1);
 
@@ -405,7 +410,7 @@ public class CLDistMesh<P extends IPoint> {
 
     }
 
-    private void initialKernelArgs() {
+    private void initialKernelArgs() throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             IntBuffer errcode_ret = stack.mallocInt(1);
             int factor = doublePrecision ? 8 : 4;
@@ -925,7 +930,7 @@ public class CLDistMesh<P extends IPoint> {
         MemoryUtil.memFree(source);
     }
 
-    public void init() {
+    public void init() throws OpenCLException {
         StopWatch watch = new StopWatch();
         initCallbacks();
         initCL();
@@ -969,7 +974,7 @@ public class CLDistMesh<P extends IPoint> {
      *
      * Assumption: There is only one Platform with a GPU.
      */
-    public static void main(String... args) {
+    public static void main(String... args) throws OpenCLException {
         AMesh<MPoint> mesh = IFace.createSimpleTriMesh();
         log.info("before");
         Collection<AVertex<MPoint>> vertices = mesh.getVertices();
@@ -995,11 +1000,11 @@ public class CLDistMesh<P extends IPoint> {
         clDistMesh.finish();
     }
 
-    private static void printPlatformInfo(long platform, String param_name, int param) {
+    private static void printPlatformInfo(long platform, String param_name, int param) throws OpenCLException {
         System.out.println("\t" + param_name + " = " + CLInfo.getPlatformInfoStringUTF8(platform, param));
     }
 
-    private static void printDeviceInfo(long device, String param_name, int param) {
+    private static void printDeviceInfo(long device, String param_name, int param) throws OpenCLException {
         System.out.println("\t" + param_name + " = " + CLInfo.getDeviceInfoStringUTF8(device, param));
     }
 

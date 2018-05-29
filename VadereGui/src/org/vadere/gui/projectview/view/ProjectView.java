@@ -522,8 +522,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			}
 
 			private void loadScenarioIntoGui(OutputBundle bundle) throws IOException {
-				Scenario scenarioRM = IOOutput.readScenarioRunManager(bundle.getProject(),
-						bundle.getDirectory().getName());
+
+				Scenario scenarioRM = bundle.getScenarioRM();
 				Optional<File> optionalTrajectoryFile = IOUtils
 						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
 				if (optionalTrajectoryFile.isPresent()) {

@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.opencl.CLConvolution;
+import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestConvolution {
@@ -39,26 +39,27 @@ public class TestConvolution {
         assertTrue(Convolution.convolve(inMatrix, kernel, 4, 4, 3, 0, 0) == 8 + 10 + 9 + 6);
     }
 
-    @Test
-    public void testConvolution() throws IOException {
-        int inputWidth = 1000;
-        int inputHeight = 1000;
-        int kernelWidth = 31;
-        float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, (float) Math.sqrt(0.7));
-        float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
+	@Test
+	public void testConvolution() throws IOException, OpenCLException {
+		int inputWidth = 1000;
+		int inputHeight = 1000;
+		int kernelWidth = 31;
+		float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, (float) Math.sqrt(0.7));
+		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-        float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
-        CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.NonSeparate, inputWidth, inputHeight, kernelWidth, kernel);
-        float[] clOutput = clConvolution.convolve(input);
-        clConvolution.clearCL();
-        equalsMatrixValues(javaOutput, clOutput, 0.00001f);
-    }
+		float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
 
-    @Test
-    public void testSmallConvolutionCol() throws IOException {
-        int inputWidth = 6;
-        int inputHeight = 1;
-        int kernelWidth = 3;
+		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.NonSeparate, inputWidth, inputHeight, kernelWidth, kernel);
+		float[] clOutput = clConvolution.convolve(input);
+		clConvolution.clearCL();
+		equalsMatrixValues(javaOutput, clOutput, 0.00001f);
+	}
+
+	@Test
+	public void testSmallConvolutionCol() throws IOException, OpenCLException {
+		int inputWidth = 6;
+		int inputHeight = 1;
+		int kernelWidth = 3;
 
         float[] rowVector = new float[] {0.5f, 0.2f, 0.3f};
         float[] input = new float[] {1f, 1f, 1f, 0f, 0f, 0f};
@@ -74,11 +75,11 @@ public class TestConvolution {
         equalsMatrixValues(result, clOutput, 0f);
     }
 
-    @Test
-    public void testSmallConvolutionRow() throws IOException {
-        int inputWidth = 1;
-        int inputHeight = 6;
-        int kernelWidth = 3;
+	@Test
+	public void testSmallConvolutionRow() throws IOException, OpenCLException {
+		int inputWidth = 1;
+		int inputHeight = 6;
+		int kernelWidth = 3;
 
         float[] rowVector = new float[] {0.5f, 0.2f, 0.3f};
         float[] input = new float[] {1f, 1f, 1f, 0f, 0f, 0f};
@@ -94,13 +95,13 @@ public class TestConvolution {
         equalsMatrixValues(result, clOutput, 0f);
     }
 
-    @Test
-    public void testConvolutionRow() throws IOException {
-        int inputWidth = 500;
-        int inputHeight = 300;
-        int kernelWidth = 31;
-        float[] rowVector = Convolution.floatGaussian1DKernel(kernelWidth, (float) Math.sqrt(0.7));
-        float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
+	@Test
+	public void testConvolutionRow() throws IOException, OpenCLException {
+		int inputWidth = 500;
+		int inputHeight = 300;
+		int kernelWidth = 31;
+		float[] rowVector = Convolution.floatGaussian1DKernel(kernelWidth, (float) Math.sqrt(0.7));
+		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
         float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
@@ -111,14 +112,14 @@ public class TestConvolution {
         equalsMatrixValues(output, clOutput, 0.00001f);
     }
 
-    @Test
-    public void testConvolutionSeparate() throws IOException {
-        int inputWidth = 500;
-        int inputHeight = 300;
-        int kernelWidth = 31;
-        float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, 0.7f);
-        float[] seperateKernel = Convolution.floatGaussian1DKernel(kernelWidth, 0.7f);
-        float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
+	@Test
+	public void testConvolutionSeparate() throws IOException, OpenCLException {
+		int inputWidth = 500;
+		int inputHeight = 300;
+		int kernelWidth = 31;
+		float[] kernel = Convolution.generateFloatGaussianKernel(kernelWidth, 0.7f);
+		float[] seperateKernel = Convolution.floatGaussian1DKernel(kernelWidth, 0.7f);
+		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
         float[] nonSeperate = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
         float[] seperate = Convolution.convolveSeperate(input, seperateKernel, seperateKernel, inputWidth, inputHeight,

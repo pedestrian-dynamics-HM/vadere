@@ -115,7 +115,10 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 
 	public void postLoop(final SimulationState state) { }
 
-	public abstract void init(final ProcessorManager manager);
+	public void init(final ProcessorManager manager){
+		this.data.clear();
+		this.lastStep = 0;
+	}
 
 	public String[] toStrings(final K key) {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NA" };

@@ -9,6 +9,10 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
 
 @SuppressWarnings("serial")
+/**
+ * Note: A rectangle which has the same corner points as a polygon is not
+ * equals to the polygon.
+ */
 public class VRectangle extends Rectangle2D.Double implements VShape {
 
 	/**

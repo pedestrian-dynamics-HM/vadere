@@ -5,6 +5,10 @@ unit_tests_with_coverage:
   
   # Here you can execute arbitrate terminal commands.
   # If any of the commands returns a non zero exit code the job fails.
+  # 
+  # Watch out: OpenCL code cannot be run on virtual machine. Therefore,
+  # skip this tests.
   script:
-    - mvn test
+    - mvn clean
+    - mvn test -Dtest=\!TestConvolution
     

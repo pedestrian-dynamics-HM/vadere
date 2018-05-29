@@ -2,6 +2,7 @@ package org.vadere.util.opencl;
 
 
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static org.lwjgl.BufferUtils.createByteBuffer;
 
 /**
  * Utility-class without a state. This class offers method to interact with OpenCL e.g. memory management methods.
@@ -30,13 +33,13 @@ public class CLUtils {
      * @return the resource data
      * @throws IOException if an IO error occurs
      */
-    public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
+    public static ByteBuffer ioResourceToByteBuffer(final String resource, int bufferSize) throws IOException {
         ByteBuffer buffer;
 
         Path path = Paths.get(resource);
         if (Files.isReadable(path)) {
             try (SeekableByteChannel fc = Files.newByteChannel(path)) {
-                buffer = MemoryUtil.memAlloc((int)fc.size() + 1);
+                buffer = MemoryUtil.memCalloc((int)fc.size() + 1);
                 while (fc.read(buffer) != -1) {}
             }
         } else {
@@ -44,7 +47,8 @@ public class CLUtils {
                     InputStream source = CLUtils.class.getClassLoader().getResourceAsStream(resource);
                     ReadableByteChannel rbc = Channels.newChannel(source)
             ) {
-                buffer =  MemoryUtil.memAlloc(bufferSize);
+
+                buffer = MemoryUtil.memCalloc(bufferSize);
 
                 while (true) {
                     int bytes = rbc.read(buffer);
@@ -74,19 +78,19 @@ public class CLUtils {
         return floatBuffer;
     }
 
-    public static float[] toFloatArray(@NotNull FloatBuffer floatBuffer, final int size) {
-        float[] result = new float[size];
-        for(int i = 0; i < size; i++) {
-            result[i] = floatBuffer.get(i);
+    public static float[] toFloatArray(@NotNull final FloatBuffer floatBuffer, final int size) {
+	    float[] result = new float[size];
+	    for(int i = 0; i < size; i++) {
+	        result[i] = floatBuffer.get(i);
         }
         return result;
     }
 
-    private static ByteBuffer resizeBuffer(@NotNull ByteBuffer buffer, int newCapacity) {
-        ByteBuffer newBuffer = MemoryUtil.memAlloc(newCapacity);
+    private static ByteBuffer resizeBuffer(@NotNull final ByteBuffer buffer, int newCapacity) {
+        ByteBuffer newBuffer = MemoryUtil.memCalloc(newCapacity);
         buffer.flip();
         newBuffer.put(buffer);
-        MemoryUtil.memFree(buffer);
+	    MemoryUtil.memFree(buffer);
         return newBuffer;
     }
 }

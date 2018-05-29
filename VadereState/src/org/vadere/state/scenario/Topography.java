@@ -11,10 +11,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -26,11 +28,13 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
-@JsonIgnoreProperties(value = {"allOtherAttributes"})
+@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
 public class Topography {
 
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
+
+	private Function<VPoint, Double> obstacleDistanceFunction;
 	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
@@ -77,7 +81,9 @@ public class Topography {
 	/** Used to store links to all attributes that are not part of scenario elements. */
 	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
 
-	public Topography(AttributesTopography attributes, AttributesAgent attributesPedestrian,
+	public Topography(
+			AttributesTopography attributes,
+			AttributesAgent attributesPedestrian,
 			AttributesCar attributesCar) {
 
 		this.attributes = attributes;
@@ -109,6 +115,8 @@ public class Topography {
 
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
+
+		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
 		
 	}
 
@@ -137,6 +145,14 @@ public class Topography {
 		}
 
 		return null;
+	}
+
+	public double distanceToObstacle(@NotNull VPoint point) {
+		return this.obstacleDistanceFunction.apply(point);
+	}
+
+	public void setObstacleDistanceFunction(@NotNull Function<VPoint, Double> obstacleDistanceFunction) {
+		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 
 	public boolean containsTarget(final Predicate<Target> targetPredicate) {
@@ -452,8 +468,8 @@ public class Topography {
 		List<Obstacle> obstacles = new ArrayList<>();
 		VPolygon boundary = new VPolygon(topography.getBounds());
 		double width = topography.getBoundingBoxWidth();
-		Collection<VPolygon> boundingBoxObstacleShapes = boundary
-				.borderAsShapes(width, width / 2.0, 0.0001);
+		Collection<VPolygon> boundingBoxObstacleShapes = boundary.borderAsShapes(width, width / 2.0, 0.0001);
+
 		for (VPolygon obstacleShape : boundingBoxObstacleShapes) {
 			AttributesObstacle obstacleAttributes = new AttributesObstacle(
 					-1, obstacleShape);

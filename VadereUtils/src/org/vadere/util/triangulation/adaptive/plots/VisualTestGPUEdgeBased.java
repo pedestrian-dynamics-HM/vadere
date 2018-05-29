@@ -10,6 +10,7 @@ import org.vadere.util.geometry.mesh.gen.AVertex;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.CLPSMeshing;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
@@ -31,7 +32,7 @@ public class VisualTestGPUEdgeBased {
 	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
 	private static final double initialEdgeLength =  1.5;
 
-	private static void overallUniformRing() {
+	private static void overallUniformRing() throws OpenCLException {
 
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
@@ -74,7 +75,7 @@ public class VisualTestGPUEdgeBased {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws OpenCLException {
 		overallUniformRing();
 	}
 

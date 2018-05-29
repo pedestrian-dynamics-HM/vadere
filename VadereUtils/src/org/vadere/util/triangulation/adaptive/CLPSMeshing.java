@@ -8,6 +8,7 @@ import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMesh;
+import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
@@ -73,7 +74,7 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
     /**
      * Start with a uniform refined triangulation
      */
-    public void initialize() {
+    public void initialize() throws OpenCLException {
         log.info("##### (start) compute a uniform refined triangulation #####");
         //UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         //uniformRefinementTriangulation.generate();
@@ -92,8 +93,9 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
 
         // TODO: dirty cast.
         clDistMesh = new CLDistMesh<>((AMesh<P>)triangulation.getMesh());
-        clDistMesh.init();
-        //clDistMesh.refresh();
+	    clDistMesh.init();
+
+	    //clDistMesh.refresh();
         initialized = true;
         log.info("##### (end) generate a triangulation #####");
     }
@@ -104,28 +106,42 @@ public class CLPSMeshing<P extends MeshPoint> implements IMeshImprover<P, AVerte
 
     @Override
     public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
-        if(!initialized) {
-            initialize();
-        }
+        try {
+	        if(!initialized) {
+		        initialize();
+	        }
 
-        // TODO: quality check!
-        while (nSteps < MAX_STEPS) {
-            improve();
-            //log.info("quality: " + quality);
+	        // TODO: quality check!
+	        while (nSteps < MAX_STEPS) {
+		        improve();
+		        //log.info("quality: " + quality);
+	        }
+	        refresh();
+	        finish();
+	        return triangulation;
         }
-        refresh();
-        finish();
-        return triangulation;
+        catch (OpenCLException e) {
+        	log.error(e.getMessage());
+        	e.printStackTrace();
+        	throw new RuntimeException(e);
+        }
     }
 
     public void execute() {
-        if(!initialized) {
-			initialize();
-		}
+    	try {
+		    if(!initialized) {
+			    initialize();
+		    }
 
-		while (!isFinished()) {
-			step();
-		}
+		    while (!isFinished()) {
+			    step();
+		    }
+	    }
+	    catch (OpenCLException e) {
+    		log.error(e.getMessage());
+    		e.printStackTrace();
+    		throw new RuntimeException(e);
+	    }
     }
 
     public boolean isFinished() {

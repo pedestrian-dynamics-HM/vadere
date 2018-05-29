@@ -20,38 +20,39 @@ import java.util.List;
 import java.util.Optional;
 
 public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey, FloorFieldGridRow> {
-	private static Logger logger = LogManager.getLogger(TargetFloorFieldProcessor.class);
+	private static Logger logger = LogManager.getLogger(TargetFloorFieldGridProcessor.class);
 	private AttributesFloorFieldProcessor att;
 	private List<Integer> targetIds;
 	private boolean hasOnceProcessed = false;
 
 	public TargetFloorFieldGridProcessor() {
 		super("potential");
+		setAttributes(new AttributesFloorFieldProcessor());
 	}
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		Optional<MainModel> optMainModel = state.getMainModel();
 
-		if(optMainModel.isPresent() && optMainModel.get() instanceof PotentialFieldModel) {
+		if (optMainModel.isPresent() && optMainModel.get() instanceof PotentialFieldModel) {
 			IPotentialFieldTarget pft = ((PotentialFieldModel) optMainModel.get()).getPotentialFieldTarget();
 
 			Rectangle.Double bound = state.getTopography().getBounds();
 
-			/**
+			/*
 			 * If the floor field is static we do not have to process it twice.
 			 */
-			if(!hasOnceProcessed || pft.needsUpdate()) {
-				/**
+			if (!hasOnceProcessed || pft.needsUpdate()) {
+				/*
 				 * We assume that all pedestrian navigate to a specific target using the same floor field. This is not always true.
 				 * For example in the cooperative and competitive queueing model, pedestrians use different floor fields.
 				 */
 				Optional<Pedestrian> optPed = state.getTopography().getPedestrianDynamicElements().getElements().stream().findAny();
 
-				if(optPed.isPresent()) {
+				if (optPed.isPresent()) {
 					int row = 0;
 					for (double y = bound.y; y < bound.y + bound.height; y += att.getResolution()) {
-						FloorFieldGridRow floorFieldGridRow = new FloorFieldGridRow((int)Math.floor(bound.width / att.getResolution()));
+						FloorFieldGridRow floorFieldGridRow = new FloorFieldGridRow((int) Math.floor(bound.width / att.getResolution()));
 						int col = 0;
 						for (double x = bound.x; x < bound.x + bound.width; x += att.getResolution()) {
 							floorFieldGridRow.setValue(col++, pft.getPotential(new VPoint(x, y), optPed.get()));
@@ -62,30 +63,31 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 				}
 			}
 
-		}
-		else {
+		} else {
 			logger.warn("could not process, main model is missing or is not the instance of " + PotentialFieldModel.class.getName());
 		}
 	}
 
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		this.att = (AttributesFloorFieldProcessor) this.getAttributes();
 		this.targetIds = new ArrayList<>();
 		this.targetIds.add(att.getTargetId());
+		this.hasOnceProcessed = false;
 	}
 
-    @Override
-    public String[] toStrings(TimestepRowKey key) {
-        return this.getValue(key).toStrings();
-    }
+	@Override
+	public String[] toStrings(TimestepRowKey key) {
+		return this.getValue(key).toStrings();
+	}
 
-    @Override
-    public AttributesProcessor getAttributes() {
-        if(super.getAttributes() == null) {
-            setAttributes(new AttributesFloorFieldProcessor());
-        }
+	@Override
+	public AttributesProcessor getAttributes() {
+		if (super.getAttributes() == null) {
+			setAttributes(new AttributesFloorFieldProcessor());
+		}
 
-        return super.getAttributes();
-    }
+		return super.getAttributes();
+	}
 }

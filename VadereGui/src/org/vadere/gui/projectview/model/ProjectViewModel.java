@@ -53,10 +53,23 @@ public class ProjectViewModel {
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
-		Arrays.stream(rows)
-				.mapToObj(row -> getOutputTableModel().getValue(row))
-				.filter(dir -> IOOutput.deleteOutputDirectory(dir))
-				.forEach(dir -> logger.info("delete output directory: " + dir.getName()));
+		// 1. delete output files on the hard disc
+		int j = 0;
+		for(int i = 0; i < rows.length; i++) {
+			File dir = getOutputTableModel().getValue(rows[i]-j);
+
+			if(IOOutput.deleteOutputDirectory(dir)) {
+				j++;
+
+				// 2. remove output files information from the output file table
+				outputTable.getModel().remove(dir);
+
+				// 3. remove output files information from the project output
+				getProject().getProjectOutput().removeOutputDir(dir.getName());
+
+				logger.info("output dir "+ dir +" dir deleted.");
+			}
+		}
 	}
 
 	public void deleteScenarios(final int[] rows) {
@@ -197,14 +210,14 @@ public class ProjectViewModel {
 
 	public ScenarioBundle getRunningScenario() {
 		Scenario scenarioRM = project.getCurrentScenario();
-		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
+		List<String> outputDirectories = project.getProjectOutput().listSelectedOutputDirs(scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
 
 	public ScenarioBundle getSelectedScenarioBundle() {
 		Scenario scenarioRM = getSelectedScenarioRunManager();
-		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
+		List<String> outputDirectories = project.getProjectOutput().listSelectedOutputDirs(scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
@@ -264,7 +277,7 @@ public class ProjectViewModel {
 		@Override
 		public void run() {
 			fireRefreshOutputStarted();
-			IOOutput.cleanOutputDirs(project);
+			project.getProjectOutput().update();
 			outputTableModel.init(project);
 			fireRefreshOutputCompleted();
 		}
@@ -317,6 +330,10 @@ public class ProjectViewModel {
 
 		public Collection<File> getOutputDirectories() {
 			return outputDirectories;
+		}
+
+		public Scenario getScenarioRM(){
+			return project.getProjectOutput().getScenario(directory.getName());
 		}
 	}
 

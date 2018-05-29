@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.opencl.OpenCLException;
 
 /**
  * IGaussianFilter is a refershable image processing calculator that can be used
@@ -19,9 +22,11 @@ import org.vadere.state.scenario.Topography;
  */
 public interface IGaussianFilter {
 
+	Logger logger = LogManager.getLogger(IGaussianFilter.class);
+
     enum Type {
         OpenCL, // default
-        NativeJava // not jet implemented
+        NativeJava
     }
 
     /**
@@ -90,26 +95,26 @@ public interface IGaussianFilter {
                 * 0.5
                 / (2 * Math.PI * standardDerivation * standardDerivation);
 
+	    BiFunction<Integer, Integer, Float> f =
+			    (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
+					    * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
+
+	    IGaussianFilter clFilter;
         switch (type) {
             case OpenCL: {
-                try {
-                    BiFunction<Integer, Integer, Float> f =
-                            (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
-                                    * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
-                    IGaussianFilter clFilter = new CLGaussianFilter(scenarioBounds, scale, f, false);
-                    return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
-                } catch (IOException e) {
-                    // cannot go on, this should never happen!
-                    throw new RuntimeException(e);
-                }
-            }
+	            try {
+		            clFilter = new CLGaussianFilter(scenarioBounds, scale, f, false);
+	            } catch (IOException | OpenCLException e) {
+		            e.printStackTrace();
+		            logger.warn(e.getClass().getName() + " while initializing OpenCL: " + e.getMessage() + " OpenCL can not be used. Native Java implementation will be used which might cause performance issues.");
+		            clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+	            }
+            } break;
             default:
-                BiFunction<Integer, Integer, Float> f =
-                        (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
-                                * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
-                IGaussianFilter clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
-                return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
+	            clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
         }
+
+	    return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
     }
 
     static IGaussianFilter create(
@@ -121,26 +126,26 @@ public interface IGaussianFilter {
     static IGaussianFilter create(
             final Topography scenario, final double scale,
             final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
+
+    	double varianz = standardDerivation * standardDerivation;
+	    BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
+			    * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
+
+	    IGaussianFilter clFilter;
         switch (type) {
             case OpenCL: {
-                try {
-                    double varianz = standardDerivation * standardDerivation;
-                    BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
-                            * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
-                    IGaussianFilter clFilter = new CLGaussianFilter(scenario.getBounds(), scale, f, true);
-                    return new ObstacleGaussianFilter(scenario, clFilter);
-                } catch (IOException e) {
-                    // cannot go on, this should never happen!
-                    throw new RuntimeException(e);
-                }
-            }
+	            try {
+		            clFilter = new CLGaussianFilter(scenario.getBounds(), scale, f, true);
+	            } catch (IOException | OpenCLException e) {
+		            e.printStackTrace();
+		            logger.warn(e.getClass().getName() + " while initializing OpenCL: " + e.getMessage() + " OpenCL can not be used. Native Java implementation will be used which might cause performance issues.");
+		            clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
+	            }
+            } break;
             default:
-                double varianz = standardDerivation * standardDerivation;
-                BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
-                        * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
-                IGaussianFilter clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
-                return new ObstacleGaussianFilter(scenario, clFilter);
+                clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
         }
+	    return new ObstacleGaussianFilter(scenario, clFilter);
     }
 
     static IGaussianFilter create(

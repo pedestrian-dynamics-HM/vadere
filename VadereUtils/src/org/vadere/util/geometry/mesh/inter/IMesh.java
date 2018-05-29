@@ -1,10 +1,10 @@
 package org.vadere.util.geometry.mesh.inter;
 
-import org.apache.commons.collections.IteratorUtils;
+import com.google.common.collect.Lists;
+
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PMesh;
@@ -394,7 +394,9 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param edge the edge holding the vertex
 	 * @return a list of faces which are adjacent to the vertex of this edge
 	 */
-	default List<F> getFaces(@NotNull E edge) { return IteratorUtils.toList(new AdjacentFaceIterator(this, edge)); }
+	default List<F> getFaces(@NotNull E edge) {
+		return Lists.newArrayList(new AdjacentFaceIterator(this, edge));
+	}
 
 	/**
 	 * Returns a list of faces which are adjacent to the vertex.
@@ -402,7 +404,9 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param vertex the vertex
 	 * @return a list of faces which are adjacent to the vertex of this edge
 	 */
-	default List<F> getFaces(@NotNull V vertex) { return IteratorUtils.toList(new AdjacentFaceIterator(this, getEdge(vertex))); }
+	default List<F> getFaces(@NotNull V vertex) {
+		return Lists.newArrayList(new AdjacentFaceIterator(this, getEdge(vertex)));
+	}
 
 	/**
 	 * Returns a Iterable which can be used to iterate over all edges which end point is the vertex that is adjacent to the vertex of this edge.
@@ -506,7 +510,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	default Iterable<F> getFaceIt(V vertex) { return () -> new AdjacentFaceIterator(this, getEdge(vertex));}
 
-	default List<F> getFaces(F face) { return IteratorUtils.toList(new SurroundingFaceIterator<>(this, face)); }
+	default List<F> getFaces(F face) { return Lists.newArrayList(new SurroundingFaceIterator<>(this, face)); }
 
 	/**
 	 * Returns a Stream consisting of all surrounding faces of the face.
@@ -559,7 +563,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return a List of all faces which are adjacent to the vertex of the edge
 	 */
 	default List<F> getAdjacentFaces(@NotNull E edge) {
-		return IteratorUtils.toList(new AdjacentFaceIterator(this, edge));
+		return Lists.newArrayList(new AdjacentFaceIterator(this, edge));
 	}
 
 	/**
@@ -569,7 +573,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param edge the edge which holds the vertex
 	 * @return a list of edges which are incident to the vertex of this edge.
 	 */
-	default List<E> getIncidentEdges(@NotNull E edge) { return IteratorUtils.toList(new IncidentEdgeIterator(this, edge)); }
+	default List<E> getIncidentEdges(@NotNull E edge) { return Lists.newArrayList(new IncidentEdgeIterator(this, edge)); }
 
 
 	/**
@@ -589,7 +593,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return all edges which end-point is equal to the vertex
 	 */
 	default List<E> getEdges(@NotNull V vertex) {
-		return IteratorUtils.toList(new EdgeOfVertexIterator(this, vertex));
+		return Lists.newArrayList(new EdgeOfVertexIterator(this, vertex));
 	}
 
 	/**
@@ -645,7 +649,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return a list of all edges of a face.
 	 */
 	default List<E> getEdges(@NotNull F face) {
-		return IteratorUtils.toList(new EdgeIterator(this, face));
+		return Lists.newArrayList(new EdgeIterator(this, face));
 	}
 
 	/**

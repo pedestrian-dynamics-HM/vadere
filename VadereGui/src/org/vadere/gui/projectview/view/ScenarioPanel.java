@@ -16,11 +16,12 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -140,26 +141,42 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						}
 					}
 				})));
+		
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
 		menusInTabs.add(mnModelNameMenu);
+		
+		JMenu submenuMainModels = new JMenu(Messages.getString("Tab.Model.insertModelNameSubMenu.title"));
+		mnModelNameMenu.add(submenuMainModels);
+		
 		ClassFinder.getMainModelNames().stream()
 				.sorted()
-				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className + " (MainModel)") {
+				.forEach(className -> submenuMainModels.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
-				})));
-		ClassFinder.getModelNames().stream()
-				.sorted()
-				.forEach(className -> mnModelNameMenu.add(new JMenuItem(new AbstractAction(className) {
+				}
+				)));
+		
+		Map<String, List<String>> groupedPackages = ClassFinder.groupPackages(ClassFinder.getModelNames());
+		
+		for (Map.Entry<String, List<String>> entry : groupedPackages.entrySet()) {
+			JMenu currentSubMenu = new JMenu(entry.getKey());
+			
+			for (String className : entry.getValue()) {
+				currentSubMenu.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
-				})));
-		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftest position instead of the rightest
+			}));
+			}
+			
+			mnModelNameMenu.add(currentSubMenu);
+		}
+	
+		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
@@ -206,7 +223,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		if (isEditable) {
 			menusInTabs.forEach(menu -> menu.setEnabled(true));
-			try {
+
 				int index = tabbedPane.getSelectedIndex();
 				if (topographyCreatorView != null && tabbedPane.indexOfComponent(topographyCreatorView) >= 0) {
 					tabbedPane.removeTabAt(tabbedPane.indexOfComponent(topographyCreatorView));
@@ -214,13 +231,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 				topographyCreatorView = new TopographyWindow(scenario);
 				tabbedPane.addTab(Messages.getString("Tab.TopographyCreator.title"), topographyCreatorView);
-				setTopography(scenario.getTopography());
+				tabbedPane.validate();
+				tabbedPane.repaint();
 				tabbedPane.setSelectedIndex(index);
+				setTopography(scenario.getTopography());
 
-			} catch (IOException | IntrospectionException e) {
-				e.printStackTrace();
-				logger.error(e.getLocalizedMessage());
-			}
 		} else {
 			menusInTabs.forEach(menu -> menu.setEnabled(false));
 			boolean topoWasSelected = false;
@@ -234,7 +249,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					tabbedPane.setSelectedComponent(postVisualizationView);
 				}
 			}
+			tabbedPane.validate();
+			tabbedPane.repaint();
+			postVisualizationView.revalidate();
 			postVisualizationView.repaint(); // force a repaint, otherwise it sometimes only repaints when the mouse moves from the output table to the postvis-view
+			postVisualizationView.getDefaultModel().resetTopographySize();
 		}
 
 		this.attributesModelView.setVadereScenario(scenario);

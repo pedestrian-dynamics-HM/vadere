@@ -6,14 +6,18 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationConfig> {
@@ -121,6 +125,13 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			} else {
 				topography = observationAreaSnapshot.scenario;
 			}
+
+			/*if(potentialField == null) {
+				potentialField = new ObstacleDistancePotential(
+						topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+						new VRectangle(topography.getBounds()),
+						new AttributesFloorField());
+			}*/
 
 			if (getSelectedElement() instanceof Car) {
 				int carId = getSelectedElement().getId();

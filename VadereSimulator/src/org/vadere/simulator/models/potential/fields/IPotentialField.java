@@ -25,6 +25,7 @@ import org.vadere.util.potential.calculators.PotentialFieldCalculatorNone;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFSM;
+import org.vadere.util.potential.calculators.cartesian.EikonalSolverSFMM;
 import org.vadere.util.potential.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
@@ -109,18 +110,24 @@ public interface IPotentialField {
 			        topography,
 			        targetId, 1.0 / cellGrid.getResolution());
 
+	        /**
+	         * The distance function returns values < 0 if the point is inside the domain,
+	         * i.e. outside of any obstacle and values > 0 if the point lies inside an obstacle.
+	         */
+	        IDistanceFunction distFunc = new DistanceFunctionTarget(cellGrid, targetShapes);
+
 	        switch (createMethod) {
 		        case NONE:
 			        eikonalSolver = new PotentialFieldCalculatorNone();
 			        break;
 		        case FAST_ITERATIVE_METHOD:
-			        eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+			        eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 			        break;
 		        case FAST_SWEEPING_METHOD:
-			        eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+			        eikonalSolver = new EikonalSolverFSM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 			        break;
 		        default:
-			        eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+			        eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 	        }
         }
         /**

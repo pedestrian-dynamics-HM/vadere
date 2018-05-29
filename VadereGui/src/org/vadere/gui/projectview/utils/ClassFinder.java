@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.OutputFileMap;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class ClassFinder {
@@ -43,6 +45,12 @@ public class ClassFinder {
 		modelNames.removeAll(getMainModelNames());
 		return modelNames;
 	}
+	
+	public static Map<String, List<String>> groupPackages(List<String> classNamesInPackageNotation) {
+		List<String> groupNames = deriveGroupNamesFromPackageNames(classNamesInPackageNotation);
+		Map<String, List<String>> groupNamesToMembers = sortClassNamesIntoGroups(classNamesInPackageNotation, groupNames);
+		return groupNamesToMembers;
+	}
 
 	// all output file classes
 	public static List<Class<?>> getOutputFileClasses() {
@@ -60,15 +68,8 @@ public class ClassFinder {
 					.map(c -> {
 						// Find corresponding outputfile class
 						try {
-							List<Class<?>> opClasses = getClasses(OutputFile.class.getPackage().getName());
-
-							Optional<Class<?>> corrOpClass = opClasses
-									.stream()
-									.filter(opc -> !Modifier.isAbstract(opc.getModifiers()))
-									.filter(opc -> ((ParameterizedType) opc.getGenericSuperclass()).getActualTypeArguments()[0].getTypeName().equals(c.getName()))
-									.findFirst();
-
-							return Pair.of((Class) c, corrOpClass);
+							OutputFileMap annotation = c.getAnnotation(OutputFileMap.class);
+							return Pair.of((Class) c, Optional.of(annotation.outputFileClass()));
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
@@ -221,5 +222,38 @@ public class ClassFinder {
 		}
 
 		return null;
+	}
+	
+	private static List<String> deriveGroupNamesFromPackageNames(List<String> classNamesInPackageNotation) {
+		List<String> groupNames = new ArrayList<String>();
+		
+		// Use characters until last dot as group names.
+		for (String classNameInPackageNotation : classNamesInPackageNotation) {
+			int lastDotPosition = classNameInPackageNotation.lastIndexOf(".");
+			
+			if (lastDotPosition >= 0) {
+				String groupName = classNameInPackageNotation.substring(0, lastDotPosition);
+				groupNames.add(groupName);
+			}
+		}
+		
+		return groupNames;
+	}
+	
+	private static Map<String, List<String>> sortClassNamesIntoGroups(List<String> classNamesInPackageNotation, List<String> groupNames) {
+		TreeMap<String, List<String>> groupNamesToMembers = new TreeMap<>();
+		
+		for (String groupName : groupNames) {
+			List<String> groupMembers = classNamesInPackageNotation.stream().filter(name -> name.startsWith(groupName)).sorted().collect(Collectors.toList());
+			groupNamesToMembers.put(groupName, groupMembers);
+		}
+		
+		List<String> modelNamesWithoutPackage = classNamesInPackageNotation.stream().filter(name -> name.lastIndexOf(".") == -1).sorted().collect(Collectors.toList());
+		
+		if (modelNamesWithoutPackage.size() > 0) {
+			groupNamesToMembers.put("...", modelNamesWithoutPackage);
+		}
+		
+		return groupNamesToMembers;
 	}
 }

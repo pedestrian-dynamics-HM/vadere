@@ -50,6 +50,17 @@ public abstract class VadereTableModelSorted<T> extends DefaultTableModel {
 
 	public abstract void insertRow(int row, T value);
 
+	@Override
+	public void removeRow(int row) {
+		safeRemove(row);
+	}
+
+	public void removeRows(final int[] rows) {
+		for(int i=0; i<rows.length; i++){
+			removeRow(rows[i]-i);
+		}
+	}
+
 	public synchronized void insertValue(final T value) {
 		int index = rows.findPrecessor(value);
 		rows.add(value);
@@ -58,7 +69,7 @@ public abstract class VadereTableModelSorted<T> extends DefaultTableModel {
 	}
 
 	private void safeRemove(final int row) {
-		removeRow(row);
 		rows.remove(row);
+		super.removeRow(row);
 	}
 }

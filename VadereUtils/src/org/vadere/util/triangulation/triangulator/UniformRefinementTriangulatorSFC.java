@@ -1,6 +1,5 @@
 package org.vadere.util.triangulation.triangulator;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +61,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		this.bbox = bound;
 		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
-		this.edgeToNode = new HashedMap();
+		this.edgeToNode = new HashMap<>();
 		this.candidates = new ArrayList<>();
 		this.sfc = new SpaceFillingCurve<>();
 		this.mesh = meshSupplier.get();

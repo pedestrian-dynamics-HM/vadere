@@ -1,81 +1,101 @@
 package org.vadere.simulator.models.potential;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math.util.MathUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.MathUtil;
 
 public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObstacle {
 
-
+	private static Logger log = LogManager.getLogger(PotentialFieldObstacleCompactSoftshell.class);
 	private AttributesPotentialCompactSoftshell attributes;
 	private Random random;
 	private double width;
 	private double height;
 	private Collection<Obstacle> obstacles;
+	private Topography topography;
 
-	public PotentialFieldObstacleCompactSoftshell(AttributesPotentialCompactSoftshell attributesPotential,
-			Collection<Obstacle> obstacles, Random random) {
-		this.attributes = attributesPotential;
-		this.random = random;
+	public PotentialFieldObstacleCompactSoftshell() {}
 
-		this.width = attributesPotential.getObstPotentialWidth();
-		this.height = attributesPotential.getObstPotentialHeight();
-
-		this.obstacles = obstacles;
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		init(Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class), topography, random);
 	}
+
+	private void init(AttributesPotentialCompactSoftshell attributes, Topography topography, Random random){
+		this.attributes = attributes;
+		this.width = attributes.getObstPotentialWidth();
+		this.height = attributes.getObstPotentialHeight();
+		this.random = random;
+		this.obstacles = new ArrayList<>(topography.getObstacles());
+		this.topography = topography;
+	}
+
 
 	@Override
 	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
 
 		double potential = 0;
-		for (Obstacle obstacle : obstacles) {
+		//for (Obstacle obstacle : obstacles) {
 
-			double distance = obstacle.getShape().distance(pos);
+			//double distance = obstacle.getShape().distance(pos);
+			double distance = topography.distanceToObstacle(pos);
+
+			/*if(distance > 0) {
+				log.info("distance: " + distance);
+			}*/
 
 			double radius = pedestrian.getRadius();
 			double currentPotential = 0;
 
 			if (distance < this.width) {
-				currentPotential = this.height * Math.exp(2 / (Math.pow(distance / (this.width), 2) - 1));
+				currentPotential = this.height * MathUtil.expAp(2 / (Math.pow(distance / (this.width), 2) - 1));
 			}
 			if (distance < radius) {
-				currentPotential += 100000 * Math.exp(1 / (Math.pow(distance / radius, 2) - 1));
+				currentPotential += 100000 * MathUtil.expAp(1 / (Math.pow(distance / radius, 2) - 1));
 			}
 
 			if (potential < currentPotential)
 				potential = currentPotential;
-		}
+		//}
 
 		return potential;
 	}
 
 	@Override
-	public Vector2D getObstaclePotentialGradient(VPoint pos,
-			Agent pedestrian) {
-		throw new UnsupportedOperationException("this method is not jet implemented.");
+	public Vector2D getObstaclePotentialGradient(VPoint pos, Agent pedestrian) {
+		throw new UnsupportedOperationException("not jet implemented.");
+		/*double epsilon = 0.0000001;
+		VPoint dxPos = pos.add(new VPoint(pos.getX() + MathUtils.EPSILON, pos.getY()));
+		VPoint dyPos = pos.add(new VPoint(pos.getX(), pos.getY() + MathUtils.EPSILON));
+
+		double potential = getObstaclePotential(pos, pedestrian);
+		double dx = (getObstaclePotential(dxPos, pedestrian) - potential) / epsilon;
+		double dy = (getObstaclePotential(dyPos, pedestrian) - potential) / epsilon;
+
+		return new Vector2D(dx, dy);*/
 	}
 
 	@Override
 	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleCompactSoftshell(attributes, new LinkedList<>(obstacles), random);
+		PotentialFieldObstacleCompactSoftshell potentialFieldObstacle = new PotentialFieldObstacleCompactSoftshell();
+		potentialFieldObstacle.init(attributes, topography, random);
+		return potentialFieldObstacle;
 	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
 }

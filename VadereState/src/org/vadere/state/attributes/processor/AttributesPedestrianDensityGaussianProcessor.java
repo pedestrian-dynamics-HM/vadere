@@ -21,4 +21,19 @@ public class AttributesPedestrianDensityGaussianProcessor extends AttributesPede
 	public boolean isObstacleDensity() {
 		return obstacleDensity;
 	}
+
+	public void setScale(double scale) {
+		checkSealed();
+		this.scale = scale;
+	}
+
+	public void setStandardDerivation(double standardDerivation) {
+		checkSealed();
+		this.standardDerivation = standardDerivation;
+	}
+
+	public void setObstacleDensity(boolean obstacleDensity) {
+		checkSealed();
+		this.obstacleDensity = obstacleDensity;
+	}
 }

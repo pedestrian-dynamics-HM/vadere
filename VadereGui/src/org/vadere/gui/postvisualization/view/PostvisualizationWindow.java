@@ -7,6 +7,7 @@ import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
@@ -29,6 +30,7 @@ import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.projects.io.IOOutput;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
@@ -63,7 +65,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		this(false, projectPath);
 	}
 
-	public PostvisualizationWindow(final boolean loadTopographyInformationsOnly, final String projectPath) {
+	private PostvisualizationWindow(final boolean loadTopographyInformationsOnly, final String projectPath) {
 
 		// 1. get data from the user screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -137,16 +139,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		final String test = java.text.MessageFormat.format(Messages.getString("PostVis.about.text"), "0.1");
 		JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
 		infoButton.setBorderPainted(false);
-		infoButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String text = "<html><font size =\"5\"><b>"+Messages.getString("PostVis.title") + "</font></b><br>" +
-						"<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("PostVis.version"), HashGenerator.releaseNumber()) + "</em></font><br>" +
-						"<font size =\"3\">" + MessageFormat.format(Messages.getString("PostVis.license.text"), "<a href=\"https://www.gnu.org/licenses/lgpl-3.0.txt\">LGPL</a>")+".</font></html>";
-				JOptionPane.showMessageDialog(null, text,
-						Messages.getString("PostVis.about.title"),
-						JOptionPane.INFORMATION_MESSAGE);
-			}
+		infoButton.addActionListener(e -> {
+			String text = "<html><font size =\"5\"><b>"+Messages.getString("PostVis.title") + "</font></b><br>" +
+					"<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("PostVis.version"), HashGenerator.releaseNumber()) + "</em></font><br>" +
+					"<font size =\"3\">" + MessageFormat.format(Messages.getString("PostVis.license.text"), "<a href=\"https://www.gnu.org/licenses/lgpl-3.0.txt\">LGPL</a>")+".</font></html>";
+			JOptionPane.showMessageDialog(null, text,
+					Messages.getString("PostVis.about.title"),
+					JOptionPane.INFORMATION_MESSAGE);
 		});
 
 		/*
@@ -178,7 +177,6 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				;
 				}, "View.btnShowPedestrian.tooltip");
 
 		addActionToToolbar(toolbar,
@@ -190,7 +188,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				;
+
 				}, "View.btnShowTrajectories.tooltip");
 
 
@@ -221,7 +219,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				;
+
 				}, "View.btnShowWalkingDirection.tooltip");
 
 		addActionToToolbar(toolbar,
@@ -245,7 +243,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				;
+
 				}, "View.btnShowGrid.tooltip");
 
 		addActionToToolbar(
@@ -258,7 +256,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				;
+
 				}, "View.btnShowDensity.tooltip");
 
 
@@ -331,12 +329,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		}
 
 
-		miGlobalSettings.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogFactory.createSettingsDialog(model).setVisible(true);
-			}
-		});
+		miGlobalSettings.addActionListener(e -> DialogFactory.createSettingsDialog(model).setVisible(true));
 
 		mFile.add(miLoadFile);
 		// mFile.add(miLoadFloorFile);
@@ -352,7 +345,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		getActionMap().put("deselect", new ActionDeselect(model, this, null));
 	}
 
-	public JMenuBar getMenu() {
+	private JMenuBar getMenu() {
 		return menuBar;
 	}
 
@@ -362,7 +355,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		model.notifyObservers();
 	}
 
-	public void loadOutputFile(final Scenario scenario) throws IOException {
+	public void loadOutputFile(final Scenario scenario) {
 		Player.getInstance(model).stop();
 		model.init(scenario, model.getOutputPath());
 		model.notifyObservers();
@@ -371,6 +364,10 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
 			final String toolTipProperty) {
 		return SwingUtils.addActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+	}
+
+	public IDefaultModel getDefaultModel(){
+		return this.model;
 	}
 
 	@Override

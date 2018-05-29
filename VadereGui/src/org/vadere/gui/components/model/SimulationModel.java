@@ -6,11 +6,13 @@ import java.util.function.Function;
 
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public abstract class SimulationModel<T extends DefaultSimulationConfig> extends DefaultModel {
 
 	public final T config;
 
+	@SuppressWarnings("unchecked")
 	public SimulationModel(final T config) {
 		super(config);
 		this.config = config;
@@ -25,6 +27,11 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 	public abstract Function<VPoint, Double> getPotentialField();
 
 	public abstract boolean isFloorFieldAvailable();
+
+	@Override
+	public void resetTopographySize() {
+		fireChangeViewportEvent(new VRectangle(getTopographyBound()));
+	}
 
 	public T getConfig() {
 		return config;

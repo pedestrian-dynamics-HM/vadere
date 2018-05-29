@@ -24,11 +24,6 @@ public class PedestrianStartTimeProcessor extends DataProcessor<PedestrianIdKey,
 				.forEach(ped -> this.update(new PedestrianIdKey(ped.getId()), state.getSimTimeInSec()));
 	}
 
-	@Override
-	public void init(final ProcessorManager manager) {
-		// No initialization needed
-	}
-
 	private void update(PedestrianIdKey pedIdKey, double startTime) {
 		Set<PedestrianIdKey> keys = this.getKeys();
 

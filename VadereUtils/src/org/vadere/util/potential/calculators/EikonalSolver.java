@@ -1,6 +1,5 @@
 package org.vadere.util.potential.calculators;
 
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -43,19 +42,18 @@ public interface EikonalSolver {
 		return false;
 	}
 
+	/**
+	 * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.
+	 *
+	 * @return a copy of the current solution of the eikonal equation
+	 */
+	Function<VPoint, Double> getPotentialField();
 
-    /**
-     * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.
-     *
-     * @return a copy of the current solution of the eikonal equation
-     */
-    Function<VPoint, Double> getPotentialField();
+	default double getPotential(final VPoint pos) {
+		return getPotential(pos.getX(), pos.getY());
+	}
 
-    default double getPotential(final VPoint pos) {
-        return getPotential(pos.getX(), pos.getY());
-    }
-
-    double getPotential(final double x, final double y);
+	double getPotential(final double x, final double y);
 
 	default boolean isHighAccuracy() {
 		return true;

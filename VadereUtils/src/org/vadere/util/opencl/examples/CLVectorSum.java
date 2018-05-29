@@ -8,6 +8,7 @@ import org.lwjgl.opencl.*;
 import org.lwjgl.system.MemoryStack;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.CLInfo;
+import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -67,11 +68,15 @@ public class CLVectorSum {
 
         programCB = CLProgramCallback.create((program, user_data) ->
         {
-            log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+	        try {
+		        log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+	        } catch (OpenCLException e) {
+		        e.printStackTrace();
+	        }
         });
     }
 
-    private void initCL() {
+    private void initCL() throws OpenCLException {
         // helper for the memory allocation in java
         stack = MemoryStack.stackPush();
         errcode_ret = stack.callocInt(1);
@@ -104,7 +109,7 @@ public class CLVectorSum {
         clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
     }
 
-    private void buildProgram() {
+    private void buildProgram() throws OpenCLException {
         PointerBuffer strings = BufferUtils.createPointerBuffer(1);
         PointerBuffer lengths = BufferUtils.createPointerBuffer(1);
 
@@ -185,7 +190,7 @@ public class CLVectorSum {
      *
      * Assumption: There is only one Platform with a GPU.
      */
-    public static void main(String... args) {
+    public static void main(String... args) throws OpenCLException {
         CLVectorSum sum = new CLVectorSum(4);
         sum.initCallbacks();
         sum.initCL();
@@ -196,11 +201,11 @@ public class CLVectorSum {
         sum.clearCL();
     }
 
-    private static void printPlatformInfo(long platform, String param_name, int param) {
+    private static void printPlatformInfo(long platform, String param_name, int param) throws OpenCLException {
         System.out.println("\t" + param_name + " = " + CLInfo.getPlatformInfoStringUTF8(platform, param));
     }
 
-    private static void printDeviceInfo(long device, String param_name, int param) {
+    private static void printDeviceInfo(long device, String param_name, int param) throws OpenCLException {
         System.out.println("\t" + param_name + " = " + CLInfo.getDeviceInfoStringUTF8(device, param));
     }
 

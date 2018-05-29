@@ -6,7 +6,9 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
+
 import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 
 import java.awt.*;
 import java.util.*;
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
  */
 public class EikonalSolverFIM extends AGridEikonalSolver {
 
-	private List<VShape> targetShapes;
+	private final IDistanceFunction distFunc;
 	private List<Point> targetPoints;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFIM.class);
 	private ITimeCostFunction timeCostFunction;
@@ -40,7 +42,7 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 
 	public EikonalSolverFIM(
 			final CellGrid cellGrid,
-			final List<VShape> targetShapes,
+			final IDistanceFunction distFunc,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction,
             final double unknownPenalty,
@@ -49,9 +51,8 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 	    this.cellGrid = cellGrid;
 		this.timeCostFunction = timeCostFunction;
 		this.isHighAccuracy = isHighAccuracy;
-		this.targetShapes = targetShapes;
-		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
-				.collect(Collectors.toList());
+		this.distFunc = distFunc;
+		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target).collect(Collectors.toList());
 		this.activeList = new LinkedList<>();
 		this.epsilon = cellGrid.getResolution() / 100;
 
@@ -71,10 +72,7 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 					if (cellGrid.getValue(neighbor).tag != PathFindingTag.NARROW) {
 						activeList.add(neighbor);
 					}
-					cellGrid.setValue(neighbor, new CellState(targetShapes.stream()
-							.map(shape -> Math.max(0, shape.distance(cellGrid.pointToCoord(neighbor))))
-							.reduce(Double.MAX_VALUE, Math::min), PathFindingTag.NARROW));
-
+					cellGrid.setValue(neighbor, new CellState(Math.max(0, distFunc.apply(cellGrid.pointToCoord(neighbor))), PathFindingTag.NARROW));
 				});
 	}
 

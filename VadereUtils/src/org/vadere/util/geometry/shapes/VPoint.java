@@ -52,6 +52,14 @@ public class VPoint implements Cloneable, IPoint {
 		return distance(other.getX(), other.getY());
 	}
 
+	public double distanceSq(final double x, final double y) {
+		return Point2D.distanceSq(this.x, this.y, x, y);
+	}
+
+	public double distanceSq(final IPoint other) {
+		return Point2D.distanceSq(other.getX(), other.getY(), x, y);
+	}
+
 	@Override
 	public VPoint clone() {
 		return new VPoint(x, y);

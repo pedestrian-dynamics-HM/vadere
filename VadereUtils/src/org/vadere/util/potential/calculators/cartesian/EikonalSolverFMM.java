@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
@@ -29,7 +27,6 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 
 	protected CellGrid cellGrid;
 	protected List<Point> targetPoints;
-	protected List<VShape> targetShapes;
 	protected IDistanceFunction distFunc;
 
 	boolean isHighAccuracy = false;
@@ -37,35 +34,6 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 	/** only for logging */
 	protected static Logger logger = LogManager.getLogger(EikonalSolverFMM.class);
 	protected long runtime = 0;
-
-	/**
-	 * Initializes the FM potential calculator with a time cost function F > 0.
-	 */
-	public EikonalSolverFMM(
-			final CellGrid potentialField,
-			final List<VShape> targetShapes,
-			final boolean isHighAccuracy,
-			final ITimeCostFunction timeCostFunction,
-            final double unknownPenalty,
-            final double weight) {
-	    super(potentialField, unknownPenalty, weight);
-		this.cellGrid = potentialField;
-		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
-				.collect(Collectors.toList());
-		this.targetShapes = targetShapes;
-		this.isHighAccuracy = isHighAccuracy;
-
-		ComparatorPotentialFieldValue comparator = new ComparatorPotentialFieldValue(
-				potentialField);
-		this.narrowBand = new PriorityQueue<Point>(50, comparator);
-		this.timeCostFunction = timeCostFunction;
-
-		if (targetPoints.size() == 0) {
-			logger.error("PotentialFieldInitializerFastMarching::Run(): "
-					+ "Warning, no target points given. Target missing or grid resolution too low.");
-			return;
-		}
-	}
 
     /**
      * Initializes the FM potential calculator with a time cost function F > 0.
@@ -79,14 +47,10 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
             final double weight) {
         super(potentialField, unknownPenalty, weight);
         this.cellGrid = potentialField;
-        this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
-                .collect(Collectors.toList());
+        this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target).collect(Collectors.toList());
         this.distFunc = distFunc;
         this.isHighAccuracy = isHighAccuracy;
-
-        ComparatorPotentialFieldValue comparator = new ComparatorPotentialFieldValue(
-                potentialField);
-        this.narrowBand = new PriorityQueue<>(50, comparator);
+        this.narrowBand = new PriorityQueue<>(50, new ComparatorPotentialFieldValue(potentialField));
         this.timeCostFunction = timeCostFunction;
 
         if (targetPoints.size() == 0) {
@@ -181,7 +145,6 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 		double distance;
 
 		for (Point neighbor : neighbors) {
-
 			if (cellGrid.isValidPoint(neighbor)) {
 				if (cellGrid.getValue(neighbor).tag == PathFindingTag.Undefined) {
 					distance = computeGodunovDifference(neighbor, cellGrid);
@@ -206,40 +169,12 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 
 		for (Point neighbor : neighbors) {
 			if (cellGrid.getValue(neighbor).tag == PathFindingTag.Undefined) {
-
-				cellGrid.setValue(
-						neighbor,
-						new CellState(minDistanceToTarget(cellGrid.pointToCoord(neighbor)) / timeCostFunction.costAt(cellGrid.pointToCoord(neighbor)),
-								PathFindingTag.Reachable));
+				double distance = Math.max(0, -distFunc.apply(cellGrid.pointToCoord(neighbor)));
+				double timeCost = timeCostFunction.costAt(cellGrid.pointToCoord(neighbor));
+				double potential = distance / timeCost;
+				cellGrid.setValue(neighbor, new CellState(potential, PathFindingTag.Reachable));
 				narrowBand.add(neighbor);
 			}
 		}
-	}
-
-	private double minDistanceToTarget(final VPoint point) {
-		double minDistance = Double.MAX_VALUE;
-		double tmp;
-		// create point that lies in the center of the grid cells so that the distances can be
-		// computed starting there.
-		VPoint dp = new VPoint(cellGrid.getWidth() / (cellGrid.getNumPointsX() - 1) / 2.0,
-				cellGrid.getHeight() / (cellGrid.getNumPointsY() - 1) / 2.0);
-
-		if(targetShapes != null && !targetShapes.isEmpty()) {
-            for (VShape targetShape : targetShapes) {
-                // negative distances are possible when point is inside the target
-                tmp = Math.max(0, targetShape.distance(point.add(dp)));
-                if (tmp < minDistance) {
-                    minDistance = tmp;
-                }
-            }
-        }
-        else if(distFunc != null) {
-            tmp = Math.max(0, -distFunc.apply(point));
-            if (tmp < minDistance) {
-                minDistance = tmp;
-            }
-        }
-
-		return minDistance;
 	}
 }

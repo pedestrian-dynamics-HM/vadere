@@ -2,6 +2,7 @@ package org.vadere.simulator.models.queuing;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.models.potential.fields.DistanceFunctionTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
@@ -13,6 +14,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElementAddListener;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
@@ -21,7 +23,10 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
+import org.vadere.util.potential.FloorDiscretizer;
+import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
+import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -77,10 +82,27 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 		Rectangle2D bounds = topography.getBounds();
 		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), 0.1, new CellState());
 
-		List<VShape> targetShapes =
-				topography.getTargets().stream().map(t -> t.getShape()).collect(Collectors.toList());
+		List<VShape> targetShapes = topography.getTargets().stream().map(t -> t.getShape()).collect(Collectors.toList());
         AttributesFloorField attributesFloorField = new AttributesFloorField();
-		this.detector = new QueueDetector(cellGrid, targetShapes, true, new UnitTimeCostFunction(),
+
+		for (VShape shape : targetShapes) {
+			FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
+					new CellState(0.0, PathFindingTag.Target));
+		}
+
+		for (Obstacle obstacle : topography.getObstacles()) {
+			FloorDiscretizer.setGridValuesForShapeCentered(
+					cellGrid, obstacle.getShape(),
+					new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
+		}
+
+		/**
+		 * The distance function returns values < 0 if the point is inside the domain,
+		 * i.e. outside of any obstacle and values > 0 if the point lies inside an obstacle.
+		 */
+		IDistanceFunction distFunc = new DistanceFunctionTarget(cellGrid, targetShapes);
+
+        this.detector = new QueueDetector(cellGrid, distFunc, true, new UnitTimeCostFunction(),
 				attributesPedestrian, topography,
                 attributesFloorField.getTargetAttractionStrength(), attributesFloorField.getObstacleGridPenalty());
 		this.queues = topography.getTargets().stream().map(t -> t.getId()).distinct()

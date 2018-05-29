@@ -1,31 +1,36 @@
 package org.vadere.simulator.models.potential;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 
-	private final AttributesPotentialOSM attributes;
+	private AttributesPotentialOSM attributes;
 	private Collection<Obstacle> obstacles;
+	private Topography topography;
 
-	public PotentialFieldObstacleOSM(
-			AttributesPotentialOSM attributesDynamicPotentialOSM,
-			Collection<Obstacle> obstacles) {
-		this.attributes = attributesDynamicPotentialOSM;
-		this.obstacles = obstacles;
+	public PotentialFieldObstacleOSM() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		AttributesPotentialOSM attributesPotentialOSM = Model.findAttributes(attributesList, AttributesPotentialOSM.class);
+		this.attributes = attributesPotentialOSM;
+		this.topography = topography;
+		this.obstacles = new ArrayList<>(topography.getObstacles());
 	}
 
 	@Override
@@ -33,11 +38,13 @@ public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 
 		double potential = 0;
 		double repulsion = 0;
-		for (Obstacle obstacle : obstacles) {
+		//for (Obstacle obstacle : obstacles) {
+
+			double distance = topography.distanceToObstacle(pos) - pedestrian.getRadius();
 
 			// Shapes of pedestrians are assumed to be circles.
-			double distance = obstacle.getShape().distance(pos)
-					- pedestrian.getRadius();
+			/*double distance = obstacle.getShape().distance(pos)
+					- pedestrian.getRadius();*/
 
 			if (distance <= 0) {
 				repulsion = attributes.getObstacleBodyPotential();
@@ -50,12 +57,10 @@ public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 						* attributes.getObstacleRepulsionStrength();
 			}
 
-			// TODO [priority=medium] [task=bugfix] [Error?]: shouldn't the potential of all obstacles be added instead of taking the maximum? see paper 'Natural discretization...'
-			// TODO [priority=medium] [task=feature] If this algorithm is chosen: first generate distance, choose closest, and then generate potential.
 			if (repulsion > potential) {
 				potential = repulsion;
 			}
-		}
+		//}
 
 		return potential;
 	}
@@ -121,12 +126,10 @@ public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 
 	@Override
 	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleOSM(attributes, new LinkedList<>(obstacles));
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
+		PotentialFieldObstacleOSM potentialFieldObstacleOSM = new PotentialFieldObstacleOSM();
+		potentialFieldObstacleOSM.attributes = attributes;
+		potentialFieldObstacleOSM.topography = topography;
+		potentialFieldObstacleOSM.obstacles = topography.getObstacles();
+		return potentialFieldObstacleOSM;
 	}
 }

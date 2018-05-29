@@ -17,7 +17,7 @@ public class OutputFileTableModel extends VadereTableModelSorted<File> {
 	@Override
 	public void init(final VadereProject project) {
 		super.init(project);
-		List<File> outputFileNames = IOOutput.listAllOutputDirs(project);
+		List<File> outputFileNames = project.getProjectOutput().getAllOutputDirs();
 		setColumnCount(1);
 		setRowCount(0);
 		outputFileNames.forEach(p -> insertValue(p));

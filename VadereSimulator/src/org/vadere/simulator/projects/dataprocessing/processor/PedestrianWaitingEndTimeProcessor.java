@@ -5,50 +5,51 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * @author Mario Teixeira Parente
- *
  */
 
 public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
-    private VRectangle waitingArea;
+	private VRectangle waitingArea;
 
-    public PedestrianWaitingEndTimeProcessor() {
-        super("waitingEndTime");
-    }
+	public PedestrianWaitingEndTimeProcessor() {
+		super("waitingEndTime");
+		setAttributes(new AttributesPedestrianWaitingEndTimeProcessor());
+	}
 
-    @Override
-    protected void doUpdate(final SimulationState state) {
-        Map<Integer, VPoint> pedPosMap = state.getPedestrianPositionMap();
+	@Override
+	protected void doUpdate(final SimulationState state) {
+		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
+		for (Pedestrian p : peds) {
+			int pedId = p.getId();
+			VPoint pos = p.getPosition();
 
-        for (Map.Entry<Integer, VPoint> entry : pedPosMap.entrySet()) {
-            int pedId = entry.getKey();
-            VPoint pos = entry.getValue();
+			if (this.waitingArea.contains(pos)) {
+				PedestrianIdKey key = new PedestrianIdKey(pedId);
+				this.putValue(key, state.getSimTimeInSec());
+			}
+		}
+	}
 
-            if (this.waitingArea.contains(pos)) {
-                PedestrianIdKey key = new PedestrianIdKey(pedId);
-                this.putValue(key, state.getSimTimeInSec());
-            }
-        }
-    }
+	@Override
+	public void init(final ProcessorManager manager) {
+		super.init(manager);
+		AttributesPedestrianWaitingEndTimeProcessor att = (AttributesPedestrianWaitingEndTimeProcessor) this.getAttributes();
+		this.waitingArea = att.getWaitingArea();
+	}
 
-    @Override
-    public void init(final ProcessorManager manager) {
-        AttributesPedestrianWaitingEndTimeProcessor att = (AttributesPedestrianWaitingEndTimeProcessor) this.getAttributes();
-        this.waitingArea = att.getWaitingArea();
-    }
+	@Override
+	public AttributesProcessor getAttributes() {
+		if (super.getAttributes() == null) {
+			setAttributes(new AttributesPedestrianWaitingEndTimeProcessor());
+		}
 
-    @Override
-    public AttributesProcessor getAttributes() {
-        if(super.getAttributes() == null) {
-            setAttributes(new AttributesPedestrianWaitingEndTimeProcessor());
-        }
-
-        return super.getAttributes();
-    }
+		return super.getAttributes();
+	}
 }

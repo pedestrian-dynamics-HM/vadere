@@ -17,15 +17,18 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 	@Override
 	public void mousePressed(final MouseEvent event) {
 		panelModel.setMousePosition(event.getPoint());
-
 		if (SwingUtilities.isMiddleMouseButton(event)) {
 			super.mousePressed(event);
 		} else {
 			panelModel.setStartSelectionPoint(event.getPoint());
-			panelModel
-					.setSelectionShape(new VRectangle(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
-							0.0001 * panelModel.getScaleFactor(), 0.0001 * panelModel.getScaleFactor()));
-			panelModel.showSelection();
+
+			// Set default dimension of selection shape to current GridResolution.
+			// If mouse is dragged smaller selection shapes are still possible.
+			double width = panelModel.getGridResolution();
+			double height = width;
+			VRectangle shape = new VRectangle(panelModel.getMousePosition().x,
+					panelModel.getMousePosition().y, width, height);
+			panelModel.setSelectionShape(shape);
 		}
 		panelModel.notifyObservers();
 	}
@@ -39,6 +42,7 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 	@Override
 	public void mouseDragged(MouseEvent event) {
 		panelModel.setMousePosition(event.getPoint());
+		panelModel.showSelection();
 
 		if (SwingUtilities.isMiddleMouseButton(event)) {
 			super.mouseDragged(event);

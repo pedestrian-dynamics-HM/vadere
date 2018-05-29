@@ -8,18 +8,40 @@ import org.vadere.state.attributes.Attributes;
  */
 public class AttributesPotentialOSM extends Attributes {
 
+	// seitz-2012 u_p = 1000
 	private double pedestrianBodyPotential = 1000;
+
+	// seitz-2012 h_p = 1.0
 	private double pedestrianRepulsionWidth = 1.0;
+
+	// seitz-2012 v_p = 0.4
 	private double pedestrianRepulsionStrength = 0.4;
+
+	// seitz-2012 a_p = 1.0
 	private double aPedOSM = 3.5;
+
+	// seitz-2012 b_p = 0.2
 	private double bPedOSM = 0.6;
+
+	//
 	private double pedestrianRecognitionDistance = 1.5;
+
+	//
 	private double personalDensityFactor = 1.2;
 
+	// seitz-2012 u_o = 10000
 	private double obstacleBodyPotential = 10000;
+
+	// seitz-2012 h_o = 6.0
 	private double obstacleRepulsionWidth = 6;
+
+	// seitz-2012 v_o = 0.2
 	private double obstacleRepulsionStrength = 0.2;
+
+	// seitz-2012 a_o = 3.0
 	private double aObsOSM = 3.5;
+
+	// seitz-2012 b_0 = 2.0
 	private double bObsOSM = 0.2;
 
 	// Getters...

@@ -27,7 +27,7 @@ public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianId
 	
 	@Override
 	public void init(ProcessorManager manager) {
-		// No initialization needed		
+		super.init(manager);
 	}
 	
 	@Override

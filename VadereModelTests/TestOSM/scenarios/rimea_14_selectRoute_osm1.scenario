@@ -10,14 +10,15 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
-        "pedPotentialWidth" : 0.5,
-        "pedPotentialHeight" : 12.6,
-        "obstPotentialWidth" : 0.25,
-        "obstPotentialHeight" : 20.1,
-        "useHardBodyShell" : false,
-        "obstDistanceDeviation" : 0.0,
-        "visionFieldRadius" : 5.0
+      "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
+        "pedPotentialIntimateSpaceWidth" : 0.45,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialHeight" : 50.0,
+        "obstPotentialWidth" : 0.8,
+        "obstPotentialHeight" : 6.0,
+        "intimateSpaceFactor" : 1.2,
+        "personalSpacePower" : 1,
+        "intimateSpacePower" : 1
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
@@ -34,8 +35,8 @@
         "seeSmallWalls" : false,
         "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
-        "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",
-        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
+        "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
+        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
         "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
@@ -90,15 +91,6 @@
         "id" : -1
       }, {
         "shape" : {
-          "x" : 7.0,
-          "y" : 30.0,
-          "width" : 18.2,
-          "height" : 4.5,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
           "x" : 0.4,
           "y" : 0.5,
           "width" : 24.8,
@@ -130,6 +122,15 @@
           "y" : 18.8,
           "width" : 0.1,
           "height" : 0.1,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 7.0,
+          "y" : 30.0,
+          "width" : 18.2,
+          "height" : 4.5,
           "type" : "RECTANGLE"
         },
         "id" : -1

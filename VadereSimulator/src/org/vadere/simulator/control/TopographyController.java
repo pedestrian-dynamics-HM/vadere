@@ -68,4 +68,8 @@ public class TopographyController extends OfflineTopographyController {
 	public void update(double simTimeInSec) {
 		recomputeCells();
 	}
+
+	public void postLoop(double simTimeInSec) {
+		topography.reset();
+	}
 }

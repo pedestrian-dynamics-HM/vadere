@@ -206,10 +206,10 @@ public class CellGrid {
 			y = yMin;
 		}
 		if (y > getHeight() + yMin) {
-			y = yMin+getHeight();
+			y = yMin + getHeight();
 		}
 		if (x > getWidth() + xMin) {
-			x = getWidth() + xMin;
+			x = xMin + getWidth();
 		}
 		return new Point((int) ((x - xMin) / resolution + 0.5),
 				(int) ((y - yMin) / resolution + 0.5));
@@ -227,11 +227,10 @@ public class CellGrid {
             y = yMin;
         }
         if (y > getHeight() + yMin) {
-            y = yMin+getHeight();
+            y = yMin + getHeight();
         }
         if (x > getWidth() + xMin) {
-            x = getWidth() + xMin;
-        }
+            x = xMin + getWidth();        }
 		return new Point((int) ((x - xMin) / resolution), (int) ((y - yMin) / resolution));
 	}
 
@@ -309,13 +308,16 @@ public class CellGrid {
 	public double getMinY() { return yMin; }
 
 	public boolean isValidPoint(Point point) {
-		Point p = (point);
+		return isValidPoint(point.x, point.y);
+	}
 
-		if ((p.x < 0) || (p.x >= numPointsX)) {
+	public boolean isValidPoint(final int x, final int y) {
+
+		if ((x < 0) || (x >= numPointsX)) {
 			return false;
 		}
 
-		if ((p.y < 0) || (p.y >= numPointsY)) {
+		if ((y < 0) || (y >= numPointsY)) {
 			return false;
 		}
 		return true;

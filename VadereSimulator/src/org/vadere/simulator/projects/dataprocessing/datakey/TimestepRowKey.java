@@ -1,12 +1,14 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepRowOutputFile;
 
 /**
  * @author Mario Teixeira Parente
  *
  */
 
+@OutputFileMap(outputFileClass = TimestepRowOutputFile.class)
 public class TimestepRowKey implements DataKey<TimestepRowKey> {
     private int timeStep;
     private int row;

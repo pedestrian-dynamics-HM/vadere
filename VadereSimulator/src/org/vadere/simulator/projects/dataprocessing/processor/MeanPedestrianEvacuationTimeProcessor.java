@@ -11,47 +11,49 @@ import java.util.stream.Collectors;
 
 /**
  * @author Mario Teixeira Parente
- *
  */
 
 public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
-    private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
+	private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 
-    public MeanPedestrianEvacuationTimeProcessor() {
-        super("meanEvacuationTime");
-    }
+	public MeanPedestrianEvacuationTimeProcessor() {
+		super("meanEvacuationTime");
+		setAttributes(new AttributesMeanPedestrianEvacuationTimeProcessor());
+	}
 
-    @Override
-    protected void doUpdate(final SimulationState state) {
-        // No implementation needed, look at 'postLoop(SimulationState)'
-    }
+	@Override
+	protected void doUpdate(final SimulationState state) {
+		//ensure that all required DataProcessors are updated.
+		this.pedEvacTimeProc.doUpdate(state);
+	}
 
-    @Override
-    public void init(final ProcessorManager manager) {
-        AttributesMeanPedestrianEvacuationTimeProcessor att = (AttributesMeanPedestrianEvacuationTimeProcessor) this.getAttributes();
-        this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
-    }
+	@Override
+	public void init(final ProcessorManager manager) {
+		super.init(manager);
+		AttributesMeanPedestrianEvacuationTimeProcessor att = (AttributesMeanPedestrianEvacuationTimeProcessor) this.getAttributes();
+		this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
+	}
 
-    @Override
-    public void postLoop(final SimulationState state) {
-        this.pedEvacTimeProc.postLoop(state);
+	@Override
+	public void postLoop(final SimulationState state) {
+		this.pedEvacTimeProc.postLoop(state);
 
-        List<Double> nonNans = this.pedEvacTimeProc.getValues().stream()
-                .filter(val -> val != Double.NaN)
-                .collect(Collectors.toList());
-        int count = nonNans.size();
+		List<Double> nonNans = this.pedEvacTimeProc.getValues().stream()
+				.filter(val -> !val.isNaN())
+				.collect(Collectors.toList());
+		int count = nonNans.size();
 
-        this.putValue(NoDataKey.key(), count > 0
-                ? nonNans.stream().reduce(0.0, (val1, val2) -> val1 + val2) / count
-                : Double.NaN);
-    }
+		this.putValue(NoDataKey.key(), count > 0
+				? nonNans.parallelStream().reduce(0.0, (val1, val2) -> val1 + val2) / count
+				: Double.NaN);
+	}
 
-    @Override
-    public AttributesProcessor getAttributes() {
-        if(super.getAttributes() == null) {
-            setAttributes(new AttributesMeanPedestrianEvacuationTimeProcessor());
-        }
+	@Override
+	public AttributesProcessor getAttributes() {
+		if (super.getAttributes() == null) {
+			setAttributes(new AttributesMeanPedestrianEvacuationTimeProcessor());
+		}
 
-        return super.getAttributes();
-    }
+		return super.getAttributes();
+	}
 }

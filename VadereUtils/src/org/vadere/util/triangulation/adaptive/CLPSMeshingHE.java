@@ -8,6 +8,7 @@ import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.opencl.CLDistMeshHE;
+import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.triangulation.improver.IMeshImprover;
 import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
@@ -74,7 +75,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
     /**
      * Start with a uniform refined triangulation
      */
-    public void initialize() {
+    public void initialize() throws OpenCLException {
         log.info("##### (start) compute a uniform refined triangulation #####");
         //UniformRefinementTriangulator uniformRefinementTriangulation = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         //uniformRefinementTriangulation.generate();
@@ -105,16 +106,22 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
 
     @Override
     public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
+		try {
+			if(!initialized) {
+				initialize();
+			}
 
-        if(!initialized) {
-            initialize();
-        }
+			while (!isFinished()) {
+				step();
+			}
 
-        while (!isFinished()) {
-            step();
-        }
-
-        return triangulation;
+			return triangulation;
+		}
+		catch (OpenCLException e) {
+			log.error(e);
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
     }
 
     public boolean isFinished() {
