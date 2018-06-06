@@ -2,12 +2,15 @@ package org.vadere.gui.components.model;
 
 import javax.swing.*;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.state.util.TexGraphGenerator;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
@@ -26,6 +29,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +38,8 @@ import java.util.stream.StreamSupport;
 public abstract class DefaultModel<T extends DefaultConfig> extends Observable implements IDefaultModel<T> {
 	// private static final int BORDER_WIDTH = 20;
 	// private static final int BORDER_HEIGHT = 20;
+
+	private static Logger log = LogManager.getLogger(DefaultModel.class);
 
 	private IMode mouseSelectionMode;
 
@@ -527,9 +533,22 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
 			PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
-					p -> 1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2) * 0.9,
-					0.4,
+					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2), 4.0),
+					0.3,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
+
+			/*PPSMeshing meshImprover = new PPSMeshing(
+					distanceFunc,
+					p -> Math.min(1.0 + Math.max(-distanceFunc.apply(p), 0) * 0.5, 4.0),
+					0.4,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
+
+			/*PPSMeshing meshImprover = new PPSMeshing(
+					distanceFunc,
+					p -> 1.0,
+					1.0,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
+
 
 			triangulation = meshImprover.getTriangulation();
 		//	meshImprover.improve();
@@ -544,6 +563,12 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					setChanged();
 					notifyObservers();
 				}
+				Function<PFace<MeshPoint>, Color> colorFunction = f -> {
+					float grayScale = (float) meshImprover.faceToQuality(f);
+					return new Color(grayScale, grayScale, grayScale);
+				};
+
+				log.info(TexGraphGenerator.toTikz(meshImprover.getMesh(), colorFunction, 1.0f, getTopography()));
 			});
 			t.start();
 		}

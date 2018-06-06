@@ -1,10 +1,10 @@
-package org.vadere.util.geometry;
+package org.vadere.util.geometry.mesh;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PMesh;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
@@ -31,7 +31,7 @@ public class TestMeshManipulations {
 
 	@Before
 	public void setUp() throws Exception {
-		bound = new VRectangle(0, 0, 10, 10);
+		bound = new VRectangle(-1, -1, 12, 12);
 		triangulation = ITriangulation.createVPTriangulation(bound);
 		triangulation.insert(new VPoint(0,0));
 		triangulation.insert(new VPoint(2,0));

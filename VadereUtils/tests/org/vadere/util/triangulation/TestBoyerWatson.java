@@ -134,27 +134,14 @@ public class TestBoyerWatson {
 
 		@Override
 		public boolean equate(final VTriangle a, final VTriangle b) {
-			List<VPoint> aPoints = a.getPoints();
-			List<VPoint> bPoints = b.getPoints();
-			return CollectionUtils.isEqualCollection(aPoints, bPoints, new VPointEquator());
+			Set<VPoint> aPoints = new HashSet<>(a.getPoints());
+			Set<VPoint> bPoints = new HashSet<>(b.getPoints());
+			return aPoints.equals(bPoints);
 		}
 
 		@Override
 		public int hash(VTriangle a) {
 			return 0;
-		}
-	}
-
-	private class VPointEquator implements CollectionUtils.IEquator<VPoint> {
-
-		@Override
-		public boolean equate(final VPoint a, final VPoint b) {
-			return a.equals(b);
-		}
-
-		@Override
-		public int hash(VPoint a) {
-			return a.hashCode();
 		}
 	}
 

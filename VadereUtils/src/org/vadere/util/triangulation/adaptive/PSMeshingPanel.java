@@ -63,10 +63,10 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	public void update(Graphics g) {
     	// TODO clone it!
 		synchronized (mesh) {
-			//faces = mesh.streamHoles().collect(Collectors.toList());
-			faces = mesh.getFacesWithHoles();
+			faces = mesh.clone().getFaces();
+			super.update(g);
 		}
-		super.update(g);
+
 	}
 
 	@Override
@@ -94,15 +94,23 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 
 		for(F face : faces) {
 			try {
-				VPolygon polygon = mesh.toPolygon(face);
+				try {
+					VPolygon polygon = mesh.toPolygon(face);
+					graphics.setColor(colorFunctions.qualityToGrayScale(mesh, face));
+					graphics.setColor(Color.GRAY);
+					graphics.fill(polygon);
+					graphics.draw(polygon);
+					graphics.setColor(Color.RED);
+					graphics.draw(polygon);
+				}
+				catch (NullPointerException ne) {
+					VPolygon polygon = mesh.toPolygon(face);
+				}
+
 				//if(alertPred.test(face)) {
 					//log.info("red triangle");
 
-					graphics.setColor(colorFunctions.qualityToGrayScale(mesh, face));
-					graphics.fill(polygon);
-					graphics.draw(polygon);
-					graphics.setColor(Color.BLACK);
-					graphics.draw(polygon);
+
 					//graphics.setColor(Color.WHITE);
 					//graphics.draw(polygon);
 

@@ -9,6 +9,7 @@ import org.vadere.util.potential.calculators.PotentialPoint;
 public class MeshPoint extends MPoint implements PotentialPoint, Cloneable {
 	private boolean fixPoint;
 	private IPoint velocity;
+	private double absoluteForce;
 	private double maxTraveldistance;
 	private IPoint lastPosition;
 	private double potential;
@@ -44,8 +45,24 @@ public class MeshPoint extends MPoint implements PotentialPoint, Cloneable {
 		this.velocity = this.velocity.subtract(decrease);
 	}
 
+	public double getAbsoluteForce() {
+		return absoluteForce;
+	}
+
+	public void increaseAbsoluteForce(double force) {
+		this.absoluteForce += force;
+	}
+
+	public void decreaseAbsoluteForce(double force) {
+		this.absoluteForce -= force;
+	}
+
 	public void setVelocity(final VPoint velocity) {
 		this.velocity = velocity;
+	}
+
+	public void setAbsoluteForce(double force) {
+		this.absoluteForce = force;
 	}
 
 	public IPoint getVelocity() {

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -31,98 +32,80 @@ public class PerformanceTest {
 
 	private static Logger log = LogManager.getLogger(TestBoyerWatson.class);
 
+	private static List<VPoint> points;
+
+	private static int width = 300;
+
+	private static int height = 300;
+
 	public static void main(String... args) {
 		testPerformanceForDifferentPointLocators();
 	}
 
-	public static void testPerformanceForDifferentPointLocators() {
-		List<VPoint> points = new ArrayList<>();
-		int width = 300;
-		int height = 300;
+	private static void setUp() {
+		points = new ArrayList<>();
+
 		Random r = new Random();
-		assert false;
-		int numberOfPoints = 8000;
+		int numberOfPoints = 500000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}
+	}
 
-		/*Collections.sort(points, (p1, p2) -> {
-			if(p1.getX() > p2.getX()){
-				return -1;
-			}
-			else {
-				return 1;
-			}
-		});*/
-
-
-
-
+	private static void testPointerWalk() {
 		long ms = System.currentTimeMillis();
-		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> pdelaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-		pdelaunayTriangulation.finish();
-		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy and a pointer-based data structure");
+		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunay = ITriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y));
+		delaunay.finish();
+		log.info("runtime of the Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
 
-		ms = System.currentTimeMillis();
-		ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> adelaunayTriangulation = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-		adelaunayTriangulation.finish();
-		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy and a array-based data structure");
+	private static void testPointerJumpAndWalk() {
+		long ms = System.currentTimeMillis();
+		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunay = ITriangulation.createPTriangulation(IPointLocator.Type.JUMP_AND_WALK, points, (x, y) -> new VPoint(x, y));
+		delaunay.finish();
+		log.info("runtime of the Jump & Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
 
-		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(new VRectangle(0,0,width, height));
-		ms = System.currentTimeMillis();
+	private static void testPointerDelaunayHierarchy() {
+		long ms = System.currentTimeMillis();
+		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunay = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+		delaunay.finish();
+		log.info("runtime of the Delaunay-Hierarchy (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
+
+	private static void testArrayDelaunayHierarchy() {
+		long ms = System.currentTimeMillis();
+		ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> delaunay = ITriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+		delaunay.finish();
+		log.info("runtime of the Delaunay-Hierarchy (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
+
+	private static void testSweepline() {
+		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(new VRectangle(0,0, width, height));
+		double ms = System.currentTimeMillis();
 		voronoiDiagram.computeVoronoiDiagram(points);
-		log.info("runtime of the Sweepline for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the vadere-voronoi");
+		log.info("runtime of the Sweepline method, #vertices = " + points.size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
 
-
-		log.info("start checking the delaunay property, this can take some time");
-		/*Collection<VTriangle> triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toList());
-
-		for(VTriangle triangle : triangles) {
-
-			List<VPoint> trianglePoints = triangle.getPoints();
-
-			for(VTriangle t : triangles) {
-				assertTrue(t.getPoints().stream().noneMatch(p -> !trianglePoints.contains(p) && triangle.isInCircumscribedCycle(p)));
-			}
-		}
-		log.info("end checking the delaunay property");*/
-
-		log.info("check vertex adjustment");
-		/*final IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh1 = delaunayTriangulation.getMesh();
-		mesh1.streamEdges().forEach(edge -> assertEquals(mesh1.getVertex(edge), mesh1.getVertex(mesh1.getEdge(mesh1.getVertex(edge)))));*/
-
-		ms = System.currentTimeMillis();
-		//ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
-		//delaunayTriangulation.finish();
-		log.info("runtime of the BowyerWatson for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the delaunay-hierarchy");
-
-		/*log.info("start checking the delaunay property, this can take some time");
-		List<VTriangle> triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toList());
-
-		for(VTriangle triangle : triangles) {
-
-			List<VPoint> trianglePoints = triangle.getPoints();
-
-			for(VTriangle t : triangles) {
-				assertTrue(t.getPoints().stream().noneMatch(p -> !trianglePoints.contains(p) &&
-						triangle.isInCircumscribedCycle(p)));
-			}
-		}
-		log.info("end checking the delaunay property");*/
-
-		log.info("check vertex adjustment");
-		/*final IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh2 = delaunayTriangulation.getMesh();
-		mesh2.streamEdges().forEach(edge -> assertEquals(mesh2.getVertex(edge), mesh2.getVertex(mesh2.getEdge(mesh2.getVertex(edge)))));*/
-
+	private static void testJTSDelaunayBuilder() {
 		GeometryFactory fact = new GeometryFactory();
 		Collection<Coordinate> coords = points.stream().map(p -> new Coordinate(p.getX(), p.getY())).collect(Collectors.toList());
-		ms = System.currentTimeMillis();
+		double ms = System.currentTimeMillis();
 		DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
 		builder.setSites(coords);
 		builder.getTriangles(fact);
-		log.info("runtime of the ? for " + numberOfPoints + " vertices =" + (System.currentTimeMillis() - ms) + " using the JTS-Delaunay-Triangulation");
+		log.info("runtime of the Quad-Tree method (JTS), #vertices = " + points.size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
+
+	public static void testPerformanceForDifferentPointLocators() {
+		setUp();
+		testSweepline();
+		testJTSDelaunayBuilder();
+		testPointerDelaunayHierarchy();
+		testPointerJumpAndWalk();
+		testPointerWalk();
 	}
 
 }

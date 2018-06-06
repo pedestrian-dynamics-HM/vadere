@@ -14,6 +14,7 @@ import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -159,6 +160,31 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         }
     }
 
+	private Optional<F> getStartFace(@NotNull final IPoint endPoint, @NotNull final ITriangulation<P, V, E, F> triangulation) {
+		Collection<V> vertices = triangulation.getMesh().getVertices();
+		int n = vertices.size();
+
+		V result = null;
+		int i = 0;
+		for(V vertex : vertices) {
+			i++;
+			if(result == null || endPoint.distanceSq(vertex) < endPoint.distanceSq(result)) {
+				result = vertex;
+			}
+
+			if(i > Math.sqrt(n)) {
+				break;
+			}
+		}
+
+		if(result == null) {
+			return Optional.empty();
+		}
+		else {
+			return Optional.of(triangulation.getMesh().getFace(result));
+		}
+	}
+
     @Override
     public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {}
 
@@ -233,7 +259,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 
     private int randomLevel() {
         int level = 1;
-        while (random.nextDouble() < 1/alpha && level < maxLevel) {
+        while (random.nextDouble() <= 1/alpha && level < maxLevel) {
             level++;
         }
         return level;
@@ -276,10 +302,10 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             //TODO: SE-Architecture dirty here!
             if(v == null) {
                 if(level == 1) {
-                    face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace());
+                    face = tri.marchRandom2D(point.getX(), point.getY(), getStartFace(point, tri).get());
                 }
                 else {
-                    face = tri.locateFace(point).get();
+                    face = tri.locateFace(point, getStartFace(point, tri).get()).get();
                 }
 
                 v = tri.getMesh().closestVertex(face, point.getX(), point.getY());
@@ -292,10 +318,11 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 
                 //TODO: SE-Architecture dirty here!
                 if(level == 1) {
-                    face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
+                    face = tri.marchRandom2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
                 }
                 else {
                     face = tri.locateFace(point, tri.getMesh().getFace(v)).get();
+
                 }
 
                 //v = tri.locateNearestNeighbour(point, face);
@@ -330,12 +357,14 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 		//log.debug(point);
 		//log.debug(tri.getMesh().getPoint(v));
 
-		face = tri.getMesh().streamFaces(v)
+		face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
+
+		/*face = tri.getMesh().streamFaces(v)
 				.filter(f -> !tri.getMesh().isBorder(f))
 				.filter(f ->
 					tri.contains(point.getX(), point.getY(), f) ||
 					tri.isMember(point.getX(), point.getY(), f, tolerance)
-				).findAny().get();
+				).findAny().get();*/
 
 		//log.debug(point + " is contained in " + tri.getMesh().toPath(face));
 	    faces.addFirst(face);
@@ -401,8 +430,8 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 
 		for(int i = 0; i < hierarchySets.size(); i++) {
 			builder.append("T_["+i+"]:" + hierarchySets.get(i).getMesh().getNumberOfVertices()+"\n");
-			IMesh<P, V, E, F> mesh = hierarchySets.get(i).getMesh();
-			hierarchySets.get(i).getMesh().streamFaces().forEach(f -> builder.append(mesh.toPath(f) + "\n"));
+			//IMesh<P, V, E, F> mesh = hierarchySets.get(i).getMesh();
+			//hierarchySets.get(i).getMesh().streamFaces().forEach(f -> builder.append(mesh.toPath(f) + "\n"));
 		}
 		return builder.toString();
 

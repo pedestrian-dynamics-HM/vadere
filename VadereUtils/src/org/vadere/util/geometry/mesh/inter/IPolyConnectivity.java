@@ -510,10 +510,11 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
      * @return
      */
 	default boolean intersects(final IPoint p1, final IPoint p2, E edge) {
-		VPoint q1 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(edge)));
-		VPoint q2 = getMesh().toPoint(getMesh().getVertex(edge));
-		return GeometryUtils.intersectLine(p1, p2, q1, q2);
+		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
+		V v2 = getMesh().getVertex(edge);
+		return GeometryUtils.intersectLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
 	}
+
 
 	/*default void fill_hole (final V v, final List<E> deletedEdges)
 	{

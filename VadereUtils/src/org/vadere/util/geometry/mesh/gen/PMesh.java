@@ -26,13 +26,13 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	private PFace<P> boundary;
 	private List<PHalfEdge<P>> edges;
 	private IPointConstructor<P> pointConstructor;
-	private Set<PVertex<P>> vertices;
+	private List<PVertex<P>> vertices;
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
 		this.faces = new ArrayList<>();
 		this.holes = new ArrayList<>();
 		this.edges = new ArrayList<>();
-		this.vertices = new HashSet<>();
+		this.vertices = new ArrayList<>();
 		this.boundary = new PFace<>(true);
 		this.pointConstructor = pointConstructor;
 	}
@@ -130,16 +130,19 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public void setTwin(final PHalfEdge<P> halfEdge, final PHalfEdge<P> twin) {
 		halfEdge.setTwin(twin);
+		twin.setTwin(halfEdge);
 	}
 
 	@Override
 	public void setNext(final PHalfEdge<P> halfEdge, final PHalfEdge<P> next) {
 		halfEdge.setNext(next);
+		next.setPrevious(halfEdge);
 	}
 
 	@Override
 	public void setPrev(final PHalfEdge<P> halfEdge, final PHalfEdge<P> prev) {
 		halfEdge.setPrevious(prev);
+		prev.setNext(halfEdge);
 	}
 
 	@Override
@@ -304,7 +307,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public void destroyVertex(@NotNull PVertex<P> vertex) {
-		vertices.remove(vertex);
+		//vertices.remove(vertex);
 		vertex.destroy();
 	}
 
@@ -377,13 +380,18 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 		} catch (UnsupportedOperationException e) {
 			log.warn(e.getMessage());
 		}
-
 	}
 
 	@Override
-	public IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> clone() {
+	public synchronized IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> clone() {
 		try {
-			PMesh<P> cMesh = construct();
+			PMesh<P> clone = (PMesh<P>)super.clone();
+			clone.pointConstructor = pointConstructor;
+			clone.faces = new ArrayList<>();
+			clone.holes = new ArrayList<>();
+			clone.edges = new ArrayList<>();
+			clone.vertices = new ArrayList<>();
+
 			Map<PVertex<P>, PVertex<P>> vertexMap = new HashMap<>();
 			Map<PHalfEdge<P>, PHalfEdge<P>> edgeMap = new HashMap<>();
 			Map<PFace<P>, PFace<P>> faceMap = new HashMap<>();
@@ -391,41 +399,44 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 			// faces are not complete: missing edge
 			for(PVertex<P> v : vertices) {
 				PVertex<P> cV = v.clone();
-				cMesh.insert(cV);
+				clone.vertices.add(cV);
 				vertexMap.put(v, cV);
 			}
 
 			// edges are not complete: missing next, prev, twin, face
 			for(PHalfEdge<P> e : edges) {
-				PHalfEdge<P> eC = e.clone();
-				edgeMap.put(e, eC);
-				e.setEnd(vertexMap.get(e.getEnd()));
-				cMesh.edges.add(eC);
+				PHalfEdge<P> cE = e.clone();
+				edgeMap.put(e, cE);
+				cE.setEnd(vertexMap.get(e.getEnd()));
+				clone.edges.add(cE);
 			}
 
 			// faces are complete
+			clone.boundary = boundary.clone();
+			faceMap.put(boundary, clone.boundary);
+			clone.boundary.setEdge(edgeMap.get(boundary.getEdge()));
 			for(PFace<P> f : faces) {
-				PFace<P> fC = f.clone();
-				faceMap.put(f, fC);
-				f.setEdge(edgeMap.get(f.getEdge()));
+				PFace<P> cF = f.clone();
+				faceMap.put(f, cF);
+				cF.setEdge(edgeMap.get(f.getEdge()));
+				clone.faces.add(cF);
 			}
 
-			for(PVertex<P> cV : cMesh.vertices) {
+			for(PVertex<P> cV : clone.vertices) {
 				cV.setEdge(edgeMap.get(cV.getEdge()));
 				cV.setDown(null);
 			}
 
-			for(PHalfEdge<P> eV : cMesh.edges) {
-				eV.setFace(faceMap.get(eV.getFace()));
-				eV.setNext(edgeMap.get(eV.getNext()));
-				eV.setPrevious(edgeMap.get(eV.getPrevious()));
-				eV.setTwin(edgeMap.get(eV.getTwin()));
+			for(PHalfEdge<P> cE : clone.edges) {
+				cE.setFace(faceMap.get(cE.getFace()));
+				cE.setNext(edgeMap.get(cE.getNext()));
+				cE.setPrevious(edgeMap.get(cE.getPrevious()));
+				cE.setTwin(edgeMap.get(cE.getTwin()));
 			}
 
 			// here we assume that the point-constructor is stateless!
-			cMesh.pointConstructor = pointConstructor;
-			cMesh.boundary = boundary.clone();
-			return cMesh;
+
+			return clone;
 
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError(e.getMessage());

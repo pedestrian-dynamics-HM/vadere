@@ -94,6 +94,12 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	@Override
 	public AHalfEdge<P> getEdge(@NotNull AFace<P> face) {
+		try {
+			edges.get(face.getEdge());
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			edges.get(face.getEdge());
+		}
 		return edges.get(face.getEdge());
 	}
 

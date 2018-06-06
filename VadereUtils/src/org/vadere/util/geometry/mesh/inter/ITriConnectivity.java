@@ -562,6 +562,138 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return splitTriangle(face, p, true);
 	}
 
+	default void removeEdge(@NotNull final E edge, @NotNull final V vertex, final boolean deleteIsolatededVertex) {
+		E halfEdge = edge;
+		if(!getMesh().getVertex(halfEdge).equals(vertex)) {
+			halfEdge = getMesh().getTwin(halfEdge);
+		}
+
+		if(!getMesh().getVertex(halfEdge).equals(vertex)) {
+			throw new IllegalArgumentException(halfEdge + " does not end in " + vertex + ".");
+		}
+
+		removeEdge(edge);
+		removeVertex(vertex, deleteIsolatededVertex);
+
+	}
+
+	default void removeVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+		assert getMesh().degree(vertex) == 2;
+
+		E survivor = getMesh().getEdge(vertex);
+		E next = getMesh().getNext(survivor);
+
+		E twin = getMesh().getTwin(survivor);
+		E twinPrev = getMesh().getPrev(twin);
+		getMesh().setNext(survivor, getMesh().getNext(next));
+		getMesh().setPrev(twin, getMesh().getPrev(twinPrev));
+
+		getMesh().setEdge(getMesh().getFace(survivor), survivor);
+		getMesh().setEdge(getMesh().getFace(twin), twin);
+
+		getMesh().setVertex(survivor, getMesh().getVertex(next));
+
+		getMesh().setEdge(getMesh().getVertex(next), survivor);
+		//getMesh().setEdge(getMesh().getVertex(twinPrev), twinPrev);
+
+		getMesh().destroyEdge(twinPrev);
+		getMesh().destroyEdge(next);
+
+		if(deleteIsolatededVertex) {
+			getMesh().destroyVertex(vertex);
+		}
+	}
+
+
+	/**
+	 * This method collapses a three degree vertex which is at the boundary by removing the
+	 * one edge which is not at the boundary and by merging the two other edges which are at the
+	 * boundary i.e. two triangles will become one and the vertex will be deleted.
+	 *
+	 * @param vertex a 3 degree vertex at the boundary which will be deleted.
+	 */
+	default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
+		assert getMesh().degree(vertex) == 3;
+		E toDeleteEdege = getMesh().streamEdges(vertex).filter(e -> !getMesh().isAtBoundary(e)).findAny().get();
+		assert getMesh().streamEdges(vertex).filter(e -> getMesh().isAtBoundary(e)).count() == 2;
+		removeEdge(toDeleteEdege, vertex, removeIsolatedVertex);
+	}
+
+	/*default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
+		assert getMesh().degree(vertex) == 3;
+		List<E> edges = getMesh().getEdges(vertex);
+
+		if(edges.stream().filter(e -> getMesh().isAtBoundary(e)).count() != 2) {
+			System.out.println(edges.stream().filter(e -> getMesh().isAtBoundary(e)).count());
+		}
+		assert edges.stream().filter(e -> getMesh().isAtBoundary(e)).count() == 2;
+
+		F boundary = getMesh().streamFaces(vertex).filter(f -> getMesh().isBoundary(f)).findAny().get();
+
+		E e1;
+		E e2;
+		E e3;
+		if(!getMesh().isAtBoundary(edges.get(0))) {
+			e1 = getMesh().isBoundary(edges.get(1)) ? edges.get(1) : edges.get(2);
+			e2 = getMesh().isBoundary(edges.get(1)) ? edges.get(2) : edges.get(1);
+			e3 = edges.get(0);
+		}
+		else if(!getMesh().isAtBoundary(edges.get(1))) {
+			e1 = getMesh().isBoundary(edges.get(0)) ? edges.get(0) : edges.get(2);
+			e2 = getMesh().isBoundary(edges.get(0)) ? edges.get(2) : edges.get(0);
+			e3 = edges.get(1);
+		}
+		else if(!getMesh().isAtBoundary(edges.get(2))) {
+			e1 = getMesh().isBoundary(edges.get(0)) ? edges.get(0) : edges.get(1);
+			e2 = getMesh().isBoundary(edges.get(0)) ? edges.get(1) : edges.get(0);
+			e3 = edges.get(1);
+		}
+		else {
+			throw new IllegalArgumentException("the degree of " + vertex + " is > 3 and/or is is not at the boundary.");
+		}
+		E twinE3 = getMesh().getTwin(e3);
+		E twinE2 = getMesh().getTwin(e2);
+
+		// 1. adjust faces
+		getMesh().setFace(getMesh().getPrev(e2), getMesh().getFace(e3));
+
+		// if
+		getMesh().setEdge(getMesh().getFace(e3), getMesh().getPrev(e3));
+
+		// if
+		getMesh().setEdge(boundary, e1);
+
+		getMesh().destroyFace(getMesh().getFace(getMesh().getTwin(e3)));
+
+		// 2. adjust vertex relation
+		getMesh().setVertex(e1, getMesh().getVertex(getMesh().getNext(e1)));
+
+
+		// 3. adjust connectivity
+		getMesh().setNext(e1, getMesh().getNext(getMesh().getTwin(e2)));
+		getMesh().setPrev(getMesh().getNext(getMesh().getTwin(e2)), e1);
+
+		getMesh().setPrev(getMesh().getTwin(e1), getMesh().getPrev(e2));
+		getMesh().setNext(getMesh().getPrev(e2), getMesh().getTwin(e1));
+
+		getMesh().setNext(getMesh().getPrev(e3), getMesh().getNext(getMesh().getTwin(e3)));
+		getMesh().setPrev(getMesh().getNext(getMesh().getTwin(e3)), getMesh().getPrev(e3));
+
+		// if
+		getMesh().setVertex(e1, getMesh().getVertex(twinE2));
+		getMesh().setEdge(getMesh().getVertex(twinE2), e1);
+
+		getMesh().destroyFace(getMesh().getFace(e2));
+		getMesh().destroyEdge(e3);
+		getMesh().destroyEdge(twinE3);
+		getMesh().destroyEdge(e2);
+		getMesh().destroyEdge(twinE2);
+
+		if(removeIsolatedVertex) {
+			getMesh().destroyVertex(vertex);
+		}
+	}*/
+
 	/**
 	 * Legalizes an edge xy of a triangle xyz if it is illegal by flipping it.
 	 * Mesh changing method.
@@ -695,7 +827,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			return marchLocate1D(x, y, startFace);
 		}
 		else {
-			return Optional.of(straightWalk2D(x, y, startFace));
+			return Optional.of(marchRandom2D(x, y, startFace));
 		}
 	}
 
@@ -842,14 +974,34 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @return
 	 */
 	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition, LinkedList<F> visitedFaces) {
-		List<E> intersectionEdges = getMesh().streamEdges(face).filter(e -> intersects(q, p, e)).collect(Collectors.toList());
+		E e1 = null;
+		E e2 = null;
+
+		for(E e : getMesh().getEdgeIt(face)) {
+			boolean intersect = intersects(q, p, e);
+
+			if(intersect && e1 == null) {
+				e1 = e;
+			}
+			else if(intersect) {
+				e2 = e;
+			}
+		}
 
 		/**
 		 * General case (1): The line defined by (q,p) intersects 2 edges of the convex polygon.
 		 */
-		if(intersectionEdges.size() == 2) {
+		if(e2 != null) {
 			//log.debug("straight walk: general case");
-			return intersectionEdges.stream().filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
+			if(!stopCondition.test(e1)) {
+				return Optional.of(getMesh().getTwinFace(e1));
+			}
+			else if(!stopCondition.test(e2)) {
+				return Optional.of(getMesh().getTwinFace(e2));
+			}
+			else {
+				return Optional.empty();
+			}
 		}
 		/**
 		 * Special case (2): There is one or two points of the polygon which are collinear with the line defined by (q,p).
@@ -859,9 +1011,9 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			/**
 			 * Good case (2.1): There is only one collinear point and the exit edge of the polygon exist.
 			 */
-			if(intersectionEdges.stream().filter(e -> !stopCondition.test(e)).count() >= 1) {
+			if(!stopCondition.test(e1) && !stopCondition.test(e2)) {
 				//log.debug("straight walk: only one intersection line");
-				return intersectionEdges.stream().filter(e -> !stopCondition.test(e)).map(f -> getMesh().getTwinFace(f)).findAny();
+				return Optional.of(getMesh().getTwinFace(e1));
 			}
 			// q, the exit point and p are collinear :( or the point lies inside the face :)
 			else {
@@ -906,7 +1058,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
         do {
 
-        	if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
+        	/*if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
 		        DebugGui.showAndWait(WalkCanvas.getDefault(
 				        getMesh(),
 				        q,
@@ -914,7 +1066,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				        startFace,
 				        startEdge,
 				        visitedFaces));
-	        }
+	        }*/
 
 
 

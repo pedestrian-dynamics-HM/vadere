@@ -1,4 +1,4 @@
-package org.vadere.util.geometry;
+package org.vadere.util.geometry.mesh;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +58,6 @@ public class TestAFace {
         mesh.setNext(yz, zx);
 
         mesh.setEdge(face1, xy);
-
 
         // second triangle yxw
         face2 = mesh.createFace();

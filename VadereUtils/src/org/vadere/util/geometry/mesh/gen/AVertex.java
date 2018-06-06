@@ -55,19 +55,6 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 	    return id;
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == null) {
-			return false;
-		}
-
-		if(obj.getClass() != this.getClass()) {
-			return false;
-		}
-
-		return point.equals(((AVertex<P>)obj).getPoint());
-	}
-
 	/**
 	 * This method should only be called by the garbage collector in AMesh.
 	 * @param id
@@ -99,7 +86,17 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 		return id+"";
 	}
 
-    @Override
+	@Override
+	public double distanceSq(IPoint other) {
+		return point.distanceSq(other);
+	}
+
+	@Override
+	public double distanceSq(double x, double y) {
+		return point.distanceSq(x, y);
+	}
+
+	@Override
     public AVertex<P> clone() {
         try {
             AVertex<P> clone = (AVertex<P>)super.clone();

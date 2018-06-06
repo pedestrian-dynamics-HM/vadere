@@ -180,14 +180,14 @@ public class MeshPlotsSmall {
 				bbox, obstacles,
 				supplier);
 
-		StopWatch overAllTime = new StopWatch();
+		/*StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
-		overAllTime.stop();
+		overAllTime.stop();*/
 
 		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
 		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
-		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		//log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
@@ -195,6 +195,20 @@ public class MeshPlotsSmall {
 		frame.setVisible(true);
 		frame.setTitle("uniformRect()");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		distmeshPanel.repaint();
+
+		StopWatch overAllTime = new StopWatch();
+		while (!meshGenerator.isFinished()) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			meshGenerator.improve();
+			distmeshPanel.repaint();
+		}
+
 		distmeshPanel.repaint();
 
 		System.out.println();
@@ -296,8 +310,8 @@ public class MeshPlotsSmall {
 		//adaptiveRing(0.2);
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
-		uniformRing();
-		//uniformRect();
+		//uniformRing();
+		uniformRect();
 		//uniformHex();
 		//adaptiveRing(initialEdgeLength / 2.0);
 	}

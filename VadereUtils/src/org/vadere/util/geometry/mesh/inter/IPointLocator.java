@@ -25,6 +25,7 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 	enum Type {
 		DELAUNAY_TREE,
 		DELAUNAY_HIERARCHY,
+		JUMP_AND_WALK,
 		BASE
 	}
 }

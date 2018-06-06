@@ -18,6 +18,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.math.MathUtil;
 
 import static org.vadere.util.geometry.GeometryUtils.Orientation.CCW;
 import static org.vadere.util.geometry.GeometryUtils.Orientation.COLLINEAR;
@@ -300,6 +301,13 @@ public class GeometryUtils {
 		double ccw2 = ccw(p, q, p2);
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
+
+	public static boolean intersectLine(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
+		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
+		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
+		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
+	}
+
 
 	public static VPoint getIncenter(final IPoint p1, final IPoint p2, final IPoint p3) {
 		double a = p1.distance(p2);
@@ -598,7 +606,6 @@ public class GeometryUtils {
 	}
 
 	public static <P extends IPoint> VRectangle bound(final Collection<P> points) {
-
 		if(points.isEmpty()) {
 			throw new IllegalArgumentException("the point collection is empty.");
 		}

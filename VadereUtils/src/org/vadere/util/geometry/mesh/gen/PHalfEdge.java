@@ -102,23 +102,14 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 
 	void setTwin(final PHalfEdge twin) {
 		this.twin = twin;
-		if(twin != null && twin.getTwin() != this) {
-			twin.setTwin(this);
-		}
 	}
 
 	void setPrevious(final PHalfEdge<P> previous) {
 		this.previous = previous;
-		if(previous != null && previous.getNext() != this) {
-			previous.setNext(this);
-		}
 	}
 
 	void setNext(final PHalfEdge<P> next) {
 		this.next = next;
-		if(next != null && next.getPrevious() != this) {
-			next.setPrevious(this);
-		}
 	}
 
 	void setEnd(PVertex<P> end) {

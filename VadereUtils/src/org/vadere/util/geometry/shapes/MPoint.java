@@ -125,7 +125,17 @@ public class MPoint implements IPoint, Cloneable{
         return point.distance(x, y);
     }
 
-    @Override
+	@Override
+	public double distanceSq(IPoint other) {
+		return point.distanceSq(other);
+	}
+
+	@Override
+	public double distanceSq(double x, double y) {
+		return point.distanceSq(x, y);
+	}
+
+	@Override
     public double distanceToOrigin() {
         return this.point.distanceToOrigin();
     }

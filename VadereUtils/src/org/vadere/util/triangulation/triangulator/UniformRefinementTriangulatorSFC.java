@@ -241,7 +241,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			step();
 		}
 
-		nextSFCLevel(0.4);
+		nextSFCLevel(0.8);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;

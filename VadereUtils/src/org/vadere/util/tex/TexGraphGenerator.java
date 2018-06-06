@@ -17,6 +17,13 @@ import java.util.stream.Collectors;
 
 public class TexGraphGenerator {
 
+	/**
+	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling.
+	 *
+	 * @param mesh      the mesh
+	 * @param scaling   the scaling of the tikz graphics
+	 * @return a string representing a tikz graphics
+	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
 			@NotNull final IMesh<P, V, E, F> mesh, final float scaling){
 		StringBuilder builder = new StringBuilder();
@@ -39,15 +46,30 @@ public class TexGraphGenerator {
 		return builder.toString();
 	}
 
+	/**
+	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling.
+	 *
+	 * @param mesh  the mesh
+	 * @return a string representing a tikz graphics
+	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
 			@NotNull final IMesh<P, V, E, F> mesh){
 		return toTikz(mesh, 1.0f);
 	}
 
+	/**
+	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face
+	 * of the mesh is filled by the color defined by the coloring-function.
+	 *
+	 * @param mesh      the mesh
+	 * @param coloring  the coloring function
+	 * @param scaling   the scaling of the tikz graphics
+	 * @return a string representing a tikz graphics
+	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
-	final float scaling) {
+			final float scaling) {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
@@ -71,6 +93,13 @@ public class TexGraphGenerator {
 		return builder.toString();
 	}
 
+	/**
+	 * Transforms a list of faces into a tikz string.
+	 *
+	 * @param mesh  the mesh which used to access components of each face
+	 * @param faces the list of faces
+	 * @return a string representing a tikz graphics
+	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final List<F> faces) {

@@ -93,11 +93,6 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 			renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
 		}
 
-		if(model.isTriangulationVisible()) {
-			model.startTriangulation();
-			renderTriangulation(graphics, model.getTriangles());
-		}
-
 		renderSimulationContent(graphics);
 
 		if (model.isElementSelected()) {
@@ -107,6 +102,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		if (model.isSelectionVisible()) {
 			renderSelectionShape(graphics);
 		}
+
+		if(model.isTriangulationVisible()) {
+			model.startTriangulation();
+			renderTriangulation(graphics, model.getTriangles());
+		}
+
 
 		if (hasLogo() && model.config.isShowLogo()) {
 			renderLogo(graphics, model.getScaleFactor(), height);

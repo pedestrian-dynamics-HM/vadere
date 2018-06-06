@@ -28,6 +28,10 @@ public interface IPoint extends Cloneable {
 
 	double distance(double x, double y);
 
+	double distanceSq(IPoint other);
+
+	double distanceSq(double x, double y);
+
 	double distanceToOrigin();
 
 	default double crossProduct(IPoint point) {

@@ -223,6 +223,9 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				}
 				pointLocator = new DelaunayHierarchy<>(this, supplier);
 				break;
+			case JUMP_AND_WALK:
+				pointLocator = new JumpAndWalk<>(this);
+				break;
 			default: pointLocator = new BasePointLocator<>(this);
 		}
 	}
@@ -340,9 +343,20 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		}
 	}
 
+	private boolean contains(@NotNull P point) {
+		double x = point.getX();
+		double y = point.getY();
+		double x0 = bound.getMinX();
+		double y0 = bound.getMinY();
+		return (x >= x0 &&
+				y >= y0 &&
+				x <= x0 + bound.getWidth() &&
+				y <= y0 + bound.getHeight());
+	}
+
 	@Override
 	public E insert(P point) {
-		if(bound.contains(point)) {
+		if(contains(point)) {
 			F face = this.pointLocator.locatePoint(point, true);
 			return insert(point, face);
 		}

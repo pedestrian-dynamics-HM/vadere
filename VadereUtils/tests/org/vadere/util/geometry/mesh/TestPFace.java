@@ -1,4 +1,4 @@
-package org.vadere.util.geometry;
+package org.vadere.util.geometry.mesh;
 
 import org.junit.Before;
 import org.junit.Test;

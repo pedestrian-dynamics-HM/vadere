@@ -46,19 +46,6 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		this.down = down;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == null) {
-			return false;
-		}
-
-		if(obj.getClass() != this.getClass()) {
-			return false;
-		}
-
-		return point.equals(((PVertex<P>)obj).getPoint());
-	}
-
 	public boolean isDestroyed() {
 		return destroyed;
 	}
@@ -72,17 +59,23 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 	}
 
 	@Override
-	public int hashCode() {
-		return point.hashCode();
-	}
-
-	@Override
 	public String toString() {
 		return point.toString();
 	}
 
 
 	// TODO: make it protected since it is a non-deep copy. Therefore the IVertex should maybe not be a IPoint!?
+
+	@Override
+	public double distanceSq(IPoint other) {
+		return point.distanceSq(other);
+	}
+
+	@Override
+	public double distanceSq(double x, double y) {
+		return point.distanceSq(x, y);
+	}
+
 	/**
 	 * Non-deep cloning.
 	 *

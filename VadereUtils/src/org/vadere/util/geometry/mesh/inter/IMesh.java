@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.mesh.inter;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -75,7 +76,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	default VPoint toPoint(@NotNull V vertex) {
-		return new VPoint(new VPoint(vertex));
+		return new VPoint(vertex);
 	}
 
 	default VPoint toPoint(@NotNull E edge) {
@@ -89,6 +90,10 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	P getPoint(@NotNull E halfEdge);
 
 	V getVertex(@NotNull E halfEdge);
+
+	default int degree(@NotNull V vertex) {
+		return Iterators.size(getAdjacentVertexIt(vertex).iterator());
+	}
 
 	// TODO: this is for the delaunay-hierarchy only!
 	V getDown(@NotNull V vertex);
