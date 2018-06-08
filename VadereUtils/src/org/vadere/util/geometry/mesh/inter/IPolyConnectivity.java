@@ -629,19 +629,19 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
             List<V> vertices = new ArrayList<>();
 
             // we only need the boundary if the face isNeighbourBorder
-            F boundary = getMesh().getBorder();
+            F border = getMesh().getBorder();
 
             int count = 0;
             for(E edge : getMesh().getEdgeIt(face)) {
 				F twinFace = getMesh().getTwinFace(edge);
                 count++;
-                if(twinFace.equals(boundary)) {
+                if(twinFace.equals(border)) {
                     delEdges.add(edge);
                 }
                 else {
                     // update the edge of the boundary since it might be deleted!
-                    getMesh().setEdge(boundary, edge);
-                    getMesh().setFace(edge, boundary);
+                    getMesh().setEdge(border, edge);
+                    getMesh().setFace(edge, border);
                 }
 
                 vertices.add(getMesh().getVertex(edge));
@@ -651,7 +651,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
             //TODO: this might be computational expensive!
             // special case: all edges will be deleted => adjust the border edge
             E borderEdge = null;
-            if(getMesh().getTwinFace(getMesh().getEdge(boundary)) == face && delEdges.size() == count) {
+            if(getMesh().getTwinFace(getMesh().getEdge(border)) == face && delEdges.size() == count) {
 
                 // all edges are border edges!
                 borderEdge = getMesh().getTwin(getMesh().getEdge(face));
@@ -665,12 +665,13 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                 }
 
                 if(getMesh().getTwinFace(borderEdge) == face) {
-                    borderEdge = getMesh().streamEdges().filter(e -> getMesh().getTwinFace(e) != face).filter(e -> getMesh().isBoundary(e)).findAny().get();
+                  System.out.print("test");
+                    borderEdge = getMesh().streamEdges().filter(e -> getMesh().getTwinFace(e) != face).filter(e -> getMesh().isBorder(e)).findAny().get();
                     //throw new IllegalArgumentException("could not adjust border edge! Deletion of " + face + " is not allowed.");
                 }
 
-                getMesh().setFace(borderEdge, boundary);
-                getMesh().setEdge(boundary, borderEdge);
+                getMesh().setFace(borderEdge, border);
+                getMesh().setEdge(border, borderEdge);
             }
 
             if(!delEdges.isEmpty()) {

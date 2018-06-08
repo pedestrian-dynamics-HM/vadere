@@ -22,6 +22,7 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.adaptive.PSDistmesh;
 import org.vadere.util.triangulation.improver.PPSMeshing;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -79,7 +80,9 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	public ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
+	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
+
+	private Collection<VTriangle> triangles;
 
 	protected boolean triangulationTriggered = false;
 
@@ -578,6 +581,51 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		if(triangulation == null) {
 			return Collections.EMPTY_LIST;
 		}
-		return triangulation.streamTriangles().collect(Collectors.toList());
+		synchronized (triangulation.getMesh()) {
+			return triangulation.streamTriangles().collect(Collectors.toList());
+		}
 	}
+
+	/*public void startTriangulation() {
+		if(!triangulationTriggered) {
+			triangulationTriggered = true;
+			VRectangle bound = new VRectangle(getTopographyBound());
+			Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
+			obstacles.addAll(getTopography().getObstacles());
+
+			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
+
+			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+			PSDistmesh meshImprover = new PSDistmesh(
+					distanceFunc,
+					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2), 4.0),
+					0.3,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
+
+
+			triangles = meshImprover.getTriangles();
+			//	meshImprover.improve();
+			Thread t = new Thread(() -> {
+				while(!meshImprover.isFinished()) {
+					meshImprover.improve();
+					setChanged();
+					notifyObservers();
+				}
+				Function<VTriangle, Color> colorFunction = f -> {
+					float grayScale = (float) meshImprover.getQuality(f);
+					return new Color(grayScale, grayScale, grayScale);
+				};
+
+				log.info(TexGraphGenerator.toTikz(meshImprover.getTriangles(), colorFunction, 1.0f, getTopography()));
+			});
+			t.start();
+		}
+	}
+
+	public Collection<VTriangle> getTriangles() {
+		if(triangles == null) {
+			return Collections.EMPTY_LIST;
+		}
+		return triangles;
+	}*/
 }

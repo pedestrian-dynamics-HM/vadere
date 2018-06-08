@@ -606,6 +606,10 @@ public class GeometryUtils {
 	}
 
 	public static <P extends IPoint> VRectangle bound(final Collection<P> points) {
+		return bound(points, 0.0);
+	}
+
+	public static <P extends IPoint> VRectangle bound(final Collection<P> points, final double epilon) {
 		if(points.isEmpty()) {
 			throw new IllegalArgumentException("the point collection is empty.");
 		}
@@ -613,8 +617,9 @@ public class GeometryUtils {
 		VPoint pMax = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()))).get();
 		VPoint pMin = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()))).get();
 
-		return new VRectangle(pMin.getX(), pMin.getY(), pMax.getX() - pMin.getX(), pMax.getY() - pMin.getY());
+		return new VRectangle(pMin.getX()-epilon, pMin.getY()-epilon, pMax.getX() - pMin.getX() + 2*epilon, pMax.getY() - pMin.getY() + 2*epilon);
 	}
+
 
 	/**
 	 * This method follows the construction from

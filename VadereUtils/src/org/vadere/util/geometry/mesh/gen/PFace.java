@@ -17,7 +17,7 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 */
 	private PHalfEdge<P> edge;
 
-	private boolean border;
+	private boolean boundary;
 
 	private boolean destroyed = false;
 
@@ -31,8 +31,8 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 		this(edge, false);
 	}
 
-	protected PFace(@NotNull final PHalfEdge<P> edge, boolean border) {
-		this.border = border;
+	protected PFace(@NotNull final PHalfEdge<P> edge, boolean boundary) {
+		this.boundary = boundary;
 		this.edge = edge;
 	}
 
@@ -40,16 +40,16 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 * This constructor can be used for constructing a new face without having
 	 * constructed the bordering half-edges jet.
 	 */
-	PFace(boolean border) {
-		this.border = border;
+	PFace(boolean boundary) {
+		this.boundary = boundary;
 	}
 
 	PFace() {
-		this.border = false;
+		this.boundary = false;
 	}
 
-	boolean isBorder() {
-		return border;
+	boolean isBoundary() {
+		return boundary;
 	}
 
 	void destroy() {
@@ -58,7 +58,7 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	}
 
 	public void setBoundary(boolean border) {
-		this.border = border;
+		this.boundary = border;
 	}
 
 	/**

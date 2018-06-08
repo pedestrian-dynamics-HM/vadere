@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.util.debug.gui.DebugGui;
 import org.vadere.util.debug.gui.canvas.SimpleTriCanvas;
 import org.vadere.util.debug.gui.canvas.WalkCanvas;
+import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -827,7 +828,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			return marchLocate1D(x, y, startFace);
 		}
 		else {
-			return Optional.of(marchRandom2D(x, y, startFace));
+			return Optional.of(straightWalk2D(x, y, startFace));
 		}
 	}
 
@@ -1011,7 +1012,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			/**
 			 * Good case (2.1): There is only one collinear point and the exit edge of the polygon exist.
 			 */
-			if(!stopCondition.test(e1) && !stopCondition.test(e2)) {
+			if(e1 != null && !stopCondition.test(e1)) {
 				//log.debug("straight walk: only one intersection line");
 				return Optional.of(getMesh().getTwinFace(e1));
 			}
@@ -1593,5 +1594,20 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		else {
 			return Optional.empty();
 		}
+	}
+
+	/**
+	 * Returns true if and only if this the mesh of this ITriConnectivity is a valid Triangulation.
+	 * @return true if this the mesh of this ITriConnectivity is a valid Triangulation, false otherwise
+	 */
+	default boolean isValid() {
+		Predicate<F> orientationPredicate = f -> {
+			E edge = getMesh().getEdge(f);
+			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
+			P p2 = getMesh().getPoint(edge);
+			P p3 = getMesh().getPoint(getMesh().getNext(edge));
+			return GeometryUtils.isLeftOf(p1, p2, p3);
+		};
+		return getMesh().streamFaces(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
 	}
 }

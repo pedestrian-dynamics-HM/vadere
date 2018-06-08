@@ -29,12 +29,17 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	private List<PVertex<P>> vertices;
 
 	public PMesh(final IPointConstructor<P> pointConstructor) {
+		clear();
+		this.pointConstructor = pointConstructor;
+	}
+
+	@Override
+	public void clear() {
 		this.faces = new ArrayList<>();
 		this.holes = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new ArrayList<>();
 		this.boundary = new PFace<>(true);
-		this.pointConstructor = pointConstructor;
 	}
 
 	@Override
@@ -43,17 +48,17 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public PHalfEdge<P> getNext(final PHalfEdge<P> halfEdge) {
+	public PHalfEdge<P> getNext(@NotNull final PHalfEdge<P> halfEdge) {
 		return halfEdge.getNext();
 	}
 
 	@Override
-	public PHalfEdge<P> getPrev(final PHalfEdge<P> halfEdge) {
+	public PHalfEdge<P> getPrev(@NotNull final PHalfEdge<P> halfEdge) {
 		return halfEdge.getPrevious();
 	}
 
 	@Override
-	public PHalfEdge<P> getTwin(final PHalfEdge<P> halfEdge) {
+	public PHalfEdge<P> getTwin(@NotNull final PHalfEdge<P> halfEdge) {
 		return halfEdge.getTwin();
 	}
 
@@ -99,7 +104,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public boolean isBoundary(@NotNull PFace<P> face) {
-		return face.isBorder();
+		return face.isBoundary();
 	}
 
 	@Override
@@ -128,13 +133,13 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public void setTwin(final PHalfEdge<P> halfEdge, final PHalfEdge<P> twin) {
+	public void setTwin(@NotNull final PHalfEdge<P> halfEdge, @NotNull final PHalfEdge<P> twin) {
 		halfEdge.setTwin(twin);
 		twin.setTwin(halfEdge);
 	}
 
 	@Override
-	public void setNext(final PHalfEdge<P> halfEdge, final PHalfEdge<P> next) {
+	public void setNext(@NotNull final PHalfEdge<P> halfEdge, @NotNull final PHalfEdge<P> next) {
 		halfEdge.setNext(next);
 		next.setPrevious(halfEdge);
 	}
@@ -336,7 +341,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public List<PFace<P>> getFaces() {
-		return streamFaces().filter(face -> !face.isBorder()).filter(face -> !face.isDestroyed()).collect(Collectors.toList());
+		return streamFaces().filter(face -> !face.isBoundary()).filter(face -> !face.isDestroyed()).collect(Collectors.toList());
 	}
 
 	@Override

@@ -49,13 +49,14 @@ import static org.vadere.util.geometry.mesh.inter.IPointLocator.Type.DELAUNAY_TR
 public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, V, E, F> {
 
 	protected Collection<P> points;
-	private final VRectangle bound;
+	private VRectangle bound;
 	private boolean finalized = false;
 	private IMesh<P, V, E, F> mesh;
 	private IPointLocator<P, V, E, F> pointLocator;
 	private boolean initialized;
 	private List<V> virtualVertices;
 	private boolean useMeshForBound;
+	private IPointLocator.Type type;
 
 	private static double BUFFER_PERCENTAGE = 0.0001;
 
@@ -86,12 +87,12 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			@NotNull final Predicate<E> illegalPredicate) {
 
 		assert mesh.getNumberOfVertices() == 0;
-
+		this.type = type;
 		this.useMeshForBound = false;
 		this.mesh = mesh;
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
-		this.bound = GeometryUtils.bound(points);
+		this.bound = GeometryUtils.bound(points, epsilon);
 		this.finalized = false;
 		this.initialized = false;
 		this.mesh = mesh;
@@ -114,7 +115,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			@NotNull final Predicate<E> illegalPredicate) {
 
 		assert mesh.getNumberOfVertices() == 0;
-
+		this.type = type;
 		this.useMeshForBound = false;
 		this.mesh = mesh;
 		this.points = new HashSet<>();
@@ -154,15 +155,16 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			@NotNull final Predicate<E> illegalPredicate) {
 
 		assert mesh.getNumberOfVertices() >= 3;
-
+		this.type = type;
 		this.useMeshForBound = true;
 		this.mesh = mesh;
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
-		this.bound = GeometryUtils.bound(mesh.getPoints(mesh.getBorder()));
+		this.bound = GeometryUtils.bound(mesh.getPoints(mesh.getBorder()), epsilon);
 		this.initialized = false;
 		this.finalized = false;
-		this.virtualVertices = new ArrayList<>(mesh.getVertices());
+		this.virtualVertices = new ArrayList<>();
+		this.virtualVertices.addAll(mesh.getVertices());
 		this.setPointLocator(type);
 	}
 
@@ -302,8 +304,13 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
     @Override
     public void recompute() {
+	    virtualVertices = new ArrayList<>();
         initialized = false;
         finalized = false;
+        points = mesh.getPoints();
+	    bound = GeometryUtils.bound(points, epsilon);
+        mesh.clear();
+	    setPointLocator(type);
         compute();
     }
 

@@ -313,6 +313,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return streamFaces(f -> true);
 	}
 
+	void clear();
+
 	/**
 	 * Returns a Stream of holes.
 	 *

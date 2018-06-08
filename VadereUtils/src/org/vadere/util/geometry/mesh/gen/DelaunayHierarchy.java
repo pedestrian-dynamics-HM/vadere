@@ -302,7 +302,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             //TODO: SE-Architecture dirty here!
             if(v == null) {
                 if(level == 1) {
-                    face = tri.marchRandom2D(point.getX(), point.getY(), getStartFace(point, tri).get());
+                    face = tri.straightWalk2D(point.getX(), point.getY(), getStartFace(point, tri).get());
                 }
                 else {
                     face = tri.locateFace(point, getStartFace(point, tri).get()).get();
@@ -318,7 +318,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 
                 //TODO: SE-Architecture dirty here!
                 if(level == 1) {
-                    face = tri.marchRandom2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
+                    face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
                 }
                 else {
                     face = tri.locateFace(point, tri.getMesh().getFace(v)).get();
@@ -360,7 +360,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 		face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
 
 		/*face = tri.getMesh().streamFaces(v)
-				.filter(f -> !tri.getMesh().isBorder(f))
+				.filter(f -> !tri.getMesh().isBoundary(f))
 				.filter(f ->
 					tri.contains(point.getX(), point.getY(), f) ||
 					tri.isMember(point.getX(), point.getY(), f, tolerance)

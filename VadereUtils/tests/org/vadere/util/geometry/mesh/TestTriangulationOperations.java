@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
@@ -32,12 +31,16 @@ public class TestTriangulationOperations {
 	private VPTriangulation triangulation;
 	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
 	private VPoint collapsePoint = new VPoint(0.5, 0);
-	private List<VPoint> points = new ArrayList<>(Arrays.asList(new VPoint(0, 0), collapsePoint, new VPoint(1, 0), new VPoint(0.5, 1)));
+	private List<VPoint> points = new ArrayList<>();
 	private VRectangle bound = new VRectangle(-0.5, -0.5, 2.0, 2.0);
 
 	@Before
 	public void setUp() throws Exception {
 		triangulation = ITriangulation.createVPTriangulation(bound);
+		points.add(new VPoint(0,0));
+		points.add(collapsePoint);
+		points.add(new VPoint(1, 0));
+		points.add(new VPoint(0.5, 1));
 		triangulation.insert(points);
 		triangulation.finish();
 		mesh = triangulation.getMesh();
@@ -73,5 +76,15 @@ public class TestTriangulationOperations {
 
 		points.remove(collapsePoint);
 		assertTrue(new HashSet<>(points).equals(new HashSet<>(mesh.getPoints())));
+	}
+
+	@Test
+	public void testIsValid() {
+		assertTrue(triangulation.isValid());
+	}
+
+	@Test
+	public void testRecompute() {
+		triangulation.recompute();
 	}
 }

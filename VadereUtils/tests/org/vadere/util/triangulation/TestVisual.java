@@ -56,7 +56,7 @@ public class TestVisual {
 		Set<VPoint> points = new HashSet<>();
 
 		Random r = new Random();
-		for(int i=0; i< 100000; i++) {
+		for(int i=0; i< 20; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
 		}

@@ -114,14 +114,22 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	@Override
     public void improve() {
 		synchronized (getMesh()) {
-			illegalMovement = false;
-			flipEdges();
-			//retriangulate();
 			computeScalingFactor();
 			computeVertexForces();
 			updateVertices();
-			removeTrianglesInsideObstacles();
+
+			if(triangulation.isValid()) {
+				flipEdges();
+				removeTrianglesInsideHoles();
+			}
+			else {
+				log.info("EikMesh re-triangulates.");
+				retriangulate();
+				removeTrianglesInsideObstacles();
+			}
+
 			removeBoundaryLowQualityTriangles();
+
 			nSteps++;
 			//log.info("quality: " + getQuality());
 			//log.info("min-quality: " + getMinQuality());
@@ -140,9 +148,9 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-//        removeBoundaryLowQualityTriangles();
+  //      removeBoundaryLowQualityTriangles();
         triangulation.recompute();
-        removeTrianglesInsideObstacles();
+        //removeTrianglesInsideObstacles();
     }
 
 	/*public void execute() {
@@ -237,12 +245,12 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			}
 
 			// 3. remove unnecessary points
-		    if(isAtBoundary && getMesh().degree(vertex) == 3) {
+		   /*if(isAtBoundary && getMesh().degree(vertex) == 3) {
 				double force = getVelocity(vertex).distanceToOrigin();
 				if(point.getAbsoluteForce() > 0 && point.getVelocity().distanceToOrigin() / point.getAbsoluteForce() < 0.3) {
 					triangulation.collapseAtBoundary(vertex, true);
 				}
-		    }
+		    }*/
 		}
 
 	    point.setVelocity(new VPoint(0,0));
@@ -461,11 +469,20 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
 	}*/
 
-	private void removeTrianglesInsideObstacles() {
+	private void removeTrianglesInsideHoles() {
 		List<F> holes = triangulation.getMesh().getHoles();
 		Predicate<F> mergeCondition = f -> !triangulation.getMesh().isBoundary(f) && distanceFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0;
 		for(F face : holes) {
 			triangulation.mergeFaces(face, mergeCondition, true);
+		}
+	}
+
+	private void removeTrianglesInsideObstacles() {
+		List<F> faces = triangulation.getMesh().getFaces();
+		for(F face : faces) {
+			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
+				triangulation.createHole(face, f -> distanceFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+			}
 		}
 	}
 
@@ -493,6 +510,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		Predicate<F> mergeCondition = f -> !triangulation.getMesh().isDestroyed(f)
 				&& !triangulation.getMesh().isBoundary(f)
 				&& triangulation.getMesh().isAtBorder(f)
+				&& -distanceFunc.apply(triangulation.getMesh().toTriangle(f).getIncenter()) < initialEdgeLen
 				&& faceToQuality(f) < Parameters.MIN_QUALITY_TRIANGLE;
 		for(F face : holes) {
 			List<F> neighbouringFaces = getMesh().streamEdges(face).map(e -> getMesh().getTwinFace(e)).collect(Collectors.toList());

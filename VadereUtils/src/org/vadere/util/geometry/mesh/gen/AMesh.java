@@ -36,12 +36,17 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	private List<AVertex<P>> vertices;
 
 	public AMesh(final IPointConstructor<P> pointConstructor) {
+		clear();
+		this.pointConstructor = pointConstructor;
+	}
+
+	@Override
+	public void clear() {
 		this.faces = new ArrayList<>();
 		this.holes = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new ArrayList<>();
 		this.boundary = new AFace<>(-1, true);
-		this.pointConstructor = pointConstructor;
 		this.elementRemoved = false;
 		this.numberOfFaces = 0;
 		this.numberOfEdges = 0;

@@ -22,11 +22,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Created by bzoennchen on 06.03.18.
+ * @author Benedikt Zoennchen
  */
 public class PerformanceTest {
 
@@ -46,7 +45,7 @@ public class PerformanceTest {
 		points = new ArrayList<>();
 
 		Random r = new Random();
-		int numberOfPoints = 500000;
+		int numberOfPoints = 50000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());

@@ -85,16 +85,14 @@ public class PSDistmesh {
 		}
 	}
 
-	public boolean hasConverged() {
-		double test = getQuality();
+	public boolean isFinished() {
 		//log.debug("quality: " + test);
-		return test > Parameters.qualityMeasurement;
+		return maxMovementLen > Parameters.DPTOL && !hasMaximalSteps();
 	}
 
 	public boolean hasMaximalSteps() {
 		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
 	}
-
 
 	private void reTriangulate() {
 		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
@@ -160,6 +158,10 @@ public class PSDistmesh {
 			//log.debug("#edges: " + lines.size());
 			//log.debug("#points: " + points.size());
 		}
+	}
+
+	public void improve() {
+		step();
 	}
 
 	/*

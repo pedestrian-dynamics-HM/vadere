@@ -82,7 +82,7 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 	}
 
 	boolean isBoundary() {
-		return face.isBorder();
+		return face.isBoundary();
 	}
 
 	/**
