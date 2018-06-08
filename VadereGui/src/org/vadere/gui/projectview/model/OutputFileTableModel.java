@@ -3,6 +3,7 @@ package org.vadere.gui.projectview.model;
 import java.io.File;
 import java.util.List;
 
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOOutput;
 
@@ -11,7 +12,7 @@ public class OutputFileTableModel extends VadereTableModelSorted<File> {
 	private static final long serialVersionUID = 134253986682827818L;
 
 	OutputFileTableModel() {
-		super(new String[] {"Output files"}, 0, (f1, f2) -> f1.getName().compareTo(f2.getName()));
+		super(new String[] {Messages.getString("ProjectView.OutputTable.label")}, 0, (f1, f2) -> f1.getName().compareTo(f2.getName()));
 	}
 
 	@Override

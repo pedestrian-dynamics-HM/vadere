@@ -182,7 +182,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 		dataProcessingGUIview = new DataProcessingView();
-		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
+		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 
