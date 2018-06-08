@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,6 +66,7 @@ import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
+import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
@@ -81,8 +83,8 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private IJsonView activeJsonView; // gui-mode or expert-mode
 	private JLabel switchJsonViewModeLabel = new JLabel();
 	private JPanel viewPanel; // hosts the gui-panel or the expert-panel
-	private static final String guiViewMode = "gui";
-	private static final String jsonViewMode = "json";
+	private static final String guiViewMode = Messages.getString("ProjectView.gui");
+	private static final String jsonViewMode = Messages.getString("ProjectView.json");
 	private boolean inGuiViewMode = true;
 
 	private Scenario currentScenario;
@@ -113,9 +115,9 @@ class DataProcessingView extends JPanel implements IJsonView {
 	}
 
 	private void switchMode() {
+		String link = MessageFormat.format(Messages.getString("ProjectView.JSONSwitch.link"), (inGuiViewMode ? jsonViewMode : guiViewMode));
 		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='blue'>" +
-				"<u>switch to <b>" + (inGuiViewMode ? jsonViewMode : guiViewMode)
-				+ "</b> mode</u></font></span></html>");
+				link+"</font></span></html>");
 		Preferences.userNodeForPackage(DataProcessingView.class).put("dataProcessingViewMode",
 				inGuiViewMode ? guiViewMode : jsonViewMode);
 		viewPanel.removeAll();
@@ -226,7 +228,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			JPanel filesPanel = new JPanel();
 			filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
-			isTimestampedCheckBox = new JCheckBox("Add timestamp to output folder");
+			isTimestampedCheckBox = new JCheckBox(Messages.getString("DataProcessingView.chbAddTimeStamp"));
 			isTimestampedCheckBox.addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -237,7 +239,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			addEditableComponent(isTimestampedCheckBox);
 			filesPanel.add(isTimestampedCheckBox);
 
-			JButton addFileBtn = new JButton(new AbstractAction("Add") {
+			JButton addFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
@@ -255,11 +257,12 @@ class DataProcessingView extends JPanel implements IJsonView {
 					refreshGUI();
 				}
 			});
-			deleteFileBtn = new JButton(new AbstractAction("Delete") {
+			deleteFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnDelete")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (selectedOutputFile == null) {
-						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No output file selected.");
+						JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
+								Messages.getString("DataProcessingView.msgFileSelected"));
 					} else {
 						currentScenario.getDataProcessingJsonManager().getOutputFiles().remove(selectedOutputFile);
 						selectedOutputFile = null;
@@ -274,18 +277,18 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			setupTables();
 
-			JPanel filesTable = buildPanel("Files", outputFilesTable, addFileBtn, deleteFileBtn);
+			JPanel filesTable = buildPanel(Messages.getString("DataProcessingView.files.label"), outputFilesTable, addFileBtn, deleteFileBtn);
 			filesTable.setAlignmentX(Component.LEFT_ALIGNMENT);
 			filesPanel.add(filesTable);
 			tableSide.add(filesPanel);
 
-			JButton addProcessorBtn = new JButton(new AbstractAction("Add") {
+			JButton addProcessorBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Map<String, Class> processorNameToClass = ClassFinder.getProcessorClassesWithNames();
 					JComboBox processorOptions = new JComboBox<>(processorNameToClass.keySet().toArray());
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
-							"Choose data processor", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							Messages.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						try {
 							DataProcessor newDataProcessor = (DataProcessor) processorNameToClass.get(processorOptions.getSelectedItem()).newInstance();
 							newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
@@ -300,11 +303,11 @@ class DataProcessingView extends JPanel implements IJsonView {
 					refreshGUI();
 				}
 			});
-			deleteProcessorBtn = new JButton(new AbstractAction("Delete") {
+			deleteProcessorBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnDelete")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (selectedDataProcessor == null) {
-						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "No data processor selected.");
+						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), Messages.getString("DataProcessingView.msgFileSelected"));
 					} else {
 						Integer id = selectedDataProcessor.getId();
 						currentScenario.getDataProcessingJsonManager().getDataProcessors().remove(selectedDataProcessor);
@@ -322,7 +325,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					}
 				}
 			});
-			tableSide.add(buildPanel("Processors", dataProcessorsTable, addProcessorBtn, deleteProcessorBtn));
+			tableSide.add(buildPanel(Messages.getString("DataProcessingView.dialogProcessors.label"), dataProcessorsTable, addProcessorBtn, deleteProcessorBtn));
 
 			// right details side
 
@@ -489,7 +492,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 0;
-			panel.add(new JLabel("File name:"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputFileSelection.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 0;
@@ -500,10 +503,10 @@ class DataProcessingView extends JPanel implements IJsonView {
 				if (!oldName.equals(newName)) {
 					String msg = "";
 					if (newName.isEmpty()) {
-						msg = "File name can't be empty";
+						msg = Messages.getString("DataProcessingView.msgFileEmpty");
 					}
 					if (outputFileNameAlreadyExists(newName)) {
-						msg = "File name is already in use";
+						msg = Messages.getString("DataProcessingView.msgFileInUse");
 					}
 					if (msg.isEmpty()) {
 						outputFile.setRelativeFileName(newName);
@@ -512,7 +515,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					} else {
 						nameField.setText(oldName);
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
-								"Invalid file name", JOptionPane.WARNING_MESSAGE);
+								Messages.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
 					}
 				}
 				passFocusOn();
@@ -522,7 +525,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel("Data key:"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputDataKeySelection.label")), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
@@ -549,7 +552,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 2;
-			panel.add(new JLabel("Header:"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputHeaderSelection.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 2;
@@ -557,7 +560,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 3;
-			panel.add(new JLabel("Processors:"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogProcessors.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 3;
@@ -602,7 +605,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel("DataKey:"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputDataKeySelection.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
@@ -611,7 +614,8 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 2;
 			c.gridy = 1;
 			c.anchor = GridBagConstraints.EAST;
-			JLabel jsonInvalidLabel = new JLabel("<html><font color='red'>invalid json</font> <font color=gray size=-2><a href=#>show error</a></font></html>");
+			JLabel jsonInvalidLabel = new JLabel("<html><font color='red'>"+Messages.getString("DataProcessingView.msgInvalidJson")+"</font> <font color=gray size=-2><a href=#>" +
+					Messages.getString("DataProcessingView.msgShowError")+ "</a></font></html>");
 			jsonInvalidLabel.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseReleased(MouseEvent e) {
