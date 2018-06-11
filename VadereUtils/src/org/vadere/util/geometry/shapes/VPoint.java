@@ -158,8 +158,12 @@ public class VPoint implements Cloneable, IPoint {
 
 	@Override
 	public VPoint norm() {
-		double abs = distanceToOrigin();
-		return new VPoint(x / abs, y / abs);
+		return norm(distanceToOrigin());
+	}
+
+	@Override
+	public VPoint norm(double len) {
+		return new VPoint(x / len, y / len);
 	}
 
 	@Override

@@ -240,11 +240,18 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		F delFace = otherFace;
 		F remFace = face;
 
+		if(getMesh().isBoundary(delFace)) {
+			F tmp = delFace;
+			delFace = remFace;
+			remFace = tmp;
+		}
+
 		if(getMesh().isBorder(delFace)) {
 			F tmp = delFace;
 			delFace = remFace;
 			remFace = tmp;
 		}
+
 		final F finalFace = delFace;
 		List<E> toDeleteEdges = getMesh().streamEdges(remFace).filter(e -> getMesh().getTwinFace(e).equals(finalFace)).collect(Collectors.toList());
 		//List<E> survivalEdges = getMesh().streamEdges(remFace).filter(e -> !getMesh().getTwinFace(e).equals(finalFace)).collect(Collectors.toList());
@@ -380,6 +387,73 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		}
 	}
 
+	default void removeEdgeUnsafe(@NotNull final E edge, final boolean deleteIsolatedVertices) {
+		E twin = getMesh().getTwin(edge);
+		E prevEdge = getMesh().getPrev(edge);
+		E prevTwin = getMesh().getPrev(twin);
+		E nextEdge = getMesh().getNext(edge);
+		E nextTwin = getMesh().getNext(twin);
+
+		// remove neighbouring faces
+		/*if(!getMesh().getFace(edge).equals(face)) {
+			removeFace(getMesh().getFace(edge), true);
+		}
+
+		if(!getMesh().getFace(twin).equals(face)) {
+			removeFace(getMesh().getFace(twin), true);
+		}*/
+
+
+		// Link the from-side of the edge
+		// off the model.
+
+		V fromVertex = getMesh().getVertex(twin);
+		E fromEdge = getMesh().getEdge(fromVertex);
+		if(fromEdge.equals(twin)) {
+
+			// isolated edge
+			if(deleteIsolatedVertices && nextTwin.equals(edge)) {
+				getMesh().destroyVertex(fromVertex);
+			}
+			else {
+				getMesh().setEdge(fromVertex, prevEdge);
+			}
+		}
+
+		V toVertex = getMesh().getVertex(edge);
+		E toEdge =  getMesh().getEdge(toVertex);
+		if(toEdge.equals(edge)) {
+
+			// isolated edge
+			if(deleteIsolatedVertices && prevEdge.equals(twin)) {
+				getMesh().destroyVertex(toVertex);
+			}
+			else {
+				getMesh().setEdge(toVertex, prevTwin);
+			}
+		}
+
+		F edgeFace = getMesh().getFace(edge);
+		F twinFace = getMesh().getFace(twin);
+		E edgeFaceEdge = getMesh().getEdge(edgeFace);
+		E twinFaceEdge = getMesh().getEdge(twinFace);
+
+		if(edgeFace.equals(edgeFaceEdge)) {
+			getMesh().setEdge(edgeFace, getMesh().getNext(edge));
+		}
+
+		if(twinFace.equals(twinFaceEdge)) {
+			getMesh().setEdge(twinFace, getMesh().getPrev(twin));
+		}
+
+		getMesh().setNext(prevEdge, nextTwin);
+		getMesh().setNext(prevTwin, nextEdge);
+
+		getMesh().destroyEdge(edge);
+		getMesh().destroyEdge(twin);
+
+	}
+
 	/**
 	 * Removes a simple link. This will be done by merging two faces into one remaining face. One of
 	 * the face will be destroyed and the other one returned.
@@ -438,7 +512,6 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		getMesh().destroyFace(delFace);
 
 		return remFace;
-
 	}
 
 	/*default void remove(final V vertex, final boolean deleteIsolatedVertices) {
@@ -611,6 +684,34 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	}
 
+	default void removeFaceUnsafe(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
+		E start = getMesh().getEdge(face);
+		E edge = start;
+
+		do {
+			edge = getMesh().getNext(edge);
+			E twin = getMesh().getTwin(edge);
+			if(getMesh().isBoundary(twin)) {
+				if(getMesh().isBoundary(edge) && !getMesh().getFace(edge).equals(getMesh().getFace(twin))) {
+
+					for(E faceEdge : getMesh().getEdgeIt(getMesh().getFace(edge))) {
+						getMesh().setFace(faceEdge, getMesh().getFace(twin));
+					}
+					getMesh().destroyFace(getMesh().getFace(edge));
+				}
+				E prev = getMesh().getPrev(edge);
+				removeEdgeUnsafe(edge, deleteIsolatedVertices);
+				edge = getMesh().getNext(prev);
+
+			}
+			else {
+				getMesh().setFace(edge, boundary);
+			}
+		} while (!start.equals(edge));
+
+		getMesh().destroyFace(face);
+	}
+
 
 	/**
 	 * Removes a face from the mesh by removing all border edges of the face.
@@ -649,7 +750,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 
             //TODO: this might be computational expensive!
-            // special case: all edges will be deleted => adjust the border edge
+            // special case: all edges will be deleted && the edge of the border will be deleted as well! => adjust the border edge
             E borderEdge = null;
             if(getMesh().getTwinFace(getMesh().getEdge(border)) == face && delEdges.size() == count) {
 
@@ -665,7 +766,6 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
                 }
 
                 if(getMesh().getTwinFace(borderEdge) == face) {
-                  System.out.print("test");
                     borderEdge = getMesh().streamEdges().filter(e -> getMesh().getTwinFace(e) != face).filter(e -> getMesh().isBorder(e)).findAny().get();
                     //throw new IllegalArgumentException("could not adjust border edge! Deletion of " + face + " is not allowed.");
                 }

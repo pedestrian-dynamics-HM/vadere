@@ -483,7 +483,7 @@ public class PSMeshingOptimized {
 	private void removeLowQualityTriangles() {
 		List<PFace<MeshPoint>> faces = getMesh().getFaces();
 		for(PFace<MeshPoint> face : faces) {
-			if(faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE) {
+			if(faceToQuality(face) < Parameters.MIN_TRIANGLE_QUALITY) {
 				Optional<PHalfEdge<MeshPoint>> optEdge = getMesh().getLinkToBoundary(face);
 				if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
 					PHalfEdge<MeshPoint> edge = getMesh().getNext(optEdge.get());

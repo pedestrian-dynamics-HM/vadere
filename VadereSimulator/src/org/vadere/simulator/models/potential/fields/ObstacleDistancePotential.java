@@ -8,6 +8,7 @@ import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.types.EikonalSolverType;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -76,7 +77,7 @@ public class ObstacleDistancePotential implements IPotentialField {
 	}
 
 	@Override
-	public double getPotential(@NotNull VPoint pos, @Nullable Agent agent) {
+	public double getPotential(@NotNull IPoint pos, @Nullable Agent agent) {
 		return eikonalSolver.getPotential(pos);
 	}
 }

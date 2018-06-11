@@ -1,5 +1,6 @@
 package org.vadere.util.potential.calculators.cartesian;
 
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.CellGrid;
 import java.util.function.Function;
@@ -16,7 +17,7 @@ public abstract class AGridEikonalSolver implements GridEikonalSolver {
 		this.weight = weight;
 	}
 
-    public Function<VPoint, Double> getPotentialField() {
+    public Function<IPoint, Double> getPotentialField() {
         CellGrid clone = potentialField.clone();
         return p -> getPotential(clone, p.getX(), p.getY());
     }

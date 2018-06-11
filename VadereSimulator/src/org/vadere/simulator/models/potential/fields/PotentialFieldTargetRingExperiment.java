@@ -7,6 +7,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.CellGrid;
 
@@ -44,7 +45,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 	 * Afterwards, rate "pos" and check if it lies in the same direction as tangent vector.
 	 */
 	@Override
-	public double getPotential(VPoint pos, Agent ped) {
+	public double getPotential(IPoint pos, Agent ped) {
 		Vector2D pedestrian = new Vector2D(ped.getPosition());
 		Vector2D center = new Vector2D(attributes.getCenter());
 

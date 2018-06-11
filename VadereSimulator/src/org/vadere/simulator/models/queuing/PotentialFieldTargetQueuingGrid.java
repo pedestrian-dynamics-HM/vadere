@@ -19,6 +19,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
@@ -150,7 +151,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	}
 
 	@Override
-	public double getPotential(final VPoint pos, final Agent pedArgument) {
+	public double getPotential(final IPoint pos, final Agent pedArgument) {
 		if (Pedestrian.class.isAssignableFrom(pedArgument.getClass()))
 			throw new IllegalArgumentException("Target grid can only handle type Pedestrian");
 		Pedestrian ped = (Pedestrian) pedArgument;

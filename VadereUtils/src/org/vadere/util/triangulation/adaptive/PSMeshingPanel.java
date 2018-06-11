@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.color.ColorHelper;
 import org.vadere.util.debug.gui.ColorFunctions;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
@@ -73,7 +74,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	public void paint(Graphics g) {
     	// double buffering => draw into an image
 		Graphics2D graphics2D = (Graphics2D) g;
-		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
 
 		graphics.setColor(Color.WHITE);
@@ -82,8 +83,10 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
 		graphics.setFont(newFont);
 		graphics.setColor(Color.GRAY);
+		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
 		graphics.scale(scale, scale);
-		graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
+
+		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
 		graphics.setStroke(new BasicStroke(0.003f));
 		graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -93,46 +96,17 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		ColorHelper colorHelper = new ColorHelper(faces.size());
 
 		for(F face : faces) {
-			try {
-				try {
-					VPolygon polygon = mesh.toPolygon(face);
-					graphics.setColor(colorFunctions.qualityToGrayScale(mesh, face));
-					graphics.setColor(Color.GRAY);
-					graphics.fill(polygon);
-					graphics.draw(polygon);
-					graphics.setColor(Color.RED);
-					graphics.draw(polygon);
-				}
-				catch (NullPointerException ne) {
-					VPolygon polygon = mesh.toPolygon(face);
-				}
-
-				//if(alertPred.test(face)) {
-					//log.info("red triangle");
-
-
-					//graphics.setColor(Color.WHITE);
-					//graphics.draw(polygon);
-
-				//} /*else if(!mesh.isBoundary(face)) {
-					/*if(face instanceof AFace) {
-
-						int bucket = ((AFace)face).getId() / groupSize;
-
-						graphics.setColor(colorHelper.numberToColor(((AFace)face).getId()));
-						graphics.fill(polygon);
-					}
-				}*/
-				/*else {
-					graphics.setColor(Color.BLACK);
-					graphics.draw(polygon);
-				}*/
-
+			VPolygon polygon = mesh.toTriangle(face);
+			if(alertPred.test(face)) {
+				graphics.setColor(Color.RED);
+				graphics.draw(polygon);
 			}
-			catch (ArrayIndexOutOfBoundsException e) {
-				log.error("could not paint a face + " + face);
+			else {
+				graphics.setColor(colorFunctions.qualityToGrayScale(mesh, face));
+				graphics.fill(polygon);
 			}
-
+			graphics.setColor(Color.GRAY);
+			graphics.draw(polygon);
 		}
 
 		graphics2D.drawImage(image, 0, 0, null);

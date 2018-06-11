@@ -2,6 +2,7 @@ package org.vadere.util.potential.calculators;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
@@ -47,9 +48,9 @@ public interface EikonalSolver {
 	 *
 	 * @return a copy of the current solution of the eikonal equation
 	 */
-	Function<VPoint, Double> getPotentialField();
+	Function<IPoint, Double> getPotentialField();
 
-	default double getPotential(final VPoint pos) {
+	default double getPotential(final IPoint pos) {
 		return getPotential(pos.getX(), pos.getY());
 	}
 

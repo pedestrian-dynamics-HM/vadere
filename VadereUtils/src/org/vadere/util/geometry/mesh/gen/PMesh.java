@@ -48,6 +48,13 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public void garbageCollection() {
+		faces = faces.stream().filter(f -> !isDestroyed(f)).collect(Collectors.toList());
+		edges = edges.stream().filter(e -> !isDestroyed(e)).collect(Collectors.toList());
+		vertices = vertices.stream().filter(v -> !isDestroyed(v)).collect(Collectors.toList());
+	}
+
+	@Override
 	public PHalfEdge<P> getNext(@NotNull final PHalfEdge<P> halfEdge) {
 		return halfEdge.getNext();
 	}
@@ -287,16 +294,16 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public void destroyFace(@NotNull PFace<P> face) {
-		faces.remove(face);
+		//faces.remove(face);
 		if(isHole(face)) {
-			holes.remove(face);
+		//	holes.remove(face);
 		}
 		face.destroy();
 	}
 
 	@Override
 	public void destroyEdge(@NotNull PHalfEdge<P> edge) {
-		edges.remove(edge);
+		//edges.remove(edge);
 		edge.destroy();
 	}
 
@@ -365,7 +372,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 	@Override
 	public Stream<PFace<P>> streamHoles() {
-		return holes.stream();
+		return holes.stream().filter(h -> !isDestroyed(h));
 	}
 
 	@Override

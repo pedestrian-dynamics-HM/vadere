@@ -74,7 +74,12 @@ public class MPoint implements IPoint, Cloneable{
         return this;
     }
 
-    @Override
+	@Override
+	public IPoint norm(double len) {
+		return point.norm(len);
+	}
+
+	@Override
     public MPoint normZeroSafe() {
         this.point = this.point.normZeroSafe();
         return this;

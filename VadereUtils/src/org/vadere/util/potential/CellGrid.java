@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
@@ -238,8 +239,8 @@ public class CellGrid {
 	 * Returns the closest grid point (matrix index) to the given coordinates
 	 * towards origin.
 	 */
-	public Point getNearestPointTowardsOrigin(VPoint p) {
-		return getNearestPointTowardsOrigin(p.x, p.y);
+	public Point getNearestPointTowardsOrigin(IPoint p) {
+		return getNearestPointTowardsOrigin(p.getX(), p.getY());
 	}
 
 	public Point getNearestPointTowardsOrigin(Point p) {
@@ -329,7 +330,7 @@ public class CellGrid {
      *
      * @return  a function VPoint (x,y-coordinate) -> Double (potential)
      */
-	public Function<VPoint, Double> getInterpolationFunction() {
+	public Function<IPoint, Double> getInterpolationFunction() {
         return pos -> {
             int incX = 1;
             int incY = 1;
@@ -352,8 +353,8 @@ public class CellGrid {
             double z3 = getValue(new Point(gridPoint.x + incX, gridPoint.y + incY)).potential;
             double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
 
-            double t = (pos.x - gridPointCoord.x) / getResolution();
-            double u = (pos.y - gridPointCoord.y) / getResolution();
+            double t = (pos.getX() - gridPointCoord.x) / getResolution();
+            double u = (pos.getY() - gridPointCoord.y) / getResolution();
 
             return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
         };

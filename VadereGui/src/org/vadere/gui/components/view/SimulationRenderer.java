@@ -8,6 +8,8 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
@@ -17,7 +19,9 @@ import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.util.color.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.scenario.Agent;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
@@ -105,7 +109,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
 		if(model.isTriangulationVisible()) {
 			model.startTriangulation();
-			renderTriangulation(graphics, model.getTriangles());
+			renderTriangulation(graphics, model.getTriangles(), triangle -> {
+				float quality = (float)GeometryUtils.qualityOf(triangle);
+				return GeometryUtils.isValid(triangle) ? new Color(quality, quality, quality) : Color.RED;
+			});
+
+			renderHoles(graphics, model.getHoles());
 		}
 
 
@@ -145,6 +154,26 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		g.setColor(Color.GRAY);
 		g.setStroke(new BasicStroke(getGridLineWidth()));
 		triangleList.stream().forEach(triangle -> g.draw(triangle));
+	}
+
+	protected void renderHoles(final Graphics2D g, final Collection<VPolygon> polygons) {
+		Random random = new Random();
+		g.setStroke(new BasicStroke(getGridLineWidth()));
+		polygons.stream().forEach(polygon -> {
+			g.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+			g.fill(polygon);
+		} );
+	}
+
+	protected void renderTriangulation(final Graphics2D g, final Collection<VTriangle> triangleList, final Function<VTriangle, Color> colorFunction) {
+
+		g.setStroke(new BasicStroke(getGridLineWidth()));
+		triangleList.stream().forEach(triangle -> {
+			g.setColor(Color.DARK_GRAY);
+			g.draw(triangle);
+			g.setColor(colorFunction.apply(triangle));
+			g.fill(triangle);
+		} );
 	}
 
 	private void renderDensity(final Graphics2D g) {

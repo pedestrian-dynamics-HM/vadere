@@ -151,7 +151,7 @@ public class CLPSMeshingHE<P extends MeshPoint> implements IMeshImprover<P, AVer
     private void removeLowQualityTriangles() {
         List<AFace<P>> faces = getMesh().getFaces();
         for(AFace<P> face : faces) {
-            if(faceToQuality(face) < Parameters.MIN_QUALITY_TRIANGLE) {
+            if(faceToQuality(face) < Parameters.MIN_TRIANGLE_QUALITY) {
                 Optional<AHalfEdge<P>> optEdge = getMesh().getLinkToBoundary(face);
                 if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
                     AHalfEdge<P> edge = getMesh().getNext(optEdge.get());

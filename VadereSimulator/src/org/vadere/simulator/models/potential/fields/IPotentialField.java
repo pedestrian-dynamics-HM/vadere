@@ -13,6 +13,7 @@ import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -55,7 +56,7 @@ public interface IPotentialField {
      * @param agent the agent for which the potential will be evaluated
      * @return a potential at pos for the agent
      */
-    double getPotential(final VPoint pos, final Agent agent);
+    double getPotential(final IPoint pos, final Agent agent);
 
 
     Logger logger = LogManager.getLogger(IPotentialField.class);

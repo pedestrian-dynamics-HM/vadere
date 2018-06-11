@@ -137,9 +137,60 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     	return mesh;
     }
 
-    private void nextSFCLevel(double ran) {
+	private void nextSFCLevel() {
 		//System.out.println(curveToTikz());
 		ArrayList<SFCNode<P, V, E ,F>> newCandidates = new ArrayList<>(candidates.size() * 2);
+		Map<E, SFCNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
+
+		ArrayList<E> toRefineEdges = new ArrayList<>();
+		boolean tFinished = true;
+
+		// 1. update CFS before refinement!
+		for(SFCNode<P, V, E ,F> node : candidates) {
+			E edge = node.getEdge();
+			if(!isCompleted(edge)  && isLongestEdge(edge)) {
+				toRefineEdges.add(edge);
+				tFinished = false;
+				SFCDirection dir = node.getDirection();
+				E t1 = getMesh().getNext(edge);
+				E t2 = getMesh().getPrev(edge);
+
+				SFCNode<P, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
+				SFCNode<P, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
+
+				if(dir == SFCDirection.FORWARD) {
+					newCandidates.add(element2);
+					newCandidates.add(element1);
+					sfc.replace(element2, element1, node);
+				}
+				else {
+					newCandidates.add(element1);
+					newCandidates.add(element2);
+					sfc.replace(element1, element2, node);
+				}
+
+				newEdgeToNode.put(t1, element1);
+				newEdgeToNode.put(t2, element2);
+			}
+			else {
+				newEdgeToNode.put(edge, node);
+			}
+		}
+
+		// 2. refine
+		for(E edge : toRefineEdges) {
+			// to avoid 2x split
+			if(validEdge(edge)) {
+				refine(edge);
+			}
+		}
+		finished = tFinished;
+		candidates = newCandidates;
+	}
+
+    private void nextSFCLevel(double ran) {
+		//System.out.println(curveToTikz());
+	    List<SFCNode<P, V, E ,F>> candidates = sfc.asList();
 	    Map<E, SFCNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
 
 	    ArrayList<E> toRefineEdges = new ArrayList<>();
@@ -148,7 +199,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		// 1. update CFS before refinement!
 		for(SFCNode<P, V, E ,F> node : candidates) {
 		    E edge = node.getEdge();
-		    if((!isCompleted(edge) || random.nextDouble() < ran) && isLongestEdge(edge)) {
+		    if((random.nextDouble() < ran) && isLongestEdge(edge)) {
 			    toRefineEdges.add(edge);
 		    	tFinished = false;
 			    SFCDirection dir = node.getDirection();
@@ -159,13 +210,9 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			    SFCNode<P, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
 
 				if(dir == SFCDirection.FORWARD) {
-					newCandidates.add(element2);
-					newCandidates.add(element1);
 					sfc.replace(element2, element1, node);
 				}
 				else {
-					newCandidates.add(element1);
-					newCandidates.add(element2);
 					sfc.replace(element1, element2, node);
 				}
 
@@ -185,7 +232,6 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		    }
 	    }
 		finished = tFinished;
-	    candidates = newCandidates;
     }
 
     private void addToCurve(@NotNull final SFCNode<P, V, E, F> node, @NotNull final ArrayList<SFCNode<P, V, E, F>> sierpinskyCurve, final double ran) {
@@ -212,7 +258,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     }
 
     public void step() {
-		nextSFCLevel(0.0);
+	    nextSFCLevel();
     }
 
 	private boolean validEdge(@NotNull E edge) {
@@ -241,7 +287,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			step();
 		}
 
-		nextSFCLevel(0.8);
+		nextSFCLevel(0.1);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;
@@ -266,6 +312,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	        logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
 
 		    getMesh().arrangeMemory(sierpinksyFaceOrder);
+	        triangulation.getMesh().garbageCollection();
         }
     }
 
@@ -274,7 +321,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     }
 
     private boolean isLongestEdge(E edge) {
-		if(!getMesh().isAtBorder(edge)) {
+		if(!getMesh().isAtBoundary(edge)) {
 			E longestEdge1 = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
 			E longestEdge2 = getMesh().streamEdges(getMesh().getTwinFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
 			return getMesh().isSame(longestEdge1, edge) && getMesh().isSame(longestEdge2, edge);
@@ -290,16 +337,26 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     }
 
 	public void removeTrianglesOutsideBBox() {
-		triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+		List<F> toDeleteFaces = triangulation.streamFaces().filter(f -> getMesh().isDestroyed(f)).filter(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0).collect(Collectors.toList());
+		for(F delFace : toDeleteFaces) {
+			triangulation.removeFaceUnsafe(delFace, getMesh().getBorder(), true);
+		}
+		//triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 	}
 
 	public void removeTrianglesInsideObstacles() {
-		List<F> faces = triangulation.getMesh().getFaces();
+		List<F> toDeleteFaces = triangulation.streamFaces().filter(f -> getMesh().isDestroyed(f)).filter(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0).collect(Collectors.toList());
+		for(F delFace : toDeleteFaces) {
+			F innerBoundary = triangulation.getMesh().createFace(true);
+			triangulation.removeFaceUnsafe(delFace, innerBoundary, true);
+		}
+
+		/*List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
-				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0.01, true);
+				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 			}
-		}
+		}*/
 	}
 
 	/**

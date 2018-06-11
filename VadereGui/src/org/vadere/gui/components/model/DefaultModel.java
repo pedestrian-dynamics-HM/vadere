@@ -16,6 +16,7 @@ import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -534,17 +535,17 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
 
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
-			PPSMeshing meshImprover = new PPSMeshing(
-					distanceFunc,
-					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2), 4.0),
-					0.3,
-					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
-
 			/*PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
-					p -> Math.min(1.0 + Math.max(-distanceFunc.apply(p), 0) * 0.5, 4.0),
-					0.4,
+					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0)*0.8, 2), 6.0),
+					0.3,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
+
+			PPSMeshing meshImprover = new PPSMeshing(
+					distanceFunc,
+					p -> Math.min(1.0 + Math.max(-distanceFunc.apply(p), 0), 5.0),
+					0.5,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
 
 			/*PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
@@ -554,24 +555,29 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 
 			triangulation = meshImprover.getTriangulation();
-		//	meshImprover.improve();
+
 			Thread t = new Thread(() -> {
 				while(!meshImprover.isFinished()) {
 					meshImprover.improve();
 					/*try {
-						Thread.sleep(2000);
+						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}*/
 					setChanged();
 					notifyObservers();
 				}
+				//meshImprover.improve();
 				Function<PFace<MeshPoint>, Color> colorFunction = f -> {
 					float grayScale = (float) meshImprover.faceToQuality(f);
-					return new Color(grayScale, grayScale, grayScale);
+					return triangulation.isValid(f) ? new Color(grayScale, grayScale, grayScale) : Color.RED;
 				};
 
-				log.info(TexGraphGenerator.toTikz(meshImprover.getMesh(), colorFunction, 1.0f, getTopography()));
+				log.info(TexGraphGenerator.toTikz(meshImprover.getMesh(), colorFunction, 1.0f));
+				log.info("number of points = " + meshImprover.getMesh().getVertices().size());
+				log.info("number of triangle = " + meshImprover.getMesh().getFaces().size());
+				log.info("avg-quality = " + meshImprover.getQuality());
+				log.info("min-quality = " + meshImprover.getMinQuality());
 			});
 			t.start();
 		}
@@ -583,6 +589,15 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		}
 		synchronized (triangulation.getMesh()) {
 			return triangulation.streamTriangles().collect(Collectors.toList());
+		}
+	}
+
+	public Collection<VPolygon> getHoles() {
+		if(triangulation == null) {
+			return Collections.EMPTY_LIST;
+		}
+		synchronized (triangulation.getMesh()) {
+			return triangulation.getMesh().streamHoles().map(f -> triangulation.getMesh().toPolygon(f)).collect(Collectors.toList());
 		}
 	}
 

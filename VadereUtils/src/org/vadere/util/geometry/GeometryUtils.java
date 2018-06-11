@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -698,5 +699,25 @@ public class GeometryUtils {
 
 	public static VPoint add(final VPoint p1, final VPoint p2) {
 		return new VPoint(p1.x + p2.x, p1.y + p2.y);
+	}
+
+	public static boolean isValid(@NotNull final VTriangle triangle) {
+		List<VPoint> points = triangle.getPoints();
+		return GeometryUtils.isLeftOf(points.get(0), points.get(1), points.get(2));
+	}
+
+	public static double qualityOf(@NotNull final VTriangle triangle) {
+		VLine[] lines = triangle.getLines();
+		double a = lines[0].length();
+		double b = lines[1].length();
+		double c = lines[2].length();
+		double part = 0.0;
+		if(a != 0.0 && b != 0.0 && c != 0.0) {
+			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+		}
+		else {
+			part = 0.0;
+		}
+		return part;
 	}
 }

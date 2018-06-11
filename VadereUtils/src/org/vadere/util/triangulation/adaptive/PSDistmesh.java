@@ -46,7 +46,7 @@ public class PSDistmesh {
 	private double geps;
 	private double deps;
 	private boolean firstStep = true;
-	private boolean runParallel = true;
+	private boolean runParallel = false;
 	private double maxMovementLen = 0;
 	private boolean hasChanged;
 

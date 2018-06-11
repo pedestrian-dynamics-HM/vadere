@@ -12,6 +12,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.calculators.EikonalSolver;
@@ -74,7 +75,7 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 
 	@Override
 	public IPotentialField getSolution() {
-		Map<Integer, Function<VPoint, Double>> clone = new HashMap<>();
+		Map<Integer, Function<IPoint, Double>> clone = new HashMap<>();
 
 		for(Map.Entry<Integer, EikonalSolver> entry : eikonalSolvers.entrySet()) {
 			Integer targetId = entry.getKey();
@@ -104,7 +105,7 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	 * @return the target potential of the agent at position pos if it exists, 0 otherwise.
 	 */
 	@Override
-	public double getPotential(final VPoint pos, final Agent agent) {
+	public double getPotential(final IPoint pos, final Agent agent) {
 
 		if (!agent.hasNextTarget()) {
 			return 0.0;

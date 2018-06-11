@@ -66,8 +66,8 @@ public abstract class DefaultRenderer {
 
 	public void renderGraphics(final Graphics2D targetGraphics2D, final int width, final int height) {
 		targetGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		targetGraphics2D.setColor(Color.GRAY);
-		targetGraphics2D.fillRect(0, 0, width, height);
+		/*targetGraphics2D.setColor(Color.GRAY);
+		targetGraphics2D.fillRect(0, 0, width, height);*/
 
 		renderPreTransformation(targetGraphics2D, width, height);
 

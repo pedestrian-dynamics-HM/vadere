@@ -56,6 +56,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 */
 	IMesh<P, V, E, F> construct();
 
+	void garbageCollection();
+
 	E getNext(@NotNull E halfEdge);
 	E getPrev(@NotNull E halfEdge);
 	E getTwin(@NotNull E halfEdge);
@@ -137,8 +139,12 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param vertex
 	 * @return
 	 */
-	default boolean isAtBoundary(@NotNull V vertex) {
-		return streamEdges(vertex).anyMatch(e -> isAtBoundary(e));
+	default boolean isAtBoundary(@NotNull final V vertex) {
+		return getBoundaryEdge(vertex).isPresent();
+	}
+
+	default Optional<E> getBoundaryEdge(@NotNull final V vertex) {
+		return streamEdges(vertex).filter(e -> isAtBoundary(e)).findAny();
 	}
 
 	default boolean isAtBorder(@NotNull V vertex) {
@@ -803,5 +809,21 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	// methods for log informations
 	default String toPath(final F face) {
 		return streamPoints(face).map(p -> p.toString()).reduce((s1, s2) -> s1 + " -> " + s2).orElse("");
+	}
+
+	default boolean isLongestEdge(E edge) {
+		if(!isAtBoundary(edge)) {
+			E longestEdge1 = streamEdges(getFace(edge)).reduce((e1, e2) -> toLine(e1).length() > toLine(e2).length() ? e1 : e2).get();
+			E longestEdge2 = streamEdges(getTwinFace(edge)).reduce((e1, e2) -> toLine(e1).length() > toLine(e2).length() ? e1 : e2).get();
+			return isSame(longestEdge1, edge) && isSame(longestEdge2, edge);
+		}
+		else {
+			if(isBoundary(edge)) {
+				edge = getTwin(edge);
+			}
+
+			E longestEdge = streamEdges(getFace(edge)).reduce((e1, e2) -> toLine(e1).length() > toLine(e2).length() ? e1 : e2).get();
+			return isSame(longestEdge, edge);
+		}
 	}
 }

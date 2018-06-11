@@ -1,5 +1,6 @@
 package org.vadere.util.potential.calculators.cartesian;
 
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.calculators.EikonalSolver;
 
@@ -12,7 +13,7 @@ public class EikonalSolverFMMAcuteTriangulation implements EikonalSolver {
 	}
 
     @Override
-    public Function<VPoint, Double> getPotentialField() {
+    public Function<IPoint, Double> getPotentialField() {
         return null;
     }
 

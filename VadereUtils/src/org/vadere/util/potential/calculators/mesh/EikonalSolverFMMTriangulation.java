@@ -201,7 +201,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
     }
 
     @Override
-    public Function<VPoint, Double> getPotentialField() {
+    public Function<IPoint, Double> getPotentialField() {
 	    ITriangulation<P, V, E, F> clone = triangulation.clone();
 	    return p -> getPotential(clone, p.getX(), p.getY());
     }

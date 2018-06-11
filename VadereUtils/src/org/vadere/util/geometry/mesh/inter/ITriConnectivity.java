@@ -142,12 +142,20 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         }
     }
 
+	/**
+	 * creates a new hole or extends an existing hole by removing neighbouring faces.
+	 *
+	 * @param face
+	 * @param mergeCondition
+	 * @param deleteIsoletedVertices
+	 * @return
+	 */
 	default F createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
-		Predicate<F> notAtBorder = f -> !getMesh().isAtBorder(f);
-		Predicate<F> predicate = notAtBorder.and(mergeCondition);
+		//Predicate<F> notAtBorder = f -> !getMesh().isAtBorder(f);
+		//Predicate<F> predicate = notAtBorder.and(mergeCondition);
 
-		if(predicate.test(face)) {
-			F remainingFace = IPolyConnectivity.super.mergeFaces(face, predicate, deleteIsoletedVertices);
+		if(mergeCondition.test(face)) {
+			F remainingFace = IPolyConnectivity.super.mergeFaces(face, mergeCondition, deleteIsoletedVertices);
 			getMesh().toHole(remainingFace);
 			return remainingFace;
 		}
@@ -317,6 +325,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge) {
 		return splitEdge(p, halfEdge, true);
+	}
+
+	default Pair<E, E> splitEdge(@NotNull E halfEdge, boolean legalize) {
+		VPoint midPoint = getMesh().toLine(halfEdge).midPoint();
+		P p = getMesh().createPoint(midPoint.getX(), midPoint.getY());
+		return splitEdge(p, halfEdge, legalize);
 	}
 
 
@@ -615,9 +629,15 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 */
 	default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
 		assert getMesh().degree(vertex) == 3;
-		E toDeleteEdege = getMesh().streamEdges(vertex).filter(e -> !getMesh().isAtBoundary(e)).findAny().get();
-		assert getMesh().streamEdges(vertex).filter(e -> getMesh().isAtBoundary(e)).count() == 2;
-		removeEdge(toDeleteEdege, vertex, removeIsolatedVertex);
+		Optional<E> toDeleteEdge = getMesh().streamEdges(vertex).filter(e -> !getMesh().isAtBoundary(e)).findAny();
+		if(toDeleteEdge.isPresent()) {
+			assert getMesh().streamEdges(vertex).filter(e -> getMesh().isAtBoundary(e)).count() == 2;
+			removeEdge(toDeleteEdge.get(), vertex, removeIsolatedVertex);
+		}
+		else {
+			List<E> test = getMesh().streamEdges(vertex).collect(Collectors.toList());
+			log.warn("something wrong?");
+		}
 	}
 
 	/*default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
@@ -1606,8 +1626,25 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
 			P p2 = getMesh().getPoint(edge);
 			P p3 = getMesh().getPoint(getMesh().getNext(edge));
+			boolean valid = GeometryUtils.isLeftOf(p1, p2, p3);
+			if(!valid) {
+				log.info(p1 + ", " + p2 + ", " + p3);
+			}
 			return GeometryUtils.isLeftOf(p1, p2, p3);
 		};
-		return getMesh().streamFaces(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
+
+		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
+	}
+
+	default boolean isValid(@NotNull F face) {
+		Predicate<F> orientationPredicate = f -> {
+			E edge = getMesh().getEdge(f);
+			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
+			P p2 = getMesh().getPoint(edge);
+			P p3 = getMesh().getPoint(getMesh().getNext(edge));
+			return GeometryUtils.isLeftOf(p1, p2, p3);
+		};
+
+		return !getMesh().isBoundary(face) && orientationPredicate.test(face);
 	}
 }

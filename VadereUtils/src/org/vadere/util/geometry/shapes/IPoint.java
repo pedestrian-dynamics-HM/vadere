@@ -22,6 +22,8 @@ public interface IPoint extends Cloneable {
 
 	IPoint norm();
 
+	IPoint norm(double len);
+
 	IPoint normZeroSafe();
 
 	double distance(IPoint other);
