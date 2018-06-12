@@ -97,7 +97,7 @@ public class TestPolygon {
 
 		// print evaluated grid
 		String g2string = GeometryPrinter.grid2string(grid);
-		IOUtils.printDataFile(Paths.get("testreports", "test_polygon2d_closestPoint"),
+		IOUtils.printDataFile(Paths.get("testreports", "test_polygon2d_closestPoint.txt"),
 				g2string);
 	}
 
