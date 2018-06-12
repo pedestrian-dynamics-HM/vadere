@@ -6,6 +6,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
@@ -15,11 +18,15 @@ import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.CellState;
+import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
@@ -534,7 +541,17 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
 
+			IPotentialField distanceField = new ObstacleDistancePotential(
+					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+					new VRectangle(getTopography().getBounds()),
+					new AttributesFloorField());
+			Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+			CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState());
+			cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
+			Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
+			IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
+
 			/*PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
 					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0)*0.8, 2), 6.0),
@@ -543,8 +560,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 			PPSMeshing meshImprover = new PPSMeshing(
 					distanceFunc,
-					p -> Math.min(1.0 + Math.max(-distanceFunc.apply(p), 0), 5.0),
-					0.5,
+					p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
+					0.35,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
 
 			/*PPSMeshing meshImprover = new PPSMeshing(

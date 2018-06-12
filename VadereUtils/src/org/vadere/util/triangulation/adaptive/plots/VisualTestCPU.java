@@ -110,13 +110,14 @@ public class VisualTestCPU {
 
 		while (nSteps < 300) {
 			nSteps++;
-			meshGenerator.improve();
+
 			overAllTime.suspend();
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			meshGenerator.improve();
 			distmeshPanel.repaint();
 			log.info("quality: " + meshGenerator.getQuality());
 			log.info("min-quality: " + meshGenerator.getMinQuality());

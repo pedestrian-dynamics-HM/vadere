@@ -9,6 +9,9 @@ import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.state.util.TexGraphGenerator;
+import org.vadere.util.debug.gui.ColorFunctions;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
@@ -19,6 +22,7 @@ import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
@@ -31,6 +35,7 @@ import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 import org.vadere.util.triangulation.improver.PPSMeshing;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -527,18 +532,18 @@ public class RealWorldPlot {
 
 		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
 				approxDistance,
-				p -> Math.min(1.0 + Math.max(-approxDistance.apply(p), 0)*0.5, 5.0),
-				0.5,
+				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
+				0.35,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				() -> new AMesh<>((x, y) -> new MeshPoint(x, y, false)));
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshGenerator.getMesh(),
+		/*PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshGenerator.getMesh(),
 				f -> false, 1000, 800, bound);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
-		frame.setTitle("Real world example");
+		frame.setTitle("Real world example EikMesh");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		distmeshPanel.repaint();
+		distmeshPanel.repaint();*/
 
 
 		StopWatch overAllTime = new StopWatch();
@@ -558,9 +563,10 @@ public class RealWorldPlot {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
-			distmeshPanel.repaint();
+
+			/*distmeshPanel.repaint();
 			log.info("quality: " + meshGenerator.getQuality());
-			log.info("min-quality: " + meshGenerator.getMinQuality());
+			log.info("min-quality: " + meshGenerator.getMinQuality());*/
 			overAllTime.resume();
 		}
 		overAllTime.stop();
@@ -572,6 +578,12 @@ public class RealWorldPlot {
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
+		/*Function<AFace<MeshPoint>, Color> colorFunction = f -> {
+			float grayScale = (float) meshGenerator.faceToQuality(f);
+			return new Color(grayScale, grayScale, grayScale);
+		};
+		log.info(TexGraphGenerator.toTikz(meshGenerator.getMesh(), colorFunction, 1.0f));
+		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());*/
 	}
 
 	private static void realWorldExampleDistMesh() throws IOException {
@@ -599,17 +611,17 @@ public class RealWorldPlot {
 
 		PSDistmesh meshGenerator = new PSDistmesh(
 				approxDistance,
-				p -> Math.min(1.0 + Math.max(-approxDistance.apply(p), 0)*0.5, 5.0),
+				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
 				0.18,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
 
-		PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator,
+		/*PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator,
 				 1000, 800, bound, f -> false);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
-		frame.setTitle("Real world example");
+		frame.setTitle("Real world example DistMesh");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		distmeshPanel.repaint();
+		distmeshPanel.repaint();*/
 
 
 		StopWatch overAllTime = new StopWatch();
@@ -629,9 +641,9 @@ public class RealWorldPlot {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
-			distmeshPanel.repaint();
+			/*distmeshPanel.repaint();
 			log.info("quality: " + meshGenerator.getQuality());
-			log.info("min-quality: " + meshGenerator.getMinQuality());
+			log.info("min-quality: " + meshGenerator.getMinQuality());*/
 			overAllTime.resume();
 		}
 		overAllTime.stop();
@@ -643,11 +655,17 @@ public class RealWorldPlot {
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
+		/*Function<VTriangle, Color> colorFunction = f -> {
+			float grayScale = (float) GeometryUtils.qualityOf(f);
+			return new Color(grayScale, grayScale, grayScale);
+		};
+		log.info(TexGraphGenerator.toTikz(meshGenerator.getTriangles(), colorFunction, 1.0f));*/
+
 	}
 
 	public static void main(String ... args) throws IOException {
-		realWorldExampleEikMesh();
-		//realWorldExampleDistMesh();
+		//realWorldExampleEikMesh();
+		realWorldExampleDistMesh();
 	}
 
 }

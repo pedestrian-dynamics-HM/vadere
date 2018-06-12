@@ -127,7 +127,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	    candidates.add(node2);
 	    sfc.insertFirst(node1);
 	    sfc.insertNext(node2, node1);
-	    triangulation = mesh.toTriangulation(IPointLocator.Type.BASE);
+	    triangulation = mesh.toTriangulation(IPointLocator.Type.JUMP_AND_WALK);
 	    edgeToNode.put(halfEdge, node1);
 	    edgeToNode.put(getMesh().getTwin(halfEdge), node2);
 	    return triangulation;
@@ -287,7 +287,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			step();
 		}
 
-		nextSFCLevel(0.1);
+		nextSFCLevel(0.23);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;
@@ -337,26 +337,26 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
     }
 
 	public void removeTrianglesOutsideBBox() {
-		List<F> toDeleteFaces = triangulation.streamFaces().filter(f -> getMesh().isDestroyed(f)).filter(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0).collect(Collectors.toList());
+		/*List<F> toDeleteFaces = triangulation.streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0).collect(Collectors.toList());
 		for(F delFace : toDeleteFaces) {
 			triangulation.removeFaceUnsafe(delFace, getMesh().getBorder(), true);
-		}
-		//triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+		}*/
+		triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 	}
 
 	public void removeTrianglesInsideObstacles() {
-		List<F> toDeleteFaces = triangulation.streamFaces().filter(f -> getMesh().isDestroyed(f)).filter(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0).collect(Collectors.toList());
+		/*List<F> toDeleteFaces = triangulation.streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0).collect(Collectors.toList());
 		for(F delFace : toDeleteFaces) {
 			F innerBoundary = triangulation.getMesh().createFace(true);
 			triangulation.removeFaceUnsafe(delFace, innerBoundary, true);
-		}
+		}*/
 
-		/*List<F> faces = triangulation.getMesh().getFaces();
+		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
 				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 			}
-		}*/
+		}
 	}
 
 	/**

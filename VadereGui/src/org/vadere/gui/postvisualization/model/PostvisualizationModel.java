@@ -28,6 +28,7 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
@@ -172,8 +173,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	@Override
-	public Function<VPoint, Double> getPotentialField() {
-        Function<VPoint, Double> f = p -> 0.0;
+	public Function<IPoint, Double> getPotentialField() {
+        Function<IPoint, Double> f = p -> 0.0;
         try {
             if (potentialContainer != null && step != null) {
                 final CellGrid potentialField = potentialContainer.getPotentialField(step.getStepNumber());

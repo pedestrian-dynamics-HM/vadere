@@ -387,7 +387,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		}
 	}
 
-	default void removeEdgeUnsafe(@NotNull final E edge, final boolean deleteIsolatedVertices) {
+	/*default void removeEdgeUnsafe(@NotNull final E edge, final boolean deleteIsolatedVertices) {
 		E twin = getMesh().getTwin(edge);
 		E prevEdge = getMesh().getPrev(edge);
 		E prevTwin = getMesh().getPrev(twin);
@@ -395,13 +395,13 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		E nextTwin = getMesh().getNext(twin);
 
 		// remove neighbouring faces
-		/*if(!getMesh().getFace(edge).equals(face)) {
-			removeFace(getMesh().getFace(edge), true);
-		}
+		//if(!getMesh().getFace(edge).equals(face)) {
+		//	removeFace(getMesh().getFace(edge), true);
+		//}
 
-		if(!getMesh().getFace(twin).equals(face)) {
-			removeFace(getMesh().getFace(twin), true);
-		}*/
+		//if(!getMesh().getFace(twin).equals(face)) {
+		//	removeFace(getMesh().getFace(twin), true);
+		//}
 
 
 		// Link the from-side of the edge
@@ -452,7 +452,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		getMesh().destroyEdge(edge);
 		getMesh().destroyEdge(twin);
 
-	}
+	}*/
 
 	/**
 	 * Removes a simple link. This will be done by merging two faces into one remaining face. One of
@@ -684,38 +684,192 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	}
 
-	default void removeFaceUnsafe(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
-		E start = getMesh().getEdge(face);
-		E edge = start;
+	/*default void removeFaceUnsafe(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
+		if(!getMesh().isDestroyed(face)) {
+			E start = getMesh().getEdge(face);
+			E edge = start;
 
-		do {
-			edge = getMesh().getNext(edge);
-			E twin = getMesh().getTwin(edge);
-			if(getMesh().isBoundary(twin)) {
-				if(getMesh().isBoundary(edge) && !getMesh().getFace(edge).equals(getMesh().getFace(twin))) {
+			do {
+				edge = getMesh().getNext(edge);
+				E twin = getMesh().getTwin(edge);
+				if(getMesh().isBoundary(twin)) {
 
 					for(E faceEdge : getMesh().getEdgeIt(getMesh().getFace(edge))) {
 						getMesh().setFace(faceEdge, getMesh().getFace(twin));
 					}
 					getMesh().destroyFace(getMesh().getFace(edge));
-				}
-				E prev = getMesh().getPrev(edge);
-				removeEdgeUnsafe(edge, deleteIsolatedVertices);
-				edge = getMesh().getNext(prev);
 
+					E prev = getMesh().getPrev(edge);
+					if(start.equals(edge)) {
+						start = prev;
+					}
+					removeEdgeUnsafe(edge, deleteIsolatedVertices);
+					edge = getMesh().getNext(prev);
+
+				}
+				else {
+					getMesh().setFace(edge, boundary);
+				}
+			} while (!start.equals(edge));
+
+			getMesh().destroyFace(face);
+		}
+	}*/
+
+	/**
+	 * Removes a face from the mesh by removing all boundary edges of the face.
+	 * If there is no boundary edge this method will not change the mesh topology.
+	 *
+	 * Mesh changing method.
+	 *
+	 * Assumption: a neighbour of the face is the boundary and there is no other neighbouring boundary.
+	 *
+	 * @param face                      the face that will be removed from the mesh
+	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
+	 */
+	default void removeFaceAtBoundary(@NotNull final F face, final F boundary, final boolean deleteIsolatedVertices) {
+		if(!getMesh().isDestroyed(face)) {
+
+			assert getMesh().streamFaces(face).filter(neighbour -> neighbour.equals(boundary)).count() > 0;
+
+			List<E> delEdges = new ArrayList<>();
+			List<V> vertices = new ArrayList<>();
+
+			// number of edges of the face
+			int nEdges = 0;
+			boolean boundaryEdgeDeleted = false;
+			E survivingEdge = null;
+			E boundaryEdge = getMesh().getEdge(boundary);
+
+			for(E edge : getMesh().getEdgeIt(face)) {
+				E twin = getMesh().getTwin(edge);
+				F twinFace = getMesh().getFace(twin);
+
+				assert twinFace.equals(boundary) || !getMesh().isBoundary(twinFace);
+
+				nEdges++;
+				if(twinFace.equals(boundary)) {
+					delEdges.add(edge);
+
+					// adjust the boundary edge if it will be deleted
+					if(boundaryEdge.equals(twin)) {
+						boundaryEdgeDeleted = true;
+					}
+				}
+				else {
+					// remember an edge that will not be deleted. This edge can be used as the edge of the boundary.
+					survivingEdge = edge;
+
+					// if the edge will not be deleted it becomes an boundary edge
+					getMesh().setFace(edge, boundary);
+				}
+				vertices.add(getMesh().getVertex(edge));
+			}
+
+
+			//TODO: this might be computational expensive!
+			// special case: all edges will be deleted && the edge of the border will be deleted as well! => adjust the border edge
+			if(getMesh().getTwinFace(boundaryEdge).equals(face) && delEdges.size() == nEdges) {
+				assert survivingEdge == null;
+
+				// all edges are border edges!
+				EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), boundaryEdge);
+
+				F twinFace = getMesh().getTwinFace(boundaryEdge);
+
+				// walk along the border away from this faces to get another edge which won't be deleted
+				while (edgeIterator.hasNext() && twinFace.equals(face)) {
+					boundaryEdge = edgeIterator.next();
+					twinFace = getMesh().getTwinFace(boundaryEdge);
+				}
+
+				// no such candidate was found. This can happen if an island will be deleted.
+				if(twinFace.equals(face)) {
+					log.warn("no boundary candidate was found, we search through all edges of the mesh.");
+					boundaryEdge = getMesh().streamEdges()
+							.filter(e -> getMesh().getFace(e).equals(boundary))
+							.filter(e -> !getMesh().getTwinFace(e).equals(face))
+							.findAny().get();
+				}
+
+				getMesh().setFace(boundaryEdge, boundary);
+				getMesh().setEdge(boundary, boundaryEdge);
+			}
+			else if(boundaryEdgeDeleted) {
+				assert survivingEdge != null;
+				getMesh().setEdge(boundary, survivingEdge);
+			}
+
+			if(!delEdges.isEmpty()) {
+				E h0, h1, next0, next1, prev0, prev1;
+				V v0, v1;
+
+				for(E delEdge : delEdges) {
+					h0 = delEdge;
+					v0 = getMesh().getVertex(delEdge);
+					next0 = getMesh().getNext(h0);
+					prev0 = getMesh().getPrev(h0);
+
+					h1    = getMesh().getTwin(delEdge);
+					v1    = getMesh().getVertex(h1);
+					next1 = getMesh().getNext(h1);
+					prev1 = getMesh().getPrev(h1);
+
+					boolean isolated0 = isSimpleConnected(v0);
+					boolean isolated1 = isSimpleConnected(v1);
+
+					//getMesh().setEdge(hole, prev1);
+
+					// adjust next and prev half-edges
+					getMesh().setNext(prev0, next1);
+					getMesh().setNext(prev1, next0);
+
+					//boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
+					//boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
+
+					//boolean isolated0 = getMesh().getTwin(h0) == getMesh().getNext(h0) || getMesh().getTwin(h0) == getMesh().getPrev(h0);
+					//boolean isolated1 = getMesh().getTwin(h1) == getMesh().getNext(h1) || getMesh().getTwin(h1) == getMesh().getPrev(h1);
+
+					// adjust vertices
+					if(getMesh().getEdge(v0) == h0 && !isolated0) {
+						getMesh().setEdge(v0, prev1);
+					}
+
+					if(deleteIsolatedVertices && isolated0) {
+						getMesh().destroyVertex(v0);
+					}
+
+					if(getMesh().getEdge(v1) == h1 && !isolated1) {
+						getMesh().setEdge(v1, prev0);
+					}
+
+					if(deleteIsolatedVertices && isolated1) {
+						getMesh().destroyVertex(v1);
+					}
+
+					// mark edge deleted if the mesh has a edge status
+					getMesh().destroyEdge(h0);
+					getMesh().destroyEdge(h1);
+
+					// TODO: do we need this?
+					vertices.stream().filter(getMesh()::isAlive).forEach(v -> adjustVertex(v));
+				}
+			}
+
+			if(nEdges > 0) {
+				getMesh().destroyFace(face);
 			}
 			else {
-				getMesh().setFace(edge, boundary);
+				log.warn("could not delete face " + face + ". It is not at the border!");
 			}
-		} while (!start.equals(edge));
 
-		getMesh().destroyFace(face);
+		}
 	}
 
 
 	/**
 	 * Removes a face from the mesh by removing all border edges of the face.
-	 * If there is no border edge this method will not chage the mesh topology.
+	 * If there is no border edge this method will not change the mesh topology.
 	 *
 	 * Mesh changing method.
 	 *
@@ -725,118 +879,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
 	 */
 	default void removeFaceAtBorder(@NotNull final F face, final boolean deleteIsolatedVertices) {
-		if(!getMesh().isDestroyed(face)) {
-			List<E> delEdges = new ArrayList<>();
-            List<V> vertices = new ArrayList<>();
-
-            // we only need the boundary if the face isNeighbourBorder
-            F border = getMesh().getBorder();
-
-            int count = 0;
-            for(E edge : getMesh().getEdgeIt(face)) {
-				F twinFace = getMesh().getTwinFace(edge);
-                count++;
-                if(twinFace.equals(border)) {
-                    delEdges.add(edge);
-                }
-                else {
-                    // update the edge of the boundary since it might be deleted!
-                    getMesh().setEdge(border, edge);
-                    getMesh().setFace(edge, border);
-                }
-
-                vertices.add(getMesh().getVertex(edge));
-            }
-
-
-            //TODO: this might be computational expensive!
-            // special case: all edges will be deleted && the edge of the border will be deleted as well! => adjust the border edge
-            E borderEdge = null;
-            if(getMesh().getTwinFace(getMesh().getEdge(border)) == face && delEdges.size() == count) {
-
-                // all edges are border edges!
-                borderEdge = getMesh().getTwin(getMesh().getEdge(face));
-                EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), borderEdge);
-
-                // walk along the border away from this faces to get another edge which won't be deleted
-                F twinFace = getMesh().getTwinFace(borderEdge);
-                while (edgeIterator.hasNext() && twinFace == face) {
-                    borderEdge = edgeIterator.next();
-                    twinFace = getMesh().getTwinFace(borderEdge);
-                }
-
-                if(getMesh().getTwinFace(borderEdge) == face) {
-                    borderEdge = getMesh().streamEdges().filter(e -> getMesh().getTwinFace(e) != face).filter(e -> getMesh().isBorder(e)).findAny().get();
-                    //throw new IllegalArgumentException("could not adjust border edge! Deletion of " + face + " is not allowed.");
-                }
-
-                getMesh().setFace(borderEdge, border);
-                getMesh().setEdge(border, borderEdge);
-            }
-
-            if(!delEdges.isEmpty()) {
-                E h0, h1, next0, next1, prev0, prev1;
-                V v0, v1;
-
-                for(E delEdge : delEdges) {
-                    h0 = delEdge;
-                    v0 = getMesh().getVertex(delEdge);
-                    next0 = getMesh().getNext(h0);
-                    prev0 = getMesh().getPrev(h0);
-
-                    h1    = getMesh().getTwin(delEdge);
-                    v1    = getMesh().getVertex(h1);
-                    next1 = getMesh().getNext(h1);
-                    prev1 = getMesh().getPrev(h1);
-
-                    boolean isolated0 = isSimpleConnected(v0);
-                    boolean isolated1 = isSimpleConnected(v1);
-
-                    //getMesh().setEdge(hole, prev1);
-
-                    // adjust next and prev half-edges
-                    getMesh().setNext(prev0, next1);
-                    getMesh().setNext(prev1, next0);
-
-                    //boolean isolated0 = getMesh().getNext(prev1).equals(getMesh().getTwin(prev1));
-                    //boolean isolated1 = getMesh().getNext(prev0).equals(getMesh().getTwin(prev0));
-
-                    //boolean isolated0 = getMesh().getTwin(h0) == getMesh().getNext(h0) || getMesh().getTwin(h0) == getMesh().getPrev(h0);
-                    //boolean isolated1 = getMesh().getTwin(h1) == getMesh().getNext(h1) || getMesh().getTwin(h1) == getMesh().getPrev(h1);
-
-                    // adjust vertices
-                    if(getMesh().getEdge(v0) == h0 && !isolated0) {
-                        getMesh().setEdge(v0, prev1);
-                    }
-
-                    if(deleteIsolatedVertices && isolated0) {
-                        getMesh().destroyVertex(v0);
-                    }
-
-                    if(getMesh().getEdge(v1) == h1 && !isolated1) {
-                        getMesh().setEdge(v1, prev0);
-                    }
-
-                    if(deleteIsolatedVertices && isolated1) {
-                        getMesh().destroyVertex(v1);
-                    }
-
-                    // mark edge deleted if the mesh has a edge status
-                    getMesh().destroyEdge(h0);
-                    getMesh().destroyEdge(h1);
-
-                    // TODO: do we need this?
-                    vertices.stream().filter(getMesh()::isAlive).forEach(v -> adjustVertex(v));
-                }
-            }
-			if(count > 0) {
-				getMesh().destroyFace(face);
-			}
-			else {
-            	log.warn("could not delete face " + face + ". It is not at the border!");
-			}
-
-        }
+		removeFaceAtBoundary(face, getMesh().getBorder(), deleteIsolatedVertices);
 	}
 
 	/**

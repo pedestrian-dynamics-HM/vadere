@@ -1,5 +1,6 @@
 package org.vadere.util.triangulation.adaptive;
 
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -61,6 +62,11 @@ public class PSDistmeshPanel extends Canvas {
 		for (VTriangle triangle : faceSet) {
 			if(this.predicate.test(triangle)) {
 				graphics.setColor(Color.RED);
+				graphics.fill(triangle);
+			}
+			else {
+				float quality = (float) GeometryUtils.qualityOf(triangle);
+				graphics.setColor(new Color(quality, quality, quality));
 				graphics.fill(triangle);
 			}
 

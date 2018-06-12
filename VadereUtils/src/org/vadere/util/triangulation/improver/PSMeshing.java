@@ -88,7 +88,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
         /**
 		 *  We move points and flip edges. Therefore only the BASE pointlocator is feasible.
 		 */
-        triangulation.setPointLocator(IPointLocator.Type.BASE);
+        triangulation.setPointLocator(IPointLocator.Type.JUMP_AND_WALK);
         log.info("##### (end) generate a triangulation #####");
 	}
 
@@ -119,13 +119,8 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	@Override
     public void improve() {
 		synchronized (getMesh()) {
-			removeBoundaryLowQualityTriangles();
-			computeScalingFactor();
-			computeVertexForces();
-			updateVertices();
-			collapseEdges();
-			splitEdges();
 
+			removeBoundaryLowQualityTriangles();
 			if(triangulation.isValid()) {
 				flipEdges();
 				removeTrianglesInsideHoles();
@@ -137,7 +132,11 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 				removeTrianglesInsideObstacles();
 			}
 
-
+			computeScalingFactor();
+			computeVertexForces();
+			updateVertices();
+			//collapseEdges();
+			//splitEdges();
 
 			nSteps++;
 			//log.info("quality: " + getQuality());
@@ -271,7 +270,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 				projectBackVertex(vertex, distance);
 			}
 
-			/*if(isAtBoundary) {
+			if(isAtBoundary) {
 				E boundaryEdge = getMesh().getBoundaryEdge(vertex).get();
 				boolean collapse = false;
 
@@ -288,7 +287,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 				if(!collapse && getMesh().isLongestEdge(boundaryEdge) && faceToQuality(getMesh().getTwinFace(boundaryEdge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY) {
 					splitEdges.add(boundaryEdge);
 				}
-			}*/
+			}
 		}
 
 	    point.setVelocity(new VPoint(0,0));
@@ -559,7 +558,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		Predicate<F> mergeCondition = f -> !triangulation.getMesh().isDestroyed(f)
 				&& !triangulation.getMesh().isBoundary(f)
 				&& triangulation.getMesh().isAtBorder(f)
-				&& -distanceFunc.apply(triangulation.getMesh().toTriangle(f).getIncenter()) > 0.1 * initialEdgeLen
+				//&& -distanceFunc.apply(triangulation.getMesh().toTriangle(f).getIncenter()) > 0.1 * initialEdgeLen
 				&& faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY;
 		for(F face : holes) {
 			List<F> neighbouringFaces = getMesh().streamEdges(face).map(e -> getMesh().getTwinFace(e)).collect(Collectors.toList());
