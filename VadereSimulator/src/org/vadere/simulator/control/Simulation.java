@@ -227,7 +227,7 @@ public class Simulation {
 	private boolean assertAllPedestrianInBounds() {
 		Rectangle2D.Double bounds = topography.getBounds();
 		Collection<Pedestrian> peds = topography.getElements(Pedestrian.class);
-		return peds.stream().map(ped -> ped.getPosition()).anyMatch(pos -> !bounds.contains(pos.getX(), pos.getY()));
+		return peds.stream().map(ped -> ped.getPosition()).allMatch(pos -> bounds.contains(pos.getX(), pos.getY()));
 	}
 
 	private SimulationState initialSimulationState() {

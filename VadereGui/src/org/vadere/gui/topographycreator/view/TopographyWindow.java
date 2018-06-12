@@ -32,7 +32,8 @@ import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
 import org.vadere.gui.topographycreator.control.DrawDotMode;
-import org.vadere.gui.topographycreator.control.DrawPolygonMode;
+import org.vadere.gui.topographycreator.control.DrawConvexHullMode;
+import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
 import org.vadere.gui.topographycreator.control.DrawRectangleMode;
 import org.vadere.gui.topographycreator.control.EraserMode;
 import org.vadere.gui.topographycreator.control.SelectElementMode;
@@ -45,8 +46,6 @@ import org.vadere.state.types.ScenarioElementType;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.beans.IntrospectionException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,15 +234,20 @@ public class TopographyWindow extends JPanel {
 
 
 		/* list of actions for the sub-dialog */
-		Action pen = new ActionSwitchSelectionMode("Pen", new ImageIcon(Resources.class
-				.getResource("/icons/paint_method_pen_icon.png")), panelModel, new DrawPolygonMode(panelModel,
+		Action pen = new ActionSwitchSelectionMode(
+				Messages.getString("TopographyCreator.btnConvexHull.label"), new ImageIcon(Resources.class
+				.getResource("/icons/convexHull.png")), panelModel, new DrawConvexHullMode(panelModel,
 				undoSupport),
 				basicAction);
-		Action rectangle = new ActionSwitchSelectionMode("Rectangle", new ImageIcon(Resources.class
+		Action pen2 = new ActionSwitchSelectionMode(Messages.getString("TopographyCreator.btnSimplePolygon.label"), new ImageIcon(Resources.class
+				.getResource("/icons/simplePolygon.png")), panelModel, new DrawSimplePolygonMode(panelModel,
+				undoSupport),
+				basicAction);
+		Action rectangle = new ActionSwitchSelectionMode(Messages.getString("TopographyCreator.btnRectangle.label"), new ImageIcon(Resources.class
 				.getResource("/icons/paint_method_rectangle_icon.png")), panelModel, new DrawRectangleMode(
 				panelModel, undoSupport),
 				basicAction);
-		Action dot = new ActionSwitchSelectionMode("Circle", new ImageIcon(Resources.class
+		Action dot = new ActionSwitchSelectionMode(Messages.getString("TopographyCreator.btnCircle.label"), new ImageIcon(Resources.class
 				.getResource("/icons/paint_method_dot_icon.png")), panelModel, new DrawDotMode(panelModel,
 				undoSupport),
 				basicAction);
@@ -253,13 +257,15 @@ public class TopographyWindow extends JPanel {
 
 		obstacleAndTargetDrawModes.add(rectangle);
 		obstacleAndTargetDrawModes.add(pen);
+		obstacleAndTargetDrawModes.add(pen2);
 
 		sourceDrawModes.add(rectangle);
 		sourceDrawModes.add(dot);
 
 		/* open obstacle paint method dialog action */
 		JButton obsButton = new JButton();
-		TopographyAction openObstacleDialog = new ActionOpenDrawOptionMenu("Obstacle", new ImageIcon(
+		TopographyAction openObstacleDialog = new ActionOpenDrawOptionMenu(
+				"Obstacle", new ImageIcon(
 				Resources.class.getResource("/icons/obstacle_icon.png")), panelModel, switchToObstacleAction,
 				obsButton, obstacleAndTargetDrawModes);
 
