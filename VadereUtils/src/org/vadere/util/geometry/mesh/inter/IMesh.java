@@ -738,7 +738,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return streamEdges(face).filter(e -> getVertex(e).distance(x, y) <= epsilon).findAny();
 	}
 
-	Collection<V> getVertices();
+	List<V> getVertices();
 
 	int getNumberOfVertices();
 

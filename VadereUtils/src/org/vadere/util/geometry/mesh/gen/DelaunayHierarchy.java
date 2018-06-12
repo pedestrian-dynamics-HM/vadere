@@ -160,32 +160,37 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         }
     }
 
-	private Optional<F> getStartFace(@NotNull final IPoint endPoint, @NotNull final ITriangulation<P, V, E, F> triangulation) {
-		Collection<V> vertices = triangulation.getMesh().getVertices();
+	private F getStartFace(@NotNull final IPoint endPoint, @NotNull final ITriangulation<P, V, E, F> triangulation) {
+		List<V> vertices = triangulation.getMesh().getVertices();
 		int n = vertices.size();
 
-		V result = null;
-		int i = 0;
-		for(V vertex : vertices) {
-			i++;
-			if(result == null || endPoint.distanceSq(vertex) < endPoint.distanceSq(result)) {
-				result = vertex;
-			}
-
-			if(i > Math.sqrt(n)) {
-				break;
-			}
-		}
-
-		if(result == null) {
-			return Optional.empty();
+		if(n < 20) {
+			return triangulation.getMesh().getFace();
 		}
 		else {
-			return Optional.of(triangulation.getMesh().getFace(result));
+			V result = null;
+			double max = Math.pow(n, 1.0/3.0);
+
+			for(int i = 0; i < max; i++) {
+				int index = random.nextInt(n);
+				V vertex = vertices.get(index);
+
+				if(result == null || endPoint.distanceSq(vertex) < endPoint.distanceSq(result)) {
+					result = vertex;
+				}
+			}
+
+			if(result == null) {
+				return triangulation.getMesh().getFace();
+			}
+			else {
+				return triangulation.getMesh().getFace(result);
+			}
 		}
 	}
 
-    @Override
+
+	@Override
     public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {}
 
     @Override
@@ -302,10 +307,10 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
             //TODO: SE-Architecture dirty here!
             if(v == null) {
                 if(level == 1) {
-                    face = tri.straightWalk2D(point.getX(), point.getY(), getStartFace(point, tri).get());
+                    face = tri.straightWalk2D(point.getX(), point.getY(), getStartFace(point, tri));
                 }
                 else {
-                    face = tri.locateFace(point, getStartFace(point, tri).get()).get();
+                    face = tri.locateFace(point, getStartFace(point, tri)).get();
                 }
 
                 v = tri.getMesh().closestVertex(face, point.getX(), point.getY());

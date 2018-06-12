@@ -197,7 +197,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 
 
 	@Override
-	public Collection<PVertex<P>> getVertices() {
+	public List<PVertex<P>> getVertices() {
 		return vertices;
 	}
 
