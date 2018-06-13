@@ -14,8 +14,6 @@ __kernel void fft1Dim(const __global float2 *input,
     int l_addr = get_local_id(0)*points_per_item; // address within one workitem
     int global_addr = get_group_id(0)*points_per_group + l_addr; // address within the hole workgroup
 
-    //printf(" local_size %i points_per_item %i ",local_size,points_per_item);
-
     uint4 index, br;
     uint mask_left, mask_right, shift_pos;
     float2 x1, x2, x3, x4;
@@ -59,7 +57,6 @@ __kernel void fft1Dim(const __global float2 *input,
 
     float cosine, sine;
     float2 wk;
-    int overflow = 0;
 
     for(int N2 = 4; N2 < points_per_item; N2 <<=1) {
         l_addr = get_local_id(0) * points_per_item;
@@ -68,9 +65,7 @@ __kernel void fft1Dim(const __global float2 *input,
             x1 = local_data[l_addr];
             local_data[l_addr] += local_data[l_addr + N2];
             local_data[l_addr + N2] = x1 - local_data[l_addr + N2];
-            if (overflow == 0 && (l_addr >= N || l_addr + N2 >= N)) {
-                overflow = l_addr;
-            }
+
             for(int i = 1; i < N2; i++) {
                 float param = (M_PI_F * i)/N2;
                 sine = sincos(param,&cosine);
@@ -86,7 +81,6 @@ __kernel void fft1Dim(const __global float2 *input,
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
-    printf("overflow %i |",overflow);
 
     uint start, angle, stage;
     stage = 2;
