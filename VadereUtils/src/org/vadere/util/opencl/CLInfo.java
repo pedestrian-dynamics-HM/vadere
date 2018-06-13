@@ -114,12 +114,25 @@ public final class CLInfo {
             checkCLError(clGetProgramBuildInfo(cl_program_id, cl_device_id, param_name, (ByteBuffer)null, pp));
             int bytes = (int)pp.get(0);
 
-            ByteBuffer buffer = stack.malloc(bytes);
+            ByteBuffer buffer = stack.malloc(bytes+1000);
             checkCLError(clGetProgramBuildInfo(cl_program_id, cl_device_id, param_name, buffer, null));
 
             return memASCII(buffer, bytes - 1);
         }
     }
+
+    public static String getKernelInfoStringASCII(long cl_kernel_id, int param_name) throws OpenCLException {
+        try (MemoryStack stack = stackPush()) {
+            PointerBuffer pp = stack.mallocPointer(1);
+            checkCLError(clGetKernelInfo(cl_kernel_id,param_name, (ByteBuffer)null,pp));
+            int bytes = (int)pp.get(0);
+            ByteBuffer buffer = stack.malloc(bytes);
+            checkCLError(clGetKernelInfo(cl_kernel_id,param_name,buffer,null));
+
+            return memASCII(buffer,bytes-1);
+        }
+    }
+
 
     public static void checkCLError(IntBuffer errcode) throws OpenCLException {
         checkCLError(errcode.get(errcode.position()));

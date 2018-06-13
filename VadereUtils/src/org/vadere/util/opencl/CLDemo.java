@@ -88,6 +88,7 @@ public final class CLDemo {
 					//System.out.println("\tCL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE = " + InfoUtils.getDeviceInfoPointer(device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE));
 					System.out.println("\tCL_DEVICE_MAX_WORK_ITEM_DIMENSIONS = " + CLInfo.getDeviceInfoInt(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS));
 					System.out.println("\tCL_DEVICE_MAX_WORK_GROUP_SIZE = " + CLInfo.getDeviceInfoPointer(device, CL_DEVICE_MAX_WORK_GROUP_SIZE));
+					System.out.println("\tCL_DEVICE_LOCAL_MEM_SIZE = " + CLInfo.getDeviceInfoPointer(device,CL_DEVICE_LOCAL_MEM_SIZE));
 					System.out.println("\tCL_DEVICE_MAX_CLOCK_FREQUENCY = " + CLInfo.getDeviceInfoInt(device, CL_DEVICE_MAX_CLOCK_FREQUENCY));
 					System.out.println("\tCL_DEVICE_ADDRESS_BITS = " + CLInfo.getDeviceInfoInt(device, CL_DEVICE_ADDRESS_BITS));
 					System.out.println("\tCL_DEVICE_AVAILABLE = " + (CLInfo.getDeviceInfoInt(device, CL_DEVICE_AVAILABLE) != 0));

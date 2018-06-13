@@ -1,19 +1,18 @@
-__kernel void fft(const __global  float2* g_data, __local float2* l_data, uint points_per_group, uint size, int dir)
+__kernel void fft(const __global  float2 * g_data, __local float2 * l_data, uint points_per_group, uint size, int dir)
 {
     int points_per_item = points_per_group /  get_local_size(0);
     int l_addr = get_local_id(0) * points_per_item;
     int g_addr = get_group_id(0) * points_per_group + l_addr;
-    int num_vectors = N/4;
 
     uint4 index, br;
-    uint maks_left, mask_right, shift_pos;
+    uint mask_left, mask_right, shift_pos;
     float2 x1, x2, x3, x4;
 
     for(int i = 0; i < points_per_item; i += 4) {
         index = (uint4) (g_addr, g_addr + 1, g_addr + 2, g_addr + 3);
         mask_left = size / 2;
         mask_right = 1;
-        shift_pos = log2(size) - 1;
+        shift_pos = (int)log2((float) size) - 1;
 
         br = (index << shift_pos) & mask_left;
         br |= (index >> shift_pos) & mask_right;
@@ -31,10 +30,10 @@ __kernel void fft(const __global  float2* g_data, __local float2* l_data, uint p
         x3 = g_data[br.s2];
         x4 = g_data[br.s3];
 
-        sum12 = x1 + x2;
-        diff12 = x1 - x2;
-        sum34 = x3 + x4;
-        diff34 = (float2) (x3.s1 - x4.s1, x4.s0 - x3.s0) * dir;
+        float2 sum12 = x1 + x2;
+        float2 diff12 = x1 - x2;
+        float2 sum34 = x3 + x4;
+        float2 diff34 = (float2) (x3.s1 - x4.s1, x4.s0 - x3.s0) * dir;
 
         l_data[l_addr] = sum12 + sum34;
         l_data[l_addr+1] = diff12 + diff34;
@@ -55,8 +54,11 @@ __kernel void fft(const __global  float2* g_data, __local float2* l_data, uint p
             l_data[l_addr + N2] = x1 - l_data[l_addr + N2];
 
             for(int i = 1; i < N2; i++) {
-                cosine = cos(M_PI_F * i/N2);
-                sine = dir * sin(M_PI_F * i/N2);
+                //cosine = cos(M_PI_F * i/N2);
+                //sine = dir * sin(M_PI_F * i/N2);
+                sine = sincos(M_PI_F * i/N2,&cosine);
+                sine = dir*sine;
+
                 wk = (float2) (
                     l_data[l_addr + N2 + i].s0 * cosine +
                     l_data[l_addr + N2 + i].s1 * sine,
@@ -70,15 +72,19 @@ __kernel void fft(const __global  float2* g_data, __local float2* l_data, uint p
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    unit start, angle, stage;
+    uint start, angle, stage;
     stage = 2;
+
     for(int N2 = points_per_item; N2 < points_per_group; N2 <<=1) {
         start = (get_local_id(0) + (get_local_id(0)/stage)*stage) * (points_per_item/2);
         angle = start % (N2*2);
 
         for(int i = start; i < start + points_per_item / 2; i++) {
-            cosine = cos(M_PI_F * angle/N2);
-            sine = dir * sin(M_PI_F * angle/N2);
+            //cosine = cos(M_PI_F * angle/N2);
+            //sine = dir * sin(M_PI_F * angle/N2);
+            sine = sincos(M_PI_F * i/N2,&cosine);
+            sine = dir*sine;
+
             wk = (float2) (
                 l_data[N2 + i].s0 * cosine +
                 l_data[N2 + i].s1 * sine,
@@ -91,4 +97,14 @@ __kernel void fft(const __global  float2* g_data, __local float2* l_data, uint p
         stage <<= 1;
         barrier(CLK_LOCAL_MEM_FENCE);
     }
+
+
+    l_addr = get_local_id(0)*points_per_item; // address within one workitem
+    g_addr = get_group_id(0)*points_per_group + l_addr;
+
+
+    printf("local_id %i ", points_per_item);
+
+
+
 }

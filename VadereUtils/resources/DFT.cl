@@ -39,6 +39,6 @@ __kernel void dft(
 		out[i] = tot;
 	} else {
 		// backward transform (frequential -> space)
-		out[i] = tot / (double)length;
+		out[i] = (float2) (tot.x / (double)length, tot.y/(double) length);
 	}
 }

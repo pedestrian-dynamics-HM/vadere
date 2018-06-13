@@ -21,4 +21,22 @@ public class TestDFT {
 	public void testDFT() throws IOException {
 		//TODO: reimplement!
 	}
+
+	public void testSimpleDFT() {
+		float[] kernel = new float[] {
+				1, 2, 3,
+				4, 5, 6,
+				7, 8, 9
+		};
+
+		float[] inMatrix = new float[] {
+				2, 1, 1, 1,
+				1, 1, 1, -1,
+				1, 1, 1, 1,
+				1, 1, 1, 0
+		};
+
+	}
+
+
 }
