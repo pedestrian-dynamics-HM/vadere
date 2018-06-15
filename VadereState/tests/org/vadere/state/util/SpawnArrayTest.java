@@ -77,6 +77,43 @@ public class SpawnArrayTest {
 	}
 
 	@Test
+	public void testFreeSpawns() {
+		source = new VRectangle(1.0, 1.0, 4.0, 4.0);
+		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
+		spawnArray = new SpawnArray(source, elementBound);
+
+		assertEquals("Number of spawn points does not match", 16, spawnArray.getSpawnPoints().length);
+
+		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
+		List<DynamicElement> dynamicElements = createMock(0.5,
+				spawnPoints[0],
+				spawnPoints[1],
+				spawnPoints[3],
+				spawnPoints[4]);
+		LinkedList<VPoint> points = spawnArray.getNextFreePoints(4, dynamicElements);
+		assertEquals(4, points.size());
+		assertEquals(spawnPoints[2], points.pollFirst());
+		assertEquals(spawnPoints[5], points.pollFirst());
+		assertEquals(spawnPoints[6], points.pollFirst());
+		assertEquals(spawnPoints[7], points.pollFirst());
+
+		source = new VRectangle(1.0, 1.0, 2.0, 2.0);
+		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
+		spawnArray = new SpawnArray(source, elementBound);
+		assertEquals("Number of spawn points does not match", 4, spawnArray.getSpawnPoints().length);
+
+		spawnPoints = spawnArray.getSpawnPoints();
+		dynamicElements = createMock(0.5,
+				spawnPoints[0],
+				spawnPoints[1],
+				spawnPoints[3]);
+		points = spawnArray.getNextFreePoints(4, dynamicElements);
+		assertEquals(1, points.size());
+		assertEquals(spawnPoints[2], points.pollFirst());
+
+	}
+
+	@Test
 	public void testGroupSpawnMatchDims() {
 		source = new VRectangle(1.0, 1.0, 8.0, 8.0);
 		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);

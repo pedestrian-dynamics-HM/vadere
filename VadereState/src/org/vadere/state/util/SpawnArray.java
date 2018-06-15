@@ -1,8 +1,11 @@
 package org.vadere.state.util;
 
+import org.lwjgl.system.CallbackI;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+
+import sun.java2d.pipe.ValidatePipe;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -95,6 +98,26 @@ public class SpawnArray {
 		return null;
 	}
 
+	/**
+	 * @param neighbours Test against this List. Caller must ensure that this neighbours are in the
+	 *                   vicinity of the source bound.
+	 * @return This function returns as many free points as possible. Caller must check how many
+	 * points where found.
+	 */
+	public LinkedList<VPoint> getNextFreePoints(int maxPoints, final List<DynamicElement> neighbours) {
+		double d = getMaxElementDim() / 2; // radius.
+		LinkedList<VPoint> points = new LinkedList<>();
+		for (VPoint p : spawnPoints) {
+			boolean overlap = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
+			if (!overlap) {
+				points.add(p);
+				if (points.size() == maxPoints) {
+					break;
+				}
+			}
+		}
+		return points;
+	}
 
 	/**
 	 * This function only spawns non overlapping groups. This means that for instance within a
