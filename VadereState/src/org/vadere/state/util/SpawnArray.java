@@ -90,7 +90,7 @@ public class SpawnArray {
 	 *                   vicinity of the source bound.
 	 * @return first free space within the spawn points.
 	 */
-	public VPoint getNextFreePoint(final List<DynamicElement> neighbours) {
+	public VPoint getNextFreeSpawnPoint(final List<DynamicElement> neighbours) {
 		double d = getMaxElementDim() / 2; // radius.
 		for (VPoint p : spawnPoints) {
 			boolean overlap = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
@@ -107,7 +107,7 @@ public class SpawnArray {
 	 * @return This function returns as many free points as possible. Caller must check how many
 	 * points where found.
 	 */
-	public LinkedList<VPoint> getNextFreePoints(int maxPoints, final List<DynamicElement> neighbours) {
+	public LinkedList<VPoint> getNextFreeSpawnPoints(int maxPoints, final List<DynamicElement> neighbours) {
 		double d = getMaxElementDim() / 2; // radius.
 		LinkedList<VPoint> points = new LinkedList<>();
 		for (VPoint p : spawnPoints) {
@@ -122,7 +122,7 @@ public class SpawnArray {
 		return points;
 	}
 
-	public LinkedList<VPoint> getNextFreeRandomPoints(int maxPoints, Random rnd, final List<DynamicElement> neighbours) {
+	public LinkedList<VPoint> getNextFreeRandomSpawnPoints(int maxPoints, Random rnd, final List<DynamicElement> neighbours) {
 		double d = getMaxElementDim() / 2; // radius.
 		LinkedList<VPoint> points = new LinkedList<>();
 		List<Integer> randInt = IntStream.range(0, spawnPoints.length).boxed().collect(Collectors.toList());
@@ -229,6 +229,54 @@ public class SpawnArray {
 		//over all overlapping groups in source
 		boolean overlap = true;
 		for (int groupNumber = 0; groupNumber < maxXGroupsWithOverlap * maxYGroupsWithOverlap; groupNumber++) {
+			int start = (groupNumber % maxXGroupsWithOverlap) + (groupNumber / maxXGroupsWithOverlap) * xDim;
+			for (int i = 0; i < groupSize; i++) {
+				int index = start + (i % dimGx) + (i / dimGx) * xDim;
+				VPoint p = spawnPoints[index].clone();
+				overlap = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
+				if (!overlap) {
+					points.add(p);
+				} else {
+					points = new LinkedList<>();
+					break;
+				}
+			}
+			// if a group was found with no overlapping point break and return group.
+			if (!overlap)
+				break;
+		}
+
+		if (points.size() < groupSize) {
+			return null;
+		} else {
+			return points;
+		}
+	}
+
+
+	public LinkedList<VPoint> getNextFreeRandomGroupPos(int groupSize, final List<DynamicElement> neighbours) {
+		if (groupSize > spawnPoints.length)
+			throw new IndexOutOfBoundsException("GroupSize: " + groupSize
+					+ "to big for source. Max Groupsize of source is " + spawnPoints.length);
+
+		// dimGx width of smallest square containing a Group of size groupSize
+		int dimGx = (int) Math.ceil(Math.sqrt(groupSize));
+		// dimGy set to minimize lost space in resulting rectangle (or square if groupSize is a square number)
+		int dimGy = dimGx * dimGx == groupSize ? dimGx : dimGx - 1;
+
+		int maxXGroupsWithOverlap = xDim - (dimGx - 1);
+		int maxYGroupsWithOverlap = yDim - (dimGy - 1);
+
+		double d = getMaxElementDim() / 2; // radius.
+		LinkedList<VPoint> points = new LinkedList<>();
+		//over all overlapping groups in source
+		boolean overlap = true;
+
+		List<Integer> rand = IntStream.range(0, maxXGroupsWithOverlap * maxYGroupsWithOverlap)
+				.boxed().collect(Collectors.toList());
+		Collections.shuffle(rand);
+
+		for (Integer groupNumber : rand) {
 			int start = (groupNumber % maxXGroupsWithOverlap) + (groupNumber / maxXGroupsWithOverlap) * xDim;
 			for (int i = 0; i < groupSize; i++) {
 				int index = start + (i % dimGx) + (i / dimGx) * xDim;

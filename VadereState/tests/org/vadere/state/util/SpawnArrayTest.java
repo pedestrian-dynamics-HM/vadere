@@ -64,13 +64,13 @@ public class SpawnArrayTest {
 		spawnArray = new SpawnArray(source, elementBound);
 
 		assertEquals("Number of spawn points does not match", 4, spawnArray.getSpawnPoints().length);
-		assertNull("There should not be a free spot.", spawnArray.getNextFreePoint(
+		assertNull("There should not be a free spot.", spawnArray.getNextFreeSpawnPoint(
 				createMock(0.5, spawnArray.getSpawnPoints())));
 		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
-		assertNotEquals("Point 1 is occupied and should not be returned", spawnPoints[1], spawnArray.getNextFreePoint(
+		assertNotEquals("Point 1 is occupied and should not be returned", spawnPoints[1], spawnArray.getNextFreeSpawnPoint(
 				createMock(0.5, spawnPoints[1])
 		));
-		assertNotNull("There should be three valid points", spawnArray.getNextFreePoint(
+		assertNotNull("There should be three valid points", spawnArray.getNextFreeSpawnPoint(
 				createMock(0.5, spawnPoints[1])
 		));
 
@@ -90,7 +90,7 @@ public class SpawnArrayTest {
 				spawnPoints[1],
 				spawnPoints[3],
 				spawnPoints[4]);
-		LinkedList<VPoint> points = spawnArray.getNextFreePoints(4, dynamicElements);
+		LinkedList<VPoint> points = spawnArray.getNextFreeSpawnPoints(4, dynamicElements);
 		assertEquals(4, points.size());
 		assertEquals(spawnPoints[2], points.pollFirst());
 		assertEquals(spawnPoints[5], points.pollFirst());
@@ -107,7 +107,7 @@ public class SpawnArrayTest {
 				spawnPoints[0],
 				spawnPoints[1],
 				spawnPoints[3]);
-		points = spawnArray.getNextFreePoints(4, dynamicElements);
+		points = spawnArray.getNextFreeSpawnPoints(4, dynamicElements);
 		assertEquals(1, points.size());
 		assertEquals(spawnPoints[2], points.pollFirst());
 
