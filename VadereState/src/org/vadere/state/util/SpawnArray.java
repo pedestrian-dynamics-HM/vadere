@@ -8,10 +8,13 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import sun.java2d.pipe.ValidatePipe;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Defines spawn points for a source and returns valid coordinates for spawning.
@@ -77,7 +80,7 @@ public class SpawnArray {
 		return ret;
 	}
 
-	public VPoint getNextRandomPoint(Random rnd) {
+	public VPoint getNextRandomSpawnPoint(Random rnd) {
 		int index = rnd.nextInt(spawnPoints.length);
 		return spawnPoints[index];
 	}
@@ -108,6 +111,24 @@ public class SpawnArray {
 		double d = getMaxElementDim() / 2; // radius.
 		LinkedList<VPoint> points = new LinkedList<>();
 		for (VPoint p : spawnPoints) {
+			boolean overlap = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
+			if (!overlap) {
+				points.add(p);
+				if (points.size() == maxPoints) {
+					break;
+				}
+			}
+		}
+		return points;
+	}
+
+	public LinkedList<VPoint> getNextFreeRandomPoints(int maxPoints, Random rnd, final List<DynamicElement> neighbours) {
+		double d = getMaxElementDim() / 2; // radius.
+		LinkedList<VPoint> points = new LinkedList<>();
+		List<Integer> randInt = IntStream.range(0, spawnPoints.length).boxed().collect(Collectors.toList());
+		Collections.shuffle(randInt);
+		for (Integer i : randInt) {
+			VPoint p = spawnPoints[i];
 			boolean overlap = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
 			if (!overlap) {
 				points.add(p);
