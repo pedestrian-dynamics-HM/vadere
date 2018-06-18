@@ -13,18 +13,7 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.PostVisualisation;
-import org.vadere.gui.postvisualization.control.ActionGeneratePNG;
-import org.vadere.gui.postvisualization.control.ActionGenerateSVG;
-import org.vadere.gui.postvisualization.control.ActionOpenFile;
-import org.vadere.gui.postvisualization.control.ActionPause;
-import org.vadere.gui.postvisualization.control.ActionPlay;
-import org.vadere.gui.postvisualization.control.ActionRecording;
-import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
-import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
-import org.vadere.gui.postvisualization.control.ActionStop;
-import org.vadere.gui.postvisualization.control.ActionSwapSelectionMode;
-import org.vadere.gui.postvisualization.control.ActionVisualization;
-import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.control.*;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
@@ -259,6 +248,11 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				new ActionGenerateSVG("svg_snapshot", resources.getIcon("camera_svg.png", iconWidth, iconHeight),
 						renderer),
 				"PostVis.btnSVGSnapshot.tooltip");
+		addActionToToolbar(
+				toolbar,
+				new ActionGenerateTikZ("tikz_snapshot", resources.getIcon("tikz_icon.png", iconWidth, iconHeight),
+						renderer),
+				"PostVis.btnTikZSnapshot.tooltip");
 
 		toolbar.addSeparator(new Dimension(5, 50));
 
