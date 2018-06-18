@@ -6,6 +6,7 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.SVGGenerator;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.state.scenario.Agent;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -42,7 +43,20 @@ public class ActionGenerateTikZ extends ActionVisualization {
 			outputFile = fileChooser.getSelectedFile().toString().endsWith(".svg") ? fileChooser.getSelectedFile()
 					: new File(fileChooser.getSelectedFile().toString() + ".svg");
 			// TODO: add code to generate TikZ code (get topography from "renderer").
-			svgGenerator.generateSVG(outputFile);
+			System.out.println(generateTikZCode());
+			// svgGenerator.generateSVG(outputFile);
 		}
+	}
+
+	private String generateTikZCode() {
+		String generatedText = "";
+
+		String agentTextPattern = "\\fill[blue] (%f,%f) circle (%fcm);\n";
+
+		for (Agent agent : model.getAgents()) {
+			generatedText += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+		}
+
+		return generatedText;
 	}
 }
