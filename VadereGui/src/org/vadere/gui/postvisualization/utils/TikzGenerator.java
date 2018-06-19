@@ -91,7 +91,7 @@ public class TikzGenerator {
                 topography.getBounds().x + topography.getBounds().width,
                 topography.getBounds().y + topography.getBounds().height);
 
-	    // TODO: draw also stairs and (maybe) trajectories.
+	    // TODO: maybe, draw also trajectories.
         generatedCode += "% Sources\n";
         for (Source source : topography.getSources()) {
             generatedCode += String.format("\\fill[SourceColor] %s\n", generatePathForScenarioElement(source));
@@ -105,6 +105,11 @@ public class TikzGenerator {
         generatedCode += "% Obstacles\n";
         for (Obstacle obstacle : topography.getObstacles()) {
             generatedCode += String.format("\\fill[ObstacleColor] %s\n", generatePathForScenarioElement(obstacle));
+        }
+
+        generatedCode += "% Stairs\n";
+        for (Stairs stair : topography.getStairs()) {
+            generatedCode += String.format("\\fill[StairColor] %s\n", generatePathForScenarioElement(stair));
         }
 
         // TODO: add agents as path NOT as pre-defined form (they require cubic splines).
@@ -130,6 +135,9 @@ public class TikzGenerator {
 
         Color obstacleColor = model.getConfig().getObstacleColor();
         colorDefinitions += String.format(colorTextPattern, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
+
+        Color stairColor = model.getConfig().getStairColor();
+        colorDefinitions += String.format(colorTextPattern, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
 
         Color agentColor = model.getConfig().getPedestrianDefaultColor();
         colorDefinitions += String.format(colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
