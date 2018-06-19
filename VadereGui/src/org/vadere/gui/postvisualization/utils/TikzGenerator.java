@@ -7,6 +7,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.state.scenario.*;
 
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.io.*;
@@ -58,7 +59,9 @@ public class TikzGenerator {
                 "\\end{tikzpicture}\n" +
                 "\\end{document}\n";
 
-	    String tikzCode = convertScenarioElementsToTikz();
+	    String tikzCode = "";
+	    tikzCode += generateTikzColorDefinitions(model);
+	    tikzCode += convertScenarioElementsToTikz();
 
 	    String output = (generateCompleteDocument) ? String.format(texTemplate, tikzCode) : tikzCode ;
 
@@ -88,30 +91,50 @@ public class TikzGenerator {
                 topography.getBounds().x + topography.getBounds().width,
                 topography.getBounds().y + topography.getBounds().height);
 
-	    // TODO: use colors from GUI config and maybe also draw trajectories.
+	    // TODO: draw also stairs and (maybe) trajectories.
         generatedCode += "% Sources\n";
         for (Source source : topography.getSources()) {
-            generatedCode += String.format("\\fill[green] %s\n", generatePathForScenarioElement(source));
+            generatedCode += String.format("\\fill[SourceColor] %s\n", generatePathForScenarioElement(source));
         }
 
         generatedCode += "% Targets\n";
         for (Target target : topography.getTargets()) {
-            generatedCode += String.format("\\fill[orange] %s\n", generatePathForScenarioElement(target));
+            generatedCode += String.format("\\fill[TargetColor] %s\n", generatePathForScenarioElement(target));
         }
 
         generatedCode += "% Obstacles\n";
         for (Obstacle obstacle : topography.getObstacles()) {
-            generatedCode += String.format("\\fill[black] %s\n", generatePathForScenarioElement(obstacle));
+            generatedCode += String.format("\\fill[ObstacleColor] %s\n", generatePathForScenarioElement(obstacle));
         }
 
         // TODO: add agents as path NOT as pre-defined form (they require cubic splines).
         generatedCode += "% Agents\n";
         for (Agent agent : model.getAgents()) {
-            String agentTextPattern = "\\fill[blue] (%f,%f) circle [radius=%fcm];\n";
+            String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
             generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
         }
 
 	    return generatedCode;
+    }
+
+    private String generateTikzColorDefinitions(SimulationModel<? extends DefaultSimulationConfig> model) {
+	    String colorDefinitions = "% Color Definitions\n";
+
+	    String colorTextPattern = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
+
+        Color sourceColor = model.getConfig().getSourceColor();
+        colorDefinitions += String.format(colorTextPattern, "SourceColor", sourceColor.getRed(), sourceColor.getGreen(), sourceColor.getBlue());
+
+        Color targetColor = model.getConfig().getTargetColor();
+        colorDefinitions += String.format(colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
+
+        Color obstacleColor = model.getConfig().getObstacleColor();
+        colorDefinitions += String.format(colorTextPattern, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
+
+        Color agentColor = model.getConfig().getPedestrianDefaultColor();
+        colorDefinitions += String.format(colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
+
+	    return colorDefinitions;
     }
 
 	private String generatePathForScenarioElement(ScenarioElement element) {
