@@ -2,52 +2,54 @@ package org.vadere.simulator.models.groups;
 
 import org.vadere.state.scenario.Pedestrian;
 
+import java.util.LinkedList;
+
 public class CentroidGroupFactory extends GroupFactory {
 
 	transient private CentroidGroupModel groupCollection;
 	transient private GroupSizeDeterminator groupSizeDeterminator;
 
-	private CentroidGroup currentGroup;
+	private LinkedList<CentroidGroup> newGroups;
 
 	public CentroidGroupFactory(CentroidGroupModel groupCollection,
 								GroupSizeDeterminator groupSizeDet) {
 		this.groupCollection = groupCollection;
 		this.groupSizeDeterminator = groupSizeDet;
+		this.newGroups = new LinkedList<>();
 	}
 
 	@Override
 	public int getOpenPersons() {
-		return currentGroup.getOpenPersons();
+		if (newGroups.peekFirst() == null) {
+			throw new IllegalStateException("No empty group exists");
+		}
+
+		return newGroups.peekFirst().getOpenPersons();
 	}
 
 	private void assignToGroup(Pedestrian ped) {
+		CentroidGroup currentGroup = newGroups.peekFirst();
+		if (currentGroup == null) {
+			throw new IllegalStateException("No empty group exists to add Pedestrian: " + ped.getId());
+		}
+
 		currentGroup.addMember(ped);
 		ped.addGroupId(currentGroup.getID());
 		groupCollection.registerMember(ped, currentGroup);
-	}
-
-	private boolean requiresNewGroup() {
-		boolean result;
-
-		if (currentGroup == null) {
-			result = true;
-		} else {
-			result = currentGroup.isFull();
+		if (currentGroup.getOpenPersons() == 0) {
+			newGroups.pollFirst(); // remove full group from list.
 		}
-
-		return result;
 	}
 
-	private void createNewGroup() {
-		currentGroup = groupCollection.getNewGroup(groupSizeDeterminator
+	public int createNewGroup() {
+		CentroidGroup newGroup = groupCollection.getNewGroup(groupSizeDeterminator
 				.nextGroupSize());
+		newGroups.addLast(newGroup);
+		return newGroup.getSize();
 	}
 
 	//listener methode (aufruf
 	public void elementAdded(Pedestrian pedestrian) {
-		if (requiresNewGroup()) {
-			createNewGroup();
-		}
 		assignToGroup(pedestrian);
 	}
 

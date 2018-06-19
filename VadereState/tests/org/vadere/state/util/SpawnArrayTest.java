@@ -1,5 +1,9 @@
 package org.vadere.state.util;
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.state.scenario.DynamicElement;
@@ -7,6 +11,7 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -29,6 +34,59 @@ public class SpawnArrayTest {
 		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
 		spawnArray = new SpawnArray(source, elementBound);
 		assertEquals("expected spawn points don't match", 81, spawnArray.getSpawnPoints().length);
+	}
+
+	@Test
+	public void toSmallSource1() {
+		// Number of Elements
+		TestAppender testAppender = new TestAppender();
+		Logger log = LogManager.getLogger(SpawnArray.class);
+		log.addAppender(testAppender);
+
+		source = new VRectangle(1.0, 1.0, 0.1, 0.1);
+		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
+		spawnArray = new SpawnArray(source, elementBound);
+		assertEquals("expected spawn points don't match", 1, spawnArray.getSpawnPoints().length);
+		assertEquals("", testAppender.getLog().get(0).getMessage(),
+				"Dimension of Source is to small for at least one dimension to contain designated spawnElement with Bound (1.00 x 1.00) Set to (1 x 1)");
+		log.removeAppender(testAppender);
+	}
+
+	@Test
+	public void toSmallSource2() {
+		// Number of Elements
+		TestAppender testAppender = new TestAppender();
+		Logger log = LogManager.getLogger(SpawnArray.class);
+		log.addAppender(testAppender);
+
+		source = new VRectangle(1.0, 1.0, 3.0, 0.1);
+		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
+		spawnArray = new SpawnArray(source, elementBound);
+		assertEquals("expected spawn points don't match", 3, spawnArray.getSpawnPoints().length);
+		assertEquals("", testAppender.getLog().get(0).getMessage(),
+				"Dimension of Source is to small for at least one dimension to contain designated spawnElement with Bound (1.00 x 1.00) Set to (3 x 1)");
+		log.removeAppender(testAppender);
+	}
+
+	/**
+	 * Group dimension is set as W x H for a Group of 6 this would be 3x2 Test if Source Width is
+	 * smaller than 3! Here the Group must be 2x3
+	 */
+	@Test
+	public void groupXDimBiggerThanSource() {
+		source = new VRectangle(1.0, 1.0, 2.0, 7);
+		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
+		spawnArray = new SpawnArray(source, elementBound);
+
+		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
+		LinkedList<VPoint> points = spawnArray.getNextGroup(6);
+		assertEquals(spawnPoints[0], points.pollFirst());
+		assertEquals(spawnPoints[1], points.pollFirst());
+		assertEquals(spawnPoints[2], points.pollFirst());
+		assertEquals(spawnPoints[3], points.pollFirst());
+		assertEquals(spawnPoints[4], points.pollFirst());
+		assertEquals(spawnPoints[5], points.pollFirst());
+
 	}
 
 	@Test
@@ -277,7 +335,7 @@ public class SpawnArrayTest {
 		assertEquals("Number of spawn points does not match", 64, spawnArray.getSpawnPoints().length);
 
 		VPoint[] spawnPoint = spawnArray.getSpawnPoints();
-		LinkedList<VPoint> group = spawnArray.getNextFreeGroupPos(6, createMock(0.5, new VPoint(99.0, 99.0)));
+		LinkedList<VPoint> group = spawnArray.getNextFreeGroup(6, createMock(0.5, new VPoint(99.0, 99.0)));
 		assertEquals(group.pollFirst(), spawnPoint[0]);
 		assertEquals(group.pollFirst(), spawnPoint[1]);
 		assertEquals(group.pollFirst(), spawnPoint[2]);
@@ -286,7 +344,7 @@ public class SpawnArrayTest {
 		assertEquals(group.pollFirst(), spawnPoint[10]);
 
 		// empty neighbours
-		group = spawnArray.getNextFreeGroupPos(6, new LinkedList<DynamicElement>());
+		group = spawnArray.getNextFreeGroup(6, new LinkedList<DynamicElement>());
 		assertEquals(group.pollFirst(), spawnPoint[0]);
 		assertEquals(group.pollFirst(), spawnPoint[1]);
 		assertEquals(group.pollFirst(), spawnPoint[2]);
@@ -297,7 +355,7 @@ public class SpawnArrayTest {
 
 		// match group 3 (with overlapping groups)
 		List<DynamicElement> dynamicElements = createMock(0.5, spawnPoint[0], spawnPoint[1], spawnPoint[10]);
-		group = spawnArray.getNextFreeGroupPos(6, dynamicElements);
+		group = spawnArray.getNextFreeGroup(6, dynamicElements);
 		assertEquals(group.pollFirst(), spawnPoint[3]);
 		assertEquals(group.pollFirst(), spawnPoint[4]);
 		assertEquals(group.pollFirst(), spawnPoint[5]);
@@ -313,7 +371,7 @@ public class SpawnArrayTest {
 				spawnPoint[3],
 				spawnPoint[6],
 				spawnPoint[9]);
-		group = spawnArray.getNextFreeGroupPos(6, dynamicElements);
+		group = spawnArray.getNextFreeGroup(6, dynamicElements);
 		assertEquals(group.pollFirst(), spawnPoint[10]);
 		assertEquals(group.pollFirst(), spawnPoint[11]);
 		assertEquals(group.pollFirst(), spawnPoint[12]);
@@ -334,5 +392,29 @@ public class SpawnArrayTest {
 			elements.add(e);
 		}
 		return elements;
+	}
+
+	class TestAppender extends AppenderSkeleton {
+		private final List<LoggingEvent> log = new ArrayList<LoggingEvent>();
+
+
+		@Override
+		protected void append(LoggingEvent loggingEvent) {
+			log.add(loggingEvent);
+		}
+
+		@Override
+		public boolean requiresLayout() {
+			return false;
+		}
+
+		@Override
+		public void close() {
+
+		}
+
+		public List<LoggingEvent> getLog() {
+			return new ArrayList<LoggingEvent>(log);
+		}
 	}
 }

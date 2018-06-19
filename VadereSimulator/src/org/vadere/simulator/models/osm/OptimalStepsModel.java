@@ -1,6 +1,9 @@
 package org.vadere.simulator.models.osm;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
+import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -305,6 +308,18 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		PedestrianOSM osmPed = (PedestrianOSM) ped;
 		pedestrianEventsQueue.remove(osmPed);
 //		System.out.printf("Remove ped %s from pedestrianEventsQueue%n", ped.getId());
+	}
+
+	@Override
+	public SourceControllerFactory getSourceControllerFactory() {
+		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
+				.filter(ac -> ac instanceof CentroidGroupModel)
+				.map(ac -> (CentroidGroupModel) ac).findAny();
+		if (opCentroidGroupModel.isPresent()) {
+			return new GroupSourceControllerFactory(opCentroidGroupModel.get());
+		}
+
+		return new SingleSourceControllerFactory();
 	}
 
 	/**
