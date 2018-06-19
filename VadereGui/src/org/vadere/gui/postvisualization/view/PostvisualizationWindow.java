@@ -19,12 +19,10 @@ import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -250,7 +248,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				"PostVis.btnSVGSnapshot.tooltip");
 		addActionToToolbar(
 				toolbar,
-				new ActionGenerateTikZ("tikz_snapshot", resources.getIcon("tikz_icon.png", iconWidth, iconHeight),
+				new ActionGenerateTikz("tikz_snapshot", resources.getIcon("tikz_icon.png", iconWidth, iconHeight),
 						renderer),
 				"PostVis.btnTikZSnapshot.tooltip");
 

@@ -4,31 +4,24 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
-import org.vadere.gui.postvisualization.utils.SVGGenerator;
-import org.vadere.gui.postvisualization.utils.TikZGenerator;
+import org.vadere.gui.postvisualization.utils.TikzGenerator;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
-import org.vadere.state.scenario.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
-public class ActionGenerateTikZ extends ActionVisualization {
-	private static Logger logger = LogManager.getLogger(ActionGenerateTikZ.class);
+public class ActionGenerateTikz extends ActionVisualization {
+	private static Logger logger = LogManager.getLogger(ActionGenerateTikz.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
-	private final TikZGenerator tikZGenerator;
+	private final TikzGenerator tikzGenerator;
 
-	public ActionGenerateTikZ(final String name, final Icon icon, final PostvisualizationRenderer renderer) {
+	public ActionGenerateTikz(final String name, final Icon icon, final PostvisualizationRenderer renderer) {
 		super(name, icon, renderer.getModel());
-		this.tikZGenerator = new TikZGenerator(renderer, renderer.getModel());
+		this.tikzGenerator = new TikzGenerator(renderer, renderer.getModel());
 	}
 
 	@Override
@@ -50,7 +43,7 @@ public class ActionGenerateTikZ extends ActionVisualization {
 					: new File(fileChooser.getSelectedFile().toString() + ".tex");
 
 			boolean completeDocument = true;
-			tikZGenerator.generateTikZ(outputFile, completeDocument);
+			tikzGenerator.generateTikz(outputFile, completeDocument);
 		}
 	}
 }
