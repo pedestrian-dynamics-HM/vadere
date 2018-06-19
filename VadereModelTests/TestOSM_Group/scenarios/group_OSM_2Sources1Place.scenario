@@ -72,7 +72,7 @@
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
         "leaderAttractionFactor" : 0.003,
-        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ]
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.5, 0.0, 0.5 ]
       }
     },
     "attributesSimulation" : {
