@@ -43,9 +43,9 @@ public class CentroidGroupModel
 	public void initialize(List<Attributes> attributesList, Topography topography,
 						   AttributesAgent attributesPedestrian, Random random) {
 		this.attributesCGM = Model.findAttributes(attributesList, AttributesCGM.class);
-		this.groupSizeDeterminator = new GroupSizeDeterminatorRandom(
-				attributesCGM.getGroupSizeDistribution(), random);
 		this.topography = topography;
+		setGroupSizeDeterminator(new GroupSizeDeterminatorRandom(
+				attributesCGM.getGroupSizeDistribution(), random));
 	}
 
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
@@ -124,4 +124,9 @@ public class CentroidGroupModel
 	public void elementRemoved(Pedestrian pedestrian) {
 		getGroupFactory(pedestrian.getSource().getId()).elementRemoved(pedestrian);
 	}
+
+	public void setGroupSizeDeterminator(GroupSizeDeterminator groupSizeDeterminator) {
+		this.groupSizeDeterminator = groupSizeDeterminator;
+	}
+
 }
