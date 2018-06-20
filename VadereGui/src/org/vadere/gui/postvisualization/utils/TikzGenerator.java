@@ -65,7 +65,7 @@ public class TikzGenerator {
 
 	    String output = (generateCompleteDocument) ? String.format(texTemplate, tikzCode) : tikzCode ;
 
-	    // TODO: maybe uses Java's resources notation.
+	    // TODO: maybe uses Java's resources notation (in general, writing the file should be done by the caller not here).
 		try {
 			file.createNewFile();
             Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
@@ -78,54 +78,10 @@ public class TikzGenerator {
 		}
 	}
 
-	private String convertScenarioElementsToTikz() {
-	    String generatedCode = "";
-
-	    Topography topography = model.getTopography();
-
-        generatedCode += "% Boundary Box\n";
-        String boundaryBoxTextPattern = "\\fill[white] (%f,%f) rectangle (%f,%f);\n";
-        generatedCode += String.format(boundaryBoxTextPattern,
-                topography.getBounds().x,
-                topography.getBounds().y,
-                topography.getBounds().x + topography.getBounds().width,
-                topography.getBounds().y + topography.getBounds().height);
-
-	    // TODO: maybe, draw also trajectories.
-        generatedCode += "% Sources\n";
-        for (Source source : topography.getSources()) {
-            generatedCode += String.format("\\fill[SourceColor] %s\n", generatePathForScenarioElement(source));
-        }
-
-        generatedCode += "% Targets\n";
-        for (Target target : topography.getTargets()) {
-            generatedCode += String.format("\\fill[TargetColor] %s\n", generatePathForScenarioElement(target));
-        }
-
-        generatedCode += "% Obstacles\n";
-        for (Obstacle obstacle : topography.getObstacles()) {
-            generatedCode += String.format("\\fill[ObstacleColor] %s\n", generatePathForScenarioElement(obstacle));
-        }
-
-        generatedCode += "% Stairs\n";
-        for (Stairs stair : topography.getStairs()) {
-            generatedCode += String.format("\\fill[StairColor] %s\n", generatePathForScenarioElement(stair));
-        }
-
-        // TODO: add agents as path NOT as pre-defined form (they require cubic splines).
-        generatedCode += "% Agents\n";
-        for (Agent agent : model.getAgents()) {
-            String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
-            generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-        }
-
-	    return generatedCode;
-    }
-
     private String generateTikzColorDefinitions(SimulationModel<? extends DefaultSimulationConfig> model) {
-	    String colorDefinitions = "% Color Definitions\n";
+        String colorDefinitions = "% Color Definitions\n";
 
-	    String colorTextPattern = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
+        String colorTextPattern = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
 
         Color sourceColor = model.getConfig().getSourceColor();
         colorDefinitions += String.format(colorTextPattern, "SourceColor", sourceColor.getRed(), sourceColor.getGreen(), sourceColor.getBlue());
@@ -142,7 +98,72 @@ public class TikzGenerator {
         Color agentColor = model.getConfig().getPedestrianDefaultColor();
         colorDefinitions += String.format(colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
-	    return colorDefinitions;
+        return colorDefinitions;
+    }
+
+	private String convertScenarioElementsToTikz() {
+	    String generatedCode = "";
+
+        DefaultSimulationConfig config = model.getConfig();
+        Topography topography = model.getTopography();
+
+        generatedCode += "% Ground\n";
+        String groundTextPattern = (config.isShowGrid()) ? "\\draw[help lines] (%f,%f) grid (%f,%f);\n" : "\\fill[white] (%f,%f) rectangle (%f,%f);\n";
+        generatedCode += String.format(groundTextPattern,
+                topography.getBounds().x,
+                topography.getBounds().y,
+                topography.getBounds().x + topography.getBounds().width,
+                topography.getBounds().y + topography.getBounds().height);
+
+        if (config.isShowSources()) {
+            generatedCode += "% Sources\n";
+            for (Source source : topography.getSources()) {
+                generatedCode += String.format("\\fill[SourceColor] %s\n", generatePathForScenarioElement(source));
+            }
+        } else {
+            generatedCode += "% Sources (not enabled in config)\n";
+        }
+
+        if (config.isShowTargets()) {
+            generatedCode += "% Targets\n";
+            for (Target target : topography.getTargets()) {
+                generatedCode += String.format("\\fill[TargetColor] %s\n", generatePathForScenarioElement(target));
+            }
+        } else {
+            generatedCode += "% Targets (not enabled in config)\n";
+        }
+
+        if (config.isShowObstacles()) {
+            generatedCode += "% Obstacles\n";
+            for (Obstacle obstacle : topography.getObstacles()) {
+                generatedCode += String.format("\\fill[ObstacleColor] %s\n", generatePathForScenarioElement(obstacle));
+            }
+        } else {
+            generatedCode += "% Obstacles (not enabled in config)\n";
+        }
+
+        if (config.isShowStairs()) {
+            generatedCode += "% Stairs\n";
+            for (Stairs stair : topography.getStairs()) {
+                generatedCode += String.format("\\fill[StairColor] %s\n", generatePathForScenarioElement(stair));
+            }
+        } else {
+            generatedCode += "% Stairs (not enabled in config)\n";
+        }
+
+        // TODO: draw agents as path NOT as pre-defined form (they require cubic splines).
+        // TODO: maybe, draw also trajectories.
+        if (config.isShowPedestrians()) {
+            generatedCode += "% Agents\n";
+            for (Agent agent : model.getAgents()) {
+                String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+            }
+        } else {
+            generatedCode += "% Agents (not enabled in config)\n";
+        }
+
+        return generatedCode;
     }
 
 	private String generatePathForScenarioElement(ScenarioElement element) {
@@ -180,9 +201,9 @@ public class TikzGenerator {
         } else if (type == SEG_LINETO) {
             convertedPath = String.format(convertedPath, coords[0], coords[1]);
         } else if (type == SEG_QUADTO) {
-	        // TODO
+	        // TODO: use coords correctly.
         } else if (type == SEG_CUBICTO) {
-            // TODO
+            // TODO: use coords correctly.
         }
 
 	    return convertedPath;

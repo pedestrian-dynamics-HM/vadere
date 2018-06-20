@@ -248,7 +248,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				"PostVis.btnSVGSnapshot.tooltip");
 		addActionToToolbar(
 				toolbar,
-				new ActionGenerateTikz("tikz_snapshot", resources.getIcon("tikz_icon.png", iconWidth, iconHeight),
+				new ActionGenerateTikz("tikz_snapshot", resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
 						renderer),
 				"PostVis.btnTikZSnapshot.tooltip");
 
