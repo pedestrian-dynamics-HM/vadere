@@ -18,24 +18,36 @@ import static java.awt.geom.PathIterator.*;
 /**
  * Convert the (Java) scenario description into a TikZ representation.
  *
- * Usually, each (Java) scenario element is represented as a path from
+ * Usually, each (Java) scenario element is represented as a path via
  * @see PathIterator This PathSeparator must be converted into its TikZ
  * representation.
  *
- * Also use configured colors from GUI settings.
+ * For example, traversing a Java path with PathIterator returns two
+ * segments:
+ *
+ *
+ *     segment type= 0 (SEG_MOVETO) with coords: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+ *     segment type= 3 (SEG_LINETO) with coords: [2.0, 2.0, 0.0, 0.0, 0.0, 0.0]
+ *
+ * This must be transformed to TikZ:
+ *
+ *     (1.0,1.0) to (2.0,2.0)
+ *
+ * The TikZGenerator should also respect the GUI settings (e.g., enabled
+ * elements, colors etc.).
  */
 public class TikzGenerator {
 
-	private static Logger logger = LogManager.getLogger(TikzGenerator.class);
-	private SimulationRenderer renderer;
+	private final static Logger logger = LogManager.getLogger(TikzGenerator.class);
+	private final SimulationRenderer renderer;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
-    private String[] translationTable;
+    private final String[] translationTable;
 
 	public TikzGenerator(final SimulationRenderer renderer,
                          final SimulationModel<? extends DefaultSimulationConfig> model) {
 		this.renderer = renderer;
 		this.model = model;
-        translationTable = new String[SEG_CLOSE + 1];
+        this.translationTable = new String[SEG_CLOSE + 1];
 
         initializeTranslationTable(translationTable);
     }
@@ -44,8 +56,8 @@ public class TikzGenerator {
 	    // Map Java path commands to TikZ commands.
         translationTable[SEG_MOVETO] = "(%f,%f) ";
         translationTable[SEG_LINETO] = "to (%f,%f) ";
-        translationTable[SEG_QUADTO] = "How to convert SEG_QUADTO to TikZ?";
-        translationTable[SEG_CUBICTO] = "How to convert SEG_CUBICTO to TikZ?";
+        translationTable[SEG_QUADTO] = ".. controls (%f,%f) .. (%f,%f) ";
+        translationTable[SEG_CUBICTO] = ".. controls (%f,%f) and (%f,%f) .. (%f,%f) ";
         translationTable[SEG_CLOSE] = "to cycle;";
     }
 
@@ -107,6 +119,7 @@ public class TikzGenerator {
         DefaultSimulationConfig config = model.getConfig();
         Topography topography = model.getTopography();
 
+        // Draw background elements first, then agents.
         generatedCode += "% Ground\n";
         String groundTextPattern = (config.isShowGrid()) ? "\\draw[help lines] (%f,%f) grid (%f,%f);\n" : "\\fill[white] (%f,%f) rectangle (%f,%f);\n";
         generatedCode += String.format(groundTextPattern,
@@ -151,13 +164,14 @@ public class TikzGenerator {
             generatedCode += "% Stairs (not enabled in config)\n";
         }
 
-        // TODO: draw agents as path NOT as pre-defined form (they require cubic splines).
         // TODO: maybe, draw also trajectories.
         if (config.isShowPedestrians()) {
             generatedCode += "% Agents\n";
             for (Agent agent : model.getAgents()) {
                 String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
                 generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+                // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
+                // generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
             }
         } else {
             generatedCode += "% Agents (not enabled in config)\n";
@@ -177,33 +191,27 @@ public class TikzGenerator {
             int type = pathIterator.currentSegment(coords);
 
             generatedPath += convertJavaToTikzPath(type, coords);
-
-			// System.out.println("segment type= " + type + " with coords: " + Arrays.toString(coords));
             pathIterator.next();
 		}
-
-		// System.out.println("TikZ path: " + generatedPath);
 
 		return generatedPath;
 	}
 
 	private String convertJavaToTikzPath(int type, float[] coords) {
-	    String convertedPath = "";
-
-	    if (type > SEG_CLOSE + 1) {
+	    if (type < SEG_MOVETO || type > SEG_CLOSE) {
             throw new IllegalStateException(String.format("Cannot process path segment type: %d (coordinates: %s)", type, Arrays.toString(coords)));
         }
 
-        convertedPath = translationTable[type];
+        String convertedPath = translationTable[type];
 
 	    if (type == SEG_MOVETO) {
             convertedPath = String.format(convertedPath, coords[0], coords[1]);
         } else if (type == SEG_LINETO) {
             convertedPath = String.format(convertedPath, coords[0], coords[1]);
         } else if (type == SEG_QUADTO) {
-	        // TODO: use coords correctly.
+            convertedPath = String.format(convertedPath, coords[0], coords[1], coords[2], coords[3]);
         } else if (type == SEG_CUBICTO) {
-            // TODO: use coords correctly.
+            convertedPath = String.format(convertedPath, coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
         }
 
 	    return convertedPath;
