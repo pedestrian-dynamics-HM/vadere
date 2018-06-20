@@ -3,6 +3,8 @@ package org.vadere.simulator.models.groups;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.scenario.ScenarioElement;
 
+import java.util.List;
+
 public interface GroupModel extends Model {
 	public Group getGroup(ScenarioElement ped);
 
@@ -12,5 +14,7 @@ public interface GroupModel extends Model {
 
 	public Group getNewGroup(int size);
 
-	public GroupFactory getGroupFactory(int SourceId);
+	public GroupFactory getGroupFactory(int sourceId);
+
+	public void initializeGroupFactory(int sourceId, List<Double> groupSizeDistribution);
 }

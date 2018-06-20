@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CentroidGroupModel
 		implements GroupModel, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
 
-	private GroupSizeDeterminator groupSizeDeterminator;
+	private Random random;
 	private Map<Integer, CentroidGroupFactory> groupFactories;
 	private Map<ScenarioElement, CentroidGroup> pedestrianGroupData;
 
@@ -44,8 +44,9 @@ public class CentroidGroupModel
 						   AttributesAgent attributesPedestrian, Random random) {
 		this.attributesCGM = Model.findAttributes(attributesList, AttributesCGM.class);
 		this.topography = topography;
-		setGroupSizeDeterminator(new GroupSizeDeterminatorRandom(
-				attributesCGM.getGroupSizeDistribution(), random));
+		this.random = random;
+//		setGroupSizeDeterminator(new GroupSizeDeterminatorRandom(
+//				attributesCGM.getGroupSizeDistribution(), random));
 	}
 
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
@@ -62,11 +63,19 @@ public class CentroidGroupModel
 		CentroidGroupFactory result = groupFactories.get(sourceId);
 
 		if (result == null) {
-			result = new CentroidGroupFactory(this, groupSizeDeterminator);
-			groupFactories.put(sourceId, result);
+			throw new IllegalArgumentException("For SourceID: " + sourceId + " no GroupFactory exists. " +
+					"Is this really a valid source?");
 		}
 
 		return result;
+	}
+
+	@Override
+	public void initializeGroupFactory(int sourceId, List<Double> groupSizeDistribution) {
+		GroupSizeDeterminator gsD = new GroupSizeDeterminatorRandom(groupSizeDistribution, random);
+		CentroidGroupFactory result =
+				new CentroidGroupFactory(this, gsD);
+		groupFactories.put(sourceId, result);
 	}
 
 	@Override
@@ -123,10 +132,6 @@ public class CentroidGroupModel
 	@Override
 	public void elementRemoved(Pedestrian pedestrian) {
 		getGroupFactory(pedestrian.getSource().getId()).elementRemoved(pedestrian);
-	}
-
-	public void setGroupSizeDeterminator(GroupSizeDeterminator groupSizeDeterminator) {
-		this.groupSizeDeterminator = groupSizeDeterminator;
 	}
 
 }

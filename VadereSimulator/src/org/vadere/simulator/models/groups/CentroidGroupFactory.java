@@ -57,4 +57,12 @@ public class CentroidGroupFactory extends GroupFactory {
 		CentroidGroup group = groupCollection.removeMember(ped);
 //		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group != null ? group.getID() : "noGroup");
 	}
+
+	public GroupSizeDeterminator getGroupSizeDeterminator() {
+		return groupSizeDeterminator;
+	}
+
+	public void setGroupSizeDeterminator(GroupSizeDeterminator groupSizeDeterminator) {
+		this.groupSizeDeterminator = groupSizeDeterminator;
+	}
 }

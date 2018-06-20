@@ -1,31 +1,31 @@
 package org.vadere.state.attributes.scenario;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.state.util.TextOutOfNodeException;
-import org.vadere.util.io.IOUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class SourceTestAttributesBuilder {
 
+	private int id = 1;
 	private double startTime = 1;
 	private double endTime = 2;
 	private int spawnNumber = 1;
 	private boolean useFreeSpaceOnly = false;
 	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
 	private double[] distributionParams = new double[] { 1 };
+	private double[] groupSizeDistribution = new double[]{0.0, 0.0, 1.0};
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
-	private double x0 = 0.1;
-	private double y0 = 0;
+	private double x0 = 0.0;
+	private double y0 = 0.0;
 	private double x1 = 0.1;
-	private double y1 = 0.1;
-	private double x2 = 0;
+	private double y1 = 0.0;
+	private double x2 = 0.1;
 	private double y2 = 0.1;
+	private double x3 = 0.0;
+	private double y3 = 0.1;
 
 	public AttributesSource getResult() {
 		String json = generateSourceAttributesJson();
@@ -78,23 +78,59 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setSourceDim(double width, double height) {
-		x0 = width;
-		y0 = 0;
-		x1 = width;
-		y1 = height;
-		x2 = 0;
-		y2 = height;
+	public SourceTestAttributesBuilder setId(int id) {
+		this.id = id;
 		return this;
 	}
 
+	public SourceTestAttributesBuilder setSourceDim(VRectangle rect) {
+		x0 = rect.x;
+		y0 = rect.y;
+
+		x1 = x0 + rect.width;
+		y1 = y0;
+
+		x2 = x0 + rect.width;
+		y2 = x0 + rect.height;
+
+		x3 = x0;
+		y3 = y0 + rect.height;
+		return this;
+	}
+
+	public SourceTestAttributesBuilder setSourceDim(double width, double height) {
+		x1 = width;
+		y1 = 0;
+		x2 = width;
+		y2 = height;
+		x3 = 0;
+		y3 = height;
+		return this;
+	}
+
+	public SourceTestAttributesBuilder setGroupSizeDistribution(double... dist) {
+		this.groupSizeDistribution = dist;
+		return this;
+	}
+
+	private String groupSizeDistribution() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < groupSizeDistribution.length - 1; i++) {
+			sb.append(groupSizeDistribution[i]).append(", ");
+		}
+		sb.append(groupSizeDistribution[groupSizeDistribution.length - 1]).append(" ]");
+
+		return sb.toString();
+	}
 
 	private String generateSourceAttributesJson() {
-		return "{\"shape\": {\"type\": \"POLYGON\",\"points\":"
+		return "{  \"id\" : " + id + "," +
+				"\"shape\": {\"type\": \"POLYGON\",\"points\":"
 				+ "[{\"x\": 0.0,\"y\": 0.0}"
-				+ ",{\"x\": " + x0 + ",\"y\": " + y0 + "}"
 				+ ",{\"x\": " + x1 + ",\"y\": " + y1 + "}"
-				+ ",{\"x\": " + x2 + ",\"y\": " + y2 + "}]}"
+				+ ",{\"x\": " + x2 + ",\"y\": " + y2 + "}"
+				+ ",{\"x\": " + x3 + ",\"y\": " + y3 + "}]}"
 				+ ",\"spawnNumber\":  " + spawnNumber
 				+ ",\"maxSpawnNumberTotal\":  " + maxSpawnNumberTotal
 				+ ",\"interSpawnTimeDistribution\": \"" + distributionClass.getName() + "\""
@@ -103,6 +139,7 @@ public class SourceTestAttributesBuilder {
 				+ ",\"endTime\": " + endTime
 				+ ",\"spawnAtRandomPositions\": true"
 				+ ",\"useFreeSpaceOnly\": " + useFreeSpaceOnly
+				+ ",\"groupSizeDistribution\" : " + groupSizeDistribution() + "\n"
 				+ ",\"targetIds\": [1]}";
 	}
 

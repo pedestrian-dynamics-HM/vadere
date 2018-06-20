@@ -23,7 +23,7 @@ public class GroupSourceControllerFactory extends SourceControllerFactory {
 								   DynamicElementFactory dynamicElementFactory,
 								   AttributesDynamicElement attributesDynamicElement,
 								   Random random) {
-
+		groupModel.initializeGroupFactory(source.getId(), source.getAttributes().getGroupSizeDistribution());
 		return new GroupSourceController(scenario, source, dynamicElementFactory, attributesDynamicElement, random, groupModel);
 	}
 }
