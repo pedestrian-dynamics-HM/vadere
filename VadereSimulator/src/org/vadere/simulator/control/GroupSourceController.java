@@ -41,7 +41,8 @@ public class GroupSourceController extends SourceController {
 							int groupSize = iter.next();
 							List<VPoint> newGroup = spawnArray.getNextFreeGroup(groupSize, random, getDynElementsAtSource());
 							if (newGroup != null) {
-								spawnGroups.add(newGroup);
+								// add immediately to Scenario to update DynElementsAtSource
+								addElementToScenario(newGroup);
 								iter.remove();
 							} else {
 								break; // FIFO Spawn. The rest of the queue at next time step
@@ -52,7 +53,7 @@ public class GroupSourceController extends SourceController {
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
 							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, random);
-							spawnGroups.add(newGroup);
+							addElementToScenario(newGroup);
 							iter.remove();
 						}
 					}
@@ -65,7 +66,8 @@ public class GroupSourceController extends SourceController {
 							int groupSize = iter.next();
 							List<VPoint> newGroup = spawnArray.getNextFreeGroup(groupSize, getDynElementsAtSource());
 							if (newGroup != null) {
-								spawnGroups.add(newGroup);
+								// add immediately to Scenario to update DynElementsAtSource
+								addElementToScenario(newGroup);
 								iter.remove();
 							} else {
 								break; // FIFO Spawn. The rest of the queue at next time step
@@ -76,21 +78,22 @@ public class GroupSourceController extends SourceController {
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
 							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize);
-							spawnGroups.add(newGroup);
+							addElementToScenario(newGroup);
 							iter.remove();
 						}
 					}
 
 				}
 
-				for (List<VPoint> group : spawnGroups) {
-					if (!isMaximumNumberOfSpawnedElementsReached()) {
-						addNewAgentToScenario(group);
-						dynamicElementsCreatedTotal++;
-					}
-				}
 
 			}
+		}
+	}
+
+	private void addElementToScenario(List<VPoint> group) {
+		if (!isMaximumNumberOfSpawnedElementsReached()) {
+			addNewAgentToScenario(group);
+			dynamicElementsCreatedTotal++;
 		}
 	}
 

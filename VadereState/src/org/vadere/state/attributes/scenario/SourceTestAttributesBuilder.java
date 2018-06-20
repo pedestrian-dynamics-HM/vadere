@@ -20,7 +20,13 @@ public class SourceTestAttributesBuilder {
 	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
 	private double[] distributionParams = new double[] { 1 };
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
-	
+	private double x0 = 0.1;
+	private double y0 = 0;
+	private double x1 = 0.1;
+	private double y1 = 0.1;
+	private double x2 = 0;
+	private double y2 = 0.1;
+
 	public AttributesSource getResult() {
 		String json = generateSourceAttributesJson();
 		return StateJsonConverter.deserializeObjectFromJson(json, AttributesSource.class);
@@ -72,12 +78,23 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
+	public SourceTestAttributesBuilder setSourceDim(double width, double height) {
+		x0 = width;
+		y0 = 0;
+		x1 = width;
+		y1 = height;
+		x2 = 0;
+		y2 = height;
+		return this;
+	}
+
+
 	private String generateSourceAttributesJson() {
 		return "{\"shape\": {\"type\": \"POLYGON\",\"points\":"
 				+ "[{\"x\": 0.0,\"y\": 0.0}"
-				+ ",{\"x\": 0.1,\"y\": 0}"
-				+ ",{\"x\": 0.1,\"y\": 0.1}"
-				+ ",{\"x\": 0,\"y\": 0.1}]}"
+				+ ",{\"x\": " + x0 + ",\"y\": " + y0 + "}"
+				+ ",{\"x\": " + x1 + ",\"y\": " + y1 + "}"
+				+ ",{\"x\": " + x2 + ",\"y\": " + y2 + "}]}"
 				+ ",\"spawnNumber\":  " + spawnNumber
 				+ ",\"maxSpawnNumberTotal\":  " + maxSpawnNumberTotal
 				+ ",\"interSpawnTimeDistribution\": \"" + distributionClass.getName() + "\""

@@ -9,6 +9,8 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.LinkedList;
 import java.util.Random;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 public class SingleSourceController extends SourceController {
 
 	private int numberToSpawn;

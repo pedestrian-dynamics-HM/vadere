@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
@@ -29,6 +30,10 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	protected SourceControllerFactory sourceControllerFactory;
 	protected long randomSeed = 0;
 
+	public void initSourceControllerFactory() {
+		sourceControllerFactory = new SingleSourceControllerFactory();
+	}
+
 	public void initialize(SourceTestAttributesBuilder builder) {
 
 		attributesSource = builder.getResult();
@@ -50,7 +55,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 			}
 		};
 
-		this.sourceControllerFactory = new SingleSourceControllerFactory();
+		initSourceControllerFactory();
 
 		sourceController = this.sourceControllerFactory.create(topography, source,
 				pedestrianFactory, attributesPedestrian, random);
