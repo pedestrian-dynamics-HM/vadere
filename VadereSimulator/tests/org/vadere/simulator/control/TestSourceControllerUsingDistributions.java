@@ -118,7 +118,6 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		// works also with sources that have startTime == endTime?
 		// expected: not stop spawning before all pedestrians are created (even after end time)
 		double startTime = 1;
-		double endTime = startTime;
 		int spawnNumber = 100;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(startTime)
@@ -126,7 +125,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setUseFreeSpaceOnly(true);
 		initialize(builder);
 
-		doUpdates(100, 0, endTime + 1);
+		doUpdates(100, 0, startTime + 1);
 
 		// despite many updates, only one ped can be spawned
 		assertEquals(1, countPedestrians());
@@ -206,30 +205,6 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		assertEquals(maxSpawnNumberTotal, countPedestrians());
 	}
 
-	private void doUpdates(int number, double startTime, double endTimeExclusive) {
-		double timeStep = (endTimeExclusive - startTime) / number;
-		for (double t = startTime; t < endTimeExclusive + 1; t += timeStep) {
-			sourceController.update(t);
-		}
-	}
 
-	private void doUpdatesBeamingPedsAway(int number) {
-		double start = 10;
-		for (double t = start; t < start + number; t += 1) {
-			sourceController.update(t);
-			beamPedsAway();
-		}
-	}
-
-	private void beamPedsAway() {
-		final VPoint positionFarAway = new VPoint(1000, 1000);
-		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
-			pedestrian.setPosition(positionFarAway);
-		}
-	}
-
-	private void pedestrianCountEquals(int expected) {
-		assertEquals(expected, countPedestrians());
-	}
 	
 }

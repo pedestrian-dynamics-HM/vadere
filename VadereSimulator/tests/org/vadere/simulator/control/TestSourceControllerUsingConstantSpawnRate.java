@@ -176,4 +176,29 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		return topography.getElements(Pedestrian.class).size();
 	}
 
+	protected void pedestrianCountEquals(int expected) {
+		assertEquals(expected, countPedestrians());
+	}
+
+	protected void doUpdates(int number, double startTime, double endTimeExclusive) {
+		double timeStep = (endTimeExclusive - startTime) / number;
+		for (double t = startTime; t < endTimeExclusive + 1; t += timeStep) {
+			sourceController.update(t);
+		}
+	}
+
+	protected void doUpdatesBeamingPedsAway(int number) {
+		double start = 10;
+		for (double t = start; t < start + number; t += 1) {
+			sourceController.update(t);
+			beamPedsAway();
+		}
+	}
+
+	protected void beamPedsAway() {
+		final VPoint positionFarAway = new VPoint(1000, 1000);
+		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
+			pedestrian.setPosition(positionFarAway);
+		}
+	}
 }

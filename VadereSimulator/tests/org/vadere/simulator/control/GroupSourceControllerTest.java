@@ -9,6 +9,7 @@ import org.vadere.simulator.models.groups.GroupSizeDeterminatorRandom;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.util.StateJsonConverter;
@@ -161,6 +162,205 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		assertEquals("wrong pedestrian number.", 300, countPedestrians());
 	}
 
+	// WithDistribution
+
+	@Test
+	public void testStartTime() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 1}; // only groups of 3
+		groupSpawn = new Integer[]{3, 3, 3, 3};
+		initialize(builder);
+
+		sourceController.update(0);
+		pedestrianCountEquals(0);
+		sourceController.update(0.9);
+		pedestrianCountEquals(0);
+
+		sourceController.update(1);
+		pedestrianCountEquals(3);
+	}
+
+	@Test
+	public void testEndTime() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
+				.setEndTime(2)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 1}; // only groups of 3
+		groupSpawn = new Integer[]{3, 3, 3, 3};
+		initialize(builder);
+
+		sourceController.update(1);
+		pedestrianCountEquals(3);
+		sourceController.update(2);
+		pedestrianCountEquals(6);
+
+		sourceController.update(3); // end time reached -> no effect
+		pedestrianCountEquals(6);
+	}
+
+	@Test
+	public void testOneTimeSpawn() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setOneTimeSpawn(1).setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 1}; // only groups of 3
+		groupSpawn = new Integer[]{3, 3, 3, 3};
+		initialize(builder);
+
+		sourceController.update(0);
+		pedestrianCountEquals(0);
+		sourceController.update(1);
+		pedestrianCountEquals(3);
+		sourceController.update(2);
+		pedestrianCountEquals(3);
+	}
+
+	@Test
+	public void testSpawnNumber() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setSpawnNumber(10)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.0, 1}; // only groups of 4
+		groupSpawn = new Integer[]{}; // do not mock group Dist.
+		initialize(builder);
+
+		sourceController.update(1);
+		pedestrianCountEquals(10 * 4);
+		sourceController.update(2);
+		pedestrianCountEquals(20 * 4);
+	}
+
+	@Test
+	public void testSpawnRateGreaterThanUpdateRate() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setStartTime(0).setEndTime(1)
+				.setSpawnIntervalForConstantDistribution(0.3)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.25, 0.75}; // only groups of 4
+		groupSpawn = new Integer[]{4, 3, 4, 4}; // do not mock group Dist.
+		initialize(builder);
+
+		// per update only one "spawn action" is performed.
+		// if the spawn rate is higher than the update time increment, spawns will get lost.
+		sourceController.update(0);
+		pedestrianCountEquals(4);
+		sourceController.update(1);
+		pedestrianCountEquals(15);
+	}
+
+	@Test
+	public void testUseFreeSpaceOnly() {
+		// expected: not stop spawning before all pedestrians are created (even after end time)
+		double d = new AttributesAgent().getRadius() * 2;
+		double startTime = 0;
+		double endTime = 1;
+		int spawnNumber = 100;
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setStartTime(startTime).setEndTime(endTime)
+				.setSpawnNumber(100)
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(2 * d + 0.1, 4 * d + 0.1);
+		groupDist = new double[]{0.0, 0.0, 0.0, 1}; // only groups of 4
+		groupSpawn = new Integer[]{};
+
+		initialize(builder);
+
+		doUpdates(100, startTime, endTime + 1);
+
+		// despite many updates, only tow groups of four can be spawned
+		assertEquals(8, countPedestrians());
+
+		doUpdatesBeamingPedsAway(1000);
+
+		// now, all pedestrians should have been created
+		assertEquals(2 * spawnNumber * 4, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalSetTo0() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setMaxSpawnNumberTotal(0) // <-- max 0 -> spawn no peds at all
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.25, 0.75};
+		groupSpawn = new Integer[]{4, 3, 4, 4};
+		initialize(builder);
+
+		sourceController.update(1);
+		sourceController.update(2);
+		sourceController.update(3);
+
+		assertEquals(0, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalNotSet() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL) // <-- maximum not set
+				.setEndTime(2)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.25, 0.75};
+		groupSpawn = new Integer[]{4, 3, 4, 4};
+		initialize(builder);
+
+		sourceController.update(1);
+		sourceController.update(2);
+		sourceController.update(3);
+
+		assertEquals(7, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalWithSmallEndTime() {
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setMaxSpawnNumberTotal(4) // <-- not exhausted
+				.setEndTime(2)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.25, 0.75};
+		groupSpawn = new Integer[]{4, 3, 4, 4};
+		initialize(builder);
+
+		sourceController.update(1);
+		sourceController.update(2);
+		sourceController.update(3);
+
+		assertEquals(7, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalWithLargeEndTime() {
+		double endTime = 100;
+		int maxSpawnNumberTotal = 4;
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setEndTime(endTime)
+				.setMaxSpawnNumberTotal(maxSpawnNumberTotal) // <-- exhausted!
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.25, 0.75};
+		groupSpawn = new Integer[]{4, 3, 4, 4};
+		initialize(builder);
+
+		doUpdates(50, 0, 200);
+
+		assertEquals(15, countPedestrians());
+	}
+
+	@Test
+	public void testMaxSpawnNumberTotalWithLargeEndTimeAndSpawnNumberGreater1() {
+		int maxSpawnNumberTotal = 4; // <-- exhausted!
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setEndTime(100)
+				.setSpawnNumber(5)
+				.setMaxSpawnNumberTotal(maxSpawnNumberTotal)
+				.setSourceDim(5.0, 5.0);
+		groupDist = new double[]{0.0, 0.0, 0.25, 0.75};
+		groupSpawn = new Integer[]{4, 3, 4, 4};
+		initialize(builder);
+
+		doUpdates(50, 0, 200);
+
+		assertEquals(15, countPedestrians());
+	}
 
 	private AttributesCGM generateCGMAttributesJson(double[] groups) {
 		StringBuilder sb = new StringBuilder();
