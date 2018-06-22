@@ -17,6 +17,7 @@ import org.vadere.gui.components.view.ScenarioScrollPane;
 import org.vadere.gui.components.view.SimulationInfoPanel;
 import org.vadere.gui.onlinevisualization.control.ActionGeneratePNG;
 import org.vadere.gui.onlinevisualization.control.ActionGenerateSVG;
+import org.vadere.gui.onlinevisualization.control.ActionGenerateTikz;
 import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 
@@ -150,6 +151,12 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				new OnlinevisualizationRenderer(model),
 				model);
 
+		ActionGenerateTikz generateTikz = new ActionGenerateTikz(
+				"generateTikz",
+				resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				new OnlinevisualizationRenderer(model),
+				model);
+
         ActionShowPotentialField showPotentialField = new ActionShowPotentialField(
                 "showPotentialField",
                 resources.getIcon("potentialField.png", iconWidth, iconHeight),
@@ -157,6 +164,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		mainPanel.addRendererChangeListener(generatePNG);
 		mainPanel.addRendererChangeListener(generateSVG);
+		mainPanel.addRendererChangeListener(generateTikz);
 		mainPanel.addRendererChangeListener(showPotentialField);
 
 
@@ -176,6 +184,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		SwingUtils.addActionToToolbar(toolbar, generatePNG, Messages.getString("PostVis.btnPNGSnapshot.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, generateSVG, Messages.getString("PostVis.btnSVGSnapshot.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, generateTikz, Messages.getString("PostVis.btnTikzSnapshot.tooltip"));
         SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
 
 		add(toolbar, cc.xyw(2, 2, 3));
