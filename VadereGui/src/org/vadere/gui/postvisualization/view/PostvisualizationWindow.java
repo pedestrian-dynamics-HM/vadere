@@ -24,21 +24,21 @@ import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
 import org.vadere.gui.postvisualization.control.ActionStop;
 import org.vadere.gui.postvisualization.control.ActionSwapSelectionMode;
 import org.vadere.gui.postvisualization.control.ActionVisualization;
+import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
@@ -260,16 +260,22 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		recordAction.setButton(recordButton);
 
 		toolbar.addSeparator(new Dimension(5, 50));
-		addActionToToolbar(
-				toolbar,
-				new ActionGeneratePNG("png_snapshot", resources.getIcon("camera_png.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnPNGSnapshot.tooltip");
-		addActionToToolbar(
-				toolbar,
-				new ActionGenerateSVG("svg_snapshot", resources.getIcon("camera_svg.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnSVGSnapshot.tooltip");
+		ArrayList<Action> imgOptions = new ArrayList<>();
+		ActionVisualization pngImg = new ActionGeneratePNG(Messages.getString("PostVis.btnPNGSnapshot.tooltip"), resources.getIcon("camera_png.png", iconWidth, iconHeight),
+				renderer);
+		ActionVisualization svgImg = new ActionGenerateSVG(Messages.getString("PostVis.btnSVGSnapshot.tooltip"), resources.getIcon("camera_svg.png", iconWidth, iconHeight),
+				renderer);
+		// add new ImageGenerator Action ...
+
+		imgOptions.add(pngImg);
+		imgOptions.add(svgImg);
+		// add Action to List ....
+
+		ActionVisualizationMenu imgDialog = new ActionVisualizationMenu(
+				"camera_menu",
+				resources.getIcon("camera.png", iconWidth, iconHeight),
+				model, null, imgOptions);
+		addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("PostVis.btnSnapshot.tooltip"));
 
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -335,6 +341,8 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		// deselect selected element on esc
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
 		getActionMap().put("deselect", new ActionDeselect(model, this, null));
+		repaint();
+		revalidate();
 	}
 
 	private JMenuBar getMenu() {
@@ -357,6 +365,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
 			final String toolTipProperty) {
 		return SwingUtils.addActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+	}
+
+	private static JButton addActionMenuToToolbar(final JToolBar toolbar, final ActionVisualizationMenu menuAction,
+												  final String toolTipProperty) {
+		JButton btn = SwingUtils.addActionToToolbar(toolbar, menuAction, Messages.getString(toolTipProperty));
+		menuAction.setParent(btn);
+		return btn;
 	}
 
 	public IDefaultModel getDefaultModel(){
