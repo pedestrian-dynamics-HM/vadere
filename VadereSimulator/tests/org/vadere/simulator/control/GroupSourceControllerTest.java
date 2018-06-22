@@ -15,7 +15,6 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -27,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 public class GroupSourceControllerTest extends TestSourceControllerUsingConstantSpawnRate {
 
-	private Integer[] groupSpawn;
 	private GroupModel m;
 
 	public SourceControllerFactory getSourceControllerFactory(SourceTestData d) {
@@ -43,10 +41,15 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	public void initialize(SourceTestAttributesBuilder builder) {
 		super.initialize(builder);
 		SourceTestData d = sourceTestData.get(sourceTestData.size() - 1);
-		if (groupSpawn.length > 0) {
-			GroupSizeDeterminatorRandom gsdRnd = Mockito.mock(GroupSizeDeterminatorRandom.class, Mockito.RETURNS_DEEP_STUBS);
+
+		if (builder.getGroupSizeDistributionMock().length > 0) {
+			Integer[] groupSizeDistributionMock = builder.getGroupSizeDistributionMock();
+			GroupSizeDeterminatorRandom gsdRnd =
+					Mockito.mock(GroupSizeDeterminatorRandom.class, Mockito.RETURNS_DEEP_STUBS);
 			Mockito.when(gsdRnd.nextGroupSize())
-					.thenReturn(groupSpawn[0], Arrays.copyOfRange(groupSpawn, 1, groupSpawn.length));
+					.thenReturn(groupSizeDistributionMock[0],
+							Arrays.copyOfRange(groupSizeDistributionMock,
+									1, groupSizeDistributionMock.length));
 			CentroidGroupFactory cgf = (CentroidGroupFactory) m.getGroupFactory(d.source.getId());
 			cgf.setGroupSizeDeterminator(gsdRnd);
 		}
@@ -58,8 +61,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.5, 0.5);
-		groupSpawn = new Integer[]{2, 2, 3, 3};
+				.setGroupSizeDistribution(0.0, 0.5, 0.5)
+				.setGroupSizeDistributionMock(2, 2, 3, 3);
 
 		initialize(builder);
 
@@ -81,8 +84,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setStartTime(startTime).setEndTime(endTime)
 				.setSpawnIntervalForConstantDistribution(10)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.5, 0.5);
-		groupSpawn = new Integer[]{2, 3, 2, 3};
+				.setGroupSizeDistribution(0.0, 0.5, 0.5)
+				.setGroupSizeDistributionMock(2, 3, 2, 3);
 		initialize(builder);
 
 		first().sourceController.update(startTime);
@@ -103,8 +106,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setStartTime(0).setEndTime(endTime)
 				.setSpawnIntervalForConstantDistribution(5)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.5, 0.5);
-		groupSpawn = new Integer[]{2, 3, 2, 3};
+				.setGroupSizeDistribution(0.0, 0.5, 0.5)
+				.setGroupSizeDistributionMock(2, 3, 2, 3);
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < endTime * 2; simTimeInSec += 1.0) {
@@ -123,8 +126,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setStartTime(0).setEndTime(endTime)
 				.setSpawnIntervalForConstantDistribution(0.1)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.5, 0.5);
-		groupSpawn = new Integer[]{2, 3, 2, 3, 2, 2, 3, 3, 3, 2, 2, 3, 3, 3, 3};
+				.setGroupSizeDistribution(0.0, 0.5, 0.5)
+				.setGroupSizeDistributionMock(2, 3, 2, 3, 2, 2, 3, 3, 3, 2, 2, 3, 3, 3, 3);
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < endTime * 2; simTimeInSec += 1.0) {
@@ -148,7 +151,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setUseFreeSpaceOnly(true)
 				.setSourceDim(2 * d + 0.1, 4 * d + 0.1)
 				.setGroupSizeDistribution(0.0, 0.0, 1);
-		groupSpawn = new Integer[]{};
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < 1000; simTimeInSec += 1.0) {
@@ -180,8 +182,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 1);
-		groupSpawn = new Integer[]{3, 3, 3, 3};
+				.setGroupSizeDistribution(0.0, 0.0, 1)
+				.setGroupSizeDistributionMock(3, 3, 3, 3);
 		initialize(builder);
 
 		first().sourceController.update(0);
@@ -199,8 +201,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 1); // only groups of 3
-		groupSpawn = new Integer[]{3, 3, 3, 3};
+				.setGroupSizeDistribution(0.0, 0.0, 1) // only groups of 3
+				.setGroupSizeDistributionMock(3, 3, 3, 3);
 		initialize(builder);
 
 		first().sourceController.update(1);
@@ -217,8 +219,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(1)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 1); // only groups of 3
-		groupSpawn = new Integer[]{3, 3, 3, 3};
+				.setGroupSizeDistribution(0.0, 0.0, 1) // only groups of 3
+				.setGroupSizeDistributionMock(3, 3, 3, 3);
 		initialize(builder);
 
 		first().sourceController.update(0);
@@ -235,7 +237,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setSpawnNumber(10)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.0, 1); // only groups of 4
-		groupSpawn = new Integer[]{}; // do not mock group Dist.
 		initialize(builder);
 
 		first().sourceController.update(1);
@@ -250,8 +251,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setStartTime(0).setEndTime(1)
 				.setSpawnIntervalForConstantDistribution(0.3)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75);
-		groupSpawn = new Integer[]{4, 3, 4, 4}; // do not mock group Dist.
+				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
+				.setGroupSizeDistributionMock(4, 3, 4, 4);
 		initialize(builder);
 
 		// per update only one "spawn action" is performed.
@@ -275,7 +276,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setUseFreeSpaceOnly(true)
 				.setSourceDim(2 * d + 0.1, 4 * d + 0.1)
 				.setGroupSizeDistribution(0.0, 0.0, 0.0, 1);
-		groupSpawn = new Integer[]{};
 
 		initialize(builder);
 
@@ -295,8 +295,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(0) // <-- max 0 -> spawn no peds at all
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75);
-		groupSpawn = new Integer[]{4, 3, 4, 4};
+				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
+				.setGroupSizeDistributionMock(4, 3, 4, 4);
 		initialize(builder);
 
 		first().sourceController.update(1);
@@ -312,8 +312,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL) // <-- maximum not set
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75);
-		groupSpawn = new Integer[]{4, 3, 4, 4};
+				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
+				.setGroupSizeDistributionMock(4, 3, 4, 4);
 		initialize(builder);
 
 		first().sourceController.update(1);
@@ -329,8 +329,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setMaxSpawnNumberTotal(4) // <-- not exhausted
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75);
-		groupSpawn = new Integer[]{4, 3, 4, 4};
+				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
+				.setGroupSizeDistributionMock(4, 3, 4, 4);
 		initialize(builder);
 
 		first().sourceController.update(1);
@@ -348,8 +348,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setEndTime(endTime)
 				.setMaxSpawnNumberTotal(maxSpawnNumberTotal) // <-- exhausted!
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75);
-		groupSpawn = new Integer[]{4, 3, 4, 4};
+				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
+				.setGroupSizeDistributionMock(4, 3, 4, 4);
 		initialize(builder);
 
 		doUpdates(0, 50, 0, 200);
@@ -367,8 +367,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setSpawnNumber(5)
 				.setMaxSpawnNumberTotal(maxSpawnNumberTotal)
 				.setSourceDim(5.0, 5.0)
-				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75);
-		groupSpawn = new Integer[]{4, 3, 4, 4};
+				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
+				.setGroupSizeDistributionMock(4, 3, 4, 4);
 		initialize(builder);
 
 		doUpdates(0, 50, 0, 200);
@@ -379,18 +379,37 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	@Ignore
 	public void multipleSources() {
-		int maxSpawnNumberTotal = 4;
 		SourceTestAttributesBuilder builder1 = new SourceTestAttributesBuilder()
+				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
-				.setSourceDim(new VRectangle(0, 0, 3, 4));
+				.setSourceDim(new VRectangle(0, 0, 3, 4))
+				.setEndTime(4)
+				.setMaxSpawnNumberTotal(4)
+				.setGroupSizeDistributionMock(3, 4, 4, 4, 3);
 		SourceTestAttributesBuilder builder2 = new SourceTestAttributesBuilder()
+				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setGroupSizeDistribution(0.0, 1.0)
-				.setSourceDim(new VRectangle(20, 20, 3, 2));
-		groupSpawn = new Integer[]{4, 3, 4, 4}; // todo spawn group for multiple sources
+				.setSourceDim(new VRectangle(20, 20, 3, 2))
+				.setEndTime(6)
+				.setMaxSpawnNumberTotal(6)
+				.setGroupSizeDistributionMock(2, 2, 2, 2, 2, 2);
+
 		initialize(builder1);
 		initialize(builder2);
 
-		//todo test different Distributions for sources
+		first().sourceController.update(1);
+		assertEquals(3, countPedestrians(0));
+
+		second().sourceController.update(1);
+		assertEquals(2, countPedestrians(1));
+
+		first().sourceController.update(2);
+		first().sourceController.update(3);
+		assertEquals(3 + 4 + 4, countPedestrians(0));
+
+		second().sourceController.update(2);
+		second().sourceController.update(3);
+		assertEquals(2 + 2 + 2, countPedestrians(1));
 
 	}
 

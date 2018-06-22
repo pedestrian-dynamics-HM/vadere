@@ -17,6 +17,7 @@ public class SourceTestAttributesBuilder {
 	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
 	private double[] distributionParams = new double[] { 1 };
 	private double[] groupSizeDistribution = new double[]{0.0, 0.0, 1.0};
+	private Integer[] groupSizeDistributionMock = new Integer[]{};
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
 	private double x0 = 0.0;
 	private double y0 = 0.0;
@@ -111,6 +112,15 @@ public class SourceTestAttributesBuilder {
 	public SourceTestAttributesBuilder setGroupSizeDistribution(double... dist) {
 		this.groupSizeDistribution = dist;
 		return this;
+	}
+
+	public SourceTestAttributesBuilder setGroupSizeDistributionMock(Integer... mock) {
+		this.groupSizeDistributionMock = mock;
+		return this;
+	}
+
+	public Integer[] getGroupSizeDistributionMock() {
+		return groupSizeDistributionMock;
 	}
 
 	private String groupSizeDistribution() {
