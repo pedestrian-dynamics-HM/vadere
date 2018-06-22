@@ -39,6 +39,14 @@ public class TimestepPedestrianIdKey implements DataKey<TimestepPedestrianIdKey>
 	}
 
 	@Override
+	public String toString() {
+		return "TimestepPedestrianIdKey{" +
+				"timestep=" + timestep +
+				", pedestrianId=" + pedestrianId +
+				'}';
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
