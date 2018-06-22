@@ -102,7 +102,7 @@
         "shape" : {
           "x" : 15.1,
           "y" : 6.0,
-          "width" : 6.9,
+          "width" : 12.0,
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
@@ -111,26 +111,8 @@
         "shape" : {
           "x" : 15.0,
           "y" : 0.2,
-          "width" : 7.0,
+          "width" : 12.0,
           "height" : 3.8,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 21.6,
-          "y" : 5.4,
-          "width" : 4.9,
-          "height" : 4.3,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 21.6,
-          "y" : 0.3,
-          "width" : 4.9,
-          "height" : 4.2,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -166,12 +148,13 @@
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 10,
+        "maxSpawnNumberTotal" : 4,
         "startTime" : 0.0,
-        "endTime" : 50.0,
+        "endTime" : 5.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 0.5, 0.0, 0.0, 0.0, 0.5 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
         "id" : 2,
@@ -185,12 +168,13 @@
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 10,
+        "maxSpawnNumberTotal" : 3,
         "startTime" : 0.0,
-        "endTime" : 50.0,
+        "endTime" : 10.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],
