@@ -47,8 +47,12 @@ public class SpawnArrayTest {
 		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
 		spawnArray = new SpawnArray(source, elementBound);
 		assertEquals("expected spawn points don't match", 1, spawnArray.getSpawnPoints().length);
-		assertEquals("", testAppender.getLog().get(0).getMessage(),
-				"Dimension of Source is to small for at least one dimension to contain designated spawnElement with Bound (1.00 x 1.00) Set to (1 x 1)");
+
+		String msg = String.format("Dimension of Source is to small for at least one" +
+						" dimension to contain designated spawnElement with" +
+						" Bound (%.2f x %.2f) Set to (%d x %d)",
+				1.0, 1.0, 1, 1);
+		assertEquals("", testAppender.getLog().get(0).getMessage(), msg);
 		log.removeAppender(testAppender);
 	}
 
@@ -63,8 +67,12 @@ public class SpawnArrayTest {
 		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
 		spawnArray = new SpawnArray(source, elementBound);
 		assertEquals("expected spawn points don't match", 3, spawnArray.getSpawnPoints().length);
-		assertEquals("", testAppender.getLog().get(0).getMessage(),
-				"Dimension of Source is to small for at least one dimension to contain designated spawnElement with Bound (1.00 x 1.00) Set to (3 x 1)");
+		String msg = String.format("Dimension of Source is to small for at least one" +
+						" dimension to contain designated spawnElement with" +
+						" Bound (%.2f x %.2f) Set to (%d x %d)",
+				1.0, 1.0, 3, 1);
+		assertEquals("", testAppender.getLog().get(0).getMessage(), msg);
+		log.removeAppender(testAppender);
 		log.removeAppender(testAppender);
 	}
 
