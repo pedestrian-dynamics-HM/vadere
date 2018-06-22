@@ -3,8 +3,6 @@ package org.vadere.gui.onlinevisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import javax.swing.*;
-
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -17,13 +15,17 @@ import org.vadere.gui.components.view.ScenarioScrollPane;
 import org.vadere.gui.components.view.SimulationInfoPanel;
 import org.vadere.gui.onlinevisualization.control.ActionGeneratePNG;
 import org.vadere.gui.onlinevisualization.control.ActionGenerateSVG;
+import org.vadere.gui.onlinevisualization.control.ActionOnlineVisMenu;
 import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.swing.*;
 
 public class OnlineVisualisationWindow extends JPanel implements Observer {
 
@@ -185,8 +187,17 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		toolbar.addSeparator();
 
-		SwingUtils.addActionToToolbar(toolbar, generatePNG, Messages.getString("PostVis.btnPNGSnapshot.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, generateSVG, Messages.getString("PostVis.btnSVGSnapshot.tooltip"));
+		ArrayList<Action> imgOptions = new ArrayList<>();
+		imgOptions.add(generatePNG);
+		imgOptions.add(generateSVG);
+
+		ActionOnlineVisMenu imgDialog = new ActionOnlineVisMenu(
+				"camera_menu",
+				resources.getIcon("camera.png", iconWidth, iconHeight), imgOptions);
+		JButton imgMenuBtn =
+				SwingUtils.addActionToToolbar(toolbar, imgDialog, "PostVis.btnSnapshot.tooltip");
+		imgDialog.setParent(imgMenuBtn);
+
         SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
 
 		add(toolbar, cc.xyw(2, 2, 3));
@@ -194,6 +205,9 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		scrollPane.setPreferredSize(new Dimension(1, windowHeight));
 		add(jsonPanel, cc.xy(4, 4));
 		add(infoPanel, cc.xyw(2, 6, 3));
+
+		repaint();
+		revalidate();
 	}
 
 	@Override
