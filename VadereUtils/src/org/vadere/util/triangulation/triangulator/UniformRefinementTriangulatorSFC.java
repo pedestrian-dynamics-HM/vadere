@@ -296,7 +296,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	public void finish() {
         synchronized (getMesh()) {
 	        finished = true;
-			List<F> sierpinksyFaceOrder = candidates.stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
+			List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 
 			// insert special fix points
 	        // TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces

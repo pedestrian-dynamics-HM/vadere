@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -46,18 +47,22 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
     private Collection<VTriangle> triangles;
     private VRectangle bound;
     private final double scale;
-    private ColorFunctions<P, V, E, F> colorFunctions;
+    private Function<F, Color> colorFunction;
+
+	public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound, final Function<F, Color> colorFunction) {
+		this.mesh = mesh;
+		this.width = width;
+		this.height = height;
+		this.alertPred = alertPred;
+		this.triangles = new ArrayList<>();
+		this.bound = bound;
+		this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+		this.faces = new ArrayList<>();
+		this.colorFunction = colorFunction;
+	}
 
     public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound) {
-        this.mesh = mesh;
-        this.width = width;
-        this.height = height;
-        this.alertPred = alertPred;
-        this.triangles = new ArrayList<>();
-        this.bound = bound;
-        this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-	    this.faces = new ArrayList<>();
-	    this.colorFunctions = new ColorFunctions<>();
+    	this(mesh, alertPred, width, height, bound, f -> ColorFunctions.qualityToGrayScale(mesh, f));
     }
 
 	@Override
@@ -102,7 +107,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 				graphics.draw(polygon);
 			}
 			else {
-				graphics.setColor(colorFunctions.qualityToGrayScale(mesh, face));
+				graphics.setColor(colorFunction.apply(face));
 				graphics.fill(polygon);
 			}
 			graphics.setColor(Color.GRAY);
@@ -110,23 +115,6 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 		}
 
 		graphics2D.drawImage(image, 0, 0, null);
-	}
-
-
-	public double triangleToQuality(final VTriangle triangle) {
-
-		VLine[] lines = triangle.getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part = 0.0;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-		}
-		else {
-			throw new IllegalArgumentException(triangle + " is not a feasible triangle!");
-		}
-		return part;
 	}
 
 	public JFrame display() {

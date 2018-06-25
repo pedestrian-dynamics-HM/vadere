@@ -3,6 +3,8 @@ package org.vadere.util.triangulation.adaptive.plots;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.util.color.ColorHelper;
+import org.vadere.util.debug.gui.ColorFunctions;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
@@ -15,6 +17,7 @@ import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.tex.TexGraphGenerator;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.CLPSMeshing;
 import org.vadere.util.triangulation.adaptive.IDistanceFunction;
@@ -23,8 +26,10 @@ import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.*;
 
@@ -37,7 +42,7 @@ public class VisualTestCPU {
 	private static final IPointConstructor<MeshPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
 	private static final double initialEdgeLength = 0.7;
 
-	private static void overallUniformRing() {
+	private static void overallUniformRingA() {
 		VPolygon hex = VShape.generateHexagon(4.0);
 		IMeshSupplier<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
@@ -47,7 +52,10 @@ public class VisualTestCPU {
 
 		PSMeshing meshGenerator = new PSMeshing(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		ColorHelper colorHelper = new ColorHelper(meshGenerator.getMesh().getNumberOfFaces());
+		Function<AFace<MeshPoint>, Color> colorFunction = f -> colorHelper.numberToColor(f.getId());
+
+		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, bbox, colorFunction);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -84,6 +92,10 @@ public class VisualTestCPU {
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+
+
+
+		System.out.println(TexGraphGenerator.toTikz((AMesh<MeshPoint>)meshGenerator.getMesh(), colorFunction, 1.0f));
 
 	}
 
@@ -135,7 +147,7 @@ public class VisualTestCPU {
 	}
 
 	public static void main(String[] args) {
-		overallUniformRingP();
+		overallUniformRingA();
 	}
 
 }

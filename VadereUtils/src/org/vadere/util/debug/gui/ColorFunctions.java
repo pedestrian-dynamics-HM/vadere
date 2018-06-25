@@ -29,8 +29,9 @@ public class ColorFunctions
 	private HashMap<F, Color> faceFillColorMap;
 	private HashMap<F, Color> faceDrawColorMap;
 
+
 	public ColorFunctions() {
-		faceFillColorFunc = this::qualityToGrayScale;
+		faceFillColorFunc = (mesh, face) -> ColorFunctions.qualityToGrayScale(mesh, face);
 		faceDrawColorFunc = (m, f) -> Color.BLACK;
 		faceFillColorMap = new HashMap<>();
 		faceDrawColorMap = new HashMap<>();
@@ -43,7 +44,7 @@ public class ColorFunctions
 	 * @param face Face to color
 	 * @return double value used for Color (only one needed for gray scale)
 	 */
-	public double faceToQuality(final IMesh<P, V, E, F> mesh, final F face) {
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double faceToQuality(final IMesh<P, V, E, F> mesh, final F face) {
 		VLine[] lines = mesh.toTriangle(face).getLines();
 		double a = lines[0].length();
 		double b = lines[1].length();
@@ -64,7 +65,7 @@ public class ColorFunctions
 	 * @param face Face to color
 	 * @return Gray scale color object
 	 */
-	public Color qualityToGrayScale(final IMesh<P, V, E, F> mesh, final F face) {
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> Color qualityToGrayScale(final IMesh<P, V, E, F> mesh, final F face) {
 		float quality = (float) faceToQuality(mesh, face);
 		return new Color(quality, quality, quality);
 	}
