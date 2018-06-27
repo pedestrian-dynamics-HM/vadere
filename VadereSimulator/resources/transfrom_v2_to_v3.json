@@ -8,9 +8,9 @@
       "processWriters": {
         "files": {
           "*": {
-            "type": "processWriters.files[&1].type",
-            "filename": "info.filename",
-            "processors": "processWriters.files[&1].processors"
+            "type": "processWriters.files[&1].&",
+            "filename": "processWriters.files[&1].&",
+            "processors": "processWriters.files[&1].&"
           }
         },
         "processors": {
@@ -19,7 +19,8 @@
             "type": "processWriters.processors[&1].type",
             "id": "processWriters.processors[&1].id"
           }
-        }
+        },
+        "isTimestamped": "&1.&0"
       },
       "scenario": {
         "mainModel": "scenario.mainModel",
@@ -301,6 +302,125 @@
             "pedestrianDynamicWeight": "scenario.&2.&1.&0",
             "loadingType": "scenario.&2.&1.&0"
           }
+        },
+        "attributesSimulation": {
+          "finishTime": "scenario.&1.&0",
+          "simTimeStepLength": "scenario.&1.&0",
+          "realTimeSimTimeRatio": "scenario.&1.&0",
+          "writeSimulationData": "scenario.&1.&0",
+          "visualizationEnabled": "scenario.&1.&0",
+          "printFPS": "scenario.&1.&0",
+          "needsBoundary": "scenario.&1.&0",
+          "digitsPerCoordinate": "scenario.&1.&0",
+          "useRandomSeed": "scenario.&1.&0",
+          "randomSeed": "scenario.&1.&0"
+        },
+        "topography": {
+          "attributes": {
+            "bounds": "scenario.&2.&1.&0",
+            "boundingBoxWidth": "scenario.&2.&1.&0",
+            "bounded": "scenario.&2.&1.&0"
+          },
+          "obstacles": "scenario.&1.&0",
+          "stairs": "scenario.&1.&0",
+          "targets": {
+            "*": {
+              "id": "scenario.&3.&2.[&1].&0",
+              "absorbing": "scenario.&3.&2.[&1].&0",
+              "shape": "scenario.&3.&2.[&1].&0",
+              "waitingTime": "scenario.&3.&2.[&1].&0",
+              "waitingTimeYellowPhase": "scenario.&3.&2.[&1].&0",
+              "parallelWaiters": "scenario.&3.&2.[&1].&0",
+              "individualWaiting": "scenario.&3.&2.[&1].&0",
+              "deletionDistance": "scenario.&3.&2.[&1].&0",
+              "startingWithRedLight": "scenario.&3.&2.[&1].&0",
+              "nextSpeed": "scenario.&3.&2.[&1].&0"
+            }
+          },
+          "sources": {
+            "*": {
+              "id": "scenario.&3.&2.[&1].&0",
+              "shape": "scenario.&3.&2.[&1].&0",
+              "interSpawnTimeDistribution": "scenario.&3.&2.[&1].&0",
+              "distributionParameters": "scenario.&3.&2.[&1].&0",
+              "spawnNumber": "scenario.&3.&2.[&1].&0",
+              "maxSpawnNumberTotal": "scenario.&3.&2.[&1].&0",
+              "startTime": "scenario.&3.&2.[&1].&0",
+              "endTime": "scenario.&3.&2.[&1].&0",
+              "spawnAtRandomPositions": "scenario.&3.&2.[&1].&0",
+              "useFreeSpaceOnly": "scenario.&3.&2.[&1].&0",
+              "targetIds": "scenario.&3.&2.[&1].&0",
+              "groupSizeDistribution": "scenario.&3.&2.[&1].&0",
+              "dynamicElementType": "scenario.&3.&2.[&1].&0"
+            }
+          },
+          "attributesPedestrian": {
+            "radius": "scenario.&2.&1.&0",
+            "densityDependentSpeed": "scenario.&2.&1.&0",
+            "speedDistributionMean": "scenario.&2.&1.&0",
+            "speedDistributionStandardDeviation": "scenario.&2.&1.&0",
+            "minimumSpeed": "scenario.&2.&1.&0",
+            "maximumSpeed": "scenario.&2.&1.&0",
+            "acceleration": "scenario.&2.&1.&0"
+          },
+          "attributesCar": {
+            "id": "scenario.&2.&1.&0",
+            "radius": "scenario.&2.&1.&0",
+            "densityDependentSpeed": "scenario.&2.&1.&0",
+            "speedDistributionMean": "scenario.&2.&1.&0",
+            "speedDistributionStandardDeviation": "scenario.&2.&1.&0",
+            "minimumSpeed": "scenario.&2.&1.&0",
+            "maximumSpeed": "scenario.&2.&1.&0",
+            "acceleration": "scenario.&2.&1.&0",
+            "length": "scenario.&2.&1.&0",
+            "width": "scenario.&2.&1.&0",
+            "direction": {
+              "x": "scenario.&3.&2.&1.&0",
+              "y": "scenario.&3.&2.&1.&0"
+            }
+          },
+          "dynamicElements": {
+            "*": {
+              "source": "scenario.&3.&2.[&1].&0",
+              "targetIds": "scenario.&3.&2.[&1].&0",
+              "position": {
+                "x": "scenario.&4.&3.&2.[&1].&0",
+                "y": "scenario.&4.&3.&2.[&1].&0"
+              },
+              "velocity": {
+                "x": "scenario.&4.&3.&2.[&1].&0",
+                "y": "scenario.&4.&3.&2.[&1].&0"
+              },
+              "nextTargetListIndex": "scenario.&3.&2.[&1].&0",
+              "freeFlowSpeed": "scenario.&3.&2.[&1].&0",
+              "attributes": {
+                "id": "scenario.&4.&3.&2.[&1].&0",
+                "radius": "scenario.&4.&3.&2.[&1].&0",
+                "densityDependentSpeed": "scenario.&4.&3.&2.[&1].&0",
+                "speedDistributionMean": "scenario.&4.&3.&2.[&1].&0",
+                "speedDistributionStandardDeviation": "scenario.&4.&3.&2.[&1].&0",
+                "minimumSpeed": "scenario.&4.&3.&2.[&1].&0",
+                "maximumSpeed": "scenario.&4.&3.&2.[&1].&0",
+                "acceleration": "scenario.&4.&3.&2.[&1].&0"
+              },
+              "idAsTarget": "scenario.&3.&2.[&1].&0",
+              "modelPedestrianMap": "scenario.&3.&2.[&1].&0",
+              "isChild": "scenario.&3.&2.[&1].&0",
+              "isLikelyInjured": "scenario.&3.&2.[&1].&0",
+              "groupIds": "scenario.&3.&2.[&1].&0",
+              "type": "scenario.&3.&2.[&1].&0"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "operation": "default",
+    "spec": {
+      "scenario": {
+        "topography": {
+          "dynamicElements[]": {}
         }
       }
     }
