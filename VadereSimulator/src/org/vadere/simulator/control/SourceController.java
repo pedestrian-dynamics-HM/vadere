@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.scripts.TargetDistribution;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
@@ -31,6 +32,7 @@ public class SourceController {
 	protected final Random random;
 	private final AttributesSource sourceAttributes;
 	private AttributesDynamicElement attributesDynamicElement;
+	private TargetDistribution targetDistribution = new TargetDistribution();
 
 	// TODO [priority=high] [task=refactoring] remove this from the SourceController and add a new attribute.
 	// This is ONLY used for "useFreeSpaceOnly".
@@ -185,6 +187,12 @@ public class SourceController {
 		// if the pedestrian itself has no targets, add the targets from the source
 		// TODO [priority=high] [task=refactoring] why only if he has no targets? because the createElement method
 		// might add some.
+
+
+		//List<Integer> targets = targetDistribution.returnTargets(targetDistribution.targetIds(), targetDistribution.getDistributions().get(1));
+		//newElement.setTargets(new LinkedList<>(targets));
+
+
 		if (newElement.getTargets().isEmpty()) {
 			newElement.setTargets(new LinkedList<>(sourceAttributes.getTargetIds()));
 		}
