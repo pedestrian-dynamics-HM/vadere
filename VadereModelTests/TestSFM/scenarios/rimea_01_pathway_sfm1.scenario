@@ -2,26 +2,11 @@
   "name" : "rimea_01_pathway_sfm1",
   "description" : "",
   "release" : "0.2",
-  "processWriters" : [ {
-    "formatString" : "%s",
-    "columnNames" : [ "evacuationTimeTest" ],
-    "attributes" : {
-      "startTime" : 0.0,
-      "endTime" : 1.7976931348623157E308
-    },
-    "dataProcessor" : {
-      "attributes" : {
-        "maxEvacuationTime" : 34.0,
-        "maxEvacuationTimeMean" : 34.0,
-        "minEvacuationTime" : 26.0,
-        "minEvacuationTimeMean" : 26.0,
-        "expectFailure" : false
-      },
-      "errorTime" : -1.0,
-      "columnNames" : [ ],
-      "clazz" : "PedestrianEvacuationTimeTest"
-    }
-  } ],
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
@@ -117,6 +102,7 @@
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1200.0,
         "spawnAtRandomPositions" : true,
@@ -129,9 +115,9 @@
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.5,
-        "minimumSpeed" : 1.25,
-        "maximumSpeed" : 1.42,
+        "speedDistributionStandardDeviation" : 0.26,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
       "attributesCar" : null
