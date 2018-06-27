@@ -12,10 +12,19 @@ public class AttributesAgent extends AttributesDynamicElement {
 
 	private double radius = 0.195;
 	private boolean densityDependentSpeed = false;
+
+	// from weidmann-1992 page 18
 	private double speedDistributionMean = 1.34;
-	private double speedDistributionStandardDeviation = 0;
-	private double minimumSpeed = 0.3;
-	private double maximumSpeed = 3.0;
+
+	// from weidmann-1992 page 18
+	private double speedDistributionStandardDeviation = 0.26;
+
+	// from weidmann-1992 page 18
+	private double minimumSpeed = 0.5;
+
+	// from weidmann-1992 page 18
+	private double maximumSpeed = 2.2;
+	
 	private double acceleration = 2.0;
 
 	public AttributesAgent() {
