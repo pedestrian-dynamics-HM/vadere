@@ -436,6 +436,11 @@
   {
     "operation": "default",
     "spec": {
+      "processWriters": {
+        "files[]": {},
+        "processors[]": {},
+        "isTimestamped": "true"
+      },
       "scenario": {
         "topography": {
           "dynamicElements[]": {}
