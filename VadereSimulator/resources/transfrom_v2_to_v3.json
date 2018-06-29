@@ -301,7 +301,25 @@
             "queueWidthLoading": "scenario.&2.&1.&0",
             "pedestrianDynamicWeight": "scenario.&2.&1.&0",
             "loadingType": "scenario.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.scenario.AttributesCar": {
+            "id": "scenario.&2.&1.&0",
+            "radius": "scenario.&2.&1.&0",
+            "densityDependentSpeed": "scenario.&2.&1.&0",
+            "speedDistributionMean": "scenario.&2.&1.&0",
+            "speedDistributionStandardDeviation": "scenario.&2.&1.&0",
+            "minimumSpeed": "scenario.&2.&1.&0",
+            "maximumSpeed": "scenario.&2.&1.&0",
+            "acceleration": "scenario.&2.&1.&0",
+            "length": "scenario.&2.&1.&0",
+            "width": "scenario.&2.&1.&0",
+            "direction": {
+              "x": "scenario.&3.&2.&1.&0",
+              "y": "scenario.&3.&2.&1.&0"
+            }
           }
+
+          //end attributesModel
         },
         "attributesSimulation": {
           "finishTime": "scenario.&1.&0",
