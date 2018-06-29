@@ -52,7 +52,16 @@ public class Stairs extends ScenarioElement {
 
 			// subtract one on the left and add one tread depth on the right so that the last and
 			// next floors gets one tread too
-			double x = rotatedBounds.getMinX() - treadDepth + factor * (rotatedBounds.getWidth() + treadDepth * 2);
+
+			// by dividing treadDepth by 2 the lines are centered between the edges
+
+			// __________________________________ << upper edge of tread
+			// ---------------------------------- << line that pedestrians walk on (centered between edges)
+			// __________________________________ << lower edge of (same) tread
+
+			// This is the assumption that pedestrians always step in the middle of a tread.
+
+			double x = rotatedBounds.getMinX() - treadDepth/2 + factor * (rotatedBounds.getWidth() + treadDepth * 2);
 			VPoint p1 = new VPoint(x, rotatedBounds.getMinY()).rotate(angle);
 			VPoint p2 = new VPoint(x, rotatedBounds.getMaxY()).rotate(angle);
 
