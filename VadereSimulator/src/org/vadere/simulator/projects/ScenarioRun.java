@@ -13,6 +13,7 @@ import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
@@ -38,7 +39,9 @@ public class ScenarioRun implements Runnable {
 	private final DataProcessingJsonManager dataProcessingJsonManager;
 
 	private Simulation simulation;
-	private ProcessorManager processorManager;
+
+	// the processor is null if no output is written i.e. if scenarioStore.attributesSimulation.isWriteSimulationData() is false.
+	private @Nullable ProcessorManager processorManager;
 
 	private final Scenario scenario;
 	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
@@ -76,10 +79,12 @@ public class ScenarioRun implements Runnable {
 			final Random random = modelBuilder.getRandom();
 			
 			// prepare processors and simulation data writer
-			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+			if(scenarioStore.attributesSimulation.isWriteSimulationData()) {
+				processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+			}
 
 			// Only create output directory and write .scenario file if there is any output.
-			if(!processorManager.isEmpty()) {
+			if(processorManager != null && !processorManager.isEmpty()) {
                 createAndSetOutputDirectory();
                 scenario.saveToOutputPath(outputPath);
             }
@@ -166,7 +171,10 @@ public class ScenarioRun implements Runnable {
 
 	private void sealAllAttributes() {
 		scenarioStore.sealAllAttributes();
-		processorManager.sealAllAttributes();
+
+		if(processorManager != null) {
+			processorManager.sealAllAttributes();
+		}
 	}
 
 }

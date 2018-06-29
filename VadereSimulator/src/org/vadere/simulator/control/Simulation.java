@@ -140,7 +140,9 @@ public class Simulation {
 			c.preLoop(simTimeInSec);
 		}
 
-		processorManager.preLoop(this.simulationState);
+		if(attributesSimulation.isWriteSimulationData()) {
+			processorManager.preLoop(this.simulationState);
+		}
 	}
 
 	private void postLoop() {
@@ -154,7 +156,9 @@ public class Simulation {
 			c.postLoop(simTimeInSec);
 		}
 
-		processorManager.postLoop(this.simulationState);
+		if(attributesSimulation.isWriteSimulationData()) {
+			processorManager.postLoop(this.simulationState);
+		}
 		topographyController.postLoop(this.simTimeInSec);
 	}
 
@@ -163,8 +167,10 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			processorManager.setMainModel(mainModel);
-			processorManager.initOutputFiles();
+			if(attributesSimulation.isWriteSimulationData()) {
+				processorManager.setMainModel(mainModel);
+				processorManager.initOutputFiles();
+			}
 
 			preLoop();
 
@@ -192,7 +198,11 @@ public class Simulation {
 				assert assertAllPedestrianInBounds();
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
-				processorManager.update(this.simulationState);
+
+				if(attributesSimulation.isWriteSimulationData()) {
+					processorManager.update(this.simulationState);
+				}
+
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
@@ -219,7 +229,9 @@ public class Simulation {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
-			processorManager.writeOutput();
+			if(attributesSimulation.isWriteSimulationData()) {
+				processorManager.writeOutput();
+			}
 			logger.info("Finished writing all output files");
 		}
 	}
