@@ -61,7 +61,7 @@
       "finishTime" : 300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
-      "writeSimulationData" : true,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
