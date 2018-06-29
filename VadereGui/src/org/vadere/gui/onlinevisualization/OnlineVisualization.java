@@ -36,7 +36,7 @@ public class OnlineVisualization implements PassiveCallback {
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
 	private Topography scenario;
-	private IPotentialFieldTarget potentialFieldTarget;
+	private @Nullable IPotentialFieldTarget potentialFieldTarget;
 	private boolean enableVisualization;
 
 	public OnlineVisualization(boolean enableVisualization) {
@@ -94,7 +94,7 @@ public class OnlineVisualization implements PassiveCallback {
 					new ObservationAreaSnapshotData(
 					        simTimeInSec,
                             scenario.clone(),
-                            model.config.isShowPotentialField() ? potentialFieldTarget.copyFields() : null));
+							(model.config.isShowPotentialField() && potentialFieldTarget != null) ? potentialFieldTarget.copyFields() : null));
 		}
 	}
 
