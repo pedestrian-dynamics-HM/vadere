@@ -402,24 +402,24 @@
               "source": "scenario.&3.&2.[&1].&0",
               "targetIds": "scenario.&3.&2.[&1].&0",
               "position": {
-                "x": "scenario.&4.&3.&2.[&1].&0",
-                "y": "scenario.&4.&3.&2.[&1].&0"
+                "x": "scenario.&4.&3.[&2].&1.&0",
+                "y": "scenario.&4.&3.[&2].&1.&0"
               },
               "velocity": {
-                "x": "scenario.&4.&3.&2.[&1].&0",
-                "y": "scenario.&4.&3.&2.[&1].&0"
+                "x": "scenario.&4.&3.[&2].&1.&0",
+                "y": "scenario.&4.&3.[&2].&1.&0"
               },
               "nextTargetListIndex": "scenario.&3.&2.[&1].&0",
               "freeFlowSpeed": "scenario.&3.&2.[&1].&0",
               "attributes": {
-                "id": "scenario.&4.&3.&2.[&1].&0",
-                "radius": "scenario.&4.&3.&2.[&1].&0",
-                "densityDependentSpeed": "scenario.&4.&3.&2.[&1].&0",
-                "speedDistributionMean": "scenario.&4.&3.&2.[&1].&0",
-                "speedDistributionStandardDeviation": "scenario.&4.&3.&2.[&1].&0",
-                "minimumSpeed": "scenario.&4.&3.&2.[&1].&0",
-                "maximumSpeed": "scenario.&4.&3.&2.[&1].&0",
-                "acceleration": "scenario.&4.&3.&2.[&1].&0"
+                "id": "scenario.&4.&3.[&2].&1.&0",
+                "radius": "scenario.&4.&3.[&2].&1.&0",
+                "densityDependentSpeed": "scenario.&4.&3.[&2].&1.&0",
+                "speedDistributionMean": "scenario.&4.&3.[&2].&1.&0",
+                "speedDistributionStandardDeviation": "scenario.&4.&3.[&2].&1.&0",
+                "minimumSpeed": "scenario.&4.&3.[&2].&1.&0",
+                "maximumSpeed": "scenario.&4.&3.[&2].&1.&0",
+                "acceleration": "scenario.&4.&3.[&2].&1.&0"
               },
               "idAsTarget": "scenario.&3.&2.[&1].&0",
               "modelPedestrianMap": "scenario.&3.&2.[&1].&0",
