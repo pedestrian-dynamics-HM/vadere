@@ -5,6 +5,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VLine;
@@ -22,17 +23,15 @@ public class Stairs extends ScenarioElement {
 		}
 	}
 
-	private final AttributesStairs attributes;
-	private final Tread[] treads;
+	private AttributesStairs attributes;
+	private Tread[] treads;
 	private double treadDepth;
 
 	public Stairs(AttributesStairs attributes) {
-		this.attributes = attributes;
-
-		treads = initializeTreads();
+		setAttributes(attributes);
 	}
 
-	private Tread[] initializeTreads() {
+	private Tread[] computeTreads() {
 		// tread count + 2 since the first and last treads must be placed outside of the shape and
 		// on the next floor.
 		Tread[] treadsResult = new Tread[this.getAttributes().getTreadCount() + 2];
@@ -71,6 +70,12 @@ public class Stairs extends ScenarioElement {
 		}
 
 		return treadsResult;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		this.attributes = (AttributesStairs) attributes;
+		treads = computeTreads();
 	}
 
 	@Override
