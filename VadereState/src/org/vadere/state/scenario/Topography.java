@@ -461,4 +461,8 @@ public class Topography {
 		allOtherAttributes.forEach(a -> a.seal());
 	}
 
+	protected void finalize() throws Throwable {
+		System.out.println("Finalized: " + this);
+		System.out.println(Thread.currentThread().getStackTrace());
+	}
 }

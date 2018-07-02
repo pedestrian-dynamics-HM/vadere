@@ -69,7 +69,15 @@ public class ScenarioRun implements Runnable {
 
 			scenarioStore.topography.reset();
 
-			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
+			// Watch out: apparently, there is a GUI bug. A GUI component (thread etc.) changes
+			// "scenarioStore.topography" at some point in time. This causes that pedestrians overlap.
+			// As workaround, clone original "topography" from "scenarioStore" and hand over the cloned
+			// "topography".
+            // But watch out: the original topography is still changed by the GUI component
+            // and we must find out where and when!
+			ScenarioStore storeClone = scenarioStore.clone();
+
+			MainModelBuilder modelBuilder = new MainModelBuilder(storeClone);
 			modelBuilder.createModelAndRandom();
 
 			final MainModel mainModel = modelBuilder.getModel();
@@ -87,7 +95,7 @@ public class ScenarioRun implements Runnable {
 			sealAllAttributes();
 
 			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
+			simulation = new Simulation(mainModel, 0, storeClone.name, storeClone, passiveCallbacks, random, processorManager);
 			simulation.run();
 
 		} catch (Exception e) {
