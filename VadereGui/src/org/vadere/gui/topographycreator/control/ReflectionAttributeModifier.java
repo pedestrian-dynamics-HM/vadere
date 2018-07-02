@@ -31,8 +31,11 @@ public class ReflectionAttributeModifier {
 				double y = shape.getBounds2D().getCenterY();
 				((AgentWrapper) element).getAgentInitialStore().setPosition(new VPoint(x, y));
 			} else {
-				Attributes attributes =
-						org.vadere.simulator.entrypoints.ReflectionAttributeModifier.getAttributes(element);
+				Attributes attributes = element.getAttributes(); // replaces Relection code from above
+
+				//TODO: issue #91 Cannot easily replace the relection in the following code. Some Attributes classes have a
+				//TODO: setShape(shape) method such as AttributesStairs, but not all, so there is no guarantee...
+				//TODO: If there is no field "shape", then only the stacktrace is printed...
 				field = attributes.getClass().getDeclaredField("shape");
 				field.setAccessible(true);
 				field.set(attributes, shape);

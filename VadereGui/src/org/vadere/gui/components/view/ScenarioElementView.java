@@ -184,8 +184,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				} else if (scenarioElement instanceof Pedestrian) {
 					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
 				} else {
-					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObject(ReflectionAttributeModifier.getAttributes(scenarioElement)));
+                    this.txtrTextfiletextarea.setText(StateJsonConverter
+                            .serializeObject(scenarioElement.getAttributes()));
 				}
 			}
 		}
