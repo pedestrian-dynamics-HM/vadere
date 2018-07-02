@@ -3,6 +3,7 @@ package org.vadere.gui.topographycreator.control;
 import java.lang.reflect.Field;
 
 import org.vadere.gui.topographycreator.model.AgentWrapper;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
