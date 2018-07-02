@@ -4,9 +4,11 @@
 
 package org.vadere.simulator.models.osm.stairOptimization;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
+import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Stairs.Tread;
 import org.vadere.util.geometry.Vector2D;
@@ -27,6 +29,8 @@ public class StairStepOptimizer implements StepCircleOptimizer {
 
 	private Stairs stairs;
 
+	private Logger logger = LogManager.getLogger(StairStepOptimizer.class);
+
 	private final double tol_equal_values = 1E-4;
 
 	public StairStepOptimizer(Stairs s) {
@@ -35,7 +39,7 @@ public class StairStepOptimizer implements StepCircleOptimizer {
 
 	@Override
 	public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) {
-
+		//logger.info(stairs.getAttributes().getUpwardDirection());
 		if (!isOnActualStairs(pedestrian)) {
 			Logger.getLogger(this.getClass())
 					.error("Only pedestrians should get in here that are on actual Stairs -> Bug in code.");

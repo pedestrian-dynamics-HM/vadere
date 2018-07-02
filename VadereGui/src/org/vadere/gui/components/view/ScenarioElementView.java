@@ -106,12 +106,14 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e) {
+			public void removeUpdate(DocumentEvent e)
+			{
 				updateModel();
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
+
 				updateModel();
 			}
 		};
@@ -126,7 +128,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		ScenarioElement element = panelModel.getSelectedElement();
 		if (element != null) {
 			String json = txtrTextfiletextarea.getText();
-
+			//logger.info(json);
 			if (json.length() == 0)
 				return;
 

@@ -100,7 +100,7 @@ public class Scenario {
 	}
 
 	public AttributesAgent getAttributesPedestrian() {
-		return scenarioStore.topography.getAttributesPedestrian();
+		return scenarioStore.getTopography().getAttributesPedestrian();
 	}
 
 	public AttributesSimulation getAttributesSimulation() {
@@ -108,7 +108,7 @@ public class Scenario {
 	}
 
 	public Topography getTopography() {
-		return scenarioStore.topography;
+		return scenarioStore.getTopography();
 	}
 
 	public void setName(String name) {
@@ -124,7 +124,7 @@ public class Scenario {
 	}
 
 	public void setTopography(final Topography topography) {
-		scenarioStore.topography = topography;
+		scenarioStore.setTopography(topography);
 	}
 
 	@Override

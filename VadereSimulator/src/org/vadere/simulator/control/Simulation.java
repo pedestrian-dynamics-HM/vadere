@@ -76,10 +76,10 @@ public class Simulation {
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.attributesSimulation;
-		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
+		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
-		this.topography = scenarioStore.topography;
+		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
