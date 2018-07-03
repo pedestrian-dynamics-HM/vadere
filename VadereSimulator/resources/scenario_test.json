@@ -26,6 +26,27 @@
       {
         "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
         "id": 3
+      },
+      {
+        "type": "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor",
+        "id": 4,
+        "attributesType": "org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor",
+        "attributes": {
+          "measurementArea": {
+            "x": 0.0,
+            "y": 0.0,
+            "width": 1.0,
+            "height": 1.0,
+            "type": "RECTANGLE"
+          },
+          "voronoiArea": {
+            "x": 0.0,
+            "y": 0.0,
+            "width": 1.0,
+            "height": 1.0,
+            "type": "RECTANGLE"
+          }
+        }
       }
     ],
     "isTimestamped": true

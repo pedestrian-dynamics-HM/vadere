@@ -8,16 +8,13 @@
       "processWriters": {
         "files": {
           "*": {
-            "type": "processWriters.files[&1].&",
-            "filename": "processWriters.files[&1].&",
-            "processors": "processWriters.files[&1].&"
+            "*": "processWriters.files[&1].&"
           }
         },
         "processors": {
           "*": {
-            // &1 is the index
-            "type": "processWriters.processors[&1].type",
-            "id": "processWriters.processors[&1].id"
+            // first '*' array, second '*' childen in object
+            "*": "processWriters.processors[&1].&0"
           }
         },
         "isTimestamped": "&1.&0"
