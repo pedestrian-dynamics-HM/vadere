@@ -52,10 +52,17 @@
       <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-compiler-plugin</artifactId>
-		  <version>3.0</version>
+		  <version>${maven-compiler.version}</version>
 		  <configuration>
-		    <source>1.8</source>
-		    <target>1.8</target>
+              <source>${maven-compiler.source.version}</source>
+              <target>${maven-compiler.target.version}</target>
+              <annotationProcessorPaths>
+              <path>
+                  <groupId>org.vadere</groupId>
+                  <artifactId>annotation</artifactId>
+                  <version>0.1-SNAPSHOT</version>
+              </path>
+              </annotationProcessorPaths>
 		  </configuration>
 		</plugin>
         <plugin>
@@ -87,7 +94,7 @@
                         <outputDirectory>${project.reporting.outputDirectory}/coverage-reports</outputDirectory>
                     </configuration>
                 </execution>
-            </executions>    
+            </executions>
         </plugin>
         <plugin>
             <!-- Maven Surefire is used to execute unit tests. -->
@@ -142,7 +149,7 @@
     	</plugins>
     </pluginManagement>
   </build>
-  
+
  <!-- local repository for all jars without an external repo -->
   <repositories>
     <repository>
@@ -162,20 +169,27 @@
   	</dependency>
 
 <!-- module dependencies -->
-  <dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>state</artifactId>
       <version>${project.version}</version>
-   </dependency>    
-   <dependency>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>utils</artifactId>
       <version>${project.version}</version>
-   </dependency>
+    </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>annotation</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+
    <dependency>
    	<groupId>net.sourceforge.argparse4j</groupId>
    	<artifactId>argparse4j</artifactId>
    	<version>0.4.3</version>
    </dependency>
+
   </dependencies>
 </project>

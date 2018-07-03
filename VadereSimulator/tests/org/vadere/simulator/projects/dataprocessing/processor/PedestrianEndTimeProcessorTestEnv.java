@@ -18,13 +18,21 @@ import java.util.StringJoiner;
 public class PedestrianEndTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
 	PedestrianEndTimeProcessorTestEnv(){
-		testedProcessor = processorFactory.createDataProcessor(PedestrianEndTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianEndTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

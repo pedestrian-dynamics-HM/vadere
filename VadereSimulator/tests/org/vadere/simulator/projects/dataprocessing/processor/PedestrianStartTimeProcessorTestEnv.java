@@ -31,13 +31,21 @@ public class PedestrianStartTimeProcessorTestEnv extends ProcessorTestEnv<Pedest
 	PedestrianStartTimeProcessorTestEnv(int nextProcessorId) {
 		super();
 
-		testedProcessor = processorFactory.createDataProcessor(PedestrianStartTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianStartTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId);
 		this.nextProcessorId = nextProcessorId++;
 
-		outputFile = outputFileFactory.createOutputfile(
-				PedestrianIdOutputFile.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createOutputfile(
+					PedestrianIdOutputFile.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(new VadereStringWriterFactory());
 	}
 

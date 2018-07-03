@@ -27,7 +27,11 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 
 	@SuppressWarnings("unchecked")
 	PedestrianVelocityProcessorTestEnv(int nextProcessorId) {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianVelocityProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianVelocityProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId);
 		this.nextProcessorId = nextProcessorId + 1;
 
@@ -47,10 +51,14 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 		addRequiredProcessors(pedPosProcEnv);
 
 		//setup output file with different VadereWriter impl for test
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepPedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepPedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

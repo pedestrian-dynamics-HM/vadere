@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.reynolds.behaviour.CollisionAvoidance;
@@ -23,6 +24,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 
+@ModelClass(isMainModel = true)
 public class ReynoldsSteeringModel implements MainModel {
 
 	private AttributesReynolds attributesReynolds;

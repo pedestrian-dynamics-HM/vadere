@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
@@ -16,6 +17,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 
+@ModelClass
 public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 
 	private AttributesPotentialOSM attributes;

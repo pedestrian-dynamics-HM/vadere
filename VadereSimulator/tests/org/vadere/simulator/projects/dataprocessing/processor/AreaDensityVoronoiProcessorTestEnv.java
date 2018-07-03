@@ -20,17 +20,25 @@ public class AreaDensityVoronoiProcessorTestEnv extends ProcessorTestEnv<Timeste
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	AreaDensityVoronoiProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(AreaDensityVoronoiProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(AreaDensityVoronoiProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 		AttributesAreaDensityVoronoiProcessor attr =
 				(AttributesAreaDensityVoronoiProcessor) testedProcessor.getAttributes();
 		attr.setVoronoiArea(new VRectangle(0, 0, 16, 16));
 		attr.setMeasurementArea(new VRectangle(0, 0, 16, 16));
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

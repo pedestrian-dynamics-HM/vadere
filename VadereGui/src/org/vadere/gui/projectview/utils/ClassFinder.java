@@ -25,6 +25,7 @@ import java.util.jar.JarFile;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class ClassFinder {
 
     private static Logger log = LogManager.getLogger(ClassFinder.class);

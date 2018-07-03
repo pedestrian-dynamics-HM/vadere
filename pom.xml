@@ -8,6 +8,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <auto-service.version>1.0-rc2</auto-service.version>
+    <maven-compiler.version>3.6.1</maven-compiler.version>
+    <maven-compiler.source.version>1.8</maven-compiler.source.version>
+    <maven-compiler.target.version>1.8</maven-compiler.target.version>
   </properties>
 
 <!-- modules -->
@@ -17,6 +21,7 @@
     <module>./VadereSimulator</module>
     <module>./VadereState</module>
     <module>./VadereUtils</module>
+    <module>VadereAnnotation</module>
   </modules>
   
 <!-- global dependencies! -->

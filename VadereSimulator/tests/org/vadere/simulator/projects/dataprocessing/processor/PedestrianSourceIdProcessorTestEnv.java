@@ -18,12 +18,20 @@ import java.util.StringJoiner;
 public class PedestrianSourceIdProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Integer> {
 
 	PedestrianSourceIdProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianSourceIdProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianSourceIdProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

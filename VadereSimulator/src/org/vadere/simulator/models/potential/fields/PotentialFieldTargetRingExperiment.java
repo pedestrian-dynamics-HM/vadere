@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.potential.fields;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+@ModelClass
 public class PotentialFieldTargetRingExperiment implements IPotentialFieldTargetGrid {
 
 	private AttributesPotentialRingExperiment attributes;
@@ -62,9 +64,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 		Vector2D normalizedTangent = tangent.normalize(stepLength);
 		Vector2D bestNextPosition = pedestrian.add(normalizedTangent);
 
-		double potential = bestNextPosition.distance(pos);
-
-		return potential;
+		return bestNextPosition.distance(pos);
 	}
 
 	@Override
@@ -74,9 +74,8 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 
 		Vector2D centerToPedestrian = pedestrian.sub(center);
 		VPoint rotatedVector = centerToPedestrian.rotate(Math.PI / 2);
-		Vector2D tangent = new Vector2D(rotatedVector);
 
-		return tangent;
+		return new Vector2D(rotatedVector);
 	}
 
 

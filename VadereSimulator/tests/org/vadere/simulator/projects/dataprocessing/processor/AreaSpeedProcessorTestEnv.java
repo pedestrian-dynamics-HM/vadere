@@ -21,7 +21,11 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 
 	@SuppressWarnings("unchecked")
 	AreaSpeedProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(AreaSpeedProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(AreaSpeedProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
 		int pedPosProcId = nextProcessorId();
@@ -41,10 +45,14 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		addRequiredProcessors(pedPosProcEnv);
 		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

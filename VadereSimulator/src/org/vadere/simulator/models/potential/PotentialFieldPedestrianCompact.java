@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -21,6 +22,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 // This potential is explained in seitz-2015 (The effect of stepping on pedestrians trajectories)
 // p. 596, eq. 1
 
+@ModelClass
 public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 
 	class DistanceComparator implements Comparator<Agent> {

@@ -1,12 +1,11 @@
 package org.vadere.simulator.models.potential;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.math.util.MathUtils;
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
@@ -17,11 +16,11 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.MathUtil;
 
 // Implementation of the soft shell repulsive potential of pedestrians according to sivers-2016b.
 // page 46, eq. 4.1
 
+@ModelClass
 public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldAgent {
 
 	private AttributesPotentialCompactSoftshell attributes;
@@ -104,9 +103,6 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 		/*double epsilon = 0.001;
 		double dx = 0;
 		double dy = 0;
-
-		VPoint dxPos = pos.add(new VPoint(pos.getX() + MathUtils.EPSILON, pos.getY()));
-		VPoint dyPos = pos.add(new VPoint(pos.getX(), pos.getY() + MathUtils.EPSILON));
 
 		double potential = getAgentPotential(pos, pedestrian, otherPedestrians);
 		dx = (getAgentPotential(dxPos, pedestrian, otherPedestrians) - potential) / epsilon;

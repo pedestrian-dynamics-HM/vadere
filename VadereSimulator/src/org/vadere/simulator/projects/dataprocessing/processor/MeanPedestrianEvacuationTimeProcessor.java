@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * @author Mario Teixeira Parente
  */
-
+@DataProcessorClass()
 public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
 	private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 

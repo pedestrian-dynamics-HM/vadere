@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
@@ -24,6 +25,8 @@ import org.vadere.util.geometry.shapes.VPoint;
  * \ \__/ /
  * \____/
  */
+
+@ModelClass
 public class PotentialFieldObstacleRingExperiment implements PotentialFieldObstacle {
 
 	private AttributesPotentialRingExperiment attributes;

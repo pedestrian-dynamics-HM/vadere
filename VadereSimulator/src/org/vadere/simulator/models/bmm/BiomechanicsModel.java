@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
@@ -21,6 +22,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  * 
  *
  */
+@ModelClass(isMainModel = true)
 public class BiomechanicsModel implements MainModel {
 
 	private List<Model> models = new LinkedList<>();
