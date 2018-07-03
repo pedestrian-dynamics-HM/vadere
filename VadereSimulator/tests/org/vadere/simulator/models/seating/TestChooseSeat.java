@@ -42,7 +42,7 @@ public class TestChooseSeat {
 	@StatisticalTestCase
 	@Test
 	public void testChooseSeat0() {
-		final int nTrials = 1000;
+		final int nTrials = 10000;
 		TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
 
 		final Map<SeatPosition, Double> probabilities = FractionProbabilityNormalization.normalize(new AttributesSeating().getSeatChoice0());
@@ -65,7 +65,7 @@ public class TestChooseSeat {
 	public void testChooseSeat1() {
 		final int[] diagonallyOppositeSeatIndexes = { 3, 2, 1, 0 };
 		for (int i = 0; i < 4; i++) {
-			final int nTrials = 1000;
+			final int nTrials = 10000;
 			clearSeatGroup(seatGroup);
 			fillSeatGroup(seatGroup, i);
 
@@ -81,7 +81,7 @@ public class TestChooseSeat {
 	@StatisticalTestCase
 	@Test
 	public void testChooseSeat2Both() {
-		final int nTrials = 1000;
+		final int nTrials = 10000;
 		fillSeatGroup(seatGroup, 0, 3);
 
 		final TallySheet<Seat> tallySheet = runChooseSeat(nTrials);
