@@ -2,6 +2,7 @@ package org.vadere.state.attributes.scenario;
 
 import org.apache.log4j.Logger;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VShape;
@@ -16,7 +17,7 @@ import org.vadere.util.geometry.shapes.VShape;
  * 
  *
  */
-public class AttributesStairs extends Attributes {
+public class AttributesStairs extends AttributesEmbedShape {
 
 	private VShape shape = null;
 	private int id = ID_NOT_SET;
@@ -42,10 +43,12 @@ public class AttributesStairs extends Attributes {
 		}
 	}
 
+	@Override
 	public void setShape(VShape shape) {
 		this.shape = shape;
 	}
 
+	@Override
 	public VShape getShape() {
 		return shape;
 	}
