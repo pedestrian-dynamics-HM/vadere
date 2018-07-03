@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.math.ConvergenceException;
@@ -35,7 +36,7 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 	public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) {
 
 		double stepSize = ((VCircle) reachableArea).getRadius();
-		LinkedList<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
