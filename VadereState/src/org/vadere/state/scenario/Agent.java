@@ -187,7 +187,7 @@ public abstract class Agent extends DynamicElement {
 
 
 	@Override
-	public void setAttributes(Attributes attributes){
+	public void setAttributes(Attributes attributes) {
 		this.attributes = (AttributesAgent) attributes;
 	}
 

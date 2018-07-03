@@ -72,7 +72,7 @@ public final class AgentWrapper extends ScenarioElement {
 	}
 
 	@Override
-	public void setAttributes(Attributes attributes){
+	public void setAttributes(Attributes attributes) {
 		this.agent.setAttributes(attributes);
 	}
 

@@ -38,7 +38,7 @@ public class PSO {
 		this.random = random;
 		this.circle = circle;
 		this.gBest = Double.MAX_VALUE;
-		this.gBestLocation = new VPoint(0,0);
+		this.gBestLocation = new VPoint(0, 0);
 		this.iterationCounter = 0;
 		this.maxVelocity = maxVelocity;
 		this.minAngle = minAngle;
@@ -77,7 +77,7 @@ public class PSO {
 	}
 
 	public void update() {
-		if(iterationCounter < attributesPSO.maxIteration) {
+		if (iterationCounter < attributesPSO.maxIteration) {
 			iterationCounter++;
 			updateLocalBest();
 			updateGlobalBest();
@@ -103,7 +103,7 @@ public class PSO {
 		particle.setVelocity(velocity);
 		particle.setLocation(particle.getLocation().add(particle.getVelocity()));
 
-		if(!circle.contains(particle.getLocation())) {
+		if (!circle.contains(particle.getLocation())) {
 			particle.setVelocity(particle.getVelocity().scalarMultiply(-0.5));
 			particle.setLocation(circle.getClosestIntersectionPoint(currentLocation, particle.getLocation(), particle.getLocation()).orElse(particle.getLocation()));
 		}
@@ -116,12 +116,12 @@ public class PSO {
 	private void updateLocalBest() {
 		particles.parallelStream().forEach(particle -> {
 
-			if(particle.getFitnessValue() < particle.getLocalBestFitnessValue()) {
+			if (particle.getFitnessValue() < particle.getLocalBestFitnessValue()) {
 				particle.setLocalBestFitnessValue(particle.getFitnessValue());
 				particle.setLocalBestLocation(particle.getLocation());
 			}
 
-			if(particle.getLocalBestFitnessValue() < particle.getGlobalBestFitnessValue()) {
+			if (particle.getLocalBestFitnessValue() < particle.getGlobalBestFitnessValue()) {
 				particle.setGlobalBestFitnessValue(particle.getLocalBestFitnessValue());
 				particle.setGlobalBestLocation(particle.getLocalBestLocation());
 			}
@@ -130,22 +130,21 @@ public class PSO {
 	}
 
 	/**
-	 * 1) updates the best overall value of the PSO.
-	 * 2) if the new best overall value is smaller than the old one,
-	 *    particles inform each other about their best values and locations.
+	 * 1) updates the best overall value of the PSO. 2) if the new best overall value is smaller
+	 * than the old one, particles inform each other about their best values and locations.
 	 */
 	private void updateGlobalBest() {
 		double lastGBest = gBest;
 
-		for(Particle particle : particles) {
+		for (Particle particle : particles) {
 			double globalBest = particle.getGlobalBestFitnessValue();
-			if(globalBest < gBest) {
+			if (globalBest < gBest) {
 				gBest = globalBest;
 				gBestLocation = particle.getGlobalBestLocation();
 			}
 		}
 
-		if(gBest >= lastGBest) {
+		if (gBest >= lastGBest) {
 			informKParticle();
 		}
 	}
@@ -154,15 +153,15 @@ public class PSO {
 		double globalBest = particle.getGlobalBestFitnessValue();
 		double otherGlobalBest = otherParticle.getGlobalBestFitnessValue();
 
-		if(globalBest < otherGlobalBest) {
+		if (globalBest < otherGlobalBest) {
 			otherParticle.setGlobalBestFitnessValue(globalBest);
 			otherParticle.setGlobalBestLocation(particle.getGlobalBestLocation());
 		}
 	}
 
 	private void informKParticle() {
-		for(Particle particle : particles) {
-			for(int i = 0; i < attributesPSO.numberOfInformedParticles; i++) {
+		for (Particle particle : particles) {
+			for (int i = 0; i < attributesPSO.numberOfInformedParticles; i++) {
 				int index = (int) Math.floor(random.nextDouble() * particles.size());
 				Particle otherParticle = particles.get(index);
 				informParticles(particle, otherParticle);
@@ -171,7 +170,7 @@ public class PSO {
 	}
 
 	private void informAllParticles() {
-		for(Particle particle : particles) {
+		for (Particle particle : particles) {
 			double globalBest = particle.getGlobalBestFitnessValue();
 
 			assert globalBest >= gBest;

@@ -34,7 +34,7 @@ public class Source extends ScenarioElement {
 	}
 
 	@Override
-	public void setAttributes(Attributes attributes){
+	public void setAttributes(Attributes attributes) {
 		this.attributes = (AttributesSource) attributes;
 	}
 

@@ -115,7 +115,7 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	}
 
 	@Override
-	public void setAttributes(Attributes attributes){
+	public void setAttributes(Attributes attributes) {
 		this.attributes = (AttributesTarget) attributes;
 	}
 

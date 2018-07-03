@@ -135,7 +135,7 @@ public class Simulation {
 			c.preLoop(simTimeInSec);
 		}
 
-		if(attributesSimulation.isWriteSimulationData()) {
+		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.preLoop(this.simulationState);
 		}
 	}
@@ -151,7 +151,7 @@ public class Simulation {
 			c.postLoop(simTimeInSec);
 		}
 
-		if(attributesSimulation.isWriteSimulationData()) {
+		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.postLoop(this.simulationState);
 		}
 		topographyController.postLoop(this.simTimeInSec);
@@ -162,7 +162,7 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			if(attributesSimulation.isWriteSimulationData()) {
+			if (attributesSimulation.isWriteSimulationData()) {
 				processorManager.setMainModel(mainModel);
 				processorManager.initOutputFiles();
 			}
@@ -194,7 +194,7 @@ public class Simulation {
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 
-				if(attributesSimulation.isWriteSimulationData()) {
+				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
 				}
 
@@ -224,7 +224,7 @@ public class Simulation {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
-			if(attributesSimulation.isWriteSimulationData()) {
+			if (attributesSimulation.isWriteSimulationData()) {
 				processorManager.writeOutput();
 			}
 			logger.info("Finished writing all output files");

@@ -149,10 +149,9 @@ public class VPoint implements Cloneable {
 	}
 
 	public VPoint limit(final double limitLength) {
-		if(this.distanceToOrigin() > limitLength) {
+		if (this.distanceToOrigin() > limitLength) {
 			return norm(limitLength);
-		}
-		else {
+		} else {
 			return this;
 		}
 	}

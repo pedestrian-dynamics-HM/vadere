@@ -13,8 +13,8 @@ import java.util.Optional;
 /**
  * @author Benedikt Zoennchen
  *
- * A VCircleSector is a part of a disc. The disc is defined by the center and the radius and the part by the minimum and maximum angle.
- *
+ * A VCircleSector is a part of a disc. The disc is defined by the center and the radius and the
+ * part by the minimum and maximum angle.
  */
 public class VCircleSector implements ICircleSector {
 
@@ -56,11 +56,11 @@ public class VCircleSector implements ICircleSector {
 	public ImmutableList<VPoint> getIntersectionPoints(double x1, double y1, double x2, double y2) {
 
 		List<VPoint> intersectionPoints = new ArrayList<>();
-		if(getLine1().intersectsLine(x1, y1, x2, y2)) {
+		if (getLine1().intersectsLine(x1, y1, x2, y2)) {
 			intersectionPoints.add(GeometryUtils.lineIntersectionPoint(getLine1(), x1, y1, x2, y2));
 		}
 
-		if(getLine2().intersectsLine(x1, y1, x2, y2)) {
+		if (getLine2().intersectsLine(x1, y1, x2, y2)) {
 			intersectionPoints.add(GeometryUtils.lineIntersectionPoint(getLine1(), x1, y1, x2, y2));
 		}
 
@@ -80,10 +80,9 @@ public class VCircleSector implements ICircleSector {
 
 	@Override
 	public boolean intersectsLine(double x1, double y1, double x2, double y2) {
-		if(getLine1().intersectsLine(x1, y1, x2, y2) || getLine2().intersectsLine(x1, y1, x2, y2)) {
+		if (getLine1().intersectsLine(x1, y1, x2, y2) || getLine2().intersectsLine(x1, y1, x2, y2)) {
 			return true;
-		}
-		else {
+		} else {
 			// intersection points with circle
 			ImmutableList<VPoint> interSectionPoints = circle.getIntersectionPoints(x1, y1, x2, y2);
 			// is one of this intersection points inside the section
@@ -92,14 +91,14 @@ public class VCircleSector implements ICircleSector {
 	}
 
 	private VLine getLine1() {
-		if(line1 == null) {
+		if (line1 == null) {
 			line1 = new VLine(center.getX(), center.getY(), Math.cos(minAngle) * radius, Math.sin(minAngle) * radius);
 		}
 		return line1;
 	}
 
 	private VLine getLine2() {
-		if(line2 == null) {
+		if (line2 == null) {
 			line2 = new VLine(center.getX(), center.getY(), Math.cos(maxAngle) * radius, Math.sin(maxAngle) * radius);
 		}
 		return line2;

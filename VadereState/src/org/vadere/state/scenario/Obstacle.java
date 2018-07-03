@@ -73,7 +73,7 @@ public class Obstacle extends ScenarioElement {
 	}
 
 	@Override
-	public void setAttributes(Attributes attributes){
+	public void setAttributes(Attributes attributes) {
 		this.attributes = (AttributesObstacle) attributes;
 	}
 
