@@ -6,6 +6,9 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
 import org.vadere.state.attributes.Attributes;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VLine;
@@ -15,6 +18,7 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public class Stairs extends ScenarioElement {
 
+	private static Logger logger = LogManager.getLogger(Stairs.class);
 	public static class Tread {
 		public final VLine treadline;
 

@@ -19,12 +19,15 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
+// Implementation of the soft shell repulsive potential of pedestrians according to sivers-2016b.
+// page 46, eq. 4.1
+
 public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldAgent {
 
 	private AttributesPotentialCompactSoftshell attributes;
-	private double intimateWidth;
-	private double personalWidth;
-	private double height;
+	private double intimateWidth; // radius of intimate zone \delta_{int}
+	private double personalWidth; // radius of personal width \delta_{per}
+	private double height; // intensity of repulsion \mu_p
 
 	public PotentialFieldPedestrianCompactSoftshell() {}
 
@@ -49,26 +52,26 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	public double getAgentPotential(VPoint pos, Agent pedestrian,
 			Agent otherPedestrian) {
 
-		double radii = pedestrian.getRadius() + otherPedestrian.getRadius();
+		double radii = pedestrian.getRadius() + otherPedestrian.getRadius(); // 2* r_p (sivers-2016b)
 		double potential = 0;
-		double distnaceSq = otherPedestrian.getPosition().distanceSq(pos);
+		double distanceSq = otherPedestrian.getPosition().distanceSq(pos);
 		double maxDistanceSq = (Math.max(personalWidth, intimateWidth)  + radii) * (Math.max(personalWidth, intimateWidth)  + radii);
 
-		if(distnaceSq < maxDistanceSq) {
-			double distance = otherPedestrian.getPosition().distance(pos);
+		if(distanceSq < maxDistanceSq) {
+			double distance = otherPedestrian.getPosition().distance(pos); // Euclidean distance d_j(x) between agent j and position x
 
-			int intPower = this.attributes.getIntimateSpacePower();
-			int perPower = this.attributes.getPersonalSpacePower();
-			double factor = this.attributes.getIntimateSpaceFactor();
+			int intPower = this.attributes.getIntimateSpacePower(); // b_p
+			int perPower = this.attributes.getPersonalSpacePower(); // not defined in sivers-2016b (perPower = 1)
+			double factor = this.attributes.getIntimateSpaceFactor(); // a_p
 
 			if (distance < personalWidth + radii) {
-				potential += this.height * MathUtil.expAp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
+				potential += this.height * MathUtil.expAp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1)); // implementation differs from sivers-2016b here:  \delta_{per} + r_p  (note: radii = 2*r_p)
 			}
 			if (distance < this.intimateWidth + radii) {
 				potential += this.height / factor
-						* MathUtil.expAp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1));
+						* MathUtil.expAp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1)); // implementation differs from sivers-2016b here:  \delta_{int} + r_p  (note: radii = 2*r_p)
 			}
-			if (distance < radii) {
+			if (distance < radii) { // implementations differs from sivers-2016b here : Math.power(distance / (radii),2)
 				potential += 1000 * MathUtil.expAp(1 / (Math.pow(distance / radii, 4) - 1));
 			}
 		}
@@ -94,7 +97,7 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	public Vector2D getAgentPotentialGradient(VPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> otherPedestrians) {
-		throw new UnsupportedOperationException("not jet implemented.");
+		throw new UnsupportedOperationException("not yet implemented.");
 		/*double epsilon = 0.001;
 		double dx = 0;
 		double dy = 0;

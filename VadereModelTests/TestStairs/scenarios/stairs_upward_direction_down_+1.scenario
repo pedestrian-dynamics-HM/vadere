@@ -103,7 +103,7 @@
         "shape" : {
           "x" : 1.0,
           "y" : 0.0,
-          "width" : 0.9,
+          "width" : 1.0,
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
@@ -157,8 +157,8 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 50.0,
-        "spawnAtRandomPositions" : false,
-        "useFreeSpaceOnly" : false,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],

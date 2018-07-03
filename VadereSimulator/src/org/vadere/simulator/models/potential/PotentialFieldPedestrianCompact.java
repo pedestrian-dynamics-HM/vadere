@@ -18,6 +18,9 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+// This potential is explained in seitz-2015 (The effect of stepping on pedestrians trajectories)
+// p. 596, eq. 1
+
 public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 
 	class DistanceComparator implements Comparator<Agent> {
