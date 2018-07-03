@@ -8,12 +8,13 @@
       "processWriters": {
         "files": {
           "*": {
+            // first '*' array, second '*' children in object
             "*": "processWriters.files[&1].&"
           }
         },
         "processors": {
           "*": {
-            // first '*' array, second '*' childen in object
+            // first '*' array, second '*' children in object
             "*": "processWriters.processors[&1].&0"
           }
         },
@@ -22,7 +23,7 @@
       "scenario": {
         "mainModel": "scenario.mainModel",
         "attributesModel": {
-          "org.vadere.state.attributes.models.AttributesBHM": {
+          "org.v adere.state.attributes.models.AttributesBHM": {
             "stepLengthIntercept": "scenario.&2.&1.&0",
             "stepLengthSlopeSpeed": "scenario.&2.&1.&0",
             "stepLengthSD": "scenario.&2.&1.&0",
@@ -433,14 +434,55 @@
   {
     "operation": "default",
     "spec": {
+      "name": "",
+      "description": "",
+      "release": "",
       "processWriters": {
         "files[]": {},
         "processors[]": {},
         "isTimestamped": "true"
       },
       "scenario": {
+        "mainModel": "null",
+        "attributesModel": {},
+        "attributesSimulation": {
+          "finishTime": "500.0",
+          "simTimeStepLength": "0.4",
+          "realTimeSimTimeRatio": "0.1",
+          "writeSimulationData": "true",
+          "visualizationEnabled": "true",
+          "printFPS": "false",
+          "needsBoundary": "false",
+          "digitsPerCoordinate": "2",
+          "useRandomSeed": "true",
+          "randomSeed": "1"
+        },
         "topography": {
-          "dynamicElements[]": {}
+          "attributes": {
+            "bounds": {
+              "x": "0.0",
+              "y": "0.0",
+              "width": "10.0",
+              "height": "10.0"
+            },
+            "boundingBoxWidth": "0.5",
+            "bounded": "true"
+          },
+          "obstacles": [],
+          "stairs": [],
+          "targets": [],
+          "sources": [],
+          "dynamicElements": [],
+          "attributesPedestrian": {
+            "radius": "0.195",
+            "densityDependentSpeed": "false",
+            "speedDistributionMean": "1.34",
+            "speedDistributionStandardDeviation": "0.0",
+            "minimumSpeed": "0.3",
+            "maximumSpeed": "3.0",
+            "acceleration": "2.0"
+          },
+          "attributesCar": null
         }
       }
     }
