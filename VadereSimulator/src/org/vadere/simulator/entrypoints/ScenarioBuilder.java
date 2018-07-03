@@ -252,7 +252,12 @@ public class ScenarioBuilder {
         AttributesBuilder<Attributes> attBuilder = new AttributesBuilder<>(element.getAttributes());
         attBuilder.setField(fieldName, value);
         E clone = (E) element.clone();
-        reflectionAttributeModifier.setAttributes(clone, attBuilder.build());
+
+        //NOTE see issue #91:
+        //This class is not tested - revert change by uncommenting reflextion and comment in
+        //clone.setAttributes
+        //reflectionAttributeModifier.setAttributes(clone, attBuilder.build());
+        clone.setAttributes(attBuilder.build());
         return clone;
     }
 
