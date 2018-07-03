@@ -68,30 +68,37 @@ public class ScenarioRun implements Runnable {
 	@Override
 	public void run() {
 		try {
-			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
-			scenarioStore.getTopography().reset();
+			/**
+			 * To make sure that no other Thread changes the scenarioStore object during the initialization of a scenario run
+			 * this is an atomic operation with respect to the scenarioStore. We observed that with Linux 18.04 KUbunto
+			 * the GUI-Thread changes the scenarioStore object during a simulation run. Which can lead to any unexpected behaviour.
+			 */
+			synchronized (scenarioStore) {
+				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
+				scenarioStore.getTopography().reset();
 
-			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
-			modelBuilder.createModelAndRandom();
+				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
+				modelBuilder.createModelAndRandom();
 
-			final MainModel mainModel = modelBuilder.getModel();
-			final Random random = modelBuilder.getRandom();
-			
-			// prepare processors and simulation data writer
-			if(scenarioStore.attributesSimulation.isWriteSimulationData()) {
-				processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+				final MainModel mainModel = modelBuilder.getModel();
+				final Random random = modelBuilder.getRandom();
+
+				// prepare processors and simulation data writer
+				if(scenarioStore.attributesSimulation.isWriteSimulationData()) {
+					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+				}
+
+				// Only create output directory and write .scenario file if there is any output.
+				if(processorManager != null && !processorManager.isEmpty()) {
+					createAndSetOutputDirectory();
+					scenario.saveToOutputPath(outputPath);
+				}
+
+				sealAllAttributes();
+
+				// Run simulation main loop from start time = 0 seconds
+				simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
 			}
-
-			// Only create output directory and write .scenario file if there is any output.
-			if(processorManager != null && !processorManager.isEmpty()) {
-                createAndSetOutputDirectory();
-                scenario.saveToOutputPath(outputPath);
-            }
-
-			sealAllAttributes();
-
-			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
 			simulation.run();
 
 		} catch (Exception e) {
