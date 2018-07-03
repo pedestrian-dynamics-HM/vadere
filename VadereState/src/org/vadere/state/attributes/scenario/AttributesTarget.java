@@ -1,6 +1,7 @@
 package org.vadere.state.attributes.scenario;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -8,7 +9,7 @@ import org.vadere.util.geometry.shapes.VShape;
  * Attributes of a target area, used by TargetController in VadereSimulation.
  * 
  */
-public class AttributesTarget extends Attributes {
+public class AttributesTarget extends AttributesEmbedShape {
 
 	private int id = ID_NOT_SET;
 	/**
@@ -99,10 +100,12 @@ public class AttributesTarget extends Attributes {
 		return id;
 	}
 
+	@Override
 	public void setShape(VShape shape) {
 		this.shape = shape;
 	}
 
+	@Override
 	public VShape getShape() {
 		return shape;
 	}

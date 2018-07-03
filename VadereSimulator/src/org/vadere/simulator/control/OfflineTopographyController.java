@@ -34,6 +34,7 @@ public class OfflineTopographyController {
 
 	// add bounding box
 	protected void prepareTopography() {
+		// add boundaries
 		if (this.topography.isBounded() && !this.topography.hasBoundary()) {
 			VPolygon boundary = new VPolygon(this.topography.getBounds());
 			double width = this.topography.getBoundingBoxWidth();
@@ -47,7 +48,7 @@ public class OfflineTopographyController {
 			}
 		}
 
-		// calculate distance after the boundary was added!
+		// add distance function
 		IPotentialField distanceField = new ObstacleDistancePotential(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),

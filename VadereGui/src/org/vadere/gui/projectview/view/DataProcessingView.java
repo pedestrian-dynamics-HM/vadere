@@ -263,7 +263,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					JComboBox processorOptions = new JComboBox<>(processors);
 
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
-						Messages.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							Messages.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						String processorClass = processorLableToClass.get(processorOptions.getSelectedItem());
 //						System.out.println("Selected Processor is: " + processorClass);
 						DataProcessor newDataProcessor = null;

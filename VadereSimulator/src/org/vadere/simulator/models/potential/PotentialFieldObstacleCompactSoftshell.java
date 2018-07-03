@@ -13,7 +13,6 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.MathUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,10 +61,10 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 			double currentPotential = 0;
 
 			if (distance < this.width) {
-				currentPotential = this.height * MathUtil.expAp(2 / (Math.pow(distance / (this.width), 2) - 1));
+				currentPotential = this.height * Math.exp(2 / (Math.pow(distance / (this.width), 2) - 1));
 			}
 			if (distance < radius) {
-				currentPotential += 100000 * MathUtil.expAp(1 / (Math.pow(distance / radius, 2) - 1));
+				currentPotential += 100000 * Math.exp(1 / (Math.pow(distance / radius, 2) - 1));
 			}
 
 			if (potential < currentPotential)

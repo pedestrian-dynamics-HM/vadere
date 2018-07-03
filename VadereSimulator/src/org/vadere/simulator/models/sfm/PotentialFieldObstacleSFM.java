@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
@@ -112,5 +112,4 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 		potentialFieldObstacle.obstacles = new LinkedList<>(topography.getObstacles());
 		return potentialFieldObstacle;
 	}
-
 }

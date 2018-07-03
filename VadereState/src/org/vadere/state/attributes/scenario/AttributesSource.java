@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class AttributesSource extends Attributes {
+public class AttributesSource extends AttributesEmbedShape {
 
 	public static final String CONSTANT_DISTRIBUTION = ConstantDistribution.class.getName();
 	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
@@ -127,10 +127,12 @@ public class AttributesSource extends Attributes {
 		return id;
 	}
 
+	@Override
 	public void setShape(VShape shape) {
 		this.shape = shape;
 	}
 
+	@Override
 	public VShape getShape() {
 		return shape;
 	}

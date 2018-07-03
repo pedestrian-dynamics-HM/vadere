@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -25,12 +27,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class ScenarioStore {
 
+	private static Logger logger = LogManager.getLogger(ScenarioStore.class);
 	public String name;
 	public String description;
 	public String mainModel;
 	public List<Attributes> attributesList;
 	public AttributesSimulation attributesSimulation;
-	public Topography topography;
+	private Topography topography;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
 			final AttributesSimulation attributesSimulation, final Topography topography) {
@@ -39,6 +42,15 @@ public class ScenarioStore {
 		this.mainModel = mainModel;
 		this.attributesList = attributesModel;
 		this.attributesSimulation = attributesSimulation;
+		this.topography = topography;
+	}
+
+	public synchronized Topography getTopography() {
+		return topography;
+	}
+
+	public synchronized void setTopography(final Topography topography) {
+		//logger.info("setTopography:" + topography + ", thread:" + Thread.currentThread());
 		this.topography = topography;
 	}
 

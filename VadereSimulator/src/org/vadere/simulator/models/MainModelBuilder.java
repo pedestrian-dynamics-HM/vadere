@@ -48,8 +48,8 @@ public class MainModelBuilder {
 		String mainModelName = scenarioStore.mainModel;
 		DynamicClassInstantiator<MainModel> instantiator = new DynamicClassInstantiator<>();
 		MainModel mainModel = instantiator.createObject(mainModelName);
-		mainModel.initialize(scenarioStore.attributesList, scenarioStore.topography,
-				scenarioStore.topography.getAttributesPedestrian(), random);
+		mainModel.initialize(scenarioStore.attributesList, scenarioStore.getTopography(),
+				scenarioStore.getTopography().getAttributesPedestrian(), random);
 		return mainModel;
 	}
 

@@ -35,6 +35,10 @@ public class VPoint implements Cloneable {
 		this.y = copy.y;
 	}
 
+	public double distance(final double x, final double y) {
+		return Point2D.distance(this.x, this.y, x, y);
+	}
+
 	public double distance(VPoint other) {
 		return Point2D.distance(x, y, other.x, other.y);
 	}
@@ -126,6 +130,30 @@ public class VPoint implements Cloneable {
 	public VPoint norm() {
 		double abs = distanceToOrigin();
 		return new VPoint(x / abs, y / abs);
+	}
+
+	public VPoint norm(final double length) {
+		double rx, ry;
+		double vl = distance(ZERO);
+		if (Math.abs(x) < GeometryUtils.DOUBLE_EPS) {
+			rx = 0;
+		} else {
+			rx = x / vl * length;
+		}
+		if (Math.abs(y) < GeometryUtils.DOUBLE_EPS) {
+			ry = 0;
+		} else {
+			ry = y / vl * length;
+		}
+		return new VPoint(rx, ry);
+	}
+
+	public VPoint limit(final double limitLength) {
+		if (this.distanceToOrigin() > limitLength) {
+			return norm(limitLength);
+		} else {
+			return this;
+		}
 	}
 
 	public VPoint normZeroSafe() {
