@@ -66,20 +66,20 @@ public class ScenarioBuilder {
             store.attributesSimulation = (AttributesSimulation) builder.build();
         }
         else if(AttributesAgent.class == clazz){
-            builder = new AttributesBuilder<>((E)store.topography.getAttributesPedestrian());
+            builder = new AttributesBuilder<>((E)store.getTopography().getAttributesPedestrian());
             builder.setField(fieldName, value);
             setAttributesAgent((AttributesAgent) builder.build());
         }
         else if(AttributesCar.class == clazz){
-            builder = new AttributesBuilder<>((E)store.topography.getAttributesCar());
+            builder = new AttributesBuilder<>((E)store.getTopography().getAttributesCar());
             builder.setField(fieldName, value);
             setAttributesCar((AttributesCar) builder.build());
         }
         else if(AttributesTopography.class == clazz){
-            builder = new AttributesBuilder<>((E)store.topography.getAttributes());
+            builder = new AttributesBuilder<>((E)store.getTopography().getAttributes());
             builder.setField(fieldName, value);
             ReflectionAttributeModifier reflectionAttributeModifier = new ReflectionAttributeModifier();
-            reflectionAttributeModifier.setAttributes(store.topography, builder.build());
+            reflectionAttributeModifier.setAttributes(store.getTopography(), builder.build());
         }
         else {
             builder = new AttributesBuilder<>(store.getAttributes(clazz));
@@ -92,9 +92,9 @@ public class ScenarioBuilder {
     private void setAttributesCar(@NotNull final AttributesCar attributesCar) {
         Field field;
         try {
-            field = store.topography.getClass().getDeclaredField("attributesCar");
+            field = store.getTopography().getClass().getDeclaredField("attributesCar");
             field.setAccessible(true);
-            field.set(store.topography, attributesCar);
+            field.set(store.getTopography(), attributesCar);
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
             logger.error(e);
@@ -104,9 +104,9 @@ public class ScenarioBuilder {
     private void setAttributesAgent(@NotNull final AttributesAgent attributesAgent) {
         Field field;
         try {
-            field = store.topography.getClass().getDeclaredField("attributesPedestrian");
+            field = store.getTopography().getClass().getDeclaredField("attributesPedestrian");
             field.setAccessible(true);
-            field.set(store.topography, attributesAgent);
+            field.set(store.getTopography(), attributesAgent);
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
             logger.error(e);
@@ -252,7 +252,12 @@ public class ScenarioBuilder {
         AttributesBuilder<Attributes> attBuilder = new AttributesBuilder<>(element.getAttributes());
         attBuilder.setField(fieldName, value);
         E clone = (E) element.clone();
-        reflectionAttributeModifier.setAttributes(clone, attBuilder.build());
+
+        //NOTE see issue #91:
+        //This class is not tested - revert change by uncommenting reflextion and comment in
+        //clone.setAttributes
+        //reflectionAttributeModifier.setAttributes(clone, attBuilder.build());
+        clone.setAttributes(attBuilder.build());
         return clone;
     }
 

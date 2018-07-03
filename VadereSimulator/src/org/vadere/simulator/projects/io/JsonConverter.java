@@ -107,7 +107,7 @@ public class JsonConverter {
 		vadereNode.set("attributesSimulation", StateJsonConverter.convertValue(scenarioStore.attributesSimulation, JsonNode.class));
 
 		// vadere > topography
-		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.topography);
+		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		vadereNode.set("topography", topographyNode);
 
 		return vadereNode;
@@ -121,7 +121,7 @@ public class JsonConverter {
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.attributesSimulation, JsonNode.class);
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.attributesList);
-		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.topography);
+		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		return new ScenarioStore(scenarioStore.name, scenarioStore.description, scenarioStore.mainModel,
 				StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode),
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),

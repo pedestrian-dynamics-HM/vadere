@@ -7,28 +7,20 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
-import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
-import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Simulation {
 
@@ -78,10 +70,10 @@ public class Simulation {
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.attributesSimulation;
-		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
+		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
-		this.topography = scenarioStore.topography;
+		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
@@ -94,7 +86,6 @@ public class Simulation {
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
-
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
         IPotentialFieldTarget pft = null;
@@ -144,7 +135,9 @@ public class Simulation {
 			c.preLoop(simTimeInSec);
 		}
 
-		processorManager.preLoop(this.simulationState);
+		if(attributesSimulation.isWriteSimulationData()) {
+			processorManager.preLoop(this.simulationState);
+		}
 	}
 
 	private void postLoop() {
@@ -158,7 +151,9 @@ public class Simulation {
 			c.postLoop(simTimeInSec);
 		}
 
-		processorManager.postLoop(this.simulationState);
+		if(attributesSimulation.isWriteSimulationData()) {
+			processorManager.postLoop(this.simulationState);
+		}
 		topographyController.postLoop(this.simTimeInSec);
 	}
 
@@ -167,8 +162,10 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			processorManager.setMainModel(mainModel);
-			processorManager.initOutputFiles();
+			if(attributesSimulation.isWriteSimulationData()) {
+				processorManager.setMainModel(mainModel);
+				processorManager.initOutputFiles();
+			}
 
 			preLoop();
 
@@ -196,7 +193,11 @@ public class Simulation {
 				assert assertAllPedestrianInBounds();
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
-				processorManager.update(this.simulationState);
+
+				if(attributesSimulation.isWriteSimulationData()) {
+					processorManager.update(this.simulationState);
+				}
+
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
@@ -223,7 +224,9 @@ public class Simulation {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
-			processorManager.writeOutput();
+			if(attributesSimulation.isWriteSimulationData()) {
+				processorManager.writeOutput();
+			}
 			logger.info("Finished writing all output files");
 		}
 	}

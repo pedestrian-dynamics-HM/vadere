@@ -85,13 +85,7 @@ public class Vector2D extends VPoint {
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 */
 	public double angleTo(VPoint center) {
-		double atan2 = Math.atan2(this.y - center.y, this.x - center.x);
-
-		if (atan2 < 0.0) {
-			atan2 = Math.PI * 2 + atan2;
-		}
-
-		return atan2;
+		return GeometryUtils.angleTo(this, center);
 	}
 
 	public Vector2D add(VPoint p) {

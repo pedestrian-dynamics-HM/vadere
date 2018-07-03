@@ -25,4 +25,7 @@ public abstract class ScenarioElement {
 	public abstract ScenarioElement clone();
 
 	public abstract Attributes getAttributes();
+
+	public abstract void setAttributes(Attributes attributes);
+
 }

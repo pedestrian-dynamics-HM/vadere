@@ -5,6 +5,10 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
+import org.vadere.state.attributes.Attributes;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VLine;
@@ -14,6 +18,7 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public class Stairs extends ScenarioElement {
 
+	private static Logger logger = LogManager.getLogger(Stairs.class);
 	public static class Tread {
 		public final VLine treadline;
 
@@ -22,17 +27,15 @@ public class Stairs extends ScenarioElement {
 		}
 	}
 
-	private final AttributesStairs attributes;
-	private final Tread[] treads;
+	private AttributesStairs attributes;
+	private Tread[] treads;
 	private double treadDepth;
 
 	public Stairs(AttributesStairs attributes) {
-		this.attributes = attributes;
-
-		treads = initializeTreads();
+		setAttributes(attributes);
 	}
 
-	private Tread[] initializeTreads() {
+	private Tread[] computeTreads() {
 		// tread count + 2 since the first and last treads must be placed outside of the shape and
 		// on the next floor.
 		Tread[] treadsResult = new Tread[this.getAttributes().getTreadCount() + 2];
@@ -52,7 +55,16 @@ public class Stairs extends ScenarioElement {
 
 			// subtract one on the left and add one tread depth on the right so that the last and
 			// next floors gets one tread too
-			double x = rotatedBounds.getMinX() - treadDepth + factor * (rotatedBounds.getWidth() + treadDepth * 2);
+
+			// by dividing treadDepth by 2 the lines are centered between the edges
+
+			// __________________________________ << upper edge of tread
+			// ---------------------------------- << line that pedestrians walk on (centered between edges)
+			// __________________________________ << lower edge of (same) tread
+
+			// This is the assumption that pedestrians always step in the middle of a tread.
+
+			double x = rotatedBounds.getMinX() - treadDepth/2 + factor * (rotatedBounds.getWidth() + treadDepth * 2);
 			VPoint p1 = new VPoint(x, rotatedBounds.getMinY()).rotate(angle);
 			VPoint p2 = new VPoint(x, rotatedBounds.getMaxY()).rotate(angle);
 
@@ -62,6 +74,12 @@ public class Stairs extends ScenarioElement {
 		}
 
 		return treadsResult;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		this.attributes = (AttributesStairs) attributes;
+		treads = computeTreads();
 	}
 
 	@Override

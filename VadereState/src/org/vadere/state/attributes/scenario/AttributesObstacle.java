@@ -1,9 +1,9 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class AttributesObstacle extends Attributes {
+public class AttributesObstacle extends AttributesEmbedShape {
 
 	private VShape shape;
 	private int id;
@@ -19,10 +19,12 @@ public class AttributesObstacle extends Attributes {
 		this.shape = shape;
 	}
 
+	@Override
 	public void setShape(VShape shape) {
 		this.shape = shape;
 	}
 
+	@Override
 	public VShape getShape() {
 		return shape;
 	}

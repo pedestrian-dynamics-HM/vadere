@@ -8,7 +8,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -38,6 +41,45 @@ public class GeometryUtils {
 			}
 		}
 		return false;
+	}
+
+	public static List<VPoint> getDiscDiscretizationPoints(
+			@NotNull final Random random,
+			final boolean varyDirection,
+			@NotNull final VCircle circle,
+			final int numberOfCircles,
+			final int numberOfPointsOfLargestCircle,
+			final double anchorAngle,
+			final double angle) {
+		double randOffset = varyDirection ? random.nextDouble() : 0;
+
+		List<VPoint> reachablePositions = new ArrayList<>();
+
+		// iterate through all circles
+		for (int j = 1; j <= numberOfCircles; j++) {
+
+			double circleOfGrid = circle.getRadius() * j / numberOfCircles;
+
+			int numberOfGridPoints = (int) Math.ceil(circleOfGrid / circle.getRadius() * numberOfPointsOfLargestCircle);
+
+			// reduce number of grid points proportional to the constraint of direction
+			if (angle < 2 * Math.PI) {
+				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2 * Math.PI));
+			}
+
+			double angleDelta = angle / numberOfGridPoints;
+
+			// iterate through all angles and compute absolute positions of grid points
+			for (int i = 0; i < numberOfGridPoints; i++) {
+
+				double x = circleOfGrid * Math.cos(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getX();
+				double y = circleOfGrid * Math.sin(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getY();
+				VPoint tmpPos = new VPoint(x, y);
+
+				reachablePositions.add(tmpPos);
+			}
+		}
+		return reachablePositions;
 	}
 
 	/**
@@ -87,6 +129,22 @@ public class GeometryUtils {
 		Collections.sort(orderedList, DataPoint.getComparator());
 
 		return orderedList;
+	}
+
+	/**
+	 * Returns the angle between the x-axis, p1 and p2.
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
+	public static double angleTo(VPoint p1, VPoint p2) {
+		double atan2 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+
+		if (atan2 < 0.0) {
+			atan2 = Math.PI * 2 + atan2;
+		}
+
+		return atan2;
 	}
 
 	/**
@@ -149,5 +207,34 @@ public class GeometryUtils {
 
 	public static VPoint add(VPoint p1, VPoint p2) {
 		return new VPoint(p1.x + p2.x, p1.y + p2.y);
+	}
+
+	public static VPoint lineIntersectionPoint(final double x1,
+	                                           final double y1,
+	                                           final double x2,
+	                                           final double y2,
+	                                           final double x3,
+	                                           final double y3,
+			                                   final double x4,
+			                                   final double y4) {
+		assert new VLine(new VPoint(x1,y1), new VPoint(x2, y2)).intersectsLine(x3, y3, x4, y4);
+		double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+		assert d != 0;
+
+		double x = ((x1 * y2 - y1 - x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+		double y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (y3 * y4 - y3 * x4)) / d;
+		return new VPoint(x, y);
+	}
+
+	public static VPoint lineIntersectionPoint(final VPoint p1, final VPoint p2, final VPoint q1, final VPoint q2) {
+		return lineIntersectionPoint(p1.x, p1.y, p2.x, p2.y, q1.x, q1.y, q2.x, q2.y);
+	}
+
+	public static VPoint lineIntersectionPoint(final VLine line,
+	                                           final double x3,
+	                                           final double y3,
+	                                           final double x4,
+	                                           final double y4) {
+		return lineIntersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), x3, y3, x4, y4);
 	}
 }

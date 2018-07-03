@@ -11,6 +11,7 @@ import org.vadere.simulator.models.SubModelBuilder;
 import org.vadere.simulator.models.groups.CentroidGroupModel;
 import org.vadere.simulator.models.groups.CentroidGroupPotential;
 import org.vadere.simulator.models.groups.CentroidGroupSpeedAdjuster;
+import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerDiscrete;
@@ -163,6 +164,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 				break;
 			case POWELL:
 				result = new StepCircleOptimizerPowell(random);
+				break;
+			case PSO:
+				result = new ParticleSwarmOptimizer(movementThreshold, random);
 				break;
 			case GRADIENT:
 				result = new StepCircleOptimizerGradient(topography,

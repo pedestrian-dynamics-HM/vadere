@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -31,7 +32,7 @@ public abstract class Agent extends DynamicElement {
 
 	private double freeFlowSpeed;
 
-	private final AttributesAgent attributes;
+	private AttributesAgent attributes;
 
 
 	public Agent(AttributesAgent attributesAgent) {
@@ -184,6 +185,11 @@ public abstract class Agent extends DynamicElement {
 
 	// Setters...
 
+
+	@Override
+	public void setAttributes(Attributes attributes){
+		this.attributes = (AttributesAgent) attributes;
+	}
 
 	/**
 	 * Set the index pointing to the next target in the target list.

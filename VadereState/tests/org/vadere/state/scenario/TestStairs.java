@@ -53,8 +53,8 @@ public class TestStairs {
 		for (int i = 0; i < treads.length; i++) {
 			assertEquals(0.0, treads[i].treadline.y1, GeometryUtils.DOUBLE_EPS);
 			assertEquals(5.0, treads[i].treadline.y2, GeometryUtils.DOUBLE_EPS);
-			assertEquals(i * 2.0, treads[i].treadline.x1, GeometryUtils.DOUBLE_EPS);
-			assertEquals(i * 2.0, treads[i].treadline.x2, GeometryUtils.DOUBLE_EPS);
+			assertEquals(1+i*2, treads[i].treadline.x1, GeometryUtils.DOUBLE_EPS);
+			assertEquals(1+i*2, treads[i].treadline.x2, GeometryUtils.DOUBLE_EPS);
 		}
 	}
 
@@ -68,8 +68,8 @@ public class TestStairs {
 		for (int i = 0; i < treads.length; i++) {
 			assertEquals(10.0, treads[i].treadline.x1, GeometryUtils.DOUBLE_EPS);
 			assertEquals(0.0, treads[i].treadline.x2, GeometryUtils.DOUBLE_EPS);
-			assertEquals(i * 1.0, treads[i].treadline.y1, GeometryUtils.DOUBLE_EPS);
-			assertEquals(i * 1.0, treads[i].treadline.y2, GeometryUtils.DOUBLE_EPS);
+			assertEquals(0.5 + i * 1.0, treads[i].treadline.y1, GeometryUtils.DOUBLE_EPS);
+			assertEquals(0.5 + i * 1.0, treads[i].treadline.y2, GeometryUtils.DOUBLE_EPS);
 		}
 	}
 
