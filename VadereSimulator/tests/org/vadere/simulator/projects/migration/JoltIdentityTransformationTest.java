@@ -15,8 +15,12 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -26,9 +30,74 @@ public class JoltIdentityTransformationTest {
 	@Test
 	public void testExistingScenarioFiles() throws IOException {
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTests").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		transform(scenarioFiles, "/transfrom_v2_to_v3.json");
+	}
 
+	@Test
+	public void testExistingScenarioFilesV01() throws IOException {
+		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		transform(scenarioFiles, "/transfrom_v1_to_v2.json");
+	}
+
+	@Test
+	public void attr01() throws IOException {
+		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		LinkedHashMap<String, Object> out = new LinkedHashMap<>();
 		for (Path scenarioFile : scenarioFiles) {
-			List chainrSpecJson = JsonUtils.classpathToList("/transfrom_v2_to_v3.json");
+			Object inputJson = JsonUtils.filepathToObject(scenarioFile.toString());
+			JsonObj va = get(new JsonObj(inputJson), "vadere", "topography");
+//			System.out.println(JsonUtils.toPrettyJsonString(va.node));
+			va.getMap().keySet().forEach(k -> out.put(k, va.getMap().get(k)));
+		}
+		System.out.println(JsonUtils.toPrettyJsonString(out));
+	}
+
+	private JsonObj get(JsonObj node, String... path) {
+
+		if ((node.type == MAP) && path.length == 1) {
+			LinkedHashMap<String, Object> m = node.getMap();
+			Object o = m.get(path[0]);
+			return new JsonObj(o);
+		}
+		if ((node.type == ARRAY) && path.length == 1) {
+			return new JsonObj(node.getArray());
+		}
+
+		if (node.type == MAP && path.length > 1) {
+			String next = path[0];
+			String[] path2 = Arrays.copyOfRange(path, 1, path.length);
+			return get(new JsonObj(node.getMap().get(next)), path2);
+		}
+		if (node.type == ARRAY && path.length != 1) {
+			throw new RuntimeException("only last element of path can be an array");
+		}
+		return new JsonObj(node);
+	}
+
+	private static final int ARRAY = 1;
+	private static final int MAP = 0;
+
+	private class JsonObj {
+		public Object node;
+		public final int type;
+
+		public JsonObj(Object node) {
+			this.node = node;
+			this.type = (node instanceof Map) ? MAP : ARRAY;
+		}
+
+		public LinkedHashMap<String, Object> getMap() {
+			return (LinkedHashMap<String, Object>) node;
+		}
+
+		public ArrayList<Object> getArray() {
+			return (ArrayList<Object>) node;
+		}
+	}
+
+	private void transform(List<Path> scenarioFiles, String transformation) {
+		for (Path scenarioFile : scenarioFiles) {
+			List chainrSpecJson = JsonUtils.classpathToList(transformation);
 			Chainr chainr = Chainr.fromSpec(chainrSpecJson);
 
 			Object inputJson = JsonUtils.filepathToObject(scenarioFile.toString());
@@ -46,7 +115,6 @@ public class JoltIdentityTransformationTest {
 			}
 
 		}
-
 	}
 
 	private List<Path> getScenarioFiles(Path vadereModelTest) {
