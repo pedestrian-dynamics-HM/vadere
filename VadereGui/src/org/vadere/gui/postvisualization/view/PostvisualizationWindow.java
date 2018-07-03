@@ -253,12 +253,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				renderer);
 		ActionVisualization svgImg = new ActionGenerateSVG(Messages.getString("PostVis.btnSVGSnapshot.tooltip"), resources.getIcon("camera_svg.png", iconWidth, iconHeight),
 				renderer);
-		ActionVisualization tikzImg = new ActionGenerateTikz("tikz_snapshot", resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+		ActionVisualization tikzImg = new ActionGenerateTikz(Messages.getString("PostVis.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
 				renderer);
 		// add new ImageGenerator Action ...
 
 		imgOptions.add(pngImg);
 		imgOptions.add(svgImg);
+		imgOptions.add(tikzImg);
 		// add Action to List ....
 
 		ActionVisualizationMenu imgDialog = new ActionVisualizationMenu(

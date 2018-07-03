@@ -166,7 +166,12 @@ public class TikzGenerator {
 		if (config.isShowPedestrians()) {
 			generatedCode += "% Agents\n";
 			for (Agent agent : model.getAgents()) {
-				String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+			    String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+
+                if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
+                    agentTextPattern = "\\fill[draw=magenta,fill=AgentColor] (%f,%f) circle [radius=%fcm];\n";
+                }
+
 				generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
 				// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
 				// generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
