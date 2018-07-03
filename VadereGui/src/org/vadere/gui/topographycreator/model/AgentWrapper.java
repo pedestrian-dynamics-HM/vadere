@@ -72,6 +72,11 @@ public final class AgentWrapper extends ScenarioElement {
 	}
 
 	@Override
+	public void setAttributes(Attributes attributes){
+		this.agent.setAttributes(attributes);
+	}
+
+	@Override
 	public AgentWrapper clone() {
 		return new AgentWrapper((Agent) agent.clone());
 	}

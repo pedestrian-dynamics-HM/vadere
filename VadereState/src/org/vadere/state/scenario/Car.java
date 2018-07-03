@@ -2,6 +2,7 @@ package org.vadere.state.scenario;
 
 import java.util.Random;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.Vector2D;
@@ -11,7 +12,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 public class Car extends Agent implements Comparable<Car> {
 
-	private final AttributesCar attributesCar;
+	private AttributesCar attributesCar;
 
 	public Car(AttributesCar attributesCar, Random random) {
 		super(attributesCar, random);
@@ -61,6 +62,10 @@ public class Car extends Agent implements Comparable<Car> {
 	@Override
 	public AttributesCar getAttributes() {
 		return this.attributesCar;
+	}
+
+	public void setAttributes(Attributes attributes) {
+		this.attributesCar = (AttributesCar) attributes;
 	}
 
 	@Override

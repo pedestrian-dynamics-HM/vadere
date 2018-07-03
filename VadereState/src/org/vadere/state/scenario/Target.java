@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
 public class Target extends ScenarioElement implements Comparable<Target> {
 
-	private final AttributesTarget attributes;
+	private AttributesTarget attributes;
 	private final Map<Integer, Double> enteringTimes;
 	
 	/**
@@ -112,6 +113,13 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	public AttributesTarget getAttributes() {
 		return attributes;
 	}
+
+	@Override
+	public void setAttributes(Attributes attributes){
+		this.attributes = (AttributesTarget) attributes;
+	}
+
+
 
 	/** Is this target actually a pedestrian? @see scenario.TargetPedestrian */
 	public boolean isTargetPedestrian() {
