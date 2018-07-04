@@ -226,6 +226,25 @@
               "x": "scenario.&3.&2.&1.&0",
               "y": "scenario.&3.&2.&1.&0"
             }
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialSFM": {
+            "pedestrianBodyPotential": "scenario.&2.&1.&0",
+            "pedestrianRecognitionDistance": "scenario.&2.&1.&0",
+            "obstacleBodyPotential": "scenario.&2.&1.&0",
+            "obstacleRepulsionStrength": "scenario.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesSFM": {
+            "attributesODEIntegrator": {
+              "solverType": "scenario.&3.&2.&1.&0",
+              "stepSizeMin": "scenario.&3.&2.&1.&0",
+              "stepSizeMax": "scenario.&3.&2.&1.&0",
+              "toleranceAbsolute": "scenario.&3.&2.&1.&0",
+              "toleranceRelative": "scenario.&3.&2.&1.&0"
+            },
+            "floorGradientProviderType": "scenario.&2.&1.&0",
+            "targetPotentialModel": "scenario.&2.&1.&0",
+            "pedestrianPotentialModel": "scenario.&2.&1.&0",
+            "obstaclePotentialModel": "scenario.&2.&1.&0"
           }
         }
       }
@@ -238,8 +257,21 @@
       "description": "",
       "release": "0.2",
       "processWriters": {
-        "files[]": {},
-        "processors[]": {},
+        "files[]": {
+          "0": {
+            "type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+            "filename": "postvis.trajectories",
+            "processors": [
+              1
+            ]
+          }
+        },
+        "processors[]": {
+          "0": {
+            "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+            "id": 1
+          }
+        },
         "isTimestamped": "true"
       },
       "scenario": {

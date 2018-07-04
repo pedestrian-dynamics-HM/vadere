@@ -74,6 +74,7 @@
             "targetPotentialModel": "vadere.&2.&1.&0",
             "pedestrianPotentialModel": "vadere.&2.&1.&0",
             "obstaclePotentialModel": "vadere.&2.&1.&0",
+            "groupModel": "vadere.&2.&1.&0",
             "submodels": "vadere.&2.&1.&0"
           },
           "org.vadere.state.attributes.models.AttributesFloorField": {
@@ -127,6 +128,25 @@
               "x": "vadere.&3.&2.&1.&0",
               "y": "vadere.&3.&2.&1.&0"
             }
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialSFM": {
+            "pedestrianBodyPotential": "vadere.&2.&1.&0",
+            "pedestrianRecognitionDistance": "vadere.&2.&1.&0",
+            "obstacleBodyPotential": "vadere.&2.&1.&0",
+            "obstacleRepulsionStrength": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesSFM": {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.&2.&1.&0",
+              "stepSizeMin": "vadere.&3.&2.&1.&0",
+              "stepSizeMax": "vadere.&3.&2.&1.&0",
+              "toleranceAbsolute": "vadere.&3.&2.&1.&0",
+              "toleranceRelative": "vadere.&3.&2.&1.&0"
+            },
+            "floorGradientProviderType": "vadere.&2.&1.&0",
+            "targetPotentialModel": "vadere.&2.&1.&0",
+            "pedestrianPotentialModel": "vadere.&2.&1.&0",
+            "obstaclePotentialModel": "vadere.&2.&1.&0"
           }
         },
         "attributesSimulation": {

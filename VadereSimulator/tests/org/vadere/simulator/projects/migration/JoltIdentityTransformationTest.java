@@ -80,6 +80,16 @@ public class JoltIdentityTransformationTest {
 	}
 
 	@Test
+	public void DirInTarget() {
+		String path = "target/TestRun";
+		try {
+			Files.createDirectory(Paths.get(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
 	public void transformv1t0v2() throws IOException {
 		Path scenario = Paths.get("../VadereModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
 		List chainrSpecJson = JsonUtils.classpathToList("/transfrom_v1_to_v2.json");
@@ -156,7 +166,7 @@ public class JoltIdentityTransformationTest {
 		FileVisitor<Path> visitor = new FileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-				if (dir.endsWith("output") || dir.endsWith("TestSFM")) {
+				if (dir.endsWith("output")) {
 					return FileVisitResult.SKIP_SUBTREE;
 				} else {
 					return FileVisitResult.CONTINUE;
