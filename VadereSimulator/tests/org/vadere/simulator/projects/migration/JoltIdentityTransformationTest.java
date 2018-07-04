@@ -6,7 +6,6 @@ import com.bazaarvoice.jolt.JsonUtils;
 
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -22,21 +21,76 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JoltIdentityTransformationTest {
 
 
 	@Test
-	public void testExistingScenarioFiles() throws IOException {
+	public void testIdenityTransformationV02() throws IOException {
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTests").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
-		transform(scenarioFiles, "/transfrom_v2_to_v3.json");
+		testIdentity(scenarioFiles, "/identity_v2.json");
 	}
 
 	@Test
-	public void testExistingScenarioFilesV01() throws IOException {
+	public void testIdenityTransformationV01() throws IOException {
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
-		transform(scenarioFiles, "/transfrom_v1_to_v2.json");
+		testIdentity(scenarioFiles, "/identity_v1.json");
+	}
+
+	@Test
+	public void testTransformationV01_to_V02() throws IOException {
+		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		Diffy diffy = new Diffy();
+		for (Path p : scenarioFiles) {
+			Object jsonInput = JsonUtils.filepathToObject(p.toString());
+			Chainr transformation =
+					Chainr.fromSpec(JsonUtils.classpathToList("/transfrom_v1_to_v2.json"));
+			Chainr identityV02 =
+					Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json"));
+			Object jsonNew = transformation.transform(jsonInput);
+
+			//test
+			Object jsonNew2 = identityV02.transform(jsonNew);
+			System.out.println(diffy.diff(jsonNew, jsonNew2).toString());
+		}
+	}
+
+	private void testIdentity(List<Path> scenarioFiles, String transformation) {
+		for (Path scenarioFile : scenarioFiles) {
+			List chainrSpecJson = JsonUtils.classpathToList(transformation);
+			Chainr chainr = Chainr.fromSpec(chainrSpecJson);
+
+			Object inputJson = JsonUtils.filepathToObject(scenarioFile.toString());
+
+			Object transformedOutput = chainr.transform(inputJson);
+
+			Diffy diffy = new Diffy();
+			Diffy.Result res = diffy.diff(inputJson, transformedOutput);
+			System.out.printf("###Json Identity Transformation on Scenario: %s | Transformation Match: %s%n",
+					scenarioFile.getFileName().toString(), res.isEmpty());
+			if (!res.isEmpty()) {
+				System.out.println(res.toString());
+				System.out.println("######");
+			}
+			assertTrue(res.isEmpty());
+
+		}
+	}
+
+	@Test
+	public void transformv1t0v2() throws IOException {
+		Path scenario = Paths.get("../VadereModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
+		List chainrSpecJson = JsonUtils.classpathToList("/transfrom_v1_to_v2.json");
+		Chainr transform_v1_v2 = Chainr.fromSpec(chainrSpecJson);
+		Object inputJson = JsonUtils.filepathToObject(scenario.toString());
+		Object jsonOut1 = transform_v1_v2.transform(inputJson);
+		Chainr identity_v2 = Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json"));
+		Object jsonOut2 = identity_v2.transform(jsonOut1);
+		System.out.println(JsonUtils.toPrettyJsonString(jsonOut2));
+		Diffy diffy = new Diffy();
+		System.out.println(diffy.diff(jsonOut1, jsonOut2).toString());
 	}
 
 	@Test
@@ -95,27 +149,7 @@ public class JoltIdentityTransformationTest {
 		}
 	}
 
-	private void transform(List<Path> scenarioFiles, String transformation) {
-		for (Path scenarioFile : scenarioFiles) {
-			List chainrSpecJson = JsonUtils.classpathToList(transformation);
-			Chainr chainr = Chainr.fromSpec(chainrSpecJson);
 
-			Object inputJson = JsonUtils.filepathToObject(scenarioFile.toString());
-
-			Object transformedOutput = chainr.transform(inputJson);
-
-			Diffy diffy = new Diffy();
-			Diffy.Result res = diffy.diff(inputJson, transformedOutput);
-			System.out.printf("###Test Jolt Identity on Scenario: %s | Transformation Match: %s%n",
-					scenarioFile.getFileName().toString(), res.isEmpty());
-			if (!res.isEmpty()) {
-				System.out.println(res.toString());
-				System.out.println("######");
-				System.out.println(JsonUtils.toPrettyJsonString(transformedOutput));
-			}
-
-		}
-	}
 
 	private List<Path> getScenarioFiles(Path vadereModelTest) {
 		LinkedList<Path> scenarioFiles = new LinkedList<>();
