@@ -2,6 +2,7 @@ package org.vadere.gui.postvisualization.utils;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.SimulationRenderer;
@@ -19,20 +20,20 @@ import static java.awt.geom.PathIterator.*;
  * Convert the (Java) scenario description into a TikZ representation.
  *
  * Usually, each (Java) scenario element is represented as a path via
- *
- * @see PathIterator This PathSeparator must be converted into its TikZ representation.
+ * @see PathIterator This PathSeparator must be converted into its TikZ
+ * representation.
  *
  * For example, traversing a Java path with PathIterator returns two segments:
  *
- *
- * segment type= 0 (SEG_MOVETO) with coords: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0] segment type= 3
- * (SEG_LINETO) with coords: [2.0, 2.0, 0.0, 0.0, 0.0, 0.0]
+ *   segment type = 0 (SEG_MOVETO) with coords: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+ *   segment type = 3 (SEG_LINETO) with coords: [2.0, 2.0, 0.0, 0.0, 0.0, 0.0]
  *
  * This must be transformed to TikZ:
  *
  * (1.0,1.0) to (2.0,2.0)
  *
- * The TikZGenerator should also respect the GUI settings (e.g., enabled elements, colors etc.).
+ * The TikZGenerator should also respect the GUI settings (e.g., enabled
+ * elements, colors etc.).
  */
 public class TikzGenerator {
 
@@ -163,27 +164,51 @@ public class TikzGenerator {
 		}
 
 		// TODO: maybe, draw also trajectories.
-		if (config.isShowPedestrians()) {
-			generatedCode += "% Agents\n";
-			for (Agent agent : model.getAgents()) {
-			    String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+        if (config.isShowPedestrians()) {
+            generatedCode += "% Agents\n";
+            generatedCode += drawAgents(config);
+        } else {
+            generatedCode = "% Agents (not enabled in config)\n";
+        }
 
-                if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
-                    agentTextPattern = "\\fill[draw=magenta,fill=AgentColor] (%f,%f) circle [radius=%fcm];\n";
-                }
-
-				generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-				// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
-				// generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
-			}
-		} else {
-			generatedCode += "% Agents (not enabled in config)\n";
-		}
-
-		return generatedCode;
+        return generatedCode;
 	}
 
-	private String generatePathForScenarioElement(ScenarioElement element) {
+    @NotNull
+    private String drawAgents(DefaultSimulationConfig config) {
+	    String generatedCode = "";
+
+        for (Agent agent : model.getAgents()) {
+            if (model.getConfig().isShowGroups()) {
+                try {
+                    Pedestrian pedestrian = (Pedestrian) agent;
+                    Color pedestrianColor = renderer.getAgentRender().getColor(pedestrian);
+                    Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
+
+                    String colorString = String.format("{rgb,255:red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+                    generatedCode += String.format("\\fill[fill=%s] %s\n", colorString, generatePathForShape(pedestrianShape));
+                } catch (ClassCastException cce) {
+                    logger.error("Error casting to Pedestrian");
+                    cce.printStackTrace();
+                    // TODO: render agent as circle!
+                }
+            } else {
+                String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+            }
+
+            if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
+                String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
+                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+            }
+            // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
+            // generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
+        }
+
+        return generatedCode;
+    }
+
+    private String generatePathForScenarioElement(ScenarioElement element) {
 		String generatedPath = "";
 
 		AffineTransform noTransformation = new AffineTransform();
@@ -199,6 +224,23 @@ public class TikzGenerator {
 
 		return generatedPath;
 	}
+
+    private String generatePathForShape(Shape shape) {
+        String generatedPath = "";
+
+        AffineTransform noTransformation = new AffineTransform();
+        PathIterator pathIterator = shape.getPathIterator(noTransformation);
+
+        while (!pathIterator.isDone()) {
+            float[] coords = new float[6];
+            int type = pathIterator.currentSegment(coords);
+
+            generatedPath += convertJavaToTikzPath(type, coords);
+            pathIterator.next();
+        }
+
+        return generatedPath;
+    }
 
 	private String convertJavaToTikzPath(int type, float[] coords) {
 		if (type < SEG_MOVETO || type > SEG_CLOSE) {
