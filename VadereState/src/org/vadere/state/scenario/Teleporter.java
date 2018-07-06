@@ -29,6 +29,11 @@ public class Teleporter extends ScenarioElement {
 	}
 
 	@Override
+	public void setShape(VShape newShape) {
+		throw new UnsupportedOperationException("A teleporter does not have a shape.");
+	}
+
+	@Override
 	public int getId() {
 		return -1;
 	}
