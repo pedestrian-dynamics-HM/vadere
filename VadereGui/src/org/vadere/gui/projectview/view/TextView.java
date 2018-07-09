@@ -173,7 +173,7 @@ public class TextView extends JPanel implements IJsonView {
 						switch (attributeType) {
 						case MODEL:
 							ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
-							currentScenario.getScenarioStore().mainModel = modelDefinition.getMainModel();
+							currentScenario.getScenarioStore().setMainModel(modelDefinition.getMainModel());
 							currentScenario.setAttributesModel(modelDefinition.getAttributesList());
 							break;
 						case SIMULATION:
@@ -220,7 +220,7 @@ public class TextView extends JPanel implements IJsonView {
 		switch (attributeType) {
 		case MODEL:
 			txtrTextfiletextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
-					scenario.getModelAttributes(), scenario.getScenarioStore().mainModel));
+					scenario.getModelAttributes(), scenario.getScenarioStore().getMainModel()));
 			break;
 		case SIMULATION:
 			txtrTextfiletextarea

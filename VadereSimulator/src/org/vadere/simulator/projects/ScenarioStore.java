@@ -3,6 +3,7 @@ package org.vadere.simulator.projects;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.LogManager;
@@ -28,11 +29,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class ScenarioStore {
 
 	private static Logger logger = LogManager.getLogger(ScenarioStore.class);
-	public String name;
-	public String description;
-	public String mainModel;
-	public List<Attributes> attributesList;
-	public AttributesSimulation attributesSimulation;
+	private String name;
+	private String description;
+	private String mainModel;
+	private List<Attributes> attributesList;
+	private AttributesSimulation attributesSimulation;
 	private Topography topography;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
@@ -85,4 +86,52 @@ public class ScenarioStore {
 	public <T extends Attributes> T getAttributes(@NotNull final Class<T> clazz) {
         return FindByClass.findSingleObjectOfClass(attributesList, clazz);
     }
+
+	public void setAttributesList(final List<Attributes> attributesList) {
+		this.attributesList = attributesList;
+	}
+
+	public void setAttributesSimulation(final AttributesSimulation attributesSimulation) {
+		this.attributesSimulation = attributesSimulation;
+	}
+
+	public void removeAttributesIf(@NotNull final Predicate<Attributes> predicate) {
+		attributesList.removeIf(predicate);
+	}
+
+	public void addAttributes(@NotNull final Attributes attributes) {
+		attributesList.add(attributes);
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public void setMainModel(final String mainModel) {
+		this.mainModel = mainModel;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	public AttributesSimulation getAttributesSimulation() {
+		return attributesSimulation;
+	}
+
+	public List<Attributes> getAttributesList() {
+		return attributesList;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getMainModel() {
+		return mainModel;
+	}
+
+	public String getName() {
+		return name;
+	}
 }

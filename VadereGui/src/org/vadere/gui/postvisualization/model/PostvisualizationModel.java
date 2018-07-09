@@ -300,7 +300,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private double getSimTimeInSec(final Step step) {
 		return step.getSimTimeInSec()
-				.orElse(step.getStepNumber() * vadere.getScenarioStore().attributesSimulation.getSimTimeStepLength());
+				.orElse(step.getStepNumber() * vadere.getScenarioStore().getAttributesSimulation().getSimTimeStepLength());
 	}
 
 	public synchronized void setPotentialFieldContainer(final PotentialFieldContainer container) {
