@@ -9,7 +9,7 @@
  *
  */
 
-#define LOCAL_SIZE_LIMIT 256U
+#define LOCAL_SIZE_LIMIT 16U
 
 inline void ComparatorPrivate(
     uint *keyA,

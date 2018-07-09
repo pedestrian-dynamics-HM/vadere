@@ -93,7 +93,7 @@ public class CLBitonicSort {
     private int[] resultKeys;
 
 	//Note: logically shared with BitonicSort.cl!
-    private static final int LOCAL_SIZE_LIMIT = 256;
+    private static final int LOCAL_SIZE_LIMIT = 16;
 
     private boolean debug = false;
 
