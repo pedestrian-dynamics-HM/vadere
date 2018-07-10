@@ -8,6 +8,18 @@ unit_tests_with_coverage:
   # 
   # Watch out: OpenCL code cannot be run on virtual machine. Therefore,
   # skip this tests.
+  #
+  # Use following (exclamation) syntax to skip test(s). Please note,
+  # exclamation mark must be escaped with backslash.
+  #
+  #   #Exclude one test class, by using the explanation mark (!)
+  #   mvn test -Dtest=!LegacyTest
+  #   # Exclude one test method
+  #   mvn verify -Dtest=!LegacyTest#testFoo
+  #   # Exclude two test methods
+  #   mvn verify -Dtest=!LegacyTest#testFoo+testBar
+  #   # Exclude a package with a wildcard (*)
+  #   mvn test -Dtest=!com.mycompany.app.Legacy*
   script:
     - mvn clean
     - mvn test -Dtest=\!TestConvolution
