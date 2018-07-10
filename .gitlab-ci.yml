@@ -10,7 +10,7 @@ unit_tests_with_coverage:
   # skip this tests.
   #
   # Use following (exclamation) syntax to skip test(s). Please note,
-  # exclamation mark must be escaped with backslash.
+  # exclamation mark may be inserted to escape the "!".
   #
   #   #Exclude one test class, by using the explanation mark (!)
   #   mvn test -Dtest=!LegacyTest
