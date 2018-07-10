@@ -22,5 +22,5 @@ unit_tests_with_coverage:
   #   mvn test -Dtest=!com.mycompany.app.Legacy*
   script:
     - mvn clean
-    - mvn test -Dtest=\!TestConvolution&!TestBitonicSort
+    - mvn test -Dtest=\!TestConvolution,!TestBitonicSort
     
