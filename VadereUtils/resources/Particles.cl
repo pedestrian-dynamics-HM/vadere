@@ -109,7 +109,7 @@ uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     gridPos.x = gridPos.x & ((*gridSize).x - 1);
     gridPos.y = gridPos.y & ((*gridSize).y - 1);
-    return UMAD( UMAD(1.0, (*gridSize).y, gridPos.y), (*gridSize).x, gridPos.x );
+    return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
 
@@ -156,7 +156,6 @@ __kernel void findCellBoundsAndReorder(
     __global uint   *d_CellStart,     //output: cell start index
     __global uint   *d_CellEnd,       //output: cell end index
     __global float2 *d_ReorderedPos,  //output: reordered by cell hash positions
-    __global float2 *d_ReorderedVel,  //output: reordered by cell hash velocities
 
     __global const uint   *d_Hash,    //input: sorted grid hashes
     __global const uint   *d_Index,   //input: particle indices sorted by hash

@@ -39,9 +39,11 @@ public class TestCellGridSort {
 
 		assertEquals(hasehs.length, positions.size());
 
+		logger.info("number of cells = " + clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1]);
 		for(int i = 0; i < hasehs.length; i++) {
 			int hash = getGridHash(getGridPosition(positions.get(i), clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign()), clUniformHashedGrid.getGridSize());
 			assertEquals(hasehs[i], hash);
+			logger.info("hash = " + hash);
 		}
 	}
 
@@ -76,7 +78,18 @@ public class TestCellGridSort {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
 		}
 		CLUniformHashedGrid.GridCells gridCells = clUniformHashedGrid.calcPositionsInCell(positions);
+		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
+		for(int cell = 0; cell < numberOfCells; cell++) {
+			int cellStart = gridCells.cellStarts[cell];
+			int cellEnd = gridCells.cellEnds[cell];
 
+			for(int i = cellStart; i < cellEnd; i++) {
+				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
+				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
+				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
+				assertEquals(gridHash, cell);
+			}
+		}
 	}
 
 	/**
@@ -102,6 +115,6 @@ public class TestCellGridSort {
 	private static int getGridHash(final int[] gridPos, int[] gridSize) {
 		gridPos[0] = gridPos[0] & (gridSize[0] - 1);
 		gridPos[1] = gridPos[1] & (gridSize[1] - 1);
-		return umad(umad(1, gridSize[1], gridPos[1]), gridSize[0], gridPos[0]);
+		return umad(gridSize[0], gridPos[1], gridPos[0]);
 	}
 }

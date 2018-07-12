@@ -41,12 +41,14 @@ import static org.lwjgl.opencl.CL10.clEnqueueWaitForEvents;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
+import static org.lwjgl.opencl.CL10.clGetDeviceInfo;
 import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
 import static org.lwjgl.opencl.CL10.clReleaseCommandQueue;
 import static org.lwjgl.opencl.CL10.clReleaseContext;
 import static org.lwjgl.opencl.CL10.clReleaseKernel;
 import static org.lwjgl.opencl.CL10.clReleaseMemObject;
 import static org.lwjgl.opencl.CL10.clReleaseProgram;
+import static org.lwjgl.opencl.CL10.clSetKernelArg;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -125,7 +127,7 @@ public class CLUniformHashedGrid {
 
     private static final Logger logger = LogManager.getLogger(CLUniformHashedGrid.class);
 
-    private int max_work_group_size;
+    private long max_work_group_size;
 
     private boolean debug = false;
 
@@ -170,30 +172,30 @@ public class CLUniformHashedGrid {
 		clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
 		clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements);
 
-		/*clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
+		clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
 		clEnqueueReadBuffer(clQueue, clCellEnds, true, 0, cellEnds, null, null);
 		clEnqueueReadBuffer(clQueue, clReorderedPositions, true, 0, reorderedPositions, null, null);
 		clEnqueueReadBuffer(clQueue, clIndices, true, 0, indices, null, null);
 		clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
-		clEnqueueReadBuffer(clQueue, clPositions, true, 0, this.positions, null, null);*/
+		clEnqueueReadBuffer(clQueue, clPositions, true, 0, this.positions, null, null);
 
-		/*int[] aCellStarts = CLUtils.toIntArray(cellStarts, numberOfElements);
-		int[] aCellEnds = CLUtils.toIntArray(cellEnds, numberOfElements);
+		int[] aCellStarts = CLUtils.toIntArray(cellStarts, numberOfGridCells);
+		int[] aCellEnds = CLUtils.toIntArray(cellEnds, numberOfGridCells);
 		float[] aReorderedPositions = CLUtils.toFloatArray(reorderedPositions, numberOfElements * 2);
 		int[] aIndices = CLUtils.toIntArray(indices, numberOfElements);
 		int[] aHashes = CLUtils.toIntArray(hashes, numberOfElements);
-		float[] aPositions = CLUtils.toFloatArray(this.positions, numberOfElements * 2);*/
+		float[] aPositions = CLUtils.toFloatArray(this.positions, numberOfElements * 2);
 
 		GridCells gridCells = new GridCells();
-		/*gridCells.cellEnds = aCellEnds;
+		gridCells.cellEnds = aCellEnds;
 		gridCells.cellStarts = aCellStarts;
 		gridCells.reorderedPositions = aReorderedPositions;
 		gridCells.indices = aIndices;
 		gridCells.hashes = aHashes;
-		gridCells.positions = aPositions;*/
+		gridCells.positions = aPositions;
 
-		//clearMemory();
-		//clearCL();
+		clearMemory();
+		clearCL();
 
 		return gridCells;
 		//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
@@ -267,8 +269,8 @@ public class CLUniformHashedGrid {
 
 		this.gridSize = CLUtils.toIntBuffer(iGridSize, CLUtils.toIntBuffer(iGridSize));
 
-		this.cellStarts = MemoryUtil.memAllocInt(numberOfElements);
-		this.cellEnds = MemoryUtil.memAllocInt(numberOfElements);
+		this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
+		this.cellEnds = MemoryUtil.memAllocInt(numberOfGridCells);
 		this.indices = MemoryUtil.memAllocInt(numberOfElements);
 		this.reorderedPositions = MemoryUtil.memAllocFloat(numberOfElements * 2);
 	}
@@ -302,15 +304,6 @@ public class CLUniformHashedGrid {
         initCL();
         buildProgram();
     }
-
-    /*__kernel void calcHash(
-    __global uint        *d_Hash, //output
-    __global uint       *d_Index, //output
-    __global const float2 *d_Pos, //input: positions
-    __constant float cellSize,
-    __constant float2 worldOrigin,
-    __constant uint2 gridSize
-    uint numParticles*/
 
     private void clCalcHash(
     		final long clHashes,
@@ -356,8 +349,8 @@ public class CLUniformHashedGrid {
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clHashes));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clIndices));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clPositions));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, (max_work_group_size+1) * 4)); // local memory
-		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 6, numberOfElements));
+		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (max_work_group_size+1) * 4)); // local memory
+		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
 
 		    clGlobalWorkSize.put(0, numberOfElements);
 		    clLocalWorkSize.put(0, max_work_group_size);
@@ -599,7 +592,10 @@ public class CLUniformHashedGrid {
 		    clFindCellBoundsAndReorder = clCreateKernel(clProgram, "findCellBoundsAndReorder", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 
-		    max_work_group_size = CLInfo.getDeviceInfoInt(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+		    PointerBuffer pp = stack.mallocPointer(1);
+		    clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+		    max_work_group_size = pp.get(0);
+
 		    logger.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
 	    }
 
