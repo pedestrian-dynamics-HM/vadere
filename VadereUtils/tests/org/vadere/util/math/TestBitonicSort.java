@@ -28,8 +28,8 @@ public class TestBitonicSort {
 
 	@Test
 	public void testLocalSort() throws IOException, OpenCLException {
-		int[] keys = randomArray(256);
-		int[] values = randomArray(256);
+		int[] keys = randomArray(32);
+		int[] values = randomArray(32);
 
 		CLBitonicSort clBitonicSort = new CLBitonicSort();
 		clBitonicSort.sort(keys, values);

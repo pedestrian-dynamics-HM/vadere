@@ -19,7 +19,6 @@ import java.nio.IntBuffer;
 import java.util.List;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
-import static org.lwjgl.opencl.CL10.CL_DEVICE_ADDRESS_BITS;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
@@ -57,9 +56,12 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
  * @author Benedikt Zoennchen
+ *
+ * This class offers the methods to compute an array based linked-cell which contains 2D-coordinates i.e. {@link VPoint}
+ * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
-public class CLUniformHashedGrid {
-    private static Logger log = LogManager.getLogger(CLUniformHashedGrid.class);
+public class CLLinkedCell {
+    private static Logger log = LogManager.getLogger(CLLinkedCell.class);
 
     // CL ids
     private long clPlatform;
@@ -122,12 +124,9 @@ public class CLUniformHashedGrid {
     private int[] resultValues;
     private int[] resultKeys;
 
-	//Note: logically shared with BitonicSort.cl!
-    private static final int LOCAL_SIZE_LIMIT = 16;
+    private static final Logger logger = LogManager.getLogger(CLLinkedCell.class);
 
-    private static final Logger logger = LogManager.getLogger(CLUniformHashedGrid.class);
-
-    private long max_work_group_size;
+    private int max_work_group_size;
 
     private boolean debug = false;
 
@@ -138,7 +137,16 @@ public class CLUniformHashedGrid {
         NonSeparate
     }
 
-    public CLUniformHashedGrid(final int numberOfElements, final VRectangle bound, final double cellSize) throws OpenCLException {
+	/**
+	 * Default constructor.
+	 *
+	 * @param numberOfElements  the number of positions contained in the linked cell.
+	 * @param bound             the spatial bound of the linked cell.
+	 * @param cellSize          the cellSize (in x and y direction) of the linked cell.
+	 *
+	 * @throws OpenCLException
+	 */
+    public CLLinkedCell(final int numberOfElements, final VRectangle bound, final double cellSize) throws OpenCLException {
 	    this.numberOfElements = numberOfElements;
 	    this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
 	    this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
@@ -153,16 +161,53 @@ public class CLUniformHashedGrid {
 	    init();
     }
 
-    public class GridCells {
+	/**
+	 * The data structure representing the linked cell. The elements of cell i
+	 * between (reorderedPositions[cellStart[i]*2], reorderedPositions[cellStart[i]*2+1])
+	 * and (reorderedPositions[(cellEnds[i]-1)*2], reorderedPositions[(cellEnds[i]-1)*2+1]).
+	 */
+	public class LinkedCell {
+		/**
+		 * the starting index at which the cell starts, i.e. cell i starts at cellStart[i].
+		 */
 	    public int[] cellStarts;
-	    public int[] cellEnds;
+
+		/**
+		 * the ending index at which the cell starts, i.e. cell i ends at cellStart[i].
+		 */
+		public int[] cellEnds;
+
+		/**
+		 * the ordered 2D-coordinates.
+		 */
 	    public float[] reorderedPositions;
+
+		/**
+		 * the mapping between the unordered (original) positions and the reorderedPositions,
+		 * i.e. reorderedPositions[i] == positions[indices[i]]
+		 */
 	    public int[] indices;
-	    public int[] hashes;
-	    public float[] positions;
+
+		/**
+		 * the hashes i.e. the cell of the positions, i.e. hashes[i] is the cell of positions[i].
+		 */
+		public int[] hashes;
+
+		/**
+		 * the original positions in original order.
+		 */
+		public float[] positions;
     }
 
-	public GridCells calcPositionsInCell(@NotNull final List<VPoint> positions) throws OpenCLException {
+	/**
+	 * Computes the {@link LinkedCell} of the list of positions.
+	 *
+	 * @param positions a list of position contained in {@link CLLinkedCell#bound}.
+	 * @return {@link LinkedCell} which is the linked list in an array based structure.
+	 *
+	 * @throws OpenCLException
+	 */
+	public LinkedCell calcLinkedCell(@NotNull final List<VPoint> positions) throws OpenCLException {
 		assert positions.size() == numberOfElements;
 		this.positionList = positions;
 		allocHostMemory();
@@ -186,7 +231,7 @@ public class CLUniformHashedGrid {
 		int[] aHashes = CLUtils.toIntArray(hashes, numberOfElements);
 		float[] aPositions = CLUtils.toFloatArray(this.positions, numberOfElements * 2);
 
-		GridCells gridCells = new GridCells();
+		LinkedCell gridCells = new LinkedCell();
 		gridCells.cellEnds = aCellEnds;
 		gridCells.cellStarts = aCellStarts;
 		gridCells.reorderedPositions = aReorderedPositions;
@@ -202,6 +247,14 @@ public class CLUniformHashedGrid {
 		//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
 	}
 
+	/**
+	 * Computes all the hash values, i.e. cells of each position and sort these hashes and construct a mapping
+	 * of the rearrangement. This method exists to test the bitonic sort algorithm on the GPU.
+	 *
+	 * @param positions the positions which will be hashed.
+	 * @return  the sorted hashes.
+	 * @throws OpenCLException
+	 */
 	public int[] calcSortedHashes(@NotNull final List<VPoint> positions) throws OpenCLException {
 		assert positions.size() == numberOfElements;
 		this.positionList = positions;
@@ -221,6 +274,14 @@ public class CLUniformHashedGrid {
 		//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
 	}
 
+	/**
+	 * Computes all the hash values, i.e. cells of each position.
+	 * This method exists to test the hash computation on the GPU.
+	 *
+	 * @param positions the positions which will be hashed.
+	 * @return the (unsorted) hashes.
+	 * @throws OpenCLException
+	 */
     public int[] calcHashes(@NotNull final List<VPoint> positions) throws OpenCLException {
 	    assert positions.size() == numberOfElements;
 		this.positionList = positions;
@@ -239,11 +300,22 @@ public class CLUniformHashedGrid {
 	    //clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
     }
 
-    public int[] getGridSize() {
+	/**
+	 * Returns the gridSizes of the linked cell, i.e. result[0] is the x and
+	 * result[1] the y direction.
+	 *
+	 * @return the gridSizes (2D) stored in an array.
+	 */
+	public int[] getGridSize() {
     	return new int[]{iGridSize[0], iGridSize[1]};
     }
 
-    public float getCellSize() {
+	/**
+	 * Returns the gridSize which is equal in x and y direction.
+	 *
+	 * @return the gridSize
+	 */
+	public float getCellSize() {
     	return iCellSize;
     }
 
@@ -299,7 +371,7 @@ public class CLUniformHashedGrid {
 		return resultValues;
 	}
 
-	public void init() throws OpenCLException {
+	private void init() throws OpenCLException {
         initCallbacks();
         initCL();
         buildProgram();
@@ -373,7 +445,7 @@ public class CLUniformHashedGrid {
 		    IntBuffer errcode_ret = stack.callocInt(1);
 
 		    // small sorts
-		    if (numberOfElements <= LOCAL_SIZE_LIMIT) {
+		    if (numberOfElements <= max_work_group_size) {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 0, clKeysOut));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 1, clValuesOut));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 2, clKeysIn));
@@ -381,6 +453,8 @@ public class CLUniformHashedGrid {
 			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 4, numberOfElements));
 			    //TODO: check the hard coded 1, and the waiting of the queue
 			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 5, 1));
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 6, keys.length * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 7, keys.length * 4)); // local memory
 			    clGlobalWorkSize.put(0, numberOfElements / 2);
 			    clLocalWorkSize.put(0, numberOfElements / 2);
 
@@ -393,18 +467,20 @@ public class CLUniformHashedGrid {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 1, clValuesOut));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 2, clKeysIn));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 3, clValuesIn));
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 4, max_work_group_size * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 5, max_work_group_size * 4)); // local memory
 
 			    clGlobalWorkSize = stack.callocPointer(1);
 			    clLocalWorkSize = stack.callocPointer(1);
 			    clGlobalWorkSize.put(0, numberOfElements / 2);
-			    clLocalWorkSize.put(0, LOCAL_SIZE_LIMIT / 2);
+			    clLocalWorkSize.put(0, max_work_group_size / 2);
 
 			    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 			    CLInfo.checkCLError(clFinish(clQueue));
 
-			    for (int size = 2 * LOCAL_SIZE_LIMIT; size <= numberOfElements; size <<= 1) {
+			    for (int size = 2 * max_work_group_size; size <= numberOfElements; size <<= 1) {
 				    for (int stride = size / 2; stride > 0; stride >>= 1) {
-					    if (stride >= LOCAL_SIZE_LIMIT) {
+					    if (stride >= max_work_group_size) {
 						    //Launch bitonicMergeGlobal
 						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 0, clKeysOut));
 						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 1, clValuesOut));
@@ -419,7 +495,7 @@ public class CLUniformHashedGrid {
 						    clGlobalWorkSize = stack.callocPointer(1);
 						    clLocalWorkSize = stack.callocPointer(1);
 						    clGlobalWorkSize.put(0, numberOfElements / 2);
-						    clLocalWorkSize.put(0, LOCAL_SIZE_LIMIT / 4);
+						    clLocalWorkSize.put(0, max_work_group_size / 4);
 
 						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 						    CLInfo.checkCLError(clFinish(clQueue));
@@ -434,11 +510,13 @@ public class CLUniformHashedGrid {
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 5, stride));
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 6, size));
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 7, dir));
+						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 8, max_work_group_size * 4)); // local memory
+						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 9, max_work_group_size * 4)); // local memory
 
 						    clGlobalWorkSize = stack.callocPointer(1);
 						    clLocalWorkSize = stack.callocPointer(1);
 						    clGlobalWorkSize.put(0, numberOfElements / 2);
-						    clLocalWorkSize.put(0, LOCAL_SIZE_LIMIT / 2);
+						    clLocalWorkSize.put(0, max_work_group_size / 2);
 
 						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 						    CLInfo.checkCLError(clFinish(clQueue));
@@ -594,7 +672,7 @@ public class CLUniformHashedGrid {
 
 		    PointerBuffer pp = stack.mallocPointer(1);
 		    clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-		    max_work_group_size = pp.get(0);
+		    max_work_group_size = (int)pp.get(0);
 
 		    logger.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
 	    }

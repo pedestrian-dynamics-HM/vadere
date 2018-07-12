@@ -12,17 +12,15 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
 import static org.lwjgl.opencl.CL10.CL_MEM_ALLOC_HOST_PTR;
 import static org.lwjgl.opencl.CL10.CL_MEM_COPY_HOST_PTR;
-import static org.lwjgl.opencl.CL10.CL_MEM_READ_ONLY;
 import static org.lwjgl.opencl.CL10.CL_MEM_READ_WRITE;
-import static org.lwjgl.opencl.CL10.CL_MEM_WRITE_ONLY;
 import static org.lwjgl.opencl.CL10.CL_PROGRAM_BUILD_STATUS;
 import static org.lwjgl.opencl.CL10.CL_SUCCESS;
 import static org.lwjgl.opencl.CL10.clBuildProgram;
@@ -33,15 +31,16 @@ import static org.lwjgl.opencl.CL10.clCreateKernel;
 import static org.lwjgl.opencl.CL10.clCreateProgramWithSource;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
-import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
+import static org.lwjgl.opencl.CL10.clGetDeviceInfo;
 import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
 import static org.lwjgl.opencl.CL10.clReleaseCommandQueue;
 import static org.lwjgl.opencl.CL10.clReleaseContext;
 import static org.lwjgl.opencl.CL10.clReleaseKernel;
 import static org.lwjgl.opencl.CL10.clReleaseMemObject;
 import static org.lwjgl.opencl.CL10.clReleaseProgram;
+import static org.lwjgl.opencl.CL10.clSetKernelArg;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -50,6 +49,8 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
  * @author Benedikt Zoennchen
+ *
+ * This class implements the bitonic sort using the GPU via OpenCL.
  */
 public class CLBitonicSort {
     private static Logger log = LogManager.getLogger(CLBitonicSort.class);
@@ -93,7 +94,7 @@ public class CLBitonicSort {
     private int[] resultKeys;
 
 	//Note: logically shared with BitonicSort.cl!
-    private static final int LOCAL_SIZE_LIMIT = 16;
+    private int max_work_group_size = 16;
 
     private boolean debug = false;
 
@@ -154,7 +155,7 @@ public class CLBitonicSort {
 
 
 	    	// small sorts
-	    	if(keys.length <= LOCAL_SIZE_LIMIT)
+	    	if(keys.length <= max_work_group_size)
 		    {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 0, clOutKeys));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 1, clOutValues));
@@ -162,6 +163,8 @@ public class CLBitonicSort {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 3, clInValues));
 			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 4, keys.length));
 			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 5, 1));
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 6, keys.length * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 7, keys.length * 4)); // local memory
 			    clGlobalWorkSize.put(0, keys.length / 2);
 			    clLocalWorkSize.put(0, keys.length / 2);
 
@@ -175,20 +178,22 @@ public class CLBitonicSort {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 1, clOutValues));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 2, clInKeys));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 3, clInValues));
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 4, max_work_group_size * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 5, max_work_group_size * 4)); // local memory
 
 			    clGlobalWorkSize = stack.callocPointer(1);
 			    clLocalWorkSize = stack.callocPointer(1);
 			    clGlobalWorkSize.put(0, keys.length / 2);
-			    clLocalWorkSize.put(0, LOCAL_SIZE_LIMIT / 2);
+			    clLocalWorkSize.put(0, max_work_group_size / 2);
 
 			    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 			    CLInfo.checkCLError(clFinish(clQueue));
 
-			    for(int size = 2 * LOCAL_SIZE_LIMIT; size <= keys.length; size <<= 1)
+			    for(int size = 2 * max_work_group_size; size <= keys.length; size <<= 1)
 			    {
 				    for(int stride = size / 2; stride > 0; stride >>= 1)
 				    {
-					    if(stride >= LOCAL_SIZE_LIMIT)
+					    if(stride >= max_work_group_size)
 					    {
 						    //Launch bitonicMergeGlobal
 						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 0, clOutKeys));
@@ -204,7 +209,7 @@ public class CLBitonicSort {
 						    clGlobalWorkSize = stack.callocPointer(1);
 						    clLocalWorkSize = stack.callocPointer(1);
 						    clGlobalWorkSize.put(0, keys.length / 2);
-						    clLocalWorkSize.put(0, LOCAL_SIZE_LIMIT / 4);
+						    clLocalWorkSize.put(0, max_work_group_size / 4);
 
 						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 						    CLInfo.checkCLError(clFinish(clQueue));
@@ -221,11 +226,13 @@ public class CLBitonicSort {
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 5, stride));
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 6, size));
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 7, dir));
+						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 8, max_work_group_size * 4 )); // local memory
+						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 9, max_work_group_size * 4)); // local memory
 
 						    clGlobalWorkSize = stack.callocPointer(1);
 						    clLocalWorkSize = stack.callocPointer(1);
 						    clGlobalWorkSize.put(0, keys.length / 2);
-						    clLocalWorkSize.put(0, LOCAL_SIZE_LIMIT / 2);
+						    clLocalWorkSize.put(0, max_work_group_size / 2);
 
 						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 						    CLInfo.checkCLError(clFinish(clQueue));
@@ -368,6 +375,9 @@ public class CLBitonicSort {
 		    clBitonicMergeLocal = clCreateKernel(clProgram, "bitonicMergeLocal", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 
+		    PointerBuffer pp = stack.mallocPointer(1);
+		    clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+		    max_work_group_size = (int)pp.get(0);
 	    }
 
     }

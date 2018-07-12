@@ -8,9 +8,6 @@
  * is strictly prohibited.
  *
  */
-
-#define LOCAL_SIZE_LIMIT 16U
-
 inline void ComparatorPrivate(
     uint *keyA,
     uint *valA,
@@ -48,10 +45,11 @@ __kernel void bitonicSortLocal(
     __global uint *d_SrcKey,
     __global uint *d_SrcVal,
     uint arrayLength,
-    uint dir
+    uint dir,
+    __local uint *l_key,
+    __local uint *l_val
 ){
-    __local  uint l_key[LOCAL_SIZE_LIMIT];
-    __local  uint l_val[LOCAL_SIZE_LIMIT];
+    uint LOCAL_SIZE_LIMIT = get_local_size(0) * 2;
 
     //Offset to the beginning of subbatch and load data
     d_SrcKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
@@ -108,11 +106,11 @@ __kernel void bitonicSortLocal1(
     __global uint *d_DstKey,
     __global uint *d_DstVal,
     __global uint *d_SrcKey,
-    __global uint *d_SrcVal
+    __global uint *d_SrcVal,
+    __local uint *l_key,
+    __local uint *l_val
 ){
-    __local uint l_key[LOCAL_SIZE_LIMIT];
-    __local uint l_val[LOCAL_SIZE_LIMIT];
-
+    uint LOCAL_SIZE_LIMIT = get_local_size(0) * 2;
     //Offset to the beginning of subarray and load data
     d_SrcKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
     d_SrcVal += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
@@ -206,11 +204,11 @@ __kernel void bitonicMergeLocal(
     uint arrayLength,
     uint stride,
     uint size,
-    uint dir
+    uint dir,
+    __local uint *l_key,
+    __local uint *l_val
 ){
-    __local uint l_key[LOCAL_SIZE_LIMIT];
-    __local uint l_val[LOCAL_SIZE_LIMIT];
-
+    uint LOCAL_SIZE_LIMIT = get_local_size(0) * 2;
     d_SrcKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
     d_SrcVal += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
     d_DstKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);

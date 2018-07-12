@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.opencl.CLUniformHashedGrid;
+import org.vadere.util.opencl.CLLinkedCell;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Benedikt Zoennchen
  */
-public class TestCellGridSort {
+public class TestCLLinkedList {
 
 	private static Logger logger = LogManager.getLogger(TestConvolution.class);
 
@@ -30,7 +30,7 @@ public class TestCellGridSort {
 
 	@Test
 	public void testCalcHash() throws IOException, OpenCLException {
-		CLUniformHashedGrid clUniformHashedGrid = new CLUniformHashedGrid(1024, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(1024, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < 1024; i++) {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
@@ -49,7 +49,7 @@ public class TestCellGridSort {
 
 	@Test
 	public void testCalcAndSortHash() throws IOException, OpenCLException {
-		CLUniformHashedGrid clUniformHashedGrid = new CLUniformHashedGrid(1024, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(1024, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < 1024; i++) {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
@@ -72,12 +72,12 @@ public class TestCellGridSort {
 
 	@Test
 	public void testGridCell() throws IOException, OpenCLException {
-		CLUniformHashedGrid clUniformHashedGrid = new CLUniformHashedGrid(1024, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(1024, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < 1024; i++) {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
 		}
-		CLUniformHashedGrid.GridCells gridCells = clUniformHashedGrid.calcPositionsInCell(positions);
+		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
 		for(int cell = 0; cell < numberOfCells; cell++) {
 			int cellStart = gridCells.cellStarts[cell];
