@@ -23,8 +23,6 @@ public class TestBitonicSort {
 
 	private static Logger logger = LogManager.getLogger(TestConvolution.class);
 
-	private static Random random = new Random();
-
 	@Before
 	public void setUp() throws Exception {}
 
