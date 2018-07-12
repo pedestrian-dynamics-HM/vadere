@@ -42,7 +42,7 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
-	private List<SpeedAdjuster> speedAdjusters;
+	private transient List<SpeedAdjuster> speedAdjusters;
 	private double durationNextStep;
 	private VPoint nextPosition;
 	private VPoint lastPosition;
@@ -180,6 +180,7 @@ public class PedestrianOSM extends Pedestrian {
 		if (nextPosition.equals(currentPosition)) {
 			timeCredit = 0;
 			setVelocity(new Vector2D(0, 0));
+
 		} else {
 			timeCredit = timeCredit - durationNextStep;
 			setPosition(nextPosition);
@@ -195,10 +196,11 @@ public class PedestrianOSM extends Pedestrian {
 	public double getStepSize() {
 
 		if (attributesOSM.isDynamicStepLength()) {
-			return attributesOSM.getStepLengthIntercept()
+			double step = attributesOSM.getStepLengthIntercept()
 					+ attributesOSM.getStepLengthSlopeSpeed()
 					* getDesiredSpeed()
 					+ stepDeviation;
+			return step;
 		} else {
 			return stepLength;
 		}

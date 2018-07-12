@@ -24,6 +24,10 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		}
 	}
 
+	public VRectangle(final Rectangle2D rectangle) {
+		this(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+	}
+
 	public VRectangle(final Rectangle2D.Double rectangle) {
 		this(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	}

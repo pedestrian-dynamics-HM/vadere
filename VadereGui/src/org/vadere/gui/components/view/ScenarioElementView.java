@@ -106,8 +106,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e)
-			{
+			public void removeUpdate(DocumentEvent e) {
 				updateModel();
 			}
 
@@ -186,8 +185,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				} else if (scenarioElement instanceof Pedestrian) {
 					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
 				} else {
-                    this.txtrTextfiletextarea.setText(StateJsonConverter
-                            .serializeObject(scenarioElement.getAttributes()));
+					this.txtrTextfiletextarea.setText(StateJsonConverter
+							.serializeObject(scenarioElement.getAttributes()));
 				}
 			}
 		}

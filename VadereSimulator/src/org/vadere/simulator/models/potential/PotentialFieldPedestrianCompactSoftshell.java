@@ -56,7 +56,7 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 		double distanceSq = otherPedestrian.getPosition().distanceSq(pos);
 		double maxDistanceSq = (Math.max(personalWidth, intimateWidth)  + radii) * (Math.max(personalWidth, intimateWidth)  + radii);
 
-		if(distanceSq < maxDistanceSq) {
+		if (distanceSq < maxDistanceSq) {
 			double distance = otherPedestrian.getPosition().distance(pos); // Euclidean distance d_j(x) between agent j and position x
 
 			int intPower = this.attributes.getIntimateSpacePower(); // b_p

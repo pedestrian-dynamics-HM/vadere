@@ -86,7 +86,7 @@ public class GeometryUtils {
 	 * Computes the point on the line segment that is closest to the given point
 	 * point. from:
 	 * http://stackoverflow.com/questions/3120357/get-closest-point-to-a-line
-	 * 
+	 *
 	 * @param point
 	 *        the point to which the counterpart should be computed
 	 * @param line
@@ -111,14 +111,14 @@ public class GeometryUtils {
 	/**
 	 * Orders a given list angular relative to a given point, starting with
 	 * angle 0.
-	 * 
+	 *
 	 * @param allPoints
 	 * @param center
 	 * @return an ordered DataPoint list with the angle of the point as data and
 	 *         the original index set.
 	 */
 	public static List<DataPoint> orderByAngle(List<VPoint> allPoints,
-			VPoint center) {
+											   VPoint center) {
 		List<DataPoint> orderedList = new ArrayList<DataPoint>();
 
 		for (int i = 0; i < allPoints.size(); i++) {
@@ -133,9 +133,6 @@ public class GeometryUtils {
 
 	/**
 	 * Returns the angle between the x-axis, p1 and p2.
-	 * @param p1
-	 * @param p2
-	 * @return
 	 */
 	public static double angleTo(VPoint p1, VPoint p2) {
 		double atan2 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
@@ -152,7 +149,7 @@ public class GeometryUtils {
 	 * ccw(p1,p2,p3) < 0 if p3 is left of Line(p1,p2)<br>
 	 * ccw(p1,p2,p3) = 0 if p3 lies on Line(p1,p2)<br>
 	 * ccw(p1,p2,p3) > 0 if p3 is right of Line(p1,p2)<br>
-	 * 
+	 *
 	 * @param p1
 	 *        first point
 	 * @param p2
@@ -168,7 +165,7 @@ public class GeometryUtils {
 	/**
 	 * Computes the cross product of two vectors and store it in the cross
 	 * vector.
-	 * 
+	 *
 	 * @param v1
 	 * @param v2
 	 * @param cross
@@ -184,7 +181,7 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param vertices
 	 * @return
 	 */
@@ -210,14 +207,14 @@ public class GeometryUtils {
 	}
 
 	public static VPoint lineIntersectionPoint(final double x1,
-	                                           final double y1,
-	                                           final double x2,
-	                                           final double y2,
-	                                           final double x3,
-	                                           final double y3,
-			                                   final double x4,
-			                                   final double y4) {
-		assert new VLine(new VPoint(x1,y1), new VPoint(x2, y2)).intersectsLine(x3, y3, x4, y4);
+											   final double y1,
+											   final double x2,
+											   final double y2,
+											   final double x3,
+											   final double y3,
+											   final double x4,
+											   final double y4) {
+		assert new VLine(new VPoint(x1, y1), new VPoint(x2, y2)).intersectsLine(x3, y3, x4, y4);
 		double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 		assert d != 0;
 
@@ -231,10 +228,10 @@ public class GeometryUtils {
 	}
 
 	public static VPoint lineIntersectionPoint(final VLine line,
-	                                           final double x3,
-	                                           final double y3,
-	                                           final double x4,
-	                                           final double y4) {
+											   final double x3,
+											   final double y3,
+											   final double x4,
+											   final double y4) {
 		return lineIntersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), x3, y3, x4, y4);
 	}
 }

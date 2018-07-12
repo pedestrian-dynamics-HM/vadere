@@ -105,7 +105,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 				random,
 				attributesOSM.isVaryStepDirection(),
 				new VCircle(pedestrian.getPosition(),
-				pedestrian.getStepSize()),
+						pedestrian.getStepSize()),
 				numberOfCircles,
 				attributesOSM.getStepCircleResolution(),
 				anchorAngle,

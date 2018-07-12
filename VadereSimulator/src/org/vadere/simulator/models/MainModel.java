@@ -1,5 +1,8 @@
 package org.vadere.simulator.models;
 
+import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
+
 import java.util.List;
 
 /**
@@ -9,5 +12,9 @@ import java.util.List;
 public interface MainModel extends Model, DynamicElementFactory {
 
 	List<Model> getSubmodels();
+
+	default SourceControllerFactory getSourceControllerFactory() {
+		return new SingleSourceControllerFactory();
+	}
 
 }

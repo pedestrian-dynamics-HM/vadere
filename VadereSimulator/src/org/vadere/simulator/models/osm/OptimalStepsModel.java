@@ -1,6 +1,9 @@
 package org.vadere.simulator.models.osm;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
+import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -19,14 +22,15 @@ import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
 import org.vadere.simulator.models.osm.updateScheme.ParallelWorkerOSM;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
@@ -47,23 +51,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @ModelClass(isMainModel = true)
-public class OptimalStepsModel implements MainModel, PotentialFieldModel {
+public class OptimalStepsModel implements MainModel, PotentialFieldModel, DynamicElementRemoveListener<Pedestrian> {
 
-	/**
-	 * Compares the time of the next possible move.
-	 */
-	private class ComparatorPedestrianOSM implements Comparator<PedestrianOSM> {
-
-		@Override
-		public int compare(PedestrianOSM ped1, PedestrianOSM ped2) {
-			// TODO [priority=low] [task=refactoring] use Double.compare() oder compareTo()
-			if (ped1.getTimeOfNextStep() < ped2.getTimeOfNextStep()) {
-				return -1;
-			} else {
-				return 1;
-			}
-		}
-	}
 
 	private AttributesOSM attributesOSM;
 	private AttributesAgent attributesPedestrian;
@@ -77,10 +66,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private double lastSimTimeInSec;
 	private int pedestrianIdCounter;
 	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
-
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
-
 	public OptimalStepsModel() {
 		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = new LinkedList<>();
@@ -88,7 +75,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random) {
 
 		this.attributesOSM = Model.findAttributes(modelAttributesList, AttributesOSM.class);
 		this.topography = topography;
@@ -106,21 +93,23 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
-		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
-		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
-		
+		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
+				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
+		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
+				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
+
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
-			filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel)ac).findAny();
-		
+				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
+
 		if (opCentroidGroupModel.isPresent()) {
-			
+
 			CentroidGroupModel centroidGroupModel = opCentroidGroupModel.get();
 			centroidGroupModel.setPotentialFieldTarget(iPotentialTargetGrid);
-			
+
 			this.potentialFieldPedestrian =
 					new CentroidGroupPotential(centroidGroupModel,
 							potentialFieldPedestrian, centroidGroupModel.getAttributesCGM());
-			
+
 			SpeedAdjuster speedAdjusterCGM = new CentroidGroupSpeedAdjuster(centroidGroupModel);
 			this.speedAdjusters.add(speedAdjusterCGM);
 		}
@@ -145,6 +134,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		} else {
 			this.executorService = null;
 		}
+
+		topography.addElementRemovedListener(Pedestrian.class, this);
 
 		models.add(this);
 	}
@@ -197,7 +188,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	}
 
 	@Override
-	public void postLoop(final double simTimeInSec) {}
+	public void postLoop(final double simTimeInSec) {
+	}
 
 	@Override
 	public void update(final double simTimeInSec) {
@@ -313,5 +305,40 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	@Override
 	public PotentialFieldAgent getPotentialFieldAgent() {
 		return potentialFieldPedestrian;
+	}
+
+	@Override
+	public void elementRemoved(Pedestrian ped) {
+		PedestrianOSM osmPed = (PedestrianOSM) ped;
+		pedestrianEventsQueue.remove(osmPed);
+//		System.out.printf("Remove ped %s from pedestrianEventsQueue%n", ped.getId());
+	}
+
+	@Override
+	public SourceControllerFactory getSourceControllerFactory() {
+		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
+				.filter(ac -> ac instanceof CentroidGroupModel)
+				.map(ac -> (CentroidGroupModel) ac).findAny();
+		if (opCentroidGroupModel.isPresent()) {
+			return new GroupSourceControllerFactory(opCentroidGroupModel.get());
+		}
+
+		return new SingleSourceControllerFactory();
+	}
+
+	/**
+	 * Compares the time of the next possible move.
+	 */
+	private class ComparatorPedestrianOSM implements Comparator<PedestrianOSM> {
+
+		@Override
+		public int compare(PedestrianOSM ped1, PedestrianOSM ped2) {
+			// TODO [priority=low] [task=refactoring] use Double.compare() oder compareTo()
+			if (ped1.getTimeOfNextStep() < ped2.getTimeOfNextStep()) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
 	}
 }

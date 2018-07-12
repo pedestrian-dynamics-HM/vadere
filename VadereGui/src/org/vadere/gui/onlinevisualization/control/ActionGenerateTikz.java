@@ -12,6 +12,7 @@ import org.vadere.gui.postvisualization.utils.SVGGenerator;
 import org.vadere.gui.postvisualization.utils.TikzGenerator;
 
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,7 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
 
 	public ActionGenerateTikz(final String name, final Icon icon, final SimulationRenderer renderer,
-                              final SimulationModel<? extends DefaultSimulationConfig> model) {
+							  final SimulationModel<? extends DefaultSimulationConfig> model) {
 		super(name, icon);
 		this.tikzGenerator = new TikzGenerator(renderer, model);
 		this.model = model;
@@ -55,5 +56,6 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 	}
 
 	@Override
-	public void update(SimulationRenderer renderer) {}
+	public void update(SimulationRenderer renderer) {
+	}
 }
