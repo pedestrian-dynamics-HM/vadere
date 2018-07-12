@@ -36,7 +36,8 @@ public class OnlineVisualization implements PassiveCallback {
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
 	private Topography scenario;
-	private @Nullable IPotentialFieldTarget potentialFieldTarget;
+	private @Nullable
+	IPotentialFieldTarget potentialFieldTarget;
 	private boolean enableVisualization;
 
 	public OnlineVisualization(boolean enableVisualization) {

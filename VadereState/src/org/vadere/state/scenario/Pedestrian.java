@@ -1,10 +1,14 @@
 package org.vadere.state.scenario;
 
-import java.util.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
 
 public class Pedestrian extends Agent {
 
@@ -58,6 +62,10 @@ public class Pedestrian extends Agent {
 		} else {
 			groupIds = new LinkedList<>();
 		}
+	}
+
+	public void addGroupId(int groupId){
+		groupIds.add(groupId);
 	}
 
 	public <T extends ModelPedestrian> T getModelPedestrian(Class<? extends T> modelType) {

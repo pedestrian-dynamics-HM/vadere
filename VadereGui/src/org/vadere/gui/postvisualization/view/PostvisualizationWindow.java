@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
@@ -191,6 +192,17 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				}, "View.btnShowWalkingDirection.tooltip");
 
 		addActionToToolbar(toolbar,
+				new ActionVisualization("show_groups",
+						resources.getIcon("group.png", iconWidth, iconHeight), model) {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						model.config.setShowGroups(!model.config.isShowGroups());
+						model.notifyObservers();
+					}
+				}, "View.btnShowGroupInformation.tooltip");
+
+		addActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
 						resources.getIcon("voronoi.png", iconWidth, iconHeight), model),
 				"View.btnDrawVoronoiDiagram.tooltip");
@@ -236,21 +248,25 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		recordAction.setButton(recordButton);
 
 		toolbar.addSeparator(new Dimension(5, 50));
-		addActionToToolbar(
-				toolbar,
-				new ActionGeneratePNG("png_snapshot", resources.getIcon("camera_png.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnPNGSnapshot.tooltip");
-		addActionToToolbar(
-				toolbar,
-				new ActionGenerateSVG("svg_snapshot", resources.getIcon("camera_svg.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnSVGSnapshot.tooltip");
-		addActionToToolbar(
-				toolbar,
-				new ActionGenerateTikz("tikz_snapshot", resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnTikZSnapshot.tooltip");
+		ArrayList<Action> imgOptions = new ArrayList<>();
+		ActionVisualization pngImg = new ActionGeneratePNG(Messages.getString("PostVis.btnPNGSnapshot.tooltip"), resources.getIcon("camera_png.png", iconWidth, iconHeight),
+				renderer);
+		ActionVisualization svgImg = new ActionGenerateSVG(Messages.getString("PostVis.btnSVGSnapshot.tooltip"), resources.getIcon("camera_svg.png", iconWidth, iconHeight),
+				renderer);
+		ActionVisualization tikzImg = new ActionGenerateTikz(Messages.getString("PostVis.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer);
+		// add new ImageGenerator Action ...
+
+		imgOptions.add(pngImg);
+		imgOptions.add(svgImg);
+		imgOptions.add(tikzImg);
+		// add Action to List ....
+
+		ActionVisualizationMenu imgDialog = new ActionVisualizationMenu(
+				"camera_menu",
+				resources.getIcon("camera.png", iconWidth, iconHeight),
+				model, null, imgOptions);
+		addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("PostVis.btnSnapshot.tooltip"));
 
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -316,6 +332,8 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		// deselect selected element on esc
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
 		getActionMap().put("deselect", new ActionDeselect(model, this, null));
+		repaint();
+		revalidate();
 	}
 
 	private JMenuBar getMenu() {
@@ -337,6 +355,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
 			final String toolTipProperty) {
 		return SwingUtils.addActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+	}
+
+	private static JButton addActionMenuToToolbar(final JToolBar toolbar, final ActionVisualizationMenu menuAction,
+												  final String toolTipProperty) {
+		JButton btn = SwingUtils.addActionToToolbar(toolbar, menuAction, Messages.getString(toolTipProperty));
+		menuAction.setParent(btn);
+		return btn;
 	}
 
 	public IDefaultModel getDefaultModel(){

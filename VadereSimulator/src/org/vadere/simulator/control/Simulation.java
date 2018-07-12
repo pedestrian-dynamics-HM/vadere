@@ -2,6 +2,7 @@ package org.vadere.simulator.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -61,6 +62,7 @@ public class Simulation {
 	/** Hold the topography in an extra field for convenience. */
 	private final Topography topography;
 	private final ProcessorManager processorManager;
+	private final SourceControllerFactory sourceControllerFactory;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
@@ -77,6 +79,7 @@ public class Simulation {
 		this.simTimeInSec = startTimeInSec;
 
 		this.models = mainModel.getSubmodels();
+		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
@@ -99,8 +102,9 @@ public class Simulation {
 
 		// create source and target controllers
 		for (Source source : topography.getSources()) {
-			sourceControllers
-					.add(new SourceController(topography, source, dynamicElementFactory, attributesAgent, random));
+			SourceController sc = this.sourceControllerFactory
+					.create(topography, source, dynamicElementFactory, attributesAgent, random);
+			sourceControllers.add(sc);
 		}
 		for (Target target : topography.getTargets()) {
 			targetControllers.add(new TargetController(topography, target));
@@ -131,7 +135,7 @@ public class Simulation {
 			c.preLoop(simTimeInSec);
 		}
 
-		if(attributesSimulation.isWriteSimulationData()) {
+		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.preLoop(this.simulationState);
 		}
 	}
@@ -147,7 +151,7 @@ public class Simulation {
 			c.postLoop(simTimeInSec);
 		}
 
-		if(attributesSimulation.isWriteSimulationData()) {
+		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.postLoop(this.simulationState);
 		}
 		topographyController.postLoop(this.simTimeInSec);
@@ -158,7 +162,7 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			if(attributesSimulation.isWriteSimulationData()) {
+			if (attributesSimulation.isWriteSimulationData()) {
 				processorManager.setMainModel(mainModel);
 				processorManager.initOutputFiles();
 			}
@@ -190,7 +194,7 @@ public class Simulation {
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 
-				if(attributesSimulation.isWriteSimulationData()) {
+				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
 				}
 
@@ -220,7 +224,7 @@ public class Simulation {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
-			if(attributesSimulation.isWriteSimulationData()) {
+			if (attributesSimulation.isWriteSimulationData()) {
 				processorManager.writeOutput();
 			}
 			logger.info("Finished writing all output files");

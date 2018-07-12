@@ -66,14 +66,8 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	/**
-	 * Returns zero, one or two points which are the intersection of this circle and the line defined
-	 * by p = (x11, y11) and q = (x22, y22).
-	 *
-	 * @param x11
-	 * @param y11
-	 * @param x22
-	 * @param y22
-	 * @return
+	 * Returns zero, one or two points which are the intersection of this circle and the line
+	 * defined by p = (x11, y11) and q = (x22, y22).
 	 */
 	public ImmutableList<VPoint> getIntersectionPoints(final double x11, final double y11, final double x22, final double y22) {
 
@@ -86,18 +80,16 @@ public class VCircle implements VShape, ICircleSector {
 		double dy = y2 - y1;
 		double dr = Math.sqrt(dx * dx + dy * dy);
 		double disc = x1 * y2 - x2 * y1;
-		double D = radius * radius * dr * dr - disc*disc;
+		double D = radius * radius * dr * dr - disc * disc;
 		double sign = dy < 0 ? -1 : 1;
 
-		if(D == 0) {
+		if (D == 0) {
 			x1 = (disc * dy + sign * dx * Math.sqrt(D)) / (dr * dr);
 			y1 = (-disc * dx + Math.abs(dy) * Math.sqrt(D)) / (dr * dr);
 			return ImmutableList.of(new VPoint(x1 + this.getCenter().x, y1 + this.getCenter().y));
-		}
-		else if(D < 0) {
+		} else if (D < 0) {
 			return ImmutableList.of();
-		}
-		else {
+		} else {
 			x1 = (disc * dy + sign * dx * Math.sqrt(D)) / (dr * dr);
 			y1 = (-disc * dx + Math.abs(dy) * Math.sqrt(D)) / (dr * dr);
 			x2 = (disc * dy - sign * dx * Math.sqrt(D)) / (dr * dr);
@@ -108,12 +100,14 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	/**
-	 * Returns, the closest of all intersection points of the intersection of this circle and the line (p, q).
+	 * Returns, the closest of all intersection points of the intersection of this circle and the
+	 * line (p, q).
 	 *
 	 * @param p defining the line
 	 * @param q defining the line
 	 * @param r the point of measurement
-	 * @return the closest of all intersection points of the intersection of this circle and the line (p, q). There might be no such point!
+	 * @return the closest of all intersection points of the intersection of this circle and the
+	 * line (p, q). There might be no such point!
 	 */
 	public Optional<VPoint> getClosestIntersectionPoint(@NotNull final VPoint p, @NotNull final VPoint q, @NotNull final VPoint r) {
 		ImmutableList<VPoint> intersectionPoints = getIntersectionPoints(p, q);
@@ -121,15 +115,8 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	/**
-	 * Returns, the closest of all intersection points of the intersection of this circle and the line (p=(x1, y1), q = (x2, y2)) with respect to r = (x3, y3).
-	 *
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 * @param x3
-	 * @param y3
-	 * @return
+	 * Returns, the closest of all intersection points of the intersection of this circle and the
+	 * line (p=(x1, y1), q = (x2, y2)) with respect to r = (x3, y3).
 	 */
 	public Optional<VPoint> getClosestIntersectionPoint(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
 		ImmutableList<VPoint> intersectionPoints = getIntersectionPoints(x1, y1, x2, y2);

@@ -6,10 +6,10 @@ import org.vadere.util.geometry.shapes.VPoint;
 /**
  * @author Benedikt Zoennchen
  *
- * A Particle of the PSO (particle swarm optimization) is a JavaBean (no logic) and one member of the swarm.
- * The logic is part of the {@link PSO} class. At each iteration of the PSO the particles velocity is updated
- * based on the globalBestLocation, the localBestLocation and the current velocity. The new location is determined by
- * the velocity and the old location.
+ * A Particle of the PSO (particle swarm optimization) is a JavaBean (no logic) and one member of
+ * the swarm. The logic is part of the {@link PSO} class. At each iteration of the PSO the particles
+ * velocity is updated based on the globalBestLocation, the localBestLocation and the current
+ * velocity. The new location is determined by the velocity and the old location.
  */
 public class Particle {
 

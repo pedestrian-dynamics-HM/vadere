@@ -41,7 +41,8 @@ public class ScenarioRun implements Runnable {
 	private Simulation simulation;
 
 	// the processor is null if no output is written i.e. if scenarioStore.attributesSimulation.isWriteSimulationData() is false.
-	private @Nullable ProcessorManager processorManager;
+	private @Nullable
+	ProcessorManager processorManager;
 
 	private final Scenario scenario;
 	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
@@ -89,7 +90,7 @@ public class ScenarioRun implements Runnable {
 				}
 
 				// Only create output directory and write .scenario file if there is any output.
-				if(processorManager != null && !processorManager.isEmpty()) {
+				if (processorManager != null && !processorManager.isEmpty()) {
 					createAndSetOutputDirectory();
 					scenario.saveToOutputPath(outputPath);
 				}
@@ -178,7 +179,7 @@ public class ScenarioRun implements Runnable {
 	private void sealAllAttributes() {
 		scenarioStore.sealAllAttributes();
 
-		if(processorManager != null) {
+		if (processorManager != null) {
 			processorManager.sealAllAttributes();
 		}
 	}

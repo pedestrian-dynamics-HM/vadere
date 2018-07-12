@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,9 @@ public class AttributesSource extends AttributesEmbedShape {
 	 */
 	private boolean useFreeSpaceOnly;
 	private List<Integer> targetIds = new LinkedList<>();
+
+	private List<Double> groupSizeDistribution = Arrays.asList(0.0, 0.0, 1.0);
+
 	/**
 	 * The type of dynamic elements this source creates.
 	 */
@@ -70,7 +74,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * 2. one or more arguments of type <code>double</code> for distribution parameters.
 	 * 
 	 * @see Class#getName()
-	 * @see https://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/package-summary.html
+	 *  https://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/package-summary.html
 	 */
 	public String getInterSpawnTimeDistribution() {
 		return interSpawnTimeDistribution;
@@ -101,7 +105,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * This attribute can be used together with non-constant distributions. For
 	 * example, consider an exponential distribution. The times of events are
 	 * random. How to ensure, that exactly 10 elements are spawned? Solution:
-	 * Set the {@link endTime} to 1e9 and this attribute to 10.
+	 * Set the {@link #endTime} to 1e9 and this attribute to 10.
 	 */
 	public int getMaxSpawnNumberTotal() {
 		return maxSpawnNumberTotal;
@@ -167,4 +171,12 @@ public class AttributesSource extends AttributesEmbedShape {
 		this.spawnAtRandomPositions = spawnAtRandomPositions;
 	}
 
+	public List<Double> getGroupSizeDistribution() {
+		return groupSizeDistribution;
+	}
+
+	public void setGroupSizeDistribution(List<Double> groupSizeDistribution) {
+		checkSealed();
+		this.groupSizeDistribution = groupSizeDistribution;
+	}
 }

@@ -64,7 +64,7 @@ public class Stairs extends ScenarioElement {
 
 			// This is the assumption that pedestrians always step in the middle of a tread.
 
-			double x = rotatedBounds.getMinX() - treadDepth/2 + factor * (rotatedBounds.getWidth() + treadDepth * 2);
+			double x = rotatedBounds.getMinX() - treadDepth / 2 + factor * (rotatedBounds.getWidth() + treadDepth * 2);
 			VPoint p1 = new VPoint(x, rotatedBounds.getMinY()).rotate(angle);
 			VPoint p2 = new VPoint(x, rotatedBounds.getMaxY()).rotate(angle);
 

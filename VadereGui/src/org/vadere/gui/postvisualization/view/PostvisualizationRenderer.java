@@ -13,6 +13,7 @@ import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
@@ -70,6 +71,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	private void renderTrajectory(final Graphics2D g, final Color color, final Trajectory trajectory, final Step step) {
 
 		Optional<Agent> optionalPedestrian = trajectory.getAgent(step);
+		AgentRender agentRender = getAgentRender();
 
 		if (optionalPedestrian.isPresent()) {
 			Agent pedestrian = optionalPedestrian.get();
@@ -88,7 +90,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			// renderImage the pedestrian
 			if (model.config.isShowPedestrians()) {
 				if (model.config.isShowFaydedPedestrians() || !trajectory.isPedestrianDisappeared(step)) {
-					g.fill(pedestrian.getShape());
+					agentRender.render(pedestrian, g);
 					if (model.config.isShowPedestrianIds()) {
 						DefaultRenderer.paintAgentId(g, pedestrian);
 					}

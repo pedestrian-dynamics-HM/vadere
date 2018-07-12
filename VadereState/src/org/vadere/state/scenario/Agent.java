@@ -18,7 +18,7 @@ import org.vadere.util.math.TruncatedNormalDistribution;
 public abstract class Agent extends DynamicElement {
 	
 	/**
-	 * Source where the agent was spawned. The {@link SourceController} should
+	 * Source where the agent was spawned. The SourceController should
 	 * set this field. It may be <code>null</code> when the agent is created
 	 * in different way.
 	 */
@@ -34,6 +34,7 @@ public abstract class Agent extends DynamicElement {
 
 	private AttributesAgent attributes;
 
+
 	public Agent(AttributesAgent attributesAgent) {
 		position = new VPoint(0, 0);
 		velocity = new Vector2D(0, 0);
@@ -42,6 +43,7 @@ public abstract class Agent extends DynamicElement {
 
 		attributes = attributesAgent;
 	}
+
 
 	public Agent(AttributesAgent attributesAgent, Random random) {
 		this(attributesAgent);
@@ -70,7 +72,6 @@ public abstract class Agent extends DynamicElement {
 		this.velocity = other.velocity;
 		this.freeFlowSpeed = other.freeFlowSpeed;
 	}
-
 	public LinkedList<Integer> getTargets() {
 		return targetIds;
 	}
@@ -186,7 +187,7 @@ public abstract class Agent extends DynamicElement {
 
 
 	@Override
-	public void setAttributes(Attributes attributes){
+	public void setAttributes(Attributes attributes) {
 		this.attributes = (AttributesAgent) attributes;
 	}
 
