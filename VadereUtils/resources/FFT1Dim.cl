@@ -1,6 +1,7 @@
 __kernel void fft1Dim(const __global float2 *input,
                       __local float2 *local_data,
-                      __global float2 *local_data_addr,
+                      __global float2 *output,
+                      const uint points_per_group,
                       const uint N,
                       const int direction) {
 
@@ -9,8 +10,7 @@ __kernel void fft1Dim(const __global float2 *input,
         return;
 
     int local_size = get_local_size(0); // number of work items in workgroup
-    int points_per_group = get_global_size(0); // points per group
-    int points_per_item = N/local_size; // points in one workitem
+    int points_per_item = points_per_group/local_size; // points in one workitem
     int l_addr = get_local_id(0)*points_per_item; // address within one workitem
     int global_addr = get_group_id(0)*points_per_group + l_addr; // address within the hole workgroup
 
@@ -108,20 +108,19 @@ __kernel void fft1Dim(const __global float2 *input,
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    // TODO return local_addr to local data so next kernel can work with it
-    // TEMP SOLUTION
 
+    // data put back into global memory
 
     l_addr = get_local_id(0)*points_per_item; // address within one workitem
     global_addr = get_group_id(0)*points_per_group + l_addr; // address within the hole workgroup
 
     for (int i = 0; i < points_per_item; ++i) {
         if (direction > 0) {
-            local_data_addr[global_addr+i] = local_data[l_addr+i];
+            output[global_addr+i] = local_data[l_addr+i];
         } else {
             float2 value = local_data[l_addr+i];
             double factor = (1/(double)N);
-            local_data_addr[global_addr+i] = (float2)(factor*value.x,factor*value.y);
+            output[global_addr+i] = (float2)(factor*value.x,factor*value.y);
         }
     }
 

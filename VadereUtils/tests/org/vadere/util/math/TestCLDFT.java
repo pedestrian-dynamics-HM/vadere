@@ -18,12 +18,12 @@ public class TestCLDFT {
             1, 1, 1, 0
     };
 
-    private static final double EPS = Math.pow(10.0,-5.0);
+    private static final double EPS = Math.pow(10.0,-3.0);
 
     @Test
     public void testSimpleDFT() throws OpenCLException {
 
-        int N = 64;
+        int N = 256;
         float[] input = new float[2*N];
         for (int i = 0; i < input.length; ++i) {
             input[i] = i%2 == 0 ? 1 : 0;
@@ -31,7 +31,7 @@ public class TestCLDFT {
 
         System.out.println("Input: "+Arrays.toString(input));
 
-        CLDFT clfft = new CLDFT(input.length,1, CLDFT.TransformationType.SPACE2FREQUENCY);
+        CLDFT clfft = new CLDFT(input.length,N, CLDFT.TransformationType.SPACE2FREQUENCY);
         float[] outputF = clfft.dft1Dim(input);
         clfft.clearCL();
 
@@ -43,7 +43,7 @@ public class TestCLDFT {
             assertEquals("All other elements should be 0",0,outputF[i],EPS);
         }
 
-        CLDFT clfftBackwards = new CLDFT(input.length,1,CLDFT.TransformationType.FREQUENCY2SPACE);
+        CLDFT clfftBackwards = new CLDFT(input.length,N,CLDFT.TransformationType.FREQUENCY2SPACE);
         float[] outputS = clfftBackwards.dft1Dim(outputF);
         clfftBackwards.clearCL();
 

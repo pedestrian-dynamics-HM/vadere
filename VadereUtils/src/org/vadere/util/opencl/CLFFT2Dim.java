@@ -28,7 +28,7 @@ public class CLFFT2Dim {
     private static final int MALLOC_SIZE = 1;
     private static final int DIMENSION_ZERO = 0;
     private static final int WORK_DIM = 1;
-    private static int MAX_FFT_PER_WORK_ITEM;
+    private static final int FLOAT_PRECITION = 8;
     private static final int MIN_ELEMENTS_PER_WORKITEM = 8;
 
     // CL ids
@@ -44,13 +44,18 @@ public class CLFFT2Dim {
 
     // Host Memory
     private FloatBuffer hostInput;
-    //private IntBuffer hostOutput;
     private FloatBuffer hostOutput;
     private ByteBuffer kernelSourceCode;
 
     private int length;
-    private int size;
+    private int N;
     private int direction;
+    private int workitems_total;
+    private int number_of_workgroups;
+    private int workitems_per_workgroup;
+    private int max_fft_per_work_item;
+    private int max_workitems_per_workgroup;
+
 
     // Kernel Memory
     private long clInput;
@@ -67,9 +72,9 @@ public class CLFFT2Dim {
         SPACE2FREQUENCY, FREQUENCY2SPACE
     }
 
-    public CLFFT2Dim(int length, int size, TransformationType type) throws OpenCLException {
+    public CLFFT2Dim(int length, int N, TransformationType type) throws OpenCLException {
         this.length = length;
-        this.size = size;
+        this.N = N;
         this.direction = type == TransformationType.SPACE2FREQUENCY ? 1 : -1;
         // enables debug memory operations
         if (debug) {
@@ -79,11 +84,8 @@ public class CLFFT2Dim {
         }
 
         init();
+        setArguments();
 
-        // max FFT on one workitem
-        long local_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_LOCAL_MEM_SIZE);
-        long max_work_group_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
-        this.MAX_FFT_PER_WORK_ITEM = (int) (local_mem_size / (max_work_group_size * 8));
     }
 
     public void init() throws OpenCLException {
@@ -94,7 +96,17 @@ public class CLFFT2Dim {
 
             hostInput = MemoryUtil.memAllocFloat(length);
             hostOutput = MemoryUtil.memAllocFloat(length);
-            setArguments();
+
+            // get divice specific constants
+            long local_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_LOCAL_MEM_SIZE);
+            max_workitems_per_workgroup = (int) CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+
+            // and determin biggest fft that can be computed with one workitem
+            this.max_fft_per_work_item = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
+            workitems_total = computeLocalSize(N * N);
+            number_of_workgroups = workitems_total < max_workitems_per_workgroup ? 1 : workitems_total / max_workitems_per_workgroup;
+            workitems_per_workgroup = workitems_total / number_of_workgroups;
+
         } catch (OpenCLException ex) {
             throw ex;
         }
@@ -159,34 +171,39 @@ public class CLFFT2Dim {
             clInput = clCreateBuffer(clContext, CL_MEM_READ_WRITE, INPUT_BUFFER_SIZE_FACTOR * length, errcode_ret);
             clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, OUTPUT_BUFFER_SIZE_FACTOR * length, errcode_ret);
             CLInfo.checkCLError(clSetKernelArg1p(clKernel, 0, clInput)); // input
-            CLInfo.checkCLError(clSetKernelArg(clKernel, 1, size*size)); // size*size=length/2
-            CLInfo.checkCLError(clSetKernelArg1p(clKernel, 2, clOutput));
-            CLInfo.checkCLError(clSetKernelArg1i(clKernel, 3, size)); // N
-            CLInfo.checkCLError(clSetKernelArg1i(clKernel, 4, length/2)); // length = N*2*N
+            CLInfo.checkCLError(clSetKernelArg(clKernel, 1, N * N)); // local memory size
+            CLInfo.checkCLError(clSetKernelArg1p(clKernel, 2, clOutput)); // output
+            CLInfo.checkCLError(clSetKernelArg1i(clKernel, 3, N)); // N
+            CLInfo.checkCLError(clSetKernelArg1i(clKernel, 4, N * N)); // matrix dimentions
             CLInfo.checkCLError(clSetKernelArg1i(clKernel, 5, direction));
         }
     }
 
-    public float[] fft2Dim(final float[] input) throws OpenCLException {
-        CLUtils.toFloatBuffer(input,hostInput);
-        clEnqueueWriteBuffer(clQueue,clInput,true,OFFSET_ZERO,hostInput,null,null);
-        fft2Dim(clKernel);
-        clEnqueueReadBuffer(clQueue,clOutput,true,OFFSET_ZERO,hostOutput,null,null);
 
-        return CLUtils.toFloatArray(hostOutput,length);
+    public float[] fft2Dim(final float[] input) throws OpenCLException {
+        // inner FFT
+        CLUtils.toFloatBuffer(input, hostInput);
+        clEnqueueWriteBuffer(clQueue, clInput, true, OFFSET_ZERO, hostInput, null, null);
+        fft2Dim(clKernel);
+        clEnqueueReadBuffer(clQueue, clOutput, true, OFFSET_ZERO, hostOutput, null, null);
+
+        // outer FFT
+        float[] innerFFT = CLUtils.toFloatArray(hostOutput, length); // TODO avoid having to read to array and then write to buffer again
+        CLUtils.toFloatBuffer(innerFFT, hostInput);
+
+        clEnqueueWriteBuffer(clQueue, clInput, true, OFFSET_ZERO, hostInput, null, null);
+        fft2Dim(clKernel);
+        clEnqueueReadBuffer(clQueue, clOutput, true, OFFSET_ZERO, hostOutput, null, null);
+
+        return CLUtils.toFloatArray(hostOutput, length);
     }
 
     private void fft2Dim(final long clKernel) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
-
-            int items_per_workgroup = length/2;
-            clGlobalWorkSizeEdges.put(DIMENSION_ZERO,items_per_workgroup);
-
-            PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM); // local_work_size
-            int local_size = computeLocalSize(items_per_workgroup);
-            clLocalWorkSizeEdges.put(DIMENSION_ZERO, local_size);
-            System.out.println("local_size " + local_size);
+            PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
+            clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup); // number of workitems per workgroup
+            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total); // number of workitems global
 
             CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
             CLInfo.checkCLError(clFinish(clQueue));
@@ -194,10 +211,10 @@ public class CLFFT2Dim {
     }
 
     private int computeLocalSize(int items_per_workgroup) {
-        int points_per_item = MAX_FFT_PER_WORK_ITEM;
+        int points_per_item = max_fft_per_work_item;
         int local_size = items_per_workgroup / points_per_item;
 
-        while (! (points_per_item >= MIN_ELEMENTS_PER_WORKITEM && items_per_workgroup > points_per_item)) {
+        while (!(points_per_item >= MIN_ELEMENTS_PER_WORKITEM && items_per_workgroup > points_per_item)) {
             points_per_item = points_per_item / 2;
             local_size = items_per_workgroup / points_per_item;
         }
@@ -213,13 +230,13 @@ public class CLFFT2Dim {
             PointerBuffer lengths = stack.mallocPointer(MALLOC_SIZE);
 
             try {
-                kernelSourceCode = CLUtils.ioResourceToByteBuffer("FFT2Dim.cl", SOURCE_BUFFER_SIZE); // TODO only use bufferSize that is needed
+                kernelSourceCode = CLUtils.ioResourceToByteBuffer("FFT2Dim.cl", SOURCE_BUFFER_SIZE);
             } catch (IOException e) {
                 throw new OpenCLException(e.getMessage());
             }
 
             strings.put(0, kernelSourceCode);
-            lengths.put(0, kernelSourceCode.remaining()); // TODO
+            lengths.put(0, kernelSourceCode.remaining());
 
             clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
             CLInfo.checkCLError(clBuildProgram(clProgram, clDevice, "", programCB, NULL));
@@ -281,8 +298,6 @@ public class CLFFT2Dim {
         contextCB.free();
         programCB.free();
     }
-
-
 
 
 }

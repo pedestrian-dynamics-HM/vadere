@@ -9,15 +9,9 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestCLFFT2Dim {
-
-    float[] inMatrix = new float[] {
-            2, 1, 1, 1,
-            1, 1, 1,-1,
-            1, 1, 1, 1,
-            1, 1, 1, 0
-    };
 
     private static final double EPS = Math.pow(10.0,-5.0);
 
@@ -31,41 +25,22 @@ public class TestCLFFT2Dim {
         }
         System.out.println("Input: "+Arrays.toString(input));
 
-        CLFFT2Dim clfftForward = new CLFFT2Dim(input.length,N,CLFFT2Dim.TransformationType.SPACE2FREQUENCY);
-        float[] outputF = clfftForward.fft2Dim(input);
-        clfftForward.clearCL();
+        CLFFT2Dim clffftForwards = new CLFFT2Dim(input.length,N,CLFFT2Dim.TransformationType.SPACE2FREQUENCY);
+        float[] forwardsFFT = clffftForwards.fft2Dim(input);
+        clffftForwards.clearCL();
 
-        System.out.println("\n Frequency: " + Arrays.toString(outputF));
+        System.out.println("\n Forward FFT: " + Arrays.toString(forwardsFFT));
 
-        assertEquals("The first element should be N",N,outputF[0],EPS);
-
-        for (int i = 1; i < outputF.length; ++i) {
-            assertEquals("All other elements should be 0",0,outputF[i],EPS);
+        assertTrue("First element should be N*N!",forwardsFFT[0] == N*N);
+        for (int i = 1; i < forwardsFFT.length; ++i) {
+            assertTrue("All other elements should be 0!",forwardsFFT[i] == 0);
         }
 
-        CLFFT2Dim clfftBackward = new CLFFT2Dim(N,N,CLFFT2Dim.TransformationType.FREQUENCY2SPACE);
-        float[] outputS = clfftBackward.fft2Dim(outputF);
+        CLFFT2Dim clfftBackward = new CLFFT2Dim(forwardsFFT.length,N,CLFFT2Dim.TransformationType.FREQUENCY2SPACE);
+        float[] outputS = clfftBackward.fft2Dim(forwardsFFT);
         clfftBackward.clearCL();
-
         System.out.println("Space: " + Arrays.toString(outputS));
         assertArrayEquals("Back transformation must be equal to original input",input,outputS,(float)EPS);
-    }
-
-    public void testSimpleConvolutionWithFFT() {
-
-        float[] kernel = new float[] {
-                1, 2, 3,
-                4, 5, 6,
-                7, 8, 9
-        };
-
-        float[] inMatrix = new float[] {
-                2, 1, 1, 1,
-                1, 1, 1,-1,
-                1, 1, 1, 1,
-                1, 1, 1, 0
-        };
-
     }
 
 

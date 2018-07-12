@@ -2,7 +2,6 @@ package org.vadere.util.opencl;
 
 
 import org.apache.log4j.Logger;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
 import org.lwjgl.opencl.CLProgramCallback;
@@ -30,11 +29,10 @@ public class CLDFT {
     private static final int OUTPUT_BUFFER_SIZE_FACTOR = 4; // TODO
     private static final int MALLOC_SIZE = 1;
     private static final int DIMENSION_ZERO = 0;
-    private static final int DIMENSION_ONE = 1;
     private static final int WORK_DIM = 2;
     private static final int FORWARDS = 1;
     private static final int BACKWARDS = -1;
-    private static int MAX_FFT_PER_WORK_ITEM;
+    private static final int FLOAT_PRECITION = 8;
     private static final int MIN_ELEMENTS_PER_WORKITEM = 8;
 
     // CL ids
@@ -53,9 +51,15 @@ public class CLDFT {
     private FloatBuffer hostOutput;
     private ByteBuffer kernelSourceCode;
 
-    private int matrixWidth;
-    private int matrixHeight;
+    private int vectorLength;
+    private int N;
     private int direction;
+
+    private int workitems_total;
+    private int number_of_workgroups;
+    private int workitems_per_workgroup;
+    private int max_fft_per_workitem;
+    private int max_workitems_per_workgroup;
 
     // Kernel Memory
     private long clInput;
@@ -70,9 +74,9 @@ public class CLDFT {
     private static Logger log = log = Logger.getLogger(CLDFT.class);
     private boolean debug = false;
 
-    public CLDFT(int matrixWidth, int matrixHeight, TransformationType type) throws OpenCLException {
-        this.matrixWidth = matrixWidth;
-        this.matrixHeight = matrixHeight;
+    public CLDFT(int vectorLength, int N, TransformationType type) throws OpenCLException {
+        this.vectorLength = vectorLength;
+        this.N = N;
         this.direction = type == TransformationType.SPACE2FREQUENCY ? FORWARDS : BACKWARDS;
         // enables debug memory operations
         if (debug) {
@@ -85,8 +89,12 @@ public class CLDFT {
 
         // max points_per_workitem
         long local_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_LOCAL_MEM_SIZE);
-        long max_work_group_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
-        this.MAX_FFT_PER_WORK_ITEM = (int) (local_mem_size / (max_work_group_size * 8));
+        max_workitems_per_workgroup = (int) CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+
+        this.max_fft_per_workitem = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
+        workitems_total = computeLocalSize(N);
+        number_of_workgroups = workitems_total < max_workitems_per_workgroup ? 1 : workitems_total / max_workitems_per_workgroup;
+        workitems_per_workgroup = workitems_total / number_of_workgroups;
     }
 
     public void init() throws OpenCLException {
@@ -95,8 +103,8 @@ public class CLDFT {
             initCL();
             buildProgram();
 
-            hostInput = MemoryUtil.memAllocFloat(matrixWidth * matrixHeight);
-            hostOutput = MemoryUtil.memAllocFloat(matrixWidth * matrixHeight);
+            hostInput = MemoryUtil.memAllocFloat(vectorLength);
+            hostOutput = MemoryUtil.memAllocFloat(vectorLength);
 
             setArguments();
 
@@ -160,12 +168,12 @@ public class CLDFT {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer errcode_ret = stack.callocInt(MALLOC_SIZE);
 
-            clInput = clCreateBuffer(clContext, CL_MEM_READ_ONLY, INPUT_BUFFER_SIZE_FACTOR * matrixWidth * matrixHeight, errcode_ret);
-            clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, OUTPUT_BUFFER_SIZE_FACTOR * matrixWidth * matrixHeight, errcode_ret);
+            clOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, OUTPUT_BUFFER_SIZE_FACTOR * vectorLength, errcode_ret);
+            clInput = clCreateBuffer(clContext, CL_MEM_READ_ONLY, INPUT_BUFFER_SIZE_FACTOR * vectorLength, errcode_ret);
 
             CLInfo.checkCLError(clSetKernelArg1p(clKernel, 0, clInput));
             CLInfo.checkCLError(clSetKernelArg1p(clKernel, 1, clOutput));
-            CLInfo.checkCLError(clSetKernelArg1i(clKernel, 2, matrixWidth/2));
+            CLInfo.checkCLError(clSetKernelArg1i(clKernel, 2, N));
             CLInfo.checkCLError(clSetKernelArg1i(clKernel, 3, direction));
         }
     }
@@ -188,28 +196,23 @@ public class CLDFT {
         clEnqueueReadBuffer(clQueue, clOutput, true, OFFSET_ZERO, hostOutput, null, null);
 
         // convert output to float array
-        return CLUtils.toFloatArray(hostOutput, matrixWidth);
+        return CLUtils.toFloatArray(hostOutput, vectorLength);
     }
 
     private void dft1Dim(final long clKernel) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(1);
-            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, matrixWidth / 2);
+            PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
+            PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
+            clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup); // number of workitems per workgroup
+            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total); // number of workitems global
 
-            int items_per_workgroup = matrixWidth / 2;
-            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, items_per_workgroup); // items_per_workgroup
-
-            //PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM); // local_work_size
-            //int local_size = computeLocalSize(items_per_workgroup);
-            //clLocalWorkSizeEdges.put(DIMENSION_ZERO, 8);
-
-            CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, 1, null, clGlobalWorkSizeEdges, null, null, null));
+            CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, 1, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
             CLInfo.checkCLError(clFinish(clQueue));
         }
     }
 
     private int computeLocalSize(int items_per_workgroup) {
-        int points_per_item = MAX_FFT_PER_WORK_ITEM;
+        int points_per_item = max_fft_per_workitem;
         int local_size = items_per_workgroup / points_per_item;
 
         while (!(points_per_item >= MIN_ELEMENTS_PER_WORKITEM && items_per_workgroup > points_per_item)) {

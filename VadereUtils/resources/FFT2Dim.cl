@@ -1,6 +1,6 @@
 __kernel void fft2Dim(const __global float2 *input,
                       __local float2 *local_data,
-                      __global float2 *local_data_addr,
+                      __global float2 *output,
                       const uint N, const uint length,
                       const int direction) {
 
@@ -9,11 +9,14 @@ __kernel void fft2Dim(const __global float2 *input,
         return;
 
     int local_size = get_local_size(0); // number of work items in workgroup
-    int points_per_group = get_global_size(0); // points per group
+    int points_per_group = length; // points per group
     int points_per_item = points_per_group/local_size; // points in one workitem
 
     int l_addr = get_local_id(0)*points_per_item; // address within one workitem
     int global_addr = get_group_id(0)*points_per_group + l_addr; // address within the hole workgroup
+
+    int workitems_per_row = local_size/N; // number of workitems div by size of row
+    int reindexing_offset = get_local_id(0)/workitems_per_row;
 
     uint4 index, br;
     uint mask_left, mask_right, shift_pos;
@@ -36,10 +39,10 @@ __kernel void fft2Dim(const __global float2 *input,
             br |= (index >> shift_pos) & mask_right;
         }
 
-        x1 = input[br.s0];
-        x2 = input[br.s1];
-        x3 = input[br.s2];
-        x4 = input[br.s3];
+        x1 = input[br.s0+reindexing_offset*N];
+        x2 = input[br.s1+reindexing_offset*N];
+        x3 = input[br.s2+reindexing_offset*N];
+        x4 = input[br.s3+reindexing_offset*N];
 
         float2 sum12 = x1 + x2;
         float2 diff12 = x1 - x2;
@@ -54,6 +57,7 @@ __kernel void fft2Dim(const __global float2 *input,
         global_addr += 4;
         l_addr += 4;
     }
+
 
     float cosine, sine;
     float2 wk;
@@ -84,6 +88,7 @@ __kernel void fft2Dim(const __global float2 *input,
     uint start, angle, stage;
     stage = 2;
 
+
     for(int N2 = points_per_item; N2 < N; N2 <<=1) {
         start = (get_local_id(0) + (get_local_id(0)/stage)*stage) * (points_per_item/2);
         angle = start % (N2*2);
@@ -108,24 +113,25 @@ __kernel void fft2Dim(const __global float2 *input,
     }
 
 
-    //printf("local_id %i &local_data %2.2v2hlf |",get_local_id(0),local_data[get_local_id(0)]);
-    // TODO return local_addr to local data so next kernel can work with it
-
-
-    // TEMP SOLUTION
+    // copy data back into global memory and transform
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     l_addr = get_local_id(0)*points_per_item; // address within one workitem
     global_addr = get_group_id(0)*points_per_group + l_addr;
 
-
     float factor = (1/(float)N);
     for (int i = 0; i < points_per_item; ++i) {
-        if (direction == 1) {
-            local_data_addr[global_addr+i] = local_data[l_addr+i];
 
-        } else {
+        int index = global_addr+i;
+        int row = index/N;
+        int col = index%N;
+        int indexTransposed = col + (N-1)*col + row;
+
+        if (direction == 1) { // forwards FFT
+            output[indexTransposed] = local_data[l_addr+i];
+        } else { // backwards FFT
             float2 val = local_data[global_addr+i];
-            local_data_addr[global_addr+i] = (float2)(factor*val.x,factor*val.y);
+            output[indexTransposed] = (float2)(factor*val.x,factor*val.y);
         }
     }
 
