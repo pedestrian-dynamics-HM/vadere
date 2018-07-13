@@ -29,6 +29,9 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.ElapsedTimeEvent;
+import org.vadere.state.events.Event;
+import org.vadere.state.events.WaitEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
@@ -261,7 +264,20 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		}
 	}
 
-	/*
+    public void update(final List<Event> events) {
+	    // Prioritize events here.
+        if (Event.listContainsEvent(events, WaitEvent.class)) {
+            System.out.println("Wait Event");
+        } else {
+            for (Event event : events) {
+                if (event instanceof ElapsedTimeEvent) {
+                    this.update(event.getTime());
+                }
+            }
+        }
+    }
+
+        /*
 	 * At the moment all pedestrians also the initalPedestrians get this.attributesPedestrain!!!
 	 */
 	@Override

@@ -40,6 +40,7 @@ public abstract class Event {
         this.targets = targets;
     }
 
+    // TODO Implement equals(), hashCode() and toString().
     public double getTime() {
         return time;
     }
@@ -54,6 +55,10 @@ public abstract class Event {
 
     public void setTargets(List<ScenarioElement> targets) {
         this.targets = targets;
+    }
+
+    public static boolean listContainsEvent(List<Event> events, Class<? extends Event> eventToCheck) {
+        return events.stream().anyMatch(event -> event.getClass().equals(eventToCheck));
     }
 
 }
