@@ -141,7 +141,7 @@ public class TrajectoryReader {
 		try (BufferedReader in = IOUtils.defaultBufferedReader(this.trajectoryFilePath)) {
 			return in.lines()                                       // a stream of lines
 					.skip(1)                                        // skip the first line i.e. the header
-					.map(line -> line.split(SPLITTER))              // split the line into string tokens
+					.map(line -> split(line))              // split the line into string tokens
 					.map(rowTokens -> parseRowTokens(rowTokens))    // transform those tokens into a pair of java objects (step, agent)
 					.collect(Collectors.groupingBy(Pair::getKey,    // group all agent objects by the step.
 							Collectors.mapping(Pair::getValue, Collectors.toList())));
@@ -149,6 +149,33 @@ public class TrajectoryReader {
 			logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
 			throw e;
 		}
+	}
+
+	/**
+	 * This method is used instead of {@link String#split(String)} since it is faster because no pattern matching is required.
+	 * 
+	 * @param line
+	 * @return
+	 */
+	private String[] split(@NotNull final String line) {
+		int tokenCount = 0;
+		int startIndex = 0;
+		int endIndex = -1;
+		do {
+			endIndex = line.indexOf(SPLITTER, startIndex+1);
+			startIndex = endIndex;
+			tokenCount++;
+		} while(endIndex != -1);
+
+		startIndex = -1;
+		endIndex = -1;
+		String[] tokens = new String[tokenCount];
+		for(int i = 0; i < tokenCount; i++) {
+			endIndex = line.indexOf(SPLITTER, startIndex+1);
+			tokens[i] = line.substring(startIndex+1, endIndex != -1 ? endIndex : line.length());
+			startIndex = endIndex;
+		}
+		return tokens;
 	}
 
 	/**
