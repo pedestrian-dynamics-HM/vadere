@@ -1,5 +1,7 @@
 package org.vadere.simulator.projects.migration;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.vadere.simulator.control.ScenarioExecutorService;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
@@ -18,12 +20,13 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class TestSimulationRunner {
 
+	private static Logger logger = LogManager.getLogger(TestSimulationRunner.class);
 	private final String outputPath = "target/TestRuns/output";
 
 
@@ -31,31 +34,31 @@ public class TestSimulationRunner {
 	public void RunAllSimulations() {
 		// remove/clean dir from target folder and create new empty tree (used for output)
 		try {
-			Files.walk(Paths.get(outputPath).getParent())
-					.sorted(Comparator.reverseOrder())
-					.map(Path::toFile)
-					.forEach(File::deleteOnExit);
+			if (Paths.get(outputPath).toFile().exists()) {
+				Files.walk(Paths.get(outputPath).getParent())
+						.sorted(Comparator.reverseOrder())
+						.map(Path::toFile)
+						.forEach(File::delete);
+			}
 			Files.createDirectories(Paths.get(outputPath));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		ThreadFactory threadFactory = new ThreadFactory() {
-
-			@Override
-			public Thread newThread(Runnable r) {
-				// System.out.println("creating pooled thread");
-				final Thread thread = new Thread(r);
-				//todo LogManager neuer Appender
-//				thread.setUncaughtExceptionHandler(exceptionHandler);
-				return thread;
-			}
+		ThreadFactory threadFactory = r -> {
+			final Thread thread = new Thread(r);
+			return thread;
 		};
+
 		ExecutorService threadPool = ScenarioExecutorService.newFixedThreadPool(4, threadFactory);
 
+		ScenarioAppender scenarioAppender = new ScenarioAppender(Paths.get(outputPath));
+		LogManager.getRootLogger().addAppender(scenarioAppender);
 
 		List<Path> scenarios = getScenarioFiles(Paths.get("../VadereModelTests/TestOSM"));
+		List<Path> chicken = scenarios.stream().filter(f -> f.getFileName().endsWith("basic_1_chicken_osm1.scenario")).collect(Collectors.toList());
 		List<Path> subset = scenarios.subList(0, 3);
+		subset.addAll(chicken);
 		System.out.println(subset.size());
 		for (Path scenarioPath : subset) {
 			Scenario s = null;
@@ -65,18 +68,20 @@ public class TestSimulationRunner {
 				e.printStackTrace();
 			}
 
-			System.out.println("#####Start scenario: " + scenarioPath.getFileName());
+			logger.info("#####Start scenario: " + scenarioPath.getFileName());
 			threadPool.submit(new ScenarioRun(s, outputPath, (listener) -> System.out.println("done")));
 		}
 
 		threadPool.shutdown();
 		if (!threadPool.isTerminated()) {
 			try {
-				System.out.println("waiting 60 sec....");
+				logger.info("waiting 60 sec....");
 				threadPool.awaitTermination(60, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				threadPool.shutdownNow();
+			} finally {
+				LogManager.getRootLogger().removeAppender(scenarioAppender);
 			}
 
 		}

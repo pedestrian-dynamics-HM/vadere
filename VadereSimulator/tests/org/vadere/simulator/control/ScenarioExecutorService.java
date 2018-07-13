@@ -1,5 +1,10 @@
 package org.vadere.simulator.control;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioRun;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -8,7 +13,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+
 public class ScenarioExecutorService extends ThreadPoolExecutor {
+
+	private static Logger log = LogManager.getLogger(ScenarioExecutorService.class);
 
 	public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
 		return new ScenarioExecutorService(nThreads, nThreads,
@@ -38,10 +46,10 @@ public class ScenarioExecutorService extends ThreadPoolExecutor {
 	protected void afterExecute(Runnable r, Throwable t) {
 		if (t != null) {
 			// todo Throwable von scenario run abolen
-			System.out.println("Error in execution found...");
+			log.info("Error in execution found...");
 			t.printStackTrace();
 		} else {
-			System.out.println("Execution worked");
+			log.info("Execution worked");
 		}
 		super.afterExecute(r, t);
 	}
