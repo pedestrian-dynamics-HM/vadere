@@ -12,15 +12,14 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.ElapsedTimeEvent;
+import org.vadere.state.events.Event;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Simulation {
 
@@ -253,7 +252,12 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
+        ElapsedTimeEvent elapsedTimeEvent = new ElapsedTimeEvent(simTimeInSec);
 
+        List<Event> events = new ArrayList<>();
+        events.add(elapsedTimeEvent);
+
+        // TODO Why are target controller readded in each simulation loop?
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -271,7 +275,7 @@ public class Simulation {
 		step++;
 
 		for (Model m : models) {
-			m.update(simTimeInSec);
+			m.update(events);
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {

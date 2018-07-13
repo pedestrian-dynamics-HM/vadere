@@ -18,7 +18,7 @@ import java.util.List;
  * The additional information depend on the type of the event and are added by
  * concrete implementations. For instance, an event "ElapsedTimeEvent" can provide
  * the current time step. The event "Bang" can have an intensity and a polygon
- * which describes where the bang can be heard.
+ * which describes where the bang can be perceived.
  *
  * TODO Add following events:
  * - TimeElapsed

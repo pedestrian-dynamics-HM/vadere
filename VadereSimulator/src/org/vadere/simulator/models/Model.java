@@ -6,6 +6,8 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.ElapsedTimeEvent;
+import org.vadere.state.events.Event;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.FindByClass;
 
@@ -30,6 +32,15 @@ public interface Model {
 	void postLoop(final double simTimeInSec);
 
 	void update(final double simTimeInSec);
+
+	default void update(final List<Event> events) {
+	    // In the first run, ignore everything else "ElapsedTimeEvent".
+	    for (Event event : events) {
+	        if (event instanceof ElapsedTimeEvent) {
+	            this.update(event.getTime());
+            }
+        }
+    }
 
 	static <T extends Attributes> T findAttributes(List<Attributes> attributesList, final Class<T> type) {
 		try {

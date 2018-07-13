@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Class representing an elapsed time step.
  *
- * The class uses the inherited "time" represent the current time step.
+ * The class uses the inherited "time" to represent the current time step.
  */
 public class ElapsedTimeEvent extends Event {
 
