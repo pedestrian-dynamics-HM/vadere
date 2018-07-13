@@ -153,7 +153,7 @@ public class TrajectoryReader {
 
 	/**
 	 * This method is used instead of {@link String#split(String)} since it is faster because no pattern matching is required.
-	 * 
+	 *
 	 * @param line
 	 * @return
 	 */
