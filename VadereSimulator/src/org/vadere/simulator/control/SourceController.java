@@ -1,28 +1,20 @@
 package org.vadere.simulator.control;
 
-import java.awt.geom.Rectangle2D;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.simulator.scripts.TargetDistribution;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DistributionFactory;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
+
+import java.awt.geom.Rectangle2D;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class SourceController {
 
@@ -188,9 +180,9 @@ public class SourceController {
 		// TODO [priority=high] [task=refactoring] why only if he has no targets? because the createElement method
 		// might add some.
 
-
+		List<Integer> targets = targetDistribution.returnTargets(sourceAttributes.getTargetDistributionIds(),sourceAttributes.getTargetDistributionProbabilities());
 		//List<Integer> targets = targetDistribution.returnTargets(targetDistribution.targetIds(), targetDistribution.getDistributions().get(1));
-		//newElement.setTargets(new LinkedList<>(targets));
+		newElement.setTargets(new LinkedList<>(targets));
 
 
 		if (newElement.getTargets().isEmpty()) {

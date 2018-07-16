@@ -48,6 +48,10 @@ public class AttributesSource extends Attributes {
 	 */
 	private DynamicElementType dynamicElementType = DynamicElementType.PEDESTRIAN;
 
+	private List<List<Integer>> targetDistributionIds = new LinkedList<>();
+	private List<Double> targetDistributionProbabilities = new LinkedList<>();
+
+
 	@SuppressWarnings("unused")
 	private AttributesSource() {}
 
@@ -165,4 +169,19 @@ public class AttributesSource extends Attributes {
 		this.spawnAtRandomPositions = spawnAtRandomPositions;
 	}
 
+	public List<List<Integer>> getTargetDistributionIds() {
+		return targetDistributionIds;
+	}
+
+	public void setTargetDistributionIds(List<List<Integer>> targetDistributionIds) {
+		this.targetDistributionIds = targetDistributionIds;
+	}
+
+	public List<Double> getTargetDistributionProbabilities() {
+		return targetDistributionProbabilities;
+	}
+
+	public void setTargetDistributionProbabilities(List<Double> targetDistributionProbabilities) {
+		this.targetDistributionProbabilities = targetDistributionProbabilities;
+	}
 }
