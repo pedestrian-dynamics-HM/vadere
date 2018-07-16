@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class ScenarioExecutorService extends ThreadPoolExecutor {
 
 	private static Logger log = LogManager.getLogger(ScenarioExecutorService.class);
+//	private HashMap<String, Throwable> output
 
 	public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
 		return new ScenarioExecutorService(nThreads, nThreads,
