@@ -14,6 +14,7 @@ import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.ElapsedTimeEvent;
 import org.vadere.state.events.Event;
+import org.vadere.state.events.WaitEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
@@ -253,9 +254,15 @@ public class Simulation {
 
 	private void updateCallbacks(double simTimeInSec) {
         ElapsedTimeEvent elapsedTimeEvent = new ElapsedTimeEvent(simTimeInSec);
+		WaitEvent waitEvent = new WaitEvent(simTimeInSec);
 
         List<Event> events = new ArrayList<>();
-        events.add(elapsedTimeEvent);
+
+        if (simTimeInSec >= 10 && simTimeInSec <= 40) {
+        	events.add(waitEvent);
+		} else {
+			events.add(elapsedTimeEvent);
+		}
 
         // TODO Why are target controller readded in each simulation loop?
 		this.targetControllers.clear();
