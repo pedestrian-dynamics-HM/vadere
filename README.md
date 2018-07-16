@@ -33,7 +33,9 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 
 * Windows: For further information using OpenCL on Windows [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
 * OS X: OpenCL is pre-installed for OS X.
-* Linux: Please refer to the installation manual of your Linux distribution.
+* Linux: Please refer to the installation manual of your Linux distribution. 
+  * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
+  * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
 ### Run the Application
 
