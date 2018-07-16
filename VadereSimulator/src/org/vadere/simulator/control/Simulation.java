@@ -258,9 +258,9 @@ public class Simulation {
 
         List<Event> events = new ArrayList<>();
 
-        if (simTimeInSec >= 10 && simTimeInSec <= 40) {
-        	events.add(waitEvent);
-		} else {
+		if (simTimeInSec >= 10 && simTimeInSec <= 40) {
+        events.add(waitEvent);
+        } else {
 			events.add(elapsedTimeEvent);
 		}
 
