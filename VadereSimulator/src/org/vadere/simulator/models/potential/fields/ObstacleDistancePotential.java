@@ -67,4 +67,8 @@ public class ObstacleDistancePotential implements IPotentialField {
 	public double getPotential(@NotNull VPoint pos, @Nullable Agent agent) {
 		return eikonalSolver.getPotential(pos, 0.0, 1.0);
 	}
+
+	public EikonalSolver getEikonalSolver() {
+		return eikonalSolver;
+	}
 }

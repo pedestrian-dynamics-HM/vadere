@@ -14,6 +14,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 /**
  * A IPotentialTargetGrid, that creates for a single target the a floor field
@@ -27,6 +28,7 @@ public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget
 	private AttributesFloorField attributesFloorField;
 	private AttributesAgent attributesPedestrian;
 	private final int targetId;
+	private EikonalSolver eikonalSolver;
 
 	public PotentialFieldSingleTargetGrid(final Topography topography,
 			final AttributesAgent attributesPedestrian,
@@ -71,7 +73,12 @@ public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget
 			PotentialFieldAndInitializer potentialFieldAndInitializer = PotentialFieldAndInitializer.create(topography,
 					targetId, shapes, this.attributesPedestrian, this.attributesFloorField);
 			targetPotentialFields.put(targetId, potentialFieldAndInitializer);
+			eikonalSolver = potentialFieldAndInitializer.eikonalSolver;
 		}
+	}
+
+	public EikonalSolver getEikonalSolver() {
+		return eikonalSolver;
 	}
 
 	@Override
