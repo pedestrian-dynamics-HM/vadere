@@ -9,10 +9,16 @@ unit_tests_with_coverage:
   # Watch out: OpenCL code cannot be run on virtual machine. Therefore,
   # skip this tests.
   #
-  # Use following (exclamation) syntax to skip test(s). Please note,
-  # exclamation mark may be inserted to escape the "!".
+  # The comma-separated list of tests after "-Dtest=<list>" is skipped.
+  # All other tests are executed normally.
   #
-  #   #Exclude one test class, by using the explanation mark (!)
+  # Watch out: on some CI instances the exclamation mark must be escaped by a
+  # backslash. Otherwise, it is interpreted by the executing shell as special
+  # command.
+  #
+  # Following syntaxes allow you to skip whole classes and single methods:
+  #
+  #   #Exclude one test class
   #   mvn test -Dtest=!LegacyTest
   #   # Exclude one test method
   #   mvn verify -Dtest=!LegacyTest#testFoo
@@ -23,4 +29,4 @@ unit_tests_with_coverage:
   script:
     - mvn clean
     - mvn test -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList
-    
+    - python3 Tools/collect_line_and_branch_coverage.py
