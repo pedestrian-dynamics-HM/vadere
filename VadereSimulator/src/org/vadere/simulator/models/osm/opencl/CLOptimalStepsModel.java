@@ -1,4 +1,4 @@
-package org.vadere.util.opencl;
+package org.vadere.simulator.models.osm.opencl;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -9,14 +9,22 @@ import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.opencl.CLInfo;
+import org.vadere.util.opencl.CLUtils;
+import org.vadere.util.opencl.OpenCLException;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
@@ -36,7 +44,6 @@ import static org.lwjgl.opencl.CL10.clCreateKernel;
 import static org.lwjgl.opencl.CL10.clCreateProgramWithSource;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
-import static org.lwjgl.opencl.CL10.clEnqueueWaitForEvents;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
@@ -48,6 +55,7 @@ import static org.lwjgl.opencl.CL10.clReleaseKernel;
 import static org.lwjgl.opencl.CL10.clReleaseMemObject;
 import static org.lwjgl.opencl.CL10.clReleaseProgram;
 import static org.lwjgl.opencl.CL10.clSetKernelArg;
+import static org.lwjgl.opencl.CL10.clSetKernelArg1f;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -60,8 +68,8 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * This class offers the methods to compute an array based linked-cell which contains 2D-coordinates i.e. {@link VPoint}
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
-public class CLLinkedCell {
-    private static Logger log = LogManager.getLogger(CLLinkedCell.class);
+public class CLOptimalStepsModel {
+    private static Logger log = LogManager.getLogger(CLOptimalStepsModel.class);
 
     // CL ids
     private long clPlatform;
@@ -75,21 +83,26 @@ public class CLLinkedCell {
     private long clIndices;
     private long clCellStarts;
     private long clCellEnds;
-    private long clReorderedPositions;
-    private long clPositions;
+    private long clReorderedPedestrians;
+    private long clPedestrians;
     private long clCellSize;
     private long clWorldOrigin;
     private long clGridSize;
+    private long clTargetPotential;
+    private long clObstaclePotential;
+    private long clPedestrianNextPositions;
 
     // Host Memory
     private IntBuffer hashes;
     private IntBuffer indices;
     private IntBuffer cellStarts;
     private IntBuffer cellEnds;
-    private FloatBuffer reorderedPositions;
-    private FloatBuffer positions;
+    private FloatBuffer reorderedPedestrians;
+    private FloatBuffer pedestrians;
     private FloatBuffer worldOrigin;
     private FloatBuffer cellSize;
+    private FloatBuffer targetPotentialField;
+    private FloatBuffer obstaclePotentialField;
     private IntBuffer gridSize;
 
 
@@ -110,13 +123,16 @@ public class CLLinkedCell {
     private long clBitonicMergeLocal;
     private long clCalcHash;
     private long clFindCellBoundsAndReorder;
+    private long clNextPositions;
 
     private int numberOfElements;
     private int numberOfGridCells;
     private VRectangle bound;
     private float iCellSize;
     private int[] iGridSize;
-    private List<VPoint> positionList;
+    private List<PedestrianOpenCL> pedestrianList;
+
+	private final AttributesFloorField attributesFloorField;
 
     private int[] keys;
     private int[] values;
@@ -124,7 +140,7 @@ public class CLLinkedCell {
     private int[] resultValues;
     private int[] resultKeys;
 
-    private static final Logger logger = LogManager.getLogger(CLLinkedCell.class);
+    private static final Logger logger = LogManager.getLogger(CLOptimalStepsModel.class);
 
     private int max_work_group_size;
 
@@ -140,18 +156,29 @@ public class CLLinkedCell {
 	/**
 	 * Default constructor.
 	 *
-	 * @param numberOfElements  the number of positions contained in the linked cell.
+	 * @param numberOfElements  the number of pedestrians contained in the linked cell.
 	 * @param bound             the spatial bound of the linked cell.
 	 * @param cellSize          the cellSize (in x and y direction) of the linked cell.
 	 *
 	 * @throws OpenCLException
 	 */
-    public CLLinkedCell(final int numberOfElements, final VRectangle bound, final double cellSize) throws OpenCLException {
+    public CLOptimalStepsModel(
+		    final int numberOfElements,
+		    @NotNull final VRectangle bound,
+		    final double cellSize,
+		    @NotNull final AttributesFloorField attributesFloorField,
+		    @NotNull final EikonalSolver targetPotential,
+		    @NotNull final EikonalSolver obstaclePotential) throws OpenCLException {
 	    this.numberOfElements = numberOfElements;
 	    this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
 	    this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
 		this.bound = bound;
 		this.iCellSize = (float)cellSize;
+		this.attributesFloorField = attributesFloorField;
+
+		//TODO: this should be done in mallocHostMemory().
+	    this.targetPotentialField = generatePotentialFieldApproximation(targetPotential);
+	    this.obstaclePotentialField = generatePotentialFieldApproximation(obstaclePotential);
 
     	if(debug) {
 		    Configuration.DEBUG.set(true);
@@ -161,10 +188,55 @@ public class CLLinkedCell {
 	    init();
     }
 
+    private int getPotentialFieldWidth() {
+    	return (int) Math.floor(bound.getWidth() / attributesFloorField.getPotentialFieldResolution())+1;
+    }
+
+    private int getPotentialFieldHeight() {
+    	return (int) Math.floor(bound.getHeight() / attributesFloorField.getPotentialFieldResolution())+1;
+    }
+
+    private int getPotentialFieldSize() {
+    	return getPotentialFieldWidth() * getPotentialFieldHeight();
+    }
+
+    private FloatBuffer generatePotentialFieldApproximation(@NotNull EikonalSolver eikonalSolver) {
+    	FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(getPotentialFieldSize());
+
+    	int index = 0;
+    	for(float y = (float)bound.getMinY(); y <= (float)bound.getHeight(); y += attributesFloorField.getPotentialFieldResolution()) {
+		    for(float x = (float)bound.getMinX(); x <= (float)bound.getWidth(); x += attributesFloorField.getPotentialFieldResolution()) {
+			    floatBuffer.put(index,
+					    (float)eikonalSolver.getPotential(new VPoint(x, y),
+							    attributesFloorField.getObstacleGridPenalty(),
+							    attributesFloorField.getTargetAttractionStrength()));
+		        index++;
+		    }
+	    }
+
+		return floatBuffer;
+    }
+
+    public static class PedestrianOpenCL {
+    	public float stepRadius;
+    	public VPoint position;
+    	public VPoint newPosition;
+
+    	public PedestrianOpenCL(final VPoint position, final float stepRadius) {
+    		this.position = position;
+    		this.stepRadius = stepRadius;
+	    }
+
+	    @Override
+	    public String toString() {
+		    return position + " -> " + newPosition;
+	    }
+    }
+
 	/**
 	 * The data structure representing the linked cell. The elements of cell i
-	 * between (reorderedPositions[cellStart[i]*2], reorderedPositions[cellStart[i]*2+1])
-	 * and (reorderedPositions[(cellEnds[i]-1)*2], reorderedPositions[(cellEnds[i]-1)*2+1]).
+	 * between (reorderedPedestrians[cellStart[i]*2], reorderedPedestrians[cellStart[i]*2+1])
+	 * and (reorderedPedestrians[(cellEnds[i]-1)*2], reorderedPedestrians[(cellEnds[i]-1)*2+1]).
 	 */
 	public class LinkedCell {
 		/**
@@ -183,85 +255,100 @@ public class CLLinkedCell {
 	    public float[] reorderedPositions;
 
 		/**
-		 * the mapping between the unordered (original) positions and the reorderedPositions,
-		 * i.e. reorderedPositions[i] == positions[indices[i]]
+		 * the mapping between the unordered (original) pedestrians and the reorderedPedestrians,
+		 * i.e. reorderedPedestrians[i] == pedestrians[indices[i]]
 		 */
 	    public int[] indices;
 
 		/**
-		 * the hashes i.e. the cell of the positions, i.e. hashes[i] is the cell of positions[i].
+		 * the hashes i.e. the cell of the pedestrians, i.e. hashes[i] is the cell of pedestrians[i].
 		 */
 		public int[] hashes;
 
 		/**
-		 * the original positions in original order.
+		 * the original pedestrians in original order.
 		 */
 		public float[] positions;
     }
 
+
 	/**
-	 * Computes the {@link LinkedCell} of the list of positions.
+	 * Computes the {@link LinkedCell} of the list of pedestrians.
 	 *
-	 * @param positions a list of position contained in {@link CLLinkedCell#bound}.
+	 * @param pedestriansOSM
 	 * @return {@link LinkedCell} which is the linked list in an array based structure.
 	 *
 	 * @throws OpenCLException
 	 */
-	public LinkedCell calcLinkedCell(@NotNull final List<VPoint> positions) throws OpenCLException {
-		assert positions.size() == numberOfElements;
-		this.positionList = positions;
-		allocHostMemory();
-		allocDeviceMemory();
+	public List<PedestrianOpenCL> getNextSteps(@NotNull final List<PedestrianOpenCL> pedestrians) throws OpenCLException {
 
-		clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
-		clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
-		clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements);
+		try (MemoryStack stack = stackPush()) {
+			assert pedestrians.size() == numberOfElements;
+			this.pedestrianList = pedestrians;
+			allocHostMemory();
+			allocDeviceMemory();
 
-		clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
-		clEnqueueReadBuffer(clQueue, clCellEnds, true, 0, cellEnds, null, null);
-		clEnqueueReadBuffer(clQueue, clReorderedPositions, true, 0, reorderedPositions, null, null);
-		clEnqueueReadBuffer(clQueue, clIndices, true, 0, indices, null, null);
-		clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
-		clEnqueueReadBuffer(clQueue, clPositions, true, 0, this.positions, null, null);
+			//clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
+			//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
+			//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements);
+			clNextPosition(clPedestrianNextPositions, clPedestrians, clCellStarts, clCellEnds, clObstaclePotential, clTargetPotential, clWorldOrigin);
 
-		int[] aCellStarts = CLUtils.toIntArray(cellStarts, numberOfGridCells);
-		int[] aCellEnds = CLUtils.toIntArray(cellEnds, numberOfGridCells);
-		float[] aReorderedPositions = CLUtils.toFloatArray(reorderedPositions, numberOfElements * 2);
-		int[] aIndices = CLUtils.toIntArray(indices, numberOfElements);
-		int[] aHashes = CLUtils.toIntArray(hashes, numberOfElements);
-		float[] aPositions = CLUtils.toFloatArray(this.positions, numberOfElements * 2);
+			//clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
+			//clEnqueueReadBuffer(clQueue, clCellEnds, true, 0, cellEnds, null, null);
+			FloatBuffer nextPositions = stack.mallocFloat(numberOfElements * 2);
+			clEnqueueReadBuffer(clQueue, clPedestrianNextPositions, true, 0, nextPositions, null, null);
+			clEnqueueReadBuffer(clQueue, clIndices, true, 0, indices, null, null);
+			//clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
+			//clEnqueueReadBuffer(clQueue, clPedestrians, true, 0, this.pedestrians, null, null);
 
-		LinkedCell gridCells = new LinkedCell();
-		gridCells.cellEnds = aCellEnds;
-		gridCells.cellStarts = aCellStarts;
-		gridCells.reorderedPositions = aReorderedPositions;
-		gridCells.indices = aIndices;
-		gridCells.hashes = aHashes;
-		gridCells.positions = aPositions;
+			int[] aIndices = CLUtils.toIntArray(indices, numberOfElements);
+			float[] positionsAndRadi = CLUtils.toFloatArray(nextPositions, numberOfElements * 2);
+			for(int i = 0; i < numberOfElements; i++) {
+				float x = positionsAndRadi[i * 2];
+				float y = positionsAndRadi[i * 2 + 1];
+				VPoint newPosition = new VPoint(x,y);
+				pedestrians.get(i).newPosition = newPosition;
+			}
 
-		clearMemory();
-		clearCL();
+			/*int[] aCellStarts = CLUtils.toIntArray(cellStarts, numberOfGridCells);
+			int[] aCellEnds = CLUtils.toIntArray(cellEnds, numberOfGridCells);
 
-		return gridCells;
-		//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
-		//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
+			int[] aIndices = CLUtils.toIntArray(indices, numberOfElements);
+			int[] aHashes = CLUtils.toIntArray(hashes, numberOfElements);
+			float[] aPositions = CLUtils.toFloatArray(this.pedestrians, numberOfElements * 2);
+
+			LinkedCell gridCells = new LinkedCell();
+			gridCells.cellEnds = aCellEnds;
+			gridCells.cellStarts = aCellStarts;
+			gridCells.reorderedPedestrians = aReorderedPositions;
+			gridCells.indices = aIndices;
+			gridCells.hashes = aHashes;
+			gridCells.positions = aPositions;*/
+
+			clearMemory();
+			clearCL();
+
+			return pedestrians;
+			//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
+			//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements, numberOfGridCells);
+		}
 	}
 
 	/**
 	 * Computes all the hash values, i.e. cells of each position and sort these hashes and construct a mapping
 	 * of the rearrangement. This method exists to test the bitonic sort algorithm on the GPU.
 	 *
-	 * @param positions the positions which will be hashed.
+	 * @param positions the pedestrians which will be hashed.
 	 * @return  the sorted hashes.
 	 * @throws OpenCLException
 	 */
-	public int[] calcSortedHashes(@NotNull final List<VPoint> positions) throws OpenCLException {
+	public int[] calcSortedHashes(@NotNull final List<PedestrianOpenCL> positions) throws OpenCLException {
 		assert positions.size() == numberOfElements;
-		this.positionList = positions;
+		this.pedestrianList = positions;
 		allocHostMemory();
 		allocDeviceMemory();
 
-		clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
+		clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
 		clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
 		clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
 		int[] result = CLUtils.toIntArray(hashes, numberOfElements);
@@ -271,24 +358,24 @@ public class CLLinkedCell {
 		return result;
 
 		//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
-		//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
+		//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements, numberOfGridCells);
 	}
 
 	/**
 	 * Computes all the hash values, i.e. cells of each position.
 	 * This method exists to test the hash computation on the GPU.
 	 *
-	 * @param positions the positions which will be hashed.
+	 * @param positions the pedestrians which will be hashed.
 	 * @return the (unsorted) hashes.
 	 * @throws OpenCLException
 	 */
-    public int[] calcHashes(@NotNull final List<VPoint> positions) throws OpenCLException {
+    public int[] calcHashes(@NotNull final List<PedestrianOpenCL> positions) throws OpenCLException {
 	    assert positions.size() == numberOfElements;
-		this.positionList = positions;
+		this.pedestrianList = positions;
 		allocHostMemory();
 	    allocDeviceMemory();
 
-	    clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
+	    clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
 	    clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
 	    int[] result = CLUtils.toIntArray(hashes, numberOfElements);
 
@@ -297,7 +384,7 @@ public class CLLinkedCell {
 	    return result;
 
 	    //clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
-	    //clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
+	    //clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements, numberOfGridCells);
     }
 
 	/**
@@ -324,13 +411,21 @@ public class CLLinkedCell {
     }
 
 	public void allocHostMemory() {
-		assert positionList.size() == numberOfElements;
-		float[] pos = new float[numberOfElements*2];
+		assert pedestrianList.size() == numberOfElements;
+		float[] posAndRadius = new float[numberOfElements*3];
 		for(int i = 0; i < numberOfElements; i++) {
-			pos[i*2] = (float)positionList.get(i).getX();
-			pos[i*2+1] = (float)positionList.get(i).getY();
+			posAndRadius[i*3] = (float) pedestrianList.get(i).position.getX();
+			posAndRadius[i*3+1] = (float) pedestrianList.get(i).position.getY();
+			posAndRadius[i*3+2] = pedestrianList.get(i).stepRadius;
 		}
-		this.positions = CLUtils.toFloatBuffer(pos, CLUtils.toFloatBuffer(pos));
+		this.pedestrians = CLUtils.toFloatBuffer(posAndRadius);
+
+		for(int i = 0; i < numberOfElements; i++) {
+			logger.info(this.pedestrians .get(i*3));
+			logger.info(this.pedestrians .get(i*3+1));
+			logger.info(this.pedestrians .get(i*3+2));
+		}
+
 		this.hashes = MemoryUtil.memAllocInt(numberOfElements);
 
 		float[] originArray = new float[]{(float)bound.getMinX(), (float)bound.getMinX()};
@@ -344,7 +439,7 @@ public class CLLinkedCell {
 		this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
 		this.cellEnds = MemoryUtil.memAllocInt(numberOfGridCells);
 		this.indices = MemoryUtil.memAllocInt(numberOfElements);
-		this.reorderedPositions = MemoryUtil.memAllocFloat(numberOfElements * 2);
+		this.reorderedPedestrians = MemoryUtil.memAllocFloat(numberOfElements * 3);
 	}
 
     private void allocDeviceMemory() {
@@ -353,13 +448,16 @@ public class CLLinkedCell {
 		    clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, cellSize, errcode_ret);
 		    clWorldOrigin = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, worldOrigin, errcode_ret);
 		    clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, gridSize, errcode_ret);
+		    clTargetPotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, obstaclePotentialField, errcode_ret);
+		    clObstaclePotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, targetPotentialField, errcode_ret);
 		    clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
 		    clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
 		    clCellStarts = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
 		    clCellEnds = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
-		    clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
-		    clPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
-		    clEnqueueWriteBuffer(clQueue, clPositions, true, 0, positions, null, null);
+		    clReorderedPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 3 * 4 * numberOfElements, errcode_ret);
+		    clPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 3 * 4 * numberOfElements, errcode_ret);
+		    clPedestrianNextPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
+		    clEnqueueWriteBuffer(clQueue, clPedestrians, true, 0, pedestrians, null, null);
 	    }
     }
 
@@ -397,6 +495,47 @@ public class CLLinkedCell {
 		    clGlobalWorkSize.put(0, numberOfElements);
 		    //TODO: local work size?
 		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clCalcHash, 1, null, clGlobalWorkSize, null, null, null));
+	    }
+    }
+
+        /*__kernel void nextSteps(
+    __global float2       *newPositions,        //output
+    __global const float3 *orderedPedestrians,  //input
+    __global const uint   *d_CellStart,         //input: cell boundaries
+    __global const uint   *d_CellEnd,           //input
+    __global const float  *obstaclePotential,   //input
+    __global const float  *targetPotential,     //input
+    __constant float2     *worldOrigin,         //input
+    __constant float      *potentialCellSize    //input
+){*/
+
+    private void clNextPosition(
+    		final long clPedestrianNextPositions,
+		    final long clReorderedPedestrians,
+		    final long clCellStarts,
+		    final long clCellEnds,
+		    final long clObstaclePotential,
+		    final long clTargetPotential,
+		    final long clWorldOrigin) throws OpenCLException {
+	    try (MemoryStack stack = stackPush()) {
+
+		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
+		    IntBuffer errcode_ret = stack.callocInt(1);
+
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 0, clPedestrianNextPositions));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 1, clReorderedPedestrians));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 2, clCellStarts));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 3, clCellEnds));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 4, clObstaclePotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 5, clTargetPotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 6, clWorldOrigin));
+		    CLInfo.checkCLError(clSetKernelArg1f(clNextPositions, 7, (float)attributesFloorField.getPotentialFieldResolution()));
+
+		    clGlobalWorkSize.put(0, numberOfElements);
+		    clLocalWorkSize.put(0, max_work_group_size);
+		    //TODO: local work size? + check 2^n constrain!
+		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clNextPositions, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 	    }
     }
 
@@ -548,11 +687,14 @@ public class CLLinkedCell {
 		    CLInfo.checkCLError(clReleaseMemObject(clIndices));
 		    CLInfo.checkCLError(clReleaseMemObject(clCellStarts));
 		    CLInfo.checkCLError(clReleaseMemObject(clCellEnds));
-		    CLInfo.checkCLError(clReleaseMemObject(clReorderedPositions));
-		    CLInfo.checkCLError(clReleaseMemObject(clPositions));
+		    CLInfo.checkCLError(clReleaseMemObject(clReorderedPedestrians));
+		    CLInfo.checkCLError(clReleaseMemObject(clPedestrians));
+		    CLInfo.checkCLError(clReleaseMemObject(clPedestrianNextPositions));
 		    CLInfo.checkCLError(clReleaseMemObject(clCellSize));
 		    CLInfo.checkCLError(clReleaseMemObject(clWorldOrigin));
 		    CLInfo.checkCLError(clReleaseMemObject(clGridSize));
+		    CLInfo.checkCLError(clReleaseMemObject(clTargetPotential));
+		    CLInfo.checkCLError(clReleaseMemObject(clObstaclePotential));
 	    }
 	    catch (OpenCLException ex) {
 			throw ex;
@@ -562,8 +704,8 @@ public class CLLinkedCell {
 		    MemoryUtil.memFree(indices);
 		    MemoryUtil.memFree(cellStarts);
 		    MemoryUtil.memFree(cellEnds);
-		    MemoryUtil.memFree(reorderedPositions);
-		    MemoryUtil.memFree(positions);
+		    MemoryUtil.memFree(reorderedPedestrians);
+		    MemoryUtil.memFree(pedestrians);
 		    MemoryUtil.memFree(worldOrigin);
 		    MemoryUtil.memFree(cellSize);
 		    MemoryUtil.memFree(gridSize);
@@ -646,7 +788,7 @@ public class CLLinkedCell {
 		    // TODO delete memory?
 
 		    try {
-			    source = CLUtils.ioResourceToByteBuffer("Particles.cl", 4096);
+			    source = CLUtils.ioResourceToByteBuffer("OSM.cl", 4096);
 		    } catch (IOException e) {
 			    throw new OpenCLException(e.getMessage());
 		    }
@@ -663,6 +805,8 @@ public class CLLinkedCell {
 		    clBitonicMergeGlobal = clCreateKernel(clProgram, "bitonicMergeGlobal", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 		    clBitonicMergeLocal = clCreateKernel(clProgram, "bitonicMergeLocal", errcode_ret);
+		    CLInfo.checkCLError(errcode_ret);
+		    clNextPositions = clCreateKernel(clProgram, "nextSteps", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 
 		    clCalcHash = clCreateKernel(clProgram, "calcHash", errcode_ret);
