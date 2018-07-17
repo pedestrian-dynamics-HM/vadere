@@ -9,8 +9,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.LinkedList;
 import java.util.Random;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-
 public class SingleSourceController extends SourceController {
 
 	private int numberToSpawn;
@@ -37,7 +35,15 @@ public class SingleSourceController extends SourceController {
 						assert (numberToSpawn >= 0);
 					} else {
 						for (int i = 0; i < numberToSpawn; i++) {
-							spawnPoints.add(spawnArray.getNextRandomSpawnPoint(random));
+							VPoint nextRandomSpawnPoint = spawnArray.getNextRandomSpawnPoint(getDynElementsAtSource(), random);
+							if (nextRandomSpawnPoint == null){
+								throw new RuntimeException("Cannot spawn new Pedestrian. Source " + source.getId() + " is set " +
+										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
+										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
+										"to queue Pedestrians.");
+							}
+							spawnPoints.add(nextRandomSpawnPoint);
+
 						}
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
@@ -51,7 +57,14 @@ public class SingleSourceController extends SourceController {
 						assert (numberToSpawn >= 0);
 					} else {
 						for (int i = 0; i < numberToSpawn; i++) {
-							spawnPoints.add(spawnArray.getNextSpawnPoint());
+							VPoint nextSpawnPoint = spawnArray.getNextSpawnPoint(getDynElementsAtSource());
+							if (nextSpawnPoint == null){
+								throw new RuntimeException("Cannot spawn new Pedestrian. Source " + source.getId() + " is set " +
+										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
+										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
+										"to queue Pedestrians.");
+							}
+							spawnPoints.add(nextSpawnPoint);
 						}
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);

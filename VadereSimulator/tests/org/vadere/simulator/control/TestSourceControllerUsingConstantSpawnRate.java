@@ -18,6 +18,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class TestSourceControllerUsingConstantSpawnRate {
 
@@ -159,7 +160,8 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0,0,0.1,0.1)); // small source
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < 1000; simTimeInSec += 1.0) {

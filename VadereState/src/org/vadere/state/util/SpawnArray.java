@@ -6,6 +6,7 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.stream.IntStream;
 public class SpawnArray {
 
 	private static Logger logger = LogManager.getLogger(SpawnArray.class);
+	private static final double EPSILON = 0.001;
 	private final VPoint[] spawnPoints;
 	private final VRectangle spawnElementBound;
 	// number of spawn elements in x and y Dimension.
@@ -92,15 +94,44 @@ public class SpawnArray {
 		return Arrays.copyOf(spawnPoints, spawnPoints.length);
 	}
 
-	public VPoint getNextSpawnPoint() {
-		VPoint ret = spawnPoints[nextPoint].clone();
-		nextPoint = (nextPoint + 1) % spawnPoints.length;
+	// spawn without checking for free space does not make sense.
+	// Check here for a complete overlap (With epsilon) and use different cell in this case
+	// caller must handle return null.
+	@Deprecated
+	public VPoint getNextSpawnPoint(final List<DynamicElement> neighbours) {
+		VPoint ret = null;
+		for (VPoint spawnPoint : spawnPoints) {
+			VPoint tmp = spawnPoints[nextPoint].clone();
+			nextPoint = (nextPoint + 1) % spawnPoints.length;
+			boolean isSpotOccupied = neighbours.stream().anyMatch(n -> n.getShape().getCentroid().equals(tmp, EPSILON));
+			if (!isSpotOccupied) {
+				ret = tmp;
+				break;
+			}
+		}
 		return ret;
 	}
 
-	public VPoint getNextRandomSpawnPoint(Random rnd) {
-		int index = rnd.nextInt(spawnPoints.length);
-		return spawnPoints[index];
+	// spawn without checking for free space does not make sense.
+	// Check here for a complete overlap (With epsilon) and use different cell in this case
+	// caller must handle return null.
+	@Deprecated
+	public VPoint getNextRandomSpawnPoint(final List<DynamicElement> neighbours, Random rnd) {
+		List<Integer> indexList = IntStream.range(0, spawnPoints.length)
+				.boxed().collect(Collectors.toList());
+		Collections.shuffle(indexList, rnd);
+
+		VPoint ret = null;
+		for (Integer i : indexList) {
+			VPoint tmp = spawnPoints[i].clone();
+			boolean isSpotOccupied = neighbours.stream().anyMatch(n -> n.getShape().getCentroid().equals(tmp, EPSILON));
+			if (!isSpotOccupied){
+				ret = tmp;
+				break;
+			}
+		}
+
+		return ret;
 	}
 
 	/**
@@ -160,57 +191,13 @@ public class SpawnArray {
 
 	// Groups
 
-	/**
-	 * This function only spawns non overlapping groups. This means that for instance within a
-	 * source of the size 4x4 there are only 4 possible locations to spawn a group of the size 4
-	 *
-	 * **00 | 00** | 0000 | 0000 |------------------------------------------------------------------
-	 * **00 | 00** | 0000 | 0000 |------------------------------------------------------------------
-	 * 0000 | 0000 | **00 | 00** |------------------------------------------------------------------
-	 * 0000 | 0000 | **00 | 00** |------------------------------------------------------------------
-	 *
-	 * This function does not test if the space is occupied.
-	 *
-	 * @param groupSize size of group which should be spawned
-	 * @return Point List
-	 */
-	public LinkedList<VPoint> getNextGroup(int groupSize) {
-		return nextGroup(groupSize, null);
+	@Deprecated
+	public LinkedList<VPoint> getNextGroup(int groupSize, final List<DynamicElement> neighbours) {
+		return nextFreeGroupPos(groupSize, null, neighbours, true);
 	}
 
-	public LinkedList<VPoint> getNextGroup(int groupSize, Random rnd) {
-		return nextGroup(groupSize, rnd);
-	}
-
-	private LinkedList<VPoint> nextGroup(int groupSize, Random rnd) {
-		if (groupSize > spawnPoints.length)
-			throw new IndexOutOfBoundsException("GroupSize: " + groupSize
-					+ "to big for source. Max GroupSize of source is " + spawnPoints.length);
-
-		GroupPlacementHelper pHelper;
-		if (groupPlacementHelpers.containsKey(groupSize)) {
-			pHelper = groupPlacementHelpers.get(groupSize);
-		} else {
-			pHelper = new GroupPlacementHelper(xDim, yDim, groupSize);
-			groupPlacementHelpers.put(groupSize, pHelper);
-		}
-
-		int groupNumber;
-		if (rnd != null) {
-			groupNumber = rnd.nextInt(pHelper.getNoneOverlappingGroupCount());
-		} else {
-			groupNumber = nextGroupPos.getOrDefault(groupSize, 0);
-		}
-
-		LinkedList<VPoint> points = new LinkedList<>();
-		for (int i = 0; i < groupSize; i++) {
-			// move index in group
-			int index = pHelper.getNoneOverlappingIndex(groupNumber, i);
-			points.add(spawnPoints[index].clone());
-		}
-		nextGroupPos.put(groupSize, pHelper.nextNoneOverlappingGroupNumber(groupNumber));
-
-		return points;
+	public LinkedList<VPoint> getNextGroup(int groupSize, Random rnd, final List<DynamicElement> neighbours) {
+		return nextFreeGroupPos(groupSize, rnd, neighbours, true);
 	}
 
 	/**
@@ -227,14 +214,14 @@ public class SpawnArray {
 	 * @return Point List or null if no free location is found for given group size.
 	 */
 	public LinkedList<VPoint> getNextFreeGroup(int groupSize, final List<DynamicElement> neighbours) {
-		return nextFreeGroupPos(groupSize, null, neighbours);
+		return nextFreeGroupPos(groupSize, null, neighbours, false);
 	}
 
 	public LinkedList<VPoint> getNextFreeGroup(int groupSize, Random rnd, final List<DynamicElement> neighbours) {
-		return nextFreeGroupPos(groupSize, rnd, neighbours);
+		return nextFreeGroupPos(groupSize, rnd, neighbours, false);
 	}
 
-	private LinkedList<VPoint> nextFreeGroupPos(int groupSize, Random rnd, final List<DynamicElement> neighbours) {
+	private LinkedList<VPoint> nextFreeGroupPos(int groupSize, Random rnd, final List<DynamicElement> neighbours, boolean allowOverlap) {
 		if (groupSize > spawnPoints.length)
 			throw new IndexOutOfBoundsException("GroupSize: " + groupSize
 					+ "to big for source. Max Groupsize of source is " + spawnPoints.length);
@@ -252,21 +239,36 @@ public class SpawnArray {
 		//over all overlapping groups in source
 		boolean isOccupied = true;
 
-		List<Integer> groupNumbers;
+		ArrayList<Integer> groupNumbers;
 		if (rnd != null) {
 			groupNumbers = IntStream.range(0, pHelper.getOverlappingGroupCount())
-					.boxed().collect(Collectors.toList());
+					.boxed().collect(Collectors.toCollection(ArrayList::new));
 			Collections.shuffle(groupNumbers, rnd);
 		} else {
 			groupNumbers = IntStream.range(0, pHelper.getOverlappingGroupCount())
-					.boxed().collect(Collectors.toList());
+					.boxed().collect(Collectors.toCollection(ArrayList::new));
 		}
+		groupNumbers.trimToSize();
 
-		for (Integer groupNumber : groupNumbers) {
+
+		// run through all possible group placements. If allowOverlap is set we must start from
+		// the next group pos saved  in the the nextGroupPos map. The if variable g is not used
+		// and only is used to run through all placements options. The currently used index
+		// is currentGroupPos.
+		int currentGroupPos = allowOverlap ? nextGroupPos.getOrDefault(groupSize, 0) : 0;
+		for (int g=0 ; g < groupNumbers.size(); g++) {
+
+			// test if at currentGroupPos all places within the group are free or
+			// (in the case of allowOverlap) only the centroid of the new group members does not
+			// overlap with existing neighbours
 			for (int i = 0; i < groupSize; i++) {
-				int index = pHelper.getOverlappingIndex(groupNumber, i);
+				int index = pHelper.getOverlappingIndex(currentGroupPos, i);
 				VPoint p = spawnPoints[index].clone();
-				isOccupied = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
+				if (allowOverlap){
+					isOccupied = neighbours.parallelStream().anyMatch(n -> n.getShape().getCentroid().equals(p, EPSILON));
+				} else {
+					isOccupied = neighbours.parallelStream().anyMatch(n -> ((n.getShape().distance(p) < d) || n.getShape().contains(p)));
+				}
 				if (!isOccupied) {
 					points.add(p);
 				} else {
@@ -274,10 +276,15 @@ public class SpawnArray {
 					break;
 				}
 			}
+			currentGroupPos = (currentGroupPos + 1) % pHelper.getOverlappingGroupCount();
+
 			// if a group was found with no overlapping point break and return group.
-			if (!isOccupied)
+			if (!isOccupied) {
 				break;
+			}
+
 		}
+		nextGroupPos.put(groupSize, currentGroupPos);
 
 		if (points.size() < groupSize) {
 			return null;

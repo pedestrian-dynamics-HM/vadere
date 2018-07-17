@@ -9,6 +9,7 @@ import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class TestSourceControllerUsingDistributions extends TestSourceControllerUsingConstantSpawnRate {
 
@@ -99,7 +100,8 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0,0,0.1,0.1));
 		initialize(builder);
 
 		doUpdates(0, 100, startTime, endTime + 1);
@@ -122,7 +124,8 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(startTime)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0,0,0.1,0.1));
 		initialize(builder);
 
 		doUpdates(0, 100, 0, startTime + 1);

@@ -41,8 +41,11 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * wave. When the endTime is reached and not enough pedestrians have been
 	 * created yet, there will be less pedestrians than spawnNumber *
 	 * (endTime-startTime)/spawnDelay in the scenario.
+	 *
+	 * useFreeSpaceOnly = false can cause errors if tow pedestrians arw spawned at
+	 * exactly the same place. Maybe Deprecate this switch.
 	 */
-	private boolean useFreeSpaceOnly;
+	private boolean useFreeSpaceOnly = true;
 	private List<Integer> targetIds = new LinkedList<>();
 
 	private List<Double> groupSizeDistribution = Arrays.asList(0.0, 0.0, 1.0);
@@ -178,5 +181,25 @@ public class AttributesSource extends AttributesEmbedShape {
 	public void setGroupSizeDistribution(List<Double> groupSizeDistribution) {
 		checkSealed();
 		this.groupSizeDistribution = groupSizeDistribution;
+	}
+
+	public void setSpawnNumber(int spawnNumber) {
+		checkSealed();
+		this.spawnNumber = spawnNumber;
+	}
+
+	public void setUseFreeSpaceOnly(boolean useFreeSpaceOnly) {
+		checkSealed();
+		this.useFreeSpaceOnly = useFreeSpaceOnly;
+	}
+
+	public void setTargetIds(List<Integer> targetIds) {
+		checkSealed();
+		this.targetIds = targetIds;
+	}
+
+	public void setDynamicElementType(DynamicElementType dynamicElementType) {
+		checkSealed();
+		this.dynamicElementType = dynamicElementType;
 	}
 }

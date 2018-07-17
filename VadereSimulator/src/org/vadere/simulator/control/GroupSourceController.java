@@ -52,7 +52,12 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, random);
+							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, random, getDynElementsAtSource());
+							if (newGroup == null)
+								throw new RuntimeException("Cannot spawn new Group. Source " + source.getId() + " is set " +
+										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
+										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
+										"to queue groups.");
 							addElementToScenario(newGroup);
 							iter.remove();
 						}
@@ -77,7 +82,12 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize);
+							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, getDynElementsAtSource());
+							if (newGroup == null)
+								throw new RuntimeException("Cannot spawn new Group. Source " + source.getId() + " is set " +
+										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
+										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
+										"to queue groups.");
 							addElementToScenario(newGroup);
 							iter.remove();
 						}
