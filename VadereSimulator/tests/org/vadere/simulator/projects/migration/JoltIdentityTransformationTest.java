@@ -57,6 +57,13 @@ public class JoltIdentityTransformationTest {
 		}
 	}
 
+	@Test
+    public void migrationTest() throws IOException {
+        Path testFile = Paths.get(getClass().getResource("/scenario_test.json").getPath());
+	    MigrationAssistant.analyzeSingleScenario(testFile);
+    }
+
+
 	private void testIdentity(List<Path> scenarioFiles, String transformation) {
 		for (Path scenarioFile : scenarioFiles) {
 			List chainrSpecJson = JsonUtils.classpathToList(transformation);

@@ -45,6 +45,8 @@ public class IOUtils {
 
 	public static final String CORRUPT_DIR = "corrupt";
 
+	public static final String LEGACY_DIR = "legacy";
+
 	public static final String VADERE_PROJECT_FILENAME = "vadere.project";
 
 	public static final String SYSTEM_VARIABLE_PROJECT_PATH = "VADERE_PROJECTS";
