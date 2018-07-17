@@ -290,7 +290,6 @@ public class CLOptimalStepsModel {
 			this.pedestrianList = pedestrians;
 			allocHostMemory();
 			allocDeviceMemory();
-
 			clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
 			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
 			clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements);

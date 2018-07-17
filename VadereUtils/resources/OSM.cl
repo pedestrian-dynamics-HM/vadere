@@ -129,7 +129,11 @@ __kernel void nextSteps(
 __kernel void calcHash(
     __global uint           *d_Hash, //output
     __global uint           *d_Index, //output
+<<<<<<< HEAD
     __global const float    *d_Pos, //input: positions
+=======
+    __global const float3   *d_Pos, //input: positions
+>>>>>>> b2aa2fcb82620d621f73eb2a76dd4ce83ff033ee
     __constant float        *cellSize,
     __constant float2       *worldOrigin,
     __constant uint2        *gridSize,
@@ -140,7 +144,6 @@ __kernel void calcHash(
         return;
 
     float3 p = (float3) (d_Pos[index*3], d_Pos[index*3+1], d_Pos[index*3+2]);
-
     //Get address in grid
     uint2  gridPos = getGridPos(p, cellSize, worldOrigin);
     uint gridHash = getGridHash(gridPos, gridSize);
@@ -167,11 +170,19 @@ __kernel void Memset(
 __kernel void findCellBoundsAndReorder(
     __global uint   *d_CellStart,     //output: cell start index
     __global uint   *d_CellEnd,       //output: cell end index
+<<<<<<< HEAD
     __global float  *d_ReorderedPos,  //output: reordered by cell hash positions
 
     __global const uint   *d_Hash,    //input: sorted grid hashes
     __global const uint   *d_Index,   //input: particle indices sorted by hash
     __global const float  *d_Pos,     //input: positions array sorted by hash
+=======
+    __global float3 *d_ReorderedPos,  //output: reordered by cell hash positions
+
+    __global const uint   *d_Hash,    //input: sorted grid hashes
+    __global const uint   *d_Index,   //input: particle indices sorted by hash
+    __global const float3 *d_Pos,     //input: positions array sorted by hash
+>>>>>>> b2aa2fcb82620d621f73eb2a76dd4ce83ff033ee
     __local uint *localHash,          //get_group_size(0) + 1 elements
     uint    numParticles
 ){
@@ -212,8 +223,6 @@ __kernel void findCellBoundsAndReorder(
 
         //Now use the sorted index to reorder the pos and vel arrays
         uint sortedIndex = d_Index[index];
-        //float3 pos = d_Pos[sortedIndex];
-
         d_ReorderedPos[index*3] = d_Pos[sortedIndex*3];
         d_ReorderedPos[index*3+1] = d_Pos[sortedIndex*3+1];
         d_ReorderedPos[index*3+2] = d_Pos[sortedIndex*3+2];
