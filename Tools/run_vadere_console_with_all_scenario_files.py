@@ -30,12 +30,12 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
     output_dir = "output"
 
     if not os.path.exists(output_dir):
-        print("Creating output directory: {}".format(output_dir))
         os.makedirs(output_dir)
-        print("Created output directory: {}".format(output_dir))
 
-    for scenario_file in scenario_files:
-        print("Running scenario file: {}".format(scenario_file))
+    total_scenario_files = len(scenario_files)
+
+    for i, scenario_file in enumerate(scenario_files):
+        print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
         # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
         completed_process = subprocess.run(args=["java", "-jar", vadere_console, scenario_file, output_dir],
                                        timeout=scenario_timeout_in_sec,
@@ -45,9 +45,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         print("Finished scenario file: {}".format(scenario_file))
 
     if os.path.exists(output_dir):
-        print("Deleting output directory: {}".format(output_dir))
         shutil.rmtree(output_dir)
-        print("Deleted output directory: {}".format(output_dir))
 
 if __name__ == "__main__":
     scenario_files = find_scenario_files()

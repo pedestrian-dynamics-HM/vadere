@@ -37,5 +37,5 @@ run_scenario_files:
   script:
       - mvn clean
       - mvn package -Dmaven.test.skip=true
-      - python3 Tools/run_vadere_console_with_all_scneario_files.py
+      - python3 Tools/run_vadere_console_with_all_scenario_files.py
 
