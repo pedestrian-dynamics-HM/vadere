@@ -15,6 +15,7 @@
 // Common definitions
 ////////////////////////////////////////////////////////////////////////////////
 #define UMAD(a, b, c)  ( (a) * (b) + (c) )
+//#define LOCAL_SIZE_LIMIT 512U
 
 typedef struct{
     float x;
@@ -321,6 +322,65 @@ __kernel void collide(
 ////////////////////////////////////////////////////////////////////////////////
 // Monolithic bitonic sort kernel for short arrays fitting into local memory
 ////////////////////////////////////////////////////////////////////////////////
+/*__kernel void bitonicSortLocal1(
+    __global uint *d_DstKey,
+    __global uint *d_DstVal,
+    __global uint *d_SrcKey,
+    __global uint *d_SrcVal,
+    uint arrayLength,
+    uint dir,
+    __local uint *l_key,
+    __local uint *l_val
+){
+    uint LOCAL_SIZE_LIMIT = get_local_size(0) * 2;
+    //Offset to the beginning of subarray and load data
+    d_SrcKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
+    d_SrcVal += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
+    d_DstKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
+    d_DstVal += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
+    l_key[get_local_id(0) +                      0] = d_SrcKey[                     0];
+    l_val[get_local_id(0) +                      0] = d_SrcVal[                     0];
+    l_key[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)] = d_SrcKey[(LOCAL_SIZE_LIMIT / 2)];
+    l_val[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)] = d_SrcVal[(LOCAL_SIZE_LIMIT / 2)];
+
+    uint comparatorI = get_global_id(0) & ((LOCAL_SIZE_LIMIT / 2) - 1);
+
+    for(uint size = 2; size < LOCAL_SIZE_LIMIT; size <<= 1){
+        //Bitonic merge
+        uint ddd = (comparatorI & (size / 2)) != 0;
+        for(uint stride = size / 2; stride > 0; stride >>= 1){
+            barrier(CLK_LOCAL_MEM_FENCE);
+            uint pos = 2 * get_local_id(0) - (get_local_id(0) & (stride - 1));
+            ComparatorLocal(
+                &l_key[pos +      0], &l_val[pos +      0],
+                &l_key[pos + stride], &l_val[pos + stride],
+                ddd
+            );
+        }
+    }
+
+    //Odd / even arrays of LOCAL_SIZE_LIMIT elements
+    //sorted in opposite directions
+    {
+        uint ddd = (get_group_id(0) & 1);
+        for(uint stride = LOCAL_SIZE_LIMIT / 2; stride > 0; stride >>= 1){
+            barrier(CLK_LOCAL_MEM_FENCE);
+            uint pos = 2 * get_local_id(0) - (get_local_id(0) & (stride - 1));
+            ComparatorLocal(
+                &l_key[pos +      0], &l_val[pos +      0],
+                &l_key[pos + stride], &l_val[pos + stride],
+               ddd
+            );
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+    d_DstKey[                     0] = l_key[get_local_id(0) +                      0];
+    d_DstVal[                     0] = l_val[get_local_id(0) +                      0];
+    d_DstKey[(LOCAL_SIZE_LIMIT / 2)] = l_key[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)];
+    d_DstVal[(LOCAL_SIZE_LIMIT / 2)] = l_val[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)];
+}*/
+
 __kernel void bitonicSortLocal(
     __global uint *d_DstKey,
     __global uint *d_DstVal,
@@ -334,10 +394,10 @@ __kernel void bitonicSortLocal(
     uint LOCAL_SIZE_LIMIT = get_local_size(0) * 2;
 
     //Offset to the beginning of subbatch and load data
-    d_SrcKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
-    d_SrcVal += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
-    d_DstKey += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
-    d_DstVal += get_group_id(0) * LOCAL_SIZE_LIMIT + get_local_id(0);
+    d_SrcKey += get_local_id(0);
+    d_SrcVal += get_local_id(0);
+    d_DstKey += get_local_id(0);
+    d_DstVal += get_local_id(0);
     l_key[get_local_id(0) +                      0] = d_SrcKey[                     0];
     l_val[get_local_id(0) +                      0] = d_SrcVal[                     0];
     l_key[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)] = d_SrcKey[(LOCAL_SIZE_LIMIT / 2)];
