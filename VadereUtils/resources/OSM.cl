@@ -97,8 +97,8 @@ inline void ComparatorLocal(
 uint2 getGridPos(float3 p, __constant float* cellSize, __constant float2* worldOrigin){
     uint2 gridPos;
     float2 wordOr = (*worldOrigin);
-    gridPos.x = (int)floor((p.x - wordOr.x) / (*cellSize));
-    gridPos.y = (int)floor((p.y - wordOr.y) / (*cellSize));
+    gridPos.x = (uint)floor((p.x - wordOr.x) / (*cellSize));
+    gridPos.y = (uint)floor((p.y - wordOr.y) / (*cellSize));
     return gridPos;
 }
 
@@ -110,30 +110,118 @@ uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
+// potential field helper methods
+uint2 getNearestPointTowardsOrigin(float2 evalPoint, float potentialCellSize, float2 potentialFieldSize) {
+    evalPoint = max(evalPoint, (float2)(0.0f, 0.0f));
+    evalPoint = min(evalPoint, (float2)(potentialFieldSize.x, potentialFieldSize.y));
+    uint2 result;
+    result.x = (uint) floor(evalPoint.x / potentialCellSize);
+    result.y = (uint) floor(evalPoint.y / potentialCellSize);
+    return result;
+}
+
+float2 pointToCoord(uint2 point, float potentialCellSize) {
+    return (float2) (point.x * potentialCellSize, point.y * potentialCellSize);
+}
+
+float getPotentialFieldGridValue(__global const float *targetPotential, uint2 cell, uint2 potentialGridSize) {
+    return targetPotential[potentialGridSize.x * cell.y + cell.x];
+}
+
+float2 bilinearInterpolationWithUnkown(float4 z, float2 delta) {
+    float knownWeights = 0;
+    float4 weights = (float4)((1.0f - delta.x) * (1.0f - delta.y), delta.x * (1.0f - delta.y), delta.x * delta.y, (1.0f - delta.x) * delta.y);
+    float4 result = weights * z;
+    return (float2) (result.s0 + result.s1 + result.s2 + result.s3, weights.s0 + weights.s1 + weights.s2 + weights.s3);
+}
+
+float getPotentialFieldValue(float2 evalPoint, __global const float *potentialField, float potentialCellSize, float2 potentialFieldSize, uint2 potentialGridSize) {
+    uint2 gridPoint = getNearestPointTowardsOrigin(evalPoint, potentialCellSize, potentialFieldSize);
+    float2 gridPointCoord = pointToCoord(gridPoint, potentialCellSize);
+    uint incX = 1, incY = 1;
+
+    if (evalPoint.x >= potentialFieldSize.x) {
+        incX = 0;
+    }
+
+    if (evalPoint.y >= potentialFieldSize.y) {
+        incY = 0;
+    }
+
+    float4 gridPotentials = (
+        getPotentialFieldGridValue(potentialField, gridPoint, potentialGridSize),
+        getPotentialFieldGridValue(potentialField, gridPoint + (uint2)(incX, 0), potentialGridSize),
+        getPotentialFieldGridValue(potentialField, gridPoint + (uint2)(incX, incY), potentialGridSize),
+        getPotentialFieldGridValue(potentialField, gridPoint + (uint2)(0, incY), potentialGridSize)
+    );
+
+    float2 result = bilinearInterpolationWithUnkown(
+        gridPotentials,
+        (float2) ((evalPoint.x - gridPointCoord.x) / potentialCellSize, (evalPoint.y - gridPointCoord.y) / potentialCellSize));
+
+    return (float)result.x;
+}
+
+float getObstaclePotential(float2 evalPoint, __global const float *obstaclePotential, float potentialCellSize) {
+    return 1.0f;
+}
+
+float getPedestrianPotential(
+    float2 evalPoint,
+    __global const float  *orderedPedestrians,
+    __global const uint *d_CellStart,
+    __global const uint *d_CellEnd) {
+    return 1.0f;
+}
+// end potential field helper methods
+
+
+
 __kernel void nextSteps(
     __global float        *newPositions,        //output
     __global const float  *orderedPedestrians,  //input
+    __global const float2 *circlePositions,     //input
     __global const uint   *d_CellStart,         //input: cell boundaries
     __global const uint   *d_CellEnd,           //input
-    __global const float  *obstaclePotential,   //input
-    __global const float  *targetPotential,     //input
+    __global const float  *obstaclePotentialField,   //input
+    __global const float  *targetPotentialField,     //input
     __constant float2     *worldOrigin,         //input
-    float                  potentialCellSize    //input
+    __constant uint2      *potentialGridSize,
+    __constant float2     *potentialFieldSize,            //input
+    float                  potentialCellSize,   //input
+    uint                   numberOfPoints       //input
 ){
     const uint index = get_global_id(0);
-    newPositions[index*2] = orderedPedestrians[index*3];
-    newPositions[index*2+1] = orderedPedestrians[index*3+1];
+
+    float2 pedPosition = (float2)(orderedPedestrians[index*3], orderedPedestrians[index*3+1]);
+    float stepSize = orderedPedestrians[index*3+2];
+    float minValue = 100000.0f;
+    float2 minArg = (float2) (-1.0f, -2.0f);
+
+    for(uint i = 0; i < numberOfPoints; i++) {
+        float2 circlePosition = circlePositions[i];
+        float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
+        float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+        float obstaclePotential = getPotentialFieldValue(evalPoint, obstaclePotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+        float pedestrianPotential = getPedestrianPotential(evalPoint, orderedPedestrians, d_CellStart, d_CellEnd);
+        float value = targetPotential + obstaclePotential + pedestrianPotential;
+
+        if(minValue > value) {
+            minValue = value;
+            minArg = evalPoint;
+        }
+        //minArg = circlePosition;
+    }
+    //minArg = pedPosition;
+    newPositions[index*2] = minValue;
+    newPositions[index*2+1] = minValue;
 }
 
 //Calculate grid hash value for each particle
 __kernel void calcHash(
     __global uint           *d_Hash, //output
     __global uint           *d_Index, //output
-<<<<<<< HEAD
     __global const float    *d_Pos, //input: positions
-=======
-    __global const float3   *d_Pos, //input: positions
->>>>>>> b2aa2fcb82620d621f73eb2a76dd4ce83ff033ee
     __constant float        *cellSize,
     __constant float2       *worldOrigin,
     __constant uint2        *gridSize,
@@ -170,19 +258,10 @@ __kernel void Memset(
 __kernel void findCellBoundsAndReorder(
     __global uint   *d_CellStart,     //output: cell start index
     __global uint   *d_CellEnd,       //output: cell end index
-<<<<<<< HEAD
     __global float  *d_ReorderedPos,  //output: reordered by cell hash positions
-
     __global const uint   *d_Hash,    //input: sorted grid hashes
     __global const uint   *d_Index,   //input: particle indices sorted by hash
     __global const float  *d_Pos,     //input: positions array sorted by hash
-=======
-    __global float3 *d_ReorderedPos,  //output: reordered by cell hash positions
-
-    __global const uint   *d_Hash,    //input: sorted grid hashes
-    __global const uint   *d_Index,   //input: particle indices sorted by hash
-    __global const float3 *d_Pos,     //input: positions array sorted by hash
->>>>>>> b2aa2fcb82620d621f73eb2a76dd4ce83ff033ee
     __local uint *localHash,          //get_group_size(0) + 1 elements
     uint    numParticles
 ){

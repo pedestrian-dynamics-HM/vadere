@@ -11,7 +11,10 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.CLInfo;
@@ -24,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
@@ -92,6 +96,8 @@ public class CLOptimalStepsModel {
     private long clObstaclePotential;
     private long clPedestrianNextPositions;
     private long clCirclePositions;
+    private long clPotentialFieldSize;
+    private long clPotentialFieldGridSize;
 
     // Host Memory
     private IntBuffer hashes;
@@ -105,7 +111,9 @@ public class CLOptimalStepsModel {
     private FloatBuffer targetPotentialField;
     private FloatBuffer obstaclePotentialField;
     private FloatBuffer circlePositions;
+    private FloatBuffer potenialFieldSize;
     private IntBuffer gridSize;
+    private IntBuffer potentialFieldGridSize;
 
 
 	private IntBuffer inValues;
@@ -136,6 +144,7 @@ public class CLOptimalStepsModel {
     private List<VPoint> circlePositionList;
 
 	private final AttributesFloorField attributesFloorField;
+	private final AttributesOSM attributesOSM;
 
     private int[] keys;
     private int[] values;
@@ -166,18 +175,21 @@ public class CLOptimalStepsModel {
 	 * @throws OpenCLException
 	 */
     public CLOptimalStepsModel(
+		    @NotNull final AttributesOSM attributesOSM,
+		    @NotNull final AttributesFloorField attributesFloorField,
 		    final int numberOfElements,
 		    @NotNull final VRectangle bound,
 		    final double cellSize,
-		    @NotNull final AttributesFloorField attributesFloorField,
 		    @NotNull final EikonalSolver targetPotential,
 		    @NotNull final EikonalSolver obstaclePotential) throws OpenCLException {
-	    this.numberOfElements = numberOfElements;
+    	this.attributesOSM = attributesOSM;
+	    this.attributesFloorField = attributesFloorField;
+
+    	this.numberOfElements = numberOfElements;
 	    this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
 	    this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
 		this.bound = bound;
 		this.iCellSize = (float)cellSize;
-		this.attributesFloorField = attributesFloorField;
 
 		//TODO: this should be done in mallocHostMemory().
 	    this.targetPotentialField = generatePotentialFieldApproximation(targetPotential);
@@ -209,10 +221,13 @@ public class CLOptimalStepsModel {
     	int index = 0;
     	for(float y = (float)bound.getMinY(); y <= (float)bound.getHeight(); y += attributesFloorField.getPotentialFieldResolution()) {
 		    for(float x = (float)bound.getMinX(); x <= (float)bound.getWidth(); x += attributesFloorField.getPotentialFieldResolution()) {
-			    floatBuffer.put(index,
-					    (float)eikonalSolver.getPotential(new VPoint(x, y),
-							    attributesFloorField.getObstacleGridPenalty(),
-							    attributesFloorField.getTargetAttractionStrength()));
+
+		    	float value = (float)eikonalSolver.getPotential(new VPoint(x, y),
+					    attributesFloorField.getObstacleGridPenalty(),
+					    attributesFloorField.getTargetAttractionStrength());
+
+		    	//logger.info(value);
+		    	floatBuffer.put(index, value);
 		        index++;
 		    }
 	    }
@@ -301,7 +316,9 @@ public class CLOptimalStepsModel {
 					clCellEnds,
 					clObstaclePotential,
 					clTargetPotential,
-					clWorldOrigin);
+					clWorldOrigin,
+					clPotentialFieldGridSize,
+					clPotentialFieldSize);
 
 			//clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
 			//clEnqueueReadBuffer(clQueue, clCellEnds, true, 0, cellEnds, null, null);
@@ -422,6 +439,10 @@ public class CLOptimalStepsModel {
 
 	public void allocHostMemory() {
 		assert pedestrianList.size() == numberOfElements;
+
+		/*
+		 * (1) pedestrian positions and step length
+		 */
 		float[] posAndRadius = new float[numberOfElements*3];
 		for(int i = 0; i < numberOfElements; i++) {
 			posAndRadius[i*3] = (float) pedestrianList.get(i).position.getX();
@@ -430,24 +451,35 @@ public class CLOptimalStepsModel {
 		}
 		this.pedestrians = CLUtils.toFloatBuffer(posAndRadius);
 
-		float[] circlePositions = new float[numberOfElements*3];
+		/*
+		 * (2) circle / disc positions at (0,0)
+		 */
+		circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
+				new VCircle(new VPoint(0,0), 1.0),
+				attributesOSM.getNumberOfCircles(),
+				attributesOSM.getStepCircleResolution(),
+				0,
+				2*Math.PI);
+
+		float[] circlePositions = new float[circlePositionList.size()*2];
 		for(int i = 0; i < circlePositionList.size(); i++) {
 			circlePositions[i*2] = (float) circlePositionList.get(i).getX();
 			circlePositions[i*2+1] = (float) circlePositionList.get(i).getY();
 		}
 
 		this.circlePositions = CLUtils.toFloatBuffer(circlePositions);
-
-		for(int i = 0; i < numberOfElements; i++) {
-			logger.info(this.pedestrians .get(i*3));
-			logger.info(this.pedestrians .get(i*3+1));
-			logger.info(this.pedestrians .get(i*3+2));
-		}
-
 		this.hashes = MemoryUtil.memAllocInt(numberOfElements);
 
 		float[] originArray = new float[]{(float)bound.getMinX(), (float)bound.getMinX()};
 		this.worldOrigin = CLUtils.toFloatBuffer(originArray, CLUtils.toFloatBuffer(originArray));
+
+		this.potenialFieldSize = MemoryUtil.memAllocFloat(2);
+		this.potenialFieldSize.put(0, (float)bound.width);
+		this.potenialFieldSize.put(1, (float)bound.height);
+
+		this.potentialFieldGridSize = MemoryUtil.memAllocInt(2);
+		this.potentialFieldGridSize.put(0, getPotentialFieldWidth());
+		this.potentialFieldGridSize.put(1, getPotentialFieldHeight());
 
 		this.cellSize = MemoryUtil.memAllocFloat(1);
 		this.cellSize.put(0, iCellSize);
@@ -464,10 +496,13 @@ public class CLOptimalStepsModel {
 	    try (MemoryStack stack = stackPush()) {
 		    IntBuffer errcode_ret = stack.callocInt(1);
 		    clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, cellSize, errcode_ret);
+		    clPotentialFieldSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, potenialFieldSize, errcode_ret);
+		    clPotentialFieldGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, potentialFieldGridSize, errcode_ret);
 		    clWorldOrigin = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, worldOrigin, errcode_ret);
 		    clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, gridSize, errcode_ret);
-		    clTargetPotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, obstaclePotentialField, errcode_ret);
-		    clObstaclePotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, targetPotentialField, errcode_ret);
+		    clTargetPotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, targetPotentialField, errcode_ret);
+		    clObstaclePotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, obstaclePotentialField, errcode_ret);
+		    clCirclePositions = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, circlePositions, errcode_ret);
 		    clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
 		    clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
 		    clCellStarts = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
@@ -535,7 +570,10 @@ public class CLOptimalStepsModel {
 		    final long clCellEnds,
 		    final long clObstaclePotential,
 		    final long clTargetPotential,
-		    final long clWorldOrigin) throws OpenCLException {
+		    final long clWorldOrigin,
+		    final long clPotentialFieldGridSize,
+		    final long clPotentialFieldSize)
+		    throws OpenCLException {
 	    try (MemoryStack stack = stackPush()) {
 
 		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
@@ -544,12 +582,16 @@ public class CLOptimalStepsModel {
 
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 0, clPedestrianNextPositions));
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 1, clReorderedPedestrians));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 2, clCellStarts));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 3, clCellEnds));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 4, clObstaclePotential));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 5, clTargetPotential));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 6, clWorldOrigin));
-		    CLInfo.checkCLError(clSetKernelArg1f(clNextPositions, 7, (float)attributesFloorField.getPotentialFieldResolution()));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 2, clCirclePositions));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 3, clCellStarts));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 4, clCellEnds));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 5, clObstaclePotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 6, clTargetPotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 7, clWorldOrigin));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 8, clPotentialFieldGridSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 9, clPotentialFieldSize));
+		    CLInfo.checkCLError(clSetKernelArg1f(clNextPositions, 10, (float)attributesFloorField.getPotentialFieldResolution()));
+		    CLInfo.checkCLError(clSetKernelArg1i(clNextPositions, 11, circlePositionList.size()));
 
 		    clGlobalWorkSize.put(0, numberOfElements);
 		    clLocalWorkSize.put(0, max_work_group_size);
@@ -710,11 +752,14 @@ public class CLOptimalStepsModel {
 		    CLInfo.checkCLError(clReleaseMemObject(clPedestrians));
 		    CLInfo.checkCLError(clReleaseMemObject(clPedestrianNextPositions));
 		    CLInfo.checkCLError(clReleaseMemObject(clCellSize));
+		    CLInfo.checkCLError(clReleaseMemObject(clPotentialFieldSize));
 		    CLInfo.checkCLError(clReleaseMemObject(clWorldOrigin));
 		    CLInfo.checkCLError(clReleaseMemObject(clGridSize));
 		    CLInfo.checkCLError(clReleaseMemObject(clTargetPotential));
 		    CLInfo.checkCLError(clReleaseMemObject(clObstaclePotential));
 		    CLInfo.checkCLError(clReleaseMemObject(clCirclePositions));
+		    CLInfo.checkCLError(clReleaseMemObject(clPotentialFieldGridSize));
+
 	    }
 	    catch (OpenCLException ex) {
 			throw ex;
@@ -728,8 +773,10 @@ public class CLOptimalStepsModel {
 		    MemoryUtil.memFree(pedestrians);
 		    MemoryUtil.memFree(worldOrigin);
 		    MemoryUtil.memFree(cellSize);
+		    MemoryUtil.memFree(potenialFieldSize);
 		    MemoryUtil.memFree(gridSize);
 		    MemoryUtil.memFree(circlePositions);
+		    MemoryUtil.memFree(potentialFieldGridSize);
 	    }
     }
 
