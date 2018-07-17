@@ -29,29 +29,51 @@ public class TestCLLinkedList {
 	public void setUp() throws Exception {}
 
 	@Test
-	public void testCalcHash() throws IOException, OpenCLException {
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(1024, new VRectangle(0, 0, 10, 10), 1);
+	public void testCalcHashSmall() throws IOException, OpenCLException {
+		int size = 8;
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
-		for(int i = 0; i < 1024; i++) {
+		for(int i = 0; i < size; i++) {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcHashes(positions);
 
 		assertEquals(hasehs.length, positions.size());
 
-		logger.info("number of cells = " + clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1]);
+		//logger.info("number of cells = " + clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1]);
 		for(int i = 0; i < hasehs.length; i++) {
 			int hash = getGridHash(getGridPosition(positions.get(i), clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign()), clUniformHashedGrid.getGridSize());
 			assertEquals(hasehs[i], hash);
-			logger.info("hash = " + hash);
+			//logger.info("hash = " + hash);
 		}
 	}
 
 	@Test
-	public void testCalcAndSortHash() throws IOException, OpenCLException {
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(1024, new VRectangle(0, 0, 10, 10), 1);
+	public void testCalcHashLarge() throws IOException, OpenCLException {
+		int size = 32768; // 2^15
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
-		for(int i = 0; i < 1024; i++) {
+		for(int i = 0; i < size; i++) {
+			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+		}
+		int[] hasehs = clUniformHashedGrid.calcHashes(positions);
+
+		assertEquals(hasehs.length, positions.size());
+
+		//logger.info("number of cells = " + clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1]);
+		for(int i = 0; i < hasehs.length; i++) {
+			int hash = getGridHash(getGridPosition(positions.get(i), clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign()), clUniformHashedGrid.getGridSize());
+			assertEquals(hasehs[i], hash);
+			//logger.info("hash = " + hash);
+		}
+	}
+
+	@Test
+	public void testCalcAndSortHashSmall() throws IOException, OpenCLException {
+		int size = 8;
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		ArrayList<VPoint> positions = new ArrayList<>();
+		for(int i = 0; i < size; i++) {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
@@ -71,10 +93,58 @@ public class TestCLLinkedList {
 	}
 
 	@Test
-	public void testGridCell() throws IOException, OpenCLException {
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(1024, new VRectangle(0, 0, 10, 10), 1);
+	public void testCalcAndSortHashLarge() throws IOException, OpenCLException {
+		int size = 32768; // 2^15
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
-		for(int i = 0; i < 1024; i++) {
+		for(int i = 0; i < size; i++) {
+			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+		}
+		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
+
+		assertEquals(hasehs.length, positions.size());
+
+		int[] expectedHashes = new int[positions.size()];
+		for(int i = 0; i < hasehs.length; i++) {
+			int hash = getGridHash(getGridPosition(positions.get(i), clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign()), clUniformHashedGrid.getGridSize());
+			expectedHashes[i] = hash;
+		}
+		Arrays.sort(expectedHashes);
+
+		for(int i = 0; i < hasehs.length; i++) {
+			assertEquals(hasehs[i], expectedHashes[i]);
+		}
+	}
+
+	@Test
+	public void testGridCellSmall() throws IOException, OpenCLException {
+		int size = 8;
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		ArrayList<VPoint> positions = new ArrayList<>();
+		for(int i = 0; i < size; i++) {
+			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+		}
+		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
+		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
+		for(int cell = 0; cell < numberOfCells; cell++) {
+			int cellStart = gridCells.cellStarts[cell];
+			int cellEnd = gridCells.cellEnds[cell];
+
+			for(int i = cellStart; i < cellEnd; i++) {
+				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
+				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
+				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
+				assertEquals(gridHash, cell);
+			}
+		}
+	}
+
+	@Test
+	public void testGridCellLarge() throws IOException, OpenCLException {
+		int size = 32768;
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		ArrayList<VPoint> positions = new ArrayList<>();
+		for(int i = 0; i < size; i++) {
 			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);

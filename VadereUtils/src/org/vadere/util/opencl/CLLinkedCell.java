@@ -424,8 +424,8 @@ public class CLLinkedCell {
 		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (max_work_group_size+1) * 4)); // local memory
 		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
 
-		    clGlobalWorkSize.put(0, numberOfElements);
-		    clLocalWorkSize.put(0, max_work_group_size);
+		    clGlobalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
+		    clLocalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
 		    //TODO: local work size? + check 2^n constrain!
 		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 	    }
@@ -451,10 +451,9 @@ public class CLLinkedCell {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 2, clKeysIn));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 3, clValuesIn));
 			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 4, numberOfElements));
-			    //TODO: check the hard coded 1, and the waiting of the queue
-			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 5, 1));
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 6, keys.length * 4)); // local memory
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 7, keys.length * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 5, dir));
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 6, numberOfElements * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 7, numberOfElements * 4)); // local memory
 			    clGlobalWorkSize.put(0, numberOfElements / 2);
 			    clLocalWorkSize.put(0, numberOfElements / 2);
 
