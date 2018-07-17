@@ -10,19 +10,28 @@
 
 import fnmatch
 import os
+import re
 import shutil
 import subprocess
 
 def find_scenario_files(path="VadereModelTests"):
     scenario_search_pattern = "*.scenario"
     scenario_files = []
+    exclude_patterns = ["TESTOVM"]
 
     for root, dirnames, filenames in os.walk(path):
         for filename in fnmatch.filter(filenames, scenario_search_pattern):
             scenario_path = os.path.join(root, filename)
-            scenario_files.append(scenario_path)
+
+            for exclude_pattern in exclude_patterns:
+                regex_pattern = re.compile(exclude_pattern)
+                match = regex_pattern.search(scenario_path)
+
+                if match is None:
+                    scenario_files.append(scenario_path)
 
     print("Total scenario files: {}".format(len(scenario_files)))
+    print("Exclude patterns: {}".format(exclude_patterns))
 
     return scenario_files
 
