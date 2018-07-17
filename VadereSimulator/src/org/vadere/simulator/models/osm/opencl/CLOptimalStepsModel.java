@@ -275,7 +275,7 @@ public class CLOptimalStepsModel {
 	/**
 	 * Computes the {@link LinkedCell} of the list of pedestrians.
 	 *
-	 * @param pedestriansOSM
+	 * @param pedestrians
 	 * @return {@link LinkedCell} which is the linked list in an array based structure.
 	 *
 	 * @throws OpenCLException
