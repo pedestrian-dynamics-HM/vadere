@@ -4,6 +4,7 @@ import org.vadere.state.scenario.ScenarioElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The base class of all available events.
@@ -40,7 +41,6 @@ public abstract class Event {
         this.targets = targets;
     }
 
-    // TODO Implement equals(), hashCode() and toString().
     public double getTime() {
         return time;
     }
@@ -59,6 +59,17 @@ public abstract class Event {
 
     public static boolean listContainsEvent(List<Event> events, Class<? extends Event> eventToCheck) {
         return events.stream().anyMatch(event -> event.getClass().equals(eventToCheck));
+    }
+
+    @Override
+    public String toString() {
+        String targetsAsString = targets.stream().map(target -> target.getClass().getSimpleName()).collect(Collectors.joining(", "));
+
+        String string = String.format("%s:\n", this.getClass().getSimpleName());
+        string += String.format("  time: %f\n", time);
+        string += String.format("  targets: [%s]\n", targetsAsString);
+
+        return string;
     }
 
 }

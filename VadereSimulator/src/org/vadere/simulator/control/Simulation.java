@@ -2,6 +2,7 @@ package org.vadere.simulator.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.control.events.EventFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -245,7 +246,6 @@ public class Simulation {
 	}
 
 	private void updateWriters(double simTimeInSec) {
-
 		SimulationState simulationState =
 				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
@@ -253,15 +253,14 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
-        ElapsedTimeEvent elapsedTimeEvent = new ElapsedTimeEvent(simTimeInSec);
-		WaitEvent waitEvent = new WaitEvent(simTimeInSec);
-
         List<Event> events = new ArrayList<>();
 
-		if (simTimeInSec >= 10 && simTimeInSec <= 40) {
-        events.add(waitEvent);
+        EventFactory eventFactory = new EventFactory();
+
+        if (simTimeInSec >= 5 && simTimeInSec <= 30) {
+	        events.add(eventFactory.getEvent(WaitEvent.class, simTimeInSec));
         } else {
-			events.add(elapsedTimeEvent);
+            events.add(eventFactory.getEvent(ElapsedTimeEvent.class, simTimeInSec));
 		}
 
         // TODO Why are target controller readded in each simulation loop?
