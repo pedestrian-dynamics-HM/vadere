@@ -10,12 +10,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
-        "pedestrianBodyPotential" : 3.59,
-        "pedestrianRecognitionDistance" : 0.7,
-        "obstacleBodyPotential" : 20.1,
-        "obstacleRepulsionStrength" : 0.25
-      },
       "org.vadere.state.attributes.models.AttributesGNM" : {
         "attributesODEIntegrator" : {
           "solverType" : "DORMAND_PRINCE_45",
@@ -28,6 +22,12 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.gnm.PotentialFieldPedestrianGNM",
         "obstaclePotentialModel" : "org.vadere.simulator.models.gnm.PotentialFieldObstacleGNM"
+      },
+      "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
+        "pedestrianBodyPotential" : 2.72,
+        "pedestrianRecognitionDistance" : 0.8,
+        "obstacleBodyPotential" : 20.1,
+        "obstacleRepulsionStrength" : 0.25
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
@@ -51,7 +51,7 @@
       "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : true,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
@@ -68,7 +68,7 @@
           "height" : 60.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : false
       },
       "obstacles" : [ {
         "shape" : {
@@ -135,6 +135,7 @@
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],

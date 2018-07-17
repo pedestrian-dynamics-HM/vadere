@@ -91,6 +91,7 @@ public class CLOptimalStepsModel {
     private long clTargetPotential;
     private long clObstaclePotential;
     private long clPedestrianNextPositions;
+    private long clCirclePositions;
 
     // Host Memory
     private IntBuffer hashes;
@@ -103,6 +104,7 @@ public class CLOptimalStepsModel {
     private FloatBuffer cellSize;
     private FloatBuffer targetPotentialField;
     private FloatBuffer obstaclePotentialField;
+    private FloatBuffer circlePositions;
     private IntBuffer gridSize;
 
 
@@ -131,6 +133,7 @@ public class CLOptimalStepsModel {
     private float iCellSize;
     private int[] iGridSize;
     private List<PedestrianOpenCL> pedestrianList;
+    private List<VPoint> circlePositionList;
 
 	private final AttributesFloorField attributesFloorField;
 
@@ -288,10 +291,18 @@ public class CLOptimalStepsModel {
 			allocHostMemory();
 			allocDeviceMemory();
 
-			//clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
-			//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
-			//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements);
-			clNextPosition(clPedestrianNextPositions, clPedestrians, clCellStarts, clCellEnds, clObstaclePotential, clTargetPotential, clWorldOrigin);
+			clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
+			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
+			clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements);
+			clNextPosition(
+					clPedestrianNextPositions,
+					clReorderedPedestrians,
+					clCirclePositions,
+					clCellStarts,
+					clCellEnds,
+					clObstaclePotential,
+					clTargetPotential,
+					clWorldOrigin);
 
 			//clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
 			//clEnqueueReadBuffer(clQueue, clCellEnds, true, 0, cellEnds, null, null);
@@ -307,7 +318,7 @@ public class CLOptimalStepsModel {
 				float x = positionsAndRadi[i * 2];
 				float y = positionsAndRadi[i * 2 + 1];
 				VPoint newPosition = new VPoint(x,y);
-				pedestrians.get(i).newPosition = newPosition;
+				pedestrians.get(aIndices[i]).newPosition = newPosition;
 			}
 
 			/*int[] aCellStarts = CLUtils.toIntArray(cellStarts, numberOfGridCells);
@@ -420,6 +431,14 @@ public class CLOptimalStepsModel {
 		}
 		this.pedestrians = CLUtils.toFloatBuffer(posAndRadius);
 
+		float[] circlePositions = new float[numberOfElements*3];
+		for(int i = 0; i < circlePositionList.size(); i++) {
+			circlePositions[i*2] = (float) circlePositionList.get(i).getX();
+			circlePositions[i*2+1] = (float) circlePositionList.get(i).getY();
+		}
+
+		this.circlePositions = CLUtils.toFloatBuffer(circlePositions);
+
 		for(int i = 0; i < numberOfElements; i++) {
 			logger.info(this.pedestrians .get(i*3));
 			logger.info(this.pedestrians .get(i*3+1));
@@ -512,6 +531,7 @@ public class CLOptimalStepsModel {
     private void clNextPosition(
     		final long clPedestrianNextPositions,
 		    final long clReorderedPedestrians,
+		    final long clCirclePositions,
 		    final long clCellStarts,
 		    final long clCellEnds,
 		    final long clObstaclePotential,
@@ -695,6 +715,7 @@ public class CLOptimalStepsModel {
 		    CLInfo.checkCLError(clReleaseMemObject(clGridSize));
 		    CLInfo.checkCLError(clReleaseMemObject(clTargetPotential));
 		    CLInfo.checkCLError(clReleaseMemObject(clObstaclePotential));
+		    CLInfo.checkCLError(clReleaseMemObject(clCirclePositions));
 	    }
 	    catch (OpenCLException ex) {
 			throw ex;
@@ -709,6 +730,7 @@ public class CLOptimalStepsModel {
 		    MemoryUtil.memFree(worldOrigin);
 		    MemoryUtil.memFree(cellSize);
 		    MemoryUtil.memFree(gridSize);
+		    MemoryUtil.memFree(circlePositions);
 	    }
     }
 
