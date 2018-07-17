@@ -30,3 +30,12 @@ unit_tests_with_coverage:
     - mvn clean
     - mvn test -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList
     - python3 Tools/collect_line_and_branch_coverage.py
+
+run_scenario_files:
+  stage: deploy
+
+  script:
+      - mvn clean
+      - mvn package
+      - python3 Tools/run_vadere_console_with_all_scneario_files.py
+
