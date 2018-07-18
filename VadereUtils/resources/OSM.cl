@@ -94,7 +94,7 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-uint2 getGridPos(float3 p, __constant float* cellSize, __constant float2* worldOrigin){
+uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
     uint2 gridPos;
     float2 wordOr = (*worldOrigin);
     gridPos.x = (uint)floor((p.x - wordOr.x) / (*cellSize));
@@ -110,7 +110,69 @@ uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
-// potential field helper methods
+////////////////////////////////////////////////////////////////////////////////
+// Potential field helper methods
+////////////////////////////////////////////////////////////////////////////////
+
+// see PotentialFieldPedestrianCompact with useHardBodyShell = false:
+float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
+
+    float radii = 0.195f + 0.195f; // 2* r_p (sivers-2016b)
+    float potential = 0.0f;
+    float d = distance(pos, otherPedPosition);
+    float width = 0.5f;
+    float height = 12.6f;
+
+    if (d < width) {
+        potential = height * exp(1 / (pown(d / width, 2) - 1));
+    }
+
+    return potential;
+}
+
+float getFullPedestrianPotential(
+        __global const float  *orderedPedestrians,  //input
+        __global const uint   *d_CellStart,
+        __global const uint   *d_CellEnd,
+        __constant float        *cellSize,
+        __constant uint2        *gridSize,
+        __constant float2       *worldOrigin,
+        float2 pos, float2 pedPosition, float pedStepSize)
+{
+    float potential = 0;
+    uint index = get_global_id(0);
+
+    //Get address in grid
+    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+
+    //Accumulate surrounding cells
+    // TODO: index check!
+    for(int y = -1; y <= 1; y++) {
+        for(int x = -1; x <= 1; x++){
+            //Get start particle index for this cell
+            uint   hash = getGridHash(gridPos + (uint2)(x, y), gridSize);
+            uint startI = d_CellStart[hash];
+
+            //Skip empty cell
+            if(startI == 0xFFFFFFFFU)
+                continue;
+
+            //Iterate over particles in this cell
+            uint endI = d_CellEnd[hash];
+            for(uint j = startI; j < endI; j++){
+                float2 otherPedestrian = (float2) (orderedPedestrians[j*3], orderedPedestrians[j*3+1]);
+
+                // TODO exclude pedestrian itself => substract to avoid branching
+                potential += getPedestrianPotential(pos, otherPedestrian);
+              //potential += 0.01f;
+            }
+        }
+    }
+
+    potential -= getPedestrianPotential(pos, pedPosition);
+    return potential;
+}
+
 uint2 getNearestPointTowardsOrigin(float2 evalPoint, float potentialCellSize, float2 potentialFieldSize) {
     evalPoint = max(evalPoint, (float2)(0.0f, 0.0f));
     evalPoint = min(evalPoint, (float2)(potentialFieldSize.x, potentialFieldSize.y));
@@ -166,16 +228,7 @@ float getObstaclePotential(float2 evalPoint, __global const float *obstaclePoten
     return 1.0f;
 }
 
-float getPedestrianPotential(
-    float2 evalPoint,
-    __global const float  *orderedPedestrians,
-    __global const uint *d_CellStart,
-    __global const uint *d_CellEnd) {
-    return 1.0f;
-}
 // end potential field helper methods
-
-
 
 __kernel void nextSteps(
     __global float        *newPositions,        //output
@@ -183,6 +236,8 @@ __kernel void nextSteps(
     __global const float2 *circlePositions,     //input
     __global const uint   *d_CellStart,         //input: cell boundaries
     __global const uint   *d_CellEnd,           //input
+    __constant float        *cellSize,
+    __constant uint2        *gridSize,
     __global const float  *obstaclePotentialField,   //input
     __global const float  *targetPotentialField,     //input
     __constant float2     *worldOrigin,         //input
@@ -198,13 +253,14 @@ __kernel void nextSteps(
     float minValue = 100000.0f;
     float2 minArg = (float2) (-1.0f, -2.0f);
 
+    // loop over all points of the disc and find the minimum value and argument
     for(uint i = 0; i < numberOfPoints; i++) {
         float2 circlePosition = circlePositions[i];
         float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
         float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
         float obstaclePotential = getPotentialFieldValue(evalPoint, obstaclePotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-        float pedestrianPotential = getPedestrianPotential(evalPoint, orderedPedestrians, d_CellStart, d_CellEnd);
-        float value = targetPotential + obstaclePotential + pedestrianPotential;
+        float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition, stepSize);
+        float value = /*targetPotential + obstaclePotential +*/ pedestrianPotential;
 
         if(minValue > value) {
             minValue = value;
@@ -231,7 +287,7 @@ __kernel void calcHash(
     if(index >= numParticles)
         return;
 
-    float3 p = (float3) (d_Pos[index*3], d_Pos[index*3+1], d_Pos[index*3+2]);
+    float2 p = (float2) (d_Pos[index*3], d_Pos[index*3+1]);
     //Get address in grid
     uint2  gridPos = getGridPos(p, cellSize, worldOrigin);
     uint gridHash = getGridHash(gridPos, gridSize);
@@ -306,120 +362,6 @@ __kernel void findCellBoundsAndReorder(
         d_ReorderedPos[index*3+1] = d_Pos[sortedIndex*3+1];
         d_ReorderedPos[index*3+2] = d_Pos[sortedIndex*3+2];
     }
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Process collisions (calculate accelerations)
-////////////////////////////////////////////////////////////////////////////////
-float4 collideSpheres(
-    float4 posA,
-    float4 posB,
-    float4 velA,
-    float4 velB,
-    float radiusA,
-    float radiusB,
-    float spring,
-    float damping,
-    float shear,
-    float attraction
-){
-    //Calculate relative position
-    float4     relPos = (float4)(posB.x - posA.x, posB.y - posA.y, posB.z - posA.z, 0);
-    float        dist = sqrt(relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z);
-    float collideDist = radiusA + radiusB;
-
-    float4 force = (float4)(0, 0, 0, 0);
-    if(dist < collideDist){
-        float4 norm = (float4)(relPos.x / dist, relPos.y / dist, relPos.z / dist, 0);
-
-        //Relative velocity
-        float4 relVel = (float4)(velB.x - velA.x, velB.y - velA.y, velB.z - velA.z, 0);
-
-        //Relative tangential velocity
-        float relVelDotNorm = relVel.x * norm.x + relVel.y * norm.y + relVel.z * norm.z;
-        float4 tanVel = (float4)(relVel.x - relVelDotNorm * norm.x, relVel.y - relVelDotNorm * norm.y, relVel.z - relVelDotNorm * norm.z, 0);
-
-        //Spring force (potential)
-        float springFactor = -spring * (collideDist - dist);
-        force = (float4)(
-            springFactor * norm.x + damping * relVel.x + shear * tanVel.x + attraction * relPos.x,
-            springFactor * norm.y + damping * relVel.y + shear * tanVel.y + attraction * relPos.y,
-            springFactor * norm.z + damping * relVel.z + shear * tanVel.z + attraction * relPos.z,
-            0
-        );
-    }
-
-    return force;
-}
-
-
-
-__kernel void collide(
-    __global float2       *d_Vel,          //output: new velocity
-    __global const float3 *d_ReorderedPos, //input: reordered positions
-    __global const float2 *d_ReorderedVel, //input: reordered velocities
-    __global const uint   *d_Index,        //input: reordered particle indices
-    __global const uint   *d_CellStart,    //input: cell boundaries
-    __global const uint   *d_CellEnd,
-    __constant float* cellSize,
-    __constant float2* worldOrigin,
-    __constant uint2* gridSize,
-    uint    numParticles
-){
-    uint index = get_global_id(0);
-    if(index >= numParticles)
-        return;
-
-    float3   pos = d_ReorderedPos[index];
-    float2   vel = d_ReorderedVel[index];
-    float2 force = (float2)(0, 0);
-
-    //Get address in grid
-    uint2 gridPos = getGridPos(pos, cellSize, worldOrigin);
-
-    //Accumulate surrounding cells
-    for(int z = -1; z <= 1; z++)
-        for(int y = -1; y <= 1; y++)
-            for(int x = -1; x <= 1; x++){
-                //Get start particle index for this cell
-                uint   hash = getGridHash(gridPos + (uint2)(x, y), gridSize);
-                uint startI = d_CellStart[hash];
-
-                //Skip empty cell
-                if(startI == 0xFFFFFFFFU)
-                    continue;
-
-                //Iterate over particles in this cell
-                uint endI = d_CellEnd[hash];
-                for(uint j = startI; j < endI; j++){
-                    if(j == index)
-                        continue;
-
-                    float3 pos2 = d_ReorderedPos[j];
-                    float2 vel2 = d_ReorderedVel[j];
-
-                    //Collide two spheres
-                    /*force += collideSpheres(
-                        pos, pos2,
-                        vel, vel2,
-                        params->particleRadius, params->particleRadius,
-                        params->spring, params->damping, params->shear, params->attraction
-                    );*/
-                }
-            }
-
-    //Collide with cursor sphere
-    /*force += collideSpheres(
-        pos, (float4)(params->colliderPos.x, params->colliderPos.y, params->colliderPos.z, 0),
-        vel, (float4)(0, 0, 0, 0),
-        params->particleRadius, params->colliderRadius,
-        params->spring, params->damping, params->shear, params->attraction
-    );*/
-
-    //Write new velocity back to original unsorted location
-    d_Vel[d_Index[index]] = vel + force;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

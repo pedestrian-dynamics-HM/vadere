@@ -137,6 +137,7 @@ public class TestCLOptimalStepsModel {
 	private Random random;
 	private int numberOfElements;
 	private VRectangle bound;
+	private float maxStepSize;
 
 	/*
 	AttributesOSM attributesOSM,
@@ -150,6 +151,7 @@ public class TestCLOptimalStepsModel {
 	@Before
 	public void setUp() throws IOException, TextOutOfNodeException {
 		random = new Random();
+		maxStepSize = 0.2f;
 		numberOfElements = 256;
 		attributesOSM = new AttributesOSM();
 		attributesFloorField = new AttributesFloorField();
@@ -164,13 +166,18 @@ public class TestCLOptimalStepsModel {
 		targetPotentialField.preLoop(0.4f);
 		pedestrians = new ArrayList<>();
 
-		for(int i = 0; i < numberOfElements; i++) {
+		for(int i = 0; i < numberOfElements-1; i++) {
 			VPoint randomPosition = new VPoint(
 					(float)(bound.getMinX() + random.nextDouble() * bound.getWidth()),
 					(float)(bound.getMinY() + random.nextDouble() * bound.getHeight()));
-			CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(randomPosition, 1.9f);
+			CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(randomPosition, maxStepSize);
 			pedestrians.add(pedestrian);
 		}
+
+		CLOptimalStepsModel.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
+
+		CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(0.01, 0.1)), maxStepSize);
+		pedestrians.add(pedestrian);
 	}
 
 
@@ -181,7 +188,7 @@ public class TestCLOptimalStepsModel {
 				attributesFloorField,
 				pedestrians.size(),
 				new VRectangle(topography.getBounds()),
-				1.5f + attributesPotentialCompact.getPedPotentialWidth(), // max step length + function width
+				attributesPotentialCompact.getPedPotentialWidth(), // max step length + function width
 				targetPotentialField.getEikonalSolver(),
 				obstacleDistancePotential.getEikonalSolver());
 

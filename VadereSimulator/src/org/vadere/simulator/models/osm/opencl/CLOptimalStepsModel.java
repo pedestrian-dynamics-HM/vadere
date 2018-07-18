@@ -314,6 +314,8 @@ public class CLOptimalStepsModel {
 					clCirclePositions,
 					clCellStarts,
 					clCellEnds,
+					clCellSize,
+					clGridSize,
 					clObstaclePotential,
 					clTargetPotential,
 					clWorldOrigin,
@@ -568,6 +570,8 @@ public class CLOptimalStepsModel {
 		    final long clCirclePositions,
 		    final long clCellStarts,
 		    final long clCellEnds,
+		    final long clCellSize,
+		    final long clGridSize,
 		    final long clObstaclePotential,
 		    final long clTargetPotential,
 		    final long clWorldOrigin,
@@ -585,13 +589,15 @@ public class CLOptimalStepsModel {
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 2, clCirclePositions));
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 3, clCellStarts));
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 4, clCellEnds));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 5, clObstaclePotential));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 6, clTargetPotential));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 7, clWorldOrigin));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 8, clPotentialFieldGridSize));
-		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 9, clPotentialFieldSize));
-		    CLInfo.checkCLError(clSetKernelArg1f(clNextPositions, 10, (float)attributesFloorField.getPotentialFieldResolution()));
-		    CLInfo.checkCLError(clSetKernelArg1i(clNextPositions, 11, circlePositionList.size()));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 5, clCellSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 6, clGridSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 7, clObstaclePotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 8, clTargetPotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 9, clWorldOrigin));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 10, clPotentialFieldGridSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 11, clPotentialFieldSize));
+		    CLInfo.checkCLError(clSetKernelArg1f(clNextPositions, 12, (float)attributesFloorField.getPotentialFieldResolution()));
+		    CLInfo.checkCLError(clSetKernelArg1i(clNextPositions, 13, circlePositionList.size()));
 
 		    clGlobalWorkSize.put(0, numberOfElements);
 		    clLocalWorkSize.put(0, max_work_group_size);
