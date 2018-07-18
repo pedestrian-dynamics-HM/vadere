@@ -31,7 +31,6 @@ public class GroupSourceController extends SourceController {
 		if (!isSourceFinished(simTimeInSec)) {
 			if (simTimeInSec >= timeOfNextEvent || !groupsToSpawn.isEmpty()) {
 				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
-				LinkedList<List<VPoint>> spawnGroups = new LinkedList<>();
 
 				if (sourceAttributes.isSpawnAtRandomPositions()) {
 
@@ -40,7 +39,7 @@ public class GroupSourceController extends SourceController {
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
 							List<VPoint> newGroup = spawnArray.getNextFreeGroup(groupSize, random, getDynElementsAtSource());
-							if (newGroup != null) {
+							if (newGroup.size() > 0) {
 								// add immediately to Scenario to update DynElementsAtSource
 								addElementToScenario(newGroup);
 								iter.remove();
@@ -53,7 +52,7 @@ public class GroupSourceController extends SourceController {
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
 							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, random, getDynElementsAtSource());
-							if (newGroup == null)
+							if (newGroup.size() == 0)
 								throw new RuntimeException("Cannot spawn new Group. Source " + source.getId() + " is set " +
 										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
 										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +

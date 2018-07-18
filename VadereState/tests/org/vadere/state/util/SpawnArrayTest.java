@@ -105,22 +105,22 @@ public class SpawnArrayTest {
 
 		// first Point
 		List<DynamicElement> dynamicElements = createMock(0.5);
-		VPoint p = spawnArray.getNextSpawnPoint(dynamicElements);
+		VPoint p = spawnArray.getNextSpawnPoints(1, dynamicElements).getFirst();
 		assertEquals("Point does not match", p, new VPoint(1.5, 1.5));
 		assertEquals("Next Element does not match", 1, spawnArray.getNextSpawnPointIndex());
 
 		// 10 more points
-		IntStream.range(0, 10).forEach(i -> spawnArray.getNextSpawnPoint(dynamicElements));
+		IntStream.range(0, 10).forEach(i -> spawnArray.getNextSpawnPoints(1, dynamicElements));
 		assertEquals("Next Element does not match", 11, spawnArray.getNextSpawnPointIndex());
 		VPoint first = new VPoint(source.x + elementBound.width / 2, source.y + elementBound.height / 2);
-		assertEquals("Point does not match", spawnArray.getNextSpawnPoint(dynamicElements),
+		assertEquals("Point does not match", spawnArray.getNextSpawnPoints(1, dynamicElements).getFirst(),
 				new VPoint(first.x + 2 * 2 * elementBound.width / 2, first.y + 1 * 2 * elementBound.height / 2));
-		// now at point 12 because getNextSpawnPoint() increments NextPointIndex
+		// now at point 12 because getNextSpawnPoints() increments NextPointIndex
 
 		// spawn 81 more to wrapp around to point 12.
-		IntStream.range(0, 81).forEach(i -> spawnArray.getNextSpawnPoint(dynamicElements));
+		IntStream.range(0, 81).forEach(i -> spawnArray.getNextSpawnPoints(1, dynamicElements));
 		assertEquals("Next Element does not match", 12, spawnArray.getNextSpawnPointIndex());
-		assertEquals("Point does not match", spawnArray.getNextSpawnPoint(dynamicElements),
+		assertEquals("Point does not match", spawnArray.getNextSpawnPoints(1, dynamicElements).getFirst(),
 				new VPoint(first.x + 3 * 2 * elementBound.width / 2, first.y + 1 * 2 * elementBound.height / 2));
 
 		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
@@ -129,7 +129,7 @@ public class SpawnArrayTest {
 				spawnPoints[13].add(new VPoint(0, 0.0003)), // match within Epsilon (use next)
 				spawnPoints[14].add(new VPoint(0.3, 0)) // match outside Epsilon (use this one)
 		);
-		assertEquals("Point does not match", spawnArray.getNextSpawnPoint(dynamicElements2), spawnPoints[14]);
+		assertEquals("Point does not match", spawnArray.getNextSpawnPoints(1, dynamicElements2).getFirst(), spawnPoints[14]);
 		assertEquals("Next Element does not match", 15, spawnArray.getNextSpawnPointIndex());
 	}
 
@@ -147,7 +147,7 @@ public class SpawnArrayTest {
 				spawnPoints[2],
 				spawnPoints[3].add(new VPoint(0, 0.0003))
 				);
-		assertEquals("there should be no free spot", null, spawnArray.getNextSpawnPoint(dynamicElements));
+		assertEquals("there should be no free spot", 0, spawnArray.getNextSpawnPoints(1, dynamicElements).size());
 
 	}
 
@@ -158,14 +158,14 @@ public class SpawnArrayTest {
 		spawnArray = new SpawnArray(source, elementBound);
 
 		assertEquals("Number of spawn points does not match", 4, spawnArray.getSpawnPoints().length);
-		assertNull("There should not be a free spot.", spawnArray.getNextFreeSpawnPoint(
-				createMock(0.5, spawnArray.getSpawnPoints())));
+		assertEquals("There should not be a free spot.", 0, spawnArray.getNextFreeSpawnPoints(1,
+				createMock(0.5, spawnArray.getSpawnPoints())).size() );
 		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
-		assertNotEquals("Point 1 is occupied and should not be returned", spawnPoints[1], spawnArray.getNextFreeSpawnPoint(
-				createMock(0.5, spawnPoints[1])
+		assertNotEquals("Point 1 is occupied and should not be returned", spawnPoints[1],
+				spawnArray.getNextFreeSpawnPoints(1, createMock(0.5, spawnPoints[1])
 		));
-		assertNotNull("There should be three valid points", spawnArray.getNextFreeSpawnPoint(
-				createMock(0.5, spawnPoints[1])
+		assertNotNull("There should be three valid points",
+				spawnArray.getNextFreeSpawnPoints( 1, createMock(0.5, spawnPoints[1])
 		));
 
 	}
@@ -436,6 +436,9 @@ public class SpawnArrayTest {
 
 	}
 
+	private List<DynamicElement> createMock(double r, ArrayList<VPoint> points) {
+		return createMock(r, points.toArray(new VPoint[points.size()]));
+	}
 
 	private List<DynamicElement> createMock(double r, VPoint... points) {
 		LinkedList<DynamicElement> elements = new LinkedList<>();

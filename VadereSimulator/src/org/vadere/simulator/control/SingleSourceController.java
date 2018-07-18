@@ -34,17 +34,7 @@ public class SingleSourceController extends SourceController {
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					} else {
-						for (int i = 0; i < numberToSpawn; i++) {
-							VPoint nextRandomSpawnPoint = spawnArray.getNextRandomSpawnPoint(getDynElementsAtSource(), random);
-							if (nextRandomSpawnPoint == null){
-								throw new RuntimeException("Cannot spawn new Pedestrian. Source " + source.getId() + " is set " +
-										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
-										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
-										"to queue Pedestrians.");
-							}
-							spawnPoints.add(nextRandomSpawnPoint);
-
-						}
+						spawnPoints = spawnArray.getNextRandomSpawnPoints(numberToSpawn, random, getDynElementsAtSource());
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					}
@@ -56,16 +46,7 @@ public class SingleSourceController extends SourceController {
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					} else {
-						for (int i = 0; i < numberToSpawn; i++) {
-							VPoint nextSpawnPoint = spawnArray.getNextSpawnPoint(getDynElementsAtSource());
-							if (nextSpawnPoint == null){
-								throw new RuntimeException("Cannot spawn new Pedestrian. Source " + source.getId() + " is set " +
-										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
-										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
-										"to queue Pedestrians.");
-							}
-							spawnPoints.add(nextSpawnPoint);
-						}
+						spawnPoints = spawnArray.getNextSpawnPoints(numberToSpawn, getDynElementsAtSource());
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					}
