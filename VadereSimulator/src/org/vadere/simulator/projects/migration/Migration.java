@@ -112,7 +112,7 @@ public class Migration {
 					stats.upToDate++;
 				}
 			} catch (MigrationException e) {
-				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION, dirName.equals(SCENARIO_DIR));
+				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION, !dirName.equals(SCENARIO_DIR));
 				logger.error("!> Can't migrate the scenario to latest version, removed it from the directory (" +
 						e.getMessage() + ") If you can fix this problem manually, do so and then remove ." +
 						NONMIGRATABLE_EXTENSION + " from the file in the " + LEGACY_DIR + "-directory "
