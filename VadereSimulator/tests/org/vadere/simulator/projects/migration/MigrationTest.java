@@ -1,15 +1,75 @@
 package org.vadere.simulator.projects.migration;
 
-import org.junit.Test;
+import com.bazaarvoice.jolt.JsonUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Assert.*;
+import org.vadere.simulator.entrypoints.Version;
+import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.io.RecursiveCopy;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+
+import joptsimple.internal.Strings;
+
+import static org.junit.Assert.assertEquals;
 
 public class MigrationTest {
 
+	// clean up after test
+	@After
+	public void resetTestStructure() throws URISyntaxException {
+		String dest = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
+		String source = getClass().getResource("/migration/testProject_v0.1.bak").toURI().getPath();
+		try {
 
-    @Test
-    public void TestTransform(){
+			if (Paths.get(dest).toFile().exists()) {
+				Files.walk(Paths.get(dest))
+						.sorted(Comparator.reverseOrder())
+						.map(Path::toFile)
+						.forEach(File::delete);
+			}
+			Files.walkFileTree(Paths.get(source), new RecursiveCopy(source, dest));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    }
+	// Test transformation of single scenario file
+	@Test
+	public void TestTransform() throws IOException {
+		String json = IOUtils.readTextFileFromResources("/migration/testProject_v0.1/scenarios/basic_1_chicken_osm1.scenario");
+		JsonNode node = StateJsonConverter.deserializeToNode(json);
+
+		Migration migration = new Migration();
+		try {
+			JsonNode newNode = migration.transform(node, Version.V0_2);
+		} catch (MigrationException e) {
+			e.printStackTrace();
+		}
+
+
+	}
+
+	// Test project transformation
+	@Test
+	public void TestTransformProject() throws URISyntaxException, IOException {
+		String projectPath = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
+
+		Migration migration = new Migration();
+
+		MigrationResult res = migration.analyzeProject(projectPath);
+		assertEquals("", new MigrationResult(12, 1, 10, 1), res);
+		System.out.println(Strings.repeat('#', 80));
+	}
 
 }
