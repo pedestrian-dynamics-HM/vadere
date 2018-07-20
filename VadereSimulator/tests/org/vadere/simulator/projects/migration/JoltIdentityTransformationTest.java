@@ -4,6 +4,7 @@ import com.bazaarvoice.jolt.Chainr;
 import com.bazaarvoice.jolt.Diffy;
 import com.bazaarvoice.jolt.JsonUtils;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -33,13 +34,16 @@ public class JoltIdentityTransformationTest {
 		testIdentity(scenarioFiles, "/identity_v2.json");
 	}
 
-	@Test
+	// todo use testResources
+	@Test @Ignore
 	public void testIdenityTransformationV01() throws IOException {
+
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		testIdentity(scenarioFiles, "/identity_v1.json");
 	}
 
-	@Test
+	// todo use testResources
+	@Test @Ignore
 	public void testTransformationV01_to_V02() throws IOException {
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		Diffy diffy = new Diffy();
@@ -86,17 +90,9 @@ public class JoltIdentityTransformationTest {
 		}
 	}
 
-	@Test
-	public void DirInTarget() {
-		String path = "target/TestRun";
-		try {
-			Files.createDirectory(Paths.get(path));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
-	@Test
+	// todo use testResources
+	@Test @Ignore
 	public void transformv1t0v2() throws IOException {
 		Path scenario = Paths.get("../VadereModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
 		List chainrSpecJson = JsonUtils.classpathToList("/transform_v1_to_v2.json");
@@ -110,7 +106,8 @@ public class JoltIdentityTransformationTest {
 		System.out.println(diffy.diff(jsonOut1, jsonOut2).toString());
 	}
 
-	@Test
+	// todo use testResources
+	@Test @Ignore
 	public void attr01() throws IOException {
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		LinkedHashMap<String, Object> out = new LinkedHashMap<>();

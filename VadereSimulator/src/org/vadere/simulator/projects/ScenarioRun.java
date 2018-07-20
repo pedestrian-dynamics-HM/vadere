@@ -71,7 +71,7 @@ public class ScenarioRun implements Runnable {
 	public void run() {
 		try {
 			//add Scenario Name to Log4j Mapped Diagnostic Context to filter log by ScenarioRun
-			MDC.put("scenario.Name", outputPath.getFileName().toString());
+//			MDC.put("scenario.Name", outputPath.getFileName().toString());
 
 			/**
 			 * To make sure that no other Thread changes the scenarioStore object during the initialization of a scenario run
@@ -111,7 +111,7 @@ public class ScenarioRun implements Runnable {
 		} finally {
 			doAfterSimulation();
 			//remove Log4j Mapped Diagnostic Context after ScenarioRun
-			MDC.remove("scenario.Name");
+//			MDC.remove("scenario.Name");
 		}
 	}
 	
