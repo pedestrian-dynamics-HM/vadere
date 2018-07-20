@@ -9,19 +9,20 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -168,6 +169,15 @@ public class IOUtils {
 				while ((line = inputStream.readLine()) != null)
 					sb.add(line);
 				return sb.toString();
+		}
+	}
+
+	public static String readTextFileFromResources(String resourcePath) throws IOException {
+		URL url = IOUtils.class.getResource(resourcePath);
+		try {
+			return  readTextFile(Paths.get(url.toURI()));
+		} catch (URISyntaxException e) {
+			throw new IOException("Wrong URI Syntax for " + url.toString(), e);
 		}
 	}
 

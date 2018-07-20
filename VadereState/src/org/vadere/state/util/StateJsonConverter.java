@@ -36,6 +36,7 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -47,6 +48,9 @@ public abstract class StateJsonConverter {
 	public static final String SCENARIO_KEY = "scenario";
 
 	public static final String MAIN_MODEL_KEY = "mainModel";
+
+	private static final TypeReference<Map<String, Object>> mapTypeReference =
+			new TypeReference<Map<String, Object>>() {};
 
 	private static Logger logger = LogManager.getLogger(StateJsonConverter.class);
 
@@ -76,6 +80,18 @@ public abstract class StateJsonConverter {
 
 	public static JsonNode deserializeToNode(String dev) throws IOException {
 		return mapper.readTree(dev);
+	}
+
+	public static Object deserializeToMapOfObjects(String dev) throws IOException {
+		return mapper.readValue(dev, mapTypeReference);
+	}
+
+	public static Object convertJsonNodeToObject(JsonNode node) throws IOException {
+		return mapper.convertValue(node, Map.class);
+	}
+
+	public static JsonNode deserializeToNode(Object map){
+		return mapper.valueToTree(map);
 	}
 
 	private static class TopographyStore {
