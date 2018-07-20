@@ -13,6 +13,7 @@ import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
@@ -69,6 +70,9 @@ public class ScenarioRun implements Runnable {
 	@Override
 	public void run() {
 		try {
+			//add Scenario Name to Log4j Mapped Diagnostic Context to filter log by ScenarioRun
+//			MDC.put("scenario.Name", outputPath.getFileName().toString());
+
 			/**
 			 * To make sure that no other Thread changes the scenarioStore object during the initialization of a scenario run
 			 * this is an atomic operation with respect to the scenarioStore. We observed that with Linux 18.04 KUbunto
@@ -77,7 +81,7 @@ public class ScenarioRun implements Runnable {
 			synchronized (scenarioStore) {
 				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 				scenarioStore.getTopography().reset();
-
+				System.out.println("StartIt " + scenario.getName());
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 				modelBuilder.createModelAndRandom();
 
@@ -106,6 +110,8 @@ public class ScenarioRun implements Runnable {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
 			doAfterSimulation();
+			//remove Log4j Mapped Diagnostic Context after ScenarioRun
+//			MDC.remove("scenario.Name");
 		}
 	}
 	
@@ -136,6 +142,10 @@ public class ScenarioRun implements Runnable {
 		} else {
 			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
 		}
+	}
+
+	public Path getOutputPath() {
+		return Paths.get(this.outputPath.toString());
 	}
 
 	public void pause() {

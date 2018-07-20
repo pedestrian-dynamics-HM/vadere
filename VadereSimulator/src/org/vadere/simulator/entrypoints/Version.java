@@ -1,6 +1,7 @@
 package org.vadere.simulator.entrypoints;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 
 import java.util.Optional;
 
@@ -28,6 +29,34 @@ public enum Version {
 				return v;
 		}
 		return null;
+	}
+
+	private static int versionId(Version curr){
+		Version[] versions = values();
+		for ( int i = 0 ; i < versions.length ; i++){
+			if (curr.equals(versions[i])){
+				return  i;
+			}
+		}
+		throw new IllegalArgumentException("Value not in Version Enumeration " + curr.toString());
+	}
+
+	public static Version nextVersion(Version curr){
+		int nextId = versionId(curr) == (values().length -1) ? versionId(curr) : versionId(curr) + 1;
+		return values()[nextId];
+	}
+
+	public static Version[] listToLatest (Version v){
+		int start = versionId(v) == (values().length -1) ? versionId(v) : versionId(v) + 1;
+		int end = values().length;
+		Version[] ret = new Version[end-start];
+		System.arraycopy(values(), start, ret, 0, end - start );
+		return ret;
+
+	}
+
+	public boolean equalOrSamller(Version test){
+		return versionId(this) <= versionId(test);
 	}
 
 	public static Version latest() {

@@ -36,7 +36,7 @@ public class MigrationAssistant {
 	private static boolean reapplyLatestMigrationFlag = false;
 	private static Version baseVersion = null;
 
-	public static void setReapplyLatestMigrationFlag() {
+		public static void setReapplyLatestMigrationFlag() {
 		reapplyLatestMigrationFlag = true;
 		baseVersion = null;
 	}
@@ -46,8 +46,14 @@ public class MigrationAssistant {
 		baseVersion = version;
 	}
 
-	public static void analyzeSingleScenario(Path path) {
+	public static void analyzeSingleScenario(Path path) throws IOException {
 		// TODO [priority=high] [task=implement] for runs initiated not from GUI... where to hook in?
+		StringBuilder log = new StringBuilder();
+		try {
+			analyzeScenario(path, null, log, true)	;
+		} catch (MigrationException e) {
+			logger.error(log.toString());
+		}
 	}
 
 	public static int[] analyzeProject(String projectFolderPath) throws IOException {

@@ -30,7 +30,7 @@ public class JoltTest {
 	public void run2() {
 
 
-		List chainrSpecJson = JsonUtils.classpathToList("/transfrom_v2_to_v3.json");
+		List chainrSpecJson = JsonUtils.classpathToList("/transform_v2_to_v3.json");
 		Chainr chainr = Chainr.fromSpec(chainrSpecJson);
 
 		Object inputJson = JsonUtils.classpathToObject("/scenario_test.json");
