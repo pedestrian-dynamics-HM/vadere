@@ -46,7 +46,7 @@ public class JoltIdentityTransformationTest {
 		for (Path p : scenarioFiles) {
 			Object jsonInput = JsonUtils.filepathToObject(p.toString());
 			Chainr transformation =
-					Chainr.fromSpec(JsonUtils.classpathToList("/transfrom_v1_to_v2.json"));
+					Chainr.fromSpec(JsonUtils.classpathToList("/transform_v1_to_v2.json"));
 			Chainr identityV02 =
 					Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json"));
 			Object jsonNew = transformation.transform(jsonInput);
@@ -99,7 +99,7 @@ public class JoltIdentityTransformationTest {
 	@Test
 	public void transformv1t0v2() throws IOException {
 		Path scenario = Paths.get("../VadereModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
-		List chainrSpecJson = JsonUtils.classpathToList("/transfrom_v1_to_v2.json");
+		List chainrSpecJson = JsonUtils.classpathToList("/transform_v1_to_v2.json");
 		Chainr transform_v1_v2 = Chainr.fromSpec(chainrSpecJson);
 		Object inputJson = JsonUtils.filepathToObject(scenario.toString());
 		Object jsonOut1 = transform_v1_v2.transform(inputJson);
