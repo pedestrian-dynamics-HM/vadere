@@ -150,20 +150,20 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		};
 
 		ActionGeneratePNG generatePNG = new ActionGeneratePNG(
-				"generatePNG",
+				Messages.getString("PostVis.btnPNGSnapshot.tooltip"),
 				resources.getIcon("camera_png.png", iconWidth, iconHeight),
 				new OnlinevisualizationRenderer(model),
 				model);
 
 
 		ActionGenerateSVG generateSVG = new ActionGenerateSVG(
-				"generateSVG",
+				Messages.getString("PostVis.btnSVGSnapshot.tooltip"),
 				resources.getIcon("camera_svg.png", iconWidth, iconHeight),
 				new OnlinevisualizationRenderer(model),
 				model);
 
 		ActionGenerateTikz generateTikz = new ActionGenerateTikz(
-				"generateTikz",
+				Messages.getString("PostVis.btnTikZSnapshot.tooltip"),
 				resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
 				new OnlinevisualizationRenderer(model),
 				model);

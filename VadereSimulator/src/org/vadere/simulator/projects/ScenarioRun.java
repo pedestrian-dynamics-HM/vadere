@@ -85,7 +85,7 @@ public class ScenarioRun implements Runnable {
 				final Random random = modelBuilder.getRandom();
 
 				// prepare processors and simulation data writer
-				if (scenarioStore.attributesSimulation.isWriteSimulationData()) {
+				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
 					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
 				}
 
@@ -98,7 +98,7 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
+				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager);
 			}
 			simulation.run();
 
@@ -166,8 +166,8 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public String readyToRunResponse() { // TODO [priority=medium] [task=check] add more conditions
-		if (scenarioStore.mainModel == null) {
-			return scenarioStore.name + ": no mainModel is set";
+		if (scenarioStore.getMainModel() == null) {
+			return scenarioStore.getName() + ": no mainModel is set";
 		}
 		return null;
 	}

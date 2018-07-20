@@ -60,7 +60,7 @@ public class AgentRender implements Renderer {
 		return new Color(Color.HSBtoRGB(hue, 1f, 0.75f));
 	}
 
-	private Color getColor(Pedestrian ped) {
+	public Color getColor(Pedestrian ped) {
 		if (ped.getGroupIds().isEmpty()) {
 			return defaultColor;
 		}
@@ -74,7 +74,7 @@ public class AgentRender implements Renderer {
 		return c;
 	}
 
-	private VShape getShape(Pedestrian ped) {
+	public VShape getShape(Pedestrian ped) {
 		if (ped.getGroupIds().isEmpty()) {
 			return ped.getShape();
 		} else if (ped.getGroupIds().getFirst() == 1) {

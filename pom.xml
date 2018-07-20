@@ -21,7 +21,7 @@
     <module>./VadereSimulator</module>
     <module>./VadereState</module>
     <module>./VadereUtils</module>
-    <module>VadereAnnotation</module>
+    <module>./VadereAnnotation</module>
   </modules>
   
 <!-- global dependencies! -->
