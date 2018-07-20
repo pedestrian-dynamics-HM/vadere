@@ -69,7 +69,7 @@ public class Simulation {
 		this.name = name;
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
-		this.attributesSimulation = scenarioStore.attributesSimulation;
+		this.attributesSimulation = scenarioStore.getAttributesSimulation();
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();

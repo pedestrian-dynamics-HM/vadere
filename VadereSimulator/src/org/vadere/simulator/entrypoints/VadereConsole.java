@@ -69,8 +69,9 @@ public class VadereConsole {
 				new ScenarioRun(scenario, null).run();
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e);
+			System.exit(-1);
 		}
 	}
 

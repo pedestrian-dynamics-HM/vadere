@@ -21,12 +21,12 @@ public class SourceTestAttributesBuilder {
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
 	private double x0 = 0.0;
 	private double y0 = 0.0;
-	private double x1 = 0.1;
+	private double x1 = 5.0;
 	private double y1 = 0.0;
-	private double x2 = 0.1;
-	private double y2 = 0.1;
+	private double x2 = 5.0;
+	private double y2 = 5.0;
 	private double x3 = 0.0;
-	private double y3 = 0.1;
+	private double y3 = 5.0;
 
 	public AttributesSource getResult() {
 		String json = generateSourceAttributesJson();

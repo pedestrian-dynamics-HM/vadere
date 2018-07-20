@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -32,24 +33,17 @@ import difflib.DiffUtils;
 public class Scenario {
 
 	private static Logger logger = LogManager.getLogger(Scenario.class);
-
 	private ScenarioStore scenarioStore;
-
 	private DataProcessingJsonManager dataProcessingJsonManager;
-
 	private String savedStateSerialized;
 	private String currentStateSerialized;
 
 
 	public Scenario(final String name) {
-		this(name, new ScenarioStore(name));
+		this(new ScenarioStore(name));
 	}
 
-	public Scenario(final ScenarioStore store) {
-		this(store.name, store);
-	}
-
-	public Scenario(final String name, final ScenarioStore store) {
+	public Scenario(@NotNull final ScenarioStore store) {
 		this.scenarioStore = store;
 
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
@@ -88,7 +82,7 @@ public class Scenario {
 	}
 
 	public String getName() {
-		return scenarioStore.name;
+		return scenarioStore.getName();
 	}
 
 	public ScenarioStore getScenarioStore() {
@@ -96,7 +90,7 @@ public class Scenario {
 	}
 
 	public List<Attributes> getModelAttributes() {
-		return scenarioStore.attributesList;
+		return scenarioStore.getAttributesList();
 	}
 
 	public AttributesAgent getAttributesPedestrian() {
@@ -104,26 +98,26 @@ public class Scenario {
 	}
 
 	public AttributesSimulation getAttributesSimulation() {
-		return scenarioStore.attributesSimulation;
+		return scenarioStore.getAttributesSimulation();
 	}
 
 	public Topography getTopography() {
 		return scenarioStore.getTopography();
 	}
 
-	public void setName(String name) {
-		this.scenarioStore.name = name;
+	public void setName(@NotNull final String name) {
+		this.scenarioStore.setName(name);
 	}
 
-	public void setAttributesModel(List<Attributes> attributesList) {
-		scenarioStore.attributesList = attributesList;
+	public void setAttributesModel(@NotNull final List<Attributes> attributesList) {
+		scenarioStore.setAttributesList(attributesList);
 	}
 
-	public void setAttributesSimulation(AttributesSimulation attributesSimulation) {
-		this.scenarioStore.attributesSimulation = attributesSimulation;
+	public void setAttributesSimulation(@NotNull final AttributesSimulation attributesSimulation) {
+		this.scenarioStore.setAttributesSimulation(attributesSimulation);
 	}
 
-	public void setTopography(final Topography topography) {
+	public void setTopography(@NotNull final Topography topography) {
 		scenarioStore.setTopography(topography);
 	}
 
@@ -142,7 +136,7 @@ public class Scenario {
 	}
 
 	public String getDisplayName() {
-		return scenarioStore.name + (hasUnsavedChanges() ? "*" : "");
+		return scenarioStore.getName() + (hasUnsavedChanges() ? "*" : "");
 	}
 
 	public void discardChanges() {
@@ -157,16 +151,16 @@ public class Scenario {
 	}
 
 	public String getDescription() {
-		return scenarioStore.description;
+		return scenarioStore.getDescription();
 	}
 
 	public void setDescription(String description) {
-		scenarioStore.description = description;
+		scenarioStore.setDescription(description);
 	}
 
 	public String readyToRunResponse() { // TODO [priority=medium] [task=check] add more conditions
-		if (scenarioStore.mainModel == null) {
-			return scenarioStore.name + ": no mainModel is set";
+		if (scenarioStore.getMainModel() == null) {
+			return scenarioStore.getName() + ": no mainModel is set";
 		}
 		return null;
 	}
@@ -175,11 +169,11 @@ public class Scenario {
 		return dataProcessingJsonManager;
 	}
 
-	public void setDataProcessingJsonManager(final DataProcessingJsonManager manager) {
+	public void setDataProcessingJsonManager(@NotNull final DataProcessingJsonManager manager) {
 		this.dataProcessingJsonManager = manager;
 	}
 
-	public void saveToOutputPath(final Path outputPath) {
+	public void saveToOutputPath(@NotNull final Path outputPath) {
 		try (PrintWriter out = new PrintWriter(Paths.get(outputPath.toString(), getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
 			out.println(JsonConverter.serializeScenarioRunManager(this, true));
 		} catch (IOException e) {

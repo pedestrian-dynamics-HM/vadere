@@ -1,6 +1,5 @@
 package org.vadere.simulator.control;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
@@ -377,7 +376,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	}
 
 	@Test
-	@Ignore
 	public void multipleSources() {
 		SourceTestAttributesBuilder builder1 = new SourceTestAttributesBuilder()
 				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)

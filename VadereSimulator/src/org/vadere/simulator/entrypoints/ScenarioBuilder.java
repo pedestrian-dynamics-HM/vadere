@@ -61,9 +61,9 @@ public class ScenarioBuilder {
 
         // TODO: duplicated code
         if(AttributesSimulation.class == clazz){
-            builder = new AttributesBuilder<>((E)store.attributesSimulation);
+            builder = new AttributesBuilder<>((E)store.getAttributesSimulation());
             builder.setField(fieldName, value);
-            store.attributesSimulation = (AttributesSimulation) builder.build();
+            store.setAttributesSimulation((AttributesSimulation) builder.build());
         }
         else if(AttributesAgent.class == clazz){
 			builder = new AttributesBuilder<>((E) store.getTopography().getAttributesPedestrian());
@@ -84,8 +84,8 @@ public class ScenarioBuilder {
         else {
             builder = new AttributesBuilder<>(store.getAttributes(clazz));
             builder.setField(fieldName, value);
-            store.attributesList.removeIf(attributes -> attributes.getClass() == clazz);
-            store.attributesList.add(builder.build());
+            store.removeAttributesIf(attributes -> attributes.getClass() == clazz);
+            store.addAttributes(builder.build());
         }
     }
 

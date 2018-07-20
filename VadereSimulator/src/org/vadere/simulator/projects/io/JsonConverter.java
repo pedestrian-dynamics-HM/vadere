@@ -87,8 +87,8 @@ public class JsonConverter {
 	}
 
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {
-		node.put("name", scenarioStore.name);
-		node.put("description", scenarioStore.description);
+		node.put("name", scenarioStore.getName());
+		node.put("description", scenarioStore.getDescription());
 		node.put("release", HashGenerator.releaseNumber());
 		if (commitHashIncluded)
 			node.put("commithash", HashGenerator.commitHash());
@@ -97,14 +97,14 @@ public class JsonConverter {
 	private static ObjectNode serializeVadereNode(ScenarioStore scenarioStore) {
 		ObjectNode vadereNode = StateJsonConverter.createObjectNode();
 
-		vadereNode.put(StateJsonConverter.MAIN_MODEL_KEY, scenarioStore.mainModel);
+		vadereNode.put(StateJsonConverter.MAIN_MODEL_KEY, scenarioStore.getMainModel());
 
 		// vadere > attributesModel
-		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.attributesList);
+		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		vadereNode.set("attributesModel", attributesModelNode);
 
 		// vadere > attributesSimulation
-		vadereNode.set("attributesSimulation", StateJsonConverter.convertValue(scenarioStore.attributesSimulation, JsonNode.class));
+		vadereNode.set("attributesSimulation", StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class));
 
 		// vadere > topography
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
@@ -119,10 +119,10 @@ public class JsonConverter {
 	}
 
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
-		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.attributesSimulation, JsonNode.class);
-		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.attributesList);
+		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
+		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
-		return new ScenarioStore(scenarioStore.name, scenarioStore.description, scenarioStore.mainModel,
+		return new ScenarioStore(scenarioStore.getName(), scenarioStore.getDescription(), scenarioStore.getMainModel(),
 				StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode),
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode));

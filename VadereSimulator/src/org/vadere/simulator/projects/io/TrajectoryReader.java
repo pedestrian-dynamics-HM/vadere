@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.io;
 import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -26,6 +27,18 @@ import java.util.stream.Collectors;
 
 /**
  * A TrajectoryReader is the counterpart of the {@link PedestrianPositionProcessor}.
+ *
+ * Output file assumptions:
+ * The TrajectoryReader assumes that the first row of the output is the headline and
+ * that there exist certain columns named:
+ *      (id or pedestrianId) [mandatory],
+ *      (step or timeStep) [mandatory],
+ *      x [mandatory],
+ *      y [mandatory],
+ *      targetId [optional] and
+ *      groupId [optional].
+ * The order of the rows (expect for the first row / header) can be arbitrary.
+ * Columns has to be separated by {@link TrajectoryReader#SPLITTER}
  */
 public class TrajectoryReader {
 
@@ -110,13 +123,9 @@ public class TrajectoryReader {
 			}
 		}
 		try {
-			if (pedIdIndex != -1 && xIndex != -1 && yIndex != -1 && stepIndex != -1 && groupIdIndex == -1) {
+			if (pedIdIndex != -1 && xIndex != -1 && yIndex != -1 && stepIndex != -1) {
 				// load default values with no groups
 				return readStandardTrajectoryFile();
-
-			} else if(pedIdIndex != -1 && xIndex != -1 && yIndex != -1 && stepIndex != -1) {//here groupIdIndex is != -1
-				// load values with group information
-				return  readGroupTrajectoryFile();
 			}
 			else {
 				throw new IOException("could not read trajectory file, some colums are missing.");
@@ -130,59 +139,75 @@ public class TrajectoryReader {
 
 	private Map<Step, List<Agent>> readStandardTrajectoryFile() throws IOException {
 		try (BufferedReader in = IOUtils.defaultBufferedReader(this.trajectoryFilePath)) {
-			return in.lines()
-					.skip(1)  //Skip header line
-					.map(line -> line.split(SPLITTER))
-					.map(cells -> {
-						int step = Integer.parseInt(cells[stepIndex]);
-						int pedestrianId = Integer.parseInt(cells[pedIdIndex]);
-						VPoint pos = new VPoint(Double.parseDouble(cells[xIndex]), Double.parseDouble(cells[yIndex]));
-
-
-						int targetId = targetIdIndex != -1 ? Integer.parseInt(cells[targetIdIndex]) : -1;
-
-						Pedestrian ped = new Pedestrian(new AttributesAgent(this.attributesPedestrian, pedestrianId), new Random());
-						ped.setPosition(pos);
-						LinkedList<Integer> targets = new LinkedList<>();
-						targets.addFirst(targetId);
-						ped.setTargets(targets);
-
-						return Pair.create(new Step(Integer.parseInt(cells[0])), ped);
-					})
-					.collect(Collectors.groupingBy(Pair::getKey, Collectors.mapping(Pair::getValue, Collectors.toList())));
+			return in.lines()                                       // a stream of lines
+					.skip(1)                                        // skip the first line i.e. the header
+					.map(line -> split(line))              // split the line into string tokens
+					.map(rowTokens -> parseRowTokens(rowTokens))    // transform those tokens into a pair of java objects (step, agent)
+					.collect(Collectors.groupingBy(Pair::getKey,    // group all agent objects by the step.
+							Collectors.mapping(Pair::getValue, Collectors.toList())));
 		} catch (Exception e){
 			logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
 			throw e;
 		}
 	}
 
-	private Map<Step, List<Agent>> readGroupTrajectoryFile() throws IOException{
-		try (BufferedReader in = IOUtils.defaultBufferedReader(this.trajectoryFilePath)) {
-			return in.lines()
-					.skip(1)  //Skip header line
-					.map(line -> line.split(SPLITTER))
-					.map(cells -> {
-						int step = Integer.parseInt(cells[stepIndex]);
-						int pedestrianId = Integer.parseInt(cells[pedIdIndex]);
-						VPoint pos = new VPoint(Double.parseDouble(cells[xIndex]), Double.parseDouble(cells[yIndex]));
+	/**
+	 * This method is used instead of {@link String#split(String)} since it is faster because no pattern matching is required.
+	 *
+	 * @param line
+	 * @return
+	 */
+	private String[] split(@NotNull final String line) {
+		int tokenCount = 0;
+		int startIndex = 0;
+		int endIndex = -1;
+		do {
+			endIndex = line.indexOf(SPLITTER, startIndex+1);
+			startIndex = endIndex;
+			tokenCount++;
+		} while(endIndex != -1);
 
-
-						int targetId = targetIdIndex != -1 ? Integer.parseInt(cells[targetIdIndex]) : -1;
-						int groupId = targetIdIndex != -1 ? Integer.parseInt(cells[groupIdIndex]) : -1;
-
-						Pedestrian ped = new Pedestrian(new AttributesAgent(this.attributesPedestrian, pedestrianId), new Random());
-						ped.setPosition(pos);
-						ped.addGroupId(groupId);
-						LinkedList<Integer> targets = new LinkedList<>();
-						targets.addFirst(targetId);
-						ped.setTargets(targets);
-
-						return Pair.create(new Step(Integer.parseInt(cells[0])), ped);
-					})
-					.collect(Collectors.groupingBy(Pair::getKey, Collectors.mapping(Pair::getValue, Collectors.toList())));
-		} catch (Exception e){
-			logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
-			throw e;
+		startIndex = -1;
+		endIndex = -1;
+		String[] tokens = new String[tokenCount];
+		for(int i = 0; i < tokenCount; i++) {
+			endIndex = line.indexOf(SPLITTER, startIndex+1);
+			tokens[i] = line.substring(startIndex+1, endIndex != -1 ? endIndex : line.length());
+			startIndex = endIndex;
 		}
+		return tokens;
+	}
+
+	/**
+	 * transforms the string tokens of the row (i.e. the values generated by the output processor of one row)
+	 * into a {@link Pair} of ({@link Step}, {@link Agent}).
+	 *
+	 * @param rowTokens string tokens of the row
+	 * @return a {@link Pair} of ({@link Step}, {@link Agent})
+	 */
+	private Pair<Step, Agent> parseRowTokens(@NotNull final String[] rowTokens) {
+		// time step
+		int step = Integer.parseInt(rowTokens[stepIndex]);
+
+		// pedestrian id
+		int pedestrianId = Integer.parseInt(rowTokens[pedIdIndex]);
+		Pedestrian ped = new Pedestrian(new AttributesAgent(this.attributesPedestrian, pedestrianId), new Random());
+
+		// pedestrian position
+		VPoint pos = new VPoint(Double.parseDouble(rowTokens[xIndex]), Double.parseDouble(rowTokens[yIndex]));
+
+		// pedestrian target
+		int targetId = targetIdIndex != -1 ? Integer.parseInt(rowTokens[targetIdIndex]) : -1;
+		ped.setPosition(pos);
+		LinkedList<Integer> targets = new LinkedList<>();
+		targets.addFirst(targetId);
+		ped.setTargets(targets);
+
+		if(groupIdIndex != -1) {
+			int groupId = targetIdIndex != -1 ? Integer.parseInt(rowTokens[groupIdIndex]) : -1;
+			ped.addGroupId(groupId);
+		}
+
+		return Pair.create(new Step(step), ped);
 	}
 }
