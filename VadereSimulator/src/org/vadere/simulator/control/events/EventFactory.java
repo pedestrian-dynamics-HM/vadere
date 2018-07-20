@@ -4,6 +4,9 @@ package org.vadere.simulator.control.events;
 import org.vadere.state.events.ElapsedTimeEvent;
 import org.vadere.state.events.Event;
 import org.vadere.state.events.WaitEvent;
+import org.vadere.state.events.WaitInAreaEvent;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * This class is used to create events from @see org.vadere.state.events package.
@@ -22,7 +25,12 @@ public class EventFactory {
             currentEvent = new ElapsedTimeEvent(time);
         } else if (clazz.equals(WaitEvent.class)) {
             currentEvent = new WaitEvent(time);
-        } else {
+        } else if (clazz.equals(WaitInAreaEvent.class)) {
+            // TODO Replace dummy area here.
+            VShape area = new VRectangle(12.5, 0, 5, 6);
+            currentEvent = new WaitInAreaEvent(time, area);
+        }
+        else {
             throw new IllegalArgumentException("Class type not supported: "  + clazz.getName());
         }
 

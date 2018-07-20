@@ -32,6 +32,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.ElapsedTimeEvent;
 import org.vadere.state.events.Event;
 import org.vadere.state.events.WaitEvent;
+import org.vadere.state.events.WaitInAreaEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
@@ -276,8 +277,37 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
                 handleElapsedTimeEvent(event);
             } else if (event instanceof WaitEvent) {
                 handleWaitEvent(event);
+            } else if (event instanceof WaitInAreaEvent) {
+                handleWaitInAreaEvent(event);
             } else {
                 throw new IllegalArgumentException("Cannot handle event: " + event);
+            }
+        }
+    }
+
+    private void handleWaitInAreaEvent(Event event) {
+        if (!(event instanceof WaitInAreaEvent)) {
+            throw new IllegalArgumentException("Wrong event type passed, expected: " + WaitInAreaEvent.class.getName());
+        }
+
+        WaitInAreaEvent waitInAreaEvent = (WaitInAreaEvent)event;
+
+        List<PedestrianOSM> pedestrians = ListUtils.select(
+                topography.getElements(Pedestrian.class), PedestrianOSM.class);
+
+        // Respect update type even if all pedestrians do not move.
+        if (attributesOSM.getUpdateType() == UpdateType.SHUFFLE) {
+            Collections.shuffle(pedestrians, this.random);
+        }
+
+        // TODO If pedestrian in area wait, else step.
+        for (PedestrianOSM pedestrian : pedestrians) {
+            if (waitInAreaEvent.getArea().contains(pedestrian.getPosition())) { // Wait
+                pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+                this.lastSimTimeInSec = waitInAreaEvent.getTime();
+            } else { // Step
+                update(event.getTime());
+
             }
         }
     }

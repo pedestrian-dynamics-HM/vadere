@@ -16,6 +16,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.ElapsedTimeEvent;
 import org.vadere.state.events.Event;
 import org.vadere.state.events.WaitEvent;
+import org.vadere.state.events.WaitInAreaEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
@@ -258,7 +259,7 @@ public class Simulation {
         EventFactory eventFactory = new EventFactory();
 
         if (simTimeInSec >= 5 && simTimeInSec <= 30) {
-	        events.add(eventFactory.getEvent(WaitEvent.class, simTimeInSec));
+	        events.add(eventFactory.getEvent(WaitInAreaEvent.class, simTimeInSec));
         } else {
             events.add(eventFactory.getEvent(ElapsedTimeEvent.class, simTimeInSec));
 		}
