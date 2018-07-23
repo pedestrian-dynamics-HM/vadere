@@ -40,6 +40,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
+	private TextView eventFileView; // Event tab
 	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
@@ -184,6 +185,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
+
+		eventFileView = new TextView("/attributes", "default_directory_attributes", AttributeType.EVENT);
+		eventFileView.isEditable(true);
+		tabbedPane.addTab(Messages.getString("Tab.Event.title"), eventFileView);
+
 		dataProcessingGUIview = new DataProcessingView();
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		// online visualization card...

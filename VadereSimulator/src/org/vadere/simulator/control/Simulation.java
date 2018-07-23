@@ -264,7 +264,7 @@ public class Simulation {
             events.add(eventFactory.getEvent(ElapsedTimeEvent.class, simTimeInSec));
 		}
 
-        // TODO Why are target controller readded in each simulation loop?
+        // TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
