@@ -19,16 +19,16 @@ unit_tests_with_coverage:
   # Following syntaxes allow you to skip whole classes and single methods:
   #
   #   #Exclude one test class
-  #   mvn test -Dtest=!LegacyTest
+  #   mvn -Dtest=!LegacyTest test
   #   # Exclude one test method
-  #   mvn verify -Dtest=!LegacyTest#testFoo
+  #   mvn -Dtest=!LegacyTest#testFoo verify 
   #   # Exclude two test methods
-  #   mvn verify -Dtest=!LegacyTest#testFoo+testBar
+  #   mvn -Dtest=!LegacyTest#testFoo+testBar verify 
   #   # Exclude a package with a wildcard (*)
-  #   mvn test -Dtest=!com.mycompany.app.Legacy*
+  #   mvn -Dtest=!com.mycompany.app.Legacy* test 
   script:
     - mvn clean
-    - mvn test -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList
+    - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList test
     - python3 Tools/collect_line_and_branch_coverage.py
 
 run_scenario_files:
@@ -36,6 +36,6 @@ run_scenario_files:
 
   script:
       - mvn clean
-      - mvn package -Dmaven.test.skip=true
+      - mvn -Dmaven.test.skip=true package
       - python3 Tools/run_vadere_console_with_all_scenario_files.py
 
