@@ -53,11 +53,16 @@ public class ScenarioRun implements Runnable {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
 	}
 
+
 	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
+		this(scenario, outputDir, scenarioFinishedListener, false);
+	}
+
+	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener, boolean suq) {
 		this.scenario = scenario;
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
-		this.setOutputPaths(Paths.get(outputDir)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+		this.setOutputPaths(Paths.get(outputDir), suq); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/outputs
 		this.finishedListener = scenarioFinishedListener;
 	}
 
@@ -135,6 +140,15 @@ public class ScenarioRun implements Runnable {
 			this.outputPath = Paths.get(outputPath.toString(), String.format("%s_%s", scenario.getName(), dateString));
 		} else {
 			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
+		}
+	}
+
+	public void setOutputPaths(final Path outputPath, boolean suq) {
+		if (suq == false){
+			setOutputPaths(outputPath);
+		}else{
+			this.outputPath = Paths.get(outputPath.toString());
+			System.out.println(this.outputPath);
 		}
 	}
 
