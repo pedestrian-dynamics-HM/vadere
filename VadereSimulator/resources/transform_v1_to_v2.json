@@ -4,6 +4,7 @@
     "spec": {
       "name": "&",
       "description": "&",
+      "commithash": "&",
       "vadere": {
         "mainModel": "scenario.mainModel",
         "attributesModel": {
@@ -256,6 +257,7 @@
       "name": "",
       "description": "",
       "release": "0.2",
+      "commithash": "warning: no commit hash",
       "processWriters": {
         "files[]": {
           "0": {

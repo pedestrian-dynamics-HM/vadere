@@ -24,7 +24,7 @@
       "scenario": {
         "mainModel": "scenario.mainModel",
         "attributesModel": {
-          "org.v adere.state.attributes.models.AttributesBHM": {
+          "org.vadere.state.attributes.models.AttributesBHM": {
             "stepLengthIntercept": "scenario.&2.&1.&0",
             "stepLengthSlopeSpeed": "scenario.&2.&1.&0",
             "stepLengthSD": "scenario.&2.&1.&0",
