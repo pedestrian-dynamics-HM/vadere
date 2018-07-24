@@ -11,6 +11,8 @@ import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
+import org.vadere.simulator.projects.migration.MigrationOptions;
+import org.vadere.simulator.projects.migration.MigrationResult;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -54,6 +56,7 @@ public class ActionLoadProject extends AbstractAction {
 
 				//TODO: [refactoring]: static call which has side-effect to the following call!
 				if (isRemigrationLoading) {
+					MigrationOptions migrationOptions;
 					Object option = JOptionPane.showInputDialog(null,
 							Messages.getString("ProjectView.chooseMigrationBaseDialog.text"),
 							Messages.getString("ProjectView.chooseMigrationBaseDialog.title"),
@@ -61,17 +64,19 @@ public class ActionLoadProject extends AbstractAction {
 							options, options[options.length-1]);
 
 					if(option.equals(options[options.length-1])) {
-						MigrationAssistant.setReapplyLatestMigrationFlag();
+						migrationOptions = MigrationOptions.reapplyWithAutomaticVersionDiscorvery();
 					}
 					else {
-						Version version = (Version)option;
-						MigrationAssistant.setReapplyLatestMigrationFlag(version);
+						migrationOptions = MigrationOptions.reapplyFromVersion((Version)option);
 					}
+					// 3. load project
+					loadProjectByPath(model, projectFilePath, migrationOptions);
 
+				} else {
+					// 3. load project
+					loadProjectByPath(model, projectFilePath);
 				}
 
-				// 3. load project
-				loadProjectByPath(model, projectFilePath);
 
 			} else {
 				logger.info(String.format("user canceled load project."));
@@ -97,9 +102,12 @@ public class ActionLoadProject extends AbstractAction {
 		ProjectView.getMainWindow().updateRecentProjectsMenu();
 	}
 
-	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath) {
+	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath){
+		loadProjectByPath(projectViewModel, projectFilePath, MigrationOptions.defaultOptions());
+	}
+	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath, MigrationOptions options) {
 		try {
-			VadereProject project = IOVadere.readProjectJson(projectFilePath);
+			VadereProject project = IOVadere.readProjectJson(projectFilePath, options);
 			projectViewModel.setCurrentProjectPath(projectFilePath);
 			projectViewModel.setProject(project);
 
@@ -118,15 +126,15 @@ public class ActionLoadProject extends AbstractAction {
 			logger.info(String.format("project '%s' loaded.", projectViewModel.getProject().getName()));
 
 			// results from migration assistant if he was active
-			int[] stats = project.getMigrationStats();
+			MigrationResult stats = project.getMigrationStats();
 
-			if (stats[1] > 0 || stats[2] > 0) { // scenarios: [0] total, [1] legacy'ed, [2] unmigratable
+			if (stats.total > 0 || stats.notmigratable > 0) { // scenarios: [0] total, [1] legacy'ed, [2] unmigratable
 				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 					@Override
 					public Void doInBackground() {
-						int total = stats[0];
-						int migrated = stats[1];
-						int nonmigratable = stats[2];
+						int total = stats.total;
+						int migrated = stats.legacy;
+						int nonmigratable = stats.notmigratable;
 						int untouched = total - migrated - nonmigratable;
 
 						// TODO pull this text from the language files
@@ -148,7 +156,7 @@ public class ActionLoadProject extends AbstractAction {
 
 						JOptionPane.showMessageDialog(
 								ProjectView.getMainWindow(),
-								message, "Migration assistant",
+								message, "JoltMigrationAssistant assistant",
 								JOptionPane.INFORMATION_MESSAGE);
 						return null;
 					}
@@ -157,7 +165,7 @@ public class ActionLoadProject extends AbstractAction {
 			}
 
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Migration assistant",
+			JOptionPane.showMessageDialog(null, e.getMessage(), "JoltMigrationAssistant assistant",
 					JOptionPane.ERROR_MESSAGE);
 			logger.error("could not load project: " + e.getMessage());
 			e.printStackTrace();

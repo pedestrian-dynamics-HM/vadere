@@ -26,50 +26,41 @@ import static org.vadere.util.io.IOUtils.OUTPUT_DIR;
 import static org.vadere.util.io.IOUtils.SCENARIO_DIR;
 
 
-public class Migration {
+public class JoltMigrationAssistant extends MigrationAssistant {
 
-	private final static Logger logger = Logger.getLogger(Migration.class);
+	private final static Logger logger = Logger.getLogger(JoltMigrationAssistant.class);
 	private final static LogBufferAppender appender;
 
 	private static HashMap<Version, Chainr> identityTransformation = new LinkedHashMap<>();
-	// Version is the target version. Only Incremental Transformation supported 1->2->3 (not 1->3)
 	private static HashMap<Version, Chainr> transformations = new LinkedHashMap<>();
-	private static final String LEGACY_EXTENSION = "legacy";
-	private static final String NONMIGRATABLE_EXTENSION = "nonmigratable";
 
 	static {
 		identityTransformation.put(Version.V0_1, Chainr.fromSpec(JsonUtils.classpathToList("/identity_v1.json")));
 		identityTransformation.put(Version.V0_2, Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json")));
 
 		transformations.put(Version.V0_2, Chainr.fromSpec(JsonUtils.classpathToList("/transform_v1_to_v2.json")));
-
 		appender = new LogBufferAppender();
 	}
 
-
-	private Version baseVersion = null;
-	private boolean reapplyLatestMigrationFlag = false;
 	private Diffy transformationDiff;
 
-	public Migration() {
+	public JoltMigrationAssistant(MigrationOptions options) {
+		super(options);
 		this.transformationDiff = new Diffy();
 		logger.addAppender(appender);
 	}
 
+	public JoltMigrationAssistant() {
+		this(MigrationOptions.defaultOptions());
+	}
+
+	@Override
 	public String getLog() {
 		return appender.getMigrationLog();
 	}
 
-	public void setReapplyLatestMigrationFlag() {
-		reapplyLatestMigrationFlag = true;
-		baseVersion = null;
-	}
 
-	public void setReapplyLatestMigrationFlag(final Version version) {
-		reapplyLatestMigrationFlag = true;
-		baseVersion = version;
-	}
-
+	@Override
 	public MigrationResult analyzeProject(String projectFolderPath) throws IOException {
 		MigrationResult stats = new MigrationResult();
 
@@ -83,9 +74,6 @@ public class Migration {
 			MigrationResult outputDirStats = analyzeDirectory(outputDir, OUTPUT_DIR);
 			stats.add(outputDirStats);
 		}
-
-		baseVersion = null;
-
 		return stats;
 	}
 
@@ -112,10 +100,10 @@ public class Migration {
 					stats.upToDate++;
 				}
 			} catch (MigrationException e) {
-				moveFileAddExtension(scenarioFilePath, legacyDir, NONMIGRATABLE_EXTENSION, !dirName.equals(SCENARIO_DIR));
+				moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getNonmigratabelExtension(), !dirName.equals(SCENARIO_DIR));
 				logger.error("!> Can't migrate the scenario to latest version, removed it from the directory (" +
 						e.getMessage() + ") If you can fix this problem manually, do so and then remove ." +
-						NONMIGRATABLE_EXTENSION + " from the file in the " + LEGACY_DIR + "-directory "
+						migrationOptions.getNonmigratabelExtension() + " from the file in the " + LEGACY_DIR + "-directory "
 						+ "and move it back into the scenarios-directory, it will be checked again when the GUI restarts.");
 				stats.notmigratable++;
 			}
@@ -179,10 +167,10 @@ public class Migration {
 			}
 
 			// if enforced migration should be done from baseVersion to latestVersion
-			if (reapplyLatestMigrationFlag && baseVersion != null) {
-				version = baseVersion;
+			if (migrationOptions.isReapplyLatestMigrationFlag() && migrationOptions.getBaseVersion() != null) {
+				version = migrationOptions.getBaseVersion();
 
-			} else if (reapplyLatestMigrationFlag) { // if enforced migration should be done from prev version to latest
+			} else if (migrationOptions.isReapplyLatestMigrationFlag()) { // if enforced migration should be done from prev version to latest
 				Optional<Version> optVersion = Version.getPrevious(version);
 				if (optVersion.isPresent()) {
 					version = optVersion.get();
@@ -204,7 +192,8 @@ public class Migration {
 			transformedNode = transform(transformedNode, v);
 		}
 		if (legacyDir != null) {
-			moveFileAddExtension(scenarioFilePath, legacyDir, LEGACY_EXTENSION, false);
+			logger.info("Scenario Migrated. Move olde version to legacyDir");
+			moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getLegacyExtension(), false);
 		}
 		IOUtils.writeTextFile(scenarioFilePath.toString(), StateJsonConverter.serializeJsonNode(transformedNode));
 		return true;
