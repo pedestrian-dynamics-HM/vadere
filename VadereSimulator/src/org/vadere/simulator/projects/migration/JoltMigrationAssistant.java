@@ -112,12 +112,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 	}
 
 	public JsonNode transform(JsonNode currentJson, Version targetVersion) throws MigrationException {
-		try {
-			return transform(StateJsonConverter.convertJsonNodeToObject(currentJson), targetVersion);
-		} catch (IOException e) {
-			logger.error("Error in converting JsonNode To Map of Object representation");
-			throw new MigrationException("Error in converting JsonNode To Map of Object representation", e);
-		}
+		return transform(StateJsonConverter.convertJsonNodeToObject(currentJson), targetVersion);
 	}
 
 	private JsonNode transform(Object currentJson, Version targetVersion) throws MigrationException {
@@ -159,7 +154,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());
 
-			if (version == null || version.equalOrSamller(Version.NOT_A_RELEASE)) {
+			if (version == null || version.equalOrSamller(Version.UNDEFINED)) {
 				logger.error("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid release create a version transformation and a new idenity transformation");
 				throw new MigrationException("release version " + node.get("release").asText() + " is unknown or not " +

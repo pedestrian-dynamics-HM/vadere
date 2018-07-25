@@ -86,7 +86,7 @@ public abstract class StateJsonConverter {
 		return mapper.readValue(dev, mapTypeReference);
 	}
 
-	public static Object convertJsonNodeToObject(JsonNode node) throws IOException {
+	public static Object convertJsonNodeToObject(JsonNode node) {
 		return mapper.convertValue(node, Map.class);
 	}
 
