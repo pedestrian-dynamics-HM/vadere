@@ -14,11 +14,13 @@ import org.vadere.state.util.StateJsonConverter;
 import java.util.Arrays;
 import java.util.List;
 
+import joptsimple.internal.Strings;
+
 
 public class JoltTest {
 
 	public static void main(String[] args) {
-		new JoltTest().attr();
+		new JoltTest().run2();
 	}
 
 	public void run() {
@@ -68,11 +70,13 @@ public class JoltTest {
 	public void run2() {
 
 
-		List chainrSpecJson = JsonUtils.classpathToList("/WithDots_transform_v2_to_v3.json");
+		List chainrSpecJson = JsonUtils.classpathToList("/transform_v0_to_v1.json");
 		Chainr chainr = Chainr.fromSpec(chainrSpecJson);
 
+		List identity = JsonUtils.classpathToList("/identity_v1.json");
+		Chainr identityTransform = Chainr.fromSpec(identity);
 
-		Object inputJson = JsonUtils.classpathToObject("/WithDotsscenario_test.json");
+		Object inputJson = JsonUtils.classpathToObject("/test.json");
 
 		Object transformedOutput = chainr.transform(inputJson);
 
@@ -82,10 +86,11 @@ public class JoltTest {
 
 //		String[] inarr = in.split(System.getProperty("line.separator"));
 //		String[] outarr = out.split(System.getProperty("line.separator"));
-//
-//		Diffy diffy = new Diffy();
-//		Diffy.Result res = diffy.diff(inputJson, transformedOutput);
-//		System.out.println(res.toString());
+		System.out.println(Strings.repeat('#', 120));
+		System.out.println(JsonUtils.toPrettyJsonString(identityTransform.transform(transformedOutput)));
+		Diffy diffy = new Diffy();
+		Diffy.Result res = diffy.diff(transformedOutput, identityTransform.transform(transformedOutput));
+		System.out.println(res.toString());
 
 		//todo leere Attribute
 		//

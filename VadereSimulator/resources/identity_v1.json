@@ -5,8 +5,7 @@
       "name": "&",
       "description": "&",
       "release": "&",
-      "topographyhash": "&",
-      "attributeshash": "&",
+      "commithash": "&",
       "processWriters": {
         "*": {
           "*": "processWriters[&1].&"
@@ -250,10 +249,26 @@
     "spec": {
       "name": "",
       "description": "",
-      "release": "",
-      "topographyhash": "",
-      "attributeshash": "",
-      "processWriters": [],
+      "release": "0.1",
+      "commithash": "warning: no commit hash",
+      "processWriters": {
+        "files[]": {
+          "0": {
+            "type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+            "filename": "postvis.trajectories",
+            "processors": [
+              1
+            ]
+          }
+        },
+        "processors[]": {
+          "0": {
+            "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+            "id": 1
+          }
+        },
+        "isTimestamped": "true"
+      },
       "vadere": {
         "mainModel": "null",
         "attributesModel": {},
