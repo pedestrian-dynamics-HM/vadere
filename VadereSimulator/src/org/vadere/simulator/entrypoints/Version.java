@@ -23,6 +23,10 @@ public enum Version {
 		return label;
 	}
 
+	public String label(char repalce) {
+		return label.replace(' ', repalce);
+	}
+
 	public static Version fromString(String versionStr) {
 		for (Version v : values()) {
 			if (v.label.equals(versionStr))
@@ -41,8 +45,13 @@ public enum Version {
 		throw new IllegalArgumentException("Value not in Version Enumeration " + curr.toString());
 	}
 
-	public static Version nextVersion(Version curr){
-		int nextId = versionId(curr) == (values().length -1) ? versionId(curr) : versionId(curr) + 1;
+	public Version nextVersion(){
+		int nextId = versionId(this) == (values().length -1) ? versionId(this) : versionId(this) + 1;
+		return values()[nextId];
+	}
+
+	public Version previousVersion(){
+		int nextId = versionId(this) == 0 ? versionId(this) : versionId(this) - 1;
 		return values()[nextId];
 	}
 
