@@ -40,18 +40,9 @@ public class VadereConsole {
 			System.exit(1);
 		}
 
-
-
-		System.out.println(System.getProperty("user.dir"));
-
 		Locale.setDefault(Locale.ENGLISH);
 		String pathToScenarioFile = ns.getString("scenario-file");
 		String outputDir = ns.get("output-dir");
-		if (ns.getBoolean("suq")){
-			if (outputDir == null){
-				throw new IllegalArgumentException("If the option -suq is activated, an output directory (output-dir) has to be specified!");
-			}
-		}
 
 		if (pathToScenarioFile == null) {
 			System.err.println("Too few arguments. Exiting.");
@@ -70,26 +61,12 @@ public class VadereConsole {
 		logger.info(String.format("Running VADERE on %s...", scenarioFilePath));
 
 		try {
-			Scenario scenario;
-			if (ns.getBoolean("suq")) {
-				 scenario = ScenarioFactory.createScenarioWithScenarioFilePath(Paths.get(scenarioFile));
-			}else{
-				scenario = ScenarioFactory.createVadereWithProjectDirectory(scenarioFile, projectDirectory);
-			}
+			Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(projectDirectory,scenarioFile);
 			if(outputDir != null) {
-				if (ns.getBoolean("suq")){
-					new ScenarioRun(scenario, outputDir, null,true).run();
-				}else {
-					new ScenarioRun(scenario, outputDir, null).run();
-				}
-
+				new ScenarioRun(scenario, outputDir,null).run();
 			}
 			else {
-				if (ns.getBoolean("suq")){
-					new ScenarioRun(scenario, null, null,true).run();
-				}else {
-					new ScenarioRun(scenario, null).run();
-				}
+				new ScenarioRun(scenario, null).run();
 			}
 
 		} catch (Exception e) {
@@ -106,9 +83,6 @@ public class VadereConsole {
 				.help("Path to the scenario file.");
 		parser.addArgument("output-dir").required(false)
 				.help("Path to the directory of the output. By default this is ./output of the directory of the executable.");
-		parser.addArgument("-suq").required(false)
-				.help("Indicates that the folder structure for input and output is fully controlled by the user. Only a single scenario is run, no project or project structure is necessary. Intended for the SUQ-Controller. Outputpath has to be specified!")
-				.action(Arguments.storeTrue());
 		return parser;
 	}
 
