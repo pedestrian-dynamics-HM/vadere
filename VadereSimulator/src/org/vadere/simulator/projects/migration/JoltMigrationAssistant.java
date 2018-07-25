@@ -38,6 +38,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		identityTransformation.put(Version.V0_1, Chainr.fromSpec(JsonUtils.classpathToList("/identity_v1.json")));
 		identityTransformation.put(Version.V0_2, Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json")));
 
+		transformations.put(Version.V0_1, Chainr.fromSpec(JsonUtils.classpathToList("/transform_v0_to_v1.json")));
 		transformations.put(Version.V0_2, Chainr.fromSpec(JsonUtils.classpathToList("/transform_v1_to_v2.json")));
 		appender = new LogBufferAppender();
 	}
