@@ -1,4 +1,4 @@
-package org.vadere.state.events;
+package org.vadere.state.events.types;
 
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
@@ -6,8 +6,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import java.util.List;
 
 /**
- * This event hold as addtional information:
- * - An area in which the event is valid.
+ * This event hold as additional information: an area in which the event is valid.
  */
 public class WaitInAreaEvent extends Event {
 

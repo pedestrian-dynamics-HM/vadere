@@ -1,8 +1,10 @@
 package org.vadere.state.events;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
 
 import java.util.ArrayList;
 import java.util.List;

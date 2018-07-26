@@ -22,6 +22,7 @@ import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Obstacle;
@@ -87,6 +88,7 @@ public abstract class StateJsonConverter {
 		Collection<AttributesTarget> targets = new LinkedList<>();
 		Collection<AttributesSource> sources = new LinkedList<>();
 		Collection<? extends DynamicElement> dynamicElements = new LinkedList<>();
+		Collection<Event> events = new LinkedList<>();
 		AttributesTeleporter teleporter = null;
 	}
 

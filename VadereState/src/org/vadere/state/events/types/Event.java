@@ -1,5 +1,9 @@
-package org.vadere.state.events;
+package org.vadere.state.events.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.vadere.state.scenario.ScenarioElement;
 
 import java.util.ArrayList;
@@ -17,15 +21,27 @@ import java.util.stream.Collectors;
  * step.
  *
  * The additional information depend on the type of the event and are added by
- * concrete implementations. For instance, an event "ElapsedTimeEvent" can provide
+ * subclasses. For instance, an event "ElapsedTimeEvent" can provide
  * the current time step. The event "Bang" can have an intensity and a polygon
  * which describes where the bang can be perceived.
  *
- * TODO Add following events:
- * - TimeElapsed
- * - Wait
- * - Bang
+ * This class and its subclasses should be de-/serialized as JSON. Therefore,
+ * provide some annotations so that serialized objects do not reveal Java
+ * type information like "util.ArrayList".
+ *
+ * See @link http://www.baeldung.com/jackson-inheritance
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
+@JsonSubTypes({
+        @Type(value = ElapsedTimeEvent.class, name = "ElapsedTimeEvent"),
+        @Type(value = WaitEvent.class, name = "WaitEvent"),
+        @Type(value = WaitInAreaEvent.class, name = "WaitInAreaEvent")
+})
+// "time" is set when the event is actually raised and must not be de-/serialized.
+@JsonIgnoreProperties({ "time" })
 public abstract class Event {
 
     protected double time;

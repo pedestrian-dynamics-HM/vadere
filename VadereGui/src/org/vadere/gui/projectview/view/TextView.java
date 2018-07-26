@@ -41,8 +41,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Shows text like the JSON formatted attributes.
- * 
- * 
+ *
+ *
  */
 public class TextView extends JPanel implements IJsonView {
 
@@ -185,6 +185,11 @@ public class TextView extends JPanel implements IJsonView {
 							break;
 						case TOPOGRAPHY:
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
+							break;
+						case EVENT:
+						    // TODO Add events to scenario(Store) so that they can be used during simulation run.
+                            // Extend JSON de-/serialization for this (i.e., deserialize text view into Event objects here).
+							System.out.println("setScenarioContent() for event text event");
 							break;
 						default:
 							throw new RuntimeException("attribute type not implemented.");

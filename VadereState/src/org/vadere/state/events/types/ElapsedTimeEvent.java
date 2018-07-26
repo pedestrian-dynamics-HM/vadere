@@ -1,4 +1,4 @@
-package org.vadere.state.events;
+package org.vadere.state.events.types;
 
 import org.vadere.state.scenario.ScenarioElement;
 

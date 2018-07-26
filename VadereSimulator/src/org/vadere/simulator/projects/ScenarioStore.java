@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.data.FindByClass;
@@ -35,15 +35,23 @@ public class ScenarioStore {
 	private List<Attributes> attributesList;
 	private AttributesSimulation attributesSimulation;
 	private Topography topography;
+	private List<Event> eventList;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
 			final AttributesSimulation attributesSimulation, final Topography topography) {
+	    // Provide empty list of events.
+		this(name, description, mainModel, attributesModel, attributesSimulation, topography, new ArrayList<>());
+	}
+
+	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
+						 final AttributesSimulation attributesSimulation, final Topography topography, final List<Event> eventList) {
 		this.name = name;
 		this.description = description;
 		this.mainModel = mainModel;
 		this.attributesList = attributesModel;
 		this.attributesSimulation = attributesSimulation;
 		this.topography = topography;
+		this.eventList = eventList;
 	}
 
 	public synchronized Topography getTopography() {
@@ -115,6 +123,14 @@ public class ScenarioStore {
 		this.name = name;
 	}
 
+	public void setEventList(List<Event> eventList) { this.eventList = eventList; }
+
+	public void addEvent(Event event) { eventList.add(event); }
+
+	public void removeEventIf(@NotNull final Predicate<Event> predicate) {
+		eventList.removeIf(predicate);
+	}
+
 	public AttributesSimulation getAttributesSimulation() {
 		return attributesSimulation;
 	}
@@ -134,4 +150,6 @@ public class ScenarioStore {
 	public String getName() {
 		return name;
 	}
+
+	public List<Event> getEventList() { return eventList; }
 }

@@ -1,10 +1,10 @@
 package org.vadere.simulator.control.events;
 
 
-import org.vadere.state.events.ElapsedTimeEvent;
-import org.vadere.state.events.Event;
-import org.vadere.state.events.WaitEvent;
-import org.vadere.state.events.WaitInAreaEvent;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
+import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
