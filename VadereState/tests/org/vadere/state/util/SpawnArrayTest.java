@@ -126,10 +126,10 @@ public class SpawnArrayTest {
 		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
 		List<DynamicElement> dynamicElements2 = createMock(0.5,
 				spawnPoints[12],	// direct match (use next)
-				spawnPoints[13].add(new VPoint(0, 0.0003)), // match within Epsilon (use next)
-				spawnPoints[14].add(new VPoint(0.3, 0)) // match outside Epsilon (use this one)
+				spawnPoints[13].add(new VPoint(0, SpawnArray.OVERLAPP_EPSILON - 0.1)), // match within Epsilon (use next)
+				spawnPoints[14].add(new VPoint(SpawnArray.OVERLAPP_EPSILON + 0.1, 0)) // match outside Epsilon (use this one)
 		);
-		assertEquals("Point does not match", spawnArray.getNextSpawnPoints(1, dynamicElements2).getFirst(), spawnPoints[14]);
+		assertEquals("Point does not match", spawnPoints[14], spawnArray.getNextSpawnPoints(1, dynamicElements2).getFirst());
 		assertEquals("Next Element does not match", 15, spawnArray.getNextSpawnPointIndex());
 	}
 
@@ -326,8 +326,8 @@ public class SpawnArrayTest {
 		// do not directly overlap with each other.
 		List<DynamicElement> dynamicElements2 = createMock(0.5,
 				spawnPoints[1],	// direct match (use next)
-				spawnPoints[2].add(new VPoint(0.0003, 0)), // match within Epsilon (use next)
-				spawnPoints[3].add(new VPoint(0.3, 0.3)) // match outside Epsilon (use this one)
+				spawnPoints[2].add(new VPoint(SpawnArray.OVERLAPP_EPSILON - 0.1, 0)), // match within Epsilon (use next)
+				spawnPoints[3].add(new VPoint(SpawnArray.OVERLAPP_EPSILON + 0.1, SpawnArray.OVERLAPP_EPSILON + 0.1)) // match outside Epsilon (use this one)
 		);
 		group = spawnArray.getNextGroup(6, dynamicElements2);
 		assertEquals(spawnPoints[3], group.pollFirst());
