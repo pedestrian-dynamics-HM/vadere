@@ -128,7 +128,7 @@ public class ActionLoadProject extends AbstractAction {
 			// results from migration assistant if he was active
 			MigrationResult stats = project.getMigrationStats();
 
-			if (stats.total > 0 || stats.notmigratable > 0) { // scenarios: [0] total, [1] legacy'ed, [2] unmigratable
+			if (stats.legacy > 0 || stats.notmigratable > 0) { // scenarios: [0] total, [1] legacy'ed, [2] unmigratable
 				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 					@Override
 					public Void doInBackground() {
@@ -162,6 +162,8 @@ public class ActionLoadProject extends AbstractAction {
 					}
 				};
 				worker.execute();
+			} else {
+				logger.info("Nothing to migrate all up to date " + stats);
 			}
 
 		} catch (Exception e) {
