@@ -22,6 +22,7 @@ import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
@@ -147,6 +148,10 @@ public abstract class StateJsonConverter {
 		}
 	}
 
+	public static EventInfoStore deserializeEvents(String json) throws IOException {
+		return mapper.readValue(json, EventInfoStore.class);
+	}
+
 	public static Pedestrian deserializePedestrian(String json) throws IOException {
 		return mapper.readValue(json, Pedestrian.class);
 	}
@@ -250,6 +255,8 @@ public abstract class StateJsonConverter {
 
 		JsonNode attributesCarNode = mapper.convertValue(topography.getAttributesCar(), JsonNode.class);
 		topographyNode.set("attributesCar", attributesCarNode);
+
+		// TODO Serialize EventInfoStore!
 
 		return topographyNode;
 	}

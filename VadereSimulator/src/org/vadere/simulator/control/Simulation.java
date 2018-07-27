@@ -13,8 +13,10 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
@@ -254,6 +256,18 @@ public class Simulation {
 
 	private void updateCallbacks(double simTimeInSec) {
         List<Event> events = new ArrayList<>();
+
+		// TODO Replace this dummy implementation and let EventController evaluate and create events.
+		/*
+        events.add(new ElapsedTimeEvent(simTimeInSec));
+        for (EventInfo eventInfo : scenarioStore.getEventInfoStore().getEventInfos()) {
+			EventTimeframe eventTimeframe = eventInfo.getEventTimeframe();
+
+			if (simTimeInSec >= eventTimeframe.getStartTime() && simTimeInSec <= eventTimeframe.getEndTime()) {
+				events.addAll(eventInfo.getEvents());
+			}
+		}
+		*/
 
         EventFactory eventFactory = new EventFactory();
 

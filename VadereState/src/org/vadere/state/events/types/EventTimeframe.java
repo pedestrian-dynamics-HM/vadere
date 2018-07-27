@@ -15,6 +15,17 @@ public class EventTimeframe {
     private boolean repeat;
     private double waitTimeBetweenRepetition;
 
+    public EventTimeframe() {
+        this(0, 0, false, 0);
+    }
+
+    public EventTimeframe(double startTime, double endTime, boolean repeat, double waitTimeBetweenRepetition) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.repeat = repeat;
+        this.waitTimeBetweenRepetition = waitTimeBetweenRepetition;
+    }
+
     public double getStartTime() {
         return startTime;
     }

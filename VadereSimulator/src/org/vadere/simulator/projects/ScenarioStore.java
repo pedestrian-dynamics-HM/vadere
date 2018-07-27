@@ -13,7 +13,7 @@ import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.events.types.Event;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.data.FindByClass;
@@ -35,23 +35,23 @@ public class ScenarioStore {
 	private List<Attributes> attributesList;
 	private AttributesSimulation attributesSimulation;
 	private Topography topography;
-	private List<Event> eventList;
+	private EventInfoStore eventInfoStore;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
 			final AttributesSimulation attributesSimulation, final Topography topography) {
-	    // Provide empty list of events.
-		this(name, description, mainModel, attributesModel, attributesSimulation, topography, new ArrayList<>());
+	    // Provide empty "EventInfoStore".
+		this(name, description, mainModel, attributesModel, attributesSimulation, topography, new EventInfoStore());
 	}
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
-						 final AttributesSimulation attributesSimulation, final Topography topography, final List<Event> eventList) {
+						 final AttributesSimulation attributesSimulation, final Topography topography, final EventInfoStore eventInfoStore) {
 		this.name = name;
 		this.description = description;
 		this.mainModel = mainModel;
 		this.attributesList = attributesModel;
 		this.attributesSimulation = attributesSimulation;
 		this.topography = topography;
-		this.eventList = eventList;
+		this.eventInfoStore = eventInfoStore;
 	}
 
 	public synchronized Topography getTopography() {
@@ -123,13 +123,7 @@ public class ScenarioStore {
 		this.name = name;
 	}
 
-	public void setEventList(List<Event> eventList) { this.eventList = eventList; }
-
-	public void addEvent(Event event) { eventList.add(event); }
-
-	public void removeEventIf(@NotNull final Predicate<Event> predicate) {
-		eventList.removeIf(predicate);
-	}
+	public void setEventInfoStore(EventInfoStore eventInfoStore) { this.eventInfoStore = eventInfoStore; }
 
 	public AttributesSimulation getAttributesSimulation() {
 		return attributesSimulation;
@@ -151,5 +145,5 @@ public class ScenarioStore {
 		return name;
 	}
 
-	public List<Event> getEventList() { return eventList; }
+	public EventInfoStore getEventInfoStore() { return eventInfoStore; }
 }

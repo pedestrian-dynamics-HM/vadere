@@ -33,6 +33,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
@@ -187,9 +188,9 @@ public class TextView extends JPanel implements IJsonView {
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 							break;
 						case EVENT:
-						    // TODO Add events to scenario(Store) so that they can be used during simulation run.
-                            // Extend JSON de-/serialization for this (i.e., deserialize text view into Event objects here).
-							System.out.println("setScenarioContent() for event text event");
+						    // TODO Serialization of events must also be implemented somewhere (when saving project or running a scenario).
+							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
+							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
 							break;
 						default:
 							throw new RuntimeException("attribute type not implemented.");

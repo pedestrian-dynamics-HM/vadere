@@ -6,6 +6,8 @@ import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +42,10 @@ public class EventInfoStore {
 
     private List<EventInfo> eventInfos;
 
+    public EventInfoStore() {
+        this.eventInfos = new ArrayList<>();
+    }
+
     public List<EventInfo> getEventInfos() {
         return eventInfos;
     }
@@ -52,11 +58,12 @@ public class EventInfoStore {
         // TODO Remove main method here.
 
         // Create "EventTimeframe" and "Event" objects.
-        EventTimeframe eventTimeframe = new EventTimeframe();
+        EventTimeframe eventTimeframe = new EventTimeframe(5, 30, false, 0);
 
         List<Event> events = new ArrayList<>();
         events.add(new ElapsedTimeEvent(0));
-        events.add(new WaitInAreaEvent(1));
+        // TODO Fix Jackson's infinite recursion with "VRectangle" here.
+        events.add(new WaitInAreaEvent(0)); // new VRectangle(12.5, 0, 5, 6)
 
         // Wrap "EventTimeframe" and "Event" objects in two "EventInfo" objects.
         EventInfo eventInfo1 = new EventInfo();
