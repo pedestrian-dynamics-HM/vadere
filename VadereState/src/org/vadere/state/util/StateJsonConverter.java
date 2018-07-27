@@ -106,8 +106,7 @@ public abstract class StateJsonConverter {
 		AttributesTeleporter teleporter = null;
 	}
 
-	public static AttributesSimulation deserializeAttributesSimulation(String json)
-			throws IOException, TextOutOfNodeException {
+	public static AttributesSimulation deserializeAttributesSimulation(String json) {
 		return deserializeObjectFromJson(json, AttributesSimulation.class);
 	}
 
@@ -142,7 +141,7 @@ public abstract class StateJsonConverter {
 		store.stairs.forEach(stairs -> topography.addStairs(new Stairs(stairs)));
 		store.targets.forEach(target -> topography.addTarget(new Target(target)));
 		store.sources.forEach(source -> topography.addSource(new Source(source)));
-		store.dynamicElements.forEach(element -> topography.addInitialElement(element));
+		store.dynamicElements.forEach(topography::addInitialElement);
 		if (store.teleporter != null)
 			topography.setTeleporter(new Teleporter(store.teleporter));
 		return topography;

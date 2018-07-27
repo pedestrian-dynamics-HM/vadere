@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.migration.jolttranformation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.entrypoints.Version;
@@ -17,13 +18,15 @@ import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.util.StateJsonConverter;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 public class JoltTransformV0toV1 extends JoltTransformation {
 
 
-	JoltTransformV0toV1(String transformation, String identity, Version version) {
+	JoltTransformV0toV1(String transformation, String identity, Version version) throws MigrationException {
 		super(transformation, identity, version);
 	}
 
@@ -32,29 +35,46 @@ public class JoltTransformV0toV1 extends JoltTransformation {
 		postTransformHooks.add(this::findMainModel);
 		postTransformHooks.add(this::attributesPotentialCompactVSosmIncident);
 		postTransformHooks.add(this::moveSpawnDelayIntoDistributionParametersIncident);
+		postTransformHooks.add(this::sort);
+	}
+
+	//post Hooks
+
+	@SuppressWarnings("unchecked")
+	public JsonNode sort (JsonNode node) throws MigrationException{
+		LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
+		LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
+		putObject(sortedRoot, source, "name");
+		putObject(sortedRoot, source, "description");
+		putObject(sortedRoot, source, "release");
+		putObject(sortedRoot, source, "commithash");
+		putObject(sortedRoot, source, "processWriters", "files", "processors", "isTimestamped");
+		putObject(sortedRoot, source, "vadere", "mainModel", "attributesModel", "attributesSimulation", "topography");
+
+		return  StateJsonConverter.deserializeToNode(sortedRoot);
 	}
 
 	private JsonNode findMainModel(JsonNode node) throws MigrationException {
-		JsonNode scenario = node.path("scenario");
+		JsonNode scenario = node.path("vadere");
 		if (scenario.isMissingNode()){
 			logger.error("There must be scenario Node");
-			throw new MigrationException("There must be scenario Node");
+			throw new MigrationException("There must be vadere Node");
 		}
 
 		// Possible Main Models
 		String mainModelValue = "";
-		if (! node.path("scenario").path("attributesModel").path(AttributesOSM.class.getName()).isMissingNode()){
+		if (! node.path("vadere").path("attributesModel").path(AttributesOSM.class.getName()).isMissingNode()){
 			mainModelValue = OptimalStepsModel.class.getName();
 		}
 
-		if (! node.path("scenario").path("attributesModel").path(AttributesGNM.class.getName()).isMissingNode()){
+		if (! node.path("vadere").path("attributesModel").path(AttributesGNM.class.getName()).isMissingNode()){
 			if (!mainModelValue.equals("")){
 				throw new MigrationException("can't automatically determine the mainModel - more than one mainModel-suitable model is present");
 			}
 			mainModelValue = GradientNavigationModel.class.getName();
 		}
 
-		if (! node.path("scenario").path("attributesModel").path(AttributesGNM.class.getName()).isMissingNode()){
+		if (! node.path("vadere").path("attributesModel").path(AttributesGNM.class.getName()).isMissingNode()){
 			if (!mainModelValue.equals("")){
 				throw new MigrationException("can't automatically determine the mainModel - more than one mainModel-suitable model is present");
 			}
@@ -76,12 +96,12 @@ public class JoltTransformV0toV1 extends JoltTransformation {
 	 *  Jolt transformation
 	 */
 	private JsonNode attributesPotentialCompactVSosmIncident (JsonNode node) throws MigrationException {
-		JsonNode osmAttr = node.path("scenario").path("attributesModel").path(AttributesOSM.class.getCanonicalName());
+		JsonNode osmAttr = node.path("vadere").path("attributesModel").path(AttributesOSM.class.getCanonicalName());
 		if (osmAttr.isMissingNode())
 			return node;
 
-		JsonNode potentialCompactAttr = node.path("scenario").path("attributesModel").path(AttributesPotentialCompact.class.getCanonicalName());
-		JsonNode potentialOSMAttr = node.path("scenario").path("attributesModel").path(AttributesPotentialOSM.class.getCanonicalName());
+		JsonNode potentialCompactAttr = node.path("vadere").path("attributesModel").path(AttributesPotentialCompact.class.getCanonicalName());
+		JsonNode potentialOSMAttr = node.path("vadere").path("attributesModel").path(AttributesPotentialOSM.class.getCanonicalName());
 
 		if (!potentialCompactAttr.isMissingNode() && !potentialOSMAttr.isMissingNode()){
 			throw new MigrationException("[AttributesPotentialCompact] and [AttributesPotentialOSM] are both present, that is not allowed.");
@@ -115,7 +135,7 @@ public class JoltTransformV0toV1 extends JoltTransformation {
 	 *  If the interSpawnTimeDistribution is set within one source rebuild the distributionParameters
 	 */
 	private JsonNode moveSpawnDelayIntoDistributionParametersIncident (JsonNode node) {
-		JsonNode sources = node.path("scenario").path("topography").path("sources");
+		JsonNode sources = node.path("vadere").path("topography").path("sources");
 
 		if (sources.isMissingNode())
 			return node;
@@ -129,7 +149,8 @@ public class JoltTransformV0toV1 extends JoltTransformation {
 
 			if (spawnDelay != -1.0 && (!distribution.isMissingNode() ||
 					distribution.asText().equals(AttributesSource.CONSTANT_DISTRIBUTION))){
-				setDoubelArray(source, "distributionParameters",  spawnDelay);
+				ArrayNode arrayNode = ((ObjectNode)source).putArray("distributionParameters");
+				arrayNode.add(spawnDelay);
 			}
 
 			((ObjectNode)source).remove("spawnDelay");

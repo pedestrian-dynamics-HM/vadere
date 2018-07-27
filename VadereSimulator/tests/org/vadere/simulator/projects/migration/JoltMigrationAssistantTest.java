@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.After;
 import org.junit.Test;
 import org.vadere.simulator.entrypoints.Version;
+import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.io.RecursiveCopy;
@@ -27,19 +28,8 @@ public class JoltMigrationAssistantTest {
 	@After
 	public void resetTestStructure() throws URISyntaxException {
 		String dest = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
-		String source = getClass().getResource("/migration/testProject_v0.1.bak").toURI().getPath();
-		try {
-
-			if (Paths.get(dest).toFile().exists()) {
-				Files.walk(Paths.get(dest))
-						.sorted(Comparator.reverseOrder())
-						.map(Path::toFile)
-						.forEach(File::delete);
-			}
-			Files.walkFileTree(Paths.get(source), new RecursiveCopy(source, dest));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String backup = getClass().getResource("/migration/testProject_v0.1.bak").toURI().getPath();
+		TestUtils.resetTestStructure(dest, backup);
 	}
 
 	// Test transformation of single scenario file

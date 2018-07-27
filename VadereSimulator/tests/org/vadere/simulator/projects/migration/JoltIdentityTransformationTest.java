@@ -22,25 +22,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JoltIdentityTransformationTest {
 
 
 	@Test
+	@Ignore
 	public void testIdenityTransformationV02() throws IOException {
-		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTests").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
-		testIdentity(scenarioFiles, "/identity_v2.json");
+		List<Path> scenarioFiles = getScenarioFiles(
+				Paths.get("../VadereModelTests").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		testIdentity(scenarioFiles, "/identity_v0.2.json");
 	}
 
-	// todo use testResources
+	// no TestResource in current git
 	@Test
 	@Ignore
 	public void testIdenityTransformationV01() throws IOException {
 
 		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
-		testIdentity(scenarioFiles, "/identity_v1.json");
+		testIdentity(scenarioFiles, "/identity_v0.1.json");
 	}
 
 	// todo use testResources
@@ -52,9 +53,9 @@ public class JoltIdentityTransformationTest {
 		for (Path p : scenarioFiles) {
 			Object jsonInput = JsonUtils.filepathToObject(p.toString());
 			Chainr transformation =
-					Chainr.fromSpec(JsonUtils.classpathToList("/transform_v1_to_v2.json"));
+					Chainr.fromSpec(JsonUtils.classpathToList("/transform_v0.1_to_v0.2.json"));
 			Chainr identityV02 =
-					Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json"));
+					Chainr.fromSpec(JsonUtils.classpathToList("/identity_v0.2.json"));
 			Object jsonNew = transformation.transform(jsonInput);
 
 			//test
@@ -100,11 +101,11 @@ public class JoltIdentityTransformationTest {
 	@Ignore
 	public void transformv1t0v2() throws IOException {
 		Path scenario = Paths.get("../VadereModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
-		List chainrSpecJson = JsonUtils.classpathToList("/transform_v1_to_v2.json");
+		List chainrSpecJson = JsonUtils.classpathToList("/transform_v0.1_to_v0.2.json");
 		Chainr transform_v1_v2 = Chainr.fromSpec(chainrSpecJson);
 		Object inputJson = JsonUtils.filepathToObject(scenario.toString());
 		Object jsonOut1 = transform_v1_v2.transform(inputJson);
-		Chainr identity_v2 = Chainr.fromSpec(JsonUtils.classpathToList("/identity_v2.json"));
+		Chainr identity_v2 = Chainr.fromSpec(JsonUtils.classpathToList("/identity_v0.2.json"));
 		Object jsonOut2 = identity_v2.transform(jsonOut1);
 		System.out.println(JsonUtils.toPrettyJsonString(jsonOut2));
 		Diffy diffy = new Diffy();
@@ -142,7 +143,7 @@ public class JoltIdentityTransformationTest {
 			String[] path2 = Arrays.copyOfRange(path, 1, path.length);
 			return get(new JsonObj(node.getMap().get(next)), path2);
 		}
-		if (node.type == ARRAY && path.length != 1) {
+		if (node.type == ARRAY) {
 			throw new RuntimeException("only last element of path can be an array");
 		}
 		return new JsonObj(node);
@@ -174,7 +175,7 @@ public class JoltIdentityTransformationTest {
 		LinkedList<Path> scenarioFiles = new LinkedList<>();
 		FileVisitor<Path> visitor = new FileVisitor<Path>() {
 			@Override
-			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
 				if (dir.endsWith("output")) {
 					return FileVisitResult.SKIP_SUBTREE;
 				} else {
@@ -183,7 +184,7 @@ public class JoltIdentityTransformationTest {
 			}
 
 			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 				if (file.getFileName().toString().endsWith("scenario")) {
 					scenarioFiles.add(file);
 				}
@@ -191,12 +192,12 @@ public class JoltIdentityTransformationTest {
 			}
 
 			@Override
-			public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+			public FileVisitResult visitFileFailed(Path file, IOException exc) {
 				return null;
 			}
 
 			@Override
-			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
 				if (Files.exists(dir.resolve(".git"))) {
 					return FileVisitResult.CONTINUE;
 				} else {
