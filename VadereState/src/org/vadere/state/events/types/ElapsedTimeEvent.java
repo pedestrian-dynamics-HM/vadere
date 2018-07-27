@@ -11,6 +11,9 @@ import java.util.List;
  */
 public class ElapsedTimeEvent extends Event {
 
+    // Default constructor required for JSON de-/serialization.
+    public ElapsedTimeEvent() { super(); }
+
     public ElapsedTimeEvent(double time) {
         super(time);
     }

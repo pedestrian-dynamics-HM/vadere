@@ -12,6 +12,9 @@ public class WaitInAreaEvent extends Event {
 
     private VShape area;
 
+    // Default constructor required for JSON de-/serialization.
+    public WaitInAreaEvent() { super(); }
+
     public WaitInAreaEvent(double time) {
         super(time);
     }

@@ -9,6 +9,9 @@ import java.util.List;
  */
 public class WaitEvent extends Event {
 
+    // Default constructor required for JSON de-/serialization.
+    public WaitEvent() { super(); }
+
     public WaitEvent(double time) {
         super(time);
     }

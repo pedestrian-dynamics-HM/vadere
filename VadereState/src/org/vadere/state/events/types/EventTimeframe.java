@@ -1,5 +1,7 @@
 package org.vadere.state.events.types;
 
+import java.lang.reflect.Field;
+
 /**
  * A timeframe in which events occur.
  *
@@ -43,6 +45,17 @@ public class EventTimeframe {
 
     public void setWaitTimeBetweenRepetition(double waitTimeBetweenRepetition) {
         this.waitTimeBetweenRepetition = waitTimeBetweenRepetition;
+    }
+
+    @Override
+    public String toString() {
+        String string = "EventTimeframe:\n";
+        string += String.format("  startTime: %f\n", startTime);
+        string += String.format("  endTime: %f\n", endTime);
+        string += String.format("  repeat: %b\n", repeat);
+        string += String.format("  waitTimeBetweenRepetition: %f\n", waitTimeBetweenRepetition);
+
+        return string;
     }
 
 }

@@ -12,19 +12,19 @@ import java.util.List;
  * This class is just a wrapper to get a convenient JSON de-/serialization. The JSON serialization should look like
  * this:
  *
- * {
- *      "eventTimeframe": {
- *          "startTime":...,
- *          "endTime":...,
- *          "repeat":...,
- *          "waitTimeBetweenRepetition":...
- *      },
- *      "events": [
- *          {"type":"ElapsedTimeEvent","targets":[...]},
- *          {"type":"WaitInAreaEvent","targets":[...],"area":...},
- *          ...
- *      ]
- * }
+ *      {
+ *           "eventTimeframe": {
+ *               "startTime":...,
+ *               "endTime":...,
+ *               "repeat":...,
+ *               "waitTimeBetweenRepetition":...
+ *           },
+ *           "events": [
+ *               {"type":"ElapsedTimeEvent","targets":[...]},
+ *               {"type":"WaitInAreaEvent","targets":[...],"area":...},
+ *               ...
+ *           ]
+ *      }
  */
 public class EventInfo {
 

@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
  * type information like "util.ArrayList".
  *
  * See @link http://www.baeldung.com/jackson-inheritance
+ *
+ * Watch out: subclasses require a default constructor so that
+ * de-/serialization works.
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -46,6 +49,12 @@ public abstract class Event {
 
     protected double time;
     protected List<ScenarioElement> targets;
+
+    // Default constructor required for JSON de-/serialization.
+    protected Event() {
+        this.time = 0;
+        this.targets = new ArrayList<ScenarioElement>();
+    }
 
     protected Event(double time) {
         this.time = time;
