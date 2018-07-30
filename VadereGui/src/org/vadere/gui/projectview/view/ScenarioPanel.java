@@ -274,6 +274,9 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		this.topographyFileView.setVadereScenario(scenario);
 		this.topographyFileView.isEditable(isEditable);
 
+		this.eventFileView.setVadereScenario(scenario);
+		this.eventFileView.isEditable(isEditable);
+
 		this.dataProcessingGUIview.setVadereScenario(scenario);
 		this.dataProcessingGUIview.isEditable(isEditable);
 	}

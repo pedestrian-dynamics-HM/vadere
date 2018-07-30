@@ -188,7 +188,6 @@ public class TextView extends JPanel implements IJsonView {
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 							break;
 						case EVENT:
-						    // TODO Serialization of events must also be implemented somewhere (when saving project or running a scenario).
 							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
 							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
 							break;
@@ -235,11 +234,14 @@ public class TextView extends JPanel implements IJsonView {
 		case OUTPUTPROCESSOR:
 			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 			break;
-
 		case TOPOGRAPHY:
 			Topography topography = scenario.getTopography().clone();
 			topography.removeBoundary();
 			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			break;
+		case EVENT:
+			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");

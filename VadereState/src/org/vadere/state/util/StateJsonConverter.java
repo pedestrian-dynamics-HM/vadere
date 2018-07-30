@@ -256,8 +256,6 @@ public abstract class StateJsonConverter {
 		JsonNode attributesCarNode = mapper.convertValue(topography.getAttributesCar(), JsonNode.class);
 		topographyNode.set("attributesCar", attributesCarNode);
 
-		// TODO Serialize EventInfoStore!
-
 		return topographyNode;
 	}
 
@@ -276,6 +274,11 @@ public abstract class StateJsonConverter {
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
 		return writer.writeValueAsString(node);
+	}
+
+	public static String serializeEvents(EventInfoStore eventInfoStore)
+			throws JsonProcessingException {
+		return writer.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
 	}
 
 	public static String serializeObject(Object object) {
