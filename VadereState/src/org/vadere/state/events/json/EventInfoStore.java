@@ -6,6 +6,8 @@ import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.state.util.JacksonObjectMapper;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -62,8 +64,8 @@ public class EventInfoStore {
 
         List<Event> events = new ArrayList<>();
         events.add(new ElapsedTimeEvent(0));
-        // TODO Fix Jackson's infinite recursion with "VRectangle" here.
-        events.add(new WaitInAreaEvent(0)); // new VRectangle(12.5, 0, 5, 6)
+        events.add(new WaitInAreaEvent(0, new VRectangle(12.5, 0, 5, 6)));
+        events.add(new WaitInAreaEvent(0, new VCircle(5, 5, 5)));
 
         // Wrap "EventTimeframe" and "Event" objects in two "EventInfo" objects.
         EventInfo eventInfo1 = new EventInfo();
@@ -83,7 +85,8 @@ public class EventInfoStore {
         eventInfoStore.setEventInfos(eventInfos);
 
         // Use annotations at event classes to specify how JSON <-> Java mapping should look like.
-        ObjectMapper mapper = new ObjectMapper();
+        // "VShape" are mapped by "JacksonObjectMapper" implementation.
+        ObjectMapper mapper = new JacksonObjectMapper();
 
         try {
             String jsonDataString = mapper.writeValueAsString(eventInfoStore);
