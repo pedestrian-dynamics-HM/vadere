@@ -256,25 +256,14 @@ public class Simulation {
 
 	private void updateCallbacks(double simTimeInSec) {
         List<Event> events = new ArrayList<>();
-
-		// TODO Replace this dummy implementation and let EventController evaluate and create events.
-		/*
         events.add(new ElapsedTimeEvent(simTimeInSec));
+
         for (EventInfo eventInfo : scenarioStore.getEventInfoStore().getEventInfos()) {
 			EventTimeframe eventTimeframe = eventInfo.getEventTimeframe();
 
 			if (simTimeInSec >= eventTimeframe.getStartTime() && simTimeInSec <= eventTimeframe.getEndTime()) {
 				events.addAll(eventInfo.getEvents());
 			}
-		}
-		*/
-
-        EventFactory eventFactory = new EventFactory();
-
-        if (simTimeInSec >= 5 && simTimeInSec <= 30) {
-	        events.add(eventFactory.getEvent(WaitInAreaEvent.class, simTimeInSec));
-        } else {
-            events.add(eventFactory.getEvent(ElapsedTimeEvent.class, simTimeInSec));
 		}
 
         // TODO Why are target controllers readded in each simulation loop?
