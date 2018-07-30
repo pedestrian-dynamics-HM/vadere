@@ -33,7 +33,7 @@ def find_scenario_files(path="VadereModelTests"):
     print("Total scenario files: {}".format(len(scenario_files)))
     print("Exclude patterns: {}".format(exclude_patterns))
 
-    return scenario_files
+    return sorted(scenario_files)
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
@@ -46,7 +46,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
     for i, scenario_file in enumerate(scenario_files):
         print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
         # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
-        completed_process = subprocess.run(args=["java", "-jar", vadere_console, scenario_file, output_dir],
+        completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console, scenario_file, output_dir],
                                        timeout=scenario_timeout_in_sec,
                                        check=True,
                                        stdout=subprocess.PIPE,
