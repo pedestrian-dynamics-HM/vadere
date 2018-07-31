@@ -2,7 +2,7 @@ package org.vadere.simulator.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.control.events.EventFactory;
+import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -17,7 +17,6 @@ import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
-import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
@@ -66,6 +65,7 @@ public class Simulation {
 	private final Topography topography;
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
+	private final EventController eventController;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
@@ -90,6 +90,8 @@ public class Simulation {
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
+
+		this.eventController = new EventController(scenarioStore);
 
         IPotentialFieldTarget pft = null;
         if(mainModel instanceof PotentialFieldModel) {
@@ -255,16 +257,7 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
-        List<Event> events = new ArrayList<>();
-        events.add(new ElapsedTimeEvent(simTimeInSec));
-
-        for (EventInfo eventInfo : scenarioStore.getEventInfoStore().getEventInfos()) {
-			EventTimeframe eventTimeframe = eventInfo.getEventTimeframe();
-
-			if (simTimeInSec >= eventTimeframe.getStartTime() && simTimeInSec <= eventTimeframe.getEndTime()) {
-				events.addAll(eventInfo.getEvents());
-			}
-		}
+        List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
         // TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();

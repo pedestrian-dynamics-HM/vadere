@@ -57,32 +57,20 @@ public class EventInfoStore {
     }
 
     public static void main(String... args) {
-        // TODO Remove main method here.
-
-        // Create "EventTimeframe" and "Event" objects.
+        // Create "EventTimeframe" and "Event" objects and encapsulate them in "EventInfo" objects.
         EventTimeframe eventTimeframe = new EventTimeframe(5, 30, false, 0);
 
         List<Event> events = new ArrayList<>();
-        // events.add(new ElapsedTimeEvent(0));
         events.add(new WaitInAreaEvent(0, new VRectangle(12.5, 0, 5, 6)));
         // events.add(new WaitInAreaEvent(0, new VCircle(5, 5, 5)));
 
-        // Wrap "EventTimeframe" and "Event" objects in two "EventInfo" objects.
         EventInfo eventInfo1 = new EventInfo();
         eventInfo1.setEventTimeframe(eventTimeframe);
         eventInfo1.setEvents(events);
 
-        /*
-        EventInfo eventInfo2 = new EventInfo();
-        eventInfo2.setEventTimeframe(eventTimeframe);
-        eventInfo2.setEvents(events);
-        */
-
         List<EventInfo> eventInfos = new ArrayList<>();
         eventInfos.add(eventInfo1);
-        // eventInfos.add(eventInfo2);
 
-        // Wrap "EventInfo" objects in "EventInfoStore".
         EventInfoStore eventInfoStore = new EventInfoStore();
         eventInfoStore.setEventInfos(eventInfos);
 
