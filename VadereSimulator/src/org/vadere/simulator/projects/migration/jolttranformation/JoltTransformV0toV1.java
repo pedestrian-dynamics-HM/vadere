@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.entrypoints.Version;
+import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.potential.PotentialFieldObstacleCompact;
@@ -13,6 +14,7 @@ import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact;
 import org.vadere.simulator.models.potential.PotentialFieldPedestrianOSM;
 import org.vadere.simulator.models.sfm.SocialForceModel;
 import org.vadere.simulator.projects.migration.MigrationException;
+import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -81,8 +83,15 @@ public class JoltTransformV0toV1 extends JoltTransformation {
 			mainModelValue = SocialForceModel.class.getName();
 		}
 
+		if (!node.path("vadere").path("attributesModel").path(AttributesBHM.class.getName()).isMissingNode()){
+			if (!mainModelValue.equals("")){
+				throw new MigrationException("can't automatically determine the mainModel - more than one mainModel-suitable model is present");
+			}
+			mainModelValue = BehaviouralHeuristicsModel.class.getName();
+		}
+
 		if (mainModelValue.equals("")){
-			throw new MigrationException("couldn't automatically determine the mainModel based on the present models OSM, GNM, SFM");
+			throw new MigrationException("could not automatically determine the mainModel based on the present models OSM, GNM, SFM, BHM");
 		}
 
 		addToObjectNode(scenario, "mainModel", mainModelValue);
