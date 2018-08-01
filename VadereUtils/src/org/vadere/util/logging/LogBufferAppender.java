@@ -28,6 +28,11 @@ public class LogBufferAppender extends AppenderSkeleton {
 		return sb.toString();
 	}
 
+
+	public void rest(){
+		sb.setLength(0);
+	}
+
 	@Override
 	protected void append(LoggingEvent loggingEvent) {
 		sb.append(layout.format(loggingEvent));

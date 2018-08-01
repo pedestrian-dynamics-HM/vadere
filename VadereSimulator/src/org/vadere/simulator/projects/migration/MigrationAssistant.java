@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.migration;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 
 public abstract class MigrationAssistant {
 	public static final String INCIDENT_ORDER_ERROR = "An incident that was found applicable couldn't be resolved. " +
@@ -23,7 +24,13 @@ public abstract class MigrationAssistant {
 
 	public abstract String getLog();
 
+	public abstract void restLog();
+
 //	public abstract void analyzeSingleScenario(Path path) throws IOException;
 
 	public abstract MigrationResult analyzeProject(String projectFolderPath) throws IOException;
+
+	protected String getTimestamp() {
+		return new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
+	}
 }

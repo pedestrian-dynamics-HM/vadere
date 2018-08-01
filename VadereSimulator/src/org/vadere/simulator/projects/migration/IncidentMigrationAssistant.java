@@ -41,6 +41,12 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 		return log.toString();
 	}
 
+	@Override
+	public void restLog() {
+		log.setLength(0);
+	}
+
+
 //	@Override
 //	public  void analyzeSingleScenario(Path path) throws IOException {
 //		try {
@@ -199,10 +205,6 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 
 		IOUtils.createDirectoryIfNotExisting(target);
 		Files.move(source, target, StandardCopyOption.REPLACE_EXISTING); // ensure potential existing files aren't overwritten?
-	}
-
-	private String getTimestamp() {
-		return new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
 	}
 
 }

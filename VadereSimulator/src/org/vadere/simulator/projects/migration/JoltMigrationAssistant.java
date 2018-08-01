@@ -43,6 +43,11 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		return appender.getMigrationLog();
 	}
 
+	@Override
+	public void restLog() {
+		appender.rest();
+	}
+
 
 	@Override
 	public MigrationResult analyzeProject(String projectFolderPath) throws IOException {
@@ -92,6 +97,12 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 				stats.notmigratable++;
 			}
 		}
+
+		if (stats.legacy + stats.notmigratable > 0)
+			IOUtils.writeTextFile(legacyDir.resolve("_LOG-" + getTimestamp() + ".txt").toString(), getLog());
+
+		// clean appender for next run with same JoltMigrationAssistant instance
+		restLog();
 		return stats;
 	}
 
