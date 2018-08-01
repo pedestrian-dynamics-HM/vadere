@@ -6,7 +6,7 @@
       "commithash": "&",
       "vadere": {
         "attributesModel": {
-          "OPTIMAL_STEPS_MODEL": {
+          "OPTIMAL_STEPS_MODEL":  {
             "stepCircleResolution" : "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOSM.&0",
             "numberOfCircles" : "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOSM.&0",
             "varyStepDirection" : "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOSM.&0",
@@ -25,7 +25,7 @@
             "obstaclePotentialModel" : "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOSM.&0",
             "submodels" : "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOSM.&0"
           },
-          "BEHAVIOURAL_HEURISTICS_MODEL": {
+          "BEHAVIOURAL_HEURISTICS_MODEL":  {
             "stepLengthIntercept": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBHM.&0",
             "stepLengthSlopeSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBHM.&0",
             "stepLengthSD": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBHM.&0",
@@ -61,50 +61,60 @@
             "spaceToKeep": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBHM.&0",
             "stepAwayFromCollisions": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBHM.&0"
           },
-          "BIOMECHANICS_MODEL": {
+          "BIOMECHANICS_MODEL":  {
             "reachedStepTolerance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBMM.&0",
             "acceleration": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBMM.&0",
             "stepwiseDecisions": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesBMM.&0"
           },
-          "CAR_ATTRIBUTES": {
-            "id": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "radius": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "densityDependentSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "speedDistributionMean": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "speedDistributionStandardDeviation": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "minimumSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "maximumSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "acceleration": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "length": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "width": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
-            "direction": {
-              "x": "vadere.&3.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&1.&0",
-              "y": "vadere.&3.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&1.&0"
-            }
+          "GRADIENT_NAVIGATION_MODEL":  {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&1.&0",
+              "stepSizeMin": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&1.&0",
+              "stepSizeMax": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&1.&0",
+              "toleranceAbsolute": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&1.&0",
+              "toleranceRelative": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&1.&0"
+            },
+            "floorGradientProviderType": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&0",
+            "targetPotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&0",
+            "pedestrianPotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&0",
+            "obstaclePotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGNM.&0"
+          },
+          "SOCIAL_FORCE_MODEL":  {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
+              "stepSizeMin": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
+              "stepSizeMax": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
+              "toleranceAbsolute": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
+              "toleranceRelative": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0"
+            },
+            "floorGradientProviderType": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0",
+            "targetPotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0",
+            "pedestrianPotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0",
+            "obstaclePotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0"
+          },
+          "OPTIMAL_VELOCITY_MODEL":  {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
+              "stepSizeMin": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
+              "stepSizeMax": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
+              "toleranceAbsolute": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
+              "toleranceRelative": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0"
+            },
+            "sensitivity": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0",
+            "sightDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0",
+            "sightDistanceFactor": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0",
+            "firstDistanceRandom": {
+              "x": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
+              "y": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0"
+            },
+            "ignoreOtherCars": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0"
           },
           "CENTROID_GROUP_MODEL": {
             "groupMemberRepulsionFactor": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesCGM.&0",
             "leaderAttractionFactor": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesCGM.&0",
             "groupSizeDistribution": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesCGM.&0"
           },
-          "FLOORFIELD": {
-            "createMethod": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
-            "potentialFieldResolution": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
-            "obstacleGridPenalty": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
-            "targetAttractionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
-            "timeCostAttributes": {
-              "standardDerivation": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "type": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "obstacleDensityWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "pedestrianSameTargetDensityWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "pedestrianOtherTargetDensityWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "pedestrianWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "queueWidthLoading": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "pedestrianDynamicWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
-              "loadingType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0"
-            }
-          },
-          "GRANULAR_FLOW_MODEL": {
+          "GRANULAR_FLOW_MODEL":  {
             "gravityFactor": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGFM.&0",
             "normalParticleStiffness": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGFM.&0",
             "dampingParticle": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGFM.&0",
@@ -126,24 +136,7 @@
             "momOfInertia": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGFM.&0",
             "startOmega": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesGFM.&0"
           },
-          "OPTIMAL_VELOCITY_MODEL": {
-            "attributesODEIntegrator": {
-              "solverType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
-              "stepSizeMin": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
-              "stepSizeMax": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
-              "toleranceAbsolute": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
-              "toleranceRelative": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0"
-            },
-            "sensitivity": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0",
-            "sightDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0",
-            "sightDistanceFactor": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0",
-            "firstDistanceRandom": {
-              "x": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0",
-              "y": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&1.&0"
-            },
-            "ignoreOtherCars": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesOVM.&0"
-          },
-          "FREDERIX_MODEL": {
+          "FREDERIX_MODEL":  {
             "attributesODEIntegrator": {
               "solverType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesParticles.&1.&0",
               "stepSizeMin": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesParticles.&1.&0",
@@ -153,7 +146,7 @@
             },
             "floorGradientProviderType": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesParticles.&0"
           },
-          "POTENTIAL_COMPACT_SUPPORT": {
+          "POTENTIAL_COMPACT_SUPPORT":  {
             "pedPotentialWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompact.&0",
             "pedPotentialHeight": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompact.&0",
             "obstPotentialWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompact.&0",
@@ -162,7 +155,7 @@
             "obstDistanceDeviation": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompact.&0",
             "visionFieldRadius": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompact.&0"
           },
-          "POTENTIAL_COMPACT_SUPPORT_SOFTSHELL": {
+          "POTENTIAL_COMPACT_SUPPORT_SOFTSHELL":  {
             "pedPotentialIntimateSpaceWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompactSoftshell.&0",
             "pedPotentialPersonalSpaceWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompactSoftshell.&0",
             "pedPotentialHeight": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompactSoftshell.&0",
@@ -172,19 +165,36 @@
             "personalSpacePower": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompactSoftshell.&0",
             "intimateSpacePower": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialCompactSoftshell.&0"
           },
-          "OBSTACLE_POTENTIAL_GNM": {
+          "FLOORFIELD":  {
+            "createMethod": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
+            "potentialFieldResolution": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
+            "obstacleGridPenalty": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
+            "targetAttractionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&0",
+            "timeCostAttributes": {
+              "standardDerivation": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "type": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "obstacleDensityWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "pedestrianSameTargetDensityWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "pedestrianOtherTargetDensityWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "pedestrianWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "queueWidthLoading": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "pedestrianDynamicWeight": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0",
+              "loadingType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesFloorField.&1.&0"
+            }
+          },
+          "PEDESTRIAN_POTENTIAL_GNM":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0",
             "pedestrianRecognitionDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0",
             "obstacleBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0",
             "obstacleRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0"
           },
-          "PEDESTRIAN_POTENTIAL_GNM": {
+          "OBSTACLE_POTENTIAL_GNM":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0",
             "pedestrianRecognitionDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0",
             "obstacleBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0",
             "obstacleRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialGNM.&0"
           },
-          "OBSTACLE_POTENTIAL_OSM": {
+          "PEDESTRIAN_POTENTIAL_OSM":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
             "pedestrianRepulsionWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
             "pedestrianRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
@@ -198,7 +208,7 @@
             "aObsOSM": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
             "bObsOSM": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0"
           },
-          "PEDESTRIAN_POTENTIAL_OSM": {
+          "OBSTACLE_POTENTIAL_OSM":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
             "pedestrianRepulsionWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
             "pedestrianRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
@@ -212,19 +222,19 @@
             "aObsOSM": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0",
             "bObsOSM": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialOSM.&0"
           },
-          "OBSTACLE_POTENTIAL_PARTICLES": {
+          "OBSTACLE_POTENTIAL_PARTICLES":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0",
             "pedestrianRecognitionDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0",
             "obstacleBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0",
             "obstacleRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0"
           },
-          "PEDESTRIAN_POTENTIAL_PARTICLES": {
+          "PEDESTRIAN_POTENTIAL_PARTICLES":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0",
             "pedestrianRecognitionDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0",
             "obstacleBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0",
             "obstacleRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialParticles.&0"
           },
-          "OBSTACLE_POTENTIAL_RING_EXPERIMENT": {
+          "OBSTACLE_POTENTIAL_RING_EXPERIMENT":  {
             "center": {
               "x": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&1.&0",
               "y": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&1.&0"
@@ -236,7 +246,7 @@
             "allowedTrajectoryWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&0",
             "pedestrianRadius": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&0"
           },
-          "TARGET_POTENTIAL_RING_EXPERIMENT": {
+          "TARGET_POTENTIAL_RING_EXPERIMENT":  {
             "center": {
               "x": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&1.&0",
               "y": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&1.&0"
@@ -248,37 +258,40 @@
             "allowedTrajectoryWidth": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&0",
             "pedestrianRadius": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialRingExperiment.&0"
           },
-          "OBSTACLE_POTENTIAL_SFM": {
+          "PEDESTRIAN_POTENTIAL_SFM":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0",
             "pedestrianRecognitionDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0",
             "obstacleBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0",
             "obstacleRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0"
           },
-          "PEDESTRIAN_POTENTIAL_SFM": {
+          "OBSTACLE_POTENTIAL_SFM":  {
             "pedestrianBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0",
             "pedestrianRecognitionDistance": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0",
             "obstacleBodyPotential": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0",
             "obstacleRepulsionStrength": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesPotentialSFM.&0"
           },
-          "QUEUEING_GAME": {
+          "QUEUEING_GAME":  {
             "queuingFloorField": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesQueuingGame.&0",
             "navigationFloorField": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesQueuingGame.&0",
             "competitiveProbability": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesQueuingGame.&0",
             "expectedGentleTimeInSec": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesQueuingGame.&0",
             "expectedCompetitiveTimeInSec": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesQueuingGame.&0"
           },
-          "SOCIAL_FORCE_MODEL": {
-            "attributesODEIntegrator": {
-              "solverType": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
-              "stepSizeMin": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
-              "stepSizeMax": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
-              "toleranceAbsolute": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0",
-              "toleranceRelative": "vadere.&3.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&1.&0"
-            },
-            "floorGradientProviderType": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0",
-            "targetPotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0",
-            "pedestrianPotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0",
-            "obstaclePotentialModel": "vadere.&2.org\\.vadere\\.state\\.attributes\\.models\\.AttributesSFM.&0"
+          "CAR_ATTRIBUTES":  {
+            "id": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "radius": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "densityDependentSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "speedDistributionMean": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "speedDistributionStandardDeviation": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "minimumSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "maximumSpeed": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "acceleration": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "length": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "width": "vadere.&2.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&0",
+            "direction": {
+              "x": "vadere.&3.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&1.&0",
+              "y": "vadere.&3.org\\.vadere\\.state\\.attributes\\.scenario\\.AttributesCar.&1.&0"
+            }
           }
         },
         "attributesSimulation": {
