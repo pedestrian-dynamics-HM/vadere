@@ -80,7 +80,7 @@ import java.util.stream.IntStream;
 public class SpawnArray {
 
 	private static Logger logger = LogManager.getLogger(SpawnArray.class);
-	private static final double EPSILON = 0.01;
+	public static final double OVERLAPP_EPSILON = 0.4;
 	private final VPoint[] spawnPoints;
 	private final VRectangle spawnElementBound;
 	// number of spawn elements in x and y Dimension.
@@ -159,7 +159,7 @@ public class SpawnArray {
 	public LinkedList<VPoint> getNextSpawnPoints(int maxPoints, final List<DynamicElement> neighbours) {
 		return spawnPoints(maxPoints,
 				neighbours,
-				(n, p) -> n.getShape().getCentroid().equals(p, EPSILON) ,
+				(n, p) -> n.getShape().getCentroid().equals(p, OVERLAPP_EPSILON) ,
 				len -> startWith(nextIndex, len));	// define spawn order (use next index)
 	}
 
@@ -170,7 +170,7 @@ public class SpawnArray {
 	public LinkedList<VPoint> getNextRandomSpawnPoints(int maxPoints, Random rnd, final List<DynamicElement> neighbours) {
 		return spawnPoints(maxPoints,
 				neighbours,
-				(n, p) -> n.getShape().getCentroid().equals(p, EPSILON) ,
+				(n, p) -> n.getShape().getCentroid().equals(p, OVERLAPP_EPSILON) ,
 				len -> shufflePoints(rnd, len));	// define spawn order (use random index)
 	}
 
@@ -262,7 +262,7 @@ public class SpawnArray {
 		GroupPlacementHelper pHelper = getHelper(groupSize);
 		return nextFreeGroupPos(pHelper,
 				neighbours,
-				(n,p) -> n.getShape().getCentroid().equals(p, EPSILON),
+				(n,p) -> n.getShape().getCentroid().equals(p, OVERLAPP_EPSILON),
 				len -> startWith(nextGroupPos.getOrDefault(pHelper.getGroupSize(), 0), len));
 	}
 
@@ -270,7 +270,7 @@ public class SpawnArray {
 		GroupPlacementHelper pHelper = getHelper(groupSize);
 		return nextFreeGroupPos(pHelper,
 				neighbours,
-				(n,p) -> n.getShape().getCentroid().equals(p, EPSILON),
+				(n,p) -> n.getShape().getCentroid().equals(p, OVERLAPP_EPSILON),
 				len -> shufflePoints(rnd, len));
 	}
 

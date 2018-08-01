@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 public class GroupSourceControllerTest extends TestSourceControllerUsingConstantSpawnRate {
@@ -230,7 +231,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		pedestrianCountEquals(3);
 	}
 
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void testSpawnNumber() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setSpawnNumber(10)
@@ -240,8 +241,11 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 		first().sourceController.update(1);
 		pedestrianCountEquals(10 * 4);
-		first().sourceController.update(2);
-		pedestrianCountEquals(20 * 4);
+		first().sourceController.update(2); 	// use random positioning thus not
+															// not optimal and thus not enough
+															// space for all
+		fail("should not be reached. Exception expected");
+
 	}
 
 	@Test

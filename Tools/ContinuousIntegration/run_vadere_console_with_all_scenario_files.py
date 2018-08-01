@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+import time
 
 def find_scenario_files(path="VadereModelTests"):
     scenario_search_pattern = "*.scenario"
@@ -33,7 +34,7 @@ def find_scenario_files(path="VadereModelTests"):
     print("Total scenario files: {}".format(len(scenario_files)))
     print("Exclude patterns: {}".format(exclude_patterns))
 
-    return scenario_files
+    return sorted(scenario_files)
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
@@ -45,13 +46,21 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
     for i, scenario_file in enumerate(scenario_files):
         print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
+
+        # Measure wall time and not cpu because it is the easiest.
+        wall_time_start = time.time()
+
         # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
-        completed_process = subprocess.run(args=["java", "-jar", vadere_console, scenario_file, output_dir],
+        completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console, scenario_file, output_dir],
                                        timeout=scenario_timeout_in_sec,
                                        check=True,
                                        stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE)
-        print("Finished scenario file: {}".format(scenario_file))
+
+        wall_time_end = time.time()
+        wall_time_delta = wall_time_end - wall_time_start
+
+        print("Finished scenario file ({:.1f} s): {}".format(wall_time_delta, scenario_file))
 
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)

@@ -67,8 +67,9 @@ def print_averaged_line_coverage(coverage_data):
     averaged_line_coverage = int(round(summed_line_coverage_data / total_modules, 0))
     averaged_branch_coverage = int(round(summed_branch_coverage_data / total_modules, 0))
 
+    print("Analyzed modules: {}".format(sorted(coverage_data.keys())))
     print("Line Coverage: Total {}%".format(averaged_line_coverage))
-    print("Branch Coverage: {}%".format(averaged_branch_coverage))
+    print("Branch Coverage: Total {}%".format(averaged_branch_coverage))
 
 if __name__ == "__main__":
     module_names = get_modules_from_pom_file()
