@@ -332,6 +332,9 @@
           "useRandomSeed": "scenario.&1.&0",
           "randomSeed": "scenario.&1.&0"
         },
+        "eventInfos": {
+          "*": "scenario.eventInfos"
+        },
         "topography": {
           "attributes": {
             "bounds": "scenario.&2.&1.&0",

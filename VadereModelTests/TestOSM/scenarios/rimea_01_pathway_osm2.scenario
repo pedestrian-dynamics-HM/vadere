@@ -132,6 +132,7 @@
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],

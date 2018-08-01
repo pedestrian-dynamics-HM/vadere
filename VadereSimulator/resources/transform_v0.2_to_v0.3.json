@@ -457,6 +457,7 @@
           "useRandomSeed": "true",
           "randomSeed": "1"
         },
+        "eventInfos": [],
         "topography": {
           "attributes": {
             "bounds": {

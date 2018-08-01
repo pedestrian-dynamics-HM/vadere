@@ -204,6 +204,7 @@
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
         "id" : 20,
@@ -223,6 +224,7 @@
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],
