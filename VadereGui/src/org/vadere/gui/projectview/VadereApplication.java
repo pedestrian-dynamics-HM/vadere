@@ -6,6 +6,7 @@ import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.util.io.IOUtils;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;

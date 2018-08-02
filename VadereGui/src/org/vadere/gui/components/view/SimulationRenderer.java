@@ -16,6 +16,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -35,12 +36,14 @@ public abstract class SimulationRenderer extends DefaultRenderer {
     private ColorHelper colorHelper;
     private Color lastDensityColor = null;
     private int topographyId;
+    private AgentRender agentRender;
 
     public SimulationRenderer(final SimulationModel model) {
         super(model);
         this.model = model;
         this.topographyId = -1;
         this.colorHelper = new ColorHelper(40);
+        this.agentRender = new AgentRender(model);
     }
 
     @Override
@@ -204,5 +207,13 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     private float getGridLineWidth() {
         return (float) (0.5 / model.getScaleFactor());
+    }
+
+    public AgentRender getAgentRender() {
+        return agentRender;
+    }
+
+    public void setAgentRender(AgentRender agentRender) {
+        this.agentRender = agentRender;
     }
 }

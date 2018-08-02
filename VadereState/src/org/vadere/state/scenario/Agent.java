@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -17,7 +18,7 @@ import org.vadere.util.math.TruncatedNormalDistribution;
 public abstract class Agent extends DynamicElement {
 	
 	/**
-	 * Source where the agent was spawned. The {@link SourceController} should
+	 * Source where the agent was spawned. The SourceController should
 	 * set this field. It may be <code>null</code> when the agent is created
 	 * in different way.
 	 */
@@ -31,7 +32,8 @@ public abstract class Agent extends DynamicElement {
 
 	private double freeFlowSpeed;
 
-	private final AttributesAgent attributes;
+	private AttributesAgent attributes;
+
 
 	public Agent(AttributesAgent attributesAgent) {
 		position = new VPoint(0, 0);
@@ -41,6 +43,7 @@ public abstract class Agent extends DynamicElement {
 
 		attributes = attributesAgent;
 	}
+
 
 	public Agent(AttributesAgent attributesAgent, Random random) {
 		this(attributesAgent);
@@ -69,7 +72,6 @@ public abstract class Agent extends DynamicElement {
 		this.velocity = other.velocity;
 		this.freeFlowSpeed = other.freeFlowSpeed;
 	}
-
 	public LinkedList<Integer> getTargets() {
 		return targetIds;
 	}
@@ -183,6 +185,11 @@ public abstract class Agent extends DynamicElement {
 
 	// Setters...
 
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		this.attributes = (AttributesAgent) attributes;
+	}
 
 	/**
 	 * Set the index pointing to the next target in the target list.

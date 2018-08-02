@@ -53,10 +53,23 @@ public class ProjectViewModel {
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
-		Arrays.stream(rows)
-				.mapToObj(row -> getOutputTableModel().getValue(row))
-				.filter(dir -> IOOutput.deleteOutputDirectory(dir))
-				.forEach(dir -> logger.info("delete output directory: " + dir.getName()));
+		// 1. delete output files on the hard disc
+		int j = 0;
+		for(int i = 0; i < rows.length; i++) {
+			File dir = getOutputTableModel().getValue(rows[i]-j);
+
+			if(IOOutput.deleteOutputDirectory(dir)) {
+				j++;
+
+				// 2. remove output files information from the output file table
+				outputTable.getModel().remove(dir);
+
+				// 3. remove output files information from the project output
+				getProject().getProjectOutput().removeOutputDir(dir.getName());
+
+				logger.info("output dir "+ dir +" dir deleted.");
+			}
+		}
 	}
 
 	public void deleteScenarios(final int[] rows) {

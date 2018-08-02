@@ -2,6 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import java.util.*;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -15,6 +16,8 @@ import org.vadere.util.geometry.shapes.VShape;
  * based on the AttributesFloorField.
  *
  */
+
+@ModelClass
 public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
 
 	// private HashMap<Integer, PotentialFieldAndInitializer> staticPotentialFields;

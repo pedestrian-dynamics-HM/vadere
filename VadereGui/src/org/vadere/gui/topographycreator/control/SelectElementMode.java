@@ -77,7 +77,7 @@ public class SelectElementMode extends DefaultSelectionMode {
 			VShape newShape =
 					panelModel.translate(new Point(e.getPoint().x - startPoint.x, e.getPoint().y - startPoint.y));
 
-			ReflectionAttributeModifier.setShapeToAttributes(element, newShape);
+			AttributeModifier.setShapeToAttributes(element, newShape);
 
 			// tell the panelModel that the selected element has changed!
 			panelModel.setSelectedElement(element);

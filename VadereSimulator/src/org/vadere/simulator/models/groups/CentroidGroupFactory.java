@@ -2,51 +2,67 @@ package org.vadere.simulator.models.groups;
 
 import org.vadere.state.scenario.Pedestrian;
 
-public class CentroidGroupFactory implements GroupFactory {
+import java.util.LinkedList;
 
-	private CentroidGroupModel groupCollection;
-	private GroupSizeDeterminator groupSizeDeterminator;
+public class CentroidGroupFactory extends GroupFactory {
 
-	private CentroidGroup currentGroup;
+	transient private CentroidGroupModel groupCollection;
+	transient private GroupSizeDeterminator groupSizeDeterminator;
+
+	private LinkedList<CentroidGroup> newGroups;
 
 	public CentroidGroupFactory(CentroidGroupModel groupCollection,
-			GroupSizeDeterminator groupSizeDet) {
+								GroupSizeDeterminator groupSizeDet) {
 		this.groupCollection = groupCollection;
 		this.groupSizeDeterminator = groupSizeDet;
+		this.newGroups = new LinkedList<>();
 	}
 
 	@Override
 	public int getOpenPersons() {
-		return currentGroup.getOpenPersons();
+		if (newGroups.peekFirst() == null) {
+			throw new IllegalStateException("No empty group exists");
+		}
+
+		return newGroups.peekFirst().getOpenPersons();
 	}
 
 	private void assignToGroup(Pedestrian ped) {
-		currentGroup.addMember(ped);
-		groupCollection.registerMember(ped, currentGroup);
-	}
-
-	private boolean requiresNewGroup() {
-		boolean result;
-
+		CentroidGroup currentGroup = newGroups.peekFirst();
 		if (currentGroup == null) {
-			result = true;
-		} else {
-			result = currentGroup.isFull();
+			throw new IllegalStateException("No empty group exists to add Pedestrian: " + ped.getId());
 		}
 
-		return result;
+		currentGroup.addMember(ped);
+		ped.addGroupId(currentGroup.getID());
+		groupCollection.registerMember(ped, currentGroup);
+		if (currentGroup.getOpenPersons() == 0) {
+			newGroups.pollFirst(); // remove full group from list.
+		}
 	}
 
-	private void createNewGroup() {
-		currentGroup = groupCollection.getNewGroup(groupSizeDeterminator
+	public int createNewGroup() {
+		CentroidGroup newGroup = groupCollection.getNewGroup(groupSizeDeterminator
 				.nextGroupSize());
+		newGroups.addLast(newGroup);
+		return newGroup.getSize();
 	}
 
-	@Override
+	//listener methode (aufruf
 	public void elementAdded(Pedestrian pedestrian) {
-		if (requiresNewGroup()) {
-			createNewGroup();
-		}
 		assignToGroup(pedestrian);
+	}
+
+	public void elementRemoved(Pedestrian ped) {
+		CentroidGroup group = groupCollection.removeMember(ped);
+//		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group != null ? group.getID() : "noGroup");
+	}
+
+	public GroupSizeDeterminator getGroupSizeDeterminator() {
+		return groupSizeDeterminator;
+	}
+
+	public void setGroupSizeDeterminator(GroupSizeDeterminator groupSizeDeterminator) {
+		this.groupSizeDeterminator = groupSizeDeterminator;
 	}
 }

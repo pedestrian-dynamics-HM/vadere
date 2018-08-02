@@ -2,6 +2,7 @@ package org.vadere.simulator.models.queuing;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+@ModelClass
 public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGrid, DynamicElementRemoveListener<Pedestrian>,
 		DynamicElementAddListener<Pedestrian> {
 

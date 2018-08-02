@@ -65,8 +65,8 @@ public class DataProcessingJsonManager {
 		this.outputFiles = new ArrayList<>();
 		this.dataProcessors = new ArrayList<>();
 		this.isTimestamped = true;
-		this.outputFileFactory = new OutputFileFactory();
-		this.processorFactory = new DataProcessorFactory();
+		this.outputFileFactory = OutputFileFactory.instance();
+		this.processorFactory = DataProcessorFactory.instance();
 	}
 
 	private static JsonNode serializeOutputFile(final OutputFile<?> outputFile) {
@@ -186,7 +186,12 @@ public class DataProcessingJsonManager {
 	}
 
 	public OutputFile<?> instantiateOutputFile(final OutputFileStore fileStore) {
-		return outputFileFactory.createOutputfile(fileStore);
+		try {
+			return outputFileFactory.createOutputfile(fileStore);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public int replaceOutputFile(OutputFileStore fileStore) {
@@ -206,7 +211,12 @@ public class DataProcessingJsonManager {
 	}
 
 	public void addProcessor(final DataProcessorStore dataProcessorStore) {
-		DataProcessor<?, ?> dataProcessor = processorFactory.createDataProcessor(dataProcessorStore);
+		DataProcessor<?, ?> dataProcessor = null;
+		try {
+			dataProcessor = processorFactory.createDataProcessor(dataProcessorStore);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		this.dataProcessors.add(dataProcessor);
 	}
 

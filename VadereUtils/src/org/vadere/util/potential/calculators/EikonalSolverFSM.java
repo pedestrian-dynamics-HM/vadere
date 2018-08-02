@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,12 +37,12 @@ public class EikonalSolverFSM implements EikonalSolver {
 	private ITimeCostFunction timeCostFunction;
 	private boolean isHighAccuracy;
 	private List<Point> targetPoints;
-	private List<VShape> targetShapes;
+	private Collection<VShape> targetShapes;
 
 	private static final double EPSILON = 0.001;
 
 	public EikonalSolverFSM(final CellGrid cellGrid,
-			final List<VShape> targetShapes,
+			final Collection<VShape> targetShapes,
 			final boolean isHighAccuracy,
 			final ITimeCostFunction timeCostFunction) {
 		this.timeCostFunction = timeCostFunction;

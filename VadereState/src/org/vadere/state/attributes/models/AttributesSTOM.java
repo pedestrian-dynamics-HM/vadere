@@ -1,11 +1,13 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 /**
  * The model types representing strategy, tactics and operation models.
  * 
  */
+@ModelAttributeClass
 public class AttributesSTOM extends Attributes {
 	// TODO [priority=medium] the following strings are class names of models. better names would be operationModel, ...
 	private String operation = "org.vadere.simulator.models.gnm.GradientNavigationModel";

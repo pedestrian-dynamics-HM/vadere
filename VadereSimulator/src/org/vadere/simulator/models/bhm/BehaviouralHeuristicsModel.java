@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
@@ -17,6 +18,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
+@ModelClass(isMainModel = true)
 public class BehaviouralHeuristicsModel implements MainModel {
 
 	/**

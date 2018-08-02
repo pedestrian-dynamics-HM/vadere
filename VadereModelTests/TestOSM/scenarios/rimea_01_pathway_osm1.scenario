@@ -3,8 +3,22 @@
   "description" : "",
   "release" : "0.2",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "evacuationTime.txt",
+      "processors" : [ 1 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 2
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -61,7 +75,7 @@
       "finishTime" : 1300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : true,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
@@ -80,151 +94,7 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
-      "obstacles" : [ {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 45.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 45.0001,
-            "y" : 0.5001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 0.5001
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 45.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 45.0001,
-            "y" : 3.0001
-          }, {
-            "x" : 44.4999,
-            "y" : 3.0001
-          }, {
-            "x" : 44.4999,
-            "y" : -1.0E-4
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 45.0001,
-            "y" : 3.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 3.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 2.4999000000000002
-          }, {
-            "x" : 45.0001,
-            "y" : 2.4999000000000002
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : 3.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 0.5001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 0.5001,
-            "y" : 3.0001
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 45.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 45.0001,
-            "y" : 0.5001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 0.5001
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 45.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 45.0001,
-            "y" : 3.0001
-          }, {
-            "x" : 44.4999,
-            "y" : 3.0001
-          }, {
-            "x" : 44.4999,
-            "y" : -1.0E-4
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 45.0001,
-            "y" : 3.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 3.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 2.4999000000000002
-          }, {
-            "x" : 45.0001,
-            "y" : 2.4999000000000002
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : 3.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 0.5001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 0.5001,
-            "y" : 3.0001
-          } ]
-        },
-        "id" : -1
-      } ],
+      "obstacles" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -269,9 +139,9 @@
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.5,
-        "minimumSpeed" : 1.25,
-        "maximumSpeed" : 1.42,
+        "speedDistributionStandardDeviation" : 0.26,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
       "attributesCar" : null

@@ -25,7 +25,7 @@ public class MainModelBuilder {
 	public void createModelAndRandom()
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-		final AttributesSimulation attributesSimulation = scenarioStore.attributesSimulation;
+		final AttributesSimulation attributesSimulation = scenarioStore.getAttributesSimulation();
 		if (attributesSimulation.isUseRandomSeed()) {
 			random = new Random(attributesSimulation.getRandomSeed());
 		} else {
@@ -45,11 +45,11 @@ public class MainModelBuilder {
 	}
 
 	private MainModel instantiateMainModel(Random random) {
-		String mainModelName = scenarioStore.mainModel;
+		String mainModelName = scenarioStore.getMainModel();
 		DynamicClassInstantiator<MainModel> instantiator = new DynamicClassInstantiator<>();
 		MainModel mainModel = instantiator.createObject(mainModelName);
-		mainModel.initialize(scenarioStore.attributesList, scenarioStore.topography,
-				scenarioStore.topography.getAttributesPedestrian(), random);
+		mainModel.initialize(scenarioStore.getAttributesList(), scenarioStore.getTopography(),
+				scenarioStore.getTopography().getAttributesPedestrian(), random);
 		return mainModel;
 	}
 

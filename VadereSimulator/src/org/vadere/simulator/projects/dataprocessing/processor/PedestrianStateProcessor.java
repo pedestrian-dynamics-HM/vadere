@@ -3,15 +3,17 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 
 /**
- * @brief   PedestrianStateProcessor adds a column "state" to the output with the state of a pedestrian.
+ * PedestrianStateProcessor adds a column "state" to the output with the state of a pedestrian.
  * 
- * @details The possible states are:
+ * The possible states are:
  *           - c = Pedestrian was created
  *           - m = Pedestrian has moved
  *           - d = Pedestrian was deleted (has reached its final target)
@@ -19,6 +21,7 @@ import org.vadere.state.scenario.Pedestrian;
  * @author  Florian Künzner
  *
  */
+@DataProcessorClass()
 public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianIdKey, String> {
 
 	public PedestrianStateProcessor() {
@@ -33,14 +36,14 @@ public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianId
 	@Override
 	protected void doUpdate(SimulationState state) {
 		List<Integer> pedsInThisState = state.getTopography().getElements(Pedestrian.class).stream()
-			.map(ped -> ped.getId())
+			.map(Agent::getId)
 			.collect(Collectors.toList());
 		
 		//insert ped states c = created or m = moved 
 		pedsInThisState.stream()
 			.forEach(id -> {
 				boolean pedEntryExists = getKeys().stream()
-					.filter(ped -> ped.getPedestrianId() == id)
+					.filter(ped -> ped.getPedestrianId().equals(id))
 					.count() > 0;
 					
 				String pedState = pedEntryExists ? "m" : "c";
@@ -51,7 +54,7 @@ public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianId
 		int previousStep = state.getStep() - 1;
 		List<Integer> activePedsInPreviousState = getKeys().stream()
 			.filter(key -> key.getTimestep() == previousStep)
-			.filter(key -> getValue(key) != "d")
+			.filter(key -> !getValue(key).equals("d"))
 			.map(TimestepPedestrianIdKey::getPedestrianId)
 			.collect(Collectors.toList());
 		

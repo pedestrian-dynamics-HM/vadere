@@ -22,6 +22,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showTrajectories = false;
 	private boolean showGrid = false;
 	private boolean showDensity = false;
+	private boolean showGroups = false;
 	protected final Color pedestrianDefaultColor = Color.BLUE;
 
 	public DefaultSimulationConfig() {
@@ -37,6 +38,15 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.showPedestrians = config.showPedestrians;
 		this.showLogo = config.showLogo;
 		this.showStairs = config.showStairs;
+		this.showGroups = config.showGroups;
+	}
+
+	public boolean isShowGroups() {
+		return showGroups;
+	}
+
+	public void setShowGroups(boolean showGroups) {
+		this.showGroups = showGroups;
 	}
 
 	public boolean isShowLogo() {

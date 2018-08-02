@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 /**
@@ -7,6 +8,7 @@ import org.vadere.state.attributes.Attributes;
  * Currently implemented: radius [m, default: 0.195].
  * 
  */
+@ModelAttributeClass
 public class AttributesTimeCost extends Attributes {
 	/**
 	 * The different time cost function types that represents different scenario

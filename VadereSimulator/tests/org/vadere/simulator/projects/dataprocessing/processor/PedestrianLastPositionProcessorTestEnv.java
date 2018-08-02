@@ -20,7 +20,11 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	PedestrianLastPositionProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianLastPositionProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianLastPositionProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
 		DataProcessor pedPosProc;
@@ -37,10 +41,14 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
 
 		//setup output file with different VadereWriter impl for test
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

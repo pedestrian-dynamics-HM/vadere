@@ -21,7 +21,11 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 	PedestrianEvacuationTimeProcessorTestEnv(){this(1);}
 
 	PedestrianEvacuationTimeProcessorTestEnv(int nextProcesorId) {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianEvacuationTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianEvacuationTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcesorId);
 		this.nextProcessorId = nextProcesorId + 1;
 
@@ -41,10 +45,14 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 		addRequiredProcessors(pedStartTimeProcEnv);
 
 		//setup output file with different VadereWriter impl for test
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}

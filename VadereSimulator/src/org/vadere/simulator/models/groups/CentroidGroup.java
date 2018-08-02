@@ -52,6 +52,9 @@ public class CentroidGroup implements Group {
 	@Override
 	public boolean equals(Group o) {
 		boolean result = false;
+		if (o == null){
+			return result;
+		}
 
 		if (this == o) {
 			result = true;
@@ -210,23 +213,23 @@ public class CentroidGroup implements Group {
 		return result;
 	}
 
-	public Pedestrian getLeader(Pedestrian ped) {
-		Pedestrian result = members.get(0);
+	public Pedestrian getPacemaker(Pedestrian ped) {
+		Pedestrian pacemaker = members.get(0);
 
-		double smallestDistance = potentialFieldTarget.getPotential(result.getPosition(), ped);
+		double smallestDistance = potentialFieldTarget.getPotential(pacemaker.getPosition(), ped);
 
 		for (Pedestrian p : members) {
 			double pedDistance = potentialFieldTarget.getPotential(p.getPosition(), p);
 			if (pedDistance < smallestDistance) {
-				result = p;
+				pacemaker = p;
 				smallestDistance = pedDistance;
 			}
 		}
 
-		if (ped.getId() == result.getId() || isLostMember(ped)) {
-			result = null;
+		if (ped.getId() == pacemaker.getId() || isLostMember(ped)) {
+			pacemaker = null;
 		}
 
-		return result;
+		return pacemaker;
 	}
 }

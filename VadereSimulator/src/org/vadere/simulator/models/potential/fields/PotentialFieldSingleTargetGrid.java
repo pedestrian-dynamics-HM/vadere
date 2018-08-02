@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -19,6 +20,7 @@ import org.vadere.util.geometry.shapes.VShape;
  * based on the AttributesFloorField.
  *
  */
+@ModelClass
 public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget {
 
 	private Topography topography;

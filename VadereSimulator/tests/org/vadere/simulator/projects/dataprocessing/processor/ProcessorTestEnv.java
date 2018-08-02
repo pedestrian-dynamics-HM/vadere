@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
@@ -70,8 +71,8 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 		testedProcessor = null;
 		outputFile = null;
 		requiredProcessors = new LinkedList<>();
-		processorFactory = new DataProcessorFactory();
-		outputFileFactory = new OutputFileFactory();
+		processorFactory = DataProcessorFactory.instance();
+		outputFileFactory = OutputFileFactory.instance();
 	}
 
 	/**

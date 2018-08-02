@@ -112,6 +112,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
+
 				updateModel();
 			}
 		};
@@ -126,7 +127,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		ScenarioElement element = panelModel.getSelectedElement();
 		if (element != null) {
 			String json = txtrTextfiletextarea.getText();
-
+			//logger.info(json);
 			if (json.length() == 0)
 				return;
 
@@ -143,7 +144,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			} else {
 				try {
 					Attributes attributes = StateJsonConverter.deserializeScenarioElementType(json, element.getType());
-					ReflectionAttributeModifier.setAttributes(element, attributes);
+					element.setAttributes(attributes); // Replaces previous AttributeModifier.setAttributes (see #91)
 					ScenarioPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();
 					jsonValidIndicator.setValid();
@@ -185,7 +186,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
 				} else {
 					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObject(ReflectionAttributeModifier.getAttributes(scenarioElement)));
+							.serializeObject(scenarioElement.getAttributes()));
 				}
 			}
 		}

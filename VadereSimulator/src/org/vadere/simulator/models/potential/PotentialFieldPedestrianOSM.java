@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
@@ -15,12 +17,17 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+@ModelClass
 public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 
-	private final AttributesPotentialOSM attributes;
+	private AttributesPotentialOSM attributes;
 
-	public PotentialFieldPedestrianOSM(AttributesPotentialOSM attributes) {
-		this.attributes = attributes;
+	public PotentialFieldPedestrianOSM() {}
+
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributes = Model.findAttributes(attributesList, AttributesPotentialOSM.class);
 	}
 
 	@Override
@@ -113,11 +120,5 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 		}
 
 		return result;
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
 	}
 }

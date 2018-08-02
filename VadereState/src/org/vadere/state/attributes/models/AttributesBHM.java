@@ -2,9 +2,10 @@ package org.vadere.state.attributes.models;
 
 import java.util.LinkedList;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
-
+@ModelAttributeClass
 public class AttributesBHM extends Attributes {
 
 	private double stepLengthIntercept = 0.4625;

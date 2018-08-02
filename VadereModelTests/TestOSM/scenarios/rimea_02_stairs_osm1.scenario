@@ -61,7 +61,7 @@
       "finishTime" : 500.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
-      "writeSimulationData" : true,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
@@ -132,78 +132,6 @@
           "width" : 0.004212,
           "height" : 0.004212,
           "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 25.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 25.0001,
-            "y" : 0.5001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 0.5001
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 25.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 25.0001,
-            "y" : 10.0001
-          }, {
-            "x" : 24.4999,
-            "y" : 10.0001
-          }, {
-            "x" : 24.4999,
-            "y" : -1.0E-4
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 25.0001,
-            "y" : 10.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 10.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 9.4999
-          }, {
-            "x" : 25.0001,
-            "y" : 9.4999
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : 10.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 0.5001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 0.5001,
-            "y" : 10.0001
-          } ]
         },
         "id" : -1
       } ],
@@ -299,9 +227,9 @@
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.0,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
+        "speedDistributionStandardDeviation" : 0.26,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
       "attributesCar" : null

@@ -7,20 +7,21 @@ import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.gui.projectview.utils.ClassFinder;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
+import org.vadere.simulator.models.ModelHelper;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.state.attributes.ModelAttributeFactory;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -128,8 +129,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		JMenu mnAttributesMenu = new JMenu(Messages.getString("Tab.Model.addAttributesMenu.title"));
 		presetMenuBar.add(mnAttributesMenu);
 		menusInTabs.add(mnAttributesMenu);
-		ClassFinder.getAttributesNames().stream()
-			.sorted().forEach(
+		ModelAttributeFactory attributeFactory = ModelAttributeFactory.instance();
+		attributeFactory.sortedAttributeStream().forEach(
 				attributesClassName -> mnAttributesMenu.add(new JMenuItem(new AbstractAction(attributesClassName) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -148,9 +149,10 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		
 		JMenu submenuMainModels = new JMenu(Messages.getString("Tab.Model.insertModelNameSubMenu.title"));
 		mnModelNameMenu.add(submenuMainModels);
-		
-		ClassFinder.getMainModelNames().stream()
-				.sorted()
+
+		ModelHelper.instance().getSortedMainModel()
+//		ClassFinder.getMainModelNames().stream()
+//				.sorted()
 				.forEach(className -> submenuMainModels.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -159,22 +161,23 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				}
 				)));
 		
-		Map<String, List<String>> groupedPackages = ClassFinder.groupPackages(ClassFinder.getModelNames());
-		
-		for (Map.Entry<String, List<String>> entry : groupedPackages.entrySet()) {
+//		Map<String, List<String>> groupedPackages = ClassFinder.groupPackages(ClassFinder.getModelNames());
+//		Map<String, List<String>> groupedPackages = ModelHelper.instance().getModelsSortedByPackage();
+
+		ModelHelper.instance().getModelsSortedByPackageStream().forEach( entry -> {
 			JMenu currentSubMenu = new JMenu(entry.getKey());
-			
+
 			for (String className : entry.getValue()) {
 				currentSubMenu.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						attributesModelView.insertAtCursor("\"" + className + "\"");
 					}
-			}));
+				}));
 			}
-			
+
 			mnModelNameMenu.add(currentSubMenu);
-		}
+		});
 	
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
@@ -182,7 +185,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 		dataProcessingGUIview = new DataProcessingView();
-		tabbedPane.addTab("Data processing GUI", dataProcessingGUIview);
+		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 

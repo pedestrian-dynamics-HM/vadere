@@ -116,78 +116,6 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 35.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 35.0001,
-            "y" : 1.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 1.0001
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 35.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 35.0001,
-            "y" : 12.0001
-          }, {
-            "x" : 33.9999,
-            "y" : 12.0001
-          }, {
-            "x" : 33.9999,
-            "y" : -1.0E-4
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 35.0001,
-            "y" : 12.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 12.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : 10.9999
-          }, {
-            "x" : 35.0001,
-            "y" : 10.9999
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : -1.0E-4,
-            "y" : 12.0001
-          }, {
-            "x" : -1.0E-4,
-            "y" : -1.0E-4
-          }, {
-            "x" : 1.0001,
-            "y" : -1.0E-4
-          }, {
-            "x" : 1.0001,
-            "y" : 12.0001
-          } ]
-        },
-        "id" : -1
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -234,8 +162,8 @@
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
       "attributesCar" : null

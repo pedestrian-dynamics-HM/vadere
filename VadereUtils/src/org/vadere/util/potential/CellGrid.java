@@ -288,14 +288,17 @@ public class CellGrid {
 				.flatMap(stream -> stream);
 	}
 
-	public boolean isValidPoint(Point point) {
-		Point p = (point);
+	public boolean isValidPoint(final Point point) {
+		return isValidPoint(point.x, point.y);
+	}
 
-		if ((p.x < 0) || (p.x >= numPointsX)) {
+	public boolean isValidPoint(final int x, final int y) {
+
+		if ((x < 0) || (x >= numPointsX)) {
 			return false;
 		}
 
-		if ((p.y < 0) || (p.y >= numPointsY)) {
+		if ((y < 0) || (y >= numPointsY)) {
 			return false;
 		}
 		return true;

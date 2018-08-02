@@ -109,12 +109,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	// ##################
 	@Override
 	public void postProjectRun(final VadereProject scenario) {
-		scenariosRunning = false;
-		model.refreshOutputTable();
-		setScenariosRunning(false);
-		progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
-		scenarioJPanel.showEditScenario();
-		selectCurrentScenarioRunManager();
+		EventQueue.invokeLater(() -> {
+			scenariosRunning = false;
+			model.refreshOutputTable();
+			setScenariosRunning(false);
+			progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
+			scenarioJPanel.showEditScenario();
+			selectCurrentScenarioRunManager();
+		});
 	}
 
 	private void selectCurrentScenarioRunManager() {
@@ -127,58 +129,71 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	@Override
 	public void preProjectRun(final VadereProject project) {
-		setScenariosRunning(true);
-		progressPanel.setData(Messages.getString("ProgressPanelWorking.text"), 0);
+		EventQueue.invokeLater(() -> {
+			setScenariosRunning(true);
+			progressPanel.setData(Messages.getString("ProgressPanelWorking.text"), 0);
+		});
 	}
 
 	@Override
 	public void preScenarioRun(final Scenario scenario, final int scenariosLeft) {
-		model.setScenarioNameLabel(scenario.getName());
-		repaint();
+		EventQueue.invokeLater(() -> {
+			model.setScenarioNameLabel(scenario.getName());
+			repaint();
+		});
 	}
 
 	@Override
 	public void postScenarioRun(final Scenario cloneScenario, final int scenarioLeft) {
-		// take the original!
-		replace(cloneScenario, VadereState.INITIALIZED);
+		EventQueue.invokeLater(() -> {
+			replace(cloneScenario, VadereState.INITIALIZED);
 
-		// model.refreshOutputTable();
-		// find index of scenario
-		int totalScenariosCount = model.getProject().getScenarios().size();
-		int doneScenariosCount = totalScenariosCount - scenarioLeft;
-		progressPanel.setData(Messages.getString("ProgressPanelWorking.text"), 100 * doneScenariosCount
-				/ totalScenariosCount);
-		logger.info(String.format("scenario %s finished", cloneScenario.getName()));
+			// model.refreshOutputTable();
+			// find index of scenario
+			int totalScenariosCount = model.getProject().getScenarios().size();
+			int doneScenariosCount = totalScenariosCount - scenarioLeft;
+			progressPanel.setData(Messages.getString("ProgressPanelWorking.text"), 100 * doneScenariosCount
+					/ totalScenariosCount);
+			logger.info(String.format("scenario %s finished", cloneScenario.getName()));
+		});
 	}
 
 	@Override
 	public void scenarioStarted(final Scenario cloneScenario, final int scenariosLeft) {
 		// take the original!
-		replace(cloneScenario, VadereState.RUNNING);
+		EventQueue.invokeLater(() -> {
+			replace(cloneScenario, VadereState.RUNNING);
+		});
 	}
 
 	@Override
 	public void scenarioPaused(final Scenario cloneScenario, final int scenariosLeft) {
 		// take the original!
-		replace(cloneScenario, VadereState.PAUSED);
+		EventQueue.invokeLater(() -> {
+			replace(cloneScenario, VadereState.PAUSED);
+		});
 	}
 
 	@Override
 	public void scenarioInterrupted(final Scenario scenario, final int scenariosLeft) {
-		replace(scenario, VadereState.INTERRUPTED);
-		setScenariosRunning(false);
-		selectCurrentScenarioRunManager();
-		logger.info(String.format("all running scenarios interrupted"));
+		EventQueue.invokeLater(() -> {
+			replace(scenario, VadereState.INTERRUPTED);
+			setScenariosRunning(false);
+			selectCurrentScenarioRunManager();
+			logger.info(String.format("all running scenarios interrupted"));
+		});
 	}
 
 	@Override
 	public void error(final Scenario scenario, final int scenarioLefts, final Throwable throwable) {
-		replace(scenario, VadereState.INTERRUPTED);
-		new Thread(
-				() -> {
-					IOUtils.errorBox(Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario
-							+ ": " + throwable, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
-				}).start();
+		EventQueue.invokeLater(() -> {
+			replace(scenario, VadereState.INTERRUPTED);
+			new Thread(
+					() -> {
+						IOUtils.errorBox(Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario
+								+ ": " + throwable, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
+					}).start();
+		});
 	}
 
 	private void replace(final Scenario scenarioRM, final VadereState state) {
@@ -190,21 +205,27 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	@Override
 	public void preRefresh() {
-		outputTable.setEnabled(false);
+		EventQueue.invokeLater(() -> {
+			outputTable.setEnabled(false);
+		});
 	}
 
 	@Override
 	public void postRefresh() {
-		if (!scenariosRunning)
-			outputTable.setEnabled(true);
+		EventQueue.invokeLater(() -> {
+			if (!scenariosRunning)
+				outputTable.setEnabled(true);
+		});
 	}
 
 	@Override
 	public void projectChanged(final VadereProject project) {
-		setTitle();
-		model.getProject().addProjectFinishedListener(this);
-		model.getProject().addSingleScenarioFinishedListener(this);
-		model.getProject().addProjectFinishedListener(scenarioJPanel);
+		EventQueue.invokeLater(() -> {
+			setTitle();
+			model.getProject().addProjectFinishedListener(this);
+			model.getProject().addSingleScenarioFinishedListener(this);
+			model.getProject().addProjectFinishedListener(scenarioJPanel);
+		});
 	}
 
 	@Override
@@ -217,21 +238,23 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 * Launch the application.
 	 */
 	public static void start() {
-		try {
-			// Set Java L&F from system
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException
-				| IllegalAccessException e) {
-			IOUtils.errorBox("The system look and feel could not be loaded.", "Error setLookAndFeel");
-		}
-		// show GUI
-		ProjectViewModel model = new ProjectViewModel();
-		ProjectView frame = new ProjectView(model);
-		frame.setProjectSpecificActionsEnabled(false);
-		frame.setVisible(true);
-		frame.setSize(1200, 800);
+		EventQueue.invokeLater(() -> {
+			try {
+				// Set Java L&F from system
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException
+					| IllegalAccessException e) {
+				IOUtils.errorBox("The system look and feel could not be loaded.", "Error setLookAndFeel");
+			}
+			// show GUI
+			ProjectViewModel model = new ProjectViewModel();
+			ProjectView frame = new ProjectView(model);
+			frame.setProjectSpecificActionsEnabled(false);
+			frame.setVisible(true);
+			frame.setSize(1200, 800);
 
-		frame.openLastUsedProject(model);
+			frame.openLastUsedProject(model);
+		});
 	}
 
 	private void openLastUsedProject(final ProjectViewModel model) {
