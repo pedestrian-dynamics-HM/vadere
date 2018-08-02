@@ -17,8 +17,8 @@ However, we welcome contributions from external sources.
 
 | Branch  | Pipeline Status  | Coverage |
 |:--------|:----------------:|:--------:| 
-| master  | [![pipeline status (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) | [![coverage report](https://gitlab.lrz.de/vadere/vadere/badges/master/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) |
-| develop |[![pipeline status](https://gitlab.lrz.de/vadere/vadere/badges/develop/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/develop) | [![coverage report](https://gitlab.lrz.de/vadere/vadere/badges/develop/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/develop) |
+| master  | [![pipeline status (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) | [![coverage report (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) |
+| develop | [![pipeline status (develop)](https://gitlab.lrz.de/vadere/vadere/badges/develop/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/develop) | [![coverage report (develop)](https://gitlab.lrz.de/vadere/vadere/badges/develop/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/develop) |
 
 ## Installation
 
