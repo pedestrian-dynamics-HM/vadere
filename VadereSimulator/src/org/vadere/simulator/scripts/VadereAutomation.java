@@ -98,63 +98,9 @@ public class VadereAutomation {
         System.out.println("*** Simulations took " + stop_time + " seconds ****");
     }
 
-    public static int randomCalc(int min, int max) {
-        Random rand = new Random();
-        return rand.nextInt(max-min)+min;
-    }
-
-
-
     private static void startAutomatic(Scenario scenario, int id) { // Scenario als final übergeben
         try {
             ScenarioBuilder builder = new ScenarioBuilder(scenario);
-            Random rand = new Random();
-            /*
-            int spawnNumber = 0;
-            for (int i = 0; i < 3; i++) {
-                spawnNumber += scenario.getTopography().getSources().get(i).getAttributes().getSpawnNumber();
-            }
-
-            int []spawnValues = new int[3];
-
-            int randomStart = rand.nextInt()%3;
-
-            if(randomStart < 0){
-                randomStart += 3;
-            }
-            spawnValues[(randomStart)] = randomCalc(0, spawnNumber);
-            spawnValues[(randomStart + 1) % 3] = randomCalc(0, spawnNumber - spawnValues[(randomStart)]);
-            spawnValues[(randomStart + 2) % 3] = spawnNumber - (spawnValues[(randomStart + 1) % 3] + spawnValues[(randomStart)]);
-
-            builder.setSourceField("spawnNumber", 1, spawnValues[0]);
-            builder.setSourceField("spawnNumber", 2, spawnValues[1]);
-            builder.setSourceField("spawnNumber", 3, spawnValues[2]);
-
-            String target_distribution = Integer.toString((int) ((float) spawnValues[0] / (float) spawnNumber * 100)) + "-" +
-                    Integer.toString((int) ((float) spawnValues[1] / (float) spawnNumber * 100)) + "-" +
-                    Integer.toString((int) ((float) spawnValues[2] / (float) spawnNumber * 100));
-            System.out.println("Distribution of pedestrians on the targets: " + target_distribution);
-            */
-
-
-
-            /*
-            int spawnNumberLeft = randomCalc(0, spawnNumber);
-            int spawnNumberStraight = randomCalc(0, spawnNumber - spawnNumberLeft);
-            int spawnNumberRight = spawnNumber - (spawnNumberStraight + spawnNumberLeft);
-
-
-            builder.setSourceField("spawnNumber", 1, spawnNumberLeft);
-            builder.setSourceField("spawnNumber", 2, spawnNumberStraight);
-            builder.setSourceField("spawnNumber", 3, spawnNumberRight);
-
-
-            String target_distribution = Integer.toString((int) ((float) spawnNumberLeft / (float) spawnNumber * 100)) + "-" +
-                    Integer.toString((int) ((float) spawnNumberStraight / (float) spawnNumber * 100)) + "-" +
-                    Integer.toString((int) ((float) spawnNumberRight / (float) spawnNumber * 100));
-            System.out.println("Distribution of pedestrians on the targets: " + target_distribution);
-
-            */
 
             scenario = builder.build();
             List<Source> sources = scenario.getScenarioStore().topography.getSources();
@@ -162,18 +108,13 @@ public class VadereAutomation {
                 List<List<Integer>> targetIds = new ArrayList<>();
                 List<Double> probabilities = new ArrayList<>();
                 int targetSize = scenario.getScenarioStore().topography.getTargets().size();
-                
-                //scenario.getScenarioStore().topography.getTargets().forEach(target -> targetIds.add(new ArrayList<>(target.getId())));
 
                 double probabilitiesSum = 0.;
 
                 //iterate over all available targets
                 for(int i = 0; i < targetSize; i++){
                     targetIds.add(Collections.singletonList(scenario.getScenarioStore().topography.getTargets().get(i).getId()));
-                    //targetIds.add(new ArrayList<Integer>().add(scenario.getScenarioStore().topography.getTargets().get(i).getId()));
 
-                    //get a probability for each one
-                    //double randomDouble = rand.nextDouble();
                     double randomDouble = nextExponentialDouble();
                     probabilities.add(randomDouble);
                     probabilitiesSum += randomDouble;
@@ -190,9 +131,7 @@ public class VadereAutomation {
                 GeneratedDistributionWriter.getInstance().addLineToFile(probabilities.toString().substring(1,probabilities.toString().length()-1));
             }
 
-
             scenario.saveChanges();
-            //scenario.setName(target_distribution + "_Distribution");
             scenario.setName(id + "_Distribution");
 
 
@@ -201,8 +140,6 @@ public class VadereAutomation {
             thread.start();
             arrThreads.add(thread);
 
-
-            //Process pr = rt.exec("java -jar /Users/Do/Documents/Vadere/Vadere.jar");
         } catch (Exception e) {
             System.out.println("error" + e.getMessage());
         }
