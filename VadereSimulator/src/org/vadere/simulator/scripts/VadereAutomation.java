@@ -24,10 +24,11 @@ import java.util.concurrent.BlockingQueue;
 public class VadereAutomation {
 
     //public static final String SCENARIO_NAME = "Kreuzung3_Unit";
-    private static final String SCENARIO_NAME = "Kreuzung_softShell_one_source";
+    //private static final String SCENARIO_NAME = "Kreuzung_softShell_one_source";
+    private static final String SCENARIO_NAME = "LangerGang_3";
     private static final String SCENARIO_PATH = "C:/Studium/BA/vadereProjects/";
     private static final int N_SIMULATIONS = 10;
-    private static final int N_CONCURENT_SIMULATIONS = 9; //if this is choosen too high, out of memory errors may occur
+    private static final int N_CONCURENT_SIMULATIONS = 20; //if this is choosen too high, out of memory errors may occur
     private static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<>();
 
@@ -97,17 +98,17 @@ public class VadereAutomation {
             ScenarioBuilder builder = new ScenarioBuilder(scenario);
 
             scenario = builder.build();
-            List<Source> sources = scenario.getScenarioStore().topography.getSources();
+            List<Source> sources = scenario.getScenarioStore().getTopography().getSources();
+            int targetSize = scenario.getScenarioStore().getTopography().getTargets().size();
             for (Source source : sources) {
                 List<List<Integer>> targetIds = new ArrayList<>();
                 List<Double> probabilities = new ArrayList<>();
-                int targetSize = scenario.getScenarioStore().topography.getTargets().size();
 
                 double probabilitiesSum = 0.;
 
                 //iterate over all available targets
                 for (int i = 0; i < targetSize; i++) {
-                    targetIds.add(Collections.singletonList(scenario.getScenarioStore().topography.getTargets().get(i).getId()));
+                    targetIds.add(Collections.singletonList(scenario.getScenarioStore().getTopography().getTargets().get(i).getId()));
 
                     double randomDouble = nextExponentialDouble();
                     probabilities.add(randomDouble);

@@ -5,13 +5,7 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DistributionFactory;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.util.SpawnArray;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -31,16 +25,8 @@ public abstract class SourceController {
 	private final DynamicElementFactory dynamicElementFactory;
 	private final Topography topography;
 	protected final Random random;
-	private final AttributesSource sourceAttributes;
-	private AttributesDynamicElement attributesDynamicElement;
 	private TargetDistribution targetDistribution = new TargetDistribution();
 
-	// TODO [priority=high] [task=refactoring] remove this from the SourceController and add a new attribute.
-	// This is ONLY used for "useFreeSpaceOnly".
-	private VCircle dynamicElementShape;
-
-	private int dynamicElementsToCreate;
-	private int dynamicElementsCreatedTotal;
 
 	/** <code>null</code>, if there is no next event. */
 	protected Double timeOfNextEvent;
