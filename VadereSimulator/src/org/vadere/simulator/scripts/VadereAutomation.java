@@ -6,6 +6,11 @@ import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.state.scenario.Source;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +27,7 @@ public class VadereAutomation {
 
     private static final String SCENARIO_NAME = "Kreuzung_softShell_one_source";
     private static final String SCENARIO_PATH = "C:/Studium/BA/vadereProjects/";
-    private static final int N_SIMULATIONS = 200;
+    private static final int N_SIMULATIONS = 10;
     private static final int N_CONCURENT_SIMULATIONS = 20; //if this is choosen too high, out of memory errors may occur
     private static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<>();
@@ -32,6 +37,7 @@ public class VadereAutomation {
 
 
     public static void main(String[] args) {
+
 
         long start_time = System.currentTimeMillis();
 
@@ -75,6 +81,8 @@ public class VadereAutomation {
                 amount--;
             }
 
+
+
             // wait for all threads to finish
             try {
                 for (int i = 0; i < arrThreads.size(); i++) {
@@ -84,6 +92,7 @@ public class VadereAutomation {
                 System.out.println(ie);
             }
         }
+        GeneratedDistributionWriter.getInstance().writeToFile();
         // time
         long stop_time = (System.currentTimeMillis() - start_time ) / 1000; // seconds
         System.out.println("*** Simulations took " + stop_time + " seconds ****");
@@ -165,7 +174,7 @@ public class VadereAutomation {
 
                     //get a probability for each one
                     //double randomDouble = rand.nextDouble();
-                    double randomDouble = nextTriangularDouble();
+                    double randomDouble = nextExponentialDouble();
                     probabilities.add(randomDouble);
                     probabilitiesSum += randomDouble;
                 }
@@ -178,6 +187,7 @@ public class VadereAutomation {
                 //set the appropriate variables in the Scenario
                 source.getAttributes().setTargetDistributionIds(targetIds);
                 source.getAttributes().setTargetDistributionProbabilities(probabilities);
+                GeneratedDistributionWriter.getInstance().addLineToFile(probabilities.toString().substring(1,probabilities.toString().length()-1));
             }
 
 
@@ -202,5 +212,41 @@ public class VadereAutomation {
         Random rand = new Random();
         return 1 - Math.sqrt(1 - rand.nextDouble());
     }
+
+    private static double nextExponentialDouble() {
+        Random rand = new Random();
+        return Math.log(rand.nextDouble()) * -1;
+    }
 }
 
+
+class GeneratedDistributionWriter {
+    private static final GeneratedDistributionWriter inst= new GeneratedDistributionWriter();
+    private List<String> lines = new ArrayList<>();
+
+    private GeneratedDistributionWriter() {
+        super();
+
+    }
+
+    synchronized void addLineToFile(String str) {
+        lines.add(str);
+    }
+
+
+    void writeToFile() {
+
+
+    Path file = Paths.get("C:/Studium/BA/Vadere/vadere/output/" + "generatedDistribution.txt");
+        try {
+            Files.write(file, lines, Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static GeneratedDistributionWriter getInstance() {
+        return inst;
+    }
+
+}
