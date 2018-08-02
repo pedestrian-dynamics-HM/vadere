@@ -237,7 +237,7 @@ class GeneratedDistributionWriter {
     void writeToFile() {
 
 
-    Path file = Paths.get("C:/Studium/BA/Vadere/vadere/output/" + "generatedDistribution.txt");
+    Path file = Paths.get("C:/Studium/BA/Vadere/vadere/output/" + "generatedDistributions.txt");
         try {
             Files.write(file, lines, Charset.forName("UTF-8"));
         } catch (IOException e) {
