@@ -3,7 +3,9 @@ package org.vadere.simulator.entrypoints;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /** Versions in strict order from oldest to newest. */
 public enum Version {
@@ -11,7 +13,8 @@ public enum Version {
 	UNDEFINED("undefined"),
 	NOT_A_RELEASE("not a release"),
 	V0_1("0.1"),
-	V0_2("0.2");
+	V0_2("0.2"),
+	V0_3("0.3");
 
 	private String label;
 
@@ -28,6 +31,7 @@ public enum Version {
 	}
 
 	public static Version fromString(String versionStr) {
+		versionStr = versionStr.replace('_', ' ');
 		for (Version v : values()) {
 			if (v.label.equals(versionStr))
 				return v;
@@ -43,6 +47,15 @@ public enum Version {
 			}
 		}
 		throw new IllegalArgumentException("Value not in Version Enumeration " + curr.toString());
+	}
+
+	public static String[] stringValues(){
+		return Arrays.stream(values()).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
+	}
+
+	public static String[] stringValues(Version startFrom){
+		int min = startFrom.ordinal();
+		return Arrays.stream(values()).filter(v -> v.ordinal() >= min).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
 	}
 
 	public Version nextVersion(){

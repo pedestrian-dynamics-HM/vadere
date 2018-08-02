@@ -15,6 +15,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
@@ -55,12 +56,18 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
+		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener);
+	}
+
+	// if overwriteTimestampSetting is true do note use timestamp in output directory
+	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
-		this.setOutputPaths(Paths.get(outputDir)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
 	}
+
 
 	/**
 	 * This method runs a simulation. It must not catch any exceptions! The
@@ -133,6 +140,14 @@ public class ScenarioRun implements Runnable {
 
 	public void addPassiveCallback(final PassiveCallback pc) {
 		passiveCallbacks.add(pc);
+	}
+
+	public void setOutputPaths(final Path outputPath, boolean overwriteTimestampSetting){
+		if (overwriteTimestampSetting){
+			this.outputPath = outputPath;
+		} else {
+			setOutputPaths(outputPath);
+		}
 	}
 
 	public void setOutputPaths(final Path outputPath) {
