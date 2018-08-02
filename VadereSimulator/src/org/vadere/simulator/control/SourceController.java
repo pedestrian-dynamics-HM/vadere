@@ -181,13 +181,7 @@ public class SourceController {
 		// might add some.
 
 		List<Integer> targets = targetDistribution.returnTargets(sourceAttributes.getTargetDistributionIds(),sourceAttributes.getTargetDistributionProbabilities());
-		//List<Integer> targets = targetDistribution.returnTargets(targetDistribution.targetIds(), targetDistribution.getDistributions().get(1));
 		newElement.setTargets(new LinkedList<>(targets));
-
-
-		if (newElement.getTargets().isEmpty()) {
-			newElement.setTargets(new LinkedList<>(sourceAttributes.getTargetIds()));
-		}
 
 		topography.addElement(newElement);
 
