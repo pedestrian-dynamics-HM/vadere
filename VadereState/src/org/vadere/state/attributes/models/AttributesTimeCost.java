@@ -54,7 +54,7 @@ public class AttributesTimeCost extends Attributes {
 	}
 
 	/** the standard derivation required for the gaussian method. */
-	private double standardDerivation = 0.7;
+	private double standardDeviation = 0.7;
 	/** the method of density measurement. */
 	private TimeCostFunctionType type = TimeCostFunctionType.UNIT;
 	/** the weight of the density. */
@@ -93,8 +93,8 @@ public class AttributesTimeCost extends Attributes {
 	private LoadingType loadingType = LoadingType.CONSTANT;
 
 	// Getters...
-	public double getStandardDerivation() {
-		return standardDerivation;
+	public double getStandardDeviation() {
+		return standardDeviation;
 	}
 
 	public TimeCostFunctionType getType() {

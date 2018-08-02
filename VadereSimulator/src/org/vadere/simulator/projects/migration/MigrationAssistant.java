@@ -1,5 +1,7 @@
 package org.vadere.simulator.projects.migration;
 
+import org.vadere.simulator.entrypoints.Version;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -33,4 +35,6 @@ public abstract class MigrationAssistant {
 	protected String getTimestamp() {
 		return new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
 	}
+
+	public abstract String convertFile(Path scenarioFilePath, Version targetVersion) throws IOException, MigrationException;
 }

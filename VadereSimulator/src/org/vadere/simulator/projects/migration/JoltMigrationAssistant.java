@@ -66,6 +66,36 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		return stats;
 	}
 
+	@Override
+	public String convertFile(Path scenarioFilePath, Version targetVersion) throws IOException, MigrationException {
+		String json = IOUtils.readTextFile(scenarioFilePath);
+		JsonNode node = StateJsonConverter.deserializeToNode(json);
+		restLog();
+		logger.info(">> analyzing JSON tree of scenario <" + node.get("name").asText() + ">");
+		Version version = Version.UNDEFINED;
+		if (node.get("release") != null) {
+			version = Version.fromString(node.get("release").asText());
+
+			if (version == null || version.equalOrSamller(Version.UNDEFINED)) {
+				logger.error("release version " + node.get("release").asText() + " is unknown or not " +
+						"supported. If this is a valid release create a version transformation and a new idenity transformation");
+				throw new MigrationException("release version " + node.get("release").asText() + " is unknown or not " +
+						"supported. If this is a valid releasecreate a version transformation and a new idenity transformation");
+			}
+		} else {
+			logger.warn("Version is unknown of scenario <" + node.get("name").asText() +  ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			version = Version.NOT_A_RELEASE;
+		}
+
+		JsonNode transformedNode = node;
+		// apply all transformation from current to latest version.
+		for (Version v : Version.listToLatest(version)) {
+			logger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
+			transformedNode = transform(transformedNode, v);
+		}
+
+		return StateJsonConverter.serializeJsonNode(transformedNode);
+	}
 
 	public MigrationResult analyzeDirectory(Path dir, String dirName) throws IOException {
 
@@ -155,6 +185,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		JsonNode transformedNode = node;
 		// apply all transformation from current to latest version.
 		for (Version v : Version.listToLatest(version)) {
+			logger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
 			transformedNode = transform(transformedNode, v);
 		}
 		if (legacyDir != null) {

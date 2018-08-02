@@ -1,7 +1,7 @@
 {
   "name" : "testtrafficlight",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.3",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -10,15 +10,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
-        "pedPotentialWidth" : 0.5,
-        "pedPotentialHeight" : 12.6,
-        "obstPotentialWidth" : 0.25,
-        "obstPotentialHeight" : 20.1,
-        "useHardBodyShell" : false,
-        "obstDistanceDeviation" : 0.0,
-        "visionFieldRadius" : 5.0
-      },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
         "numberOfCircles" : 1,
@@ -38,13 +29,22 @@
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
         "submodels" : [ ]
       },
+      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
+        "pedPotentialWidth" : 0.5,
+        "pedPotentialHeight" : 12.6,
+        "obstPotentialWidth" : 0.25,
+        "obstPotentialHeight" : 20.1,
+        "useHardBodyShell" : false,
+        "obstDistanceDeviation" : 0.0,
+        "visionFieldRadius" : 5.0
+      },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
+          "standardDeviation" : 0.7,
           "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,

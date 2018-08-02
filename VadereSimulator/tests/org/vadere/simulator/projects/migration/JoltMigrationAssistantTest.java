@@ -58,7 +58,7 @@ public class JoltMigrationAssistantTest {
 		JoltMigrationAssistant joltMigrationAssistant = new JoltMigrationAssistant();
 
 		MigrationResult res = joltMigrationAssistant.analyzeProject(projectPath);
-		assertEquals("", new MigrationResult(12, 1, 10, 1), res);
+		assertEquals("", new MigrationResult(12, 0, 11, 1), res);
 		System.out.println(Strings.repeat('#', 80));
 	}
 

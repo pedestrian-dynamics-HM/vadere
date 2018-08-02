@@ -21,6 +21,8 @@ import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class IncidentMigrationAssistant extends MigrationAssistant {
 
 	private static Logger logger = LogManager.getLogger(IncidentMigrationAssistant.class);
@@ -47,14 +49,7 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 	}
 
 
-//	@Override
-//	public  void analyzeSingleScenario(Path path) throws IOException {
-//		try {
-//			analyzeScenario(path, null, log, true)	;
-//		} catch (MigrationException e) {
-//			logger.error(log.toString());
-//		}
-//	}
+//
 
 	@Override
 	public MigrationResult analyzeProject(String projectFolderPath) throws IOException {
@@ -74,6 +69,11 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 
 
 		return stats;
+	}
+
+	@Override
+	public String convertFile(Path scenarioFilePath, Version targetVersion) throws IOException, MigrationException {
+		throw new NotImplementedException();
 	}
 
 	// if isScenario is false, its output

@@ -16,8 +16,8 @@ public class AttributesCGM extends Attributes {
 	 *  moved to org.vadere.state.attributes.scenario.AttributeSource class to allow
 	 *  different groupDistributions for each source
 	 */
-	@Deprecated()
-	private List<Double> groupSizeDistribution = Arrays.asList(0.0, 0.0, 1.0);
+//	@Deprecated()
+//	private List<Double> groupSizeDistribution = Arrays.asList(0.0, 0.0, 1.0);
 
 	public double getGroupMemberRepulsionFactor() {
 		return groupMemberRepulsionFactor;
@@ -27,7 +27,4 @@ public class AttributesCGM extends Attributes {
 		return leaderAttractionFactor;
 	}
 
-	public List<Double> getGroupSizeDistribution() {
-		return groupSizeDistribution;
-	}
 }

@@ -74,7 +74,7 @@ public class QueueDetector extends EikonalSolverFMM {
                 topography.getBounds(),
                 topography.getElements(Pedestrian.class),
                 1.0 / cellGrid.getResolution(),
-                new AttributesTimeCost().getStandardDerivation(),
+                new AttributesTimeCost().getStandardDeviation(),
                 attributesPedestrian,
                 loadingStrategy, IGaussianFilter.Type.OpenCL);
 

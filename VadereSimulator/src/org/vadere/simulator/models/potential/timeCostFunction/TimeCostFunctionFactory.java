@@ -67,7 +67,7 @@ public class TimeCostFunctionFactory {
 						topography.getBounds(),
 						topography.getElements(Pedestrian.class),
 						scale,
-						timeCostAttributes.getStandardDerivation(),
+						timeCostAttributes.getStandardDeviation(),
 						attributesPedestrian,
 						loadingStrategy);
 
@@ -91,7 +91,7 @@ public class TimeCostFunctionFactory {
 						topography.getBounds(),
 						topography.getElements(Pedestrian.class),
 						scale,
-						timeCostAttributes.getStandardDerivation(),
+						timeCostAttributes.getStandardDeviation(),
 						attributesPedestrian,
 						loadingStrategy);
 
@@ -104,7 +104,7 @@ public class TimeCostFunctionFactory {
 						topography.getBounds(),
 						topography.getElements(Pedestrian.class),
 						scale,
-						timeCostAttributes.getStandardDerivation(),
+						timeCostAttributes.getStandardDeviation(),
 						attributesPedestrian,
 						loadingStrategy);
 
@@ -120,7 +120,7 @@ public class TimeCostFunctionFactory {
 						topography.getBounds(),
 						topography.getElements(Pedestrian.class),
 						scale,
-						timeCostAttributes.getStandardDerivation(),
+						timeCostAttributes.getStandardDeviation(),
 						attributesPedestrian,
 						loadingStrategy);
 
@@ -142,7 +142,7 @@ public class TimeCostFunctionFactory {
 		IGaussianFilter obstacleFilter = IGaussianFilter.create(
 				topography,
 				scale,
-				timeCostAttributes.getStandardDerivation());
+				timeCostAttributes.getStandardDeviation());
 
 		TimeCostObstacleDensity timeCostObstacle = new TimeCostObstacleDensity(
 				new UnitTimeCostFunction(),

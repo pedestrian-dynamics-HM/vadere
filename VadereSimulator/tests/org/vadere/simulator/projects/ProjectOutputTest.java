@@ -7,6 +7,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.IOVadere;
+import org.vadere.simulator.projects.migration.MigrationAssistant;
+import org.vadere.simulator.projects.migration.MigrationOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +78,13 @@ public class ProjectOutputTest {
 		FileUtils.copyDirectoryToDirectory(backup.toFile(), project.getOutputDir().toFile());
 		IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("corrupt/testOutput2").toFile());
 	}
+
+	@Test
+	public void bi(){
+		MigrationAssistant m = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
+//		System.out.println(m.convertFile());
+	}
+	//ToDo: update testResources/data/simpleProject/output/... to v0.3
 
 	@Test
 	public void updateWithNew() throws IOException, URISyntaxException {

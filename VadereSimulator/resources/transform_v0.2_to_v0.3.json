@@ -1,10 +1,19 @@
 [
   {
+    // Changes
+    // * move /scenario/attributesModel/org.vadere.state.attributes.models.AttributesCGM/groupSizeDistribution
+    //   to each source in /scenario/topography/sources/[]/groupSizeDistribution. This allows different
+    //   group size distribution for each source
+    // * rename /scenario/attributesModel/*/timeCostAttributes/standardDerivation to standardDeviation.
+    //
+    // PostHooks in JoltTransformV0toV1.java
+    // /* sort: ensure key order on first level only
     "operation": "shift",
     "spec": {
       "name": "&",
       "description": "&",
-      "release": "&",
+      // no relase here to overwrite it with default at the default operation down below
+      "commithash": "&",
       "processWriters": {
         "files": {
           "*": {
@@ -128,8 +137,7 @@
           },
           "org.vadere.state.attributes.models.AttributesCGM": {
             "groupMemberRepulsionFactor": "scenario.&2.&1.&0",
-            "leaderAttractionFactor": "scenario.&2.&1.&0",
-            "groupSizeDistribution": "scenario.&2.&1.&0"
+            "leaderAttractionFactor": "scenario.&2.&1.&0"
           },
           "org.vadere.state.attributes.models.AttributesGFM": {
             "gravityFactor": "scenario.&2.&1.&0",
@@ -188,7 +196,7 @@
             "obstacleGridPenalty": "scenario.&2.&1.&0",
             "targetAttractionStrength": "scenario.&2.&1.&0",
             "timeCostAttributes": {
-              "standardDerivation": "scenario.&3.&2.&1.&0",
+              "standardDerivation": "scenario.&3.&2.&1.standardDeviation",
               "type": "scenario.&3.&2.&1.&0",
               "obstacleDensityWeight": "scenario.&3.&2.&1.&0",
               "pedestrianSameTargetDensityWeight": "scenario.&3.&2.&1.&0",
@@ -306,7 +314,7 @@
             "targetID": "scenario.&2.&1.&0"
           },
           "org.vadere.state.attributes.models.AttributesTimeCost": {
-            "standardDerivation": "scenario.&2.&1.&0",
+            "standardDerivation": "scenario.&2.&1.standardDeviation",
             "type": "scenario.&2.&1.&0",
             "obstacleDensityWeight": "scenario.&2.&1.&0",
             "pedestrianSameTargetDensityWeight": "scenario.&2.&1.&0",
@@ -436,11 +444,13 @@
     "spec": {
       "name": "",
       "description": "",
-      "release": "",
+      // set new version
+      "release": "0.3",
+      "commithash": "warning: no commit hash",
       "processWriters": {
         "files[]": {},
         "processors[]": {},
-        "isTimestamped": "true"
+        "isTimestamped": true
       },
       "scenario": {
         "mainModel": "null",
@@ -449,12 +459,12 @@
           "finishTime": "500.0",
           "simTimeStepLength": "0.4",
           "realTimeSimTimeRatio": "0.1",
-          "writeSimulationData": "true",
-          "visualizationEnabled": "true",
-          "printFPS": "false",
-          "needsBoundary": "false",
+          "writeSimulationData": true,
+          "visualizationEnabled": true,
+          "printFPS": false,
+          "needsBoundary": false,
           "digitsPerCoordinate": "2",
-          "useRandomSeed": "true",
+          "useRandomSeed": true,
           "randomSeed": "1"
         },
         "eventInfos": [],
@@ -467,7 +477,7 @@
               "height": "10.0"
             },
             "boundingBoxWidth": "0.5",
-            "bounded": "true"
+            "bounded": true
           },
           "obstacles": [],
           "stairs": [],
@@ -476,7 +486,7 @@
           "dynamicElements": [],
           "attributesPedestrian": {
             "radius": "0.195",
-            "densityDependentSpeed": "false",
+            "densityDependentSpeed": false,
             "speedDistributionMean": "1.34",
             "speedDistributionStandardDeviation": "0.0",
             "minimumSpeed": "0.3",

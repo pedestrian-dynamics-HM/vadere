@@ -1,7 +1,7 @@
 {
   "name" : "rimea_07_speeds_sfm1",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -24,12 +24,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
-        "pedestrianBodyPotential" : 2.72,
-        "pedestrianRecognitionDistance" : 0.3,
-        "obstacleBodyPotential" : 10.0,
-        "obstacleRepulsionStrength" : 0.2
-      },
       "org.vadere.state.attributes.models.AttributesSFM" : {
         "attributesODEIntegrator" : {
           "solverType" : "DORMAND_PRINCE_45",
@@ -49,7 +43,7 @@
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
+          "standardDeviation" : 0.7,
           "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
@@ -59,6 +53,12 @@
           "pedestrianDynamicWeight" : 6.0,
           "loadingType" : "CONSTANT"
         }
+      },
+      "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
+        "pedestrianBodyPotential" : 2.72,
+        "pedestrianRecognitionDistance" : 0.3,
+        "obstacleBodyPotential" : 10.0,
+        "obstacleRepulsionStrength" : 0.2
       }
     },
     "attributesSimulation" : {

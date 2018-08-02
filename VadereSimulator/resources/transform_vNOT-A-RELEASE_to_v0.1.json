@@ -1,5 +1,23 @@
 [
   {
+    // Changes
+    // * add description key on root level
+    // * move and rename  vadere/topography/attributes to vadere/attributesSimulation
+    // * move all attributesModles from ALL_CAPS_NAMES to the canonical class name
+    //   * merge PEDESTRIAN_POTENTIAL_GNM and OBSTACLE_POTENTIAL_GNM under org.vadere.state.attributes.models.AttributesPotentialGNM
+    //   * merge PEDESTRIAN_POTENTIAL_OSM and OBSTACLE_POTENTIAL_OSM under org.vadere.state.attributes.models.AttributesPotentialOSM
+    //   * merge PEDESTRIAN_POTENTIAL_PARTICLES and OBSTACLE_POTENTIAL_PARTICLES  under org.vadere.state.attributes.models.AttributesPotentialParticles
+    //   * merge TARGET_POTENTIAL_RING_EXPERIMENT and OBSTACLE_POTENTIAL_RING_EXPERIMENT under org.vadere.state.attributes.models.AttributesPotentialRingExperiment
+    //   * merge PEDESTRIAN_POTENTIAL_SFM and OBSTACLE_POTENTIAL_SFM under org.vadere.state.attributes.models.AttributesPotentialSFM
+    // * remove vadere/topography/pedestrians (is not shown in the transformaiton description thus removed.
+    // * for all items under vadere/topography/dynamicElements rename nextTargetListPosition to nextTargetListIndex
+    // * add under vadere/mainModel the main model debending on used model attributes. (==> PostTransformHook in JoltTransformV0toV1.java)
+    //
+    // PostHooks in JoltTransformV0toV1.java
+    // * findMainModel: derive main model from used Attributes in the current scenario file
+    // * attributesPotentialCompactVSosmIncident: set correct Potential attribute in OSM attribues based on current scenario file
+    // * moveSpawnDelayIntoDistributionParametersIncident: if interSpawnTimeDistribution is used in source construct needed distribution array
+    // * sort: ensure key order on first level only
     "operation": "shift",
     "spec": {
       "name": "&",
@@ -409,7 +427,7 @@
             "id": 1
           }
         },
-        "isTimestamped": "true"
+        "isTimestamped": true
       },
       "vadere": {
         "mainModel": "null",
@@ -418,12 +436,12 @@
           "finishTime": "500.0",
           "simTimeStepLength": "0.4",
           "realTimeSimTimeRatio": "0.1",
-          "writeSimulationData": "true",
-          "visualizationEnabled": "true",
-          "printFPS": "false",
-          "needsBoundary": "false",
+          "writeSimulationData": true,
+          "visualizationEnabled": true,
+          "printFPS": false,
+          "needsBoundary": false,
           "digitsPerCoordinate": "2",
-          "useRandomSeed": "true",
+          "useRandomSeed": true,
           "randomSeed": "1"
         },
         "topography": {
@@ -435,7 +453,7 @@
               "height": "10.0"
             },
             "boundingBoxWidth": "0.5",
-            "bounded": "true"
+            "bounded": true
           },
           "obstacles": [],
           "stairs": [],
@@ -444,7 +462,7 @@
           "dynamicElements": [],
           "attributesPedestrian": {
             "radius": "0.195",
-            "densityDependentSpeed": "false",
+            "densityDependentSpeed": false,
             "speedDistributionMean": "1.34",
             "speedDistributionStandardDeviation": "0.0",
             "minimumSpeed": "0.3",
