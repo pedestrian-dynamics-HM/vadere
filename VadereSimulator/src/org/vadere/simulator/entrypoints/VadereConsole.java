@@ -67,6 +67,23 @@ public class VadereConsole {
 				.dest("scenario-file")
 				.help("Name of Scenario file");
 
+		// Run Scenario
+		Subparser scenarioRun = subparsers
+				.addParser("scenario-run")
+				.help("Run scenario without a project")
+				.setDefault("func", new ScenarioRunSubCommand());
+		scenarioRun.addArgument("--output-dir", "-o")
+				.required(false)
+				.setDefault("output")
+				.dest("output-dir") // set name in namespace
+				.type(String.class)
+				.help("Supply differernt output directory path to use.");
+
+		scenarioRun.addArgument("--scenario-file", "-f")
+				.required(true)
+				.type(String.class)
+				.dest("scenario-file")
+				.help("Scenario files to run");
 
 		// Run SUQ
 		Subparser suqRun = subparsers
@@ -85,7 +102,7 @@ public class VadereConsole {
 				.required(true)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("List of scenario files to run");
+				.help("Scenario files to run");
 
 
 		// Run Migration Assistant
