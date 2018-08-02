@@ -27,7 +27,7 @@ public class VadereAutomation {
     private static final String SCENARIO_NAME = "Kreuzung_softShell_one_source";
     private static final String SCENARIO_PATH = "C:/Studium/BA/vadereProjects/";
     private static final int N_SIMULATIONS = 10;
-    private static final int N_CONCURENT_SIMULATIONS = 20; //if this is choosen too high, out of memory errors may occur
+    private static final int N_CONCURENT_SIMULATIONS = 9; //if this is choosen too high, out of memory errors may occur
     private static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class VadereAutomation {
 
         // run simulations
         int amount = N_SIMULATIONS;
-        int numberOfIterations = (N_SIMULATIONS / N_CONCURENT_SIMULATIONS) + ((N_SIMULATIONS % N_CONCURENT_SIMULATIONS == 0) ? 0 : 1);
+        int numberOfIterations = (int)Math.ceil(((double)N_SIMULATIONS / N_CONCURENT_SIMULATIONS));
 
         for (int iteration = 0; iteration < numberOfIterations; iteration++) {
 
@@ -171,7 +171,7 @@ class GeneratedDistributionWriter {
             e.printStackTrace();
         }
     }
-    
+
     public static GeneratedDistributionWriter getInstance() {
         return inst;
     }
