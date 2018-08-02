@@ -55,7 +55,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             wall_time_start = time.time()
 
             # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
-            completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console, "scenario-run", "-f", scenario_file, " -o",output_dir],
+            completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console, "scenario-run", "-f", scenario_file, "-o", output_dir],
                                            timeout=scenario_timeout_in_sec,
                                            check=True,
                                            stdout=subprocess.PIPE,
