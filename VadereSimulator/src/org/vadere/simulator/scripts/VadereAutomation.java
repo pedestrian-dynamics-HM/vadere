@@ -1,4 +1,5 @@
 package org.vadere.simulator.scripts;
+
 import org.vadere.simulator.entrypoints.ScenarioBuilder;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
@@ -22,9 +23,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class VadereAutomation {
 
-
     //public static final String SCENARIO_NAME = "Kreuzung3_Unit";
-
     private static final String SCENARIO_NAME = "Kreuzung_softShell_one_source";
     private static final String SCENARIO_PATH = "C:/Studium/BA/vadereProjects/";
     private static final int N_SIMULATIONS = 10;
@@ -33,9 +32,6 @@ public class VadereAutomation {
     private static ArrayList<Thread> arrThreads = new ArrayList<>();
 
     // ThreadPoolExecuter !
-
-
-
     public static void main(String[] args) {
 
 
@@ -56,19 +52,18 @@ public class VadereAutomation {
                 }
             }
 
-            if (scenario==null) {
+            if (scenario == null) {
                 throw new IllegalArgumentException("Scenario " + SCENARIO_NAME + " does not exist!");
             }
 
             final_scenario = scenario;
 
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("error" + e.getMessage());
         }
 
         // run simulations
         int amount = N_SIMULATIONS;
-
         int numberOfIterations = (N_SIMULATIONS / N_CONCURENT_SIMULATIONS) + ((N_SIMULATIONS % N_CONCURENT_SIMULATIONS == 0) ? 0 : 1);
 
         for (int iteration = 0; iteration < numberOfIterations; iteration++) {
@@ -82,7 +77,6 @@ public class VadereAutomation {
             }
 
 
-
             // wait for all threads to finish
             try {
                 for (int i = 0; i < arrThreads.size(); i++) {
@@ -94,7 +88,7 @@ public class VadereAutomation {
         }
         GeneratedDistributionWriter.getInstance().writeToFile();
         // time
-        long stop_time = (System.currentTimeMillis() - start_time ) / 1000; // seconds
+        long stop_time = (System.currentTimeMillis() - start_time) / 1000; // seconds
         System.out.println("*** Simulations took " + stop_time + " seconds ****");
     }
 
@@ -112,7 +106,7 @@ public class VadereAutomation {
                 double probabilitiesSum = 0.;
 
                 //iterate over all available targets
-                for(int i = 0; i < targetSize; i++){
+                for (int i = 0; i < targetSize; i++) {
                     targetIds.add(Collections.singletonList(scenario.getScenarioStore().topography.getTargets().get(i).getId()));
 
                     double randomDouble = nextExponentialDouble();
@@ -121,19 +115,18 @@ public class VadereAutomation {
                 }
 
                 //norm the probabilities to 1
-                for(int i = 0; i < probabilities.size();i++){
-                    probabilities.set(i,probabilities.get(i)/probabilitiesSum);
+                for (int i = 0; i < probabilities.size(); i++) {
+                    probabilities.set(i, probabilities.get(i) / probabilitiesSum);
                 }
 
                 //set the appropriate variables in the Scenario
                 source.getAttributes().setTargetDistributionIds(targetIds);
                 source.getAttributes().setTargetDistributionProbabilities(probabilities);
-                GeneratedDistributionWriter.getInstance().addLineToFile(probabilities.toString().substring(1,probabilities.toString().length()-1));
+                GeneratedDistributionWriter.getInstance().addLineToFile(probabilities.toString().substring(1, probabilities.toString().length() - 1));
             }
 
             scenario.saveChanges();
             scenario.setName(id + "_Distribution");
-
 
 
             Thread thread = new Thread(new ScenarioRun(scenario, s -> System.out.print(s + "finished")));
@@ -158,7 +151,7 @@ public class VadereAutomation {
 
 
 class GeneratedDistributionWriter {
-    private static final GeneratedDistributionWriter inst= new GeneratedDistributionWriter();
+    private static final GeneratedDistributionWriter inst = new GeneratedDistributionWriter();
     private List<String> lines = new ArrayList<>();
 
     private GeneratedDistributionWriter() {
@@ -170,20 +163,16 @@ class GeneratedDistributionWriter {
         lines.add(str);
     }
 
-
     void writeToFile() {
-
-
-    Path file = Paths.get("C:/Studium/BA/Vadere/vadere/output/" + "generatedDistributions.txt");
+        Path file = Paths.get("C:/Studium/BA/Vadere/vadere/output/" + "generatedDistributions.txt");
         try {
             Files.write(file, lines, Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+    
     public static GeneratedDistributionWriter getInstance() {
         return inst;
     }
-
 }
