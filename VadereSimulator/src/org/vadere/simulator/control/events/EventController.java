@@ -21,6 +21,7 @@ public class EventController {
     private ScenarioStore scenarioStore;
 
     // Constructors
+    // TODO Analyse events in "scenarioStore" and split them up in one-time and recurring events.
     public EventController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
     }
