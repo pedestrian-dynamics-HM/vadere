@@ -18,6 +18,7 @@ import java.util.Collection;
 public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer> {
 	private double pedRadius;
 
+
 	public PedestrianOverlapProcessor() {
 		super("overlaps");
 		setAttributes(new AttributesPedestrianOverlapProcessor());
