@@ -296,6 +296,10 @@ public abstract class StateJsonConverter {
 		return writer.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
 	}
 
+	public static ObjectNode serializeEventsToNode(EventInfoStore eventInfoStore) {
+		return mapper.valueToTree(eventInfoStore);
+	}
+
 	public static String serializeObject(Object object) {
 		try {
 			return writer.writeValueAsString(mapper.convertValue(object, JsonNode.class));

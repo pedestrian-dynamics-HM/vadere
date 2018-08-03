@@ -110,6 +110,11 @@ public class JsonConverter {
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		vadereNode.set("topography", topographyNode);
 
+		// vadere > eventInfos
+		// We get a complete tree here and not only a node. Therefore, use "setAll()" instead of "set()".
+		ObjectNode eventNode = StateJsonConverter.serializeEventsToNode(scenarioStore.getEventInfoStore());
+		vadereNode.setAll(eventNode);
+
 		return vadereNode;
 	}
 
