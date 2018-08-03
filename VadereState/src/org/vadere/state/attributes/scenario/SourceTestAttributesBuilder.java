@@ -150,7 +150,10 @@ public class SourceTestAttributesBuilder {
 				+ ",\"spawnAtRandomPositions\": true"
 				+ ",\"useFreeSpaceOnly\": " + useFreeSpaceOnly
 				+ ",\"groupSizeDistribution\" : " + groupSizeDistribution() + "\n"
-				+ ",\"targetIds\": [1]}";
+				+ ",\"targetIds\": [1]" + "\n"
+				+ ",\"targetDistributionIds\": [ [ 10, 20, 21 ], [ 11, 1, 2 ], [ 32,1] ]" + "\n"
+				+ ",\"targetDistributionProbabilities\": [ 0.3, 0.1, 0.6 ]" + "\n"
+				+ "}";
 	}
 
 }
