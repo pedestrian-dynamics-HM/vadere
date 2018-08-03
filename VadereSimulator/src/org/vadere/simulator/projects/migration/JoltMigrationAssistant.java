@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.migration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.apache.log4j.Logger;
@@ -67,9 +68,15 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 	}
 
 	@Override
-	public String convertFile(Path scenarioFilePath, Version targetVersion) throws IOException, MigrationException {
-		String json = IOUtils.readTextFile(scenarioFilePath);
-		JsonNode node = StateJsonConverter.deserializeToNode(json);
+	public String convertFile(Path scenarioFilePath, Version targetVersion) throws MigrationException {
+		JsonNode node;
+		try {
+			String json = IOUtils.readTextFile(scenarioFilePath);
+			node = StateJsonConverter.deserializeToNode(json);
+		} catch (IOException e){
+			logger.error("Error converting File: " + e.getMessage());
+			throw new MigrationException("Could not read JsonFile or create Json representation" + e.getMessage());
+		}
 		restLog();
 		logger.info(">> analyzing JSON tree of scenario <" + node.get("name").asText() + ">");
 		Version version = Version.UNDEFINED;
@@ -94,8 +101,36 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 			transformedNode = transform(transformedNode, v);
 		}
 
-		return StateJsonConverter.serializeJsonNode(transformedNode);
+		try {
+			return StateJsonConverter.serializeJsonNode(transformedNode);
+		} catch (JsonProcessingException e) {
+			logger.error("could not serializeJsonNode after Transformation: " + e.getMessage());
+			throw new MigrationException("could not serializeJsonNode after Transformation: " + e.getMessage());
+		}
 	}
+
+	@Override
+	public void revertFile(Path scenarioFile) throws MigrationException {
+		Path backupFile = MigrationAssistant.getBackupPath(scenarioFile);
+		if (!backupFile.toFile().exists()){
+			logger.error("There does not exist a Backup for the given file");
+			logger.error("File: " + scenarioFile.toString());
+			logger.error("Backup does not exist: " + backupFile.toString());
+		}
+
+		try {
+			Files.copy(backupFile, scenarioFile, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			logger.error("Could not copy legacy backup to current version: " + e.getMessage(), e);
+			throw new MigrationException("Could not copy legacy backup to current version: " + e.getMessage(), e);
+		}
+		try {
+			Files.deleteIfExists(backupFile);
+		} catch (IOException e) {
+			logger.error("Cold not delete old legacy file after reverting File: " + e.getMessage(), e);
+		}
+	}
+
 
 	public MigrationResult analyzeDirectory(Path dir, String dirName) throws IOException {
 
@@ -150,7 +185,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 
 		logger.info(">> analyzing JSON tree of scenario <" + parentPath + node.get("name").asText() + ">");
 
-		Version version = Version.UNDEFINED;
+		Version version;
 
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());

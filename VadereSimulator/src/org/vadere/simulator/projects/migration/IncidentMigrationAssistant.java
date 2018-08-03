@@ -72,7 +72,12 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 	}
 
 	@Override
-	public String convertFile(Path scenarioFilePath, Version targetVersion) throws IOException, MigrationException {
+	public String convertFile(Path scenarioFilePath, Version targetVersion) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void revertFile(Path scenarioFile) {
 		throw new NotImplementedException();
 	}
 
