@@ -116,5 +116,7 @@ public class GroupPlacementHelper {
 		return overlapXGroupCount * overlapYGroupCount;
 	}
 
-
+	public int getGroupSize() {
+		return groupSize;
+	}
 }

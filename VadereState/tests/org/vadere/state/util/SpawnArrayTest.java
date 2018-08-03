@@ -23,9 +23,9 @@ import static org.junit.Assert.assertNull;
 
 public class SpawnArrayTest {
 
-	VRectangle source;
-	VRectangle elementBound;
-	SpawnArray spawnArray;
+	private VRectangle source;
+	private VRectangle elementBound;
+	private SpawnArray spawnArray;
 
 	@Test
 	public void NumberOfElements() {
@@ -87,7 +87,7 @@ public class SpawnArrayTest {
 		spawnArray = new SpawnArray(source, elementBound);
 
 		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
-		LinkedList<VPoint> points = spawnArray.getNextGroup(6);
+		LinkedList<VPoint> points = spawnArray.getNextGroup(6, createMock(0.5));
 		assertEquals(spawnPoints[0], points.pollFirst());
 		assertEquals(spawnPoints[1], points.pollFirst());
 		assertEquals(spawnPoints[2], points.pollFirst());
@@ -104,23 +104,51 @@ public class SpawnArrayTest {
 		spawnArray = new SpawnArray(source, elementBound);
 
 		// first Point
-		VPoint p = spawnArray.getNextSpawnPoint();
+		List<DynamicElement> dynamicElements = createMock(0.5);
+		VPoint p = spawnArray.getNextSpawnPoints(1, dynamicElements).getFirst();
 		assertEquals("Point does not match", p, new VPoint(1.5, 1.5));
 		assertEquals("Next Element does not match", 1, spawnArray.getNextSpawnPointIndex());
 
 		// 10 more points
-		IntStream.range(0, 10).forEach(i -> spawnArray.getNextSpawnPoint());
+		IntStream.range(0, 10).forEach(i -> spawnArray.getNextSpawnPoints(1, dynamicElements));
 		assertEquals("Next Element does not match", 11, spawnArray.getNextSpawnPointIndex());
 		VPoint first = new VPoint(source.x + elementBound.width / 2, source.y + elementBound.height / 2);
-		assertEquals("Point does not match", spawnArray.getNextSpawnPoint(),
+		assertEquals("Point does not match", spawnArray.getNextSpawnPoints(1, dynamicElements).getFirst(),
 				new VPoint(first.x + 2 * 2 * elementBound.width / 2, first.y + 1 * 2 * elementBound.height / 2));
-		// now at point 12 because getNextSpawnPoint() increments NextPointIndex
+		// now at point 12 because getNextSpawnPoints() increments NextPointIndex
 
 		// spawn 81 more to wrapp around to point 12.
-		IntStream.range(0, 81).forEach(i -> spawnArray.getNextSpawnPoint());
+		IntStream.range(0, 81).forEach(i -> spawnArray.getNextSpawnPoints(1, dynamicElements));
 		assertEquals("Next Element does not match", 12, spawnArray.getNextSpawnPointIndex());
-		assertEquals("Point does not match", spawnArray.getNextSpawnPoint(),
+		assertEquals("Point does not match", spawnArray.getNextSpawnPoints(1, dynamicElements).getFirst(),
 				new VPoint(first.x + 3 * 2 * elementBound.width / 2, first.y + 1 * 2 * elementBound.height / 2));
+
+		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
+		List<DynamicElement> dynamicElements2 = createMock(0.5,
+				spawnPoints[12],	// direct match (use next)
+				spawnPoints[13].add(new VPoint(0, SpawnArray.OVERLAPP_EPSILON - 0.1)), // match within Epsilon (use next)
+				spawnPoints[14].add(new VPoint(SpawnArray.OVERLAPP_EPSILON + 0.1, 0)) // match outside Epsilon (use this one)
+		);
+		assertEquals("Point does not match", spawnPoints[14], spawnArray.getNextSpawnPoints(1, dynamicElements2).getFirst());
+		assertEquals("Next Element does not match", 15, spawnArray.getNextSpawnPointIndex());
+	}
+
+	// if all points are occupied measured only with centroid point throw exception
+	@Test()
+	public void PointsWithException(){
+		source = new VRectangle(1.0, 1.0, 2.0, 2.0);
+		elementBound = new VRectangle(0.0, 0.0, 1.0, 1.0);
+		spawnArray = new SpawnArray(source, elementBound);
+
+		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
+		List<DynamicElement> dynamicElements = createMock(0.5,
+				spawnPoints[0],
+				spawnPoints[1],
+				spawnPoints[2],
+				spawnPoints[3].add(new VPoint(0, 0.0003))
+				);
+		assertEquals("there should be no free spot", 0, spawnArray.getNextSpawnPoints(1, dynamicElements).size());
+
 	}
 
 	@Test
@@ -130,14 +158,14 @@ public class SpawnArrayTest {
 		spawnArray = new SpawnArray(source, elementBound);
 
 		assertEquals("Number of spawn points does not match", 4, spawnArray.getSpawnPoints().length);
-		assertNull("There should not be a free spot.", spawnArray.getNextFreeSpawnPoint(
-				createMock(0.5, spawnArray.getSpawnPoints())));
+		assertEquals("There should not be a free spot.", 0, spawnArray.getNextFreeSpawnPoints(1,
+				createMock(0.5, spawnArray.getSpawnPoints())).size() );
 		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
-		assertNotEquals("Point 1 is occupied and should not be returned", spawnPoints[1], spawnArray.getNextFreeSpawnPoint(
-				createMock(0.5, spawnPoints[1])
+		assertNotEquals("Point 1 is occupied and should not be returned", spawnPoints[1],
+				spawnArray.getNextFreeSpawnPoints(1, createMock(0.5, spawnPoints[1])
 		));
-		assertNotNull("There should be three valid points", spawnArray.getNextFreeSpawnPoint(
-				createMock(0.5, spawnPoints[1])
+		assertNotNull("There should be three valid points",
+				spawnArray.getNextFreeSpawnPoints( 1, createMock(0.5, spawnPoints[1])
 		));
 
 	}
@@ -187,50 +215,52 @@ public class SpawnArrayTest {
 		assertEquals("Number of spawn points does not match", 64, spawnArray.getSpawnPoints().length);
 
 		VPoint[] spawnPoint = spawnArray.getSpawnPoints();
+		List<DynamicElement> dynamicElements = createMock(0.5);
 
 		//group 0
-		LinkedList<VPoint> group = spawnArray.getNextGroup(4);
-		assertEquals(group.pollFirst(), spawnPoint[0]);
-		assertEquals(group.pollFirst(), spawnPoint[1]);
-		assertEquals(group.pollFirst(), spawnPoint[8]);
-		assertEquals(group.pollFirst(), spawnPoint[9]);
+		LinkedList<VPoint> group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals( spawnPoint[0], group.pollFirst());
+		assertEquals( spawnPoint[1], group.pollFirst());
+		assertEquals( spawnPoint[8], group.pollFirst());
+		assertEquals( spawnPoint[9], group.pollFirst());
 
 		//group 1
-		group = spawnArray.getNextGroup(4);
-		assertEquals(group.pollFirst(), spawnPoint[2]);
-		assertEquals(group.pollFirst(), spawnPoint[3]);
-		assertEquals(group.pollFirst(), spawnPoint[10]);
-		assertEquals(group.pollFirst(), spawnPoint[11]);
+		group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals( spawnPoint[1], group.pollFirst());
+		assertEquals( spawnPoint[2], group.pollFirst());
+		assertEquals( spawnPoint[9], group.pollFirst());
+		assertEquals( spawnPoint[10], group.pollFirst());
 
 		//group 2-3
-		spawnArray.getNextGroup(4);
-		group = spawnArray.getNextGroup(4);
-		assertEquals(group.pollFirst(), spawnPoint[6]);
-		assertEquals(group.pollFirst(), spawnPoint[7]);
-		assertEquals(group.pollFirst(), spawnPoint[14]);
-		assertEquals(group.pollFirst(), spawnPoint[15]);
+		spawnArray.getNextGroup(4 , dynamicElements);
+		group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals( spawnPoint[3], group.pollFirst());
+		assertEquals( spawnPoint[4], group.pollFirst());
+		assertEquals( spawnPoint[11], group.pollFirst());
+		assertEquals( spawnPoint[12], group.pollFirst());
 
-		//group 4 (line wrap)
-		group = spawnArray.getNextGroup(4);
-		assertEquals(group.pollFirst(), spawnPoint[16]);
-		assertEquals(group.pollFirst(), spawnPoint[17]);
-		assertEquals(group.pollFirst(), spawnPoint[24]);
-		assertEquals(group.pollFirst(), spawnPoint[25]);
+		//group 8 (line wrap)
+		IntStream.range(4, 7).forEach(i -> spawnArray.getNextGroup(4,dynamicElements));
+		group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals( spawnPoint[8], group.pollFirst());
+		assertEquals( spawnPoint[9], group.pollFirst());
+		assertEquals( spawnPoint[16], group.pollFirst());
+		assertEquals( spawnPoint[17], group.pollFirst());
 
-		//group 15 (last group)
-		IntStream.range(0, 10).forEach(i -> spawnArray.getNextGroup(4));
-		group = spawnArray.getNextGroup(4);
-		assertEquals(group.pollFirst(), spawnPoint[54]);
-		assertEquals(group.pollFirst(), spawnPoint[55]);
-		assertEquals(group.pollFirst(), spawnPoint[62]);
-		assertEquals(group.pollFirst(), spawnPoint[63]);
+		//group 48 (last group)
+		IntStream.range(8, 48).forEach(i -> spawnArray.getNextGroup(4, dynamicElements));
+		group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals( spawnPoint[54], group.pollFirst());
+		assertEquals( spawnPoint[55], group.pollFirst());
+		assertEquals( spawnPoint[62], group.pollFirst());
+		assertEquals( spawnPoint[63], group.pollFirst());
 
 		// group 0 (wrap around to first group)
-		group = spawnArray.getNextGroup(4);
-		assertEquals(group.pollFirst(), spawnPoint[0]);
-		assertEquals(group.pollFirst(), spawnPoint[1]);
-		assertEquals(group.pollFirst(), spawnPoint[8]);
-		assertEquals(group.pollFirst(), spawnPoint[9]);
+		group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals( spawnPoint[0], group.pollFirst());
+		assertEquals( spawnPoint[1], group.pollFirst());
+		assertEquals( spawnPoint[8], group.pollFirst());
+		assertEquals( spawnPoint[9], group.pollFirst());
 
 	}
 
@@ -242,54 +272,70 @@ public class SpawnArrayTest {
 		spawnArray = new SpawnArray(source, elementBound);
 		assertEquals("Number of spawn points does not match", 64, spawnArray.getSpawnPoints().length);
 
-		VPoint[] spawnPoint = spawnArray.getSpawnPoints();
+		VPoint[] spawnPoints = spawnArray.getSpawnPoints();
+		List<DynamicElement> dynamicElements = createMock(0.5);
 
 		//group 0
-		LinkedList<VPoint> group = spawnArray.getNextGroup(6);
-		assertEquals(group.pollFirst(), spawnPoint[0]);
-		assertEquals(group.pollFirst(), spawnPoint[1]);
-		assertEquals(group.pollFirst(), spawnPoint[2]);
-		assertEquals(group.pollFirst(), spawnPoint[8]);
-		assertEquals(group.pollFirst(), spawnPoint[9]);
-		assertEquals(group.pollFirst(), spawnPoint[10]);
+		LinkedList<VPoint> group = spawnArray.getNextGroup(6, dynamicElements);
+		assertEquals(spawnPoints[0], group.pollFirst());
+		assertEquals(spawnPoints[1], group.pollFirst());
+		assertEquals(spawnPoints[2], group.pollFirst());
+		assertEquals(spawnPoints[8], group.pollFirst());
+		assertEquals(spawnPoints[9], group.pollFirst());
+		assertEquals(spawnPoints[10], group.pollFirst());
 
 		//group 1
-		group = spawnArray.getNextGroup(6);
-		assertEquals(group.pollFirst(), spawnPoint[3]);
-		assertEquals(group.pollFirst(), spawnPoint[4]);
-		assertEquals(group.pollFirst(), spawnPoint[5]);
-		assertEquals(group.pollFirst(), spawnPoint[11]);
-		assertEquals(group.pollFirst(), spawnPoint[12]);
-		assertEquals(group.pollFirst(), spawnPoint[13]);
+		group = spawnArray.getNextGroup(6, dynamicElements);
+		assertEquals(spawnPoints[1], group.pollFirst());
+		assertEquals(spawnPoints[2], group.pollFirst());
+		assertEquals(spawnPoints[3], group.pollFirst());
+		assertEquals(spawnPoints[9], group.pollFirst());
+		assertEquals(spawnPoints[10], group.pollFirst());
+		assertEquals(spawnPoints[11], group.pollFirst());
 
-		//group 2 (line wrap)
-		group = spawnArray.getNextGroup(6);
-		assertEquals(group.pollFirst(), spawnPoint[16]);
-		assertEquals(group.pollFirst(), spawnPoint[17]);
-		assertEquals(group.pollFirst(), spawnPoint[18]);
-		assertEquals(group.pollFirst(), spawnPoint[24]);
-		assertEquals(group.pollFirst(), spawnPoint[25]);
-		assertEquals(group.pollFirst(), spawnPoint[26]);
+		//group 6 (line wrap)
+		IntStream.range(2, 6).forEach(i -> spawnArray.getNextGroup(6, dynamicElements));
+		group = spawnArray.getNextGroup(6, dynamicElements);
+		assertEquals(spawnPoints[8], group.pollFirst());
+		assertEquals(spawnPoints[9], group.pollFirst());
+		assertEquals(spawnPoints[10], group.pollFirst());
+		assertEquals(spawnPoints[16], group.pollFirst());
+		assertEquals(spawnPoints[17], group.pollFirst());
+		assertEquals(spawnPoints[18], group.pollFirst());
 
-		//group 7 (last group)
-		IntStream.range(0, 4).forEach(i -> spawnArray.getNextGroup(6));
-		group = spawnArray.getNextGroup(6);
-		assertEquals(group.pollFirst(), spawnPoint[51]);
-		assertEquals(group.pollFirst(), spawnPoint[52]);
-		assertEquals(group.pollFirst(), spawnPoint[53]);
-		assertEquals(group.pollFirst(), spawnPoint[59]);
-		assertEquals(group.pollFirst(), spawnPoint[60]);
-		assertEquals(group.pollFirst(), spawnPoint[61]);
+		//group 41 (last group)
+		IntStream.range(7, 41).forEach(i -> spawnArray.getNextGroup(6, dynamicElements));
+		group = spawnArray.getNextGroup(6, dynamicElements);
+		assertEquals(spawnPoints[53], group.pollFirst());
+		assertEquals(spawnPoints[54], group.pollFirst());
+		assertEquals(spawnPoints[55], group.pollFirst());
+		assertEquals(spawnPoints[61], group.pollFirst());
+		assertEquals(spawnPoints[62], group.pollFirst());
+		assertEquals(spawnPoints[63], group.pollFirst());
 
 		//group 0 (wrap around to first group)
-		group = spawnArray.getNextGroup(6);
-		assertEquals(group.pollFirst(), spawnPoint[0]);
-		assertEquals(group.pollFirst(), spawnPoint[1]);
-		assertEquals(group.pollFirst(), spawnPoint[2]);
-		assertEquals(group.pollFirst(), spawnPoint[8]);
-		assertEquals(group.pollFirst(), spawnPoint[9]);
-		assertEquals(group.pollFirst(), spawnPoint[10]);
+		group = spawnArray.getNextGroup(6, dynamicElements);
+		assertEquals(spawnPoints[0], group.pollFirst());
+		assertEquals(spawnPoints[1], group.pollFirst());
+		assertEquals(spawnPoints[2], group.pollFirst());
+		assertEquals(spawnPoints[8], group.pollFirst());
+		assertEquals(spawnPoints[9], group.pollFirst());
+		assertEquals(spawnPoints[10], group.pollFirst());
 
+		// In this case allow Overlapping but make sure the centroid of the new group members
+		// do not directly overlap with each other.
+		List<DynamicElement> dynamicElements2 = createMock(0.5,
+				spawnPoints[1],	// direct match (use next)
+				spawnPoints[2].add(new VPoint(SpawnArray.OVERLAPP_EPSILON - 0.1, 0)), // match within Epsilon (use next)
+				spawnPoints[3].add(new VPoint(SpawnArray.OVERLAPP_EPSILON + 0.1, SpawnArray.OVERLAPP_EPSILON + 0.1)) // match outside Epsilon (use this one)
+		);
+		group = spawnArray.getNextGroup(6, dynamicElements2);
+		assertEquals(spawnPoints[3], group.pollFirst());
+		assertEquals(spawnPoints[4], group.pollFirst());
+		assertEquals(spawnPoints[5], group.pollFirst());
+		assertEquals(spawnPoints[11], group.pollFirst());
+		assertEquals(spawnPoints[12], group.pollFirst());
+		assertEquals(spawnPoints[13], group.pollFirst());
 	}
 
 	@Test(expected = IndexOutOfBoundsException.class)
@@ -300,9 +346,10 @@ public class SpawnArrayTest {
 		assertEquals("Number of spawn points does not match", 64, spawnArray.getSpawnPoints().length);
 
 		VPoint[] spawnPoint = spawnArray.getSpawnPoints();
+		List<DynamicElement> dynamicElements = createMock(0.5);
 
 		//group 3 lines
-		LinkedList<VPoint> group = spawnArray.getNextGroup(9);
+		LinkedList<VPoint> group = spawnArray.getNextGroup(9, dynamicElements);
 		assertEquals(group.pollFirst(), spawnPoint[0]);
 		assertEquals(group.pollFirst(), spawnPoint[1]);
 		assertEquals(group.pollFirst(), spawnPoint[2]);
@@ -314,24 +361,24 @@ public class SpawnArrayTest {
 		assertEquals(group.pollFirst(), spawnPoint[18]);
 
 		//group 0
-		group = spawnArray.getNextGroup(4);
+		group = spawnArray.getNextGroup(4, dynamicElements);
 		assertEquals(group.pollFirst(), spawnPoint[0]);
 		assertEquals(group.pollFirst(), spawnPoint[1]);
 		assertEquals(group.pollFirst(), spawnPoint[8]);
 		assertEquals(group.pollFirst(), spawnPoint[9]);
 
 		// spawning different size groups does not effect other groups
-		spawnArray.getNextGroup(9);
-		spawnArray.getNextGroup(9);
+		spawnArray.getNextGroup(9, dynamicElements);
+		spawnArray.getNextGroup(9, dynamicElements);
 
 		//group 1
-		group = spawnArray.getNextGroup(4);
+		group = spawnArray.getNextGroup(4, dynamicElements);
+		assertEquals(group.pollFirst(), spawnPoint[1]);
 		assertEquals(group.pollFirst(), spawnPoint[2]);
-		assertEquals(group.pollFirst(), spawnPoint[3]);
+		assertEquals(group.pollFirst(), spawnPoint[9]);
 		assertEquals(group.pollFirst(), spawnPoint[10]);
-		assertEquals(group.pollFirst(), spawnPoint[11]);
 
-		spawnArray.getNextGroup(100);
+		spawnArray.getNextGroup(100, dynamicElements);
 
 	}
 
@@ -389,6 +436,9 @@ public class SpawnArrayTest {
 
 	}
 
+	private List<DynamicElement> createMock(double r, ArrayList<VPoint> points) {
+		return createMock(r, points.toArray(new VPoint[points.size()]));
+	}
 
 	private List<DynamicElement> createMock(double r, VPoint... points) {
 		LinkedList<DynamicElement> elements = new LinkedList<>();

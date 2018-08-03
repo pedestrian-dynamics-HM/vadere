@@ -61,6 +61,56 @@ public class AttributesSimulation extends Attributes {
 		return randomSeed;
 	}
 
+	public void setFinishTime(double finishTime) {
+		checkSealed();
+		this.finishTime = finishTime;
+	}
+
+	public void setSimTimeStepLength(double simTimeStepLength) {
+		checkSealed();
+		this.simTimeStepLength = simTimeStepLength;
+	}
+
+	public void setRealTimeSimTimeRatio(double realTimeSimTimeRatio) {
+		checkSealed();
+		this.realTimeSimTimeRatio = realTimeSimTimeRatio;
+	}
+
+	public void setWriteSimulationData(boolean writeSimulationData) {
+		checkSealed();
+		this.writeSimulationData = writeSimulationData;
+	}
+
+	public void setVisualizationEnabled(boolean visualizationEnabled) {
+		checkSealed();
+		this.visualizationEnabled = visualizationEnabled;
+	}
+
+	public void setPrintFPS(boolean printFPS) {
+		checkSealed();
+		this.printFPS = printFPS;
+	}
+
+	public void setNeedsBoundary(boolean needsBoundary) {
+		checkSealed();
+		this.needsBoundary = needsBoundary;
+	}
+
+	public void setDigitsPerCoordinate(int digitsPerCoordinate) {
+		checkSealed();
+		this.digitsPerCoordinate = digitsPerCoordinate;
+	}
+
+	public void setUseRandomSeed(boolean useRandomSeed) {
+		checkSealed();
+		this.useRandomSeed = useRandomSeed;
+	}
+
+	public void setRandomSeed(long randomSeed) {
+		checkSealed();
+		this.randomSeed = randomSeed;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)

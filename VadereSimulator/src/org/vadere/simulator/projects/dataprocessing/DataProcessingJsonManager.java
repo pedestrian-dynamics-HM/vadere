@@ -278,4 +278,8 @@ public class DataProcessingJsonManager {
 		return maxId;
 	}
 
+	public boolean containsOutputFile(String name){
+		return  this.outputFiles.stream().anyMatch(f -> f.getFileName().equals(name));
+	}
+
 }

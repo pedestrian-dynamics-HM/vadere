@@ -38,6 +38,7 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -49,6 +50,9 @@ public abstract class StateJsonConverter {
 	public static final String SCENARIO_KEY = "scenario";
 
 	public static final String MAIN_MODEL_KEY = "mainModel";
+
+	private static final TypeReference<Map<String, Object>> mapTypeReference =
+			new TypeReference<Map<String, Object>>() {};
 
 	private static Logger logger = LogManager.getLogger(StateJsonConverter.class);
 
@@ -80,6 +84,18 @@ public abstract class StateJsonConverter {
 		return mapper.readTree(dev);
 	}
 
+	public static Object deserializeToMapOfObjects(String dev) throws IOException {
+		return mapper.readValue(dev, mapTypeReference);
+	}
+
+	public static Object convertJsonNodeToObject(JsonNode node) {
+		return mapper.convertValue(node, Map.class);
+	}
+
+	public static JsonNode deserializeToNode(Object map){
+		return mapper.valueToTree(map);
+	}
+
 	private static class TopographyStore {
 		AttributesTopography attributes = new AttributesTopography();
 		AttributesAgent attributesPedestrian = new AttributesAgent();
@@ -93,8 +109,7 @@ public abstract class StateJsonConverter {
 		AttributesTeleporter teleporter = null;
 	}
 
-	public static AttributesSimulation deserializeAttributesSimulation(String json)
-			throws IOException, TextOutOfNodeException {
+	public static AttributesSimulation deserializeAttributesSimulation(String json) {
 		return deserializeObjectFromJson(json, AttributesSimulation.class);
 	}
 
@@ -129,7 +144,7 @@ public abstract class StateJsonConverter {
 		store.stairs.forEach(stairs -> topography.addStairs(new Stairs(stairs)));
 		store.targets.forEach(target -> topography.addTarget(new Target(target)));
 		store.sources.forEach(source -> topography.addSource(new Source(source)));
-		store.dynamicElements.forEach(element -> topography.addInitialElement(element));
+		store.dynamicElements.forEach(topography::addInitialElement);
 		if (store.teleporter != null)
 			topography.setTeleporter(new Teleporter(store.teleporter));
 		return topography;

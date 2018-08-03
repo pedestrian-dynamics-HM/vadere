@@ -103,10 +103,11 @@
             <version>2.19</version>
             <configuration>
                 <argLine>${surefireArgLine}</argLine>
-                <failIfNoTests>false</failIfNoTests>
+                <enableAssertions>true</enableAssertions>
                 <excludes>
                     <exclude></exclude>
                 </excludes>
+                <failIfNoTests>false</failIfNoTests>
                 <skipTests>${skip.unit.tests}</skipTests>
             </configuration>
         </plugin>

@@ -103,7 +103,7 @@ public class TestScenarioBuilder {
             "        \"obstacleGridPenalty\" : 0.1,\n" +
             "        \"targetAttractionStrength\" : 1.0,\n" +
             "        \"timeCostAttributes\" : {\n" +
-            "          \"standardDerivation\" : 0.7,\n" +
+            "          \"standardDeviation\" : 0.7,\n" +
             "          \"type\" : \"UNIT\",\n" +
             "          \"obstacleDensityWeight\" : 3.5,\n" +
             "          \"pedestrianSameTargetDensityWeight\" : 3.5,\n" +
