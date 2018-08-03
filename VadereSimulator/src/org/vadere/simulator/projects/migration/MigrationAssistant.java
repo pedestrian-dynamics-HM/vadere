@@ -33,7 +33,6 @@ public abstract class MigrationAssistant {
 
 	public abstract void restLog();
 
-//	public abstract void analyzeSingleScenario(Path path) throws IOException;
 
 	public abstract MigrationResult analyzeProject(String projectFolderPath) throws IOException;
 
@@ -43,5 +42,7 @@ public abstract class MigrationAssistant {
 
 	public abstract String convertFile(Path scenarioFilePath, Version targetVersion) throws MigrationException;
 
+
+	public abstract void migrateFile(Path scenarioFilePath, Version targetVersion,  Path outputFile) throws MigrationException;
 	public abstract void revertFile(Path scenarioFile) throws MigrationException;
 }

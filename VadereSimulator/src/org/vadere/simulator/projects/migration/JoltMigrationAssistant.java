@@ -67,6 +67,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		return stats;
 	}
 
+	// will return null if current and target version match
 	@Override
 	public String convertFile(Path scenarioFilePath, Version targetVersion) throws MigrationException {
 		JsonNode node;
@@ -79,7 +80,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		}
 		restLog();
 		logger.info(">> analyzing JSON tree of scenario <" + node.get("name").asText() + ">");
-		Version version = Version.UNDEFINED;
+		Version version;
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());
 
@@ -94,6 +95,12 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 			version = Version.NOT_A_RELEASE;
 		}
 
+		if (version.equals(targetVersion)) {
+			logger.info("Nothing to do current version and target version match");
+			restLog();
+			return null;
+		}
+
 		JsonNode transformedNode = node;
 		// apply all transformation from current to latest version.
 		for (Version v : Version.listToLatest(version)) {
@@ -102,12 +109,42 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		}
 
 		try {
+			restLog();
 			return StateJsonConverter.serializeJsonNode(transformedNode);
 		} catch (JsonProcessingException e) {
 			logger.error("could not serializeJsonNode after Transformation: " + e.getMessage());
 			throw new MigrationException("could not serializeJsonNode after Transformation: " + e.getMessage());
 		}
 	}
+
+
+	@Override
+	public void migrateFile(Path scenarioFilePath, Version targetVersion, Path outputFile) throws MigrationException {
+		String json = convertFile(scenarioFilePath, targetVersion);
+		if (json == null){
+			logger.info("Nothing todo scenarioFile up-to-date");
+			return;
+		}
+
+		if (outputFile == null || scenarioFilePath.equals(outputFile)){
+			//overwrite scenarioFile
+			Path backupPath = getBackupPath(scenarioFilePath);
+			try {
+				Files.copy(scenarioFilePath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+				IOUtils.writeTextFile(scenarioFilePath.toString(), json);
+			} catch (IOException e) {
+				logger.error("Cannot overwrite scenarioFile or cannot write new file new version: " + e.getMessage(), e);
+				throw new MigrationException("Cannot overwrite scenarioFile or cannot write new file new version: " + e.getMessage(), e);
+			}
+		} else {
+			try {
+				IOUtils.writeTextFile(outputFile.toString(), json);
+			} catch (IOException e) {
+				throw new MigrationException("Cannot write to output file:  " + e.getMessage(), e);
+			}
+		}
+	}
+
 
 	@Override
 	public void revertFile(Path scenarioFile) throws MigrationException {

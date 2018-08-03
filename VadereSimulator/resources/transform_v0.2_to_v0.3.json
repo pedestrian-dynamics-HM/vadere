@@ -444,7 +444,6 @@
     "spec": {
       "name": "",
       "description": "",
-      // set new version
       "release": "0.3",
       "commithash": "warning: no commit hash",
       "processWriters": {

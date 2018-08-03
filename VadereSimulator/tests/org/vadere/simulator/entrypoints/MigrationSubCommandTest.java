@@ -1,7 +1,5 @@
 package org.vadere.simulator.entrypoints;
 
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-
 import org.hamcrest.core.StringContains;
 import org.junit.After;
 import org.junit.Before;
@@ -67,6 +65,18 @@ public class MigrationSubCommandTest {
 		assertFalse("legacy file should be deleted after revert", legacyFile.toFile().exists());
 	}
 
+
+	@Test
+	public void testMigrationSameVersion() throws IOException {
+
+		assertThat("Old Version must be 0.1", getText(baseScenario), v01);
+		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), "-f", baseScenario.toString(), "--target-version", Version.V0_1.label()};
+		VadereConsole.main(args);
+		Path legacyFile = MigrationAssistant.getBackupPath(baseScenario);
+		assertThat("New Version must be the same" , getText(baseScenario), v01);
+
+		assertFalse("No Transformation performed thus the should not be a legacyFile", legacyFile.toFile().exists());
+	}
 
 	private String getText (Path path) throws IOException {
 		return IOUtils.readTextFile(path);
