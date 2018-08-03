@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_1Source2Places_noGroups",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -55,7 +55,7 @@
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
+          "standardDeviation" : 0.7,
           "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
