@@ -26,8 +26,8 @@ public enum Version {
 		return label;
 	}
 
-	public String label(char repalce) {
-		return label.replace(' ', repalce);
+	public String label(char replaceSpaceWith) {
+		return label.replace(' ', replaceSpaceWith);
 	}
 
 	public static Version fromString(String versionStr) {

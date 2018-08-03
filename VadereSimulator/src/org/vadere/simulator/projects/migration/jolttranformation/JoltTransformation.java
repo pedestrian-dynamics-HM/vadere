@@ -11,6 +11,10 @@ import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.state.util.StateJsonConverter;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,8 +39,8 @@ public abstract class JoltTransformation {
 			throw new MigrationException("No Transformation needed. Already latest Version!");
 
 
-		String transformationResource = "/transform_v" + currentVersion.label('-').toUpperCase() + "_to_v" + currentVersion.nextVersion().label('-').toUpperCase() + ".json";
-		String identityResource = "/identity_v" + currentVersion.nextVersion().label('-').toUpperCase() + ".json";
+		String transformationResource = getTransforamtionResourcePath(currentVersion.label('-'), currentVersion.nextVersion().label('-'));
+		String identityResource = getIdentiyResoucrePath(currentVersion.nextVersion().label('-'));
 
 		JoltTransformation ret = transformations.getOrDefault(currentVersion, null);
 		if ( ret == null) {
@@ -56,6 +60,28 @@ public abstract class JoltTransformation {
 			transformations.put(currentVersion, ret);
 		}
 		return ret;
+	}
+
+	public static Path getTransforamtionFile(Version toVersion) throws URISyntaxException {
+		String transformString = getTransforamtionResourcePath(
+				toVersion.previousVersion().label('-'),
+				toVersion.label('-'));
+		URI res = JoltTransformation.class.getResource(transformString).toURI();
+		return Paths.get(res);
+	}
+
+	public static Path getIdenityFile(Version v) throws URISyntaxException {
+		String idenityString = getIdentiyResoucrePath(v.label('-'));
+		URI res = JoltTransformation.class.getResource(idenityString).toURI();
+		return Paths.get(res);
+	}
+
+	public static String getTransforamtionResourcePath(String from, String to){
+		return "/transform_v" +from.toUpperCase() + "_to_v" + to.toUpperCase() + ".json";
+	}
+
+	public static String getIdentiyResoucrePath(String to){
+		return "/identity_v" + to.toUpperCase() + ".json";
 	}
 
 	public JoltTransformation(String transformation, String  identity, Version version) throws MigrationException {

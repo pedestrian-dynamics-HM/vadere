@@ -9,6 +9,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
  */
 public interface SubCommandRunner {
 
-	void run(Namespace ns, ArgumentParser parser);
+	void run(Namespace ns, ArgumentParser parser) throws Exception;
 
 }

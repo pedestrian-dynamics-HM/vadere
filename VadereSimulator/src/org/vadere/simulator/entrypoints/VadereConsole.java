@@ -1,21 +1,14 @@
 package org.vadere.simulator.entrypoints;
 
-import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.ScenarioRun;
-import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
-
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Locale;
-import org.vadere.simulator.entrypoints.Version;
+import org.apache.log4j.Logger;
 /**
  * Provides the possibility to start VADERE in console mode.
  * 
@@ -24,19 +17,19 @@ public class VadereConsole {
 
 	private final static Logger logger = Logger.getLogger(VadereConsole.class);
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws ArgumentParserException {
+	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
 
 //		args = new String[]{"migrate", "-f", "/home/lphex/hm.d/vadere/VadereSimulator/testResources/data/simpleProject/output/test_postvis_2018-01-17_16-56-37.307/test_postvis.scenario"};
 		try {
 			Namespace ns = parser.parseArgs(args);
-			SubCommandRunner sRunner = (SubCommandRunner) ns.get("func");
+			SubCommandRunner sRunner = ns.get("func");
 			sRunner.run(ns, parser);
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
+			System.exit(1);
+		} catch (Exception e) {
+			logger.error("error in command:" + e.getMessage());
 			System.exit(1);
 		}
 
@@ -53,7 +46,7 @@ public class VadereConsole {
 
 		// Run Project
 		Subparser projectRun = subparsers
-				.addParser("project-run")
+				.addParser(SubCommand.PROJECT_RUN.getCmdName())
 				.help("This command uses a Vadere Project and runs selected scenario.")
 				.setDefault("func", new ProjectRunSubCommand());
 		projectRun.addArgument("--project-dir", "-p")
@@ -69,7 +62,7 @@ public class VadereConsole {
 
 		// Run Scenario
 		Subparser scenarioRun = subparsers
-				.addParser("scenario-run")
+				.addParser(SubCommand.SCENARO_RUN.getCmdName())
 				.help("Run scenario without a project")
 				.setDefault("func", new ScenarioRunSubCommand());
 		scenarioRun.addArgument("--output-dir", "-o")
@@ -87,7 +80,7 @@ public class VadereConsole {
 
 		// Run SUQ
 		Subparser suqRun = subparsers
-				.addParser("suq")
+				.addParser(SubCommand.SUQ.getCmdName())
 				.help("Run a single scenario file to specify to  fully controll folder structure for input and output.")
 				.setDefault("func", new SuqSubCommand());
 
@@ -107,7 +100,7 @@ public class VadereConsole {
 
 		// Run Migration Assistant
 		Subparser migrationAssistant = subparsers
-				.addParser("migrate")
+				.addParser(SubCommand.MIGRATE.getCmdName())
 				.help("Run migration assistant on single sceanrio file")
 				.setDefault("func", new MigrationSubCommand());
 
@@ -132,6 +125,13 @@ public class VadereConsole {
 				.dest("output-file")
 				.choices(versions)
 				.help("Write new version to this file. If not specified backup input file and overwrite it.");
+
+		migrationAssistant.addArgument("--revert-migration")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.dest("revert-migration")
+				.help("if set vadere will search for a <scenario-file>.legacy and will replace the current version with this backup." +
+						" The Backup must be in the same directory");
 
 		return parser;
 	}
