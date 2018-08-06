@@ -16,8 +16,11 @@ public class TargetDistribution {
     public List<Integer> returnTargets(List<List<Integer>> targetIds, List<Double> distribution) {
 
         double randomNumber = random.nextDouble();
-
         double tmpSum = 0;
+
+        if (distribution.size() == 0) {
+            throw new RuntimeException("Distribution parameter from SourceAttributes cannot be empty.");
+        }
         for (int i = 0; i <= distribution.size(); i++) {
             tmpSum += distribution.get(i);
             if (randomNumber < tmpSum) {
