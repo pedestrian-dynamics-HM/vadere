@@ -25,7 +25,7 @@ public abstract class SourceController {
 	private final DynamicElementFactory dynamicElementFactory;
 	private final Topography topography;
 	protected final Random random;
-	private TargetDistribution targetDistribution = new TargetDistribution();
+	private TargetDistribution targetDistribution;
 
 
 	/** <code>null</code>, if there is no next event. */
@@ -59,6 +59,8 @@ public abstract class SourceController {
 			throw new IllegalArgumentException("problem with scenario parameters for source: "
 					+ "interSpawnTimeDistribution and/or distributionParameters. see causing excepion.", e);
 		}
+
+		this.targetDistribution = new TargetDistribution(random);
 	}
 
 	protected List<DynamicElement> getDynElementsAtSource() {
