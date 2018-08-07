@@ -10,6 +10,7 @@ import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.DynamicClassInstantiator;
@@ -17,31 +18,14 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import javax.swing.plaf.nimbus.State;
+
 public class JsonConverter {
 	
 	public static Scenario deserializeScenarioRunManager(String json) throws IOException, IllegalArgumentException {
 		return deserializeScenarioRunManagerFromNode(StateJsonConverter.readTree(json));
 	}
-	
-	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException, IllegalArgumentException {
-		JsonNode rootNode = node;
-		String name = rootNode.get("name").asText();
-		JsonNode scenarioNode = rootNode.get(StateJsonConverter.SCENARIO_KEY);
-		AttributesSimulation attributesSimulation = StateJsonConverter.deserializeAttributesSimulationFromNode(scenarioNode.get("attributesSimulation"));
-		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
-		String mainModel = scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
-		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
-		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
-		String description = rootNode.get("description").asText();
-		ScenarioStore scenarioStore = new ScenarioStore(name, description, mainModel, attributesModel, attributesSimulation, topography);
-		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
-		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
-		scenarioRunManager.saveChanges();
-
-		return scenarioRunManager;
-	}
-	
 	public static ModelDefinition deserializeModelDefinition(String json) throws Exception {
 		JsonNode node = StateJsonConverter.readTree(json);
 		StateJsonConverter.checkForTextOutOfNode(json);
@@ -58,7 +42,30 @@ public class JsonConverter {
 		}
 		return new ModelDefinition(mainModelString, StateJsonConverter.deserializeAttributesListFromNode(node.get("attributesModel")));
 	}
-	
+
+	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException, IllegalArgumentException {
+		JsonNode rootNode = node;
+		JsonNode scenarioNode = rootNode.get(StateJsonConverter.SCENARIO_KEY);
+
+		String scenarioName = rootNode.get("name").asText();
+		String scenarioDescription = rootNode.get("description").asText();
+
+		AttributesSimulation attributesSimulation = StateJsonConverter.deserializeAttributesSimulationFromNode(scenarioNode.get("attributesSimulation"));
+		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
+		String mainModel = scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
+		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
+		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
+		EventInfoStore eventInfoStore = StateJsonConverter.deserializeEventsFromNode(scenarioNode.get("eventInfos"));
+
+		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription, mainModel, attributesModel, attributesSimulation, topography, eventInfoStore);
+		Scenario scenarioRunManager = new Scenario(scenarioStore);
+
+		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
+		scenarioRunManager.saveChanges();
+
+		return scenarioRunManager;
+	}
+
 
 
 	// used in hasUnsavedChanges, TODO [priority=high] [task=bugfix] check if commitHashIncluded can always be false
@@ -127,9 +134,12 @@ public class JsonConverter {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
+		ObjectNode eventNode = StateJsonConverter.serializeEventsToNode(scenarioStore.getEventInfoStore());
+		// TODO Test if events are correctly de- and serialized.
 		return new ScenarioStore(scenarioStore.getName(), scenarioStore.getDescription(), scenarioStore.getMainModel(),
 				StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode),
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
-				StateJsonConverter.deserializeTopographyFromNode(topographyNode));
+				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
+				StateJsonConverter.deserializeEventsFromNode(eventNode));
 	}
 }

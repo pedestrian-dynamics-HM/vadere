@@ -2,7 +2,6 @@
   "name" : "rimea_14_selectRoute_osm1",
   "description" : "",
   "release" : "0.3",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -204,6 +203,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -213,8 +213,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }
