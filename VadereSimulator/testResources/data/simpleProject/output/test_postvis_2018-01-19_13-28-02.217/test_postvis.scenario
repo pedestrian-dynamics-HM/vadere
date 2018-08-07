@@ -1,7 +1,7 @@
 {
   "name" : "test_postvis",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.3",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -55,7 +55,7 @@
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
+          "standardDeviation" : 0.7,
           "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
@@ -220,7 +220,6 @@
         "targetIds" : [ 1 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -245,7 +244,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      }
+      },
+      "dynamicElements" : [ ]
     }
   }
 }

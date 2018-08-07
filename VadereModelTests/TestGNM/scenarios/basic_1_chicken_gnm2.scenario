@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_gnm2",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.3",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -10,12 +10,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
-        "pedestrianBodyPotential" : 3.59,
-        "pedestrianRecognitionDistance" : 0.7,
-        "obstacleBodyPotential" : 20.1,
-        "obstacleRepulsionStrength" : 0.25
-      },
       "org.vadere.state.attributes.models.AttributesGNM" : {
         "attributesODEIntegrator" : {
           "solverType" : "DORMAND_PRINCE_45",
@@ -35,7 +29,7 @@
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
+          "standardDeviation" : 0.7,
           "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
@@ -45,6 +39,12 @@
           "pedestrianDynamicWeight" : 6.0,
           "loadingType" : "CONSTANT"
         }
+      },
+      "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
+        "pedestrianBodyPotential" : 3.59,
+        "pedestrianRecognitionDistance" : 0.7,
+        "obstacleBodyPotential" : 20.1,
+        "obstacleRepulsionStrength" : 0.25
       }
     },
     "attributesSimulation" : {
@@ -135,6 +135,7 @@
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],

@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_1Source2Places",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -42,6 +42,10 @@
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
         "submodels" : [ "org.vadere.simulator.models.groups.CentroidGroupModel" ]
       },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
+      },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
         "pedPotentialPersonalSpaceWidth" : 1.2,
@@ -58,7 +62,7 @@
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
+          "standardDeviation" : 0.7,
           "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
@@ -68,11 +72,6 @@
           "pedestrianDynamicWeight" : 6.0,
           "loadingType" : "CONSTANT"
         }
-      },
-      "org.vadere.state.attributes.models.AttributesCGM" : {
-        "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003,
-        "groupSizeDistribution" : [ 10.0, 0.0, 0.0, 0.0, 10.0 ]
       }
     },
     "attributesSimulation" : {

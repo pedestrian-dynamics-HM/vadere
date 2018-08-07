@@ -34,7 +34,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 	private static final long serialVersionUID = 1L;
 
 	public JacksonObjectMapper() {
-		configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, false); // otherwise 4.7 will automatically be casted to 4 for integers, with this it throws an error
+		configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, true); // otherwise 4.7 will automatically be casted to 4 for integers, with this it throws an error
 		enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // forbids duplicate keys
 		disable(SerializationFeature.FAIL_ON_EMPTY_BEANS); // to allow empty attributes like "attributes.SeatingAttr": {}, useful while in dev
 		setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // otherwise private fields won't be usable

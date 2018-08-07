@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
+import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.simulator.projects.io.TrajectoryReader;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -25,21 +26,22 @@ import java.util.stream.IntStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 public class TestTrajectoryReader {
 
 	private Scenario test;
 	private VadereProject project;
-	private AttributesAgent attributes;
 	private String folderName;
-	private double EPSILON = 0.0000001;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
+		resetTestStructure();
 		folderName = "Test1_2015-03-11_17-42-08.826";
-		attributes = new AttributesAgent();
+		AttributesAgent attributes = new AttributesAgent();
 		try {
 			project = IOVadere.readProjectJson(getClass().getResource("/data/VTestMultiRun/vadere.project").getPath().replaceFirst("^/(.:/)", "$1"));
 			test = project.getScenarios().stream().filter(t -> t.getName().equals("Test1")).findFirst().get();
@@ -49,6 +51,13 @@ public class TestTrajectoryReader {
 			e.printStackTrace();
 		}
 	}
+
+	private void resetTestStructure() throws URISyntaxException {
+		String dest = getClass().getResource("/data/VTestMultiRun").toURI().getPath();
+		String backup = getClass().getResource("/data/VTestMultiRun.bak").toURI().getPath();
+		TestUtils.resetTestStructure(dest, backup);
+	}
+
 
 	@Test
 	public void testFolderAvailable() {
@@ -72,16 +81,15 @@ public class TestTrajectoryReader {
 				IOUtils.getFirstFile(dir.toFile(), IOUtils.TRAJECTORY_FILE_EXTENSION).get().toPath(), test);
 		Map<Step, List<Agent>> pedestriansByStep = reader.readFile();
 
-		assertTrue("incorrect number of steps " + pedestriansByStep.size() + " != " + 120,
-				pedestriansByStep.size() == 120);
+		assertEquals("incorrect number of steps " + pedestriansByStep.size() + " != " + 120, 120, pedestriansByStep.size());
 		List<Step> sortedSteps = pedestriansByStep.keySet().stream()
 				.sorted((s1, s2) -> s1.getStepNumber() - s2.getStepNumber()).collect(Collectors.toList());
-		assertTrue("incorrect number of steps", sortedSteps.size() == 120);
+		assertEquals("incorrect number of steps", 120, sortedSteps.size());
 
 		IntStream.range(0, sortedSteps.size())
 				.forEach(i -> assertTrue("missing step " + i, sortedSteps.get(i).getStepNumber() == i + 1));
 
-		assertTrue("wrong number of pedestrians", pedestriansByStep.get(sortedSteps.get(10)).size() == 5);
-		assertTrue("wrong number of pedestrians", pedestriansByStep.get(sortedSteps.get(39)).size() == 7);
+		assertEquals("wrong number of pedestrians", 5, pedestriansByStep.get(sortedSteps.get(10)).size());
+		assertEquals("wrong number of pedestrians", 7, pedestriansByStep.get(sortedSteps.get(39)).size());
 	}
 }

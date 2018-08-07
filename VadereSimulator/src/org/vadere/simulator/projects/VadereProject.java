@@ -3,6 +3,7 @@ package org.vadere.simulator.projects;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.projects.migration.MigrationResult;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 
 /**
  * A VadereProject holds a list of {@link Scenario}s and functionality to manage them.
- * 
  */
 public class VadereProject {
 
@@ -37,8 +37,7 @@ public class VadereProject {
 	private Path outputDirectory;
 	private ProjectOutput projectOutput; //TODO initialize and wire up with rest ....
 
-	// TODO should be encapsulated in a class (we are not programming in C):
-	private int[] migrationStats; // scenarios: [0] total, [1] legacy'ed, [2] nonmigratable
+	private MigrationResult migrationStats;
 
 	public VadereProject(final String name, final Iterable<Scenario> scenarios) {
 		this.name = name;
@@ -98,7 +97,7 @@ public class VadereProject {
 			currentScenarioRun.simulationFailed(ex);
 			notifySimulationListenersSimulationError(currentScenarioRun.getScenario(), ex);
 		});
-		
+
 		notifySimulationListenersSimulationStarted(getCurrentScenario());
 		currentScenarioThread.start();
 	}
@@ -222,8 +221,8 @@ public class VadereProject {
 	public int getScenarioIndexByName(final Scenario srm) {
 		int index = -1;
 		int currentIndex = 0;
-		for(Scenario csrm : getScenarios()) {
-			if(csrm.getName().equals(srm.getName())) {
+		for (Scenario csrm : getScenarios()) {
+			if (csrm.getName().equals(srm.getName())) {
 				return currentIndex;
 			} else {
 				currentIndex++;
@@ -237,7 +236,7 @@ public class VadereProject {
 	}
 
 	public Scenario getScenario(int index) {
-		return getScenarios().toArray(new Scenario[] {})[index];
+		return getScenarios().toArray(new Scenario[]{})[index];
 	}
 
 	public void removeScenario(final Scenario scenario) {
@@ -256,15 +255,17 @@ public class VadereProject {
 		return currentScenarioRun.getScenario();
 	}
 
-	public void setMigrationStats(int[] migrationStats) {
+	public void setMigrationStats(MigrationResult migrationStats) {
 		this.migrationStats = migrationStats;
 	}
 
-	public int[] getMigrationStats() {
+	public MigrationResult getMigrationStats() {
 		return migrationStats;
 	}
 
-	/** Starts the next simulation if any. */
+	/**
+	 * Starts the next simulation if any.
+	 */
 	private RunnableFinishedListener scenarioFinishedListener = new RunnableFinishedListener() {
 		@Override
 		public void finished(Runnable runnable) {
