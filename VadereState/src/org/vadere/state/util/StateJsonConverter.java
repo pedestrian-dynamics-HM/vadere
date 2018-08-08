@@ -22,6 +22,7 @@ import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Car;
@@ -161,6 +162,24 @@ public abstract class StateJsonConverter {
 		} finally {
 			jp.close();
 		}
+	}
+
+	/**
+	 * Pass a node representing an array of @see EventInfo objects.
+	 *
+	 * Usually, this array is extracted by reading in a scenario file as @see JsonNode
+	 * an you call "get("eventInfos") on this @see JsonNode.
+	 */
+	public static EventInfoStore deserializeEventsFromNode(JsonNode node) throws IllegalArgumentException {
+		EventInfoStore eventInfoStore = new EventInfoStore();
+
+		if (node != null) {
+			List<EventInfo> eventInfoList = new ArrayList<>();
+			node.forEach(eventInfoNode -> eventInfoList.add(mapper.convertValue(eventInfoNode, EventInfo.class)));
+			eventInfoStore.setEventInfos(eventInfoList);
+		}
+
+		return eventInfoStore;
 	}
 
 	public static EventInfoStore deserializeEvents(String json) throws IOException {
