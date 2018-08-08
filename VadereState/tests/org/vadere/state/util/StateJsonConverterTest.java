@@ -64,7 +64,7 @@ public class StateJsonConverterTest {
         EventInfo actualEventInfo = actualEventInfoStore.getEventInfos().get(0);
 
         double allowedDelta = 1e-3;
-        
+
         assertEquals(expectedEventInfo.getEventTimeframe().getStartTime(), actualEventInfo.getEventTimeframe().getStartTime(), allowedDelta);
         assertEquals(expectedEventInfo.getEventTimeframe().getEndTime(), actualEventInfo.getEventTimeframe().getEndTime(), allowedDelta);
         assertEquals(expectedEventInfo.getEventTimeframe().isRepeat(), actualEventInfo.getEventTimeframe().isRepeat());

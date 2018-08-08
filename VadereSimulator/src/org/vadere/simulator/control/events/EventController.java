@@ -8,6 +8,7 @@ import org.vadere.state.events.types.EventTimeframe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The EventController encapsulates logic to raise events.
@@ -19,25 +20,39 @@ public class EventController {
 
     // Variables
     private ScenarioStore scenarioStore;
+    private List<EventInfo> oneTimeEvents;
+    private List<EventInfo> recurringEvents;
 
     // Constructors
-    // TODO Analyse events in "scenarioStore" and split them up in one-time and recurring events.
     public EventController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
+
+        oneTimeEvents = scenarioStore.getEventInfoStore().getEventInfos().stream()
+                .filter(eventInfo -> eventInfo.getEventTimeframe().isRepeat() == false)
+                .collect(Collectors.toList());
+
+        recurringEvents = scenarioStore.getEventInfoStore().getEventInfos().stream()
+                .filter(eventInfo -> eventInfo.getEventTimeframe().isRepeat() == true)
+                .collect(Collectors.toList());
     }
 
     // Getters
     public ScenarioStore getScenarioStore() {
         return scenarioStore;
     }
+    public List<EventInfo> getOneTimeEvents() { return oneTimeEvents; }
+    public List<EventInfo> getRecurringEvents() { return recurringEvents; }
 
     // Setters
     public void setScenarioStore(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
     }
+    public void setOneTimeEvents(List<EventInfo> oneTimeEvents) { this.oneTimeEvents = oneTimeEvents; }
+    public void setRecurringEvents(List<EventInfo> recurringEvents) { this.recurringEvents = recurringEvents; }
 
     // Methods
     public List<Event> getEventsForTime(double simulationTime) {
+        // TODO Handle one-time and recurring events properly.
         List<Event> events = new ArrayList<>();
 
         // Always, create an "ElapsedTimeEvent".
