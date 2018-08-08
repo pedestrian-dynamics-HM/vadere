@@ -1,5 +1,6 @@
 package org.vadere.simulator.control.events;
 
+import junit.framework.AssertionFailedError;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void EventControllerConstructorFindsNoEventsIfPassingEmptyScenarioStore() {
+    public void eventControllerConstructorFindsNoEventsIfPassingEmptyScenarioStore() {
         ScenarioStore emptyScenarioStore = new ScenarioStore("emptyScenarioStore");
 
         EventController eventController = new EventController(emptyScenarioStore);
@@ -47,7 +49,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void EventControllerConstructorDetectsOneTimeEventsProperly() {
+    public void eventControllerConstructorDetectsOneTimeEventsProperly() {
         ScenarioStore scenarioStoreContainingOneOneTimeEvent = new ScenarioStore("name",
                 "description",
                 "mainModel",
@@ -63,7 +65,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void EventControllerConstructorDetectsRecurringEventsProperly() {
+    public void eventControllerConstructorDetectsRecurringEventsProperly() {
         ScenarioStore scenarioStoreContainingOneRecurringEvent = new ScenarioStore("name",
                 "description",
                 "mainModel",
@@ -79,7 +81,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void EventControllerConstructorDetectsOneTimeAndRecurringEventsProperly() {
+    public void eventControllerConstructorDetectsOneTimeAndRecurringEventsProperly() {
         List<EventInfo> oneTimeAndRecurringEvents = new ArrayList<>();
         oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(false).getEventInfos());
         oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(true).getEventInfos());
@@ -101,4 +103,8 @@ public class EventControllerTest {
         assertEquals(1, eventController.getRecurringEvents().size());
     }
 
+    @Test
+    public void getRecurringEventsForSimulationTimeEvaluatesTimeframe1Properly() {
+        throw new NotImplementedException();
+    }
 }

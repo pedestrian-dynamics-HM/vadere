@@ -99,7 +99,7 @@ public class EventController {
      *
      * // TODO Write unit tests for this method.
      */
-    private List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
+    public List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
         List<Event> activeEvents = new ArrayList<>();
 
         for (EventInfo eventInfo : recurringEvents) {
