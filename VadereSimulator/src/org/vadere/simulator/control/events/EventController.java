@@ -69,4 +69,58 @@ public class EventController {
         return events;
     }
 
+    /**
+     * Given a "simulationTime", return all events which must be raised at that point in time
+     * (according to their timeframe description).
+     *
+     * An @see EventTimeframe contains "startTime", "endTime" and "waitTimeBetweenRepetition" for
+     * an @see Event. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
+     * the frequency of an event:
+     *
+     *   frequency = (endTime - startTime) * waitTimeBetweenRepetition
+     *
+     * With this information, you can define timeframes in which the event is active. For instance:
+     *
+     *   startTime = 0.75
+     *   endTime = 1.25
+     *   waitTimeBetweenRepetition = 1.0
+     *   simulationTime = 0.8
+     *
+     * That means, the event is active in following timeframes (end time should be excluded):
+     *
+     *   [0.75 -- 1.25)
+     *   [2.25 -- 2.75)
+     *   [3.75 -- 4.25)
+     *   [5.25 -- 5.75)
+     *   ...
+     *
+     * Now, if this method gets "simulationTime = 0.8", the method should detect that the event
+     * is active during this time.
+     *
+     * // TODO Write unit tests for this method.
+     */
+    private List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
+        List<Event> activeEvents = new ArrayList<>();
+
+        for (EventInfo eventInfo : recurringEvents) {
+            EventTimeframe timeframe = eventInfo.getEventTimeframe();
+
+            double eventLength = timeframe.getEndTime() - timeframe.getStartTime();
+            double eventFrequency = eventLength + timeframe.getWaitTimeBetweenRepetition();
+
+            // TODO Check if implementation is correct or "if (simulationTime < startTime)" must be introduced.
+            double normalizedSimulationTime = Math.max(0, Math.floor(simulationTime) - 1);
+            double startTimeForNextEvent = timeframe.getStartTime() + (normalizedSimulationTime * eventFrequency);
+            double endTimeForNextEvent = startTimeForNextEvent + eventLength;
+
+            boolean eventIsActive = (simulationTime >= startTimeForNextEvent && simulationTime < endTimeForNextEvent);
+
+            if (eventIsActive) {
+                activeEvents.addAll(eventInfo.getEvents());
+            }
+        }
+
+        return activeEvents;
+    }
+
 }
