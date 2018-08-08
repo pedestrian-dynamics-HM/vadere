@@ -1,10 +1,13 @@
 package org.vadere.state.attributes;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
 /**
  * Provides attributes for the simulation, like visualizationEnabled and
  * writeSimulationData.
  * 
  */
+@JsonFilter("testFilter")
 public class AttributesSimulation extends Attributes {
 
 	private double finishTime = 500;
