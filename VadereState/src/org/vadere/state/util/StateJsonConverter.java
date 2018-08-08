@@ -43,6 +43,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 public abstract class StateJsonConverter {
 
 	public static final String SCENARIO_KEY = "scenario";
@@ -288,6 +290,23 @@ public abstract class StateJsonConverter {
 		try {
 			return writer.writeValueAsString(mapper.convertValue(object, JsonNode.class));
 		} catch (JsonProcessingException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String getScenarioStoreHash(Object object){
+		JsonNode jsonNode = mapper.convertValue(object, JsonNode.class);
+		JsonNode attrSimulation = jsonNode.findPath("attributesSimulation");
+		if (! attrSimulation.isMissingNode()){
+			((ObjectNode)attrSimulation).remove("simulationSeed");
+			((ObjectNode)attrSimulation).remove("useFixedSeed");
+			((ObjectNode)attrSimulation).remove("simulationSeed");
+		}
+
+		try {
+			String scenarioString = writer.writeValueAsString(jsonNode);
+			return DigestUtils.sha1Hex(scenarioString);
+		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 	}

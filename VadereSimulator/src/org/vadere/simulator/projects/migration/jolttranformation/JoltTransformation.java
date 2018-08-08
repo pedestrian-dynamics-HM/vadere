@@ -54,6 +54,9 @@ public abstract class JoltTransformation {
 				case V0_2:
 					ret = new JoltTransformV2toV3(transformationResource, identityResource, currentVersion);
 					break;
+				case V0_3:
+					ret = new JoltTransformV3toV4(transformationResource, identityResource, currentVersion);
+					break;
 				default:
 					throw new MigrationException("No Transformation defined for Verson " + currentVersion.toString());
 			}
@@ -147,7 +150,7 @@ public abstract class JoltTransformation {
 	 * @param key			key to add to new HashMap
 	 * @param children		Specify Order on second level
 	 */
-	protected void putObject(LinkedHashMap<Object, Object> target,
+	protected static void putObject(LinkedHashMap<Object, Object> target,
 						   LinkedHashMap<Object, Object> source,
 						   String key, String... children) throws MigrationException {
 
