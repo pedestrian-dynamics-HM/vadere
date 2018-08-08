@@ -1,0 +1,29 @@
+# This file contains all information regarding the generated output data
+
+# Datatype
+gaussian density
+
+# script version tag
+1.0
+
+# OBSERVATION_AREA
+[19.5, 55.0, 6, 10]
+
+# TIME_STEP_BOUNDS
+(30, 0)
+
+# RESOLUTION 
+0.5
+
+# SIGMA
+0.7
+
+# GAUSS_DENSITY_BOUNDS
+(2, 2)
+
+# FRAMERATE
+1
+
+# scenarios used
+['C:/Studium/BA/datensets/2018-08-07-new-vadere-version\\Asymmetrisch_2_2018-08-07_13-08-15.780\\postvis.trajectories']
+
