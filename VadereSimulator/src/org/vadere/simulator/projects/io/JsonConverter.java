@@ -18,8 +18,6 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import javax.swing.plaf.nimbus.State;
-
 public class JsonConverter {
 	
 	public static Scenario deserializeScenarioRunManager(String json) throws IOException, IllegalArgumentException {
@@ -55,7 +53,7 @@ public class JsonConverter {
 		String mainModel = scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
 		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
-		EventInfoStore eventInfoStore = StateJsonConverter.deserializeEventsFromNode(scenarioNode.get("eventInfos"));
+		EventInfoStore eventInfoStore = StateJsonConverter.deserializeEventsFromArrayNode(scenarioNode.get("eventInfos"));
 
 		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription, mainModel, attributesModel, attributesSimulation, topography, eventInfoStore);
 		Scenario scenarioRunManager = new Scenario(scenarioStore);
@@ -135,11 +133,12 @@ public class JsonConverter {
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		ObjectNode eventNode = StateJsonConverter.serializeEventsToNode(scenarioStore.getEventInfoStore());
-		// TODO Test if events are correctly de- and serialized.
+		JsonNode eventInfoArrayNode = eventNode.get("eventInfos");
+
 		return new ScenarioStore(scenarioStore.getName(), scenarioStore.getDescription(), scenarioStore.getMainModel(),
 				StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode),
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeEventsFromNode(eventNode));
+				StateJsonConverter.deserializeEventsFromArrayNode(eventInfoArrayNode));
 	}
 }

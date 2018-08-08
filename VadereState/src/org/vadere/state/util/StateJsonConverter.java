@@ -106,7 +106,6 @@ public abstract class StateJsonConverter {
 		Collection<AttributesTarget> targets = new LinkedList<>();
 		Collection<AttributesSource> sources = new LinkedList<>();
 		Collection<? extends DynamicElement> dynamicElements = new LinkedList<>();
-		Collection<Event> events = new LinkedList<>();
 		AttributesTeleporter teleporter = null;
 	}
 
@@ -170,7 +169,7 @@ public abstract class StateJsonConverter {
 	 * Usually, this array is extracted by reading in a scenario file as @see JsonNode
 	 * an you call "get("eventInfos") on this @see JsonNode.
 	 */
-	public static EventInfoStore deserializeEventsFromNode(JsonNode node) throws IllegalArgumentException {
+	public static EventInfoStore deserializeEventsFromArrayNode(JsonNode node) throws IllegalArgumentException {
 		EventInfoStore eventInfoStore = new EventInfoStore();
 
 		if (node != null) {
