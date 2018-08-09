@@ -18,6 +18,16 @@ import static org.junit.Assert.*;
 
 public class EventControllerTest {
 
+    private ScenarioStore getScenarioStoreContainingRecurringEvent(boolean recurring) {
+        return new ScenarioStore("name",
+                "description",
+                "mainModel",
+                null,
+                null,
+                null,
+                getEventInfoStoreContainingRecurringEvent(recurring));
+    }
+
     private EventInfoStore getEventInfoStoreContainingRecurringEvent(boolean recurringEvent) {
         // Create "EventTimeframe" and "Event" objects and encapsulate them in "EventInfo" objects.
         EventTimeframe eventTimeframe = new EventTimeframe(5, 30, recurringEvent, 0);
@@ -42,21 +52,14 @@ public class EventControllerTest {
 
         EventController eventController = new EventController(emptyScenarioStore);
 
-        int expectedEvents = 0;
-
-        assertEquals(expectedEvents, eventController.getOneTimeEvents().size());
-        assertEquals(expectedEvents, eventController.getRecurringEvents().size());
+        assertEquals(0, eventController.getOneTimeEvents().size());
+        assertEquals(0, eventController.getRecurringEvents().size());
     }
 
     @Test
     public void eventControllerConstructorDetectsOneTimeEventsProperly() {
-        ScenarioStore scenarioStoreContainingOneOneTimeEvent = new ScenarioStore("name",
-                "description",
-                "mainModel",
-                null,
-                null,
-                null,
-                getEventInfoStoreContainingRecurringEvent(false));
+        boolean isRecurringEvent = false;
+        ScenarioStore scenarioStoreContainingOneOneTimeEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
 
         EventController eventController = new EventController(scenarioStoreContainingOneOneTimeEvent);
 
@@ -66,13 +69,8 @@ public class EventControllerTest {
 
     @Test
     public void eventControllerConstructorDetectsRecurringEventsProperly() {
-        ScenarioStore scenarioStoreContainingOneRecurringEvent = new ScenarioStore("name",
-                "description",
-                "mainModel",
-                null,
-                null,
-                null,
-                getEventInfoStoreContainingRecurringEvent(true));
+        boolean isRecurringEvent = true;
+        ScenarioStore scenarioStoreContainingOneRecurringEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
 
         EventController eventController = new EventController(scenarioStoreContainingOneRecurringEvent);
 
@@ -82,6 +80,7 @@ public class EventControllerTest {
 
     @Test
     public void eventControllerConstructorDetectsOneTimeAndRecurringEventsProperly() {
+        // Create a list containing one one-time and one recurring event.
         List<EventInfo> oneTimeAndRecurringEvents = new ArrayList<>();
         oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(false).getEventInfos());
         oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(true).getEventInfos());
@@ -103,8 +102,32 @@ public class EventControllerTest {
         assertEquals(1, eventController.getRecurringEvents().size());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void timeframeIsActiveAtSimulationTimeThrowsExceptionIfNoRecurringEventTimeframe() {
+        boolean isRecurringEvent = false;
+        double simulationTime = 0.8;
+
+        EventTimeframe timeframe = new EventTimeframe(0.75, 1.25, isRecurringEvent, 1.0);
+
+        EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
+    }
+
     @Test
-    public void getRecurringEventsForSimulationTimeEvaluatesTimeframe1Properly() {
-        throw new NotImplementedException();
+    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfTimeframeIsActive() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 1.0;
+        double simulationTime = 0.75;
+        double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        for (int i = 0; i < 50; i++) {
+            double currentSimulationTime = simulationTime + (i * periodicity);
+
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, currentSimulationTime);
+            assertTrue(timeframeIsActive);
+        }
     }
 }

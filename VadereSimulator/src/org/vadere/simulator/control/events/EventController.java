@@ -69,36 +69,6 @@ public class EventController {
         return events;
     }
 
-    /**
-     * Given a "simulationTime", return all events which must be raised at that point in time
-     * (according to their timeframe description).
-     *
-     * An @see EventTimeframe contains "startTime", "endTime" and "waitTimeBetweenRepetition" for
-     * an @see Event. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
-     * the frequency of an event:
-     *
-     *   frequency = (endTime - startTime) * waitTimeBetweenRepetition
-     *
-     * With this information, you can define timeframes in which the event is active. For instance:
-     *
-     *   startTime = 0.75
-     *   endTime = 1.25
-     *   waitTimeBetweenRepetition = 1.0
-     *   simulationTime = 0.8
-     *
-     * That means, the event is active in following timeframes (end time should be excluded):
-     *
-     *   [0.75 -- 1.25)
-     *   [2.25 -- 2.75)
-     *   [3.75 -- 4.25)
-     *   [5.25 -- 5.75)
-     *   ...
-     *
-     * Now, if this method gets "simulationTime = 0.8", the method should detect that the event
-     * is active during this time.
-     *
-     * // TODO Write unit tests for this method.
-     */
     public List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
         List<Event> activeEvents = new ArrayList<>();
 
@@ -121,6 +91,52 @@ public class EventController {
         }
 
         return activeEvents;
+    }
+
+    /**
+     * Given a (recurring) "timeframe" and a "simulationTime" return if the
+     * timeframe is "active" at that specific "simulationTime" or not.
+     *
+     * An @see EventTimeframe contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
+     * an @see Event. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
+     * the period length of an event:
+     *
+     *   period_length = (endTime - startTime) + waitTimeBetweenRepetition
+     *
+     * With this information, you can define intervals in which the timeframe is active. For instance:
+     *
+     *   startTime = 0.75
+     *   endTime = 1.25
+     *   waitTimeBetweenRepetition = 1.0
+     *   simulationTime = 0.8
+     *
+     * That means, the timeframe is active in following intervals (end time is excluded!):
+     *
+     *   [0.75 -- 1.25)
+     *   [2.25 -- 2.75)
+     *   [3.75 -- 4.25)
+     *   [5.25 -- 5.75)
+     *   ...
+     *
+     * Now, if this method gets "simulationTime = 0.8", the method should detect that the timeframe
+     * is active in that given time.
+     */
+    public static boolean timeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {
+        if (timeframe.isRepeat() == false) {
+            throw new IllegalArgumentException("EventTimeframe: \"repeat=true\" is required!");
+        }
+
+        double eventLength = timeframe.getEndTime() - timeframe.getStartTime();
+        double eventPeriodLength = eventLength + timeframe.getWaitTimeBetweenRepetition();
+
+        // TODO Check if mapping of "simulationTime" to "curentPeriod" is correct. Maybe, rounding or a cut-off is required.
+        int currentPeriod = (int)(Math.max(0, (simulationTime - timeframe.getStartTime())) / eventPeriodLength);
+        double eventStartTimeCurrentPeriod = timeframe.getStartTime() + (currentPeriod * eventPeriodLength);
+        double eventEndTimeCurrentPeriod = eventStartTimeCurrentPeriod + eventLength;
+
+        boolean eventIsActive = (simulationTime >= eventStartTimeCurrentPeriod && simulationTime < eventEndTimeCurrentPeriod);
+
+        return eventIsActive;
     }
 
 }
