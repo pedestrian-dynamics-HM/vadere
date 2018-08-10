@@ -29,7 +29,7 @@ public abstract class SourceController {
 
 	// Pedestrians should not touch each other in the spawn position.
 	// Therefore increase the spwan grid by 0.1.
-	private final double SAFETY_OVERLAP_FACTOR = 1.1;
+	public static final double SAFETY_OVERLAP_FACTOR = 1;
 
 	protected final Source source;
 	private final DynamicElementFactory dynamicElementFactory;
