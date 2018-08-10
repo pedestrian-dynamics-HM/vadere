@@ -26,6 +26,7 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
+		this.pedRadius = state.getTopography().getAttributesPedestrian().getRadius();  // in init there is no access to the state
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 		peds.forEach(p -> this.putValue(
 				new TimestepPedestrianIdKey(state.getStep(), p.getId()),
@@ -41,7 +42,7 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 	}
 
 	private int calculateOverlaps(final Collection<Pedestrian> peds, VPoint pos) {
-		return (int) peds.stream().filter(p -> p.getPosition().distance(pos) < 2 * this.pedRadius).count() - 1;
+		return (int) peds.stream().filter(p -> p.getPosition().distance(pos) <= 2 * this.pedRadius).count() - 1;
 	}
 
 	@Override

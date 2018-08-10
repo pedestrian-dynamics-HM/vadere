@@ -24,7 +24,7 @@ public class ActionShowPotentialField extends ActionVisualization {
 	@Override
 	public void actionPerformed(final ActionEvent event) {
 
-		if (!model.config.isShowPotentialField()) {
+		if (!model.config.isShowTargetPotentialField()) {
 			//final JFileChooser fc = new JFileChooser(resources.getProperty("View.outputDirectory.path"));
 			final JFileChooser fc = new JFileChooser(model.getOutputPath());
 			int returnVal = fc.showOpenDialog(null);
@@ -44,7 +44,7 @@ public class ActionShowPotentialField extends ActionVisualization {
 						PotentialFieldContainer container = new PotentialFieldContainer(file,
 								topography.getBounds().getWidth(), topography.getBounds().getHeight(), false);
 						model.setPotentialFieldContainer(container);
-						model.config.setShowPotentialField(true);
+						model.config.setShowTargetPotentialField(true);
 						model.notifyObservers();
 						// logger.info("read: \n" + data);
 					} catch (Exception e) {
@@ -65,7 +65,7 @@ public class ActionShowPotentialField extends ActionVisualization {
 				new Thread(runnable).start();
 			}
 		} else {
-			model.config.setShowPotentialField(false);
+			model.config.setShowTargetPotentialField(false);
 			model.notifyObservers();
 		}
 	}

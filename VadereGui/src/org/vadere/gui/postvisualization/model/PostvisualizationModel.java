@@ -362,7 +362,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				e.printStackTrace();
 			}
 		}
-		config.setShowPotentialField(false);
+		config.setShowTargetPotentialField(false);
 		potentialContainer = null;
 	}
 }
