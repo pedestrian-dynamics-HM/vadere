@@ -104,34 +104,46 @@ public class VadereConsole {
 				.help("Run migration assistant on single sceanrio file")
 				.setDefault("func", new MigrationSubCommand());
 
-		migrationAssistant.addArgument("--scenario-file", "-f")
+		migrationAssistant.addArgument("path")
+				.nargs("+")
+				.metavar("PATH")
 				.required(true)
 				.type(String.class)
-				.dest("scenario-file")
-				.help("The scenario file which should be migrated to new version");
+				.dest("paths")
+				.help("The scenario files or directories on to operate on. Directories containing" +
+						"the files DO_NOT_MIGRATE or DO_NOT_MIGRATE_TREE will be ignored.");
 
 		String[] versions = Version.stringValues(Version.NOT_A_RELEASE);
-		migrationAssistant.addArgument("--target-version", "-V")
+		migrationAssistant.addArgument("--target-version")
 				.required(false)
 				.type(String.class)
 				.dest("target-version")
 				.choices(versions)
 				.setDefault(Version.latest().label())
-				.help("use one of the shown version strings to indicate the target version. If not specified the last version is used");
+				.help("Default: " + Version.latest().label() + " Use one of the shown version strings to indicate the target version." +
+						" If not specified the last version is used." );
 
 		migrationAssistant.addArgument("--output-file", "-o")
 				.required(false)
 				.type(String.class)
-				.dest("output-file")
-				.choices(versions)
-				.help("Write new version to this file. If not specified backup input file and overwrite it.");
+				.metavar("OUTPUT-PATH")
+				.dest("output-path")
+				.help("Write new version to this directory. If not specified backup input file and overwrite.");
 
 		migrationAssistant.addArgument("--revert-migration")
 				.required(false)
 				.action(Arguments.storeTrue())
 				.dest("revert-migration")
-				.help("if set vadere will search for a <scenario-file>.legacy and will replace the current version with this backup." +
+				.help("If set vadere will search for a <scenario-file>.legacy and will replace the current version with this backup." +
 						" The Backup must be in the same directory");
+
+		migrationAssistant.addArgument("--recursive", "-r")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.dest("recursive")
+				.setDefault(false)
+				.help("If PATH contains a directory instead of a scenario file recursively search " +
+						"the directory tree for scenario files and apply the command");
 
 		return parser;
 	}
