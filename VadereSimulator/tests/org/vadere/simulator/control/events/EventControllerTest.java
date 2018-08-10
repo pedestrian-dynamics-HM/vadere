@@ -18,19 +18,19 @@ import static org.junit.Assert.*;
 
 public class EventControllerTest {
 
-    private ScenarioStore getScenarioStoreContainingRecurringEvent(boolean recurring) {
+    private ScenarioStore getScenarioStoreContainingRecurringEvent(boolean isRecurring) {
         return new ScenarioStore("name",
                 "description",
                 "mainModel",
                 null,
                 null,
                 null,
-                getEventInfoStoreContainingRecurringEvent(recurring));
+                getEventInfoStoreContainingRecurringEvent(isRecurring));
     }
 
-    private EventInfoStore getEventInfoStoreContainingRecurringEvent(boolean recurringEvent) {
+    private EventInfoStore getEventInfoStoreContainingRecurringEvent(boolean isRecurring) {
         // Create "EventTimeframe" and "Event" objects and encapsulate them in "EventInfo" objects.
-        EventTimeframe eventTimeframe = new EventTimeframe(5, 30, recurringEvent, 0);
+        EventTimeframe eventTimeframe = new EventTimeframe(5, 30, isRecurring, 0);
         List<Event> events = new ArrayList<>();
 
         EventInfo eventInfo1 = new EventInfo();
@@ -113,12 +113,12 @@ public class EventControllerTest {
     }
 
     @Test
-    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfTimeframeIsActive() {
+    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfSimulationTimeFallsOntoStartTimePeriodically() {
         boolean recurringEvent = true;
         double startTime = 0.75;
         double endTime = 1.25;
         double waitTimeBetweenRepetition = 1.0;
-        double simulationTime = 0.75;
+        double simulationTime = startTime;
         double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
 
         EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
@@ -128,6 +128,120 @@ public class EventControllerTest {
 
             boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, currentSimulationTime);
             assertTrue(timeframeIsActive);
+        }
+    }
+
+    @Test
+    public void timeframeIsActiveAtSimulationTimeReturnsFalseIfSimulationTimeFallsOntoEndTimePeriodically() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 1.0;
+        double simulationTime = endTime;
+        double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        for (int i = 0; i < 50; i++) {
+            double currentSimulationTime = simulationTime + (i * periodicity);
+
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, currentSimulationTime);
+            assertFalse(timeframeIsActive);
+        }
+    }
+
+    @Test
+    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfSimulationTimeFallsBetweenStartAndEndTimePeriodically() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 1.0;
+        double simulationTime = 1.0;
+        double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        for (int i = 0; i < 50; i++) {
+            double currentSimulationTime = simulationTime + (i * periodicity);
+
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, currentSimulationTime);
+            assertTrue(timeframeIsActive);
+        }
+    }
+
+    @Test
+    public void timeframeIsActiveAtSimulationTimeReturnsFalseIfSimulationTimeIsBeforeStartTime() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 1.0;
+        double simulationTime = 0.10;
+        double increment = 0.05;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        while (simulationTime < startTime) {
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
+            assertFalse(timeframeIsActive);
+
+            simulationTime += increment;
+        }
+    }
+
+    @Test
+    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfSimulationTimeBetweenStartAndEndTime() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 1.0;
+        double simulationTime = startTime;
+        double increment = 0.05;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        while (simulationTime < endTime) {
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
+            assertTrue(timeframeIsActive);
+
+            simulationTime += increment;
+        }
+    }
+
+    @Test
+    public void timeframeIsActiveAtSimulationTimeReturnsFalseIfWaitTimeIsZeroButSimulationTimeBeforeStartTime() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 0.0;
+        double simulationTime = 0;
+        double increment = 0.05;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        while (simulationTime < startTime) {
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
+            assertFalse(timeframeIsActive);
+
+            simulationTime += increment;
+        }
+    }
+
+    @Test
+    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfWaitTimeIsZeroAndSimulationTimeGreaterThanStartTime() {
+        boolean recurringEvent = true;
+        double startTime = 0.75;
+        double endTime = 1.25;
+        double waitTimeBetweenRepetition = 0.0;
+        double simulationTime = startTime;
+        double increment = 0.10;
+
+        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+
+        while (simulationTime < 500 * endTime) {
+            boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
+            assertTrue(timeframeIsActive);
+
+            simulationTime += increment;
         }
     }
 }

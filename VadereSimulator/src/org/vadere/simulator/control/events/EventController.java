@@ -129,8 +129,10 @@ public class EventController {
         double eventLength = timeframe.getEndTime() - timeframe.getStartTime();
         double eventPeriodLength = eventLength + timeframe.getWaitTimeBetweenRepetition();
 
-        // TODO Check if mapping of "simulationTime" to "curentPeriod" is correct. Maybe, rounding or a cut-off is required.
-        int currentPeriod = (int)(Math.max(0, (simulationTime - timeframe.getStartTime())) / eventPeriodLength);
+        double normalizedSimulationTime = Math.max(0, (simulationTime - timeframe.getStartTime()));
+        // Check with unit testing if cut-off is okay here or if we need rounding.
+        int currentPeriod = (int)(normalizedSimulationTime / eventPeriodLength);
+
         double eventStartTimeCurrentPeriod = timeframe.getStartTime() + (currentPeriod * eventPeriodLength);
         double eventEndTimeCurrentPeriod = eventStartTimeCurrentPeriod + eventLength;
 
