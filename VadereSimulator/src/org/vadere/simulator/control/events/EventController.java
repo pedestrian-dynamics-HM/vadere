@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
  *
  * The EventController uses the passed @see ScenarioStore
  * to extract the possible events from the scenario description.
+ *
+ * TODO Clarify what happens if "simTimeSteps" are too big.
  */
 public class EventController {
 
@@ -34,6 +36,9 @@ public class EventController {
         recurringEvents = scenarioStore.getEventInfoStore().getEventInfos().stream()
                 .filter(eventInfo -> eventInfo.getEventTimeframe().isRepeat() == true)
                 .collect(Collectors.toList());
+
+        oneTimeEvents.stream().forEach(eventInfo -> throwExceptionIfTimeframeIsInvalid(eventInfo.getEventTimeframe(), false));
+        recurringEvents.stream().forEach(eventInfo -> throwExceptionIfTimeframeIsInvalid(eventInfo.getEventTimeframe(), true));
     }
 
     // Getters
@@ -52,45 +57,51 @@ public class EventController {
 
     // Methods
     public List<Event> getEventsForTime(double simulationTime) {
-        // TODO Handle one-time and recurring events properly.
         List<Event> events = new ArrayList<>();
 
         // Always, create an "ElapsedTimeEvent".
         events.add(new ElapsedTimeEvent(simulationTime));
 
-        for (EventInfo eventInfo : scenarioStore.getEventInfoStore().getEventInfos()) {
-            EventTimeframe eventTimeframe = eventInfo.getEventTimeframe();
+        List<Event> activeOneTimeEvents = getOneTimeEventsForSimulationTime(simulationTime);
+        List<Event> activeRecurringEvents = getRecurringEventsForSimulationTime(simulationTime);
 
-            if (simulationTime >= eventTimeframe.getStartTime() && simulationTime <= eventTimeframe.getEndTime()) {
-                events.addAll(eventInfo.getEvents());
-            }
-        }
+        events.addAll(activeOneTimeEvents);
+        events.addAll(activeRecurringEvents);
 
         return events;
     }
 
-    public List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
+    private List<Event> getOneTimeEventsForSimulationTime(double simulationTime) {
         List<Event> activeEvents = new ArrayList<>();
 
-        for (EventInfo eventInfo : recurringEvents) {
-            EventTimeframe timeframe = eventInfo.getEventTimeframe();
-
-            double eventLength = timeframe.getEndTime() - timeframe.getStartTime();
-            double eventFrequency = eventLength + timeframe.getWaitTimeBetweenRepetition();
-
-            // TODO Check if implementation is correct or "if (simulationTime < startTime)" must be introduced.
-            double normalizedSimulationTime = Math.max(0, Math.floor(simulationTime) - 1);
-            double startTimeForNextEvent = timeframe.getStartTime() + (normalizedSimulationTime * eventFrequency);
-            double endTimeForNextEvent = startTimeForNextEvent + eventLength;
-
-            boolean eventIsActive = (simulationTime >= startTimeForNextEvent && simulationTime < endTimeForNextEvent);
-
-            if (eventIsActive) {
-                activeEvents.addAll(eventInfo.getEvents());
-            }
-        }
+        oneTimeEvents.stream()
+                .filter(eventInfo -> oneTimeTimeframeIsActiveAtSimulationTime(eventInfo.getEventTimeframe(), simulationTime))
+                .forEach(eventInfo -> activeEvents.addAll(eventInfo.getEvents()));
 
         return activeEvents;
+    }
+
+    private List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
+        List<Event> activeEvents = new ArrayList<>();
+
+        recurringEvents.stream()
+                .filter(eventInfo -> timeframeIsActiveAtSimulationTime(eventInfo.getEventTimeframe(), simulationTime))
+                .forEach(eventInfo -> activeEvents.addAll(eventInfo.getEvents()));
+
+        return activeEvents;
+    }
+
+    /**
+     * Return if "simulationTime" is in interval [startTime, endTime) of given "timeframe".
+     *
+     * @throws IllegalArgumentException If given timeframe is a recurring one.
+     */
+    public static boolean oneTimeTimeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {
+        throwExceptionIfTimeframeIsInvalid(timeframe, false);
+
+        boolean eventIsActive = (simulationTime >= timeframe.getStartTime() && simulationTime < timeframe.getEndTime());
+
+        return eventIsActive;
     }
 
     /**
@@ -120,11 +131,11 @@ public class EventController {
      *
      * Now, if this method gets "simulationTime = 0.8", the method should detect that the timeframe
      * is active in that given time.
+     *
+     * @throws IllegalArgumentException If given timeframe is a one-time timeframe.
      */
     public static boolean timeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {
-        if (timeframe.isRepeat() == false) {
-            throw new IllegalArgumentException("EventTimeframe: \"repeat=true\" is required!");
-        }
+        throwExceptionIfTimeframeIsInvalid(timeframe, true);
 
         double eventLength = timeframe.getEndTime() - timeframe.getStartTime();
         double eventPeriodLength = eventLength + timeframe.getWaitTimeBetweenRepetition();
@@ -139,6 +150,20 @@ public class EventController {
         boolean eventIsActive = (simulationTime >= eventStartTimeCurrentPeriod && simulationTime < eventEndTimeCurrentPeriod);
 
         return eventIsActive;
+    }
+
+
+    /**
+     * Throw @see IllegalArgumentException if startTime > endTime OR timeframe does not meet recurring expectation.
+     */
+    private static void throwExceptionIfTimeframeIsInvalid(EventTimeframe timeframe, boolean expectRecurring) {
+        if (timeframe.getStartTime() > timeframe.getEndTime()) {
+            throw new IllegalArgumentException("EventTimeframe: startTime > endTime!");
+        }
+
+        if (timeframe.isRepeat() != expectRecurring) {
+            throw new IllegalArgumentException(String.format("EventTimeframe: \"repeat=%b\" expected!", expectRecurring));
+        }
     }
 
 }
