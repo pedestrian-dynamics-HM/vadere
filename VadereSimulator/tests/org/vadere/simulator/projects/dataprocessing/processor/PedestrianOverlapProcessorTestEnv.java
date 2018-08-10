@@ -44,6 +44,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(3, new VPoint(1.5, 1.0));
 				b.add(4, new VPoint(1.0, 1.5));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 0);
@@ -63,6 +64,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(4, new VPoint(1.0, 1.5));
 				b.add(5, new VPoint(0.8, 0.8));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 2);
@@ -81,6 +83,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(3, new VPoint(1.0, 1.0));
 				b.add(4, new VPoint(1.0, 1.0));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 3);
