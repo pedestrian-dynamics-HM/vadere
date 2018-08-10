@@ -220,6 +220,10 @@ public class Topography {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).removeElement(element);
 	}
 
+	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
+		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
+	}
+
 	public List<Source> getSources() {
 		return sources;
 	}
