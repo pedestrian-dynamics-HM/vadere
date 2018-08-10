@@ -6,7 +6,9 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -88,17 +90,27 @@ public class Simulation {
 		this.passiveCallbacks = passiveCallbacks;
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
-        IPotentialFieldTarget pft = null;
-        if(mainModel instanceof PotentialFieldModel) {
-            pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
-        }
+		// ::start:: this code is to visualize the potential fields. It may be refactored later.
+		IPotentialFieldTarget pft = null;
+		IPotentialField pt = null;
+		if(mainModel instanceof PotentialFieldModel) {
+			pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+			pt = (pos, agent) -> {
+				if(agent instanceof PedestrianOSM) {
+					return ((PedestrianOSM)agent).getPotential(pos);
+				}
+				else {
+					return 0.0;
+				}
+			};
+		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
-            if(pft != null) {
-                pc.setPotentialFieldTarget(pft);
-            }
+			pc.setPotentialFieldTarget(pft);
+			pc.setPotentialField(pt);
 		}
+		// ::end::
 
 		// create source and target controllers
 		for (Source source : topography.getSources()) {

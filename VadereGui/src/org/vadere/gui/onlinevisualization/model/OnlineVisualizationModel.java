@@ -11,7 +11,6 @@ import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.voronoi.VoronoiDiagram;
@@ -29,7 +28,11 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	 * pontetial field of a certain pedestrian. See 'Simulation' for more
 	 * information. For debug purposes. Updated by popDrawData().
 	 */
+	private IPotentialField potentialFieldTarget = null;
+
 	private IPotentialField potentialField = null;
+
+	private Agent agent = null;
 
 	/**
 	 * Latest snapshot of the jts diagram to be displayed. Updated by
@@ -104,8 +107,10 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 					observationAreaSnapshots.getFirst();
 			simTimeInSec = observationAreaSnapshot.simTimeInSec;
 
-			// potentialField might be null!
-            potentialField = observationAreaSnapshot.potentialFieldTarget;
+			// potentialFieldTarget might be null!
+            potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
+			potentialField = observationAreaSnapshot.potentialField;
+			agent = observationAreaSnapshot.selectedAgent;
 
 			/*
 			 * if(topography == null ||
@@ -179,10 +184,13 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	public Function<VPoint, Double> getPotentialField() {
 	    Function<VPoint, Double> f = pos -> 0.0;
 
-	    if(potentialField != null) {
+	    if(potentialField != null && config.isShowPotentialField() && agent.equals(getSelectedElement())) {
+	    	f = pos -> potentialField.getPotential(pos, agent);
+	    }
+		else if(potentialFieldTarget != null && config.isShowTargetPotentialField()) {
             if(getSelectedElement() instanceof Agent) {
                 Agent selectedAgent = (Agent)getSelectedElement();
-                f = pos -> potentialField.getPotential(pos, selectedAgent);
+                f = pos -> potentialFieldTarget.getPotential(pos, selectedAgent);
             }
         }
 
