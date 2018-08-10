@@ -47,20 +47,20 @@ public class NumberOverlapsProcessor extends DataProcessor<NoDataKey, Long> {
 	public void postLoop(final SimulationState state) {
 		this.pedOverlapProc.postLoop(state);
 
-		long numberOverlaps = 0;
+		long numberOverlaps = this.pedOverlapProc.getValues().stream().mapToInt(val -> val.intValue()).sum() / 2;
 
-
-		if (this.pedOverlapProc.getValues().size() > 0) {
-			numberOverlaps = this.pedOverlapProc.getValues().stream().filter(i -> i == 1).count();
-		}
 
 		/* // Uncomment this code if you want to get the info box with the number of overlaps
 		if (numberOverlaps > 0 ) {
 			NumberOverlapsProcessor.infoBox(numberOverlaps + " Overlaps have occured during the simulation!", "Number Overlaps");
 			System.out.println("* CAREFUL *: " + numberOverlaps + " Overlaps have occured during the simulation!");
-		}
+		}else{
+			NumberOverlapsProcessor.infoBox("No Overlaps have occured during the simulation :)", "Number Overlaps");
 
+		}
 		*/
+
+
 		this.putValue(NoDataKey.key(), numberOverlaps);
 	}
 

@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 
@@ -24,8 +25,37 @@ public class ActionShowPotentialField extends AbstractAction implements IRendere
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        model.config.setShowPotentialField(!model.config.isShowPotentialField());
-        model.notifyObservers();
+
+	    String[] possibilities = {
+	    		Messages.getString("OnlineVis.msgDialogShowPotentialfield.target"),
+			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.overall"),
+			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.none")};
+	    String s = (String)JOptionPane.showInputDialog(
+			    null,
+			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.text"),
+			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.title"),
+			    JOptionPane.PLAIN_MESSAGE,
+			    null,
+			    possibilities,
+			    possibilities[0]);
+
+		//If a string was returned, say so.
+	    if(possibilities[0].equals(s)) {
+		    model.config.setShowTargetPotentialField(true);
+		    model.config.setShowPotentialField(false);
+		    model.notifyObservers();
+	    }
+	    else if(possibilities[1].equals(s)) {
+		    model.config.setShowTargetPotentialField(false);
+		    model.config.setShowPotentialField(true);
+		    model.notifyObservers();
+	    }
+	    else {
+		    model.config.setShowTargetPotentialField(false);
+		    model.config.setShowPotentialField(false);
+	    }
+
+
     }
 
     @Override

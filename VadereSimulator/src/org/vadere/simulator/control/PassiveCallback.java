@@ -1,5 +1,7 @@
 package org.vadere.simulator.control;
 
+import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Topography;
 
@@ -20,5 +22,7 @@ public interface PassiveCallback {
 
 	void setTopography(Topography scenario);
 
-	default void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget){}
+	default void setPotentialFieldTarget(@Nullable IPotentialFieldTarget potentialFieldTarget){}
+
+	default void setPotentialField(@Nullable IPotentialField potentialField) {}
 }
