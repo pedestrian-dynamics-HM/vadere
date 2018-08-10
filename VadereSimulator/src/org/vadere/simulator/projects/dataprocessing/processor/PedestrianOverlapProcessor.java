@@ -1,5 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -16,6 +18,7 @@ import java.util.Collection;
  */
 @DataProcessorClass()
 public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer> {
+	private static Logger logger = LogManager.getLogger(PedestrianOverlapProcessor.class);
 	private double pedRadius;
 
 
@@ -42,7 +45,8 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 	}
 
 	private int calculateOverlaps(final Collection<Pedestrian> peds, VPoint pos) {
-		return (int) peds.stream().filter(p -> p.getPosition().distance(pos) <= 2 * this.pedRadius).count() - 1;
+		long overlap = peds.stream().filter(p -> p.getPosition().distance(pos) <= 2 * this.pedRadius).count() - 1;
+		return (int)overlap;
 	}
 
 	@Override

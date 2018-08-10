@@ -67,11 +67,12 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 			Agent pedestrian, Topography scenario) {
 
 		List<Pedestrian> result = new LinkedList<>();
+		final double maxWalkedDistanceInSimTime = 0.4 * 3; // quick fix 0.4 = simtime, 3 = max velocity.
 
 		// select pedestrians within recognition distance
 		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
 				.getObjects(relevantArea.getCenter(), this.width + pedestrian.getRadius() +
-						attributes.getVisionFieldRadius());
+						attributes.getVisionFieldRadius() + maxWalkedDistanceInSimTime);
 
 		result = closePedestrians;
 

@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
@@ -40,16 +41,18 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	}
 
 	@Override
-	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
+	public Collection<Pedestrian> getRelevantAgents(VCircle maxStepCircle,
 			Agent pedestrian, Topography scenario) {
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
-				.getObjects(relevantArea.getCenter(), this.personalWidth + 0.5);
+		final double maxWalkedDistanceInSimTime = 0.4 * 3; // quick fix 0.4 = simtime, 3 = max velocity.
+		List<Pedestrian> closePedestrians = scenario.getElements(Pedestrian.class)
+				.stream().filter(p -> p.getPosition().distance(maxStepCircle.getCenter()) <= this.personalWidth + maxStepCircle.getRadius() + maxWalkedDistanceInSimTime + pedestrian.getRadius()).collect(Collectors.toList());
+
 		return closePedestrians;
 	}
 
 	@Override
 	public double getAgentPotential(VPoint pos, Agent pedestrian,
-			Agent otherPedestrian) {
+	                                Agent otherPedestrian) {
 
 		double radii = pedestrian.getRadius() + otherPedestrian.getRadius(); // 2* r_p (sivers-2016b)
 		double potential = 0;
@@ -80,6 +83,39 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 		return potential;
 
 	}
+
+	/*
+	@Override
+	public double getAgentPotential(VPoint pos, Agent pedestrian,
+			Agent otherPedestrian) {
+		double radii = pedestrian.getRadius() + otherPedestrian.getRadius(); // 2* r_p (sivers-2016b)
+		double potential = 0;
+		double distanceSq = otherPedestrian.getPosition().distanceSq(pos);
+		double maxDistanceSq = (Math.max(personalWidth, intimateWidth)  + pedestrian.getRadius()) * (Math.max(personalWidth, intimateWidth)  + pedestrian.getRadius());
+
+		if (distanceSq < maxDistanceSq) {
+			double distance = otherPedestrian.getPosition().distance(pos); // Euclidean distance d_j(x) between agent j and position x
+
+			int intPower = this.attributes.getIntimateSpacePower(); // b_p
+			int perPower = this.attributes.getPersonalSpacePower(); // not defined in sivers-2016b (perPower = 1)
+			double factor = this.attributes.getIntimateSpaceFactor(); // a_p
+
+			if (distance < personalWidth + otherPedestrian.getRadius()) {
+				// implementation differs from sivers-2016b here:  \delta_{per} + r_p  (note: radii = 2*r_p)
+				potential += this.height * Math.exp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
+			}
+			if (distance < this.intimateWidth + otherPedestrian.getRadius()) {
+				// implementation differs from sivers-2016b here:  \delta_{int} + r_p  (note: radii = 2*r_p)
+				potential += this.height / factor
+						* Math.exp(4 / (Math.pow(distance / (this.intimateWidth + pedestrian.getRadius()), (2 * intPower)) - 1));
+			}
+			if (distance < radii) {
+				// implementations differs from sivers-2016b here : Math.power(distance / (radii),2)
+				potential += 1000 * Math.exp(1 / (Math.pow(distance / pedestrian.getRadius(), 2) - 1));
+			}
+		}
+		return potential;
+	}*/
 
 	@Override
 	public double getAgentPotential(VPoint pos, Agent pedestrian,
