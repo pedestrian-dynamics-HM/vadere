@@ -74,7 +74,7 @@ public class ScenarioStore {
 	}
 	
 	public String hashOfJsonRepresentation() throws JsonProcessingException {
-		return DigestUtils.sha1Hex(StateJsonConverter.serializeObject(this));
+		return StateJsonConverter.getScenarioStoreHash(this);
 	}
 	
 	public void sealAllAttributes() {

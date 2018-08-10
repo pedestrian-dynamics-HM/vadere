@@ -26,10 +26,14 @@ public class MainModelBuilder {
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		final AttributesSimulation attributesSimulation = scenarioStore.getAttributesSimulation();
-		if (attributesSimulation.isUseRandomSeed()) {
-			random = new Random(attributesSimulation.getRandomSeed());
+		if (attributesSimulation.isUseFixedSeed()) {
+			long seed = attributesSimulation.getFixedSeed();
+			attributesSimulation.setSimulationSeed(seed);
+			random = new Random(seed);
 		} else {
-			random = new Random();
+			long seed = new Random().nextLong();
+			attributesSimulation.setSimulationSeed(seed);
+			random = new Random(seed);
 		}
 
 		model = instantiateMainModel(random);

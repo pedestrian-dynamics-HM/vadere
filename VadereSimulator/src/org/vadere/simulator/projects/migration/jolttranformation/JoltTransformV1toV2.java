@@ -17,11 +17,11 @@ public class JoltTransformV1toV2 extends JoltTransformation {
 
 	@Override
 	protected void initPostHooks() {
-		postTransformHooks.add(this::sort);
+		postTransformHooks.add(JoltTransformV1toV2::sort);
 	}
 
 	@SuppressWarnings("unchecked")
-	public JsonNode sort (JsonNode node) throws MigrationException{
+	public static JsonNode sort (JsonNode node) throws MigrationException{
 		LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
 		LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
 		putObject(sortedRoot, source, "name");

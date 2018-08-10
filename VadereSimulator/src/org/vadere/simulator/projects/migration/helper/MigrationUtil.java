@@ -14,27 +14,35 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MigrationUtil {
 
 	private final static Logger logger = Logger.getLogger(MigrationUtil.class);
 
+	private ArrayList<String> dirMarker;
+	private ArrayList<String> treeMarker;
+	private ArrayList<String> ignoreDirs;
+	Throwable err;
+
+	public MigrationUtil() {
+		dirMarker = createList("DO_NOT_MIGRATE", ".DO_NOT_MIGRATE");
+		treeMarker = createList("DO_NOT_MIGRATE_TREE", ".DO_NOT_MIGRATE_TREE");
+		ignoreDirs = createList("VadereModelTests", "target", "Documentation");
+	}
+
 	public static void main(String[] args) throws URISyntaxException, IOException {
 		MigrationUtil migrationUtil = new MigrationUtil();
 
-
 //		migrationUtil.migrateTestData(Paths.get("/home/lphex/hm.d/vadere/"));
-		migrationUtil.generateNewVersionTransform(Paths.get("/home/lphex/hm.d/vadere/VadereSimulator/resources"), "0.4");
+//		migrationUtil.generateNewVersionTransform(Paths.get("/home/lphex/hm.d/vadere/VadereSimulator/resources"), "0.4");
 	}
 
 
-	private ArrayList<String> createList(String... addAll){
+	private ArrayList<String> createList(String... addAll) {
 		return Arrays.stream(addAll).collect(Collectors.toCollection(ArrayList::new));
 	}
 
@@ -52,84 +60,127 @@ public class MigrationUtil {
 		Path newIdenity = resourceDir.resolve(newIdenityString.substring(1));
 
 		String json = IOUtils.readTextFile(oldIdentity);
-		json =  json.replace("\"release\": \"" + Version.latest().label('-') + "\",", "\"release\": \"" + newVersionLabel + "\",");
+		json = json.replace("\"release\": \"" + Version.latest().label('-') + "\",", "\"release\": \"" + newVersionLabel + "\",");
 		IOUtils.writeTextFile(newIdenity.toString(), json);
 
-		json =  json.replace("\"release\": \"&\",", "// no relase here to overwrite it with default at the default operation down below");
+		json = json.replace("\"release\": \"&\",", "// no relase here to overwrite it with default at the default operation down below");
 		IOUtils.writeTextFile(newTransform.toString(), json);
 
 	}
 
-	/**
-	 *
-	 * @param p root path of repo
-	 */
-	private void migrateTestData(Path p) {
-		ArrayList<String> ignoreDirs = createList("VadereModelTests", "target", "Documentation");
-		ArrayList<String> dirMarker = createList("DO_NOT_MIGRATE", ".DO_NOT_MIGRATE");
-		ArrayList<String> treeMarker =  createList("DO_NOT_MIGRATE_TREE", ".DO_NOT_MIGRATE_TREE");
-		FileVisitor<Path> visitor = getVisitor(ignoreDirs, treeMarker, dirMarker, this::migrateToLatestVersion);
 
+	public void migrateDirectoryTree(Path p, Version targetVersion, boolean recursive) throws MigrationException {
+		FileVisitor<Path> visitor = getVisitor(new ArrayList<>(), treeMarker, dirMarker, recursive, path -> migrate(path, targetVersion));
+		this.err = null;
 		try {
 			Files.walkFileTree(p, visitor);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		if (this.err != null) {
+			throw new MigrationException("error while processing MigrationTaskHandler in walkFileTree", this.err);
+		}
 
 	}
 
-	private boolean migrateToLatestVersion(Path path){
+	public void revertDirectoryTree(Path p, boolean recursive) throws MigrationException {
+		FileVisitor<Path> visitor = getVisitor(new ArrayList<>(), treeMarker, dirMarker, recursive, this::revert);
+		this.err = null;
+		try {
+			Files.walkFileTree(p, visitor);
+		} catch (IOException e) {
+			throw new MigrationException("error in walkFileTree", e);
+		}
+		if (this.err != null) {
+			throw new MigrationException("error while processing MigrationTaskHandler in walkFileTree", this.err);
+		}
+	}
+
+	/**
+	 * Called in walkFileTree call and thus cannot throw exception. save Throwable and aboard the
+	 * FileTreeWalk the calling funtion will check if an error occurred and will throw the Throwable
+	 * upstream.
+	 */
+	private boolean migrate(Path path, Version version) {
 		MigrationAssistant ms = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
 		try {
+			logger.info("migrate: " + path.toString());
 			ms.migrateFile(path, Version.latest(), null);
 			return true;
 		} catch (MigrationException e) {
 			logger.error("Error in MigrationUtil stop: " + e.getMessage());
-			e.printStackTrace();
+			this.err = e;
 			return false;
 		}
 	}
 
-	private boolean revert(Path path){
+	/**
+	 * Called in walkFileTree call and thus cannot throw exception. save Throwable and aboard the
+	 * FileTreeWalk the calling funtion will check if an error occurred and will throw the Throwable
+	 * upstream.
+	 */
+	private boolean revert(Path path) {
 		MigrationAssistant ms = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
-		try{
+		try {
 			ms.revertFile(path);
 			return true;
-		} catch (MigrationException e){
+		} catch (MigrationException e) {
 			logger.error("Error in MigraionUtil: " + e.getMessage());
+			this.err = e;
 			return false;
 		}
 	}
 
-	FileVisitor<Path> getVisitor(ArrayList<String> ignoreDirs, ArrayList<String> treeMarker, ArrayList<String> dirMarker, Function<Path, Boolean> func) {
-		return  new FileVisitor<Path>() {
+	FileVisitor<Path> getVisitor(ArrayList<String> ignoreDirs, ArrayList<String> treeMarker,
+								 ArrayList<String> dirMarker, boolean recursive, MigrationTaskHandler func) {
+
+
+		return new FileVisitor<Path>() {
+
+			private int maxRecursion = 0; //
+
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-				boolean hasTreeMarker = treeMarker.stream().anyMatch( m -> dir.resolve(m).toFile().exists());
-				if (ignoreDirs.contains(dir.getFileName().toString())){ // skip ignored directories-trees.
+
+				boolean hasTreeMarker = treeMarker.stream().anyMatch(m -> dir.resolve(m).toFile().exists());
+				if (ignoreDirs.contains(dir.getFileName().toString())) { // skip ignored directories-trees.
 					return FileVisitResult.SKIP_SUBTREE;
 				} else if (hasTreeMarker) { // skip directory tree if treeMarker is present.
 					return FileVisitResult.SKIP_SUBTREE;
 				}
-				return FileVisitResult.CONTINUE;
+
+				// if recursive is true then continue all the way down.
+				if (recursive)
+					return FileVisitResult.CONTINUE;
+
+
+				// if recursive is false we must enter only in the first directory and then
+				// skip all others found.
+				if (maxRecursion > 1) {
+					return FileVisitResult.SKIP_SUBTREE;
+				} else {
+					maxRecursion++;
+					return FileVisitResult.CONTINUE;
+				}
+
 			}
 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 
 				// continue traversal if not scenario
-				if (! file.getFileName().toString().endsWith("scenario"))
+				if (!file.getFileName().toString().endsWith("scenario"))
 					return FileVisitResult.CONTINUE;
 
 				// if dirMarker is set do not migrate any scenario files in this dir
 				// but continue with sub-dirs.
 				boolean hasDirMarker = dirMarker.stream().anyMatch(m -> file.getParent().resolve(m).toFile().exists());
-				if (hasDirMarker){
+				if (hasDirMarker) {
 					return FileVisitResult.CONTINUE;
 				}
 
-				boolean ret = func.apply(file);
-				if (ret){
+				boolean ret = func.handle(file);
+				if (ret) {
 					return FileVisitResult.CONTINUE;
 				} else {
 					return FileVisitResult.TERMINATE;

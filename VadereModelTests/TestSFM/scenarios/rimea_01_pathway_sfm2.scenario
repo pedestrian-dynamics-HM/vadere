@@ -1,7 +1,8 @@
 {
   "name" : "rimea_01_pathway_sfm2",
   "description" : "",
-  "release" : "0.3",
+  "release" : "0.4",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -24,19 +25,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesSFM" : {
-        "attributesODEIntegrator" : {
-          "solverType" : "DORMAND_PRINCE_45",
-          "stepSizeMin" : 1.0E-4,
-          "stepSizeMax" : 1.0,
-          "toleranceAbsolute" : 1.0E-5,
-          "toleranceRelative" : 1.0E-4
-        },
-        "floorGradientProviderType" : "FLOOR_EIKONAL_DISCRETE",
-        "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
-        "pedestrianPotentialModel" : "org.vadere.simulator.models.sfm.PotentialFieldPedestrianSFM",
-        "obstaclePotentialModel" : "org.vadere.simulator.models.sfm.PotentialFieldObstacleSFM"
-      },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
@@ -59,6 +47,19 @@
         "pedestrianRecognitionDistance" : 0.3,
         "obstacleBodyPotential" : 10.0,
         "obstacleRepulsionStrength" : 0.2
+      },
+      "org.vadere.state.attributes.models.AttributesSFM" : {
+        "attributesODEIntegrator" : {
+          "solverType" : "DORMAND_PRINCE_45",
+          "stepSizeMin" : 1.0E-4,
+          "stepSizeMax" : 1.0,
+          "toleranceAbsolute" : 1.0E-5,
+          "toleranceRelative" : 1.0E-4
+        },
+        "floorGradientProviderType" : "FLOOR_EIKONAL_DISCRETE",
+        "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
+        "pedestrianPotentialModel" : "org.vadere.simulator.models.sfm.PotentialFieldPedestrianSFM",
+        "obstaclePotentialModel" : "org.vadere.simulator.models.sfm.PotentialFieldObstacleSFM"
       }
     },
     "attributesSimulation" : {
@@ -70,8 +71,9 @@
       "printFPS" : false,
       "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
-      "useRandomSeed" : true,
-      "randomSeed" : 1
+      "useFixedSeed" : true,
+      "fixedSeed" : 1,
+      "simulationSeed" : null
     },
     "topography" : {
       "attributes" : {
@@ -125,7 +127,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -135,7 +136,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }
