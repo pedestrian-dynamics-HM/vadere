@@ -35,7 +35,7 @@ public class TimestepPedestrianIdOverlap implements DataKey<TimestepPedestrianId
 	}
 
 	public String[] toStrings(){
-		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId1)};
+		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
 	@Override

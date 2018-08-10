@@ -103,7 +103,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private ScenarioPanel scenarioJPanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
-
+	private ProjectRunResultDialog projectRunResultDialog = new ProjectRunResultDialog();
 
 	// ####################### Part of the control this should also be part of another class
 	// ##################
@@ -225,6 +225,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			model.getProject().addProjectFinishedListener(this);
 			model.getProject().addSingleScenarioFinishedListener(this);
 			model.getProject().addProjectFinishedListener(scenarioJPanel);
+			model.getProject().addProjectFinishedListener(projectRunResultDialog);
 		});
 	}
 
