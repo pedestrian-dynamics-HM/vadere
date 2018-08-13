@@ -4,10 +4,12 @@ import java.awt.geom.RectangularShape;
 import java.util.*;
 
 import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.VPoint;
 
 public class DynamicElementContainer<T extends DynamicElement> {
 	private transient final List<DynamicElementAddListener<T>> addListener;
 	private transient final List<DynamicElementRemoveListener<T>> removeListener;
+	private transient final List<DynamicElementMoveListener<T>> moveListener;
 
 	private final Map<Integer, T> elementMap;
 
@@ -32,6 +34,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 
 		this.addListener = new LinkedList<>();
 		this.removeListener = new LinkedList<>();
+		this.moveListener = new LinkedList<>();
 	}
 
 	public LinkedCellsGrid<T> getCellsElements() {
@@ -56,10 +59,18 @@ public class DynamicElementContainer<T extends DynamicElement> {
 
 	public void addElement(T element) {
 		this.elementMap.put(element.getId(), element);
-		this.cellsElements.addObject(element, element.getPosition());
+		this.cellsElements.addObject(element);
 
 		for (DynamicElementAddListener<T> listener : addListener) {
 			listener.elementAdded(element);
+		}
+	}
+
+	public void moveElement(T element, VPoint oldPosition) {
+		this.cellsElements.moveObject(element, oldPosition);
+
+		for (DynamicElementMoveListener<T> listener : moveListener) {
+			listener.elementMove(element);
 		}
 	}
 

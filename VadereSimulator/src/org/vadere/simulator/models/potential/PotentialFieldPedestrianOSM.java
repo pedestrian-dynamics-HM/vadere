@@ -66,11 +66,9 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 	@Override
 	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography scenario) {
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
+		return scenario.getSpatialMap(Pedestrian.class)
 				.getObjects(relevantArea.getCenter(),
 						attributes.getPedestrianRecognitionDistance());
-
-		return closePedestrians;
 	}
 
 	@Override
