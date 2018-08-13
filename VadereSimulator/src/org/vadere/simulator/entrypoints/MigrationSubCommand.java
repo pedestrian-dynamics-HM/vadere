@@ -7,29 +7,70 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
+import org.vadere.simulator.projects.migration.helper.MigrationUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MigrationSubCommand implements  SubCommandRunner{
+public class MigrationSubCommand implements SubCommandRunner {
 	private final static Logger logger = Logger.getLogger(MigrationSubCommand.class);
+
 	@Override
 	public void run(Namespace ns, ArgumentParser parser) throws Exception {
-		Path scenarioFile = Paths.get(ns.getString("scenario-file"));
-		if (!scenarioFile.toFile().exists() || !scenarioFile.toFile().isFile()){
-			logger.error("scenario-file does not exist, is not a regular file or you do not have read permissions:" +
-					scenarioFile.toFile().toString());
-			System.exit(-1);
-		}
 
 		String outputPathString = ns.getString("output-file");
 		Version targetVersion = Version.fromString(ns.getString("target-version"));
 		boolean revertMode = ns.getBoolean("revert-migration");
+		boolean recursive = ns.getBoolean("recursive");
+		List<String> paths = ns.getList("paths");
 
-		if (revertMode){
-			revert(scenarioFile);
+		ArrayList<Path> files = new ArrayList<>();
+		ArrayList<Path> dirs = new ArrayList<>();
+		ArrayList<Path> err = new ArrayList<>();
+		for (String path : paths) {
+			Path tmp = Paths.get(path);
+			if (tmp.toFile().exists()) {
+				if (tmp.toFile().isFile()) {
+					files.add(tmp);
+				} else if (tmp.toFile().isDirectory()) {
+					dirs.add(tmp);
+				} else {
+					err.add(tmp);
+				}
+			} else {
+				err.add(tmp);
+			}
+		}
+
+		if (err.size() > 0) {
+			logger.error("some input input paths. Stop processing");
+			err.stream().forEach(e -> logger.error("Path does not exist or missing permissions: " + e));
+			throw new MigrationException("Error in input paths");
+		}
+
+
+		if (revertMode) {
+			for (Path file : files) {
+				logger.info("revert file: " + file.toString());
+				revert(file);
+			}
+			MigrationUtil migrationUtil = new MigrationUtil();
+			for (Path dir : dirs) {
+				logger.info("revert directory: " + dir.toString());
+				migrationUtil.revertDirectoryTree(dir, recursive);
+			}
 		} else {
-			migrate(scenarioFile, targetVersion, outputPathString);
+			for (Path file : files) {
+				logger.info("migrate file version(" + targetVersion.label() + "): " + file.toAbsolutePath().toString());
+				migrate(file, targetVersion, outputPathString);
+			}
+			MigrationUtil migrationUtil = new MigrationUtil();
+			for (Path dir : dirs) {
+				logger.info("migrate directory to version(" + targetVersion.label() + "): " + dir.toAbsolutePath().toString());
+				migrationUtil.migrateDirectoryTree(dir, targetVersion, recursive);
+			}
 		}
 
 	}
@@ -39,15 +80,19 @@ public class MigrationSubCommand implements  SubCommandRunner{
 		ma.revertFile(scenarioFile);
 	}
 
-	private void migrate(Path scenarioFile, Version targetVersion, String outputPathString){
+	private void migrate(Path scenarioFile, Version targetVersion, String outputPathString) {
 		MigrationAssistant ma = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
 		String out;
-		try{
+		try {
 			logger.info("Scenario file" + scenarioFile.getFileName().toString());
 			logger.info("Try to migrate to version " + targetVersion);
 			Path outputFile = null;
-			if (outputPathString != null){
-				outputFile = Paths.get(outputPathString);
+			if (outputPathString != null) {
+				if (!Paths.get(outputPathString).toFile().isDirectory()) {
+					throw new MigrationException("output-file must be a directory:" + outputPathString);
+
+				}
+				outputFile = Paths.get(outputPathString).resolve(scenarioFile.getFileName());
 			}
 
 			ma.migrateFile(scenarioFile, targetVersion, outputFile);
@@ -58,9 +103,4 @@ public class MigrationSubCommand implements  SubCommandRunner{
 		}
 	}
 
-	private Path addSuffix(Path p, String suffix){
-		Path abs = p.toAbsolutePath();
-		String filename = abs.getFileName().toString() + suffix;
-		return  abs.getParent().resolve(filename);
-	}
 }

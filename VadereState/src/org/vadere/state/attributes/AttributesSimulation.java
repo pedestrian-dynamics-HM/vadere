@@ -1,5 +1,8 @@
 package org.vadere.state.attributes;
 
+import java.util.Objects;
+import java.util.Random;
+
 /**
  * Provides attributes for the simulation, like visualizationEnabled and
  * writeSimulationData.
@@ -16,8 +19,9 @@ public class AttributesSimulation extends Attributes {
 	private boolean printFPS = false;
 	private boolean needsBoundary = false;
 	private int digitsPerCoordinate = 2;
-	private boolean useRandomSeed = true;
-	private long randomSeed = 1;
+	private boolean useFixedSeed = true;
+	private long fixedSeed = new Random().nextLong();
+	private long simulationSeed;
 
 	// Getter...
 
@@ -53,12 +57,16 @@ public class AttributesSimulation extends Attributes {
 		return digitsPerCoordinate;
 	}
 
-	public boolean isUseRandomSeed() {
-		return useRandomSeed;
+	public boolean isUseFixedSeed() {
+		return useFixedSeed;
 	}
 
-	public long getRandomSeed() {
-		return randomSeed;
+	public long getFixedSeed() {
+		return fixedSeed;
+	}
+
+	public long getSimulationSeed() {
+		return simulationSeed;
 	}
 
 	public void setFinishTime(double finishTime) {
@@ -101,66 +109,42 @@ public class AttributesSimulation extends Attributes {
 		this.digitsPerCoordinate = digitsPerCoordinate;
 	}
 
-	public void setUseRandomSeed(boolean useRandomSeed) {
+	public void setUseFixedSeed(boolean useFixedSeed) {
 		checkSealed();
-		this.useRandomSeed = useRandomSeed;
+		this.useFixedSeed = useFixedSeed;
 	}
 
-	public void setRandomSeed(long randomSeed) {
+	public void setFixedSeed(long fixedSeed) {
 		checkSealed();
-		this.randomSeed = randomSeed;
+		this.fixedSeed = fixedSeed;
+	}
+
+	public void setSimulationSeed(long simulationSeed) {
+		checkSealed();
+		this.simulationSeed = simulationSeed;
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 		AttributesSimulation that = (AttributesSimulation) o;
-
-		if (digitsPerCoordinate != that.digitsPerCoordinate)
-			return false;
-		if (needsBoundary != that.needsBoundary)
-			return false;
-		if (printFPS != that.printFPS)
-			return false;
-		if (randomSeed != that.randomSeed)
-			return false;
-		if (Double.compare(that.realTimeSimTimeRatio, realTimeSimTimeRatio) != 0)
-			return false;
-		if (Double.compare(that.simTimeStepLength, simTimeStepLength) != 0)
-			return false;
-		if (useRandomSeed != that.useRandomSeed)
-			return false;
-		if (visualizationEnabled != that.visualizationEnabled)
-			return false;
-		if (writeSimulationData != that.writeSimulationData)
-			return false;
-		if (finishTime != that.finishTime)
-			return false;
-
-		return true;
+		return Double.compare(that.finishTime, finishTime) == 0 &&
+				Double.compare(that.simTimeStepLength, simTimeStepLength) == 0 &&
+				Double.compare(that.realTimeSimTimeRatio, realTimeSimTimeRatio) == 0 &&
+				writeSimulationData == that.writeSimulationData &&
+				visualizationEnabled == that.visualizationEnabled &&
+				printFPS == that.printFPS &&
+				needsBoundary == that.needsBoundary &&
+				digitsPerCoordinate == that.digitsPerCoordinate &&
+				useFixedSeed == that.useFixedSeed &&
+				fixedSeed == that.fixedSeed &&
+				simulationSeed == that.simulationSeed;
 	}
 
 	@Override
 	public int hashCode() {
-		int result;
-		long temp;
-		temp = Double.doubleToLongBits(simTimeStepLength);
-		result = (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(realTimeSimTimeRatio);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(finishTime);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		result = 31 * result + (writeSimulationData ? 1 : 0);
-		result = 31 * result + (visualizationEnabled ? 1 : 0);
-		result = 31 * result + (printFPS ? 1 : 0);
-		result = 31 * result + (needsBoundary ? 1 : 0);
-		result = 31 * result + digitsPerCoordinate;
-		result = 31 * result + (useRandomSeed ? 1 : 0);
-		result = 31 * result + (int) (randomSeed ^ (randomSeed >>> 32));
-		return result;
+
+		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, needsBoundary, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed);
 	}
 }

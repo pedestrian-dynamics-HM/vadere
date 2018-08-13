@@ -65,13 +65,11 @@ public class OfflineTopographyController {
 	protected void recomputeCells() {
 		this.topography.getSpatialMap(Pedestrian.class).clear();
 		for (Pedestrian pedestrian : this.topography.getElements(Pedestrian.class)) {
-			this.topography.getSpatialMap(Pedestrian.class).addObject(pedestrian,
-					pedestrian.getPosition());
+			this.topography.getSpatialMap(Pedestrian.class).addObject(pedestrian);
 		}
 		this.topography.getSpatialMap(Car.class).clear();
 		for (Car car : this.topography.getElements(Car.class)) {
-			this.topography.getSpatialMap(Car.class).addObject(car,
-					car.getPosition());
+			this.topography.getSpatialMap(Car.class).addObject(car);
 		}
 	}
 }

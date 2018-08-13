@@ -14,7 +14,8 @@ public enum Version {
 	NOT_A_RELEASE("not a release"),
 	V0_1("0.1"),
 	V0_2("0.2"),
-	V0_3("0.3");
+	V0_3("0.3"),
+	V0_4("0.4");
 
 	private String label;
 

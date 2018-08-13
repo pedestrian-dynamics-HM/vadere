@@ -104,16 +104,16 @@ public class PedestrianOSM extends Pedestrian {
 
 		switch (updateType) {
 			case EVENT_DRIVEN:
-				result = new UpdateSchemeEventDriven(pedestrian);
+				result = new UpdateSchemeEventDriven(pedestrian, pedestrian.topography);
 				break;
 			case PARALLEL:
 				result = new UpdateSchemeParallel(pedestrian);
 				break;
 			case SEQUENTIAL:
-				result = new UpdateSchemeSequential(pedestrian);
+				result = new UpdateSchemeSequential(pedestrian, pedestrian.topography);
 				break;
 			default:
-				result = new UpdateSchemeSequential(pedestrian);
+				result = new UpdateSchemeSequential(pedestrian, pedestrian.topography);
 		}
 
 		return result;

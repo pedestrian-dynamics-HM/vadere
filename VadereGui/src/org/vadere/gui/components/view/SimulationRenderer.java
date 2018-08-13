@@ -48,7 +48,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     @Override
     protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
-        if (model.isFloorFieldAvailable() && model.config.isShowPotentialField()) {
+        if (model.isFloorFieldAvailable() && (model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
             synchronized (model) {
                 renderPotentialField(graphics2D,
                         (int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
@@ -64,7 +64,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
         // if there is no potential field than draw the default background (white)
         // otherwise do not overdraw the potential field!!!
-        if (!model.isFloorFieldAvailable() || !model.config.isShowPotentialField()) {
+        if (!model.isFloorFieldAvailable() || !(model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
             super.renderPostTransformation(graphics, width, height);
         }
 
