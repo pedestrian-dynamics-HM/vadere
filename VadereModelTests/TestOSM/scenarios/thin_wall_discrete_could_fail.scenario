@@ -1,11 +1,27 @@
 {
-  "name" : "rimea_09_publicRoom_osm1_2",
+  "name" : "thin_wall_discrete_could_fail",
   "description" : "",
   "release" : "0.4",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "waitingTime.txt",
+      "processors" : [ 1 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "waitingArea" : {
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 7.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        }
+      }
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -59,98 +75,35 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
-      "writeSimulationData" : true,
+      "realTimeSimTimeRatio" : 0.5,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : null
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 35.0,
-          "height" : 30.0
+          "width" : 20.0,
+          "height" : 10.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 0.5,
-          "y" : 25.0,
-          "width" : 4.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 5.5,
-          "y" : 25.0,
-          "width" : 20.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 26.5,
-          "y" : 25.0,
-          "width" : 3.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 0.5,
-          "y" : 5.0,
-          "width" : 4.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 5.5,
-          "y" : 5.0,
-          "width" : 20.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 26.5,
-          "y" : 5.0,
-          "width" : 3.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 29.5,
-          "y" : 5.0,
-          "width" : 1.0,
-          "height" : 21.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 4.3,
-          "y" : 25.0,
-          "width" : 22.8,
-          "height" : 1.0,
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 0.1,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -160,32 +113,11 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 31.0,
-            "y" : 27.0
-          }, {
-            "x" : 2.0,
-            "y" : 27.0
-          }, {
-            "x" : 2.0,
-            "y" : 29.0
-          }, {
-            "x" : 33.0,
-            "y" : 29.0
-          }, {
-            "x" : 33.0,
-            "y" : 2.0
-          }, {
-            "x" : 2.0,
-            "y" : 2.0
-          }, {
-            "x" : 2.0,
-            "y" : 4.0
-          }, {
-            "x" : 31.0,
-            "y" : 4.0
-          } ]
+          "x" : 16.0,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
+          "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
@@ -199,23 +131,24 @@
         "id" : -1,
         "shape" : {
           "x" : 2.5,
-          "y" : 8.0,
-          "width" : 25.0,
-          "height" : 15.0,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 1000,
+        "spawnNumber" : 50,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -225,8 +158,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "attributesCar" : null
     }
   }
 }

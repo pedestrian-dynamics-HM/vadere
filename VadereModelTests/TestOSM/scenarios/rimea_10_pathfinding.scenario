@@ -1,8 +1,7 @@
 {
-  "name" : "rimea_10_pathfinding_osm1",
+  "name" : "rimea_10_pathfinding",
   "description" : "",
   "release" : "0.4",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -91,7 +90,7 @@
     "attributesSimulation" : {
       "finishTime" : 50.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -99,7 +98,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : null
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
@@ -499,6 +498,33 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
+      }, {
+        "shape" : {
+          "x" : 29.0,
+          "y" : 72.2,
+          "width" : 4.3,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 33.3,
+          "y" : 65.8,
+          "width" : 1.0,
+          "height" : 7.4,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 29.0,
+          "y" : 65.8,
+          "width" : 4.3,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -537,7 +563,7 @@
         "nextSpeed" : -1.0
       } ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 1,
         "shape" : {
           "x" : 4.5,
           "y" : 71.5,
@@ -552,12 +578,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 8.5,
           "y" : 71.5,
@@ -572,12 +598,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 7,
         "shape" : {
           "x" : 4.5,
           "y" : 63.5,
@@ -592,12 +618,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 8,
         "shape" : {
           "x" : 8.5,
           "y" : 63.5,
@@ -612,12 +638,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 9,
         "shape" : {
           "x" : 12.5,
           "y" : 63.5,
@@ -632,12 +658,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 10,
         "shape" : {
           "x" : 17.5,
           "y" : 63.5,
@@ -652,12 +678,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 11,
         "shape" : {
           "x" : 21.5,
           "y" : 63.5,
@@ -672,12 +698,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 12,
         "shape" : {
           "x" : 25.5,
           "y" : 63.5,
@@ -692,12 +718,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 4,
         "shape" : {
           "x" : 17.5,
           "y" : 71.5,
@@ -712,12 +738,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 5,
         "shape" : {
           "x" : 21.5,
           "y" : 71.5,
@@ -732,12 +758,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 6,
         "shape" : {
           "x" : 25.5,
           "y" : 71.5,
@@ -752,12 +778,12 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 14.7,
           "y" : 71.5,
@@ -767,16 +793,17 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 2,
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -786,8 +813,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "attributesCar" : null
     }
   }
 }
