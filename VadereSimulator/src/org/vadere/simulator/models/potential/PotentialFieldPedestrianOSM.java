@@ -66,12 +66,9 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 	@Override
 	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography scenario) {
-		final double maxWalkedDistanceInSimTime = 0.4 * 3; // quick fix 0.4 = simtime, 3 = max velocity.
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
+		return scenario.getSpatialMap(Pedestrian.class)
 				.getObjects(relevantArea.getCenter(),
-						attributes.getPedestrianRecognitionDistance() + maxWalkedDistanceInSimTime);
-
-		return closePedestrians;
+						attributes.getPedestrianRecognitionDistance());
 	}
 
 	@Override

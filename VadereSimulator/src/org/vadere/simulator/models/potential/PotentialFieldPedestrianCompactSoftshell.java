@@ -43,10 +43,8 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	@Override
 	public Collection<Pedestrian> getRelevantAgents(VCircle maxStepCircle,
 			Agent pedestrian, Topography scenario) {
-		final double maxWalkedDistanceInSimTime = 0.4 * 3; // quick fix 0.4 = simtime, 3 = max velocity.
-		List<Pedestrian> closePedestrians = scenario.getElements(Pedestrian.class)
-				.stream().filter(p -> p.getPosition().distance(maxStepCircle.getCenter()) <= this.personalWidth + maxStepCircle.getRadius() + maxWalkedDistanceInSimTime + pedestrian.getRadius()).collect(Collectors.toList());
-
+		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class).getObjects(maxStepCircle.getCenter(),
+				this.personalWidth + maxStepCircle.getRadius() + pedestrian.getRadius());
 		return closePedestrians;
 	}
 
