@@ -33,7 +33,7 @@ VERSION = 1.0
 # directory to read input files from
 #INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/DatenGruppe/ModSim17-data-generation-filters/input/')
 #INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/vadereProjects/output')
-INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/datensets/2018-08-07-new-vadere-version')
+INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/datensets/2018-08-06-repo-cleanup-check')
 
 
 # directory to write output files to
@@ -164,9 +164,6 @@ def pedestrian_count_main(): # unused!
 if __name__ == '__main__':
     print("**** PRE-PROCESSING OF DATA      ****")
     t1 = clock()
-
-    print('hallo')
-
     data_preprocessing()
     dt = clock() - t1
     print("Calculation time %d [s]" % dt)

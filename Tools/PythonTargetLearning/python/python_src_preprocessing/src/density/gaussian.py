@@ -27,9 +27,7 @@ def calculate_density_timeseries(data, obs_area, resolution, gauss_density_bound
     meas_area_width = obs_area[2]
     meas_area_height = obs_area[3]
 
-    #size = (int(meas_area_width/ resolution), int(meas_area_height / resolution))
-    
-    #size = (int(meas_area_height/ resolution), int(meas_area_width / resolution))
+    size = (int(meas_area_height/ resolution), int(meas_area_width / resolution))
     
     density_field = get_gaussian_grid(gauss_density_bounds[0], gauss_density_bounds[1], resolution, sigma)
     #density_field = get_vadere_gaussian_grid()
