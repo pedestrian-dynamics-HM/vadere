@@ -66,7 +66,7 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
             if np.mod(ifile, 10) == 0:
                 print("Reading files: ", round(ifile / len(imported_files) * 100), "%")
 
-    print("Size of data_frame_density:", data_frame_density.shape)
+    #print("Size of data_frame_density:", data_frame_density.shape)
     print("Max value %f" % np.max(np.max(data_frame_density)))
     print("Min value %f" % np.min(np.min(data_frame_density)))
 
@@ -154,11 +154,6 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
             fid2.close()
 
             # calc error of prediction
-
-            # print importance of features
-            # print("Importance of features")
-            # print(rf_density_regressor.feature_importances_)
-
             # error calculation / writing into my "csv"
             error_mean_trees.values[idf + 1, idx + 1], error_mean_trees.values[idf + 1, numberOfForests + idx + 1], \
             error_mean_trees.values[idf + 1, numberOfForests * 2 + idx + 1] = euklidError(y_test_density,
@@ -198,11 +193,7 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
     plt.colorbar()
     plt.show()
 
-    print("Out of bag error prediction")
-    #print(rf_density_regressor.oob_prediction_)
     print("Out of bag error score %f" % rf_density_regressor.oob_score_)
-    # print("Estimators")
-    # print(rf_density_regressor.estimators_)
 
 
     print(
@@ -242,15 +233,7 @@ def determineTargetSize(data):
             if switch_done:
                 target_set.add(target)
                 break
-                
-                
-                '''
-            if sum <= 1 != math.isclose(sum, 1,abs_tol = 1e-10):
-                target += 1
-            else:
-                target_set.add(target)
-                break
-                '''
+
     if len(target_set) > 1:
         raise ValueError('The Algorithm to determine the Number of Targets has failed, or the data is corrupt')
     number_of_targets = target_set.pop()
@@ -270,7 +253,7 @@ def euklidError(y_data, y_predicted):
         for j in range(0, len(y_data.columns)):
             tmpsum += (y_data.values[i,j] - y_predicted[i,j])**2
 
-        y_error[i] = np.sqrt(tmpsum) # for each sample
+        y_error[i] = np.sqrt(tmpsum)/np.sqrt(2) # for each sample
 
     fid1 = open('y_error.csv', 'wt')
     y_error.tofile(fid1, sep=";")
@@ -291,7 +274,7 @@ def maxError(y_data, y_predicted):
         for j in range(0, len(y_data.columns)):
             tmpsum[j] = (y_data.values[i,j] - y_predicted[i,j])
 
-        y_error[i] = np.max(tmpsum)
+        y_error[i] = np.max(tmpsum)/np.sqrt(2)
 
     return np.mean(y_error), np.std(y_error), np.max(y_error)
 

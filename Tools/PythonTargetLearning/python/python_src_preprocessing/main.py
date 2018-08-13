@@ -85,7 +85,6 @@ def data_preprocessing():
 
             # generate file name through pedestrian target distribution
             output_file_name = get_output_file_name(global_distribution)  # filename with global dist
-            #print(output_file_name)
             with open(OUTPUT_ROOT_DIRECTORY +'\\'+ output_file_name +"_" +str(i) + '.csv', mode='w') as file: # mode w: existing file is deleted!
                 # calculate Gaussian density
                 calculate_density_timeseries(data_period, OBSERVATION_AREA, \
@@ -93,7 +92,6 @@ def data_preprocessing():
                                              pedestrian_target_distribution, file)
 
             print("Done: ", str(np.round(((i+1) / number_of_files) * 100,0)), " %")
-            #print(output_file_name + str(i), " = ", trajectory_files[i])
 
             # Datatype, script version tag, OBSERVATION_AREA,
             # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
