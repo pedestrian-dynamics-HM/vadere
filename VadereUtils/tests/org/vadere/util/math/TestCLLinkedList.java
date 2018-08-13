@@ -99,7 +99,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextDouble() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
 
@@ -123,7 +123,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
@@ -146,7 +146,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];

@@ -421,7 +421,7 @@ public class CLLinkedCell {
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clHashes));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clIndices));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clPositions));
-		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (max_work_group_size+1) * 4)); // local memory
+		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (Math.min(numberOfElements, max_work_group_size)+1) * 4)); // local memory
 		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
 
 		    clGlobalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
