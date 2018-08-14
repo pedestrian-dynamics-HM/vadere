@@ -42,7 +42,7 @@ OBSERVATION_AREA = [7,23,10,10]#[20, 5, 10, 10] #[25, 5, 10, 10]  # select data 
 OBSERVATION_AREA = [20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 
 
-OBSERVATION_AREA = [19.5, 55.0, 6, 10] #langer Gang/assymetrisch
+OBSERVATION_AREA = [19.5, 55.0, 6, 6] #langer Gang/assymetrisch
 #OBSERVATION_AREA = [7, 33, 10, 10] # eventuell für brücke
 
 
