@@ -225,6 +225,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	}
 
 	public void setTargetDistributionIds(List<List<Integer>> targetDistributionIds) {
+		checkSealed();
 		this.targetDistributionIds = targetDistributionIds;
 	}
 
@@ -233,6 +234,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	}
 
 	public void setTargetDistributionProbabilities(List<Double> targetDistributionProbabilities) {
+		checkSealed();
 		this.targetDistributionProbabilities = targetDistributionProbabilities;
 	}
 }
