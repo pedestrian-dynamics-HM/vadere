@@ -38,7 +38,7 @@ public class PSO {
 		this.random = random;
 		this.circle = circle;
 		this.gBest = Double.MAX_VALUE;
-		this.gBestLocation = new VPoint(0, 0);
+		this.gBestLocation = circle.getCenter();
 		this.iterationCounter = 0;
 		this.maxVelocity = maxVelocity;
 		this.minAngle = minAngle;

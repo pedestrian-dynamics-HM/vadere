@@ -3,8 +3,43 @@
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "evacuationTime.txt",
+      "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "tests.txt",
+      "processors" : [ 4 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianEvacuationTimeProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "pedestrianEvacuationTimeProcessorId" : 1,
+        "maximalEvacuationTime" : 18.18,
+        "minimalEvacuationTime" : 12.34
+      }
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -61,7 +96,7 @@
       "finishTime" : 500.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
-      "writeSimulationData" : false,
+      "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,

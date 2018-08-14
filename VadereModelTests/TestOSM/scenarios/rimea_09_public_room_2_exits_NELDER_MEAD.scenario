@@ -1,5 +1,5 @@
 {
-  "name" : "rimea_01_pathway_osm2",
+  "name" : "rimea_09_public_room_2_exits_NELDER_MEAD",
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
@@ -7,6 +7,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
       "filename" : "evacuationTime.txt",
       "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "tests.txt",
+      "processors" : [ 4, 5 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
@@ -18,6 +26,26 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestEvacuationTimeProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestEvacuationTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "evacuationTimeProcessorId" : 5,
+        "maximalEvacuationTime" : 220.0,
+        "minimalEvacuationTime" : 180.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianEvacuationTimeProcessorId" : 1
+      }
     } ],
     "isTimestamped" : true
   },
@@ -42,14 +70,14 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 30,
-        "numberOfCircles" : 4,
-        "varyStepDirection" : true,
+        "stepCircleResolution" : 18,
+        "numberOfCircles" : 1,
+        "varyStepDirection" : false,
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "DISCRETE",
+        "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
@@ -72,40 +100,133 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1300.0,
+      "finishTime" : 300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : false,
+      "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 0
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 45.0,
-          "height" : 3.0
+          "width" : 35.0,
+          "height" : 30.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "x" : 0.5,
+          "y" : 25.0,
+          "width" : 4.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 5.5,
+          "y" : 25.0,
+          "width" : 20.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 26.5,
+          "y" : 25.0,
+          "width" : 3.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 0.5,
+          "y" : 5.0,
+          "width" : 4.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 5.5,
+          "y" : 5.0,
+          "width" : 20.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 26.5,
+          "y" : 5.0,
+          "width" : 3.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 29.5,
+          "y" : 5.0,
+          "width" : 1.0,
+          "height" : 21.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 4.3,
+          "y" : 25.0,
+          "width" : 22.8,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 42.0,
-          "y" : 0.7,
-          "width" : 1.5,
-          "height" : 1.6,
-          "type" : "RECTANGLE"
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 31.0,
+            "y" : 27.0
+          }, {
+            "x" : 2.0,
+            "y" : 27.0
+          }, {
+            "x" : 2.0,
+            "y" : 29.0
+          }, {
+            "x" : 33.0,
+            "y" : 29.0
+          }, {
+            "x" : 33.0,
+            "y" : 2.0
+          }, {
+            "x" : 2.0,
+            "y" : 2.0
+          }, {
+            "x" : 2.0,
+            "y" : 4.0
+          }, {
+            "x" : 31.0,
+            "y" : 4.0
+          } ]
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
@@ -118,20 +239,20 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 1.0,
-          "y" : 1.0,
-          "width" : 1.0,
-          "height" : 1.0,
+          "x" : 2.5,
+          "y" : 8.0,
+          "width" : 25.0,
+          "height" : 15.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 30.0 ],
-        "spawnNumber" : 1,
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1000,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1200.0,
+        "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"

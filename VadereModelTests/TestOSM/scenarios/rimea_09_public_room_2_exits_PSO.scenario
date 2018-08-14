@@ -1,10 +1,52 @@
 {
-  "name" : "rimea_11_exit_selection",
+  "name" : "rimea_09_public_room_2_exits_PSO",
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "evacuationTime.txt",
+      "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "tests.txt",
+      "processors" : [ 4, 5 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestEvacuationTimeProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestEvacuationTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "evacuationTimeProcessorId" : 5,
+        "maximalEvacuationTime" : 220.0,
+        "minimalEvacuationTime" : 180.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianEvacuationTimeProcessorId" : 1
+      }
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -58,7 +100,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 400.0,
+      "finishTime" : 300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -103,7 +145,7 @@
         "shape" : {
           "x" : 26.5,
           "y" : 25.0,
-          "width" : 4.0,
+          "width" : 3.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
@@ -112,32 +154,32 @@
         "shape" : {
           "x" : 0.5,
           "y" : 5.0,
-          "width" : 21.0,
+          "width" : 4.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
       }, {
         "shape" : {
-          "x" : 22.5,
+          "x" : 5.5,
           "y" : 5.0,
-          "width" : 5.0,
+          "width" : 20.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
       }, {
         "shape" : {
-          "x" : 28.5,
+          "x" : 26.5,
           "y" : 5.0,
-          "width" : 2.0,
+          "width" : 3.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
       }, {
         "shape" : {
-          "x" : 30.5,
+          "x" : 29.5,
           "y" : 5.0,
           "width" : 1.0,
           "height" : 21.0,
@@ -159,11 +201,32 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 20.0,
-          "y" : 1.0,
-          "width" : 10.1,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 31.0,
+            "y" : 27.0
+          }, {
+            "x" : 2.0,
+            "y" : 27.0
+          }, {
+            "x" : 2.0,
+            "y" : 29.0
+          }, {
+            "x" : 33.0,
+            "y" : 29.0
+          }, {
+            "x" : 33.0,
+            "y" : 2.0
+          }, {
+            "x" : 2.0,
+            "y" : 2.0
+          }, {
+            "x" : 2.0,
+            "y" : 4.0
+          }, {
+            "x" : 31.0,
+            "y" : 4.0
+          } ]
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
@@ -178,7 +241,7 @@
         "shape" : {
           "x" : 2.5,
           "y" : 8.0,
-          "width" : 12.5,
+          "width" : 25.0,
           "height" : 15.0,
           "type" : "RECTANGLE"
         },

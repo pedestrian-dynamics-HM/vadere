@@ -30,7 +30,13 @@ public class IOVadere {
 	private static Logger logger = LogManager.getLogger(IOVadere.class);
 
 	public static Scenario fromJson(final String json) throws IOException, IllegalArgumentException {
-		return JsonConverter.deserializeScenarioRunManager(json);
+		try {
+			return JsonConverter.deserializeScenarioRunManager(json);
+		}
+		catch (Exception e) {
+			logger.warn("could not deserialize " + json);
+			throw e;
+		}
 	}
 
 	public static VadereProject readProjectJson(final String filepath) throws ParserConfigurationException, SAXException,

@@ -61,7 +61,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 
 		}
 
-		if (curPosPotential - potential < movementThreshold) {
+		if (curPosPotential - potential <= movementThreshold) {
 			nextPos = curPos;
 		}
 
