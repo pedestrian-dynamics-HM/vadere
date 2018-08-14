@@ -18,16 +18,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
-
-/* Works only for three targets */
-
 public class VadereAutomation {
 
-    //public static final String SCENARIO_NAME = "Kreuzung3_Unit";
-    //private static final String SCENARIO_NAME = "Kreuzung_softShell_one_source";
-    private static final String SCENARIO_NAME = "LangerGang_3";
+
+    //private static final String SCENARIO_NAME = "Asymmetrisch";
+    //private static final String SCENARIO_NAME = "Bruecke";
+    private static final String SCENARIO_NAME = "LangerGang";
     private static final String SCENARIO_PATH = "C:/Studium/BA/vadereProjects/";
-    private static final int N_SIMULATIONS = 10;
+    private static final int N_SIMULATIONS = 25;
     private static final int N_CONCURENT_SIMULATIONS = 20; //if this is choosen too high, out of memory errors may occur
     private static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<>();
