@@ -1,8 +1,7 @@
 {
-  "name" : "basic_4_2_wall_osm2",
+  "name" : "thick_wall_discrete_could_fail",
   "description" : "",
   "release" : "0.4",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -57,7 +56,7 @@
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : true,
+        "seeSmallWalls" : false,
         "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -86,7 +85,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : null
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
@@ -96,15 +95,15 @@
           "width" : 20.0,
           "height" : 10.0
         },
-        "boundingBoxWidth" : 1.0,
+        "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
       "obstacles" : [ {
         "shape" : {
           "x" : 9.0,
-          "y" : 0.3,
-          "width" : 0.1,
-          "height" : 8.55,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -131,9 +130,9 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 4.7,
+          "x" : 2.5,
           "y" : 2.5,
-          "width" : 4.0,
+          "width" : 2.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
@@ -149,6 +148,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -158,8 +158,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "attributesCar" : null
     }
   }
 }
