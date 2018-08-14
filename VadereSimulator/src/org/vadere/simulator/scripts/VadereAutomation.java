@@ -139,6 +139,7 @@ public class VadereAutomation {
         }
     }
 
+    @SuppressWarnings("unused")
     private static double nextTriangularDouble() {
         Random rand = new Random();
         return 1 - Math.sqrt(1 - rand.nextDouble());
