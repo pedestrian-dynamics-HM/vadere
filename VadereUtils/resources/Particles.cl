@@ -95,7 +95,7 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-static uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
+inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
     uint2 gridPos;
     float2 wordOr = (*worldOrigin);
     gridPos.x = (int)floor((p.x - wordOr.x) / (*cellSize));
@@ -104,7 +104,7 @@ static uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2*
 }
 
 //Calculate address in grid from position (clamping to edges)
-static uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
+inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     gridPos.x = gridPos.x & ((*gridSize).x - 1);
     gridPos.y = gridPos.y & ((*gridSize).y - 1);

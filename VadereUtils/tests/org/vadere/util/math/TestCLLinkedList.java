@@ -127,17 +127,20 @@ public class TestCLLinkedList {
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
+		int sum = 0;
 		for(int cell = 0; cell < numberOfCells; cell++) {
 			int cellStart = gridCells.cellStarts[cell];
 			int cellEnd = gridCells.cellEnds[cell];
-
 			for(int i = cellStart; i < cellEnd; i++) {
+				sum++;
 				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
 				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
 				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
 				assertEquals(gridHash, cell);
 			}
 		}
+
+		assertEquals(sum, size);
 	}
 
 	@Test

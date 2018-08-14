@@ -424,11 +424,31 @@ public class CLLinkedCell {
 		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (Math.min(numberOfElements, max_work_group_size)+1) * 4)); // local memory
 		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
 
-		    clGlobalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
-		    clLocalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
+
+		    int globalWorkSize;
+		    int localWorkSize;
+		    if(numberOfElements <= max_work_group_size){
+			    localWorkSize = numberOfElements;
+		    	globalWorkSize = numberOfElements;
+		    }
+		    else {
+		    	localWorkSize = max_work_group_size;
+		    	globalWorkSize = multipleOf(numberOfElements, localWorkSize);
+		    }
+
+		    clGlobalWorkSize.put(0, globalWorkSize);
+		    clLocalWorkSize.put(0, localWorkSize);
 		    //TODO: local work size? + check 2^n constrain!
 		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 	    }
+    }
+
+    private int multipleOf(int value, int multiple) {
+		int result = multiple;
+		while (result < value) {
+			result += multiple;
+		}
+		return result;
     }
 
     private void clBitonicSort(
