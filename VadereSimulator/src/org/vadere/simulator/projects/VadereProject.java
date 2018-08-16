@@ -282,9 +282,11 @@ public class VadereProject {
 			simulationResults.add(currentScenarioRun.getSimulationResult());
 
 			if (scenariosLeft.isEmpty()) {
+				simulationResults.stream().forEach(res -> logger.info(res.toString()));
 				for (ProjectFinishedListener listener : projectFinishedListener) {
 					listener.postProjectRun(VadereProject.this);
 				}
+				resetState();
 			} else {
 				prepareAndStartScenarioRunThread();
 			}
@@ -297,5 +299,9 @@ public class VadereProject {
 
 	public void setProjectOutput(ProjectOutput projectOutput) {
 		this.projectOutput = projectOutput;
+	}
+
+	public void resetState() {
+		simulationResults = new LinkedList<>();
 	}
 }

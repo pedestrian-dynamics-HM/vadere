@@ -26,7 +26,7 @@ public class SimulationResult {
 		startTime = Instant.now();
 	}
 	public void stopTime(){
-		runTime = Duration.between(Instant.now(), startTime);
+		runTime = Duration.between(startTime, Instant.now());
 	}
 
 
@@ -61,5 +61,15 @@ public class SimulationResult {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	@Override
+	public String toString() {
+		return "SimulationResult{" +
+				"scenarioName='" + scenarioName + '\'' +
+				", runTime=" + runTime +
+				", totalOverlaps=" + totalOverlaps +
+				", state='" + state + '\'' +
+				'}';
 	}
 }

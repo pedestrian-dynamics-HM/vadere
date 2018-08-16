@@ -1,6 +1,5 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.commons.codec.language.bm.Lang;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Language;
@@ -32,6 +31,7 @@ import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
 import org.vadere.gui.projectview.control.ActionShowAboutDialog;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.control.ShowResultDialogAction;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
@@ -42,7 +42,6 @@ import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
@@ -103,7 +102,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private ScenarioPanel scenarioJPanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
-	private ProjectRunResultDialog projectRunResultDialog = new ProjectRunResultDialog();
+	private ProjectRunResultDialog projectRunResultDialog;
 
 	// ####################### Part of the control this should also be part of another class
 	// ##################
@@ -304,6 +303,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		model.addOutputFileRefreshListener(this);
 		model.addProjectChangeListener(this);
 		this.model = model;
+		projectRunResultDialog = new ProjectRunResultDialog(this, model);
 
 		setTitle("Vadere GUI");
 		setBounds(100, 100, 1000, 600);
@@ -384,6 +384,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JMenuItem mntmSaveAs = new JMenuItem(saveProjectAsAction);
 		addToProjectSpecificActions(saveProjectAsAction);
 		mnFile.add(mntmSaveAs);
+
+		// Checkbox menu item to turn off result dialog of project run.
+		mnFile.addSeparator();
+		boolean showDialogDefault = Preferences.userNodeForPackage(VadereApplication.class)
+				.getBoolean("Project.simulationResult.show", false);
+		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, showDialogDefault);
+		Action showResultDialogMenuAction = new ShowResultDialogAction(Messages.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
+		showResultDialogMenu.setAction(showResultDialogMenuAction);
+		mnFile.add(showResultDialogMenu);
 
 		JMenuItem mntmExit = new JMenuItem(closeApplicationAction);
 		mnFile.addSeparator();

@@ -2,7 +2,6 @@
   "name" : "rimea_14_select_route",
   "description" : "",
   "release" : "0.4",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

@@ -2,7 +2,6 @@
   "name" : "rimea_11_exit_selection",
   "description" : "",
   "release" : "0.4",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

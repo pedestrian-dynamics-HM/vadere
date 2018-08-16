@@ -114,9 +114,10 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager);
+				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
 			}
 			simulation.run();
+			simulationResult.setState("SimulationRun completed");
 
 		} catch (Exception e) {
 			throw new RuntimeException("Simulation failed.", e);
