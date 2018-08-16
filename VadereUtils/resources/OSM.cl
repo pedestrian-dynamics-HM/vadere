@@ -94,7 +94,7 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
+inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
     uint2 gridPos;
     float2 wordOr = (*worldOrigin);
     gridPos.x = (uint)floor((p.x - wordOr.x) / (*cellSize));
@@ -103,7 +103,7 @@ uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldO
 }
 
 //Calculate address in grid from position (clamping to edges)
-uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
+inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     gridPos.x = gridPos.x & ((*gridSize).x - 1);
     gridPos.y = gridPos.y & ((*gridSize).y - 1);
@@ -115,7 +115,7 @@ uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
 ////////////////////////////////////////////////////////////////////////////////
 
 // see PotentialFieldPedestrianCompact with useHardBodyShell = false:
-float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
+inline float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
 
     float radii = 0.195f + 0.195f; // 2* r_p (sivers-2016b)
     float potential = 0.0f;
@@ -130,7 +130,7 @@ float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
     return potential;
 }
 
-float getFullPedestrianPotential(
+inline float getFullPedestrianPotential(
         __global const float  *orderedPedestrians,  //input
         __global const uint   *d_CellStart,
         __global const uint   *d_CellEnd,
@@ -173,7 +173,7 @@ float getFullPedestrianPotential(
     return potential;
 }
 
-uint2 getNearestPointTowardsOrigin(float2 evalPoint, float potentialCellSize, float2 potentialFieldSize) {
+inline uint2 getNearestPointTowardsOrigin(float2 evalPoint, float potentialCellSize, float2 potentialFieldSize) {
     evalPoint = max(evalPoint, (float2)(0.0f, 0.0f));
     evalPoint = min(evalPoint, (float2)(potentialFieldSize.x, potentialFieldSize.y));
     uint2 result;
@@ -182,22 +182,22 @@ uint2 getNearestPointTowardsOrigin(float2 evalPoint, float potentialCellSize, fl
     return result;
 }
 
-float2 pointToCoord(uint2 point, float potentialCellSize) {
+inline float2 pointToCoord(uint2 point, float potentialCellSize) {
     return (float2) (point.x * potentialCellSize, point.y * potentialCellSize);
 }
 
-float getPotentialFieldGridValue(__global const float *targetPotential, uint2 cell, uint2 potentialGridSize) {
+inline float getPotentialFieldGridValue(__global const float *targetPotential, uint2 cell, uint2 potentialGridSize) {
     return targetPotential[potentialGridSize.x * cell.y + cell.x];
 }
 
-float2 bilinearInterpolationWithUnkown(float4 z, float2 delta) {
+inline float2 bilinearInterpolationWithUnkown(float4 z, float2 delta) {
     float knownWeights = 0;
     float4 weights = (float4)((1.0f - delta.x) * (1.0f - delta.y), delta.x * (1.0f - delta.y), delta.x * delta.y, (1.0f - delta.x) * delta.y);
     float4 result = weights * z;
     return (float2) (result.s0 + result.s1 + result.s2 + result.s3, weights.s0 + weights.s1 + weights.s2 + weights.s3);
 }
 
-float getPotentialFieldValue(float2 evalPoint, __global const float *potentialField, float potentialCellSize, float2 potentialFieldSize, uint2 potentialGridSize) {
+inline float getPotentialFieldValue(float2 evalPoint, __global const float *potentialField, float potentialCellSize, float2 potentialFieldSize, uint2 potentialGridSize) {
     uint2 gridPoint = getNearestPointTowardsOrigin(evalPoint, potentialCellSize, potentialFieldSize);
     float2 gridPointCoord = pointToCoord(gridPoint, potentialCellSize);
     uint incX = 1, incY = 1;
@@ -224,7 +224,7 @@ float getPotentialFieldValue(float2 evalPoint, __global const float *potentialFi
     return (float)result.x;
 }
 
-float getObstaclePotential(float2 evalPoint, __global const float *obstaclePotential, float potentialCellSize) {
+inline float getObstaclePotential(float2 evalPoint, __global const float *obstaclePotential, float potentialCellSize) {
     return 1.0f;
 }
 
