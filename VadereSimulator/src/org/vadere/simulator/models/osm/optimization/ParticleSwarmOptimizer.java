@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.ICircleSector;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCircleSector;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.MathUtil;
 import org.vadere.util.math.pso.PSO;
 
 import java.awt.Shape;
@@ -54,8 +55,16 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 			angle = StepCircleOptimizerDiscrete.getMovementAngle(pedestrian);
 			Vector2D velocity = pedestrian.getVelocity();
 			anchorAngle = velocity.angleToZero() - angle;
-			angle = 2 * angle;
-			circleSector = new VCircleSector(circle.getCenter(), circle.getRadius(), anchorAngle, anchorAngle + 2 * angle);
+			anchorAngle = MathUtil.toPositiveSmallestRadian(anchorAngle);
+			double maxAngle = MathUtil.toPositiveSmallestRadian(anchorAngle + 2 * angle);
+
+			if(maxAngle < anchorAngle) {
+				double tmp = maxAngle;
+				maxAngle = anchorAngle;
+				anchorAngle = tmp;
+			}
+
+			circleSector = new VCircleSector(circle.getCenter(), circle.getRadius(), anchorAngle, maxAngle);
 		} else {
 			angle = 2 * Math.PI;
 			anchorAngle = 0;

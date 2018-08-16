@@ -7,6 +7,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
       "filename" : "waitingTime.txt",
       "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "tests.txt",
+      "processors" : [ 2 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 3 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
@@ -21,6 +29,19 @@
           "type" : "RECTANGLE"
         }
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianWaitingTimeProcessor",
+      "id" : 2,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "pedestrianWaitingTimeProcessorId" : 1,
+        "maximalWaitingTime" : "Infinity",
+        "minimalWaitingTime" : 0.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 3
     } ],
     "isTimestamped" : true
   },

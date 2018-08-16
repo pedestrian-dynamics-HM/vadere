@@ -57,7 +57,8 @@ public class TestPedestrianWaitingTimeProcessor extends TestProcessor {
 			}
 		}
 
-		handleAssertion(invalidWaitingTimes <= 0);
+		String msg = invalidWaitingTimes + "(#invalid waiting times) <= " + 0;
+		handleAssertion(invalidWaitingTimes <= 0, msg);
 	}
 
 	@Override

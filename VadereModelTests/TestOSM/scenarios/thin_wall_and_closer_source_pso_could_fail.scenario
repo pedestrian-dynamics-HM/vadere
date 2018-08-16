@@ -1,10 +1,48 @@
 {
-  "name" : "rimea_04_flow_osm1_125_up",
+  "name" : "thin_wall_and_closer_source_pso_could_fail",
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "waitingTime.txt",
+      "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "tests.txt",
+      "processors" : [ 2 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 3 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "waitingArea" : {
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 7.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        }
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianWaitingTimeProcessor",
+      "id" : 2,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS_OR_FAIL",
+        "pedestrianWaitingTimeProcessorId" : 1,
+        "maximalWaitingTime" : "Infinity",
+        "minimalWaitingTime" : 0.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 3
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -35,7 +73,7 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "DISCRETE",
+        "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
@@ -58,53 +96,48 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : true,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 0
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 35.0,
-          "height" : 4.0
+          "width" : 20.0,
+          "height" : 10.0
         },
-        "boundingBoxWidth" : 0.5,
+        "boundingBoxWidth" : 1.0,
         "bounded" : true
       },
-      "obstacles" : [ ],
-      "stairs" : [ {
+      "obstacles" : [ {
         "shape" : {
-          "x" : 2.6,
-          "y" : 0.5,
-          "width" : 29.9,
-          "height" : 3.0,
+          "x" : 9.0,
+          "y" : 0.7,
+          "width" : 0.1,
+          "height" : 8.55,
           "type" : "RECTANGLE"
         },
-        "id" : -1,
-        "treadCount" : 100,
-        "upwardDirection" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
+        "id" : -1
       } ],
+      "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 33.0,
-          "y" : 1.0,
-          "width" : 1.0,
-          "height" : 2.0,
+          "x" : 16.0,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -118,19 +151,19 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 1.0,
-          "y" : 1.0,
-          "width" : 1.0,
-          "height" : 2.0,
+          "x" : 4.7,
+          "y" : 2.5,
+          "width" : 4.0,
+          "height" : 5.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 125,
+        "spawnNumber" : 200,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],

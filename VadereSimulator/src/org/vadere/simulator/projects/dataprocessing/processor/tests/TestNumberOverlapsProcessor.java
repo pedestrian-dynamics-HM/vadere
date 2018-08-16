@@ -26,7 +26,7 @@ public class TestNumberOverlapsProcessor extends TestProcessor {
 	}
 
 	@Override
-	public void init(final ProcessorManager manager) {
+	public void init(@NotNull final ProcessorManager manager) {
 		super.init(manager);
 		AttributesTestNumberOverlapsProcessor att = this.getAttributes();
 		overlapProcessor =
@@ -39,14 +39,16 @@ public class TestNumberOverlapsProcessor extends TestProcessor {
 	}
 
 	@Override
-	public void preLoop(SimulationState state) {
+	public void preLoop(@NotNull final SimulationState state) {
 		overlapProcessor.preLoop(state);
 	}
 
 	@Override
-	public void postLoop(SimulationState state) {
+	public void postLoop(@NotNull final SimulationState state) {
 		overlapProcessor.postLoop(state);
-		handleAssertion(overlapProcessor.getValue(NoDataKey.key()) <= getAttributes().getMaxOverlaps());
+		Long overlaps = overlapProcessor.getValue(NoDataKey.key());
+		String msg = overlaps + "(#overlaps) <= " + getAttributes().getMaxOverlaps();
+		handleAssertion(overlapProcessor.getValue(NoDataKey.key()) <= getAttributes().getMaxOverlaps(), msg);
 	}
 
 	@Override

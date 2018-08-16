@@ -1,5 +1,5 @@
 {
-  "name" : "see_small_wall_ok",
+  "name" : "thin_wall_discrete_ok",
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
@@ -24,7 +24,7 @@
         "waitingArea" : {
           "x" : 9.0,
           "y" : 0.0,
-          "width" : 7.0,
+          "width" : 11.0,
           "height" : 10.0,
           "type" : "RECTANGLE"
         }
@@ -36,7 +36,7 @@
       "attributes" : {
         "expectedResult" : "SUCCESS",
         "pedestrianWaitingTimeProcessorId" : 1,
-        "maximalWaitingTime" : 0.0,
+        "maximalWaitingTime" : "Infinity",
         "minimalWaitingTime" : 0.0
       }
     }, {
@@ -73,11 +73,11 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "NELDER_MEAD",
+        "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : true,
+        "seeSmallWalls" : false,
         "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -98,8 +98,8 @@
     "attributesSimulation" : {
       "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : true,
+      "realTimeSimTimeRatio" : 0.5,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
@@ -116,15 +116,15 @@
           "width" : 20.0,
           "height" : 10.0
         },
-        "boundingBoxWidth" : 1.0,
+        "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
       "obstacles" : [ {
         "shape" : {
           "x" : 9.0,
-          "y" : 0.3,
+          "y" : 0.0,
           "width" : 0.1,
-          "height" : 8.55,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -151,9 +151,9 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 4.7,
+          "x" : 2.5,
           "y" : 2.5,
-          "width" : 4.0,
+          "width" : 2.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
         },

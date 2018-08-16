@@ -1,10 +1,48 @@
 {
-  "name" : "rimea_11_exit_selection",
+  "name" : "thick_wall_pso_ok",
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
-    "files" : [ ],
-    "processors" : [ ],
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "waitingTime.txt",
+      "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "tests.txt",
+      "processors" : [ 2 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 3 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "waitingArea" : {
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 7.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        }
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianWaitingTimeProcessor",
+      "id" : 2,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "pedestrianWaitingTimeProcessorId" : 1,
+        "maximalWaitingTime" : "Infinity",
+        "minimalWaitingTime" : 0.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 3
+    } ],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -35,7 +73,7 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "PSO",
+        "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
@@ -58,10 +96,10 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 400.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : true,
+      "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
@@ -75,81 +113,18 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 35.0,
-          "height" : 30.0
+          "width" : 20.0,
+          "height" : 10.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 0.5,
-          "y" : 25.0,
-          "width" : 4.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 5.5,
-          "y" : 25.0,
-          "width" : 20.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 26.5,
-          "y" : 25.0,
-          "width" : 4.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 0.5,
-          "y" : 5.0,
-          "width" : 21.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 22.5,
-          "y" : 5.0,
-          "width" : 5.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 28.5,
-          "y" : 5.0,
-          "width" : 2.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 30.5,
-          "y" : 5.0,
+          "x" : 9.0,
+          "y" : 0.0,
           "width" : 1.0,
-          "height" : 21.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 4.3,
-          "y" : 25.0,
-          "width" : 22.8,
-          "height" : 1.0,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -159,10 +134,10 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 20.0,
-          "y" : 1.0,
-          "width" : 10.1,
-          "height" : 2.0,
+          "x" : 16.0,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -177,19 +152,19 @@
         "id" : -1,
         "shape" : {
           "x" : 2.5,
-          "y" : 8.0,
-          "width" : 12.5,
-          "height" : 15.0,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 1000,
+        "spawnNumber" : 50,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : true,
+        "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"

@@ -58,7 +58,8 @@ public class TestEvacuationTimeProcessor extends TestProcessor {
 			invalidEvacuationTimes++;
 		}
 
-		handleAssertion(invalidEvacuationTimes <= 0);
+		String msg = minimalEvacTime + " <= " + evacTime + "(evacuation time) <= " + maximalEvacTime;
+		handleAssertion(invalidEvacuationTimes <= 0, msg);
 	}
 
 	@Override

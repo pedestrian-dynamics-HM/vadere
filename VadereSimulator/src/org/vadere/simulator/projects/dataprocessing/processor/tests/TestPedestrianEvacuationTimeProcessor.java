@@ -52,12 +52,12 @@ public class TestPedestrianEvacuationTimeProcessor extends TestProcessor {
 			Double minimalEvacTime = getAttributes().getMinimalEvacuationTime();
 
 			if((evacTime == Double.POSITIVE_INFINITY && maximalEvacTime != Double.POSITIVE_INFINITY) ||
-					(evacTime < minimalEvacTime|| evacTime > maximalEvacTime)) {
+					(evacTime < minimalEvacTime || evacTime > maximalEvacTime)) {
 				invalidEvacuationTimes++;
 			}
 		}
-
-		handleAssertion(invalidEvacuationTimes <= 0);
+		String msg = invalidEvacuationTimes + "(#invalid evacuation times) <= " + 0;
+		handleAssertion(invalidEvacuationTimes <= 0, msg);
 	}
 
 	@Override
