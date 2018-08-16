@@ -33,7 +33,7 @@ public class NumberOverlapsProcessor extends DataProcessor<NoDataKey, Long> {
 
 
 	public NumberOverlapsProcessor() {
-		super("overlaps");
+		super("nr_overlaps");
 		setAttributes(new AttributesNumberOverlapsProcessor());
 	}
 
