@@ -1,24 +1,30 @@
 {
-  "name" : "basic_3_2_wall_osm1",
+  "name" : "chicken_floorfield_ok",
   "description" : "",
   "release" : "0.4",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "waitingTime.txt",
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
       "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "waitingTimes.txt",
+      "processors" : [ 2 ]
     } ],
     "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 1
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
-      "id" : 1,
+      "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
         "waitingArea" : {
-          "x" : 9.0,
-          "y" : 0.0,
-          "width" : 7.0,
-          "height" : 10.0,
+          "x" : 10.0,
+          "y" : 32.0,
+          "width" : 15.0,
+          "height" : 8.0,
           "type" : "RECTANGLE"
         }
       }
@@ -76,25 +82,25 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 30.0,
+      "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
-      "writeSimulationData" : false,
+      "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : null
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 20.0,
-          "height" : 10.0
+          "width" : 35.0,
+          "height" : 60.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true
@@ -102,9 +108,27 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 9.0,
-          "y" : 0.0,
-          "width" : 0.5,
-          "height" : 10.0,
+          "y" : 21.0,
+          "width" : 1.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 25.0,
+          "y" : 21.0,
+          "width" : 1.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 10.0,
+          "y" : 40.0,
+          "width" : 15.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -114,9 +138,9 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 16.0,
-          "y" : 2.5,
-          "width" : 2.0,
+          "x" : 10.0,
+          "y" : 51.0,
+          "width" : 15.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
@@ -131,24 +155,25 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 2.5,
-          "y" : 2.5,
-          "width" : 2.0,
-          "height" : 5.0,
+          "x" : 10.0,
+          "y" : 6.0,
+          "width" : 15.0,
+          "height" : 7.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 50,
+        "spawnNumber" : 300,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -158,8 +183,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "attributesCar" : null
     }
   }
 }

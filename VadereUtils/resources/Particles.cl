@@ -95,7 +95,7 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
+inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
     uint2 gridPos;
     float2 wordOr = (*worldOrigin);
     gridPos.x = (int)floor((p.x - wordOr.x) / (*cellSize));
@@ -104,7 +104,7 @@ uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldO
 }
 
 //Calculate address in grid from position (clamping to edges)
-uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
+inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     gridPos.x = gridPos.x & ((*gridSize).x - 1);
     gridPos.y = gridPos.y & ((*gridSize).y - 1);
@@ -205,119 +205,6 @@ __kernel void findCellBoundsAndReorder(
     }
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Process collisions (calculate accelerations)
-////////////////////////////////////////////////////////////////////////////////
-float4 collideSpheres(
-    float4 posA,
-    float4 posB,
-    float4 velA,
-    float4 velB,
-    float radiusA,
-    float radiusB,
-    float spring,
-    float damping,
-    float shear,
-    float attraction
-){
-    //Calculate relative position
-    float4     relPos = (float4)(posB.x - posA.x, posB.y - posA.y, posB.z - posA.z, 0);
-    float        dist = sqrt(relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z);
-    float collideDist = radiusA + radiusB;
-
-    float4 force = (float4)(0, 0, 0, 0);
-    if(dist < collideDist){
-        float4 norm = (float4)(relPos.x / dist, relPos.y / dist, relPos.z / dist, 0);
-
-        //Relative velocity
-        float4 relVel = (float4)(velB.x - velA.x, velB.y - velA.y, velB.z - velA.z, 0);
-
-        //Relative tangential velocity
-        float relVelDotNorm = relVel.x * norm.x + relVel.y * norm.y + relVel.z * norm.z;
-        float4 tanVel = (float4)(relVel.x - relVelDotNorm * norm.x, relVel.y - relVelDotNorm * norm.y, relVel.z - relVelDotNorm * norm.z, 0);
-
-        //Spring force (potential)
-        float springFactor = -spring * (collideDist - dist);
-        force = (float4)(
-            springFactor * norm.x + damping * relVel.x + shear * tanVel.x + attraction * relPos.x,
-            springFactor * norm.y + damping * relVel.y + shear * tanVel.y + attraction * relPos.y,
-            springFactor * norm.z + damping * relVel.z + shear * tanVel.z + attraction * relPos.z,
-            0
-        );
-    }
-
-    return force;
-}
-
-
-
-__kernel void collide(
-    __global float2       *d_Vel,          //output: new velocity
-    __global const float2 *d_ReorderedPos, //input: reordered positions
-    __global const float2 *d_ReorderedVel, //input: reordered velocities
-    __global const uint   *d_Index,        //input: reordered particle indices
-    __global const uint   *d_CellStart,    //input: cell boundaries
-    __global const uint   *d_CellEnd,
-    __constant float* cellSize,
-    __constant float2* worldOrigin,
-    __constant uint2* gridSize,
-    uint    numParticles
-){
-    uint index = get_global_id(0);
-    if(index >= numParticles)
-        return;
-
-    float2   pos = d_ReorderedPos[index];
-    float2   vel = d_ReorderedVel[index];
-    float2 force = (float2)(0, 0);
-
-    //Get address in grid
-    uint2 gridPos = getGridPos(pos, cellSize, worldOrigin);
-
-    //Accumulate surrounding cells
-    for(int z = -1; z <= 1; z++)
-        for(int y = -1; y <= 1; y++)
-            for(int x = -1; x <= 1; x++){
-                //Get start particle index for this cell
-                uint   hash = getGridHash(gridPos + (uint2)(x, y), gridSize);
-                uint startI = d_CellStart[hash];
-
-                //Skip empty cell
-                if(startI == 0xFFFFFFFFU)
-                    continue;
-
-                //Iterate over particles in this cell
-                uint endI = d_CellEnd[hash];
-                for(uint j = startI; j < endI; j++){
-                    if(j == index)
-                        continue;
-
-                    float2 pos2 = d_ReorderedPos[j];
-                    float2 vel2 = d_ReorderedVel[j];
-
-                    //Collide two spheres
-                    /*force += collideSpheres(
-                        pos, pos2,
-                        vel, vel2,
-                        params->particleRadius, params->particleRadius,
-                        params->spring, params->damping, params->shear, params->attraction
-                    );*/
-                }
-            }
-
-    //Collide with cursor sphere
-    /*force += collideSpheres(
-        pos, (float4)(params->colliderPos.x, params->colliderPos.y, params->colliderPos.z, 0),
-        vel, (float4)(0, 0, 0, 0),
-        params->particleRadius, params->colliderRadius,
-        params->spring, params->damping, params->shear, params->attraction
-    );*/
-
-    //Write new velocity back to original unsorted location
-    d_Vel[d_Index[index]] = vel + force;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Monolithic bitonic sort kernel for short arrays fitting into local memory

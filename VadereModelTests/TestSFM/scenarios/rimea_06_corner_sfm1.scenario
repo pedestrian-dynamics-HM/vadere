@@ -31,12 +31,15 @@
       "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 3
+        "pedestrianStartTimeProcessorId" : 4
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
       "id" : 3
-    } ],
+    } ,{
+	"type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor", 
+	"id": 4
+	}],
     "isTimestamped" : true
   },
   "scenario" : {
@@ -157,7 +160,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"

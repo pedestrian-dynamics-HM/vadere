@@ -26,19 +26,14 @@ import java.util.Random;
 public abstract class SourceController {
 
 	protected final double NO_EVENT = Double.MAX_VALUE;
-
-	// Pedestrians should not touch each other in the spawn position.
-	// Therefore increase the spwan grid by 0.1.
-	public static final double SAFETY_OVERLAP_FACTOR = 1.1;
+	public static final double SPAWN_BUFFER_SIZE = 0.001;
 
 	protected final Source source;
 	private final DynamicElementFactory dynamicElementFactory;
 	private final Topography topography;
 	protected final Random random;
 
-	/**
-	 * <code>null</code>, if there is no next event.
-	 */
+	/** <code>null</code>, if there is no next event. */
 	protected Double timeOfNextEvent;
 	protected RealDistribution distribution;
 	protected final AttributesSource sourceAttributes;
@@ -58,8 +53,7 @@ public abstract class SourceController {
 		this.topography = scenario;
 		this.random = random;
 		this.spawnArray = new SpawnArray(new VRectangle(source.getShape().getBounds2D()),
-				new VRectangle(0, 0, getDynamicElementShape().getRadius() * 2 * SAFETY_OVERLAP_FACTOR,
-						getDynamicElementShape().getRadius() * 2 * SAFETY_OVERLAP_FACTOR));
+				new VRectangle(0, 0, (getDynamicElementShape().getRadius()) * 2 + SPAWN_BUFFER_SIZE, (getDynamicElementShape().getRadius()) * 2 + SPAWN_BUFFER_SIZE));
 
 		timeOfNextEvent = sourceAttributes.getStartTime();
 		try {
@@ -137,8 +131,8 @@ public abstract class SourceController {
 	}
 
 	/**
-	 * note that most models create their own pedestrians and ignore the attributes given here. the
-	 * source is mostly used to set the position and target ids, not the attributes.
+	 * note that most models create their own pedestrians and ignore the attributes given here.
+	 * the source is mostly used to set the position and target ids, not the attributes.
 	 */
 	protected void addNewAgentToScenario(final List<VPoint> position) {
 		position.forEach(p -> addNewAgentToScenario(p));

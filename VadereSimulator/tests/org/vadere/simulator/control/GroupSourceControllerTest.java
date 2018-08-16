@@ -144,7 +144,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testUpdateUseFreeSpaceOnly() {
 
-		double d = new AttributesAgent().getRadius() * 2 * SourceController.SAFETY_OVERLAP_FACTOR;
+		double d = new AttributesAgent().getRadius() * 2  +  SourceController.SPAWN_BUFFER_SIZE;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
@@ -233,7 +233,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 	@Test(expected = RuntimeException.class)
 	public void testSpawnNumber() {
-		double d = new AttributesAgent().getRadius() * 2 * SourceController.SAFETY_OVERLAP_FACTOR;
+		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setSpawnNumber(10)
 				.setSourceDim(12 * d, 12 * d ) // create source with 12x12 spots
@@ -270,7 +270,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testUseFreeSpaceOnly() {
 		// expected: not stop spawning before all pedestrians are created (even after end time)
-		double d = new AttributesAgent().getRadius() * 2 * SourceController.SAFETY_OVERLAP_FACTOR;
+		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
 		double startTime = 0;
 		double endTime = 1;
 		int spawnNumber = 100;

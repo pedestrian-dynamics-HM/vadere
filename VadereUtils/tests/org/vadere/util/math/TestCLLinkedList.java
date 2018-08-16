@@ -99,7 +99,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextDouble() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
 
@@ -123,21 +123,24 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
+		int sum = 0;
 		for(int cell = 0; cell < numberOfCells; cell++) {
 			int cellStart = gridCells.cellStarts[cell];
 			int cellEnd = gridCells.cellEnds[cell];
-
 			for(int i = cellStart; i < cellEnd; i++) {
+				sum++;
 				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
 				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
 				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
 				assertEquals(gridHash, cell);
 			}
 		}
+
+		assertEquals(sum, size);
 	}
 
 	@Test
@@ -146,7 +149,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
@@ -154,14 +157,12 @@ public class TestCLLinkedList {
 			int cellStart = gridCells.cellStarts[cell];
 			int cellEnd = gridCells.cellEnds[cell];
 
-			/*
 			for(int i = cellStart; i < cellEnd; i++) {
 				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
 				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
 				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
 				assertEquals(gridHash, cell);
 			}
-			*/
 		}
 	}
 
