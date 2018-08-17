@@ -15,21 +15,23 @@ import shutil
 import subprocess
 import time
 
-def find_scenario_files(path="VadereModelTests"):
-    scenario_search_pattern = "*.scenario"
+# exclude output and legacy to make sure that if used locally, .scenario files in these directories are not used
+def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM","output","legacy"]):
     scenario_files = []
-    exclude_patterns = ["TESTOVM"]
 
     for root, dirnames, filenames in os.walk(path):
         for filename in fnmatch.filter(filenames, scenario_search_pattern):
             scenario_path = os.path.join(root, filename)
+            bool_exclude = False
 
             for exclude_pattern in exclude_patterns:
                 regex_pattern = re.compile(exclude_pattern)
                 match = regex_pattern.search(scenario_path)
+                if match:
+                    bool_exclude = True
 
-                if match is None:
-                    scenario_files.append(scenario_path)
+            if not(bool_exclude):
+                scenario_files.append(scenario_path)
 
     print("Total scenario files: {}".format(len(scenario_files)))
     print("Exclude patterns: {}".format(exclude_patterns))
@@ -54,6 +56,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             # Measure wall time and not cpu because it is the easiest.
             wall_time_start = time.time()
 
+
             # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
             completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console, "scenario-run", "-f", scenario_file, "-o", output_dir],
                                            timeout=scenario_timeout_in_sec,
@@ -74,7 +77,10 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         except subprocess.CalledProcessError as exception:
             print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: non-zero return value {} ({})".format(exception.returncode, exception.cmd))
+            print(exception.stdout)
+            print(exception.stderr)
             failed_scenarios_with_exception.append((scenario_file, exception))
+
 
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
@@ -82,8 +88,18 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
     return {"passed": passed_scenarios, "failed": failed_scenarios_with_exception}
 
 if __name__ == "__main__":
-    scenario_files = find_scenario_files()
-    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files)
+
+    scenarios_long = ["rimea_09", "rimea_11", "queueing"]
+    scenario_do_not_test = ["TESTOVM","output","legacy", "basic_4_1_wall_gnm1"]
+    scenarios_long.extend(scenario_do_not_test)
+
+    scenario_files_regular_length = find_scenario_files(exclude_patterns=scenarios_long)
+    # passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
+
+    for scenario in scenarios_long:
+        search_pattern = "*" + scenario + "*.scenario"
+        scenario_files_long = find_scenario_files(scenario_search_pattern=search_pattern)
+        passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long, scenario_timeout_in_sec=240)
 
     if len(passed_and_failed_scenarios["failed"]) > 0:
         exit(1)
