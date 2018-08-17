@@ -98,8 +98,8 @@
     "attributesSimulation" : {
       "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.5,
-      "writeSimulationData" : false,
+      "realTimeSimTimeRatio" : 0.0,
+      "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "needsBoundary" : false,
