@@ -16,7 +16,7 @@ import subprocess
 import time
 
 # exclude output and legacy to make sure that if used locally, .scenario files in these directories are not used
-def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM","output","legacy"]):
+def find_scenario_files(path="C:/Daten/Repos/vadere/VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM","output","legacy"]):
     scenario_files = []
 
     for root, dirnames, filenames in os.walk(path):
@@ -39,7 +39,7 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
 
     return sorted(scenario_files)
 
-def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
+def run_scenario_files_with_vadere_console(scenario_files, vadere_console="C:/Daten/Repos/vadere/VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
 
     if not os.path.exists(output_dir):
@@ -75,7 +75,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             passed_scenarios.append(scenario_file)
         except subprocess.TimeoutExpired as exception:
             prefix = ""
-            if scenario_file.find("TestOSM"):
+            if "TestOSM" in scenario_file:
                 prefix = " * OSM * "
 
             print(prefix +"Scenario file failed: {}".format(scenario_file))
@@ -83,8 +83,8 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             failed_scenarios_with_exception.append((scenario_file, exception))
         except subprocess.CalledProcessError as exception:
             prefix = ""
-            if scenario_file.find("TestOSM"):
-                prefix = " * OSM Test *"
+            if "TestOSM" in scenario_file:
+                prefix = " * OSM * "
             print(prefix + "Scenario file failed: {}".format(scenario_file))
             print("->  Reason: non-zero return value {}".format(exception.returncode))
             failed_scenarios_with_exception.append((scenario_file, exception))
@@ -105,12 +105,12 @@ if __name__ == "__main__":
     scenario_do_not_test.extend(scenarios_long)
 
     scenario_files_regular_length = find_scenario_files(exclude_patterns=scenario_do_not_test)
-    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
+    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_lengt)
 
     for scenario in scenarios_long:
         search_pattern = "*" + scenario + "*.scenario"
         scenario_files_long = find_scenario_files(scenario_search_pattern=search_pattern)
-        tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long, scenario_timeout_in_sec=180)
+        tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long, scenario_timeout_in_sec=240)
         passed_and_failed_scenarios["passed"].extend(tmp_passed_and_failed_scenarios["passed"])
         passed_and_failed_scenarios["failed"].extend(tmp_passed_and_failed_scenarios["failed"])
 
