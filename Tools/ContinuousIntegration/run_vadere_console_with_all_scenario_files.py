@@ -51,7 +51,8 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
     for i, scenario_file in enumerate(scenario_files):
         try:
-            print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
+            # Surpress this output to see the files that failed in the email
+            # print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
 
             # Measure wall time and not cpu because it is the easiest.
             wall_time_start = time.time()
@@ -67,7 +68,8 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             wall_time_end = time.time()
             wall_time_delta = wall_time_end - wall_time_start
 
-            print("Finished scenario file ({:.1f} s): {}".format(wall_time_delta, scenario_file))
+            # Surpress this output to see the files that failed in the email
+            # print("Finished scenario file ({:.1f} s): {}".format(wall_time_delta, scenario_file))
 
             passed_scenarios.append(scenario_file)
         except subprocess.TimeoutExpired as exception:
@@ -77,8 +79,6 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         except subprocess.CalledProcessError as exception:
             print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: non-zero return value {} ({})".format(exception.returncode, exception.cmd))
-            print(exception.stdout)
-            print(exception.stderr)
             failed_scenarios_with_exception.append((scenario_file, exception))
 
 
@@ -89,17 +89,22 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
 if __name__ == "__main__":
 
+    passed_and_failed_scenarios = {"passed": [], "failed" : []}
     scenarios_long = ["rimea_09", "rimea_11", "queueing"]
     scenario_do_not_test = ["TESTOVM","output","legacy", "basic_4_1_wall_gnm1"]
-    scenarios_long.extend(scenario_do_not_test)
+    scenario_do_not_test.extend(scenarios_long)
 
-    scenario_files_regular_length = find_scenario_files(exclude_patterns=scenarios_long)
-    # passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
+    scenario_files_regular_length = find_scenario_files(exclude_patterns=scenario_do_not_test)
+    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
 
     for scenario in scenarios_long:
+        print(scenario)
         search_pattern = "*" + scenario + "*.scenario"
         scenario_files_long = find_scenario_files(scenario_search_pattern=search_pattern)
-        passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long, scenario_timeout_in_sec=240)
+        tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long, scenario_timeout_in_sec=180)
+        passed_and_failed_scenarios["passed"].extend(tmp_passed_and_failed_scenarios["passed"])
+        passed_and_failed_scenarios["failed"].extend(tmp_passed_and_failed_scenarios["failed"])
+
 
     if len(passed_and_failed_scenarios["failed"]) > 0:
         exit(1)
