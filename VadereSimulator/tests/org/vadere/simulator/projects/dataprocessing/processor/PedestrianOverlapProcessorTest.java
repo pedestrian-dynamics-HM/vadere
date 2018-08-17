@@ -3,14 +3,9 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor;
-import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PedestrianOverlapProcessorTest extends ProcessorTest {
 
