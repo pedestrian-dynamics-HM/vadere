@@ -39,7 +39,7 @@
       "id" : 4,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
-        "pedestrianOverlapProcessorId" : 4
+        "pedestrianOverlapProcessorId" : 3
       }
     } ],
     "isTimestamped" : true

@@ -9,7 +9,7 @@ public class SimulationResult {
 
 	private String scenarioName;
 	private Duration runTime;
-	private int totalOverlaps;
+	private int totalOverlaps = -1;
 	private String state;
 
 	private Instant startTime;
