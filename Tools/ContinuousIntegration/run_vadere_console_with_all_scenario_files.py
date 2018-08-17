@@ -105,7 +105,7 @@ if __name__ == "__main__":
     scenario_do_not_test.extend(scenarios_long)
 
     scenario_files_regular_length = find_scenario_files(exclude_patterns=scenario_do_not_test)
-    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length,scenario_timeout_in_sec = 1)
+    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
 
     for scenario in scenarios_long:
         search_pattern = "*" + scenario + "*.scenario"
