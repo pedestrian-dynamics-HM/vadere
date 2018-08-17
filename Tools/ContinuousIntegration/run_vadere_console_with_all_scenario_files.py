@@ -33,8 +33,9 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
             if not(bool_exclude):
                 scenario_files.append(scenario_path)
 
-    print("Total scenario files: {}".format(len(scenario_files)))
-    print("Exclude patterns: {}".format(exclude_patterns))
+    # Surpress this output since only failed scenarios are shown
+    # print("Total scenario files: {}".format(len(scenario_files)))
+    # print("Exclude patterns: {}".format(exclude_patterns))
 
     return sorted(scenario_files)
 
@@ -73,12 +74,19 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
             passed_scenarios.append(scenario_file)
         except subprocess.TimeoutExpired as exception:
-            print("Scenario file failed: {}".format(scenario_file))
-            print("->  Reason: timeout after {} s ({})".format(exception.timeout, exception.cmd))
+            prefix = ""
+            if scenario_file.find("TestOSM"):
+                prefix = " * OSM * "
+
+            print(prefix +"Scenario file failed: {}".format(scenario_file))
+            print("->  Reason: timeout after {} s".format(exception.timeout))
             failed_scenarios_with_exception.append((scenario_file, exception))
         except subprocess.CalledProcessError as exception:
-            print("Scenario file failed: {}".format(scenario_file))
-            print("->  Reason: non-zero return value {} ({})".format(exception.returncode, exception.cmd))
+            prefix = ""
+            if scenario_file.find("TestOSM"):
+                prefix = " * OSM Test *"
+            print(prefix + "Scenario file failed: {}".format(scenario_file))
+            print("->  Reason: non-zero return value {}".format(exception.returncode))
             failed_scenarios_with_exception.append((scenario_file, exception))
 
 
@@ -89,16 +97,17 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
 if __name__ == "__main__":
 
+    print(" * Output is only shown for scenarios that fail * ")
+
     passed_and_failed_scenarios = {"passed": [], "failed" : []}
     scenarios_long = ["rimea_09", "rimea_11", "queueing"]
-    scenario_do_not_test = ["TESTOVM","output","legacy", "basic_4_1_wall_gnm1"]
+    scenario_do_not_test = ["TESTOVM","output","legacy"]
     scenario_do_not_test.extend(scenarios_long)
 
     scenario_files_regular_length = find_scenario_files(exclude_patterns=scenario_do_not_test)
-    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
+    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length,scenario_timeout_in_sec = 1)
 
     for scenario in scenarios_long:
-        print(scenario)
         search_pattern = "*" + scenario + "*.scenario"
         scenario_files_long = find_scenario_files(scenario_search_pattern=search_pattern)
         tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long, scenario_timeout_in_sec=180)
