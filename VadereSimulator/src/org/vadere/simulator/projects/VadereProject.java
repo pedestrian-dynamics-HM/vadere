@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +30,7 @@ public class VadereProject {
 	private Thread currentScenarioThread;
 	private ScenarioRun currentScenarioRun;
 	private PassiveCallback visualization;
+	private LinkedList<SimulationResult> simulationResults = new LinkedList<>();
 	private final ConcurrentMap<String, Scenario> scenarios = new ConcurrentHashMap<>();
 	private final BlockingQueue<ProjectFinishedListener> projectFinishedListener = new LinkedBlockingQueue<>();
 	private final BlockingQueue<SingleScenarioFinishedListener> singleScenarioFinishedListener =
@@ -214,6 +216,11 @@ public class VadereProject {
 
 	// Getter...
 
+
+	public LinkedList<SimulationResult> getSimulationResults() {
+		return simulationResults;
+	}
+
 	public BlockingQueue<Scenario> getScenarios() {
 		return scenarios.values().stream().sorted((f1, f2) -> f1.getName().compareTo(f2.getName())).collect(Collectors.toCollection(LinkedBlockingQueue::new));
 	}
@@ -272,11 +279,14 @@ public class VadereProject {
 			notifyScenarioRMListenerAboutPostRun(getCurrentScenario());
 
 			projectOutput.update();
+			simulationResults.add(currentScenarioRun.getSimulationResult());
 
 			if (scenariosLeft.isEmpty()) {
+				simulationResults.stream().forEach(res -> logger.info(res.toString()));
 				for (ProjectFinishedListener listener : projectFinishedListener) {
 					listener.postProjectRun(VadereProject.this);
 				}
+				resetState();
 			} else {
 				prepareAndStartScenarioRunThread();
 			}
@@ -289,5 +299,9 @@ public class VadereProject {
 
 	public void setProjectOutput(ProjectOutput projectOutput) {
 		this.projectOutput = projectOutput;
+	}
+
+	public void resetState() {
+		simulationResults = new LinkedList<>();
 	}
 }

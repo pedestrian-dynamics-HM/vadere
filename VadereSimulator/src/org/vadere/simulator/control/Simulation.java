@@ -11,6 +11,7 @@ import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -65,9 +66,10 @@ public class Simulation {
 	private final Topography topography;
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
+	private SimulationResult simulationResult;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
+					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
 		this.name = name;
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
@@ -79,6 +81,7 @@ public class Simulation {
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
+		this.simulationResult = simulationResult;
 
 		this.models = mainModel.getSubmodels();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
@@ -229,6 +232,7 @@ public class Simulation {
 
 				if (Thread.interrupted()) {
 					runSimulation = false;
+					simulationResult.setState("Simulation interrupted");
 					logger.info("Simulation interrupted.");
 				}
 			}

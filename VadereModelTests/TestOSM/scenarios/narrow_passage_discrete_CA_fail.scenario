@@ -1,5 +1,5 @@
 {
-  "name" : "narrow_passage_discrete_ca_fail",
+  "name" : "narrow_passage_discrete_CA_fail",
   "description" : "",
   "release" : "0.4",
   "processWriters" : {
@@ -9,8 +9,12 @@
       "processors" : [ 1, 2 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "test-evacuationTimes.txt",
+      "filename" : "out.txt",
       "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
+      "filename" : "out1.txt",
+      "processors" : [ 4 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -19,25 +23,19 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianEvacuationTimeProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
       "id" : 3,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianEvacuationTimeProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
-        "expectedResult" : "FAIL",
-        "pedestrianEvacuationTimeProcessorId" : 4,
-        "maximalEvacuationTime" : 21.0,
-        "minimalEvacuationTime" : 0.0
+        "pedestrianOverlapProcessorId" : 4
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 5
+        "pedRadius" : 0.2
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
-      "id" : 5
     } ],
     "isTimestamped" : true
   },
