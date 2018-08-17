@@ -27,8 +27,8 @@ public class JoltMigrationAssistantTest {
 	// clean up after test
 	@After
 	public void resetTestStructure() throws URISyntaxException {
-		String dest = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
-		String backup = getClass().getResource("/migration/testProject_v0.1.bak").toURI().getPath();
+		String dest = new File(getClass().getResource("/migration/testProject_v0.1").getFile()).toString();
+		String backup = new File(getClass().getResource("/migration/testProject_v0.1.bak").getFile()).toString();
 		TestUtils.resetTestStructure(dest, backup);
 	}
 
@@ -53,7 +53,7 @@ public class JoltMigrationAssistantTest {
 	// Test project transformation
 	@Test
 	public void TestTransformProject() throws URISyntaxException, IOException {
-		String projectPath = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
+		String projectPath = new File(getClass().getResource("/migration/testProject_v0.1").getFile()).toString();
 
 		JoltMigrationAssistant joltMigrationAssistant = new JoltMigrationAssistant();
 
