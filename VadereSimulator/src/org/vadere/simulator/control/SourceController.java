@@ -26,7 +26,7 @@ import java.util.Random;
 public abstract class SourceController {
 
 	protected final double NO_EVENT = Double.MAX_VALUE;
-	public static final double SPAWN_BUFFER_SIZE = 0.001;
+	public static final double SPAWN_BUFFER_SIZE = 0.01;
 
 	protected final Source source;
 	private final DynamicElementFactory dynamicElementFactory;

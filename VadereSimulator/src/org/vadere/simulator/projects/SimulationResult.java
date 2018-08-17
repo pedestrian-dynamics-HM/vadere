@@ -1,11 +1,8 @@
 package org.vadere.simulator.projects;
 
-import org.lwjgl.system.CallbackI;
-import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
-
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
+import java.util.Arrays;
 
 public class SimulationResult {
 
@@ -61,6 +58,30 @@ public class SimulationResult {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+
+	public String[] getAsTableRow(){
+		String[] ret = new String[4];
+		ret[0] = scenarioName;
+		ret[1] = runTime.toString();
+		ret[2] = Integer.toString(totalOverlaps);
+		ret[3] = state;
+		return ret;
+	}
+
+	public void addCsvRow(StringBuilder sj, char dl){
+		Arrays.stream(getAsTableRow()).forEach(i -> sj.append(i).append(dl));
+		sj.setLength(sj.length() -1);
+		sj.append("\n");
+	}
+
+	public static void addCsvHeader(StringBuilder sj, char dl){
+		sj.append("Scenario_Name").append(dl);
+		sj.append("Runtime").append(dl);
+		sj.append("Overlaps").append(dl);
+		sj.append("State\n");
+
 	}
 
 	@Override
