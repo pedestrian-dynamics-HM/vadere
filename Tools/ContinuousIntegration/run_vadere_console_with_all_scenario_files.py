@@ -16,7 +16,7 @@ import subprocess
 import time
 
 # exclude output and legacy to make sure that if used locally, .scenario files in these directories are not used
-def find_scenario_files(path="C:/Daten/Repos/vadere/VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM","output","legacy"]):
+def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM","output","legacy"]):
     scenario_files = []
 
     for root, dirnames, filenames in os.walk(path):
@@ -39,7 +39,7 @@ def find_scenario_files(path="C:/Daten/Repos/vadere/VadereModelTests", scenario_
 
     return sorted(scenario_files)
 
-def run_scenario_files_with_vadere_console(scenario_files, vadere_console="C:/Daten/Repos/vadere/VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
+def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
 
     if not os.path.exists(output_dir):
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     scenario_do_not_test.extend(scenarios_long)
 
     scenario_files_regular_length = find_scenario_files(exclude_patterns=scenario_do_not_test)
-    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_lengt)
+    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length)
 
     for scenario in scenarios_long:
         search_pattern = "*" + scenario + "*.scenario"
