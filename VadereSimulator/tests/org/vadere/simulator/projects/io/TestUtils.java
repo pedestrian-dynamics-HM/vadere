@@ -26,7 +26,7 @@ public class TestUtils {
 		}
 	}
 
-	public static void copyDirTo(String dest, String backup) {
-		copyDirTo(Paths.get(dest), Paths.get(backup));
+	public static void copyDirTo(String source, String dest) {
+		copyDirTo(Paths.get(source), Paths.get(dest));
 	}
 }

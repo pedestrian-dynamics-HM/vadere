@@ -1,69 +1,54 @@
 package org.vadere.simulator.projects.migration.jolttranformation;
 
-import org.hamcrest.core.IsNot;
 import org.hamcrest.core.StringContains;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
-import org.vadere.util.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import org.vadere.simulator.entrypoints.Version;
 
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
-public class JoltTransformV3toV4Test {
+public class JoltTransformV3toV4Test extends JoltTransformationTest{
 
 	ArrayList<Path> scenarios;
 	ArrayList<Path> bakScenarios;
-	private StringContains v04 = new StringContains("\"release\" : \"0.4\"");
+	private StringContains v04 = versionMatcher(Version.V0_4);
 	private StringContains useFixedSeed = new StringContains("useFixedSeed");
 	private StringContains fixedSeed = new StringContains("fixedSeed");
 	private StringContains simulationSeed = new StringContains("simulationSeed");
 	private StringContains useRandomSeed = new StringContains("useRandomSeed");
 	private StringContains randomSeed = new StringContains("randomSeed");
 
-
+	@Override
+	protected Path getTestDir() {
+		return getDirFromResources("/migration/v03_to_v04");
+	}
 
 	@Before
-	public void init() throws URISyntaxException {
+	public void init()  {
+		super.init();
+
 		scenarios = new ArrayList<>();
 		bakScenarios = new ArrayList<>();
 
-		scenarios.add(Paths.get(getClass()
-		.getResource("/migration/v03_to_v04/basic_1_chicken_osm1.scenario").toURI()));
+		scenarios.add(getTestFile("basic_1_chicken_osm1.scenario"));
+		scenarios.add(getTestFile("group_OSM_1Source1Place.scenario"));
 
-		scenarios.add(Paths.get(getClass()
-				.getResource("/migration/v03_to_v04/group_OSM_1Source1Place.scenario").toURI()));
-
-		scenarios.forEach(f -> {
-			try {
-				bakScenarios.add(IOUtils.makeBackup(f, ".bak", true));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-
+		bakScenarios.add(getTestFileBackup("basic_1_chicken_osm1.scenario"));
+		bakScenarios.add(getTestFileBackup("group_OSM_1Source1Place.scenario"));
 	}
 
 	@After
-	public void cleaUp() throws IOException {
-		for (int i=0; i < scenarios.size(); i++){
-			if (scenarios.get(i) != null && bakScenarios.get(i) != null){
-				Files.move(bakScenarios.get(i), scenarios.get(i), StandardCopyOption.REPLACE_EXISTING);
-			}
-		}
+	public void cleaUp() {
+		super.cleaUp();
 	}
 
 	@Test

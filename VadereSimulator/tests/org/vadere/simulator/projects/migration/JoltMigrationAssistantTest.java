@@ -8,15 +8,9 @@ import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
-import org.vadere.util.io.RecursiveCopy;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 
 import joptsimple.internal.Strings;
 
@@ -29,7 +23,7 @@ public class JoltMigrationAssistantTest {
 	public void resetTestStructure() throws URISyntaxException {
 		String dest = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
 		String backup = getClass().getResource("/migration/testProject_v0.1.bak").toURI().getPath();
-		TestUtils.resetTestStructure(dest, backup);
+		TestUtils.copyDirTo(dest, backup);
 	}
 
 	// Test transformation of single scenario file
