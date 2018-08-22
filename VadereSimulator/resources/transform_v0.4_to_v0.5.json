@@ -1,5 +1,9 @@
 [
   {
+    // Changes
+    // remove: scenario/attributesSimulation/needsBoundary
+    // remove attributes from processor PedestrianOverlapProcessor [removed via java]
+
     "operation": "shift",
     "spec": {
       "name": "&",

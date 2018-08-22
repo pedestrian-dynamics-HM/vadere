@@ -53,13 +53,6 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 6
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
-      "attributes" : {
-        "pedRadius" : 0.2
-      }
     } ],
     "isTimestamped" : true
   },

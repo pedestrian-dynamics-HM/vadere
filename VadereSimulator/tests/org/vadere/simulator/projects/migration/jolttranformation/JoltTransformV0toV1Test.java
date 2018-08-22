@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JoltTransformV0toV1Test extends JoltTransformationTest{
+public class JoltTransformV0toV1Test extends JoltTransformationTest {
 
 	private final String TRANSFORM = "/transform_vNOT-A-RELEASE_to_v0.1.json";
 	private final String IDENTITY = "/identity_v0.1.json";
@@ -32,11 +32,11 @@ public class JoltTransformV0toV1Test extends JoltTransformationTest{
 	public void TestPostHooks1() throws IOException, MigrationException, URISyntaxException {
 		JoltTransformation transformation = JoltTransformation.get(Version.NOT_A_RELEASE);
 		String TEST1 = "/migration/vNOT-A-RELEASE_to_v0.1_Test1.scenario";
-		JsonNode in = getJson(TEST1);
+		JsonNode in = getJsonFromResource(TEST1);
 		JsonNode out = transformation.applyTransformation(in);
 		// will test that  sources exists.
 		JsonNode sources = pathMustExist(out, "vadere/topography/sources");
-		assertEquals("Therer must be one source",1, sources.size());
+		assertEquals("Therer must be one source", 1, sources.size());
 		assertTrue("The source should not have the attribute distributionParameters", sources.elements().next().path("distributionParameters").isMissingNode());
 
 
@@ -54,11 +54,11 @@ public class JoltTransformV0toV1Test extends JoltTransformationTest{
 	public void TestPostHooks2() throws IOException, MigrationException, URISyntaxException {
 		JoltTransformation transformation = factory.getJoltTransformV0toV1();
 		String TEST2 = "/migration/vNOT-A-RELEASE_to_v0.1_Test2.scenario";
-		JsonNode in = getJson(TEST2);
+		JsonNode in = getJsonFromResource(TEST2);
 		JsonNode out = transformation.applyTransformation(in);
 
 		JsonNode sources = pathMustExist(out, "vadere/topography/sources");
-		assertEquals("Therer must be one source",1, sources.size());
+		assertEquals("Therer must be one source", 1, sources.size());
 		assertFalse("The source must have the attribute distributionParameters", sources.elements().next().path("distributionParameters").isMissingNode());
 
 		assertThat(pathMustExist(out, "vadere/mainModel"),
@@ -75,7 +75,7 @@ public class JoltTransformV0toV1Test extends JoltTransformationTest{
 	public void TestPostHooks3() throws IOException, MigrationException, URISyntaxException {
 		JoltTransformation transformation = factory.getJoltTransformV0toV1();
 		String TEST3 = "/migration/vNOT-A-RELEASE_to_v0.1_Test3.scenario";
-		JsonNode in = getJson(TEST3);
+		JsonNode in = getJsonFromResource(TEST3);
 		transformation.applyTransformation(in);
 
 		fail("should not be reached! The Transformation should fail with MigrationException");

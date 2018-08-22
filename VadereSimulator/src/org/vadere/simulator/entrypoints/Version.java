@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/** Versions in strict order from oldest to newest. */
+/**
+ * Versions in strict order from oldest to newest.
+ */
 public enum Version {
 
 	UNDEFINED("undefined"),
@@ -15,7 +17,8 @@ public enum Version {
 	V0_1("0.1"),
 	V0_2("0.2"),
 	V0_3("0.3"),
-	V0_4("0.4");
+	V0_4("0.4"),
+	V0_5("0.5");
 
 	private String label;
 
@@ -40,45 +43,45 @@ public enum Version {
 		return null;
 	}
 
-	private static int versionId(Version curr){
+	private static int versionId(Version curr) {
 		Version[] versions = values();
-		for ( int i = 0 ; i < versions.length ; i++){
-			if (curr.equals(versions[i])){
-				return  i;
+		for (int i = 0; i < versions.length; i++) {
+			if (curr.equals(versions[i])) {
+				return i;
 			}
 		}
 		throw new IllegalArgumentException("Value not in Version Enumeration " + curr.toString());
 	}
 
-	public static String[] stringValues(){
+	public static String[] stringValues() {
 		return Arrays.stream(values()).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
 	}
 
-	public static String[] stringValues(Version startFrom){
+	public static String[] stringValues(Version startFrom) {
 		int min = startFrom.ordinal();
 		return Arrays.stream(values()).filter(v -> v.ordinal() >= min).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
 	}
 
-	public Version nextVersion(){
-		int nextId = versionId(this) == (values().length -1) ? versionId(this) : versionId(this) + 1;
+	public Version nextVersion() {
+		int nextId = versionId(this) == (values().length - 1) ? versionId(this) : versionId(this) + 1;
 		return values()[nextId];
 	}
 
-	public Version previousVersion(){
+	public Version previousVersion() {
 		int nextId = versionId(this) == 0 ? versionId(this) : versionId(this) - 1;
 		return values()[nextId];
 	}
 
-	public static Version[] listToLatest (Version v){
-		int start = versionId(v) == (values().length -1) ? versionId(v) : versionId(v) + 1;
+	public static Version[] listToLatest(Version v) {
+		int start = versionId(v) == (values().length - 1) ? versionId(v) : versionId(v) + 1;
 		int end = values().length;
-		Version[] ret = new Version[end-start];
-		System.arraycopy(values(), start, ret, 0, end - start );
+		Version[] ret = new Version[end - start];
+		System.arraycopy(values(), start, ret, 0, end - start);
 		return ret;
 
 	}
 
-	public boolean equalOrSamller(Version test){
+	public boolean equalOrSamller(Version test) {
 		return versionId(this) <= versionId(test);
 	}
 
@@ -89,8 +92,8 @@ public enum Version {
 	public static Optional<Version> getPrevious(@NotNull final Version successorVersion) {
 		Version prevVersion = null;
 
-		for(Version version : values()) {
-			if(successorVersion.equals(version)) {
+		for (Version version : values()) {
+			if (successorVersion.equals(version)) {
 				return Optional.ofNullable(prevVersion);
 			}
 			prevVersion = version;
@@ -98,7 +101,7 @@ public enum Version {
 
 		return Optional.empty();
 	}
-	
+
 	@Override
 	public String toString() {
 		return label();
