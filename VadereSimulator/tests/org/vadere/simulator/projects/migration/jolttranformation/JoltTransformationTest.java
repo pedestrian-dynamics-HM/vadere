@@ -27,6 +27,8 @@ import static org.junit.Assert.assertThat;
 
 abstract class JoltTransformationTest {
 
+	protected org.vadere.simulator.projects.migration.jolttranformation.JoltTransformationFactory factory = org.vadere.simulator.projects.migration.jolttranformation.JoltTransformationFactory.instance();
+
 	abstract protected  Path getTestDir();
 
 

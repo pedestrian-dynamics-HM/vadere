@@ -52,7 +52,7 @@ public class JoltTransformV0toV1Test extends JoltTransformationTest{
 	// All postHooks should bee used here
 	@Test
 	public void TestPostHooks2() throws IOException, MigrationException, URISyntaxException {
-		JoltTransformation transformation = new JoltTransformV0toV1(TRANSFORM, IDENTITY, Version.V0_1);
+		JoltTransformation transformation = factory.getJoltTransformV0toV1();
 		String TEST2 = "/migration/vNOT-A-RELEASE_to_v0.1_Test2.scenario";
 		JsonNode in = getJson(TEST2);
 		JsonNode out = transformation.applyTransformation(in);
@@ -73,7 +73,7 @@ public class JoltTransformV0toV1Test extends JoltTransformationTest{
 	// should fail because no main model was found
 	@Test(expected = MigrationException.class)
 	public void TestPostHooks3() throws IOException, MigrationException, URISyntaxException {
-		JoltTransformation transformation = new JoltTransformV0toV1(TRANSFORM, IDENTITY, Version.V0_1);
+		JoltTransformation transformation = factory.getJoltTransformV0toV1();
 		String TEST3 = "/migration/vNOT-A-RELEASE_to_v0.1_Test3.scenario";
 		JsonNode in = getJson(TEST3);
 		transformation.applyTransformation(in);

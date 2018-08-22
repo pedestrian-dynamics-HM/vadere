@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
@@ -25,11 +26,12 @@ import org.vadere.state.util.StateJsonConverter;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+@MigrationTransformation(targetVersionLabel = "0.1")
 public class JoltTransformV0toV1 extends JoltTransformation {
 
 
-	JoltTransformV0toV1(String transformation, String identity, Version version) throws MigrationException {
-		super(transformation, identity, version);
+	JoltTransformV0toV1() {
+		super(Version.V0_1);
 	}
 
 	@Override
