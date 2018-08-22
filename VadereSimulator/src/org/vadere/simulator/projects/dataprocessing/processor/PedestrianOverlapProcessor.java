@@ -4,8 +4,6 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlap;
-import org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -21,18 +19,16 @@ import java.util.stream.Collectors;
  */
 @DataProcessorClass()
 public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlap, Double> {
-	private double pedRadius;
 	private double minDist;
 
 
 	public PedestrianOverlapProcessor() {
 		super("overlaps");
-		setAttributes(new AttributesPedestrianOverlapProcessor());
 	}
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
-		this.pedRadius = state.getTopography().getAttributesPedestrian().getRadius();  // in init there is no access to the state
+		double pedRadius = state.getTopography().getAttributesPedestrian().getRadius();
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 		minDist = pedRadius * 2;
 		int timeStep = state.getStep();
@@ -40,7 +36,7 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 			// get all Pedestrians with at moust pedRadius*2.5 distance away
 			// this reduces the amount auf overlap test.
 			VPoint pedPos = ped.getPosition();
-			List<DynamicElement> neighbours = getDynElementsAtPosition(state.getTopography(), ped.getPosition(), pedRadius*2.5);
+			List<DynamicElement> neighbours = getDynElementsAtPosition(state.getTopography(), ped.getPosition(), pedRadius *2.5);
 			// collect pedIds and distance of all overlaps for the current ped in the current timestep
 			List<Pair> overlaps = neighbours
 					.parallelStream()
@@ -55,23 +51,11 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
-		AttributesPedestrianOverlapProcessor att = (AttributesPedestrianOverlapProcessor) this.getAttributes();
-
-		this.pedRadius = att.getPedRadius();
 	}
 
 	private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {
 		LinkedCellsGrid<DynamicElement> dynElements = topography.getSpatialMap(DynamicElement.class);
 		return dynElements.getObjects(sourcePosition, radius);
-	}
-
-	@Override
-	public AttributesProcessor getAttributes() {
-		if (super.getAttributes() == null) {
-			setAttributes(new AttributesPedestrianOverlapProcessor());
-		}
-
-		return super.getAttributes();
 	}
 
 

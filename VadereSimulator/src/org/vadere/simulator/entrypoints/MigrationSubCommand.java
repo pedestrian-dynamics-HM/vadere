@@ -9,6 +9,8 @@ import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.helper.MigrationUtil;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ public class MigrationSubCommand implements SubCommandRunner {
 		boolean revertMode = ns.getBoolean("revert-migration");
 		boolean recursive = ns.getBoolean("recursive");
 		List<String> paths = ns.getList("paths");
+		String newVersion = ns.getString("create-new-version");
 
 		ArrayList<Path> files = new ArrayList<>();
 		ArrayList<Path> dirs = new ArrayList<>();
@@ -50,6 +53,10 @@ public class MigrationSubCommand implements SubCommandRunner {
 			throw new MigrationException("Error in input paths");
 		}
 
+		if (newVersion != null && dirs.size() == 1){
+			createNewTransformFiles(dirs.get(0), newVersion);
+			return;
+		}
 
 		if (revertMode) {
 			for (Path file : files) {
@@ -71,6 +78,18 @@ public class MigrationSubCommand implements SubCommandRunner {
 				logger.info("migrate directory to version(" + targetVersion.label() + "): " + dir.toAbsolutePath().toString());
 				migrationUtil.migrateDirectoryTree(dir, targetVersion, recursive);
 			}
+		}
+
+	}
+
+	private void createNewTransformFiles(Path dest, String versionLabel) throws MigrationException {
+		MigrationUtil migrationUtil = new MigrationUtil();
+		try {
+			migrationUtil.generateNewVersionTransform(dest, versionLabel);
+		} catch (URISyntaxException e) {
+			throw new MigrationException("Error creating new transformation", e);
+		} catch (IOException e) {
+			throw new MigrationException("Error creating new transformation", e);
 		}
 
 	}

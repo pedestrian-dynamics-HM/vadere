@@ -46,7 +46,7 @@ public class MigrationUtil {
 		return Arrays.stream(addAll).collect(Collectors.toCollection(ArrayList::new));
 	}
 
-	private void generateNewVersionTransform(Path resourceDir, String newVersionLabel) throws URISyntaxException, IOException {
+	public void generateNewVersionTransform(Path resourceDir, String newVersionLabel) throws URISyntaxException, IOException {
 
 		Path oldTransform = JoltTransformation.getTransforamtionFile(Version.latest());
 		Path oldIdentity = JoltTransformation.getIdenityFile(Version.latest());
@@ -63,7 +63,7 @@ public class MigrationUtil {
 		json = json.replace("\"release\": \"" + Version.latest().label('-') + "\",", "\"release\": \"" + newVersionLabel + "\",");
 		IOUtils.writeTextFile(newIdenity.toString(), json);
 
-		json = json.replace("\"release\": \"&\",", "// no relase here to overwrite it with default at the default operation down below");
+		json = json.replace("\"release\": \"&\",", "// no release here to overwrite it with default at the default operation down below");
 		IOUtils.writeTextFile(newTransform.toString(), json);
 
 	}

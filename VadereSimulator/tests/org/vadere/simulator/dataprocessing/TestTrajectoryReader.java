@@ -53,9 +53,9 @@ public class TestTrajectoryReader {
 	}
 
 	private void resetTestStructure() throws URISyntaxException {
-		String dest = getClass().getResource("/data/VTestMultiRun").toURI().getPath();
-		String backup = getClass().getResource("/data/VTestMultiRun.bak").toURI().getPath();
-		TestUtils.resetTestStructure(dest, backup);
+		String source = getClass().getResource("/data/VTestMultiRun").toURI().getPath();
+		String dest = getClass().getResource("/data/VTestMultiRun.bak").toURI().getPath();
+		TestUtils.copyDirTo(source, dest);
 	}
 
 

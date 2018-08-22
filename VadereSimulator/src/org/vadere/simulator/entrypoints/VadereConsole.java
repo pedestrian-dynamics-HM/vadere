@@ -20,7 +20,7 @@ public class VadereConsole {
 	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
 
-//		args = new String[]{"migrate", "-f", "/home/lphex/hm.d/vadere/VadereSimulator/testResources/data/simpleProject/output/test_postvis_2018-01-17_16-56-37.307/test_postvis.scenario"};
+//		args = new String[]{"migrate", "--create-new-version",  "0.5", "/home/lphex/hm.d/vadere/VadereSimulator/resources"};
 		try {
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
@@ -144,6 +144,14 @@ public class VadereConsole {
 				.setDefault(false)
 				.help("If PATH contains a directory instead of a scenario file recursively search " +
 						"the directory tree for scenario files and apply the command");
+
+		migrationAssistant.addArgument("--create-new-version")
+				.required(false)
+				.type(String.class)
+				.dest("create-new-version")
+				.help("Create new transformation and identity file based on current latest version" +
+						"PATH must point to the directory containing the old transformation files." +
+						" This Argument takes the new Version Label as input");
 
 		return parser;
 	}

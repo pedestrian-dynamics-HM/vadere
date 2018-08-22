@@ -3,7 +3,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,9 +22,7 @@ public class PedestrianOverlapProcessorTest extends ProcessorTest {
 
 	@Test
 	public void init() throws Exception {
-		AttributesPedestrianOverlapProcessor att = (AttributesPedestrianOverlapProcessor) p.getAttributes();
 		assertInit(p);
-		assertEquals(att.getPedRadius(), r.valOfField("pedRadius"), 0.001);
 
 		for (SimulationState s : processorTestEnv.getSimStates()) {
 			p.update(s);
