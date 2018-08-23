@@ -20,7 +20,7 @@ public class TestCLFFT {
         int N = 64;
         float[] input = new float[2*N];
         for (int i = 0; i < input.length; ++i) {
-            input[i] = i%2 == 0 ? 64 : 0;
+            input[i] = i%2 == 0 ? 1 : 0;
         }
 
         // forward FFT
@@ -28,7 +28,7 @@ public class TestCLFFT {
         float[] outputF = clfftForward.fft1Dim(input);
         clfftForward.clearCL();
 
-        assertEquals("The first element should be N*N",N*N,outputF[0],EPS);
+        assertEquals("The first element should be N",N,outputF[0],EPS);
         for (int i = 1; i < outputF.length; ++i) {
             assertEquals("All other elements should be 0",0,outputF[i],EPS);
         }
