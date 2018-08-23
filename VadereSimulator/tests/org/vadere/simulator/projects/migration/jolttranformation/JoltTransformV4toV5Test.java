@@ -49,11 +49,19 @@ public class JoltTransformV4toV5Test extends JoltTransformationTest {
 		pathLastElementMustNotExist(v5, "scenario/attributesSimulation/needsBoundary");
 	}
 
+	/**
+	 * Test with scenario containing a PedestrianOverlapProcessor processor. In this case
+	 * The Attributes have to be deleted.
+	 */
 	@Test
 	public void PedestrianOverlapProcessorAttributeIsRemoved() {
 		testAttribute(test001(), 4, 1);
 	}
 
+	/**
+	 * Test with scenario not containing a PedestrianOverlapProcessor processor. In this case
+	 * Nothing should happen.
+	 */
 	@Test
 	public void NoPedestrianOverlapProcessor() {
 		testAttribute(test002(), 5, 0);

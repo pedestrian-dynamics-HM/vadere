@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
 
@@ -21,6 +22,25 @@ public class PedestrianOverlapProcessorTest extends ProcessorTest {
 	}
 
 	@Test
+	public void doUpdateWithOverlap() throws Exception {
+		((PedestrianOverlapProcessorTestEnv)processorTestEnv).verySmallOverlapping();
+		super.doUpdate();
+	}
+
+	@Test
+	public void doUpdateWithoutOverlap() throws Exception {
+		((PedestrianOverlapProcessorTestEnv)processorTestEnv).verySmallNotOverlapping();
+		super.doUpdate();
+	}
+
+	@Test
+	@Ignore
+	public void doUpdateWithTouching() throws Exception {
+		((PedestrianOverlapProcessorTestEnv)processorTestEnv).touching();
+		super.doUpdate();
+	}
+
+	@Test
 	public void init() throws Exception {
 		assertInit(p);
 
@@ -35,5 +55,8 @@ public class PedestrianOverlapProcessorTest extends ProcessorTest {
 		p.init(processorTestEnv.getManager());
 		assertInit(p);
 	}
+
+
+
 
 }

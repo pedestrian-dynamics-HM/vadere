@@ -18,7 +18,6 @@ public class JoltTransformV4toV5 extends JoltTransformation {
 	@Override
 	protected void initPostHooks() {
 		postTransformHooks.add(this::cleanupPedestrianOverlapProcessorAttribute);
-		postTransformHooks.add(this::addOverlapProcessors);
 		postTransformHooks.add(JoltTransformV1toV2::sort);
 	}
 
@@ -38,9 +37,6 @@ public class JoltTransformV4toV5 extends JoltTransformation {
 		return node;
 	}
 
-	private JsonNode addOverlapProcessors(JsonNode node) throws MigrationException {
-		return node;
-	}
 
 
 }
