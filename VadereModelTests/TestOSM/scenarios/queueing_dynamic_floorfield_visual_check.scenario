@@ -67,7 +67,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 450.0,
+      "finishTime" : 350.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -141,9 +141,9 @@
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 40.0,
+        "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"

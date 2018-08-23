@@ -36,8 +36,11 @@ public interface TestResourceHandler {
 		return testDir.getParent().resolve(testDir.getFileName() + ".bak");
 	}
 
-	default Path getDirFromResources(String resource) {
+	default Path getPathFromResources(String resource) {
 		URL resource1 = getClass().getResource(resource);
+		if (resource1 == null){
+			fail("Resource not found: " + resource);
+		}
 		File f = new File(resource1.getFile());
 		return Paths.get(f.toString());
 	}

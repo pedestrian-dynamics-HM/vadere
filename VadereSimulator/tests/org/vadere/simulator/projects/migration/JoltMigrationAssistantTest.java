@@ -7,22 +7,29 @@ import org.junit.Test;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.tests.util.reflection.TestResourceHandler;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import joptsimple.internal.Strings;
 
 import static org.junit.Assert.assertEquals;
 
-public class JoltMigrationAssistantTest {
+public class JoltMigrationAssistantTest implements TestResourceHandler {
+
+	@Override
+	public Path getTestDir() {
+		return getPathFromResources("/migration");
+	}
 
 	// clean up after test
 	@After
 	public void resetTestStructure() throws URISyntaxException {
-		String dest = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
-		String backup = getClass().getResource("/migration/testProject_v0.1.bak").toURI().getPath();
+		Path dest =  getRelativeTestPath("testProject_v0.1");
+		Path backup = getRelativeTestPath("testProject_v0.1.bak");
 		TestUtils.copyDirTo(dest, backup);
 	}
 
@@ -47,11 +54,11 @@ public class JoltMigrationAssistantTest {
 	// Test project transformation
 	@Test
 	public void TestTransformProject() throws URISyntaxException, IOException {
-		String projectPath = getClass().getResource("/migration/testProject_v0.1").toURI().getPath();
+		Path projectPath = getRelativeTestPath("testProject_v0.1");
 
 		JoltMigrationAssistant joltMigrationAssistant = new JoltMigrationAssistant();
 
-		MigrationResult res = joltMigrationAssistant.analyzeProject(projectPath);
+		MigrationResult res = joltMigrationAssistant.analyzeProject(projectPath.toString());
 		assertEquals("", new MigrationResult(12, 0, 11, 1), res);
 		System.out.println(Strings.repeat('#', 80));
 	}

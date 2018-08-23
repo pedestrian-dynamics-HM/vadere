@@ -18,7 +18,7 @@ public class JoltTransformV4toV5Test extends JoltTransformationTest {
 
 	@Override
 	public Path getTestDir() {
-		return getDirFromResources("/migration/v04_to_v05");
+		return getPathFromResources("/migration/v04_to_v05");
 	}
 
 	private JsonNode test001() {

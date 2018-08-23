@@ -10,9 +10,8 @@ import org.vadere.simulator.projects.io.TrajectoryReader;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
+import org.vadere.tests.util.reflection.TestResourceHandler;
 import org.vadere.util.io.IOUtils;
-import org.vadere.util.reflection.VadereClassNotFoundException;
-import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,19 +22,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class TestTrajectoryReader {
+public class TestTrajectoryReader implements TestResourceHandler {
 
 	private Scenario test;
 	private VadereProject project;
 	private String folderName;
+
+	@Override
+	public Path getTestDir() {
+		return getPathFromResources("/data/VTestMultiRun");
+	}
 
 	@Before
 	public void setUp() throws URISyntaxException {
@@ -43,7 +44,7 @@ public class TestTrajectoryReader {
 		folderName = "Test1_2015-03-11_17-42-08.826";
 		AttributesAgent attributes = new AttributesAgent();
 		try {
-			project = IOVadere.readProjectJson(getClass().getResource("/data/VTestMultiRun/vadere.project").getPath().replaceFirst("^/(.:/)", "$1"));
+			project = IOVadere.readProjectJson(getRelativeTestPath("vadere.project").toString());
 			test = project.getScenarios().stream().filter(t -> t.getName().equals("Test1")).findFirst().get();
 
 		} catch (IOException e) {
@@ -52,9 +53,9 @@ public class TestTrajectoryReader {
 	}
 
 	private void resetTestStructure() throws URISyntaxException {
-		String source = getClass().getResource("/data/VTestMultiRun").toURI().getPath();
-		String dest = getClass().getResource("/data/VTestMultiRun.bak").toURI().getPath();
-		TestUtils.copyDirTo(source, dest);
+		String dest = getPathFromResources("/data/VTestMultiRun").toString();
+		String backup = getPathFromResources("/data/VTestMultiRun.bak").toString();
+		TestUtils.copyDirTo(dest, backup);
 	}
 
 

@@ -29,7 +29,7 @@ public class JoltTransformV3toV4Test extends JoltTransformationTest {
 
 	@Override
 	public Path getTestDir() {
-		return getDirFromResources("/migration/v03_to_v04");
+		return getPathFromResources("/migration/v03_to_v04");
 	}
 
 	@Before

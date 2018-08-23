@@ -2,19 +2,15 @@ package org.vadere.simulator.entrypoints;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.hamcrest.core.StringContains;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.tests.util.reflection.JsonNodeTester;
 import org.vadere.tests.util.reflection.TestResourceHandler;
-import org.vadere.util.io.IOUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,7 +30,7 @@ public class MigrationSubCommandTest implements JsonNodeTester, TestResourceHand
 
 	@Override
 	public Path getTestDir() {
-		return getDirFromResources("/migration/VadererConsole");
+		return getPathFromResources("/migration/VadererConsole");
 	}
 
 	@Before
