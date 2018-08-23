@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElement;
@@ -49,6 +50,10 @@ public class PedestrianListBuilder {
 		VPoint p1 = out.stream().filter(p -> p.getId() == id1).findFirst().get().getPosition();
 		VPoint p2 = out.stream().filter(p -> p.getId() == id2).findFirst().get().getPosition();
 		return p1.distance(p2);
+	}
+
+	OverlapData overlapData(int id1, int id2, double minDist){
+		return new OverlapData(out.get(id1 -1) , out.get(id2 -1), minDist);
 	}
 
 	public List<Pedestrian> getList() {

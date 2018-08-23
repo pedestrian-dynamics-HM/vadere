@@ -1,4 +1,4 @@
-package org.vadere.tests.reflection;
+package org.vadere.tests.util.reflection;
 
 import java.lang.reflect.Field;
 
@@ -7,7 +7,7 @@ public class ReflectionHelper {
 	private Class<?> concreetClass;
 	private Object o;
 
-	public ReflectionHelper(Object o){
+	private ReflectionHelper(Object o){
 		this.o = o;
 		this.concreetClass  = o.getClass();
 	}
@@ -28,7 +28,7 @@ public class ReflectionHelper {
 		}
 	}
 
-	public Field getField (String member)throws NoSuchFieldException, IllegalAccessException{
+	private Field getField(String member)throws NoSuchFieldException {
 		Field field = null;
 		Class c = concreetClass;
 
@@ -36,7 +36,6 @@ public class ReflectionHelper {
 			try {
 				field = c.getDeclaredField(member);
 			} catch (NoSuchFieldException e) {
-				field = null;
 				c = c.getSuperclass();
 			}
 		}

@@ -3,12 +3,11 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
-import org.vadere.tests.reflection.ReflectionHelper;
+import org.vadere.tests.util.reflection.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,7 +129,6 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	void removeState(int index) {
 		states.remove(index);
 		expectedOutput.remove(index);
-		requiredProcessors.forEach(env -> env.removeState(index));
 		requiredProcessors.forEach(env -> env.removeState(index));
 	}
 

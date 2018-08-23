@@ -1,7 +1,7 @@
 {
   "name" : "rimea_10_pathfinding_sfm1",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -85,7 +85,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

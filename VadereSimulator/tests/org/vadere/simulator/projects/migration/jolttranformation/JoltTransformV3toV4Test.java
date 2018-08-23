@@ -16,10 +16,10 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class JoltTransformV3toV4Test extends JoltTransformationTest{
+public class JoltTransformV3toV4Test extends JoltTransformationTest {
 
-	ArrayList<Path> scenarios;
-	ArrayList<Path> bakScenarios;
+	private ArrayList<Path> scenarios;
+	private ArrayList<Path> bakScenarios;
 	private StringContains v04 = versionMatcher(Version.V0_4);
 	private StringContains useFixedSeed = new StringContains("useFixedSeed");
 	private StringContains fixedSeed = new StringContains("fixedSeed");
@@ -28,19 +28,19 @@ public class JoltTransformV3toV4Test extends JoltTransformationTest{
 	private StringContains randomSeed = new StringContains("randomSeed");
 
 	@Override
-	protected Path getTestDir() {
+	public Path getTestDir() {
 		return getDirFromResources("/migration/v03_to_v04");
 	}
 
 	@Before
-	public void init()  {
+	public void init() {
 		super.init();
 
 		scenarios = new ArrayList<>();
 		bakScenarios = new ArrayList<>();
 
-		scenarios.add(getTestFile("basic_1_chicken_osm1.scenario"));
-		scenarios.add(getTestFile("group_OSM_1Source1Place.scenario"));
+		scenarios.add(getRelativeTestPath("basic_1_chicken_osm1.scenario"));
+		scenarios.add(getRelativeTestPath("group_OSM_1Source1Place.scenario"));
 
 		bakScenarios.add(getTestFileBackup("basic_1_chicken_osm1.scenario"));
 		bakScenarios.add(getTestFileBackup("group_OSM_1Source1Place.scenario"));
@@ -52,7 +52,7 @@ public class JoltTransformV3toV4Test extends JoltTransformationTest{
 	}
 
 	@Test
-	public void TestTransform(){
+	public void TestTransform() {
 		MigrationAssistant ma = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
 		try {
 			String out = ma.convertFile(scenarios.get(0), Version.V0_4);

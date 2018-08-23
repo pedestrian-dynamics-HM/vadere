@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_discrete_CA_fail",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -31,17 +31,30 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
-      "attributes" : {
-        "pedRadius" : 0.2
-      }
+      "id" : 4
     } ],
     "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution" : 0.1,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "timeCostAttributes" : {
+          "standardDeviation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT"
+        }
+      },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
         "numberOfCircles" : 1,
@@ -70,23 +83,6 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
-      },
-      "org.vadere.state.attributes.models.AttributesFloorField" : {
-        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
-        "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
-        "timeCostAttributes" : {
-          "standardDeviation" : 0.7,
-          "type" : "UNIT",
-          "obstacleDensityWeight" : 3.5,
-          "pedestrianSameTargetDensityWeight" : 3.5,
-          "pedestrianOtherTargetDensityWeight" : 3.5,
-          "pedestrianWeight" : 3.5,
-          "queueWidthLoading" : 1.0,
-          "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
-        }
       }
     },
     "attributesSimulation" : {
@@ -96,7 +92,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

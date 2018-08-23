@@ -74,7 +74,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		try {
 			String json = IOUtils.readTextFile(scenarioFilePath);
 			node = StateJsonConverter.deserializeToNode(json);
-		} catch (IOException e){
+		} catch (IOException e) {
 			logger.error("Error converting File: " + e.getMessage());
 			throw new MigrationException("Could not read JsonFile or create Json representation" + e.getMessage());
 		}
@@ -91,7 +91,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 						"supported. If this is a valid releasecreate a version transformation and a new idenity transformation");
 			}
 		} else {
-			logger.warn("Version is unknown of scenario <" + node.get("name").asText() +  ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			logger.warn("Version is unknown of scenario <" + node.get("name").asText() + ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
 			version = Version.NOT_A_RELEASE;
 		}
 
@@ -103,7 +103,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 
 		JsonNode transformedNode = node;
 		// apply all transformation from current to latest version.
-		for (Version v : Version.listToLatest(version)) {
+		for (Version v : Version.listVersionFromTo(version, targetVersion)) {
 			logger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
 			transformedNode = transform(transformedNode, v);
 		}
@@ -121,12 +121,12 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 	@Override
 	public void migrateFile(Path scenarioFilePath, Version targetVersion, Path outputFile) throws MigrationException {
 		String json = convertFile(scenarioFilePath, targetVersion);
-		if (json == null){
+		if (json == null) {
 			logger.info("Nothing todo scenarioFile up-to-date");
 			return;
 		}
 
-		if (outputFile == null || scenarioFilePath.equals(outputFile)){
+		if (outputFile == null || scenarioFilePath.equals(outputFile)) {
 			//overwrite scenarioFile
 			Path backupPath = getBackupPath(scenarioFilePath);
 			try {
@@ -149,7 +149,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 	@Override
 	public void revertFile(Path scenarioFile) throws MigrationException {
 		Path backupFile = MigrationAssistant.getBackupPath(scenarioFile);
-		if (!backupFile.toFile().exists()){
+		if (!backupFile.toFile().exists()) {
 			logger.error("There does not exist a Backup for the given file");
 			logger.error("File: " + scenarioFile.toString());
 			logger.error("Backup does not exist: " + backupFile.toString());
@@ -169,7 +169,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 	}
 
 
-	public MigrationResult analyzeDirectory(Path dir, String dirName) throws IOException {
+	private MigrationResult analyzeDirectory(Path dir, String dirName) throws IOException {
 
 		Path legacyDir = dir.getParent().resolve(LEGACY_DIR).resolve(dirName);
 
@@ -250,7 +250,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 				return false;
 			}
 		} else {
-			logger.warn("Version is unknown of scenario <" + parentPath + node.get("name").asText() +  ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			logger.warn("Version is unknown of scenario <" + parentPath + node.get("name").asText() + ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
 			version = Version.NOT_A_RELEASE;
 		}
 

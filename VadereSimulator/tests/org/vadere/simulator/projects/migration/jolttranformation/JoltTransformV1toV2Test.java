@@ -14,16 +14,13 @@ import static org.junit.Assert.*;
 
 public class JoltTransformV1toV2Test extends JoltTransformationTest {
 
-	private final String TRANSFORM = "/transform_v0.1_to_v0.2.json";
-	private final String IDENTITY = "/identity_v0.2.json";
-
 	@Override
-	protected Path getTestDir() {
+	public Path getTestDir() {
 		return null;
 	}
 
 	@Test
-	public void Test1() throws MigrationException, IOException, URISyntaxException {
+	public void Test1() throws MigrationException {
 		JoltTransformation t = JoltTransformation.get(Version.V0_1);
 		JsonNode node = t.applyTransformation(getJsonFromResource("/migration/v0.1_to_v0.2_Test1.scenario"));
 		pathMustExist(node, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesPotentialCompact");
@@ -33,7 +30,7 @@ public class JoltTransformV1toV2Test extends JoltTransformationTest {
 	}
 
 	@Test
-	public void Test2() throws MigrationException, IOException, URISyntaxException {
+	public void Test2() throws MigrationException {
 		JoltTransformation t = JoltTransformation.get(Version.V0_1);
 		JsonNode node = t.applyTransformation(getJsonFromResource("/migration/v0.1_to_v0.2_Test2.scenario"));
 		pathMustExist(node, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesPotentialCompact");
@@ -44,7 +41,7 @@ public class JoltTransformV1toV2Test extends JoltTransformationTest {
 
 	// Test default values if only name is given.
 	@Test
-	public void Test3() throws MigrationException, IOException, URISyntaxException {
+	public void Test3() throws MigrationException {
 		JoltTransformation t = JoltTransformation.get(Version.V0_1);
 		JsonNode node = t.applyTransformation(getJsonFromResource("/migration/v0.1_to_v0.2_Test3.scenario"));
 		pathMustExist(node, "scenario/attributesModel");

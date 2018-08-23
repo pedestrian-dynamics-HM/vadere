@@ -3,9 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
-import org.vadere.tests.reflection.ReflectionHelper;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import static org.junit.Assert.*;
@@ -53,7 +51,7 @@ public class PedestrianWaitingTimeProcessorTest extends ProcessorTest{
 	}
 
 	@Test
-	public void getAttributes() throws Exception {
+	public void getAttributes() {
 	}
 
 }

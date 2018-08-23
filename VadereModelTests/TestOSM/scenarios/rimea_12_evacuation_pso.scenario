@@ -1,7 +1,7 @@
 {
   "name" : "rimea_12_evacuation_pso",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -46,6 +46,15 @@
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
         "submodels" : [ ]
       },
+      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
+        "pedPotentialWidth" : 0.5,
+        "pedPotentialHeight" : 12.6,
+        "obstPotentialWidth" : 0.25,
+        "obstPotentialHeight" : 20.1,
+        "useHardBodyShell" : false,
+        "obstDistanceDeviation" : 0.0,
+        "visionFieldRadius" : 5.0
+      },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
         "pedPotentialPersonalSpaceWidth" : 1.2,
@@ -55,15 +64,6 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
-      },
-      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
-        "pedPotentialWidth" : 0.5,
-        "pedPotentialHeight" : 12.6,
-        "obstPotentialWidth" : 0.25,
-        "obstPotentialHeight" : 20.1,
-        "useHardBodyShell" : false,
-        "obstDistanceDeviation" : 0.0,
-        "visionFieldRadius" : 5.0
       }
     },
     "attributesSimulation" : {
@@ -73,7 +73,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

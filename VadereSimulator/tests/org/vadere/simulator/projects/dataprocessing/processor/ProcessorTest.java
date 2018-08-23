@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.tests.reflection.ReflectionHelper;
+import org.vadere.tests.util.reflection.ReflectionHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +22,7 @@ public abstract class ProcessorTest {
 	ProcessorTestEnv<?, ?> processorTestEnv;
 
 	@Before
-	public void setup(){
+	public void setup() {
 		processorTestEnv.loadDefaultSimulationStateMocks();
 		processorTestEnv.init();
 		p = processorTestEnv.getTestedProcessor();
@@ -50,7 +50,7 @@ public abstract class ProcessorTest {
 			p.update(s);
 		}
 		int l = processorTestEnv.getSimStates().size();
-		p.postLoop(processorTestEnv.getSimStates().get(l-1));
+		p.postLoop(processorTestEnv.getSimStates().get(l - 1));
 		processorTestEnv.getOutputFile().write();
 
 		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());

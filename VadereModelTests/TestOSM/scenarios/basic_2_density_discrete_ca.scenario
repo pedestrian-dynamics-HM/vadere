@@ -1,7 +1,7 @@
 {
   "name" : "basic_2_density_discrete_ca",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -15,6 +15,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "out1.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 1, 2 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
@@ -29,11 +33,7 @@
       "id" : 2
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 3,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
-      "attributes" : {
-        "pedRadius" : 0.2
-      }
+      "id" : 3
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
       "id" : 4,
@@ -101,7 +101,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

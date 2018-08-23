@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlap;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
  * @author Mario Teixeira Parente
  */
 @DataProcessorClass()
-public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlap, Double> {
+public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlap, OverlapData> {
 	private double minDist;
 
 
 	public PedestrianOverlapProcessor() {
-		super("overlaps");
+		super("distance", "overlaps");
 	}
 
 	@Override
@@ -38,14 +39,18 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 			VPoint pedPos = ped.getPosition();
 			List<DynamicElement> neighbours = getDynElementsAtPosition(state.getTopography(), ped.getPosition(), pedRadius *2.5);
 			// collect pedIds and distance of all overlaps for the current ped in the current timestep
-			List<Pair> overlaps = neighbours
+			List<OverlapData> overlaps = neighbours
 					.parallelStream()
-					.map(p -> new Pair(p.getId(), p.getPosition().distance(pedPos)))
-					.filter(p -> ped.getId() != p.id)
-					.filter(Pair::isOverlap)
+					.map(p -> new OverlapData(ped, p, minDist))
+					.filter(OverlapData::isNotSelfOverlap)
+					.filter(OverlapData::isOverlap)
 					.collect(Collectors.toList());
-			overlaps.forEach(o -> this.putValue(new TimestepPedestrianIdOverlap(timeStep, ped.getId(), o.id), o.dist));
+			overlaps.forEach(o -> this.putValue(new TimestepPedestrianIdOverlap(timeStep, o.getPed1Id(), o.getPed2Id()), o));
 		}
+	}
+
+	public String[] toStrings(final TimestepPedestrianIdOverlap key) {
+		return  this.hasValue(key) ? this.getValue(key).toStrings() : new String[]{"N/A", "N/A"};
 	}
 
 	@Override
@@ -58,18 +63,4 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 		return dynElements.getObjects(sourcePosition, radius);
 	}
 
-
-	class Pair{
-		int id;
-		double dist;
-
-		public Pair(int id, double dist) {
-			this.id = id;
-			this.dist = dist;
-		}
-
-		boolean isOverlap(){
-			return dist < minDist;
-		}
-	}
 }

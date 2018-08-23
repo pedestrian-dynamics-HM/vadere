@@ -17,7 +17,7 @@ public class JoltTransformV4toV5Test extends JoltTransformationTest {
 
 
 	@Override
-	protected Path getTestDir() {
+	public Path getTestDir() {
 		return getDirFromResources("/migration/v04_to_v05");
 	}
 
@@ -50,8 +50,8 @@ public class JoltTransformV4toV5Test extends JoltTransformationTest {
 	}
 
 	/**
-	 * Test with scenario containing a PedestrianOverlapProcessor processor. In this case
-	 * The Attributes have to be deleted.
+	 * Test with scenario containing a PedestrianOverlapProcessor processor. In this case The
+	 * Attributes have to be deleted.
 	 */
 	@Test
 	public void PedestrianOverlapProcessorAttributeIsRemoved() {
@@ -67,7 +67,7 @@ public class JoltTransformV4toV5Test extends JoltTransformationTest {
 		testAttribute(test002(), 5, 0);
 	}
 
-	public void testAttribute(JsonNode v4, int processorCount, int overlapProcessors) {
+	private void testAttribute(JsonNode v4, int processorCount, int overlapProcessors) {
 		JsonNode processors_v4 = pathMustExist(v4, "processWriters/processors");
 
 		Iterator<JsonNode> iter_v4 = new JsonFilterIterator(processors_v4, n -> {

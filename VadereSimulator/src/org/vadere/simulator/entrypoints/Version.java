@@ -72,6 +72,15 @@ public enum Version {
 		return values()[nextId];
 	}
 
+	public static Version[] listVersionFromTo(Version from, Version to){
+		int start = versionId(from) == (values().length - 1) ? versionId(from) : versionId(from) + 1;
+		int end =  versionId(to);
+		Version[] ret = new Version[(end - start) + 1];
+		Version[] values = values();
+		System.arraycopy(values, start, ret, 0, (end - start)+1);
+		return ret;
+	}
+
 	public static Version[] listToLatest(Version v) {
 		int start = versionId(v) == (values().length - 1) ? versionId(v) : versionId(v) + 1;
 		int end = values().length;

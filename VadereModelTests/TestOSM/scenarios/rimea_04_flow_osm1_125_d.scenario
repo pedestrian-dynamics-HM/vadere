@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_osm1_125_d",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -64,7 +64,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

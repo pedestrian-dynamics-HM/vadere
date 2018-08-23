@@ -1,7 +1,7 @@
 {
   "name" : "Neues_Szenario",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -138,11 +138,7 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 14,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
-      "attributes" : {
-        "pedRadius" : 0.21
-      }
+      "id" : 14
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
       "id" : 15,
@@ -247,7 +243,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

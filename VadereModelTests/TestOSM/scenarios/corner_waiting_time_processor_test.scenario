@@ -1,7 +1,7 @@
 {
   "name" : "corner_waiting_time_processor_test",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -55,11 +55,7 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
-      "attributes" : {
-        "pedRadius" : 0.2
-      }
+      "id" : 6
     } ],
     "isTimestamped" : true
   },
@@ -120,7 +116,6 @@
       "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,

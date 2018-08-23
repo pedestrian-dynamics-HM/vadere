@@ -8,12 +8,8 @@ import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.MigrationResult;
-import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
 import org.vadere.util.io.IOUtils;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +20,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class IOVadere {
 
@@ -39,14 +38,12 @@ public class IOVadere {
 		}
 	}
 
-	public static VadereProject readProjectJson(final String filepath) throws ParserConfigurationException, SAXException,
-			IOException, TransformerException {
+	public static VadereProject readProjectJson(final String filepath) throws IOException {
 		return readProjectJson(filepath, MigrationOptions.defaultOptions());
 	}
 
 	public static VadereProject readProjectJson(final String filepath, final MigrationOptions options)
-			throws ParserConfigurationException, SAXException,
-			IOException, TransformerException {
+			throws IOException {
 
 		Path p = Paths.get(filepath);
 		if (!Files.isDirectory(p))
@@ -82,7 +79,7 @@ public class IOVadere {
 					}
 					scenarios.add(scenario);
 				} catch (Exception e) {
-					logger.error("could not read " + file.getName());
+					logger.error("could not read " + file.getAbsolutePath());
 					throw e;
 				}
 			}

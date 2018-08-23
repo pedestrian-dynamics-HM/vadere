@@ -46,8 +46,7 @@ public class TestTrajectoryReader {
 			project = IOVadere.readProjectJson(getClass().getResource("/data/VTestMultiRun/vadere.project").getPath().replaceFirst("^/(.:/)", "$1"));
 			test = project.getScenarios().stream().filter(t -> t.getName().equals("Test1")).findFirst().get();
 
-		} catch (ParserConfigurationException | SAXException | IOException | TransformerException
-				| VadereClassNotFoundException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

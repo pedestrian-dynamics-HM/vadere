@@ -80,7 +80,7 @@ public class IOUtils {
 
 	public static File[] getScenarioFilesInOutputDirectory(Path outputDir) throws IOException {
 		return Files.walk(outputDir)
-				.filter(path -> !path.toString().contains("\\corrupt")) // don't look into the corrupt-folder
+				.filter(path -> !path.toString().contains("corrupt")) // don't look into the corrupt-folder
 				.filter(path -> path.getFileName().toString().endsWith(".scenario"))
 				.map(path -> new File(path.toString()))
 				.toArray(File[]::new);
@@ -128,8 +128,6 @@ public class IOUtils {
 	 * @param cls
 	 *        class type for which the preferences should be loaded
 	 * @return the preferences object, or null.
-	 * @throws InvalidPreferencesFormatException
-	 * @throws IOException
 	 */
 	public static Preferences loadUserPreferences(String filename, Class<?> cls)
 			throws IOException, InvalidPreferencesFormatException {
