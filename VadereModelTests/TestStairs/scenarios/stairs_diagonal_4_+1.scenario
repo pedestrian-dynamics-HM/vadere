@@ -2,7 +2,6 @@
   "name" : "stairs_diagonal_4_+1",
   "description" : "",
   "release" : "0.5",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -78,7 +77,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : null
+      "simulationSeed" : 0
     },
     "topography" : {
       "attributes" : {
@@ -191,6 +190,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -215,8 +215,7 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      },
-      "dynamicElements" : [ ]
+      }
     }
   }
 }
