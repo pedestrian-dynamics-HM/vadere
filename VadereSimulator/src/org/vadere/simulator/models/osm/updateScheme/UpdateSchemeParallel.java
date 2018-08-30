@@ -39,7 +39,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private void updateParallelSeek(double timeStepInSec) {
+	protected void updateParallelSeek(double timeStepInSec) {
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
