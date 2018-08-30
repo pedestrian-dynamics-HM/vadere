@@ -129,40 +129,51 @@ public abstract class DefaultRenderer {
 
 	protected  void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
 								 final Color color){
-		final Color tmpColor = g.getColor();
-
 		for (Stairs s : stairs) {
-			g.setColor(Color.black);
-			g.fill(s.getShape());
-			Area hatchArea = new Area(s.getShape());
-			double stroke = s.getTreadDepth() * 0.05;
-			double halfTreadDepth = s.getTreadDepth()/2;
-
-			for (Stairs.Tread tread : s.getTreads()) {
-
-				VLine tLine = tread.treadline;
-				Vector2D vec = tLine.asVector();
-				vec = vec.normalize(stroke);
-				vec = vec.rotate(rotNeg90);
-				Vector2D trans = vec.normalize(halfTreadDepth);
-				Path2D p = new Path2D.Double();
-				p.moveTo(tLine.x1, tLine.y1);
-				p.lineTo(tLine.x2, tLine.y2);
-				p.lineTo(tLine.x2 + vec.x, tLine.y2  + vec.y);
-				p.lineTo(tLine.x1 + vec.x, tLine.y1 + vec.y);
-				p.closePath();
-
-				p.transform(AffineTransform.getTranslateInstance(trans.x, trans.y));
-
-				hatchArea.subtract(new Area(p));
-			}
-
-			g.setColor(color);
-			g.fill(hatchArea);
+			renderStair(s, g, color);
 		}
-		g.setColor(tmpColor);
 	}
 
+	protected void renderStair(ScenarioElement element, final Graphics2D graphics, Color color){
+		Stairs stairs = (Stairs) element;
+
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(Color.black);
+		graphics.fill(stairs.getShape());
+		Area hatchArea = new Area(stairs.getShape());
+		double stroke = stairs.getTreadDepth() * 0.05;
+		double halfTreadDepth = stairs.getTreadDepth()/2;
+
+		for (Stairs.Tread tread : stairs.getTreads()) {
+
+			VLine tLine = tread.treadline;
+			Vector2D vec = tLine.asVector();
+			vec = vec.normalize(stroke);
+			vec = vec.rotate(rotNeg90);
+			Vector2D trans = vec.normalize(halfTreadDepth);
+			Path2D p = new Path2D.Double();
+			p.moveTo(tLine.x1, tLine.y1);
+			p.lineTo(tLine.x2, tLine.y2);
+			p.lineTo(tLine.x2 + vec.x, tLine.y2  + vec.y);
+			p.lineTo(tLine.x1 + vec.x, tLine.y1 + vec.y);
+			p.closePath();
+
+			p.transform(AffineTransform.getTranslateInstance(trans.x, trans.y));
+
+			hatchArea.subtract(new Area(p));
+		}
+
+		graphics.setColor(color);
+		graphics.fill(hatchArea);
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderFilledShape(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(color);
+		graphics.fill(element.getShape());
+		graphics.setColor(tmpColor);
+	}
 
 	protected void renderSelectionShape(final Graphics2D graphics) {
 		graphics.setColor(defaultModel.getMouseSelectionMode().getSelectionColor());

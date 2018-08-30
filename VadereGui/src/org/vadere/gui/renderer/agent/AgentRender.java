@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.*;
@@ -28,19 +29,20 @@ public class AgentRender implements Renderer {
 	}
 
 	@Override
-	public void render(Agent a, Graphics2D g) {
+	public void render(final ScenarioElement element, Graphics2D g) {
+
 		if (model.config.isShowGroups()) {
 			try {
-				Pedestrian ped = (Pedestrian) a;
+				Pedestrian ped = (Pedestrian) element;
 				renderGroup(ped, g);
 			} catch (ClassCastException cce) {
 				logger.error("Error casting to Pedestrian");
 				cce.printStackTrace();
 				model.config.setShowGroups(false);
-				renderDefault(a, g, defaultColor);
+				renderDefault(element, g, defaultColor);
 			}
 		} else {
-			renderDefault(a, g, defaultColor);
+			renderDefault(element, g, defaultColor);
 		}
 	}
 
@@ -49,9 +51,9 @@ public class AgentRender implements Renderer {
 		g.fill(getShape(ped));
 	}
 
-	private void renderDefault(Agent a, Graphics2D g, Color c) {
+	private void renderDefault(final ScenarioElement element, Graphics2D g, Color c) {
 		g.setColor(c);
-		g.fill(a.getShape());
+		g.fill(element.getShape());
 	}
 
 	private Color getHSBColor(int groupId) {
