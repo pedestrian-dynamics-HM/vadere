@@ -47,7 +47,6 @@ public class CLFFTConvolution {
     private FloatBuffer hostInput;
     private FloatBuffer hostOutput;
     private FloatBuffer hostGaussKernelInput;
-    private FloatBuffer hostGaussKernelOutput;
     private FloatBuffer hostGaussKernelTransformed;
     private ByteBuffer kernelSourceCode;
 
@@ -93,11 +92,11 @@ public class CLFFTConvolution {
      * FFT Convolution takes the 1 dimensional Argument gaussKernel and directly applys a FFT on it.
      * matrixHeight, matrixWidth and kernelSize are the dimensions for the real Data.
      *
-     * @param matrixHeight
-     * @param matrixWidth
-     * @param kernelSize
-     * @param gaussKernel
-     * @throws OpenCLException
+     * @param matrixHeight height
+     * @param matrixWidth width
+     * @param kernelSize kernel size
+     * @param gaussKernel gaussian kernel vector 1 dim
+     * @throws OpenCLException openCLException
      */
 
 
@@ -132,13 +131,13 @@ public class CLFFTConvolution {
     }
 
 
-        /**
-         * init initializes all OpenCL fields, the openCL Callbacks for error messages. Also builds the Kernels for the
-         * 2 - dimensional FFT, 1 - dimensional FFT and the multiplication
-         * Both for the matrix and the gauss Kernel FFT the Memory is allocated,
-         * hostGaussKernelTransformed holds the transformed gaussKernel
-         * @throws OpenCLException
-         */
+    /**
+     * init initializes all OpenCL fields, the openCL Callbacks for error messages. Also builds the Kernels for the
+     * 2 - dimensional FFT, 1 - dimensional FFT and the multiplication
+     * Both for the matrix and the gauss Kernel FFT the Memory is allocated,
+     * hostGaussKernelTransformed holds the transformed gaussKernel
+     * @throws OpenCLException openCLException
+     */
     public void init() throws OpenCLException {
         try {
             initCallbacks();
@@ -174,9 +173,7 @@ public class CLFFTConvolution {
             setArgumentsMultiply();
 
         } catch (OpenCLException ex) {
-            throw ex;
-        } finally {
-
+            ex.printStackTrace();
         }
     }
 
@@ -185,9 +182,7 @@ public class CLFFTConvolution {
      */
     private void initCallbacks() {
         contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
-        {
-            log.debug("[LWJGL] cl_context_callback" + "\tInfo: " + memUTF8(errinfo));
-        });
+                log.debug("[LWJGL] cl_context_callback" + "\tInfo: " + memUTF8(errinfo)));
 
         programCB = CLProgramCallback.create((program, user_data) ->
         {
@@ -201,7 +196,7 @@ public class CLFFTConvolution {
 
     /**
      * Inizializes the clPlatform, clDevice, clContext and the cl Queue
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     private void initCL() throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
@@ -241,13 +236,9 @@ public class CLFFTConvolution {
         return gaussKernelTransformed;
     }
 
-    public float[] getGaussKernel() {
-        return gaussKernel;
-    }
-
     /**
      * Sets the kernel arguments for the FFT for the matrix and the gauss kernel
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     private void setArgumentsFFT() throws OpenCLException {
 
@@ -271,7 +262,7 @@ public class CLFFTConvolution {
 
     /**
      * Sets the kernel arguments for the multiplication
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     private void setArgumentsMultiply() throws OpenCLException {
 
@@ -290,13 +281,12 @@ public class CLFFTConvolution {
      * Computes the linear convolution of the given matrix with the set Gaussian kernel
      * @param matrix position matrix
      * @return densityMatrix with the size of the original matrix
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     public float[] convolve(final float[] matrix) throws OpenCLException {
 
         // padd Matrix
         float[] tmpMatrix = zeroPaddMatrix(matrix);
-        System.out.println("padded Matrix "+ Arrays.toString(tmpMatrix));
         // FFT on Matrix
         tmpMatrix = fft2Dim(tmpMatrix,Direction.SPACE2FREQUENCY);
         //multiply matrix rows with kernel
@@ -310,9 +300,9 @@ public class CLFFTConvolution {
 
     /**
      * multiply computes the point wise multiplication of the matrix with the kernel row and column wise
-     * @param matrix
+     * @param matrix matrix in fourier space
      * @return outputMatrix
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     public float[] multiply(final float[] matrix, int height, int width) throws OpenCLException {
 
@@ -328,8 +318,8 @@ public class CLFFTConvolution {
 
     /**
      * multiply sets the local and global worksize and enqueues the multiply kernel
-     * @param clKernel
-     * @throws OpenCLException
+     * @param clKernel kernel program for multiplication
+     * @throws OpenCLException openCLException
      */
     private void multiply(final long clKernel, int height, int width) throws OpenCLException {
 
@@ -358,10 +348,10 @@ public class CLFFTConvolution {
 
     /**
      * fft1Dim computes the 1 dimensional FFT of the input in the given direction
-     * @param input
-     * @param direction
+     * @param input 1 dim input vector
+     * @param direction of fft
      * @return transformed input
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     public float[] fft1Dim(final float[] input, Direction direction) throws OpenCLException {
         // inner FFT
@@ -375,9 +365,9 @@ public class CLFFTConvolution {
 
     /**
      * fft1Dim sets the local and global worksize and enqueues the 1 dim FFT Kernel
-     * @param clKernel
-     * @param direction
-     * @throws OpenCLException
+     * @param clKernel kernel program
+     * @param direction for fft
+     * @throws OpenCLException openCLException
      */
     private void fft1Dim(final long clKernel, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -403,7 +393,7 @@ public class CLFFTConvolution {
     /**
      * fftGaussKernel computes the FFT transformation into frequency space of the set gauss kernel
      * @return transformedGaussKernel in the frequency space
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     private float[] fftGaussKernel() throws OpenCLException {
         return fft1Dim(gaussKernel, Direction.SPACE2FREQUENCY);
@@ -411,10 +401,10 @@ public class CLFFTConvolution {
 
     /**
      * fft2Dim compute the 2 dimensional FFT in the given direction. The input matrix is given in vector.
-     * @param input
-     * @param direction
+     * @param input 2 dim input matrix as 1-dim vector
+     * @param direction for fft
      * @return output transformed input matrix
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     public float[] fft2Dim(final float[] input, Direction direction) throws OpenCLException {
 
@@ -438,9 +428,9 @@ public class CLFFTConvolution {
 
     /**
      * fft2Dim enqueues the 2-dim FFT Kernel and sets the direction argument of the kernel
-     * @param clKernel
-     * @param direction
-     * @throws OpenCLException
+     * @param clKernel kernel program
+     * @param direction for fft
+     * @throws OpenCLException openCLException
      */
     private void fft2Dim(final long clKernel, int height, int width, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -469,25 +459,21 @@ public class CLFFTConvolution {
     /**
      * computePaddWidth calculates the paddWidth from the matrixWidth and KernelSize and rounds up to the next power of two
      */
-    public void computePaddWidth() {
-        int N = matrixWidth + kernelSize - 1; // matrixWidth * 2 -> real and complex values
-        int N2 = nextPowerOf2(N);
-        this.paddWidth = N2; // times two for complex values
+    private void computePaddWidth() {
+        this.paddWidth = nextPowerOf2(matrixWidth + kernelSize - 1); // times two for complex values
     }
 
     /**
      * computePaddHeight calculates the paddHeight from the matrixHeight and KernelSize and rounds up to the next power of two
      */
-    public void computePaddHeight() {
-        int M = matrixHeight + kernelSize - 1;
-        int M2 = nextPowerOf2(M);
-        this.paddHeight = M2;
+    private void computePaddHeight() {
+        this.paddHeight = nextPowerOf2(matrixHeight + kernelSize - 1);
     }
 
     /**
      * zeroPaddKernel padds the Kernel with zeros and adds the complex values which are zero
-     * @param orginalKernel
-     * @return paddedKernel
+     * @param orginalKernel befor zero padding
+     * @return paddedKernel after zero padding
      */
     public float[] zeroPaddKernel(float[] orginalKernel) {
 
@@ -506,8 +492,8 @@ public class CLFFTConvolution {
 
     /**
      * zeroPaddMatrix padds the matrix with zeros and adds the complex values which are zero
-     * @param orginalMatrix
-     * @return paddedMatrix
+     * @param orginalMatrix input matrix befor zero padding
+     * @return paddedMatrix after zero padding
      */
     public float[] zeroPaddMatrix(float[] orginalMatrix) {
         float[] paddedMatrix = new float[paddHeight * 2 * paddWidth];
@@ -527,10 +513,10 @@ public class CLFFTConvolution {
 
     /**
      * extractOriginalArea returns the convolution result with the same size as the original matrix
-     * @param outputMatrix
+     * @param outputMatrix convolved matrix still with zero padding
      * @return originalMatrix
      */
-    public float[] extractOriginalArea(float[] outputMatrix) { // TODO extract only real numbers
+    public float[] extractOriginalArea(float[] outputMatrix) {
 
         float[] originalSizeMatrix = new float[matrixHeight * matrixWidth];
         int M = (matrixHeight + kernelSize - 1);
@@ -553,7 +539,7 @@ public class CLFFTConvolution {
 
     /**
      * nextPowerOf2 rounds n up to the next power of two
-     * @param n
+     * @param n number
      * @return power of two neares to n
      */
     public static int nextPowerOf2(int n) {
@@ -563,8 +549,8 @@ public class CLFFTConvolution {
 
     /**
      * computeWorksize computes the works size and checks that the points_per_item are not samller that the required minimum
-     * @param points_per_workgroup
-     * @return
+     * @param points_per_workgroup data points per workgroup
+     * @return local_size
      */
     private int computeWorksize(int points_per_workgroup) {
         int points_per_item = max_fft_per_work_item;
@@ -582,7 +568,7 @@ public class CLFFTConvolution {
 
     /**
      * buildKernels compiles the kernels for the 2-dim FFT the 1-dim FFT and the multiplication
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     private void buildKernels() throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -646,7 +632,7 @@ public class CLFFTConvolution {
 
     /**
      * clearMemory releases the allocated memory objects
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     private void clearMemory() throws OpenCLException {
         try {
@@ -659,7 +645,7 @@ public class CLFFTConvolution {
             CLInfo.checkCLError(clReleaseKernel(clFFTKernel));
             CLInfo.checkCLError(clReleaseKernel(clMultiplyKernel));
         } catch (OpenCLException e) {
-            throw e;
+            e.printStackTrace();
         } finally {
             MemoryUtil.memFree(hostInput);
             MemoryUtil.memFree(hostOutput);
@@ -671,7 +657,7 @@ public class CLFFTConvolution {
 
     /**
      * clearCL releses the OpenCL fields
-     * @throws OpenCLException
+     * @throws OpenCLException openCLException
      */
     public void clearCL() throws OpenCLException {
         clearMemory();
