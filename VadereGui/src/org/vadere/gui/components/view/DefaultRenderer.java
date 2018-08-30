@@ -1,22 +1,11 @@
 package org.vadere.gui.components.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
@@ -25,10 +14,21 @@ import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.RectangleLimits;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+
 public abstract class DefaultRenderer {
 
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
+	private static final double rotNeg90 = - Math.PI /2;
 
 	public DefaultRenderer(final IDefaultModel defaultModel) {
 		this(defaultModel, true, false);
@@ -126,6 +126,43 @@ public abstract class DefaultRenderer {
 
 		g.setColor(tmpColor);
 	}
+
+	protected  void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
+								 final Color color){
+		final Color tmpColor = g.getColor();
+
+		for (Stairs s : stairs) {
+			g.setColor(Color.black);
+			g.fill(s.getShape());
+			Area hatchArea = new Area(s.getShape());
+			double stroke = s.getTreadDepth() * 0.05;
+			double halfTreadDepth = s.getTreadDepth()/2;
+
+			for (Stairs.Tread tread : s.getTreads()) {
+
+				VLine tLine = tread.treadline;
+				Vector2D vec = tLine.asVector();
+				vec = vec.normalize(stroke);
+				vec = vec.rotate(rotNeg90);
+				Vector2D trans = vec.normalize(halfTreadDepth);
+				Path2D p = new Path2D.Double();
+				p.moveTo(tLine.x1, tLine.y1);
+				p.lineTo(tLine.x2, tLine.y2);
+				p.lineTo(tLine.x2 + vec.x, tLine.y2  + vec.y);
+				p.lineTo(tLine.x1 + vec.x, tLine.y1 + vec.y);
+				p.closePath();
+
+				p.transform(AffineTransform.getTranslateInstance(trans.x, trans.y));
+
+				hatchArea.subtract(new Area(p));
+			}
+
+			g.setColor(color);
+			g.fill(hatchArea);
+		}
+		g.setColor(tmpColor);
+	}
+
 
 	protected void renderSelectionShape(final Graphics2D graphics) {
 		graphics.setColor(defaultModel.getMouseSelectionMode().getSelectionColor());
