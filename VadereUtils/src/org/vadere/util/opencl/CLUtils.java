@@ -7,6 +7,7 @@ import org.lwjgl.system.MemoryUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -75,6 +76,18 @@ public class CLUtils {
         return floatBuffer;
     }
 
+    public static DoubleBuffer toDoubleBuffer(@NotNull final double[] doubles) {
+        DoubleBuffer doubleBuffer = MemoryUtil.memAllocDouble(doubles.length);
+        return toDoubleBuffer(doubles, doubleBuffer);
+    }
+
+    public static DoubleBuffer toDoubleBuffer(@NotNull final double[] doubles, @NotNull final DoubleBuffer doubleBuffer) {
+        for(int i = 0; i < doubles.length; i++) {
+            doubleBuffer.put(i, doubles[i]);
+        }
+        return doubleBuffer;
+    }
+
     public static float[] toFloatArray(@NotNull final FloatBuffer floatBuffer, final int size) {
 	    float[] result = new float[size];
 	    for(int i = 0; i < size; i++) {
@@ -82,6 +95,15 @@ public class CLUtils {
         }
         return result;
     }
+
+    public static double[] toDoubleArray(@NotNull final DoubleBuffer doubleBuffer, final int size) {
+        double[] result = new double[size];
+        for(int i = 0; i < size; i++) {
+            result[i] = doubleBuffer.get(i);
+        }
+        return result;
+    }
+
 
     private static ByteBuffer resizeBuffer(@NotNull final ByteBuffer buffer, int newCapacity) {
         ByteBuffer newBuffer = MemoryUtil.memCalloc(newCapacity);

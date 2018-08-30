@@ -11,9 +11,8 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
 import static org.lwjgl.opencl.CL10.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -21,15 +20,15 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 
-public class CLFFTConvolution {
+public class CLFFTConvolutionDP {
 
     private static final int OFFSET_ZERO = 0;
     private static final int SOURCE_BUFFER_SIZE = 4096;
-    private static final int BUFFER_SIZE_FACTOR = 4;
+    private static final int BUFFER_SIZE_FACTOR = 8;
     private static final int MALLOC_SIZE = 1;
     private static final int DIMENSION_ZERO = 0;
     private static final int WORK_DIM = 1;
-    private static final int FLOAT_PRECITION = 8;
+    private static final int FLOAT_PRECITION = 16;
     private static final int MIN_ELEMENTS_PER_WORKITEM = 8;
 
     // CL ids
@@ -44,18 +43,17 @@ public class CLFFTConvolution {
     private CLProgramCallback programCB;
 
     // Host Memory
-    private FloatBuffer hostInput;
-    private FloatBuffer hostOutput;
-    private FloatBuffer hostGaussKernelInput;
-    private FloatBuffer hostGaussKernelOutput;
-    private FloatBuffer hostGaussKernelTransformed;
+    private DoubleBuffer hostInput;
+    private DoubleBuffer hostOutput;
+    private DoubleBuffer hostGaussKernelInput;
+    private DoubleBuffer hostGaussKernelTransformed;
     private ByteBuffer kernelSourceCode;
 
     private int matrixHeight;
     private int matrixWidth;
     private int kernelSize;
-    private float[] gaussKernel;
-    private float[] gaussKernelTransformed;
+    private double[] gaussKernel;
+    private double[] gaussKernelTransformed;
 
     private int paddHeight;
     private int paddWidth;
@@ -76,7 +74,7 @@ public class CLFFTConvolution {
 
 
     // logger for callbacks
-    private static Logger log = Logger.getLogger(CLFFTConvolution.class);
+    private static Logger log = Logger.getLogger(CLFFTConvolutionDP.class);
     private boolean debug = false;
     private boolean profiling = false;
     private boolean padd;
@@ -101,13 +99,13 @@ public class CLFFTConvolution {
      */
 
 
-    public CLFFTConvolution(int matrixHeight, int matrixWidth, int kernelSize, @NotNull final float[] gaussKernel) throws OpenCLException {
+    public CLFFTConvolutionDP(int matrixHeight, int matrixWidth, int kernelSize, @NotNull final double[] gaussKernel) throws OpenCLException {
 
         this(matrixHeight,matrixWidth,kernelSize,gaussKernel,true);
 
     }
 
-    public CLFFTConvolution(int matrixHeight, int matrixWidth, int kernelSize, @NotNull final float[] gaussKernel, boolean padd) throws OpenCLException {
+    public CLFFTConvolutionDP(int matrixHeight, int matrixWidth, int kernelSize, @NotNull final double[] gaussKernel, boolean padd) throws OpenCLException {
         this.matrixHeight = matrixHeight;
         this.matrixWidth = matrixWidth;
         this.kernelSize = kernelSize;
@@ -153,9 +151,9 @@ public class CLFFTConvolution {
             this.max_fft_per_work_item = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
 
             // reserve memory for input matrix and gauss kernel
-            hostInput = MemoryUtil.memAllocFloat(2 * paddHeight * paddWidth);
-            hostOutput = MemoryUtil.memAllocFloat(2 * paddHeight * paddWidth);
-            hostGaussKernelInput = MemoryUtil.memAllocFloat(2*paddWidth);
+            hostInput = MemoryUtil.memAllocDouble(2 * paddHeight * paddWidth);
+            hostOutput = MemoryUtil.memAllocDouble(2 * paddHeight * paddWidth);
+            hostGaussKernelInput = MemoryUtil.memAllocDouble(2*paddWidth);
 
             setArgumentsFFT();
 
@@ -165,7 +163,7 @@ public class CLFFTConvolution {
                 gaussKernelTransformed = gaussKernel; // for testing purposses skipp kernel fft
             }
 
-            hostGaussKernelTransformed = CLUtils.toFloatBuffer(gaussKernelTransformed);
+            hostGaussKernelTransformed = CLUtils.toDoubleBuffer(gaussKernelTransformed);
 
 
             // clear hostGaussKernel and clGaussKernel as kernel fft is only done once
@@ -237,11 +235,11 @@ public class CLFFTConvolution {
         }
     }
 
-    public float[] getGaussKernelTransformed() {
+    public double[] getGaussKernelTransformed() {
         return gaussKernelTransformed;
     }
 
-    public float[] getGaussKernel() {
+    public double[] getGaussKernel() {
         return gaussKernel;
     }
 
@@ -292,17 +290,18 @@ public class CLFFTConvolution {
      * @return densityMatrix with the size of the original matrix
      * @throws OpenCLException
      */
-    public float[] convolve(final float[] matrix) throws OpenCLException {
+    public double[] convolve(final double[] matrix) throws OpenCLException {
 
         // padd Matrix
-        float[] tmpMatrix = zeroPaddMatrix(matrix);
-        System.out.println("padded Matrix "+ Arrays.toString(tmpMatrix));
+        double[] tmpMatrix = zeroPaddMatrix(matrix);
         // FFT on Matrix
-        tmpMatrix = fft2Dim(tmpMatrix,Direction.SPACE2FREQUENCY);
+        tmpMatrix = fft2Dim(tmpMatrix, Direction.SPACE2FREQUENCY);
+
         //multiply matrix rows with kernel
         tmpMatrix = multiplyRows(tmpMatrix);
         //multiply matrix cols with kernel
         tmpMatrix = multiplyCols(tmpMatrix);
+
         // IFFT
         tmpMatrix = fft2Dim(tmpMatrix, Direction.FREQUENCY2SPACE);
         return extractOriginalArea(tmpMatrix);
@@ -314,16 +313,16 @@ public class CLFFTConvolution {
      * @return outputMatrix
      * @throws OpenCLException
      */
-    public float[] multiply(final float[] matrix, int height, int width) throws OpenCLException {
+    public double[] multiply(final double[] matrix, int height, int width) throws OpenCLException {
 
-        CLUtils.toFloatBuffer(matrix,hostInput);
+        CLUtils.toDoubleBuffer(matrix,hostInput);
         clEnqueueWriteBuffer(clQueue,clMatrixInput,true,OFFSET_ZERO,hostInput,null,null);
 
         multiply(clMultiplyKernel, height,width);
 
         clEnqueueReadBuffer(clQueue,clMatrixOutput,true,OFFSET_ZERO,hostOutput,null,null);
 
-        return CLUtils.toFloatArray(hostOutput,matrix.length);
+        return CLUtils.toDoubleArray(hostOutput,matrix.length);
     }
 
     /**
@@ -348,11 +347,11 @@ public class CLFFTConvolution {
         }
     }
 
-    public float[] multiplyRows(final float[] matrix) throws OpenCLException {
+    public double[] multiplyRows(final double[] matrix) throws OpenCLException {
         return multiply(matrix,paddHeight,paddWidth);
     }
 
-    public float[] multiplyCols(final float[] matrix) throws OpenCLException {
+    public double[] multiplyCols(final double[] matrix) throws OpenCLException {
         return multiply(matrix,paddWidth,paddHeight); // matrix is transposed
     }
 
@@ -363,14 +362,14 @@ public class CLFFTConvolution {
      * @return transformed input
      * @throws OpenCLException
      */
-    public float[] fft1Dim(final float[] input, Direction direction) throws OpenCLException {
+    public double[] fft1Dim(final double[] input, Direction direction) throws OpenCLException {
         // inner FFT
-        CLUtils.toFloatBuffer(input, hostGaussKernelInput);
+        CLUtils.toDoubleBuffer(input, hostGaussKernelInput);
         clEnqueueWriteBuffer(clQueue, clGaussKernelInput, true, OFFSET_ZERO, hostGaussKernelInput, null, null);
         fft1Dim(clFFTKernel, direction);
         clEnqueueReadBuffer(clQueue, clGaussKernelInput, true, OFFSET_ZERO, hostGaussKernelInput, null, null);
 
-        return CLUtils.toFloatArray(hostGaussKernelInput, input.length);
+        return CLUtils.toDoubleArray(hostGaussKernelInput, input.length);
     }
 
     /**
@@ -405,7 +404,7 @@ public class CLFFTConvolution {
      * @return transformedGaussKernel in the frequency space
      * @throws OpenCLException
      */
-    private float[] fftGaussKernel() throws OpenCLException {
+    private double[] fftGaussKernel() throws OpenCLException {
         return fft1Dim(gaussKernel, Direction.SPACE2FREQUENCY);
     }
 
@@ -416,24 +415,24 @@ public class CLFFTConvolution {
      * @return output transformed input matrix
      * @throws OpenCLException
      */
-    public float[] fft2Dim(final float[] input, Direction direction) throws OpenCLException {
+    public double[] fft2Dim(final double[] input, Direction direction) throws OpenCLException {
 
         // inner FFT
-        CLUtils.toFloatBuffer(input, hostInput);
+        CLUtils.toDoubleBuffer(input, hostInput);
         clEnqueueWriteBuffer(clQueue, clMatrixInput, true, OFFSET_ZERO, hostInput, null, null);
 
         fft2Dim(clFFTMatrix, paddHeight, paddWidth, direction);
         clEnqueueReadBuffer(clQueue, clMatrixOutput, true, OFFSET_ZERO, hostOutput, null, null);
 
         // outer FFT -> matrix is transposed
-        float[] innerFFT = CLUtils.toFloatArray(hostOutput, 2 * paddHeight * paddWidth); // TODO avoid having to read to array and then write to buffer again
-        CLUtils.toFloatBuffer(innerFFT, hostInput);
+        double[] innerFFT = CLUtils.toDoubleArray(hostOutput, 2 * paddHeight * paddWidth); // TODO avoid having to read to array and then write to buffer again
+        CLUtils.toDoubleBuffer(innerFFT, hostInput);
 
         clEnqueueWriteBuffer(clQueue, clMatrixInput, true, OFFSET_ZERO, hostInput, null, null);
         fft2Dim(clFFTMatrix, paddWidth, paddHeight, direction); // swapp height and width as matrix is transpose
         clEnqueueReadBuffer(clQueue, clMatrixOutput, true, OFFSET_ZERO, hostOutput, null, null);
 
-        return CLUtils.toFloatArray(hostOutput, 2 * paddHeight * paddWidth);
+        return CLUtils.toDoubleArray(hostOutput, 2 * paddHeight * paddWidth);
     }
 
     /**
@@ -489,9 +488,9 @@ public class CLFFTConvolution {
      * @param orginalKernel
      * @return paddedKernel
      */
-    public float[] zeroPaddKernel(float[] orginalKernel) {
+    public double[] zeroPaddKernel(double[] orginalKernel) {
 
-        float[] paddedKernel = new float[2*paddWidth];
+        double[] paddedKernel = new double[2*paddWidth];
         for (int i = 0; i < paddedKernel.length; ++i) {
 
             if (i%2 != 0 || i >= kernelSize*2) {
@@ -509,8 +508,8 @@ public class CLFFTConvolution {
      * @param orginalMatrix
      * @return paddedMatrix
      */
-    public float[] zeroPaddMatrix(float[] orginalMatrix) {
-        float[] paddedMatrix = new float[paddHeight * 2 * paddWidth];
+    public double[] zeroPaddMatrix(double[] orginalMatrix) {
+        double[] paddedMatrix = new double[paddHeight * 2 * paddWidth];
 
         for (int i = 0; i < paddedMatrix.length; ++i) {
             int col = i % (paddWidth*2);
@@ -530,9 +529,9 @@ public class CLFFTConvolution {
      * @param outputMatrix
      * @return originalMatrix
      */
-    public float[] extractOriginalArea(float[] outputMatrix) { // TODO extract only real numbers
+    public double[] extractOriginalArea(double[] outputMatrix) { // TODO extract only real numbers
 
-        float[] originalSizeMatrix = new float[matrixHeight * matrixWidth];
+        double[] originalSizeMatrix = new double[matrixHeight * matrixWidth];
         int M = (matrixHeight + kernelSize - 1);
         int N = (matrixWidth + kernelSize - 1)*2;
         int offsetTop = (M - matrixHeight) / 2;
@@ -592,7 +591,7 @@ public class CLFFTConvolution {
             PointerBuffer lengths = stack.mallocPointer(MALLOC_SIZE);
 
             try {
-                kernelSourceCode = CLUtils.ioResourceToByteBuffer("FFTConvolution.cl", SOURCE_BUFFER_SIZE);
+                kernelSourceCode = CLUtils.ioResourceToByteBuffer("FFTConvolution64.cl", SOURCE_BUFFER_SIZE);
             } catch (IOException e) {
                 throw new OpenCLException(e.getMessage());
             }
