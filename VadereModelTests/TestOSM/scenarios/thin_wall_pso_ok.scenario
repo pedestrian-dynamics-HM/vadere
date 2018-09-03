@@ -35,7 +35,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianWaitingTimeProcessor",
       "attributes" : {
         "expectedResult" : "SUCCESS",
-        "pedestrianWaitingTimeProcessorId" : 0,
+        "pedestrianWaitingTimeProcessorId" : 1,
         "maximalWaitingTime" : "Infinity",
         "minimalWaitingTime" : 0.0
       }
