@@ -127,7 +127,16 @@ public class TikzGenerator {
 		DefaultSimulationConfig config = model.getConfig();
 		Topography topography = model.getTopography();
 
-		// Draw background elements first, then other scenario elements on toph.
+		// Clip everything outside of topography bound.
+		generatedCode += "% Clipping\n";
+		String clipTextPattern = "\\clip (%f,%f) rectangle (%f,%f);\n";
+		generatedCode += String.format(clipTextPattern,
+				topography.getBounds().x,
+				topography.getBounds().y,
+				topography.getBounds().x + topography.getBounds().width,
+				topography.getBounds().y + topography.getBounds().height);
+
+		// Draw background elements first, then other scenario elements.
 		generatedCode += "% Ground\n";
 		String groundTextPattern = (config.isShowGrid()) ? "\\draw[help lines] (%f,%f) grid (%f,%f);\n" : "\\fill[white] (%f,%f) rectangle (%f,%f);\n";
 		generatedCode += String.format(groundTextPattern,
@@ -255,9 +264,14 @@ public class TikzGenerator {
                 } catch (ClassCastException cce) {
                     logger.error("Error casting to Pedestrian");
                     cce.printStackTrace();
-                    // TODO: render agent as circle!
+
+                    // Fall back to default rendering of agents.
+					String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+					generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
                 }
             } else {
+				// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
+				// generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
                 String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
                 generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
             }
@@ -266,8 +280,6 @@ public class TikzGenerator {
                 String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
                 generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
             }
-            // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
-            // generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
         }
 
         return generatedCode;
