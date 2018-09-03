@@ -278,6 +278,8 @@ public interface EikonalSolver {
 					c += factor * Math.pow(tp, 2);
 				}
 			}
+
+
 			return MathUtil.solveQuadraticMax(a, b, c);
 		}
 

@@ -2,7 +2,6 @@
   "name" : "rimea_09_public_room_2_exits_pso",
   "description" : "",
   "release" : "0.5",
-  "commithash" : "72af1aed04182a19d4297fdf053337b4acdce871",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",

@@ -45,11 +45,11 @@ public class PerformanceSFMM {
 
 			cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), resolution, new CellState());
 			for (VShape shape : targets) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape, new CellState(0.0, PathFindingTag.Target));
+				FloorDiscretizer.setGridValuesForShape(cellGrid, shape, new CellState(0.0, PathFindingTag.Target));
 			}
 
 			for (VShape obstacle : obstacles) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, obstacle, new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
+				FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle, new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
 			}
 		}
 	}

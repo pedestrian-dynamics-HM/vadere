@@ -196,13 +196,9 @@ public class EikonalSolverSFMM implements EikonalSolver {
 		}
 	}
 
-	private double minDistanceToTarget(final VPoint point) {
+	private double minDistanceToTarget(final VPoint point, VPoint dp) {
 		double minDistance = Double.MAX_VALUE;
 		double tmp;
-		// create point that lies in the center of the grid cells so that the distances can be
-		// computed starting there.
-		VPoint dp = new VPoint(cellGrid.getWidth() / (cellGrid.getNumPointsX() - 1) / 2.0,
-				cellGrid.getHeight() / (cellGrid.getNumPointsY() - 1) / 2.0);
 		for (VShape targetShape : targetShapes) {
 			// negative distances are possible when point is inside the target
 			tmp = Math.max(0, targetShape.distance(point.add(dp)));
@@ -211,6 +207,15 @@ public class EikonalSolverSFMM implements EikonalSolver {
 			}
 		}
 		return minDistance;
+	}
+
+	private double minDistanceToTargetCentered(final VPoint point) {
+		return minDistanceToTarget(point, new VPoint(cellGrid.getWidth() / (cellGrid.getNumPointsX() - 1) / 2.0,
+				cellGrid.getHeight() / (cellGrid.getNumPointsY() - 1) / 2.0));
+	}
+
+	private double minDistanceToTarget(final VPoint point) {
+		return minDistanceToTarget(point, new VPoint(0,0));
 	}
 
 	private class ComparatorPotentialFieldValueSFMM implements Comparator<Pair<Point, Double>> {

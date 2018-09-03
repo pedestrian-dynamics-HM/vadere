@@ -37,7 +37,7 @@ public class ObstacleDistancePotential implements IPotentialField {
 		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState());
 
 		for (VShape shape : obstacles) {
-			FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
+			FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
 					new CellState(0.0, PathFindingTag.Target));
 		}
 
@@ -49,10 +49,10 @@ public class ObstacleDistancePotential implements IPotentialField {
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
 			case FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverFIM(cellGrid, obstacles, isHighAccuracyFM, new UnitTimeCostFunction());
+				eikonalSolver = new EikonalSolverFIM(cellGrid, obstacles, new UnitTimeCostFunction());
 				break;
 			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, obstacles, isHighAccuracyFM, new UnitTimeCostFunction());
+				eikonalSolver = new EikonalSolverFSM(cellGrid, obstacles, new UnitTimeCostFunction());
 				break;
 			default:
 				eikonalSolver = new EikonalSolverSFMM(cellGrid, obstacles, isHighAccuracyFM, new UnitTimeCostFunction());
