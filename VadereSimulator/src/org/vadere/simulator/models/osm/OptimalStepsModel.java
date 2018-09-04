@@ -20,6 +20,7 @@ import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerGradient;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerNelderMead;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
 import org.vadere.simulator.models.osm.updateScheme.ParallelWorkerOSM;
+import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
@@ -36,24 +37,20 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.io.ListUtils;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel, DynamicElementRemoveListener<Pedestrian> {
 
-
+	private UpdateSchemeOSM updateSchemeOSM;
 	private AttributesOSM attributesOSM;
 	private AttributesAgent attributesPedestrian;
 	private Random random;
@@ -65,7 +62,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	private Topography topography;
 	private double lastSimTimeInSec;
 	private int pedestrianIdCounter;
-	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
 	public OptimalStepsModel() {
@@ -81,6 +77,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.topography = topography;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
+		this.updateSchemeOSM = UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
+		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
+		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
@@ -119,14 +118,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 		if (attributesPedestrian.isDensityDependentSpeed()) {
 			this.speedAdjusters.add(new SpeedAdjusterWeidmann());
-		}
-
-		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN) {
-			this.pedestrianEventsQueue = new PriorityQueue<>(100,
-					new ComparatorPedestrianOSM());
-		} else {
-			// not needed and should not be used in this case
-			this.pedestrianEventsQueue = null;
 		}
 
 		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
@@ -193,72 +184,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 	@Override
 	public void update(final double simTimeInSec) {
-
-		final double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
-		// event driven update
-		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN
-				&& !pedestrianEventsQueue.isEmpty()) {
-			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < simTimeInSec) {
-				PedestrianOSM ped = pedestrianEventsQueue.poll();
-				ped.update(timeStepInSec, simTimeInSec, CallMethod.EVENT_DRIVEN);
-				pedestrianEventsQueue.add(ped);
-			}
-
-		} else {
-			// time step length
-
-
-			// parallel update
-			if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
-				parallelCall(timeStepInSec);
-			} else {
-				List<PedestrianOSM> pedestrians = ListUtils.select(
-						topography.getElements(Pedestrian.class), PedestrianOSM.class);
-
-				// random shuffle update
-				if (attributesOSM.getUpdateType() == UpdateType.SHUFFLE) {
-					Collections.shuffle(pedestrians, this.random);
-				}
-
-				// default is fixed order sequential update
-				for (PedestrianOSM pedestrian : pedestrians) {
-					pedestrian.update(timeStepInSec, -1, CallMethod.SEQUENTIAL);
-
-				}
-			}
-
-			this.lastSimTimeInSec = simTimeInSec;
-		}
-	}
-
-	private void parallelCall(double timeStepInSec) {
-		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
-		List<Future<?>> futures;
-
-		for (CallMethod callMethod : callMethods) {
-			futures = new LinkedList<>();
-			for (final PedestrianOSM pedestrian : ListUtils.select(
-					topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
-				Runnable worker = new ParallelWorkerOSM(callMethod, pedestrian,
-						timeStepInSec);
-				futures.add(executorService.submit(worker));
-			}
-			collectFutures(futures);
-		}
-	}
-
-	private void collectFutures(final List<Future<?>> futures) {
-		try {
-			for (Future<?> future : futures) {
-				future.get();
-			}
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-		// restore interruption in order to stop simulation
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
+		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
+		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
+		lastSimTimeInSec = simTimeInSec;
 	}
 
 	/*
@@ -279,10 +207,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 				speedAdjusters, stepCircleOptimizer.clone());
 
 		pedestrian.setPosition(position);
-
-		if (attributesOSM.getUpdateType() == UpdateType.EVENT_DRIVEN) {
-			this.pedestrianEventsQueue.add(pedestrian);
-		}
 
 		return pedestrian;
 	}
@@ -308,11 +232,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	}
 
 	@Override
-	public void elementRemoved(Pedestrian ped) {
-		PedestrianOSM osmPed = (PedestrianOSM) ped;
-		pedestrianEventsQueue.remove(osmPed);
-//		System.out.printf("Remove ped %s from pedestrianEventsQueue%n", ped.getId());
-	}
+	public void elementRemoved(Pedestrian ped) {}
 
 	@Override
 	public SourceControllerFactory getSourceControllerFactory() {

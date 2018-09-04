@@ -18,7 +18,7 @@ public class ParallelWorkerOSM implements Runnable {
 
 	@Override
 	public void run() {
-		ped.update(timeStepInSec, -1, callMethod);
+		//ped.update(timeStepInSec, -1, callMethod);
 	}
 
 }

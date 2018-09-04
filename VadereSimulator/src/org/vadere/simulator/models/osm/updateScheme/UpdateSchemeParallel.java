@@ -1,66 +1,106 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.io.ListUtils;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
-	private final PedestrianOSM pedestrian;
-	private boolean isMoving;
+	private ExecutorService executorService;
+	private final Topography topography;
+	private Set<Pedestrian> movedPedestrians;
 
-	public UpdateSchemeParallel(PedestrianOSM pedestrian) {
-		this.pedestrian = pedestrian;
+	public UpdateSchemeParallel(@NotNull final Topography topography) {
+		this.topography = topography;
+		this.executorService = Executors.newSingleThreadExecutor();
+		this.movedPedestrians = new HashSet<>();
 	}
 
 	@Override
-	public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
+	public void update(double timeStepInSec, double currentTimeInSec) {
+		movedPedestrians.clear();
+		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
+		List<Future<?>> futures;
+
+		for (CallMethod callMethod : callMethods) {
+			futures = new LinkedList<>();
+			for (final PedestrianOSM pedestrian : ListUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
+				Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
+				futures.add(executorService.submit(worker));
+			}
+			collectFutures(futures);
+		}
+	}
+
+	private void collectFutures(final List<Future<?>> futures) {
+		try {
+			for (Future<?> future : futures) {
+				future.get();
+			}
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		// restore interruption in order to stop simulation
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
+		pedestrian.clearStrides();
 		switch (callMethod) {
 			case SEEK:
-				updateParallelSeek(timeStepInSec);
+				updateParallelSeek(pedestrian, timeStepInSec);
 				break;
 			case RETRY:
-				updateParallelSeek(0.0);
+				updateParallelSeek(pedestrian,0.0);
 			case MOVE:
-				updateParallelMove(timeStepInSec);
+				updateParallelMove(pedestrian, timeStepInSec);
 				break;
 			case CONFLICTS:
-				updateParallelConflicts(timeStepInSec);
+				updateParallelConflicts(pedestrian, timeStepInSec);
 				break;
 			case STEPS:
-				updateParallelSteps(timeStepInSec);
+				updateParallelSteps(pedestrian, timeStepInSec);
 				break;
 			default:
 				throw new UnsupportedOperationException();
 		}
 	}
 
-	protected void updateParallelSeek(double timeStepInSec) {
+	protected void updateParallelSeek(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();
-			this.isMoving = true;
-		} else {
-			this.isMoving = false;
+			movedPedestrians.add(pedestrian);
 		}
 	}
 
-	private void updateParallelMove(double timeStepInSec) {
-		if (isMoving) {
+	private void updateParallelMove(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
+		if (movedPedestrians.contains(pedestrian)) {
 			pedestrian.setLastPosition(pedestrian.getPosition());
 			pedestrian.setPosition(pedestrian.getNextPosition());
 		}
 	}
 
-	private void updateParallelConflicts(double timeStepInSec) {
-		if (isMoving) {
-			List<Agent> others = getCollisionPedestrians();
+	private void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
+		if (movedPedestrians.contains(pedestrian)) {
+			List<Agent> others = getCollisionPedestrians(pedestrian);
 
 			boolean undoStep = false;
 
@@ -83,8 +123,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private void updateParallelSteps(double timeStepInSec) {
-		if (isMoving) {
+	private void updateParallelSteps(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
+		if (movedPedestrians.contains(pedestrian)) {
 			// did not want to make a step
 			if (pedestrian.getNextPosition().equals(pedestrian.getLastPosition())) {
 				pedestrian.setTimeCredit(0);
@@ -107,7 +147,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private List<Agent> getCollisionPedestrians() {
+	private List<Agent> getCollisionPedestrians(@NotNull final PedestrianOSM pedestrian) {
 		LinkedList<Agent> result = new LinkedList<>();
 
 		for (Agent ped : pedestrian.getRelevantPedestrians()) {
@@ -122,4 +162,11 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 		return result;
 	}
+
+
+	@Override
+	public void elementAdded(Pedestrian element) {}
+
+	@Override
+	public void elementRemoved(Pedestrian element) {}
 }

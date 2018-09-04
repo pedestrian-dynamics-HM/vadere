@@ -34,7 +34,6 @@ public class PedestrianOSM extends Pedestrian {
 
 	private final AttributesOSM attributesOSM;
 	private final transient StepCircleOptimizer stepCircleOptimizer;
-	private final transient UpdateSchemeOSM updateScheme;
 	private final transient Topography topography;
 	private final double stepLength;
 	private final double stepDeviation;
@@ -77,7 +76,6 @@ public class PedestrianOSM extends Pedestrian {
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
 		this.stepCircleOptimizer = stepCircleOptimizer;
-		this.updateScheme = createUpdateScheme(attributesOSM.getUpdateType(), this);
 
 		this.speedAdjusters = speedAdjusters;
 		this.relevantPedestrians = new HashSet<>();
@@ -95,31 +93,12 @@ public class PedestrianOSM extends Pedestrian {
 			this.minStepLength = 0;
 		}
 
+		this.lastPosition = getPosition();
+		this.nextPosition = getPosition();
 		this.strides = new LinkedList<>();
 	}
 
-	private static UpdateSchemeOSM createUpdateScheme(UpdateType updateType, PedestrianOSM pedestrian) {
-
-		UpdateSchemeOSM result;
-
-		switch (updateType) {
-			case EVENT_DRIVEN:
-				result = new UpdateSchemeEventDriven(pedestrian);
-				break;
-			case PARALLEL:
-				result = new UpdateSchemeParallel(pedestrian);
-				break;
-			case SEQUENTIAL:
-				result = new UpdateSchemeSequential(pedestrian);
-				break;
-			default:
-				result = new UpdateSchemeSequential(pedestrian);
-		}
-
-		return result;
-	}
-
-	public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
+	/*public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
 		double lastSimTimeInSec = currentTimeInSec - timeStepInSec;
 
 		// clear the old strides to avoid large linked lists
@@ -128,7 +107,7 @@ public class PedestrianOSM extends Pedestrian {
 		}
 
 		this.updateScheme.update(timeStepInSec, currentTimeInSec, callMethod);
-	}
+	}*/
 
 	public void updateNextPosition() {
 
