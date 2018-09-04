@@ -28,7 +28,7 @@ unit_tests_with_coverage:
   #   mvn test -Dtest=!com.mycompany.app.Legacy*
   script:
     - mvn clean
-    - mvn test -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList
+    - mvn test -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel
     - python3 Tools/collect_line_and_branch_coverage.py
 
 run_scenario_files:
