@@ -272,6 +272,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
     }
 
     private void dispatchEvents(final List<Event> events) {
+        // TODO: prioritize events here (i.e., a wait event is more important than an "ElapsedTimeEvent").
         for (Event event : events) {
             if (event instanceof ElapsedTimeEvent) {
                 handleElapsedTimeEvent(event);
@@ -300,7 +301,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
             Collections.shuffle(pedestrians, this.random);
         }
 
-        // TODO If pedestrian in area wait, else step.
         for (PedestrianOSM pedestrian : pedestrians) {
             if (waitInAreaEvent.getArea().contains(pedestrian.getPosition())) { // Wait
                 pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
