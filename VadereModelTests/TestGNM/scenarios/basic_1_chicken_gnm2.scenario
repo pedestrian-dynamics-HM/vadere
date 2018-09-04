@@ -2,7 +2,6 @@
   "name" : "basic_1_chicken_gnm2",
   "description" : "",
   "release" : "0.5",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
