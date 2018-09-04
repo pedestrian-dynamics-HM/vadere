@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.Arrays;
 
 import static org.lwjgl.opencl.CL10.*;
@@ -77,7 +78,7 @@ public class CLFFTConvolution {
     // logger for callbacks
     private static Logger log = Logger.getLogger(CLFFTConvolution.class);
     private boolean debug = false;
-    private boolean profiling = false;
+    private boolean profiling = true;
     private boolean padd;
 
     public enum Direction {
@@ -168,12 +169,14 @@ public class CLFFTConvolution {
 
 
             // clear hostGaussKernel and clGaussKernel as kernel fft is only done once
-            // CLInfo.checkCLError(clReleaseMemObject(clGaussKernelInput));
+            CLInfo.checkCLError(clReleaseMemObject(clGaussKernelInput));
 
             setArgumentsMultiply();
 
         } catch (OpenCLException ex) {
             ex.printStackTrace();
+        } finally {
+            MemoryUtil.memFree(hostGaussKernelInput);
         }
     }
 
@@ -226,8 +229,11 @@ public class CLFFTConvolution {
 
             clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
-
-            clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+            if (profiling) {
+                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
+            } else {
+                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+            }
             CLInfo.checkCLError(errcode_ret);
         }
     }
@@ -333,7 +339,10 @@ public class CLFFTConvolution {
             CLInfo.checkCLError(clSetKernelArg1i(clMultiplyKernel, 3, height));
             CLInfo.checkCLError(clSetKernelArg1i(clMultiplyKernel, 4, width));
 
-            CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue,clKernel,2,null,clGlobalWorkSizeEdges,null,null, null));
+            //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue,clKernel,2,null,clGlobalWorkSizeEdges,null,null, null));
+            int err_code = (int) enqueueNDRangeKernel("multiply",clQueue,clKernel,2,null,clGlobalWorkSizeEdges,null,null, null);
+            CLInfo.checkCLError(err_code);
+
             CLInfo.checkCLError(clFinish(clQueue));
         }
     }
@@ -384,7 +393,9 @@ public class CLFFTConvolution {
             // set direction for FFT
             CLInfo.checkCLError(clSetKernelArg1i(clFFTKernel, 3, direction.getValue()));
 
-            CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
+            //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
+            int err_code = (int) enqueueNDRangeKernel("fft1dim",clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null);
+            CLInfo.checkCLError(err_code);
             CLInfo.checkCLError(clFinish(clQueue));
 
         }
@@ -451,7 +462,9 @@ public class CLFFTConvolution {
             // set Direction for FFT
             CLInfo.checkCLError(clSetKernelArg1i(clFFTMatrix, 5, direction.getValue())); // FFT: 1 or IFFT: -1
 
-            CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
+            //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
+            int err_code = (int) enqueueNDRangeKernel("fft2dim",clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null);
+            CLInfo.checkCLError(err_code);
             CLInfo.checkCLError(clFinish(clQueue));
         }
     }
@@ -558,11 +571,6 @@ public class CLFFTConvolution {
         if (local_size <= 0) {
             local_size = MIN_ELEMENTS_PER_WORKITEM;
         }
-//        while (!(points_per_item >= MIN_ELEMENTS_PER_WORKITEM && points_per_workgroup > points_per_item)) {
-//            points_per_item = points_per_item / 2;
-//            local_size = points_per_workgroup / points_per_item;
-//        }
-
         return local_size;
     }
 
@@ -602,33 +610,37 @@ public class CLFFTConvolution {
 
     }
 
-    /*
-    private PointerBuffer clEvent;
-    clEvent = MemoryUtil.memAllocPointer(1);
+
+    private PointerBuffer clEvent = MemoryUtil.memAllocPointer(1);
     LongBuffer startTime;
     LongBuffer endTime;
     PointerBuffer retSize;
 
-
     private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
         if(profiling) {
-            long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
-            clWaitForEvents(clEvent);
-            long eventAddr = clEvent.get();
-            clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, retSize);
-            clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, retSize);
-            clEvent.clear();
-            // in nanaSec
-            log.info(name + " event time " + "0x"+eventAddr + ": " + (endTime.get() - startTime.get()) + " ns");
-            endTime.clear();
-            startTime.clear();
-            return result;
+            try (MemoryStack stack = MemoryStack.stackPush()){
+                retSize = stack.mallocPointer(1);
+                startTime = stack.mallocLong(1);
+                endTime = stack.mallocLong(1);
+
+                long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
+                clWaitForEvents(clEvent);
+                long eventAddr = clEvent.get();
+                clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, retSize);
+                clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, retSize);
+                clEvent.clear();
+                // in nanaSec
+                log.info(name + " " + (endTime.get() - startTime.get()));
+                endTime.clear();
+                startTime.clear();
+                return result;
+            }
         }
         else {
-            return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event);
+            return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, null, null);
         }
     }
-    */
+
 
     /**
      * clearMemory releases the allocated memory objects
@@ -638,7 +650,6 @@ public class CLFFTConvolution {
         try {
             CLInfo.checkCLError(clReleaseMemObject(clMatrixInput));
             CLInfo.checkCLError(clReleaseMemObject(clMatrixOutput));
-            CLInfo.checkCLError(clReleaseMemObject(clGaussKernelInput));
             CLInfo.checkCLError(clReleaseMemObject(clGaussKernelTransformed));
 
             CLInfo.checkCLError(clReleaseKernel(clFFTMatrix));
@@ -651,7 +662,7 @@ public class CLFFTConvolution {
             MemoryUtil.memFree(hostOutput);
             MemoryUtil.memFree(hostGaussKernelTransformed);
             MemoryUtil.memFree(kernelSourceCode);
-            MemoryUtil.memFree(hostGaussKernelInput);
+
         }
     }
 

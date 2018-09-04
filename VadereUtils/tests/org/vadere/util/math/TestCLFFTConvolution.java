@@ -59,7 +59,7 @@ public class TestCLFFTConvolution {
 
         // This test only uses the FFT methods ans does not padd the matrix
 
-        int N = 128; // 2 workgroups for N = 128
+        int N = 256; // 2 workgroups for N = 128
         float[] kernel = new float[]{1, 1, 1, 1, 1, 1, 1};
         float[] input = new float[2 * N * N];
         for (int i = 0; i < 2 * N * N; ++i) {
@@ -328,34 +328,53 @@ public class TestCLFFTConvolution {
 
     @Test
     public void testFFTConvolution() throws OpenCLException {
-        int matrixHeight = 110; // currently padded to 32, for 40 padded to 64
-        int matrixWidth = 110; // currently padded to 32, for 40 padded to 64
+        int matrixHeight = 150; // currently padded to 32, for 40 padded to 64
+        int matrixWidth = 150; // currently padded to 32, for 40 padded to 64
 
         float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
 
-        int kernelSize = 21;
+        int kernelSize = 91;
         float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
-
-        //System.out.println("kernel " + Arrays.toString(kernel));
 
         CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
         float[] densityMatrix = fftConvolution.convolve(matrix);
         fftConvolution.clearCL();
 
-        //System.out.println("density " + Arrays.toString(densityMatrix));
-
         // compare results to CLConvolution
         CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Separate, matrixHeight, matrixWidth, kernelSize, kernel);
         float[] output = clConvolution.convolve(matrix);
         clConvolution.clearCL();
-        //System.out.println("clConvolution " + Arrays.toString(output));
 
         assertArrayEquals("CLFFTConvolution does not match clConvolution!", densityMatrix, output, (float) EPS);
-
     }
 
     @Test
-    public void testRuntimeFFTConvolution() {
+    public void testRuntimeFFTConvolution() throws  OpenCLException {
+
+        int min_size = 32;
+        int max_size = 256;
+        int kernelSize = 11;
+
+        for (int paddSize = min_size; paddSize <= max_size; paddSize*=2) {
+
+            int matrixHeight = paddSize - kernelSize + 1; // currently padded to 32, for 40 padded to 64
+            int matrixWidth = paddSize - kernelSize + 1; // currently padded to 32, for 40 padded to 64
+            System.out.println("INFO - " + matrixHeight + " " + matrixWidth + " " + kernelSize);
+            float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
+            float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
+
+            CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
+            float[] densityMatrix = fftConvolution.convolve(matrix);
+            fftConvolution.clearCL();
+
+            // compare results to CLConvolution
+            CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Separate, matrixHeight, matrixWidth, kernelSize, kernel);
+            float[] output = clConvolution.convolve(matrix);
+            clConvolution.clearCL();
+            assertArrayEquals("CLFFTConvolution does not match clConvolution!", densityMatrix, output, (float) EPS);
+
+        }
+
 
     }
 
