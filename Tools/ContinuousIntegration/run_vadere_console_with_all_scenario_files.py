@@ -96,7 +96,15 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 if __name__ == "__main__":
     print("Output is only shown for failed scenarios!")
 
-    long_running_scenarios = ["TestSFM", "rimea_09", "rimea_11", "queueing"]
+    long_running_scenarios = [
+            "basic_4_1_wall_gnm1",
+            "queueing",
+            "rimea_09",
+            "rimea_11",
+            "TestSFM",
+            "thin_wall_and_closer_source_nelder_mead_ok",
+            "thin_wall_and_closer_source_pso_could_fail"
+    ]
     excluded_scenarios = ["TESTOVM", "output", "legacy"]
     excluded_scenarios.extend(long_running_scenarios)
 
