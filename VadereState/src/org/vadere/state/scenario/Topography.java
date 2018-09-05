@@ -24,6 +24,9 @@ import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.CellState;
+import org.vadere.util.potential.PathFindingTag;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
 public class Topography {
@@ -150,6 +153,18 @@ public class Topography {
 
 	public void setObstacleDistanceFunction(@NotNull Function<VPoint, Double> obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
+	}
+
+	public CellGrid getDistanceFunctionApproximation(final double cellSize) {
+		CellGrid cellGrid = new CellGrid(getBounds().width, getBounds().height, cellSize, new CellState());
+		for(int row = 0; row < cellGrid.getNumPointsY(); row++){
+			for(int col = 0; col < cellGrid.getNumPointsX(); col++){
+				cellGrid.setValue(col, row, new CellState(
+						distanceToObstacle(cellGrid.pointToCoord(col, row).add(new VPoint(getBounds().getMinX(), getBounds().getMinY()))),
+						PathFindingTag.Reachable));
+			}
+		}
+		return cellGrid;
 	}
 
 	public boolean containsTarget(final Predicate<Target> targetPredicate) {

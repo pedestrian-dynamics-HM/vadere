@@ -19,13 +19,13 @@ import org.vadere.util.io.ListUtils;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
-	private ExecutorService executorService;
-	private final Topography topography;
-	private Set<Pedestrian> movedPedestrians;
+	protected final ExecutorService executorService;
+	protected final Topography topography;
+	protected final Set<Pedestrian> movedPedestrians;
 
 	public UpdateSchemeParallel(@NotNull final Topography topography) {
 		this.topography = topography;
-		this.executorService = Executors.newSingleThreadExecutor();
+		this.executorService = Executors.newFixedThreadPool(8);
 		this.movedPedestrians = new HashSet<>();
 	}
 
@@ -45,7 +45,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private void collectFutures(final List<Future<?>> futures) {
+	protected void collectFutures(final List<Future<?>> futures) {
 		try {
 			for (Future<?> future : futures) {
 				future.get();
@@ -59,7 +59,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
+	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
 		pedestrian.clearStrides();
 		switch (callMethod) {
 			case SEEK:

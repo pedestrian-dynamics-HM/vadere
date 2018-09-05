@@ -1,5 +1,7 @@
 package org.vadere.simulator.models.osm.opencl;
 
+import com.sun.tools.internal.xjc.model.Model;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -215,7 +217,7 @@ public class CLOptimalStepsModel {
     	return getPotentialFieldWidth() * getPotentialFieldHeight();
     }
 
-    private FloatBuffer generatePotentialFieldApproximation(@NotNull EikonalSolver eikonalSolver) {
+    private FloatBuffer generatePotentialFieldApproximation(@NotNull final EikonalSolver eikonalSolver) {
     	FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(getPotentialFieldSize());
 
     	int index = 0;

@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
@@ -19,16 +20,17 @@ import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerEvolStrat
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerGradient;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerNelderMead;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
-import org.vadere.simulator.models.osm.updateScheme.ParallelWorkerOSM;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
+import org.vadere.state.attributes.models.AttributesPotentialCompact;
+import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
@@ -37,12 +39,13 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.calculators.EikonalSolver;
 
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,7 +80,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.topography = topography;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
-		this.updateSchemeOSM = UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
+		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
 		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
 		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
@@ -129,6 +132,50 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		topography.addElementRemovedListener(Pedestrian.class, this);
 
 		models.add(this);
+	}
+
+	// Dirty quick implementation to test it! TODO: refactoring!
+	private UpdateSchemeOSM createUpdateScheme(
+			@NotNull final List<Attributes> attributesList,
+			@NotNull final Topography topography,
+			@NotNull final AttributesOSM attributesOSM) {
+		switch (attributesOSM.getUpdateType()) {
+			case PARALLEL_OPEN_CL: {
+				return UpdateSchemeOSM.createOpenCLUpdateScheme(
+						topography,
+						attributesOSM,
+						Model.findAttributes(attributesList, AttributesFloorField.class),
+						new AttributesPotentialCompact().getPedPotentialWidth(),
+
+
+						new EikonalSolver() {
+							CellGrid cellGrid = ((IPotentialFieldTargetGrid)potentialFieldTarget).getCellGrids().get(1);
+
+							@Override
+							public void initialize() {}
+
+							@Override
+							public CellGrid getPotentialField() {
+								return cellGrid;
+							}
+						},
+						new EikonalSolver() {
+							CellGrid cellGrid = topography.getDistanceFunctionApproximation(
+									Model.findAttributes(attributesList, AttributesFloorField.class).getPotentialFieldResolution()
+							);
+
+							@Override
+							public void initialize() {}
+
+							@Override
+							public CellGrid getPotentialField() {
+								return cellGrid;
+							}
+						}
+						);
+			}
+			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
+		}
 	}
 
 	private StepCircleOptimizer createStepCircleOptimizer(
