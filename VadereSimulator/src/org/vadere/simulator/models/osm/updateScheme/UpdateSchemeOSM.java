@@ -47,7 +47,6 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			CLOptimalStepsModel clOptimalStepsModel = new CLOptimalStepsModel(
 					attributesOSM,
 					attributesFloorField,
-					topography.getPedestrianDynamicElements().getElements().size(),
 					new VRectangle(topography.getBounds()),
 					pedestrianPotentialWidth, // max step length + function width
 					targetEikonalSolver,

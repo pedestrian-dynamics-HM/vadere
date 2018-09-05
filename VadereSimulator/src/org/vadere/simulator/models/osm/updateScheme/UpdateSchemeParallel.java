@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,10 +12,12 @@ import java.util.concurrent.Future;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.io.ListUtils;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
@@ -147,10 +150,25 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private List<Agent> getCollisionPedestrians(@NotNull final PedestrianOSM pedestrian) {
+	private Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
+	                                                 Agent pedestrian, Topography scenario) {
+		List<Pedestrian> result;
+
+		// select pedestrians within recognition distance
+		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
+				.getObjects(relevantArea.getCenter(),
+						new AttributesPotentialCompact().getVisionFieldRadius() + pedestrian.getRadius()
+								+ new AttributesPotentialCompact().getPedPotentialWidth());
+
+		result = closePedestrians;
+		return result;
+	}
+
+
+	protected List<Agent> getCollisionPedestrians(@NotNull final PedestrianOSM pedestrian) {
 		LinkedList<Agent> result = new LinkedList<>();
 
-		for (Agent ped : pedestrian.getRelevantPedestrians()) {
+		for (Agent ped : getRelevantAgents(new VCircle(pedestrian.getPosition(), pedestrian.getStepSize()), pedestrian, topography)) {
 			if (ped.getId() != pedestrian.getId()) {
 				double thisDistance = ped.getPosition().distance(pedestrian.getPosition());
 
@@ -162,6 +180,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 		return result;
 	}
+
 
 
 	@Override

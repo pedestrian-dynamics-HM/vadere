@@ -186,7 +186,6 @@ public class TestCLOptimalStepsModel {
 		CLOptimalStepsModel clOptimalStepsModel = new CLOptimalStepsModel(
 				attributesOSM,
 				attributesFloorField,
-				pedestrians.size(),
 				new VRectangle(topography.getBounds()),
 				attributesPotentialCompact.getPedPotentialWidth(), // max step length + function width
 				targetPotentialField.getEikonalSolver(),
@@ -197,5 +196,13 @@ public class TestCLOptimalStepsModel {
 		for(int i = 0; i < numberOfElements; i++) {
 			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
 		}
+
+		result = clOptimalStepsModel.getNextSteps(pedestrians);
+
+		for(int i = 0; i < numberOfElements; i++) {
+			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+		}
+
+		//clOptimalStepsModel.clear();
 	}
 }

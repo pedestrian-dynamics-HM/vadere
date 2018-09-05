@@ -105,8 +105,8 @@ inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2*
 //Calculate address in grid from position (clamping to edges)
 inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
-    gridPos.x = gridPos.x & ((*gridSize).x - 1);
-    gridPos.y = gridPos.y & ((*gridSize).y - 1);
+    //gridPos.x = gridPos.x & ((*gridSize).x - 1);
+    //gridPos.y = gridPos.y & ((*gridSize).y - 1);
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
@@ -117,14 +117,20 @@ inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
 // see PotentialFieldPedestrianCompact with useHardBodyShell = false:
 inline float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
 
-    float radii = 0.195f + 0.195f; // 2* r_p (sivers-2016b)
     float potential = 0.0f;
     float d = distance(pos, otherPedPosition);
     float width = 0.5f;
+    //float width = 3.0;
     float height = 12.6f;
 
-    if (d < width) {
+    /*if(d < 0.0f) {
+        potential = 1000.0f;
+    }
+    else*/
+    if (d < 0.5f) {
         potential = height * exp(1 / (pown(d / width, 2) - 1));
+        //potential = 1000.0f;
+        //printf("distance = %f, potential = %f \n", d, potential);
     }
 
     return potential;
@@ -137,7 +143,8 @@ inline float getFullPedestrianPotential(
         __constant float        *cellSize,
         __constant uint2        *gridSize,
         __constant float2       *worldOrigin,
-        float2 pos, float2 pedPosition, float pedStepSize)
+        float2 pos,
+        float2 pedPosition)
 {
     float potential = 0;
     uint index = get_global_id(0);
@@ -145,17 +152,31 @@ inline float getFullPedestrianPotential(
     //Get address in grid
     uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
 
+    //printf("global_size (%d)\n", get_global_size(0));
+    /*for(int i = 0; i < get_global_size(0); i++) {
+         float2 otherPedestrian = (float2) (orderedPedestrians[i*3], orderedPedestrians[i*3+1]);
+         potential += getPedestrianPotential(pos, otherPedestrian);
+    }*/
+
+
     //Accumulate surrounding cells
     // TODO: index check!
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
             //Get start particle index for this cell
-            uint   hash = getGridHash(gridPos + (uint2)(x, y), gridSize);
+
+            uint2 uGridPos = (uint2) (((int)gridPos.x) + x, ((int)gridPos.y) + y);
+
+            if(uGridPos.x < 0 || uGridPos.y < 0){
+                continue;
+            }
+
+            uint   hash = getGridHash(uGridPos, gridSize);
             uint startI = d_CellStart[hash];
 
             //Skip empty cell
-            if(startI == 0xFFFFFFFFU)
-                continue;
+            //if(startI == 0xFFFFFFFFU)
+            //    continue;
 
             //Iterate over particles in this cell
             uint endI = d_CellEnd[hash];
@@ -217,15 +238,24 @@ inline float getPotentialFieldValue(float2 evalPoint, __global const float *pote
         getPotentialFieldGridValue(potentialField, gridPoint + (uint2)(0, incY), potentialGridSize)
     );
 
-    float2 result = bilinearInterpolationWithUnkown(
-        gridPotentials,
-        (float2) ((evalPoint.x - gridPointCoord.x) / potentialCellSize, (evalPoint.y - gridPointCoord.y) / potentialCellSize));
+    float2 result = bilinearInterpolationWithUnkown(gridPotentials,(float2) ((evalPoint.x - gridPointCoord.x) / potentialCellSize, (evalPoint.y - gridPointCoord.y) / potentialCellSize));
 
     return (float)result.x;
 }
 
-inline float getObstaclePotential(float2 evalPoint, __global const float *obstaclePotential, float potentialCellSize) {
-    return 1.0f;
+inline float getObstaclePotential(float minDistanceToObstacle){
+    float currentPotential = 0;
+    float width = 0.25f;
+    float height = 20.1f;
+
+    if (minDistanceToObstacle <= 0.0f) {
+        currentPotential = 1000000.0f;
+    } else if (minDistanceToObstacle < width) {
+        currentPotential = 20.1f * exp(1.0f / (pow(minDistanceToObstacle / width, 2) - 1.0f));
+    }
+
+    currentPotential = max(0.0f, currentPotential);
+    return currentPotential;
 }
 
 // end potential field helper methods
@@ -238,7 +268,7 @@ __kernel void nextSteps(
     __global const uint   *d_CellEnd,           //input
     __constant float        *cellSize,
     __constant uint2        *gridSize,
-    __global const float  *obstaclePotentialField,   //input
+    __global const float  *distanceField,   //input
     __global const float  *targetPotentialField,     //input
     __constant float2     *worldOrigin,         //input
     __constant uint2      *potentialGridSize,
@@ -250,17 +280,28 @@ __kernel void nextSteps(
 
     float2 pedPosition = (float2)(orderedPedestrians[index*3], orderedPedestrians[index*3+1]);
     float stepSize = orderedPedestrians[index*3+2];
-    float minValue = 100000.0f;
-    float2 minArg = (float2) (-1.0f, -2.0f);
+
+    float2 evalPoint = pedPosition;
+    float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+    float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+    float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
+    float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
+    float value = targetPotential + obstaclePotential + pedestrianPotential;
+
+    float2 minArg = pedPosition;
+    float minValue = value;
+    float currentPotential = value;
 
     // loop over all points of the disc and find the minimum value and argument
     for(uint i = 0; i < numberOfPoints; i++) {
         float2 circlePosition = circlePositions[i];
         float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
         float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-        float obstaclePotential = getPotentialFieldValue(evalPoint, obstaclePotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-        float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition, stepSize);
-        float value = /*targetPotential + obstaclePotential +*/ pedestrianPotential;
+        float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+        float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
+        float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd,
+                                            cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
+        float value = targetPotential + obstaclePotential + pedestrianPotential;
 
         if(minValue > value) {
             minValue = value;
@@ -268,9 +309,11 @@ __kernel void nextSteps(
         }
         //minArg = circlePosition;
     }
+
+    //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
     //minArg = pedPosition;
-    newPositions[index*2] = minValue;
-    newPositions[index*2+1] = minValue;
+    newPositions[index*2] = minArg.x;
+    newPositions[index*2+1] = minArg.y;
 }
 
 //Calculate grid hash value for each particle

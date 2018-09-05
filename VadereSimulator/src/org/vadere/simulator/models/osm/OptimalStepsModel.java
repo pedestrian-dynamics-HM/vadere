@@ -80,9 +80,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.topography = topography;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
-		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
-		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
-		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
@@ -129,6 +126,10 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 			this.executorService = null;
 		}
 
+		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
+		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
+		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
+
 		topography.addElementRemovedListener(Pedestrian.class, this);
 
 		models.add(this);
@@ -145,17 +146,23 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 						topography,
 						attributesOSM,
 						Model.findAttributes(attributesList, AttributesFloorField.class),
-						new AttributesPotentialCompact().getPedPotentialWidth(),
-
+						new AttributesPotentialCompact().getPedPotentialWidth()*2,
+						//3.0,
 
 						new EikonalSolver() {
-							CellGrid cellGrid = ((IPotentialFieldTargetGrid)potentialFieldTarget).getCellGrids().get(1);
+							CellGrid cellGrid = null;
 
 							@Override
-							public void initialize() {}
+							public void initialize() {
+								potentialFieldTarget.preLoop(0.4);
+								cellGrid = ((IPotentialFieldTargetGrid)potentialFieldTarget).getCellGrids().get(1);
+							}
 
 							@Override
 							public CellGrid getPotentialField() {
+								if(cellGrid == null) {
+									initialize();
+								}
 								return cellGrid;
 							}
 						},

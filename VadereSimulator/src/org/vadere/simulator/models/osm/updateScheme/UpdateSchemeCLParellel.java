@@ -22,6 +22,7 @@ public class UpdateSchemeCLParellel extends UpdateSchemeParallel {
 
 	private CLOptimalStepsModel clOptimalStepsModel;
 
+	private int counter = 0;
 	private Logger logger = LogManager.getLogger(UpdateSchemeCLParellel.class);
 
 	public UpdateSchemeCLParellel(@NotNull final Topography topography, @NotNull final CLOptimalStepsModel clOptimalStepsModel) {
@@ -58,8 +59,11 @@ public class UpdateSchemeCLParellel extends UpdateSchemeParallel {
 			List<CLOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians);
 
 			for(int i = 0; i < pedestrians.size(); i++) {
-				logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+				//logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
 				PedestrianOSM pedestrian = pedestrianOSMList.get(i);
+				pedestrian.clearStrides();
+
+				pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 				pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
 				if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
@@ -80,6 +84,8 @@ public class UpdateSchemeCLParellel extends UpdateSchemeParallel {
 				}
 				collectFutures(futures);
 			}
+
+			counter++;
 
 		} catch (OpenCLException e) {
 			e.printStackTrace();
