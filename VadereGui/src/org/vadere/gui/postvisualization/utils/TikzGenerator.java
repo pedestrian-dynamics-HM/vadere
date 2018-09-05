@@ -175,7 +175,7 @@ public class TikzGenerator {
 		if (config.isShowStairs()) {
 			generatedCode += "% Stairs\n";
 			for (Stairs stair : topography.getStairs()) {
-				generatedCode += String.format("\\fill[StairColor] %s\n", generatePathForScenarioElement(stair));
+				generatedCode += String.format("\\fill[StairColor] %s;\n", generatePathForScenarioElement(stair));
 			}
 		} else {
 			generatedCode += "% Stairs (not enabled in config)\n";
