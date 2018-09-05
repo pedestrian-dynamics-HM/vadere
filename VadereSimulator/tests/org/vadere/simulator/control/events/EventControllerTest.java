@@ -1,15 +1,13 @@
 package org.vadere.simulator.control.events;
 
-import junit.framework.AssertionFailedError;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
+import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.vadere.state.events.types.WaitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -243,5 +241,76 @@ public class EventControllerTest {
 
             simulationTime += increment;
         }
+    }
+
+    @Test
+    public void getEventsForTimeAlwaysCreatesASingleElapsedTimeEventWithRequestedSimulationTime() {
+        boolean isRecurringEvent = false;
+        ScenarioStore scenarioStoreContainingOneOneTimeEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
+
+        EventController eventController = new EventController(scenarioStoreContainingOneOneTimeEvent);
+
+        double expectedSimulationTime = 1.0;
+
+        List<Event> activeEvents = eventController.getEventsForTime(expectedSimulationTime);
+
+        if (activeEvents.size() == 1) {
+            Event event = activeEvents.get(0);
+
+            assertEquals(ElapsedTimeEvent.class, event.getClass());
+            assertEquals(expectedSimulationTime, event.getTime(), 10e-1);
+        } else {
+            fail("Expected only one event for simulationTime = " + expectedSimulationTime);
+        }
+    }
+
+    @Test
+    public void getEventsForTimeTimestampsEachActiveEvent() {
+        boolean isRecurringEvent = false;
+        ScenarioStore scenarioStoreContainingOneOneTimeEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
+
+        // Store one concrete one-time event in "EventInfoStore" to check if its timestamp is updated.
+        WaitEvent waitEvent = new WaitEvent();
+        List<Event> events = new ArrayList<>();
+        events.add(waitEvent);
+
+        EventInfo activeEventInfo = scenarioStoreContainingOneOneTimeEvent.getEventInfoStore().getEventInfos().get(0);
+        activeEventInfo.setEvents(events);
+
+        EventController eventController = new EventController(scenarioStoreContainingOneOneTimeEvent);
+
+        double expectedSimulationTime = 5.0;
+
+        List<Event> activeEvents = eventController.getEventsForTime(expectedSimulationTime);
+
+        for (Event event : activeEvents) {
+            assertEquals(expectedSimulationTime, event.getTime(), 10e-1);
+        }
+
+        assertEquals(2, activeEvents.size());
+    }
+
+    @Test
+    public void getEventsForTimeDoesNotTimestampInactiveEvents() {
+        boolean isRecurringEvent = false;
+        ScenarioStore scenarioStoreContainingOneOneTimeEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
+
+        // Store one concrete one-time event in "EventInfoStore" to check if its timestamp is updated.
+        WaitEvent waitEvent = new WaitEvent();
+        List<Event> events = new ArrayList<>();
+        events.add(waitEvent);
+
+        EventInfo inactiveEventInfo = scenarioStoreContainingOneOneTimeEvent.getEventInfoStore().getEventInfos().get(0);
+        inactiveEventInfo.setEvents(events);
+        inactiveEventInfo.setEventTimeframe(new EventTimeframe(0, 1, false, 0));
+
+        EventController eventController = new EventController(scenarioStoreContainingOneOneTimeEvent);
+
+        double expectedSimulationTime = 5.0;
+
+        List<Event> activeEvents = eventController.getEventsForTime(expectedSimulationTime);
+
+        assertEquals(1, activeEvents.size());
+        assertEquals(0, waitEvent.getTime(), 10e-1);
     }
 }

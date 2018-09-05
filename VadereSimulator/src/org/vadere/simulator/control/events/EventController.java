@@ -65,6 +65,10 @@ public class EventController {
         List<Event> activeOneTimeEvents = getOneTimeEventsForSimulationTime(simulationTime);
         List<Event> activeRecurringEvents = getRecurringEventsForSimulationTime(simulationTime);
 
+        // Set timestamp for each active event.
+        activeOneTimeEvents.stream().forEach(event -> event.setTime(simulationTime));
+        activeRecurringEvents.stream().forEach((event -> event.setTime(simulationTime)));
+
         events.addAll(activeOneTimeEvents);
         events.addAll(activeRecurringEvents);
 
