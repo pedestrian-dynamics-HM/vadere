@@ -18,7 +18,8 @@ public enum Version {
 	V0_2("0.2"),
 	V0_3("0.3"),
 	V0_4("0.4"),
-	V0_5("0.5");
+	V0_5("0.5"),
+	V0_6("0.6");
 
 	private String label;
 

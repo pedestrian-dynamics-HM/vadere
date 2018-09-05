@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.DynamicElement;
 
 public class OverlapData {
@@ -34,7 +35,15 @@ public class OverlapData {
 		return ped2Id;
 	}
 
+	public double getOverlap() {
+		return overlap;
+	}
+
 	public String[] toStrings(){
 		return new String[]{Double.toString(dist), Double.toString(overlap)};
+	}
+
+	public int maxDist(@NotNull OverlapData o) {
+		return Double.compare(overlap, o.getOverlap());
 	}
 }

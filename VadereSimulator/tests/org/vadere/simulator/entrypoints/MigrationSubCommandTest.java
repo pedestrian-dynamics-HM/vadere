@@ -6,7 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
-import org.vadere.tests.util.reflection.JsonNodeTester;
+import org.vadere.tests.util.reflection.TestJsonNodeExplorer;
+import org.vadere.tests.util.reflection.TestJsonNodeHelper;
 import org.vadere.tests.util.reflection.TestResourceHandler;
 
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MigrationSubCommandTest implements JsonNodeTester, TestResourceHandler {
+public class MigrationSubCommandTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
 
 	private Path scenario1;
 	private JsonNode scenario1Json;

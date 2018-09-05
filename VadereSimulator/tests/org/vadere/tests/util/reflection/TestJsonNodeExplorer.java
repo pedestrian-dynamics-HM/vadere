@@ -7,26 +7,22 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.StringContains;
 import org.vadere.simulator.entrypoints.Version;
-import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.io.IOUtils;
+import org.vadere.simulator.projects.migration.MigrationException;
+import org.vadere.simulator.projects.migration.jolttranformation.JsonNodeExplorer;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.StringJoiner;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public interface JsonNodeTester {
 
-	/**
-	 * Get path from JsonNode and assert that it exists.
-	 */
-
-
+/**
+ * Overwrite {@link JsonNodeExplorer} function to allow Hamcrest Matchers for Tests.
+ */
+public interface TestJsonNodeExplorer extends JsonNodeExplorer {
 	default JsonNode path(JsonNode root, String path) {
 		String[] pathElements = path.split("/");
 		JsonNode ret = root;
@@ -39,63 +35,6 @@ public interface JsonNodeTester {
 	default JsonNode pathMustExist(JsonNode root, String path) {
 		JsonNode ret = path(root, path);
 		assertThat(ret, notMissing(path));
-		return ret;
-	}
-
-	default JsonNode pathLastElementMustNotExist(JsonNode root, String path) {
-		String[] pathElements = path.split("/");
-		JsonNode ret = root;
-		StringJoiner sj = new StringJoiner("/");
-		for (int i = 0; i < pathElements.length; i++) {
-			ret = ret.path(pathElements[i]);
-			sj.add(pathElements[i]);
-			if (i == pathElements.length - 1) {
-				assertThat("The last element should be missing", ret, not(notMissing(sj.toString())));
-			} else {
-				assertThat("Path elements up to the last must be present.", ret, notMissing(sj.toString()));
-			}
-		}
-		return ret;
-	}
-
-	default JsonNode pathMustNotExist(JsonNode root, String path) {
-		JsonNode ret = path(root, path);
-		assertThat(ret, not(notMissing(path)));
-		return ret;
-	}
-
-	default JsonNode getJsonFromString(String s) {
-		JsonNode ret = null;
-		try {
-			ret = StateJsonConverter.deserializeToNode(s);
-		} catch (IOException e) {
-			fail("Cannot create Json object from string: " + s);
-		}
-		return ret;
-	}
-
-	default JsonNode getJsonFromPath(Path path) {
-		JsonNode ret = null;
-		String json;
-		try {
-			json = IOUtils.readTextFile(path);
-			ret = StateJsonConverter.deserializeToNode(json);
-		} catch (Exception e) {
-			fail("Cannot create Json object from path: " + path.toString());
-		}
-		return ret;
-	}
-
-	default JsonNode getJsonFromResource(String resources) {
-		URL url = getClass().getResource(resources);
-		String json;
-		JsonNode ret = null;
-		try {
-			json = IOUtils.readTextFile(Paths.get(url.toURI()));
-			ret = StateJsonConverter.deserializeToNode(json);
-		} catch (Exception e) {
-			fail("Cannot create Json object from resource: " + resources);
-		}
 		return ret;
 	}
 
@@ -147,4 +86,43 @@ public interface JsonNodeTester {
 				nodeHasText(v.label('-')));
 	}
 
+	default JsonNode pathLastElementMustNotExist(JsonNode root, String path) {
+		String[] pathElements = path.split("/");
+		JsonNode ret = root;
+		StringJoiner sj = new StringJoiner("/");
+		for (int i = 0; i < pathElements.length; i++) {
+			ret = ret.path(pathElements[i]);
+			sj.add(pathElements[i]);
+			if (i == pathElements.length - 1) {
+				assertThat("The last element should be missing", ret, not(notMissing(sj.toString())));
+			} else {
+				assertThat("Path elements up to the last must be present.", ret, notMissing(sj.toString()));
+			}
+		}
+		return ret;
+	}
+
+	default JsonNode pathMustNotExist(JsonNode root, String path) {
+		JsonNode ret = path(root, path);
+		assertThat(ret, not(notMissing(path)));
+		return ret;
+	}
+
+	default ArrayList<JsonNode> getProcessorsByType(JsonNode node, String processorType)  {
+		try {
+			return JsonNodeExplorer.super.getProcessorsByType(node, processorType);
+		} catch (MigrationException e) {
+			fail("default nodes not present.");
+			return null;
+		}
+	}
+
+	default ArrayList<JsonNode> getFilesForProcessorId(JsonNode node, String processorType){
+		try {
+			return JsonNodeExplorer.super.getFilesForProcessorId(node, processorType);
+		} catch (MigrationException e) {
+			fail("default nodes not present.");
+			return null;
+		}
+	}
 }

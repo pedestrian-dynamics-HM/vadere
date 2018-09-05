@@ -5,8 +5,11 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
 import org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+
+import java.util.Optional;
 
 /**
  * This processor counts the number of overlaps during a simulation run.
@@ -36,13 +39,13 @@ public class NumberOverlapsProcessor extends DataProcessor<NoDataKey, Long> {
 	public void postLoop(final SimulationState state) {
 		this.pedOverlapProc.postLoop(state);
 
-		long numberOverlaps = this.pedOverlapProc.getData().size()/2;
+		long numberOverlaps = this.pedOverlapProc.getData().size();
 		this.putValue(NoDataKey.key(), numberOverlaps);
 	}
 
 	@Override
 	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
-		result.setTotalOverlaps(this.pedOverlapProc.getData().size()/2);
+		result.setTotalOverlaps(this.pedOverlapProc.getData().size());
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 
-public abstract class JoltTransformation {
+public abstract class JoltTransformation implements JsonNodeExplorer{
 
 	protected final static Logger logger = Logger.getLogger(JoltTransformation.class);
 	private static ConcurrentHashMap<Version, JoltTransformation> transformations = new ConcurrentHashMap<>();
@@ -136,10 +136,6 @@ public abstract class JoltTransformation {
 	protected abstract void initPostHooks();
 
 
-	protected void addToObjectNode(JsonNode node, String key, String value) {
-		((ObjectNode) node).put(key, value);
-	}
-
 
 	public ArrayList<PostTransformHook> getPostTransformHooks() {
 		return postTransformHooks;
@@ -157,9 +153,9 @@ public abstract class JoltTransformation {
 	 * @param key      key to add to new HashMap
 	 * @param children Specify Order on second level
 	 */
-	protected static void putObject(LinkedHashMap<Object, Object> target,
-									LinkedHashMap<Object, Object> source,
-									String key, String... children) throws MigrationException {
+	static void putObject(LinkedHashMap<Object, Object> target,
+						   LinkedHashMap<Object, Object> source,
+						   String key, String... children) throws MigrationException {
 
 		Object obj = source.get(key);
 		if (obj == null) {
@@ -181,52 +177,5 @@ public abstract class JoltTransformation {
 
 	}
 
-	protected void remove(JsonNode root, String childName) throws MigrationException {
-		ObjectNode parent = (ObjectNode) root;
-		if (parent.remove(childName) == null) {
-			throw new MigrationException("Cannot delete childElement '" + childName + "' from parent " + root.asText());
-		}
-	}
-
-	protected JsonNode pathMustExist(JsonNode root, String path) throws MigrationException {
-		JsonNode ret = path(root, path);
-		if (ret.isMissingNode()) {
-			throw new MigrationException("Json Path Erro: The path '" + path +
-					"' should be accessible from " + root.asText());
-		}
-		return ret;
-	}
-
-	protected JsonNode path(JsonNode root, String path) {
-		String[] pathElements = path.split("/");
-		JsonNode ret = root;
-		for (String item : pathElements) {
-			ret = ret.path(item);
-		}
-		return ret;
-	}
-
-	protected boolean nodeIsArray(JsonNode node) {
-		return nodeNotEmptyAnd(node, n -> n.getNodeType() == JsonNodeType.ARRAY);
-	}
-
-	protected boolean nodeNotEmptyAnd(JsonNode node, Predicate<JsonNode> predicate) {
-		return !node.isMissingNode() && predicate.test(node);
-	}
-
-	protected Iterator<JsonNode> filterIterator(JsonNode root, Predicate<JsonNode> filter) {
-		return new Iterator<JsonNode>() {
-
-			@Override
-			public boolean hasNext() {
-				return false;
-			}
-
-			@Override
-			public JsonNode next() {
-				return null;
-			}
-		};
-	}
 
 }

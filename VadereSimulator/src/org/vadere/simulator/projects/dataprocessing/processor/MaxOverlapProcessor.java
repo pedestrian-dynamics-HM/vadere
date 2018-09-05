@@ -2,11 +2,14 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
 import org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
 
 /**
@@ -20,7 +23,7 @@ import java.util.OptionalDouble;
 
 @DataProcessorClass()
 public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
-	private PedestrianOverlapDistProcessor pedOverlapProc;
+	private PedestrianOverlapProcessor pedOverlapProc;
 
 
 	public MaxOverlapProcessor() {
@@ -39,10 +42,11 @@ public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
 	public void postLoop(final SimulationState state) {
 		this.pedOverlapProc.postLoop(state);
 
-		OptionalDouble maximumOverlap = this.pedOverlapProc.getValues().stream().filter(val -> val > 0).mapToDouble(val -> val.doubleValue()).max();
+		Optional<OverlapData> maximumOverlap = this.pedOverlapProc.getData().values().stream().max(OverlapData::maxDist);
+
 
 		if(maximumOverlap.isPresent()){
-			this.putValue(NoDataKey.key(),maximumOverlap.getAsDouble());
+			this.putValue(NoDataKey.key(),maximumOverlap.get().getOverlap());
 
 			/* // Uncomment  if you want a info box to inform you about the maximum overlap
 			MaxOverlapProcessor.infoBox("Minimum distance between centers: " + maximumOverlap + " meters" , "Maximum Overlap");
@@ -53,19 +57,16 @@ public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
 		}
 	}
 
-
-	/* // Uncomment  if you want a info box to inform you about the maximum overlap
-	public static void infoBox(String infoMessage, String titleBar)
-	{
-		JOptionPane.showMessageDialog(null, infoMessage, titleBar, JOptionPane.INFORMATION_MESSAGE);
+	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
+		result.setMaxOverlap(this.getValue(NoDataKey.key()));
 	}
-	*/
+
 
 	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesMaxOverlapProcessor att = (AttributesMaxOverlapProcessor) this.getAttributes();
-		this.pedOverlapProc = (PedestrianOverlapDistProcessor) manager.getProcessor(att.getPedestrianOverlapDistProcessorId());
+		this.pedOverlapProc = (PedestrianOverlapProcessor) manager.getProcessor(att.getPedestrianOverlapProcessorId());
 
 	}
 

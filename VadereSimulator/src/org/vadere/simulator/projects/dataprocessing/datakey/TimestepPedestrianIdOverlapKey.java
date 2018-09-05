@@ -9,13 +9,13 @@ import java.util.Objects;
 public class TimestepPedestrianIdOverlapKey implements DataKey<TimestepPedestrianIdOverlapKey> {
 
 	private final int timeStep;
-	private final int pedId1;
-	private final int pedId2;
+	private final int pedId1;	//smaller id
+	private final int pedId2;	//bigger id
 
-	public TimestepPedestrianIdOverlapKey(int timeStep, int pedId1, int pedId2) {
+	public TimestepPedestrianIdOverlapKey(int timeStep, int pedA, int pedB) {
 		this.timeStep = timeStep;
-		this.pedId1 = pedId1;
-		this.pedId2 = pedId2;
+		this.pedId1 = (pedA <= pedB) ? pedA : pedB;
+		this.pedId2 = (pedA > pedB) ? pedA : pedB;
 	}
 
 	public static String[] getHeaders(){

@@ -10,6 +10,7 @@ public class SimulationResult {
 	private String scenarioName;
 	private Duration runTime;
 	private int totalOverlaps = -1;
+	private double maxOverlap = -1;
 	private String state;
 
 	private Instant startTime;
@@ -60,13 +61,21 @@ public class SimulationResult {
 		this.state = state;
 	}
 
+	public double getMaxOverlap() {
+		return maxOverlap;
+	}
+
+	public void setMaxOverlap(double maxOverlap) {
+		this.maxOverlap = maxOverlap;
+	}
 
 	public String[] getAsTableRow(){
-		String[] ret = new String[4];
+		String[] ret = new String[5];
 		ret[0] = scenarioName;
 		ret[1] = runTime.toString();
 		ret[2] = Integer.toString(totalOverlaps);
-		ret[3] = state;
+		ret[3] = Double.toString(maxOverlap);
+		ret[4] = state;
 		return ret;
 	}
 
@@ -79,7 +88,8 @@ public class SimulationResult {
 	public static void addCsvHeader(StringBuilder sj, char dl){
 		sj.append("Scenario_Name").append(dl);
 		sj.append("Runtime").append(dl);
-		sj.append("Overlaps").append(dl);
+		sj.append("NumberOverlaps").append(dl);
+		sj.append("MaxOverlap").append(dl);
 		sj.append("State\n");
 
 	}

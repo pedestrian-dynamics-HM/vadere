@@ -22,17 +22,12 @@ public class JoltTransformV4toV5 extends JoltTransformation {
 	}
 
 	private JsonNode cleanupPedestrianOverlapProcessorAttribute(JsonNode node) throws MigrationException {
-		JsonNode processors = path(node, "processWriters/processors");
-		if (nodeIsArray(processors)) {
-			Iterator<JsonNode> iter = processors.iterator();
-			while (iter.hasNext()) {
-				JsonNode processor = iter.next();
-				String type = pathMustExist(processor, "type").asText();
-				if (type.equals("org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor")) {
-					remove(processor, "attributes");
-					remove(processor, "attributesType");
-				}
-			}
+		Iterator<JsonNode> iter = iteratorProcessorsByType(node,"org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor");
+		while (iter.hasNext()) {
+			JsonNode processor = iter.next();
+			String type = pathMustExist(processor, "type").asText();
+				remove(processor, "attributes");
+				remove(processor, "attributesType");
 		}
 		return node;
 	}
