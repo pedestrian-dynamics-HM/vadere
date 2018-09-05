@@ -8,8 +8,11 @@ import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.events.types.WaitEvent;
+import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -24,6 +27,16 @@ public class EventControllerTest {
                 null,
                 null,
                 getEventInfoStoreContainingRecurringEvent(isRecurring));
+    }
+
+    private ScenarioStore getScenarioStore(EventInfoStore store) {
+        return new ScenarioStore("name",
+                "description",
+                "mainModel",
+                null,
+                null,
+                null,
+                store);
     }
 
     private EventInfoStore getEventInfoStoreContainingRecurringEvent(boolean isRecurring) {
@@ -42,6 +55,19 @@ public class EventControllerTest {
         eventInfoStore.setEventInfos(eventInfos);
 
         return eventInfoStore;
+    }
+
+    private EventInfoStore getEventInfoStore(List<EventInfo> eventList){
+        EventInfoStore store = new EventInfoStore();
+        store.setEventInfos(eventList);
+        return store;
+    }
+
+    private EventInfo getEventInfo(EventTimeframe eventTimeframe, Event... events){
+        EventInfo eventInfo = new EventInfo();
+        eventInfo.setEventTimeframe(eventTimeframe);
+        eventInfo.setEvents(Arrays.asList(events));
+        return eventInfo;
     }
 
     @Test
@@ -312,5 +338,86 @@ public class EventControllerTest {
 
         assertEquals(1, activeEvents.size());
         assertEquals(0, waitEvent.getTime(), 10e-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void IsActiveTimeframeOnSingleEvent(){
+        EventController.timeframeIsActiveAtSimulationTime(
+                new EventTimeframe(2, 7, false,0), 1);
+        fail("Should not be reached");
+    }
+
+    @Test
+    public void IsActiveTimeframeOnRepeatedEvent(){
+        EventTimeframe frame = new EventTimeframe(3, 4, true, 1);
+        assertFalse(EventController.timeframeIsActiveAtSimulationTime(frame, 0.4));
+        assertFalse(EventController.timeframeIsActiveAtSimulationTime(frame, 8.4));
+
+        assertTrue(EventController.timeframeIsActiveAtSimulationTime(frame, 3.1));
+        assertTrue(EventController.timeframeIsActiveAtSimulationTime(frame, 5.3));
+    }
+
+    @Test
+    public void getEventsAtTime(){
+
+        Event e1 = new WaitEvent(2.0);
+        Event e2 = new WaitEvent(3.0);
+        Event e3 = new WaitInAreaEvent(12, new VRectangle(1,1,100,10.0));
+        EventInfo eventInfo1 = getEventInfo(
+                new EventTimeframe(2, 7, false,0),
+                e1, e2);
+
+        EventInfo eventInfo2 = getEventInfo(
+                new EventTimeframe(3, 4, true, 1),
+                e3);
+
+
+
+        EventInfoStore store = getEventInfoStore(Arrays.asList(eventInfo1, eventInfo2));
+        EventController eventController = new EventController(getScenarioStore(store));
+        String errMsg = "expected event at this TimeStep";
+
+        List<Event> events;
+        //only default event
+        events = eventController.getEventsForTime(0.5);
+        assertEquals(1, events.size());
+        assertTimeStamp(events, 0.5);
+
+        //only eventInfo1
+        events = eventController.getEventsForTime(2.5);
+        assertEquals(3, events.size());
+        assertTimeStamp(events, 2.5);
+
+        //both eventInfo1 eventInfo2
+        events = eventController.getEventsForTime(3.5);
+        assertEquals(4, events.size());
+        assertTrue(errMsg, events.contains(e1));
+        assertTrue(errMsg, events.contains(e2));
+        assertTrue(errMsg, events.contains(e3));
+        assertTimeStamp(events, 3.5);
+
+        //only eventInfo1
+        events = eventController.getEventsForTime(4.5);
+        assertEquals(3, events.size());
+        assertTrue(errMsg, events.contains(e1));
+        assertTrue(errMsg, events.contains(e2));
+        assertTimeStamp(events, 4.5);
+
+        //one time event is over only events from eventInfo2
+        events = eventController.getEventsForTime(7.8);
+        assertEquals(2, events.size());
+        assertTrue(errMsg, events.contains(e3));
+        assertTimeStamp(events, 7.8);
+
+        //no event (only the default time event)
+        //one time event is over only events from eventInfo2
+        events = eventController.getEventsForTime(8.3);
+        assertEquals(1, events.size());
+        assertTimeStamp(events, 8.3);
+
+    }
+
+    private void assertTimeStamp(List<Event> events, double simTime){
+        events.forEach(e -> assertEquals(e.getTime(), simTime, 1e-3));
     }
 }
