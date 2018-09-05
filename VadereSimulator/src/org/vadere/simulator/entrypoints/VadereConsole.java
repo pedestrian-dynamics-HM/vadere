@@ -47,7 +47,7 @@ public class VadereConsole {
 		// Run Project
 		Subparser projectRun = subparsers
 				.addParser(SubCommand.PROJECT_RUN.getCmdName())
-				.help("This command uses a Vadere Project and runs selected scenario.")
+				.help("This command uses a VADERE project and runs selected scenario.")
 				.setDefault("func", new ProjectRunSubCommand());
 		projectRun.addArgument("--project-dir", "-p")
 				.required(true)
@@ -70,18 +70,18 @@ public class VadereConsole {
 				.setDefault("output")
 				.dest("output-dir") // set name in namespace
 				.type(String.class)
-				.help("Supply differernt output directory path to use.");
+				.help("Supply different output directory path to use.");
 
 		scenarioRun.addArgument("--scenario-file", "-f")
 				.required(true)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Scenario files to run");
+				.help("Scenario file to run");
 
 		// Run SUQ
 		Subparser suqRun = subparsers
 				.addParser(SubCommand.SUQ.getCmdName())
-				.help("Run a single scenario file to specify to  fully controll folder structure for input and output.")
+				.help("Run a single scenario file but specify output path manually.")
 				.setDefault("func", new SuqSubCommand());
 
 		suqRun.addArgument("--output-dir", "-o")
@@ -89,7 +89,7 @@ public class VadereConsole {
 				.setDefault("output")
 				.dest("output-dir") // set name in namespace
 				.type(String.class)
-				.help("Supply differernt output directory path to use.");
+				.help("Supply different output directory path to use.");
 
 		suqRun.addArgument("--scenario-file", "-f")
 				.required(true)
@@ -101,7 +101,7 @@ public class VadereConsole {
 		// Run Migration Assistant
 		Subparser migrationAssistant = subparsers
 				.addParser(SubCommand.MIGRATE.getCmdName())
-				.help("Run migration assistant on single sceanrio file")
+				.help("Run migration assistant on single sceanrio file.")
 				.setDefault("func", new MigrationSubCommand());
 
 		migrationAssistant.addArgument("path")

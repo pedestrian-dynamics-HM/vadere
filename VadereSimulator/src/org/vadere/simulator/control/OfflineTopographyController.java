@@ -5,7 +5,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.scenario.Car;
@@ -49,7 +49,7 @@ public class OfflineTopographyController {
 		}
 
 		// add distance function
-		IPotentialField distanceField = new ObstacleDistancePotential(
+		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
 				new AttributesFloorField());

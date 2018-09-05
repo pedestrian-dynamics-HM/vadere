@@ -15,7 +15,6 @@ import org.vadere.util.potential.FloorDiscretizer;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.EikonalSolverFIM;
-import org.vadere.util.potential.calculators.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.EikonalSolverFSM;
 import org.vadere.util.potential.calculators.EikonalSolverSFMM;
 import org.vadere.util.potential.calculators.PotentialFieldCalculatorNone;
@@ -25,15 +24,20 @@ import java.util.Collection;
 
 /**
  * @author Benedikt Zoennchen
+ *
+ * PotentialFieldDistanceEikonalEq computes the nearest distnace to any obstacle by computing
+ * the distance at certain discrete points lying on an Cartesian grid. Values inbetween are
+ * bilinear interpolated. To compute the distance at these grid points the eikonal equation is
+ * used by choosing obstacles to be the destination area of the propageting wave front.
  */
-public class ObstacleDistancePotential implements IPotentialField {
+public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 
-	private static Logger logger = LogManager.getLogger(ObstacleDistancePotential.class);
+	private static Logger logger = LogManager.getLogger(PotentialFieldDistanceEikonalEq.class);
 	private final EikonalSolver eikonalSolver;
 
-	public ObstacleDistancePotential(@NotNull final Collection<VShape> obstacles,
-	                                 @NotNull final VRectangle bounds,
-	                                 @NotNull final AttributesFloorField attributesFloorField) {
+	public PotentialFieldDistanceEikonalEq(@NotNull final Collection<VShape> obstacles,
+										   @NotNull final VRectangle bounds,
+										   @NotNull final AttributesFloorField attributesFloorField) {
 		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState());
 
 		for (VShape shape : obstacles) {
@@ -65,6 +69,8 @@ public class ObstacleDistancePotential implements IPotentialField {
 
 	@Override
 	public double getPotential(@NotNull VPoint pos, @Nullable Agent agent) {
-		return eikonalSolver.getPotential(pos, 0.0, 1.0);
+		// unknownPenalty = 0.0 since there will be no unknowns such as values at obstacles
+		// the fmm can cause an error mostly an underestimation of 20% near the source which are exactly the points we are interested
+		return eikonalSolver.getPotential(pos, 0.0, 1.2);
 	}
 }
