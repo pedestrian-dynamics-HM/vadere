@@ -5,12 +5,9 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor;
-import org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
-import javax.swing.*;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 
 /**
  * This processor saves the largest overlap (2*pedRadius - distance between the pedestrian's centers) for one simulation.
@@ -68,7 +65,7 @@ public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesMaxOverlapProcessor att = (AttributesMaxOverlapProcessor) this.getAttributes();
-		this.pedOverlapProc = (PedestrianOverlapDistProcessor) manager.getProcessor(att.getPedestrianMaxOverlapProcessorId());
+		this.pedOverlapProc = (PedestrianOverlapDistProcessor) manager.getProcessor(att.getPedestrianOverlapDistProcessorId());
 
 	}
 
