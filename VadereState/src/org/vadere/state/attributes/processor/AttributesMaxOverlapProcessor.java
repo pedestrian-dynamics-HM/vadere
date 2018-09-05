@@ -6,14 +6,14 @@ package org.vadere.state.attributes.processor;
  */
 
 public class AttributesMaxOverlapProcessor extends AttributesProcessor {
-    private int pedestrianMaxOverlapProcessorId;
+    private int pedestrianOverlapDistProcessorId;
 
-    public int getPedestrianMaxOverlapProcessorId() {
-        return this.pedestrianMaxOverlapProcessorId;
+    public int getPedestrianOverlapDistProcessorId() {
+        return this.pedestrianOverlapDistProcessorId;
     }
 
-    public void getPedestrianMaxOverlapProcessorId(int pedestrianMaxOverlapProcessorId) {
+    public void getPedestrianOverlapDistProcessorId(int pedestrianOverlapDistProcessorId) {
         checkSealed();
-        this.pedestrianMaxOverlapProcessorId = pedestrianMaxOverlapProcessorId;
+        this.pedestrianOverlapDistProcessorId = pedestrianOverlapDistProcessorId;
     }
 }

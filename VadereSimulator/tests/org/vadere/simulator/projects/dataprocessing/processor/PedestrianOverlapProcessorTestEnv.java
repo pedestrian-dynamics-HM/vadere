@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlap;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
@@ -18,10 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import static org.mockito.ArgumentMatchers.doubleThat;
 import static org.mockito.Mockito.mock;
 
-public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdOverlap, OverlapData> {
+public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdOverlapKey, OverlapData> {
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
@@ -35,7 +34,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 
 		try {
 			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdOverlap.class,
+					TimestepPedestrianIdOverlapKey.class,
 					testedProcessor.getId());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -82,10 +81,10 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 1, 5), b.overlapData(1,5,minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 5, 1), b.overlapData(5,1,minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 1, 3), b.overlapData(1,3,minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 3, 1), b.overlapData(3,1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 5), b.overlapData(1,5,minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 5, 1), b.overlapData(5,1,minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 3), b.overlapData(1,3,minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 1), b.overlapData(3,1, minDist));
 			}
 		});
 
@@ -101,21 +100,21 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 1, 2), b.overlapData(1, 2, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 1, 3), b.overlapData(1, 3, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 1, 4), b.overlapData(1, 4, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 2), b.overlapData(1, 2, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 3), b.overlapData(1, 3, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 4), b.overlapData(1, 4, minDist));
 
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 2, 1), b.overlapData(2, 1, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 2, 3), b.overlapData(2, 3, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 2, 4), b.overlapData(2, 4, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 1), b.overlapData(2, 1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 3), b.overlapData(2, 3, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 4), b.overlapData(2, 4, minDist));
 
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 3, 1), b.overlapData(3, 1, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 3, 2), b.overlapData(3, 2, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 3, 4), b.overlapData(3, 4, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 1), b.overlapData(3, 1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 2), b.overlapData(3, 2, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 4), b.overlapData(3, 4, minDist));
 
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 4, 1), b.overlapData(4, 1, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 4, 2), b.overlapData(4, 2, minDist));
-				addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 4, 3), b.overlapData(4, 3, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 1), b.overlapData(4, 1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 2), b.overlapData(4, 2, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 3), b.overlapData(4, 3, minDist));
 			}
 		});
 	}
@@ -127,12 +126,12 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
 		double minDist = 0.195*2;
 		int step = 1;
-		addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 1, 2), b.overlapData(1, 2, minDist));
-		addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 2, 1), b.overlapData(2, 1, minDist));
-		addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 3, 4), b.overlapData(3, 4, minDist));
-		addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 4, 3), b.overlapData(4, 3, minDist));
-		addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 5, 6), b.overlapData(5, 6, minDist));
-		addToExpectedOutput(new TimestepPedestrianIdOverlap(step, 6, 5), b.overlapData(6, 5, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 2), b.overlapData(1, 2, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 1), b.overlapData(2, 1, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 4), b.overlapData(3, 4, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 3), b.overlapData(4, 3, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 5, 6), b.overlapData(5, 6, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 6, 5), b.overlapData(6, 5, minDist));
 
 	}
 

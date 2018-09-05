@@ -1,17 +1,17 @@
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.annotation.factories.outputfiles.OutputFileClass;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlap;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
 
-@OutputFileClass(dataKeyMapping = TimestepPedestrianIdOverlap.class)
-public class TimestepPedestrianIdOverlapOutputFile extends OutputFile<TimestepPedestrianIdOverlap>{
+@OutputFileClass(dataKeyMapping = TimestepPedestrianIdOverlapKey.class)
+public class TimestepPedestrianIdOverlapOutputFile extends OutputFile<TimestepPedestrianIdOverlapKey>{
 
 	public TimestepPedestrianIdOverlapOutputFile() {
-		super(TimestepPedestrianIdOverlap.getHeaders());
+		super(TimestepPedestrianIdOverlapKey.getHeaders());
 	}
 
 	@Override
-	public String[] toStrings(final TimestepPedestrianIdOverlap key){
+	public String[] toStrings(final TimestepPedestrianIdOverlapKey key){
 		return key.toStrings();
 	}
 }

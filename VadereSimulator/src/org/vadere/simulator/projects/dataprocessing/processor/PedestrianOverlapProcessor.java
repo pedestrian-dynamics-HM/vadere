@@ -4,7 +4,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlap;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -18,8 +18,9 @@ import java.util.stream.Collectors;
 /**
  * @author Mario Teixeira Parente
  */
+
 @DataProcessorClass()
-public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlap, OverlapData> {
+public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlapKey, OverlapData> {
 	private double minDist;
 
 
@@ -45,11 +46,11 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 					.filter(OverlapData::isNotSelfOverlap)
 					.filter(OverlapData::isOverlap)
 					.collect(Collectors.toList());
-			overlaps.forEach(o -> this.putValue(new TimestepPedestrianIdOverlap(timeStep, o.getPed1Id(), o.getPed2Id()), o));
+			overlaps.forEach(o -> this.putValue(new TimestepPedestrianIdOverlapKey(timeStep, o.getPed1Id(), o.getPed2Id()), o));
 		}
 	}
 
-	public String[] toStrings(final TimestepPedestrianIdOverlap key) {
+	public String[] toStrings(final TimestepPedestrianIdOverlapKey key) {
 		return  this.hasValue(key) ? this.getValue(key).toStrings() : new String[]{"N/A", "N/A"};
 	}
 
