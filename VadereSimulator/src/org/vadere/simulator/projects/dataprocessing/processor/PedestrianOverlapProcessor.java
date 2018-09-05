@@ -34,8 +34,8 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 		minDist = pedRadius * 2;
 		int timeStep = state.getStep();
 		for (Pedestrian ped : peds) {
-			// get all Pedestrians with at moust pedRadius*2.5 distance away
-			// this reduces the amount auf overlap test.
+			// get all Pedestrians with at most pedRadius*2.5 distance away
+			// this reduces the amount of overlap tests
 			VPoint pedPos = ped.getPosition();
 			List<DynamicElement> neighbours = getDynElementsAtPosition(state.getTopography(), ped.getPosition(), pedRadius *2.5);
 			// collect pedIds and distance of all overlaps for the current ped in the current timestep

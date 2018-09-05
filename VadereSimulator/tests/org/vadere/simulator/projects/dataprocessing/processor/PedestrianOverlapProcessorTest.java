@@ -34,7 +34,6 @@ public class PedestrianOverlapProcessorTest extends ProcessorTest {
 	}
 
 	@Test
-	@Ignore
 	public void doUpdateWithTouching() throws Exception {
 		((PedestrianOverlapProcessorTestEnv)processorTestEnv).touching();
 		super.doUpdate();

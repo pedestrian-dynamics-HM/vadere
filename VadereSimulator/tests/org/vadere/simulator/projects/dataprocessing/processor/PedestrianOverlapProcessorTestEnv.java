@@ -10,6 +10,8 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -137,16 +139,26 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 	void verySmallNotOverlapping() {
 		AttributesAgent a = new AttributesAgent();
 		double distAtAxis =  a.getRadius()*2 + 0.001; // this should count as overlap
-		double vertDistAt45deg = 2*Math.sqrt(0.5)*a.getRadius() + 0.001;
+		double vertDistAt45deg = Math.sqrt(2)*a.getRadius() + 0.001;
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
 	}
 
 	void touching() {
 		AttributesAgent a = new AttributesAgent();
 		double distAtAxis =  a.getRadius()*2; // this should count as overlap
-		double vertDistAt45deg = 2*Math.sqrt(0.5)*a.getRadius();
+		double vertDistAt45deg = round(Math.sqrt(2)*a.getRadius(), 16);
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
 	}
+
+	public static double round(double val, int places){
+		if(places < 0)
+			throw new IllegalArgumentException();
+
+		BigDecimal bigDecimal = new BigDecimal(val);
+		bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);
+		return bigDecimal.doubleValue();
+	}
+
 
 	private void addMockStates(double radius, double distAtAxis, VPoint vertDistAt45deg) {
 		clearStates();
