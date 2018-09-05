@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * The EventController encapsulates logic to raise events.
  *
- * The EventController uses the passed @see ScenarioStore
+ * The EventController uses the passed {@link ScenarioStore}
  * to extract the possible events from the scenario description.
  *
  * TODO Clarify what happens if "simTimeSteps" are too big.
@@ -112,8 +112,8 @@ public class EventController {
      * Given a (recurring) "timeframe" and a "simulationTime" return if the
      * timeframe is "active" at that specific "simulationTime" or not.
      *
-     * An @see EventTimeframe contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
-     * an @see Event. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
+     * An {@link EventTimeframe} contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
+     * an {@link Event}. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
      * the period length of an event:
      *
      *   period_length = (endTime - startTime) + waitTimeBetweenRepetition
@@ -156,9 +156,8 @@ public class EventController {
         return eventIsActive;
     }
 
-
     /**
-     * Throw @see IllegalArgumentException if startTime > endTime OR timeframe does not meet recurring expectation.
+     * Throw {@link IllegalArgumentException} if startTime > endTime OR timeframe does not meet recurring expectation.
      */
     private static void throwExceptionIfTimeframeIsInvalid(EventTimeframe timeframe, boolean expectRecurring) {
         if (timeframe.getStartTime() > timeframe.getEndTime()) {
