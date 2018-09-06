@@ -134,12 +134,7 @@ public abstract class DefaultRenderer {
 		}
 	}
 
-	protected void renderStair(ScenarioElement element, final Graphics2D graphics, Color color){
-		Stairs stairs = (Stairs) element;
-
-		final Color tmpColor = graphics.getColor();
-		graphics.setColor(Color.black);
-		graphics.fill(stairs.getShape());
+	public static Area getStairShapeWithThreads(Stairs stairs){
 		Area hatchArea = new Area(stairs.getShape());
 		double stroke = stairs.getTreadDepth() * 0.05;
 		double halfTreadDepth = stairs.getTreadDepth()/2;
@@ -159,9 +154,19 @@ public abstract class DefaultRenderer {
 			p.closePath();
 
 			p.transform(AffineTransform.getTranslateInstance(trans.x, trans.y));
-
 			hatchArea.subtract(new Area(p));
 		}
+		return hatchArea;
+	}
+
+	protected void renderStair(ScenarioElement element, final Graphics2D graphics, Color color){
+		Stairs stairs = (Stairs) element;
+
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(Color.black);
+		graphics.fill(stairs.getShape());
+
+		Area hatchArea = getStairShapeWithThreads(stairs);
 
 		graphics.setColor(color);
 		graphics.fill(hatchArea);

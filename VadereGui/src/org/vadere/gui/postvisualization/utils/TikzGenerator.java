@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianOSMStrideLengthProcessor;
@@ -175,7 +176,8 @@ public class TikzGenerator {
 		if (config.isShowStairs()) {
 			generatedCode += "% Stairs\n";
 			for (Stairs stair : topography.getStairs()) {
-				generatedCode += String.format("\\fill[StairColor] %s;\n", generatePathForScenarioElement(stair));
+				generatedCode += String.format("\\fill[black] %s;\n", generatePathForScenarioElement(stair));
+				generatedCode += String.format("\\fill[StairColor] %s;\n", generatePathForStairs(stair));
 			}
 		} else {
 			generatedCode += "% Stairs (not enabled in config)\n";
@@ -290,6 +292,24 @@ public class TikzGenerator {
 
 		AffineTransform noTransformation = new AffineTransform();
 		PathIterator pathIterator = element.getShape().getPathIterator(noTransformation);
+
+		while (!pathIterator.isDone()) {
+			float[] coords = new float[6];
+			int type = pathIterator.currentSegment(coords);
+
+			generatedPath += convertJavaToTikzPath(type, coords);
+			pathIterator.next();
+		}
+
+		return generatedPath.trim();
+	}
+
+	private String generatePathForStairs(Stairs element) {
+		String generatedPath = "";
+
+		AffineTransform noTransformation = new AffineTransform();
+		Shape shape = DefaultRenderer.getStairShapeWithThreads(element);
+		PathIterator pathIterator = shape.getPathIterator(noTransformation);
 
 		while (!pathIterator.isDone()) {
 			float[] coords = new float[6];
