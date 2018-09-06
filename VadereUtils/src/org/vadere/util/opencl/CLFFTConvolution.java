@@ -61,7 +61,7 @@ public class CLFFTConvolution {
     private int paddWidth;
 
     // for global and local size
-    private int max_fft_per_work_item;
+    private int fft_per_workitem;
     private int max_workitems_per_workgroup;
 
     // Kernel Memory
@@ -147,10 +147,14 @@ public class CLFFTConvolution {
 
             // get divice specific constants
             long local_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_LOCAL_MEM_SIZE);
+            long global_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_GLOBAL_MEM_SIZE);
+
             max_workitems_per_workgroup = (int) CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
 
             // determin biggest fft that can be computed with one workitem
-            this.max_fft_per_work_item = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
+            int max_fft_per_work_item = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
+            this.fft_per_workitem = paddWidth < max_fft_per_work_item ? MIN_ELEMENTS_PER_WORKITEM : max_fft_per_work_item;
+
 
             // reserve memory for input matrix and gauss kernel
             hostInput = MemoryUtil.memAllocFloat(2 * paddHeight * paddWidth);
@@ -162,7 +166,7 @@ public class CLFFTConvolution {
             if (padd) {
                 gaussKernelTransformed = fftGaussKernel();
             } else {
-                gaussKernelTransformed = gaussKernel; // for testing purposses skipp kernel fft
+                gaussKernelTransformed = Arrays.copyOf(gaussKernel,gaussKernel.length); // for testing purposses skipp kernel fft
             }
 
             hostGaussKernelTransformed = CLUtils.toFloatBuffer(gaussKernelTransformed);
@@ -170,13 +174,14 @@ public class CLFFTConvolution {
 
             // clear hostGaussKernel and clGaussKernel as kernel fft is only done once
             CLInfo.checkCLError(clReleaseMemObject(clGaussKernelInput));
+            MemoryUtil.memFree(hostGaussKernelInput);
 
             setArgumentsMultiply();
 
         } catch (OpenCLException ex) {
             ex.printStackTrace();
         } finally {
-            MemoryUtil.memFree(hostGaussKernelInput);
+
         }
     }
 
@@ -240,6 +245,10 @@ public class CLFFTConvolution {
 
     public float[] getGaussKernelTransformed() {
         return gaussKernelTransformed;
+    }
+
+    public void setProfiling(boolean profiling) {
+        this.profiling = profiling;
     }
 
     /**
@@ -380,10 +389,8 @@ public class CLFFTConvolution {
      */
     private void fft1Dim(final long clKernel, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int workitems_total = computeWorksize(paddWidth);
-
-            int number_of_workgroups = workitems_total < max_workitems_per_workgroup ? 1 : workitems_total / max_workitems_per_workgroup;
-            int workitems_per_workgroup = workitems_total / number_of_workgroups;
+            int workitems_total = paddWidth/fft_per_workitem;
+            int workitems_per_workgroup = Math.min(workitems_total,max_workitems_per_workgroup);
 
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
             PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
@@ -445,10 +452,8 @@ public class CLFFTConvolution {
      */
     private void fft2Dim(final long clKernel, int height, int width, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int workitems_total = computeWorksize(paddWidth * paddHeight);
-
-            int number_of_workgroups = workitems_total < max_workitems_per_workgroup ? 1 : workitems_total / max_workitems_per_workgroup;
-            int workitems_per_workgroup = workitems_total / number_of_workgroups;
+            int workitems_total = Math.max((paddHeight*paddWidth)/fft_per_workitem, MIN_ELEMENTS_PER_WORKITEM);
+            int workitems_per_workgroup = Math.min(workitems_total,max_workitems_per_workgroup); //paddWidth/max_fft_per_work_item;
 
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
             PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
@@ -560,19 +565,6 @@ public class CLFFTConvolution {
         return (int) Math.pow(2, exponent);
     }
 
-    /**
-     * computeWorksize computes the works size and checks that the points_per_item are not samller that the required minimum
-     * @param points_per_workgroup data points per workgroup
-     * @return local_size
-     */
-    private int computeWorksize(int points_per_workgroup) {
-        int points_per_item = max_fft_per_work_item;
-        int local_size = points_per_workgroup / points_per_item;
-        if (local_size <= 0) {
-            local_size = MIN_ELEMENTS_PER_WORKITEM;
-        }
-        return local_size;
-    }
 
     /**
      * buildKernels compiles the kernels for the 2-dim FFT the 1-dim FFT and the multiplication

@@ -380,10 +380,8 @@ public class CLFFTConvolutionDP {
      */
     private void fft1Dim(final long clKernel, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int workitems_total = computeWorksize(paddWidth);
-
-            int number_of_workgroups = workitems_total < max_workitems_per_workgroup ? 1 : workitems_total / max_workitems_per_workgroup;
-            int workitems_per_workgroup = workitems_total / number_of_workgroups;
+            int workitems_total = paddWidth/max_fft_per_work_item;
+            int workitems_per_workgroup = Math.min(workitems_total,max_workitems_per_workgroup); //paddWidth/max_fft_per_work_item;
 
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
             PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
@@ -443,10 +441,8 @@ public class CLFFTConvolutionDP {
      */
     private void fft2Dim(final long clKernel, int height, int width, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int workitems_total = computeWorksize(paddWidth * paddHeight);
-
-            int number_of_workgroups = workitems_total < max_workitems_per_workgroup ? 1 : workitems_total / max_workitems_per_workgroup;
-            int workitems_per_workgroup = workitems_total / number_of_workgroups;
+            int workitems_total = paddWidth/max_fft_per_work_item;
+            int workitems_per_workgroup = Math.min(workitems_total,max_workitems_per_workgroup); //paddWidth/max_fft_per_work_item;
 
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
             PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
@@ -560,24 +556,6 @@ public class CLFFTConvolutionDP {
         return (int) Math.pow(2, exponent);
     }
 
-    /**
-     * computeWorksize computes the works size and checks that the points_per_item are not samller that the required minimum
-     * @param points_per_workgroup
-     * @return
-     */
-    private int computeWorksize(int points_per_workgroup) {
-        int points_per_item = max_fft_per_work_item;
-        int local_size = points_per_workgroup / points_per_item;
-        if (local_size <= 0) {
-            local_size = MIN_ELEMENTS_PER_WORKITEM;
-        }
-//        while (!(points_per_item >= MIN_ELEMENTS_PER_WORKITEM && points_per_workgroup > points_per_item)) {
-//            points_per_item = points_per_item / 2;
-//            local_size = points_per_workgroup / points_per_item;
-//        }
-
-        return local_size;
-    }
 
     /**
      * buildKernels compiles the kernels for the 2-dim FFT the 1-dim FFT and the multiplication
