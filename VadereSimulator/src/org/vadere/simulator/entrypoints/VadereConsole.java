@@ -20,7 +20,7 @@ public class VadereConsole {
 	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
 
-//		args = new String[]{"migrate", "--create-new-version",  "0.5", "/home/lphex/hm.d/vadere/VadereSimulator/resources"};
+//		args = new String[]{"migrate", "--create-new-version",  "0.6", "/home/lphex/hm.d/vadere/VadereSimulator/resources"};
 		try {
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");

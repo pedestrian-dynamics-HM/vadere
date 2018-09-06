@@ -1,7 +1,8 @@
 {
   "name" : "basic_3_1_wall_sfm1",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -137,7 +138,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -147,6 +147,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "dynamicElements" : [ ],
       "attributesCar" : null
     }
   }

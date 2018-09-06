@@ -1,7 +1,8 @@
 {
   "name" : "narrow_passage_nelder_mead_ok",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -179,7 +180,31 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
-      "sources" : [ ],
+      "attributesPedestrian" : {
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0
+      },
+      "attributesCar" : {
+        "id" : -1,
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0,
+        "length" : 4.5,
+        "width" : 1.7,
+        "direction" : {
+          "x" : 1.0,
+          "y" : 0.0
+        }
+      },
       "dynamicElements" : [ {
         "source" : null,
         "targetIds" : [ 1 ],
@@ -239,31 +264,7 @@
         "groupIds" : [ ],
         "type" : "PEDESTRIAN"
       } ],
-      "attributesPedestrian" : {
-        "radius" : 0.195,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.0,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
-        "acceleration" : 2.0
-      },
-      "attributesCar" : {
-        "id" : -1,
-        "radius" : 0.195,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.0,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
-        "acceleration" : 2.0,
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
+      "sources" : [ ]
     }
   }
 }

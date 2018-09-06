@@ -1,7 +1,8 @@
 {
   "name" : "group_OSM_1Source1Place",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -138,7 +139,6 @@
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -163,7 +163,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      }
+      },
+      "dynamicElements" : [ ]
     }
   }
 }

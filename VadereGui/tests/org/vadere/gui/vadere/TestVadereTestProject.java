@@ -31,7 +31,7 @@ public class TestVadereTestProject {
 		assertEquals("Neues_Szenario", srm.getName());
 		assertEquals(3, srm.getModelAttributes().size());
 		assertEquals(21, srm.getDataProcessingJsonManager().getDataProcessors().size());
-		assertEquals(6, srm.getDataProcessingJsonManager().getOutputFiles().size());
+		assertEquals(7, srm.getDataProcessingJsonManager().getOutputFiles().size());
 		assertTrue(srm.getAttributesPedestrian() != null);
 		assertTrue(srm.getAttributesSimulation() != null);
 		assertTrue(srm.getTopography() != null);

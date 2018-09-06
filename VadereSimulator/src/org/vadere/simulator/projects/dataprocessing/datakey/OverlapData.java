@@ -16,11 +16,11 @@ public class OverlapData {
 		this.ped1Id = ped1.getId();
 		this.ped2Id = ped2.getId();
 		this.dist = ped1.getPosition().distance(ped2.getPosition());
-		this.overlap = dist - minDist;
+		this.overlap = minDist - dist;
 	}
 
 	public boolean isOverlap(){
-		return overlap < 0;
+		return overlap > 0;
 	}
 
 	public boolean isNotSelfOverlap(){

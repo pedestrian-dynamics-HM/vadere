@@ -1,7 +1,7 @@
 {
   "name" : "warteschlange_ein_ziel",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {

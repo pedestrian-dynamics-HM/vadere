@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_osm1",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -163,8 +163,8 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "Test1",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
   "commithash" : "c45f1d26328baaec22418c15e6351a059e910f5f",
   "processWriters" : {
     "files" : [ {
@@ -135,8 +135,8 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }

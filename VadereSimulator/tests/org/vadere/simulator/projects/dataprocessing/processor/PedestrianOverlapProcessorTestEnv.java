@@ -18,19 +18,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import static org.mockito.Mockito.mock;
-
 public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdOverlapKey, OverlapData> {
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
-	PedestrianOverlapProcessorTestEnv() {
+	PedestrianOverlapProcessorTestEnv(){
+		this(1);
+	}
+
+	PedestrianOverlapProcessorTestEnv(int processorId) {
 		try {
 			testedProcessor = processorFactory.createDataProcessor(PedestrianOverlapProcessor.class);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		testedProcessor.setId(nextProcessorId());
+		testedProcessor.setId(processorId);
 
 		try {
 			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
@@ -42,7 +44,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
-	private LinkedCellsGrid<DynamicElement> getCellGridMock(PedestrianListBuilder b) {
+	protected LinkedCellsGrid<DynamicElement> getCellGridMock(PedestrianListBuilder b) {
 		LinkedCellsGrid<DynamicElement> cellsGrid = new LinkedCellsGrid<>(0.0, 0.0, 10.0, 10.0, 1);
 		b.getDynamicElementList().forEach(cellsGrid::addObject);
 		return cellsGrid;
@@ -149,7 +151,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
 	}
 
-	public static double round(double val, int places){
+	private static double round(double val, int places){
 		if(places < 0)
 			throw new IllegalArgumentException();
 

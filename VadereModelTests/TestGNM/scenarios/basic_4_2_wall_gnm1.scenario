@@ -1,7 +1,8 @@
 {
   "name" : "basic_4_2_wall_gnm1",
   "description" : "",
-  "release" : "0.5",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -120,7 +121,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -130,7 +130,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }
