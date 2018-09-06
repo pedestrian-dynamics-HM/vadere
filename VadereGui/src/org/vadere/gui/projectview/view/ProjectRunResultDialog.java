@@ -64,6 +64,7 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 		private final String[] columnNames = {"Scenario_Name",
 				"Runtime",
 				"Overlaps",
+				"MaxOverlap",
 				"State"};
 		Button btnOk, btnCsv;
 		private JTable table;
@@ -108,7 +109,7 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 
 
 		public Object[][] getData(LinkedList<SimulationResult> data) {
-			Object[][] res = new Object[data.size()][4];
+			Object[][] res = new Object[data.size()][5];
 			int rowIdx = 0;
 			for (SimulationResult d : data) {
 				res[rowIdx] = d.getAsTableRow();

@@ -74,7 +74,7 @@ public class SimulationResult {
 		ret[0] = scenarioName;
 		ret[1] = runTime.toString();
 		ret[2] = Integer.toString(totalOverlaps);
-		ret[3] = Double.toString(maxOverlap);
+		ret[3] = String.format("%.5f", maxOverlap);
 		ret[4] = state;
 		return ret;
 	}
