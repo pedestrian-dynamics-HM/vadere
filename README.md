@@ -105,7 +105,7 @@ Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guid
 
 - 0.1 initial release of the software as open source (2016-08-05)
 - 0.2 stability and usability improved, additional pedestrian simulation models are supported (2016-12-22)
-[...]
+- [...]
 - 0.6 [Description to be added... ] (2018-09-07)
 
 ## Contributors
