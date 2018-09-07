@@ -2,11 +2,9 @@ package org.vadere.util.geometry;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -79,6 +77,7 @@ public class GeometryUtils {
 				reachablePositions.add(tmpPos);
 			}
 		}
+
 		return reachablePositions;
 	}
 
