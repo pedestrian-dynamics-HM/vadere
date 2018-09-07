@@ -2,7 +2,6 @@
   "name" : "chicken_floorfield_ok",
   "description" : "",
   "release" : "0.6",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -44,6 +43,13 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
       "id" : 4,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
@@ -174,9 +180,9 @@
         "id" : -1,
         "shape" : {
           "x" : 10.0,
-          "y" : 6.0,
+          "y" : 5.0,
           "width" : 15.0,
-          "height" : 7.0,
+          "height" : 9.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
@@ -191,6 +197,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -200,7 +207,6 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
       "attributesCar" : null
     }
   }

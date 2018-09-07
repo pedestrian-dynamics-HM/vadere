@@ -2,7 +2,6 @@
   "name" : "narrow_passage_nelder_mead_ok",
   "description" : "",
   "release" : "0.6",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -39,6 +38,23 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
+      "id" : 7,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 6
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 6
+      }
     } ],
     "isTimestamped" : true
   },
@@ -160,6 +176,78 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 10.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 10.0001,
+            "y" : 0.5001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 0.5001
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 10.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 10.0001,
+            "y" : 5.0001
+          }, {
+            "x" : 9.4999,
+            "y" : 5.0001
+          }, {
+            "x" : 9.4999,
+            "y" : -1.0E-4
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 10.0001,
+            "y" : 5.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 5.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 4.4999
+          }, {
+            "x" : 10.0001,
+            "y" : 4.4999
+          } ]
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : 5.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : 5.0001
+          } ]
+        },
+        "id" : -1
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -180,31 +268,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
-      "attributesPedestrian" : {
-        "radius" : 0.195,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.0,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
-        "acceleration" : 2.0
-      },
-      "attributesCar" : {
-        "id" : -1,
-        "radius" : 0.195,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.0,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
-        "acceleration" : 2.0,
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      },
+      "sources" : [ ],
       "dynamicElements" : [ {
         "source" : null,
         "targetIds" : [ 1 ],
@@ -264,7 +328,31 @@
         "groupIds" : [ ],
         "type" : "PEDESTRIAN"
       } ],
-      "sources" : [ ]
+      "attributesPedestrian" : {
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0
+      },
+      "attributesCar" : {
+        "id" : -1,
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0,
+        "length" : 4.5,
+        "width" : 1.7,
+        "direction" : {
+          "x" : 1.0,
+          "y" : 0.0
+        }
+      }
     }
   }
 }

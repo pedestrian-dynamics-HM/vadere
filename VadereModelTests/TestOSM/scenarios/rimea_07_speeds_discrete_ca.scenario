@@ -2,7 +2,6 @@
   "name" : "rimea_07_speeds_discrete_ca",
   "description" : "",
   "release" : "0.6",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -39,6 +38,23 @@
         "pedestrianEvacuationTimeProcessorId" : 1,
         "maximalEvacuationTime" : 220.0,
         "minimalEvacuationTime" : 50.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
+      "id" : 6,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 5
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
+      "id" : 7,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 5
       }
     } ],
     "isTimestamped" : true
@@ -157,6 +173,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -166,7 +183,6 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
       "attributesCar" : null
     }
   }

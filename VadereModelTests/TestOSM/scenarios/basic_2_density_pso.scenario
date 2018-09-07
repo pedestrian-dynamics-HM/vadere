@@ -2,7 +2,6 @@
   "name" : "basic_2_density_pso",
   "description" : "",
   "release" : "0.6",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -20,6 +19,23 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
       "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 3
+      }
     } ],
     "isTimestamped" : true
   },
@@ -157,7 +173,7 @@
         "shape" : {
           "x" : 1.0,
           "y" : 1.0,
-          "width" : 3.0,
+          "width" : 5.0,
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
@@ -173,6 +189,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -182,7 +199,6 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
       "attributesCar" : null
     }
   }
