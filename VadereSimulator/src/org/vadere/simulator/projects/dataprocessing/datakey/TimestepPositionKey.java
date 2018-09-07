@@ -1,12 +1,14 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * @author Mario Teixeira Parente
  */
 
+@OutputFileMap(outputFileClass = TimestepPositionOutputFile.class)
 public class TimestepPositionKey implements DataKey<TimestepPositionKey> {
     private int timeStep;
     private VPoint position;

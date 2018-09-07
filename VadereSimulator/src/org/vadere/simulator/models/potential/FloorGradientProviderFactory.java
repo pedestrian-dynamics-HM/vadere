@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.vadere.simulator.models.potential.fields.IPotentialTargetGrid;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
@@ -33,7 +33,7 @@ public class FloorGradientProviderFactory {
 	 */
 	public static GradientProvider createFloorGradientProvider(
 			GradientProviderType type, Topography scenario,
-			Map<Integer, Target> targets, IPotentialTargetGrid potentialField) {
+			Map<Integer, Target> targets, IPotentialFieldTargetGrid potentialField) {
 		GradientProvider result = null;
 
 		// TODO [priority=low] [task=refactoring] refactor

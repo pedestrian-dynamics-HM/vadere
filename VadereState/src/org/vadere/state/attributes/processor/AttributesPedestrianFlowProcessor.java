@@ -16,4 +16,14 @@ public class AttributesPedestrianFlowProcessor extends AttributesProcessor {
     public int getPedestrianDensityProcessorId() {
         return this.pedestrianDensityProcessorId;
     }
+
+    public void setPedestrianVelocityProcessorId(int pedestrianVelocityProcessorId) {
+        checkSealed();
+        this.pedestrianVelocityProcessorId = pedestrianVelocityProcessorId;
+    }
+
+    public void setPedestrianDensityProcessorId(int pedestrianDensityProcessorId) {
+        checkSealed();
+        this.pedestrianDensityProcessorId = pedestrianDensityProcessorId;
+    }
 }

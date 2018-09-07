@@ -2,17 +2,24 @@ package org.vadere.simulator.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,40 +65,61 @@ public class Simulation {
 	/** Hold the topography in an extra field for convenience. */
 	private final Topography topography;
 	private final ProcessorManager processorManager;
+	private final SourceControllerFactory sourceControllerFactory;
+	private SimulationResult simulationResult;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
+					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
 		this.name = name;
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
-		this.attributesSimulation = scenarioStore.attributesSimulation;
-		this.attributesAgent = scenarioStore.topography.getAttributesPedestrian();
+		this.attributesSimulation = scenarioStore.getAttributesSimulation();
+		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
-		this.topography = scenarioStore.topography;
-
+		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
+		this.simulationResult = simulationResult;
 
 		this.models = mainModel.getSubmodels();
+		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
-
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
+
+		// ::start:: this code is to visualize the potential fields. It may be refactored later.
+		IPotentialFieldTarget pft = null;
+		IPotentialField pt = null;
+		if(mainModel instanceof PotentialFieldModel) {
+			pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+			pt = (pos, agent) -> {
+				if(agent instanceof PedestrianOSM) {
+					return ((PedestrianOSM)agent).getPotential(pos);
+				}
+				else {
+					return 0.0;
+				}
+			};
+		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
+			pc.setPotentialFieldTarget(pft);
+			pc.setPotentialField(pt);
 		}
+		// ::end::
 
 		// create source and target controllers
 		for (Source source : topography.getSources()) {
-			sourceControllers
-					.add(new SourceController(topography, source, dynamicElementFactory, attributesAgent, random));
+			SourceController sc = this.sourceControllerFactory
+					.create(topography, source, dynamicElementFactory, attributesAgent, random);
+			sourceControllers.add(sc);
 		}
 		for (Target target : topography.getTargets()) {
 			targetControllers.add(new TargetController(topography, target));
@@ -122,7 +150,9 @@ public class Simulation {
 			c.preLoop(simTimeInSec);
 		}
 
-		processorManager.preLoop(this.simulationState);
+		if (attributesSimulation.isWriteSimulationData()) {
+			processorManager.preLoop(this.simulationState);
+		}
 	}
 
 	private void postLoop() {
@@ -136,7 +166,10 @@ public class Simulation {
 			c.postLoop(simTimeInSec);
 		}
 
-		processorManager.postLoop(this.simulationState);
+		if (attributesSimulation.isWriteSimulationData()) {
+			processorManager.postLoop(this.simulationState);
+		}
+		topographyController.postLoop(this.simTimeInSec);
 	}
 
 	/**
@@ -144,8 +177,10 @@ public class Simulation {
 	 */
 	public void run() {
 		try {
-			processorManager.setMainModel(mainModel);
-			processorManager.initOutputFiles();
+			if (attributesSimulation.isWriteSimulationData()) {
+				processorManager.setMainModel(mainModel);
+				processorManager.initOutputFiles();
+			}
 
 			preLoop();
 
@@ -170,9 +205,14 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
+				assert assertAllPedestrianInBounds();
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
-				processorManager.update(this.simulationState);
+
+				if (attributesSimulation.isWriteSimulationData()) {
+					processorManager.update(this.simulationState);
+				}
+
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
@@ -192,6 +232,7 @@ public class Simulation {
 
 				if (Thread.interrupted()) {
 					runSimulation = false;
+					simulationResult.setState("Simulation interrupted");
 					logger.info("Simulation interrupted.");
 				}
 			}
@@ -199,9 +240,17 @@ public class Simulation {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
 
-			processorManager.writeOutput();
+			if (attributesSimulation.isWriteSimulationData()) {
+				processorManager.writeOutput();
+			}
 			logger.info("Finished writing all output files");
 		}
+	}
+
+	private boolean assertAllPedestrianInBounds() {
+		Rectangle2D.Double bounds = topography.getBounds();
+		Collection<Pedestrian> peds = topography.getElements(Pedestrian.class);
+		return peds.stream().map(ped -> ped.getPosition()).allMatch(pos -> bounds.contains(pos.getX(), pos.getY()));
 	}
 
 	private SimulationState initialSimulationState() {

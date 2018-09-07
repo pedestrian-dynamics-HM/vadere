@@ -3,6 +3,7 @@ package org.vadere.gui.projectview.model;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -18,6 +19,10 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 public class ProjectViewModel {
@@ -29,7 +34,8 @@ public class ProjectViewModel {
 	private final OutputFileTableModel outputTableModel;
 	private final VadereScenarioTableModel scenarioTableModel;
 	private String currentProjectPath;
-	private Thread refreshOutputThread;
+	private ExecutorService refreshOutputExecutor;
+
 
 	// these are also part of the model, because only they know the current selected row
 	private VTable scenarioTable;
@@ -38,6 +44,7 @@ public class ProjectViewModel {
 	private final Collection<IOutputFileRefreshListener> outputRefreshListeners;
 	private final Collection<IProjectChangeListener> projectChangeListeners;
 	private JLabel scenarioNameLabel; // to add or remove the "*" to indicate unsaved changes
+	private boolean showSimulationResultDialog;
 
 	public ProjectViewModel() {
 		this.outputTableModel = new OutputFileTableModel();
@@ -45,14 +52,29 @@ public class ProjectViewModel {
 		this.outputRefreshListeners = new LinkedList<>();
 		this.projectChangeListeners = new LinkedList<>();
 		this.project = null;
-		this.refreshOutputThread = null;
+		this.refreshOutputExecutor = Executors.newSingleThreadExecutor();
+		this.showSimulationResultDialog = Preferences.userNodeForPackage(VadereApplication.class)
+				.getBoolean("Project.simulationResult.show", true);
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
-		Arrays.stream(rows)
-				.mapToObj(row -> getOutputTableModel().getValue(row))
-				.filter(dir -> IOOutput.deleteOutputDirectory(dir))
-				.forEach(dir -> logger.info("delete output directory: " + dir.getName()));
+		// 1. delete output files on the hard disc
+		int j = 0;
+		for(int i = 0; i < rows.length; i++) {
+			File dir = getOutputTableModel().getValue(rows[i]-j);
+
+			if(IOOutput.deleteOutputDirectory(dir)) {
+				j++;
+
+				// 2. remove output files information from the output file table
+				outputTable.getModel().remove(dir);
+
+				// 3. remove output files information from the project output
+				getProject().getProjectOutput().removeOutputDir(dir.getName());
+
+				logger.info("output dir "+ dir +" dir deleted.");
+			}
+		}
 	}
 
 	public void deleteScenarios(final int[] rows) {
@@ -123,17 +145,7 @@ public class ProjectViewModel {
 	}
 
 	public void refreshOutputTable() {
-		if (refreshOutputThread != null && refreshOutputThread.isAlive()) {
-			try {
-				logger.info("wait for output refresh to be finished, before restart again");
-				refreshOutputThread.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				logger.error(e.getLocalizedMessage());
-			}
-		}
-		refreshOutputThread = new Thread(new OutputRefresher());
-		refreshOutputThread.start();
+		refreshOutputExecutor.execute(new OutputRefresher());
 	}
 
 	public void addScenario(final Scenario scenario) {
@@ -203,14 +215,14 @@ public class ProjectViewModel {
 
 	public ScenarioBundle getRunningScenario() {
 		Scenario scenarioRM = project.getCurrentScenario();
-		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
+		List<String> outputDirectories = project.getProjectOutput().listSelectedOutputDirs(scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
 
 	public ScenarioBundle getSelectedScenarioBundle() {
 		Scenario scenarioRM = getSelectedScenarioRunManager();
-		List<String> outputDirectories = IOOutput.listSelectedOutputDirs(project, scenarioRM)
+		List<String> outputDirectories = project.getProjectOutput().listSelectedOutputDirs(scenarioRM)
 				.stream().map(file -> file.getAbsolutePath()).collect(Collectors.toList());
 		return new ScenarioBundle(project, scenarioRM, outputDirectories);
 	}
@@ -270,7 +282,7 @@ public class ProjectViewModel {
 		@Override
 		public void run() {
 			fireRefreshOutputStarted();
-			IOOutput.cleanOutputDirs(project);
+			project.getProjectOutput().update();
 			outputTableModel.init(project);
 			fireRefreshOutputCompleted();
 		}
@@ -323,6 +335,10 @@ public class ProjectViewModel {
 
 		public Collection<File> getOutputDirectories() {
 			return outputDirectories;
+		}
+
+		public Scenario getScenarioRM(){
+			return project.getProjectOutput().getScenario(directory.getName());
 		}
 	}
 
@@ -392,4 +408,11 @@ public class ProjectViewModel {
 		return currentScenario;
 	}
 
+	public boolean isShowSimulationResultDialog() {
+		return showSimulationResultDialog;
+	}
+
+	public void setShowSimulationResultDialog(boolean showSimulationResultDialog) {
+		this.showSimulationResultDialog = showSimulationResultDialog;
+	}
 }

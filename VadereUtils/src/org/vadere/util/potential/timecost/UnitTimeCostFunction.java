@@ -28,4 +28,9 @@ public class UnitTimeCostFunction implements ITimeCostFunction {
 		return false;
 	}
 
+    @Override
+    public ITimeCostFunction clone() {
+        return new UnitTimeCostFunction();
+    }
+
 }

@@ -10,12 +10,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,263 +25,261 @@ import java.util.stream.Collectors;
 
 /**
  * @author Mario Teixeira Parente
- *
  */
 
 public class DataProcessingJsonManager {
 
-    //TODO Change to 'dataprocessing'
-    public static final String DATAPROCCESSING_KEY = "processWriters";
+	//TODO Change to 'dataprocessing'
+	public static final String DATAPROCCESSING_KEY = "processWriters";
 
-    public static final String TRAJECTORIES_FILENAME = "postvis.trajectories";
+	public static final String TRAJECTORIES_FILENAME = "postvis.trajectories";
 
-    public static final String FILES_KEY = "files";
-    private static final String TYPE_KEY = "type";
-    private static final String FILENAME_KEY = "filename";
-    private static final String FILE_PROCESSORS_KEY = "processors";
-    private static final String SEPARATOR_KEY = "separator";
+	public static final String FILES_KEY = "files";
+	public static final String PROCESSORS_KEY = "processors";
+	public static final String ATTRIBUTES_KEY = "attributes";
+	public static final String DEFAULT_SEPARATOR = " ";
+	public static final String DEFAULT_OUTPUTFILE_TYPE = NoDataKeyOutputFile.class.getName();
+	public static final String DEFAULT_NAME = "outputFile";
+	private static final String TYPE_KEY = "type";
+	private static final String FILENAME_KEY = "filename";
+	private static final String FILE_PROCESSORS_KEY = "processors";
+	private static final String SEPARATOR_KEY = "separator";
+	private static final String PROCESSORID_KEY = "id";
+	private static final String ATTRIBUTESTYPE_KEY = "attributesType";
+	private static final String TIMESTAMP_KEY = "isTimestamped";
+	public static ObjectWriter writer;
+	private static ObjectMapper mapper;
 
-    public static final String PROCESSORS_KEY = "processors";
-    private static final String PROCESSORID_KEY = "id";
-    private static final String ATTRIBUTESTYPE_KEY = "attributesType";
-    public static final String ATTRIBUTES_KEY = "attributes";
+	static {
+		mapper = StateJsonConverter.getMapper();
+		writer = mapper.writerWithDefaultPrettyPrinter();
+	}
 
-    private static final String TIMESTAMP_KEY = "isTimestamped";
+	private final OutputFileFactory outputFileFactory;
+	private final DataProcessorFactory processorFactory;
+	private List<OutputFile<?>> outputFiles;
+	private List<DataProcessor<?, ?>> dataProcessors;
+	private boolean isTimestamped;
 
-    public static final String DEFAULT_SEPARATOR = " ";
-    public static final String DEFAULT_OUTPUTFILE_TYPE = NoDataKeyOutputFile.class.getName();
+	public DataProcessingJsonManager() {
+		this.outputFiles = new ArrayList<>();
+		this.dataProcessors = new ArrayList<>();
+		this.isTimestamped = true;
+		this.outputFileFactory = OutputFileFactory.instance();
+		this.processorFactory = DataProcessorFactory.instance();
+	}
 
-    private static ObjectMapper mapper;
-    public static ObjectWriter writer;
+	private static JsonNode serializeOutputFile(final OutputFile<?> outputFile) {
+		ObjectNode node = mapper.createObjectNode();
 
-    private static final DynamicClassInstantiator<OutputFile<?>> outputFileInstantiator;
-    private static final DynamicClassInstantiator<DataProcessor<?, ?>> processorInstantiator;
+		node.put(TYPE_KEY, outputFile.getClass().getName());
+		node.put(FILENAME_KEY, outputFile.getFileName());
+		node.set(FILE_PROCESSORS_KEY, mapper.convertValue(outputFile.getProcessorIds(), JsonNode.class));
 
-    private List<OutputFile<?>> outputFiles;
-    private List<DataProcessor<?, ?>> dataProcessors;
-    private boolean isTimestamped;
+		final String separator = outputFile.getSeparator();
+		if (separator != DEFAULT_SEPARATOR) {
+			node.put(SEPARATOR_KEY, separator);
+		}
 
-    static {
-        mapper = StateJsonConverter.getMapper();
-        writer = mapper.writerWithDefaultPrettyPrinter();
-        
-        outputFileInstantiator = new DynamicClassInstantiator<>();
-        processorInstantiator = new DynamicClassInstantiator<>();
-    }
+		return node;
+	}
 
-    public DataProcessingJsonManager() {
-        this.outputFiles = new ArrayList<>();
-        this.dataProcessors = new ArrayList<>();
-        this.isTimestamped = true;
-    }
+	public static JsonNode serializeProcessor(final DataProcessor<?, ?> dataProcessor) {
+		ObjectNode node = mapper.createObjectNode();
 
-    public List<OutputFile<?>> getOutputFiles() {
-        return outputFiles;
-    }
+		node.put(TYPE_KEY, dataProcessor.getClass().getName());
+		node.put(PROCESSORID_KEY, dataProcessor.getId());
 
-    public List<DataProcessor<?, ?>> getDataProcessors() {
-        return dataProcessors;
-    }
+		if (dataProcessor.getAttributes() != null) {
+			node.put(ATTRIBUTESTYPE_KEY, dataProcessor.getAttributes().getClass().getName());
 
-    public void addOutputFile(final OutputFileStore fileStore) {
-        // If fileName already exists, change it by removing and readding
-        this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.getFilename())).collect(Collectors.toList()));
-        this.outputFiles.add(instantiateOutputFile(fileStore));
-    }
+			if (!dataProcessor.getAttributes().getClass().equals(AttributesProcessor.class)) {
+				node.set(ATTRIBUTES_KEY, mapper.convertValue(dataProcessor.getAttributes(), JsonNode.class));
+			}
+		}
 
-    private OutputFile<?> instantiateOutputFile(final OutputFileStore fileStore) {
-        OutputFile<?> file = outputFileInstantiator.createObject(fileStore.getType());
-        file.setFileName(fileStore.getFilename());
-        file.setProcessorIds(fileStore.getProcessors());
-        file.setSeparator(fileStore.getSeparator());
-        return file;
-    }
+		return node;
+	}
 
-    public int replaceOutputFile(OutputFileStore fileStore) {
-        int index = indexOf(fileStore.getFilename());
-        this.outputFiles.remove(index);
-        this.outputFiles.add(index, instantiateOutputFile(fileStore));
-        return index;
-    }
+	public static DataProcessingJsonManager createDefault() {
+		try {
+			return deserializeFromNode(mapper.convertValue(OutputPresets.getOutputDefinition(), JsonNode.class));
+		} catch (JsonProcessingException ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
 
-    private int indexOf(String filename) {
-        for (int i = 0; i < outputFiles.size(); i ++) {
-            if (outputFiles.get(i).getFileName().equals(filename)) {
-                return i;
-            }
-        }
-        return -1;
-    }
+	public static DataProcessingJsonManager deserialize(String json) {
+		try {
+			JsonNode node = json.isEmpty() ? mapper.createObjectNode() : mapper.readTree(json);
+			return deserializeFromNode(node);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
 
-    public void addProcessor(final DataProcessorStore dataProcessorStore) {
-        DataProcessor<?, ?> dataProcessor = processorInstantiator.createObject(dataProcessorStore.getType());
-        dataProcessor.setId(dataProcessorStore.getId());
-        dataProcessor.setAttributes(dataProcessorStore.getAttributes());
-        this.dataProcessors.add(dataProcessor);
-    }
+	public static DataProcessingJsonManager deserializeFromNode(JsonNode node) throws JsonProcessingException {
+		DataProcessingJsonManager manager = new DataProcessingJsonManager();
 
-    public void addInstantiatedProcessor(final DataProcessor<?, ?> dataProcessor) {
-        this.dataProcessors.add(dataProcessor);
-    }
-    
-    public void updateDataProcessor(final DataProcessor<?, ?> oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
-        this.dataProcessors.remove(oldDataProcessor);
-        addProcessor(newDataProcessorStore);
-    }
+		// part 1: output files
+		ArrayNode outputFilesArrayNode = (ArrayNode) node.get(FILES_KEY);
+		if (outputFilesArrayNode != null)
+			for (JsonNode fileNode : outputFilesArrayNode) {
+				OutputFileStore fileStore = mapper.treeToValue(fileNode, OutputFileStore.class);
+				manager.addOutputFile(fileStore);
+			}
 
-    public boolean isTimestamped() {
-        return this.isTimestamped;
-    }
+		// part 2: processors
+		ArrayNode processorsArrayNode = (ArrayNode) node.get(PROCESSORS_KEY);
+		if (processorsArrayNode != null)
+			for (JsonNode processorNode : processorsArrayNode) {
+				DataProcessorStore dataProcessorStore = deserializeProcessorStore(processorNode);
+				manager.addProcessor(dataProcessorStore);
+			}
 
-    public void setTimestamped(boolean isTimestamped) {
-        this.isTimestamped = isTimestamped;
-    }
+		// part 3: timestamp
+		JsonNode timestampArrayNode = node.get(TIMESTAMP_KEY);
+		if (timestampArrayNode != null) {
+			manager.setTimestamped(timestampArrayNode.asBoolean());
+		}
 
-    private static JsonNode serializeOutputFile(final OutputFile<?> outputFile) {
-        ObjectNode node = mapper.createObjectNode();
+		return manager;
+	}
 
-        node.put(TYPE_KEY, outputFile.getClass().getName());
-        node.put(FILENAME_KEY, outputFile.getFileName());
-        node.set(FILE_PROCESSORS_KEY, mapper.convertValue(outputFile.getProcessorIds(), JsonNode.class));
+	public static DataProcessorStore deserializeProcessorStore(JsonNode node) {
+		DataProcessorStore store = new DataProcessorStore();
 
-        final String separator = outputFile.getSeparator();
-        if (separator != DEFAULT_SEPARATOR) {
-            node.put(SEPARATOR_KEY, separator);
-        }
+		store.setType(node.get(TYPE_KEY).asText());
+		store.setId(node.get(PROCESSORID_KEY).asInt());
 
-        return node;
-    }
+		if (node.has(ATTRIBUTESTYPE_KEY)) {
+			String attType = node.get(ATTRIBUTESTYPE_KEY).asText();
 
-    public static JsonNode serializeProcessor(final DataProcessor<?, ?> dataProcessor) {
-        ObjectNode node = mapper.createObjectNode();
+			if (attType != "") {
+				store.setAttributesType(attType);
 
-        node.put(TYPE_KEY, dataProcessor.getClass().getName());
-        node.put(PROCESSORID_KEY, dataProcessor.getId());
+				try {
+					store.setAttributes(mapper.readValue(node.get(ATTRIBUTES_KEY).toString(), mapper.getTypeFactory().constructFromCanonical(attType)));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
 
-        if (dataProcessor.getAttributes() != null) {
-            node.put(ATTRIBUTESTYPE_KEY, dataProcessor.getAttributes().getClass().getName());
+		return store;
+	}
 
-            if (!dataProcessor.getAttributes().getClass().equals(AttributesProcessor.class)) {
-                node.set(ATTRIBUTES_KEY, mapper.convertValue(dataProcessor.getAttributes(), JsonNode.class));
-            }
-        }
+	public List<OutputFile<?>> getOutputFiles() {
+		return outputFiles;
+	}
 
-        return node;
-    }
+	public List<DataProcessor<?, ?>> getDataProcessors() {
+		return dataProcessors;
+	}
 
-    public String serialize() throws JsonProcessingException {
-        return writer.writeValueAsString(serializeToNode());
-    }
+	public void addOutputFile(final OutputFileStore fileStore) {
+		// If fileName already exists, change it by removing and readding
+		this.outputFiles.removeAll(this.outputFiles.stream().filter(f -> f.getFileName().equals(fileStore.getFilename())).collect(Collectors.toList()));
+		this.outputFiles.add(instantiateOutputFile(fileStore));
+	}
 
-    public JsonNode serializeToNode() {
-        ObjectNode main = mapper.createObjectNode();
+	public OutputFile<?> instantiateOutputFile(final OutputFileStore fileStore) {
+		try {
+			return outputFileFactory.createOutputfile(fileStore);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-        // part 1: output files
-        ArrayNode outputFilesArrayNode = mapper.createArrayNode();
-        this.outputFiles.forEach(file -> {
-            outputFilesArrayNode.add(serializeOutputFile(file));
-        });
-        main.set(FILES_KEY, outputFilesArrayNode);
+	public int replaceOutputFile(OutputFileStore fileStore) {
+		int index = indexOf(fileStore.getFilename());
+		this.outputFiles.remove(index);
+		this.outputFiles.add(index, instantiateOutputFile(fileStore));
+		return index;
+	}
 
-        // part 2: processors
-        ArrayNode processorsArrayNode = mapper.createArrayNode();
-        this.dataProcessors.forEach(proc -> {
-            processorsArrayNode.add(serializeProcessor(proc));
-        });
-        main.set(PROCESSORS_KEY, processorsArrayNode);
+	private int indexOf(String filename) {
+		for (int i = 0; i < outputFiles.size(); i++) {
+			if (outputFiles.get(i).getFileName().equals(filename)) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
-        // part 3: timestamp
-        main.put(TIMESTAMP_KEY, this.isTimestamped);
+	public void addProcessor(final DataProcessorStore dataProcessorStore) {
+		DataProcessor<?, ?> dataProcessor = null;
+		try {
+			dataProcessor = processorFactory.createDataProcessor(dataProcessorStore);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		this.dataProcessors.add(dataProcessor);
+	}
 
-        return main;
-    }
+	public void addInstantiatedProcessor(final DataProcessor<?, ?> dataProcessor) {
+		this.dataProcessors.add(dataProcessor);
+	}
 
-    public static DataProcessingJsonManager createDefault() {
-        try {
-            return deserializeFromNode(mapper.convertValue(OutputPresets.getOutputDefinition(), JsonNode.class));
-        }
-        catch (JsonProcessingException ex) {
-            ex.printStackTrace();
-        }
+	public void updateDataProcessor(final DataProcessor<?, ?> oldDataProcessor, final DataProcessorStore newDataProcessorStore) {
+		this.dataProcessors.remove(oldDataProcessor);
+		addProcessor(newDataProcessorStore);
+	}
 
-        return null;
-    }
+	public boolean isTimestamped() {
+		return this.isTimestamped;
+	}
 
-    public static DataProcessingJsonManager deserialize(String json) {
-        try {
-            JsonNode node = json.isEmpty() ? mapper.createObjectNode() : mapper.readTree(json);
-            return deserializeFromNode(node);
-        }
-        catch (IOException ex) {
-            ex.printStackTrace();
-        }
+	public void setTimestamped(boolean isTimestamped) {
+		this.isTimestamped = isTimestamped;
+	}
 
-        return null;
-    }
+	public String serialize() throws JsonProcessingException {
+		return writer.writeValueAsString(serializeToNode());
+	}
 
-    public static DataProcessingJsonManager deserializeFromNode(JsonNode node) throws JsonProcessingException {
-        DataProcessingJsonManager manager = new DataProcessingJsonManager();
+	public JsonNode serializeToNode() {
+		ObjectNode main = mapper.createObjectNode();
 
-        // part 1: output files
-        ArrayNode outputFilesArrayNode = (ArrayNode) node.get(FILES_KEY);
-        if (outputFilesArrayNode != null)
-            for (JsonNode fileNode : outputFilesArrayNode) {
-                OutputFileStore fileStore = mapper.treeToValue(fileNode, OutputFileStore.class);
-                manager.addOutputFile(fileStore);
-            }
+		// part 1: output files
+		ArrayNode outputFilesArrayNode = mapper.createArrayNode();
+		this.outputFiles.forEach(file -> {
+			outputFilesArrayNode.add(serializeOutputFile(file));
+		});
+		main.set(FILES_KEY, outputFilesArrayNode);
 
-        // part 2: processors
-        ArrayNode processorsArrayNode = (ArrayNode) node.get(PROCESSORS_KEY);
-        if (processorsArrayNode != null)
-            for (JsonNode processorNode : processorsArrayNode) {
-                DataProcessorStore dataProcessorStore = deserializeProcessorStore(processorNode);
-                manager.addProcessor(dataProcessorStore);
-            }
+		// part 2: processors
+		ArrayNode processorsArrayNode = mapper.createArrayNode();
+		this.dataProcessors.forEach(proc -> {
+			processorsArrayNode.add(serializeProcessor(proc));
+		});
+		main.set(PROCESSORS_KEY, processorsArrayNode);
 
-        // part 3: timestamp
-        JsonNode timestampArrayNode = node.get(TIMESTAMP_KEY);
-        if (timestampArrayNode != null) {
-            manager.setTimestamped(timestampArrayNode.asBoolean());
-        }
+		// part 3: timestamp
+		main.put(TIMESTAMP_KEY, this.isTimestamped);
 
-        return manager;
-    }
+		return main;
+	}
 
-    public static DataProcessorStore deserializeProcessorStore(JsonNode node) {
-        DataProcessorStore store = new DataProcessorStore();
+	public ProcessorManager createProcessorManager(MainModel mainModel) {
+		return new ProcessorManager(dataProcessors, outputFiles, mainModel);
+	}
 
-        store.setType(node.get(TYPE_KEY).asText());
-        store.setId(node.get(PROCESSORID_KEY).asInt());
+	public int getMaxProcessorsId() {
+		int maxId = 0;
+		for (DataProcessor<?, ?> dataProc : dataProcessors) {
+			if (dataProc.getId() > maxId) {
+				maxId = dataProc.getId();
+			}
+		}
+		return maxId;
+	}
 
-        if(node.has(ATTRIBUTESTYPE_KEY)) {
-            String attType = node.get(ATTRIBUTESTYPE_KEY).asText();
-
-            if (attType != "") {
-                store.setAttributesType(attType);
-
-                try {
-                    store.setAttributes(mapper.readValue(node.get(ATTRIBUTES_KEY).toString(), mapper.getTypeFactory().constructFromCanonical(attType)));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        return store;
-    }
-
-    public ProcessorManager createProcessorManager(MainModel mainModel) {
-        return new ProcessorManager(this, dataProcessors, outputFiles, mainModel);
-    }
-
-    public int getMaxProcessorsId() {
-        int maxId = 0;
-        for (DataProcessor<?, ?> dataProc : dataProcessors) {
-            if (dataProc.getId() > maxId) {
-                maxId = dataProc.getId();
-            }
-        }
-        return maxId;
-    }
+	public boolean containsOutputFile(String name){
+		return  this.outputFiles.stream().anyMatch(f -> f.getFileName().equals(name));
+	}
 
 }

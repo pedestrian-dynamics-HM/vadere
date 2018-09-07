@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
@@ -22,17 +24,22 @@ import org.vadere.util.potential.gradients.GradientProvider;
  * (Helbing 1995).
  * 
  */
+@ModelClass
 public class PotentialFieldObstacleSFM implements GradientProvider,
 		PotentialFieldObstacle {
 
 	private Collection<Obstacle> obstacles;
+	private Topography topography;
+	private AttributesPotentialSFM attributes;
 
-	private final AttributesPotentialSFM attributes;
+	public PotentialFieldObstacleSFM() {}
 
-	public PotentialFieldObstacleSFM(Collection<Obstacle> obstacles,
-			AttributesPotentialSFM attributesPotential) {
-		this.obstacles = obstacles;
-		this.attributes = attributesPotential;
+	@Override
+	public void initialize(final List<Attributes> attributesList, final Topography topography,
+	                       final AttributesAgent attributesPedestrian, final Random random) {
+		this.obstacles = topography.getObstacles();
+		this.topography = topography;
+		this.attributes = Model.findAttributes(attributesList, AttributesPotentialSFM.class);
 	}
 
 	@Override
@@ -98,14 +105,11 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 	}
 
 	@Override
-	public PotentialFieldObstacle copy() {
-		return new PotentialFieldObstacleSFM(new LinkedList<>(obstacles), attributes);
+	public PotentialFieldObstacleSFM copy() {
+		PotentialFieldObstacleSFM potentialFieldObstacle = new PotentialFieldObstacleSFM();
+		potentialFieldObstacle.attributes = attributes;
+		potentialFieldObstacle.topography = topography;
+		potentialFieldObstacle.obstacles = new LinkedList<>(topography.getObstacles());
+		return potentialFieldObstacle;
 	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
 }

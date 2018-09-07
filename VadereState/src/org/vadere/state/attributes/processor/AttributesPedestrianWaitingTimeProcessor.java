@@ -13,4 +13,9 @@ public class AttributesPedestrianWaitingTimeProcessor extends AttributesProcesso
     public VRectangle getWaitingArea() {
         return waitingArea;
     }
+
+    public void setWaitingArea(VRectangle waitingArea) {
+        checkSealed();
+        this.waitingArea = waitingArea;
+    }
 }

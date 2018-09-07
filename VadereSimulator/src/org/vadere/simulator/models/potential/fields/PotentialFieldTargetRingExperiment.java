@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.potential.fields;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
@@ -14,9 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid {
+@ModelClass
+public class PotentialFieldTargetRingExperiment implements IPotentialFieldTargetGrid {
 
-	private final AttributesPotentialRingExperiment attributes;
+	private AttributesPotentialRingExperiment attributes;
 
 	public PotentialFieldTargetRingExperiment(AttributesPotentialRingExperiment attributes) {
 		this.attributes = attributes;
@@ -44,7 +46,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 	 * Afterwards, rate "pos" and check if it lies in the same direction as tangent vector.
 	 */
 	@Override
-	public double getTargetPotential(VPoint pos, Agent ped) {
+	public double getPotential(VPoint pos, Agent ped) {
 		Vector2D pedestrian = new Vector2D(ped.getPosition());
 		Vector2D center = new Vector2D(attributes.getCenter());
 
@@ -62,9 +64,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 		Vector2D normalizedTangent = tangent.normalize(stepLength);
 		Vector2D bestNextPosition = pedestrian.add(normalizedTangent);
 
-		double potential = bestNextPosition.distance(pos);
-
-		return potential;
+		return bestNextPosition.distance(pos);
 	}
 
 	@Override
@@ -74,15 +74,30 @@ public class PotentialFieldTargetRingExperiment implements IPotentialTargetGrid 
 
 		Vector2D centerToPedestrian = pedestrian.sub(center);
 		VPoint rotatedVector = centerToPedestrian.rotate(Math.PI / 2);
-		Vector2D tangent = new Vector2D(rotatedVector);
 
-		return tangent;
+		return new Vector2D(rotatedVector);
 	}
 
-	@Override
+
+    @Override
+    public PotentialFieldTargetRingExperiment clone() {
+        try {
+            PotentialFieldTargetRingExperiment clone = (PotentialFieldTargetRingExperiment)super.clone();
+            clone.attributes = (AttributesPotentialRingExperiment) attributes.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+    }
+
+    @Override
+    public IPotentialField copyFields() {
+        throw new UnsupportedOperationException("not jet implemented.");
+    }
+
+    @Override
 	public HashMap<Integer, CellGrid> getCellGrids() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	@Override

@@ -1,24 +1,29 @@
 package org.vadere.util.io;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -41,6 +46,8 @@ public class IOUtils {
 	public static final String SCENARIO_DIR = "scenarios";
 
 	public static final String CORRUPT_DIR = "corrupt";
+
+	public static final String LEGACY_DIR = "legacy";
 
 	public static final String VADERE_PROJECT_FILENAME = "vadere.project";
 
@@ -73,7 +80,7 @@ public class IOUtils {
 
 	public static File[] getScenarioFilesInOutputDirectory(Path outputDir) throws IOException {
 		return Files.walk(outputDir)
-				.filter(path -> !path.toString().contains("\\corrupt")) // don't look into the corrupt-folder
+				.filter(path -> !path.toString().contains("corrupt")) // don't look into the corrupt-folder
 				.filter(path -> path.getFileName().toString().endsWith(".scenario"))
 				.map(path -> new File(path.toString()))
 				.toArray(File[]::new);
@@ -121,8 +128,6 @@ public class IOUtils {
 	 * @param cls
 	 *        class type for which the preferences should be loaded
 	 * @return the preferences object, or null.
-	 * @throws InvalidPreferencesFormatException
-	 * @throws IOException
 	 */
 	public static Preferences loadUserPreferences(String filename, Class<?> cls)
 			throws IOException, InvalidPreferencesFormatException {
@@ -137,8 +142,6 @@ public class IOUtils {
 			Preferences prefs) throws IOException, BackingStoreException {
 		try (FileOutputStream fos = new FileOutputStream(preferencesfilename)) {
 			prefs.exportNode(fos);
-		} catch (IOException e) {
-			throw e;
 		}
 	}
 
@@ -150,17 +153,53 @@ public class IOUtils {
 		}
 	}
 
-	/** Reads all text of a given file and store it in a string. */
-	public static String readTextFile(Path filePath) throws IOException {
-		List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < lines.size(); i++) {
-			sb.append(lines.get(i));
-			if (i < lines.size() - 1) {
-				sb.append(System.lineSeparator());
-			}
+	/** add a suffix to a path. If beforeExtension first test extenion (i.e. filename<suffix>.txt*/
+	public static Path addSuffix(Path path, String suffix, boolean beforeExtension){
+		String filname = path.getFileName().toString();
+		Path parent = path.getParent();
+		int  startExtension = filname.lastIndexOf('.');
+		Path ret;
+		if (beforeExtension && startExtension > 0){ // if filename start with a point this is not an extension.
+			String baseFilename = filname.substring(0, startExtension);
+			String extension = filname.substring(startExtension);
+			ret = parent.resolve(filname + suffix + extension);
+		} else {
+			ret = parent.resolve(filname + suffix);
 		}
-		return sb.toString();
+		return ret;
+	}
+
+	public static Path makeBackup(Path path, String backupSuffix, boolean overwrite) throws IOException {
+		if (overwrite) {
+			return Files.copy(path, addSuffix(path, backupSuffix, false), StandardCopyOption.REPLACE_EXISTING);
+		} else {
+			return Files.copy(path, addSuffix(path, backupSuffix, false));
+		}
+	}
+
+	public static BufferedReader defaultBufferedReader(Path filePath) throws FileNotFoundException {
+		return new BufferedReader(new InputStreamReader(
+				new FileInputStream(filePath.toFile()), StandardCharsets.UTF_8), 8192);
+	}
+
+	/** Reads all text of a given file and store it in a string. */
+	public static String readTextFile(Path filePath) throws IOException{
+		StringJoiner sb = new StringJoiner(System.lineSeparator());
+		try(BufferedReader inputStream = IOUtils.defaultBufferedReader(filePath)){
+				String line;
+				while ((line = inputStream.readLine()) != null)
+					sb.add(line);
+				return sb.toString();
+		}
+	}
+
+	public static String readTextFileFromResources(String resourcePath) throws IOException {
+		URL url = IOUtils.class.getResource(resourcePath);
+		try {
+			return  readTextFile(Paths.get(url.toURI()));
+		} catch (URISyntaxException e) {
+			throw new IOException("Wrong URI Syntax for " + url.toString(), e);
+		}
 	}
 
 	public static String readTextFile(String filePath) throws IOException {

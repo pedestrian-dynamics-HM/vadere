@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
-import org.vadere.gui.components.control.ReflectionAttributeModifier;
+import org.vadere.simulator.entrypoints.ReflectionAttributeModifier;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -89,7 +89,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			Theme syntaxTheme = Theme.load(in);
 			syntaxTheme.apply(textAreaLocal);
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error("could not load theme" + e.getMessage());
 		}
 
 		txtrTextfiletextarea = textAreaLocal;
@@ -112,6 +112,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
+
 				updateModel();
 			}
 		};
@@ -126,7 +127,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		ScenarioElement element = panelModel.getSelectedElement();
 		if (element != null) {
 			String json = txtrTextfiletextarea.getText();
-
+			//logger.info(json);
 			if (json.length() == 0)
 				return;
 
@@ -143,7 +144,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			} else {
 				try {
 					Attributes attributes = StateJsonConverter.deserializeScenarioElementType(json, element.getType());
-					ReflectionAttributeModifier.setAttributes(element, attributes);
+					element.setAttributes(attributes); // Replaces previous AttributeModifier.setAttributes (see #91)
 					ScenarioPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();
 					jsonValidIndicator.setValid();
@@ -185,7 +186,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
 				} else {
 					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObject(ReflectionAttributeModifier.getAttributes(scenarioElement)));
+							.serializeObject(scenarioElement.getAttributes()));
 				}
 			}
 		}

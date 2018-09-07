@@ -85,13 +85,7 @@ public class Vector2D extends VPoint {
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 */
 	public double angleTo(VPoint center) {
-		double atan2 = Math.atan2(this.y - center.y, this.x - center.x);
-
-		if (atan2 < 0.0) {
-			atan2 = Math.PI * 2 + atan2;
-		}
-
-		return atan2;
+		return GeometryUtils.angleTo(this, center);
 	}
 
 	public Vector2D add(VPoint p) {
@@ -100,6 +94,11 @@ public class Vector2D extends VPoint {
 
 	public Vector2D sub(VPoint p) {
 		return new Vector2D(this.x - p.x, this.y - p.y);
+	}
+
+	public Vector2D rotate(final double radAngle) {
+		return new Vector2D(x * Math.cos(radAngle) - y * Math.sin(radAngle),
+				x * Math.sin(radAngle) + y * Math.cos(radAngle));
 	}
 
 }

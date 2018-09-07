@@ -11,4 +11,14 @@ public class AttributesFloorFieldProcessor extends AttributesProcessor {
 	public double getResolution() {
 		return resolution;
 	}
+
+	public void setTargetId(int targetId) {
+    	checkSealed();
+		this.targetId = targetId;
+	}
+
+	public void setResolution(double resolution) {
+    	checkSealed();
+		this.resolution = resolution;
+	}
 }

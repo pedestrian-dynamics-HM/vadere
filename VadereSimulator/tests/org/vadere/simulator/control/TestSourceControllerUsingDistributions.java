@@ -9,6 +9,7 @@ import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class TestSourceControllerUsingDistributions extends TestSourceControllerUsingConstantSpawnRate {
 
@@ -26,12 +27,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setDistributionClass(ConstantTestDistribution.class);
 		initialize(builder);
 
-		sourceController.update(0);
+		first().sourceController.update(0);
 		pedestrianCountEquals(0);
-		sourceController.update(0.9);
+		first().sourceController.update(0.9);
 		pedestrianCountEquals(0);
 
-		sourceController.update(1);
+		first().sourceController.update(1);
 		pedestrianCountEquals(1);
 	}
 
@@ -40,12 +41,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder();
 		initialize(builder);
 
-		sourceController.update(1);
+		first().sourceController.update(1);
 		pedestrianCountEquals(1);
-		sourceController.update(2);
+		first().sourceController.update(2);
 		pedestrianCountEquals(2);
 
-		sourceController.update(3); // end time reached -> no effect
+		first().sourceController.update(3); // end time reached -> no effect
 		pedestrianCountEquals(2);
 	}
 
@@ -55,11 +56,11 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setOneTimeSpawn(1);
 		initialize(builder);
 
-		sourceController.update(0);
+		first().sourceController.update(0);
 		pedestrianCountEquals(0);
-		sourceController.update(1);
+		first().sourceController.update(1);
 		pedestrianCountEquals(1);
-		sourceController.update(2);
+		first().sourceController.update(2);
 		pedestrianCountEquals(1);
 	}
 
@@ -69,9 +70,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setSpawnNumber(10);
 		initialize(builder);
 
-		sourceController.update(1);
+		first().sourceController.update(1);
 		pedestrianCountEquals(10);
-		sourceController.update(2);
+		first().sourceController.update(2);
 		pedestrianCountEquals(20);
 	}
 
@@ -84,9 +85,9 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 
 		// per update only one "spawn action" is performed.
 		// if the spawn rate is higher than the update time increment, spawns will get lost.
-		sourceController.update(0);
+		first().sourceController.update(0);
 		pedestrianCountEquals(1);
-		sourceController.update(1);
+		first().sourceController.update(1);
 		pedestrianCountEquals(4);
 	}
 
@@ -99,18 +100,19 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0,0,0.1,0.1));
 		initialize(builder);
 
-		doUpdates(100, startTime, endTime + 1);
+		doUpdates(0, 100, startTime, endTime + 1);
 
 		// despite many updates, only one ped can be spawned
-		assertEquals(1, countPedestrians());
+		assertEquals(1, countPedestrians(0));
 
-		doUpdatesBeamingPedsAway(1000);
+		doUpdatesBeamingPedsAway(0, 1000);
 
 		// now, all pedestrians should have been created
-		assertEquals(2 * spawnNumber, countPedestrians());
+		assertEquals(2 * spawnNumber, countPedestrians(0));
 	}
 
 	@Test
@@ -118,24 +120,24 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		// works also with sources that have startTime == endTime?
 		// expected: not stop spawning before all pedestrians are created (even after end time)
 		double startTime = 1;
-		double endTime = startTime;
 		int spawnNumber = 100;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(startTime)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0,0,0.1,0.1));
 		initialize(builder);
 
-		doUpdates(100, 0, endTime + 1);
+		doUpdates(0, 100, 0, startTime + 1);
 
 		// despite many updates, only one ped can be spawned
-		assertEquals(1, countPedestrians());
+		assertEquals(1, countPedestrians(0));
 
 		// now, move the peds away after updates
-		doUpdatesBeamingPedsAway(1000);
+		doUpdatesBeamingPedsAway(0, 1000);
 
 		// now, all pedestrians should have been created
-		assertEquals(spawnNumber, countPedestrians());
+		assertEquals(spawnNumber, countPedestrians(0));
 
 	}
 	
@@ -144,12 +146,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(0); // <-- max 0 -> spawn no peds at all
 		initialize(builder);
-		
-		sourceController.update(1);
-		sourceController.update(2);
-		sourceController.update(3);
-		
-		assertEquals(0, countPedestrians());
+
+		first().sourceController.update(1);
+		first().sourceController.update(2);
+		first().sourceController.update(3);
+
+		assertEquals(0, countPedestrians(0));
 	}
 
 	@Test
@@ -157,12 +159,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL); // <-- maximum not set
 		initialize(builder);
-		
-		sourceController.update(1);
-		sourceController.update(2);
-		sourceController.update(3);
-		
-		assertEquals(2, countPedestrians());
+
+		first().sourceController.update(1);
+		first().sourceController.update(2);
+		first().sourceController.update(3);
+
+		assertEquals(2, countPedestrians(0));
 	}
 
 	@Test
@@ -170,12 +172,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(4); // <-- not exhausted
 		initialize(builder);
-		
-		sourceController.update(1);
-		sourceController.update(2);
-		sourceController.update(3);
-		
-		assertEquals(2, countPedestrians());
+
+		first().sourceController.update(1);
+		first().sourceController.update(2);
+		first().sourceController.update(3);
+
+		assertEquals(2, countPedestrians(0));
 	}
 
 	@Test
@@ -186,10 +188,10 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setEndTime(endTime)
 				.setMaxSpawnNumberTotal(maxSpawnNumberTotal); // <-- exhausted!
 		initialize(builder);
-		
-		doUpdates(50, 0, 200);
-		
-		assertEquals(maxSpawnNumberTotal, countPedestrians());
+
+		doUpdates(0, 50, 0, 200);
+
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
 
 	@Test
@@ -200,36 +202,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setSpawnNumber(5)
 				.setMaxSpawnNumberTotal(maxSpawnNumberTotal);
 		initialize(builder);
-		
-		doUpdates(50, 0, 200);
-		
-		assertEquals(maxSpawnNumberTotal, countPedestrians());
+
+		doUpdates(0, 50, 0, 200);
+
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
 
-	private void doUpdates(int number, double startTime, double endTimeExclusive) {
-		double timeStep = (endTimeExclusive - startTime) / number;
-		for (double t = startTime; t < endTimeExclusive + 1; t += timeStep) {
-			sourceController.update(t);
-		}
-	}
 
-	private void doUpdatesBeamingPedsAway(int number) {
-		double start = 10;
-		for (double t = start; t < start + number; t += 1) {
-			sourceController.update(t);
-			beamPedsAway();
-		}
-	}
-
-	private void beamPedsAway() {
-		final VPoint positionFarAway = new VPoint(1000, 1000);
-		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
-			pedestrian.setPosition(positionFarAway);
-		}
-	}
-
-	private void pedestrianCountEquals(int expected) {
-		assertEquals(expected, countPedestrians());
-	}
 	
 }

@@ -27,8 +27,8 @@ import java.util.List;
  *
  */
 class PotentialFieldAndInitializer {
-	protected final EikonalSolver eikonalSolver;
-	protected final AttributesFloorField attributesFloorField;
+	protected EikonalSolver eikonalSolver;
+	protected AttributesFloorField attributesFloorField;
 	private static Logger logger = LogManager.getLogger(PotentialFieldAndInitializer.class);
 
 	protected PotentialFieldAndInitializer(
@@ -53,12 +53,12 @@ class PotentialFieldAndInitializer {
 
 		if (createMethod != EikonalSolverType.NONE) {
 			for (VShape shape : targetShapes) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
+				FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
 						new CellState(0.0, PathFindingTag.Target));
 			}
 
 			for (Obstacle obstacle : topography.getObstacles()) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, obstacle.getShape(),
+				FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle.getShape(),
 						new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
 			}
 		}
@@ -78,13 +78,13 @@ class PotentialFieldAndInitializer {
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
 			case FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, timeCost);
 				break;
 			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, timeCost);
 				break;
 			default:
-				eikonalSolver = new EikonalSolverFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverSFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
 		}
 
 		long ms = System.currentTimeMillis();
@@ -92,15 +92,5 @@ class PotentialFieldAndInitializer {
 		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 
 		return new PotentialFieldAndInitializer(eikonalSolver, attributesPotential);
-	}
-
-	public double[] getGridPotentials(List<Point> points) {
-		double[] result = new double[points.size()];
-
-		for (int i = 0; i < points.size(); i++) {
-			result[i] = this.eikonalSolver.getPotentialField().getValue(points.get(i)).potential;
-		}
-
-		return result;
 	}
 }

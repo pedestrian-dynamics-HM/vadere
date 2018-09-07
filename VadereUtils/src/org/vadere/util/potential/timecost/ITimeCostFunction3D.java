@@ -16,6 +16,6 @@ public interface ITimeCostFunction3D {
 	 *        a point in 3D space.
 	 * @return the double-valued cost at p.
 	 */
-	public double costAt(Vector3D p);
+	double costAt(Vector3D p);
 
 }

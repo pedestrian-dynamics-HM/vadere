@@ -52,12 +52,65 @@
       <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-compiler-plugin</artifactId>
-		  <version>3.0</version>
+		  <version>${maven-compiler.version}</version>
 		  <configuration>
-		    <source>1.8</source>
-		    <target>1.8</target>
+              <source>${maven-compiler.source.version}</source>
+              <target>${maven-compiler.target.version}</target>
+              <annotationProcessorPaths>
+              <path>
+                  <groupId>org.vadere</groupId>
+                  <artifactId>annotation</artifactId>
+                  <version>0.1-SNAPSHOT</version>
+              </path>
+              </annotationProcessorPaths>
 		  </configuration>
 		</plugin>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.7.9</version>
+            <executions>
+                <!-- Use JaCoCo's Java agents to record coverage data by using on-the-fly class file instrumentation. -->
+                <execution>
+                    <id>pre-unit-test</id>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                    <configuration>
+                        <output>file</output>
+                        <destFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</destFile>
+                        <propertyName>surefireArgLine</propertyName>
+                    </configuration>
+                </execution>
+                <!-- Use JaCoCo agent output to create coverage reports in CSV, HTML and XML format. -->
+                <execution>
+                    <id>post-unit-test</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                    <configuration>
+                        <dataFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</dataFile>
+                        <outputDirectory>${project.reporting.outputDirectory}/coverage-reports</outputDirectory>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <!-- Maven Surefire is used to execute unit tests. -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.19</version>
+            <configuration>
+                <argLine>${surefireArgLine}</argLine>
+                <enableAssertions>true</enableAssertions>
+                <excludes>
+                    <exclude></exclude>
+                </excludes>
+                <failIfNoTests>false</failIfNoTests>
+                <skipTests>${skip.unit.tests}</skipTests>
+            </configuration>
+        </plugin>
     </plugins>
     <pluginManagement>
     	<plugins>
@@ -97,7 +150,7 @@
     	</plugins>
     </pluginManagement>
   </build>
-  
+
  <!-- local repository for all jars without an external repo -->
   <repositories>
     <repository>
@@ -117,20 +170,27 @@
   	</dependency>
 
 <!-- module dependencies -->
-  <dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>state</artifactId>
       <version>${project.version}</version>
-   </dependency>    
-   <dependency>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>utils</artifactId>
       <version>${project.version}</version>
-   </dependency>
+    </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>annotation</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+
    <dependency>
    	<groupId>net.sourceforge.argparse4j</groupId>
    	<artifactId>argparse4j</artifactId>
    	<version>0.4.3</version>
    </dependency>
+
   </dependencies>
 </project>

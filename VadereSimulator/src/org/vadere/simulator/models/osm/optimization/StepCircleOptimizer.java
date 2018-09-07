@@ -14,5 +14,5 @@ public interface StepCircleOptimizer {
 	/** Returns the reachable position with the minimal potential. */
 	VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea);
 
-	public StepCircleOptimizer clone();
+	StepCircleOptimizer clone();
 }

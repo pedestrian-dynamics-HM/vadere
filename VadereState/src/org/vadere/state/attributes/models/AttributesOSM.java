@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.MovementType;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 
+@ModelAttributeClass
 public class AttributesOSM extends Attributes {
 
 	private int stepCircleResolution = 18;
@@ -25,8 +27,8 @@ public class AttributesOSM extends Attributes {
 	private boolean seeSmallWalls = false;
 	private boolean minimumStepLength = false;
 	private String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
-	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact";
-	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact";
+	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell";
+	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
 	private List<String> submodels = new LinkedList<>();
 
 	public AttributesOSM() {}

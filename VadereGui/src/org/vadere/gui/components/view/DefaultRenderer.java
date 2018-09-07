@@ -1,23 +1,11 @@
 package org.vadere.gui.components.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
@@ -26,10 +14,21 @@ import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.RectangleLimits;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+
 public abstract class DefaultRenderer {
 
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
+	private static final double rotNeg90 = - Math.PI /2;
 
 	public DefaultRenderer(final IDefaultModel defaultModel) {
 		this(defaultModel, true, false);
@@ -55,13 +54,12 @@ public abstract class DefaultRenderer {
 	}
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
-		/*
-		 * if(doubleBuffering) {
-		 * targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
-		 * } else {
-		 */
-		targetGraphics2D.translate(x, y);
-		renderGraphics(targetGraphics2D, width, height);
+
+		 //if(doubleBuffering) {
+		 targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+         //} else {
+		//targetGraphics2D.translate(x, y);
+		//renderGraphics(targetGraphics2D, width, height);
 		// }
 		targetGraphics2D.dispose();
 	}
@@ -83,7 +81,6 @@ public abstract class DefaultRenderer {
 		Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
 
 		renderGraphics(bufferGraphics2D, width, height);
-
 		return image;
 	}
 
@@ -128,6 +125,59 @@ public abstract class DefaultRenderer {
 		}
 
 		g.setColor(tmpColor);
+	}
+
+	protected  void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
+								 final Color color){
+		for (Stairs s : stairs) {
+			renderStair(s, g, color);
+		}
+	}
+
+	public static Area getStairShapeWithThreads(Stairs stairs){
+		Area hatchArea = new Area(stairs.getShape());
+		double stroke = stairs.getTreadDepth() * 0.05;
+		double halfTreadDepth = stairs.getTreadDepth()/2;
+
+		for (Stairs.Tread tread : stairs.getTreads()) {
+
+			VLine tLine = tread.treadline;
+			Vector2D vec = tLine.asVector();
+			vec = vec.normalize(stroke);
+			vec = vec.rotate(rotNeg90);
+			Vector2D trans = vec.normalize(halfTreadDepth);
+			Path2D p = new Path2D.Double();
+			p.moveTo(tLine.x1, tLine.y1);
+			p.lineTo(tLine.x2, tLine.y2);
+			p.lineTo(tLine.x2 + vec.x, tLine.y2  + vec.y);
+			p.lineTo(tLine.x1 + vec.x, tLine.y1 + vec.y);
+			p.closePath();
+
+			p.transform(AffineTransform.getTranslateInstance(trans.x, trans.y));
+			hatchArea.subtract(new Area(p));
+		}
+		return hatchArea;
+	}
+
+	protected void renderStair(ScenarioElement element, final Graphics2D graphics, Color color){
+		Stairs stairs = (Stairs) element;
+
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(Color.black);
+		graphics.fill(stairs.getShape());
+
+		Area hatchArea = getStairShapeWithThreads(stairs);
+
+		graphics.setColor(color);
+		graphics.fill(hatchArea);
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderFilledShape(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(color);
+		graphics.fill(element.getShape());
+		graphics.setColor(tmpColor);
 	}
 
 	protected void renderSelectionShape(final Graphics2D graphics) {
@@ -225,6 +275,77 @@ public abstract class DefaultRenderer {
 	protected float getLineWidth() {
 		return (float) (2.0 / defaultModel.getScaleFactor());
 	}
+
+    /*protected void paintPotentialField(final Graphics2D g, final Function<VPoint, Double> potentialField, final VRectangle bound) {
+        float norm;
+
+        if (potentialField == null) {
+            return;
+        }
+
+        double pixToW = 1.0 / defaultModel.getScaleFactor();
+        double potOld, maxPotential = 0, invPotential;
+        double maxBorder = Math.max(bound.getWidth(), bound.getHeight());
+
+
+
+        for (double y = bound.getMinY(); y < bound.getMaxY(); y += pixToW) {
+            for (double x = bound.getMinX(); x < bound.getMaxX(); x += pixToW) {
+                potOld = potentialField.apply(new VPoint(x,y));
+
+                if ((potOld > maxPotential) && (potOld != Double.MAX_VALUE)) {
+                    maxPotential = potOld;
+                }
+            }
+        }
+
+        for (double y = bound.getMinY(); y < bound.getMaxY(); y += pixToW) {
+            for (double x = bound.getMinX(); x < bound.getMaxX(); x += pixToW) {
+                double contourDist = 0.02f;
+                boolean isContourLine = false;
+                double potential[] = new double[3];
+
+                if (!isContourLine) {
+                    invPotential = 1 - potential[0];
+
+                    if (invPotential < 1 / 7.0) {
+                        norm = (float) (invPotential * 6.0);
+                        g.setColor(new Color(0.14285f - norm * 7 / 6.0f * 0.14285f, 0.14285f - norm * 7 / 6.0f
+                                * 0.14285f, norm + 0.14285f));
+                    }
+                    else if (invPotential < 2 / 7.0) {
+                        norm = (float) ((invPotential - 1.0 / 7.0) * 6.0 + 0.14285f);
+                        g.setColor(new Color(norm, 0, 1.0f));
+                    }
+                    else if (invPotential < 3 / 7.0) {
+                        norm = (float) ((invPotential - 2.0 / 7.0) * 7.0);
+                        g.setColor(new Color(1.0f, 0, 1.0f - norm));
+                    }
+                    else if (invPotential < 4 / 7.0) {
+                        norm = (float) ((invPotential - 3.0 / 7.0) * 7.0);
+                        g.setColor(new Color(1.0f, norm, 0));
+                    }
+                    else if (invPotential < 5 / 7.0) {
+                        norm = (float) ((invPotential - 4.0 / 7.0) * 7.0);
+                        g.setColor(new Color(1.0f - norm, 1.0f, 0));
+                    }
+                    else if (invPotential < 6 / 7.0) {
+                        norm = (float) ((invPotential - 5.0 / 7.0) * 7.0);
+                        g.setColor(new Color(0, 1.0f, norm));
+                    }
+                    else {
+                        norm = (float) ((invPotential - 6.0 / 7.0) * 7.0);
+                        g.setColor(new Color(norm, 1.0f, 1.0f));
+                    }
+                }
+                else {
+                    g.setColor(new Color(0.3f, 0.3f, 0.3f));
+                }
+
+                g.fill(new Rectangle2D.Double(x, y, pixToW, pixToW));
+            }
+        }
+    }*/
 
 	protected void paintPotentialField(final Graphics2D g, final CellGrid potentialField) {
 		float norm;

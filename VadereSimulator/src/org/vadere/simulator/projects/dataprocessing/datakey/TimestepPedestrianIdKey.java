@@ -1,10 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
+
 /**
  * @author Mario Teixeira Parente
  *
  */
 
+@OutputFileMap(outputFileClass = TimestepPedestrianIdOutputFile.class)
 public class TimestepPedestrianIdKey implements DataKey<TimestepPedestrianIdKey> {
 	private final int timestep;
 	private final int pedestrianId;
@@ -33,6 +36,14 @@ public class TimestepPedestrianIdKey implements DataKey<TimestepPedestrianIdKey>
 
 	public static String[] getHeaders() {
 		return new String[] { TimestepKey.getHeader(), PedestrianIdKey.getHeader() };
+	}
+
+	@Override
+	public String toString() {
+		return "TimestepPedestrianIdKey{" +
+				"timestep=" + timestep +
+				", pedestrianId=" + pedestrianId +
+				'}';
 	}
 
 	@Override

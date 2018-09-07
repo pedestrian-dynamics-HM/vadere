@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -17,6 +19,10 @@ import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+// This potential is explained in seitz-2015 (The effect of stepping on pedestrians trajectories)
+// p. 596, eq. 1
+
+@ModelClass
 public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 
 	class DistanceComparator implements Comparator<Agent> {
@@ -42,13 +48,16 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 		}
 	}
 
-	private final AttributesPotentialCompact attributes;
+	private AttributesPotentialCompact attributes;
+	private double width;
+	private double height;
 
-	private final double width;
-	private final double height;
+	public PotentialFieldPedestrianCompact() {}
 
-	public PotentialFieldPedestrianCompact(AttributesPotentialCompact attributes) {
-		this.attributes = attributes;
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.attributes  = Model.findAttributes(attributesList, AttributesPotentialCompact.class);
 		this.width = attributes.getPedPotentialWidth();
 		this.height = attributes.getPedPotentialHeight();
 	}
@@ -57,18 +66,10 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography scenario) {
 
-		List<Pedestrian> result = new LinkedList<>();
-
 		// select pedestrians within recognition distance
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
+		return scenario.getSpatialMap(Pedestrian.class)
 				.getObjects(relevantArea.getCenter(), this.width + pedestrian.getRadius() +
 						attributes.getVisionFieldRadius());
-
-		result = closePedestrians;
-
-
-
-		return result;
 	}
 
 	@Override
@@ -144,11 +145,5 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 			result = new Vector2D(0, 0);
 		}
 		return result;
-	}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
 	}
 }

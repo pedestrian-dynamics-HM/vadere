@@ -13,4 +13,9 @@ public class AttributesAreaDensityVoronoiProcessor extends AttributesAreaProcess
     public VRectangle getVoronoiArea() {
         return this.voronoiArea;
     }
+
+    public void setVoronoiArea(VRectangle voronoiArea) {
+        checkSealed();
+        this.voronoiArea = voronoiArea;
+    }
 }

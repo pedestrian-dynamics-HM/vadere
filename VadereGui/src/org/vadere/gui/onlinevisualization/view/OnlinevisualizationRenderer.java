@@ -8,6 +8,7 @@ import java.util.Map;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
+import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -29,16 +30,21 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 
 	@Override
 	public void render(final Graphics2D targetGraphics2D, int x, int y, int width, int height) {
-		if (model.popDrawData()) {
-			super.render(targetGraphics2D, x, y, width, height);
-		}
+	    synchronized (model.getDataSynchronizer()) {
+            if (model.popDrawData()) {
+                super.render(targetGraphics2D, x, y, width, height);
+            }
+        }
+
 	}
 
 	@Override
 	public void render(final Graphics2D targetGraphics2D, int width, int height) {
-		if (model.popDrawData()) {
-			super.render(targetGraphics2D, width, height);
-		}
+        synchronized (model.getDataSynchronizer()) {
+            if (model.popDrawData()) {
+                super.render(targetGraphics2D, width, height);
+            }
+        }
 	}
 
 	@Override
@@ -50,10 +56,11 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderPedestrians(final Graphics2D g) {
+		AgentRender agentRender = getAgentRender();
 		g.setColor(model.config.getPedestrianDefaultColor());
 		for (Agent ped : model.getAgents()) {
 			VPoint position = ped.getPosition();
-			g.fill(ped.getShape());
+			agentRender.render(ped, g);
 
 			if (!pedestrianPositions.containsKey(ped.getId())) {
 				pedestrianPositions.put(ped.getId(), new LinkedList());

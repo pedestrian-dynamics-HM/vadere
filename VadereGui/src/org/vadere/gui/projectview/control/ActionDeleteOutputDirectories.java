@@ -40,7 +40,6 @@ public class ActionDeleteOutputDirectories extends AbstractAction {
 				e.printStackTrace();
 				logger.error(e.getLocalizedMessage());
 			}
-			model.refreshOutputTable();
 		}
 	}
 }

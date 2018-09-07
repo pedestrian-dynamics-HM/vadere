@@ -19,6 +19,7 @@ public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepKey, V>
 
     @Override
     public void init(final ProcessorManager manager) {
+        super.init(manager);
         AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();
         this.measurementArea = att.getMeasurementArea();
     }

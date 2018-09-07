@@ -1,13 +1,14 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
 public class Obstacle extends ScenarioElement {
 
-	private final AttributesObstacle attributes;
+	private AttributesObstacle attributes;
 
 	public Obstacle(AttributesObstacle attributes) {
 		if (attributes == null)
@@ -70,6 +71,12 @@ public class Obstacle extends ScenarioElement {
 	public Attributes getAttributes() {
 		return attributes;
 	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		this.attributes = (AttributesObstacle) attributes;
+	}
+
 
 	@Override
 	public Obstacle clone() {

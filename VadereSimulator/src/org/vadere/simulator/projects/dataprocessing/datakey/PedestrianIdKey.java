@@ -1,10 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
+import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
+
 /**
  * @author Mario Teixeira Parente
  *
  */
-
+@OutputFileMap(outputFileClass = PedestrianIdOutputFile.class)
 public class PedestrianIdKey implements DataKey<PedestrianIdKey> {
 	private final int pedestrianId;
 

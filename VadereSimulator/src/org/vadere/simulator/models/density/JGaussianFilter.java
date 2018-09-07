@@ -14,6 +14,9 @@ public class JGaussianFilter extends GaussianFilter {
 
 	@Override
 	public void filterImage() {
-		outputMatrix = Convolution.convolve(inputMatrix, kernel, matrixWidth, matrixHeight, kernelWidth);
+		outputMatrix = Convolution.convolveSeperate(inputMatrix, kernel, kernel, matrixWidth, matrixHeight, kernelWidth);
 	}
+
+    @Override
+    public void destroy() {}
 }

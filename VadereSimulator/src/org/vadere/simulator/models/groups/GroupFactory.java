@@ -1,8 +1,14 @@
 package org.vadere.simulator.models.groups;
 
-import org.vadere.state.scenario.DynamicElementAddListener;
 import org.vadere.state.scenario.Pedestrian;
 
-public interface GroupFactory extends DynamicElementAddListener<Pedestrian> {
-	public int getOpenPersons();
+//wenn ped erzeugt und entfernet werden
+public abstract class GroupFactory {
+	public abstract int getOpenPersons();
+
+	public abstract void elementAdded(Pedestrian pedestrian);
+
+	public abstract void elementRemoved(Pedestrian ped);
+
+	public abstract int createNewGroup();
 }

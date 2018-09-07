@@ -28,23 +28,18 @@ import java.util.stream.Collectors;
 public class EikonalSolverFIM implements EikonalSolver {
 
 	private CellGrid cellGrid;
-	private List<VShape> targetShapes;
+	private Collection<VShape> targetShapes;
 	private List<Point> targetPoints;
 	private static Logger logger = LogManager.getLogger(EikonalSolverFIM.class);
 	private ITimeCostFunction timeCostFunction;
-	private boolean isHighAccuracy;
-	private boolean isActiveList[][];
-
 	private final double epsilon;
 
 	private LinkedList<Point> activeList;
 
 	public EikonalSolverFIM(final CellGrid cellGrid,
-			final List<VShape> targetShapes,
-			final boolean isHighAccuracy,
+			final Collection<VShape> targetShapes,
 			final ITimeCostFunction timeCostFunction) {
 		this.timeCostFunction = timeCostFunction;
-		this.isHighAccuracy = isHighAccuracy;
 		this.targetShapes = targetShapes;
 		this.targetPoints = cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Target)
 				.collect(Collectors.toList());
@@ -103,7 +98,7 @@ public class EikonalSolverFIM implements EikonalSolver {
 							double qq = computeGodunovDifference(neighbour, cellGrid, Direction.ANY);
 
 							// converged
-							if (qq < (pp - epsilon)) {
+							if (pp > qq) {
 								cellGrid.setValue(neighbour, new CellState(qq, PathFindingTag.NARROW));
 								newActiveList.add(neighbour);
 							}
@@ -112,13 +107,15 @@ public class EikonalSolverFIM implements EikonalSolver {
 					cellGrid.setValue(activePoint,
 							new CellState(cellGrid.getValue(activePoint).potential, PathFindingTag.Reached));
 					activeListIterator.remove();
+				} else {
+					newActiveList.add(activePoint);
 				}
 			}
 			activeList.addAll(newActiveList);
 		}
 	}
 
-	@Override
+    @Override
 	public void initialize() {
 		init();
 		loop();
@@ -160,6 +157,6 @@ public class EikonalSolverFIM implements EikonalSolver {
 
 	@Override
 	public boolean isHighAccuracy() {
-		return true;
+		return false;
 	}
 }

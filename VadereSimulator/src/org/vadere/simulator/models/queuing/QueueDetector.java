@@ -25,100 +25,101 @@ import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 public class QueueDetector extends EikonalSolverFMM {
 
-	private AttributesAgent attributesPedestrian;
-	private Topography topography;
-	private final PriorityQueue<Point> targetPoints;
-	private VPolygon polytope;
-	private static double QUEUE_DENSITY = 0.03;
-	private static double radius = 2.0;
-	protected LinkedList<VPoint> orderedPoints;
+    private AttributesAgent attributesPedestrian;
+    private Topography topography;
+    private final PriorityQueue<Point> targetPoints;
+    private VPolygon polytope;
+    private static double QUEUE_DENSITY = 0.03;
+    private static double radius = 2.0;
+    protected LinkedList<VPoint> orderedPoints;
 
-	/**
-	 * Initializes the FM potential calculator with a time cost function F > 0.
-	 *
-	 * @param potentialField
-	 * @param targetShapes
-	 * @param isHighAccuracy
-	 * @param timeCostFunction
-	 */
-	public QueueDetector(CellGrid potentialField, List<VShape> targetShapes, boolean isHighAccuracy,
-			ITimeCostFunction timeCostFunction, AttributesAgent attributesPedestrian, Topography topography) {
-		super(potentialField, targetShapes, isHighAccuracy, timeCostFunction);
-		this.orderedPoints = new LinkedList<>();
-		this.attributesPedestrian = attributesPedestrian;
-		this.topography = topography;
-		this.targetPoints = new PriorityQueue<>();
-		this.polytope = null;
+    /**
+     * Initializes the FM potential calculator with a time cost function F > 0.
+     *
+     * @param potentialField
+     * @param targetShapes
+     * @param isHighAccuracy
+     * @param timeCostFunction
+     */
+    public QueueDetector(CellGrid potentialField, List<VShape> targetShapes, boolean isHighAccuracy,
+                         ITimeCostFunction timeCostFunction, AttributesAgent attributesPedestrian, Topography topography) {
+        super(potentialField, targetShapes, isHighAccuracy, timeCostFunction);
+        this.orderedPoints = new LinkedList<>();
+        this.attributesPedestrian = attributesPedestrian;
+        this.topography = topography;
+        this.targetPoints = new PriorityQueue<>();
+        this.polytope = null;
 
-		for (VShape shape : targetShapes) {
-			FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
-					new CellState(0.0, PathFindingTag.Target));
-		}
+        for (VShape shape : targetShapes) {
+            FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
+                    new CellState(0.0, PathFindingTag.Target));
+        }
 
-		for (Obstacle obstacle : topography.getObstacles()) {
-			FloorDiscretizer.setGridValuesForShapeCentered(
-					cellGrid, obstacle.getShape(),
-					new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
-		}
+        for (Obstacle obstacle : topography.getObstacles()) {
+            FloorDiscretizer.setGridValuesForShape(
+                    cellGrid, obstacle.getShape(),
+                    new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
+        }
 
-	}
+    }
 
-	public double getResolution() {
-		return cellGrid.getResolution();
-	}
+    public double getResolution() {
+        return cellGrid.getResolution();
+    }
 
-	@Override
-	public void initialize() {
-		IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create();
-		IGaussianFilter filter = IGaussianFilter.create(
-				topography.getBounds(),
-				topography.getElements(Pedestrian.class),
-				1.0 / cellGrid.getResolution(),
-				new AttributesTimeCost().getStandardDerivation(),
-				attributesPedestrian,
-				loadingStrategy, IGaussianFilter.Type.OpenCL);
+    @Override
+    public void initialize() {
+        IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create();
+        IGaussianFilter filter = IGaussianFilter.create(
+                topography.getBounds(),
+                topography.getElements(Pedestrian.class),
+                1.0 / cellGrid.getResolution(),
+                new AttributesTimeCost().getStandardDeviation(),
+                attributesPedestrian,
+                loadingStrategy, IGaussianFilter.Type.OpenCL);
 
-		filter.filterImage();
-		cellGrid.pointStream().forEach(p -> {
-			int x = p.x;
-			int y = p.y;
+        filter.filterImage();
+        cellGrid.pointStream().forEach(p -> {
+            int x = p.x;
+            int y = p.y;
 
-			VPoint point = cellGrid.pointToCoord(x, y);
-			if (cellGrid.getValue(x, y).tag != PathFindingTag.Target
-					&& filter.getFilteredValue(point.x, point.y) <= QUEUE_DENSITY) {
-				cellGrid.getValue(x, y).tag = PathFindingTag.Obstacle;
-			} else if (cellGrid.getValue(x, y).tag != PathFindingTag.Target) {
-				// System.out.println("found:" + point);
-				cellGrid.getValue(x, y).tag = PathFindingTag.Undefined;
-			}
-		});
-		orderedPoints.clear();
-		super.initialize();
-	}
+            VPoint point = cellGrid.pointToCoord(x, y);
+            if (cellGrid.getValue(x, y).tag != PathFindingTag.Target
+                    && filter.getFilteredValue(point.x, point.y) <= QUEUE_DENSITY) {
+                cellGrid.getValue(x, y).tag = PathFindingTag.Obstacle;
+            } else if (cellGrid.getValue(x, y).tag != PathFindingTag.Target) {
+                // System.out.println("found:" + point);
+                cellGrid.getValue(x, y).tag = PathFindingTag.Undefined;
+            }
+        });
+        orderedPoints.clear();
+        filter.destroy();
+        super.initialize();
+    }
 
-	@Override
-	protected void setNeighborDistances(Point point) {
-		super.setNeighborDistances(point);
-		VPoint worldCoord = cellGrid.pointToCoord(point);
-		orderedPoints = orderedPoints.stream().filter(p -> p.distance(worldCoord) > radius)
-				.collect(Collectors.toCollection(LinkedList::new));
-		if (targetShapes.stream().noneMatch(shape -> shape.distance(worldCoord) <= radius)) {
-			orderedPoints.addFirst(cellGrid.pointToCoord(point));
-		}
-	}
+    @Override
+    protected void setNeighborDistances(Point point) {
+        super.setNeighborDistances(point);
+        VPoint worldCoord = cellGrid.pointToCoord(point);
+        orderedPoints = orderedPoints.stream().filter(p -> p.distance(worldCoord) > radius)
+                .collect(Collectors.toCollection(LinkedList::new));
+        if (targetShapes.stream().noneMatch(shape -> shape.distance(worldCoord) <= radius)) {
+            orderedPoints.addFirst(cellGrid.pointToCoord(point));
+        }
+    }
 
-	public void setPolytope(VPolygon polytope) {
-		this.polytope = polytope;
-	}
+    public void setPolytope(VPolygon polytope) {
+        this.polytope = polytope;
+    }
 
-	@Override
-	public boolean needsUpdate() {
-		return true;
-	}
+    @Override
+    public boolean needsUpdate() {
+        return true;
+    }
 
-	public List<VPoint> getTargetPoints() {
-		return orderedPoints;
-	}
+    public List<VPoint> getTargetPoints() {
+        return orderedPoints;
+    }
 
 
 

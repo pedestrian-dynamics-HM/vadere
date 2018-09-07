@@ -1,14 +1,11 @@
 package org.vadere.util.math;
 
-import com.nativelibs4java.opencl.*;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.logging.Timer;
-import org.vadere.util.math.CLConvolution;
-import org.vadere.util.math.Convolution;
+import org.vadere.util.opencl.CLConvolution;
+import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
 
@@ -44,7 +41,7 @@ public class TestConvolution {
 	}
 
 	@Test
-	public void testConvolution() throws IOException {
+	public void testConvolution() throws IOException, OpenCLException {
 		int inputWidth = 1000;
 		int inputHeight = 1000;
 		int kernelWidth = 31;
@@ -52,14 +49,15 @@ public class TestConvolution {
 		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
 		float[] javaOutput = Convolution.convolve(input, kernel, inputWidth, inputHeight, kernelWidth);
-		CLConvolution clConvolution = new CLConvolution();
-		float[] clOutput = clConvolution.convolve(input, inputWidth, inputHeight, kernel, kernelWidth);
 
+		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.NonSeparate, inputWidth, inputHeight, kernelWidth, kernel);
+		float[] clOutput = clConvolution.convolve(input);
+		clConvolution.clearCL();
 		equalsMatrixValues(javaOutput, clOutput, 0.00001f);
 	}
 
 	@Test
-	public void testSmallConvolutionCol() throws IOException {
+	public void testSmallConvolutionCol() throws IOException, OpenCLException {
 		int inputWidth = 6;
 		int inputHeight = 1;
 		int kernelWidth = 3;
@@ -70,15 +68,16 @@ public class TestConvolution {
 
 		float[] output = Convolution.convolveCol(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		CLConvolution clConvolution = new CLConvolution();
-		float[] clOutput = clConvolution.convolveCol(input, inputWidth, inputHeight, rowVector, kernelWidth);
+		CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Col, inputWidth, inputHeight, kernelWidth, rowVector);
+		float[] clOutput = clConvolution.convolve(input);
+        clConvolution.clearCL();
 
 		equalsMatrixValues(result, output, 0f);
 		equalsMatrixValues(result, clOutput, 0f);
 	}
 
 	@Test
-	public void testSmallConvolutionRow() throws IOException {
+	public void testSmallConvolutionRow() throws IOException, OpenCLException {
 		int inputWidth = 1;
 		int inputHeight = 6;
 		int kernelWidth = 3;
@@ -89,15 +88,16 @@ public class TestConvolution {
 
 		float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		CLConvolution clConvolution = new CLConvolution();
-		float[] clOutput = clConvolution.convolveRow(input, inputWidth, inputHeight, rowVector, kernelWidth);
+        CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Row, inputWidth, inputHeight, kernelWidth, rowVector);
+		float[] clOutput = clConvolution.convolve(input);
+        clConvolution.clearCL();
 
 		equalsMatrixValues(result, output, 0f);
 		equalsMatrixValues(result, clOutput, 0f);
 	}
 
 	@Test
-	public void testConvolutionRow() throws IOException {
+	public void testConvolutionRow() throws IOException, OpenCLException {
 		int inputWidth = 500;
 		int inputHeight = 300;
 		int kernelWidth = 31;
@@ -106,15 +106,15 @@ public class TestConvolution {
 
 		float[] output = Convolution.convolveRow(input, rowVector, inputWidth, inputHeight, kernelWidth);
 
-		CLConvolution clConvolution = new CLConvolution();
-		float[] clOutput = clConvolution.convolveRow(input, inputWidth, inputHeight, rowVector, kernelWidth);
-
+        CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Row, inputWidth, inputHeight, kernelWidth, rowVector);
+		float[] clOutput = clConvolution.convolve(input);
+        clConvolution.clearCL();
 
 		equalsMatrixValues(output, clOutput, 0.00001f);
 	}
 
 	@Test
-	public void testConvolutionSeperate() throws IOException {
+	public void testConvolutionSeparate() throws IOException, OpenCLException {
 		int inputWidth = 500;
 		int inputHeight = 300;
 		int kernelWidth = 31;
@@ -126,15 +126,14 @@ public class TestConvolution {
 		float[] seperate = Convolution.convolveSeperate(input, seperateKernel, seperateKernel, inputWidth, inputHeight,
 				kernelWidth);
 
-		CLConvolution clGPUConvolution = new CLConvolution();
-		float[] clCPUOutput =
-				clGPUConvolution.convolveSperate(input, inputWidth, inputHeight, seperateKernel, kernelWidth);
+        CLConvolution clGPUConvolution = new CLConvolution(CLConvolution.KernelType.Separate, inputWidth, inputHeight, kernelWidth, seperateKernel);
+		float[] clCPUOutput = clGPUConvolution.convolve(input);
 
 		equalsMatrixValues(seperate, nonSeperate, 0.00001f);
 		equalsMatrixValues(clCPUOutput, nonSeperate, 0.00001f);
 	}
 
-	@Test
+	/*@Test
 	public void testConvolutionPerformance() throws IOException {
 		int inputWidth = 500;
 		int inputHeight = 500;
@@ -144,9 +143,9 @@ public class TestConvolution {
 		float[] separateKernel = Convolution.floatGaussian1DKernel(kernelWidth, (float) Math.sqrt(0.7));
 		float[] input = Convolution.generdateInputMatrix(inputWidth * inputHeight);
 
-		CLConvolution clGPUConvolution = new CLConvolution();
-		CLConvolution clCPUConvolution =
-				new CLConvolution(CLPlatform.DeviceFeature.CPU, CLPlatform.DeviceFeature.MaxComputeUnits);
+        CLConvolve clGPUConvolution = new CLConvolve();
+        CLConvolve clCPUConvolution =
+				new CLConvolve(CLPlatform.DeviceFeature.CPU, CLPlatform.DeviceFeature.MaxComputeUnits);
 
 		// initial the .cl program
 		float[] clGPUOutput = clGPUConvolution.convolve(input, inputWidth, inputHeight, kernel, kernelWidth);
@@ -190,12 +189,12 @@ public class TestConvolution {
 		equalsMatrixValues(javaOutput, clCPUOutput, 0.00001f);
 		equalsMatrixValues(javaOutput, clGPUSeperateOutput, 0.00001f);
 
-	}
+	}*/
 
 	private static void equalsMatrixValues(final float[] m1, final float[] m2, final float epsilon) {
 		assertTrue(m1.length == m2.length);
 		for (int i = 0; i < m1.length; i++) {
-			assertTrue("computeGodunovDifference: " + i + ", " + m1[i] + ", " + m2[i] + ", " + Math.abs(m1[i] - m2[i]),
+			assertTrue("difference: " + i + ", " + m1[i] + ", " + m2[i] + ", " + Math.abs(m1[i] - m2[i]),
 					Math.abs(m1[i] - m2[i]) <= epsilon);
 		}
 	}

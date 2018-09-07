@@ -1,15 +1,24 @@
 package org.vadere.util.potential.calculators;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 
 import java.awt.*;
+import java.awt.List;
+import java.util.*;
+import java.util.function.Function;
 
+/**
+ * The eikonal solver, solves the eikonal equation on a Cartesian grid. In case of a changing F the
+ * solver re-computes the solution if update is called.
+ */
 public interface EikonalSolver {
 
 	Logger logger = LogManager.getLogger(EikonalSolver.class);
@@ -45,11 +54,78 @@ public interface EikonalSolver {
 	 * @param point
 	 * @return
 	 */
-	default double getValue(final Point point, final CellGrid cellGrid) {
-		return cellGrid.getValue(point).potential;
+	default double getValue(final Point point) {
+		return getPotentialField().getValue(point).potential;
 	}
 
 	CellGrid getPotentialField();
+
+    /**
+     * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.
+     *
+     * @return a copy of the current solution of the eikonal equation
+     */
+    default Function<VPoint, Double> getSolution(final double unknownPenalty, final double weight) {
+        // copy the current data
+        final CellGrid potentialField = getPotentialField().clone();
+        return p -> getPotential(potentialField, p, unknownPenalty, weight);
+    }
+
+    default double getPotential(final VPoint pos, final double unknownPenalty, final double weight) {
+        return getPotential(getPotentialField(), pos, unknownPenalty, weight);
+    }
+
+    default double getPotential(final CellGrid potentialField, final VPoint pos, final double unknownPenalty, final double weight) {
+        double targetPotential = Double.MAX_VALUE;
+
+		/* Interpolate the known (potential < Double.MAX_VALUE) values. */
+        Pair<Double, Double> result = potentialField.getInterpolatedValueAt(pos);
+
+        double tmpPotential = result.getLeft();
+
+        // weightOfKnown is in (0,1)
+        double weightOfKnown = result.getRight();
+
+		/*
+		 * If at least one node is known, a specialized version of
+		 * interpolation is used: If the divisor weightOfKnown[ 0 ] would
+		 * not be part of the equation, it would be a general bilinear
+		 * interpolation using obstacleGridPenalty for the unknown. However,
+		 * as soon as the interpolated value is not on the line of known
+		 * values (weightOfKnown < 1) the potential is increased, like an
+		 * additional penalty. The more the interpolated value moves into
+		 * direction of the unknown, the higher the penalty becomes.
+		 * The values are only unknown at the boundary!
+		 */
+        if (weightOfKnown > 0.00001) {
+            tmpPotential = tmpPotential / weightOfKnown
+                    + (1 - weightOfKnown)
+                    * unknownPenalty;
+        } else /* If all values are maximal, set potential to maximum. */
+        {
+            tmpPotential = Double.MAX_VALUE;
+        }
+
+        tmpPotential *= weight;
+
+        if (tmpPotential < targetPotential) {
+            targetPotential = tmpPotential;
+        }
+
+
+        return targetPotential;
+    }
+
+    default double[] getGridPotentials(final java.util.List<Point> points, final CellGrid potentialField) {
+        double[] result = new double[points.size()];
+
+        for (int i = 0; i < points.size(); i++) {
+            result[i] = potentialField.getValue(points.get(i)).potential;
+        }
+
+        return result;
+    }
+
 
 	default boolean isHighAccuracy() {
 		return true;
@@ -63,9 +139,17 @@ public interface EikonalSolver {
 		return cellGrid.isValidPoint(point);
 	}
 
-	default double computeGodunovDifference(final Point point, final CellGrid cellGrid, final Direction direction) {
+	default boolean isValidPoint(final int x, final int y, final CellGrid cellGrid) {
+		return cellGrid.isValidPoint(x, y);
+	}
 
-		VPoint position = cellGrid.pointToCoord(point.x, point.y);
+	default double computeGodunovDifference(final Point point, final CellGrid cellGrid, final Direction direction) {
+		return computeGodunovDifference(point.x, point.y, cellGrid, direction);
+	}
+
+	default double computeGodunovDifference(final int x, int y, final CellGrid cellGrid, final Direction direction) {
+
+		VPoint position = cellGrid.pointToCoord(x, y);
 		double cost = getTimeCostFunction().costAt(new VPoint(position.x, position.y));
 		double speed = (1.0 / cellGrid.getResolution()) / cost; // = F/cost
 
@@ -83,50 +167,50 @@ public interface EikonalSolver {
 		Point yhPoint;
 		switch (direction) {
 			case UP_LEFT:
-				xPoint = new Point(point.x - 1, point.y);
-				yPoint = new Point(point.x, point.y + 1);
-				xhPoint = new Point(point.x - 2, point.y);
-				yhPoint = new Point(point.x, point.y + 2);
+				xPoint = new Point(x - 1, y);
+				yPoint = new Point(x, y + 1);
+				xhPoint = new Point(x - 2, y);
+				yhPoint = new Point(x, y + 2);
 				break;
 			case UP_RIGHT:
-				xPoint = new Point(point.x + 1, point.y);
-				yPoint = new Point(point.x, point.y + 1);
-				xhPoint = new Point(point.x + 2, point.y);
-				yhPoint = new Point(point.x, point.y + 2);
+				xPoint = new Point(x + 1, y);
+				yPoint = new Point(x, y + 1);
+				xhPoint = new Point(x + 2, y);
+				yhPoint = new Point(x, y + 2);
 				break;
 			case BOTTOM_LEFT:
-				xPoint = new Point(point.x - 1, point.y);
-				yPoint = new Point(point.x, point.y - 1);
-				xhPoint = new Point(point.x - 2, point.y);
-				yhPoint = new Point(point.x, point.y - 2);
+				xPoint = new Point(x - 1, y);
+				yPoint = new Point(x, y - 1);
+				xhPoint = new Point(x - 2, y);
+				yhPoint = new Point(x, y - 2);
 				break;
 			case BOTTOM_RIGHT:
-				xPoint = new Point(point.x + 1, point.y);
-				yPoint = new Point(point.x, point.y - 1);
-				xhPoint = new Point(point.x + 2, point.y);
-				yhPoint = new Point(point.x, point.y - 2);
+				xPoint = new Point(x + 1, y);
+				yPoint = new Point(x, y - 1);
+				xhPoint = new Point(x + 2, y);
+				yhPoint = new Point(x, y - 2);
 				break;
 			default: {
-				if (isValidPoint(new Point(point.x + 1, point.y), cellGrid) &&
-						(!isValidPoint(new Point(point.x - 1, point.y), cellGrid)
-								|| (cellGrid.getValue(new Point(point.x + 1, point.y)).potential < cellGrid
-										.getValue(new Point(point.x - 1, point.y)).potential))) {
-					xPoint = new Point(point.x + 1, point.y);
-					xhPoint = new Point(point.x + 2, point.y);
+				if (isValidPoint(x + 1, y, cellGrid) &&
+						(!isValidPoint(x - 1, y, cellGrid)
+								|| (cellGrid.getValue(x + 1, y).potential < cellGrid
+								.getValue(x - 1, y).potential))) {
+					xPoint = new Point(x + 1, y);
+					xhPoint = new Point(x + 2, y);
 				} else {
-					xPoint = new Point(point.x - 1, point.y);
-					xhPoint = new Point(point.x - 2, point.y);
+					xPoint = new Point(x - 1, y);
+					xhPoint = new Point(x - 2, y);
 				}
 
-				if (isValidPoint(new Point(point.x, point.y + 1), cellGrid) &&
-						(!isValidPoint(new Point(point.x, point.y - 1), cellGrid)
-								|| (cellGrid.getValue(new Point(point.x, point.y + 1)).potential < cellGrid
-										.getValue(new Point(point.x, point.y - 1)).potential))) {
-					yPoint = new Point(point.x, point.y + 1);
-					yhPoint = new Point(point.x, point.y + 2);
+				if (isValidPoint(x, y + 1, cellGrid) &&
+						(!isValidPoint(x, y - 1, cellGrid)
+								|| (cellGrid.getValue(x, y + 1).potential < cellGrid
+								.getValue(x, y - 1).potential))) {
+					yPoint = new Point(x, y + 1);
+					yhPoint = new Point(x, y + 2);
 				} else {
-					yPoint = new Point(point.x, point.y - 1);
-					yhPoint = new Point(point.x, point.y - 2);
+					yPoint = new Point(x, y - 1);
+					yhPoint = new Point(x, y - 2);
 				}
 			}
 		}
@@ -173,24 +257,17 @@ public interface EikonalSolver {
 					c += factor * Math.pow(tp, 2);
 				}
 			}
-			java.util.List<Double> solutions = MathUtil.solveQuadratic(a, b, c);
-			int numberOfSolutions = solutions.size();
 
-			if (numberOfSolutions == 2) {
-				result = Math.max(solutions.get(0), solutions.get(1));
-			} else if (numberOfSolutions == 1) {
-				result = solutions.get(0);
-			}
+
+			return MathUtil.solveQuadraticMax(a, b, c);
 		}
 
 		return result;
 	}
 
-	default double computeGodunovDifference(final Point point, final CellGrid cellGrid) {
-		double result = Double.MAX_VALUE;
-
+	default double computeGodunovDifference(final int x, final int y, final CellGrid cellGrid) {
 		// enables cost fields with cost != 1
-		VPoint position = cellGrid.pointToCoord(point.x, point.y);
+		VPoint position = cellGrid.pointToCoord(x, y);
 		double cost = getTimeCostFunction().costAt(new VPoint(position.x, position.y));
 
 		double speed = (1.0 / cellGrid.getResolution()) / cost; // = F/cost
@@ -207,11 +284,11 @@ public interface EikonalSolver {
 			double val2 = Double.MAX_VALUE;
 
 			for (int i = 0; i < 2; i++) {
-				Point pni = new Point(point.x + neighbors.get(2 * j + i).x,
-						point.y + neighbors.get(2 * j + i).y);
+				Point pni = new Point(x + neighbors.get(2 * j + i).x,
+						y + neighbors.get(2 * j + i).y);
 				Point pni2 = new Point(
-						point.x + neighbors.get(2 * j + i).x * 2, point.y
-								+ neighbors.get(2 * j + i).y * 2);
+						x + neighbors.get(2 * j + i).x * 2, y
+						+ neighbors.get(2 * j + i).y * 2);
 
 				if (isValidPoint(pni, cellGrid) && cellGrid.getValue(pni).tag.frozen) {
 					double val1n = cellGrid.getValue(pni).potential;
@@ -245,16 +322,10 @@ public interface EikonalSolver {
 			}
 		}
 
-		java.util.List<Double> solutions = MathUtil
-				.solveQuadratic(coeff2, coeff1, coeff0);
-		int numberOfSolutions = solutions.size();
+		return MathUtil.solveQuadraticMax(coeff2, coeff1, coeff0);
+	}
 
-		if (numberOfSolutions == 2) {
-			result = Math.max(solutions.get(0), solutions.get(1));
-		} else if (numberOfSolutions == 1) {
-			result = solutions.get(0);
-		}
-
-		return result;
+	default double computeGodunovDifference(final Point point, final CellGrid cellGrid) {
+		return computeGodunovDifference(point.x, point.y, cellGrid);
 	}
 }

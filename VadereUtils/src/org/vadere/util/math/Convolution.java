@@ -129,7 +129,7 @@ public class Convolution {
 		for (int yOut = 0; yOut < nHeight; yOut++) {
 			for (int xOut = 0; xOut < nWidth; xOut++) {
 				final int idxOut = yOut * nWidth + xOut;
-				outMatrix[idxOut] = convolveCol(tmpOutMatrix, rowVector, nWidth, nHeight, nFilterWidth, xOut, yOut);
+				outMatrix[idxOut] = convolveCol(tmpOutMatrix, colVector, nWidth, nHeight, nFilterWidth, xOut, yOut);
 			}
 		}
 		return outMatrix;

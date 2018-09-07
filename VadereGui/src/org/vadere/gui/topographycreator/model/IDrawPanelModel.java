@@ -34,7 +34,7 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	/**
 	 * Part of the observer-pattern. Adds an observer that will be notified about the changes of
 	 * this panelModel.
-	 * 
+	 *
 	 * @param observer the observer that will be notified about the change of this panelModel.
 	 */
 	void addObserver(Observer observer);
@@ -83,10 +83,6 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	@Override
 	void hideSelection();
 
-	/**
-	 * resets the scenarioSize to the original scenario size.
-	 */
-	void resetTopographySize();
 
 	/**
 	 * cleans the whole topography, after this call there is no topography element in the topography

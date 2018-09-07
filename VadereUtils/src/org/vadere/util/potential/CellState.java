@@ -1,6 +1,6 @@
 package org.vadere.util.potential;
 
-public class CellState {
+public class CellState implements Cloneable {
 	public Double potential;
 	public PathFindingTag tag;
 
@@ -16,7 +16,7 @@ public class CellState {
 
 	@Override
 	public CellState clone() {
-		return new CellState(potential, tag);
+		return new CellState(new Double(potential), tag);
 	}
 
 	@Override

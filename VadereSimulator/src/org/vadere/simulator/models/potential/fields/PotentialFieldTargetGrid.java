@@ -2,6 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import java.util.*;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -15,11 +16,11 @@ import org.vadere.util.geometry.shapes.VShape;
  * based on the AttributesFloorField.
  *
  */
-public class PotentialFieldTargetGrid<T extends Agent> extends AbstractPotentialFieldTarget {
+
+@ModelClass
+public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
 
 	// private HashMap<Integer, PotentialFieldAndInitializer> staticPotentialFields;
-	/** The topography the floor fields are generated for. */
-	private Topography topography;
 
 	/* Optimization */
 	private boolean potentialFieldsNeedUpdate;
@@ -31,7 +32,6 @@ public class PotentialFieldTargetGrid<T extends Agent> extends AbstractPotential
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential) {
 		super(topography);
-		this.topography = topography;
 		this.attributesPedestrian = attributesPedestrian;
 		this.potentialFieldsNeedUpdate = false;
 		this.lastUpdateTimestamp = -1;
@@ -57,7 +57,7 @@ public class PotentialFieldTargetGrid<T extends Agent> extends AbstractPotential
 		throw new UnsupportedOperationException("gradient not yet implemented");
 	}
 
-	@Override
+    @Override
 	public void preLoop(final double simTimeInSec) {
 		createMissingPotentialFieldAndInitializers();
 	}
@@ -85,4 +85,5 @@ public class PotentialFieldTargetGrid<T extends Agent> extends AbstractPotential
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
 	}
+
 }

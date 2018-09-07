@@ -1,7 +1,5 @@
 package org.vadere.gui.components.utils;
 
-import com.android.dx.gen.Local;
-
 import javax.swing.*;
 
 import org.vadere.gui.projectview.VadereApplication;

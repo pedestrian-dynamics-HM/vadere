@@ -1,8 +1,11 @@
 package org.vadere.simulator.projects.io;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.SimulationOutput;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
@@ -26,17 +29,16 @@ import java.util.stream.Collectors;
 
 /**
  * This IOUtility class provides all methods to load, delete, list, clean output directories.
- * Each output directory contains two fiels *.scenario and *.trajectories.
+ * Each output directory contains two files *.scenario and *.trajectories.
  *
  */
 public abstract class IOOutput {
 
-	private static Logger logger = LogManager.getLogger(IOOutput.class);
+	private static final Logger logger = LogManager.getLogger(IOOutput.class);
 
 	public static List<File> listSelectedOutputDirs(final VadereProject project, final Scenario scenario) {
-		List<File> selectedOutputDirectories = new LinkedList<>();
 
-		selectedOutputDirectories = listAllOutputDirs(project).stream()
+		List<File> selectedOutputDirectories = listAllOutputDirs(project).stream()
 				.filter(dir -> isMatchingOutputDirectory(project, dir, scenario))
 				.collect(Collectors.toList());
 
@@ -47,8 +49,7 @@ public abstract class IOOutput {
 	 * Returns all valid output directories of the project.
 	 */
 	public static List<File> listAllOutputDirs(final VadereProject project) {
-		return listAllDirs(project).stream().filter(f -> isValidOutputDirectory(project, f))
-				.collect(Collectors.toList());
+		return listAllDirs(project).stream().filter(f -> isValidOutputDirectory(project, f)).collect(Collectors.toList());
 	}
 
 	/**
@@ -59,19 +60,26 @@ public abstract class IOOutput {
 				.forEach(dir -> cleanDirectory(project, dir));
 	}
 
-	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project,
-			final Scenario scenario, final String directoryName) throws IOException {
-		TrajectoryReader reader = new TrajectoryReader(
-				getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
+	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project, final Scenario scenario, final String directoryName) throws IOException {
+		TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
 		return reader.readFile();
 	}
 
-	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath,
-			final Scenario scenario) throws IOException {
+	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath, final Scenario scenario) throws IOException {
 		TrajectoryReader reader = new TrajectoryReader(trajectoryFilePath, scenario);
 		Map<Step, List<Agent>> result = reader.readFile();
 		return result;
 	}
+
+    private static Optional<Map<Step, List<Agent>>> readTrajectories(final VadereProject project, final File directory) {
+        try {
+            TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
+            return Optional.of(reader.readFile());
+        } catch (IOException | VadereClassNotFoundException e) {
+            logger.error("Error in output file " + directory.getName());
+            return Optional.empty();
+        }
+    }
 
 	public static Scenario readScenarioRunManager(final VadereProject project, final String directoryName)
 			throws IOException {
@@ -154,7 +162,7 @@ public abstract class IOOutput {
 	private static List<File> listAllDirs(final VadereProject project) {
 		List<File> outputDirectories = new LinkedList<>();
 		if (Files.exists(project.getOutputDir())) {
-			File[] files = new File(project.getOutputDir().toString()).listFiles(f -> f.isDirectory());
+			File[] files = new File(project.getOutputDir().toString()).listFiles(File::isDirectory);
 			if (files != null) {
 				outputDirectories = Arrays.stream(files).filter(dir -> !dir.getName().equals(IOUtils.CORRUPT_DIR))
 						.collect(Collectors.toList());
@@ -163,34 +171,85 @@ public abstract class IOOutput {
 		return outputDirectories;
 	}
 
-	private static void cleanDirectory(final VadereProject project, final File directory) {
-		IOUtils.errorBox(
-				"The directory '"
-						+ directory.getName()
-						+ "' is corrupted and was moved to the '" + IOUtils.CORRUPT_DIR + "' folder.",
-				"Corrupt output file detected.");
+	private static void cleanDirectory(final VadereProject project, final File directory, boolean withGui){
+		final String info = "The directory '"
+				+ directory.getName()
+				+ "' is corrupted and was moved to the '" + IOUtils.CORRUPT_DIR + "' folder.";
+
+		if(withGui)
+			IOUtils.errorBox(info, "Corrupt output file detected.");
+
 		try {
 			Files.createDirectories(Paths.get(project.getOutputDir().toString(), IOUtils.CORRUPT_DIR));
 			Path sourcePath = directory.toPath();
 			Path targetPath = Paths.get(project.getOutputDir().toString(), IOUtils.CORRUPT_DIR, directory.getName());
 			Files.move(sourcePath, targetPath, StandardCopyOption.ATOMIC_MOVE);
+			logger.info(info);
 		} catch (IOException e1) {
 			logger.error(e1);
 		}
+	}
+
+
+	private static void cleanDirectory(final VadereProject project, final File directory) {
+		cleanDirectory(project, directory, true);
+	}
+
+	/**
+	 * Returns {@link SimulationOutput} if supplied directory is a valid output directory.
+	 * @param project     VadereProject
+	 * @param directory   Directory containing a simulated data
+	 * @return            SimulationOutput contained in selected directory
+	 */
+	public static Optional<SimulationOutput> getSimulationOutput(final VadereProject project, final File directory ){
+		if(!directory.exists())
+			return Optional.empty();
+
+		Optional<Scenario> scenario = readOutputFile(project, directory);
+		Optional<Map<Step, List<Agent>>>  trajectories =  readTrajectories(project, directory);
+		if (scenario.isPresent() && trajectories.isPresent()){
+			return Optional.of(new SimulationOutput(directory.toPath(), scenario.get()));
+		} else {
+			//if directory is not a valid OutputDirectory
+			cleanDirectory(project, directory, false);
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Returns valid {@link SimulationOutput} of {@link VadereProject}
+	 * @param project   VadereProject
+	 * @return          All valid {@link SimulationOutput}s found in selected project.
+	 */
+	public static ConcurrentMap<String, SimulationOutput> getSimulationOutputs(final VadereProject project){
+		List<File> simOutDir = IOOutput.listAllDirs(project);
+		ConcurrentMap<String, SimulationOutput> simulationOutputs = new ConcurrentHashMap<>();
+		simOutDir.forEach( f -> {
+			Optional<Scenario> scenario = readOutputFile(project, f);
+			Optional<Map<Step, List<Agent>>>  trajectories =  readTrajectories(project, f);
+			if (scenario.isPresent() && trajectories.isPresent()){
+				SimulationOutput out = new SimulationOutput(f.toPath(), scenario.get());
+				simulationOutputs.put(f.getName(), out);
+			} else {
+				//invalid output directory move to corrupt.
+				cleanDirectory(project, f, false);
+			}
+		});
+		return simulationOutputs;
 	}
 
 	private static Optional<Scenario> readOutputFile(final VadereProject project, final File directory) {
 		try {
 			final Path pathToSnapshot = getPathToOutputFile(project, directory.getName(), IOUtils.SCENARIO_FILE_EXTENSION);
 			return Optional.of(IOVadere.fromJson(IOUtils.readTextFile(pathToSnapshot.toString())));
-		} catch (IOException | VadereClassNotFoundException e) {
+		} catch (IOException | VadereClassNotFoundException | IllegalArgumentException e ) {
 			logger.error("Error in output file " + directory.getName());
 			return Optional.empty();
 		}
 	}
 
 	private static boolean isValidOutputDirectory(final VadereProject project, final File directory) {
-		return readOutputFile(project, directory).isPresent();
+		return readOutputFile(project, directory).isPresent() && readTrajectories(project, directory).isPresent();
 	}
 
 	private static boolean isMatchingOutputDirectory(final VadereProject project, final File directory,

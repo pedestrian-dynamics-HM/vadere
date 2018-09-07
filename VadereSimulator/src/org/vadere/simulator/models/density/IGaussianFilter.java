@@ -5,151 +5,152 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.opencl.OpenCLException;
 
 /**
  * IGaussianFilter is a refershable image processing calculator that can be used
  * to solve a discrete convolution or other calculations that can be done by a
  * image processing filter.
- * 
- * 
+ *
+ *
  */
 public interface IGaussianFilter {
 
-	enum Type {
-		OpenCV, // old alternative
-		OpenCL, // default
-		NativeJava; // not jet implemented
-	}
+	Logger logger = LogManager.getLogger(IGaussianFilter.class);
 
-	/**
-	 * Returns the value of a specified coordinate. This coordinate will be
-	 * converted to natural numbers of the image.
-	 * 
-	 * @param x
-	 *        the x-coordinate (for example the x-coordinate of a place on
-	 *        the floor)
-	 * @param y
-	 *        the y-coordinate (for example the y-coordinate of a place on
-	 *        the floor)
-	 * @return the value of a specified coordinate
-	 */
-	double getFilteredValue(final double x, final double y);
+    enum Type {
+        OpenCL, // default
+        NativeJava
+    }
 
-	double getFilteredValue(int x, int y);
+    /**
+     * Returns the value of a specified coordinate. This coordinate will be
+     * converted to natural numbers of the image.
+     *
+     * @param x
+     *        the x-coordinate (for example the x-coordinate of a place on
+     *        the floor)
+     * @param y
+     *        the y-coordinate (for example the y-coordinate of a place on
+     *        the floor)
+     * @return the value of a specified coordinate
+     */
+    double getFilteredValue(final double x, final double y);
 
-	double getInputValue(int x, int y);
+    double getFilteredValue(int x, int y);
 
-	void setInputValue(final double x, final double y, final double value);
+    double getInputValue(int x, int y);
 
-	void setInputValue(final int x, final int y, final double value);
+    void setInputValue(final double x, final double y, final double value);
 
-	/** refresh or update the values of the image that contains all values. */
-	void filterImage();
+    void setInputValue(final int x, final int y, final double value);
 
-	void clear();
+    /** refresh or update the values of the image that triangleContains all values. */
+    void filterImage();
 
-	int getMatrixWidth();
+    void clear();
 
-	int getMatrixHeight();
+    int getMatrixWidth();
 
-	double getScale();
+    int getMatrixHeight();
 
-	double getMaxFilteredValue();
+    double getScale();
 
-	double getMinFilteredValue();
+    double getMaxFilteredValue();
 
-	static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
-			Collection<E> pedestrians, final double scale,
-			final double standardDerivation,
-			final AttributesAgent attributesPedestrian,
-			final IPedestrianLoadingStrategy loadingStrategy) {
-		return create(scenarioBounds, pedestrians, scale, standardDerivation, attributesPedestrian, loadingStrategy,
-				Type.OpenCL);
-	}
+    double getMinFilteredValue();
 
-	/*
-	 * Factory-methods
-	 */
-	static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
-			Collection<E> pedestrians, final double scale,
-			final double standardDerivation,
-			final AttributesAgent attributesPedestrian,
-			final IPedestrianLoadingStrategy loadingStrategy, final Type type) {
+    /**
+     * This method has to be called if the Filter will no longer called!
+     */
+    void destroy();
 
-		double scaleFactor = attributesPedestrian.getRadius() * 2
-				* attributesPedestrian.getRadius() * 2
-				* Math.sqrt(3)
-				* 0.5
-				/ (2 * Math.PI * standardDerivation * standardDerivation);
+    static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
+                                                    Collection<E> pedestrians, final double scale,
+                                                    final double standardDerivation,
+                                                    final AttributesAgent attributesPedestrian,
+                                                    final IPedestrianLoadingStrategy loadingStrategy) {
+        return create(scenarioBounds, pedestrians, scale, standardDerivation, attributesPedestrian, loadingStrategy,
+                Type.OpenCL);
+    }
 
-		switch (type) {
-			case OpenCV: {
-				throw new UnsupportedOperationException();
-				/*
-				 * return new PedestrianCVGaussianFilter(scenarioBounds, pedestrians, scale,
-				 * scaleFactor, standardDerivation,
-				 * loadingStrategy);
-				 */
-			}
-			case OpenCL: {
-				try {
-					BiFunction<Integer, Integer, Float> f =
-							(centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
-									* ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
-					IGaussianFilter clFilter = new CLGaussianFilter(scenarioBounds, scale, f, false);
-					return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
-				} catch (IOException e) {
-					// cannot go on, this should never happen!
-					throw new RuntimeException(e);
-				}
-			}
-			default:
-				throw new IllegalArgumentException(type + " is not jet supported");
-		}
-	}
+    /*
+     * Factory-methods
+     */
+    static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
+                                                    Collection<E> pedestrians, final double scale,
+                                                    final double standardDerivation,
+                                                    final AttributesAgent attributesPedestrian,
+                                                    final IPedestrianLoadingStrategy loadingStrategy, final Type type) {
 
-	static IGaussianFilter create(
-			final Topography scenario, final double scale,
-			final boolean scenarioHasBoundary, final double standardDerivation) {
-		return create(scenario, scale, scenarioHasBoundary, standardDerivation, Type.OpenCL);
-	}
+        double scaleFactor = attributesPedestrian.getRadius() * 2
+                * attributesPedestrian.getRadius() * 2
+                * Math.sqrt(3)
+                * 0.5
+                / (2 * Math.PI * standardDerivation * standardDerivation);
 
-	static IGaussianFilter create(
-			final Topography scenario, final double scale,
-			final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
-		switch (type) {
-			case OpenCV: {
-				throw new UnsupportedOperationException();
-				/*
-				 * return new ObstacleCVGaussianFilter(scenario, scale, scenarioHasBoundary,
-				 * standardDerivation);
-				 */
-			}
-			case OpenCL: {
-				try {
-					double varianz = standardDerivation * standardDerivation;
-					BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
-							* Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
-					IGaussianFilter clFilter = new CLGaussianFilter(scenario.getBounds(), scale, f, true);
-					return new ObstacleGaussianFilter(scenario, clFilter);
-				} catch (IOException e) {
-					// cannot go on, this should never happen!
-					throw new RuntimeException(e);
-				}
-			}
-			default:
-				throw new IllegalArgumentException(type + " is not jet supported");
-		}
-	}
+	    BiFunction<Integer, Integer, Float> f =
+			    (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
+					    * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
 
-	static IGaussianFilter create(
-			final Topography scenario, final double scale,
-			final double standardDerivation) {
-		return create(scenario, scale, true, standardDerivation);
-	}
+	    IGaussianFilter clFilter;
+        switch (type) {
+            case OpenCL: {
+	            try {
+		            clFilter = new CLGaussianFilter(scenarioBounds, scale, f, false);
+	            } catch (IOException | OpenCLException e) {
+		            e.printStackTrace();
+		            logger.warn(e.getClass().getName() + " while initializing OpenCL: " + e.getMessage() + " OpenCL can not be used. Native Java implementation will be used which might cause performance issues.");
+		            clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+	            }
+            } break;
+            default:
+	            clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+        }
+
+	    return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
+    }
+
+    static IGaussianFilter create(
+            final Topography scenario, final double scale,
+            final boolean scenarioHasBoundary, final double standardDerivation) {
+        return create(scenario, scale, scenarioHasBoundary, standardDerivation, Type.OpenCL);
+    }
+
+    static IGaussianFilter create(
+            final Topography scenario, final double scale,
+            final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
+
+    	double varianz = standardDerivation * standardDerivation;
+	    BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
+			    * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
+
+	    IGaussianFilter clFilter;
+        switch (type) {
+            case OpenCL: {
+	            try {
+		            clFilter = new CLGaussianFilter(scenario.getBounds(), scale, f, true);
+	            } catch (IOException | OpenCLException e) {
+		            e.printStackTrace();
+		            logger.warn(e.getClass().getName() + " while initializing OpenCL: " + e.getMessage() + " OpenCL can not be used. Native Java implementation will be used which might cause performance issues.");
+		            clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
+	            }
+            } break;
+            default:
+                clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
+        }
+	    return new ObstacleGaussianFilter(scenario, clFilter);
+    }
+
+    static IGaussianFilter create(
+            final Topography scenario, final double scale,
+            final double standardDerivation) {
+        return create(scenario, scale, true, standardDerivation);
+    }
 }

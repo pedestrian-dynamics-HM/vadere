@@ -1,0 +1,55 @@
+# # GitLab CI Jobs
+#
+# Each of the jobs defined here is triggered by GitLab's CI pipeline.
+#
+# ## GitLab YAML Job Description Syntax
+#
+# <job_name>:                   # Job name which is displayed in web interface.
+#   stage: <stage_name>         # <build|test|deploy>: these stages are executed
+#                               # one after another. A stage can contain multiple
+#                               # jobs.
+#   script:
+#      - <arbitrary_commands>   # Here you can execute arbitratry terminal
+#                               # commands. If any of the commands return a
+#                               # non-zero exit code, the job fails.
+#
+# ## Maven Syntax for Skipping Unit Tests
+#
+# General syntax to execute unit tests:
+#
+# ```
+# mvn test
+# ```
+#
+# The comma-separated list of tests after "-Dtest=<list>" is skipped. All other
+# tests are executed normally:
+#
+# ```
+# mvn -Dtest=!TestClassA,!TestClassB,!TestClassC
+# ```
+#
+# **Note:** on some CI instances the exclamation mark must be escaped by a
+# backslash. Otherwise, it is interpreted by the executing shell as special
+# command.
+#
+# ## Unit Test Limitations
+#
+# **Watch out:** OpenCL code cannot be run on virtual machines where tests are
+# executed. Therefore, skip this tests.
+
+unit_tests_with_coverage:
+  stage: test
+  
+  script:
+    - mvn clean
+    - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList test
+    - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
+
+run_scenario_files:
+  stage: deploy
+
+  script:
+      - mvn clean
+      - mvn -Dmaven.test.skip=true package
+      - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+

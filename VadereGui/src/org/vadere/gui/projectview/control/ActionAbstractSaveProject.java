@@ -103,7 +103,7 @@ public abstract class ActionAbstractSaveProject extends AbstractAction {
 						Messages.getString("SaveFileErrorMessage.text") + System.lineSeparator()
 								+ e.getLocalizedMessage(),
 						Messages.getString("SaveFileErrorMessage.title"));
-				logger.error(e);
+				logger.error("could not save project: " + e.getMessage());
 				throw new IOException(e);
 			}
 		} else {

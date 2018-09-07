@@ -1,8 +1,9 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
-
+@ModelAttributeClass
 public class AttributesBMM extends Attributes {
 
 	private double reachedStepTolerance = 0.1;

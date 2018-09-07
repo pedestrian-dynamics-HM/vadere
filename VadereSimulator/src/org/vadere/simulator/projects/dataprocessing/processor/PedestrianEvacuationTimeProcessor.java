@@ -1,9 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor;
+import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 /**
@@ -19,16 +21,18 @@ import org.vadere.state.scenario.Pedestrian;
  * @author Jakob Schöttl
  *
  */
-
+@DataProcessorClass()
 public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
 	private PedestrianStartTimeProcessor pedStartTimeProc;
 
 	public PedestrianEvacuationTimeProcessor() {
 		super("evacuationTime");
+		setAttributes(new AttributesPedestrianEvacuationTimeProcessor());
 	}
 	
 	@Override
 	public void init(final ProcessorManager manager) {
+		super.init(manager);
 		AttributesPedestrianEvacuationTimeProcessor att = (AttributesPedestrianEvacuationTimeProcessor) this.getAttributes();
 		pedStartTimeProc = (PedestrianStartTimeProcessor) manager.getProcessor(att.getPedestrianStartTimeProcessorId());
 	}
@@ -63,7 +67,15 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 	public void postLoop(final SimulationState state) {
 		state.getTopography().getElements(Pedestrian.class).stream()
 				.map(ped -> new PedestrianIdKey(ped.getId()))
-				.forEach(key -> this.putValue(key, Double.NaN));
+				.forEach(key -> this.putValue(key, Double.POSITIVE_INFINITY));
 	}
 
+    @Override
+    public AttributesProcessor getAttributes() {
+        if(super.getAttributes() == null) {
+            setAttributes(new AttributesPedestrianEvacuationTimeProcessor());
+        }
+
+        return super.getAttributes();
+    }
 }

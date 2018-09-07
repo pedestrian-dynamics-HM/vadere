@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.state.attributes.processor.AttributesProcessor;
@@ -115,7 +116,14 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 
 	public void postLoop(final SimulationState state) { }
 
-	public abstract void init(final ProcessorManager manager);
+	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
+
+	}
+
+	public void init(final ProcessorManager manager){
+		this.data.clear();
+		this.lastStep = 0;
+	}
 
 	public String[] toStrings(final K key) {
 		return new String[] { this.hasValue(key) ? this.getValue(key).toString() : "NA" };

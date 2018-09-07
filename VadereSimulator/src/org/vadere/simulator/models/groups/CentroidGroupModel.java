@@ -1,56 +1,60 @@
 package org.vadere.simulator.models.groups;
 
+import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesCGM;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.DynamicElementAddListener;
+import org.vadere.state.scenario.DynamicElementRemoveListener;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Topography;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesCGM;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
+@ModelClass
+public class CentroidGroupModel
+		implements GroupModel, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
 
-public class CentroidGroupModel implements GroupModel {
-
-	private GroupSizeDeterminator groupSizeDeterminator;
+	private Random random;
 	private Map<Integer, CentroidGroupFactory> groupFactories;
 	private Map<ScenarioElement, CentroidGroup> pedestrianGroupData;
 
 	private Topography topography;
-	private PotentialFieldTarget potentialFieldTarget;
+	private IPotentialFieldTarget potentialFieldTarget;
 	private AttributesCGM attributesCGM;
 
-	private int nextFreeGroupId = 0;
-	
+	private AtomicInteger nextFreeGroupId;
+
 	public CentroidGroupModel() {
-		this.groupFactories = new TreeMap<>();
+		this.groupFactories = new HashMap<>();
 		this.pedestrianGroupData = new HashMap<>();
-	}
-	
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		this.attributesCGM = Model.findAttributes(attributesList, AttributesCGM.class);
-		this.groupSizeDeterminator = new GroupSizeDeterminatorRandom(
-				attributesCGM.getGroupSizeDistribution(), random);
-		this.topography = topography;
+		this.nextFreeGroupId = new AtomicInteger(0);
 	}
 
-	public void setPotentialFieldTarget(PotentialFieldTarget potentialFieldTarget) {
+	@Override
+	public void initialize(List<Attributes> attributesList, Topography topography,
+						   AttributesAgent attributesPedestrian, Random random) {
+		this.attributesCGM = Model.findAttributes(attributesList, AttributesCGM.class);
+		this.topography = topography;
+		this.random = random;
+//		setGroupSizeDeterminator(new GroupSizeDeterminatorRandom(
+//				attributesCGM.getGroupSizeDistribution(), random));
+	}
+
+	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
 		this.potentialFieldTarget = potentialFieldTarget;
 	}
 
 	protected int getFreeGroupId() {
-		int result = nextFreeGroupId;
-
-		nextFreeGroupId++;
-
-		return result;
+		return nextFreeGroupId.getAndIncrement();
 	}
 
 	@Override
@@ -59,11 +63,19 @@ public class CentroidGroupModel implements GroupModel {
 		CentroidGroupFactory result = groupFactories.get(sourceId);
 
 		if (result == null) {
-			result = new CentroidGroupFactory(this, groupSizeDeterminator);
-			groupFactories.put(sourceId, result);
+			throw new IllegalArgumentException("For SourceID: " + sourceId + " no GroupFactory exists. " +
+					"Is this really a valid source?");
 		}
 
 		return result;
+	}
+
+	@Override
+	public void initializeGroupFactory(int sourceId, List<Double> groupSizeDistribution) {
+		GroupSizeDeterminator gsD = new GroupSizeDeterminatorRandom(groupSizeDistribution, random);
+		CentroidGroupFactory result =
+				new CentroidGroupFactory(this, gsD);
+		groupFactories.put(sourceId, result);
 	}
 
 	@Override
@@ -77,6 +89,16 @@ public class CentroidGroupModel implements GroupModel {
 	}
 
 	@Override
+	public CentroidGroup removeMember(ScenarioElement ped) {
+		return pedestrianGroupData.remove(ped);
+	}
+
+
+	public Map<ScenarioElement, CentroidGroup> getPedestrianGroupData() {
+		return pedestrianGroupData;
+	}
+
+	@Override
 	public CentroidGroup getNewGroup(final int size) {
 		CentroidGroup result = new CentroidGroup(getFreeGroupId(), size,
 				this.potentialFieldTarget);
@@ -85,17 +107,31 @@ public class CentroidGroupModel implements GroupModel {
 
 	@Override
 	public void preLoop(final double simTimeInSec) {
-		topography.addElementAddedListener(Pedestrian.class, getGroupFactory(-1));
+		topography.addElementAddedListener(Pedestrian.class, this);
+		topography.addElementRemovedListener(Pedestrian.class, this);
 	}
 
 	@Override
-	public void postLoop(final double simTimeInSec) {}
+	public void postLoop(final double simTimeInSec) {
+	}
 
 	@Override
-	public void update(final double simTimeInSec) {}
+	public void update(final double simTimeInSec) {
+	}
 
 	public AttributesCGM getAttributesCGM() {
 		return attributesCGM;
 	}
-	
+
+	@Override
+	public void elementAdded(Pedestrian pedestrian) {
+		// call GroupFactory for selected Source
+		getGroupFactory(pedestrian.getSource().getId()).elementAdded(pedestrian);
+	}
+
+	@Override
+	public void elementRemoved(Pedestrian pedestrian) {
+		getGroupFactory(pedestrian.getSource().getId()).elementRemoved(pedestrian);
+	}
+
 }
