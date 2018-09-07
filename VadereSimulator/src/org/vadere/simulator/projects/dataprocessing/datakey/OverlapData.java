@@ -5,11 +5,19 @@ import org.vadere.state.scenario.DynamicElement;
 
 public class OverlapData {
 
+	public static final OverlapData noOverLap = new OverlapData();
 
 	private final int ped1Id;
 	private final int ped2Id;
-	private final double dist;
-	private final double overlap;
+	private final Double dist;
+	private final Double overlap;
+
+	private OverlapData() {
+		this.ped1Id = -1;
+		this.ped2Id = -1;
+		this.dist = Double.POSITIVE_INFINITY;
+		this.overlap = 0.0;
+	}
 
 
 	public OverlapData(final DynamicElement ped1, final DynamicElement ped2, final double minDist){
@@ -35,7 +43,7 @@ public class OverlapData {
 		return ped2Id;
 	}
 
-	public double getOverlap() {
+	public Double getOverlap() {
 		return overlap;
 	}
 

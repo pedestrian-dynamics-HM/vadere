@@ -42,23 +42,13 @@ public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
 	public void postLoop(final SimulationState state) {
 		this.pedOverlapProc.postLoop(state);
 
-		Optional<OverlapData> maximumOverlap = this.pedOverlapProc.getData().values().stream().max(OverlapData::maxDist);
-
-
-		if(maximumOverlap.isPresent()){
-			this.putValue(NoDataKey.key(),maximumOverlap.get().getOverlap());
-
-			/* // Uncomment  if you want a info box to inform you about the maximum overlap
-			MaxOverlapProcessor.infoBox("Minimum distance between centers: " + maximumOverlap + " meters" , "Maximum Overlap");
-			*/
-
-		}else{
-			this.putValue(NoDataKey.key(), null);
-		}
+		OverlapData maximumOverlap = this.pedOverlapProc.getData().values().stream().max(OverlapData::maxDist).orElse(OverlapData.noOverLap);
+		this.putValue(NoDataKey.key(),maximumOverlap.getOverlap());
 	}
 
 	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
 		result.setMaxOverlap(this.getValue(NoDataKey.key()));
+
 	}
 
 

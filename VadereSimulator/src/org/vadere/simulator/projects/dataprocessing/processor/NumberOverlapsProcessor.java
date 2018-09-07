@@ -45,7 +45,7 @@ public class NumberOverlapsProcessor extends DataProcessor<NoDataKey, Long> {
 
 	@Override
 	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
-		result.setTotalOverlaps(this.pedOverlapProc.getData().size());
+		result.setTotalOverlaps(this.getValue(NoDataKey.key()).intValue());
 	}
 
 	@Override
