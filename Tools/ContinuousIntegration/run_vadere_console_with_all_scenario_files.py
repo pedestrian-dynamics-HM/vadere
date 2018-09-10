@@ -2,7 +2,7 @@
 # scenario files under "VadereModelTests" subdirectory.
 #
 # Note: script contains some print statements so that progress can be tracked
-# a little bit
+# a little bit while script is running in continuous integration pipeline.
 
 # Wach out: call this script from root directory of project. E.g.
 #
@@ -32,9 +32,6 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
             if scenario_path_excluded == False:
                 scenario_files.append(scenario_path)
 
-    print("Total scenario files: {}".format(len(scenario_files)))
-    # print("Exclude patterns: {}".format(exclude_patterns))
-
     return sorted(scenario_files)
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
@@ -50,12 +47,10 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
     for i, scenario_file in enumerate(scenario_files):
         try:
-            # Surpress this output to print only failed scenarios.
-            # print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
+            print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
 
-            # Measure wall time and not cpu because it is the easiest.
+            # Measure wall time and not CPU time simply because it is the simplest method.
             wall_time_start = time.time()
-
 
             # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
             completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console, "scenario-run", "-f", scenario_file, "-o", output_dir],
@@ -67,16 +62,11 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             wall_time_end = time.time()
             wall_time_delta = wall_time_end - wall_time_start
 
-            # Surpress this output to print only failed scenarios.
-            # print("Finished scenario file ({:.1f} s): {}".format(wall_time_delta, scenario_file))
+            print("Finished scenario file ({:.1f} s): {}".format(wall_time_delta, scenario_file))
 
             passed_scenarios.append(scenario_file)
         except subprocess.TimeoutExpired as exception:
-            prefix = ""
-            if "TestOSM" in scenario_file:
-                prefix = " * OSM * "
-
-            print(prefix + "Scenario file failed: {}".format(scenario_file))
+            print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: timeout after {} s".format(exception.timeout))
             failed_scenarios_with_exception.append((scenario_file, exception))
         except subprocess.CalledProcessError as exception:
@@ -87,15 +77,25 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             print("->  Reason: non-zero return value {}".format(exception.returncode))
             failed_scenarios_with_exception.append((scenario_file, exception))
 
-
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
 
     return {"passed": passed_scenarios, "failed": failed_scenarios_with_exception}
 
-if __name__ == "__main__":
-    print("Output is only shown for failed scenarios!")
+def print_summary(passed_and_failed_scenarios):
+    total_passed_scenarios = len(passed_and_failed_scenarios["passed"])
+    total_failed_scenarios = + len(passed_and_failed_scenarios["failed"])
+    total_scenarios = total_passed_scenarios + total_failed_scenarios
 
+    print("###########")
+    print("# Summary #")
+    print("###########")
+    print("")
+    print("Total scenario runs: {}".format(total_scenarios))
+    print("Passed: {}".format(total_passed_scenarios))
+    print("Failed: {}".format(total_failed_scenarios))
+
+if __name__ == "__main__":
     long_running_scenarios = [
             "basic_4_1_wall_gnm1",
             "queueing",
@@ -118,6 +118,7 @@ if __name__ == "__main__":
         passed_and_failed_scenarios["passed"].extend(tmp_passed_and_failed_scenarios["passed"])
         passed_and_failed_scenarios["failed"].extend(tmp_passed_and_failed_scenarios["failed"])
 
+    print_summary(passed_and_failed_scenarios)
 
     if len(passed_and_failed_scenarios["failed"]) > 0:
         exit(1)
