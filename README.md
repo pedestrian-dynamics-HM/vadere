@@ -101,18 +101,15 @@ switch to another branch and switch back again using the command line or any oth
 
 Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
 
-## Release History
-
-- 0.1 initial release of the software as open source (2016-08-05)
-- 0.2 stability and usability improved, additional pedestrian simulation models are supported (2016-12-22)
-- [...]
-- 0.6 [Description to be added... ] (2018-09-07)
-
 ## Contributors
 
 People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
 
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
+Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Marion Gödel, Benedikt Kleinmeier, Daniel Lehmberg, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 ## License
 
