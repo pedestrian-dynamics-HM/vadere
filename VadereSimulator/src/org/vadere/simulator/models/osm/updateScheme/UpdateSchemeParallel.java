@@ -12,12 +12,10 @@ import java.util.concurrent.Future;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.io.ListUtils;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
@@ -110,7 +108,9 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	private void updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
 			pedestrian.setLastPosition(pedestrian.getPosition());
-			pedestrian.setPosition(pedestrian.getNextPosition());
+			synchronized (topography) {
+				movePedestrian(topography, pedestrian, pedestrian.getPosition(), pedestrian.getNextPosition());
+			}
 		}
 	}
 
@@ -120,7 +120,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 *
 	 * @param pedestrian the pedestrian for which a rollback might be performed.
 	 */
-	private void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian) {
+	protected void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
 			List<Agent> others = getCollisionPedestrians(pedestrian);
 
@@ -129,15 +129,20 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 			for (Agent ped : others) {
 				double creditOther = ((PedestrianOSM) ped).getTimeCredit();
 
-				if ((creditOther < pedestrian.getTimeCredit()) ||
-						(creditOther == pedestrian.getTimeCredit() && ped.getId() < pedestrian.getId())) {
+				if (creditOther < pedestrian.getTimeCredit()) {
+					undoStep = true;
+					break;
+				} else if (creditOther == pedestrian.getTimeCredit()
+						&& ped.getId() < pedestrian.getId()) {
 					undoStep = true;
 					break;
 				}
 			}
 
 			if (undoStep) {
-				pedestrian.setPosition(pedestrian.getLastPosition());
+				synchronized (topography) {
+					movePedestrian(topography, pedestrian, pedestrian.getPosition(), pedestrian.getLastPosition());
+				}
 			}
 		}
 	}
@@ -172,6 +177,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
+
 	/**
 	 * Computes a {@link List<Agent>} of pedestrians overlapping / colliding with the pedestrian
 	 * @param pedestrian the pedestrian
@@ -179,8 +185,9 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	protected List<Agent> getCollisionPedestrians(@NotNull final PedestrianOSM pedestrian) {
 		LinkedList<Agent> result = new LinkedList<>();
+		Collection<? extends Agent> agents = pedestrian.getRelevantPedestrians();
 
-		for (Agent ped : pedestrian.getRelevantPedestrians()) {
+		for (Agent ped : agents) {
 			if (!ped.equals(pedestrian)) {
 				double thisDistance = ped.getPosition().distance(pedestrian.getPosition());
 

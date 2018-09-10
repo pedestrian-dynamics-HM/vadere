@@ -53,12 +53,12 @@ class PotentialFieldAndInitializer {
 
 		if (createMethod != EikonalSolverType.NONE) {
 			for (VShape shape : targetShapes) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
+				FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
 						new CellState(0.0, PathFindingTag.Target));
 			}
 
 			for (Obstacle obstacle : topography.getObstacles()) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, obstacle.getShape(),
+				FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle.getShape(),
 						new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
 			}
 		}
@@ -78,10 +78,10 @@ class PotentialFieldAndInitializer {
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
 			case FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFIM(cellGrid, targetShapes, timeCost);
 				break;
 			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);
+				eikonalSolver = new EikonalSolverFSM(cellGrid, targetShapes, timeCost);
 				break;
 			default:
 				eikonalSolver = new EikonalSolverSFMM(cellGrid, targetShapes, isHighAccuracyFM, timeCost);

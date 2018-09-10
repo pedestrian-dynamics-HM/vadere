@@ -95,8 +95,8 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
-    uint2 gridPos;
+inline int2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
+    int2 gridPos;
     float2 wordOr = (*worldOrigin);
     gridPos.x = (int)floor((p.x - wordOr.x) / (*cellSize));
     gridPos.y = (int)floor((p.y - wordOr.y) / (*cellSize));
@@ -104,10 +104,10 @@ inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2*
 }
 
 //Calculate address in grid from position (clamping to edges)
-inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
+inline uint getGridHash(int2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
-    gridPos.x = gridPos.x & ((*gridSize).x - 1);
-    gridPos.y = gridPos.y & ((*gridSize).y - 1);
+    //gridPos.x = gridPos.x & ((*gridSize).x - 1);
+    //gridPos.y = gridPos.y & ((*gridSize).y - 1);
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
@@ -129,7 +129,7 @@ __kernel void calcHash(
     float2 p = d_Pos[index];
 
     //Get address in grid
-    uint2  gridPos = getGridPos(p, cellSize, worldOrigin);
+    int2  gridPos = getGridPos(p, cellSize, worldOrigin);
     uint gridHash = getGridHash(gridPos, gridSize);
 
     //Store grid hash and particle index

@@ -15,6 +15,22 @@ public class MathUtil {
 
 	private final static List<Point> neumannNeighborhood = getNeumannNeighborhood(new Point(0, 0));
 
+	public static double toPositiveSmallestRadian(final double radian) {
+		double result = radian;
+		if(result < 0) {
+			while (result < 0) {
+				result += 2 * Math.PI;
+			}
+		}
+		else if(result > 2 * Math.PI) {
+			while (result > 2 * Math.PI) {
+				result -= Math.PI;
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * The two-norm of a vector.
 	 * 

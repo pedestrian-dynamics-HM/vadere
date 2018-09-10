@@ -169,7 +169,6 @@ public class CLOptimalStepsModel {
 	 * Default constructor.
 	 *
 	 * @param bound             the spatial bound of the linked cell.
-	 * @param cellSize          the cellSize (in x and y direction) of the linked cell.
 	 *
 	 * @throws OpenCLException
 	 */
@@ -177,16 +176,11 @@ public class CLOptimalStepsModel {
 		    @NotNull final AttributesOSM attributesOSM,
 		    @NotNull final AttributesFloorField attributesFloorField,
 		    @NotNull final VRectangle bound,
-		    final double cellSize,
 		    @NotNull final EikonalSolver targetPotential,
 		    @NotNull final EikonalSolver obstaclePotential) throws OpenCLException {
     	this.attributesOSM = attributesOSM;
 	    this.attributesFloorField = attributesFloorField;
-
-	    this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
-	    this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
 		this.bound = bound;
-		this.iCellSize = (float)cellSize;
 
 		//TODO: this should be done in mallocHostMemory().
 	    this.targetPotentialField = generatePotentialFieldApproximation(targetPotential);
@@ -297,7 +291,11 @@ public class CLOptimalStepsModel {
 	 * @throws OpenCLException
 	 */
 	//TODO: dont sort if the size is <= 1!
-	public List<PedestrianOpenCL> getNextSteps(@NotNull final List<PedestrianOpenCL> pedestrians) throws OpenCLException {
+	public List<PedestrianOpenCL> getNextSteps(@NotNull final List<PedestrianOpenCL> pedestrians, final double cellSize) throws OpenCLException {
+
+		this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
+		this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
+		this.iCellSize = (float)cellSize;
 
 		// support also not multiple of 2 !
 		numberOfSortElements = expOf(pedestrians.size(), 2);
@@ -497,15 +495,14 @@ public class CLOptimalStepsModel {
 			this.potentialFieldGridSize = MemoryUtil.memAllocInt(2);
 			this.potentialFieldGridSize.put(0, getPotentialFieldWidth());
 			this.potentialFieldGridSize.put(1, getPotentialFieldHeight());
-
-			this.cellSize = MemoryUtil.memAllocFloat(1);
-			this.cellSize.put(0, iCellSize);
-
-			this.gridSize = CLUtils.toIntBuffer(iGridSize, CLUtils.toIntBuffer(iGridSize));
-
-			this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
-			this.cellEnds = MemoryUtil.memAllocInt(numberOfGridCells);
 		}
+		this.cellSize = MemoryUtil.memAllocFloat(1);
+		this.cellSize.put(0, iCellSize);
+
+		this.gridSize = CLUtils.toIntBuffer(iGridSize, CLUtils.toIntBuffer(iGridSize));
+
+		this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
+		this.cellEnds = MemoryUtil.memAllocInt(numberOfGridCells);
 		this.indices = MemoryUtil.memAllocInt(pedestrianList.size());
 		this.reorderedPedestrians = MemoryUtil.memAllocFloat(numberOfElements * 3);
 	}
@@ -513,12 +510,14 @@ public class CLOptimalStepsModel {
     private void allocDeviceMemory(final int numberOfElements) {
 	    try (MemoryStack stack = stackPush()) {
 		    IntBuffer errcode_ret = stack.callocInt(1);
+
+		    clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, cellSize, errcode_ret);
+		    clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, gridSize, errcode_ret);
+
 		    if(counter == 0) {
-			    clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, cellSize, errcode_ret);
 			    clPotentialFieldSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, potenialFieldSize, errcode_ret);
 			    clPotentialFieldGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, potentialFieldGridSize, errcode_ret);
 			    clWorldOrigin = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, worldOrigin, errcode_ret);
-			    clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, gridSize, errcode_ret);
 			    clTargetPotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, targetPotentialField, errcode_ret);
 			    clObstaclePotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, obstaclePotentialField, errcode_ret);
 			    clCirclePositions = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, circlePositions, errcode_ret);
@@ -808,6 +807,8 @@ public class CLOptimalStepsModel {
 
 	private void clearIterationMemory() throws OpenCLException {
 		try {
+			CLInfo.checkCLError(clReleaseMemObject(clCellSize));
+			CLInfo.checkCLError(clReleaseMemObject(clGridSize));
 			CLInfo.checkCLError(clReleaseMemObject(clHashes));
 			CLInfo.checkCLError(clReleaseMemObject(clIndices));
 			CLInfo.checkCLError(clReleaseMemObject(clCellStarts));
@@ -820,6 +821,10 @@ public class CLOptimalStepsModel {
 			throw ex;
 		}
 		finally {
+			MemoryUtil.memFree(gridSize);
+			MemoryUtil.memFree(cellSize);
+			MemoryUtil.memFree(cellStarts);
+			MemoryUtil.memFree(cellEnds);
 			MemoryUtil.memFree(hashes);
 			MemoryUtil.memFree(indices);
 			MemoryUtil.memFree(reorderedPedestrians);

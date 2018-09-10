@@ -1,7 +1,8 @@
 {
   "name" : "testtrafficlight",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -10,14 +11,22 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
-        "pedPotentialWidth" : 0.5,
-        "pedPotentialHeight" : 12.6,
-        "obstPotentialWidth" : 0.25,
-        "obstPotentialHeight" : 20.1,
-        "useHardBodyShell" : false,
-        "obstDistanceDeviation" : 0.0,
-        "visionFieldRadius" : 5.0
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution" : 0.1,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "timeCostAttributes" : {
+          "standardDeviation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT"
+        }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
@@ -38,22 +47,14 @@
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
         "submodels" : [ ]
       },
-      "org.vadere.state.attributes.models.AttributesFloorField" : {
-        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
-        "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
-        "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
-          "type" : "UNIT",
-          "obstacleDensityWeight" : 3.5,
-          "pedestrianSameTargetDensityWeight" : 3.5,
-          "pedestrianOtherTargetDensityWeight" : 3.5,
-          "pedestrianWeight" : 3.5,
-          "queueWidthLoading" : 1.0,
-          "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
-        }
+      "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
+        "pedPotentialWidth" : 0.5,
+        "pedPotentialHeight" : 12.6,
+        "obstPotentialWidth" : 0.25,
+        "obstPotentialHeight" : 20.1,
+        "useHardBodyShell" : false,
+        "obstDistanceDeviation" : 0.0,
+        "visionFieldRadius" : 5.0
       }
     },
     "attributesSimulation" : {
@@ -63,10 +64,10 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
-      "useRandomSeed" : true,
-      "randomSeed" : 1
+      "useFixedSeed" : true,
+      "fixedSeed" : 1,
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
@@ -132,11 +133,11 @@
         "startTime" : 0.0,
         "endTime" : 1000.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1, 2 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -161,7 +162,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      }
+      },
+      "dynamicElements" : [ ]
     }
   }
 }

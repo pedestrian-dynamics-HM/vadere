@@ -35,29 +35,6 @@ typedef struct{
 }Int3;
 
 
-typedef struct{
-    Float3 colliderPos;
-    float  colliderRadius;
-
-    Float3 gravity;
-    float globalDamping;
-    float particleRadius;
-
-    Uint3 gridSize;
-    uint numCells;
-    Float3 worldOrigin;
-    Float3 cellSize;
-
-    uint numBodies;
-    uint maxParticlesPerCell;
-
-    float spring;
-    float damping;
-    float shear;
-    float attraction;
-    float boundaryDamping;
-} simParams_t;
-
 typedef struct {
     float2 position;
     float stepLength;
@@ -94,16 +71,16 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-inline uint2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
-    uint2 gridPos;
+inline int2 getGridPos(float2 p, __constant float* cellSize, __constant float2* worldOrigin){
+    int2 gridPos;
     float2 wordOr = (*worldOrigin);
-    gridPos.x = (uint)floor((p.x - wordOr.x) / (*cellSize));
-    gridPos.y = (uint)floor((p.y - wordOr.y) / (*cellSize));
+    gridPos.x = (int)floor((p.x - wordOr.x) / (*cellSize));
+    gridPos.y = (int)floor((p.y - wordOr.y) / (*cellSize));
     return gridPos;
 }
 
 //Calculate address in grid from position (clamping to edges)
-inline uint getGridHash(uint2 gridPos, __constant uint2* gridSize){
+inline uint getGridHash(int2 gridPos, __constant uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     //gridPos.x = gridPos.x & ((*gridSize).x - 1);
     //gridPos.y = gridPos.y & ((*gridSize).y - 1);
@@ -120,17 +97,9 @@ inline float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
     float potential = 0.0f;
     float d = distance(pos, otherPedPosition);
     float width = 0.5f;
-    //float width = 3.0;
     float height = 12.6f;
-
-    /*if(d < 0.0f) {
-        potential = 1000.0f;
-    }
-    else*/
-    if (d < 0.5f) {
+    if (d < width) {
         potential = height * exp(1 / (pown(d / width, 2) - 1));
-        //potential = 1000.0f;
-        //printf("distance = %f, potential = %f \n", d, potential);
     }
 
     return potential;
@@ -150,28 +119,30 @@ inline float getFullPedestrianPotential(
     uint index = get_global_id(0);
 
     //Get address in grid
-    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
 
     //printf("global_size (%d)\n", get_global_size(0));
-    for(int i = 0; i < get_global_size(0); i++) {
+    /*for(int i = 0; i < get_global_size(0); i++) {
          float2 otherPedestrian = (float2) (orderedPedestrians[i*3], orderedPedestrians[i*3+1]);
          potential += getPedestrianPotential(pos, otherPedestrian);
-    }
+    }*/
 
 
     //Accumulate surrounding cells
     // TODO: index check!
-    /*for(int y = -1; y <= 1; y++) {
+    for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
             //Get start particle index for this cell
 
-            int2 uGridPos = (gridPos.x + x , gridPos.y + y);
+            int2 uGridPos = (int2)(gridPos.x + x , gridPos.y + y);
+
+            //printf("position = (%f, %f) gridPos = (%d, %d)\n", pedPosition.x, pedPosition.y, gridPos.x, gridPos.y);
 
             if(uGridPos.x < 0 || uGridPos.y < 0){
                 continue;
             }
 
-            uint   hash = getGridHash((uint2)uGridPos, gridSize);
+            uint   hash = getGridHash(uGridPos, gridSize);
             uint startI = d_CellStart[hash];
 
             //Skip empty cell
@@ -182,13 +153,12 @@ inline float getFullPedestrianPotential(
             uint endI = d_CellEnd[hash];
             for(uint j = startI; j < endI; j++){
                 float2 otherPedestrian = (float2) (orderedPedestrians[j*3], orderedPedestrians[j*3+1]);
-
-                // TODO exclude pedestrian itself => substract to avoid branching
+                //printf("otherPed = (%f, %f)\n", otherPedestrian.x, otherPedestrian.y);
                 potential += getPedestrianPotential(pos, otherPedestrian);
               //potential += 0.01f;
             }
         }
-    }*/
+    }
 
     potential -= getPedestrianPotential(pos, pedPosition);
     return potential;
@@ -332,7 +302,7 @@ __kernel void calcHash(
 
     float2 p = (float2) (d_Pos[index*3], d_Pos[index*3+1]);
     //Get address in grid
-    uint2  gridPos = getGridPos(p, cellSize, worldOrigin);
+    int2  gridPos = getGridPos(p, cellSize, worldOrigin);
     uint gridHash = getGridHash(gridPos, gridSize);
 
     //Store grid hash and particle index

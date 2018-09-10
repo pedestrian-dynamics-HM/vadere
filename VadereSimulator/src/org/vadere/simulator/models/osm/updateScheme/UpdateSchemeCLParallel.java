@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLOptimalStepsModel;
+import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.ListUtils;
@@ -49,14 +50,18 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 
 			List<CLOptimalStepsModel.PedestrianOpenCL> pedestrians = new ArrayList<>();
 
+			double maxStepSize = -1.0;
 			for(int i = 0; i < pedestrianOSMList.size(); i++) {
+				PedestrianOSM pedestrianOSM = pedestrianOSMList.get(i);
 				CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(
-						pedestrianOSMList.get(i).getPosition(),
-						(float)pedestrianOSMList.get(i).getStepSize());
+						pedestrianOSM.getPosition(),
+						(float)pedestrianOSM.getStepSize());
 				pedestrians.add(pedestrian);
+				maxStepSize = Math.max(maxStepSize, pedestrianOSM.getStepSize());
 			}
 
-			List<CLOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians);
+			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
+			List<CLOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, cellSize);
 
 			for(int i = 0; i < pedestrians.size(); i++) {
 				//logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
@@ -93,4 +98,9 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 		}
 	}
 
+	@Override
+	protected void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian) {
+		pedestrian.refreshRelevantPedestrians();
+		super.updateParallelConflicts(pedestrian);
+	}
 }

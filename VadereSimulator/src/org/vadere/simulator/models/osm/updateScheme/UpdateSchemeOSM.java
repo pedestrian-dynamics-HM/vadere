@@ -42,7 +42,6 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			@NotNull final Topography topography,
 			@NotNull final AttributesOSM attributesOSM,
 			@NotNull final AttributesFloorField attributesFloorField,
-			@NotNull final double pedestrianPotentialWidth,
 			@NotNull final EikonalSolver targetEikonalSolver,
 			@NotNull final EikonalSolver distanceEikonalSolver) {
 
@@ -51,7 +50,6 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 					attributesOSM,
 					attributesFloorField,
 					new VRectangle(topography.getBounds()),
-					pedestrianPotentialWidth, // max step length + function width
 					targetEikonalSolver,
 					distanceEikonalSolver);
 
@@ -61,10 +59,14 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-
 	}
 
-	default void makeStep(@NotNull final PedestrianOSM pedestrian, final double stepTime) {
+	default void movePedestrian(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, @NotNull final VPoint from, @NotNull final VPoint to) {
+		pedestrian.setPosition(to);
+		topography.moveElement(pedestrian, from);
+	}
+
+	default void makeStep(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, final double stepTime) {
 		VPoint currentPosition = pedestrian.getPosition();
 		VPoint nextPosition = pedestrian.getNextPosition();
 		if (nextPosition.equals(currentPosition)) {
@@ -73,8 +75,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 
 		} else {
 			pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep());
-			pedestrian.setPosition(nextPosition);
-
+			movePedestrian(topography, pedestrian, pedestrian.getPosition(), nextPosition);
 			// compute velocity by forward difference
 			Vector2D pedVelocity = new Vector2D(nextPosition.x - currentPosition.x, nextPosition.y - currentPosition.y).multiply(1.0 / stepTime);
 			pedestrian.setVelocity(pedVelocity);

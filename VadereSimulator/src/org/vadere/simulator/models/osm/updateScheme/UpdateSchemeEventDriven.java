@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -36,6 +37,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	}
 
 	private void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
+		VPoint oldPosition = pedestrian.getPosition();
+
 		// for the first step after creation, timeOfNextStep has to be initialized
 		if (pedestrian.getTimeOfNextStep() == 0) {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
@@ -43,8 +46,9 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 		pedestrian.updateNextPosition();
-		makeStep(pedestrian, pedestrian.getDurationNextStep());
+		makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
 		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		topography.moveElement(pedestrian, oldPosition);
 	}
 
 	@Override

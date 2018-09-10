@@ -146,7 +146,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 						topography,
 						attributesOSM,
 						Model.findAttributes(attributesList, AttributesFloorField.class),
-						new AttributesPotentialCompact().getPedPotentialWidth()*2,
 						//3.0,
 
 						new EikonalSolver() {

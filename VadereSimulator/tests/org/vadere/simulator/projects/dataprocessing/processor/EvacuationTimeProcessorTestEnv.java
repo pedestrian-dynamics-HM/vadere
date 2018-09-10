@@ -73,7 +73,7 @@ public class EvacuationTimeProcessorTestEnv extends ProcessorTestEnv<NoDataKey, 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(40.0);
 
-				addToExpectedOutput(NoDataKey.key(), Double.NaN);
+				addToExpectedOutput(NoDataKey.key(), Double.POSITIVE_INFINITY);
 
 			}
 		});

@@ -76,7 +76,7 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, 2, 3, 4, 5, 6);
+				b.clear().add(1, 2, 3, 4, 5);
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getSimTimeInSec()).thenReturn(10.0);
 			}
@@ -85,7 +85,7 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 		addSimState(new SimulationStateMock(4) {
 			@Override
 			public void mockIt() {
-				b.clear().add(6);
+				b.clear();
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getSimTimeInSec()).thenReturn(15.0);
 

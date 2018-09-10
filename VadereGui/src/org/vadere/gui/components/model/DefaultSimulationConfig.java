@@ -18,6 +18,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
 	private boolean showWalkdirection = false;
+	private boolean showTargetPotentialField = false;
 	private boolean showPotentialField = false;
 	private boolean showTrajectories = false;
 	private boolean showGrid = false;
@@ -32,13 +33,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	public DefaultSimulationConfig(final DefaultSimulationConfig config) {
 		super(config);
 		this.showDensity = config.showDensity;
-		this.showPotentialField = config.showPotentialField;
+		this.showTargetPotentialField = config.showTargetPotentialField;
 		this.showWalkdirection = config.showWalkdirection;
 		this.showGrid = config.showGrid;
 		this.showPedestrians = config.showPedestrians;
 		this.showLogo = config.showLogo;
 		this.showStairs = config.showStairs;
 		this.showGroups = config.showGroups;
+		this.showPotentialField = config.showPotentialField;
 	}
 
 	public boolean isShowGroups() {
@@ -143,6 +145,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
+	public void setShowTargetPotentialField(final boolean showTargetPotentialField) {
+		this.showTargetPotentialField = showTargetPotentialField;
+		setChanged();
+	}
+
 	public void setShowPotentialField(final boolean showPotentialField) {
 		this.showPotentialField = showPotentialField;
 		setChanged();
@@ -162,6 +169,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public double getPedestrianTorso() {
 		return pedestrianTorso;
+	}
+
+	public boolean isShowTargetPotentialField() {
+		return showTargetPotentialField;
 	}
 
 	public boolean isShowPotentialField() {

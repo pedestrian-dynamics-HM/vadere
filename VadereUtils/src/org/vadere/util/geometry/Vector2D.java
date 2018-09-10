@@ -96,4 +96,9 @@ public class Vector2D extends VPoint {
 		return new Vector2D(this.x - p.x, this.y - p.y);
 	}
 
+	public Vector2D rotate(final double radAngle) {
+		return new Vector2D(x * Math.cos(radAngle) - y * Math.sin(radAngle),
+				x * Math.sin(radAngle) + y * Math.cos(radAngle));
+	}
+
 }

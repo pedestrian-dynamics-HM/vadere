@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
@@ -339,4 +341,33 @@ public class CellGrid {
             return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
         };
     }
+
+    public Pair<Double, Double> getInterpolatedValueAt(@NotNull final VPoint pos) {
+		Point gridPoint = getNearestPointTowardsOrigin(pos);
+		VPoint gridPointCoord = pointToCoord(gridPoint);
+		int incX = 1, incY = 1;
+		double gridPotentials[] = new double[4];
+
+		if (pos.x >= getWidth()) {
+			incX = 0;
+		}
+
+		if (pos.y >= getHeight()) {
+			incY = 0;
+		}
+
+		gridPotentials[0] = getValue(gridPoint).potential;
+		gridPotentials[1] = getValue(gridPoint.x + incX, gridPoint.y).potential;
+		gridPotentials[2] = getValue(gridPoint.x + incX, gridPoint.y + incY).potential;
+		gridPotentials[3] = getValue(gridPoint.x, gridPoint.y + incY).potential;
+
+
+		/* Interpolate the known (potential < Double.MAX_VALUE) values. */
+		Pair<Double, Double> result = InterpolationUtil.bilinearInterpolationWithUnkown(
+				gridPotentials,
+				(pos.x - gridPointCoord.x) / getResolution(),
+				(pos.y - gridPointCoord.y) / getResolution());
+
+		return result;
+	}
 }

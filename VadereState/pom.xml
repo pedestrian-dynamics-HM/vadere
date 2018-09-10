@@ -67,10 +67,11 @@
             <version>2.19</version>
             <configuration>
                 <argLine>${surefireArgLine}</argLine>
-                <failIfNoTests>false</failIfNoTests>
+                <enableAssertions>true</enableAssertions>
                 <excludes>
                     <exclude></exclude>
                 </excludes>
+                <failIfNoTests>false</failIfNoTests>
                 <skipTests>${skip.unit.tests}</skipTests>
             </configuration>
         </plugin>
@@ -92,6 +93,11 @@
           <groupId>${project.groupId}</groupId>
           <artifactId>annotation</artifactId>
           <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+          <version>1.8</version>
       </dependency>
 
   </dependencies>

@@ -51,12 +51,12 @@ public class QueueDetector extends EikonalSolverFMM {
         this.polytope = null;
 
         for (VShape shape : targetShapes) {
-            FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
+            FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
                     new CellState(0.0, PathFindingTag.Target));
         }
 
         for (Obstacle obstacle : topography.getObstacles()) {
-            FloorDiscretizer.setGridValuesForShapeCentered(
+            FloorDiscretizer.setGridValuesForShape(
                     cellGrid, obstacle.getShape(),
                     new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
         }
@@ -74,7 +74,7 @@ public class QueueDetector extends EikonalSolverFMM {
                 topography.getBounds(),
                 topography.getElements(Pedestrian.class),
                 1.0 / cellGrid.getResolution(),
-                new AttributesTimeCost().getStandardDerivation(),
+                new AttributesTimeCost().getStandardDeviation(),
                 attributesPedestrian,
                 loadingStrategy, IGaussianFilter.Type.OpenCL);
 

@@ -1,23 +1,14 @@
 package org.vadere.simulator.entrypoints;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Locale;
-
-import org.apache.log4j.Logger;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.ScenarioRun;
-import org.vadere.util.io.IOUtils;
-
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentGroup;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
 import net.sourceforge.argparse4j.inf.Namespace;
+import net.sourceforge.argparse4j.inf.Subparser;
+import net.sourceforge.argparse4j.inf.Subparsers;
 
+import org.apache.log4j.Logger;
 /**
  * Provides the possibility to start VADERE in console mode.
  * 
@@ -26,63 +17,142 @@ public class VadereConsole {
 
 	private final static Logger logger = Logger.getLogger(VadereConsole.class);
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
 
-		Namespace ns = null;
+//		args = new String[]{"migrate", "--create-new-version",  "0.6", "/home/lphex/hm.d/vadere/VadereSimulator/resources"};
 		try {
-			ns = parser.parseArgs(args);
+			Namespace ns = parser.parseArgs(args);
+			SubCommandRunner sRunner = ns.get("func");
+			sRunner.run(ns, parser);
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
 			System.exit(1);
-		}
-
-		Locale.setDefault(Locale.ENGLISH);
-		String pathToScenarioFile = ns.getString("scenario-file");
-		String outputDir = ns.get("output-dir");
-
-		if (pathToScenarioFile == null) {
-			System.err.println("Too few arguments. Exiting.");
-			parser.printHelp();
+		} catch (Exception e) {
+			logger.error("error in command:" + e.getMessage());
 			System.exit(1);
 		}
 
-		String scenarioFilePath = Paths.get(pathToScenarioFile).toString();
-		String scenarioFile = Paths.get(pathToScenarioFile).getFileName().toString();
-		String projectDirectory = Paths.get(ns.getString("scenario-file")).getParent().toString();
-
-		if(!Files.exists(Paths.get(projectDirectory, scenarioFile))) {
-			System.err.println("The file " + Paths.get(projectDirectory, scenarioFile) + " does not exist");
-		}
-
-		logger.info(String.format("Running VADERE on %s...", scenarioFilePath));
-
-		try {
-			Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(projectDirectory,scenarioFile);
-			if(outputDir != null) {
-				new ScenarioRun(scenario, outputDir,null).run();
-			}
-			else {
-				new ScenarioRun(scenario, null).run();
-			}
-
-		} catch (Exception e) {
-			logger.error(e);
-			System.exit(-1);
-		}
 	}
 
 	private static ArgumentParser createArgumentParser() {
 		ArgumentParser parser = ArgumentParsers.newArgumentParser("Vadere")
 				.defaultHelp(true)
 				.description("Runs the VADERE pedestrian simulator.");
-		parser.addArgument("scenario-file").required(true)
-				.help("Path to the scenario file.");
-		parser.addArgument("output-dir").required(false)
-				.help("Path to the directory of the output. By default this is ./output of the directory of the executable.");
+		Subparsers subparsers = parser.addSubparsers()
+										.title("subcommands")
+										.description("valid subcommands")
+										.metavar("COMMAND");
+
+		// Run Project
+		Subparser projectRun = subparsers
+				.addParser(SubCommand.PROJECT_RUN.getCmdName())
+				.help("This command uses a VADERE project and runs selected scenario.")
+				.setDefault("func", new ProjectRunSubCommand());
+		projectRun.addArgument("--project-dir", "-p")
+				.required(true)
+				.type(String.class)
+				.dest("project-dir")
+				.help("Path to project directory");
+		projectRun.addArgument("--scenario-file", "-f")
+				.required(true)
+				.type(String.class)
+				.dest("scenario-file")
+				.help("Name of Scenario file");
+
+		// Run Scenario
+		Subparser scenarioRun = subparsers
+				.addParser(SubCommand.SCENARO_RUN.getCmdName())
+				.help("Run scenario without a project")
+				.setDefault("func", new ScenarioRunSubCommand());
+		scenarioRun.addArgument("--output-dir", "-o")
+				.required(false)
+				.setDefault("output")
+				.dest("output-dir") // set name in namespace
+				.type(String.class)
+				.help("Supply different output directory path to use.");
+
+		scenarioRun.addArgument("--scenario-file", "-f")
+				.required(true)
+				.type(String.class)
+				.dest("scenario-file")
+				.help("Scenario file to run");
+
+		// Run SUQ
+		Subparser suqRun = subparsers
+				.addParser(SubCommand.SUQ.getCmdName())
+				.help("Run a single scenario file but specify output path manually.")
+				.setDefault("func", new SuqSubCommand());
+
+		suqRun.addArgument("--output-dir", "-o")
+				.required(false)
+				.setDefault("output")
+				.dest("output-dir") // set name in namespace
+				.type(String.class)
+				.help("Supply different output directory path to use.");
+
+		suqRun.addArgument("--scenario-file", "-f")
+				.required(true)
+				.type(String.class)
+				.dest("scenario-file")
+				.help("Scenario files to run");
+
+
+		// Run Migration Assistant
+		Subparser migrationAssistant = subparsers
+				.addParser(SubCommand.MIGRATE.getCmdName())
+				.help("Run migration assistant on single sceanrio file.")
+				.setDefault("func", new MigrationSubCommand());
+
+		migrationAssistant.addArgument("path")
+				.nargs("+")
+				.metavar("PATH")
+				.required(true)
+				.type(String.class)
+				.dest("paths")
+				.help("The scenario files or directories on to operate on. Directories containing" +
+						"the files DO_NOT_MIGRATE or DO_NOT_MIGRATE_TREE will be ignored.");
+
+		String[] versions = Version.stringValues(Version.NOT_A_RELEASE);
+		migrationAssistant.addArgument("--target-version")
+				.required(false)
+				.type(String.class)
+				.dest("target-version")
+				.choices(versions)
+				.setDefault(Version.latest().label())
+				.help("Default: " + Version.latest().label() + " Use one of the shown version strings to indicate the target version." +
+						" If not specified the last version is used." );
+
+		migrationAssistant.addArgument("--output-file", "-o")
+				.required(false)
+				.type(String.class)
+				.metavar("OUTPUT-PATH")
+				.dest("output-path")
+				.help("Write new version to this directory. If not specified backup input file and overwrite.");
+
+		migrationAssistant.addArgument("--revert-migration")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.dest("revert-migration")
+				.help("If set vadere will search for a <scenario-file>.legacy and will replace the current version with this backup." +
+						" The Backup must be in the same directory");
+
+		migrationAssistant.addArgument("--recursive", "-r")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.dest("recursive")
+				.setDefault(false)
+				.help("If PATH contains a directory instead of a scenario file recursively search " +
+						"the directory tree for scenario files and apply the command");
+
+		migrationAssistant.addArgument("--create-new-version")
+				.required(false)
+				.type(String.class)
+				.dest("create-new-version")
+				.help("Create new transformation and identity file based on current latest version" +
+						"PATH must point to the directory containing the old transformation files." +
+						" This Argument takes the new Version Label as input");
+
 		return parser;
 	}
 

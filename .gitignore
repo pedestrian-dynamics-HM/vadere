@@ -3,6 +3,9 @@ target/
 *.out
 *.preferences.xml
 
+#Tools and build utils
+bin/
+
 #IntelliJ
 .idea/
 *.iml
@@ -17,9 +20,11 @@ target/
 VadereGui/*.png
 VadereGui/*.svg
 VadereGui/*.mov
+VadereGui/testResources/**/*.legacy
 VadereUtils/testreports/*.txt
 VadereUtils/output/*
 VadereSimulator/resources/current_commit_hash.txt
+VadereSimulator/testResources/**/*.legacy
 
 #model test output
 VadereModelTests/TestOSM/output/*
@@ -27,6 +32,12 @@ VadereModelTests/TestOSM_Group/output/*
 VadereModelTests/TestSFM/output/*
 VadereModelTests/TestGNM/output/*
 VadereModelTests/TestOVM/output/*
+VadereModelTests/TestOSM/legacy/*
+VadereModelTests/TestOSM_Group/legacy/*
+VadereModelTests/TestSFM/legacy/*
+VadereModelTests/TestGNM/legacy/*
+VadereModelTests/TestOVM/legacy/*
+VadereModelTests/TESTOVM/legacy/*
 VadereModelTests/TestOSM/processed output/*
 VadereModelTests/TestOSM_Group/processed output/*
 VadereModelTests/TestSFM/processed output/*
@@ -35,7 +46,6 @@ VadereModelTests/TestOVM/processed output/*
 VadereUtils/output/*
 
 #deprecated: can potentially be removed
-bin/
 VadereGui/output/
 
 #mac osx files
@@ -44,3 +54,4 @@ VadereGui/output/
 #linux deskopt dotfiles
 **/.directory
 /VadereModelTests/TestStairs/output
+/VadereModelTests/TestStairs/legacy

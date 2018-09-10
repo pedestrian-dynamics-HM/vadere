@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
@@ -113,10 +114,10 @@ public class PedestrianOSM extends Pedestrian {
 
 		if (PotentialFieldTargetRingExperiment.class.equals(potentialFieldTarget.getClass())) {
 			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-			this.relevantPedestrians = potentialFieldPedestrian
-					.getRelevantAgents(reachableArea, this, topography);
 
+			refreshRelevantPedestrians();
 			nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
+
 			// if (nextPosition.distance(this.getPosition()) < this.minStepLength) {
 			// nextPosition = this.getPosition();
 			// }
@@ -126,10 +127,6 @@ public class PedestrianOSM extends Pedestrian {
 			this.nextPosition = getPosition();
 		} else {
 			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-
-			this.relevantPedestrians = potentialFieldPedestrian
-					.getRelevantAgents(reachableArea, this, topography);
-
 
 			// get stairs pedestrian is on - remains null if on area
 			Stairs stairs = null;
@@ -141,10 +138,15 @@ public class PedestrianOSM extends Pedestrian {
 			}
 
 			if (stairs == null) { // meaning pedestrian is on area
+
+				refreshRelevantPedestrians();
 				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
+
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
 				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
+
+				refreshRelevantPedestrians();
 				nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
 				// Logger.getLogger(this.getClass()).info("Pedestrian " + this.getId() + " is on
 				// stairs @position: " + nextPosition);
@@ -247,8 +249,17 @@ public class PedestrianOSM extends Pedestrian {
 		this.timeCredit = timeCredit;
 	}
 
+	public void refreshRelevantPedestrians() {
+		VCircle reachableArea = new VCircle(getPosition(), getStepSize());
+		relevantPedestrians = potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography());
+	}
+
 
 	// Setters...
+
+	public void setRelevantPedestrians(@NotNull final Collection<? extends Agent> relevantPedestrians) {
+		this.relevantPedestrians = relevantPedestrians;
+	}
 
 	public Collection<? extends Agent> getRelevantPedestrians() {
 		return relevantPedestrians;

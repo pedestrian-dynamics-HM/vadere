@@ -1,6 +1,7 @@
 package org.vadere.util.geometry;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,75 +15,19 @@ import org.vadere.util.geometry.shapes.VPoint;
 /**
  * A grid augmenting the position of generic objects, for faster access. O(1)
  * instead of O(n) for one fixed radius check. See
- * {@link LinkedCellsGrid#getObjects(java.awt.geometry.shapes.VPoint, double)}.
+ * {@link LinkedCellsGrid#getObjects(VPoint, double)}.
  * 
  * 
  */
-public class LinkedCellsGrid<T> implements Iterable<T> {
-	/**
-	 * Key value pair holding an object with its assigned position.
-	 * 
-	 * 
-	 */
-	private class ObjectWithPosition<U> {
-		U object;
-		VPoint position;
-
-		public ObjectWithPosition(U object, VPoint pos) {
-			this.object = object;
-			this.position = pos;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((object == null) ? 0 : object.hashCode());
-			result = prime * result
-					+ ((position == null) ? 0 : position.hashCode());
-			return result;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			ObjectWithPosition<U> other = (ObjectWithPosition<U>) obj;
-			if (object == null) {
-				if (other.object != null) {
-					return false;
-				}
-			} else if (!object.equals(other.object)) {
-				return false;
-			}
-			if (position == null) {
-				if (other.position != null) {
-					return false;
-				}
-			} else if (!position.equals(other.position)) {
-				return false;
-			}
-			return true;
-		}
-	}
-
+public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	final private double left;
 	final private double top;
 	final private double width;
 	final private double height;
 	private GridCell<T>[][] grid;
-	private List<ObjectWithPosition<T>> totalObjects = new LinkedList<ObjectWithPosition<T>>();
 	private int[] gridSize = new int[2];
 	private double[] cellSize = new double[2];
+	private int size;
 
 	/**
 	 * One cell in the grid. It contains a mapping from points to lists of
@@ -92,8 +37,8 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	 * @param <E>
 	 *        type of objects stored in this cell.
 	 */
-	private class GridCell<E> {
-		public Map<VPoint, List<E>> objects = new HashMap<VPoint, List<E>>();
+	private class GridCell<E extends PointPositioned> {
+		public List<E> objects = new ArrayList<>();
 
 		@Override
 		public int hashCode() {
@@ -148,7 +93,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 		for (int r = 0; r < grid.length; r++) {
 			// TODO [priority=medium] [task=test] changed this [20.08.2014] here 1 to r - pls check this
 			for (int c = 0; c < grid[r].length; c++) {
-				grid[r][c] = new GridCell<T>();
+				grid[r][c] = new GridCell<>();
 			}
 		}
 
@@ -177,6 +122,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 		this.top = top;
 		this.width = width;
 		this.height = height;
+		this.size = 0;
 
 
 		// create grid
@@ -221,30 +167,20 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Adds a given object to the grid at the given position. The position is
+	 * Adds a given object to the grid at position of the object. The position is
 	 * discretized automatically to fit in the cells.
 	 * 
-	 * @param object
-	 *        object to add
-	 * @param pos
-	 *        position in the grid
+	 * @param object object to add
 	 */
-	public void addObject(final T object, final VPoint pos) {
-		int[] gridPos = gridPos(pos);
+	public synchronized void addObject(final T object) {
+		int[] gridPos = gridPos(object.getPosition());
+		grid[gridPos[0]][gridPos[1]].objects.add(object);
+		size++;
+	}
 
-		// store object in the grid cell.
-		// if there is nothing there yet, create the list.
-		if (!this.grid[gridPos[0]][gridPos[1]].objects.containsKey(pos)) {
-			this.grid[gridPos[0]][gridPos[1]].objects.put(pos,
-					new LinkedList<T>());
-		}
-		List<T> objects = this.grid[gridPos[0]][gridPos[1]].objects.get(pos);
-		// add the object to the list stored in this cell
-		objects.add(object);
-
-		// also store it in the total objects list for easy iteration over all
-		// stored objects.
-		totalObjects.add(new ObjectWithPosition<T>(object, pos));
+	public void moveObject(final T object, final VPoint oldPosition) {
+		removeObject(object, oldPosition);
+		addObject(object);
 	}
 
 	/**
@@ -256,24 +192,24 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	 *        radius of the ball
 	 * @return set of objects, or an empty set if no objects are present.
 	 */
-	public List<T> getObjects(final VPoint pos, final double radius) {
+	public synchronized List<T> getObjects(final VPoint pos, final double radius) {
 		final List<T> result = new LinkedList<T>();
 
 		int[] gridPos = gridPos(pos);
 		int[] discreteRad = new int[2];
-		discreteRad[0] = (int) Math.ceil(radius / this.cellSize[0]);
-		discreteRad[1] = (int) Math.ceil(radius / this.cellSize[1]);
+		discreteRad[0] = (int) Math.ceil(radius / cellSize[0]);
+		discreteRad[1] = (int) Math.ceil(radius / cellSize[1]);
 
-		final int maxRow = Math.min(this.gridSize[0] - 1, gridPos[0] + discreteRad[0]);
-		final int maxCol = Math.min(this.gridSize[1] - 1, gridPos[1] + discreteRad[1]);
+		final int maxRow = Math.min(gridSize[0] - 1, gridPos[0] + discreteRad[0]);
+		final int maxCol = Math.min(gridSize[1] - 1, gridPos[1] + discreteRad[1]);
 
 		for (int row = Math.max(0, gridPos[0] - discreteRad[0]); row <= maxRow; row++) {
 			for (int col = Math.max(0, gridPos[1] - discreteRad[1]); col <= maxCol; col++) {
 
-				for (Entry<VPoint, List<T>> entry : this.grid[row][col].objects.entrySet()) {
+				for (T object : grid[row][col].objects) {
 					// if the given position is closer than the radius, add all objects stored there
-					if (entry.getKey().distance(pos) < radius) {
-						result.addAll(entry.getValue());
+					if (object.getPosition().distance(pos) < radius) {
+						result.add(object);
 					}
 				}
 			}
@@ -288,26 +224,17 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	 * 
 	 * @param object
 	 */
-	public void removeObject(T object) {
-		for (Iterator<ObjectWithPosition<T>> iter = totalObjects.iterator(); iter
-				.hasNext();) {
-			ObjectWithPosition<T> obj = iter.next();
-			if (obj.object.equals(object)) {
-				iter.remove();
+	public synchronized void removeObject(T object) {
+		int[] gridPos = gridPos(object.getPosition());
+		if(grid[gridPos[0]][gridPos[1]].objects.removeIf(element -> element.equals(object))){
+			size--;
+		}
+	}
 
-				// get the list of objects stored at the given position and
-				// remove the object.
-				VPoint pos = obj.position;
-				int[] gridPos = gridPos(pos);
-				List<T> objectsAtPos = this.grid[gridPos[0]][gridPos[1]].objects
-						.get(pos);
-				objectsAtPos.remove(object);
-
-				// if the list is empty, remove the entry at this position
-				if (objectsAtPos.isEmpty()) {
-					this.grid[gridPos[0]][gridPos[1]].objects.remove(pos);
-				}
-			}
+	public synchronized void removeObject(T object, final VPoint oldPosition) {
+		int[] gridPos = gridPos(oldPosition);
+		if(grid[gridPos[0]][gridPos[1]].objects.removeIf(element -> element.equals(object))){
+			size--;
 		}
 	}
 
@@ -315,8 +242,20 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	 * Removes all objects.
 	 */
 	public void clear() {
-		totalObjects.clear();
-		this.grid = generateGrid(gridSize[0], gridSize[1]);
+		grid = generateGrid(gridSize[0], gridSize[1]);
+		size = 0;
+	}
+
+	public List<T> getElements() {
+		List<T> elements = new ArrayList<>();
+		for (int r = 0; r < grid.length; r++) {
+			// TODO [priority=medium] [task=test] changed this [20.08.2014] here 1 to r - pls check this
+			for (int c = 0; c < grid[r].length; c++) {
+				elements.addAll(grid[r][c].objects);
+			}
+		}
+
+		return elements;
 	}
 
 	/**
@@ -324,31 +263,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	 */
 	@Override
 	public Iterator<T> iterator() {
-		return new Iterator<T>() {
-			private Iterator<ObjectWithPosition<T>> objectsIter = totalObjects
-					.iterator();
-
-			@Override
-			public boolean hasNext() {
-				return objectsIter.hasNext();
-			}
-
-			@Override
-			public T next() {
-				// only return the object itself, not the position
-				ObjectWithPosition<T> obj = objectsIter.next();
-				if (obj == null) {
-					return null;
-				} else {
-					return obj.object;
-				}
-			}
-
-			@Override
-			public void remove() {
-				objectsIter.remove();
-			}
-		};
+		return getElements().iterator();
 	}
 
 	/**
@@ -357,7 +272,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 	 * @return the size (number of different keys &lt;T&gt;) of List
 	 */
 	public int size() {
-		return totalObjects.size();
+		return size;
 	}
 
 	/**
@@ -392,8 +307,6 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = java.lang.Double.doubleToLongBits(top);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result
-				+ ((totalObjects == null) ? 0 : totalObjects.hashCode());
 		temp = java.lang.Double.doubleToLongBits(width);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
@@ -431,13 +344,6 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 		}
 		if (java.lang.Double.doubleToLongBits(top) != java.lang.Double
 				.doubleToLongBits(other.top)) {
-			return false;
-		}
-		if (totalObjects == null) {
-			if (other.totalObjects != null) {
-				return false;
-			}
-		} else if (!totalObjects.equals(other.totalObjects)) {
 			return false;
 		}
 		if (java.lang.Double.doubleToLongBits(width) != java.lang.Double

@@ -159,7 +159,7 @@ public abstract class AbstractFactoryProcessor extends AbstractProcessor {
 	protected void createSingletone(final String instanceType, PrintWriter writer){
 		writer.append("	private static ").append(instanceType).append(" instance;").println();
 		writer.println();
-		writer.println("	//performance threadsafe Singletone. Sync block will only be used once");
+		writer.println("	//good performance threadsafe Singletone. Sync block will only be used once");
 		writer.append("	public static ").append(instanceType).append(" instance(){").println();
 		writer.println("		if(instance ==  null){");
 		writer.append("			synchronized (").append(instanceType).append(".class){").println();

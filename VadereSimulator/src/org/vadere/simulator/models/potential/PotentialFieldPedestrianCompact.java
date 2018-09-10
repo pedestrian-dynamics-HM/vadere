@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
@@ -63,21 +64,12 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 	}
 
 	@Override
-	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
+	public Collection<Pedestrian> getRelevantAgents(@NotNull final VCircle stepDisc,
 			Agent pedestrian, Topography scenario) {
 
-		List<Pedestrian> result = new LinkedList<>();
-
 		// select pedestrians within recognition distance
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
-				.getObjects(relevantArea.getCenter(), this.width + pedestrian.getRadius() +
-						attributes.getVisionFieldRadius());
-
-		result = closePedestrians;
-
-
-
-		return result;
+		return scenario.getSpatialMap(Pedestrian.class)
+				.getObjects(stepDisc.getCenter(), stepDisc.getRadius() + this.width + pedestrian.getRadius() + attributes.getVisionFieldRadius());
 	}
 
 	@Override

@@ -1,0 +1,8 @@
+# Marker-File for MigrationUtil
+
+The content of this file is ignored.
+
+All scenario files in this directory and all child directories will _NOT_ be migrated.
+
+Use DO_NOT_MIGRATE or .DO_NOT_MIGRATE to stop migration only for the current directory and
+allow traversal down to child directories.

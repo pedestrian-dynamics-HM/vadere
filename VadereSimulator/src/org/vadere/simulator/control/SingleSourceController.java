@@ -9,8 +9,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.LinkedList;
 import java.util.Random;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-
 public class SingleSourceController extends SourceController {
 
 	private int numberToSpawn;
@@ -36,9 +34,7 @@ public class SingleSourceController extends SourceController {
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					} else {
-						for (int i = 0; i < numberToSpawn; i++) {
-							spawnPoints.add(spawnArray.getNextRandomSpawnPoint(random));
-						}
+						spawnPoints = spawnArray.getNextRandomSpawnPoints(numberToSpawn, random, getDynElementsAtSource());
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					}
@@ -50,9 +46,7 @@ public class SingleSourceController extends SourceController {
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					} else {
-						for (int i = 0; i < numberToSpawn; i++) {
-							spawnPoints.add(spawnArray.getNextSpawnPoint());
-						}
+						spawnPoints = spawnArray.getNextSpawnPoints(numberToSpawn, getDynElementsAtSource());
 						numberToSpawn -= spawnPoints.size();
 						assert (numberToSpawn >= 0);
 					}
