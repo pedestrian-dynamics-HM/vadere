@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A good changelog entry should be descriptive and concise. It should explain the change to a reader who has *zero* context about the change. Each change should be categorized into on of the following types: `added`, `removed`, `changed`, `fixed`, `performance`, `security`, `deprecated` or `other`.
+A good changelog entry should be descriptive and concise. It should explain the change to a reader who has **zero** context about the change. Each change should be categorized into one of the following types: `added`, `removed`, `changed`, `fixed`, `performance`, `security`, `deprecated` or `other`.
 
 - **Bad:** Highlight agents.
 - **Good:** In class `OnlineVisualization`, highlight the agent which was selected with left-mouse button.
