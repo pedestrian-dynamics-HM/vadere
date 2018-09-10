@@ -43,7 +43,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 		pedestrian.updateNextPosition();
-		pedestrian.makeStep(pedestrian.getDurationNextStep());
+		makeStep(pedestrian, pedestrian.getDurationNextStep());
 		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 	}
 

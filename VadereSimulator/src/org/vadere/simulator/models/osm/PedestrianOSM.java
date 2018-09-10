@@ -153,25 +153,6 @@ public class PedestrianOSM extends Pedestrian {
 
 	}
 
-	public void makeStep(double stepTime) {
-		VPoint currentPosition = getPosition();
-
-		if (nextPosition.equals(currentPosition)) {
-			timeCredit = 0;
-			setVelocity(new Vector2D(0, 0));
-
-		} else {
-			timeCredit = timeCredit - durationNextStep;
-			setPosition(nextPosition);
-
-			// compute velocity by forward difference
-			setVelocity(new Vector2D(nextPosition.x - currentPosition.x,
-					nextPosition.y - currentPosition.y).multiply(1.0 / stepTime));
-		}
-
-		strides.add(Pair.of(currentPosition.distance(nextPosition), getTimeOfNextStep()));
-	}
-
 	public double getStepSize() {
 
 		if (attributesOSM.isDynamicStepLength()) {

@@ -270,8 +270,7 @@ public class LinkedCellsGrid<T> implements Iterable<T> {
 		for (int row = Math.max(0, gridPos[0] - discreteRad[0]); row <= maxRow; row++) {
 			for (int col = Math.max(0, gridPos[1] - discreteRad[1]); col <= maxCol; col++) {
 
-				for (Entry<VPoint, List<T>> entry : this.grid[row][col].objects
-						.entrySet()) {
+				for (Entry<VPoint, List<T>> entry : this.grid[row][col].objects.entrySet()) {
 					// if the given position is closer than the radius, add all objects stored there
 					if (entry.getKey().distance(pos) < radius) {
 						result.addAll(entry.getValue());

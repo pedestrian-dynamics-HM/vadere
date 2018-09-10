@@ -71,10 +71,10 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 			case RETRY:
 				updateParallelSeek(pedestrian,0.0);
 			case MOVE:
-				updateParallelMove(pedestrian, timeStepInSec);
+				updateParallelMove(pedestrian);
 				break;
 			case CONFLICTS:
-				updateParallelConflicts(pedestrian, timeStepInSec);
+				updateParallelConflicts(pedestrian);
 				break;
 			case STEPS:
 				updateParallelSteps(pedestrian, timeStepInSec);
@@ -84,6 +84,12 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
+	/**
+	 * Computes the next pedestrian position without update the position.
+	 *
+	 * @param pedestrian    the pedestrian
+	 * @param timeStepInSec the duration of the time step in seconds
+	 */
 	protected void updateParallelSeek(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
@@ -94,14 +100,27 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private void updateParallelMove(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
+	/**
+	 * Sets the last and (current) position of the pedestrian. The velocity and the
+	 * timeCredit will be updated later since the move operation might reverted by
+	 * {@link UpdateSchemeParallel#updateParallelConflicts(PedestrianOSM)}.
+	 *
+	 * @param pedestrian the pedestrian
+	 */
+	private void updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
 			pedestrian.setLastPosition(pedestrian.getPosition());
 			pedestrian.setPosition(pedestrian.getNextPosition());
 		}
 	}
 
-	private void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
+	/**
+	 * Resolves conflicts: If there is any overlapping pedestrian with a smaller timeCredit,
+	 * the pedestrians position will be set to his last position i.e. a rollback of the move step.
+	 *
+	 * @param pedestrian the pedestrian for which a rollback might be performed.
+	 */
+	private void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
 			List<Agent> others = getCollisionPedestrians(pedestrian);
 
@@ -110,11 +129,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 			for (Agent ped : others) {
 				double creditOther = ((PedestrianOSM) ped).getTimeCredit();
 
-				if (creditOther < pedestrian.getTimeCredit()) {
-					undoStep = true;
-					break;
-				} else if (creditOther == pedestrian.getTimeCredit()
-						&& ped.getId() < pedestrian.getId()) {
+				if ((creditOther < pedestrian.getTimeCredit()) ||
+						(creditOther == pedestrian.getTimeCredit() && ped.getId() < pedestrian.getId())) {
 					undoStep = true;
 					break;
 				}
@@ -126,6 +142,12 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
+	/**
+	 * Updates the timeCredit and the velocity of the pedestrian.
+	 *
+	 * @param pedestrian    the pedestrian
+	 * @param timeStepInSec the duration of the time step in seconds
+	 */
 	private void updateParallelSteps(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
 		if (movedPedestrians.contains(pedestrian)) {
 			// did not want to make a step
@@ -150,26 +172,16 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		}
 	}
 
-	private Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
-	                                                 Agent pedestrian, Topography scenario) {
-		List<Pedestrian> result;
-
-		// select pedestrians within recognition distance
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
-				.getObjects(relevantArea.getCenter(),
-						new AttributesPotentialCompact().getVisionFieldRadius() + pedestrian.getRadius()
-								+ new AttributesPotentialCompact().getPedPotentialWidth());
-
-		result = closePedestrians;
-		return result;
-	}
-
-
+	/**
+	 * Computes a {@link List<Agent>} of pedestrians overlapping / colliding with the pedestrian
+	 * @param pedestrian the pedestrian
+	 * @return a {@link List<Agent>} of pedestrians colliding with the pedestrian
+	 */
 	protected List<Agent> getCollisionPedestrians(@NotNull final PedestrianOSM pedestrian) {
 		LinkedList<Agent> result = new LinkedList<>();
 
-		for (Agent ped : getRelevantAgents(new VCircle(pedestrian.getPosition(), pedestrian.getStepSize()), pedestrian, topography)) {
-			if (ped.getId() != pedestrian.getId()) {
+		for (Agent ped : pedestrian.getRelevantPedestrians()) {
+			if (!ped.equals(pedestrian)) {
 				double thisDistance = ped.getPosition().distance(pedestrian.getPosition());
 
 				if (ped.getRadius() + pedestrian.getRadius() > thisDistance) {
@@ -177,11 +189,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 				}
 			}
 		}
-
 		return result;
 	}
-
-
 
 	@Override
 	public void elementAdded(Pedestrian element) {}

@@ -18,14 +18,14 @@ import java.util.concurrent.Future;
 /**
  * @author Benedikt Zoennchen
  */
-public class UpdateSchemeCLParellel extends UpdateSchemeParallel {
+public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 
 	private CLOptimalStepsModel clOptimalStepsModel;
 
 	private int counter = 0;
-	private Logger logger = LogManager.getLogger(UpdateSchemeCLParellel.class);
+	private Logger logger = LogManager.getLogger(UpdateSchemeCLParallel.class);
 
-	public UpdateSchemeCLParellel(@NotNull final Topography topography, @NotNull final CLOptimalStepsModel clOptimalStepsModel) {
+	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLOptimalStepsModel clOptimalStepsModel) {
 		super(topography);
 		this.clOptimalStepsModel = clOptimalStepsModel;
 	}

@@ -1,16 +1,19 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElementAddListener;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.UpdateType;
+import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.potential.calculators.EikonalSolver;
@@ -52,13 +55,32 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 					targetEikonalSolver,
 					distanceEikonalSolver);
 
-			return new UpdateSchemeCLParellel(topography, clOptimalStepsModel);
+			return new UpdateSchemeCLParallel(topography, clOptimalStepsModel);
 
 		} catch (OpenCLException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 
+	}
+
+	default void makeStep(@NotNull final PedestrianOSM pedestrian, final double stepTime) {
+		VPoint currentPosition = pedestrian.getPosition();
+		VPoint nextPosition = pedestrian.getNextPosition();
+		if (nextPosition.equals(currentPosition)) {
+			pedestrian.setTimeCredit(0);
+			pedestrian.setVelocity(new Vector2D(0, 0));
+
+		} else {
+			pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep());
+			pedestrian.setPosition(nextPosition);
+
+			// compute velocity by forward difference
+			Vector2D pedVelocity = new Vector2D(nextPosition.x - currentPosition.x, nextPosition.y - currentPosition.y).multiply(1.0 / stepTime);
+			pedestrian.setVelocity(pedVelocity);
+		}
+
+		pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), pedestrian.getTimeOfNextStep()));
 	}
 
 }

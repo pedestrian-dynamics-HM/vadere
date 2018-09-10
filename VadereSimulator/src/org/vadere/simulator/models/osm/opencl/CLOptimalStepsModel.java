@@ -1,7 +1,5 @@
 package org.vadere.simulator.models.osm.opencl;
 
-import com.sun.tools.internal.xjc.model.Model;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -11,10 +9,8 @@ import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -28,10 +24,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;

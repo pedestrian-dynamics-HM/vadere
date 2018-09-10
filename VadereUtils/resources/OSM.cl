@@ -153,25 +153,25 @@ inline float getFullPedestrianPotential(
     uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
 
     //printf("global_size (%d)\n", get_global_size(0));
-    /*for(int i = 0; i < get_global_size(0); i++) {
+    for(int i = 0; i < get_global_size(0); i++) {
          float2 otherPedestrian = (float2) (orderedPedestrians[i*3], orderedPedestrians[i*3+1]);
          potential += getPedestrianPotential(pos, otherPedestrian);
-    }*/
+    }
 
 
     //Accumulate surrounding cells
     // TODO: index check!
-    for(int y = -1; y <= 1; y++) {
+    /*for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
             //Get start particle index for this cell
 
-            uint2 uGridPos = (uint2) (((int)gridPos.x) + x, ((int)gridPos.y) + y);
+            int2 uGridPos = (gridPos.x + x , gridPos.y + y);
 
             if(uGridPos.x < 0 || uGridPos.y < 0){
                 continue;
             }
 
-            uint   hash = getGridHash(uGridPos, gridSize);
+            uint   hash = getGridHash((uint2)uGridPos, gridSize);
             uint startI = d_CellStart[hash];
 
             //Skip empty cell
@@ -188,7 +188,7 @@ inline float getFullPedestrianPotential(
               //potential += 0.01f;
             }
         }
-    }
+    }*/
 
     potential -= getPedestrianPotential(pos, pedPosition);
     return potential;

@@ -11,7 +11,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	private final Topography topography;
 
-	public UpdateSchemeSequential(@NotNull Topography topography) {
+	public UpdateSchemeSequential(@NotNull final Topography topography) {
 		this.topography = topography;
 	}
 
@@ -34,7 +34,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 		while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();
-			pedestrian.makeStep(timeStepInSec);
+			makeStep(pedestrian, timeStepInSec);
 			pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 		}
 	}
