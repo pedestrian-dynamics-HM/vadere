@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * A grid augmenting the position of generic objects, for faster access. O(1)
@@ -100,6 +102,18 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 		return this.grid;
 	}
 
+	public int getGridWidth() {
+		return gridSize[0];
+	}
+
+	public int getGridHeight() {
+		return gridSize[1];
+	}
+
+	public LinkedCellsGrid(@NotNull final VRectangle bound, double sideLength) {
+		this(bound.x, bound.y, bound.width, bound.height, sideLength);
+	}
+
 	/**
 	 * Generates a LinkedCellsGrid with given dimension, position and number of
 	 * items on one side.
@@ -139,8 +153,6 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 		this.cellSize[1] = this.height / gridSize[1];
 
 		this.grid = generateGrid(this.gridSize[0], this.gridSize[1]);
-
-
 	}
 
 	/**
@@ -152,7 +164,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	 * @return the position in the grid, from 0 to this.gridSize-1 in both
 	 *         coordinates.
 	 */
-	private int[] gridPos(VPoint pos) {
+	public int[] gridPos(VPoint pos) {
 		// compute position in the grid
 		int iX = (int) Math.max(
 				0,

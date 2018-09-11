@@ -110,6 +110,9 @@ public class PedestrianOSM extends Pedestrian {
 		this.updateScheme.update(timeStepInSec, currentTimeInSec, callMethod);
 	}*/
 
+	/**
+	 * Expensive call!
+	 */
 	public void updateNextPosition() {
 
 		if (PotentialFieldTargetRingExperiment.class.equals(potentialFieldTarget.getClass())) {

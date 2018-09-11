@@ -34,6 +34,8 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			case PARALLEL: return new UpdateSchemeParallel(topography);
 			case EVENT_DRIVEN: return new UpdateSchemeEventDriven(topography);
 			case SHUFFLE: return new UpdateSchemeShuffle(topography, random);
+			//TODO: magic number!
+			case EVENT_DRIVEN_PARALLEL: return new UpdateSchemeEventDrivenParallel(topography, 0.5);
 			default: throw new IllegalArgumentException(updateType + " is not supported.");
 		}
 	}
@@ -63,7 +65,9 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 
 	default void movePedestrian(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, @NotNull final VPoint from, @NotNull final VPoint to) {
 		pedestrian.setPosition(to);
-		topography.moveElement(pedestrian, from);
+		synchronized (topography) {
+			topography.moveElement(pedestrian, from);
+		}
 	}
 
 	default void makeStep(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, final double stepTime) {

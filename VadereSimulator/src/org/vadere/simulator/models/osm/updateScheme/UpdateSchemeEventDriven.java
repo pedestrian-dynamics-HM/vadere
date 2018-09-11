@@ -9,10 +9,13 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+/**
+ *
+ */
 public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	private final Topography topography;
-	private PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
+	protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 
 	public UpdateSchemeEventDriven(@NotNull final Topography topography) {
 		this.topography = topography;
@@ -27,7 +30,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		}
 
 		if(!pedestrianEventsQueue.isEmpty()) {
-			// default is fixed order sequential update
+			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
 				update(ped, currentTimeInSec);
@@ -36,7 +39,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		}
 	}
 
-	private void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
+	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
 		VPoint oldPosition = pedestrian.getPosition();
 
 		// for the first step after creation, timeOfNextStep has to be initialized
@@ -44,9 +47,11 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
 		}
 
+		// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 		pedestrian.updateNextPosition();
 		makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
+
 		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		topography.moveElement(pedestrian, oldPosition);
 	}
