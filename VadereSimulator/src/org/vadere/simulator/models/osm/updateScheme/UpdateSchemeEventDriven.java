@@ -34,6 +34,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
 				update(ped, currentTimeInSec);
+				//System.out.println(ped.getId());
 				pedestrianEventsQueue.add(ped);
 			}
 		}
@@ -70,14 +71,19 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	 * Compares the time of the next possible move.
 	 */
 	private class ComparatorPedestrianOSM implements Comparator<PedestrianOSM> {
-
 		@Override
 		public int compare(PedestrianOSM ped1, PedestrianOSM ped2) {
-			// TODO [priority=low] [task=refactoring] use Double.compare() oder compareTo()
-			if (ped1.getTimeOfNextStep() < ped2.getTimeOfNextStep()) {
-				return -1;
-			} else {
-				return 1;
+			int timeCompare = Double.compare(ped1.getTimeOfNextStep(), ped2.getTimeOfNextStep());
+			if(timeCompare != 0) {
+				return timeCompare;
+			}
+			else {
+				if(ped1.getId() < ped2.getId()) {
+					return -1;
+				}
+				else {
+					return 1;
+				}
 			}
 		}
 	}

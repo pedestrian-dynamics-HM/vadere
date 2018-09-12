@@ -35,7 +35,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			case EVENT_DRIVEN: return new UpdateSchemeEventDriven(topography);
 			case SHUFFLE: return new UpdateSchemeShuffle(topography, random);
 			//TODO: magic number!
-			case EVENT_DRIVEN_PARALLEL: return new UpdateSchemeEventDrivenParallel(topography, 0.5);
+			case EVENT_DRIVEN_PARALLEL: return new UpdateSchemeEventDrivenParallel(topography, 0.6);
 			default: throw new IllegalArgumentException(updateType + " is not supported.");
 		}
 	}

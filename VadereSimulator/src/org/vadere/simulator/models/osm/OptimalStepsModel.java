@@ -29,8 +29,6 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.attributes.models.AttributesPotentialCompact;
-import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.DynamicElementRemoveListener;

@@ -297,4 +297,8 @@ public class PedestrianOSM extends Pedestrian {
 		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
 	}
 
+	@Override
+	public String toString() {
+		return "id = " + getId() + " memory " + super.toString();
+	}
 }
