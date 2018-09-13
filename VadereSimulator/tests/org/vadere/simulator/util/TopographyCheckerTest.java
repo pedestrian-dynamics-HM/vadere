@@ -6,12 +6,12 @@ import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import javax.swing.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class TopographyCheckerTest {
 
@@ -21,6 +21,7 @@ public class TopographyCheckerTest {
 
         Obstacle obs1 = new Obstacle(new AttributesObstacle(0, new VRectangle(0,0,1,1)));
         Obstacle obs2 = new Obstacle(new AttributesObstacle(1, new VRectangle(0,0,1,1)));
+
         topography.addObstacle(obs1);
         topography.addObstacle(obs2);
 
@@ -29,6 +30,26 @@ public class TopographyCheckerTest {
         List<Pair<Obstacle, Obstacle>> actualList = topcheck.checkObstacleOverlap();
 
         assertEquals(1, actualList.size());
+    }
+
+    @Test
+    public void tset(){
+        MsgDocument doc = new MsgDocument();
+        doc.setContentType("text/html");
+        doc.setText("File not found please contact:<a href='element/0023'>e-mail to</a> or call 963");
+        doc.addHyperlinkListener( e -> {
+            System.out.println(e.getURL());
+        });
+
+    }
+
+    class MsgDocument extends JTextPane {
+
+        public MsgDocument(){
+
+        }
+
+
     }
 
     @Test

@@ -13,6 +13,7 @@ import org.vadere.gui.components.view.InfoPanel;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.components.view.ScenarioToolBar;
 import org.vadere.gui.projectview.control.ActionDeselect;
+import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.topographycreator.control.ActionBasic;
 import org.vadere.gui.topographycreator.control.ActionCloseDrawOptionPanel;
 import org.vadere.gui.topographycreator.control.ActionCopyElement;
@@ -28,6 +29,7 @@ import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
+import org.vadere.gui.topographycreator.control.ActionTopographyCheckerMenu;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
@@ -111,7 +113,8 @@ public class TopographyWindow extends JPanel {
 		infoPanel = new InfoPanel(panelModel);
 		selectedElementLabel = new JLabelObserver(JLabelObserver.DEFAULT_TEXT);
 
-		final ScenarioElementView textView = new ScenarioElementView(panelModel, selectedElementLabel);
+		JsonValidIndicator jsonValidIndicator = new JsonValidIndicator();
+		final ScenarioElementView textView = new ScenarioElementView(panelModel, jsonValidIndicator, selectedElementLabel);
 
 		final JPanel thisPanel = this;
 
@@ -306,6 +309,12 @@ public class TopographyWindow extends JPanel {
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
 				panelModel, selectShape);
 
+		/* Topography checker*/
+		ActionTopographyCheckerMenu actionTopographyCheckerMenu =
+				new ActionTopographyCheckerMenu("TopographyChecker", panelModel, jsonValidIndicator);
+
+
+		/* create toolbar*/
 		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
 		addActionToToolbar(
 				toolbar,
@@ -341,6 +350,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
+		addActionToToolbar(toolbar, actionTopographyCheckerMenu, "TopographyCreator.btnChecker.tooltip");
 		toolbar.add(infoButton);
 		infoButton.setToolTipText("About");
 
