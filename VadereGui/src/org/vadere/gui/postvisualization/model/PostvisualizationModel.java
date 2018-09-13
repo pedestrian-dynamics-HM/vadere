@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
@@ -238,21 +239,26 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 	}
 
-	public Optional<Color> getColor(final Agent agent) {
+	private boolean parseIgnoreException(@NotNull final VPredicate<JsonNode> predicate, @NotNull final JsonNode node) {
+		try {
+			return predicate.test(node);
+		} catch (ParseException e) {
+			return false;
+		}
+	}
+
+	public Optional<Color> getColorByPredicate(final Agent agent) {
 		JsonNode jsonObj = StateJsonConverter.toJsonNode(agent);
-		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet().stream().filter(
-				entry -> {
-					try {
-						return entry.getValue().test(jsonObj);
-					} catch (ParseException e) {
-						return false;
-					}
-				}).findFirst();
+		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet()
+				.stream()
+				.filter(entry -> parseIgnoreException(entry.getValue(), jsonObj))
+				.findFirst();
 
 		if (firstEntry.isPresent()) {
 			return Optional.of((Color) pedestrianColorTableModel.getValueAt(firstEntry.get().getKey(),
 					PedestrianColorTableModel.COLOR_COLUMN));
 		}
+
 		return Optional.empty();
 	}
 

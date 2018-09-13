@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
@@ -137,15 +138,18 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 				setSelectedElement(ped);
 			}
 
-			if (!voronoiSnapshots.isEmpty()) {
-				voronoiDiagram = voronoiSnapshots.getFirst();
+			if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
+				getVoronoiDiagram().computeVoronoiDiagram(topography.getPedestrianDynamicElements().getElements()
+								.stream()
+								.map(ped -> ped.getPosition())
+								.collect(Collectors.toList()));
 			}
 
 			return true;
 		}
 	}
 
-	public void pushObersavtionAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
+	public void pushObservationAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
         if (observationAreaSnapshots.size() > 0) {
             observationAreaSnapshots.pop();
         }
@@ -195,6 +199,11 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
         }
 
 		return f;
+	}
+
+	@Override
+	public double getGridResolution() {
+		return config.getGridWidth();
 	}
 
 	@Override

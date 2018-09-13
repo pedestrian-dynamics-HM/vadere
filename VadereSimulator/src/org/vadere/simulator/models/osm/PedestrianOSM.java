@@ -194,7 +194,6 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public double getStepSize() {
-
 		if (attributesOSM.isDynamicStepLength()) {
 			double step = attributesOSM.getStepLengthIntercept()
 					+ attributesOSM.getStepLengthSlopeSpeed()

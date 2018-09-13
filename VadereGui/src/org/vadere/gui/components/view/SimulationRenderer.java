@@ -8,16 +8,19 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
@@ -215,5 +218,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     public void setAgentRender(AgentRender agentRender) {
         this.agentRender = agentRender;
+    }
+
+    protected Color getPedestrianColor(@NotNull final Agent agent) {
+	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
+	    return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianColor);
     }
 }
