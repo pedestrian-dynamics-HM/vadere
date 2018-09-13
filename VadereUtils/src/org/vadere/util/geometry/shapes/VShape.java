@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.shapes;
 
 import java.awt.Shape;
+import java.awt.geom.Area;
 
 import org.vadere.util.geometry.ShapeType;
 
@@ -26,4 +27,12 @@ public interface VShape extends Shape, Cloneable {
 	VPoint getCentroid();
 
 	ShapeType getType();
+
+	default boolean intersects(VShape shape){
+		Area thisShape = new Area(this);
+		Area otherShape = new Area(shape);
+		Area thisShapeCpy = new Area(this);
+		thisShape.subtract(otherShape);
+		return !thisShape.equals(thisShapeCpy);
+	}
 }

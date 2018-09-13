@@ -18,7 +18,7 @@ However, we welcome contributions from external sources.
 | Branch  | Pipeline Status  | Coverage |
 |:--------|:----------------:|:--------:| 
 | master  | [![pipeline status (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) | [![coverage report (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) |
-| develop | [![pipeline status (develop)](https://gitlab.lrz.de/vadere/vadere/badges/develop/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/develop) | [![coverage report (develop)](https://gitlab.lrz.de/vadere/vadere/badges/develop/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/develop) |
+| stable | [![pipeline status (stable)](https://gitlab.lrz.de/vadere/vadere/badges/stable/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/stable) | [![coverage report (stable)](https://gitlab.lrz.de/vadere/vadere/badges/stable/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/stable) |
 
 ## Installation
 
@@ -101,16 +101,15 @@ switch to another branch and switch back again using the command line or any oth
 
 Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
 
-## Release History
-
-- 0.1 initial release of the software as open source (2016-08-05)
-- 0.2 stability and usability improved, additional pedestrian simulation models are supported (2016-12-22)
-
 ## Contributors
 
 People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
 
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Sch&ouml;ttl, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Z&ouml;nnchen
+Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Marion Gödel, Benedikt Kleinmeier, Daniel Lehmberg, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 ## License
 
