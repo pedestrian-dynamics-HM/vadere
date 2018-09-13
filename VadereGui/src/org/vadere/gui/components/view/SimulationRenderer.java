@@ -222,11 +222,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         this.agentRender = agentRender;
     }
 
-    protected Color getPedestrianColor(@NotNull final Agent agent) {
+    public Color getPedestrianColor(@NotNull final Agent agent) {
 	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
 	    if (model.config.isUseRandomPedestrianColors()) {
 		   return model.config.getRandomColor(agent.getId());
 	    }
+
 	    return model.config.getColorByTargetId(targetId)
 			    .orElseGet(model.config::getPedestrianColor);
     }
