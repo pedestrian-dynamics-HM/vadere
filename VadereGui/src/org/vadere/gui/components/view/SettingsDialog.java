@@ -96,7 +96,7 @@ public class SettingsDialog extends JDialog {
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu", // col
 				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		FormLayout colorLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		colorLayeredPane.setLayout(colorLayout);
 		additionalLayeredPane.setLayout(additionalLayout);
 
@@ -236,6 +236,16 @@ public class SettingsDialog extends JDialog {
 				"Set Pedestrian without Target Color", model, pPedestrianNoTarget));
 		colorLayeredPane.add(pPedestrianNoTarget, cc.xy(4, 18));
 		colorLayeredPane.add(bPedestrianNoTarget, cc.xy(6, 18));
+
+		// 20 is free
+
+		JCheckBox chRandomColors = new JCheckBox(Messages.getString("SettingsDialog.chbUseRandomColors.text"));
+		chRandomColors.setSelected(model.config.isUseRandomPedestrianColors());
+		chRandomColors.addItemListener(e -> {
+			model.config.setUseRandomPedestrianColors(!model.config.isUseRandomPedestrianColors());
+			model.notifyObservers();
+		});
+		colorLayeredPane.add(chRandomColors, cc.xyw(2, 22, 8));
 
 
 		additionalLayeredPane.add(chHideVoronoiDiagram, cc.xyw(2, 2, 5));
