@@ -75,19 +75,18 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.pedestrianColorTableModel = new PedestrianColorTableModel();
 		this.steps = new ArrayList<>();
 
-		for (int i = 0; i < 5; i++) {
+		/*for (int i = 0; i < 5; i++) {
 			try {
 				colorEvalFunctions.put(i, new JsonLogicParser("false").parse());
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 
 		this.pedestrianColorTableModel.addTableModelListener(
 				e -> {
 					for (int row = e.getFirstRow(); row <= e.getLastRow(); row++) {
-						if (row >= 0 && colorEvalFunctions.containsKey(row)
-								&& e.getColumn() == PedestrianColorTableModel.CIRTERIA_COLUMN) {
+						if (row >= 0 && e.getColumn() == PedestrianColorTableModel.CIRTERIA_COLUMN) {
 							try {
 								VPredicate<JsonNode> evaluator = new JsonLogicParser(
 										pedestrianColorTableModel.getValueAt(row, e.getColumn()).toString()).parse();

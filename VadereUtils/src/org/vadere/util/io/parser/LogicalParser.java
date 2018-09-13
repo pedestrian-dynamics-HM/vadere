@@ -82,11 +82,13 @@ public abstract class LogicalParser<T> {
 		String reformatText = text.replaceAll("\\(", " ( ");
 		reformatText = reformatText.replaceAll("\\)", " ) ");
 		reformatText = reformatText.replaceAll("\\s==\\s", "==");
-		reformatText = reformatText.replaceAll("\\s<\\s", "!=");
+		reformatText = reformatText.replaceAll("\\s<\\s", "<");
 		reformatText = reformatText.replaceAll("\\s<=\\s", "<=");
 		reformatText = reformatText.replaceAll("\\s>=\\s", ">=");
 		reformatText = reformatText.replaceAll("\\s>\\s", ">");
 		reformatText = reformatText.replaceAll("\\s<\\s", "<");
+		reformatText = reformatText.replaceAll("\\s!=\\s", "!=");
+		reformatText = reformatText.replaceAll("\\s:\\s", ":");
 		if (!reformatText.startsWith("(") || !reformatText.endsWith(")")) {
 			reformatText = "( " + reformatText + " )";
 		}
