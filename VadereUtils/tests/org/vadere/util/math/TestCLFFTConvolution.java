@@ -26,7 +26,7 @@ public class TestCLFFTConvolution {
 
         // This test only uses the FFT methods ans does not padd the matrix
 
-        int N = 64; // single workgroup only for N = 64
+        int N = 128; // single workgroup only for N = 64
         float[] kernel = new float[]{1, 1, 1, 1, 1, 1, 1};
         float[] input = new float[2 * N * N];
         // all complex values are 0!
@@ -52,6 +52,8 @@ public class TestCLFFTConvolution {
 
         //System.out.println("Space: " + Arrays.toString(outputS));
         assertArrayEquals("Back transformation must be equal to original input", input, outputS, (float) EPS);
+
+
     }
 
     @Test
@@ -59,7 +61,7 @@ public class TestCLFFTConvolution {
 
         // This test only uses the FFT methods ans does not padd the matrix
 
-        int N = 256; // 2 workgroups for N = 128
+        int N = 2048; // 2 workgroups for N = 128
         float[] kernel = new float[]{1, 1, 1, 1, 1, 1, 1};
         float[] input = new float[2 * N * N];
         for (int i = 0; i < 2 * N * N; ++i) {
@@ -274,8 +276,8 @@ public class TestCLFFTConvolution {
     @Test
     public void testMultiply() throws OpenCLException {
 
-        int M = 64;
-        int N = 128;
+        int M = 32;
+        int N = 32;
         float[] matrix = new float[M * 2 * N];
         float[] expected = new float[M * 2 * N];
         for (int i = 0; i < matrix.length; ++i) {
@@ -323,12 +325,14 @@ public class TestCLFFTConvolution {
 
     @Test
     public void testFFTConvolution() throws OpenCLException {
-        int matrixHeight = 250; // currently padded to 32, for 40 padded to 64
-        int matrixWidth = 250; // currently padded to 32, for 40 padded to 64
+        int matrixHeight = 1000; // currently padded to 32, for 40 padded to 64
+        int matrixWidth = 1000; // currently padded to 32, for 40 padded to 64
 
         float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
 
-        int kernelSize = 91;
+        int kernelSize = matrixWidth+1;
+        System.out.println("INFO - " + matrixHeight + " " + matrixWidth + " " + kernelSize);
+
         float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
 
         CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
@@ -347,13 +351,15 @@ public class TestCLFFTConvolution {
     public void testRuntimeFFTConvolution() throws  OpenCLException {
 
         int min_size = 32;
-        int max_size = 256;
-        int kernelSize = 11;
+        int max_size = (int)Math.pow(2,11);
+
 
         for (int paddSize = min_size; paddSize <= max_size; paddSize*=2) {
 
-            int matrixHeight = paddSize - kernelSize + 1; // currently padded to 32, for 40 padded to 64
-            int matrixWidth = paddSize - kernelSize + 1; // currently padded to 32, for 40 padded to 64
+            int matrixHeight = paddSize; // currently padded to 32, for 40 padded to 64
+            int matrixWidth = paddSize; // currently padded to 32, for 40 padded to 64
+            int kernelSize = paddSize+1;
+
             System.out.println("INFO - " + matrixHeight + " " + matrixWidth + " " + kernelSize);
             float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
             float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
@@ -371,6 +377,21 @@ public class TestCLFFTConvolution {
         }
 
 
+    }
+
+    @Test
+    public void testCLConvolution() throws OpenCLException {
+
+        int matrixHeight = (int) Math.pow(2,5);
+        int matrixWidth = (int) Math.pow(2,5);
+        int kernelSize = 11;
+
+        float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
+        float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
+
+        CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Separate, matrixHeight, matrixWidth, kernelSize, kernel);
+        float[] output = clConvolution.convolve(matrix);
+        clConvolution.clearCL();
     }
 
     @Test

@@ -1,8 +1,9 @@
-__kernel void fft2Dim(const __global float2 *input,
+__kernel void fft2Dim(__global float2 *input,
                       __local float2 *local_data,
                       __global float2 *output,
-                      const uint M, const uint N,
+                      uint M, const uint N,
                       const int direction) {
+
 
     int length = M*N; // size of matrix as vector
 
@@ -25,6 +26,7 @@ __kernel void fft2Dim(const __global float2 *input,
     uint mask_left, mask_right, shift_pos;
     float2 x1, x2, x3, x4;
 
+    #pragma unroll
     for(int i = 0; i < points_per_item; i += 4) {
         index = (uint4) (g_addr, g_addr + 1, g_addr + 2, g_addr + 3);
         mask_left = N / 2;
@@ -68,6 +70,7 @@ __kernel void fft2Dim(const __global float2 *input,
     for(int N2 = 4; N2 < points_per_item; N2 <<=1) {
         l_addr = get_local_id(0) * points_per_item;
 
+        #pragma unroll
         for(int fft_index = 0; fft_index < points_per_item; fft_index += 2*N2) {
             x1 = local_data[l_addr];
             local_data[l_addr] += local_data[l_addr + N2];
@@ -90,9 +93,9 @@ __kernel void fft2Dim(const __global float2 *input,
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
+
     uint start, angle, stage;
     stage = 2;
-
 
     for(int N2 = points_per_item; N2 < N; N2 <<=1) {
         start = (get_local_id(0) + (get_local_id(0)/stage)*stage) * (points_per_item/2);
@@ -107,8 +110,9 @@ __kernel void fft2Dim(const __global float2 *input,
                 local_data[N2 + i].s1 * sine,
                 local_data[N2 + i].s1 * cosine -
                 local_data[N2 + i].s0 * sine);
+
             local_data[N2 + i] = local_data[i] - wk;
-            local_data[i] += wk;
+            local_data[i] = local_data[i] + wk;
 
             angle++;
         }
@@ -118,7 +122,6 @@ __kernel void fft2Dim(const __global float2 *input,
     }
 
     // copy data back into global memory and transform
-    barrier(CLK_GLOBAL_MEM_FENCE);
 
     l_addr = get_local_id(0)*points_per_item; // address within one workitem
     g_addr = get_group_id(0)*points_per_group + l_addr;
@@ -138,6 +141,16 @@ __kernel void fft2Dim(const __global float2 *input,
             output[indexTransposed] = (float2)(factor*val.x,factor*val.y);
         }
     }
+
+}
+
+__kernel void transpose(const __global float2 *matrix, __global float2 *output, int height, int width) {
+        int i = get_global_id(0); // row
+        int j = get_global_id(1); // col
+
+        int index = i*width + j;
+        int indexTransposed = j*height + i;
+        output[indexTransposed] = matrix[index];
 }
 
 // Kernel for fft convolution row/col
@@ -170,9 +183,10 @@ __kernel void fft1Dim(__global float2 *input,
 
     int workitems_per_workgroup = get_local_size(0); // number of work items in workgroup
     int number_of_workgroups = get_num_groups(0);
-    int points_per_group = N/number_of_workgroups; // points per group
 
+    int points_per_group = N/number_of_workgroups; // points per group
     int points_per_item = points_per_group/workitems_per_workgroup; // points in one workitem
+
     int l_addr = get_local_id(0)*points_per_item; // address within one workitem
     int global_addr = get_group_id(0)*points_per_group + l_addr; // address within the hole workgroup
 

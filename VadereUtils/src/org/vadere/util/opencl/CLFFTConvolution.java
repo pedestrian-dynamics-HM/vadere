@@ -31,7 +31,7 @@ public class CLFFTConvolution {
     private static final int DIMENSION_ZERO = 0;
     private static final int WORK_DIM = 1;
     private static final int FLOAT_PRECITION = 8;
-    private static final int MIN_ELEMENTS_PER_WORKITEM = 8;
+    private static final int MIN_POINTS_PER_WORKITEM = 8;
 
     // CL ids
     private long clPlatform;
@@ -61,8 +61,12 @@ public class CLFFTConvolution {
     private int paddWidth;
 
     // for global and local size
-    private int fft_per_workitem;
     private int max_workitems_per_workgroup;
+    private int points_per_workitem;
+    private int workitems_total_dim1;
+    private int workitems_total_dim2;
+    private int workitems_per_workgroup_dim1;
+    private int workitems_per_workgroup_dim2;
 
     // Kernel Memory
     private long clMatrixInput;
@@ -73,6 +77,7 @@ public class CLFFTConvolution {
     private long clFFTKernel;
     private long clFFTMatrix;
     private long clMultiplyKernel;
+    private long clTransposeKernel;
 
 
     // logger for callbacks
@@ -147,14 +152,18 @@ public class CLFFTConvolution {
 
             // get divice specific constants
             long local_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_LOCAL_MEM_SIZE);
-            long global_mem_size = CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_GLOBAL_MEM_SIZE);
-
             max_workitems_per_workgroup = (int) CLInfo.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
 
-            // determin biggest fft that can be computed with one workitem
-            int max_fft_per_work_item = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
-            this.fft_per_workitem = paddWidth < max_fft_per_work_item ? MIN_ELEMENTS_PER_WORKITEM : max_fft_per_work_item;
+            //determin biggest fft that can be computed with one workitem
+            int max_points_per_workitem = (int) (local_mem_size / (max_workitems_per_workgroup * FLOAT_PRECITION));
+            points_per_workitem = paddWidth < max_points_per_workitem ? MIN_POINTS_PER_WORKITEM : max_points_per_workitem;
 
+            workitems_total_dim1 = paddWidth/MIN_POINTS_PER_WORKITEM < max_workitems_per_workgroup
+                    ? paddWidth/MIN_POINTS_PER_WORKITEM : paddWidth/(MIN_POINTS_PER_WORKITEM*2);
+            workitems_per_workgroup_dim1 = Math.min(workitems_total_dim1,max_workitems_per_workgroup);
+
+            workitems_total_dim2 = (paddHeight*paddWidth)/points_per_workitem;
+            workitems_per_workgroup_dim2 = Math.min(workitems_total_dim2,max_workitems_per_workgroup);
 
             // reserve memory for input matrix and gauss kernel
             hostInput = MemoryUtil.memAllocFloat(2 * paddHeight * paddWidth);
@@ -171,17 +180,10 @@ public class CLFFTConvolution {
 
             hostGaussKernelTransformed = CLUtils.toFloatBuffer(gaussKernelTransformed);
 
-
-            // clear hostGaussKernel and clGaussKernel as kernel fft is only done once
-            CLInfo.checkCLError(clReleaseMemObject(clGaussKernelInput));
-            MemoryUtil.memFree(hostGaussKernelInput);
-
             setArgumentsMultiply();
 
         } catch (OpenCLException ex) {
             ex.printStackTrace();
-        } finally {
-
         }
     }
 
@@ -264,13 +266,13 @@ public class CLFFTConvolution {
             clMatrixOutput = clCreateBuffer(clContext, CL_MEM_WRITE_ONLY, BUFFER_SIZE_FACTOR * 2 * paddHeight * paddWidth, errcode_ret);
 
             CLInfo.checkCLError(clSetKernelArg1p(clFFTMatrix, 0, clMatrixInput)); // input
-            CLInfo.checkCLError(clSetKernelArg(clFFTMatrix, 1, paddWidth * paddHeight)); // local memory size
+            CLInfo.checkCLError(clSetKernelArg(clFFTMatrix, 1, workitems_per_workgroup_dim2*points_per_workitem*BUFFER_SIZE_FACTOR*2)); // local memory size
             CLInfo.checkCLError(clSetKernelArg1p(clFFTMatrix, 2, clMatrixOutput)); // output
 
             clGaussKernelInput = clCreateBuffer(clContext, CL_MEM_READ_WRITE, BUFFER_SIZE_FACTOR * 2 * paddWidth, errcode_ret);
 
             CLInfo.checkCLError(clSetKernelArg1p(clFFTKernel, 0, clGaussKernelInput));
-            CLInfo.checkCLError(clSetKernelArg(clFFTKernel, 1, (long) paddWidth)); // local memory size
+            CLInfo.checkCLError(clSetKernelArg(clFFTKernel, 1, paddWidth*BUFFER_SIZE_FACTOR*2)); // local memory size
             CLInfo.checkCLError(clSetKernelArg1i(clFFTKernel, 2, paddWidth));
         }
     }
@@ -289,6 +291,9 @@ public class CLFFTConvolution {
             CLInfo.checkCLError(clSetKernelArg1p(clMultiplyKernel, 0, clMatrixInput));
             CLInfo.checkCLError(clSetKernelArg1p(clMultiplyKernel, 1, clGaussKernelTransformed));
             CLInfo.checkCLError(clSetKernelArg1p(clMultiplyKernel, 2, clMatrixOutput));
+
+            CLInfo.checkCLError(clSetKernelArg1p(clTransposeKernel, 0, clMatrixInput));
+            CLInfo.checkCLError(clSetKernelArg1p(clTransposeKernel, 1, clMatrixOutput));
         }
     }
 
@@ -356,6 +361,32 @@ public class CLFFTConvolution {
         }
     }
 
+    /**
+     * multiply sets the local and global worksize and enqueues the multiply kernel
+     * @param clKernel kernel program for multiplication
+     * @throws OpenCLException openCLException
+     */
+    private void transpose(final long clKernel, int height, int width) throws OpenCLException {
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+
+            PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(2);
+
+            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, height);
+            clGlobalWorkSizeEdges.put(1, width);
+
+            CLInfo.checkCLError(clSetKernelArg1i(clTransposeKernel, 2, height));
+            CLInfo.checkCLError(clSetKernelArg1i(clTransposeKernel, 3, width));
+
+            //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue,clKernel,2,null,clGlobalWorkSizeEdges,null,null, null));
+            int err_code = (int) enqueueNDRangeKernel("transpose",clQueue,clKernel,2,null,clGlobalWorkSizeEdges,null,null, null);
+            CLInfo.checkCLError(err_code);
+
+            CLInfo.checkCLError(clFinish(clQueue));
+        }
+    }
+
+
     public float[] multiplyRows(final float[] matrix) throws OpenCLException {
         return multiply(matrix,paddHeight,paddWidth);
     }
@@ -389,13 +420,11 @@ public class CLFFTConvolution {
      */
     private void fft1Dim(final long clKernel, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int workitems_total = paddWidth/fft_per_workitem;
-            int workitems_per_workgroup = Math.min(workitems_total,max_workitems_per_workgroup);
 
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
             PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
-            clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup); // number of workitems per workgroup
-            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total); // number of workitems global
+            clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup_dim1); // number of workitems per workgroup
+            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total_dim1); // number of workitems global
 
             // set direction for FFT
             CLInfo.checkCLError(clSetKernelArg1i(clFFTKernel, 3, direction.getValue()));
@@ -404,7 +433,6 @@ public class CLFFTConvolution {
             int err_code = (int) enqueueNDRangeKernel("fft1dim",clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null);
             CLInfo.checkCLError(err_code);
             CLInfo.checkCLError(clFinish(clQueue));
-
         }
     }
 
@@ -428,12 +456,12 @@ public class CLFFTConvolution {
 
         // inner FFT
         CLUtils.toFloatBuffer(input, hostInput);
-        clEnqueueWriteBuffer(clQueue, clMatrixInput, true, OFFSET_ZERO, hostInput, null, null);
 
+        clEnqueueWriteBuffer(clQueue, clMatrixInput, true, OFFSET_ZERO, hostInput, null, null);
         fft2Dim(clFFTMatrix, paddHeight, paddWidth, direction);
         clEnqueueReadBuffer(clQueue, clMatrixOutput, true, OFFSET_ZERO, hostOutput, null, null);
 
-        // outer FFT -> matrix is transposed
+        //outer FFT -> matrix is transposed
         float[] innerFFT = CLUtils.toFloatArray(hostOutput, 2 * paddHeight * paddWidth); // TODO avoid having to read to array and then write to buffer again
         CLUtils.toFloatBuffer(innerFFT, hostInput);
 
@@ -452,27 +480,24 @@ public class CLFFTConvolution {
      */
     private void fft2Dim(final long clKernel, int height, int width, Direction direction) throws OpenCLException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int workitems_total = Math.max((paddHeight*paddWidth)/fft_per_workitem, MIN_ELEMENTS_PER_WORKITEM);
-            int workitems_per_workgroup = Math.min(workitems_total,max_workitems_per_workgroup); //paddWidth/max_fft_per_work_item;
-
-            PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
-            PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
-            clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup); // number of workitems per workgroup
-            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total); // number of workitems global
-
             // set height and width
             CLInfo.checkCLError(clSetKernelArg1i(clFFTMatrix, 3, height)); // matrix height
             CLInfo.checkCLError(clSetKernelArg1i(clFFTMatrix, 4, width)); // matrix width
-
             // set Direction for FFT
             CLInfo.checkCLError(clSetKernelArg1i(clFFTMatrix, 5, direction.getValue())); // FFT: 1 or IFFT: -1
 
+            PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
+            PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
+            clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup_dim2); // number of workitems per workgroup
+            clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total_dim2); // number of workitems global
+
             //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null));
-            int err_code = (int) enqueueNDRangeKernel("fft2dim",clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null);
+            int err_code = (int) enqueueNDRangeKernel("fft2dim_" + direction.name(),clQueue, clKernel, WORK_DIM, null, clGlobalWorkSizeEdges, clLocalWorkSizeEdges, null, null);
             CLInfo.checkCLError(err_code);
             CLInfo.checkCLError(clFinish(clQueue));
         }
     }
+
 
     /**
      * computePaddWidth calculates the paddWidth from the matrixWidth and KernelSize and rounds up to the next power of two
@@ -598,6 +623,8 @@ public class CLFFTConvolution {
             clMultiplyKernel = clCreateKernel(clProgram, "multiply", errcode_ret);
             CLInfo.checkCLError(errcode_ret);
 
+            clTransposeKernel = clCreateKernel(clProgram, "transpose", errcode_ret);
+            CLInfo.checkCLError(errcode_ret);
         }
 
     }
@@ -643,17 +670,21 @@ public class CLFFTConvolution {
             CLInfo.checkCLError(clReleaseMemObject(clMatrixInput));
             CLInfo.checkCLError(clReleaseMemObject(clMatrixOutput));
             CLInfo.checkCLError(clReleaseMemObject(clGaussKernelTransformed));
+            CLInfo.checkCLError(clReleaseMemObject(clGaussKernelInput));
 
             CLInfo.checkCLError(clReleaseKernel(clFFTMatrix));
             CLInfo.checkCLError(clReleaseKernel(clFFTKernel));
             CLInfo.checkCLError(clReleaseKernel(clMultiplyKernel));
+            CLInfo.checkCLError(clReleaseKernel(clTransposeKernel));
         } catch (OpenCLException e) {
             e.printStackTrace();
         } finally {
             MemoryUtil.memFree(hostInput);
             MemoryUtil.memFree(hostOutput);
+            MemoryUtil.memFree(hostGaussKernelInput);
             MemoryUtil.memFree(hostGaussKernelTransformed);
             MemoryUtil.memFree(kernelSourceCode);
+
 
         }
     }
