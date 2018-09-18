@@ -1,4 +1,4 @@
-package org.vadere.gui.postvisualization.control;
+package org.vadere.gui.components.control.simulation;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -6,12 +6,13 @@ import java.awt.event.ActionEvent;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.gui.components.model.DefaultSimulationConfig;
+import org.vadere.gui.components.model.SimulationModel;
 
 public abstract class ActionSetColor extends ActionVisualization {
 	private JPanel coloredPanel;
 
-	public ActionSetColor(final String name, final PostvisualizationModel model, final JPanel coloredPanel) {
+	public ActionSetColor(final String name, final SimulationModel<? extends DefaultSimulationConfig> model, final JPanel coloredPanel) {
 		super(name, model);
 		this.coloredPanel = coloredPanel;
 	}

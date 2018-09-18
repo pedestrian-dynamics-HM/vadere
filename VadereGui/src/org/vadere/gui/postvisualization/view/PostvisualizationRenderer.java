@@ -82,15 +82,15 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			Optional<Color> c = model.config.isUseEvacuationTimeColor() ?
 					Optional.of(colorHelper.numberToColor(trajectory.getLifeTime().orElse(0))) :
 					Optional.empty();
-			g.setColor(model.getColor(pedestrian)
-					.orElse(model.config.getColorByTargetId(targetId)
-							.orElse(c
-								.orElseGet(model.config::getPedestrianDefaultColor))));
+
+			Color nonGroupColor = model.getColorByPredicate(pedestrian).orElse(getPedestrianColor(pedestrian));
+
+			g.setColor(nonGroupColor);
 
 			// renderImage the pedestrian
 			if (model.config.isShowPedestrians()) {
 				if (model.config.isShowFaydedPedestrians() || !trajectory.isPedestrianDisappeared(step)) {
-					agentRender.render(pedestrian, g);
+					agentRender.render(pedestrian, nonGroupColor, g);
 					if (model.config.isShowPedestrianIds()) {
 						DefaultRenderer.paintAgentId(g, pedestrian);
 					}

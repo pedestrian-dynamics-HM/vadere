@@ -2,8 +2,8 @@ package org.vadere.gui.renderer.agent;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
@@ -29,7 +29,7 @@ public class AgentRender implements Renderer {
 	}
 
 	@Override
-	public void render(final ScenarioElement element, Graphics2D g) {
+	public void render(@NotNull final ScenarioElement element, @NotNull final Color color, @NotNull final Graphics2D g) {
 
 		if (model.config.isShowGroups()) {
 			try {
@@ -39,15 +39,15 @@ public class AgentRender implements Renderer {
 				logger.error("Error casting to Pedestrian");
 				cce.printStackTrace();
 				model.config.setShowGroups(false);
-				renderDefault(element, g, defaultColor);
+				renderDefault(element, g, color);
 			}
 		} else {
-			renderDefault(element, g, defaultColor);
+			renderDefault(element, g, color);
 		}
 	}
 
 	private void renderGroup(Pedestrian ped, Graphics2D g) {
-		g.setColor(getColor(ped));
+		g.setColor(getGroupColor(ped));
 		g.fill(getShape(ped));
 	}
 
@@ -62,7 +62,7 @@ public class AgentRender implements Renderer {
 		return new Color(Color.HSBtoRGB(hue, 1f, 0.75f));
 	}
 
-	public Color getColor(Pedestrian ped) {
+	public Color getGroupColor(Pedestrian ped) {
 		if (ped.getGroupIds().isEmpty()) {
 			return defaultColor;
 		}

@@ -1,5 +1,6 @@
 package org.vadere.gui.postvisualization.control;
 
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import java.awt.*;
