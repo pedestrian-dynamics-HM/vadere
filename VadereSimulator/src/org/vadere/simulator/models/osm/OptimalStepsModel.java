@@ -27,7 +27,6 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
@@ -37,8 +36,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.calculators.EikonalSolver;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -140,7 +137,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 			@NotNull final AttributesOSM attributesOSM) {
 		switch (attributesOSM.getUpdateType()) {
 			case PARALLEL_OPEN_CL: {
-				return UpdateSchemeOSM.createOpenCLUpdateScheme(
+				throw new UnsupportedOperationException("not jet implemented.");
+				/*return UpdateSchemeOSM.createOpenCLUpdateScheme(
 						topography,
 						attributesOSM,
 						Model.findAttributes(attributesList, AttributesFloorField.class),
@@ -176,7 +174,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 								return cellGrid;
 							}
 						}
-						);
+						);*/
 			}
 			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
 		}

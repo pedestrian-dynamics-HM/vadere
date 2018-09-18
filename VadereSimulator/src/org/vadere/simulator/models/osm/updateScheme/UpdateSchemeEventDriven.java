@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
- *
+ * @author Benedikt Zoennchen
  */
 public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
