@@ -8,19 +8,16 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.simulator.projects.dataprocessing.processor.PedestrianOSMStrideLengthProcessor;
 import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import javax.swing.text.html.Option;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -241,8 +238,14 @@ public class TikzGenerator {
 	    String colorString = "AgentColor";
 
 	    if (agent.get() instanceof Pedestrian) {
+		    Color pedestrianColor;
 	        Pedestrian pedestrian = (Pedestrian)agent.get();
-	        Color pedestrianColor = renderer.getAgentRender().getColor(pedestrian);
+	        if(model.config.isShowGroups()) {
+		        pedestrianColor = renderer.getAgentRender().getGroupColor(pedestrian);
+	        }
+	        else {
+		        pedestrianColor = renderer.getPedestrianColor(pedestrian);
+	        }
 
             colorString = String.format("{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
         }
@@ -255,33 +258,38 @@ public class TikzGenerator {
 	    String generatedCode = "";
 
         for (Agent agent : model.getAgents()) {
-            if (model.getConfig().isShowGroups()) {
-                try {
-                    Pedestrian pedestrian = (Pedestrian) agent;
-                    Color pedestrianColor = renderer.getAgentRender().getColor(pedestrian);
-                    Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
+        	if(agent instanceof Pedestrian) {
+		        if (model.getConfig().isShowGroups()) {
+			        try {
+				        Pedestrian pedestrian = (Pedestrian) agent;
+				        Color pedestrianColor = renderer.getAgentRender().getGroupColor(pedestrian);
+				        Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
 
-                    String colorString = String.format("{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
-                    generatedCode += String.format("\\fill[fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
-                } catch (ClassCastException cce) {
-                    logger.error("Error casting to Pedestrian");
-                    cce.printStackTrace();
+				        String colorString = String.format("{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+				        generatedCode += String.format("\\fill[fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
+			        } catch (ClassCastException cce) {
+				        logger.error("Error casting to Pedestrian");
+				        cce.printStackTrace();
 
-                    // Fall back to default rendering of agents.
-					String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
-					generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-                }
-            } else {
-				// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
-				// generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
-                String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
-                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-            }
+				        // Fall back to default rendering of agents.
+				        String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+				        generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+			        }
+		        } else {
+			        Pedestrian pedestrian = (Pedestrian) agent;
+			        Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
+			        String colorString = String.format("{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+			        // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
+			        // generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
+			        String agentTextPattern = "\\fill[fill=%s] (%f,%f) circle [radius=%fcm];\n";
+			        generatedCode += String.format(agentTextPattern, colorString, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+		        }
 
-            if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
-                String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
-                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-            }
+		        if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
+			        String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
+			        generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+		        }
+	        }
         }
 
         return generatedCode;

@@ -6,6 +6,6 @@ import java.awt.*;
 
 public interface Renderer {
 
-	void render(final ScenarioElement element, final Graphics2D g);
+	void render(final ScenarioElement element, final Color color, final Graphics2D g);
 
 }

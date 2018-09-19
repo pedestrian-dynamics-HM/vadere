@@ -83,9 +83,9 @@ public class MovRecorder implements IRecorder {
 	@Override
 	public synchronized void startRecording() {
 		Date todaysDate = new java.util.Date();
-		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("View.dataFormat"));
+		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("SettingsDialog.dataFormat"));
 		String formattedDate = formatter.format(todaysDate);
-		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", "."));
+		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
 		File outputFile = new File("pv_snapshot_" + formattedDate + ".mov");
 		fileChooser.setSelectedFile(outputFile);
 

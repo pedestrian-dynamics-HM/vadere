@@ -1,7 +1,10 @@
 package org.vadere.gui.components.model;
 
 
+import java.awt.*;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.vadere.state.scenario.Agent;
@@ -87,6 +90,9 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		if (config.hasChanged()) {
 			setChanged();
 			config.clearChange();
+			if(!config.isUseRandomPedestrianColors()) {
+				config.clearRandomColors();
+			}
 		}
 		// }
 		super.notifyObservers();

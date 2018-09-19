@@ -1,11 +1,14 @@
-package org.vadere.gui.postvisualization.control;
+package org.vadere.gui.components.control.simulation;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.model.DefaultSimulationConfig;
+import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.view.SimulationRenderer;
+import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.TikzGenerator;
-import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
 
 import javax.swing.*;
 
@@ -15,23 +18,26 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
-public class ActionGenerateTikz extends ActionVisualization {
+public class ActionGenerateTikz extends AbstractAction implements IRendererChangeListener {
 	private static Logger logger = LogManager.getLogger(ActionGenerateTikz.class);
-	private static Resources resources = Resources.getInstance("postvisualization");
+	private static Resources resources = Resources.getInstance("global");
 	private final TikzGenerator tikzGenerator;
+	private final SimulationModel<? extends DefaultSimulationConfig> model;
 
-	public ActionGenerateTikz(final String name, final Icon icon, final PostvisualizationRenderer renderer) {
-		super(name, icon, renderer.getModel());
-		this.tikzGenerator = new TikzGenerator(renderer, renderer.getModel());
+	public ActionGenerateTikz(final String name, final Icon icon, final SimulationRenderer renderer,
+							  final SimulationModel<? extends DefaultSimulationConfig> model) {
+		super(name, icon);
+		this.tikzGenerator = new TikzGenerator(renderer, model);
+		this.model = model;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Date todaysDate = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("View.dataFormat"));
+		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("SettingsDialog.dataFormat"));
 		String formattedDate = formatter.format(todaysDate);
 
-		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", "."));
+		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
 		File outputFile = new File("pv_snapshot_" + formattedDate + ".tex");
 
 		fileChooser.setSelectedFile(outputFile);
@@ -46,5 +52,9 @@ public class ActionGenerateTikz extends ActionVisualization {
 			boolean completeDocument = true;
 			tikzGenerator.generateTikz(outputFile, completeDocument);
 		}
+	}
+
+	@Override
+	public void update(SimulationRenderer renderer) {
 	}
 }

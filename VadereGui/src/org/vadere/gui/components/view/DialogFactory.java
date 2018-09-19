@@ -1,17 +1,19 @@
-package org.vadere.gui.postvisualization.view;
+package org.vadere.gui.components.view;
 
 import javax.swing.*;
 
+import org.vadere.gui.components.model.DefaultSimulationConfig;
+import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.utils.SwingUtils;
+import org.vadere.gui.components.view.SettingsDialog;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import java.awt.*;
 
 public class DialogFactory {
 
-	private static Resources resources = Resources.getInstance("postvisualization");
-	private static PostvisualizationModel currentModel;
+	private static SimulationModel<? extends DefaultSimulationConfig> currentModel;
 	private static SettingsDialog settingsDialog;
 
 	public static JFrame createLoadingDialog() {
@@ -31,10 +33,17 @@ public class DialogFactory {
 		return frame;
 	}
 
-	public static JDialog createSettingsDialog(final PostvisualizationModel model) {
+	public static JDialog createSettingsDialog(final SimulationModel<? extends DefaultSimulationConfig> model) {
+		//SwingUtilities.invokeLater()
 		if (settingsDialog == null || currentModel == null || !currentModel.equals(model)) {
 			currentModel = model;
-			settingsDialog = new SettingsDialog(model);
+			if(model instanceof PostvisualizationModel) {
+				settingsDialog = new org.vadere.gui.postvisualization.view.SettingsDialog((PostvisualizationModel)model);
+			}
+			else {
+				settingsDialog = new SettingsDialog(model);
+			}
+			settingsDialog.initComponents();
 		}
 		return settingsDialog;
 	}

@@ -1,7 +1,5 @@
 package org.vadere.gui.onlinevisualization.control;
 
-import org.vadere.gui.postvisualization.control.ActionVisualization;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
