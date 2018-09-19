@@ -82,6 +82,11 @@ public final class AttributesSourceBuilder {
 		return this;
 	}
 
+	public AttributesSourceBuilder targetIds(Integer... targetIds) {
+		this.targetIds = Arrays.asList(targetIds);
+		return this;
+	}
+
 	public AttributesSourceBuilder groupSizeDistribution(List<Double> groupSizeDistribution) {
 		this.groupSizeDistribution = groupSizeDistribution;
 		return this;

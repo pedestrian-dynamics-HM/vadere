@@ -151,7 +151,7 @@ public class TopographyCheckerTest {
 
 		assertEquals(1, out.size());
 		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_SET, out.get(0).getReason());
-		assertEquals(TopographyCheckerMessageType.ERROR, out.get(0).getMsgType());
+		isErrorMsg(out.get(0));
 	}
 
 
@@ -174,7 +174,7 @@ public class TopographyCheckerTest {
 
 		assertEquals(1, out.size());
 		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, out.get(0).getReason());
-		assertEquals(TopographyCheckerMessageType.ERROR, out.get(0).getMsgType());
+		isErrorMsg(out.get(0));
 	}
 
 	@Test
@@ -200,7 +200,7 @@ public class TopographyCheckerTest {
 
 		assertEquals(1, out.size());
 		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, out.get(0).getReason());
-		assertEquals(TopographyCheckerMessageType.ERROR, out.get(0).getMsgType());
+		isErrorMsg(out.get(0));
 		assertEquals("[2]", out.get(0).getReasonModifier());
 	}
 
@@ -279,12 +279,63 @@ public class TopographyCheckerTest {
 
 		TopographyCheckerMessage msg = out.get(0);
 		assertEquals( 1, out.size());
-		assertEquals(TopographyCheckerMessageType.ERROR, msg.getMsgType());
+		isErrorMsg(msg);
 		assertEquals(TopographyCheckerReason.SOURCE_OVERLAP_WITH_OBSTACLE, msg.getReason());
 		assertEquals(testSource, msg.getMsgTarget().getTargets().get(0));
 		assertEquals(testObstacle, msg.getMsgTarget().getTargets().get(1));
 
 	}
 
+	// Test checkUnusedTargets
+
+	@Test
+	public void testCheckUnusedTargetsWithNoError(){
+		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
+
+		builder.addSource(attrSourceB.targetIds(1,2).build());
+		builder.addSource(attrSourceB.targetIds(3).build());
+
+		builder.addTarget(1);
+		builder.addTarget(2);
+		builder.addTarget(3);
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkUnusedTargets();
+
+		assertEquals(0, out.size());
+	}
+
+	@Test
+	public void testCheckUnusedTargetsWithError(){
+		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
+
+		builder.addSource(attrSourceB.targetIds(1,2).build());
+
+		builder.addTarget(1);
+		builder.addTarget(2);
+		builder.addTarget(3);
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkUnusedTargets();
+
+		assertEquals(1, out.size());
+		TopographyCheckerMessage msg = out.get(0);
+
+		isWarnMsg(msg);
+		assertEquals(TopographyCheckerReason.TARGET_UNUSED, msg.getReason());
+	}
+
+
+	private void  isErrorMsg(TopographyCheckerMessage msg){
+		assertEquals(TopographyCheckerMessageType.ERROR, msg.getMsgType());
+	}
+
+	private void isWarnMsg(TopographyCheckerMessage msg){
+		assertEquals(TopographyCheckerMessageType.WARN, msg.getMsgType());
+	}
 
 }

@@ -108,8 +108,6 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 
 
 	private void msgToDocString(StringBuilder sb, TopographyCheckerMessage msg, MsgDocument doc) {
-		sb.append(Messages.getString(msg.getMsgType().getLocalTypeId())).append(":  ");
-
 		sb.append("[");
 		msg.getMsgTarget().getTargets().forEach(t -> {
 			doc.makeLink(t, sb);

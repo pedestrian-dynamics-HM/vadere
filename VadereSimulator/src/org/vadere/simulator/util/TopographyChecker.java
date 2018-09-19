@@ -67,8 +67,29 @@ public class TopographyChecker {
 		ret.addAll(checkValidTargetsInSource());
 		ret.addAll(checkUniqueSourceId());
 		ret.addAll(checkSourceObstacleOverlap());
+		ret.addAll(checkUnusedTargets());
 		return ret;
 	}
+
+	public List<TopographyCheckerMessage> checkUnusedTargets() {
+		List<TopographyCheckerMessage> ret = new ArrayList<>();
+		Set<Integer> usedTargetIds = new HashSet<>();
+		topography.getSources()
+				.forEach(s -> usedTargetIds.addAll(s.getAttributes().getTargetIds()));
+
+		topography.getTargets().forEach(t -> {
+			if (!usedTargetIds.contains(t.getId())){
+				ret.add(msgBuilder
+						.warning()
+						.reason(TopographyCheckerReason.TARGET_UNUSED)
+						.target(t)
+						.build());
+			}
+		});
+
+		return ret;
+	}
+
 
     public List<TopographyCheckerMessage> checkValidTargetsInSource() {
 		List<TopographyCheckerMessage> ret = new ArrayList<>();
