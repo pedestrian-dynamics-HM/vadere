@@ -109,7 +109,15 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 
 	private void msgToDocString(StringBuilder sb, TopographyCheckerMessage msg, MsgDocument doc) {
 		sb.append(Messages.getString(msg.getMsgType().getLocalTypeId())).append(":  ");
-		doc.makeLink(msg.getElement(), sb);
+
+		sb.append("[");
+		msg.getMsgTarget().getTargets().forEach(t -> {
+			doc.makeLink(t, sb);
+			sb.append(", ");
+		});
+		sb.setLength(sb.length()-2);
+		sb.append("] ");
+
 		sb.append("Reason: ").append(Messages.getString(msg.getReason().getLocalMessageId()));
 		if (!msg.getReasonModifier().isEmpty()) {
 			sb.append(" ").append(msg.getReasonModifier());
@@ -130,7 +138,6 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 		if (errorMsg.size() > 0) {
 			ScenarioPanel.setActiveTopographyErrorMsg(msgDocument);
 		}
-
 	}
 
 
@@ -148,7 +155,6 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 			setContentType("text/html");
 			setEditable(false);
 			addHyperlinkListener(e -> {
-				System.out.println(e.getEventType().toString() + " " + e.getDescription());
 				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 					ScenarioElement element = linkMap.getOrDefault(e.getDescription(), null);
 					if (element != null) {
@@ -163,7 +169,7 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 			sb.append("<a href='element/id/")
 					.append(id).append("'>")
 					.append(element.getClass().getSimpleName())
-					.append("(Id:").append(element.getId()).append(")")
+					.append("{Id:").append(element.getId()).append("}")
 					.append("</a>");
 			id++;
 		}

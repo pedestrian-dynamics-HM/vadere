@@ -16,12 +16,12 @@ public class TopographyCheckerMessage implements Comparable<TopographyCheckerMes
 	// error or warning. A scenario with an error cannot be simulated.
 	private TopographyCheckerMessageType msgType;
 	// element producing the error / warning
-	private ScenarioElement element;
+	private TopographyCheckerMessageTarget msgTarget;
 
 
 	public TopographyCheckerMessage(TopographyCheckerMessageType type) {
 		msgType = type;
-		element = null;
+		msgTarget = null;
 		reasonModifier = "";
 	}
 
@@ -41,12 +41,12 @@ public class TopographyCheckerMessage implements Comparable<TopographyCheckerMes
 		this.msgType = msgType;
 	}
 
-	public ScenarioElement getElement() {
-		return element;
+	public TopographyCheckerMessageTarget getMsgTarget() {
+		return msgTarget;
 	}
 
-	public void setElement(ScenarioElement element) {
-		this.element = element;
+	public void setMsgTarget(TopographyCheckerMessageTarget msgTarget) {
+		this.msgTarget = msgTarget;
 	}
 
 	public String getReasonModifier() {
@@ -70,24 +70,24 @@ public class TopographyCheckerMessage implements Comparable<TopographyCheckerMes
 			}
 		};
 	}
-
-	private Comparator<TopographyCheckerMessage> sortByElement() {
-		return (o1, o2) -> {
-			if (o1.element.equals(o2.element))
-				return 0;
-
-			if (o1.element.getType().ordinal() > o2.element.getType().ordinal()) {
-				return 1;
-			} else if (o1.element.getType().ordinal() < o2.element.getType().ordinal()) {
-				return -1;
-			} else {
-				return 0;
-			}
-		};
-	}
+//
+//	private Comparator<TopographyCheckerMessage> sortByElement() {
+//		return (o1, o2) -> {
+//			if (o1.element.equals(o2.element))
+//				return 0;
+//
+//			if (o1.element.getType().ordinal() > o2.element.getType().ordinal()) {
+//				return 1;
+//			} else if (o1.element.getType().ordinal() < o2.element.getType().ordinal()) {
+//				return -1;
+//			} else {
+//				return 0;
+//			}
+//		};
+//	}
 
 	private Comparator<TopographyCheckerMessage> defaultSort() {
-		return sortByType().thenComparing(sortByElement());
+		return sortByType();
 	}
 
 	@Override

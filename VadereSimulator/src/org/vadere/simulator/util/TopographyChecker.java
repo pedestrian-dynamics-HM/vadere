@@ -10,10 +10,7 @@ import org.vadere.state.scenario.Topography;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class TopographyChecker {
@@ -39,14 +36,37 @@ public class TopographyChecker {
         return intersectList;
     }
 
+
     public boolean hasObstacleOverlaps() {
         return checkObstacleOverlap().size() > 0;
     }
+
+	public List<TopographyCheckerMessage> checkSourceObstacleOverlap(){
+		List<TopographyCheckerMessage> ret = new ArrayList<>();
+    	final List<Source> sources = topography.getSources();
+    	final List<Obstacle> obstacles = topography.getObstacles();
+
+		for (Obstacle obstacle : obstacles) {
+			for(Source source: sources){
+				if (obstacle.getShape().intersects(source.getShape())){
+					ret.add(msgBuilder.error()
+							.reason(TopographyCheckerReason.SOURCE_OVERLAP_WITH_OBSTACLE)
+							.target(source, obstacle)
+							.build());
+				}
+			}
+		}
+		return ret;
+	}
+
+
+
 
     public List<TopographyCheckerMessage> checkBuildingStep(){
 		List<TopographyCheckerMessage> ret = new ArrayList<>();
 		ret.addAll(checkValidTargetsInSource());
 		ret.addAll(checkUniqueSourceId());
+		ret.addAll(checkSourceObstacleOverlap());
 		return ret;
 	}
 
@@ -61,12 +81,12 @@ public class TopographyChecker {
 				if (s.getAttributes().getSpawnNumber() == 0){
 					ret.add(msgBuilder
 							.warning()
-							.element(s)
+							.target(s)
 							.reason(TopographyCheckerReason.SOURCE_NO_TARGET_ID_NO_SPAWN)
 							.build());
 				} else {
 					ret.add(msgBuilder.error()
-							.element(s)
+							.target(s)
 							.reason(TopographyCheckerReason.SOURCE_NO_TARGET_ID_SET)
 							.build());
 				}
@@ -82,7 +102,7 @@ public class TopographyChecker {
 					sj.setLength(sj.length() - 2);
 					sj.append("]");
 					ret.add(msgBuilder.error()
-							.element(s)
+							.target(s)
 							.reason(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, sj.toString())
 							.build());
 				}
@@ -99,7 +119,7 @@ public class TopographyChecker {
 		for(Source s : topography.getSources()){
 			if (!sourceId.add(s.getId())){
 				ret.add(msgBuilder.warning()
-						.element(s)
+						.target(s)
 						.reason(TopographyCheckerReason.SOURCE_ID_NOT_UNIQUE)
 						.build());
 			}

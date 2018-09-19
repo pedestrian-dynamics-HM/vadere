@@ -4,6 +4,7 @@ import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
@@ -13,6 +14,7 @@ import org.vadere.util.geometry.shapes.VShape;
 public class TopographyTestBuilder {
 
 	Topography topography;
+	ScenarioElement lastAddedElement;
 
 	public TopographyTestBuilder(){
 		topography = new Topography();
@@ -22,6 +24,10 @@ public class TopographyTestBuilder {
 		Topography ret = topography;
 		topography = new Topography();
 		return  ret;
+	}
+
+	public ScenarioElement getLastAddedElement(){
+		return lastAddedElement;
 	}
 
 
@@ -41,7 +47,9 @@ public class TopographyTestBuilder {
 	}
 
 	TopographyTestBuilder addSource(AttributesSource attr){
-		topography.addSource(new Source(attr));
+		Source source = new Source(attr);
+		lastAddedElement = source;
+		topography.addSource(source);
 		return  this;
 	}
 
@@ -61,7 +69,9 @@ public class TopographyTestBuilder {
 	}
 
 	TopographyTestBuilder addTarget(AttributesTarget attr){
-		topography.addTarget(new Target(attr));
+		Target target = new Target(attr);
+		lastAddedElement = target;
+		topography.addTarget(target);
 		return this;
 	}
 
@@ -81,7 +91,9 @@ public class TopographyTestBuilder {
 	}
 
 	TopographyTestBuilder addObstacle(AttributesObstacle attr){
-		topography.addObstacle(new Obstacle(attr));
+		Obstacle obstacle = new Obstacle(attr);
+		lastAddedElement = obstacle;
+		topography.addObstacle(obstacle);
 		return this;
 	}
 

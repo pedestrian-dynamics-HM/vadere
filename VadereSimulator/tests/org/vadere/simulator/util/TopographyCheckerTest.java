@@ -4,10 +4,13 @@ import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.builder.AttributesObstacleBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesSourceBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesTargetBuilder;
 import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
@@ -45,25 +48,6 @@ public class TopographyCheckerTest {
 		assertEquals(1, actualList.size());
 	}
 
-	@Test
-	public void tset() {
-		MsgDocument doc = new MsgDocument();
-		doc.setContentType("text/html");
-		doc.setText("File not found please contact:<a href='element/0023'>e-mail to</a> or call 963");
-		doc.addHyperlinkListener(e -> {
-			System.out.println(e.getURL());
-		});
-
-	}
-
-	class MsgDocument extends JTextPane {
-
-		public MsgDocument() {
-
-		}
-
-
-	}
 
 	@Test
 	public void testCheckObstacleOverlapHasNoOverlap() {
@@ -96,6 +80,8 @@ public class TopographyCheckerTest {
 
 		assertEquals(0, actualList.size());
 	}
+
+	// Test checkUniqueSourceId
 
 	/**
 	 * There should be non unique ids
@@ -131,6 +117,8 @@ public class TopographyCheckerTest {
 
 		assertEquals("No warnings expected", 0, out.size());
 	}
+
+	// Test checkValidTargetsInSource
 
 	@Test
 	public void TestCheckValidTargetsInSourceNoIdNoSpawn() {
@@ -235,5 +223,68 @@ public class TopographyCheckerTest {
 
 		assertEquals(0, out.size());
 	}
+
+	// Test checkSourceObstacleOverlap
+
+	@Test
+	public void testCheckSourceObstacleOverlapWithNoOverlap(){
+		AttributesObstacleBuilder attrObstacleB = AttributesObstacleBuilder.anAttributesObstacle();
+		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
+
+		builder.addSource(attrSourceB
+				.shape(new VRectangle(0,0,10,10))
+				.build());
+
+		builder.addObstacle(attrObstacleB
+				.shape(new VRectangle(15,15,5,5))
+				.build());
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkSourceObstacleOverlap();
+
+		assertEquals( 0, out.size());
+	}
+
+
+	@Test
+	public void testCheckSourceObstacleOverlapWithOverlap(){
+		AttributesObstacleBuilder attrObstacleB = AttributesObstacleBuilder.anAttributesObstacle();
+		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
+
+		builder.addSource(attrSourceB
+				.shape(new VRectangle(0,0,10,10))
+				.build());
+		Source testSource = (Source)builder.getLastAddedElement();
+
+		builder.addSource(attrSourceB
+				.shape(new VRectangle(100,100,10,10))
+				.build());
+
+
+		builder.addObstacle(attrObstacleB
+				.shape(new VCircle(0,0,5.0))
+				.build());
+		Obstacle testObstacle = (Obstacle) builder.getLastAddedElement();
+
+		builder.addObstacle(attrObstacleB
+				.shape(new VRectangle(15,15,5,5))
+				.build());
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkSourceObstacleOverlap();
+
+		TopographyCheckerMessage msg = out.get(0);
+		assertEquals( 1, out.size());
+		assertEquals(TopographyCheckerMessageType.ERROR, msg.getMsgType());
+		assertEquals(TopographyCheckerReason.SOURCE_OVERLAP_WITH_OBSTACLE, msg.getReason());
+		assertEquals(testSource, msg.getMsgTarget().getTargets().get(0));
+		assertEquals(testObstacle, msg.getMsgTarget().getTargets().get(1));
+
+	}
+
 
 }

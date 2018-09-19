@@ -29,8 +29,8 @@ public class TopographyCheckerMessageBuilder {
 		return this;
 	}
 
-	public TopographyCheckerMessageBuilder element(ScenarioElement element) {
-		msg.setElement(element);
+	public TopographyCheckerMessageBuilder target(ScenarioElement... targets) {
+		msg.setMsgTarget(new TopographyCheckerMessageTarget(targets));
 		return this;
 	}
 
