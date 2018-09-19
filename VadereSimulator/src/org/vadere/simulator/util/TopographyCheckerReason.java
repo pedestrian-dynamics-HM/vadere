@@ -18,7 +18,8 @@ public enum TopographyCheckerReason {
 	OBSTACLES_OVERLAP("TopographyChecker.obstacles.overlap"),
 	SOURCE_OVERLAP("TopographyChecker.source.overlap"),
 	TARGET_OVERLAP("TopographyChecker.target.overlap"),
-	STAIRS_OVERLAP("TopographyChecker.stairs.overlap");
+	STAIRS_OVERLAP("TopographyChecker.stairs.overlap"),
+	PEDESTRIAN_SPEED_SETUP("TopographyChecker.pedestrian.speedsetup");
 
 	private String msgId;
 

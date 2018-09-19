@@ -4,11 +4,13 @@ import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.builder.AttributesAgentBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesObstacleBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesSourceBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesStairsBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesTargetBuilder;
 import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -380,6 +382,72 @@ public class TopographyCheckerTest {
 		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
 		hasNoElement(out);
 	}
+
+
+	// Test checkPedestrianSpeedSetup
+
+	@Test
+	public void testCheckPedestrianSpeedSetupToSmall(){
+		AttributesAgentBuilder attrAgentB = AttributesAgentBuilder.anAttributesAgent();
+
+		builder.addPedestrian(attrAgentB
+								.minimumSpeed(1.2)
+								.maximumSpeed(2.2)
+								.speedDistributionMean(0.8)
+								.build());
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isErrorMsg(msg);
+		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_SETUP, msg.getReason());
+	}
+
+	@Test
+	public void testCheckPedestrianSpeedSetupToBig(){
+		AttributesAgentBuilder attrAgentB = AttributesAgentBuilder.anAttributesAgent();
+
+		builder.addPedestrian(attrAgentB
+				.minimumSpeed(0.5)
+				.maximumSpeed(2.2)
+				.build());
+
+		// SpeedDistributionMean cannot be set bigger than max speed at construction time.
+		Pedestrian p = (Pedestrian) builder.getLastAddedElement();
+		p.getAttributes().setSpeedDistributionMean(10.0);
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isErrorMsg(msg);
+		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_SETUP, msg.getReason());
+	}
+
+
+	@Test
+	public void testCheckPedestrianSpeedSetupOk(){
+		AttributesAgentBuilder attrAgentB = AttributesAgentBuilder.anAttributesAgent();
+
+		builder.addPedestrian(attrAgentB
+				.minimumSpeed(0.5)
+				.maximumSpeed(2.2)
+				.speedDistributionMean(0.8)
+				.build());
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+
+		hasNoElement(out);
+	}
+
 
 	private TopographyCheckerMessage hasOneElement(List<TopographyCheckerMessage> out){
 		assertEquals(1, out.size());

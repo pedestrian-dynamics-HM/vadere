@@ -1,10 +1,12 @@
 package org.vadere.simulator.util;
 
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Stairs;
@@ -13,13 +15,17 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.util.Random;
+
 public class TopographyTestBuilder {
 
 	Topography topography;
 	ScenarioElement lastAddedElement;
+	Random rnd;
 
 	public TopographyTestBuilder(){
 		topography = new Topography();
+		rnd = new Random(1);
 	}
 
 	public Topography build(){
@@ -111,6 +117,16 @@ public class TopographyTestBuilder {
 		return this;
 	}
 
+	TopographyTestBuilder addPedestrian(){
 
+		return this;
+	}
+
+	TopographyTestBuilder addPedestrian(AttributesAgent attr){
+		Pedestrian pedestrian = new Pedestrian(attr, rnd);
+		lastAddedElement = pedestrian;
+		topography.addInitialElement(pedestrian);
+		return this;
+	}
 
 }

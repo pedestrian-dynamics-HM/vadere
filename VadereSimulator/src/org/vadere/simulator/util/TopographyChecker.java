@@ -3,12 +3,14 @@ package org.vadere.simulator.util;
 import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +70,27 @@ public class TopographyChecker {
 		ret.addAll(checkSourceObstacleOverlap());
 		ret.addAll(checkUnusedTargets());
 		ret.addAll(checkStairTreadSanity());
+		ret.addAll(checkPedestrianSpeedSetup());
+		return ret;
+	}
+
+	public List<TopographyCheckerMessage> checkPedestrianSpeedSetup() {
+		List<TopographyCheckerMessage> ret = new ArrayList<>();
+		topography.getPedestrianDynamicElements().getInitialElements().forEach(p -> {
+			double speedMean = p.getSpeedDistributionMean();
+			if (speedMean < p.getAttributes().getMinimumSpeed() || speedMean > p.getAttributes().getMaximumSpeed()){
+				ret.add(msgBuilder
+						.error()
+						.target(p)
+						.reason(TopographyCheckerReason.PEDESTRIAN_SPEED_SETUP,
+								"(" + p.getAttributes().getMaximumSpeed()
+										+ "  &lt; treadDepth  &gt; "
+										+ p.getAttributes().getMaximumSpeed() +
+								") current SpeedDistributionMean is: " + String.format("%.2f",speedMean))
+						.build());
+			}
+		});
+
 		return ret;
 	}
 
