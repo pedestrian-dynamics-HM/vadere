@@ -2,10 +2,12 @@ package org.vadere.simulator.util;
 
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -96,5 +98,19 @@ public class TopographyTestBuilder {
 		topography.addObstacle(obstacle);
 		return this;
 	}
+
+	TopographyTestBuilder addStairs(){
+		addStairs(new AttributesStairs());
+		return this;
+	}
+
+	TopographyTestBuilder addStairs(AttributesStairs attr){
+		Stairs stairs = new Stairs(attr);
+		lastAddedElement = stairs;
+		topography.addStairs(stairs);
+		return this;
+	}
+
+
 
 }

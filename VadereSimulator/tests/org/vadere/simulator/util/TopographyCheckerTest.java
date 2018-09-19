@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.builder.AttributesObstacleBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesSourceBuilder;
+import org.vadere.state.attributes.scenario.builder.AttributesStairsBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesTargetBuilder;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Source;
@@ -133,8 +134,8 @@ public class TopographyCheckerTest {
 		TopographyChecker checker = new TopographyChecker(topography);
 		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		assertEquals(1, out.size());
-		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_NO_SPAWN, out.get(0).getReason());
+		TopographyCheckerMessage msg = hasOneElement(out);
+		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_NO_SPAWN, msg.getReason());
 	}
 
 	@Test
@@ -149,9 +150,9 @@ public class TopographyCheckerTest {
 		TopographyChecker checker = new TopographyChecker(topography);
 		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		assertEquals(1, out.size());
-		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_SET, out.get(0).getReason());
-		isErrorMsg(out.get(0));
+		TopographyCheckerMessage msg = hasOneElement(out);
+		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_SET, msg.getReason());
+		isErrorMsg(msg);
 	}
 
 
@@ -172,9 +173,9 @@ public class TopographyCheckerTest {
 		TopographyChecker checker = new TopographyChecker(topography);
 		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		assertEquals(1, out.size());
-		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, out.get(0).getReason());
-		isErrorMsg(out.get(0));
+		TopographyCheckerMessage msg = hasOneElement(out);
+		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, msg.getReason());
+		isErrorMsg(msg);
 	}
 
 	@Test
@@ -198,10 +199,10 @@ public class TopographyCheckerTest {
 		TopographyChecker checker = new TopographyChecker(topography);
 		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		assertEquals(1, out.size());
-		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, out.get(0).getReason());
-		isErrorMsg(out.get(0));
-		assertEquals("[2]", out.get(0).getReasonModifier());
+		TopographyCheckerMessage msg = hasOneElement(out);
+		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, msg.getReason());
+		isErrorMsg(msg);
+		assertEquals("[2]", msg.getReasonModifier());
 	}
 
 	@Test
@@ -221,7 +222,7 @@ public class TopographyCheckerTest {
 		TopographyChecker checker = new TopographyChecker(topography);
 		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		assertEquals(0, out.size());
+		hasNoElement(out);
 	}
 
 	// Test checkSourceObstacleOverlap
@@ -244,7 +245,7 @@ public class TopographyCheckerTest {
 
 		List<TopographyCheckerMessage> out = checker.checkSourceObstacleOverlap();
 
-		assertEquals( 0, out.size());
+		hasNoElement(out);
 	}
 
 
@@ -277,8 +278,7 @@ public class TopographyCheckerTest {
 
 		List<TopographyCheckerMessage> out = checker.checkSourceObstacleOverlap();
 
-		TopographyCheckerMessage msg = out.get(0);
-		assertEquals( 1, out.size());
+		TopographyCheckerMessage msg = hasOneElement(out);
 		isErrorMsg(msg);
 		assertEquals(TopographyCheckerReason.SOURCE_OVERLAP_WITH_OBSTACLE, msg.getReason());
 		assertEquals(testSource, msg.getMsgTarget().getTargets().get(0));
@@ -304,7 +304,7 @@ public class TopographyCheckerTest {
 
 		List<TopographyCheckerMessage> out = checker.checkUnusedTargets();
 
-		assertEquals(0, out.size());
+		hasNoElement(out);
 	}
 
 	@Test
@@ -322,13 +322,73 @@ public class TopographyCheckerTest {
 
 		List<TopographyCheckerMessage> out = checker.checkUnusedTargets();
 
-		assertEquals(1, out.size());
-		TopographyCheckerMessage msg = out.get(0);
+		TopographyCheckerMessage msg = hasOneElement(out);
 
 		isWarnMsg(msg);
 		assertEquals(TopographyCheckerReason.TARGET_UNUSED, msg.getReason());
 	}
 
+	// Test checkStairTreadSanity
+
+	@Test
+	public void tesCheckStairTreadSanityTreadToBig(){
+		AttributesStairsBuilder attrStairsB = AttributesStairsBuilder.anAttributesStairs();
+
+		builder.addStairs(attrStairsB
+				.shape(new VRectangle(0,0,10.0,10.0))
+				.treadCount(3) // 10m / 3treads = 3.333
+				.build());
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isWarnMsg(msg);
+		assertEquals(TopographyCheckerReason.STAIRS_TREAD_DIM_WRONG, msg.getReason());
+	}
+
+	@Test
+	public void tesCheckStairTreadSanityTreadToSmall(){
+		AttributesStairsBuilder attrStairsB = AttributesStairsBuilder.anAttributesStairs();
+
+		builder.addStairs(attrStairsB
+				.shape(new VRectangle(0,0,10.0,10.0))
+				.treadCount(200) // 10m / 200 treads = 0.050
+				.build());
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isWarnMsg(msg);
+		assertEquals(TopographyCheckerReason.STAIRS_TREAD_DIM_WRONG, msg.getReason());
+	}
+
+	@Test
+	public void tesCheckStairTreadSanityTreadOk(){
+		AttributesStairsBuilder attrStairsB = AttributesStairsBuilder.anAttributesStairs();
+
+		builder.addStairs(attrStairsB
+				.shape(new VRectangle(0,0,10.0,10.0))
+				.treadCount(80) // 10m / 80treads = 0.125
+				.build());
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
+		hasNoElement(out);
+	}
+
+	private TopographyCheckerMessage hasOneElement(List<TopographyCheckerMessage> out){
+		assertEquals(1, out.size());
+		return out.get(0);
+	}
+
+	private void hasNoElement(List<TopographyCheckerMessage> out){
+		assertEquals(0, out.size());
+	}
 
 	private void  isErrorMsg(TopographyCheckerMessage msg){
 		assertEquals(TopographyCheckerMessageType.ERROR, msg.getMsgType());

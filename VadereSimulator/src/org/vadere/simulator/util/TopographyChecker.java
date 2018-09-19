@@ -4,6 +4,7 @@ import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
@@ -60,16 +61,35 @@ public class TopographyChecker {
 	}
 
 
-
-
     public List<TopographyCheckerMessage> checkBuildingStep(){
 		List<TopographyCheckerMessage> ret = new ArrayList<>();
 		ret.addAll(checkValidTargetsInSource());
 		ret.addAll(checkUniqueSourceId());
 		ret.addAll(checkSourceObstacleOverlap());
 		ret.addAll(checkUnusedTargets());
+		ret.addAll(checkStairTreadSanity());
 		return ret;
 	}
+
+	public List<TopographyCheckerMessage> checkStairTreadSanity() {
+		List<TopographyCheckerMessage> ret = new ArrayList<>();
+		topography.getStairs().forEach( stairs -> {
+			double treadDepth = stairs.getTreadDepth();
+			if (treadDepth < Stairs.MIN_TREAD_DEPTH || treadDepth > Stairs.MAX_TREAD_DEPTH){
+				ret.add(msgBuilder
+						.warning()
+						.target(stairs)
+						.reason(TopographyCheckerReason.STAIRS_TREAD_DIM_WRONG
+								, "(" + Stairs.MIN_TREAD_DEPTH + "m  &lt; treadDepth  &gt; " + Stairs.MAX_TREAD_DEPTH +
+										"m) current treadDepth is: " + String.format("%.3fm",stairs.getTreadDepth()))
+						.build()
+				);
+			}
+		});
+
+		return ret;
+    }
+
 
 	public List<TopographyCheckerMessage> checkUnusedTargets() {
 		List<TopographyCheckerMessage> ret = new ArrayList<>();
