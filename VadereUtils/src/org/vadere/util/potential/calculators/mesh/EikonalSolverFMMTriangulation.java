@@ -23,7 +23,7 @@ import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.PotentialPoint;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.mesh.iterators.FaceIterator;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -200,7 +200,13 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 	    }
     }
 
-    @Override
+    // unknownPenalty is ignored.
+	@Override
+	public double getPotential(IPoint pos, double unknownPenalty, double weight) {
+		return weight * getPotential(pos.getX(), pos.getY());
+	}
+
+	@Override
     public Function<IPoint, Double> getPotentialField() {
 	    ITriangulation<P, V, E, F> clone = triangulation.clone();
 	    return p -> getPotential(clone, p.getX(), p.getY());
@@ -218,7 +224,7 @@ public class EikonalSolverFMMTriangulation<P extends PotentialPoint, V extends I
 
 	    Optional<F> optFace = triangulation.locateFace(x, y);
 
-	    double result = -1.0;
+	    double result = Double.MAX_VALUE;
 	    if(!optFace.isPresent()) {
 		    //logger.warn("no face found for coordinates (" + x + "," + y + ")");
 	    }

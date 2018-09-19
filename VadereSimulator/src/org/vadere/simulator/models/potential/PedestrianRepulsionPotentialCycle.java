@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -12,9 +13,11 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+@ModelClass
 public class PedestrianRepulsionPotentialCycle implements
 		PotentialFieldAgent {
 
@@ -29,8 +32,8 @@ public class PedestrianRepulsionPotentialCycle implements
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
-			Collection<? extends Agent> closePedestrians) {
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Collection<? extends Agent> closePedestrians) {
 
 		double result = potentialFieldPedestrian.getAgentPotential(pos,
 				pedestrian, closePedestrians);
@@ -39,8 +42,8 @@ public class PedestrianRepulsionPotentialCycle implements
 
 			Teleporter teleporter = scenario.getTeleporter();
 			// shift forwards
-			VPoint shiftPos = new VPoint(pos.x
-					+ teleporter.getTeleporterShift().x, pos.y); // TODO [priority=medium] [task=feature] the y coordinate of the teleporter is not used yet
+			VPoint shiftPos = new VPoint(pos.getX()
+					+ teleporter.getTeleporterShift().x, pos.getY()); // TODO [priority=medium] [task=feature] the y coordinate of the teleporter is not used yet
 
 			// TODO [priority=low] [task=refactoring] find a better way to get the close pedestrians in this case
 			closePedestrians = potentialFieldPedestrian.getRelevantAgents(
@@ -50,8 +53,8 @@ public class PedestrianRepulsionPotentialCycle implements
 					pedestrian, closePedestrians);
 
 			// shift backwards
-			shiftPos = new VPoint(pos.x - teleporter.getTeleporterShift().x,
-					pos.y); // TODO [priority=low] [task=refactoring] the y coordinate of the teleporter is not used yet
+			shiftPos = new VPoint(pos.getX() - teleporter.getTeleporterShift().x,
+					pos.getY()); // TODO [priority=low] [task=refactoring] the y coordinate of the teleporter is not used yet
 
 			// TODO [task=refactoring] [priority=low] find a better way to get the close pedestrians in this case
 			closePedestrians = potentialFieldPedestrian.getRelevantAgents(
@@ -65,7 +68,7 @@ public class PedestrianRepulsionPotentialCycle implements
 	}
 
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> closePedestrians) {
 		Vector2D result = potentialFieldPedestrian
@@ -76,8 +79,8 @@ public class PedestrianRepulsionPotentialCycle implements
 
 			Teleporter teleporter = scenario.getTeleporter();
 			// shift forwards
-			VPoint shiftPos = new VPoint(pos.x
-					+ teleporter.getTeleporterShift().x, pos.y
+			VPoint shiftPos = new VPoint(pos.getX()
+					+ teleporter.getTeleporterShift().x, pos.getY()
 							+ teleporter.getTeleporterShift().y);
 
 			// TODO [priority=low] [task=refactoring] find a better way to get the close pedestrians in this case
@@ -89,8 +92,8 @@ public class PedestrianRepulsionPotentialCycle implements
 							pedestrian, closePedestrians));
 
 			// shift backwards
-			shiftPos = new VPoint(pos.x - teleporter.getTeleporterShift().x,
-					pos.y - teleporter.getTeleporterShift().y);
+			shiftPos = new VPoint(pos.getX() - teleporter.getTeleporterShift().x,
+					pos.getY() - teleporter.getTeleporterShift().y);
 
 			// TODO [priority=low] [task=refactoring] find a better way to get the close pedestrians in this case
 			closePedestrians = potentialFieldPedestrian.getRelevantAgents(
@@ -105,7 +108,7 @@ public class PedestrianRepulsionPotentialCycle implements
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 			Agent otherPedestrian) {
 		throw new UnsupportedOperationException();
 	}

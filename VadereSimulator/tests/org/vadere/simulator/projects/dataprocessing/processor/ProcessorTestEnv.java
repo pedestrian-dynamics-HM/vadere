@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
-import org.vadere.tests.reflection.ReflectionHelper;
+import org.vadere.tests.util.reflection.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,8 +70,8 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 		testedProcessor = null;
 		outputFile = null;
 		requiredProcessors = new LinkedList<>();
-		processorFactory = new DataProcessorFactory();
-		outputFileFactory = new OutputFileFactory();
+		processorFactory = DataProcessorFactory.instance();
+		outputFileFactory = OutputFileFactory.instance();
 	}
 
 	/**
@@ -128,11 +128,13 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 
 	void removeState(int index) {
 		states.remove(index);
+		expectedOutput.remove(index);
 		requiredProcessors.forEach(env -> env.removeState(index));
 	}
 
 	void clearStates() {
 		states.clear();
+		expectedOutput.clear();
 		requiredProcessors.forEach(ProcessorTestEnv::clearStates);
 	}
 

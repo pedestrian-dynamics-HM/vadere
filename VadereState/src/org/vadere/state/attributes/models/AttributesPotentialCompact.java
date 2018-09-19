@@ -1,11 +1,9 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
-/**
- * reference: The effect of stepping on pedestrian trajectories (seitz-2015).
- *
- */
+@ModelAttributeClass
 public class AttributesPotentialCompact extends Attributes {
 
 	// queueing

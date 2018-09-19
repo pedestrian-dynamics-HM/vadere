@@ -1,14 +1,24 @@
-![Vadere](vadere.png "Vadere")
+![VADERE](vadere.png "VADERE")
 
 ---
 
-# Vadere
+# VADERE
 
-Vadere is an open source framework for the simulation of microscopic pedestrian dynamics. In addition to this core domain, other systems including cars and granular flow can be introduced into the framework. Vadere provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of simulation models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies.
+VADERE is an open source framework for the simulation of microscopic pedestrian dynamics. In addition to this core domain, other systems including cars and granular flow can be introduced into the framework. VADERE provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of simulation models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies.
 
-This software runs on OS X, Windows, and Linux. 
+This software runs on OS X, Windows, and Linux.
 
-Vadere has been developed at the Munich University of Applied Sciences at the department for Computer Science and Mathematics. However, we welcome contributions from external sources.
+VADERE has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
+research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
+[department for Computer Science and Mathematics](http://cs.hm.edu/).
+However, we welcome contributions from external sources.
+
+## Pipeline Status
+
+| Branch  | Pipeline Status  | Coverage |
+|:--------|:----------------:|:--------:| 
+| master  | [![pipeline status (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) | [![coverage report (master)](https://gitlab.lrz.de/vadere/vadere/badges/master/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/master) |
+| stable | [![pipeline status (stable)](https://gitlab.lrz.de/vadere/vadere/badges/stable/pipeline.svg)](https://gitlab.lrz.de/vadere/vadere/commits/stable) | [![coverage report (stable)](https://gitlab.lrz.de/vadere/vadere/badges/stable/coverage.svg)](https://gitlab.lrz.de/vadere/vadere/commits/stable) |
 
 ## Installation
 
@@ -30,7 +40,9 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 
 * Windows: For further information using OpenCL on Windows [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
 * OS X: OpenCL is pre-installed for OS X.
-* Linux: Please refer to the installation manual of your Linux distribution.
+* Linux: Please refer to the installation manual of your Linux distribution. 
+  * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
+  * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
 ### Run the Application
 
@@ -39,7 +51,7 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
-## Usage Example 
+## Usage Example
 
 With the following steps, you can start a scenario of one of the model test projects in [VadereModelTests](VadereModelTests):
 
@@ -57,13 +69,13 @@ Follow the **installation instructions** above i.e. install all required softwar
 
 - *File* > *Import* > *Maven* > *Existing Maven Projects*
 - choose `pom.xml` as *Root Directory* and click *Finish*
-- open *VadereGui* > *src* > *projectview* > `VadereApplication`
+- open *Vaderegui (gui)* > *src* > *org.vadere.gui.projectview* > `Vadereapplication`
 
 ### IntelliJ IDEA
 
-- on the welcome-screen select *Import Project* 
+- on the welcome-screen select *Import Project*
 - select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
-- open *VadereGui* > *src* > *projectview* > `VadereApplication`
+- open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
 - click the *run*-icon next to the `main` method
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
@@ -82,27 +94,25 @@ from [version-control](Documentation/version-control) to your local **.git/hooks
 These files start the script [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software).
 2. Make sure that [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software) is executable.
 
-To create this file without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
+To create the **current_commit_hash.txt** without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
 switch to another branch and switch back again using the command line or any other tool you prefer.
 
 ## Contribution
 
-Please see [Contribution guidelines](CONTRIBUTION.md). The document defines guidelines for coding style and commit messages.
-
-## Release History
-
-- 0.1 initial release of the software as open source
-- 0.2 stability and usability improved, additional pedestrian simulation models are supported
-
+Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
 
 ## Contributors
 
 People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
 
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Benedikt Kleinmeier, Jakob Sch&ouml;ttl, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Z&ouml;nnchen
+Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Marion Gödel, Benedikt Kleinmeier, Daniel Lehmberg, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 ## License
 
 This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
+
 For more information: http://www.gnu.org/licenses/lgpl.html

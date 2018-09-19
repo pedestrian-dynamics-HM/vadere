@@ -4,6 +4,7 @@ package org.vadere.util.triangulation.adaptive;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
 

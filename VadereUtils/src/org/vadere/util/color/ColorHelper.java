@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class ColorHelper {
 
@@ -17,8 +18,28 @@ public class ColorHelper {
 	private final static Map<Integer, Color> map = initNumberToColorMap();
 	private int maxValue;
 
+	private static Random random = new Random();
+
 	public ColorHelper(final int maxValue) {
 		this.maxValue = maxValue;
+	}
+
+	public static Color randomColor() {
+		return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+	}
+
+	public Color numberToColor(final double value) {
+		if (value < 0) {
+			return numberToColorPercentage(0);
+		} else if (value > maxValue) {
+			return numberToColorPercentage(1);
+		} else {
+			return numberToColorPercentage(value / maxValue);
+		}
+	}
+
+	public int getMaxValue() {
+		return maxValue;
 	}
 
 	public static Color numberToColorPercentage(final double value) {
@@ -110,19 +131,5 @@ public class ColorHelper {
 		return new Color(Math.abs(190 - c.getRed()),
 				Math.abs(190 - c.getGreen()),
 				Math.abs(190 - c.getBlue()));
-	}
-
-	public Color numberToColor(final double value) {
-		if (value < 0) {
-			return numberToColorPercentage(0);
-		} else if (value > maxValue) {
-			return numberToColorPercentage(1);
-		} else {
-			return numberToColorPercentage(value / maxValue);
-		}
-	}
-
-	public int getMaxValue() {
-		return maxValue;
 	}
 }

@@ -14,7 +14,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.triangulation.ITriangulationSupplier;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
 import java.util.*;

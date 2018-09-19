@@ -4,7 +4,7 @@ import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;

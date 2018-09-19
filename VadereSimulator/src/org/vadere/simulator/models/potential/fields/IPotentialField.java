@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
@@ -17,6 +18,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.FloorDiscretizer;
@@ -26,11 +28,10 @@ import org.vadere.util.potential.calculators.PotentialFieldCalculatorNone;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFSM;
-import org.vadere.util.potential.calculators.cartesian.EikonalSolverSFMM;
 import org.vadere.util.potential.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.improver.PPSMeshing;
 
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.vadere.util.math.InterpolationUtil;
 
 /**
  * A potential field for some agents: ((x,y), agent) -> potential.
@@ -57,7 +60,6 @@ public interface IPotentialField {
      * @return a potential at pos for the agent
      */
     double getPotential(final IPoint pos, final Agent agent);
-
 
     Logger logger = LogManager.getLogger(IPotentialField.class);
 
@@ -93,12 +95,12 @@ public interface IPotentialField {
 
 	        if (createMethod != EikonalSolverType.NONE) {
 		        for (VShape shape : targetShapes) {
-			        FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
+			        FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
 					        new CellState(0.0, PathFindingTag.Target));
 		        }
 
 		        for (Obstacle obstacle : topography.getObstacles()) {
-			        FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, obstacle.getShape(),
+			        FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle.getShape(),
 					        new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
 		        }
 	        }
@@ -177,4 +179,52 @@ public interface IPotentialField {
         logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
         return eikonalSolver;
     }
+
+
+	static IPotentialField copyAgentField(final @NotNull IPotentialField potentialField, final @NotNull Agent agent, final @NotNull VRectangle bound, final double steps) {
+
+		final int gridWidth = (int)Math.ceil(bound.getWidth() / steps)+1;
+		final int gridHeight = (int)Math.ceil(bound.getHeight() / steps)+1;
+		final double[][] potentialFieldApproximation = new double[gridHeight][gridWidth];
+
+		for(int row = 0; row < gridHeight; row++) {
+			for(int col = 0; col < gridWidth; col++) {
+				double x = col*steps;
+				double y = row*steps;
+				potentialFieldApproximation[row][col] = potentialField.getPotential(new VPoint(x, y), agent);
+			}
+		}
+
+		return (pos, ped) -> {
+			if(ped.equals(agent)) {
+				int incX = 1;
+				int incY = 1;
+
+				int col = (int)(pos.getX() / steps);
+				int row = (int)(pos.getY() / steps);
+
+				if (col + 1 >= gridWidth) {
+					incX = 0;
+				}
+
+				if (row + 1 >= gridHeight) {
+					incY = 0;
+				}
+
+				VPoint gridPointCoord = new VPoint(col * steps, row * steps);
+				double z1 = potentialFieldApproximation[row][col];
+				double z2 = potentialFieldApproximation[row][col + incX];
+				double z3 = potentialFieldApproximation[row + incY][col + incX];
+				double z4 = potentialFieldApproximation[row + incY][col];
+
+				double t = (pos.getX() - gridPointCoord.x) / steps;
+				double u = (pos.getY() - gridPointCoord.y) / steps;
+
+				return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
+			}
+			else {
+				return 0.0;
+			}
+		};
+	}
 }

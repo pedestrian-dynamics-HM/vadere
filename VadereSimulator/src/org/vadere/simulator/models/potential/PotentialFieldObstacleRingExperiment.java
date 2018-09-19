@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
@@ -11,6 +12,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -24,6 +26,8 @@ import org.vadere.util.geometry.shapes.VPoint;
  * \ \__/ /
  * \____/
  */
+
+@ModelClass
 public class PotentialFieldObstacleRingExperiment implements PotentialFieldObstacle {
 
 	private AttributesPotentialRingExperiment attributes;
@@ -54,7 +58,7 @@ public class PotentialFieldObstacleRingExperiment implements PotentialFieldObsta
 	}
 
 	@Override
-	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
+	public double getObstaclePotential(IPoint pos, Agent pedestrian) {
 		double potential = 0;
 
 		double distanceCenterToPoint = center.distance(pos);

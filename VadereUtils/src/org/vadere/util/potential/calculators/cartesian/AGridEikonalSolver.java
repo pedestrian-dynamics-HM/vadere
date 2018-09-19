@@ -35,4 +35,10 @@ public abstract class AGridEikonalSolver implements GridEikonalSolver {
 	public double getPotential(final double x, final double y) {
         return getPotential(potentialField, x, y);
 	}
+
+	@Override
+	public double getPotential(IPoint pos, double unknownPenalty, double weight) {
+		return getPotential(potentialField, pos, unknownPenalty, weight);
+	}
+
 }

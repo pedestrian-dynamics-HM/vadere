@@ -1,15 +1,5 @@
 package org.vadere.util.triangulation.adaptive.plots;
 
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
-import org.vadere.util.triangulation.improver.PPSMeshing;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Created by bzoennchen on 10.06.18.
  */

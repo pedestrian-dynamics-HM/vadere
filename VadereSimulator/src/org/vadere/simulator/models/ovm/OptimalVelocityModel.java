@@ -1,14 +1,9 @@
-/**
- * This class implements the optimal velocity model for car traffic
- * 
+/*
+  This class implements the optimal velocity model for car traffic
  */
 package org.vadere.simulator.models.ovm;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -23,6 +18,12 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+@ModelClass(isMainModel = true)
 public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 
 	private int carIdCounter = 10000000; // TODO [priority=low] [task=refactoring] hack, think about another way of separating car IDs and pedestrian IDs.
@@ -32,15 +33,14 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 
 	/**
 	 * Constructor for OptimalVelocityModel used in the ModelCreator
-	 * 
 	 */
 	/*@Deprecated
 	public OptimalVelocityModel(Topography scenario,
-			OVMEquations ovmEquations,
-			AttributesOVM attributesOVM,
-			AttributesCar elementAttributes,
-			boolean pedestrianInteraction,
-			Random random) {
+								OVMEquations ovmEquations,
+								AttributesOVM attributesOVM,
+								AttributesCar elementAttributes,
+								boolean pedestrianInteraction,
+								Random random) {
 
 		super(Car.class, scenario,
 				IntegratorFactory.createFirstOrderIntegrator(attributesOVM.getAttributesODEIntegrator()),
@@ -57,11 +57,12 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 		ovmEquations.setGradients(null, null, null, scenario);
 	}*/
 
-	public OptimalVelocityModel() { }
+	public OptimalVelocityModel() {
+	}
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random) {
 
 		this.attributesOVM = Model.findAttributes(modelAttributesList, AttributesOVM.class);
 		this.elementAttributes = topography.getAttributesCar();// Model.findAttributes(modelAttributesList, AttributesCar.class);
@@ -82,10 +83,10 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 
 
 	@Override
-	/**
-	 * Creates a single car with given attributes
-	 * 
-	 * @param store
+	/*
+	  Creates a single car with given attributes
+
+	  @param store
 	 * @return single Car-Object
 	 */
 	public <T extends DynamicElement> Agent createElement(VPoint position, int id, Class<T> type) {

@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
@@ -28,9 +28,8 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.PSDistmesh;
 import org.vadere.util.triangulation.improver.PPSMeshing;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -102,8 +101,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.cursorWorldPosition = VPoint.ZERO;
 		this.selectScenarioElementListener = new LinkedList<>();
 		this.voronoiDiagram = null;
-		this.showVoroniDiagram = false;
 		this.showTriangulation = false;
+		this.showVoroniDiagram = true;
 		this.showSelection = false;
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();
@@ -541,7 +540,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
 
-			IPotentialField distanceField = new ObstacleDistancePotential(
+			IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 					new VRectangle(getTopography().getBounds()),
 					new AttributesFloorField());

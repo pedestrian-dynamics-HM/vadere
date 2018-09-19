@@ -4,25 +4,20 @@ import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.stream.Collectors;
 
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellState;
-import org.vadere.util.potential.FloorDiscretizer;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 public class QueueDetector extends EikonalSolverFMM {
 
@@ -70,7 +65,7 @@ public class QueueDetector extends EikonalSolverFMM {
                 topography.getBounds(),
                 topography.getElements(Pedestrian.class),
                 1.0 / cellGrid.getResolution(),
-                new AttributesTimeCost().getStandardDerivation(),
+                new AttributesTimeCost().getStandardDeviation(),
                 attributesPedestrian,
                 loadingStrategy, IGaussianFilter.Type.OpenCL);
 
@@ -98,7 +93,7 @@ public class QueueDetector extends EikonalSolverFMM {
         super.setNeighborDistances(point);
         VPoint worldCoord = cellGrid.pointToCoord(point);
         orderedPoints.removeIf(p -> p.distance(worldCoord) <= radius);
-	    
+
         if (Math.max(0, -distFunc.apply(worldCoord)) <= radius) {
             orderedPoints.addFirst(worldCoord);
         }

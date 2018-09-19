@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
@@ -20,7 +21,7 @@ import org.vadere.state.scenario.Pedestrian;
  * @author Jakob Schöttl
  *
  */
-
+@DataProcessorClass()
 public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
 	private PedestrianStartTimeProcessor pedStartTimeProc;
 
@@ -66,7 +67,7 @@ public class PedestrianEvacuationTimeProcessor extends DataProcessor<PedestrianI
 	public void postLoop(final SimulationState state) {
 		state.getTopography().getElements(Pedestrian.class).stream()
 				.map(ped -> new PedestrianIdKey(ped.getId()))
-				.forEach(key -> this.putValue(key, Double.NaN));
+				.forEach(key -> this.putValue(key, Double.POSITIVE_INFINITY));
 	}
 
     @Override

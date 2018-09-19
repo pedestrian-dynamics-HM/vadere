@@ -59,10 +59,10 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
+        <version>${maven-compiler.version}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+            <source>${maven-compiler.source.version}</source>
+            <target>${maven-compiler.target.version}</target>
         </configuration>
       </plugin>
 
@@ -171,14 +171,14 @@
             <version>2.19</version>
             <configuration>
                 <argLine>${surefireArgLine}</argLine>
-                <failIfNoTests>false</failIfNoTests>
+                <enableAssertions>true</enableAssertions>
                 <excludes>
                     <exclude></exclude>
                 </excludes>
+                <failIfNoTests>false</failIfNoTests>
                 <skipTests>${skip.unit.tests}</skipTests>
             </configuration>
         </plugin>
-      
     </plugins>
   </build>
   <properties>

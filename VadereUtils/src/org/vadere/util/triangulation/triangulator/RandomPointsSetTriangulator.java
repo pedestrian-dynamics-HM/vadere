@@ -6,7 +6,7 @@ import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Random;
 

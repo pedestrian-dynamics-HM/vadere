@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ScenarioFactory {
@@ -31,4 +32,21 @@ public class ScenarioFactory {
 		return scenario;
 	}
 
+
+	public static Scenario createScenarioWithScenarioFilePath(
+			final Path scenarioPath) throws IOException {
+
+		String json = IOUtils.readTextFile(scenarioPath);
+		Scenario scenario = IOVadere.fromJson(json);
+
+		return scenario;
+	}
+
+	public static Scenario createScenarioWithScenarioJson(
+			final String scenarioJson) throws IOException {
+
+		Scenario scenario = IOVadere.fromJson(scenarioJson);
+
+		return scenario;
+	}
 }

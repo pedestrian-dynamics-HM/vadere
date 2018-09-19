@@ -29,7 +29,11 @@ public class TargetFloorFieldGridProcessorTestEnv extends ProcessorTestEnv<Times
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	TargetFloorFieldGridProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(TargetFloorFieldGridProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(TargetFloorFieldGridProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
 		AttributesFloorFieldProcessor attr =
@@ -37,10 +41,14 @@ public class TargetFloorFieldGridProcessorTestEnv extends ProcessorTestEnv<Times
 		attr.setResolution(1.0);
 		attr.setTargetId(1);
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepRowKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepRowKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

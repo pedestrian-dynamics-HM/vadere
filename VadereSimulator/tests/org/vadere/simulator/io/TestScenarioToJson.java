@@ -11,7 +11,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class TestScenarioToJson {

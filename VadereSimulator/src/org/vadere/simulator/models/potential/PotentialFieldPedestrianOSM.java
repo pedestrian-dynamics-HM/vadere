@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
@@ -13,9 +14,11 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+@ModelClass
 public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 
 	private AttributesPotentialOSM attributes;
@@ -29,8 +32,8 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
-			Collection<? extends Agent> otherPedestrians) {
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Collection<? extends Agent> otherPedestrians) {
 		double potential = 0;
 
 		for (Agent neighbor : otherPedestrians) {
@@ -43,7 +46,7 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 			Agent otherPedestrian) {
 		// Note: Only works for Circle and not for other shapes
 		double distance = otherPedestrian.getPosition().distance(pos)
@@ -64,15 +67,13 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 	@Override
 	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography scenario) {
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
+		return scenario.getSpatialMap(Pedestrian.class)
 				.getObjects(relevantArea.getCenter(),
 						attributes.getPedestrianRecognitionDistance());
-
-		return closePedestrians;
 	}
 
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> otherPedestrians) {
 
@@ -89,7 +90,7 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 
 	}
 
-	public Vector2D getPedestrianPotentialGradient(VPoint pos,
+	public Vector2D getPedestrianPotentialGradient(IPoint pos,
 			Agent pedestrian, Agent otherPedestrian) {
 		Vector2D result;
 
@@ -100,7 +101,7 @@ public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 		if (distance >= 0
 				&& distance < attributes.getPedestrianRepulsionWidth()) {
 
-			Vector2D direction = new Vector2D(pos.x - positionOther.x, pos.y
+			Vector2D direction = new Vector2D(pos.getX() - positionOther.x, pos.getY()
 					- positionOther.y);
 			direction = direction.normalize(distance);
 

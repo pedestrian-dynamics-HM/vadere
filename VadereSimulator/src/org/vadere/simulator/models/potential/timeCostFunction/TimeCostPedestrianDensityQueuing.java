@@ -64,7 +64,7 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 		cost = Math.min(cost, 1.0 - EPSILON);
 
 		if (highestCost < cost) {
-			logger.info("pedestrian density cost: " + cost);
+			// logger.info("pedestrian density cost: " + cost);
 			highestCost = cost;
 		}
 
@@ -73,7 +73,7 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 
 	@Override
 	public void update() {
-		logger.info("runtime: " + runtime);
+		// logger.info("runtime: " + runtime);
 		runtime = 0;
 		long ms = System.currentTimeMillis();
 

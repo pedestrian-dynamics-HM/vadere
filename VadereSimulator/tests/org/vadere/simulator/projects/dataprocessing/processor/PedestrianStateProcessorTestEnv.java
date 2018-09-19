@@ -21,12 +21,20 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 	private Pedestrian[] peds;
 
 	PedestrianStateProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianStateProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianStateProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createOutputfile(
-				TimestepPedestrianIdOutputFile.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createOutputfile(
+					TimestepPedestrianIdOutputFile.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

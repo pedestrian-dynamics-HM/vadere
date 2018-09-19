@@ -39,8 +39,9 @@ public class VPoint implements Cloneable, IPoint {
 		this.y = copy.y;
 	}
 
+	@Override
 	public double distance(IPoint other) {
-		return Point2D.distance(x, y, other.getX(), other.getY());
+		return distance(other.getX(), other.getY());
 	}
 
 	@Override
@@ -64,7 +65,6 @@ public class VPoint implements Cloneable, IPoint {
 	public VPoint clone() {
 		return new VPoint(x, y);
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -118,9 +118,6 @@ public class VPoint implements Cloneable, IPoint {
 		return y;
 	}
 
-
-	// CCW rotation!
-	@Override
 	public VPoint rotate(final double radAngle) {
 		return new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
 				x * Math.sin(radAngle) + y * Math.cos(radAngle));

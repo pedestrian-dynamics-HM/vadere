@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
@@ -14,6 +15,7 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.gradients.GradientProvider;
@@ -24,6 +26,7 @@ import org.vadere.util.potential.gradients.GradientProvider;
  * calculating the distance to that point.
  * 
  */
+@ModelClass
 public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFieldObstacle {
 
 	private Collection<Obstacle> obstacles;
@@ -106,7 +109,7 @@ public class PotentialFieldObstacleGNM implements GradientProvider, PotentialFie
 	}
 
 	@Override
-	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
+	public double getObstaclePotential(IPoint pos, Agent pedestrian) {
 		throw new UnsupportedOperationException();
 	}
 

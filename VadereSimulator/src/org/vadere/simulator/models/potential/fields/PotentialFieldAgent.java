@@ -23,6 +23,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.reflection.DynamicClassInstantiator;
@@ -58,13 +59,13 @@ public interface PotentialFieldAgent extends Model {
 	Collection<? extends Agent> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography topography);
 
-	double getAgentPotential(VPoint pos, Agent pedestrian,
-			Agent otherPedestrian);
+	double getAgentPotential(IPoint pos, Agent pedestrian,
+	                         Agent otherPedestrian);
 
-	double getAgentPotential(VPoint pos, Agent pedestrian,
+	double getAgentPotential(IPoint pos, Agent pedestrian,
 			Collection<? extends Agent> otherAgents);
 
-	Vector2D getAgentPotentialGradient(VPoint pos,
+	Vector2D getAgentPotentialGradient(IPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> otherAgents);
 

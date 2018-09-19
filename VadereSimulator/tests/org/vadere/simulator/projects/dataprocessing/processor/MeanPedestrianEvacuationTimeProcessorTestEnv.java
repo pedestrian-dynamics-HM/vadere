@@ -18,7 +18,11 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 
 	@SuppressWarnings("unchecked")
 	MeanPedestrianEvacuationTimeProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(MeanPedestrianEvacuationTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(MeanPedestrianEvacuationTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
 		DataProcessor pedEvacTimeProc;
@@ -37,10 +41,14 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 		addRequiredProcessors(pedEvacTimeProcEnv);
 
 		//setup output file with different VadereWriter impl for test
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				NoDataKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					NoDataKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}
@@ -68,7 +76,7 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, 2, 3, 4, 5, 6);
+				b.clear().add(1, 2, 3, 4, 5);
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getSimTimeInSec()).thenReturn(10.0);
 			}
@@ -77,7 +85,7 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 		addSimState(new SimulationStateMock(4) {
 			@Override
 			public void mockIt() {
-				b.clear().add(6);
+				b.clear();
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getSimTimeInSec()).thenReturn(15.0);
 

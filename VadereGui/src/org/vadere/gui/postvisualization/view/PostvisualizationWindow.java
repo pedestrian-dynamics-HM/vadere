@@ -7,38 +7,32 @@ import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
+import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.PostVisualisation;
-import org.vadere.gui.postvisualization.control.ActionGeneratePNG;
-import org.vadere.gui.postvisualization.control.ActionGenerateSVG;
-import org.vadere.gui.postvisualization.control.ActionOpenFile;
-import org.vadere.gui.postvisualization.control.ActionPause;
-import org.vadere.gui.postvisualization.control.ActionPlay;
-import org.vadere.gui.postvisualization.control.ActionRecording;
-import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
-import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
-import org.vadere.gui.postvisualization.control.ActionStop;
-import org.vadere.gui.postvisualization.control.ActionSwapSelectionMode;
-import org.vadere.gui.postvisualization.control.ActionVisualization;
-import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.control.*;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.projects.io.IOOutput;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
@@ -155,8 +149,8 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 		 */
 
-		int iconHeight = Integer.valueOf(resources.getProperty("View.icon.height.value"));
-		int iconWidth = Integer.valueOf(resources.getProperty("View.icon.width.value"));
+		int iconHeight = Integer.valueOf(resources.getProperty("ProjectView.icon.height.value"));
+		int iconWidth = Integer.valueOf(resources.getProperty("ProjectView.icon.width.value"));
 		addActionToToolbar(toolbar,
 				new ActionPlay("play", resources.getIcon("play.png", iconWidth, iconHeight), model),
 				"PostVis.btnPlay.tooltip");
@@ -177,7 +171,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				}, "View.btnShowPedestrian.tooltip");
+				}, "ProjectView.btnShowPedestrian.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_trajectory",
@@ -189,7 +183,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowTrajectories.tooltip");
+				}, "ProjectView.btnShowTrajectories.tooltip");
 
 
 		addActionToToolbar(toolbar,
@@ -220,12 +214,23 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowWalkingDirection.tooltip");
+				}, "ProjectView.btnShowWalkingDirection.tooltip");
+
+		addActionToToolbar(toolbar,
+				new ActionVisualization("show_groups",
+						resources.getIcon("group.png", iconWidth, iconHeight), model) {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						model.config.setShowGroups(!model.config.isShowGroups());
+						model.notifyObservers();
+					}
+				}, "ProjectView.btnShowGroupInformation.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
 						resources.getIcon("voronoi.png", iconWidth, iconHeight), model),
-				"View.btnDrawVoronoiDiagram.tooltip");
+				"ProjectView.btnDrawVoronoiDiagram.tooltip");
 
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -233,7 +238,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				toolbar,
 				new ActionShowPotentialField("show_potentialField", resources.getIcon("potentialField.png", iconWidth,
 						iconHeight), model),
-				"View.btnShowPotentialfield.tooltip");
+				"ProjectView.btnShowPotentialfield.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_grid", resources.getIcon("grid.png", iconWidth, iconHeight), model) {
@@ -244,7 +249,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowGrid.tooltip");
+				}, "ProjectView.btnShowGrid.tooltip");
 
 		addActionToToolbar(
 				toolbar,
@@ -257,7 +262,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowDensity.tooltip");
+				}, "ProjectView.btnShowDensity.tooltip");
 
 
 		// toolbar.addSeparator(new Dimension(5, 50));
@@ -268,16 +273,25 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		recordAction.setButton(recordButton);
 
 		toolbar.addSeparator(new Dimension(5, 50));
-		addActionToToolbar(
-				toolbar,
-				new ActionGeneratePNG("png_snapshot", resources.getIcon("camera_png.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnPNGSnapshot.tooltip");
-		addActionToToolbar(
-				toolbar,
-				new ActionGenerateSVG("svg_snapshot", resources.getIcon("camera_svg.png", iconWidth, iconHeight),
-						renderer),
-				"PostVis.btnSVGSnapshot.tooltip");
+		ArrayList<Action> imgOptions = new ArrayList<>();
+		AbstractAction pngImg = new ActionGeneratePNG(Messages.getString("ProjectView.btnPNGSnapshot.tooltip"), resources.getIcon("camera_png.png", iconWidth, iconHeight),
+				renderer, model);
+		AbstractAction svgImg = new ActionGenerateSVG(Messages.getString("ProjectView.btnSVGSnapshot.tooltip"), resources.getIcon("camera_svg.png", iconWidth, iconHeight),
+				renderer, model);
+		AbstractAction tikzImg = new ActionGenerateTikz(Messages.getString("ProjectView.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer, model);
+		// add new ImageGenerator Action ...
+
+		imgOptions.add(pngImg);
+		imgOptions.add(svgImg);
+		imgOptions.add(tikzImg);
+		// add Action to List ....
+
+		ActionVisualizationMenu imgDialog = new ActionVisualizationMenu(
+				"camera_menu",
+				resources.getIcon("camera.png", iconWidth, iconHeight),
+				model, null, imgOptions);
+		addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
 
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -290,7 +304,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 				;
-				}, "View.btnSettings.tooltip");
+				}, "ProjectView.btnSettings.tooltip");
 
 
 		toolbar.add(Box.createHorizontalGlue());
@@ -343,6 +357,8 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		// deselect selected element on esc
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
 		getActionMap().put("deselect", new ActionDeselect(model, this, null));
+		repaint();
+		revalidate();
 	}
 
 	private JMenuBar getMenu() {
@@ -364,6 +380,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
 			final String toolTipProperty) {
 		return SwingUtils.addActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+	}
+
+	private static JButton addActionMenuToToolbar(final JToolBar toolbar, final ActionVisualizationMenu menuAction,
+												  final String toolTipProperty) {
+		JButton btn = SwingUtils.addActionToToolbar(toolbar, menuAction, Messages.getString(toolTipProperty));
+		menuAction.setParent(btn);
+		return btn;
 	}
 
 	public IDefaultModel getDefaultModel(){

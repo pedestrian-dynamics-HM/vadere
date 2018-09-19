@@ -17,12 +17,20 @@ import java.util.StringJoiner;
 public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Integer> {
 
 	PedestrianTargetIdProcessorTestEnv(){
-		testedProcessor = processorFactory.createDataProcessor(PedestrianTargetIdProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianTargetIdProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				TimestepPedestrianIdKey.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					TimestepPedestrianIdKey.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

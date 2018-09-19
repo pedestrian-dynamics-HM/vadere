@@ -5,7 +5,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
 import java.util.*;

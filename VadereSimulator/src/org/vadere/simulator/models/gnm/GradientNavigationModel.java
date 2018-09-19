@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.gnm;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
+@ModelClass(isMainModel = true)
 public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> implements PotentialFieldModel {
 	private AttributesGNM attributes;
 	private GradientProvider floorGradient;

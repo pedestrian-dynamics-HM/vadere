@@ -67,8 +67,8 @@ public class TimeCostPedestrianDensity implements ITimeCostFunction {
 		// refersh the filtered image
 		this.gaussianCalculator.filterImage();
 		runtime += System.currentTimeMillis() - ms;
-		logger.info(++updateCount + " pedestrian density cost: "
-				+ heighestDensity + ", runtime: " + runtime + "[msec]");
+		//logger.info(++updateCount + " pedestrian density cost: "+ heighestDensity + ", runtime: " + runtime + "[msec]");
+		updateCount++;
 	}
 
 	@Override

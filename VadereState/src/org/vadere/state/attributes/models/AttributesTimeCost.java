@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 /**
@@ -7,6 +8,7 @@ import org.vadere.state.attributes.Attributes;
  * Currently implemented: radius [m, default: 0.195].
  * 
  */
+@ModelAttributeClass
 public class AttributesTimeCost extends Attributes {
 	/**
 	 * The different time cost function types that represents different scenario
@@ -52,7 +54,7 @@ public class AttributesTimeCost extends Attributes {
 	}
 
 	/** the standard derivation required for the gaussian method. */
-	private double standardDerivation = 0.7;
+	private double standardDeviation = 0.7;
 	/** the method of density measurement. */
 	private TimeCostFunctionType type = TimeCostFunctionType.UNIT;
 	/** the weight of the density. */
@@ -91,8 +93,8 @@ public class AttributesTimeCost extends Attributes {
 	private LoadingType loadingType = LoadingType.CONSTANT;
 
 	// Getters...
-	public double getStandardDerivation() {
-		return standardDerivation;
+	public double getStandardDeviation() {
+		return standardDeviation;
 	}
 
 	public TimeCostFunctionType getType() {

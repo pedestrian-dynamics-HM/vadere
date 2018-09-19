@@ -1,6 +1,6 @@
 package org.vadere.gui.onlinevisualization.view;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -8,6 +8,7 @@ import java.util.Map;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
+import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -55,10 +56,12 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderPedestrians(final Graphics2D g) {
-		g.setColor(model.config.getPedestrianDefaultColor());
+		AgentRender agentRender = getAgentRender();
 		for (Agent ped : model.getAgents()) {
+			Color nonGroupColor = getPedestrianColor(ped);
+			g.setColor(nonGroupColor);
 			VPoint position = ped.getPosition();
-			g.fill(ped.getShape());
+			agentRender.render(ped, nonGroupColor, g);
 
 			if (!pedestrianPositions.containsKey(ped.getId())) {
 				pedestrianPositions.put(ped.getId(), new LinkedList());

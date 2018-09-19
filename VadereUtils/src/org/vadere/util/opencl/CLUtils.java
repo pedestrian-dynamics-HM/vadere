@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
@@ -66,6 +67,18 @@ public class CLUtils {
         return buffer;
     }
 
+    public static IntBuffer toIntBuffer(@NotNull final int[] array) {
+    	IntBuffer intBuffer = MemoryUtil.memAllocInt(array.length);
+    	return intBuffer;
+    }
+
+	public static IntBuffer toIntBuffer(@NotNull final int[] array, @NotNull final IntBuffer intBuffer) {
+		for(int i = 0; i < array.length; i++) {
+			intBuffer.put(i, array[i]);
+		}
+		return intBuffer;
+	}
+
     public static FloatBuffer toFloatBuffer(@NotNull final float[] floats) {
         FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(floats.length);
         return toFloatBuffer(floats, floatBuffer);
@@ -78,7 +91,16 @@ public class CLUtils {
         return floatBuffer;
     }
 
-    public static float[] toFloatArray(@NotNull final FloatBuffer floatBuffer, final int size) {
+	public static int[] toIntArray(@NotNull final IntBuffer floatBuffer, final int size) {
+		int[] result = new int[size];
+		for(int i = 0; i < size; i++) {
+			result[i] = floatBuffer.get(i);
+		}
+		return result;
+	}
+
+
+	public static float[] toFloatArray(@NotNull final FloatBuffer floatBuffer, final int size) {
 	    float[] result = new float[size];
 	    for(int i = 0; i < size; i++) {
 	        result[i] = floatBuffer.get(i);

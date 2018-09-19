@@ -1,19 +1,16 @@
 package org.vadere.gui.topographycreator.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.geom.Line2D;
-
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class TopographyCreatorRenderer extends DefaultRenderer {
+import java.awt.*;
+import java.awt.geom.Line2D;
+
+public class TopographyCreatorRenderer  extends DefaultRenderer{
 
 	private final IDrawPanelModel<DefaultConfig> panelModel;
 
@@ -25,15 +22,24 @@ public class TopographyCreatorRenderer extends DefaultRenderer {
 	private final static long REPAINT_SLEEP_TIME = 25; // 25 => 40 FPS
 
 	private int boundId = -1;
+	private ScenarioElementRenderer[] renderers;
 
 	/**
 	 * Creates a new DrawPanel and start the repaint thead.
 	 * 
 	 * @param panelModel the panelModel of the panel
 	 */
-	public TopographyCreatorRenderer(final IDrawPanelModel panelModel) {
+	public TopographyCreatorRenderer(final IDrawPanelModel panelModel){
 		super(panelModel);
 		this.panelModel = panelModel;
+		this.renderers = new ScenarioElementRenderer[ScenarioElementType.values().length];
+		renderers[ScenarioElementType.OBSTACLE.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.PEDESTRIAN.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.SOURCE.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.TARGET.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.STAIRS.ordinal()] = this::renderStair;
+		renderers[ScenarioElementType.TELEPORTER.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.CAR.ordinal()] = this::renderFilledShape;
 	}
 
 	@Override
@@ -48,8 +54,8 @@ public class TopographyCreatorRenderer extends DefaultRenderer {
 		}
 
 		for (ScenarioElement element : panelModel) {
-			graphics.setColor(panelModel.getScenarioElementColor(element.getType()));
-			graphics.fill(element.getShape());
+			Color color = panelModel.getScenarioElementColor(element.getType());
+			renderers[element.getType().ordinal()].render(element, graphics, color);
 		}
 
 		if (panelModel.isPrototypeVisble()) {
@@ -84,10 +90,6 @@ public class TopographyCreatorRenderer extends DefaultRenderer {
 				+ resolution * 0.2));
 	}
 
-	/**
-	 * Draws a grid with the given resolution and line width to graphics.
-	 * Recalculate the grid only if needed. Otherwise use the old image. This improves performance!
-	 */
 	/*
 	 * private void paintGrid(Graphics2D graphics, double width, double height, double resolution,
 	 * float lineWidth) {

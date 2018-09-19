@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -20,6 +21,7 @@ import org.vadere.util.potential.calculators.EikonalSolver;
  * based on the AttributesFloorField.
  *
  */
+@ModelClass
 public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 
     /**
@@ -81,6 +83,10 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
+	}
+
+	public EikonalSolver getEikonalSolver() {
+		return eikonalSolvers.get(targetId);
 	}
 
 }

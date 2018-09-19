@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * @author Mario Teixeira Parente
  */
-
+@DataProcessorClass()
 public class PedestrianOSMStrideLengthProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
 	private OptimalStepsModel osm;
 

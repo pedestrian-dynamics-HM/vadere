@@ -6,7 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -15,13 +17,14 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
-/**
- * reference: The effect of stepping on pedestrian trajectories (seitz-2015).
- *
- */
+// This potential is explained in seitz-2015 (The effect of stepping on pedestrians trajectories)
+// p. 596, eq. 1
+
+@ModelClass
 public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 
 	class DistanceComparator implements Comparator<Agent> {
@@ -62,26 +65,17 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 	}
 
 	@Override
-	public Collection<Pedestrian> getRelevantAgents(VCircle relevantArea,
+	public Collection<Pedestrian> getRelevantAgents(@NotNull final VCircle stepDisc,
 			Agent pedestrian, Topography scenario) {
 
-		List<Pedestrian> result = new LinkedList<>();
-
 		// select pedestrians within recognition distance
-		List<Pedestrian> closePedestrians = scenario.getSpatialMap(Pedestrian.class)
-				.getObjects(relevantArea.getCenter(), this.width + pedestrian.getRadius() +
-						attributes.getVisionFieldRadius());
-
-		result = closePedestrians;
-
-
-
-		return result;
+		return scenario.getSpatialMap(Pedestrian.class)
+				.getObjects(stepDisc.getCenter(), stepDisc.getRadius() + this.width + pedestrian.getRadius() + attributes.getVisionFieldRadius());
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
-			Agent otherPedestrian) {
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Agent otherPedestrian) {
 		double distance = otherPedestrian.getPosition().distance(pos);
 
 
@@ -101,7 +95,7 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 			Collection<? extends Agent> otherPedestrians) {
 		double potential = 0;
 
@@ -115,7 +109,7 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 	}
 
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> otherPedestrians) {
 
@@ -131,7 +125,7 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 		return gradient;
 	}
 
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 			Agent pedestrian, Agent otherPedestrian) {
 
 		Vector2D result;
@@ -141,7 +135,7 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 
 		if (distance < this.width) {
 
-			Vector2D direction = new Vector2D(pos.x - positionOther.x, pos.y - positionOther.y);
+			Vector2D direction = new Vector2D(pos.getX() - positionOther.x, pos.getY() - positionOther.y);
 			direction = direction.normalize(distance);
 
 			double dp = -2 * height * distance * width * width / Math.pow(distance * distance - width * width, 2);

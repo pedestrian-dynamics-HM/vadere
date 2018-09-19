@@ -1,0 +1,111 @@
+{
+  "topographyhash": "0f0df2931e5781bb76327a62305844c0b7f84f5c",
+  "name": "Test2",
+  "processWriters": [],
+  "attributeshash": "af732ad440af7f01cd0cc12608657058fd55f8a8",
+  "vadere": {
+    "attributesModel": {
+      "FLOORFIELD": {
+        "createMethod": "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution": 0.1,
+        "obstacleGridPenalty": 0.1,
+        "targetAttractionStrength": 1.0,
+        "timeCostAttributes": {
+          "standardDerivation": 0.7,
+          "pedestrianTorso": 0.4,
+          "meanSpeed": 1.34,
+          "type": "UNIT",
+          "obstacleDensityWeight": 3.5,
+          "pedestrianSameTargetDensityWeight": 3.5,
+          "pedestrianOtherTargetDensityWeight": 3.5,
+          "pedestrianWeight": 3.5,
+          "queueWidthLoading": 1.0,
+          "pedestrianDynamicWeight": 6.0,
+          "loadingType": "CONSTANT"
+        }
+      },
+      "POTENTIAL_COMPACT_SUPPORT": {
+        "pedPotentialWidth": 0.5,
+        "pedPotentialHeight": 12.6,
+        "obstPotentialWidth": 0.25,
+        "obstPotentialHeight": 20.1,
+        "visionFieldAngle": 1.8849555921538759,
+        "visionFieldRadius": 5.0,
+        "numPedConsidered": 5.0
+      }
+    },
+    "attributesPedestrian": {
+      "radius": 0.195,
+      "densityDependentSpeed": false,
+      "speedDistributionMean": 1.34,
+      "speedDistributionStandardDeviation": 0.0,
+      "minimumSpeed": 0.3,
+      "maximumSpeed": 3.0,
+      "acceleration": 2.0,
+      "id": -1
+    },
+    "attributesSimulation": {
+      "simTimeStepLength": 0.4,
+      "realTimeSimTimeRatio": 0.1,
+      "writeSimulationData": true,
+      "visualizationEnabled": true,
+      "printFPS": false,
+      "needsBoundary": false,
+      "digitsPerCoordinate": 2,
+      "useRandomSeed": true,
+      "randomSeed": 1
+    },
+    "topography": {
+      "attributes": {
+        "finishTime": 500.0,
+        "bounds": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 10.0,
+          "height": 10.0
+        },
+        "boundingBoxWidth": 0.5,
+        "bounded": true
+      },
+      "obstacles": [
+        {
+          "shape": {
+            "x": 3.1,
+            "y": 7.4,
+            "width": 2.4,
+            "height": 1.4,
+            "type": "RECTANGLE"
+          },
+          "id": -1
+        }
+      ],
+      "stairs": [],
+      "targets": [],
+      "sources": [
+              {
+                "id": 2,
+                "shape": {
+                  "x": 1.0,
+                  "y": 8.0,
+                  "width": 1.0,
+                  "height": 1.0,
+                  "type": "RECTANGLE"
+                },
+                "spawnDelay": 1.0,
+                "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+                "spawnNumber": 1,
+                "startTime": 0.0,
+                "endTime": 40.0,
+                "spawnAtRandomPositions": false,
+                "useFreeSpaceOnly": false,
+                "targetIds": [
+                  1
+                ]
+              }
+            ],
+      "dynamicElements": [],
+      "pedestrians": []
+    }
+  },
+  "commithash": "c45f1d26328baaec22418c15e6351a059e910f5f"
+}

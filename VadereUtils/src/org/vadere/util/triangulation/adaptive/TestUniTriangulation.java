@@ -8,6 +8,7 @@ import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 

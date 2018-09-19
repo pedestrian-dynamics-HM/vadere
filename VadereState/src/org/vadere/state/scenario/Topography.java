@@ -24,9 +24,13 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.potential.CellGrid;
+import org.vadere.util.potential.CellState;
+import org.vadere.util.potential.PathFindingTag;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
 public class Topography {
@@ -34,7 +38,7 @@ public class Topography {
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
-	private Function<VPoint, Double> obstacleDistanceFunction;
+	private Function<IPoint, Double> obstacleDistanceFunction;
 	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
@@ -147,12 +151,24 @@ public class Topography {
 		return null;
 	}
 
-	public double distanceToObstacle(@NotNull VPoint point) {
+	public double distanceToObstacle(@NotNull IPoint point) {
 		return this.obstacleDistanceFunction.apply(point);
 	}
 
-	public void setObstacleDistanceFunction(@NotNull Function<VPoint, Double> obstacleDistanceFunction) {
+	public void setObstacleDistanceFunction(@NotNull Function<IPoint, Double> obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
+	}
+
+	public CellGrid getDistanceFunctionApproximation(final double cellSize) {
+		CellGrid cellGrid = new CellGrid(getBounds().width, getBounds().height, cellSize, new CellState());
+		for(int row = 0; row < cellGrid.getNumPointsY(); row++){
+			for(int col = 0; col < cellGrid.getNumPointsX(); col++){
+				cellGrid.setValue(col, row, new CellState(
+						distanceToObstacle(cellGrid.pointToCoord(col, row).add(new VPoint(getBounds().getMinX(), getBounds().getMinY()))),
+						PathFindingTag.Reachable));
+			}
+		}
+		return cellGrid;
 	}
 
 	public boolean containsTarget(final Predicate<Target> targetPredicate) {
@@ -221,6 +237,10 @@ public class Topography {
 
 	public <T extends DynamicElement> void removeElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).removeElement(element);
+	}
+
+	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
+		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
 	}
 
 	public List<Source> getSources() {

@@ -6,7 +6,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
 import java.util.List;
@@ -92,6 +92,7 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 		int iterations = 0;
 		boolean allFrozen = false;
 		int itNumb = 1;
+
 		while (!allFrozen) {
 
 			itNumb--;
@@ -103,8 +104,7 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 			for (int x = 0; x < cellGrid.getNumPointsX(); x++) {
 				for (int y = 0; y < cellGrid.getNumPointsY(); y++) {
 					Point point = new Point(x, y);
-					if (cellGrid.getValue(point).tag != PathFindingTag.Target
-							&& cellGrid.getValue(point).tag != PathFindingTag.Obstacle) {
+					if (isRelevant(point)) {
 						double p = cellGrid.getValue(point).potential;
 						double q = Math.min(computeGodunovDifference(point, cellGrid, Direction.ANY), p);
 						cellGrid.getValue(point).potential = q;
@@ -120,8 +120,7 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 			for (int x = cellGrid.getNumPointsX() - 1; x >= 0; x--) {
 				for (int y = 0; y < cellGrid.getNumPointsY(); y++) {
 					Point point = new Point(x, y);
-					if (cellGrid.getValue(point).tag != PathFindingTag.Target
-							&& cellGrid.getValue(point).tag != PathFindingTag.Obstacle) {
+					if (isRelevant(point)) {
 						double p = cellGrid.getValue(point).potential;
 						double q = Math.min(computeGodunovDifference(point, cellGrid, Direction.ANY), p);
 						cellGrid.getValue(point).potential = q;
@@ -134,11 +133,10 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 			}
 
 			// third sweep
-			for (int x = cellGrid.getNumPointsX() - 1; x >= 0; x--) {
-				for (int y = cellGrid.getNumPointsY() - 1; y >= 0; y--) {
+			for (int y = cellGrid.getNumPointsY() - 1; y >= 0; y--) {
+				for (int x = cellGrid.getNumPointsX() - 1; x >= 0; x--) {
 					Point point = new Point(x, y);
-					if (cellGrid.getValue(point).tag != PathFindingTag.Target
-							&& cellGrid.getValue(point).tag != PathFindingTag.Obstacle) {
+					if (isRelevant(point)) {
 						double p = cellGrid.getValue(point).potential;
 						double q = Math.min(computeGodunovDifference(point, cellGrid, Direction.ANY), p);
 						cellGrid.getValue(point).potential = q;
@@ -151,11 +149,10 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 			}
 
 			// fourth sweep
-			for (int x = 0; x < cellGrid.getNumPointsX(); x++) {
-				for (int y = cellGrid.getNumPointsY() - 1; y >= 0; y--) {
+			for (int y = cellGrid.getNumPointsY() - 1; y >= 0; y--) {
+				for (int x = 0; x < cellGrid.getNumPointsX(); x++) {
 					Point point = new Point(x, y);
-					if (cellGrid.getValue(point).tag != PathFindingTag.Target
-							&& cellGrid.getValue(point).tag != PathFindingTag.Obstacle) {
+					if (isRelevant(point)) {
 						double p = cellGrid.getValue(point).potential;
 						double q = Math.min(computeGodunovDifference(point, cellGrid, Direction.ANY), p);
 						cellGrid.getValue(point).potential = q;
@@ -169,6 +166,15 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 		}
 	}
 
+	private boolean converged(final double oldValue, final double newValue) {
+		double diff = Math.abs(oldValue-newValue);
+		return diff < oldValue * EPSILON;
+	}
+
+	private boolean isRelevant(final Point point) {
+		return cellGrid.getValue(point).tag != PathFindingTag.Target && cellGrid.getValue(point).tag != PathFindingTag.Obstacle;
+	}
+
 	@Override
 	public ITimeCostFunction getTimeCostFunction() {
 		return timeCostFunction;
@@ -176,6 +182,6 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 
 	@Override
 	public boolean isHighAccuracy() {
-		return true;
+		return false;
 	}
 }

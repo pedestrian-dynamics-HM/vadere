@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.shapes;
 
 import java.awt.Shape;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,5 +59,13 @@ public interface VShape extends Shape, Cloneable {
 		path2D.lineTo(points.get(0).getX(),points.get(0).getY());
 
 		return new VPolygon(path2D);
+	}
+
+	default boolean intersects(VShape shape){
+		Area thisShape = new Area(this);
+		Area otherShape = new Area(shape);
+		Area thisShapeCpy = new Area(this);
+		thisShape.subtract(otherShape);
+		return !thisShape.equals(thisShapeCpy);
 	}
 }

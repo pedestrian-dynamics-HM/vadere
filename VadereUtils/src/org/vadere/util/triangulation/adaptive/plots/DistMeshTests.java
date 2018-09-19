@@ -3,21 +3,14 @@ package org.vadere.util.triangulation.adaptive.plots;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.mesh.gen.AFace;
-import org.vadere.util.geometry.mesh.gen.AHalfEdge;
-import org.vadere.util.geometry.mesh.gen.AMesh;
-import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
 import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
-import org.vadere.util.triangulation.adaptive.Parameters;
 
 import javax.swing.*;
 

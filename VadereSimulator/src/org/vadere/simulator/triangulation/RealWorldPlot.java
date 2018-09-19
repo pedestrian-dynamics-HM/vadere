@@ -4,45 +4,32 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
+import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.state.util.TexGraphGenerator;
-import org.vadere.util.debug.gui.ColorFunctions;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSDistmesh;
-import org.vadere.util.triangulation.adaptive.PSDistmeshPanel;
-import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
-import org.vadere.util.triangulation.improver.PPSMeshing;
 import org.vadere.util.triangulation.improver.PSMeshing;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.swing.*;
 
 /**
  * @author Benedikt Zoennchen
@@ -517,7 +504,7 @@ public class RealWorldPlot {
 
 		IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
 
-		IPotentialField distanceField = new ObstacleDistancePotential(
+		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
 				new AttributesFloorField());
@@ -596,7 +583,7 @@ public class RealWorldPlot {
 
 		IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
 
-		IPotentialField distanceField = new ObstacleDistancePotential(
+		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
 				new AttributesFloorField());

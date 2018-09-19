@@ -2,6 +2,7 @@ package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
@@ -17,30 +18,9 @@ public interface GridEikonalSolver extends EikonalSolver {
 
 	default double getPotential(final CellGrid potentialField, final double x, final double y, final double unknownPenalty, final double weight) {
 		double targetPotential = Double.MAX_VALUE;
-		Point gridPoint = potentialField.getNearestPointTowardsOrigin(x, y);
-		VPoint gridPointCoord = potentialField.pointToCoord(gridPoint);
-		int incX = 1, incY = 1;
-		double gridPotentials[] = new double[4];
-
-		if (x >= potentialField.getWidth()) {
-			incX = 0;
-		}
-
-		if (y >= potentialField.getHeight()) {
-			incY = 0;
-		}
-
-		gridPotentials[0] = potentialField.getValue(gridPoint).potential;
-		gridPotentials[1] = potentialField.getValue(gridPoint.x + incX, gridPoint.y).potential;
-		gridPotentials[2] = potentialField.getValue(gridPoint.x + incX, gridPoint.y + incY).potential;
-		gridPotentials[3] = potentialField.getValue(gridPoint.x, gridPoint.y + incY).potential;
-
 
 		/* Interpolate the known (potential < Double.MAX_VALUE) values. */
-		Pair<Double, Double> result = InterpolationUtil.bilinearInterpolationWithUnkown(
-				gridPotentials,
-				(x - gridPointCoord.x) / potentialField.getResolution(),
-				(y - gridPointCoord.y) / potentialField.getResolution());
+		Pair<Double, Double> result = potentialField.getInterpolatedValueAt(x, y);
 
 		double tmpPotential = result.getLeft();
 
@@ -73,11 +53,12 @@ public interface GridEikonalSolver extends EikonalSolver {
 			targetPotential = tmpPotential;
 		}
 
+
 		return targetPotential;
 	}
 
-	default double getPotential(final CellGrid potentialField, final VPoint pos, final double unknownPenalty, final double weight) {
-		return getPotential(potentialField, pos.x, pos.y, unknownPenalty, weight);
+	default double getPotential(final CellGrid potentialField, final IPoint pos, final double unknownPenalty, final double weight) {
+		return getPotential(potentialField, pos.getX(), pos.getY(), unknownPenalty, weight);
 	}
 
 	default double computeGodunovDifference(final Point point, final CellGrid cellGrid, final Direction direction) {

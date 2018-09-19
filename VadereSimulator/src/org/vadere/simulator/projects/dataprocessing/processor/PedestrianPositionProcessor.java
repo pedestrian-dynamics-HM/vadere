@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * @author Mario Teixeira Parente
  */
-
+@DataProcessorClass()
 public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestrianIdKey, VPoint> {
 
 	public PedestrianPositionProcessor() {
@@ -43,7 +44,13 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 	@Override
 	public String[] toStrings(TimestepPedestrianIdKey key) {
 		VPoint p = this.getValue(key);
-
-		return new String[]{Double.toString(p.x), Double.toString(p.y)};
+		if(p == null) {
+			System.out.println("wtf?");
+			return new String[]{Double.toString(0), Double.toString(0)};
+		}
+		else {
+			return new String[]{Double.toString(p.x), Double.toString(p.y)};
+		}
+		//return new String[]{Double.toString(p.x), Double.toString(p.y)};
 	}
 }

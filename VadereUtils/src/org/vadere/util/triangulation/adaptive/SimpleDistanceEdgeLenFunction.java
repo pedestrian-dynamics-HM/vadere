@@ -2,6 +2,7 @@ package org.vadere.util.triangulation.adaptive;
 
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.math.IDistanceFunction;
 
 
 public class SimpleDistanceEdgeLenFunction implements IEdgeLengthFunction {

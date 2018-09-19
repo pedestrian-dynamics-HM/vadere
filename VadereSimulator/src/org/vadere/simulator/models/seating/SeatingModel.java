@@ -9,6 +9,7 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.Logger;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
@@ -37,10 +38,11 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
  * To enable this model, add this model's class name to the main model's submodel list and
  * load a train topography.
  * 
- * @see https://github.com/schoettl/master-thesis
+ * https://github.com/schoettl/master-thesis
  * @author Jakob Schöttl
  *
  */
+@ModelClass
 public class SeatingModel implements Model {
 
 	private final Logger log = Logger.getLogger(SeatingModel.class);

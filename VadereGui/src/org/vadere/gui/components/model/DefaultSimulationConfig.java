@@ -1,8 +1,13 @@
 package org.vadere.gui.components.model;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.util.color.ColorHelper;
 
 public class DefaultSimulationConfig extends DefaultConfig {
 	private static Resources resources = Resources.getInstance("global");
@@ -12,17 +17,26 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private double densityStandardDerivation = Double.valueOf(resources.getProperty("Density.standardderivation"));
 	private double pedestrianTorso = Double.valueOf(resources.getProperty("Pedestrian.Radius")) * 2;
 
+	private boolean useRandomPedestrianColors = false;
+	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
 	private boolean showWalkdirection = false;
+	private boolean showTargetPotentialField = false;
 	private boolean showPotentialField = false;
 	private boolean showTrajectories = false;
 	private boolean showGrid = false;
 	private boolean showDensity = false;
+	private boolean showGroups = false;
 	protected final Color pedestrianDefaultColor = Color.BLUE;
+	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
+	private Map<Integer, Color> randomColors = new HashMap<>();
+	private double gridWidth = Double.valueOf(resources.getProperty("ProjectView.cellWidth"));
+	private final double MIN_CELL_WIDTH = Double.valueOf(resources.getProperty("ProjectView.minCellWidth"));
+	private final double MAX_CELL_WIDTH = Double.valueOf(resources.getProperty("ProjectView.maxCellWidth"));
 
 	public DefaultSimulationConfig() {
 		super();
@@ -30,13 +44,34 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public DefaultSimulationConfig(final DefaultSimulationConfig config) {
 		super(config);
+
+		this.randomColors = new HashMap<>();
+		this.pedestrianColors = new HashMap<>();
+
+		for (Map.Entry<Integer, Color> entry : config.pedestrianColors.entrySet()) {
+			this.pedestrianColors.put(new Integer(entry.getKey()), new Color(entry.getValue().getRed(), entry
+					.getValue().getGreen(), entry.getValue().getBlue()));
+		}
+
+		this.showPedestrianIds = config.showPedestrianIds;
+		this.gridWidth = config.gridWidth;
 		this.showDensity = config.showDensity;
-		this.showPotentialField = config.showPotentialField;
+		this.showTargetPotentialField = config.showTargetPotentialField;
 		this.showWalkdirection = config.showWalkdirection;
 		this.showGrid = config.showGrid;
 		this.showPedestrians = config.showPedestrians;
 		this.showLogo = config.showLogo;
 		this.showStairs = config.showStairs;
+		this.showGroups = config.showGroups;
+		this.showPotentialField = config.showPotentialField;
+	}
+
+	public boolean isShowGroups() {
+		return showGroups;
+	}
+
+	public void setShowGroups(boolean showGroups) {
+		this.showGroups = showGroups;
 	}
 
 	public boolean isShowLogo() {
@@ -133,6 +168,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
+	public void setShowTargetPotentialField(final boolean showTargetPotentialField) {
+		this.showTargetPotentialField = showTargetPotentialField;
+		setChanged();
+	}
+
 	public void setShowPotentialField(final boolean showPotentialField) {
 		this.showPotentialField = showPotentialField;
 		setChanged();
@@ -154,7 +194,76 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return pedestrianTorso;
 	}
 
+	public boolean isShowTargetPotentialField() {
+		return showTargetPotentialField;
+	}
+
 	public boolean isShowPotentialField() {
 		return showPotentialField;
 	}
+
+	public Optional<Color> getColorByTargetId(final int targetId) {
+		return Optional.ofNullable(pedestrianColors.get(targetId));
+	}
+
+	public void setPedestrianColor(final int targetId, final Color color) {
+		this.pedestrianColors.put(targetId, color);
+		setChanged();
+	}
+
+	public void addPedestrianColors(final Map<Integer, Color> pedestrianColors, final boolean override) {
+		if (override) {
+			this.pedestrianColors.putAll(pedestrianColors);
+		} else {
+			for (Map.Entry<Integer, Color> entry : pedestrianColors.entrySet()) {
+				if (!this.pedestrianColors.containsKey(entry.getKey())) {
+					this.pedestrianColors.put(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+	}
+
+	public void clearRandomColors() {
+		randomColors.clear();
+	}
+
+	public Color getRandomColor(int pedId) {
+		if (!randomColors.containsKey(pedId)) {
+			randomColors.put(pedId, ColorHelper.randomColor());
+		}
+		return randomColors.get(pedId);
+	}
+
+	public void setUseRandomPedestrianColors(final boolean useRandomPedestrianColors) {
+		this.useRandomPedestrianColors = useRandomPedestrianColors;
+	}
+
+	public boolean isUseRandomPedestrianColors() {
+		return useRandomPedestrianColors;
+	}
+
+	public void setGridWidth(double gridWidth) {
+		this.gridWidth = gridWidth;
+	}
+
+	public double getGridWidth() {
+		return gridWidth;
+	}
+
+	public double getMaxCellWidth() {
+		return MAX_CELL_WIDTH;
+	}
+
+	public double getMinCellWidth() {
+		return MIN_CELL_WIDTH;
+	}
+
+	public boolean isShowPedestrianIds() {
+		return showPedestrianIds;
+	}
+
+	public void setShowPedestrianIds(final boolean showPedestrianIds) {
+		this.showPedestrianIds = showPedestrianIds;
+	}
+
 }

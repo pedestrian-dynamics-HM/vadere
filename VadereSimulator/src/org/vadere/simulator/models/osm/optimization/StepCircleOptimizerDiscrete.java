@@ -2,15 +2,17 @@ package org.vadere.simulator.models.osm.optimization;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.types.MovementType;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.awt.*;
-import java.util.LinkedList;
+import java.awt.Shape;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -24,19 +26,19 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 	private final Random random;
 	private final static Logger log = LogManager.getLogger(StepCircleOptimizerDiscrete.class);
 
-	public StepCircleOptimizerDiscrete(final double movementThreshold, Random random) {
+	public StepCircleOptimizerDiscrete(final double movementThreshold, @NotNull final Random random) {
 		this.movementThreshold = movementThreshold;
 		this.random = random;
 	}
 
 	@Override
-	public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) {
-
+	public VPoint getNextPosition(@NotNull final PedestrianOSM pedestrian, @NotNull final Shape reachableArea) {
+		assert reachableArea instanceof VCircle;
 		double stepSize = ((VCircle) reachableArea).getRadius();
-		LinkedList<VPoint> positions = getReachablePositions(pedestrian, random);
 
-		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(
-				pedestrian);
+		List<VPoint> positions = getReachablePositions(pedestrian, random);
+
+		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
 
 		VPoint curPos = pedestrian.getPosition();
@@ -44,8 +46,6 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 		double curPosPotential = pedestrian.getPotential(curPos);
 		double potential = curPosPotential;
 		double tmpPotential = 0;
-
-
 
 		for (VPoint tmpPos : positions) {
 			try {
@@ -55,7 +55,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 						|| (Math.abs(tmpPotential - potential) <= 0.0001 && random
 								.nextBoolean())) {
 					potential = tmpPotential;
-					nextPos = tmpPos.clone();
+					nextPos = tmpPos;
 				}
 			} catch (Exception e) {
 				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an error.");
@@ -63,28 +63,22 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 
 		}
 
-		if (curPosPotential - potential < movementThreshold) {
+		if (curPosPotential - potential <= movementThreshold) {
 			nextPos = curPos;
-			potential = curPosPotential;
 		}
+
 		return nextPos;
 	}
+
 
 	public StepCircleOptimizer clone() {
 		return new StepCircleOptimizerDiscrete(movementThreshold, random);
 	}
 
-	public static LinkedList<VPoint> getReachablePositions(final PedestrianOSM pedestrian, final Random random) {
+	public static List<VPoint> getReachablePositions(@NotNull final PedestrianOSM pedestrian, @NotNull final Random random) {
 
 		final AttributesOSM attributesOSM = pedestrian.getAttributesOSM();
-		double randOffset = attributesOSM.isVaryStepDirection() ? random.nextDouble() : 0;
-
-		VPoint currentPosition = pedestrian.getPosition();
-		LinkedList<VPoint> reachablePositions = new LinkedList<VPoint>();
 		int numberOfCircles = attributesOSM.getNumberOfCircles();
-		double circleOfGrid = 0;
-		int numberOfGridPoints;
-
 		// if number of circle is negative, choose number of circles according to
 		// StepCircleResolution
 		if (attributesOSM.getNumberOfCircles() < 0) {
@@ -119,39 +113,23 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 			anchorAngle = 0;
 		}
 
-		// iterate through all circles
-		for (int j = 1; j <= numberOfCircles; j++) {
+		return GeometryUtils.getDiscDiscretizationPoints(
+				random,
+				attributesOSM.isVaryStepDirection(),
+				new VCircle(pedestrian.getPosition(),
+						pedestrian.getStepSize()),
+				numberOfCircles,
+				attributesOSM.getStepCircleResolution(),
+				anchorAngle,
+				angle);
 
-			circleOfGrid = pedestrian.getStepSize() * j / numberOfCircles;
-
-			numberOfGridPoints = (int) Math.ceil(circleOfGrid / pedestrian.getStepSize()
-					* attributesOSM.getStepCircleResolution());
-
-			// reduce number of grid points proportional to the constraint of direction
-			if (attributesOSM.getMovementType() == MovementType.DIRECTIONAL) {
-				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2 * Math.PI));
-			}
-
-			double angleDelta = angle / numberOfGridPoints;
-
-			// iterate through all angles and compute absolute positions of grid points
-			for (int i = 0; i < numberOfGridPoints; i++) {
-
-				double x = circleOfGrid * Math.cos(anchorAngle + angleDelta * (randOffset + i)) + currentPosition.x;
-				double y = circleOfGrid * Math.sin(anchorAngle + angleDelta * (randOffset + i)) + currentPosition.y;
-				VPoint tmpPos = new VPoint(x, y);
-
-				reachablePositions.add(tmpPos);
-			}
-		}
-		return reachablePositions;
 	}
 
 	/**
 	 * The maximum deviation from the last movement direction given the current speed.
      * See seitz-2016 PhD-thesis equation 4.6
 	 */
-	private static double getMovementAngle(PedestrianOSM pedestrian) {
+	public static double getMovementAngle(@NotNull final PedestrianOSM pedestrian) {
 
 		final double speed = pedestrian.getVelocity().getLength();
 		double result = Math.PI - speed;

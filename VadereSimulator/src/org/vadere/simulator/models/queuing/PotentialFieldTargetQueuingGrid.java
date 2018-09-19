@@ -2,7 +2,8 @@ package org.vadere.simulator.models.queuing;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.simulator.models.potential.fields.DistanceFunctionTarget;
+import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
@@ -27,7 +28,7 @@ import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.FloorDiscretizer;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+@ModelClass
 public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGrid, DynamicElementRemoveListener<Pedestrian>,
 		DynamicElementAddListener<Pedestrian> {
 
@@ -151,36 +153,13 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	}
 
 	@Override
-	public double getPotential(final IPoint pos, final Agent pedArgument) {
-		if (Pedestrian.class.isAssignableFrom(pedArgument.getClass()))
-			throw new IllegalArgumentException("Target grid can only handle type Pedestrian");
-		Pedestrian ped = (Pedestrian) pedArgument;
-
-		if (pedestrianAttitudeMap.containsKey(ped) && queues.stream().anyMatch(queue -> queue.isQueued(ped))) {
-			switch (pedestrianAttitudeMap.get(ped)) {
-				case COMPETITIVE:
-					return competitiveField.getPotential(pos, ped);
-				case GENTLE:
-					return gentleField.getPotential(pos, ped);
-				default:
-					throw new IllegalArgumentException(ped + " is not contained in the attitude map.");
-			}
-		} else if (queues.stream().noneMatch(queue -> queue.isQueued(ped))) {
-			return competitiveField.getPotential(pos, ped);
-		} else {
-			logger.warn("ped is neither queued nor not-queued.");
-			return 0;
-		}
-	}
-
-	@Override
 	public Vector2D getTargetPotentialGradient(final VPoint pos, final Agent ped) {
 		throw new UnsupportedOperationException("method not implemented jet.");
 	}
 
     @Override
     public IPotentialField getSolution() {
-        return null;
+        throw new UnsupportedOperationException("not jet implemented");
     }
 
     @Override
@@ -331,5 +310,28 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
+	}
+
+	@Override
+	public double getPotential(IPoint pos, Agent agent) {
+		if (Pedestrian.class.isAssignableFrom(agent.getClass()))
+			throw new IllegalArgumentException("Target grid can only handle type Pedestrian");
+		Pedestrian ped = (Pedestrian) agent;
+
+		if (pedestrianAttitudeMap.containsKey(ped) && queues.stream().anyMatch(queue -> queue.isQueued(ped))) {
+			switch (pedestrianAttitudeMap.get(ped)) {
+				case COMPETITIVE:
+					return competitiveField.getPotential(pos, ped);
+				case GENTLE:
+					return gentleField.getPotential(pos, ped);
+				default:
+					throw new IllegalArgumentException(ped + " is not contained in the attitude map.");
+			}
+		} else if (queues.stream().noneMatch(queue -> queue.isQueued(ped))) {
+			return competitiveField.getPotential(pos, ped);
+		} else {
+			logger.warn("ped is neither queued nor not-queued.");
+			return 0;
+		}
 	}
 }

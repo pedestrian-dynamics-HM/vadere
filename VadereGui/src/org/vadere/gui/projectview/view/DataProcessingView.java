@@ -1,55 +1,9 @@
 package org.vadere.gui.projectview.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import info.clearthought.layout.TableLayout;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -58,22 +12,42 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
-import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.gui.projectview.utils.ClassFinder;
+import org.vadere.gui.projectview.utils.SimpleDocumentListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory;
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
-import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
-import info.clearthought.layout.TableLayout;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 
 class DataProcessingView extends JPanel implements IJsonView {
@@ -243,11 +217,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					String filename = "out.txt";
-					int count = 1;
-					while (outputFileNameAlreadyExists(filename)) { // ensure unique suggested filename
-						filename = "out" + (count ++) + ".txt";
-					}
+					String filename = getDefaultFilename();
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(filename);
 					currentScenario.getDataProcessingJsonManager().addOutputFile(outputFileStore);
@@ -285,20 +255,28 @@ class DataProcessingView extends JPanel implements IJsonView {
 			JButton addProcessorBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Map<String, Class> processorNameToClass = ClassFinder.getProcessorClassesWithNames();
-					JComboBox processorOptions = new JComboBox<>(processorNameToClass.keySet().toArray());
+					DataProcessorFactory factory = DataProcessorFactory.instance();
+					// map label of processors to class string
+					Map<String, String> processorLableToClass = factory.getLabelMap();
+					String[] processors = processorLableToClass.keySet().stream().sorted().toArray(String[]::new);
+					JComboBox processorOptions = new JComboBox<>(processors);
+
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
 							Messages.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						String processorClass = processorLableToClass.get(processorOptions.getSelectedItem());
+//						System.out.println("Selected Processor is: " + processorClass);
+						DataProcessor newDataProcessor = null;
 						try {
-							DataProcessor newDataProcessor = (DataProcessor) processorNameToClass.get(processorOptions.getSelectedItem()).newInstance();
-							newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
-							currentScenario.getDataProcessingJsonManager().addInstantiatedProcessor(newDataProcessor);
-							updateDataProcessorsTable();
-							int index = dataProcessorsTable.getRowCount() - 1;
-							dataProcessorsTable.setRowSelectionInterval(index, index);
-						} catch (InstantiationException | IllegalAccessException ex) {
-							ex.printStackTrace();
+							newDataProcessor = factory.getInstanceOf(processorClass);
+						} catch (ClassNotFoundException e1) {
+							e1.printStackTrace();
 						}
+						assert newDataProcessor != null;
+						newDataProcessor.setId(currentScenario.getDataProcessingJsonManager().getMaxProcessorsId() + 1);
+						currentScenario.getDataProcessingJsonManager().addInstantiatedProcessor(newDataProcessor);
+						updateDataProcessorsTable();
+						int index = dataProcessorsTable.getRowCount() - 1;
+						dataProcessorsTable.setRowSelectionInterval(index, index);
 					}
 					refreshGUI();
 				}
@@ -346,6 +324,15 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private void refreshGUI() {
 			currentScenario.updateCurrentStateSerialized();
 			ProjectView.getMainWindow().refreshScenarioNames();
+		}
+
+		private String getDefaultFilename(){
+			String filename = "out.txt";
+			int count = 1;
+			while (outputFileNameAlreadyExists(filename) > 0) { // ensure unique suggested filename
+				filename = "out" + (count ++) + ".txt";
+			}
+			return filename;
 		}
 
 		@Override
@@ -497,29 +484,52 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 1;
 			c.gridy = 0;
 			JTextField nameField = new JTextField(outputFile.toString());
-			nameField.addActionListener(ae -> {
-				String oldName = outputFile.toString();
-				String newName = nameField.getText();
-				if (!oldName.equals(newName)) {
-					String msg = "";
-					if (newName.isEmpty()) {
-						msg = Messages.getString("DataProcessingView.msgFileEmpty");
-					}
-					if (outputFileNameAlreadyExists(newName)) {
-						msg = Messages.getString("DataProcessingView.msgFileInUse");
-					}
-					if (msg.isEmpty()) {
-						outputFile.setRelativeFileName(newName);
-						outputFilesTable.repaint();
-						refreshGUI();
-					} else {
-						nameField.setText(oldName);
-						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
-								Messages.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
-					}
+			// add DocumentLister to update outputFiles character at a time
+			nameField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+				@Override
+				public void update(DocumentEvent e){
+					SwingUtilities.invokeLater(() -> {
+						String oldName = outputFile.toString();
+						String newName = nameField.getText();
+						if (!oldName.equals(newName)) {
+							outputFile.setRelativeFileName(newName);
+							outputFilesTable.repaint();
+							refreshGUI();
+						}
+					});
 				}
+			});
+
+			// check at focus loss for invalid file names. If found reset to a default free value.
+			nameField.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					SwingUtilities.invokeLater(() -> {
+						String newName = nameField.getText();
+
+						String msg = "";
+						if (newName.isEmpty()) {
+							msg = Messages.getString("DataProcessingView.msgFileEmpty");
+							newName = getDefaultFilename();
+						} else if (outputFileNameAlreadyExists(newName) > 1) { // is automatically updated.
+							msg = Messages.getString("DataProcessingView.msgFileInUse");
+							newName = getDefaultFilename();
+						}
+						if (!msg.isEmpty()) {
+							nameField.setText(newName);
+							JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
+									Messages.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
+						}
+					});
+				}
+			});
+
+			// got to next element. Note: this will trigger the focus loss event above.
+			nameField.addActionListener(ae -> {
 				passFocusOn();
 			});
+
+
 			addEditableComponent(nameField);
 			panel.add(nameField, c);
 
@@ -531,16 +541,19 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridy = 1;
 			String outputFileDataKeyName = extractSimpleName(outputFileDataKey);
 
-			Map<String, Class> dataKeysOutputFiles = ClassFinder.getDataKeysOutputFileRelation();
+			Map<String, String> dataKeysOutputFiles = OutputFileFactory.instance().getDataKeyOutputFileMap();
+//			Map<String, Class> dataKeysOutputFiles = ClassFinder.getDataKeysOutputFileRelation();
 			JComboBox dataKeysChooser = new JComboBox<>(dataKeysOutputFiles.keySet().toArray());
 
 			dataKeysChooser.setSelectedItem(outputFileDataKeyName);
 			dataKeysChooser.addActionListener(ae -> {
 				String newDataKey = (String) dataKeysChooser.getSelectedItem();
+				assert newDataKey != null;
 				if (!newDataKey.equals(outputFileDataKeyName)) {
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(outputFile.getFileName());
-					outputFileStore.setType(dataKeysOutputFiles.get(newDataKey).getName()); // Choose corresponding outputfile type
+					System.out.println("Selected KeyFile: " + newDataKey + " | " + dataKeysOutputFiles.get(newDataKey));
+					outputFileStore.setType(dataKeysOutputFiles.get(newDataKey)); // Choose corresponding outputfile type
 					int index = currentScenario.getDataProcessingJsonManager().replaceOutputFile(outputFileStore);
 					updateOutputFilesTable();
 					outputFilesTable.setRowSelectionInterval(index, index);
@@ -585,6 +598,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			revalidate();
 			repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
 		}
+
 
 		private void handleDataProcessorSelected(DataProcessor dataProcessor) {
 			selectedDataProcessor = dataProcessor;
@@ -707,9 +721,9 @@ class DataProcessingView extends JPanel implements IJsonView {
 			return type.getTypeName().substring(type.getTypeName().lastIndexOf(".") + 1);
 		}
 
-		private boolean outputFileNameAlreadyExists(String filename) {
+		private long outputFileNameAlreadyExists(String filename) {
 			return currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
-					.filter(oFile -> oFile.getFileName().equals(filename)).findAny().isPresent();
+					.filter(oFile -> oFile.getFileName().equals(filename)).count();
 		}
 	}
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
@@ -12,10 +13,12 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
+@ModelClass
 public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 
 	private AttributesPotentialSFM attributes;
@@ -29,8 +32,8 @@ public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
-			Collection<? extends Agent> otherPedestrians) {
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Collection<? extends Agent> otherPedestrians) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -39,7 +42,7 @@ public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 	 * Navigation Model.
 	 */
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 			Vector2D velocity, Agent pedestrian,
 			Collection<? extends Agent> closePedestrians) {
 
@@ -49,7 +52,7 @@ public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 		double distance;
 		double pot;
 		double phi;
-		double[] x = new double[] {pos.x, pos.y};
+		double[] x = new double[] {pos.getX(), pos.getY()};
 		double[] x2 = new double[2];
 		double[] v = new double[] {velocity.x, velocity.y};
 		double[] v2 = new double[2];
@@ -118,7 +121,7 @@ public class PotentialFieldPedestrianSFM implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 			Agent otherPedestrian) {
 		throw new UnsupportedOperationException();
 	}

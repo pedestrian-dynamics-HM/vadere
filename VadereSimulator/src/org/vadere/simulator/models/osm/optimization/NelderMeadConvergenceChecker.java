@@ -24,6 +24,8 @@ public class NelderMeadConvergenceChecker implements RealConvergenceChecker {
 
 	private int dimension;
 
+	private final int maxIterations;
+
 	/**
 	 * Instantiates a new convergence checker for NelderMead.
 	 */
@@ -34,6 +36,7 @@ public class NelderMeadConvergenceChecker implements RealConvergenceChecker {
 		prev = new RealPointValuePair[dimension];
 		curr = new RealPointValuePair[dimension];
 		index = 0;
+		maxIterations = 100;
 	}
 
 	@Override
@@ -59,7 +62,7 @@ public class NelderMeadConvergenceChecker implements RealConvergenceChecker {
 			for (int i = 0; i < dimension; i++) {
 				value += Math.pow(curr[i].getValue() - meanValue, 2);
 			}
-			return (value / dimension < threshold || iteration > 100); // earlier 1000 => change to parameter
+			return (value / dimension < threshold || iteration > maxIterations); // earlier 1000 => change to parameter
 		} else {
 			return true;
 		}

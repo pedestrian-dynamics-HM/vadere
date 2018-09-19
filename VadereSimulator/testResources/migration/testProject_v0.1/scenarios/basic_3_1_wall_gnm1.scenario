@@ -1,0 +1,135 @@
+{
+  "name" : "basic_3_1_wall_gnm1",
+  "description" : "",
+  "release" : "0.2",
+  "processWriters" : {
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true
+  },
+  "scenario" : {
+    "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
+    "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesPotentialGNM" : {
+        "pedestrianBodyPotential" : 3.59,
+        "pedestrianRecognitionDistance" : 0.7,
+        "obstacleBodyPotential" : 20.1,
+        "obstacleRepulsionStrength" : 0.25
+      },
+      "org.vadere.state.attributes.models.AttributesGNM" : {
+        "attributesODEIntegrator" : {
+          "solverType" : "DORMAND_PRINCE_45",
+          "stepSizeMin" : 1.0E-4,
+          "stepSizeMax" : 1.0,
+          "toleranceAbsolute" : 1.0E-5,
+          "toleranceRelative" : 1.0E-4
+        },
+        "floorGradientProviderType" : "FLOOR_EUCLIDEAN_CONTINUOUS",
+        "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
+        "pedestrianPotentialModel" : "org.vadere.simulator.models.gnm.PotentialFieldPedestrianGNM",
+        "obstaclePotentialModel" : "org.vadere.simulator.models.gnm.PotentialFieldObstacleGNM"
+      },
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "NONE",
+        "potentialFieldResolution" : 0.1,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "timeCostAttributes" : {
+          "standardDerivation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT"
+        }
+      }
+    },
+    "attributesSimulation" : {
+      "finishTime" : 30.0,
+      "simTimeStepLength" : 0.4,
+      "realTimeSimTimeRatio" : 0.0,
+      "writeSimulationData" : true,
+      "visualizationEnabled" : true,
+      "printFPS" : false,
+      "needsBoundary" : false,
+      "digitsPerCoordinate" : 2,
+      "useRandomSeed" : true,
+      "randomSeed" : 1
+    },
+    "topography" : {
+      "attributes" : {
+        "bounds" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 20.0,
+          "height" : 10.0
+        },
+        "boundingBoxWidth" : 0.5,
+        "bounded" : true
+      },
+      "obstacles" : [ {
+        "shape" : {
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 0.1,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      } ],
+      "stairs" : [ ],
+      "targets" : [ {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 16.0,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      } ],
+      "sources" : [ {
+        "id" : -1,
+        "shape" : {
+          "x" : 2.5,
+          "y" : 2.5,
+          "width" : 2.0,
+          "height" : 5.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 50,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : false,
+        "targetIds" : [ 1 ],
+        "dynamicElementType" : "PEDESTRIAN"
+      } ],
+      "dynamicElements" : [ ],
+      "attributesPedestrian" : {
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.26,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
+        "acceleration" : 2.0
+      },
+      "attributesCar" : null
+    }
+  }
+}

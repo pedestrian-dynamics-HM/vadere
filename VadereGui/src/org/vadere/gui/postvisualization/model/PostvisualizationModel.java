@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
@@ -75,19 +76,18 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.pedestrianColorTableModel = new PedestrianColorTableModel();
 		this.steps = new ArrayList<>();
 
-		for (int i = 0; i < 5; i++) {
+		/*for (int i = 0; i < 5; i++) {
 			try {
 				colorEvalFunctions.put(i, new JsonLogicParser("false").parse());
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 
 		this.pedestrianColorTableModel.addTableModelListener(
 				e -> {
 					for (int row = e.getFirstRow(); row <= e.getLastRow(); row++) {
-						if (row >= 0 && colorEvalFunctions.containsKey(row)
-								&& e.getColumn() == PedestrianColorTableModel.CIRTERIA_COLUMN) {
+						if (row >= 0 && e.getColumn() == PedestrianColorTableModel.CIRTERIA_COLUMN) {
 							try {
 								VPredicate<JsonNode> evaluator = new JsonLogicParser(
 										pedestrianColorTableModel.getValueAt(row, e.getColumn()).toString()).parse();
@@ -101,10 +101,20 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				});
 	}
 
-	public void init(final Map<Step, List<Agent>> agentsByStep, final Scenario vadere, final String projectPath) {
-		logger.info("start init postvis model");
-		init(vadere, projectPath);
+	/**
+	 * Initialize the {@link PostvisualizationModel}.
+	 *
+	 * @param agentsByStep  the trajectory information: a list of agent (their position, target, group...) sorted by the time step.
+	 * @param scenario      the scenario which was used to produce the output the PostVis will display.
+	 * @param projectPath   the path to the project.
+	 */
+	public void init(final Map<Step, List<Agent>> agentsByStep, final Scenario scenario, final String projectPath) {
+		logger.info("start the initialization of the PostvisualizationModel.");
+		init(scenario, projectPath);
 		this.agentsByStep = agentsByStep;
+		trajectories = new HashMap<>();
+
+		// to have fast access to the key values.
 		Map<Integer, Step> map = agentsByStep
 				.keySet().stream()
 				.sorted(stepComparator)
@@ -119,21 +129,22 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			for (int stepNumber = 1; stepNumber <= optLastStep.get().getStepNumber(); stepNumber++) {
 				if (map.containsKey(stepNumber)) {
 					steps.add(map.get(stepNumber));
+
+					for(Agent agent : agentsByStep.get(map.get(stepNumber))) {
+						if(!trajectories.containsKey(agent.getId())) {
+							trajectories.put(agent.getId(), new Trajectory(agent.getId()));
+						}
+						trajectories.get(agent.getId()).addStep(map.get(stepNumber), agent);
+					}
 				} else {
 					steps.add(new Step(stepNumber));
 				}
 			}
 		}
 
-		this.trajectories = agentsByStep
-				.entrySet()
-				.stream()
-				.flatMap(entry -> entry.getValue().stream())
-				.map(ped -> ped.getId())
-				.distinct()
-				.map(id -> new Trajectory(agentsByStep, id))
-				.collect(Collectors.toMap(t -> t.getPedestrianId(), t -> t));
-
+		for(Trajectory trajectory : trajectories.values()) {
+			trajectory.fill();
+		}
 
 		this.step = !steps.isEmpty() ? steps.get(0) : null;
 		logger.info("finished init postvis model");
@@ -232,21 +243,26 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 	}
 
-	public Optional<Color> getColor(final Agent agent) {
+	private boolean parseIgnoreException(@NotNull final VPredicate<JsonNode> predicate, @NotNull final JsonNode node) {
+		try {
+			return predicate.test(node);
+		} catch (ParseException e) {
+			return false;
+		}
+	}
+
+	public Optional<Color> getColorByPredicate(final Agent agent) {
 		JsonNode jsonObj = StateJsonConverter.toJsonNode(agent);
-		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet().stream().filter(
-				entry -> {
-					try {
-						return entry.getValue().test(jsonObj);
-					} catch (ParseException e) {
-						return false;
-					}
-				}).findFirst();
+		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet()
+				.stream()
+				.filter(entry -> parseIgnoreException(entry.getValue(), jsonObj))
+				.findFirst();
 
 		if (firstEntry.isPresent()) {
 			return Optional.of((Color) pedestrianColorTableModel.getValueAt(firstEntry.get().getKey(),
 					PedestrianColorTableModel.COLOR_COLUMN));
 		}
+
 		return Optional.empty();
 	}
 
@@ -305,7 +321,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private double getSimTimeInSec(final Step step) {
 		return step.getSimTimeInSec()
-				.orElse(step.getStepNumber() * vadere.getScenarioStore().attributesSimulation.getSimTimeStepLength());
+				.orElse(step.getStepNumber() * vadere.getScenarioStore().getAttributesSimulation().getSimTimeStepLength());
 	}
 
 	public synchronized void setPotentialFieldContainer(final PotentialFieldContainer container) {
@@ -356,7 +372,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				e.printStackTrace();
 			}
 		}
-		config.setShowPotentialField(false);
+		config.setShowTargetPotentialField(false);
 		potentialContainer = null;
 	}
 }

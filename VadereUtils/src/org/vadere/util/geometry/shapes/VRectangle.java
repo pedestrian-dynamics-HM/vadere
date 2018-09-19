@@ -27,6 +27,10 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		}
 	}
 
+	public VRectangle(final Rectangle2D rectangle) {
+		this(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+	}
+
 	public VRectangle(final Rectangle2D.Double rectangle) {
 		this(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	}
@@ -133,7 +137,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
     @Override
     public boolean intersect(final VShape shape) {
         if(shape instanceof VRectangle){
-            return intersects(((VRectangle)shape));
+            return super.intersects(((VRectangle)shape));
         }
         else if(shape instanceof VPolygon) {
             return shape.intersect(this);

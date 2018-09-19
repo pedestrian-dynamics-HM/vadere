@@ -12,7 +12,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 /**
  * EikonalSolverFMM initializes a potential field on basis
@@ -62,14 +62,9 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 
 	@Override
 	public void initialize() {
-
 		for (Point point : targetPoints) {
-			//if(!targetShapes.isEmpty()) {
-            setTargetNeighborsDistances(point);
-			//}
-			narrowBand.add(point);
+			setTargetNeighborsDistances(point);
 		}
-
 
 		/**
 		 * Create whole Floor Field at the beginning.

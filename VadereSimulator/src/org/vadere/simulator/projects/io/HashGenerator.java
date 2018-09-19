@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class HashGenerator {
 
 	private static Logger logger = LogManager.getLogger(HashGenerator.class);
-	
+
 	private static final String CURRENT_COMMIT_HASH_RESOURCE = "/current_commit_hash.txt";
 
 	public static boolean isCommitHashAvailable() {
@@ -43,5 +43,4 @@ public class HashGenerator {
 		}
 		return null;
 	}
-
 }

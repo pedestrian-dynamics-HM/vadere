@@ -18,13 +18,21 @@ import java.util.StringJoiner;
 public class PedestrianEndTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
 	PedestrianEndTimeProcessorTestEnv(){
-		testedProcessor = processorFactory.createDataProcessor(PedestrianEndTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianEndTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId()
-		);
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
@@ -95,8 +103,8 @@ public class PedestrianEndTimeProcessorTestEnv extends ProcessorTestEnv<Pedestri
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(peds);
 
 				double time = state.getSimTimeInSec();
-				addToExpectedOutput(new PedestrianIdKey(8), Double.NaN);
-				addToExpectedOutput(new PedestrianIdKey(10), Double.NaN);
+				addToExpectedOutput(new PedestrianIdKey(8), Double.POSITIVE_INFINITY);
+				addToExpectedOutput(new PedestrianIdKey(10), Double.POSITIVE_INFINITY);
 			}
 		});
 	}

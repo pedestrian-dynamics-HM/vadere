@@ -1,13 +1,8 @@
 package org.vadere.simulator.models.potential;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
-import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
@@ -17,9 +12,15 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.MathUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+
+@ModelClass
 public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObstacle {
 
 	private static Logger log = LogManager.getLogger(PotentialFieldObstacleCompactSoftshell.class);
@@ -49,7 +50,7 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 
 
 	@Override
-	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
+	public double getObstaclePotential(IPoint pos, Agent pedestrian) {
 
 		double potential = 0;
 		//for (Obstacle obstacle : obstacles) {
@@ -65,10 +66,10 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 			double currentPotential = 0;
 
 			if (distance < this.width) {
-				currentPotential = this.height * MathUtil.expAp(2 / (Math.pow(distance / (this.width), 2) - 1));
+				currentPotential = this.height * Math.exp(2 / (Math.pow(distance / (this.width), 2) - 1));
 			}
 			if (distance < radius) {
-				currentPotential += 100000 * MathUtil.expAp(1 / (Math.pow(distance / radius, 2) - 1));
+				currentPotential += 100000 * Math.exp(1 / (Math.pow(distance / radius, 2) - 1));
 			}
 
 			if (potential < currentPotential)

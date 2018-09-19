@@ -1,11 +1,13 @@
 package org.vadere.state.attributes.models;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 /**
  * Provides potential attributes for pedestrians and obstacles in the Gradient Navigation Model.
  * 
  */
+@ModelAttributeClass
 public class AttributesPotentialOSM extends Attributes {
 
 	// seitz-2012 u_p = 1000

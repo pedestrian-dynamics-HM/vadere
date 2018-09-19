@@ -13,6 +13,9 @@ import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
@@ -38,24 +41,36 @@ public class ScenarioRun implements Runnable {
 	private final DataProcessingJsonManager dataProcessingJsonManager;
 
 	private Simulation simulation;
-	private ProcessorManager processorManager;
+
+	// the processor is null if no output is written i.e. if scenarioStore.attributesSimulation.isWriteSimulationData() is false.
+	private @Nullable
+	ProcessorManager processorManager;
 
 	private final Scenario scenario;
 	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
 
 	private final RunnableFinishedListener finishedListener;
 
+	private SimulationResult simulationResult;
+
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
 	}
 
 	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
+		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener);
+	}
+
+	// if overwriteTimestampSetting is true do note use timestamp in output directory
+	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
-		this.setOutputPaths(Paths.get(outputDir)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
+		this.simulationResult = new SimulationResult(scenario.getName());
 	}
+
 
 	/**
 	 * This method runs a simulation. It must not catch any exceptions! The
@@ -65,35 +80,52 @@ public class ScenarioRun implements Runnable {
 	@Override
 	public void run() {
 		try {
-			logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
+			//add Scenario Name to Log4j Mapped Diagnostic Context to filter log by ScenarioRun
+//			MDC.put("scenario.Name", outputPath.getFileName().toString());
+			simulationResult.startTime();
 
-			scenarioStore.topography.reset();
+			/**
+			 * To make sure that no other Thread changes the scenarioStore object during the initialization of a scenario run
+			 * this is an atomic operation with respect to the scenarioStore. We observed that with Linux 18.04 KUbunto
+			 * the GUI-Thread changes the scenarioStore object during a simulation run. Which can lead to any unexpected behaviour.
+			 */
+			synchronized (scenarioStore) {
+				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
+				scenarioStore.getTopography().reset();
+				System.out.println("StartIt " + scenario.getName());
+				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
+				modelBuilder.createModelAndRandom();
 
-			MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
-			modelBuilder.createModelAndRandom();
+				final MainModel mainModel = modelBuilder.getModel();
+				final Random random = modelBuilder.getRandom();
 
-			final MainModel mainModel = modelBuilder.getModel();
-			final Random random = modelBuilder.getRandom();
-			
-			// prepare processors and simulation data writer
-			processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+				// prepare processors and simulation data writer
+				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
+					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+					processorManager.setSimulationResult(simulationResult);
+				}
 
-			// Only create output directory and write .scenario file if there is any output.
-			if(!processorManager.isEmpty()) {
-                createAndSetOutputDirectory();
-                scenario.saveToOutputPath(outputPath);
-            }
+				// Only create output directory and write .scenario file if there is any output.
+				if (processorManager != null && !processorManager.isEmpty()) {
+					createAndSetOutputDirectory();
+					scenario.saveToOutputPath(outputPath);
+				}
 
-			sealAllAttributes();
+				sealAllAttributes();
 
-			// Run simulation main loop from start time = 0 seconds
-			simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
+				// Run simulation main loop from start time = 0 seconds
+				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
+			}
 			simulation.run();
+			simulationResult.setState("SimulationRun completed");
 
 		} catch (Exception e) {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
+			simulationResult.stopTime();
 			doAfterSimulation();
+			//remove Log4j Mapped Diagnostic Context after ScenarioRun
+//			MDC.remove("scenario.Name");
 		}
 	}
 	
@@ -117,6 +149,14 @@ public class ScenarioRun implements Runnable {
 		passiveCallbacks.add(pc);
 	}
 
+	public void setOutputPaths(final Path outputPath, boolean overwriteTimestampSetting){
+		if (overwriteTimestampSetting){
+			this.outputPath = outputPath;
+		} else {
+			setOutputPaths(outputPath);
+		}
+	}
+
 	public void setOutputPaths(final Path outputPath) {
 		if (dataProcessingJsonManager.isTimestamped()) {
 			String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
@@ -124,6 +164,10 @@ public class ScenarioRun implements Runnable {
 		} else {
 			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
 		}
+	}
+
+	public Path getOutputPath() {
+		return Paths.get(this.outputPath.toString());
 	}
 
 	public void pause() {
@@ -154,8 +198,8 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public String readyToRunResponse() { // TODO [priority=medium] [task=check] add more conditions
-		if (scenarioStore.mainModel == null) {
-			return scenarioStore.name + ": no mainModel is set";
+		if (scenarioStore.getMainModel() == null) {
+			return scenarioStore.getName() + ": no mainModel is set";
 		}
 		return null;
 	}
@@ -164,9 +208,16 @@ public class ScenarioRun implements Runnable {
 		return scenario;
 	}
 
+	public SimulationResult getSimulationResult() {
+		return simulationResult;
+	}
+
 	private void sealAllAttributes() {
 		scenarioStore.sealAllAttributes();
-		processorManager.sealAllAttributes();
+
+		if (processorManager != null) {
+			processorManager.sealAllAttributes();
+		}
 	}
 
 }

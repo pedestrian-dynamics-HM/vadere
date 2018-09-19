@@ -4,6 +4,7 @@ import java.awt.geom.Line2D;
 import java.util.stream.Stream;
 
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.Vector2D;
 
 @SuppressWarnings("serial")
 public class VLine extends Line2D.Double {
@@ -61,4 +62,11 @@ public class VLine extends Line2D.Double {
     public double length() {
         return getP1().distance(getP2());
     }
+	public double distance(VPoint point) {
+		return GeometryUtils.closestToSegment(this, point).distance(point);
+	}
+
+	public Vector2D asVector(){
+		return new Vector2D(x2 - x1, y2 - y1);
+	}
 }

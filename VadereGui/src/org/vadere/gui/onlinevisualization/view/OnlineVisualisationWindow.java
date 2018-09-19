@@ -3,8 +3,6 @@ package org.vadere.gui.onlinevisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import javax.swing.*;
-
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -15,15 +13,23 @@ import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.components.view.ScenarioScrollPane;
 import org.vadere.gui.components.view.SimulationInfoPanel;
-import org.vadere.gui.onlinevisualization.control.ActionGeneratePNG;
-import org.vadere.gui.onlinevisualization.control.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.onlinevisualization.control.ActionOnlineVisMenu;
 import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
+import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
+import org.vadere.gui.components.view.DialogFactory;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.swing.*;
 
 public class OnlineVisualisationWindow extends JPanel implements Observer {
 
@@ -73,8 +79,16 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		setLayout(spiltLayout);
 
 
-		int iconHeight = Integer.valueOf(resources.getProperty("View.icon.height.value"));
-		int iconWidth = Integer.valueOf(resources.getProperty("View.icon.width.value"));
+		int iconHeight = Integer.valueOf(resources.getProperty("ProjectView.icon.height.value"));
+		int iconWidth = Integer.valueOf(resources.getProperty("ProjectView.icon.width.value"));
+
+
+		AbstractAction openSettingsDialog = new ActionVisualization("settings", resources.getIcon("settings.png", iconWidth, iconHeight), model) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						DialogFactory.createSettingsDialog(model).setVisible(true);
+					}
+				};
 
 
 		AbstractAction paintArrowAction = new AbstractAction("paintArrowAction",
@@ -100,6 +114,17 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				model.notifyObservers();
 			}
 		};
+
+		AbstractAction showGroupInformationAction = new AbstractAction("showGroupInformationAction",
+				resources.getIcon("group.png", iconWidth, iconHeight)) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.config.setShowGroups(!model.config.isShowGroups());
+				model.notifyObservers();
+			}
+		};
+
+		AbstractAction drawVoronoiDiagram = new ActionSwapSelectionMode("draw_voronoi_diagram", resources.getIcon("voronoi.png", iconWidth, iconHeight), model);
 
 		AbstractAction paintGridAction = new AbstractAction("paintGridAction",
 				resources.getIcon("grid.png", iconWidth, iconHeight)) {
@@ -137,17 +162,25 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 			}
 		};
 
+		OnlinevisualizationRenderer renderer = new OnlinevisualizationRenderer(model);
+		renderer.setLogo(resources.getImage("vadere.png"));
 		ActionGeneratePNG generatePNG = new ActionGeneratePNG(
-				"generatePNG",
+				Messages.getString("ProjectView.btnPNGSnapshot.tooltip"),
 				resources.getIcon("camera_png.png", iconWidth, iconHeight),
-				new OnlinevisualizationRenderer(model),
+				renderer,
 				model);
 
 
 		ActionGenerateSVG generateSVG = new ActionGenerateSVG(
-				"generateSVG",
+				Messages.getString("ProjectView.btnSVGSnapshot.tooltip"),
 				resources.getIcon("camera_svg.png", iconWidth, iconHeight),
-				new OnlinevisualizationRenderer(model),
+				renderer,
+				model);
+
+		ActionGenerateTikz generateTikz = new ActionGenerateTikz(
+				Messages.getString("ProjectView.btnTikZSnapshot.tooltip"),
+				resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer,
 				model);
 
         ActionShowPotentialField showPotentialField = new ActionShowPotentialField(
@@ -157,32 +190,55 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		mainPanel.addRendererChangeListener(generatePNG);
 		mainPanel.addRendererChangeListener(generateSVG);
+		mainPanel.addRendererChangeListener(generateTikz);
 		mainPanel.addRendererChangeListener(showPotentialField);
 
 
 		SwingUtils.addActionToToolbar(toolbar, paintPedestriansAction,
-				Messages.getString("View.btnShowPedestrian.tooltip"));
+				Messages.getString("ProjectView.btnShowPedestrian.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintTrajectories,
-				Messages.getString("View.btnShowTrajectories.tooltip"));
+				Messages.getString("ProjectView.btnShowTrajectories.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintArrowAction,
-				Messages.getString("View.btnShowWalkingDirection.tooltip"));
+				Messages.getString("ProjectView.btnShowWalkingDirection.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, showGroupInformationAction,
+				Messages.getString("ProjectView.btnShowGroupInformation.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, drawVoronoiDiagram,
+				Messages.getString("ProjectView.btnDrawVoronoiDiagram.tooltip"));
+
 
 		toolbar.addSeparator();
 
-		SwingUtils.addActionToToolbar(toolbar, paintGridAction, Messages.getString("View.btnShowGrid.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintDensity, Messages.getString("View.btnShowDensity.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintGridAction, Messages.getString("ProjectView.btnShowGrid.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintDensity, Messages.getString("ProjectView.btnShowDensity.tooltip"));
 
 		toolbar.addSeparator();
 
-		SwingUtils.addActionToToolbar(toolbar, generatePNG, Messages.getString("PostVis.btnPNGSnapshot.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, generateSVG, Messages.getString("PostVis.btnSVGSnapshot.tooltip"));
+		ArrayList<Action> imgOptions = new ArrayList<>();
+		imgOptions.add(generatePNG);
+		imgOptions.add(generateSVG);
+		imgOptions.add(generateTikz);
+
+		ActionOnlineVisMenu imgDialog = new ActionOnlineVisMenu(
+				"camera_menu",
+				resources.getIcon("camera.png", iconWidth, iconHeight), imgOptions);
+		JButton imgMenuBtn =
+				SwingUtils.addActionToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
+		imgDialog.setParent(imgMenuBtn);
+
         SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
+
+		toolbar.addSeparator();
+		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog,
+				Messages.getString("ProjectView.btnSettings.tooltip"));
 
 		add(toolbar, cc.xyw(2, 2, 3));
 		add(scrollPane, cc.xy(2, 4));
 		scrollPane.setPreferredSize(new Dimension(1, windowHeight));
 		add(jsonPanel, cc.xy(4, 4));
 		add(infoPanel, cc.xyw(2, 6, 3));
+
+		repaint();
+		revalidate();
 	}
 
 	@Override

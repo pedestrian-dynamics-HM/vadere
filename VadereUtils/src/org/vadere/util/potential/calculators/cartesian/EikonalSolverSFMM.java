@@ -1,7 +1,6 @@
 package org.vadere.util.potential.calculators.cartesian;
 
 import java.awt.Point;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -10,14 +9,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.math3.util.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 /**
  * EikonalSolverSFMM is almost identical to EikonalSolverFMM avoiding

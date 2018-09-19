@@ -8,9 +8,7 @@ public abstract class ScenarioElement {
 
 	public abstract VShape getShape();
 	
-	public void setShape(VShape newShape) {
-		throw new UnsupportedOperationException("This concrete scenario element does not support setting the shape.");
-	}
+	public abstract void setShape(VShape newShape);
 
 	public abstract int getId();
 
@@ -25,4 +23,7 @@ public abstract class ScenarioElement {
 	public abstract ScenarioElement clone();
 
 	public abstract Attributes getAttributes();
+
+	public abstract void setAttributes(Attributes attributes);
+
 }

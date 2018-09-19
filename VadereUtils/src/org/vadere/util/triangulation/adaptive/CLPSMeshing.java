@@ -7,6 +7,7 @@ import org.vadere.util.geometry.mesh.gen.*;
 import org.vadere.util.geometry.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.opencl.CLDistMesh;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.triangulation.improver.IMeshImprover;

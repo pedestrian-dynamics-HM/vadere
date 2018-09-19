@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
@@ -21,6 +22,7 @@ import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -34,7 +36,6 @@ public class PedestrianOSM extends Pedestrian {
 
 	private final AttributesOSM attributesOSM;
 	private final transient StepCircleOptimizer stepCircleOptimizer;
-	private final transient UpdateSchemeOSM updateScheme;
 	private final transient Topography topography;
 	private final double stepLength;
 	private final double stepDeviation;
@@ -42,7 +43,7 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
-	private List<SpeedAdjuster> speedAdjusters;
+	private transient List<SpeedAdjuster> speedAdjusters;
 	private double durationNextStep;
 	private VPoint nextPosition;
 	private VPoint lastPosition;
@@ -77,7 +78,6 @@ public class PedestrianOSM extends Pedestrian {
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
 		this.stepCircleOptimizer = stepCircleOptimizer;
-		this.updateScheme = createUpdateScheme(attributesOSM.getUpdateType(), this);
 
 		this.speedAdjusters = speedAdjusters;
 		this.relevantPedestrians = new HashSet<>();
@@ -95,31 +95,12 @@ public class PedestrianOSM extends Pedestrian {
 			this.minStepLength = 0;
 		}
 
+		this.lastPosition = getPosition();
+		this.nextPosition = getPosition();
 		this.strides = new LinkedList<>();
 	}
 
-	private static UpdateSchemeOSM createUpdateScheme(UpdateType updateType, PedestrianOSM pedestrian) {
-
-		UpdateSchemeOSM result;
-
-		switch (updateType) {
-			case EVENT_DRIVEN:
-				result = new UpdateSchemeEventDriven(pedestrian);
-				break;
-			case PARALLEL:
-				result = new UpdateSchemeParallel(pedestrian);
-				break;
-			case SEQUENTIAL:
-				result = new UpdateSchemeSequential(pedestrian);
-				break;
-			default:
-				result = new UpdateSchemeSequential(pedestrian);
-		}
-
-		return result;
-	}
-
-	public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
+	/*public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
 		double lastSimTimeInSec = currentTimeInSec - timeStepInSec;
 
 		// clear the old strides to avoid large linked lists
@@ -128,16 +109,19 @@ public class PedestrianOSM extends Pedestrian {
 		}
 
 		this.updateScheme.update(timeStepInSec, currentTimeInSec, callMethod);
-	}
+	}*/
 
+	/**
+	 * Expensive call!
+	 */
 	public void updateNextPosition() {
 
 		if (PotentialFieldTargetRingExperiment.class.equals(potentialFieldTarget.getClass())) {
 			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-			this.relevantPedestrians = potentialFieldPedestrian
-					.getRelevantAgents(reachableArea, this, topography);
 
+			refreshRelevantPedestrians();
 			nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
+
 			// if (nextPosition.distance(this.getPosition()) < this.minStepLength) {
 			// nextPosition = this.getPosition();
 			// }
@@ -147,10 +131,6 @@ public class PedestrianOSM extends Pedestrian {
 			this.nextPosition = getPosition();
 		} else {
 			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-
-			this.relevantPedestrians = potentialFieldPedestrian
-					.getRelevantAgents(reachableArea, this, topography);
-
 
 			// get stairs pedestrian is on - remains null if on area
 			Stairs stairs = null;
@@ -162,10 +142,15 @@ public class PedestrianOSM extends Pedestrian {
 			}
 
 			if (stairs == null) { // meaning pedestrian is on area
+
+				refreshRelevantPedestrians();
 				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
+
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
 				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
+
+				refreshRelevantPedestrians();
 				nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
 				// Logger.getLogger(this.getClass()).info("Pedestrian " + this.getId() + " is on
 				// stairs @position: " + nextPosition);
@@ -174,31 +159,13 @@ public class PedestrianOSM extends Pedestrian {
 
 	}
 
-	public void makeStep(double stepTime) {
-		VPoint currentPosition = getPosition();
-
-		if (nextPosition.equals(currentPosition)) {
-			timeCredit = 0;
-			setVelocity(new Vector2D(0, 0));
-		} else {
-			timeCredit = timeCredit - durationNextStep;
-			setPosition(nextPosition);
-
-			// compute velocity by forward difference
-			setVelocity(new Vector2D(nextPosition.x - currentPosition.x,
-					nextPosition.y - currentPosition.y).multiply(1.0 / stepTime));
-		}
-
-		strides.add(Pair.of(currentPosition.distance(nextPosition), getTimeOfNextStep()));
-	}
-
 	public double getStepSize() {
-
 		if (attributesOSM.isDynamicStepLength()) {
-			return attributesOSM.getStepLengthIntercept()
+			double step = attributesOSM.getStepLengthIntercept()
 					+ attributesOSM.getStepLengthSlopeSpeed()
 					* getDesiredSpeed()
 					+ stepDeviation;
+			return step;
 		} else {
 			return stepLength;
 		}
@@ -214,7 +181,7 @@ public class PedestrianOSM extends Pedestrian {
 		return desiredSpeed;
 	}
 
-	public double getPotential(VPoint newPos) {
+	public double getPotential(IPoint newPos) {
 
 		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
 
@@ -285,8 +252,17 @@ public class PedestrianOSM extends Pedestrian {
 		this.timeCredit = timeCredit;
 	}
 
+	public void refreshRelevantPedestrians() {
+		VCircle reachableArea = new VCircle(getPosition(), getStepSize());
+		relevantPedestrians = potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography());
+	}
+
 
 	// Setters...
+
+	public void setRelevantPedestrians(@NotNull final Collection<? extends Agent> relevantPedestrians) {
+		this.relevantPedestrians = relevantPedestrians;
+	}
 
 	public Collection<? extends Agent> getRelevantPedestrians() {
 		return relevantPedestrians;
@@ -321,4 +297,8 @@ public class PedestrianOSM extends Pedestrian {
 		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
 	}
 
+	@Override
+	public String toString() {
+		return "id = " + getId() + " memory " + super.toString();
+	}
 }

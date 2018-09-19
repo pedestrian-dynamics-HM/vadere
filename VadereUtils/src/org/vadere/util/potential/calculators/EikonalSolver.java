@@ -3,7 +3,6 @@ package org.vadere.util.potential.calculators;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
 
@@ -42,6 +41,8 @@ public interface EikonalSolver {
 	default boolean needsUpdate() {
 		return false;
 	}
+
+	double getPotential(final IPoint pos, final double unknownPenalty, final double weight);
 
 	/**
 	 * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.

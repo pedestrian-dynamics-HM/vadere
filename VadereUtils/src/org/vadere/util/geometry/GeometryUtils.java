@@ -7,11 +7,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -127,10 +130,63 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Generates a set of points which are positioned inside a disc segment. The points are placed equidistant on one or multiple circles
+	 * with the center at the center of the disc and the radius <= the radius of the disc.
+	 *
+	 * @param random                            a random number generator which will only be used if varyDirection is true.
+	 * @param varyDirection                     if true the generated points will be rotated by a random offset
+	 * @param circle                            the circle defining the disc (containing the points)
+	 * @param numberOfCircles                   the number of circles
+	 * @param numberOfPointsOfLargestCircle     the number of points of the most outer circle
+	 * @param anchorAngle                       start angle of the segment
+	 * @param angle                             anchorAngle + angle = end angle of the segment
+	 * @return a set of points which are positioned inside a disc segment
+	 */
+	public static List<VPoint> getDiscDiscretizationPoints(
+			@NotNull final Random random,
+			final boolean varyDirection,
+			@NotNull final VCircle circle,
+			final int numberOfCircles,
+			final int numberOfPointsOfLargestCircle,
+			final double anchorAngle,
+			final double angle) {
+		double randOffset = varyDirection ? random.nextDouble() : 0;
+
+		List<VPoint> reachablePositions = new ArrayList<>();
+
+		// iterate through all circles
+		for (int j = 1; j <= numberOfCircles; j++) {
+
+			double circleOfGrid = circle.getRadius() * j / numberOfCircles;
+
+			int numberOfGridPoints = (int) Math.ceil(circleOfGrid / circle.getRadius() * numberOfPointsOfLargestCircle);
+
+			// reduce number of grid points proportional to the constraint of direction
+			if (angle < 2 * Math.PI) {
+				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2 * Math.PI));
+			}
+
+			double angleDelta = angle / numberOfGridPoints;
+
+			// iterate through all angles and compute absolute positions of grid points
+			for (int i = 0; i < numberOfGridPoints; i++) {
+
+				double x = circleOfGrid * Math.cos(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getX();
+				double y = circleOfGrid * Math.sin(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getY();
+				VPoint tmpPos = new VPoint(x, y);
+
+				reachablePositions.add(tmpPos);
+			}
+		}
+
+		return reachablePositions;
+	}
+
+	/**
 	 * Computes the point on the line segment that is closest to the given point
 	 * point. from:
 	 * http://stackoverflow.com/questions/3120357/get-closest-point-to-a-line
-	 * 
+	 *
 	 * @param point
 	 *        the point to which the counterpart should be computed
 	 * @param line
@@ -155,14 +211,14 @@ public class GeometryUtils {
 	/**
 	 * Orders a given list angular relative to a given point, starting with
 	 * angle 0.
-	 * 
+	 *
 	 * @param allPoints
 	 * @param center
 	 * @return an ordered DataPoint list with the angle of the point as data and
 	 *         the original index set.
 	 */
 	public static List<DataPoint> orderByAngle(List<VPoint> allPoints,
-			VPoint center) {
+											   VPoint center) {
 		List<DataPoint> orderedList = new ArrayList<DataPoint>();
 
 		for (int i = 0; i < allPoints.size(); i++) {
@@ -243,11 +299,24 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Returns the angle between the x-axis, p1 and p2.
+	 */
+	public static double angleTo(VPoint p1, VPoint p2) {
+		double atan2 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+
+		if (atan2 < 0.0) {
+			atan2 = Math.PI * 2 + atan2;
+		}
+
+		return atan2;
+	}
+
+	/**
 	 * Calculate the counter clockwise result for the three given points.<br>
 	 * ccw(p1,p2,p3) < 0 if p3 is left of Line(p1,p2)<br>
 	 * ccw(p1,p2,p3) = 0 if p3 lies on Line(p1,p2)<br>
 	 * ccw(p1,p2,p3) > 0 if p3 is right of Line(p1,p2)<br>
-	 * 
+	 *
 	 * @param p1
 	 *        first point
 	 * @param p2
@@ -430,7 +499,7 @@ public class GeometryUtils {
 	/**
 	 * Computes the cross product of two vectors and store it in the cross
 	 * vector.
-	 * 
+	 *
 	 * @param v1
 	 * @param v2
 	 * @param cross
@@ -719,5 +788,34 @@ public class GeometryUtils {
 			part = 0.0;
 		}
 		return part;
+	}
+
+	public static VPoint lineIntersectionPoint(final double x1,
+											   final double y1,
+											   final double x2,
+											   final double y2,
+											   final double x3,
+											   final double y3,
+											   final double x4,
+											   final double y4) {
+		assert new VLine(new VPoint(x1, y1), new VPoint(x2, y2)).intersectsLine(x3, y3, x4, y4);
+		double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+		assert d != 0;
+
+		double x = ((x1 * y2 - y1 - x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+		double y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (y3 * y4 - y3 * x4)) / d;
+		return new VPoint(x, y);
+	}
+
+	public static VPoint lineIntersectionPoint(final VPoint p1, final VPoint p2, final VPoint q1, final VPoint q2) {
+		return lineIntersectionPoint(p1.x, p1.y, p2.x, p2.y, q1.x, q1.y, q2.x, q2.y);
+	}
+
+	public static VPoint lineIntersectionPoint(final VLine line,
+											   final double x3,
+											   final double y3,
+											   final double x4,
+											   final double y4) {
+		return lineIntersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), x3, y3, x4, y4);
 	}
 }

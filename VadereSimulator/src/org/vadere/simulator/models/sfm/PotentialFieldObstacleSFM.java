@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
@@ -15,6 +16,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.potential.gradients.GradientProvider;
 
@@ -23,6 +25,7 @@ import org.vadere.util.potential.gradients.GradientProvider;
  * (Helbing 1995).
  * 
  */
+@ModelClass
 public class PotentialFieldObstacleSFM implements GradientProvider,
 		PotentialFieldObstacle {
 
@@ -86,7 +89,7 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 	}
 
 	@Override
-	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
+	public double getObstaclePotential(IPoint pos, Agent pedestrian) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -95,7 +98,7 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 			Agent pedestrian) {
 
 		double[] completeGrad = new double[2];
-		double[] x = new double[] {pos.x, pos.y};
+		double[] x = new double[] {pos.getX(), pos.getY()};
 		double t = 0;
 		gradient(t, pedestrian.getNextTargetId(), x, completeGrad);
 
@@ -110,5 +113,4 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 		potentialFieldObstacle.obstacles = new LinkedList<>(topography.getObstacles());
 		return potentialFieldObstacle;
 	}
-
 }

@@ -17,12 +17,20 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
 	PedestrianWaitingTimeProcessorTestEnv() {
-		testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingTimeProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingTimeProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(nextProcessorId());
 
-		outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-				PedestrianIdKey.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					PedestrianIdKey.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

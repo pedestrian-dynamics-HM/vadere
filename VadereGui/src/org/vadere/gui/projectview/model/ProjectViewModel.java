@@ -3,6 +3,7 @@ package org.vadere.gui.projectview.model;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 public class ProjectViewModel {
@@ -42,6 +44,7 @@ public class ProjectViewModel {
 	private final Collection<IOutputFileRefreshListener> outputRefreshListeners;
 	private final Collection<IProjectChangeListener> projectChangeListeners;
 	private JLabel scenarioNameLabel; // to add or remove the "*" to indicate unsaved changes
+	private boolean showSimulationResultDialog;
 
 	public ProjectViewModel() {
 		this.outputTableModel = new OutputFileTableModel();
@@ -50,6 +53,8 @@ public class ProjectViewModel {
 		this.projectChangeListeners = new LinkedList<>();
 		this.project = null;
 		this.refreshOutputExecutor = Executors.newSingleThreadExecutor();
+		this.showSimulationResultDialog = Preferences.userNodeForPackage(VadereApplication.class)
+				.getBoolean("Project.simulationResult.show", true);
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
@@ -403,4 +408,11 @@ public class ProjectViewModel {
 		return currentScenario;
 	}
 
+	public boolean isShowSimulationResultDialog() {
+		return showSimulationResultDialog;
+	}
+
+	public void setShowSimulationResultDialog(boolean showSimulationResultDialog) {
+		this.showSimulationResultDialog = showSimulationResultDialog;
+	}
 }

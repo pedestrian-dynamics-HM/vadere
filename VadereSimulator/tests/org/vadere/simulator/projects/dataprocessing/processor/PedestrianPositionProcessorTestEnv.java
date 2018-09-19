@@ -24,13 +24,21 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 
 	PedestrianPositionProcessorTestEnv(int processorId) {
 		super();
-		testedProcessor = processorFactory.createDataProcessor(PedestrianPositionProcessor.class);
+		try {
+			testedProcessor = processorFactory.createDataProcessor(PedestrianPositionProcessor.class);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		testedProcessor.setId(processorId);
 		this.nextProcessorId = processorId + 1;
 
-		outputFile = outputFileFactory.createOutputfile(
-				TimestepPedestrianIdOutputFile.class,
-				testedProcessor.getId());
+		try {
+			outputFile = outputFileFactory.createOutputfile(
+					TimestepPedestrianIdOutputFile.class,
+					testedProcessor.getId());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 

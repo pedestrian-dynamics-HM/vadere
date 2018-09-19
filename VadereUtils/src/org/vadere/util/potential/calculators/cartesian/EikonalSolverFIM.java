@@ -2,13 +2,12 @@ package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
 import java.util.*;
@@ -113,6 +112,8 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 					cellGrid.setValue(activePoint,
 							new CellState(cellGrid.getValue(activePoint).potential, PathFindingTag.Reached));
 					activeListIterator.remove();
+				} else {
+					newActiveList.add(activePoint);
 				}
 			}
 			activeList.addAll(newActiveList);
@@ -149,13 +150,13 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 		return false;
 	}
 
-    @Override
+	@Override
 	public ITimeCostFunction getTimeCostFunction() {
 		return timeCostFunction;
 	}
 
 	@Override
 	public boolean isHighAccuracy() {
-		return true;
+		return false;
 	}
 }

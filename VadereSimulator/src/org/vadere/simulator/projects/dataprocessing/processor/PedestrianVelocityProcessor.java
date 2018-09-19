@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
  * @author Mario Teixeira Parente
  *
  */
-
+@DataProcessorClass()
 public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
 	private int backSteps;

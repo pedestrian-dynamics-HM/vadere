@@ -14,7 +14,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverSFMM;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,11 +61,11 @@ public class PerformanceSFMM {
 
 			cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), resolution, new CellState());
 			for (VShape shape : targets) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape, new CellState(0.0, PathFindingTag.Target));
+				FloorDiscretizer.setGridValuesForShape(cellGrid, shape, new CellState(0.0, PathFindingTag.Target));
 			}
 
 			for (VShape obstacle : obstacles) {
-				FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, obstacle, new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
+				FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle, new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
 			}
 		}
 	}

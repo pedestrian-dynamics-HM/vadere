@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.MovementType;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 
+@ModelAttributeClass
 public class AttributesOSM extends Attributes {
 
 	private int stepCircleResolution = 18;

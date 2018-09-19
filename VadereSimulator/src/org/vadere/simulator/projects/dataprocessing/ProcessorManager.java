@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing;
 
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 
@@ -21,6 +22,7 @@ public class ProcessorManager {
 
 	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
+	private SimulationResult simulationResult;
 
 	public ProcessorManager(List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles, MainModel mainModel) {
 		this.mainModel = mainModel;
@@ -60,6 +62,7 @@ public class ProcessorManager {
 
 	public void postLoop(final SimulationState state) {
 		this.processorMap.values().forEach(proc -> proc.postLoop(state));
+		this.processorMap.values().forEach(proc -> proc.postLoopAddResultInfo(state, simulationResult));
 	}
 
 	public void setOutputPath(String directory) {
@@ -70,6 +73,9 @@ public class ProcessorManager {
 		this.outputFiles.forEach(file -> file.write());
 	}
 
+	public void setSimulationResult(SimulationResult simulationResult) {
+		this.simulationResult = simulationResult;
+	}
 
 	/**
 	 * Returns true if there is no output to write, otherwise false.

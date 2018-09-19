@@ -13,16 +13,14 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.triangulation.IPointConstructor;
 import org.vadere.util.triangulation.adaptive.CLPSMeshing;
-import org.vadere.util.triangulation.adaptive.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 import org.vadere.util.triangulation.adaptive.MeshPoint;
 import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
-import org.vadere.util.triangulation.improver.PSMeshing;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * @author Benedikt Zoennchen

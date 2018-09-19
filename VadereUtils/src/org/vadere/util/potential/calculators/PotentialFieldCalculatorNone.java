@@ -17,7 +17,12 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 		return false;
 	}
 
-    @Override
+	@Override
+	public double getPotential(IPoint pos, double unknownPenalty, double weight) {
+		return 0;
+	}
+
+	@Override
     public Function<IPoint, Double> getPotentialField() {
         return p -> 0.0;
     }

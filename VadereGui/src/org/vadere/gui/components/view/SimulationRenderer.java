@@ -10,15 +10,21 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.util.color.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -33,41 +39,43 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	private static double CONTOUR_STEP = 2.0;
 	private static double CONTOUR_THINKNESS = 0.2;
 
-	private SimulationModel model;
-	private BufferedImage obstacleDensity = null;
-	private BufferedImage potentialFieldImage = null;
-	private ColorHelper colorHelper;
-	private Color lastDensityColor = null;
-	private int topographyId;
+    private SimulationModel model;
+    private BufferedImage obstacleDensity = null;
+    private BufferedImage potentialFieldImage = null;
+    private ColorHelper colorHelper;
+    private Color lastDensityColor = null;
+    private int topographyId;
+    private AgentRender agentRender;
 
-	public SimulationRenderer(final SimulationModel model) {
-		super(model);
-		this.model = model;
-		this.topographyId = -1;
-		this.colorHelper = new ColorHelper(40);
-	}
+    public SimulationRenderer(final SimulationModel model) {
+        super(model);
+        this.model = model;
+        this.topographyId = -1;
+        this.colorHelper = new ColorHelper(40);
+        this.agentRender = new AgentRender(model);
+    }
 
-	@Override
-	protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
-		if (model.isFloorFieldAvailable() && model.config.isShowPotentialField()) {
-			synchronized (model) {
-				renderPotentialField(graphics2D,
-						(int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
-						(int)(Math.min(model.getTopographyBound().height, model.getViewportBound().height) * model.getScaleFactor()));
-			}
-		}
-		super.renderPreTransformation(graphics2D, width, height);
-	}
+    @Override
+    protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
+        if (model.isFloorFieldAvailable() && (model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
+            synchronized (model) {
+                renderPotentialField(graphics2D,
+                        (int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
+                        (int)(Math.min(model.getTopographyBound().height, model.getViewportBound().height) * model.getScaleFactor()));
+            }
+        }
+        super.renderPreTransformation(graphics2D, width, height);
+    }
 
 	@Override
 	public void renderPostTransformation(final Graphics2D graphics, final int width, final int height) {
 		graphics.setColor(Color.BLACK);
 
-		// if there is no potential field than draw the default background (white)
-		// otherwise do not overdraw the potential field!!!
-		if (!model.isFloorFieldAvailable() || !model.config.isShowPotentialField()) {
-			super.renderPostTransformation(graphics, width, height);
-		}
+        // if there is no potential field than draw the default background (white)
+        // otherwise do not overdraw the potential field!!!
+        if (!model.isFloorFieldAvailable() || !(model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
+            super.renderPostTransformation(graphics, width, height);
+        }
 
 		if (model.config.isShowDensity()) {
 			renderDensity(graphics);
@@ -81,9 +89,9 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 			renderScenarioElement(model.getTopography().getObstacles(), graphics, model.config.getObstacleColor());
 		}
 
-		if (model.config.isShowStairs()) {
-			renderScenarioElement(model.getTopography().getStairs(), graphics, model.config.getStairColor());
-		}
+        if (model.config.isShowStairs()) {
+            renderStairs(model.getTopography().getStairs(), graphics, model.config.getStairColor());
+        }
 
 		if (model.config.isShowTargets()) {
 			renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
@@ -239,5 +247,23 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     private float getGridLineWidth() {
         return (float) (0.5 / model.getScaleFactor());
+    }
+
+    public AgentRender getAgentRender() {
+        return agentRender;
+    }
+
+    public void setAgentRender(AgentRender agentRender) {
+        this.agentRender = agentRender;
+    }
+
+    public Color getPedestrianColor(@NotNull final Agent agent) {
+	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
+	    if (model.config.isUseRandomPedestrianColors()) {
+		   return model.config.getRandomColor(agent.getId());
+	    }
+
+	    return model.config.getColorByTargetId(targetId)
+			    .orElseGet(model.config::getPedestrianColor);
     }
 }

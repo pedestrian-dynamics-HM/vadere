@@ -24,11 +24,34 @@ public class TestLinkedCellsGrid {
 	private static Logger logger = LogManager
 			.getLogger(TestLinkedCellsGrid.class);
 
-	private class NotComparableObject {
+	private class NotComparableObject implements PointPositioned {
 		public int value;
+		public VPoint coord;
 
-		public NotComparableObject(int value) {
+		public NotComparableObject(int value, VPoint coord) {
 			this.value = value;
+			this.coord = coord;
+		}
+
+		@Override
+		public VPoint getPosition() {
+			return coord;
+		}
+	}
+
+	private static class CoordinatedInteger implements PointPositioned {
+		public final Integer number;
+		public final VPoint coordinate;
+
+		public CoordinatedInteger(Integer number, VPoint coordinate) {
+			this.number = number;
+			this.coordinate = coordinate;
+		}
+
+
+		@Override
+		public VPoint getPosition() {
+			return coordinate;
 		}
 	}
 
@@ -47,13 +70,13 @@ public class TestLinkedCellsGrid {
 	int int3 = 3;
 	int int4 = 4;
 
-	NotComparableObject obj1 = new NotComparableObject(1);
-	NotComparableObject obj2 = new NotComparableObject(2);
-	NotComparableObject obj3 = new NotComparableObject(3);
-	NotComparableObject obj4 = new NotComparableObject(4);
+	NotComparableObject obj1 = new NotComparableObject(1, pos1);
+	NotComparableObject obj2 = new NotComparableObject(2, pos2);
+	NotComparableObject obj3 = new NotComparableObject(3, pos3);
+	NotComparableObject obj4 = new NotComparableObject(4, pos3);
 
 	/** linked cells grid with comparable objects */
-	private static LinkedCellsGrid<Integer> linkedCellsInteger;
+	private static LinkedCellsGrid<CoordinatedInteger> linkedCellsInteger;
 	/** linked cells grid with non comparable objects */
 	private static LinkedCellsGrid<NotComparableObject> linkedCellsObject;
 
@@ -64,7 +87,7 @@ public class TestLinkedCellsGrid {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		linkedCellsInteger = new LinkedCellsGrid<Integer>(left, top, width,
+		linkedCellsInteger = new LinkedCellsGrid<CoordinatedInteger>(left, top, width,
 				height, sideLength);
 		linkedCellsObject = new LinkedCellsGrid<NotComparableObject>(left, top,
 				width, height, sideLength);
@@ -72,64 +95,64 @@ public class TestLinkedCellsGrid {
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.util.geometry.LinkedCellsGrid#addObject(java.lang.Object, java.awt.geometry.shapes.VPoint)}
+	 * {@link org.vadere.util.geometry.LinkedCellsGrid#addObject(PointPositioned)}
 	 * . adds several integer objects and tries to retrieve them via
-	 * {@link LinkedCellsGrid#getObjects(java.awt.geometry.shapes.VPoint, double)}
+	 * {@link LinkedCellsGrid#getObjects(VPoint, double)}
 	 * .
 	 */
 	@Test
 	public void testAddObject() {
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
-		linkedCellsInteger.addObject(int3, pos3);
+		CoordinatedInteger coordinatedInteger1 = new CoordinatedInteger(int1, pos1);
+		CoordinatedInteger coordinatedInteger2 = new CoordinatedInteger(int2, pos2);
+		CoordinatedInteger coordinatedInteger3 = new CoordinatedInteger(int3, pos3);
+		linkedCellsInteger.addObject(coordinatedInteger1);
+		linkedCellsInteger.addObject(coordinatedInteger2);
+		linkedCellsInteger.addObject(coordinatedInteger3);
 
 		// the values are chosen so that all points should clearly be inside the
 		// ball
 		VPoint testpos1 = new VPoint(25, 25);
 		double testradius1 = 40;
-		List<Integer> objects1 = linkedCellsInteger.getObjects(testpos1,
-				testradius1);
+		List<CoordinatedInteger> objects1 = linkedCellsInteger.getObjects(testpos1, testradius1);
 
 		assertEquals("the grid did not add the correct number of objects.", 3,
 				objects1.size());
 		assertTrue("the first object was not added correctly",
-				objects1.contains(int1));
+				objects1.contains(coordinatedInteger1));
 		assertTrue("the second object was not added correctly",
-				objects1.contains(int2));
+				objects1.contains(coordinatedInteger2));
 		assertTrue("the third object was not added correctly",
-				objects1.contains(int3));
+				objects1.contains(coordinatedInteger3));
 
 		// add a new object at exactly the same position as before. should NOT
 		// be added
-		linkedCellsInteger.addObject(int4, pos3);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int4, pos3));
 
-		List<Integer> objects2 = linkedCellsInteger.getObjects(testpos1,
-				testradius1);
+		List<CoordinatedInteger> objects2 = linkedCellsInteger.getObjects(testpos1, testradius1);
 		assertEquals("the grid did not add the object but should have.", 4,
 				objects2.size());
 
 		// add exactly the same object at exactly the same position as before.
 		// should also be added
-		linkedCellsInteger.addObject(int1, pos1);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos1));
 
-		List<Integer> objects3 = linkedCellsInteger.getObjects(testpos1,
-				testradius1);
+		List<CoordinatedInteger> objects3 = linkedCellsInteger.getObjects(testpos1, testradius1);
 		assertEquals("the grid did add the object but should not have.", 5,
 				objects3.size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.util.geometry.LinkedCellsGrid#addObject(java.lang.Object, java.awt.geometry.shapes.VPoint)}
+	 * {@link org.vadere.util.geometry.LinkedCellsGrid#addObject(PointPositioned)}
 	 * . adds several non comparable objects and tries to retrieve them via
-	 * {@link LinkedCellsGrid#getObjects(java.awt.geometry.shapes.VPoint, double)}
+	 * {@link LinkedCellsGrid#getObjects(VPoint, double)}
 	 * .
 	 */
 	@Test
 	public void testAddNonComparableObject() {
-		linkedCellsObject.addObject(obj1, pos1);
-		linkedCellsObject.addObject(obj2, pos2);
-		linkedCellsObject.addObject(obj3, pos3);
+		linkedCellsObject.addObject(obj1);
+		linkedCellsObject.addObject(obj2);
+		linkedCellsObject.addObject(obj3);
 
 		// the values are chosen so that all points should clearly be inside the
 		// ball
@@ -149,7 +172,7 @@ public class TestLinkedCellsGrid {
 
 		// add a new object at exactly the same position as before. should be
 		// added
-		linkedCellsObject.addObject(obj4, pos3);
+		linkedCellsObject.addObject(obj4);
 
 		List<NotComparableObject> objects2 = linkedCellsObject.getObjects(
 				testpos1, testradius1);
@@ -158,7 +181,7 @@ public class TestLinkedCellsGrid {
 
 		// add exactly the same object at exactly the same position as before.
 		// should also be added
-		linkedCellsObject.addObject(obj1, pos1);
+		linkedCellsObject.addObject(obj1);
 
 		List<NotComparableObject> objects3 = linkedCellsObject.getObjects(
 				testpos1, testradius1);
@@ -168,22 +191,22 @@ public class TestLinkedCellsGrid {
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.util.geometry.LinkedCellsGrid#addObject(java.lang.Object, java.awt.geometry.shapes.VPoint)}
+	 * {@link org.vadere.util.geometry.LinkedCellsGrid#addObject(PointPositioned)}
 	 * . adds several points and tests the number of objects stored in the
 	 * linked cells grid after adding three comparable objects.
 	 */
 	@Test
 	public void testAddObjectSize() {
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
-		linkedCellsInteger.addObject(int3, pos3);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos1));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int2, pos2));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int3, pos3));
 
 		assertEquals("size of linkedCellsDouble is wrong", 3,
 				linkedCellsInteger.size());
 
 		// add exactly the same object at exactly the same position as before.
 		// should still be added
-		linkedCellsInteger.addObject(int1, pos3);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos3));
 
 		assertEquals("size of linkedCellsDouble is wrong", 4,
 				linkedCellsInteger.size());
@@ -191,52 +214,53 @@ public class TestLinkedCellsGrid {
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.util.geometry.LinkedCellsGrid#getObjects(java.awt.geometry.shapes.VPoint, double)}
+	 * {@link org.vadere.util.geometry.LinkedCellsGrid#getObjects(VPoint, double)}
 	 * . Adds objects and tries to retrieve them via getObjects.
 	 */
 	@Test
 	public void testGetObjects() {
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
-		linkedCellsInteger.addObject(int3, pos3);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos1));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int2, pos2));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int3, pos3));
 
 		// this should only return the object at pos1
-		List<Integer> objects = linkedCellsInteger.getObjects(pos1,
+		List<CoordinatedInteger> objects = linkedCellsInteger.getObjects(pos1,
 				pos1.distance(pos2) - 1);
 		assertEquals(
 				"getObjects did not return the correct number of objects.", 1,
 				objects.size());
 		assertEquals("getObjects did not return the correct object.", int1,
-				(int) objects.get(0));
+				(int) objects.get(0).number);
 
 		// this should return the object at pos1 and pos2
-		List<Integer> objects2 = linkedCellsInteger.getObjects(pos1,
+		List<CoordinatedInteger> objects2 = linkedCellsInteger.getObjects(pos1,
 				pos1.distance(pos2) + 1);
 		assertEquals(
 				"getObjects did not return the correct number of objects.", 2,
 				objects2.size());
 		assertEquals("getObjects did not return the correct object.", int1,
-				(int) objects2.get(0));
+				(int) objects2.get(0).number);
 		assertEquals("getObjects did not return the correct object.", int2,
-				(int) objects2.get(1));
+				(int) objects2.get(1).number);
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.util.geometry.LinkedCellsGrid#removeObject(java.lang.Object)}. Adds two
+	 * {@link org.vadere.util.geometry.LinkedCellsGrid#removeObject(PointPositioned)}
 	 * objects and tries to remove one.
 	 */
 	@Test
 	public void testRemoveObject() {
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
+		CoordinatedInteger coordinatedInteger = new CoordinatedInteger(int2, pos2);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos1));
+		linkedCellsInteger.addObject(coordinatedInteger);
 
 		// remove the second object
-		linkedCellsInteger.removeObject(int2);
+		linkedCellsInteger.removeObject(coordinatedInteger);
 		assertEquals("remove object did not remove the object.", 1,
 				linkedCellsInteger.size());
 		assertEquals("remove object did not remove the last object.", int1,
-				(int) linkedCellsInteger.iterator().next());
+				(int) linkedCellsInteger.iterator().next().number);
 	}
 
 	/**
@@ -245,15 +269,15 @@ public class TestLinkedCellsGrid {
 	 */
 	@Test
 	public void testClear() {
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos1));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int2, pos2));
 
 		linkedCellsInteger.clear();
 
 		assertEquals("the grid is not empty.", 0, linkedCellsInteger.size());
 
 		// try to retrieve the objects, should return an empty list
-		List<Integer> objects = linkedCellsInteger.getObjects(pos1,
+		List<CoordinatedInteger> objects = linkedCellsInteger.getObjects(pos1,
 				pos1.distance(pos2) + 1);
 		assertEquals("there are still objects present in the grid.", 0,
 				objects.size());
@@ -265,22 +289,22 @@ public class TestLinkedCellsGrid {
 	 */
 	@Test
 	public void testIterator() {
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
-		linkedCellsInteger.addObject(int3, pos3);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int1, pos1));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int2, pos2));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int3, pos3));
 
 		List<Integer> objects = new LinkedList<Integer>();
 
-		Iterator<Integer> objectIterator = linkedCellsInteger.iterator();
+		Iterator<CoordinatedInteger> objectIterator = linkedCellsInteger.iterator();
 		assertEquals("the iterator should find the first element", true,
 				objectIterator.hasNext());
-		objects.add(objectIterator.next());
+		objects.add(objectIterator.next().number);
 		assertEquals("the iterator should find the second element", true,
 				objectIterator.hasNext());
-		objects.add(objectIterator.next());
+		objects.add(objectIterator.next().number);
 		assertEquals("the iterator should find the third element", true,
 				objectIterator.hasNext());
-		objects.add(objectIterator.next());
+		objects.add(objectIterator.next().number);
 		assertEquals(
 				"the iterator should not find any elements after the third element",
 				false, objectIterator.hasNext());
@@ -302,15 +326,15 @@ public class TestLinkedCellsGrid {
 	@Test
 	public void testSize() {
 		assertEquals("grid is not empty.", 0, linkedCellsInteger.size());
-
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
-		linkedCellsInteger.addObject(int3, pos3);
+		CoordinatedInteger coordinatedInteger = new CoordinatedInteger(int1, pos1);
+		linkedCellsInteger.addObject(coordinatedInteger);
+		linkedCellsInteger.addObject(new CoordinatedInteger(int2, pos2));
+		linkedCellsInteger.addObject(new CoordinatedInteger(int3, pos3));
 
 		assertEquals("grid does not contain the correct number of objects.", 3,
 				linkedCellsInteger.size());
 
-		linkedCellsInteger.removeObject(int1);
+		linkedCellsInteger.removeObject(coordinatedInteger);
 
 		assertEquals("grid does not contain the correct number of objects.", 2,
 				linkedCellsInteger.size());
@@ -323,32 +347,37 @@ public class TestLinkedCellsGrid {
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.util.geometry.LinkedCellsGrid#contains(java.lang.Object)}. Checks
-	 * triangleContains on an empty grid as well as with three added objects.
+	 * {@link org.vadere.util.geometry.LinkedCellsGrid#contains(PointPositioned)}. Checks
+	 * contains on an empty grid as well as with three added objects.
 	 */
 	@Test
 	public void testContainsT() {
+		CoordinatedInteger coordinatedInteger1 = new CoordinatedInteger(int1, pos1);
+		CoordinatedInteger coordinatedInteger2 = new CoordinatedInteger(int2, pos2);
+		CoordinatedInteger coordinatedInteger3 = new CoordinatedInteger(int3, pos3);
+		CoordinatedInteger coordinatedInteger4 = new CoordinatedInteger(int4, pos3);
 		assertFalse("grid did contain object 1 even it was empty.",
-				linkedCellsInteger.contains(int1));
+				linkedCellsInteger.contains(coordinatedInteger1));
 
-		linkedCellsInteger.addObject(int1, pos1);
-		linkedCellsInteger.addObject(int2, pos2);
-		linkedCellsInteger.addObject(int3, pos3);
+
+
+		linkedCellsInteger.addObject(coordinatedInteger1);
+		linkedCellsInteger.addObject(coordinatedInteger2);
+		linkedCellsInteger.addObject(coordinatedInteger3);
 
 		assertTrue("grid did not contain object 1.",
-				linkedCellsInteger.contains(int1));
+				linkedCellsInteger.contains(coordinatedInteger1));
 		assertTrue("grid did not contain object 1.",
-				linkedCellsInteger.contains(int2));
+				linkedCellsInteger.contains(coordinatedInteger2));
 		assertTrue("grid did not contain object 1.",
-				linkedCellsInteger.contains(int3));
+				linkedCellsInteger.contains(coordinatedInteger3));
 		assertFalse("grid did contain object 4.",
-				linkedCellsInteger.contains(int4));
+				linkedCellsInteger.contains(coordinatedInteger4));
 	}
 
 	/**
 	 * Test method for the complexity of
-	 * {@link LinkedCellsGrid#getObjects(java.awt.geometry.shapes.VPoint, double)}
-	 * . Should be O(1).
+	 * {@link LinkedCellsGrid#getObjects(VPoint, double)}. Should be O(1).
 	 */
 	@Test
 	public void testGetObjectsCompexity() {
@@ -362,7 +391,7 @@ public class TestLinkedCellsGrid {
 
 			// create a grid that holds at max one object per cell
 			double sideLength = width / Math.sqrt(count);
-			linkedCellsInteger = new LinkedCellsGrid<Integer>(left, top, width,
+			linkedCellsInteger = new LinkedCellsGrid<>(left, top, width,
 					height, sideLength);
 			linkedCellsInteger.clear();
 			fillGrid(linkedCellsInteger, numberOfObjects);
@@ -408,7 +437,7 @@ public class TestLinkedCellsGrid {
 	 * @param linkedCellsGrid
 	 * @param numberOfObjects
 	 */
-	private void fillGrid(LinkedCellsGrid<Integer> linkedCellsGrid,
+	private void fillGrid(LinkedCellsGrid<CoordinatedInteger> linkedCellsGrid,
 			int numberOfObjects) {
 		int size = (int) Math.sqrt(numberOfObjects);
 		for (int row = 0; row < size; row++) {
@@ -416,7 +445,7 @@ public class TestLinkedCellsGrid {
 				int obj = row * size + col;
 				VPoint pos = new VPoint(row / (double) size * height, col
 						/ (double) size * width);
-				linkedCellsGrid.addObject(obj, pos);
+				linkedCellsGrid.addObject(new CoordinatedInteger(obj, pos));
 			}
 		}
 	}
