@@ -1,7 +1,6 @@
 package org.vadere.simulator.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.scenario.ScenarioElement;
 
 import java.util.Comparator;
 
@@ -70,21 +69,6 @@ public class TopographyCheckerMessage implements Comparable<TopographyCheckerMes
 			}
 		};
 	}
-//
-//	private Comparator<TopographyCheckerMessage> sortByElement() {
-//		return (o1, o2) -> {
-//			if (o1.element.equals(o2.element))
-//				return 0;
-//
-//			if (o1.element.getType().ordinal() > o2.element.getType().ordinal()) {
-//				return 1;
-//			} else if (o1.element.getType().ordinal() < o2.element.getType().ordinal()) {
-//				return -1;
-//			} else {
-//				return 0;
-//			}
-//		};
-//	}
 
 	private Comparator<TopographyCheckerMessage> defaultSort() {
 		return sortByType();
@@ -93,5 +77,15 @@ public class TopographyCheckerMessage implements Comparable<TopographyCheckerMes
 	@Override
 	public int compareTo(@NotNull TopographyCheckerMessage o) {
 		return defaultSort().compare(this, o);
+	}
+
+	@Override
+	public String toString() {
+		return "TopographyCheckerMessage{" +
+				"reason=" + reason +
+				", reasonModifier='" + reasonModifier + '\'' +
+				", msgType=" + msgType +
+				", msgTarget=" + msgTarget +
+				'}';
 	}
 }

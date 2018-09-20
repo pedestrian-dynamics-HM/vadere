@@ -24,4 +24,11 @@ public enum TopographyCheckerMessageType {
 	public String getLocalTypeId() {
 		return msgId;
 	}
+
+	@Override
+	public String toString() {
+		return "TopographyCheckerMessageType{" +
+				"type='" + type + '\'' +
+				'}';
+	}
 }

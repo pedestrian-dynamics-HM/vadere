@@ -10,7 +10,6 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -83,10 +82,26 @@ public class TopographyChecker {
 						.error()
 						.target(p)
 						.reason(TopographyCheckerReason.PEDESTRIAN_SPEED_SETUP,
-								"(" + p.getAttributes().getMaximumSpeed()
-										+ "  &lt; treadDepth  &gt; "
+								"(" + p.getAttributes().getMinimumSpeed()
+										+ "  &lt; treadDepth  &lt; "
 										+ p.getAttributes().getMaximumSpeed() +
 								") current SpeedDistributionMean is: " + String.format("%.2f",speedMean))
+						.build());
+			}
+			if (p.getAttributes().getMinimumSpeed() > Pedestrian.HUMAN_MAX_SPEED || p.getAttributes().getMaximumSpeed() > Pedestrian.HUMAN_MAX_SPEED){
+				ret.add(msgBuilder
+						.warning()
+						.target(p)
+						.reason(TopographyCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL,
+								String.format("[max: %.2f min: %.2f threshold: %.2f]", p.getAttributes().getMinimumSpeed(),
+										p.getAttributes().getMaximumSpeed(), Pedestrian.HUMAN_MAX_SPEED))
+						.build());
+			}
+			if (p.getAttributes().getMinimumSpeed() < 0 || p.getAttributes().getMaximumSpeed() < 0){
+				ret.add(msgBuilder
+						.error()
+						.target(p)
+						.reason(TopographyCheckerReason.PEDESTRIAN_SPEED_NEGATIVE)
 						.build());
 			}
 		});

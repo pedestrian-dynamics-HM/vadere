@@ -448,6 +448,68 @@ public class TopographyCheckerTest {
 		hasNoElement(out);
 	}
 
+	@Test
+	public void testCheckPedestrianSpeedMinIsWorldRecord(){
+		AttributesAgentBuilder attrAgentB = AttributesAgentBuilder.anAttributesAgent();
+
+		builder.addPedestrian(attrAgentB
+				.minimumSpeed(13.0)
+				.maximumSpeed(17.0)
+				.speedDistributionStandardDeviation(2.0)
+				.speedDistributionMean(15.0)
+				.build());
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isWarnMsg(msg);
+		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL, msg.getReason());
+	}
+
+	@Test
+	public void testCheckPedestrianSpeedMaxIsWorldRecord(){
+		AttributesAgentBuilder attrAgentB = AttributesAgentBuilder.anAttributesAgent();
+
+		builder.addPedestrian(attrAgentB
+				.minimumSpeed(10.0)
+				.maximumSpeed(17.0)
+				.speedDistributionMean(10.0)
+				.build());
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isWarnMsg(msg);
+		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL, msg.getReason());
+	}
+
+	@Test
+	public void testCheckPedestrianSpeedSetupWithNegativSpeed(){
+		AttributesAgentBuilder attrAgentB = AttributesAgentBuilder.anAttributesAgent();
+
+		builder.addPedestrian(attrAgentB
+				.minimumSpeed(-0.5)
+				.maximumSpeed(2.2)
+				.speedDistributionMean(0.8)
+				.build());
+
+
+		Topography topography = builder.build();
+		TopographyChecker checker = new TopographyChecker(topography);
+
+		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+
+		TopographyCheckerMessage msg = hasOneElement(out);
+		isErrorMsg(msg);
+		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_NEGATIVE, msg.getReason());
+	}
+
 
 	private TopographyCheckerMessage hasOneElement(List<TopographyCheckerMessage> out){
 		assertEquals(1, out.size());

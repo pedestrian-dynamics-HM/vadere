@@ -1,6 +1,5 @@
 package org.vadere.simulator.util;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.ScenarioElement;
 
 import java.util.ArrayList;
@@ -45,5 +44,16 @@ public class TopographyCheckerMessageTarget {
 		return Objects.hash(targets);
 	}
 
+	@Override
+	public String toString() {
 
+		StringBuilder sb = new StringBuilder();
+		sb.append("TopographyCheckerMessageTarget{ targets=");
+		sb.append("[");
+		targets.forEach(t -> sb.append(t.getClass().getSimpleName()).append(", "));
+		sb.setLength(sb.length() -2);
+		sb.append("]}");
+
+		return sb.toString();
+	}
 }
