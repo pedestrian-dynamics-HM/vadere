@@ -35,4 +35,19 @@ public interface VShape extends Shape, Cloneable {
 		thisShape.subtract(otherShape);
 		return !thisShape.equals(thisShapeCpy);
 	}
+
+	default boolean sameArea(VShape shape){
+		Area thisShape = new Area(this);
+		Area otherShape = new Area(shape);
+		thisShape.subtract(otherShape);
+		return thisShape.isEmpty();
+	}
+
+	default boolean containsShape(VShape otherShape){
+		Area thisArea = new Area(this);
+		Area otherArea = new Area(otherShape);
+		thisArea.intersect(otherArea);
+		return thisArea.equals(otherArea);
+
+	}
 }

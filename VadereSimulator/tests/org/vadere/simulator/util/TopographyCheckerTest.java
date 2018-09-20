@@ -2,6 +2,7 @@ package org.vadere.simulator.util;
 
 import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.builder.AttributesAgentBuilder;
@@ -15,7 +16,9 @@ import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -103,6 +106,20 @@ public class TopographyCheckerTest {
 
 		assertEquals("The sources should have the same id", 3, out.size());
 		out.forEach(m -> assertEquals(TopographyCheckerReason.SOURCE_ID_NOT_UNIQUE, m.getReason()));
+	}
+
+	@Test
+	@Ignore
+	public void TestOverlap(){
+		VShape a = new VRectangle(0, 0, 10, 10);
+		VShape b = new VRectangle(1, 1, 1, 1);
+
+		Area aa = new Area(a);
+		Area bb = new Area(b);
+		System.out.println(a.containsShape(b));
+		System.out.println(a.containsShape(a));
+		System.out.println(b.containsShape(a));
+		System.out.println(b.containsShape(b));
 	}
 
 	/**
@@ -245,7 +262,7 @@ public class TopographyCheckerTest {
 		Topography topography = builder.build();
 		TopographyChecker checker = new TopographyChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkSourceObstacleOverlap();
+		List<TopographyCheckerMessage> out = checker.checkOverlap((type, type2) -> true);
 
 		hasNoElement(out);
 	}
@@ -278,11 +295,11 @@ public class TopographyCheckerTest {
 		Topography topography = builder.build();
 		TopographyChecker checker = new TopographyChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkSourceObstacleOverlap();
+		List<TopographyCheckerMessage> out = checker.checkOverlap((type, type2) -> true);
 
 		TopographyCheckerMessage msg = hasOneElement(out);
 		isErrorMsg(msg);
-		assertEquals(TopographyCheckerReason.SOURCE_OVERLAP_WITH_OBSTACLE, msg.getReason());
+		assertEquals(TopographyCheckerReason.OVERLAP_OBSTACLE_SOURCE, msg.getReason());
 		assertEquals(testSource, msg.getMsgTarget().getTargets().get(0));
 		assertEquals(testObstacle, msg.getMsgTarget().getTargets().get(1));
 

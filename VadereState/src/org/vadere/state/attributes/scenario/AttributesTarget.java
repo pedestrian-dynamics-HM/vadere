@@ -144,4 +144,8 @@ public class AttributesTarget extends AttributesEmbedShape {
 		this.deletionDistance = reachedDistance;
 	}
 
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
 }

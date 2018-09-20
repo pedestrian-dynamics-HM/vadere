@@ -30,6 +30,7 @@ import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
 import org.vadere.gui.topographycreator.control.ActionTopographyCheckerMenu;
+import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
@@ -309,6 +310,12 @@ public class TopographyWindow extends JPanel {
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
 				panelModel, selectShape);
 
+		/* Makros */
+		ActionTopographyMakroMenu actionTopographyMakroMenu =
+				new ActionTopographyMakroMenu("TopographyMakros",
+						new ImageIcon(Resources.class.getResource("/icons/setting32x32.png")),
+						panelModel);
+
 		/* Topography checker*/
 		ActionTopographyCheckerMenu actionTopographyCheckerMenu =
 				new ActionTopographyCheckerMenu("TopographyChecker", panelModel, jsonValidIndicator);
@@ -350,6 +357,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
+		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnMakro.tooltip");
 		addActionToToolbar(toolbar, actionTopographyCheckerMenu, "TopographyCreator.btnChecker.tooltip");
 		toolbar.add(infoButton);
 		infoButton.setToolTipText("About");
