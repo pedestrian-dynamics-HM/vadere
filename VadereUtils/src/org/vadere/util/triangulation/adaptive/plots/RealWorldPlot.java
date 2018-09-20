@@ -1,5 +1,27 @@
 package org.vadere.util.triangulation.adaptive.plots;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.mesh.gen.AFace;
+import org.vadere.util.geometry.mesh.gen.AHalfEdge;
+import org.vadere.util.geometry.mesh.gen.AVertex;
+import org.vadere.util.geometry.mesh.gen.PFace;
+import org.vadere.util.geometry.mesh.gen.PHalfEdge;
+import org.vadere.util.geometry.mesh.gen.PVertex;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
+import org.vadere.util.triangulation.improver.PPSMeshing;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+
 /**
  * Created by bzoennchen on 10.06.18.
  */
@@ -235,21 +257,54 @@ public class RealWorldPlot {
 			"  }\n" +
 			"}";
 
-	private static void realWorldExample() {
+	public static void main(String... args) {
 
-		/*VRectangle bound = new VRectangle(getTopographyBound());
-		Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
-		obstacles.addAll(getTopography().getObstacles());
+		VPolygon boundary = GeometryUtils.polygonFromPoints2D(
+				new VPoint(0,0),
+				new VPoint(0, 1),
+				new VPoint(1, 2),
+				new VPoint(2,1),
+				new VPoint(2,0));
 
-		List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
-
-		IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+		VRectangle rect = new VRectangle(0.5, 0.5, 0.5, 0.5);
+		List<VShape> obstacleShapes = new ArrayList<>();
+		obstacleShapes.add(rect);
 
 		PPSMeshing meshImprover = new PPSMeshing(
-				distanceFunc,
-				p -> Math.min(1.0 + Math.max(-distanceFunc.apply(p), 0), 5.0),
-				0.5,
-				bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
+				boundary,
+				0.1,
+				obstacleShapes);
+
+		PSMeshingPanel<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshImprover.getMesh(), f -> false, 1000, 800, new VRectangle(boundary.getBounds()));
+		JFrame frame = distmeshPanel.display();
+		frame.setVisible(true);
+		frame.setTitle("uniformRing()");
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		distmeshPanel.repaint();
+
+		StopWatch overAllTime = new StopWatch();
+		overAllTime.start();
+		//meshGenerator.improve();
+		//meshGenerator.improve();
+		//meshGenerator.improve();
+
+
+		int nSteps = 0;
+		while (nSteps < 300) {
+			nSteps++;
+			meshImprover.improve();
+			overAllTime.suspend();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			distmeshPanel.repaint();
+			overAllTime.resume();
+		}
+		meshImprover.improve();
+		overAllTime.stop();
+		distmeshPanel.repaint();
 	}
 
 }

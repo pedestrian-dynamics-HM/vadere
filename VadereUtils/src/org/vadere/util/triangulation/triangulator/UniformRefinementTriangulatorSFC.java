@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Triangulation creator: This class is realises an algorithm which refine a given triangulation
  * (which might be empty), by recursively splitting existing triangles (starting with the super triangle if
- * the triangulation is empty) into parts. The class is a Functional.
+ * the triangulation is empty) into parts.
  *
  * @author Benedikt Zoennchen
  *

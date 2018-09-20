@@ -516,7 +516,7 @@ public class GeometryUtils {
 
 	/**
 	 * Constructs a new Polygon defined by the vertices. It is assumed that
-	 * all vertices a distinct.
+	 * all vertices are distinct.
 	 *
 	 * @param vertices the defining distinct vertices.
 	 * @return a new Polygon

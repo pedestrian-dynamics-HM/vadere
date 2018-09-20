@@ -2,6 +2,7 @@ package org.vadere.util.triangulation.improver;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.gen.*;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
@@ -24,4 +25,13 @@ public class PPSMeshing extends PSMeshing<MeshPoint, PVertex<MeshPoint>, PHalfEd
         super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
 		        () -> new PMesh<>((x, y) -> new MeshPoint(x, y, false)));
     }
+
+	public PPSMeshing(
+			@NotNull VPolygon polygon,
+			double initialEdgeLen,
+			@NotNull Collection<? extends VShape> obstacleShapes) {
+		super(polygon, initialEdgeLen, obstacleShapes,
+				() -> new PMesh<>((x, y) -> new MeshPoint(x, y, false)));
+	}
+
 }

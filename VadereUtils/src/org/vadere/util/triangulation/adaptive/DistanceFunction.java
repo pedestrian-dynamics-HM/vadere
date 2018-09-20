@@ -1,6 +1,7 @@
 package org.vadere.util.triangulation.adaptive;
 
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
@@ -9,10 +10,15 @@ import java.util.Collection;
 
 public class DistanceFunction implements IDistanceFunction {
 
-	private final VRectangle regionBoundingBox;
+	private final VShape regionBoundingBox;
 	private final Collection<? extends VShape> obstacles;
 
 	public DistanceFunction(final VRectangle regionBoundingBox, final Collection<? extends VShape> obstacles) {
+		this.regionBoundingBox = regionBoundingBox;
+		this.obstacles = obstacles;
+	}
+
+	public DistanceFunction(final VPolygon regionBoundingBox, final Collection<? extends VShape> obstacles) {
 		this.regionBoundingBox = regionBoundingBox;
 		this.obstacles = obstacles;
 	}
