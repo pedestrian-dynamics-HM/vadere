@@ -1,17 +1,19 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.simulator.entrypoints.cmd.commands;
 
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.log4j.Logger;
+import org.vadere.simulator.entrypoints.ScenarioFactory;
+import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ScenarioRunSubCommand implements SubCommandRunner{
-	private final static Logger logger = Logger.getLogger(ScenarioRunSubCommand.class);
+public class SuqSubCommand implements SubCommandRunner {
+	private final static Logger logger = Logger.getLogger(SuqSubCommand.class);
 
 	@Override
 	public void run(Namespace ns, ArgumentParser parser) {
@@ -36,7 +38,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner{
 
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
-			new ScenarioRun(scenario, outputDir.toFile().toString() , null).run();
+			new ScenarioRun(scenario, outputDir.toFile().toString(), true, null).run();
 		} catch (Exception e){
 			logger.error(e);
 			System.exit(-1);

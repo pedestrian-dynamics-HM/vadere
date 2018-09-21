@@ -1,4 +1,4 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.simulator.entrypoints.cmd;
 
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;

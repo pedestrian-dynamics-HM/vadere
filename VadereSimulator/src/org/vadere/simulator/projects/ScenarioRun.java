@@ -93,7 +93,7 @@ public class ScenarioRun implements Runnable {
 			synchronized (scenarioStore) {
 				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 				scenarioStore.getTopography().reset();
-				System.out.println("StartIt " + scenario.getName());
+				logger.info("StartIt " + scenario.getName());
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 				modelBuilder.createModelAndRandom();
 

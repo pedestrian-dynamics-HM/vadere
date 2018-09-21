@@ -1,4 +1,4 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.simulator.entrypoints.cmd;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -9,6 +9,13 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
 import org.apache.log4j.Logger;
+import org.vadere.simulator.entrypoints.Version;
+import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.SetLogLevelCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
+
 /**
  * Provides the possibility to start VADERE in console mode.
  * 
@@ -20,7 +27,9 @@ public class VadereConsole {
 	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
 
-//		args = new String[]{"migrate", "--create-new-version",  "0.6", "/home/lphex/hm.d/vadere/VadereSimulator/resources"};
+//		args = new String[]{"--loglevel", "OFF", "scenario-run", "-o", "/tmp", "-f", "/home/lphex/hm.d/vadere/VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario"};
+//		args = new String[]{"-h"};
+
 		try {
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
@@ -39,6 +48,16 @@ public class VadereConsole {
 		ArgumentParser parser = ArgumentParsers.newArgumentParser("Vadere")
 				.defaultHelp(true)
 				.description("Runs the VADERE pedestrian simulator.");
+
+		parser.addArgument("--loglevel")
+				.required(false)
+				.type(String.class)
+				.dest("loglevel")
+				.choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "ALL")
+				.setDefault("INFO")
+				.action(new SetLogLevelCommand())
+				.help("Set Log Level for vadere.");
+
 		Subparsers subparsers = parser.addSubparsers()
 										.title("subcommands")
 										.description("valid subcommands")
