@@ -34,9 +34,11 @@ public class Scenario {
 
 	private static Logger logger = LogManager.getLogger(Scenario.class);
 	private ScenarioStore scenarioStore;
+	private ScenarioStore simulationScenarioStore;
 	private DataProcessingJsonManager dataProcessingJsonManager;
 	private String savedStateSerialized;
 	private String currentStateSerialized;
+	private boolean simulationRunning;	// manage which copy of ScenarioStore is currently used.
 
 
 	public Scenario(final String name) {
@@ -45,11 +47,40 @@ public class Scenario {
 
 	public Scenario(@NotNull final ScenarioStore store) {
 		this.scenarioStore = store;
-
+		this.simulationRunning = false;
 		this.dataProcessingJsonManager = new DataProcessingJsonManager();
-
 		this.saveChanges();
 	}
+
+	public boolean isSimulationRunning() {
+		return simulationRunning;
+	}
+
+	/**
+	 * Creates a copy {@link ScenarioStore} which will be used in the simulation. After the simulation
+	 * finishes, this copy is removed and the base version is used again. This is necessary, because
+	 * the simulation seed is calculated for each simulation run and thus would change the base
+	 * version of the simulation. The newly generated seed must be saved in the output copy of the
+	 * {@link Scenario} file but not in the base version of the Scenario file.
+	 */
+	public void setSimulationRunning(boolean simulationRunning) {
+		if (simulationRunning){
+			simulationScenarioStore = copyScenarioStore();
+		} else {
+			simulationScenarioStore = null;
+		}
+		this.simulationRunning = simulationRunning;
+	}
+
+	public ScenarioStore copyScenarioStore() {
+		try {
+			return JsonConverter.cloneScenarioStore(this.scenarioStore);
+		} catch (IOException e) {
+			throw  new RuntimeException();
+		}
+	}
+
+
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
 		savedStateSerialized = JsonConverter.serializeScenarioRunManager(this);
@@ -86,7 +117,7 @@ public class Scenario {
 	}
 
 	public ScenarioStore getScenarioStore() {
-		return scenarioStore;
+		return simulationRunning ? simulationScenarioStore : scenarioStore;
 	}
 
 	public List<Attributes> getModelAttributes() {
