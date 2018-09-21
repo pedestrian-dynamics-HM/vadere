@@ -56,6 +56,10 @@ public class TopographyCheckerMessage implements Comparable<TopographyCheckerMes
 		this.reasonModifier = reasonModifier;
 	}
 
+	public boolean isMessageForAllElements(Integer... ids){
+		return  msgTarget.affectsAllTargets(ids);
+	}
+
 	private Comparator<TopographyCheckerMessage> sortByType() {
 		return (o1, o2) -> {
 			if (o1.equals(o2))

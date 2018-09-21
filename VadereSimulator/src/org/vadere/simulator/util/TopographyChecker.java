@@ -161,7 +161,7 @@ public class TopographyChecker {
 					.reason(TopographyCheckerReason.OVERLAP_OBSTACLE_TARGET_ERR).build());
 		}else if (obstacle.overlapWith(target)) {
 			ret.add(msgBuilder.warning().target(obstacle, target)
-					.reason(TopographyCheckerReason.OVERLAP_OBSTACLE_TARGET_ERR).build());
+					.reason(TopographyCheckerReason.OVERLAP_OBSTACLE_TARGET_WARN).build());
 		}
 	}
 
@@ -208,7 +208,10 @@ public class TopographyChecker {
 	}
 
 	private void handelTargetTargetOverlap(ScenarioElement e1, ScenarioElement e2, List<TopographyCheckerMessage> ret) {
-		//todo
+		if (e1.overlapWith(e2)) {
+			ret.add(msgBuilder.warning().target(e1, e2)
+					.reason(TopographyCheckerReason.OVERLAP_TARGET_TARGET).build());
+		}
 	}
 
 	// WARN total overlap == partial overlap
@@ -375,8 +378,4 @@ public class TopographyChecker {
 		return ret;
 	}
 
-
-	public void doCreatorChecks() {
-
-	}
 }

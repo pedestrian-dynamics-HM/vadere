@@ -15,6 +15,7 @@ public enum TopographyCheckerReason {
 	STAIRS_TREAD_DIM_WRONG("TopographyChecker.stairs.wrongTreadDim"),
 
 	OVERLAP_STAIR_STAIR("TopographyChecker.overlap.stair.stair"),
+	OVERLAP_TARGET_TARGET("TopographyChecker.overlap.target.target"),
 	OVERLAP_TARGET_STAIR("TopographyChecker.overlap.target.stair"),
 	OVERLAP_SOURCE_STAIR("TopographyChecker.overlap.source.stair"),
 	OVERLAP_SOURCE_TARGET("TopographyChecker.overlap.source.target"),

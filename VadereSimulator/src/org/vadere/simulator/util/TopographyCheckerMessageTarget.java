@@ -31,6 +31,15 @@ public class TopographyCheckerMessageTarget {
 		this.targets = new ArrayList<>(Arrays.asList(targets));;
 	}
 
+	public boolean affectsAllTargets(Integer... ids){
+		for (Integer id : ids) {
+			if(targets.stream().noneMatch(e -> e.getId() == id)){
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
