@@ -2,6 +2,13 @@
 
 # In Progress: v0.7 
 
+## Added
+
+- In package `org.vadere.simulator.util` added TopographyChecker to show user if the current topograhpy as problems. The 
+  TopographyChecker will check for overlapping ScenarioElements and check for inconsistence settings such as missing 
+  TargetIDs in a Source or inconsistenct speed ranges for pedestrians. See this [table](Documentation/changelLogImages/TopographyCheckerMessages.md) for supported warnings and erros
+  as well as this [picture](Documentation/changelLogImages/TopographyChecker.png) to see which kind of overlap produces erros or warnings.
+
 # v0.6 (2018-09-07)
 
 ## Added
