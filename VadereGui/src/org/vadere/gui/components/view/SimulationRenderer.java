@@ -8,6 +8,8 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -220,8 +222,13 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         this.agentRender = agentRender;
     }
 
-    protected Color getPedestrianColor(@NotNull final Agent agent) {
+    public Color getPedestrianColor(@NotNull final Agent agent) {
 	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
-	    return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianColor);
+	    if (model.config.isUseRandomPedestrianColors()) {
+		   return model.config.getRandomColor(agent.getId());
+	    }
+
+	    return model.config.getColorByTargetId(targetId)
+			    .orElseGet(model.config::getPedestrianColor);
     }
 }

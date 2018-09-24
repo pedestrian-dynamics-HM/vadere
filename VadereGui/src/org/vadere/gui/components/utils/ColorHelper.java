@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class ColorHelper {
 
@@ -20,8 +21,14 @@ public class ColorHelper {
 
 	private int maxValue;
 
+	private static Random random = new Random();
+
 	public ColorHelper(final int maxValue) {
 		this.maxValue = maxValue;
+	}
+
+	public static Color randomColor() {
+		return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
 	}
 
 	public Color numberToColor(final double value) {

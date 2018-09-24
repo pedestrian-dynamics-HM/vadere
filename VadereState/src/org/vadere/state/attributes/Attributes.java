@@ -23,7 +23,7 @@ package org.vadere.state.attributes;
  */
 public abstract class Attributes extends DefaultSealable implements Cloneable {
 	/** Used for default ID values of some scenario elements. */
-	protected static final int ID_NOT_SET = -1;
+	public static final int ID_NOT_SET = -1;
 
 	public Attributes() {}
 	

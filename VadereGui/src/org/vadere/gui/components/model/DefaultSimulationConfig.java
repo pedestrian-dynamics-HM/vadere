@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
 
 public class DefaultSimulationConfig extends DefaultConfig {
@@ -16,6 +17,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private double densityStandardDerivation = Double.valueOf(resources.getProperty("Density.standardderivation"));
 	private double pedestrianTorso = Double.valueOf(resources.getProperty("Pedestrian.Radius")) * 2;
 
+	private boolean useRandomPedestrianColors = false;
 	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
 	private boolean showSources = true;
@@ -31,6 +33,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showGroups = false;
 	protected final Color pedestrianDefaultColor = Color.BLUE;
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
+	private Map<Integer, Color> randomColors = new HashMap<>();
 	private double gridWidth = Double.valueOf(resources.getProperty("ProjectView.cellWidth"));
 	private final double MIN_CELL_WIDTH = Double.valueOf(resources.getProperty("ProjectView.minCellWidth"));
 	private final double MAX_CELL_WIDTH = Double.valueOf(resources.getProperty("ProjectView.maxCellWidth"));
@@ -42,6 +45,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	public DefaultSimulationConfig(final DefaultSimulationConfig config) {
 		super(config);
 
+		this.randomColors = new HashMap<>();
 		this.pedestrianColors = new HashMap<>();
 
 		for (Map.Entry<Integer, Color> entry : config.pedestrianColors.entrySet()) {
@@ -217,6 +221,25 @@ public class DefaultSimulationConfig extends DefaultConfig {
 				}
 			}
 		}
+	}
+
+	public void clearRandomColors() {
+		randomColors.clear();
+	}
+
+	public Color getRandomColor(int pedId) {
+		if (!randomColors.containsKey(pedId)) {
+			randomColors.put(pedId, ColorHelper.randomColor());
+		}
+		return randomColors.get(pedId);
+	}
+
+	public void setUseRandomPedestrianColors(final boolean useRandomPedestrianColors) {
+		this.useRandomPedestrianColors = useRandomPedestrianColors;
+	}
+
+	public boolean isUseRandomPedestrianColors() {
+		return useRandomPedestrianColors;
 	}
 
 	public void setGridWidth(double gridWidth) {

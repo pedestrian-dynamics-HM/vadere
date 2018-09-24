@@ -30,6 +30,10 @@ public class Obstacle extends ScenarioElement {
 		return attributes.getId();
 	}
 
+	public void setId(int id){
+		((AttributesObstacle)getAttributes()).setId(id);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

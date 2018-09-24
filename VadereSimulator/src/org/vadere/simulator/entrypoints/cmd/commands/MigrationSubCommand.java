@@ -1,9 +1,11 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.simulator.entrypoints.cmd.commands;
 
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.log4j.Logger;
+import org.vadere.simulator.entrypoints.Version;
+import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;

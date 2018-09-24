@@ -19,7 +19,6 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
@@ -387,6 +386,15 @@ public class ProjectViewModel {
 					Messages.getString("RunScenarioJsonErrors.title"),
 					Messages.getString("RunScenarioJsonErrors.text"),
 					errorMsg, JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
+		JEditorPane errorPanel = ScenarioPanel.getActiveTopographyErrorMsg();
+		if (errorPanel != null) {
+			VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
+					Messages.getString("RunScenarioTopographyCheckerErrors.title"),
+					Messages.getString("RunScenarioTopographyCheckerErrors.text"),
+					errorPanel, JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 

@@ -82,7 +82,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.vadere.simulator.entrypoints.VadereConsole</mainClass>
+                            <mainClass>org.vadere.simulator.entrypoints.cmd.VadereConsole</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

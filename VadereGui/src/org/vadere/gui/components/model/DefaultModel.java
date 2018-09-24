@@ -66,7 +66,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.cursorWorldPosition = VPoint.ZERO;
 		this.selectScenarioElementListener = new LinkedList<>();
 		this.voronoiDiagram = null;
-		this.showVoroniDiagram = false;
+		this.showVoroniDiagram = true;
 		this.showSelection = false;
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();

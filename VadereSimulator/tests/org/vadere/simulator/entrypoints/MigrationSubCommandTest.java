@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.entrypoints.cmd.SubCommand;
+import org.vadere.simulator.entrypoints.cmd.VadereConsole;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.tests.util.reflection.TestJsonNodeExplorer;
 import org.vadere.tests.util.reflection.TestJsonNodeHelper;
