@@ -14,7 +14,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.opencl.OpenCLException;
 
 /**
- * IGaussianFilter is a refershable image processing calculator that can be used
+ * IGaussianFilter is a refreshable image processing calculator that can be used
  * to solve a discrete convolution or other calculations that can be done by a
  * image processing filter.
  *

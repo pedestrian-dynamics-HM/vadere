@@ -20,10 +20,10 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 	/** the image processing filter to measure the weighted density. */
 	private final IGaussianFilter gaussianCalculator;
 
-	/** the decorator that is uesed by this decorator. */
+	/** the decorator that is used by this decorator. */
 	private ITimeCostFunction timeCostFunction;
 
-	private final double queueWidhtFactor;
+	private final double queueWidthFactor;
 
 	// private final static double EPSILON = 0.0001;
 	private final static double EPSILON = 0.000001;
@@ -41,10 +41,10 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 
 		this.timeCostFunction = timeCostFunction;
 		this.gaussianCalculator = filter;
-		this.queueWidhtFactor = attributes.getQueueWidthLoading();
+		this.queueWidthFactor = attributes.getQueueWidthLoading();
 
 		logger.info("time cost attributes:  " + attributes);
-		logger.info("queueWidhtFactor: " + queueWidhtFactor);
+		logger.info("queueWidthFactor: " + queueWidthFactor);
 		logger.info("filter: " + filter);
 
 		// the initial filtering (convolution)
@@ -55,7 +55,7 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 	public double costAt(final VPoint p) {
 		long ms = System.currentTimeMillis();
 
-		double cost = queueWidhtFactor
+		double cost = queueWidthFactor
 				* gaussianCalculator.getFilteredValue(p.x, p.y);
 
 		runtime += System.currentTimeMillis() - ms;
@@ -76,7 +76,7 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 		runtime = 0;
 		long ms = System.currentTimeMillis();
 
-		// refersh the filtered image
+		// refresh the filtered image
 		this.gaussianCalculator.filterImage();
 		runtime += System.currentTimeMillis() - ms;
 	}
