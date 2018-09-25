@@ -55,6 +55,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private ProjectViewModel model;
 
 	private static String activeJsonParsingErrorMsg = null;
+	private static JEditorPane activeTopographyErrorMsg = null;
 
 
 	ScenarioPanel(JLabel scenarioName, ProjectViewModel model) {
@@ -322,6 +323,14 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 	public void loadOutputFileForPostVis(File trajectoryFile, Scenario scenarioRM) throws IOException {
 		postVisualizationView.loadOutputFile(trajectoryFile, scenarioRM);
+	}
+
+	public static void setActiveTopographyErrorMsg(JEditorPane msg){
+		activeTopographyErrorMsg = msg;
+	}
+
+	public static JEditorPane getActiveTopographyErrorMsg(){
+		return activeTopographyErrorMsg;
 	}
 
 	public static void setActiveJsonParsingErrorMsg(String msg) {

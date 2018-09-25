@@ -3,6 +3,7 @@ package org.vadere.state.scenario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -480,4 +481,49 @@ public class Topography {
 		allOtherAttributes.forEach(a -> a.seal());
 	}
 
+	public void generateUniqueIdIfNotSet(){
+		Set<Integer> usedIds = sources.stream().map(Source::getId).collect(Collectors.toSet());
+		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
+		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
+		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+
+		sources.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		targets.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		obstacles.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
+
+		stairs.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+
+	}
+
+	private int nextIdNotInSet(Set<Integer> usedIDs){
+		int newId = 1;
+		while (usedIDs.contains(newId)){
+			newId++;
+		}
+		usedIDs.add(newId);
+		return newId;
+	}
+
+
+	public ArrayList<ScenarioElement> getAllScenarioElements(){
+		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size()));
+		all.addAll(obstacles);
+		all.addAll(stairs);
+		all.addAll(targets);
+		all.addAll(sources);
+		all.addAll(boundaryObstacles);
+		return  all;
+
+	}
 }

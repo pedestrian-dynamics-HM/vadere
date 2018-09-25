@@ -50,6 +50,14 @@ public class VDialogManager {
 				title, buttonOptions);
 	}
 
+	public static int showConfirmDialogWithBodyAndEditorPane(String title, String body, JEditorPane editorPane,
+														   int buttonOptions) {
+		return JOptionPane.showConfirmDialog(
+				ProjectView.getMainWindow(),
+				getPanelWithBodyAndTextEditorPane(body, editorPane),
+				title, buttonOptions);
+	}
+
 
 	public static void showMessageDialogWithBodyAndTextArea(String title, String body, String textAreaContent,
 			int messageType) {
@@ -61,6 +69,16 @@ public class VDialogManager {
 				title, messageType);
 	}
 
+	public static void showMessageDialogWithBodyAndTextEditorPane(String title, String body, JEditorPane jEditorPane,
+																  int messageType) {
+		JOptionPane.showMessageDialog(
+				ProjectView.getMainWindow(),
+				getPanelWithBodyAndTextEditorPane(
+						"<html>" + body + "<br><br></html>",
+						jEditorPane),
+				title, messageType);
+	}
+
 	public static JPanel getPanelWithBodyAndTextArea(String body, String textAreaContent) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -69,6 +87,19 @@ public class VDialogManager {
 		panel.add(label);
 
 		JScrollPane jsp = new JScrollPane(new JTextArea(textAreaContent));
+		jsp.setPreferredSize(new Dimension(600, 300));
+		panel.add(jsp);
+
+		return panel;
+	}
+
+	public static JPanel getPanelWithBodyAndTextEditorPane(String body, JEditorPane jEditorPane){
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		JLabel label = new JLabel(body);
+		panel.add(label);
+		JScrollPane jsp = new JScrollPane(jEditorPane);
 		jsp.setPreferredSize(new Dimension(600, 300));
 		panel.add(jsp);
 
@@ -90,6 +121,15 @@ public class VDialogManager {
 					Messages.getString("SaveDespiteJsonErrors.title"),
 					"<html>" + Messages.getString("SaveDespiteJsonErrors.text") + "<br><br><html>",
 					errorMsg, JOptionPane.YES_NO_OPTION);
+			if (ret == JOptionPane.YES_OPTION)
+				return false;
+		}
+		JEditorPane jEditorPane = ScenarioPanel.getActiveTopographyErrorMsg();
+		if (jEditorPane != null) {
+			int ret = VDialogManager.showConfirmDialogWithBodyAndEditorPane(
+					Messages.getString("SaveDespiteTopographyCheckerErrors.title"),
+					"<html>" + Messages.getString("SaveDespiteTopographyCheckerErrors.text") + "<br><br><html>",
+					jEditorPane, JOptionPane.YES_NO_OPTION);
 			if (ret == JOptionPane.YES_OPTION)
 				return false;
 		}

@@ -1,9 +1,11 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.simulator.entrypoints.cmd.commands;
 
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.log4j.Logger;
+import org.vadere.simulator.entrypoints.ScenarioFactory;
+import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
 import org.vadere.util.io.IOUtils;

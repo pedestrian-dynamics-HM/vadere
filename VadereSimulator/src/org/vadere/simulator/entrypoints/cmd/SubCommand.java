@@ -1,4 +1,4 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.simulator.entrypoints.cmd;
 
 public enum SubCommand {
 
