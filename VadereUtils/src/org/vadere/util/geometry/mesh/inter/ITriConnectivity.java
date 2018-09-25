@@ -635,9 +635,64 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			removeEdge(toDeleteEdge.get(), vertex, removeIsolatedVertex);
 		}
 		else {
-			List<E> test = getMesh().streamEdges(vertex).collect(Collectors.toList());
 			log.warn("something wrong?");
 		}
+	}
+
+	/**
+	 * Creates a new face by connecting two boundary vertices v1, v3 of a boundary path v1->v2->v3 such that
+	 * v1->v2->v3 becomes a new face.
+	 *
+	 * Assumption: There is an angle < 180 at v2 of the triangle (v1,v2,v3) and the boundaryEdge is a boundary edge.
+	 *
+	 * @param boundaryEdge an edge of the boundary (i.e. part of the border or a hole).
+	 */
+	default void createFaceAtBoundary(@NotNull final E boundaryEdge) {
+		assert getMesh().isBoundary(boundaryEdge);
+
+		F boundary = getMesh().getFace(boundaryEdge);
+
+		E next = getMesh().getNext(boundaryEdge);
+		E prev = getMesh().getPrev(boundaryEdge);
+
+		// can we form a triangle
+		assert GeometryUtils.angle(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next)) < Math.PI;
+
+		E nnext = getMesh().getNext(next);
+
+		E newEdge = getMesh().createEdge(getMesh().getVertex(next));
+		E newTwin = getMesh().createEdge(getMesh().getVertex(prev));
+		F newFace = getMesh().createFace();
+
+		getMesh().setFace(newEdge, boundary);
+		getMesh().setNext(newEdge, nnext);
+		getMesh().setPrev(newEdge, prev);
+		getMesh().setTwin(newEdge, newTwin);
+
+		getMesh().setFace(newTwin, newFace);
+		getMesh().setNext(newTwin, boundaryEdge);
+		getMesh().setPrev(newTwin, next);
+		getMesh().setTwin(newTwin, newEdge);
+
+		getMesh().setEdge(newFace, newTwin);
+
+		//getMesh().setPrev(nnext, newEdge);
+
+		//getMesh().setNext(next, newTwin);
+		//getMesh().setFace(newEdge, newFace);
+
+		//getMesh().setPrev(boundaryEdge, newTwin);
+		getMesh().setFace(boundaryEdge, newFace);
+		getMesh().setFace(next, newFace);
+
+		//getMesh().setNext(prev, newEdge);
+
+		if(getMesh().getEdge(boundary).equals(boundaryEdge) || getMesh().getEdge(boundary).equals(next)) {
+			getMesh().setEdge(boundary, newEdge);
+		}
+
+		// to find the boundary edge as quick as possible
+		getMesh().setEdge(getMesh().getVertex(next), newEdge);
 	}
 
 	/*default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
@@ -967,6 +1022,24 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
         return straightGatherWalk2D(q, p, face, edge, stopCondition);
     }
+
+	default void smoothBorder() {
+		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
+			if(getMesh().isBorder(edge)) {
+
+				VPoint p = getMesh().toPoint(edge);
+				VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+				VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
+
+				if(GeometryUtils.isCCW(r, p, q)) {
+					double angle = GeometryUtils.angle(r, p, q);
+					if(angle < 0.5*Math.PI) {
+						createFaceAtBoundary(edge);
+					}
+				}
+			}
+		}
+	}
 
     /**
      * Walks along the line defined by q and p. The walking direction should be controlled by the stopCondition e.g.

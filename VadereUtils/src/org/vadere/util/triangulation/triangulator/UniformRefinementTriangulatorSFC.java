@@ -3,6 +3,7 @@ package org.vadere.util.triangulation.triangulator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.tex.TexGraphGenerator;
@@ -10,6 +11,7 @@ import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.triangulation.adaptive.IEdgeLengthFunction;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -287,7 +289,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			step();
 		}
 
-		nextSFCLevel(0.23);
+		//nextSFCLevel(0.23);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;
@@ -301,9 +303,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			// insert special fix points
 	        // TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
 			triangulation.insert(fixPoints);
+
 			triangulation.finish();
 			removeTrianglesOutsideBBox();
 			removeTrianglesInsideObstacles();
+			triangulation.smoothBorder();
+			smoothHoles();
 
 	        sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));
 	        List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
@@ -314,6 +319,22 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		    getMesh().arrangeMemory(sierpinksyFaceOrder);
 	        triangulation.getMesh().garbageCollection();
         }
+    }
+
+    private void insertFixPoints(@NotNull final Collection<P> fixPoints) {
+
+		for(P fixPoint : fixPoints) {
+			Optional<F> optFace = triangulation.locateFace(fixPoint);
+			if(optFace.isPresent()) {
+
+				for(P q : getMesh().getPointIt(optFace.get())) {
+					//if(Math.abs(distFunc.andThen(q) - distFunc.apply(fixPoint)))
+				}
+
+			}
+		}
+
+
     }
 
     private E getLongestEdge(F face) {
@@ -341,7 +362,8 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		for(F delFace : toDeleteFaces) {
 			triangulation.removeFaceUnsafe(delFace, getMesh().getBorder(), true);
 		}*/
-		triangulation.shrinkBorder(f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+		Predicate<F> removePredicate = face -> distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0;
+		triangulation.shrinkBorder(removePredicate, true);
 	}
 
 	public void removeTrianglesInsideObstacles() {
@@ -353,8 +375,29 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
-			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
+			if(!triangulation.getMesh().isDestroyed(face) &&
+					!triangulation.getMesh().isHole(face)) {
 				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+			}
+		}
+	}
+
+	public void smoothHoles() {
+		for(F hole : getMesh().getHoles()) {
+			for(E edge : getMesh().getEdges(hole)) {
+				if(getMesh().isBoundary(edge)) {
+
+					VPoint p = getMesh().toPoint(edge);
+					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
+
+					if(GeometryUtils.isCCW(r, p, q)) {
+						double angle = GeometryUtils.angle(r, p, q);
+						if(angle < 0.5*Math.PI) {
+							triangulation.createFaceAtBoundary(edge);
+						}
+					}
+				}
 			}
 		}
 	}

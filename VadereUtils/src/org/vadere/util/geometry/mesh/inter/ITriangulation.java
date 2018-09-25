@@ -103,7 +103,6 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
         return triangulation;
     }
 
-
 	/**
 	 * Creates a triangulation where the bound of it is determined by the mesh
 	 *

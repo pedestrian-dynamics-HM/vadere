@@ -62,7 +62,7 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	}
 
     public PSMeshingPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound) {
-    	this(mesh, alertPred, width, height, bound, f -> ColorFunctions.qualityToGrayScale(mesh, f));
+    	this(mesh, alertPred, width, height, bound, f -> Color.WHITE);
     }
 
 	@Override

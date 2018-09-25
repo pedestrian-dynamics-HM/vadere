@@ -4,6 +4,8 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +34,54 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	public VPolygon(Shape shape) {
 		this(new Path2D.Double(shape));
+	}
+
+	public boolean isSimple() {
+		List<VPoint> points = getPath();
+		for(int i = 0; i < points.size(); i++) {
+			VPoint p1 = points.get(i);
+			VPoint p2 = points.get((i+1) % points.size());
+			for(int j = i + 1; j < points.size(); j++) {
+				VPoint q1 = points.get(j);
+				VPoint q2 = points.get((j+1) % points.size());
+
+				if(GeometryUtils.intersectLineSegment(p1, p2, q1, q2)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public boolean isCCW() {
+		List<VPoint> points = getPath();
+		assert points.size() >= 3;
+		return GeometryUtils.isCCW(points.get(0), points.get(1), points.get(2));
+	}
+
+	public VPolygon toCWOrder() {
+		if(isCCW()) {
+			return revertOrder();
+		}
+		else {
+			return toCCWOrder();
+		}
+	}
+
+	public VPolygon toCCWOrder() {
+		if(isCCW()) {
+			return this;
+		}
+		else {
+			return revertOrder();
+		}
+	}
+
+	public VPolygon revertOrder() {
+		List<VPoint> points = getPath();
+		Collections.reverse(points);
+		return GeometryUtils.toPolygon(points);
 	}
 
 	/**

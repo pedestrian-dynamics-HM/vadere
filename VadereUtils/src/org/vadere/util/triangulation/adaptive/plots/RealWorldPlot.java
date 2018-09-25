@@ -284,25 +284,26 @@ public class RealWorldPlot {
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
+		overAllTime.suspend();
 		//meshGenerator.improve();
 		//meshGenerator.improve();
 		//meshGenerator.improve();
-
 
 		int nSteps = 0;
 		while (nSteps < 300) {
 			nSteps++;
-			meshImprover.improve();
-			overAllTime.suspend();
 			try {
-				Thread.sleep(200);
+				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			distmeshPanel.repaint();
 			overAllTime.resume();
+			meshImprover.improve();
+			overAllTime.suspend();
+			distmeshPanel.repaint();
 		}
 		meshImprover.improve();
+		overAllTime.resume();
 		overAllTime.stop();
 		distmeshPanel.repaint();
 	}

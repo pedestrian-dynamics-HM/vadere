@@ -1,5 +1,6 @@
 package org.vadere.util.geometry.mesh.inter;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
@@ -27,6 +28,7 @@ import org.vadere.util.triangulation.IPointConstructor;
 
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -140,11 +142,22 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return
 	 */
 	default boolean isAtBoundary(@NotNull final V vertex) {
-		return getBoundaryEdge(vertex).isPresent();
+		return getAtBoundaryEdge(vertex).isPresent();
+	}
+
+	default Optional<E> getAtBoundaryEdge(@NotNull final V vertex) {
+		return streamEdges(vertex).filter(e -> isAtBoundary(e)).findAny();
 	}
 
 	default Optional<E> getBoundaryEdge(@NotNull final V vertex) {
-		return streamEdges(vertex).filter(e -> isAtBoundary(e)).findAny();
+		return streamEdges(vertex).filter(e -> isBoundary(e)).findAny();
+	}
+
+	default Optional<E> getBoundaryEdge(@NotNull final F face) {
+		if(isBoundary(face)) {
+			return Optional.of(getEdge(face));
+		}
+		return streamEdges(face).filter(e -> isAtBoundary(e)).map(e -> getTwin(e)).findAny();
 	}
 
 	default boolean isAtBorder(@NotNull V vertex) {
@@ -251,8 +264,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return vertex;
 	}
 
-	// TODO: name?
-	default F createFace(V... points) {
+	default F createFace(@NotNull final List<V> points) {
 		F face = createFace();
 		F borderFace = getBorder();
 
@@ -296,6 +308,18 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		return face;
 	}
 
+	default F createFace(V... points) {
+		return createFace(Lists.newArrayList(points));
+	}
+
+	default F toFace(P... points) {
+		return createFace(Arrays.stream(points).map(p -> createVertex(p)).collect(Collectors.toList()));
+	}
+
+	default F toFace(@NotNull final List<P> points) {
+		return createFace(points.stream().map(p -> createVertex(p)).collect(Collectors.toList()));
+	}
+
 	void toHole(@NotNull F face);
 	void destroyFace(@NotNull F face);
 	void destroyEdge(@NotNull E edge);
@@ -320,6 +344,18 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	void clear();
+
+	default Optional<P> findAny(@NotNull final Predicate<P> predicate) {
+		return streamPoints().filter(predicate).findAny();
+	}
+
+	default Optional<E> findAnyEdge(@NotNull final Predicate<P> predicate) {
+		return streamEdges().filter(edge -> predicate.test(getPoint(edge))).findAny();
+	}
+
+	default boolean findMatch(@NotNull final Predicate<P> predicate) {
+		return streamPoints().anyMatch(predicate);
+	}
 
 	/**
 	 * Returns a Stream of holes.

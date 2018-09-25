@@ -5,7 +5,9 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.Random;
 
@@ -284,7 +286,7 @@ public class GeometryUtils {
 	 * @param p1
 	 * @param p2
 	 * @param q
-	 * @return true if q is right of the oriented-line defined by (p1, p2), false otherwise
+	 * @return true if q is left of the oriented-line defined by (p1, p2), false otherwise
 	 */
 	public static boolean isLeftOf(final IPoint p1, final IPoint p2, final IPoint q) {
 		return isLeftOf(p1, p2, q.getX(), q.getY());
@@ -424,6 +426,43 @@ public class GeometryUtils {
 	 */
 	public static boolean intersectLineSegment(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
 		return intersectLine(p, q, p1, p2) && intersectLine(p1, p2, p, q);
+	}
+
+	/**
+	 * Tests if the first line-segment (p,q) intersects the second line-segment (p1,p2).
+	 * @param p     point defining the first line-segment
+	 * @param q     point defining the first line-segment
+	 * @param p1    point defining the second line-segment
+	 * @param p2    point defining the second line-segment
+	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
+	 */
+	public static boolean intersectLineSegment(final Point2D.Double p, final Point2D.Double q, final Point2D.Double p1, final Point2D.Double p2) {
+		return intersectLine(p.x, p.y, q.x, q.y, p1.x, p1.y, p2.x, p2.y) && intersectLine(p1.x, p1.y, p2.x, p2.y, p.x, p.y, q.x, q.y);
+	}
+
+	/**
+	 * Tests if the first line-segment (p,q) intersects the second line-segment (p1,p2).
+	 * @param p     point defining the first line-segment
+	 * @param q     point defining the first line-segment
+	 * @param p1    point defining the second line-segment
+	 * @param p2    point defining the second line-segment
+	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
+	 */
+
+	/**
+	 * Tests if the first line-segment (p = (x1, y1), q = (x2, y2)) intersects the second line-segment (p1 = (x3, y3), p2 = (x4, y4)).
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @param x3
+	 * @param y3
+	 * @param x4
+	 * @param y4
+	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
+	 */
+	public static boolean intersectLineSegment(final double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+		return intersectLine(x1, y1, x2, y2, x3, y3, x4, y4) && intersectLine(x3, y3, x4, y4, x1, y1, x2, y2);
 	}
 
 	/**
@@ -639,11 +678,12 @@ public class GeometryUtils {
 
 	/**
 	 *
-	 * Computes the angle between the x-axis through the given Point "center" and this.
+	 * Computes the angle between the positive x-axis through the given Point "center" and this.
+	 * see: https://en.wikipedia.org/wiki/Atan2
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 */
 	public static double angleTo(final IPoint from, final IPoint to) {
-		double atan2 = Math.atan2(from.getY() - to.getY(), from.getX() - to.getX());
+		double atan2 = Math.atan2(to.getY() - from.getY(), to.getX() - from.getX());
 
 		if (atan2 < 0.0) {
 			atan2 = Math.PI * 2 + atan2;
@@ -817,5 +857,99 @@ public class GeometryUtils {
 											   final double x4,
 											   final double y4) {
 		return lineIntersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), x3, y3, x4, y4);
+	}
+
+	public static VPoint lineIntersectionPoint(final VLine line1,
+	                                           final VLine line2) {
+		return lineIntersectionPoint(line1.getX1(), line1.getY1(), line1.getX2(), line1.getY2(), line2.getX1(), line2.getY1(), line2.getX2(), line2.getY2());
+	}
+
+	/**
+	 * A brute force method to get the set of all intersection points of a list of shapes.
+	 * For two shapes this requires O(n * m) time where n, m are the number of points of the shapes.
+	 *
+	 * Note: A sweepline algorithm could improve the performance significantly.
+	 *
+	 * @param shapes a list of shapes
+	 * @return a set of intersection points
+	 */
+	public static Set<VPoint> getIntersectionPoints(@NotNull final List<? extends VShape> shapes) {
+		Set<VPoint> intersectionPoints = new HashSet<>();
+		for(int i = 0; i < shapes.size(); i++) {
+			for(int j = i + 1; j < shapes.size(); j++) {
+				List<VPoint> path1 = shapes.get(i).getPath();
+				List<VPoint> path2 = shapes.get(j).getPath();
+
+				for(int ii = 0; ii < path1.size(); ii++) {
+					VPoint p1 = path1.get((ii) % path1.size());
+					VPoint p2 = path1.get((ii + 1) % path1.size());
+
+					for(int jj = 0; jj < path2.size(); jj++) {
+						VPoint q1 = path2.get((jj) % path2.size());
+						VPoint q2 = path2.get((jj + 1) % path2.size());
+
+						if(intersectLineSegment(p1, p2, q1, q2)) {
+							VPoint intersectionPoint = GeometryUtils.lineIntersectionPoint(p1, p2, q1, q2);
+							intersectionPoints.add(intersectionPoint);
+						}
+					}
+
+				}
+			}
+		}
+
+		return intersectionPoints;
+	}
+
+	/**
+	 * Transforms a list of distinct points (p1,p2,p3,...,pn) into a polygon.
+	 *
+	 * Assumption: the points are in the correct order i.e. ccw or cw. and the list contains
+	 * more than 2 points.
+	 *
+	 * @param points a list of points in order
+	 * @return a polygon
+	 */
+	public static VPolygon toPolygon(@NotNull final List<? extends VPoint> points) {
+		assert points.size() >= 3;
+		if(points.size() < 3) {
+			throw new IllegalArgumentException("more than 2 points are required to form a valid polygon.");
+		}
+
+		Path2D path2D = new Path2D.Double();
+		path2D.moveTo(points.get(0).getX(), points.get(0).getY());
+		path2D.lineTo(points.get(0).getX(), points.get(0).getY());
+
+		for(int i = 1; i < points.size(); i++) {
+			path2D.lineTo(points.get(i).getX(), points.get(i).getY());
+		}
+
+		return new VPolygon(path2D);
+	}
+
+	/**
+	 * Transforms a list of distinct points (p1,p2,p3,...,pn) into a polygon.
+	 *
+	 * Assumption: the points are in the correct order i.e. ccw or cw. and the list contains
+	 * more than 2 points.
+	 *
+	 * @param points an array / list of points in order
+	 * @return a polygon
+	 */
+	public static VPolygon toPolygon(@NotNull final VPoint ... points) {
+		assert points.length >= 3;
+		if(points.length < 3) {
+			throw new IllegalArgumentException("more than 2 points are required to form a valid polygon.");
+		}
+
+		Path2D path2D = new Path2D.Double();
+		path2D.moveTo(points[0].getX(), points[0].getY());
+		path2D.lineTo(points[0].getX(), points[0].getY());
+
+		for(int i = 1; i < points.length; i++) {
+			path2D.lineTo(points[i].getX(), points[i].getY());
+		}
+
+		return new VPolygon(path2D);
 	}
 }

@@ -3,9 +3,10 @@ package org.vadere.util.triangulation.improver;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.inter.*;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -19,7 +20,6 @@ import org.vadere.util.triangulation.adaptive.Parameters;
 import org.vadere.util.triangulation.triangulator.ITriangulator;
 import org.vadere.util.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +46,7 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 	private int nSteps;
 	private double initialEdgeLen;
 
-	private boolean runParallel = true;
+	private boolean runParallel = false;
 	private boolean profiling = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
@@ -161,13 +161,14 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
     public void improve() {
 		synchronized (getMesh()) {
 
-			//removeBoundaryLowQualityTriangles();
+			removeBoundaryLowQualityTriangles();
+			triangulation.smoothBorder();
 			if(triangulation.isValid()) {
 				flipEdges();
-				removeTrianglesInsideHoles();
+				//removeTrianglesInsideHoles();
 			}
 			else {
-				log.info("EikMesh re-triangulates.");
+				log.info("EikMesh re-triangulates in step " + nSteps);
 				retriangulate();
 				removeTrianglesOutsideBBox();
 				removeTrianglesInsideObstacles();
@@ -180,8 +181,6 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			splitEdges();
 
 			nSteps++;
-			//log.info("quality: " + getQuality());
-			//log.info("min-quality: " + getMinQuality());
 		}
     }
 
@@ -308,11 +307,11 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 			double distance = distanceFunc.apply(vertex);
 			if(distance > 0 || isAtBoundary) {
 				//(Math.abs(distance) <= deps &&
-				projectBackVertex(vertex, distance);
+				projectBackVertex(vertex, distance, distance <= 0 ? 0.5 : 0.5, isAtBoundary);
 			}
 
 			if(isAtBoundary) {
-				E boundaryEdge = getMesh().getBoundaryEdge(vertex).get();
+				E boundaryEdge = getMesh().getAtBoundaryEdge(vertex).get();
 				boolean collapse = false;
 
 				// 3. remove unnecessary points
@@ -339,47 +338,41 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
      *
      * @param vertex the vertex
      */
-    private void projectBackVertex(@NotNull final V vertex, double distance) {
-
-    	//TODO: refactoring
+    private void projectBackVertex(@NotNull final V vertex, double distance, final double scale, final boolean isAtBoundary) {
         MeshPoint position = getMesh().getPoint(vertex);
 	    double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
 	    double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
-	    VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
-	    double len = projection.distanceToOrigin();
-	    position.subtract(projection);
-        /*if(len > 0 && getMesh().isAtBorder(vertex)) {
-        	E boundaryEdge = getMesh().streamEdges(vertex).filter(edge -> getMesh().isBoundary(edge)).findAny().get();
+	    VPoint projection = new VPoint(dGradPX * distance * scale, dGradPY * distance * scale);
 
-        	VPoint n1 = getMesh().toPoint(getMesh().getVertex(getMesh().getTwin(boundaryEdge)));
-        	VPoint n2 = getMesh().toPoint(getMesh().getVertex(getMesh().getNext(boundaryEdge)));
-	        VPoint point = getMesh().toPoint(vertex);
+	    VPoint newPosition = getMesh().toPoint(vertex).subtract(projection);
 
-	        if(n1.equals(new VPoint(8.0, 10.0))) {
-		        log.info("im here!");
-	        }
+	    if(isAtBoundary) {
+	    	E boundaryEdge = getMesh().getBoundaryEdge(vertex).get();
+	    	VPoint p = getMesh().toPoint(vertex);
+	    	VPoint q = getMesh().toPoint(getMesh().getNext(boundaryEdge));
+	    	VPoint r = getMesh().toPoint(getMesh().getPrev(boundaryEdge));
+	    	double angle = GeometryUtils.angle(r, p, q);
 
-	        VPoint newPosition = point.subtract(projection);
-
-	        if(!GeometryUtils.isLeftOf(n1, point, newPosition)) {
-				VPoint corrector = point.subtract(new VPoint((n1.getX() + n2.getX()) * 0.5, (n1.getY() + n2.getY()) * 0.5)).scalarMultiply(0.5);
-				//VPoint project = point.subtract(n1).norm(len * 0.99);
-				position.subtract(corrector);
-				//position.subtract(project);
-	        }
-	        else if(!GeometryUtils.isLeftOf(point, n2, newPosition)) {
-		        VPoint corrector = point.subtract(new VPoint((n1.getX() + n2.getX()) * 0.5, (n1.getY() + n2.getY()) * 0.5)).scalarMultiply(0.5);
-		        //VPoint project = point.subtract(n2).norm(len * 0.99);
-		        position.subtract(corrector);
-		        //position.subtract(project);
-	        }
-	        else {
-		        position.subtract(projection.scalarMultiply(0.1));
-	        }
-        }
-        else {
-	        position.subtract(projection.scalarMultiply(0.1));
-        }*/
+	    	// back projection to the inside i.e. towards the inside of its triangle
+	    	if(distance > 0) {
+				//if(GeometryUtils.isRightOf(r, p, newPosition)
+				//		&& GeometryUtils.isRightOf(p, q, newPosition)
+				//		&& GeometryUtils.isRightOf(q, r, newPosition)){
+					position.subtract(projection);
+				//}
+		    }
+		    // back projection to the outside
+		    else {
+			    if(angle > Math.PI || (GeometryUtils.isLeftOf(r, p, newPosition) && GeometryUtils.isLeftOf(p, q, newPosition))) {
+				    position.subtract(projection);
+			    }
+			    else {
+			    	//triangulation.createFaceAtBoundary(boundaryEdge);
+				   // VTriangle triangle = new VTriangle(p, q, r);
+				   // position.add(triangle.midPoint().subtract(position));
+			    }
+		    }
+	    }
     }
 
     /**
@@ -388,38 +381,13 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
      * @return true, if any flip was necessary, false otherwise.
      */
     private boolean flipEdges() {
-        boolean anyFlip = false;
-	    streamEdges().filter(e -> triangulation.isIllegal(e))
-			    .forEach(e -> triangulation.flipSync(e));
-        /*if(runParallel) {
-	        streamEdges().filter(e -> triangulation.isIllegal(e))
-			        .forEach(e -> triangulation.flipSync(e));
+	    if(runParallel) {
+	        streamEdges().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flipSync(e));
         }
         else {
-	        //streamEdges().filter(e -> triangulation.isIllegal(e))
-	        //.forEach(e -> triangulation.flip(e));
-	        List<E> illegalEdges = streamEdges().filter(e -> triangulation.isIllegal(e)).collect(Collectors.toList());
-
-	        for(E edge : illegalEdges) {
-		        if(triangulation.isIllegal(edge)) {
-			        triangulation.flip(edge);
-		        }
-	        }
-        }*/
-        // there is still an illegal edge
-	    /*streamEdges().filter(e -> triangulation.isIllegal(e)).collect(Collectors.toList());
-
-	    for(E edge : illegalEdges) {
-	    	if(triangulation.isIllegal(edge)) {
-	    		triangulation.flipSync(edge);
-		    }
-	    }*/
-
-	    //while (streamEdges().anyMatch(e -> triangulation.isIllegal(e))) {
-            //.forEach(e -> triangulation.flip(e));
-            //anyFlip = true;
-        //}
-        return anyFlip;
+		    streamEdges().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flip(e));
+        }
+        return false;
     }
 
     /**
@@ -615,8 +583,10 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		Predicate<F> mergeCondition = f -> !triangulation.getMesh().isDestroyed(f)
 				&& !triangulation.getMesh().isBoundary(f)
 				&& triangulation.getMesh().isAtBorder(f)
+				&& (isCorner(f) || !isShortBoundaryEdge(f))
 				//&& -distanceFunc.apply(triangulation.getMesh().toTriangle(f).getIncenter()) > 0.1 * initialEdgeLen
 				&& faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY;
+
 		for(F face : holes) {
 			List<F> neighbouringFaces = getMesh().streamEdges(face).map(e -> getMesh().getTwinFace(e)).collect(Collectors.toList());
 			for (F neighbouringFace : neighbouringFaces) {
@@ -632,7 +602,32 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 				triangulation.removeEdges(getMesh().getBorder(), neighbouringFace, true);
 			}
 		}
-		triangulation.mergeFaces(getMesh().getBorder(), mergeCondition, true);
+
+		//triangulation.mergeFaces(getMesh().getBorder(), mergeCondition, true);
+	}
+
+	private boolean isCorner(@NotNull final F face) {
+		E edge = getMesh().getBoundaryEdge(face).get();
+		// corner => can be deleted
+		if(getMesh().isBoundary(getMesh().getNext(edge)) || getMesh().isBoundary(getMesh().getPrev(edge))) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isShortBoundaryEdge(@NotNull final F face) {
+		E edge = getMesh().getBoundaryEdge(face).get();
+		// corner => can be deleted
+
+		VLine l1 = getMesh().toLine(edge);
+		VLine l2 = getMesh().toLine(getMesh().getNext(edge));
+		VLine l3 = getMesh().toLine(getMesh().getPrev(edge));
+
+		if(l1.length() < l2.length() || l1.length() < l3.length()) {
+			return true;
+		}
+
+		return false;
 	}
 
     /*private void removeBoundaryLowQualityTriangles() {

@@ -33,6 +33,12 @@ public interface VShape extends Shape, Cloneable {
 
 	boolean intersect(VShape shape);
 
+	/**
+	 * Returns a list of points (p1, p2, ..., pn) such that the line (p1,p2) is part of the boundary
+	 * of the approximation of this shape. p1 != pn i.e. it is not a closed path.
+	 *
+	 * @return the path which approximates the boundary of this shape
+	 */
 	List<VPoint> getPath();
 
 	static VPolygon generateHexagon(final double radius) {

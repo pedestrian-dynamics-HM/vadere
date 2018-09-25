@@ -125,6 +125,42 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
+	 * Splits the edge (s)->(e)  into two edges (s)->(p)->(e)
+	 *                    <-                       <-   <-
+	 * @param edge
+	 * @param p
+	 * @return returns the new vertex
+	 */
+	static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> V splitEdge(
+			@NotNull final E edge, @NotNull P p, @NotNull IMesh<P, V, E, F> mesh) {
+		V u = mesh.createVertex(p);
+		E twin = mesh.getTwin(edge);
+		E prev = mesh.getPrev(edge);
+		E tNext = mesh.getNext(twin);
+
+		E e = mesh.createEdge(u);
+		mesh.setFace(e, mesh.getFace(edge));
+		E t = mesh.createEdge(mesh.getVertex(twin));
+		mesh.setFace(t, mesh.getFace(twin));
+
+		if(mesh.getEdge(mesh.getVertex(twin)).equals(twin)) {
+			mesh.setEdge(mesh.getVertex(twin), t);
+		}
+
+		mesh.setVertex(twin, u);
+		mesh.setEdge(u, e);
+
+		mesh.setTwin(e, t);
+		mesh.setNext(e, edge);
+		mesh.setNext(twin, t);
+
+		mesh.setPrev(e, prev);
+		mesh.setNext(t, tNext);
+
+		return u;
+	}
+
+	/**
 	 * Tests if there is any face which shares more than one edge with the face
 	 * we are checking.
 	 *
@@ -350,6 +386,14 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return currentFace;
 	}
 
+	/**
+	 * Shrinks the border as long as the removeCondition is satisfied i.e. a face will be removed if
+	 * it is at the border (during the shrinking process) and satisfies the condition. Like a virus this
+	 * algorithms removes faces from outside, i.e. the border, towards inside.
+	 *
+	 * @param removeCondition
+	 * @param deleteIsolatedVertices
+	 */
 	default void shrinkBorder(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
 		boolean modified = true;
 
