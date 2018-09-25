@@ -106,7 +106,7 @@ public abstract class SourceController {
 		return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
 				&& dynamicElementsCreatedTotal >= maxNumber;
 	}
-	
+
 	abstract protected boolean isQueueEmpty();
 
 	abstract protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec);

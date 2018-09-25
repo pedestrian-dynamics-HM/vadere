@@ -147,7 +147,7 @@ public class SourceTestAttributesBuilder {
 				+ ",\"distributionParameters\": " + Arrays.toString(distributionParams)
 				+ ",\"startTime\": " + startTime
 				+ ",\"endTime\": " + endTime
-				+ ",\"spawnAtRandomPositions\": true"
+				+ ",\"spawnAtRandomPositions\": false"
 				+ ",\"useFreeSpaceOnly\": " + useFreeSpaceOnly
 				+ ",\"groupSizeDistribution\" : " + groupSizeDistribution() + "\n"
 				+ ",\"targetIds\": [1]}";
