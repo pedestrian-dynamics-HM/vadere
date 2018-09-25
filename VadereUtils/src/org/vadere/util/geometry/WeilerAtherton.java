@@ -22,8 +22,9 @@ public class WeilerAtherton {
 	private VPolygon subject;
 	private VPolygon clipping;
 	private boolean directionRevert = true;
-	private PMesh<WeilerPoint> subjectMesh;
-	private PMesh<WeilerPoint> clippingMesh;
+	private int i = 0;
+	private int j = 1;
+	private List<VPolygon> polygons;
 
 	@Nullable private WeilerPoint wp;
 
@@ -64,16 +65,16 @@ public class WeilerAtherton {
 		}
 	}
 
-	public WeilerAtherton(@NotNull final VPolygon subject, @NotNull final VPolygon clipping) {
-		assert subject.isSimple() && clipping.isSimple();
-		this.subject = subject;
-		this.clipping = clipping;
-		subjectMesh = new PMesh<>((x,y) -> new WeilerPoint(new VPoint(x,y), false, false));
-		clippingMesh = new PMesh<>((x,y) -> new WeilerPoint(new VPoint(x,y), false, false));
+	public WeilerAtherton(@NotNull final List<VPolygon> polygons) {
+		this.polygons = polygons;
 	}
 
-	public Pair<PFace<WeilerPoint>, PFace<WeilerPoint>> constructIntersectionFaces() {
-		// phase (1)
+	public Pair<PFace<WeilerPoint>, PFace<WeilerPoint>> constructIntersectionFaces(
+			@NotNull final VPolygon subject,
+			@NotNull final PMesh<WeilerPoint> subjectMesh,
+			@NotNull final VPolygon clipping,
+			@NotNull final PMesh<WeilerPoint> clippingMesh) {
+
 		PFace<WeilerPoint> subjectFace = subjectMesh.toFace(subject.getPath()
 				.stream()
 				.map(p -> new WeilerPoint(p, false, clipping.contains(p)))
@@ -90,14 +91,14 @@ public class WeilerAtherton {
 		PVertex<WeilerPoint> ip = null;
 
 		// compute intersections and add those to the two faces, this implementation is rather slow!
-		do  {
+		do {
 			PHalfEdge<WeilerPoint> innerStart = clippingMesh.getEdge(clippingFace);
 			PHalfEdge<WeilerPoint> innerNext = innerStart;
 			do {
 				VLine l1 = subjectMesh.toLine(next);
 				VLine l2 = clippingMesh.toLine(innerNext);
 
-				if(GeometryUtils.intersectLineSegment(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY())) {
+				if (GeometryUtils.intersectLineSegment(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY())) {
 					VPoint intersectionPoint = GeometryUtils.intersectionPoint(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY());
 					WeilerPoint wp1 = new WeilerPoint(intersectionPoint, true, false);
 					WeilerPoint wp2 = new WeilerPoint(intersectionPoint, true, false);
@@ -127,9 +128,55 @@ public class WeilerAtherton {
 	}
 
 	public List<VPolygon> execute() {
+
+		boolean merged = true;
+		List<VPolygon> newPolygons = new ArrayList<>();
+		newPolygons.addAll(polygons);
+
+		while (merged) {
+			int ii = -1;
+			int jj = -1;
+			merged = false;
+			Pair<VPolygon, VPolygon> mergeResult = null;
+			for(int i = 0; i < newPolygons.size(); i++) {
+				VPolygon first = newPolygons.get(i);
+
+				for(int j = i+1; j < newPolygons.size(); j++) {
+					VPolygon second = newPolygons.get(j);
+
+					mergeResult = merge(first, second);
+
+					// something got merged
+					if(mergeResult.getSecond() == null) {
+						merged = true;
+						ii = i;
+						jj = j;
+						break;
+					}
+				}
+
+				if(merged) {
+					break;
+				}
+			}
+
+			if(merged) {
+				newPolygons.remove(ii);
+				newPolygons.remove(jj-1);
+				newPolygons.add(mergeResult.getFirst());
+			}
+		}
+
+		return newPolygons;
+	}
+
+	public Pair<VPolygon, VPolygon> merge(@NotNull final VPolygon subject, @NotNull final VPolygon clipping) {
+		PMesh<WeilerPoint> subjectMesh = new PMesh<>((x,y) -> new WeilerPoint(new VPoint(x,y), false, false));
+		PMesh<WeilerPoint> clippingMesh = new PMesh<>((x,y) -> new WeilerPoint(new VPoint(x,y), false, false));
+
 		List<VPolygon> result = new ArrayList<>(2);
 
-		Pair<PFace<WeilerPoint>, PFace<WeilerPoint>> pair = constructIntersectionFaces();
+		Pair<PFace<WeilerPoint>, PFace<WeilerPoint>> pair = constructIntersectionFaces(subject, subjectMesh, clipping, clippingMesh);
 
 		PFace<WeilerPoint> subjectFace = pair.getFirst();
 		PFace<WeilerPoint> clippingFace = pair.getSecond();
@@ -140,22 +187,22 @@ public class WeilerAtherton {
 		Optional<PHalfEdge<WeilerPoint>> optStartPointClip = clippingMesh.findAnyEdge(p -> !p.isIntersectionPoint() && !p.isInside());
 
 		// no point intersection and no point is contained in the other polygon => polygons do not overlap at all
-		if(!optStartPointSub.isPresent() && !optStartPointClip.isPresent() && !intersectionEdges.isPresent()) {
+		if(optStartPointSub.isPresent() && optStartPointClip.isPresent() && !intersectionEdges.isPresent()) {
 			result.add(subject);
 			result.add(clipping);
-			return result;
+			return Pair.create(subject, clipping);
 		}
 
 		// no point intersections and there is a point of the subject outside of the clipping => clipping is fully contained in subject
 		if(optStartPointSub.isPresent() && !intersectionEdges.isPresent()) {
 			result.add(subject);
-			return result;
+			return Pair.create(subject, null);
 		}
 
 		// no point intersections and there is a point of the clipping outside of the subject => subject is fully contained in clipping
 		if(optStartPointClip.isPresent() && !intersectionEdges.isPresent()) {
 			result.add(clipping);
-			return result;
+			return pair.create(clipping, null);
 		}
 
 		PHalfEdge<WeilerPoint> first = null;
@@ -183,7 +230,6 @@ public class WeilerAtherton {
 
 		List<VPoint> points = new ArrayList<>();
 		do {
-
 			next = getNext(mesh, next, directionRevert && mesh == mesh2);
 			WeilerPoint wp = mesh.getPoint(next);
 
@@ -200,7 +246,7 @@ public class WeilerAtherton {
 		}
 		while (!next.equals(first));
 
-		return result;
+		return Pair.create(GeometryUtils.toPolygon(points), null);
 	}
 
 	private PHalfEdge<WeilerPoint> getNext(@NotNull final PMesh<WeilerPoint> mesh, @NotNull final PHalfEdge<WeilerPoint> edge, boolean reverse) {

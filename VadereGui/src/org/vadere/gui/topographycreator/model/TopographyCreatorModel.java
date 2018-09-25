@@ -7,12 +7,15 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Observer;
+import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
@@ -101,6 +104,11 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	@Override
 	public Topography getTopography() {
 		return topographyBuilder.build();
+	}
+
+	@Override
+	public double getBoundingBoxWidth() {
+		return topographyBuilder.getAttributes().getBoundingBoxWidth();
 	}
 
 	@Override
@@ -334,6 +342,16 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public VShape translateElement(ScenarioElement element, VPoint vector) {
 		// double factor = Math.max(10,1/getGridResulution()); // ?? related to scaleTopography?
 		return element.getShape().translatePrecise(alignToGrid(vector));
+	}
+
+	@Override
+	public void removeObstacleIf(@NotNull final Predicate predicate) {
+		if(selectedElement instanceof Obstacle) {
+			selectedElement = null;
+		}
+
+		topographyBuilder.removeObstacleIf(predicate);
+		setChanged();
 	}
 
 	@Override

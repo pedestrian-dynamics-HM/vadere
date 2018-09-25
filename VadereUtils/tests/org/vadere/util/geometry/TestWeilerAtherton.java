@@ -1,7 +1,5 @@
 package org.vadere.util.geometry;
 
-import com.google.common.collect.Iterables;
-
 import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +28,11 @@ public class TestWeilerAtherton {
 		VPolygon poly1 = GeometryUtils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
 		VPolygon poly2 = GeometryUtils.toPolygon(new VPoint(-0.01, 0), new VPoint(-1, 1), new VPoint(-1, -1));
 
-		WeilerAtherton weilerAtherton = new WeilerAtherton(poly1, poly2);
+		List<VPolygon> originalList = new ArrayList<>(2);
+		originalList.add(poly1);
+		originalList.add(poly2);
+
+		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
 		List<VPolygon> polygonList = weilerAtherton.execute();
 
 		assertTrue(polygonList.contains(poly1));
@@ -43,8 +45,15 @@ public class TestWeilerAtherton {
 		VPolygon poly1 = GeometryUtils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
 		VPolygon poly2 = GeometryUtils.toPolygon(new VPoint(-0.01, 0), new VPoint(-1, 1), new VPoint(-1, -1));
 
-		WeilerAtherton weilerAtherton = new WeilerAtherton(poly1, poly2);
-		Pair<PFace<WeilerAtherton.WeilerPoint>, PFace<WeilerAtherton.WeilerPoint>> pair = weilerAtherton.constructIntersectionFaces();
+		List<VPolygon> originalList = new ArrayList<>(2);
+		originalList.add(poly1);
+		originalList.add(poly2);
+
+		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
+		Pair<PFace<WeilerAtherton.WeilerPoint>, PFace<WeilerAtherton.WeilerPoint>> pair = weilerAtherton.constructIntersectionFaces(
+				poly1, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false)),
+				poly2, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false))
+		);
 
 		PFace<WeilerAtherton.WeilerPoint> face1 = pair.getFirst();
 		PFace<WeilerAtherton.WeilerPoint> face2 = pair.getSecond();
@@ -68,8 +77,15 @@ public class TestWeilerAtherton {
 		VPolygon poly1 = GeometryUtils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
 		VPolygon poly2 = GeometryUtils.toPolygon(new VPoint(0.3, 0), new VPoint(-1, 1), new VPoint(-1, -1));
 
-		WeilerAtherton weilerAtherton = new WeilerAtherton(poly1, poly2);
-		Pair<PFace<WeilerAtherton.WeilerPoint>, PFace<WeilerAtherton.WeilerPoint>> pair = weilerAtherton.constructIntersectionFaces();
+		List<VPolygon> originalList = new ArrayList<>(2);
+		originalList.add(poly1);
+		originalList.add(poly2);
+
+		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
+		Pair<PFace<WeilerAtherton.WeilerPoint>, PFace<WeilerAtherton.WeilerPoint>> pair = weilerAtherton.constructIntersectionFaces(
+				poly1, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false)),
+				poly2, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false))
+		);
 
 		PFace<WeilerAtherton.WeilerPoint> face1 = pair.getFirst();
 		PFace<WeilerAtherton.WeilerPoint> face2 = pair.getSecond();
@@ -79,7 +95,8 @@ public class TestWeilerAtherton {
 
 		assertEquals(5, mesh.streamPoints(face1).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
 		assertEquals(5, mesh.streamPoints(face2).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
-
 	}
+
+
 
 }
