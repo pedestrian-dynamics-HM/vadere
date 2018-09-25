@@ -73,4 +73,8 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 		// the fmm can cause an error mostly an underestimation of 20% near the source which are exactly the points we are interested
 		return eikonalSolver.getPotential(pos, 0.0, 1.2);
 	}
+
+	public EikonalSolver getEikonalSolver() {
+		return eikonalSolver;
+	}
 }

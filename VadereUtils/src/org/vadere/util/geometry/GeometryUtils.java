@@ -41,6 +41,19 @@ public class GeometryUtils {
 		return false;
 	}
 
+	/**
+	 * Generates a set of points which are positioned inside a disc segment. The points are placed equidistant on one or multiple circles
+	 * with the center at the center of the disc and the radius <= the radius of the disc.
+	 *
+	 * @param random                            a random number generator which will only be used if varyDirection is true.
+	 * @param varyDirection                     if true the generated points will be rotated by a random offset
+	 * @param circle                            the circle defining the disc (containing the points)
+	 * @param numberOfCircles                   the number of circles
+	 * @param numberOfPointsOfLargestCircle     the number of points of the most outer circle
+	 * @param anchorAngle                       start angle of the segment
+	 * @param angle                             anchorAngle + angle = end angle of the segment
+	 * @return a set of points which are positioned inside a disc segment
+	 */
 	public static List<VPoint> getDiscDiscretizationPoints(
 			@NotNull final Random random,
 			final boolean varyDirection,

@@ -2,8 +2,8 @@ package org.vadere.util.math;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -32,10 +32,10 @@ public class TestCLLinkedList {
 	@Test
 	public void testCalcHashSmall() throws IOException, OpenCLException {
 		int size = 8;
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcHashes(positions);
 
@@ -52,10 +52,10 @@ public class TestCLLinkedList {
 	@Test
 	public void testCalcHashLarge() throws IOException, OpenCLException {
 		int size = 32768; // 2^15
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcHashes(positions);
 
@@ -75,7 +75,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextDouble() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
 
@@ -99,7 +99,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextDouble() * 10));
+			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
 
@@ -120,7 +120,7 @@ public class TestCLLinkedList {
 	@Test
 	public void testGridCellSmall() throws IOException, OpenCLException {
 		int size = 8;
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
 			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
@@ -131,38 +131,68 @@ public class TestCLLinkedList {
 		for(int cell = 0; cell < numberOfCells; cell++) {
 			int cellStart = gridCells.cellStarts[cell];
 			int cellEnd = gridCells.cellEnds[cell];
+
 			for(int i = cellStart; i < cellEnd; i++) {
-				sum++;
 				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
 				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
 				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
+				sum++;
 				assertEquals(gridHash, cell);
 			}
 		}
 
-		assertEquals(sum, size);
+		assertEquals(size, sum);
 	}
 
 	@Test
 	public void testGridCellLarge() throws IOException, OpenCLException {
 		int size = 32768;
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
 			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
 		}
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
+		equalPositions(gridCells);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
+		int sum = 0;
 		for(int cell = 0; cell < numberOfCells; cell++) {
 			int cellStart = gridCells.cellStarts[cell];
 			int cellEnd = gridCells.cellEnds[cell];
 
+			logger.info("cell = " + cell + " #elements = " + (cellEnd - cellStart));
 			for(int i = cellStart; i < cellEnd; i++) {
 				VPoint point = new VPoint(gridCells.reorderedPositions[i*2], gridCells.reorderedPositions[i*2+1]);
 				int[] gridPosition = getGridPosition(point, clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign());
 				int gridHash = getGridHash(gridPosition, clUniformHashedGrid.getGridSize());
+				sum++;
 				assertEquals(gridHash, cell);
 			}
+		}
+
+		assertEquals(size, sum);
+	}
+
+	private void equalPositions(@NotNull final CLLinkedCell.LinkedCell linkedCell) {
+		assertEquals(linkedCell.positions.length, linkedCell.reorderedPositions.length);
+		for(int i = 0; i < linkedCell.positions.length / 2; i++) {
+			float x = linkedCell.positions[2*i];
+			float y = linkedCell.positions[2*i+1];
+			boolean found = false;
+
+			for(int j = 0; j < linkedCell.reorderedPositions.length / 2; j++) {
+				float xR = linkedCell.reorderedPositions[2*j];
+				float yR = linkedCell.reorderedPositions[2*j+1];
+				if(x == xR && y == yR) {
+					found = true;
+					break;
+				}
+			}
+
+			if(!found) {
+				assert false : "position (" + x + "," + y + ") not found";
+			}
+
 		}
 	}
 
@@ -187,8 +217,8 @@ public class TestCLLinkedList {
 	 * Computes the hash value of a grid position, see OpenCL code in Particles.cl
 	 */
 	private static int getGridHash(final int[] gridPos, int[] gridSize) {
-		gridPos[0] = gridPos[0] & (gridSize[0] - 1);
-		gridPos[1] = gridPos[1] & (gridSize[1] - 1);
+		//gridPos[0] = gridPos[0] & (gridSize[0] - 1);
+		//gridPos[1] = gridPos[1] & (gridSize[1] - 1);
 		return umad(gridSize[0], gridPos[1], gridPos[0]);
 	}
 }

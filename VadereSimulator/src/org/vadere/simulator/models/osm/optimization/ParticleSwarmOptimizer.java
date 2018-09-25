@@ -38,10 +38,6 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 		VCircle circle = ((VCircle) reachableArea);
 		double stepSize = circle.getRadius();
 
-		final PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
-		potentialEvaluationFunction.setStepSize(stepSize);
-
-
 		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
 		// maximum possible angle of movement relative to ankerAngle
 		double angle;

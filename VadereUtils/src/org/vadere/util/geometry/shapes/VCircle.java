@@ -254,4 +254,15 @@ public class VCircle implements VShape, ICircleSector {
 	public ShapeType getType() {
 		return ShapeType.CIRCLE;
 	}
+
+	@Override
+	public boolean intersects(VShape shape) {
+		if(shape instanceof VCircle) {
+			VCircle otherCircle = (VCircle)shape;
+			return otherCircle.getCenter().distance(this.getCenter()) < (otherCircle.getRadius() + this.getRadius());
+		}
+		else {
+			return VShape.super.intersects(shape);
+		}
+	}
 }
