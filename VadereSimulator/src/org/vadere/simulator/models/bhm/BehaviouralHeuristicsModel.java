@@ -18,6 +18,7 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -87,7 +88,7 @@ public class BehaviouralHeuristicsModel implements MainModel {
 
 	@Override
 	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
-		return createElement(position, new AttributesAgent(attributesPedestrian, -1)).getShape();
+		return new VCircle(position, new AttributesAgent(attributesPedestrian, -1).getRadius()+new AttributesBHM().getSpaceToKeep());
 	}
 
 	@Override
