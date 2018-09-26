@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
 import java.util.Observer;
 import java.util.function.Predicate;
 
@@ -177,4 +179,8 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
 
 	void removeObstacleIf(final @NotNull Predicate<Obstacle> predicate);
+
+	List<Obstacle> getObstacles();
+
+	Rectangle2D.Double getBounds();
 }

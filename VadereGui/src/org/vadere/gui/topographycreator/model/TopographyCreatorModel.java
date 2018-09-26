@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D.Double;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observer;
 import java.util.function.Predicate;
 
@@ -105,6 +106,8 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public Topography getTopography() {
 		return topographyBuilder.build();
 	}
+
+
 
 	@Override
 	public double getBoundingBoxWidth() {
@@ -342,6 +345,16 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public VShape translateElement(ScenarioElement element, VPoint vector) {
 		// double factor = Math.max(10,1/getGridResulution()); // ?? related to scaleTopography?
 		return element.getShape().translatePrecise(alignToGrid(vector));
+	}
+
+	@Override
+	public List<Obstacle> getObstacles() {
+		return topographyBuilder.getObstacles();
+	}
+
+	@Override
+	public Double getBounds() {
+		return topographyBuilder.getAttributes().getBounds();
 	}
 
 	@Override

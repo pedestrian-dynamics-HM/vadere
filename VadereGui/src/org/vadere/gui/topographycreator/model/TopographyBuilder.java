@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
@@ -250,6 +251,10 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 	public Iterator<Obstacle> getObstacleIterator() {
 		return obstacles.iterator();
+	}
+
+	public List<Obstacle> getObstacles() {
+		return obstacles;
 	}
 
 	public Iterator<Stairs> getStairsIterator() {

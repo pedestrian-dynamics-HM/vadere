@@ -30,8 +30,8 @@ public class ActionResizeTopographyBound extends TopographyAction {
 
 		TopographyCreatorModel model = (TopographyCreatorModel) getScenarioPanelModel();
 		ActionResizeTopographyBoundDialog dialog = new ActionResizeTopographyBoundDialog(
-				model.getTopography().getBounds().width,
-				model.getTopography().getBounds().height
+				model.getBounds().width,
+				model.getBounds().height
 		);
 
 		if (dialog.getValue()){

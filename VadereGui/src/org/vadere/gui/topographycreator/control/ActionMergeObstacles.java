@@ -1,17 +1,14 @@
 package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.gui.topographycreator.model.TopographyElementFactory;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.WeilerAtherton;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +16,9 @@ import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+/**
+ * @author Benedikt Zoennchen
+ */
 public class ActionMergeObstacles extends TopographyAction {
 
 	private final UndoableEditSupport undoSupport;
@@ -30,9 +30,11 @@ public class ActionMergeObstacles extends TopographyAction {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		List<Obstacle> obstacleList = getScenarioPanelModel().getTopography().getObstacles();
-		List<VPolygon> polygons = obstacleList.stream()
+	public void actionPerformed(final ActionEvent e) {
+		// soft copy of the list
+		List<Obstacle> before = new ArrayList<>(getScenarioPanelModel().getObstacles());
+
+		List<VPolygon> polygons = before.stream()
 				.map(obstacle -> obstacle.getShape())
 				.map(shape -> shape instanceof VRectangle ? new VPolygon(shape) : shape)
 				.filter(shape -> shape instanceof VPolygon)
@@ -53,18 +55,10 @@ public class ActionMergeObstacles extends TopographyAction {
 				.forEach(obstacle -> getScenarioPanelModel().addShape(obstacle));
 
 
-		/*ScenarioElementType type = getScenarioPanelModel().getCurrentType();
-		UndoableEdit edit = new EditDrawShape(getScenarioPanelModel(), type);
+		List<Obstacle> after = new ArrayList<>(getScenarioPanelModel().getObstacles());
+
+		UndoableEdit edit = new EditMergeObstacles(getScenarioPanelModel(), before, after);
 		undoSupport.postEdit(edit);
-
-		IDrawPanelModel model = getScenarioPanelModel();
-
-		model.getCurrentType();
-		model.hideSelection();
-		ScenarioElement element = TopographyElementFactory.getInstance().createScenarioShape(model.getCurrentType(),
-				model.getSelectionShape());
-		model.addShape(element);
-		model.setSelectedElement(element);*/
 		getScenarioPanelModel().notifyObservers();
 	}
 }

@@ -300,6 +300,30 @@ public class GeometryUtils {
 		return isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
+	public static boolean isCCW(final @NotNull VPolygon polygon) {
+		List<VPoint> points = polygon.getPath();
+
+		assert points.size() >= 3;
+
+		// find the most-left, most-bottom point of the polygon
+		VPoint mostLeft = points.get(0);
+		int indexMostLeft = 0;
+		for(int i = 1; i < points.size(); i++) {
+			if(mostLeft.getX() > points.get(i).getX() ||
+					(Double.compare(mostLeft.getX(), points.get(i).getX()) == 0 && mostLeft.getY() > points.get(i).getY())) {
+				mostLeft = points.get(i);
+				indexMostLeft = i;
+			}
+		}
+
+		// get the next point and the prev point
+		VPoint next = points.get((indexMostLeft+1) % points.size());
+		VPoint prev = points.get((indexMostLeft + points.size() - 1) % points.size());
+
+		return isLeftOf(mostLeft, next, prev);
+
+	}
+
 	/**
 	 * Returns the angle between the x-axis, p1 and p2.
 	 */
@@ -379,7 +403,6 @@ public class GeometryUtils {
 		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
-
 
 	public static VPoint getIncenter(final IPoint p1, final IPoint p2, final IPoint p3) {
 		double a = p1.distance(p2);
