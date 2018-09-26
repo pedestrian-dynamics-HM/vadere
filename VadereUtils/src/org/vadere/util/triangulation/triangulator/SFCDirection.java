@@ -1,7 +1,7 @@
 package org.vadere.util.triangulation.triangulator;
 
 /**
- * Created by bzoennchen on 25.05.18.
+ * @author Benedikt Zoennchen
  */
 public enum SFCDirection {
 	FORWARD,

@@ -11,11 +11,19 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by bzoennchen on 25.05.18.
+ * A {@link SpaceFillingCurve} is a (linked-)list of nodes {@link SFCNode} in the order in which
+ * the curve would travers these nodes. Each node contains a half-edge which refers to
+ * a face.
+ *
+ * @author Benedikt Zoennchen
+ *
+ * @param <P> generic type of the point
+ * @param <V> generic type of the vertex
+ * @param <E> generic type of the half-edge
+ * @param <F> generic type of the face
  */
 public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
 	private SFCNode<P, V, E, F> head;
-
 
 	public SpaceFillingCurve(){
 		head = null;

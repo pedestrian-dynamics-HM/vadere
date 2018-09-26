@@ -13,6 +13,7 @@ import java.util.*;
 /**
  * @author Benedikt Zoennchen
  */
+@Deprecated
 public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
     private final Collection<VShape> boundary;
     private final VRectangle bbox;
@@ -20,7 +21,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
     private ITriangulation<P, V, E, F> triangulation;
     private Set<P> points;
     private IMesh<P, V, E, F> mesh;
-    private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulator.class);
+    private static final Logger logger = LogManager.getLogger(UniformSFCTriangulator.class);
     private final IDistanceFunction distFunc;
     private final static Random random = new Random();
     private final LinkedList<F> sortedFaces;

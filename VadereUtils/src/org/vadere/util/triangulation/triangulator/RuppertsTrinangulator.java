@@ -11,7 +11,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by bzoennchen on 16.01.18.
+ * Ruperts-Algorithm: not jet finished!
+ *
+ * @author Benedikt Zonnchen
+ *
+ * @param <P> generic type of the point
+ * @param <V> generic type of the vertex
+ * @param <E> generic type of the half-edge
+ * @param <F> generic type of the face
  */
 public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F>{
 

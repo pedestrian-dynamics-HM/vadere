@@ -8,7 +8,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+/**
+ * This triangulator triangulates a whole bounding box by a uniform triangulation of a specific side length.
+ *
+ * @author Benedikt Zoennchen
+ *
+ * @param <P> generic type of the point
+ * @param <V> generic type of the vertex
+ * @param <E> generic type of the half-edge
+ * @param <F> generic type of the face
+ */
 public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 
 	private double left;
@@ -18,6 +27,13 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	private double minTriangleSideLength;
 	private final ITriangulation<P, V, E, F> triangulation;
 
+	/**
+	 * The default constructor.
+	 *
+	 * @param bound                 the bounding box
+	 * @param minTriangleSideLength the minimal side length
+	 * @param triangulation         the triangulation i.e. the algorithm inserting points
+	 */
 	public UniformTriangulator(final VRectangle bound,
                                final double minTriangleSideLength,
                                final ITriangulation<P, V, E, F> triangulation) {
@@ -50,7 +66,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 
 	private Collection<P> generatePointSet() {
 		// height of a triangle with 60 deg everywhere
-		List<P> pointSet = new ArrayList<P>();
+		List<P> pointSet = new ArrayList<>();
 		double s = minTriangleSideLength;
 		double h = minTriangleSideLength * Math.sqrt(3) / 2.0;
 		// create stencil with four triangle which can be used to triangulate

@@ -26,7 +26,10 @@ import java.util.*;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P>
+ * @param <P> generic type of the point
+ * @param <V> generic type of the vertex
+ * @param <E> generic type of the half-edge
+ * @param <F> generic type of the face
  */
 public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 	private final Collection<? extends VShape> boundary;
