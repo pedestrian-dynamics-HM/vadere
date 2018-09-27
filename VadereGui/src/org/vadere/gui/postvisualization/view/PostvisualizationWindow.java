@@ -130,25 +130,6 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 			add(adjustPanel, cc.xy(2, 6));
 		}
 
-		final String test = java.text.MessageFormat.format(Messages.getString("PostVis.about.text"), "0.1");
-		JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
-		infoButton.setBorderPainted(false);
-		infoButton.addActionListener(e -> {
-			String text = "<html><font size =\"5\"><b>"+Messages.getString("PostVis.title") + "</font></b><br>" +
-					"<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("PostVis.version"), HashGenerator.releaseNumber()) + "</em></font><br>" +
-					"<font size =\"3\">" + MessageFormat.format(Messages.getString("PostVis.license.text"), "<a href=\"https://www.gnu.org/licenses/lgpl-3.0.txt\">LGPL</a>")+".</font></html>";
-			JOptionPane.showMessageDialog(null, text,
-					Messages.getString("PostVis.about.title"),
-					JOptionPane.INFORMATION_MESSAGE);
-		});
-
-		/*
-
-		"<html>" + java.text.MessageFormat.format(Messages.getString("PostVis.about.text"), "0.1")
-						 + "<a href=\"http://www.gnu.org/licenses/lgpl-3.0.txt/\">a link</a></html>"
-
-		 */
-
 		int iconHeight = Integer.valueOf(resources.getProperty("ProjectView.icon.height.value"));
 		int iconWidth = Integer.valueOf(resources.getProperty("ProjectView.icon.width.value"));
 		addActionToToolbar(toolbar,
@@ -274,7 +255,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				model, null, imgOptions);
 		addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
 
-		toolbar.addSeparator(new Dimension(5, 50));
+		toolbar.add(Box.createHorizontalGlue());
 
 		addActionToToolbar(
 				toolbar,
@@ -286,11 +267,6 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 				;
 				}, "ProjectView.btnSettings.tooltip");
-
-
-		toolbar.add(Box.createHorizontalGlue());
-		toolbar.add(infoButton);
-		infoButton.setToolTipText(Messages.getString("PostVis.btnAbout.tooltip"));
 
 		menuBar = new JMenuBar();
 		JMenu mFile = new JMenu(Messages.getString("PostVis.menuFile.title"));
