@@ -2,6 +2,7 @@ package org.vadere.util.math;
 
 import org.junit.Test;
 import org.vadere.util.opencl.CLConvolution;
+import org.vadere.util.opencl.CLFFT;
 import org.vadere.util.opencl.CLFFTConvolution;
 import org.vadere.util.opencl.OpenCLException;
 
@@ -26,22 +27,24 @@ public class TestCLFFTConvolution {
 
         // This test only uses the FFT methods ans does not padd the matrix
 
-        int N = 128; // single workgroup only for N = 64
+        int M = 2048;
+        int N = 2048; // single workgroup only for N = 64
+
         float[] kernel = new float[]{1, 1, 1, 1, 1, 1, 1};
-        float[] input = new float[2 * N * N];
+        float[] input = new float[2 * M * N];
         // all complex values are 0!
         for (int i = 0; i < input.length; ++i) {
             input[i] = i % 2 == 0 ? 1 : 1;
         }
         //System.out.println("Input: " + Arrays.toString(input));
 
-        CLFFTConvolution fftTest = new CLFFTConvolution(N, N, kernel.length, kernel, false);
+        CLFFTConvolution fftTest = new CLFFTConvolution(M, N, kernel.length, kernel, false);
         float[] forwardsFFT = fftTest.fft2Dim(input, CLFFTConvolution.Direction.SPACE2FREQUENCY);
 
         //System.out.println("\nForward: " + Arrays.toString(forwardsFFT));
 
-        assertTrue("First element should be N*N!", forwardsFFT[0] == N * N);
-        assertTrue("Second element should be N*N!", forwardsFFT[1] == N * N);
+        assertTrue("First element should be M*N!", forwardsFFT[0] == M * N);
+        assertTrue("Second element should be M*N!", forwardsFFT[1] == M * N);
 
         for (int i = 2; i < forwardsFFT.length; ++i) {
             assertTrue("All other elements should be 0!", forwardsFFT[i] == 0);
@@ -52,8 +55,6 @@ public class TestCLFFTConvolution {
 
         //System.out.println("Space: " + Arrays.toString(outputS));
         assertArrayEquals("Back transformation must be equal to original input", input, outputS, (float) EPS);
-
-
     }
 
     @Test
@@ -61,7 +62,7 @@ public class TestCLFFTConvolution {
 
         // This test only uses the FFT methods ans does not padd the matrix
 
-        int N = 2048; // 2 workgroups for N = 128
+        int N = 64; // 2 workgroups for N = 128
         float[] kernel = new float[]{1, 1, 1, 1, 1, 1, 1};
         float[] input = new float[2 * N * N];
         for (int i = 0; i < 2 * N * N; ++i) {
@@ -122,15 +123,15 @@ public class TestCLFFTConvolution {
         int matrixWidth = 20; // for height, width = 40 the matrix will be padded to 64x64
         int kernelSize = 21;
         float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
-        //System.out.println("Kernel " + Arrays.toString(kernel));
+        System.out.println("Kernel " + Arrays.toString(kernel));
 
         CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
 
         float[] fftKernel = fftConvolution.getGaussKernelTransformed();
-        //System.out.println("fftKernel " + Arrays.toString(fftKernel));
+        System.out.println("fftKernel " + Arrays.toString(fftKernel) + "\n size " + fftKernel.length);
 
 //        float[] backTransformation = fftConvolution.fft1Dim(fftKernel, CLFFTConvolution.Direction.FREQUENCY2SPACE);
-//
+//        System.out.println("kernel " + Arrays.toString(backTransformation));
 //        fftConvolution.clearCL();
 //
 //        for (int i = 0; i < backTransformation.length; ++i) {
@@ -143,25 +144,43 @@ public class TestCLFFTConvolution {
     }
 
     @Test
+    public void testComputeG() throws OpenCLException {
+        int matrixHeight = 20; // currently the matrix will be padded to 10 + 21 - 1 = 30 with the next power of 2 being 32x32,
+        int matrixWidth = 20; // for height, width = 40 the matrix will be padded to 64x64
+        int kernelSize = 21;
+        float[] kernel = new float[]{28f, 0f, -4f, 9.6569f, -4f, 4f, -4f, 1.6569f, -4f, 0f, -4f, -1.6569f, -4f, -4f, -4f, -9.6569f};
+
+        CLFFTConvolution clfftConvolution = new CLFFTConvolution(matrixHeight,matrixWidth,kernelSize,kernel,false);
+        float[] G = clfftConvolution.computeG(kernel,8);
+        //System.out.println(Arrays.toString(G));
+    }
+
+    @Test
     public void test1DimFFT() throws OpenCLException {
 
         int size = 64;
-        float[] input = new float[2 * size];
-        for (int i = 0; i < 2 * size; ++i) {
-            input[i] = i % 2 == 0 ? 1 : 1;
+        float[] input = new float[size];
+        for (int i = 0; i < size; ++i) {
+            input[i] = 1;
         }
         System.out.println(Arrays.toString(input));
 
         CLFFTConvolution fftConvolution = new CLFFTConvolution(size, size, size, input, false); // matrix size not used
         float[] output = fftConvolution.fft1Dim(input, CLFFTConvolution.Direction.SPACE2FREQUENCY);
-//        System.out.println(Arrays.toString(output));
-//
-//        assertEquals(2 * size, output.length);
-//        assertEquals("The first element should be N", size, output[0], EPS);
-//        assertEquals("The second element should be N", size, output[1], EPS);
-//        for (int i = 2; i < output.length; ++i) {
-//            assertEquals("All other elements should be 0", 0, output[i], EPS);
-//        }
+        System.out.println(Arrays.toString(output));
+        float[] g = fftConvolution.computeG(output, size / 2);
+        System.out.println(Arrays.toString(g));
+
+        assertEquals(size, g.length);
+        assertEquals("The first element should be N", size, g[0], EPS);
+        assertEquals("The second element should be N", size, g[1], EPS);
+        for (int i = 2; i < output.length; ++i) {
+            assertEquals("All other elements should be 0", 0, g[i], EPS);
+        }
+
+        float[] space = fftConvolution.fft1Dim(output, CLFFTConvolution.Direction.FREQUENCY2SPACE);
+
+        assertArrayEquals("should mach input ", input, space, (float) EPS);
 
     }
 
@@ -182,7 +201,7 @@ public class TestCLFFTConvolution {
 
         CLFFTConvolution fftConvolution = new CLFFTConvolution(height, width, kernelSize, kernel);
 
-        float[] kernelPadded = fftConvolution.zeroPaddKernel(kernel);
+//        float[] kernelPadded = fftConvolution.zeroPaddKernel(kernel);
         float[] matrixPadded = fftConvolution.zeroPaddMatrix(input);
 
         float[] matrixExpected = new float[]{
@@ -205,11 +224,11 @@ public class TestCLFFTConvolution {
 
         float[] expectedKernel = new float[]{1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        assertEquals("padded kernel should have the size ", 32, kernelPadded.length);
+//        assertEquals("padded kernel should have the size ", 32, kernelPadded.length);
         assertEquals("padded matrix should have the size ", 16 * 32, matrixPadded.length);
 
         assertArrayEquals("padded matrix should match expected matrix", matrixExpected, matrixPadded, (float) EPS);
-        assertArrayEquals("padded kernel should match expected kernel", expectedKernel, kernelPadded, (float) EPS);
+//        assertArrayEquals("padded kernel should match expected kernel", expectedKernel, kernelPadded, (float) EPS);
 
         fftConvolution.clearCL();
     }
@@ -281,22 +300,24 @@ public class TestCLFFTConvolution {
         float[] matrix = new float[M * 2 * N];
         float[] expected = new float[M * 2 * N];
         for (int i = 0; i < matrix.length; ++i) {
-            matrix[i] = i % 2 == 0 ? i : 0;
-            expected[i] = i % 2 == 0 ? 4 * i : 0;
+            matrix[i] = i % 2 == 0 ? 1 : 0;
+            expected[i] = i % 2 == 0 ? 4 : 0;
         }
 
-        float[] kernel = new float[2 * N];
+        float[] kernel = new float[N];
         for (int i = 0; i < kernel.length; ++i) {
-            kernel[i] = 2;
+            kernel[i] = i%2 == 0 ? 2 : 0;
         }
-
+        System.out.println(Arrays.toString(matrix));
+        System.out.println(Arrays.toString(expected));
         CLFFTConvolution fftConvolution = new CLFFTConvolution(M, N, N, kernel, false);
 
         float[] matrixOutput = fftConvolution.multiplyRows(matrix);
-
+        System.out.println(Arrays.toString(matrixOutput));
         matrixOutput = fftConvolution.multiplyCols(matrixOutput);
-        fftConvolution.clearCL();
+        System.out.println(Arrays.toString(matrixOutput));
 
+        fftConvolution.clearCL();
         assertArrayEquals("Muliplying rows*2 and cols*2 should give original matrix*4", expected, matrixOutput, (float) EPS);
 
     }
@@ -304,13 +325,13 @@ public class TestCLFFTConvolution {
     @Test
     public void testSmallFFTConvolution() throws OpenCLException {
 
-        int matrixHeight = 40; // currently padded to 32, for 40 padded to 64
-        int matrixWidth = 40; // currently padded to 32, for 40 padded to 64
-        int kernelSize = 11;
+        int matrixHeight = 200; // currently padded to 32, for 40 padded to 64
+        int matrixWidth = 200; // currently padded to 32, for 40 padded to 64
+        int kernelSize = 99;
 
         float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
         float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
-
+        //System.out.println("kernel " + Arrays.toString(kernel));
         CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
         float[] densityMatrix = fftConvolution.convolve(matrix);
         fftConvolution.clearCL();
@@ -330,7 +351,7 @@ public class TestCLFFTConvolution {
 
         float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
 
-        int kernelSize = matrixWidth+1;
+        int kernelSize = matrixWidth + 1;
         System.out.println("INFO - " + matrixHeight + " " + matrixWidth + " " + kernelSize);
 
         float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
@@ -348,20 +369,58 @@ public class TestCLFFTConvolution {
     }
 
     @Test
-    public void testRuntimeFFTConvolution() throws  OpenCLException {
+    public void testRuntimeDifferentMatrixSize() throws OpenCLException {
 
-        int min_size = 32;
-        int max_size = (int)Math.pow(2,11);
+        int min_size = 256;
+        int max_size = (int) Math.pow(2, 12);
+        int seed = 1;
+
+        for (int size = min_size; size <= max_size; size *= 2) {
+
+            int kernelSize = 91;
+            int matrixHeight = size-kernelSize+1;
+            int matrixWidth = size-kernelSize+1;
 
 
-        for (int paddSize = min_size; paddSize <= max_size; paddSize*=2) {
-
-            int matrixHeight = paddSize; // currently padded to 32, for 40 padded to 64
-            int matrixWidth = paddSize; // currently padded to 32, for 40 padded to 64
-            int kernelSize = paddSize+1;
+            float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth,seed);
+            float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
 
             System.out.println("INFO - " + matrixHeight + " " + matrixWidth + " " + kernelSize);
-            float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
+            CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
+
+            int paddHeight = fftConvolution.getPaddHeight();
+            int paddWidth = fftConvolution.getPaddWidth();
+
+            //System.out.println(" padd " + paddWidth);
+
+            float[] densityMatrix = fftConvolution.convolve(matrix);
+            fftConvolution.clearCL();
+
+            // compare results to CLConvolution
+            CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Separate, matrixHeight, matrixWidth, kernelSize, kernel);
+            float[] output = clConvolution.convolve(matrix);
+            clConvolution.clearCL();
+            assertArrayEquals("CLFFTConvolution does not match clConvolution!", densityMatrix, output, (float) EPS);
+        }
+
+
+    }
+
+    @Test
+    public void testRuntimeDifferentKernelSize() throws OpenCLException {
+
+        int min_size = 32;
+        int max_size = (int) Math.pow(2, 10);
+        int seed = 1;
+
+        for (int paddSize = min_size; paddSize <= 32; paddSize *= 2) {
+
+            int matrixHeight = (int) Math.pow(2, 10);
+            int matrixWidth = (int) Math.pow(2, 10);
+            int kernelSize = paddSize - 1;
+
+            System.out.println("INFO - " + matrixHeight + " " + matrixWidth + " " + kernelSize);
+            float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth,seed);
             float[] kernel = Convolution.floatGaussian1DKernel(kernelSize, (float) Math.sqrt(0.7));
 
             CLFFTConvolution fftConvolution = new CLFFTConvolution(matrixHeight, matrixWidth, kernelSize, kernel);
@@ -373,7 +432,6 @@ public class TestCLFFTConvolution {
             float[] output = clConvolution.convolve(matrix);
             clConvolution.clearCL();
             assertArrayEquals("CLFFTConvolution does not match clConvolution!", densityMatrix, output, (float) EPS);
-
         }
 
 
@@ -382,8 +440,8 @@ public class TestCLFFTConvolution {
     @Test
     public void testCLConvolution() throws OpenCLException {
 
-        int matrixHeight = (int) Math.pow(2,5);
-        int matrixWidth = (int) Math.pow(2,5);
+        int matrixHeight = (int) Math.pow(2, 5);
+        int matrixWidth = (int) Math.pow(2, 5);
         int kernelSize = 11;
 
         float[] matrix = Convolution.generdateInputMatrix(matrixHeight * matrixWidth);
@@ -392,6 +450,15 @@ public class TestCLFFTConvolution {
         CLConvolution clConvolution = new CLConvolution(CLConvolution.KernelType.Separate, matrixHeight, matrixWidth, kernelSize, kernel);
         float[] output = clConvolution.convolve(matrix);
         clConvolution.clearCL();
+    }
+
+    @Test
+    public void testRandomMatrix() throws OpenCLException {
+
+        float[] mat1 = Convolution.generdateInputMatrix(100,1);
+        float[] mat2 = Convolution.generdateInputMatrix(100,1);
+
+        assertArrayEquals("should give same matrix for same seed", mat1,mat2,(float)EPS);
     }
 
     @Test

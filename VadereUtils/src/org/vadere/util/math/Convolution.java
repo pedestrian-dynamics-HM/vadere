@@ -80,12 +80,21 @@ public class Convolution {
 		return floatGaussian2DKernel(size, sigma, defaultNominator);
 	}
 
-
 	public static float[] generateDoubleDensityGaussianKernel(final int size, final float sigma) {
 		return floatGaussian2DKernel(size, sigma, densityNominator);
 	}
 
 	public static float[] generdateInputMatrix(final int size) {
+		float[] matrix = new float[size];
+		for (int i = 0; i < size; i++) {
+			matrix[i] = (float) random.nextDouble();
+		}
+		return matrix;
+	}
+
+	public static float[] generdateInputMatrix(final int size, int seed) {
+		Random random = new Random(seed);
+
 		float[] matrix = new float[size];
 		for (int i = 0; i < size; i++) {
 			matrix[i] = (float) random.nextDouble();

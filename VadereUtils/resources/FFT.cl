@@ -1,5 +1,8 @@
-__kernel void fft(const __global  float2 * g_data, __local float2 * l_data, uint points_per_group, uint size, int dir)
-{
+__kernel void fft(const __global float2 * g_data, __local float2 * l_data, uint size, int dir) {
+
+    int workitems_per_workgroup = get_local_size(0);
+    int number_of_workgroups = get_num_groups(0);
+    int points_per_group = size/number_of_workgroups;
     int points_per_item = points_per_group /  get_local_size(0);
     int l_addr = get_local_id(0) * points_per_item;
     int g_addr = get_group_id(0) * points_per_group + l_addr;
@@ -54,11 +57,8 @@ __kernel void fft(const __global  float2 * g_data, __local float2 * l_data, uint
             l_data[l_addr + N2] = x1 - l_data[l_addr + N2];
 
             for(int i = 1; i < N2; i++) {
-                //cosine = cos(M_PI_F * i/N2);
-                //sine = dir * sin(M_PI_F * i/N2);
-                sine = sincos(M_PI_F * i/N2,&cosine);
-                sine = dir*sine;
-
+                float param = (M_PI_F * i)/N2;
+                sine = sincos(param,&cosine);
                 wk = (float2) (
                     l_data[l_addr + N2 + i].s0 * cosine +
                     l_data[l_addr + N2 + i].s1 * sine,
@@ -80,10 +80,9 @@ __kernel void fft(const __global  float2 * g_data, __local float2 * l_data, uint
         angle = start % (N2*2);
 
         for(int i = start; i < start + points_per_item / 2; i++) {
-            //cosine = cos(M_PI_F * angle/N2);
-            //sine = dir * sin(M_PI_F * angle/N2);
-            sine = sincos(M_PI_F * i/N2,&cosine);
-            sine = dir*sine;
+            float param = M_PI_F * angle/N2;
+            sine = sincos(param,&cosine);
+            sine = direction*sine;
 
             wk = (float2) (
                 l_data[N2 + i].s0 * cosine +
@@ -98,13 +97,22 @@ __kernel void fft(const __global  float2 * g_data, __local float2 * l_data, uint
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
+    // write back into input
+    barrier(CLK_GLOBAL_MEM_FENCE);
 
     l_addr = get_local_id(0)*points_per_item; // address within one workitem
     g_addr = get_group_id(0)*points_per_group + l_addr;
 
+    float factor = (1/(float)N);
+    for (int i = 0; i < points_per_item; ++i) {
+        int index = g_addr+i;
 
-    printf("local_id %i ", points_per_item);
-
-
+        if (direction == 1) {
+            g_data[index] = l_data[l_addr+i];
+        } else { // inverse FFT
+            float2 val = l_data[l_addr+i];
+            g_data[index] = (float2)(factor*val.x,factor*val.y);
+        }
+    }
 
 }

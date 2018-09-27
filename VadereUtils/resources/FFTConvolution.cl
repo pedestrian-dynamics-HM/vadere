@@ -1,3 +1,41 @@
+__kernel void computeG(__global float2 *X, __global float2 *G, uint N) {
+
+    int k = get_global_id(0); // col
+
+    double sine = sin((2*M_PI*k)/(double)N);
+    double cosine = cos((2*M_PI*k)/(double)N);
+
+    double Ar, Ai, Br, Bi, X1r, X1i, X2r, X2i, Gr, Gi;
+
+    Ar = 0.5*(1 - sine);
+    Ai = 0.5*(-1*cosine);
+    Br = 0.5*(1 + sine);
+    Bi = 0.5*(1*cosine);
+
+    X1r = X[k].x;
+    X1i = X[k].y;
+
+    if (k > 0) {
+        X2r = X[(N/2 - k)].x;
+        X2i = X[(N/2 - k)].y;
+    } else {
+        X2r = X[0].x;
+        X2i = X[0].y;
+    }
+
+    Gr = X1r * Ar - X1i * Ai + X2r * Br + X2i * Bi;
+    Gi = X1i * Ar + X1r * Ai + X2r * Bi - X2i * Br;
+    G[k] = (float2)(Gr,Gi);
+
+    if (k == 0) {
+        G[N/2] = (float2)(X[0].x-X[0].y,0);
+    } else {
+        G[N - k] = (float2)(G[k].x,-G[k].y);
+    }
+
+}
+
+
 __kernel void fft2Dim(__global float2 *input,
                       __local float2 *local_data,
                       __global float2 *output,
@@ -26,7 +64,6 @@ __kernel void fft2Dim(__global float2 *input,
     uint mask_left, mask_right, shift_pos;
     float2 x1, x2, x3, x4;
 
-    #pragma unroll
     for(int i = 0; i < points_per_item; i += 4) {
         index = (uint4) (g_addr, g_addr + 1, g_addr + 2, g_addr + 3);
         mask_left = N / 2;
@@ -63,14 +100,12 @@ __kernel void fft2Dim(__global float2 *input,
         l_addr += 4;
     }
 
-
     float cosine, sine;
     float2 wk;
 
     for(int N2 = 4; N2 < points_per_item; N2 <<=1) {
         l_addr = get_local_id(0) * points_per_item;
 
-        #pragma unroll
         for(int fft_index = 0; fft_index < points_per_item; fft_index += 2*N2) {
             x1 = local_data[l_addr];
             local_data[l_addr] += local_data[l_addr + N2];
@@ -85,14 +120,15 @@ __kernel void fft2Dim(__global float2 *input,
                     local_data[l_addr + N2 + i].s1 * sine,
                     local_data[l_addr + N2 + i].s1 * cosine -
                     local_data[l_addr + N2 + i].s0 * sine);
+
                 local_data[l_addr + N2 + i] = local_data[l_addr + i] - wk;
                 local_data[l_addr + i] += wk;
             }
             l_addr += 2*N2;
+
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
-
 
     uint start, angle, stage;
     stage = 2;
@@ -127,6 +163,7 @@ __kernel void fft2Dim(__global float2 *input,
     g_addr = get_group_id(0)*points_per_group + l_addr;
 
     float factor = (1/(float)N);
+    //#pragma unroll 8
     for (int i = 0; i < points_per_item; ++i) {
 
         int index = g_addr+i;
@@ -158,6 +195,7 @@ __kernel void transpose(const __global float2 *matrix, __global float2 *output, 
 __kernel void multiply(const __global float2 *paddedMatrix, const __global float2 *paddedKernel, __global float2 *output,
     const uint height, const uint width) {
 
+
     int i = get_global_id(0); // row
     int j = get_global_id(1); // col
 
@@ -166,6 +204,7 @@ __kernel void multiply(const __global float2 *paddedMatrix, const __global float
     float2 m = paddedMatrix[index];
     float2 k = paddedKernel[j];
     output[indexTransposed] = (float2) (m.x * k.x - m.y * k.y, m.x * k.y + m.y*k.x);
+
 }
 
 // 1 dimensional FFT
@@ -174,7 +213,7 @@ __kernel void multiply(const __global float2 *paddedMatrix, const __global float
 
 __kernel void fft1Dim(__global float2 *input,
                       __local float2 *local_data,
-                      const uint N,
+                      uint N,
                       const int direction) {
 
     int g_id = get_global_id(0); // Returns the element of the work-item’s global ID for a given dimension
