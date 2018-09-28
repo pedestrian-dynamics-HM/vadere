@@ -2,6 +2,7 @@ package org.vadere.gui.projectview.view;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.SimulationResult;
@@ -40,11 +41,14 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 	public void postProjectRun(VadereProject project) {
 		LinkedList<SimulationResult> simulationResultList = project.getSimulationResults();
 		StringBuilder sb = new StringBuilder();
+
 		for (SimulationResult res : simulationResultList) {
-			sb.append(res.getScenarioName()).append(":\n")
-					.append("    Runtime: ").append(res.getRunTimeAsString()).append("\n")
-					.append("    Overlaps: ").append(res.getTotalOverlaps()).append("\n")
-					.append("    State: ").append(res.getState()).append("\n\n");
+			String[] headers = res.getHeaders();
+			String[] values = res.getAsTableRow();
+
+			for(int i = 0; i < headers.length; i++) {
+				sb.append("    " + headers[i] + ": ").append(values[i]).append("\n");
+			}
 		}
 
 
@@ -61,11 +65,6 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 	}
 
 	class ResultDialog extends JDialog {
-		private final String[] columnNames = {"Scenario_Name",
-				"Runtime",
-				"Overlaps",
-				"MaxOverlap",
-				"State"};
 		Button btnOk, btnCsv;
 		private JTable table;
 		JPanel main;
@@ -80,15 +79,15 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 			main = new JPanel();
 			main.setLayout(new BoxLayout(main, BoxLayout.PAGE_AXIS));
 
-			table = new JTable(getData(data), columnNames);
+			table = new JTable(getData(data), data.getFirst().getHeaders());
 			table.setFillsViewportHeight(true);
 			table.doLayout();
 			scrollPane = new JScrollPane(table);
 			main.add(scrollPane);
 
-			btnOk = new Button("Close");
+			btnOk = new Button(Messages.getString("SettingsDialog.btnClose.text"));
 			btnOk.addActionListener(this::btnOKListener);
-			btnCsv = new Button("Export csv");
+			btnCsv = new Button(Messages.getString("ProjectView.btnExpertCSV"));
 			btnPane = new JPanel();
 			btnCsv.addActionListener(this::btnCsvListener);
 			btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.LINE_AXIS));
@@ -102,7 +101,7 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 			c.add(main, BorderLayout.CENTER);
 			c.add(btnPane, BorderLayout.PAGE_END);
 
-			setTitle("Simulation Result");
+			setTitle(Messages.getString("ProjectView.label.simResults"));
 			setSize(600, 200);
 
 		}
@@ -124,11 +123,11 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 
 		private void btnCsvListener(ActionEvent actionEvent) {
 			StringBuilder sj = new StringBuilder();
-			SimulationResult.addCsvHeader(sj, ';');
-			data.forEach(i -> i.addCsvRow(sj, ';'));
+			SimulationResult.addCsvHeader(data.getFirst(), sj, ';');
+			data.forEach(simulationResult -> simulationResult.addCsvRow(sj, ';'));
 
 
-			FileDialog fd = new FileDialog(this, "Bitte eine Datei waehlen!", FileDialog.SAVE);
+			FileDialog fd = new FileDialog(this, Messages.getString("ProjectView.chooseFile"), FileDialog.SAVE);
 
 			fd.setVisible(true);
 			Path p = (Paths.get(fd.getDirectory()).resolve(fd.getFile()));

@@ -20,7 +20,7 @@ import java.util.Optional;
 
 
 @DataProcessorClass()
-public class NumberOverlapsProcessor extends DataProcessor<NoDataKey, Long> {
+public class NumberOverlapsProcessor extends NoDataKeyProcessor<Long> {
 	private PedestrianOverlapProcessor pedOverlapProc;
 
 
@@ -44,16 +44,10 @@ public class NumberOverlapsProcessor extends DataProcessor<NoDataKey, Long> {
 	}
 
 	@Override
-	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
-		result.setTotalOverlaps(this.getValue(NoDataKey.key()).intValue());
-	}
-
-	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesNumberOverlapsProcessor att = (AttributesNumberOverlapsProcessor) this.getAttributes();
 		this.pedOverlapProc = (PedestrianOverlapProcessor) manager.getProcessor(att.getPedestrianOverlapProcessorId());
-
 	}
 
 

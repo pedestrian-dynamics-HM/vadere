@@ -52,6 +52,7 @@ public class TrajectoryReader {
 	private Set<String> yKeys;
 	private Set<String> targetIdKeys;
 	private Set<String> groupIdKeys;
+	private Set<String> groupSizeKeys;
 
 
 	private int pedIdIndex;
@@ -60,6 +61,7 @@ public class TrajectoryReader {
 	private int yIndex;
 	private int targetIdIndex;
 	private int groupIdIndex;
+	private int groupSizeIndex;
 
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
 		this(trajectoryFilePath, scenario.getAttributesPedestrian());
@@ -78,6 +80,7 @@ public class TrajectoryReader {
 		yKeys = new HashSet<>();
 		targetIdKeys = new HashSet<>();
 		groupIdKeys = new HashSet<>();
+		groupSizeKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
@@ -88,6 +91,7 @@ public class TrajectoryReader {
 		yKeys.add("y");
 		targetIdKeys.add("targetId");
 		groupIdKeys.add("groupId");
+		groupSizeKeys.add("groupSize");
 
 		pedIdIndex = -1;
 		stepIndex = -1;
@@ -95,6 +99,7 @@ public class TrajectoryReader {
 		yIndex = -1;
 		targetIdIndex = -1;
 		groupIdIndex = -1;
+		groupSizeIndex = -1;
 
 	}
 
@@ -120,6 +125,9 @@ public class TrajectoryReader {
 				targetIdIndex = index;
 			} else if (groupIdKeys.contains(columns[index])){
 				groupIdIndex = index;
+			}
+			else if (groupSizeKeys.contains(columns[index])){
+				groupSizeIndex = index;
 			}
 		}
 		try {
@@ -204,8 +212,9 @@ public class TrajectoryReader {
 		ped.setTargets(targets);
 
 		if(groupIdIndex != -1) {
-			int groupId = targetIdIndex != -1 ? Integer.parseInt(rowTokens[groupIdIndex]) : -1;
-			ped.addGroupId(groupId);
+			int groupId = groupIdIndex != -1 ? Integer.parseInt(rowTokens[groupIdIndex]) : -1;
+			int groupSize = groupSizeIndex != -1 ? Integer.parseInt(rowTokens[groupSizeIndex]) : -1;
+			ped.addGroupId(groupId, groupSize);
 		}
 
 		return Pair.create(new Step(step), ped);

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @author Mario Teixeira Parente
  */
 @DataProcessorClass()
-public class MeanPedestrianEvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
+public class MeanPedestrianEvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
 	private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 
 	public MeanPedestrianEvacuationTimeProcessor() {

@@ -45,7 +45,6 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 	public String[] toStrings(TimestepPedestrianIdKey key) {
 		VPoint p = this.getValue(key);
 		if(p == null) {
-			System.out.println("wtf?");
 			return new String[]{Double.toString(0), Double.toString(0)};
 		}
 		else {

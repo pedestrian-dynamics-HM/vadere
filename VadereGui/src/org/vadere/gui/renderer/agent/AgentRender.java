@@ -9,6 +9,7 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.*;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -16,6 +17,7 @@ public class AgentRender implements Renderer {
 
 	private static Logger logger = LogManager.getLogger(AgentRender.class);
 	private static final Integer COLOR_NUM = 9;
+	private Random random;
 
 	private final SimulationModel model;
 	private final Color defaultColor;
@@ -26,6 +28,7 @@ public class AgentRender implements Renderer {
 		this.defaultColor = model.config.getPedestrianDefaultColor();
 		this.colorMap = new ConcurrentHashMap<>();
 		this.colorMap.put(-1, defaultColor);
+		this.random = new Random();
 	}
 
 	@Override
@@ -57,13 +60,14 @@ public class AgentRender implements Renderer {
 	}
 
 	private Color getHSBColor(int groupId) {
-		float hue = ((float) (groupId) / COLOR_NUM);
+//		float hue = ((float) (groupId) / COLOR_NUM);
+		float hue = random.nextFloat();
 //		System.out.printf("groupId: %d | hue: %f%n",groupId, hue);
 		return new Color(Color.HSBtoRGB(hue, 1f, 0.75f));
 	}
 
 	public Color getGroupColor(Pedestrian ped) {
-		if (ped.getGroupIds().isEmpty()) {
+		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() <= 1)) {
 			return defaultColor;
 		}
 
@@ -77,7 +81,7 @@ public class AgentRender implements Renderer {
 	}
 
 	public VShape getShape(Pedestrian ped) {
-		if (ped.getGroupIds().isEmpty()) {
+		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() <= 1)) {
 			return ped.getShape();
 		} else if (ped.getGroupIds().getFirst() == 1) {
 			return ped.getShape();
