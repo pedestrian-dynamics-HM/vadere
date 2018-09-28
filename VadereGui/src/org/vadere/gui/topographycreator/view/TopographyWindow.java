@@ -125,14 +125,6 @@ public class TopographyWindow extends JPanel {
 		int windowHeight = screenSize.height - 250;
 		int windowWidth = screenSize.width - 250;
 
-		JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
-		infoButton.setBorderPainted(false);
-		infoButton.addActionListener(e -> {
-			JOptionPane.showMessageDialog(null,
-					"Scenario Creator\nVersion: 2.0\nCooperation: Hochschule München", "About",
-					JOptionPane.INFORMATION_MESSAGE);
-		});
-
 		/* basic action */
 		final TopographyAction basicAction = new ActionBasic("notify", panelModel);
 
@@ -313,7 +305,7 @@ public class TopographyWindow extends JPanel {
 		/* Makros */
 		ActionTopographyMakroMenu actionTopographyMakroMenu =
 				new ActionTopographyMakroMenu("TopographyMakros",
-						new ImageIcon(Resources.class.getResource("/icons/setting32x32.png")),
+						new ImageIcon(Resources.class.getResource("/icons/auto_generate_ids.png")),
 						panelModel);
 
 		/* Topography checker*/
@@ -359,8 +351,6 @@ public class TopographyWindow extends JPanel {
 		toolbar.add(Box.createHorizontalGlue());
 		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnMakro.tooltip");
 		addActionToToolbar(toolbar, actionTopographyCheckerMenu, "TopographyCreator.btnChecker.tooltip");
-		toolbar.add(infoButton);
-		infoButton.setToolTipText("About");
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 

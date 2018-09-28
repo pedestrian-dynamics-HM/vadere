@@ -1,67 +1,32 @@
 {
-  "name" : "rimea_07_speeds_nelder_mead",
+  "name" : "group_OSM_2Sources1Place_2Group_and_3Group",
   "description" : "",
   "release" : "0.6",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "evacuationTime.txt",
-      "processors" : [ 1 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "tests.txt",
-      "processors" : [ 4 ]
+      "processors" : [ 1, 2, 3 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
-      "id" : 1,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
-      "attributes" : {
-        "pedestrianStartTimeProcessorId" : 2
-      }
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 1
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
       "id" : 3
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianEvacuationTimeProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianEvacuationTimeProcessor",
-      "attributes" : {
-        "expectedResult" : "SUCCESS",
-        "pedestrianEvacuationTimeProcessorId" : 1,
-        "maximalEvacuationTime" : 220.0,
-        "minimalEvacuationTime" : 50.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 5
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
-      "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 5
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 7,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 5
-      }
     } ],
     "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
+      },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
@@ -81,13 +46,13 @@
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
-        "numberOfCircles" : 8,
-        "varyStepDirection" : true,
+        "numberOfCircles" : 1,
+        "varyStepDirection" : false,
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "NELDER_MEAD",
+        "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
@@ -96,7 +61,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.groups.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -110,38 +75,74 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 120.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 0
     },
     "topography" : {
       "attributes" : {
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 112.0,
-          "height" : 55.0
+          "width" : 50.0,
+          "height" : 10.0
         },
-        "boundingBoxWidth" : 1.0,
+        "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "x" : 11.0,
+          "y" : 0.3,
+          "width" : 8.0,
+          "height" : 5.6,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 23.2,
+          "y" : 3.0,
+          "width" : 10.9,
+          "height" : 6.5,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 4.5,
+          "y" : 4.6,
+          "width" : 3.2,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 37.1,
+          "y" : 4.6,
+          "width" : 3.2,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 105.0,
-          "y" : 2.5,
-          "width" : 5.0,
-          "height" : 50.0,
+          "x" : 41.1,
+          "y" : 3.2,
+          "width" : 1.0,
+          "height" : 4.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -153,24 +154,44 @@
         "nextSpeed" : -1.0
       } ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 1,
         "shape" : {
           "x" : 2.0,
-          "y" : 2.0,
-          "width" : 2.0,
-          "height" : 50.0,
+          "y" : 1.0,
+          "width" : 1.0,
+          "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
-        "spawnNumber" : 10,
-        "maxSpawnNumberTotal" : -1,
+        "distributionParameters" : [ 0.1 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : 100,
         "startTime" : 0.0,
-        "endTime" : 100.0,
+        "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN"
+      }, {
+        "id" : 1,
+        "shape" : {
+          "x" : 2.0,
+          "y" : 6.0,
+          "width" : 1.0,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : 100,
+        "startTime" : 0.0,
+        "endTime" : 200.0,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 0.0, 1.0, 0.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],
@@ -178,12 +199,27 @@
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.0,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "attributesCar" : null
+      "attributesCar" : {
+        "id" : -1,
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.0,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
+        "acceleration" : 2.0,
+        "length" : 4.5,
+        "width" : 1.7,
+        "direction" : {
+          "x" : 1.0,
+          "y" : 0.0
+        }
+      }
     }
   }
 }

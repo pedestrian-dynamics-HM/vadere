@@ -227,7 +227,8 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
         SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
 
-		toolbar.addSeparator();
+		toolbar.add(Box.createHorizontalGlue());
+
 		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog,
 				Messages.getString("ProjectView.btnSettings.tooltip"));
 
