@@ -36,23 +36,35 @@ public class ActionRecording extends ActionVisualization {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		try {
-			if (button != null) {
-				if (model.config.isRecording()) {
-					button.setIcon(resources.getIcon("record.png", iconWidth, iconHeight));
+		if (button != null) {
+			if (model.config.isRecording()) {
+				try {
 					recorder.stopRecording();
-				} else {
-					ImageSizeDialog imageSizeDialog = new ImageSizeDialog(model);
-					if (imageSizeDialog.getState() == ImageSizeDialog.State.Ok) {
-						button.setIcon(resources.getIcon("stop_record.png", iconWidth, iconHeight));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					logger.warn("recording failed.");
+				}
+				finally {
+					button.setIcon(resources.getIcon("record.png", iconWidth, iconHeight));
+					model.config.setRecording(!model.config.isRecording());
+				}
+
+			} else {
+				ImageSizeDialog imageSizeDialog = new ImageSizeDialog(model);
+				if (imageSizeDialog.getState() == ImageSizeDialog.State.Ok) {
+					try {
 						recorder.startRecording(imageSizeDialog.getImageBound());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						logger.warn("start recording failed.");
+					}
+					finally {
+						button.setIcon(resources.getIcon("stop_record.png", iconWidth, iconHeight));
+						model.config.setRecording(!model.config.isRecording());
 					}
 				}
-				model.config.setRecording(!model.config.isRecording());
 			}
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			logger.error(ioe.getMessage());
+
 		}
 	}
 
