@@ -107,6 +107,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 */
 	private final IMesh<P, V, E, F> mesh;
 
+	private boolean initialized;
+
+	private boolean refinementFinished;
+
+	private double minEdgeLength;
+
 	/**
 	 * The defaul constructor.
 	 *
@@ -121,13 +127,17 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
+			final double minEdgeLength,
 			final IDistanceFunction distFunc,
 			final Collection<P> fixPoints) {
 
 		this.meshSupplier = meshSupplier;
+		this.initialized = false;
+		this.refinementFinished = false;
 	    this.distFunc = distFunc;
 		this.boundary = boundary;
 		this.lenFunc = lenFunc;
+		this.minEdgeLength = minEdgeLength;
 		this.bbox = bound;
 		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
@@ -140,17 +150,19 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			final IMeshSupplier<P, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
+			final double minEdgeLength,
 			final IDistanceFunction distFunc,
 			final Collection<P> fixPoints) {
-		this(meshSupplier, bound, new ArrayList<>(), lenFunc, distFunc, fixPoints);
+		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc, fixPoints);
 	}
 
 	public UniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
+			final double minEdgeLength,
 			final IDistanceFunction distFunc) {
-		this(meshSupplier, bound, new ArrayList<>(), lenFunc, distFunc, new ArrayList<>());
+		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc, new ArrayList<>());
 	}
 
 	/**
@@ -161,6 +173,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 * @return a triangulation consisting of two triangles containing the bounding box
 	 */
     public ITriangulation<P, V, E, F> init() {
+	    initialized = true;
     	double xMin = bbox.getMinX();
 	    double yMin = bbox.getMinY();
 
@@ -292,7 +305,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 				refine(edge);
 			}
 		}
-		finished = tFinished;
+		refinementFinished = tFinished;
 		candidates = newCandidates;
 	}
 
@@ -305,7 +318,17 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	}
 
     public void step() {
-	    nextSFCLevel();
+		if(!initialized) {
+			init();
+			initialized = true;
+		}
+
+		if(!refinementFinished) {
+			nextSFCLevel();
+		}
+		else if(!finished) {
+			finish();
+		}
     }
 
 	/**
@@ -392,8 +415,9 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 
 			// insert special fix points
 	        // TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
-			triangulation.insert(fixPoints);
+			//triangulation.insert(fixPoints);
 
+			insertFixPoints(fixPoints);
 			triangulation.finish();
 			shrinkBorder();
 			createHoles();
@@ -423,11 +447,23 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		for(P fixPoint : fixPoints) {
 			Optional<F> optFace = triangulation.locateFace(fixPoint);
 			if(optFace.isPresent()) {
-
-				for(P q : getMesh().getPointIt(optFace.get())) {
-					//if(Math.abs(distFunc.andThen(q) - distFunc.apply(fixPoint)))
+				V closestPoint = null;
+				double distance = Double.MAX_VALUE;
+				for(V v : getMesh().getVertexIt(optFace.get())) {
+					P q = getMesh().getPoint(v);
+					double tmpDistance = Math.abs(distFunc.apply(q)- distFunc.apply(fixPoint));
+					if(closestPoint == null ||  tmpDistance < distance) {
+						closestPoint = v;
+						distance = tmpDistance;
+					}
 				}
 
+				if(closestPoint != null && distance < minEdgeLength) {
+					triangulation.replacePoint(closestPoint, fixPoint);
+				}
+				else {
+					triangulation.insert(fixPoint);
+				}
 			}
 		}
     }
@@ -532,7 +568,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 */
 	private boolean isSmallEnough(@NotNull final E edge) {
 		VLine line = getMesh().toLine(edge);
-		return (line.length() <= lenFunc.apply(line.midPoint()));
+		return (line.length() <= lenFunc.apply(line.midPoint()) * minEdgeLength);
 	}
 
 	/**

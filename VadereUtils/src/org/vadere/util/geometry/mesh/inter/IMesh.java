@@ -325,7 +325,20 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	void destroyEdge(@NotNull E edge);
 	void destroyVertex(@NotNull V vertex);
 
-	List<F> getFaces();
+	default List<F> getFaces() {
+		return streamFaces().filter(face -> !isBoundary(face)).filter(face -> !isDestroyed(face)).collect(Collectors.toList());
+	}
+
+	void setPoint(@NotNull final V vertex, @NotNull final P point);
+
+	default List<P> getPoints(V vertex) {
+		List<P> points = new ArrayList<>();
+		for(V v : getAdjacentVertexIt(vertex)) {
+			points.add(getPoint(v));
+		}
+
+		return points;
+	}
 
 	List<F> getFacesWithHoles();
 

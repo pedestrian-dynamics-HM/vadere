@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IMeshImprover<P, V, E, F>, ITriangulator<P, V, E, F> {
 
 	private boolean illegalMovement = false;
+	private UniformRefinementTriangulatorSFC triangulatorSFC;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
 	private ITriangulation<P, V, E, F> triangulation;
@@ -77,20 +78,15 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 
         log.info("##### (start) generate a triangulation #####");
 		Set<P> fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
-        ITriangulator<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+		triangulatorSFC = new UniformRefinementTriangulatorSFC(
 		        meshSupplier,
                 bound,
                 obstacleShapes,
-                p -> edgeLengthFunc.apply(p) * initialEdgeLen,
+                edgeLengthFunc,
+				initialEdgeLen,
                 distanceFunc,
 		        fixPoints);
-        triangulation = uniformRefinementTriangulation.generate();
-		triangulation.getMesh().streamPoints().filter(p -> fixPoints.contains(p)).forEach(p -> p.setFixPoint(true));
-
-        /**
-		 *  We move points and flip edges. Therefore only the BASE pointlocator is feasible.
-		 */
-        triangulation.setPointLocator(IPointLocator.Type.JUMP_AND_WALK);
+        triangulation = triangulatorSFC.init();
         log.info("##### (end) generate a triangulation #####");
 	}
 
@@ -112,29 +108,53 @@ public class PSMeshing<P extends MeshPoint, V extends IVertex<P>, E extends IHal
 		this.splitEdges = new ArrayList<>();
 
 		log.info("##### (start) generate a triangulation #####");
-		Set<P> fixPoints = new HashSet<>();
-		/*Set<P> fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
-		addFixPoints(meshSupplier.get(), boundary, fixPoints);*/
+		//Set<P> fixPoints = new HashSet<>();
+		Set<P> fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
+		addFixPoints(meshSupplier.get(), boundary, fixPoints);
 
-		ITriangulator<P, V, E, F> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+		triangulatorSFC = new UniformRefinementTriangulatorSFC(
 				meshSupplier,
 				bound,
 				obstacleShapes,
-				p -> edgeLengthFunc.apply(p) * initialEdgeLen,
+				edgeLengthFunc,
+				initialEdgeLen,
 				distanceFunc,
 				fixPoints);
-		triangulation = uniformRefinementTriangulation.generate();
-		triangulation.getMesh().streamPoints().filter(p -> fixPoints.contains(p)).forEach(p -> p.setFixPoint(true));
+		triangulation = triangulatorSFC.init();
 
-		/**
-		 *  We move points and flip edges. Therefore only the BASE pointlocator is feasible.
-		 */
-		triangulation.setPointLocator(IPointLocator.Type.JUMP_AND_WALK);
 		log.info("##### (end) generate a triangulation #####");
+	}
+
+	public void step() {
+		if(!triangulatorSFC.isFinished()) {
+			stepInitialize();
+		}
+		else {
+			improve();
+		}
+	}
+
+	public void initialize() {
+		while (!triangulatorSFC.isFinished()) {
+			stepInitialize();
+		}
+	}
+
+	public void stepInitialize() {
+		triangulatorSFC.step();
+	}
+
+	public boolean initializationFinished() {
+		return triangulatorSFC.isFinished();
 	}
 
 	@Override
 	public ITriangulation<P, V, E, F> generate() {
+
+		if(!initializationFinished()) {
+			initialize();
+		}
+
 		double quality = getQuality();
 		//log.info("quality: " + quality);
 		while (quality < Parameters.qualityMeasurement && nSteps < MAX_STEPS) {

@@ -32,7 +32,7 @@ public class TestUniTriangulation extends JFrame {
 	    IMeshSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> new AMesh<>(pointConstructor);
 
         UniformRefinementTriangulatorSFC<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 1.5, distanceFunc, new ArrayList<>());
+                new UniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 1.0, 1.5, distanceFunc, new ArrayList<>());
 
 	    ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
         PSMeshingPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> distmeshPanel =

@@ -69,21 +69,24 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 	public void update(Graphics g) {
     	// TODO clone it!
 		synchronized (mesh) {
-			faces = mesh.clone().getFaces();
+			refresh();
 			super.update(g);
 		}
 
 	}
 
-	@Override
-	public void paint(Graphics g) {
-    	// double buffering => draw into an image
-		Graphics2D graphics2D = (Graphics2D) g;
+	public void refresh() {
+		synchronized (mesh) {
+			faces = mesh.clone().getFaces();
+		}
+	}
+
+	public BufferedImage getImage() {
 		BufferedImage image = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
 
 		graphics.setColor(Color.WHITE);
-		graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
+		graphics.fill(new VRectangle(0, 0, width, height));
 		Font currentFont = graphics.getFont();
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
 		graphics.setFont(newFont);
@@ -114,7 +117,14 @@ public class PSMeshingPanel<P extends IPoint, V extends IVertex<P>, E extends IH
 			graphics.draw(polygon);
 		}
 
-		graphics2D.drawImage(image, 0, 0, null);
+		return image;
+	}
+
+	@Override
+	public void paint(Graphics g) {
+    	// double buffering => draw into an image
+		Graphics2D graphics2D = (Graphics2D) g;
+		graphics2D.drawImage(getImage(), 0, 0, null);
 	}
 
 	public JFrame display() {

@@ -337,8 +337,8 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public synchronized List<AFace<P>> getFaces() {
-		return streamFaces().filter(f -> !isDestroyed(f)).filter(f -> !isBoundary(f)).collect(Collectors.toList());
+	public void setPoint(AVertex<P> vertex, P point) {
+		vertex.setPoint(point);
 	}
 
 	@Override

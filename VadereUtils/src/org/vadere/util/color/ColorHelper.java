@@ -38,6 +38,11 @@ public class ColorHelper {
 		}
 	}
 
+	public static Color numberToHurColor(final float hue) {
+//		System.out.printf("groupId: %d | hue: %f%n",groupId, hue);
+		return new Color(Color.HSBtoRGB(hue, 1f, 0.75f));
+	}
+
 	public int getMaxValue() {
 		return maxValue;
 	}

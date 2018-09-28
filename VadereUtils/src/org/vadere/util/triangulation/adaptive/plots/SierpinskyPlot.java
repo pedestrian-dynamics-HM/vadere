@@ -49,7 +49,8 @@ public class SierpinskyPlot {
 				supplier,
 				bbox,
 				obstacles,
-				p -> edgeLengthFunc.apply(p) * initialEdgeLength,
+				edgeLengthFunc,
+				initialEdgeLength,
 				distanceFunc,
 				new ArrayList<>());
 

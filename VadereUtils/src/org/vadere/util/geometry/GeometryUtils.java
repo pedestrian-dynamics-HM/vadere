@@ -933,7 +933,7 @@ public class GeometryUtils {
 	 * @param points a list of points in order
 	 * @return a polygon
 	 */
-	public static VPolygon toPolygon(@NotNull final List<? extends VPoint> points) {
+	public static VPolygon toPolygon(@NotNull final List<? extends IPoint> points) {
 		assert points.size() >= 3;
 		if(points.size() < 3) {
 			throw new IllegalArgumentException("more than 2 points are required to form a valid polygon.");
@@ -959,7 +959,7 @@ public class GeometryUtils {
 	 * @param points an array / list of points in order
 	 * @return a polygon
 	 */
-	public static VPolygon toPolygon(@NotNull final VPoint ... points) {
+	public static VPolygon toPolygon(@NotNull final IPoint ... points) {
 		assert points.length >= 3;
 		if(points.length < 3) {
 			throw new IllegalArgumentException("more than 2 points are required to form a valid polygon.");

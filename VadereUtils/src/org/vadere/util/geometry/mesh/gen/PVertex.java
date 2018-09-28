@@ -25,6 +25,10 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		this.lock = new ReentrantLock();
 	}
 
+	public void setPoint(P point) {
+		this.point = point;
+	}
+
 	@Override
 	public P getPoint() {
 		return point;

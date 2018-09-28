@@ -324,6 +324,11 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
+	public void setPoint(PVertex<P> vertex, P point) {
+		vertex.setPoint(point);
+	}
+
+	@Override
 	public Stream<PHalfEdge<P>> streamEdges() {
 		return edges.stream().filter(e -> !isDestroyed(e));
 	}
@@ -344,11 +349,6 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public Iterable<PHalfEdge<P>> getEdgeIt() {
 		return () -> edges.iterator();
-	}
-
-	@Override
-	public List<PFace<P>> getFaces() {
-		return streamFaces().filter(face -> !face.isBoundary()).filter(face -> !face.isDestroyed()).collect(Collectors.toList());
 	}
 
 	@Override

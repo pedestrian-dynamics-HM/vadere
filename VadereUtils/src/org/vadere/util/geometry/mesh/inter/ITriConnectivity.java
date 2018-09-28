@@ -52,6 +52,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return ()  -> new Ring1Iterator<>(getMesh(), getMesh().getEdge(vertex));
 	}
 
+	default void replacePoint(V vertex, P point) {
+		assert GeometryUtils.toPolygon(getMesh().getPoint(vertex)).contains(point);
+		getMesh().setPoint(vertex, point);
+	}
+
 	/**
 	 * Inserts a point into the mesh which is contained in the boundary. The point will be
 	 * connected by the start and end point of the edge. Note that the user has to make sure

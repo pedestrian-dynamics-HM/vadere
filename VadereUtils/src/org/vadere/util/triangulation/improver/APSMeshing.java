@@ -5,6 +5,8 @@ import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AMesh;
 import org.vadere.util.geometry.mesh.gen.AVertex;
+import org.vadere.util.geometry.mesh.gen.PMesh;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
@@ -26,4 +28,12 @@ public class APSMeshing extends PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEd
         super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
 		        () -> new AMesh<>((x, y) -> new MeshPoint(x, y, false)));
     }
+
+	public APSMeshing(
+			@NotNull VPolygon polygon,
+			double initialEdgeLen,
+			@NotNull Collection<? extends VShape> obstacleShapes) {
+		super(polygon, initialEdgeLen, obstacleShapes,
+				() -> new AMesh<>((x, y) -> new MeshPoint(x, y, false)));
+	}
 }

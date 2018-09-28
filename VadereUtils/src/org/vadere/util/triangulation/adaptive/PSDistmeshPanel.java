@@ -38,9 +38,7 @@ public class PSDistmeshPanel extends Canvas {
 		this.predicate = predicate;
 	}
 
-	@Override
-	public void paint(Graphics g) {
-		Graphics2D graphics2D = (Graphics2D) g;
+	public BufferedImage getImage() {
 		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
 
@@ -73,7 +71,13 @@ public class PSDistmeshPanel extends Canvas {
 			graphics.setColor(Color.GRAY);
 			graphics.draw(triangle);
 		}
-		graphics2D.drawImage(image, 0, 0, null);
+		return image;
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		Graphics2D graphics2D = (Graphics2D) g;
+		graphics2D.drawImage(getImage(), 0, 0, null);
 	}
 
 	public JFrame display() {
