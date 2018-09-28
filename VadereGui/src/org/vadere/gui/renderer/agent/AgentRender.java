@@ -67,7 +67,7 @@ public class AgentRender implements Renderer {
 	}
 
 	public Color getGroupColor(Pedestrian ped) {
-		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() <= 1)) {
+		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
 			return defaultColor;
 		}
 
@@ -81,7 +81,7 @@ public class AgentRender implements Renderer {
 	}
 
 	public VShape getShape(Pedestrian ped) {
-		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() <= 1)) {
+		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
 			return ped.getShape();
 		} else if (ped.getGroupIds().getFirst() == 1) {
 			return ped.getShape();
