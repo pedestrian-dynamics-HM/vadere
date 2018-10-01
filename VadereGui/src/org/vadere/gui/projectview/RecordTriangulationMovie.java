@@ -55,15 +55,19 @@ public class RecordTriangulationMovie {
 				bbound,
 				obstacleShapes);
 
-		Function<AFace<MeshPoint>, Color> colorFunction = f -> {
+		Function<AFace<MeshPoint>, Color> colorFunction1 = f -> {
 			float q = Math.max(0.0f, Math.min(1.0f, (float) meshImprover.faceToQuality(f)));
 			return new Color(q, q, q);
+		};
+
+		Function<AFace<MeshPoint>, Color> colorFunction2 = f -> {
+			return ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		};
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
 		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(
-		meshImprover.getMesh(), f -> false, bbound.getWidth()*1000, bbound.getHeight()*1000, bbound, colorFunction);
+		meshImprover.getMesh(), f -> false, bbound.getWidth()*1000, bbound.getHeight()*1000, bbound, colorFunction1);
 
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
@@ -87,14 +91,14 @@ public class RecordTriangulationMovie {
 
 			distmeshPanel.refresh();
 			if(!meshImprover.initializationFinished()) {
-				addPictures(recorder, distmeshPanel, 1);
+				addPictures(recorder, distmeshPanel, 10);
 			}
 			else if(finished) {
 				finished = false;
-				addPictures(recorder, distmeshPanel, 2);
+				addPictures(recorder, distmeshPanel, 20);
 			}
 
-			addPictures(recorder, distmeshPanel, 1);
+			addPictures(recorder, distmeshPanel, 5);
 
 
 			/*try {
