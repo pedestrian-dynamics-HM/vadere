@@ -124,7 +124,7 @@ public class ReynoldsSteeringModel implements MainModel {
 	}
 
 	private Pedestrian create(@NotNull final VPoint position, @NotNull final AttributesAgent attributesAgent) {
-		Pedestrian pedestrian = new PedestrianReynolds(attributesPedestrian, random);
+		Pedestrian pedestrian = new PedestrianReynolds(attributesAgent, random);
 		pedestrian.setPosition(position);
 		return pedestrian;
 	}
