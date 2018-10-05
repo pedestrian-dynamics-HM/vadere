@@ -283,6 +283,7 @@ public class GeometryUtils {
 
 	/**
 	 * Returns true if q is left of the oriented-line defined by (p1, p2).
+	 *
 	 * @param p1
 	 * @param p2
 	 * @param q
@@ -292,6 +293,14 @@ public class GeometryUtils {
 		return isLeftOf(p1, p2, q.getX(), q.getY());
 	}
 
+	/**
+	 *
+	 * @param p1
+	 * @param p2
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public static boolean isRightOf(final IPoint p1, final IPoint p2, final double x, final double y) {
 		return isCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
@@ -948,6 +957,39 @@ public class GeometryUtils {
 		}
 
 		return new VPolygon(path2D);
+	}
+
+	/**
+	 * This method removes duplicated and co-linear points from a list (p1, ..., pn) of points which form a simple polygon.
+	 * Assumption: p1 - ... - pn forms a simple polygon.
+	 *
+	 * @param points points of a polygon.
+	 *
+	 * @return a list of points forming a simple polygon such that there are no duplicated or co-linear points.
+	 */
+	public static List<VPoint> filterUselessPoints(@NotNull final List<VPoint> points, final double eps) {
+		assert points.size() >= 3;
+		List<VPoint> filteredList = new ArrayList<>(points);
+
+		boolean removePoint = false;
+
+		do {
+			removePoint = false;
+			for(int i = 0; i < filteredList.size(); i++) {
+
+				VPoint p1 = filteredList.get((i + filteredList.size()-1) % filteredList.size());
+				VPoint p2 = filteredList.get(i);
+				VPoint p3 = filteredList.get((i + 1) % filteredList.size());
+
+				if(p2.equals(p1) || p2.equals(p3) || GeometryUtils.distanceToLineSegment(p1, p3, p2) <= eps) {
+					filteredList.remove(i);
+					removePoint = true;
+					break;
+				}
+			}
+		} while (removePoint);
+
+		return filteredList;
 	}
 
 	/**

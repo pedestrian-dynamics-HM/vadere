@@ -6,8 +6,6 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.debug.gui.DebugGui;
 import org.vadere.util.debug.gui.canvas.SimpleTriCanvas;
-import org.vadere.util.debug.gui.canvas.WalkCanvas;
-import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -19,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 //TODO: check unused methods!
 /**
@@ -1119,7 +1116,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				/**
 				 * Good case (2.2) There are two collinear points but the face contains p => p lies on an edge of the face.
 				 */
-				if(contains(p.getX(), p.getY(), face) || getMesh().isMember(face, p.getX(), p.getY())) {
+				if(contains(p.getX(), p.getY(), face) || getMesh().isCloseTo(face, p.getX(), p.getY())) {
 					//log.debug("no intersection line and not contained.");
 					return Optional.empty();
 				}
@@ -1549,7 +1546,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @return
 	 */
 	/*default boolean contains(F face, double x, double y) {
-		if(isMember(face, x, y)) {
+		if(isCloseTo(face, x, y)) {
 			return true;
 		}
 

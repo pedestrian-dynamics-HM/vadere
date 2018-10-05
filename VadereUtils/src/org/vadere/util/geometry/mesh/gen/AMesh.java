@@ -4,10 +4,14 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.mesh.inter.IFace;
+import org.vadere.util.geometry.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
+import org.vadere.util.geometry.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.SpaceFillingCurve;
@@ -342,23 +346,8 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public List<AFace<P>> getFacesWithHoles() {
-		return streamFaces().filter(face -> !face.isDestroyed()).collect(Collectors.toList());
-	}
-
-	@Override
-	public List<AHalfEdge<P>> getBoundaryEdges() {
-		return streamEdges().filter(edge -> isBoundary(edge)).collect(Collectors.toList());
-	}
-
-	@Override
-	public List<AVertex<P>> getBoundaryVertices() {
-		return streamEdges().filter(edge -> isBoundary(edge)).map(edge -> getVertex(edge)).collect(Collectors.toList());
-	}
-
-	@Override
 	public Stream<AFace<P>> streamFaces(@NotNull Predicate<AFace<P>> predicate) {
-		return faces.stream().filter(f -> !f.isDestroyed()).filter(predicate);
+		return faces.stream().filter(f -> isAlive(f)).filter(predicate);
 	}
 
 	@Override
@@ -389,11 +378,6 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	@Override
 	public Iterable<AHalfEdge<P>> getEdgeIt() {
 		return () -> streamEdges().iterator();
-	}
-
-	@Override
-	public List<AVertex<P>> getVertices() {
-		return streamVertices().collect(Collectors.toList());
 	}
 
 	@Override
@@ -722,5 +706,16 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		}
 
 		assert (getNumberOfVertices() == vertices.size()) && (getNumberOfEdges() == edges.size()) && (getNumberOfFaces() == faces.size()-holes.size());
+	}
+
+	/**
+	 * Creates a very simple mesh consisting of two triangles ((-100, 0), (100, 0), (0, 1)) and ((0, -1), (-100, 0), (100, 0)).
+	 *
+	 * @return the created mesh
+	 */
+	public static AMesh<MPoint> createSimpleTriMesh() {
+		AMesh<MPoint> mesh = new AMesh<>((x1, y1) -> new MPoint(x1, y1));
+		IMesh.createSimpleTriMesh(mesh);
+		return mesh;
 	}
 }

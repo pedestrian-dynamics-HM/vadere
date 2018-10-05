@@ -118,7 +118,6 @@ public class RecordTriangulationMovie {
 		recorder.stopRecording();
 	}
 
-
 	public static void addPictures(Recorder recorder,
 	                               PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel,
 	                               int frames) throws IOException {

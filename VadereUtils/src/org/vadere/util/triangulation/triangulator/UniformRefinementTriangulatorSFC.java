@@ -490,7 +490,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		if(!getMesh().isAtBoundary(edge)) {
 			E longestEdge1 = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
 			E longestEdge2 = getMesh().streamEdges(getMesh().getTwinFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
-			return getMesh().isSame(longestEdge1, edge) && getMesh().isSame(longestEdge2, edge);
+			return getMesh().isSameLineSegment(longestEdge1, edge) && getMesh().isSameLineSegment(longestEdge2, edge);
 		} // the edge is part of one face
 	    else {
 			if(getMesh().isBoundary(edge)) {
@@ -498,7 +498,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 			}
 
 			E longestEdge = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
-			return getMesh().isSame(longestEdge, edge);
+			return getMesh().isSameLineSegment(longestEdge, edge);
 		}
     }
 

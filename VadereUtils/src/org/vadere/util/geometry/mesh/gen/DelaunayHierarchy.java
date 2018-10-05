@@ -368,7 +368,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 				.filter(f -> !tri.getMesh().isBoundary(f))
 				.filter(f ->
 					tri.contains(point.getX(), point.getY(), f) ||
-					tri.isMember(point.getX(), point.getY(), f, tolerance)
+					tri.isCloseTo(point.getX(), point.getY(), f, tolerance)
 				).findAny().get();*/
 
 		//log.debug(point + " is contained in " + tri.getMesh().toPath(face));

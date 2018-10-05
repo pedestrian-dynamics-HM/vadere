@@ -700,7 +700,7 @@ public class CLDistMeshHE<P extends IPoint> {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        AMesh<MPoint> mesh = IFace.createSimpleTriMesh();
+        AMesh<MPoint> mesh = AMesh.createSimpleTriMesh().createSimpleTriMesh();
         log.info("before");
         Collection<AVertex<MPoint>> vertices = mesh.getVertices();
         log.info(vertices);
