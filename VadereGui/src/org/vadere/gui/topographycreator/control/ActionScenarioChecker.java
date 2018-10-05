@@ -1,19 +1,17 @@
 package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.projectview.view.JsonValidIndicator;
+import org.vadere.gui.projectview.view.ScenarioCheckerPanel;
 import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.simulator.util.TopographyChecker;
-import org.vadere.simulator.util.TopographyCheckerMessage;
-import org.vadere.simulator.util.TopographyCheckerMessageType;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.util.ScenarioChecker;
+import org.vadere.simulator.util.ScenarioCheckerMessage;
 import org.vadere.state.scenario.ScenarioElement;
 
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.PriorityQueue;
@@ -21,27 +19,25 @@ import java.util.PriorityQueue;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 
-public class ActionTopographyCheckerMenu extends TopographyAction implements Observer {
+public class ActionScenarioChecker extends AbstractAction implements Observer {
 
-	private final static ImageIcon iconRed = new ImageIcon(Resources.class.getResource("/icons/light_red_icon.png"));
-	private final static ImageIcon iconYellow = new ImageIcon(Resources.class.getResource("/icons/light_yellow_icon.png"));
-	private final static ImageIcon iconGreen = new ImageIcon(Resources.class.getResource("/icons/light_green_icon.png"));
-
-	private final JsonValidIndicator jsonValidIndicator;
-	private PriorityQueue<TopographyCheckerMessage> errorMsg;
-	private PriorityQueue<TopographyCheckerMessage> warnMsg;
+	private PriorityQueue<ScenarioCheckerMessage> errorMsg;
+	private PriorityQueue<ScenarioCheckerMessage> warnMsg;
 	private MsgDocument msgDocument;
 
-	public ActionTopographyCheckerMenu(String name, IDrawPanelModel<?> panelModel, JsonValidIndicator jsonValidIndicator) {
-		super(name, iconYellow, panelModel);
-		this.jsonValidIndicator = jsonValidIndicator;
+	private IDrawPanelModel model;
+	private ScenarioCheckerPanel view;
+
+	public
+	ActionScenarioChecker(String name, ScenarioCheckerPanel view) {
+		super(name);
 		this.errorMsg = new PriorityQueue<>();
 		this.warnMsg = new PriorityQueue<>();
-		panelModel.addObserver(this);
+		this.view = view;
 	}
 
 	/**
-	 * Handel click on traffic light icon and show all TopographyChecker messages generated for the
+	 * Handel click on traffic light icon and show all ScenarioChecker messages generated for the
 	 * current state of the topography.
 	 */
 	@Override
@@ -54,29 +50,42 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 		);
 	}
 
+	public void observerModel(IDrawPanelModel model){
+		model.addObserver(this);
+		this.model = model;
+	}
+
+
 	/**
 	 * After each change of the Topography which yields a valid json representation check run the
-	 * {@link TopographyChecker} and change the icon respectively. This function also creates the
+	 * {@link ScenarioChecker} and change the icon respectively. This function also creates the
 	 * message document presented in various dialog windows.
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
-		if (jsonValidIndicator.isValid()) {
-			TopographyChecker checker = new TopographyChecker(getScenarioPanelModel().getTopography());
-			errorMsg.clear();
-			warnMsg.clear();
-			ScenarioPanel.setActiveTopographyErrorMsg(null);
-			addMsg(checker.checkBuildingStep());
+		if(model != null){
+			check(model.getScenario());
+		}
+	}
 
-			putValue(Action.SMALL_ICON, iconGreen);
+	public void check(final Scenario scenario){
+		ScenarioChecker checker = new ScenarioChecker(scenario);
+		errorMsg.clear();
+		warnMsg.clear();
+		ScenarioPanel.setActiveTopographyErrorMsg(null);
+		addMsg(checker.checkBuildingStep());
 
-			if (warnMsg.size() > 0) {
-				putValue(Action.SMALL_ICON, iconYellow);
-			}
+		view.setGreen();
+		view.setMsgOK();
 
-			if (errorMsg.size() > 0) {
-				putValue(Action.SMALL_ICON, iconRed);
-			}
+		if (warnMsg.size() > 0) {
+			view.setYellow();
+			view.setMsgWarn();
+		}
+
+		if (errorMsg.size() > 0) {
+			view.setRed();
+			view.setMsgErr();
 		}
 	}
 
@@ -107,7 +116,7 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 	}
 
 
-	private void msgToDocString(StringBuilder sb, TopographyCheckerMessage msg, MsgDocument doc) {
+	private void msgToDocString(StringBuilder sb, ScenarioCheckerMessage msg, MsgDocument doc) {
 		sb.append("[");
 		msg.getMsgTarget().getTargets().forEach(t -> {
 			doc.makeLink(t, sb);
@@ -124,9 +133,9 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 		doc.setText(sb.toString());
 	}
 
-	private void addMsg(List<TopographyCheckerMessage> msg) {
+	private void addMsg(PriorityQueue<ScenarioCheckerMessage> msg) {
 		msg.forEach(m -> {
-			if (m.getMsgType().equals(TopographyCheckerMessageType.WARN)) {
+			if (m.getMsgType().getId() >= 500) {
 				warnMsg.add(m);
 			} else {
 				errorMsg.add(m);
@@ -141,7 +150,7 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 
 	/**
 	 * Simple {@link JEditorPane} wrapper which manages the links within the document to highlight
-	 * the {@link ScenarioElement} producing the error / warning.
+	 * the {@link ScenarioElement} producing the topographyError / topographyWarning.
 	 */
 	class MsgDocument extends JEditorPane {
 		HashMap<String, ScenarioElement> linkMap;
@@ -156,7 +165,9 @@ public class ActionTopographyCheckerMenu extends TopographyAction implements Obs
 				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 					ScenarioElement element = linkMap.getOrDefault(e.getDescription(), null);
 					if (element != null) {
-						getScenarioPanelModel().setSelectedElement(element);
+						if (model != null){
+							model.setSelectedElement(element);
+						}
 					}
 				}
 			});

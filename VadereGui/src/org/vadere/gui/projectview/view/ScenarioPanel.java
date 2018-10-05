@@ -43,6 +43,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
+	private ScenarioCheckerPanel scenarioCheckerPanel;
 
 	// during simulation-run, only this is shown instead of the tabs above:
 	private final OnlineVisualization onlineVisualization;
@@ -64,7 +65,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
         this.model = model;
 
-		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setBorder(new EmptyBorder(0, 0, 0, 0));
 		setLayout(new CardLayout(0, 0));
 		setBounds(0, 0, 500, 100);
 	}
@@ -75,25 +76,36 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		// Edit card...
 		JPanel editCard = new JPanel();
-		editCard.setBorder(new EmptyBorder(5, 5, 5, 5));
-		editCard.setLayout(new BorderLayout(0, 0));
+		editCard.setBorder(new EmptyBorder(0, 0, 0, 0));
+		editCard.setLayout(new BorderLayout(0, 5));
 		editCard.setBounds(0, 0, 500, 100);
 
 		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		editCard.add(tabbedPane, BorderLayout.CENTER);
 
-		tabbedPane.addChangeListener(e -> { // TODO what's happening here? can this be simplified?
+		scenarioCheckerPanel = new ScenarioCheckerPanel();
+		editCard.add(scenarioCheckerPanel, BorderLayout.SOUTH);
+
+
+		tabbedPane.addChangeListener(e -> {
+			// remove ScenarioChecker listener if exists
+
+			scenarioCheckerPanel.stopObserver();
+
 			int index = tabbedPane.getSelectedIndex();
 			if (index >= 0 && topographyFileView != null
 					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.Topography.title"))
 					&& scenario != null) {
 				topographyFileView.setVadereScenario(scenario);
-			}
-			if (index >= 0 && topographyFileView != null
+			} else 	if (index >= 0 && topographyCreatorView != null
 					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.TopographyCreator.title"))
 					&& scenario != null) {
 				setTopography(scenario.getTopography());
+				scenarioCheckerPanel.observerIDrawPanelModel(topographyCreatorView.getPanelModel());
+				return;
 			}
+
+			scenarioCheckerPanel.check(scenario);
 		});
 		attributesSimulationView =
 				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);

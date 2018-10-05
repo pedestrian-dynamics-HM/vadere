@@ -26,67 +26,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
-public class TopographyCheckerTest implements TestResourceHandler {
+public class ScenarioCheckerTest implements TestResourceHandler {
 
 	TopographyTestBuilder builder;
 
 	@Before
 	public void setup() {
 		builder = new TopographyTestBuilder();
-	}
-
-	@Test
-	public void testCheckObstacleOverlapHasOverlap() {
-		Topography topography = new Topography();
-
-		Obstacle obs1 = new Obstacle(new AttributesObstacle(0, new VRectangle(0, 0, 1, 1)));
-		Obstacle obs2 = new Obstacle(new AttributesObstacle(1, new VRectangle(0, 0, 1, 1)));
-
-		topography.addObstacle(obs1);
-		topography.addObstacle(obs2);
-
-		TopographyChecker topcheck = new TopographyChecker(topography);
-
-		List<Pair<Obstacle, Obstacle>> actualList = topcheck.checkObstacleOverlap();
-
-		assertEquals(1, actualList.size());
-	}
-
-
-	@Test
-	public void testCheckObstacleOverlapHasNoOverlap() {
-		Topography topography = new Topography();
-
-		Obstacle obs1 = new Obstacle(new AttributesObstacle(0, new VRectangle(0, 0, 1, 1)));
-		Obstacle obs2 = new Obstacle(new AttributesObstacle(1, new VRectangle(1.1, 0, 1, 1)));
-		topography.addObstacle(obs1);
-		topography.addObstacle(obs2);
-
-		TopographyChecker topcheck = new TopographyChecker(topography);
-
-		List<Pair<Obstacle, Obstacle>> actualList = topcheck.checkObstacleOverlap();
-
-		assertEquals(0, actualList.size());
-	}
-
-	@Test
-	public void testCheckObstacleOverlapReturnsNoOverlapsIfTwoSegmentsTouch() {
-		Topography topography = new Topography();
-
-		Obstacle obs1 = new Obstacle(new AttributesObstacle(0, new VRectangle(0, 0, 1, 1)));
-		Obstacle obs2 = new Obstacle(new AttributesObstacle(1, new VRectangle(1, 0, 1, 1)));
-		topography.addObstacle(obs1);
-		topography.addObstacle(obs2);
-
-		TopographyChecker topcheck = new TopographyChecker(topography);
-
-		List<Pair<Obstacle, Obstacle>> actualList = topcheck.checkObstacleOverlap();
-
-		assertEquals(0, actualList.size());
 	}
 
 	// Test checkUniqueSourceId
@@ -103,11 +54,11 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		builder.addSource(2); // err
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkUniqueSourceId();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkUniqueSourceId();
 
 		assertEquals("The sources should have the same id", 3, out.size());
-		out.forEach(m -> assertEquals(TopographyCheckerReason.SOURCE_ID_NOT_UNIQUE, m.getReason()));
+		out.forEach(m -> assertEquals(ScenarioCheckerReason.SOURCE_ID_NOT_UNIQUE, m.getReason()));
 	}
 
 	@Test
@@ -134,8 +85,8 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		builder.addSource(3);
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkUniqueSourceId();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkUniqueSourceId();
 
 		assertEquals("No warnings expected", 0, out.size());
 	}
@@ -152,11 +103,11 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		);
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
-		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_NO_SPAWN, msg.getReason());
+		ScenarioCheckerMessage msg = hasOneElement(out);
+		assertEquals(ScenarioCheckerReason.SOURCE_NO_TARGET_ID_NO_SPAWN, msg.getReason());
 	}
 
 	@Test
@@ -168,11 +119,11 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		);
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
-		assertEquals(TopographyCheckerReason.SOURCE_NO_TARGET_ID_SET, msg.getReason());
+		ScenarioCheckerMessage msg = hasOneElement(out);
+		assertEquals(ScenarioCheckerReason.SOURCE_NO_TARGET_ID_SET, msg.getReason());
 		isErrorMsg(msg);
 	}
 
@@ -191,11 +142,11 @@ public class TopographyCheckerTest implements TestResourceHandler {
 
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
-		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, msg.getReason());
+		ScenarioCheckerMessage msg = hasOneElement(out);
+		assertEquals(ScenarioCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, msg.getReason());
 		isErrorMsg(msg);
 	}
 
@@ -217,11 +168,11 @@ public class TopographyCheckerTest implements TestResourceHandler {
 
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkValidTargetsInSource();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
-		assertEquals(TopographyCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, msg.getReason());
+		ScenarioCheckerMessage msg = hasOneElement(out);
+		assertEquals(ScenarioCheckerReason.SOURCE_TARGET_ID_NOT_FOUND, msg.getReason());
 		isErrorMsg(msg);
 		assertEquals("[2]", msg.getReasonModifier());
 	}
@@ -240,8 +191,8 @@ public class TopographyCheckerTest implements TestResourceHandler {
 
 		Topography topography = builder.build();
 
-		TopographyChecker checker = new TopographyChecker(topography);
-		List<TopographyCheckerMessage> out = checker.checkValidTargetsInSource();
+		ScenarioChecker checker = new ScenarioChecker(topography);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkValidTargetsInSource();
 
 		hasNoElement(out);
 	}
@@ -262,9 +213,9 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.build());
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkOverlap((type, type2) -> true);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkOverlap();
 
 		hasNoElement(out);
 	}
@@ -295,13 +246,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.build());
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkOverlap((type, type2) -> true);
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkOverlap();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isErrorMsg(msg);
-		assertEquals(TopographyCheckerReason.OVERLAP_OBSTACLE_SOURCE, msg.getReason());
+		assertEquals(ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, msg.getReason());
 		assertEquals(testSource, msg.getMsgTarget().getTargets().get(0));
 		assertEquals(testObstacle, msg.getMsgTarget().getTargets().get(1));
 
@@ -321,9 +272,9 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		builder.addTarget(3);
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkUnusedTargets();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkUnusedTargets();
 
 		hasNoElement(out);
 	}
@@ -339,14 +290,14 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		builder.addTarget(3);
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkUnusedTargets();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkUnusedTargets();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 
 		isWarnMsg(msg);
-		assertEquals(TopographyCheckerReason.TARGET_UNUSED, msg.getReason());
+		assertEquals(ScenarioCheckerReason.TARGET_UNUSED, msg.getReason());
 	}
 
 	// Test checkStairTreadSanity
@@ -360,13 +311,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.treadCount(3) // 10m / 3treads = 3.333
 				.build());
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkStairTreadSanity();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isWarnMsg(msg);
-		assertEquals(TopographyCheckerReason.STAIRS_TREAD_DIM_WRONG, msg.getReason());
+		assertEquals(ScenarioCheckerReason.STAIRS_TREAD_DIM_WRONG, msg.getReason());
 	}
 
 	@Test
@@ -378,13 +329,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.treadCount(200) // 10m / 200 treads = 0.050
 				.build());
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkStairTreadSanity();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isWarnMsg(msg);
-		assertEquals(TopographyCheckerReason.STAIRS_TREAD_DIM_WRONG, msg.getReason());
+		assertEquals(ScenarioCheckerReason.STAIRS_TREAD_DIM_WRONG, msg.getReason());
 	}
 
 	@Test
@@ -396,9 +347,9 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.treadCount(80) // 10m / 80treads = 0.125
 				.build());
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkStairTreadSanity();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkStairTreadSanity();
 		hasNoElement(out);
 	}
 
@@ -416,13 +367,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 								.build());
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkPedestrianSpeedSetup();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isErrorMsg(msg);
-		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_SETUP, msg.getReason());
+		assertEquals(ScenarioCheckerReason.PEDESTRIAN_SPEED_SETUP, msg.getReason());
 	}
 
 	@Test
@@ -439,13 +390,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 		p.getAttributes().setSpeedDistributionMean(10.0);
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkPedestrianSpeedSetup();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isErrorMsg(msg);
-		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_SETUP, msg.getReason());
+		assertEquals(ScenarioCheckerReason.PEDESTRIAN_SPEED_SETUP, msg.getReason());
 	}
 
 
@@ -460,9 +411,9 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.build());
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkPedestrianSpeedSetup();
 
 		hasNoElement(out);
 	}
@@ -479,13 +430,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.build());
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkPedestrianSpeedSetup();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isWarnMsg(msg);
-		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL, msg.getReason());
+		assertEquals(ScenarioCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL, msg.getReason());
 	}
 
 	@Test
@@ -499,13 +450,13 @@ public class TopographyCheckerTest implements TestResourceHandler {
 				.build());
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkPedestrianSpeedSetup();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isWarnMsg(msg);
-		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL, msg.getReason());
+		assertEquals(ScenarioCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL, msg.getReason());
 	}
 
 	@Test
@@ -520,90 +471,90 @@ public class TopographyCheckerTest implements TestResourceHandler {
 
 
 		Topography topography = builder.build();
-		TopographyChecker checker = new TopographyChecker(topography);
+		ScenarioChecker checker = new ScenarioChecker(topography);
 
-		List<TopographyCheckerMessage> out = checker.checkPedestrianSpeedSetup();
+		PriorityQueue<ScenarioCheckerMessage> out = checker.checkPedestrianSpeedSetup();
 
-		TopographyCheckerMessage msg = hasOneElement(out);
+		ScenarioCheckerMessage msg = hasOneElement(out);
 		isErrorMsg(msg);
-		assertEquals(TopographyCheckerReason.PEDESTRIAN_SPEED_NEGATIVE, msg.getReason());
+		assertEquals(ScenarioCheckerReason.PEDESTRIAN_SPEED_NEGATIVE, msg.getReason());
 	}
 
 	@Test
 	public void testCheckOverlapAllCases(){
-		Scenario testScenarioWithErrors = getScenarioFromRelativeResource("TopographyCheckerTest.scenario");
+		Scenario testScenarioWithErrors = getScenarioFromRelativeResource("ScenarioCheckerTest.scenario");
 
-		TopographyChecker checker = new TopographyChecker(testScenarioWithErrors.getTopography());
+		ScenarioChecker checker = new ScenarioChecker(testScenarioWithErrors);
 
-		List<TopographyCheckerMessage>  out = checker.checkOverlap((type, type2) -> true); //activate all tests.
+		PriorityQueue<ScenarioCheckerMessage>  out = checker.checkOverlap(); //activate all tests.
 
 		assertEquals(22, out.size());
-		List<TopographyCheckerMessage> errorMsg = out.stream()
-				.filter(m -> m.getMsgType().equals(TopographyCheckerMessageType.ERROR))
+		List<ScenarioCheckerMessage> errorMsg = out.stream()
+				.filter(m -> m.getMsgType().equals(ScenarioCheckerMessageType.TOPOGRAPHY_ERROR))
 				.collect(Collectors.toList());
 		assertEquals(6, errorMsg.size());
 
-		List<TopographyCheckerMessage> warnMsg = out.stream()
-				.filter(m -> m.getMsgType().equals(TopographyCheckerMessageType.WARN))
+		List<ScenarioCheckerMessage> warnMsg = out.stream()
+				.filter(m -> m.getMsgType().equals(ScenarioCheckerMessageType.TOPOGRAPHY_WARN))
 				.collect(Collectors.toList());
 		assertEquals(16, warnMsg.size());
 
 		// Errors
-		assertIdAndReason(1,6,TopographyCheckerReason.OVERLAP_OBSTACLE_SOURCE, errorMsg);
-		assertIdAndReason(2,6,TopographyCheckerReason.OVERLAP_OBSTACLE_SOURCE, errorMsg);
-		assertIdAndReason(9,8,TopographyCheckerReason.OVERLAP_OBSTACLE_TARGET_ERR, errorMsg);
-		assertIdAndReason(11,13,TopographyCheckerReason.OVERLAP_OBSTACLE_STAIRS_ERR, errorMsg);
-		assertIdAndReason(35,36,TopographyCheckerReason.OVERLAP_STAIR_STAIR, errorMsg);
-		assertIdAndReason(35,36,TopographyCheckerReason.OVERLAP_STAIR_STAIR, errorMsg);
+		assertIdAndReason(1,6,ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, errorMsg);
+		assertIdAndReason(2,6,ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, errorMsg);
+		assertIdAndReason(9,8,ScenarioCheckerReason.OVERLAP_OBSTACLE_TARGET_ERR, errorMsg);
+		assertIdAndReason(11,13,ScenarioCheckerReason.OVERLAP_OBSTACLE_STAIRS_ERR, errorMsg);
+		assertIdAndReason(35,36,ScenarioCheckerReason.OVERLAP_STAIR_STAIR, errorMsg);
+		assertIdAndReason(35,36,ScenarioCheckerReason.OVERLAP_STAIR_STAIR, errorMsg);
 
 
 		// Warnings
-		assertIdAndReason(4,5,TopographyCheckerReason.OVERLAP_OBSTACLE_OBSTACLE, warnMsg);
-		assertIdAndReason(9,7,TopographyCheckerReason.OVERLAP_OBSTACLE_TARGET_WARN, warnMsg);
-		assertIdAndReason(11,12,TopographyCheckerReason.OVERLAP_OBSTACLE_STAIRS_WARN, warnMsg);
-		assertIdAndReason(22,24,TopographyCheckerReason.OVERLAP_SOURCE_STAIR, warnMsg);
-		assertIdAndReason(22,25,TopographyCheckerReason.OVERLAP_SOURCE_STAIR, warnMsg);
-		assertIdAndReason(23,26,TopographyCheckerReason.OVERLAP_SOURCE_STAIR, warnMsg);
-		assertIdAndReason(30,32,TopographyCheckerReason.OVERLAP_TARGET_STAIR, warnMsg);
-		assertIdAndReason(30,33,TopographyCheckerReason.OVERLAP_TARGET_STAIR, warnMsg);
-		assertIdAndReason(31,34,TopographyCheckerReason.OVERLAP_TARGET_STAIR, warnMsg);
-		assertIdAndReason(17,19,TopographyCheckerReason.OVERLAP_SOURCE_TARGET, warnMsg);
-		assertIdAndReason(17,20,TopographyCheckerReason.OVERLAP_SOURCE_TARGET, warnMsg);
-		assertIdAndReason(18,21,TopographyCheckerReason.OVERLAP_SOURCE_TARGET, warnMsg);
-		assertIdAndReason(27,28,TopographyCheckerReason.OVERLAP_TARGET_TARGET, warnMsg);
-		assertIdAndReason(27,29,TopographyCheckerReason.OVERLAP_TARGET_TARGET, warnMsg);
-		assertIdAndReason(14,15,TopographyCheckerReason.OVERLAP_SOURCE_SOURCE, warnMsg);
-		assertIdAndReason(14,16,TopographyCheckerReason.OVERLAP_SOURCE_SOURCE, warnMsg);
+		assertIdAndReason(4,5,ScenarioCheckerReason.OVERLAP_OBSTACLE_OBSTACLE, warnMsg);
+		assertIdAndReason(9,7,ScenarioCheckerReason.OVERLAP_OBSTACLE_TARGET_WARN, warnMsg);
+		assertIdAndReason(11,12,ScenarioCheckerReason.OVERLAP_OBSTACLE_STAIRS_WARN, warnMsg);
+		assertIdAndReason(22,24,ScenarioCheckerReason.OVERLAP_SOURCE_STAIR, warnMsg);
+		assertIdAndReason(22,25,ScenarioCheckerReason.OVERLAP_SOURCE_STAIR, warnMsg);
+		assertIdAndReason(23,26,ScenarioCheckerReason.OVERLAP_SOURCE_STAIR, warnMsg);
+		assertIdAndReason(30,32,ScenarioCheckerReason.OVERLAP_TARGET_STAIR, warnMsg);
+		assertIdAndReason(30,33,ScenarioCheckerReason.OVERLAP_TARGET_STAIR, warnMsg);
+		assertIdAndReason(31,34,ScenarioCheckerReason.OVERLAP_TARGET_STAIR, warnMsg);
+		assertIdAndReason(17,19,ScenarioCheckerReason.OVERLAP_SOURCE_TARGET, warnMsg);
+		assertIdAndReason(17,20,ScenarioCheckerReason.OVERLAP_SOURCE_TARGET, warnMsg);
+		assertIdAndReason(18,21,ScenarioCheckerReason.OVERLAP_SOURCE_TARGET, warnMsg);
+		assertIdAndReason(27,28,ScenarioCheckerReason.OVERLAP_TARGET_TARGET, warnMsg);
+		assertIdAndReason(27,29,ScenarioCheckerReason.OVERLAP_TARGET_TARGET, warnMsg);
+		assertIdAndReason(14,15,ScenarioCheckerReason.OVERLAP_SOURCE_SOURCE, warnMsg);
+		assertIdAndReason(14,16,ScenarioCheckerReason.OVERLAP_SOURCE_SOURCE, warnMsg);
 	}
 
-	private void assertIdAndReason(int idA, int idB, TopographyCheckerReason reason, List<TopographyCheckerMessage> messages){
+	private void assertIdAndReason(int idA, int idB, ScenarioCheckerReason reason, List<ScenarioCheckerMessage> messages){
 
-		List<TopographyCheckerMessage> msg = messages.stream()
+		List<ScenarioCheckerMessage> msg = messages.stream()
 				.filter(m -> m.isMessageForAllElements(idA, idB) && m.getReason().equals(reason))
 				.collect(Collectors.toList());
 
 		assertEquals("expected Message with ids{" + idA + ", " + idB + "} and Reason: "+ reason.toString(), 1, msg.size());
 	}
 
-	private TopographyCheckerMessage hasOneElement(List<TopographyCheckerMessage> out){
+	private ScenarioCheckerMessage hasOneElement(PriorityQueue<ScenarioCheckerMessage> out){
 		assertEquals(1, out.size());
-		return out.get(0);
+		return out.poll();
 	}
 
-	private void hasNoElement(List<TopographyCheckerMessage> out){
+	private void hasNoElement(PriorityQueue<ScenarioCheckerMessage> out){
 		assertEquals(0, out.size());
 	}
 
-	private void  isErrorMsg(TopographyCheckerMessage msg){
-		assertEquals(TopographyCheckerMessageType.ERROR, msg.getMsgType());
+	private void  isErrorMsg(ScenarioCheckerMessage msg){
+		assertEquals(ScenarioCheckerMessageType.TOPOGRAPHY_ERROR, msg.getMsgType());
 	}
 
-	private void isWarnMsg(TopographyCheckerMessage msg){
-		assertEquals(TopographyCheckerMessageType.WARN, msg.getMsgType());
+	private void isWarnMsg(ScenarioCheckerMessage msg){
+		assertEquals(ScenarioCheckerMessageType.TOPOGRAPHY_WARN, msg.getMsgType());
 	}
 
 	@Override
 	public Path getTestDir() {
-		return getPathFromResources("/data/TopographyChecker");
+		return getPathFromResources("/data/ScenarioChecker");
 	}
 }

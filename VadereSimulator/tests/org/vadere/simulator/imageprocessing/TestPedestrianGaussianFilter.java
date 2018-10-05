@@ -82,9 +82,9 @@ public class TestPedestrianGaussianFilter {
 				maxAbsErrorCL = Math.max(maxAbsErrorCL, Math.abs((clFilter.getFilteredValue(x, y) - exactDensity)));
 				maxRelErrorCL = Math.max(maxRelErrorCL,
 						Math.abs((clFilter.getFilteredValue(x, y) - exactDensity)) / exactDensity);
-				// System.out.println("abs. cl-error:" + (clFilter.getFilteredValue(x, y) -
+				// System.out.println("abs. cl-topographyError:" + (clFilter.getFilteredValue(x, y) -
 				// exactDensity));
-				// System.out.println("abs. cv-error:" + (cvFilter.getFilteredValue(x, y) -
+				// System.out.println("abs. cv-topographyError:" + (cvFilter.getFilteredValue(x, y) -
 				// exactDensity));
 			}
 		}
@@ -94,11 +94,11 @@ public class TestPedestrianGaussianFilter {
 		assertTrue(maxRelErrorCV <= 0.1);
 
 		/*
-		 * System.out.println("abs. cl-error:" + maxAbsErrorCL);
-		 * System.out.println("abs. cv-error:" + maxAbsErrorCV);
+		 * System.out.println("abs. cl-topographyError:" + maxAbsErrorCL);
+		 * System.out.println("abs. cv-topographyError:" + maxAbsErrorCV);
 		 * 
-		 * System.out.println("rel. cl-error:" + maxRelErrorCL);
-		 * System.out.println("rel. cv-error:" + maxRelErrorCV);
+		 * System.out.println("rel. cl-topographyError:" + maxRelErrorCL);
+		 * System.out.println("rel. cv-topographyError:" + maxRelErrorCV);
 		 */
 //	}
 
