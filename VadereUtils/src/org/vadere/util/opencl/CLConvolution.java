@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 
 import static org.lwjgl.opencl.CL10.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -63,6 +64,7 @@ public class CLConvolution {
     private float[] kernel;
     private KernelType type;
     private boolean debug = false;
+    private boolean profiling = false;
 
     public enum KernelType {
         Separate,
@@ -157,8 +159,12 @@ public class CLConvolution {
 
             PointerBuffer ev = stack.callocPointer(1);
             // run the kernel and read the result
-	        CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernelConvolveCol, 2, null, clGlobalWorkSizeEdges, null, null, null));
-	        CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernelConvolveRow, 2, null, clGlobalWorkSizeEdges, null, null, null));
+	        //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernelConvolveCol, 2, null, clGlobalWorkSizeEdges, null, null, null));
+	        //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernelConvolveRow, 2, null, clGlobalWorkSizeEdges, null, null, null));
+            int err_code = (int)enqueueNDRangeKernel("clKernelConvolveCol",clQueue, clKernelConvolveCol, 2, null, clGlobalWorkSizeEdges, null, null, null);
+            CLInfo.checkCLError(err_code);
+            err_code = (int) enqueueNDRangeKernel("clKernelConvolveRow",clQueue, clKernelConvolveRow, 2, null, clGlobalWorkSizeEdges, null, null, null);
+            CLInfo.checkCLError(err_code);
             clFinish(clQueue);
         }
     }
@@ -170,9 +176,41 @@ public class CLConvolution {
 		    clGlobalWorkSizeEdges.put(1, matrixHeight);
 
 		    // run the kernel and read the result
-		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, 2, null, clGlobalWorkSizeEdges, null, null, null));
+		    //CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernel, 2, null, clGlobalWorkSizeEdges, null, null, null));
+		    int err_code = (int) enqueueNDRangeKernel("convolve",clQueue, clKernel, 2, null, clGlobalWorkSizeEdges, null, null, null);
+            CLInfo.checkCLError(err_code);
 		    CLInfo.checkCLError(clFinish(clQueue));
 	    }
+    }
+
+    private PointerBuffer clEvent = MemoryUtil.memAllocPointer(1);
+    LongBuffer startTime;
+    LongBuffer endTime;
+    PointerBuffer retSize;
+
+    private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
+        if(profiling) {
+            try (MemoryStack stack = MemoryStack.stackPush()){
+                retSize = stack.mallocPointer(1);
+                startTime = stack.mallocLong(1);
+                endTime = stack.mallocLong(1);
+
+                long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
+                clWaitForEvents(clEvent);
+                long eventAddr = clEvent.get();
+                clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, retSize);
+                clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, retSize);
+                clEvent.clear();
+                // in nanaSec
+                log.info(name + " " + (endTime.get() - startTime.get()));
+                endTime.clear();
+                startTime.clear();
+                return result;
+            }
+        }
+        else {
+            return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, null, null);
+        }
     }
 
     private void setArguments(final long clKernel) throws OpenCLException {
@@ -300,7 +338,11 @@ public class CLConvolution {
             clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
 
-            clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+            if (profiling) {
+                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
+            } else {
+                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+            }
             CLInfo.checkCLError(errcode_ret);
         }
     }

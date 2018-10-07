@@ -87,7 +87,7 @@ public class CLFFTConvolution {
     // logger for callbacks
     private static Logger log = Logger.getLogger(CLFFTConvolution.class);
     private boolean debug = false;
-    private boolean profiling = true;
+    private boolean profiling = false;
     private boolean padd;
 
     public enum Direction {
@@ -145,11 +145,12 @@ public class CLFFTConvolution {
         if (padd) {
             computePaddHeight();
             computePaddWidth();
+            this.gaussKernel = zeroPaddKernel(gaussKernel);
         } else {
             this.paddWidth = matrixWidth;
             this.paddHeight = matrixHeight;
+            this.gaussKernel = gaussKernel;
         }
-        this.gaussKernel = zeroPaddKernel(gaussKernel);
 
         init();
     }
@@ -556,7 +557,7 @@ public class CLFFTConvolution {
 
             PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(WORK_DIM);
             PointerBuffer clLocalWorkSizeEdges = stack.callocPointer(WORK_DIM);
-
+            
             clLocalWorkSizeEdges.put(DIMENSION_ZERO, workitems_per_workgroup_dim2); // number of workitems per workgroup
             clGlobalWorkSizeEdges.put(DIMENSION_ZERO, workitems_total_dim2); // number of workitems global
 
