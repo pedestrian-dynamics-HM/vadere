@@ -7,6 +7,8 @@ import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Obstacle;
@@ -42,11 +44,17 @@ public class PedestrianBHM extends Pedestrian {
 	private boolean evadesTangentially;
 	private boolean evadesSideways;
 	private int remainCounter;
+	private @Nullable IPotentialFieldTarget potentialFieldTarget;
 
 	public PedestrianBHM(Topography topography, AttributesAgent attributesPedestrian,
-			AttributesBHM attributesBHM, Random random) {
-		super(attributesPedestrian, random);
+	                     AttributesBHM attributesBHM, Random random) {
+		this(topography, attributesPedestrian, attributesBHM, random, null);
+	}
 
+	public PedestrianBHM(Topography topography, AttributesAgent attributesPedestrian,
+			AttributesBHM attributesBHM, Random random, IPotentialFieldTarget potentialFieldTarget) {
+		super(attributesPedestrian, random);
+		this.potentialFieldTarget = potentialFieldTarget;
 		this.random = random;
 		this.attributesBHM = attributesBHM;
 		this.topography = topography;
@@ -232,15 +240,23 @@ public class PedestrianBHM extends Pedestrian {
 		if (hasNextTarget()) {
 			VShape targetShape = topography.getTarget(getNextTargetId()).getShape();
 			if (!targetShape.contains(getPosition())) {
-				VPoint targetPoint = targetShape.closestPoint(getPosition());
-				targetDirection = targetPoint.subtract(getPosition()).norm();
 
-				for (DirectionAddend da : directionAddends) {
-					targetDirection = targetDirection.add(da.getDirectionAddend());
+				// use just euklid direction to  the target
+				if(potentialFieldTarget == null) {
+					VPoint targetPoint = targetShape.closestPoint(getPosition());
+					targetDirection = targetPoint.subtract(getPosition()).norm();
+
+					for (DirectionAddend da : directionAddends) {
+						targetDirection = targetDirection.add(da.getDirectionAddend());
+					}
+
+					if (!targetDirection.equals(VPoint.ZERO)) {
+						targetDirection = targetDirection.norm();
+					}
 				}
-
-				if (!targetDirection.equals(VPoint.ZERO)) {
-					targetDirection = targetDirection.norm();
+				else {
+					Vector2D vec = potentialFieldTarget.getTargetPotentialGradient(getPosition(), this);
+					targetDirection = vec.norm();
 				}
 			}
 		}

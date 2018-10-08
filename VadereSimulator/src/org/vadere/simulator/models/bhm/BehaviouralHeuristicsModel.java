@@ -11,6 +11,9 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -24,6 +27,8 @@ import org.vadere.util.geometry.shapes.VShape;
 
 @ModelClass(isMainModel = true)
 public class BehaviouralHeuristicsModel implements MainModel {
+
+	private IPotentialFieldTarget potentialFieldTarget;
 
 	/**
 	 * Compares the time of the next possible move.
@@ -58,6 +63,10 @@ public class BehaviouralHeuristicsModel implements MainModel {
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
+
+		potentialFieldTarget = IPotentialFieldTargetGrid.createPotentialField(
+				modelAttributesList, topography, attributesPedestrian, PotentialFieldTargetGrid.class.getCanonicalName());
+
 		this.attributesBHM = Model.findAttributes(modelAttributesList, AttributesBHM.class);
 		this.attributesPedestrian = attributesPedestrian;
 		this.topography = topography;
@@ -81,7 +90,7 @@ public class BehaviouralHeuristicsModel implements MainModel {
 	}
 
 	private PedestrianBHM createElement(VPoint position, @NotNull final AttributesAgent pedAttributes) {
-		PedestrianBHM pedestrian = new PedestrianBHM(topography, pedAttributes, attributesBHM, random);
+		PedestrianBHM pedestrian = new PedestrianBHM(topography, pedAttributes, attributesBHM, random, potentialFieldTarget);
 		pedestrian.setPosition(position);
 		return pedestrian;
 	}

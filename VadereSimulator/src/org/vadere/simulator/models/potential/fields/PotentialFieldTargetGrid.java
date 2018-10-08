@@ -54,6 +54,11 @@ public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
 
 	@Override
 	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
+		double potential = getPotential(pos, ped);
+		double eps = 0.01;
+
+		getPotential(pos.add(new VPoint(eps, 0)), ped);
+
 		throw new UnsupportedOperationException("gradient not yet implemented");
 	}
 
