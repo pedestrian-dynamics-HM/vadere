@@ -1,6 +1,7 @@
 import csv
 from glob import glob
 import numpy as np
+import math
 
 ################################################################################
 # run with `python main.py`                                                    #
@@ -67,7 +68,7 @@ def extract_observation_area(data, area):
 # number of targets hardcoded, currently 3
 # target ids hardcoded
 # also calculate total distribution
-def calculate_pedestrian_target_distribution(data):
+def calculate_pedestrian_target_distribution(data, target_size):
     current_dist = []
     timesteps = []
     unique_target_IDs = set()
@@ -79,8 +80,16 @@ def calculate_pedestrian_target_distribution(data):
     
     for timestep in data:
         timesteps.append(timestep[0][0])
-        #target_id_counts = [0, 0, 0]
-        target_id_counts = np.zeros(len(unique_target_IDs))
+
+        target_id_counts = np.zeros(target_size)
+        
+        
+        
+        
+        
+        
+        
+        
         for row in timestep:
             
             '''
@@ -110,6 +119,12 @@ def calculate_pedestrian_target_distribution(data):
         sum += [np.sum(tmp[:,i])]
     total_dist = np.array(sum)/length
     #total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
+    
+    for i in current_dist:
+        for j in i:
+            if math.isnan(j):
+                print("we have a nan Value!")
+    
 
     return current_dist, total_dist, timesteps
 

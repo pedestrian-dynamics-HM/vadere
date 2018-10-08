@@ -16,7 +16,7 @@ def getTriangularNumber(max):
     
 def getExponentialNumber(max):
     #number =  np.log(1- np.random.rand())/-1
-    number = -1 * np.log(np.random.rand())/2
+    number = -np.log(np.random.rand())
     '''
     if number > max:
         #return max
@@ -145,9 +145,10 @@ def plotHeatmap(x,y, title, iterations):
         vmax = iterations/500
     plt.imshow(heatmap.T, extent=extent, origin='lower', vmin = 0, vmax = vmax)
     plt.colorbar()
-    plt.title(title)
+    #plt.title(title)
     plt.xlabel('Anteil an Linksabbiegern')
-    plt.ylabel('Anteil an nicht Abbiegern')
+    plt.ylabel('Anteil an Rechtsabbiegern')
+    plt.savefig('C:/Studium/BA/Latex/Template_BA_Tests/pictures/tmp.pdf')
     plt.show()
     
 def plot3dInteractive(x,y,z):
@@ -161,7 +162,7 @@ def plot3dInteractive(x,y,z):
 ###################
 # 3-way Vergleiche#
 ###################
-iterations = 500
+iterations = 5000
 
 #Gleichverteilt, summe
 #summe_3(getUniformNumber, iterations, 'Gleichverteilt Summe')
@@ -170,7 +171,7 @@ iterations = 500
 #summe_3(getTriangularNumber, iterations, 'Dreieck Summe')
 
 #Dreieck, summe, randomStart
-summe_32(getTriangularNumber, iterations, 'Dreieck Summe Random Start')
+#summe_32(getTriangularNumber, iterations, 'Dreieck Summe Random Start')
 
 #Gleichverteilung, normiert
 #normiert_3(getUniformNumber, iterations, 'Gleichverteilt Normiert')
@@ -181,6 +182,7 @@ summe_32(getTriangularNumber, iterations, 'Dreieck Summe Random Start')
 #Exponential normiert
 normiert_3(getExponentialNumber, iterations, 'Exponentialverteilung Normiert') 
 
+'''
 left = []
 middle = []
 right = []
@@ -197,7 +199,7 @@ for i in range(iterations):
     right += [maximum]
     
 plotHeatmap(left, middle, "Dreieck und Gleichverteilung", iterations)
-    
+'''
 
 
 ##############
@@ -205,6 +207,7 @@ plotHeatmap(left, middle, "Dreieck und Gleichverteilung", iterations)
 ##############
 
 '''
+#expo
 erg = []
 for _ in range(iterations):
     #erg += [1 - np.random.triangular(0,1,1)]
@@ -212,11 +215,15 @@ for _ in range(iterations):
 
 bin_width = 0.05
 plt.hist(erg, bins=np.arange(min(erg), max(erg) + bin_width, bin_width))
+plt.xlabel('Wertebereich')
+plt.ylabel('Häufigkeit')
 #plt.hist(erg)
+plt.savefig('C:/Studium/BA/Latex/Template_BA_Tests/pictures/tmp.pdf')
 plt.show()
+'''
 
-
-
+'''
+#dreieck
 erg = []
 for _ in range (iterations):
     b = 1
@@ -226,7 +233,10 @@ for _ in range (iterations):
 
 bin_width = 0.05
 plt.hist(erg, bins=np.arange(min(erg), max(erg) + bin_width, bin_width))
+plt.xlabel('Wertebereich')
+plt.ylabel('Häufigkeit')
 #plt.hist(erg)
+plt.savefig('C:/Studium/BA/Latex/Template_BA_Tests/pictures/tmp.pdf')
 plt.show()
 '''
     
@@ -234,6 +244,87 @@ plt.show()
 ###########
 #Sonstiges#
 ###########
+
+#euklid
+#simulationen = np.array([10,25,50,100,200])
+#simulationen2 = np.array([10,25,50,100,200, 250, 300])
+#langerGang = np.array([0.205, 0.196,0.215,0.236,0.223, 0.218, 0.217])
+#Bruecke = np.array([0.087, 0.084, 0.079, 0.069, 0.052])
+#Asymmetrisch = np.array([0.147,0.154,0.122,0.106,0.086])
+
+
+'''
+simulationen = np.array([10,25,50,75,100,150,200,250,300])
+langerGang = np.array([0.213,0.209,0.226,0.236,0.247,0.224,0.235,0.232,0.232])
+Asymmetrisch= np.array([0.149,0.161,0.129,0.129,0.116,0.1,0.094,0.092,0.077])
+Bruecke  = np.array([0.087,0.089,0.086,0.072,0.075,0.074,0.056,0.054,0.051])
+
+
+plt.plot(simulationen, langerGang)
+plt.plot(simulationen, Bruecke)
+plt.plot(simulationen, Asymmetrisch)
+
+plt.scatter(simulationen, langerGang, label = 'Kreuzung')
+plt.scatter(simulationen, Bruecke, label = 'schiefer Gang')
+plt.scatter(simulationen, Asymmetrisch, label = 'Asymmetrisch')
+
+plt.xlabel('Anzahl an Simulationen')
+plt.ylabel('Mittlerer euklidischer Fehler')
+plt.legend()
+plt.savefig('C:/Studium/BA/Latex/Template_BA_Tests/pictures/SampleSize.pdf')
+plt.show()
+
+
+
+simulationen = np.array([10,25,50,75,100,150,200,250,300])
+langerGang = np.array([0.367,0.161,0.249,0.267,0.227,0.27,0.283,0.264,0.277])
+Asymmetrisch= np.array([0.522,0.574,0.594,0.679,0.663,0.757,0.753,0.761,0.799])
+Bruecke  = np.array([0.745,0.872,0.837,0.896,0.881,0.827,0.909,0.887,0.894])
+
+
+plt.plot(simulationen, langerGang)
+plt.plot(simulationen, Bruecke)
+plt.plot(simulationen, Asymmetrisch)
+
+plt.scatter(simulationen, langerGang, label = 'Kreuzung')
+plt.scatter(simulationen, Bruecke, label = 'schiefer Gang')
+plt.scatter(simulationen, Asymmetrisch, label = 'Asymmetrisch')
+
+plt.xlabel('Anzahl an Simulationen')
+plt.ylabel('Out of Bag Score')
+plt.legend()
+plt.savefig('C:/Studium/BA/Latex/Template_BA_Tests/pictures/oob.pdf')
+plt.show()
+'''
+
+
+
+
+'''
+#OOB
+simulationen = np.array([10,25,50,100,200])
+simulationen2 = np.array([10,25,50,100,200, 250, 300])
+langerGang = np.array([])
+Bruecke = np.array([])
+Asymmetrisch = np.array([])
+
+plt.plot(simulationen2, langerGang)
+plt.plot(simulationen, Bruecke)
+plt.plot(simulationen, Asymmetrisch)
+
+plt.scatter(simulationen2, langerGang, label = 'Langer Gang')
+plt.scatter(simulationen, Bruecke, label = 'Brücke')
+plt.scatter(simulationen, Asymmetrisch, label = 'Asymmetrisch')
+
+plt.xlabel('Anzahl an Simulationen')
+plt.ylabel('Mittlerer Euklidischer Fehler')
+plt.legend()
+plt.show()
+'''
+
+
+
+
 
 '''
 #Exponential normiert 2-way

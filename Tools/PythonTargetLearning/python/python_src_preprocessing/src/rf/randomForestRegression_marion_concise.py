@@ -71,38 +71,47 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
     print("Min value %f" % np.min(np.min(data_frame_density)))
 
     # determine Target Size
-    number_of_targets = determineTargetSize(data_frame_density.iloc[0:10,:])
+    number_of_targets = determineTargetSize(data_frame_density.iloc[0:1000,:])
     
     # split data in samples and response
     y_density = data_frame_density[data_frame_density.columns[-number_of_targets:]]
     x_density = data_frame_density.iloc[:, 0:-number_of_targets]
 
 
-
     # plot input distribution
-    plt.scatter( y_density.values[:,0], y_density.values[:,1], label = 'Observation Polygon')
+    plt.scatter( y_density.values[:,0], y_density.values[:,1], label = 'Simulierte Verteilungen')
     
     generatedDistributions = pd.read_csv( directory + '/generatedDistributions.txt', header = None)
-    plt.scatter(generatedDistributions.values[:,0],generatedDistributions.values[:,1], label = 'generated Distributions')
+    plt.scatter(generatedDistributions.values[:,0],generatedDistributions.values[:,1], label = 'Generierte Verteilungen')
     plt.legend()
+    plt.xlim([0,1])
+    plt.ylim([0,1])
+    plt.xlabel('Anteil Linksabbieger')
+    plt.ylabel('Anteil Rechtsabbieger')
     plt.savefig('C:/Studium/BA/Bilder/scatter.pdf')
     plt.show()
     
-    heatmap, xedges, yedges = np.histogram2d(y_density.values[:,0], y_density.values[:,1], bins=50) 
-    '''
-    for row in range(len(heatmap)):
-        for column in range(len(heatmap[row])):
-            if heatmap[row][column] == 0:
-                heatmap[row][column] = 1.0
-    heatmap = np.log(heatmap)
-    '''  
+    heatmap, xedges, yedges = np.histogram2d(y_density.values[:,0], y_density.values[:,1], bins=50, range=[[0, 1], [0, 1]]) 
+    plt.xlim([0,1])
+    plt.ylim([0,1])
+    
+    
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
     plt.clf()
     plt.imshow(heatmap.T, extent=extent, origin='lower')
     plt.colorbar()
+    plt.xlabel('Anteil Linksabbieger')
+    plt.ylabel('Anteil Rechtsabbieger')
     plt.savefig('C:/Studium/BA/Bilder/heatmap.pdf')
     plt.show()
 
+    for i in y_density.values[:]:
+        for j in range(len(i)):
+            if math.isnan(i[j]):
+                #print("we have a nan Value!")
+                i[j] = 0
+                
+    
 
 
     # split data into training and test set of data
@@ -235,7 +244,8 @@ def determineTargetSize(data):
                 break
 
     if len(target_set) > 1:
-        raise ValueError('The Algorithm to determine the Number of Targets has failed, or the data is corrupt')
+        print('Number of Targets Calculated: ' , max(target_set))
+        return max(target_set)
     number_of_targets = target_set.pop()
     print('Number of Targets Calculated: ' , number_of_targets)
     return number_of_targets

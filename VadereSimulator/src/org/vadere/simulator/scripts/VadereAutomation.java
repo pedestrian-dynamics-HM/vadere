@@ -21,12 +21,12 @@ import java.util.concurrent.BlockingQueue;
 public class VadereAutomation {
 
 
-    //private static final String SCENARIO_NAME = "Asymmetrisch";
+    private static final String SCENARIO_NAME = "Asymmetrisch";
     //private static final String SCENARIO_NAME = "Bruecke";
-    private static final String SCENARIO_NAME = "LangerGang";
+    //private static final String SCENARIO_NAME = "LangerGang";
     private static final String SCENARIO_PATH = "C:/Studium/BA/vadereProjects/";
-    private static final int N_SIMULATIONS = 25;
-    private static final int N_CONCURENT_SIMULATIONS = 20; //if this is choosen too high, out of memory errors may occur
+    private static final int N_SIMULATIONS = 75;
+    private static final int N_CONCURENT_SIMULATIONS = 5; //if this is choosen too high, out of memory errors may occur
     private static Scenario final_scenario;
     private static ArrayList<Thread> arrThreads = new ArrayList<>();
 

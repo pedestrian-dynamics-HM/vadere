@@ -33,20 +33,15 @@ VERSION = 1.0
 # directory to read input files from
 #INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/DatenGruppe/ModSim17-data-generation-filters/input/')
 #INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/vadereProjects/output')
-INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/datensets/2018-08-06-repo-cleanup-check')
+INPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/datensets/Asymmetrisch-75Samples/vadere')
 
 
 # directory to write output files to
 OUTPUT_ROOT_DIRECTORY = os.path.join('C:/Studium/BA/Vadere/vadere/Tools/PythonTargetLearning/output/')
-OBSERVATION_AREA = [7,23,10,10]#[20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
-OBSERVATION_AREA = [20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+OBSERVATION_AREA = [19.5, 50.0, 6, 6] #langer Gang/assymetrisch
 
-
-OBSERVATION_AREA = [19.5, 55.0, 6, 6] #langer Gang/assymetrisch
-#OBSERVATION_AREA = [7, 33, 10, 10] # eventuell für brücke
-
-
-TIME_STEP_BOUNDS = (30, 0)  # cut off number of timesteps from start and end time
+target_size = 2
+TIME_STEP_BOUNDS = (75, 0)  # cut off number of timesteps from start and end time
 RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
 GAUSS_DENSITY_BOUNDS = (2,2)  # side length of quadratic area for gaussian density
@@ -129,10 +124,9 @@ def process_data_file(file):
             if time[0][0] % FRAMERATE == 0:
                 data_reduced.append(time)
 
-
         # calculate pedestrian target distribution
         pedestrian_target_distribution, global_distribution, timesteps = \
-            calculate_pedestrian_target_distribution(data_reduced)  # use data before it is sorted!
+            calculate_pedestrian_target_distribution(data_reduced, target_size)  # use data before it is sorted!
 
         return data_reduced, pedestrian_target_distribution, global_distribution, timesteps
     else:
@@ -170,7 +164,7 @@ if __name__ == '__main__':
 
     ## Parameters for random forest
     test_size_percent = 0.2
-    use_cores = 4
+    use_cores = 3
     numberOfTrees = [100]
     treeDepths = [None] # as long as possible
 
