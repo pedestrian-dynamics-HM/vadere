@@ -44,7 +44,7 @@ public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends 
 	public void postInsertEvent(V vertex) {}
 
 	@Override
-	public F locatePoint(final P point, boolean insertion) {
+	public F locatePoint(final P point) {
 		//return triConnectivity.getMesh().getFace(triConnectivity.locateNearestNeighbour(point));
 		return triConnectivity.locateFace(point.getX(), point.getY()).get();
 		/*if(insertion) {

@@ -4,78 +4,129 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.util.debug.gui.DebugGui;
 import org.vadere.util.debug.gui.canvas.SimpleTriCanvas;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.iterators.Ring1Iterator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 
-//TODO: check unused methods!
 /**
- * @author Benedikt Zoennchen
+ * <p>A tri-connectivity {@link ITriConnectivity} is the connectivity of a mesh of non-intersecting connected triangles including holes.
+ * A hole can be an arbitrary simple polygon. So it is more concrete than a poly-connectivity {@link IPolyConnectivity}.
+ * The mesh {@link IMesh} stores all the date of the base elements (points {@link P}, vertices {@link V}, half-edges {@link E}
+ * and faces {@link F}) and offers factory method to create new base elements.
+ * The connectivities, i.e. {@link IPolyConnectivity} and {@link ITriConnectivity} offers all the operations manipulating
+ * the connectivity of the mesh. The connectivity is the relation between vertices and edges which define faces which therefore define the mesh structure.</p>
  *
- * @param <P>
- * @param <E>
- * @param <F>
+ * <p>We say a mesh represents a valid triangulation or a triangulation is valid if and only if all triangle-faces are counter-clockwise oriented.</p>
+ *
+ * <p>We say a mesh represents a feasible triangulation or a triangulation is feasible if and only if all triangle-faces are legal, i.e. all half-edges are legal.
+ * The certificate for an edge to be legal relies on the concrete implementation of the triangulation. E. g. for a strict Delaunay-Triangulation the Delaunay-Criterion
+ * has to be fulfilled.</p>
+ *
+ * @param <P> the type of the points (containers)
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
+ *
+ * @author Benedikt Zoennchen
  */
 public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IPolyConnectivity<P, V, E, F> {
 
+	/**
+	 * A logger for debug and information reasons.
+	 */
 	Logger log = LogManager.getLogger(ITriConnectivity.class);
+
+	/**
+	 * A Random number generator to randomly walk through the trinagulation.
+	 */
 	Random random = new Random();
+
+	/**
+	 * A flag to activate and deactivate the debug mode.
+	 */
 	boolean debug = false;
 
 
 	/**
-	 * Non mesh changing method.
+	 * <p>This will be called whenever a triangle / face is split into three faces
+	 * and inform all listeners about that event.</p>
 	 *
-	 * @param original
-	 * @param f1
-	 * @param f2
-	 * @param f3
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param original  the original face
+	 * @param f1        one of the split results
+	 * @param f2        one of the split results
+	 * @param f3        one of the split results
 	 */
-	default void splitTriangleEvent(F original, F f1, F f2, F f3) {}
+	default void splitTriangleEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2, @NotNull final F f3) {}
 
-	default void splitEdgeEvent(F original, F f1, F f2) {}
+	/**
+	 * <p>This will be called whenever a triangle / face is split at a specific edge which
+	 * will split it into tow faces. The method informs all listeners about that event.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param original  the original face
+	 * @param f1        one of the split results
+	 * @param f2        one of the split results
+	 */
+	default void splitEdgeEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2) {}
 
-	default Iterable<E> getRing1It(V vertex) {
-		return ()  -> new Ring1Iterator<>(getMesh(), getMesh().getEdge(vertex));
-	}
-
-	default void replacePoint(V vertex, P point) {
+	/**
+	 * <p>This will replace the point of a vertex. If the point has other coordinates than
+	 * the old point of the vertex this will reposition the vertex without any checks, i.e.
+	 * the user has to know what he does and has to make sure that the mesh is valid and feasible
+	 * afterwards and all listeners e.g. the point locators such as the Delaunay-Hierarchy
+	 * {@link org.vadere.util.geometry.mesh.gen.DelaunayHierarchy<P, V, E, F>} can handle this
+	 * repositioning!</p>
+	 *
+	 * <p>Does not change the connectivity but may change the position of a vertex and therefore requires
+	 * connectivity changes which has to be made manually!</p>
+	 *
+	 * @param vertex    the vertex
+	 * @param point     the new point of the vertex
+	 */
+	default void replacePoint(@NotNull final V vertex, @NotNull final P point) {
 		assert GeometryUtils.toPolygon(getMesh().getPoint(vertex)).contains(point);
 		getMesh().setPoint(vertex, point);
 	}
 
 	/**
-	 * Inserts a point into the mesh which is contained in the boundary. The point will be
-	 * connected by the start and end point of the edge. Note that the user has to make sure
-	 * that a valid triangulation will obtained!
+	 * <p>Inserts a point into the mesh which is contained in a boundary by connecting the boundaryEdge
+	 * to the point in O(1) time. This will create 4 new half-edges, one new vertex and one face.</p>
 	 *
-	 * @param point
-	 * @param edge
-	 * @return
+	 * <p>Assumption: The point is contained in the boundary i.e. the point is inside the border or inside a hole.</p>
+	 *
+	 * <p>Changes the connectivity.</p>
+	 *
+	 * @param point         the point to be inserted
+	 * @param boundaryEdge  the boundary edge
+	 * @param boundary      the boundary of the edge
+	 * @return the created face
 	 */
-	default F insertOutsidePoint(P point, E edge) {
-		assert getMesh().isBoundary(edge);
-		Optional<V> optVertex = getMesh()
-				.streamVertices()
-				.filter(v -> v.equals(getMesh().getPoint(v)))
-				.findAny();
+	default F insertOutsidePoint(@NotNull final P point, @NotNull final E boundaryEdge, @NotNull final F boundary) {
+		assert getMesh().isBoundary(boundaryEdge) &&
+				getMesh().isBoundary(boundary) &&
+				getMesh().getFace(boundaryEdge).equals(boundary) &&
+				(!getMesh().locate(point.getX(), point.getY()).isPresent() || getMesh().locate(point.getX(), point.getY()).get().equals(boundary));
 
-		V vertex = optVertex.orElse(getMesh().createVertex(point));
+		V vertex = getMesh().createVertex(point);
 		F face = getMesh().createFace();
-		F borderFace = getMesh().getFace(edge);
+		F borderFace = getMesh().getFace(boundaryEdge);
 
-		E prev = getMesh().getPrev(edge);
-		E next = getMesh().getNext(edge);
+		E prev = getMesh().getPrev(boundaryEdge);
+		E next = getMesh().getNext(boundaryEdge);
 
 		E e1 = getMesh().createEdge(vertex);
 		getMesh().setFace(e1, face);
@@ -84,16 +135,16 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 		E b1 = getMesh().createEdge(vertex);
 		getMesh().setFace(b1, borderFace);
-		E b2 = getMesh().createEdge(getMesh().getVertex(edge));
+		E b2 = getMesh().createEdge(getMesh().getVertex(boundaryEdge));
 		getMesh().setFace(b2, borderFace);
 
 		getMesh().setNext(prev, b1);
 		getMesh().setNext(b1, b2);
 		getMesh().setNext(b2, next);
 
-		getMesh().setNext(edge, e1);
+		getMesh().setNext(boundaryEdge, e1);
 		getMesh().setNext(e1, e2);
-		getMesh().setNext(e2, edge);
+		getMesh().setNext(e2, boundaryEdge);
 
 		getMesh().setTwin(b1, e2);
 		getMesh().setTwin(b2, e1);
@@ -102,40 +153,65 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		getMesh().setEdge(borderFace, b1);
 		getMesh().setEdge(face, e1);
 
-		getMesh().setFace(edge, face);
+		getMesh().setFace(boundaryEdge, face);
 
 		return face;
 	}
 
 	/**
-	 * Non mesh changing method.
+	 * <p>This will be called whenever a triangle / face edge is flipped
+	 * and inform all listeners about that event. For each flip two
+	 * triangles are taking part.</p>
 	 *
-	 * @param f1
-	 * @param f2
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param f1 the first triangle / face of the flip operation
+	 * @param f2 the second triangle / face of the flip operation
 	 */
-	default void flipEdgeEvent(F f1, F f2) {}
+	default void flipEdgeEvent(@NotNull final F f1, @NotNull final F f2) {}
 
 	/**
-	 * Non mesh changing method.
+	 * <p>This will be called whenever a new point is inserted into the mesh.</p>
 	 *
-	 * @param vertex
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param vertex the vertex which was inserted
 	 */
-	default void insertEvent(E vertex) {};
+	default void insertEvent(@NotNull final E vertex) {};
 
 	/**
-	 * Non mesh changing method.
+	 * <p>Tests whether an edge is illegal and should be flipped.</p>
 	 *
-	 * @param edge
-	 * @return
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param edge  the edge which will be tested
+	 * @param p     the point, i.e. point(next(edge))
+	 * @return true if the edge is illega, false otherwise
 	 */
-	boolean isIllegal(E edge, V p);
+	boolean isIllegal(@NotNull final E edge, @NotNull final V p);
 
-	default boolean isIllegal(E edge) {
+	/**
+	 * <p>Tests whether an edge is illegal and should be flipped.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param edge  the edge which will be tested
+	 * @return true if the edge is illega, false otherwise
+	 */
+	default boolean isIllegal(@NotNull final E edge) {
 		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
-
-    default E getAnyEdge(Pair<E, E> pair) {
+	/**
+	 * <p>Helper method which returns an arbitrary edge of a pair of edges.
+	 * It returns the left if it is not null otherwise the right.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param pair a pair of half-edges
+	 * @return an arbitrary edge of a pair of edges
+	 */
+    default E getAnyEdge(@NotNull final Pair<E, E> pair) {
         if(pair.getLeft() != null) {
             return pair.getLeft();
         }
@@ -145,34 +221,16 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
     }
 
 	/**
-	 * creates a new hole or extends an existing hole by removing neighbouring faces.
+	 * <p>Splits the half-edge at point p, which means two triangles will be split into four if
+	 * the edge is not a boundary edge otherwise only one triangle will be split into two.</p>
 	 *
-	 * @param face
-	 * @param mergeCondition
-	 * @param deleteIsoletedVertices
-	 * @return
-	 */
-	default F createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
-		//Predicate<F> notAtBorder = f -> !getMesh().isAtBorder(f);
-		//Predicate<F> predicate = notAtBorder.and(mergeCondition);
-
-		if(mergeCondition.test(face)) {
-			F remainingFace = IPolyConnectivity.super.mergeFaces(face, mergeCondition, deleteIsoletedVertices);
-			getMesh().toHole(remainingFace);
-			return remainingFace;
-		}
-		else {
-			return face;
-		}
-	}
-
-	/**
-	 * Splits the half-edge at point p, preserving a valid triangulation.
-	 * Assumption: p is located on the edge!
-	 * Mesh changing method.
+	 * <p>Assumption: p is located on the edge!</p>
+	 *
+	 * <p>Mesh changing method.</p>
 	 *
 	 * @param p         the split point
 	 * @param halfEdge  the half-edge which will be split
+	 * @param legalize  if true the split will be legalized i.e. the mesh will be locally changed until it is legal
 	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
      *         edges and their twins are the faces which took part / where modified / added by the split.
      */
@@ -325,11 +383,38 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
         return Pair.of(t1, t2);
 	}
 
-	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge) {
+	/**
+	 * <p>Splits the half-edge at point p, which means two triangles will be split into four if
+	 * the edge is not a boundary edge otherwise only one triangle will be split into two.
+	 * Afterwards the mesh is legalized locally, to preserve a feasible triangulation.</p>
+	 *
+	 * <p>Assumption: p is located on the edge!</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param p         the split point
+	 * @param halfEdge  the half-edge which will be split
+	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
+	 *         edges and their twins are the faces which took part / where modified / added by the split.
+	 */
+	default Pair<E, E> splitEdge(@NotNull final P p, @NotNull final E halfEdge) {
 		return splitEdge(p, halfEdge, true);
 	}
 
-	default Pair<E, E> splitEdge(@NotNull E halfEdge, boolean legalize) {
+	/**
+	 * <p>Splits the half-edge at the mid point of its full-edge, which means two triangles will be split into four if
+	 * the edge is not a boundary edge otherwise only one triangle will be split into two.</p>
+	 *
+	 * <p>Assumption: p is located on the edge!</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param halfEdge  the half-edge which will be split
+	 * @param legalize  if true the split will be legalized i.e. the mesh will be locally changed until it is legal
+	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
+	 *         edges and their twins are the faces which took part / where modified / added by the split.
+	 */
+	default Pair<E, E> splitEdge(@NotNull final E halfEdge, final boolean legalize) {
 		VPoint midPoint = getMesh().toLine(halfEdge).midPoint();
 		P p = getMesh().createPoint(midPoint.getX(), midPoint.getY());
 		return splitEdge(p, halfEdge, legalize);
@@ -340,6 +425,14 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	}*/
 
+	/**
+	 * <p>A synchronized version of {@link ITriConnectivity#flip(IHalfEdge)}, i.e. the method acquires every
+	 * involved vertex (four vertices) before it flips the edge.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param edge the edge which will be flipped.
+	 */
 	default void flipSync(@NotNull final E edge) {
 		IMesh<P, V, E, F> mesh = getMesh();
 
@@ -395,9 +488,9 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Flips an edge in the triangulation assuming the egdge which will be
-	 * created is not jet there.
-	 * mesh changing method.
+	 * <p>Flips an edge in the triangulation assuming the egdge which will be created is not jet there.</p>
+	 *
+	 * <p>Mesh changing method.</p>
 	 *
 	 * @param edge the edge which will be flipped.
 	 */
@@ -461,37 +554,57 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Tests if the face is counter-clockwise oriented.
-	 * Assumption: The face is a triangle!
+	 * <p>Tests if the face is counter-clockwise oriented in O(1) time. If a triangulation is valid
+	 * all triangle-faces are counter-clockwise oriented.</p>
 	 *
-	 * @param triangleFace
-	 * @return
+	 * <p>Assumption: The face is a triangle!</p>
+	 *
+	 * @param triangleFace the face representing a triangle
+	 * @return true if the face (triangle) is counter-clockwise oriented, false otherwise
 	 */
-	default boolean isCCW(F triangleFace) {
+	default boolean isCCW(@NotNull final F triangleFace) {
+		assert getMesh().getEdges(triangleFace).size() == 3;
+
 		E edge = getMesh().getEdge(triangleFace);
 		P p1 = getMesh().getPoint(edge);
 		P p2 = getMesh().getPoint(getMesh().getNext(edge));
 		P p3 = getMesh().getPoint(getMesh().getPrev(edge));
 
-		return GeometryUtils.isCCW(p1, p2, p3);
+		return GeometryUtils.isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
-
-	default boolean isTriangle(F face) {
-		IMesh<P, V, E, F> mesh = getMesh();
-		List<E> edges = mesh.getEdges(face);
-		return edges.size() == 3;
-	}
-
-	E insert(@NotNull P p, @NotNull F face);
 
 	/**
-	 * Splits the triangle xyz into three new triangles xyp, yzp and zxp.
-	 * Assumption: p is inside the face.
-	 * Mesh changing method.
+	 * <p>Inserts a new point into the mesh / triangulation by preserving a feasible triangulation. There are different possible
+	 * outcomes:
+	 * <ol>
+	 *     <li>the face will be split by an edge-split {@link ITriConnectivity#splitEdge(IPoint, IHalfEdge)}</li>
+	 *     <li>the face will be split by an face-split {@link ITriConnectivity#splitTriangle(IFace, IPoint)}</li>
+	 *     <li>the point is very close to some point of the face {@link ITriConnectivity#isClose(double, double, IFace, double)}
+	 * 	 *    and therefore it will not be inserted at all.</li>
+	 * </ol>
+	 * This requires amortized O(1) time.</p>
+	 *
+	 * <p>Assumption:  the face contains the point or the point lines on an edge of the face
+	 *              and the face is part of the mesh.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param p     the point which will be inserted
+	 * @param face  the face which contains the point.
+	 * @return one of the new created half-edges
+	 */
+	E insert(@NotNull final P p, @NotNull final F face);
+
+	/**
+	 * <p>Splits the triangle xyz into three new triangles xyp, yzp and zxp. This requires amortized O(1) time.</p>
+	 *
+	 * <p>Assumption: p is inside the face.</p>
+	 *
+	 * <p>Mesh changing method.</p>
 	 *
 	 * @param point     the point which splits the triangle
 	 * @param face      the triangle face we split
-	 * @param legalize  true means that recursive filps will be done afterwards to legalizeRecursively illegal edges (e.g. delaunay requirement).
+	 * @param legalize  if true the triangulation will be legalized locally at the split to preserve a feasible triangulation
 	 *
 	 * @return an half-edge which has point as its end-point
 	 */
@@ -566,9 +679,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Splits the triangle xyz into three new triangles xyp, yzp and zxp and legalizes all possibly illegal edges.
-	 * Assumption: p is inside the face.
-	 * Mesh changing method.
+	 * <p>Splits the triangle xyz into three new triangles xyp, yzp and zxp and legalizes all possibly illegal edges locally,
+	 * which preserves a legal triangulation. This requires amortized O(1) time.</p>
+	 *
+	 * <p>Assumption: p is contained in the face.</p>
+	 *
+	 * <p>Mesh changing method.</p>
 	 *
 	 * @param p         the point which splits the triangle
 	 * @param face      the triangle face we split
@@ -579,22 +695,59 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return splitTriangle(face, p, true);
 	}
 
-	default void removeEdge(@NotNull final E edge, @NotNull final V vertex, final boolean deleteIsolatededVertex) {
-		E halfEdge = edge;
-		if(!getMesh().getVertex(halfEdge).equals(vertex)) {
-			halfEdge = getMesh().getTwin(halfEdge);
+	/**
+	 * <p>This method collapses a three degree vertex which is at the boundary by removing the
+	 * one edge (a simple link) which is not a boundary edge and by merging the two other boundary edges,
+	 * i.e. two triangles will become one and the vertex will be deleted. This requires O(1) time
+	 * since we assume a triangulation.</p>
+	 *
+	 * <p>Assumption: vertex is a three degree vertex, the edge ends in vertex, the edge is a non-boundary edge,
+	 * the two other half-edges ending in the vertex are boundary edges</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param vertex                    the vertex where the edge ends
+	 * @param deleteIsolatededVertex    if true the vertex will be removed from the mesh data structure.
+	 */
+	default void collapse3DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+		assert getMesh().degree(vertex) == 3;
+		Optional<E> toDeleteEdge = getMesh().streamEdges(vertex).filter(e -> !getMesh().isAtBoundary(e)).findAny();
+
+		assert toDeleteEdge.isPresent();
+
+		if(toDeleteEdge.isPresent()) {
+			E edge = toDeleteEdge.get();
+			assert getMesh().streamEdges(vertex).filter(e -> getMesh().isAtBoundary(e)).count() == 2;
+
+			E halfEdge = edge;
+			if(!getMesh().getVertex(halfEdge).equals(vertex)) {
+				halfEdge = getMesh().getTwin(halfEdge);
+			}
+
+			if(!getMesh().getVertex(halfEdge).equals(vertex)) {
+				throw new IllegalArgumentException(halfEdge + " does not end in " + vertex + ".");
+			}
+
+			removeSimpleLink(edge);
+			remove2DVertex(vertex, deleteIsolatededVertex);
 		}
-
-		if(!getMesh().getVertex(halfEdge).equals(vertex)) {
-			throw new IllegalArgumentException(halfEdge + " does not end in " + vertex + ".");
+		else {
+			log.warn("Did not found any non-boundary half-edge. Something went wrong!");
 		}
-
-		removeEdge(edge);
-		removeVertex(vertex, deleteIsolatededVertex);
-
 	}
 
-	default void removeVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+	/**
+	 * <p>Removes a two degree vertex by removing its two collapsing its two neighbouring edges which
+	 * will remove two half-edges which is one full-edge in O(1)</p>
+	 *
+	 * <p>Assumption: the veterx is of degree equals two.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param vertex                    the 2-degree vertex which will be removed
+	 * @param deleteIsolatededVertex    if true the vertex will be removed from the mesh data structure
+	 */
+	default void remove2DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
 		assert getMesh().degree(vertex) == 2;
 
 		E survivor = getMesh().getEdge(vertex);
@@ -605,13 +758,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		getMesh().setNext(survivor, getMesh().getNext(next));
 		getMesh().setPrev(twin, getMesh().getPrev(twinPrev));
 
-		getMesh().setEdge(getMesh().getFace(survivor), survivor);
-		getMesh().setEdge(getMesh().getFace(twin), twin);
+		if(getMesh().getEdge(getMesh().getFace(survivor)).equals(next)) {
+			getMesh().setEdge(getMesh().getFace(survivor), survivor);
+		}
+
+		if(getMesh().getEdge(getMesh().getFace(twin)).equals(twinPrev)) {
+			getMesh().setEdge(getMesh().getFace(twin), twin);
+		}
 
 		getMesh().setVertex(survivor, getMesh().getVertex(next));
 
-		getMesh().setEdge(getMesh().getVertex(next), survivor);
-		//getMesh().setEdge(getMesh().getVertex(twinPrev), twinPrev);
+		if(getMesh().getEdge(getMesh().getVertex(next)).equals(next)) {
+			getMesh().setEdge(getMesh().getVertex(next), survivor);
+		}
 
 		getMesh().destroyEdge(twinPrev);
 		getMesh().destroyEdge(next);
@@ -621,31 +780,18 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
-
 	/**
-	 * This method collapses a three degree vertex which is at the boundary by removing the
-	 * one edge which is not at the boundary and by merging the two other edges which are at the
-	 * boundary i.e. two triangles will become one and the vertex will be deleted.
+	 * <p>Creates a new face by connecting two boundary vertices v1, v3 of a boundary path v1->v2->v3 such that
+	 * v1->v2->v3 becomes a new face. This requires O(1) time.</p>
 	 *
-	 * @param vertex a 3 degree vertex at the boundary which will be deleted.
-	 */
-	default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
-		assert getMesh().degree(vertex) == 3;
-		Optional<E> toDeleteEdge = getMesh().streamEdges(vertex).filter(e -> !getMesh().isAtBoundary(e)).findAny();
-		if(toDeleteEdge.isPresent()) {
-			assert getMesh().streamEdges(vertex).filter(e -> getMesh().isAtBoundary(e)).count() == 2;
-			removeEdge(toDeleteEdge.get(), vertex, removeIsolatedVertex);
-		}
-		else {
-			log.warn("something wrong?");
-		}
-	}
-
-	/**
-	 * Creates a new face by connecting two boundary vertices v1, v3 of a boundary path v1->v2->v3 such that
-	 * v1->v2->v3 becomes a new face.
+	 * <p>Assumption:
+	 * <ul>
+	 *     <li>there is an counter clockwise angle < 180 (PI) at v2 of the triangle (v1,v2,v3)</li>
+	 *     <li>the boundaryEdge is a boundary edge</li>
+	 * </ul>
+	 * </p>
 	 *
-	 * Assumption: There is an angle < 180 at v2 of the triangle (v1,v2,v3) and the boundaryEdge is a boundary edge.
+	 * <p>Mesh changing method.</p>
 	 *
 	 * @param boundaryEdge an edge of the boundary (i.e. part of the border or a hole).
 	 */
@@ -653,12 +799,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		assert getMesh().isBoundary(boundaryEdge);
 
 		F boundary = getMesh().getFace(boundaryEdge);
-
 		E next = getMesh().getNext(boundaryEdge);
 		E prev = getMesh().getPrev(boundaryEdge);
 
 		// can we form a triangle
-		assert GeometryUtils.angle(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next)) < Math.PI;
+		assert GeometryUtils.isCCW(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next))
+				&& GeometryUtils.angle(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next)) < Math.PI;
 
 		E nnext = getMesh().getNext(next);
 
@@ -697,7 +843,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		getMesh().setEdge(getMesh().getVertex(next), newEdge);
 	}
 
-	/*default void collapseAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
+	/*default void collapse3DAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
 		assert getMesh().degree(vertex) == 3;
 		List<E> edges = getMesh().getEdges(vertex);
 
@@ -773,14 +919,18 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}*/
 
 	/**
-	 * Legalizes an edge xy of a triangle xyz if it is illegal by flipping it.
-	 * Mesh changing method.
+	 * <p>Legalizes recursively an edge xy of a triangle xyz if it is illegal / not feasible by flipping it.
+	 * This requires amortized O(1) time.</p>
+	 *
+	 * <p>Mesh changing method.</p>
 	 *
 	 * @param edge  an edge zx of a triangle xyz
+	 * @param p     point(next(edge))
+	 * @param depth the depth of the recursion
 	 */
-	default void legalizeRecursively(@NotNull final E edge, final V p, int depth) {
+	default void legalizeRecursively(@NotNull final E edge, @NotNull final V p, int depth) {
 		if(isIllegal(edge, p)) {
-			assert isFlipOk(edge);
+			assert isFlipOkAssertion(edge);
 			assert getMesh().getVertex(getMesh().getNext(edge)).equals(p);
 
 			F f1 = getMesh().getFace(edge);
@@ -809,20 +959,75 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
-	void legalizeNonRecursive(final E edge, final V p);
+	/**
+	 * <p>Legalizes an edge xy of a triangle xyz if it is illegal / not feasible by flipping it.
+	 * This requires amortized O(1) time.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param edge  an edge zx of a triangle xyz
+	 * @param p     point(next(edge))
+	 */
+	default void legalizeNonRecursive(@NotNull final E edge, @NotNull final V p) {
+		int flips = 0;
+		int its = 0;
+		//if(isIllegal(edge, p)) {
 
-	default void legalize(final E edge, V p) {
+		// this should be the same afterwards
+		//E halfEdge = getMesh().getNext(edge);
+
+		IMesh<P, V, E, F> mesh = getMesh();
+		E startEdge = mesh.getPrev(edge);
+		E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
+		E currentEdge = mesh.getPrev(edge);
+
+		// flipp
+		//c.prev.twin
+
+		while(currentEdge != endEdge) {
+			while (isIllegal(mesh.getNext(currentEdge), p)) {
+				flip(mesh.getNext(currentEdge));
+				flips++;
+				its++;
+			}
+			its++;
+
+			currentEdge = mesh.getTwin(mesh.getPrev(currentEdge));
+		}
+
+		//log.info("#flips = " + flips);
+		//log.info("#its = " + its);
+		//}
+	}
+
+	/**
+	 * <p>Legalizes an edge xy of a triangle xyz if it is illegal / not feasible by flipping it.
+	 * This requires amortized O(1) time.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param edge  an edge zx of a triangle xyz
+	 * @param p     point(next(edge))
+	 */
+	default void legalize(@NotNull  final E edge, @NotNull final V p) {
 		legalizeNonRecursive(edge, p);
 	}
 
 	/**
-	 * Tests if a flip for this half-edge is valid, i.e. the edge does not already exist.
-	 * Non mesh changing method.
+	 * <p>This method is a plausibility assertion-test. It tests if
+	 * <ol>
+	 *  <li>the edge is not a boundary edge</li>
+	 *  <li>the vertex of the next of its twin is not equal to any vertex of the neighbouring edges of its next.</li>
+	 * </ol>
+	 * </p>
+	 * This method requires O(d) time where d is the degree of the involved vertices and should only be used for assertions.
+	 *
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param halfEdge the half-edge that might be flipped
-	 * @return true if and only if the flip is valid
+	 * @return true if the plausibility assertion-test is true.
 	 */
-	default boolean isFlipOk(@NotNull final E halfEdge) {
+	default boolean isFlipOkAssertion(@NotNull final E halfEdge) {
 		if(getMesh().isBoundary(halfEdge)) {
 			return false;
 		}
@@ -846,11 +1051,6 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	@Override
-	default Optional<F> locateFace(final P point) {
-		return this.locateFace(point.getX(), point.getY());
-	}
-
-	@Override
 	default Optional<F> locateFace(final double x, final double y) {
 		Optional<F> optFace;
 		if(getMesh().getNumberOfFaces() > 1) {
@@ -864,13 +1064,6 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 
 		return optFace;
-
-		/*if(optFace.isPresent() && getMesh().isBoundary(optFace.get())) {
-			return Optional.empty();
-		}
-		else {
-			return optFace;
-		}*/
 	}
 
 	/*default Optional<P> locateVertex(double x, double y, F startFace) {
@@ -888,14 +1081,21 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}*/
 
 	/**
-	 * None mesh changing method.
+	 * <p>Searches and returns the face containing the point (x,y) in O(n),
+	 * where n is the number of faces of the mesh by starting at a specific face.
+	 * The search uses a robust straight walk such that it can walk through holes, i.e.
+	 * polygons. If this face is close to (x, y) the search will be fast.</p>
 	 *
-	 * @param x
-	 * @param y
-	 * @param startFace
-	 * @return
+	 * Assumption: the start-face is contained in the mesh structure.
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param x         x-coordinate of the location point
+	 * @param y         y-coordinate of the location point
+	 * @param startFace the face at which the search starts
+	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(double x, double y, F startFace) {
+	default Optional<F> locateFace(final double x, final double y, @NotNull final F startFace) {
 		// there is no face.
 		if(getDimension() <= 0 ){
 			return Optional.empty();
@@ -909,19 +1109,33 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
-	default Optional<F> locateFace(P point, F startFace) {
+	/**
+	 * <p>Searches and returns (optional) the face containing the point (x,y) in O(n),
+	 * where n is the number of faces of the mesh by starting at a specific face.
+	 * The search uses a robust straight walk such that it can walk through holes, i.e.
+	 * polygons. If this face is close to (x, y) the search will be fast.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param point     the point (x, y)
+	 * @param startFace the face at which the search starts
+	 * @return the face containing the point or empty() if there is none
+	 */
+	default Optional<F> locateFace(@NotNull final P point, F startFace) {
 		return locateFace(point.getX(), point.getY(), startFace);
 	}
 
 	/**
-	 * None mesh changing method.
+	 * <p>Straight walk in the 1D-case, i.e. the mesh consists only one interior-face.</p>
 	 *
-	 * @param x
-	 * @param y
-	 * @param startFace
-	 * @return
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param x         the x-coordinate of the point
+	 * @param y         the y-coordinate of the point
+	 * @param startFace the startFace face of the search
+	 * @return (optional) the face containing the point or empty() if there is none
 	 */
-	default Optional<F> marchLocate1D(double x, double y, F startFace) {
+	default Optional<F> marchLocate1D(final double x, final double y, @NotNull final F startFace) {
 		if(contains(x, y, startFace)) {
 			return Optional.of(startFace);
 		}
@@ -971,32 +1185,53 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Marching to the face which triangleContains the point defined by (x2, y2). Inside the startFace.
-	 * This algorithm also works if there are convex polygon (holes) inside the triangulation.
-	 * None mesh changing method.
+	 * <p>Marching to the face which contains the point defined by (x2, y2) starting inside the startFace.
+	 * This algorithm also works if there are convex polygon (holes) inside the triangulation.</p>
+	 *
+	 * <p>Assumption: (x, y) is contained in some face.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x1        the x-coordinate of the ending point
 	 * @param y1        the y-coordinate of the ending point
 	 * @param startFace the face where the march start containing (x1,y1).
-	 * @return
+	 * @return returns the face containing (x, y)
 	 */
 	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace) {
 		return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
 	}
 
+	/**
+	 * <p>Marching to the face which contains the point defined by (x2, y2) starting inside the startFace.
+	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
+	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
+	 * inside the triangulation.</p>
+	 *
+	 * <p>Assumption: (x, y) is contained in some face.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param x1        the x-coordinate of the point at which the march will start
+	 * @param y1        the y-coordinate of the point at which the march will start
+	 * @param startFace the face where the march start containing (x1,y1).
+	 * @return returns all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 */
     default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
         return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
     }
 
 	/**
-	 * Marching from a vertex which is the vertex of startVertex towards direction until the stopCondition is fulfilled.
+	 * Marching from a vertex which is the vertex (<tt>startVertex</tt>) of face (<tt>face</tt>) in the direction (<tt>direction</tt>)
+	 * until the stop-condition (<tt>stopCondition</tt>) is fulfilled. This requires O(n) worst case time, where n is the number of faces of the mesh.
 	 *
-	 * @param startVertex
-	 * @param direction
-	 * @param stopCondition
-	 * @return
+	 * <p>Assumption: The stopCondition will be fulfilled at some point.</p>
+	 *
+	 * @param startVertex       the vertex at which the march starts
+	 * @param direction         the direction in which the march will go
+	 * @param stopCondition     the stop condition at which the march will stop
+	 * @return a face which is reached by starting a march from vertex and marching towards direction until stopCondition
 	 */
-	default F straightWalk2D(final E startVertex, final F face, final VPoint direction, final Predicate<E> stopCondition) {
+	default F straightWalk2D(@NotNull final E startVertex, @NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> stopCondition) {
 
         E edge = getMesh().getPrev(startVertex);
 		VPoint p1 = getMesh().toPoint(startVertex);
@@ -1006,25 +1241,53 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		assert getMesh().getEdges(face).contains(startVertex);
 		// TODO: quick solution!
         VPoint q = p1.add(direction.scalarMultiply(Double.MAX_VALUE * 0.5));
-		return straightWalk2D(p1, q, face, edge, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
+		return straightWalk2D(p1, q, face, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
 	}
 
 	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
 		return straightGatherWalk2D(x1, y1, startFace, stopCondition).peekLast();
 	}
 
-    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, final F startFace, final Predicate<E> stopCondition) {
+	/**
+	 * <p>Marches / walks along the line defined by q and p from q to p starting inside the startFace.
+	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
+	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
+	 * inside the triangulation. A stop condition like e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1),
+	 * will stop the walk if the point p = (x1, y1) is contained in the face.</p>
+	 *
+	 * Assumption:
+	 * <ol>
+	 *     <li>q is contained in the start face</li>
+	 *     <li>the stop condition will be fulfilled at some point</li>
+	 * </ol>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param x1            the x-coordinate of the point at which the march will start
+	 * @param y1            the y-coordinate of the point at which the march will start
+	 * @param startFace     the face where the march start containing (x1,y1).
+	 * @param stopCondition the stopCondition at which the march will stop.
+	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 */
+    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
         assert !getMesh().isBorder(startFace);
 
         // initialize
         F face = startFace;
-        E edge = getMesh().getEdge(face);
         VPoint q = getMesh().toPolygon(startFace).getCentroid(); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
-        return straightGatherWalk2D(q, p, face, edge, stopCondition);
+        return straightGatherWalk2D(q, p, face, stopCondition);
     }
 
+	/**
+	 * <p>Connects each (current) two consecutive border edge if they form an acute angle
+	 * which smoothes the border of the mesh overall. This requires O(n) time, where n
+	 * is the number of border edges.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 */
 	default void smoothBorder() {
 		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
 			if(getMesh().isBorder(edge)) {
@@ -1043,36 +1306,98 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
+	/**
+	 * <p>Connects each (current) two consecutive border edge if they form an acute angle
+	 * which smoothes the border of the mesh overall. This requires O(n) time, where n
+	 * is the number of border edges.</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 */
+	default void smoothHoles() {
+		for(F hole : getMesh().getHoles()) {
+			for(E edge : getMesh().getEdges(hole)) {
+				if(getMesh().getFace(edge).equals(hole)) {
+
+					VPoint p = getMesh().toPoint(edge);
+					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
+
+					if(GeometryUtils.isCCW(r, p, q)) {
+						double angle = GeometryUtils.angle(r, p, q);
+						if(angle < 0.5*Math.PI) {
+							createFaceAtBoundary(edge);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	default void smoothBoundary() {
+		smoothBorder();
+		smoothHoles();
+	}
+
     /**
-     * Walks along the line defined by q and p. The walking direction should be controlled by the stopCondition e.g.
+     * <p>Walks along the line defined by q and p. The walking direction should be controlled by the stopCondition e.g.
      * e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1) is on the left side of each edge which is the case if the
      * point is inside the reached face. The walk starts at the startFace and continues in the direction of line defined
-     * by q and p using the any edge which does not fulfill the stopCondition.
+     * by q and p using the any edge which does not fulfill the stopCondition.</p>
+     *
+     * <p>Does not change the connectivity.</p>
      *
      * @param q
      * @param p
      * @param startFace
-     * @param startEdge
      * @param stopCondition
      * @return
      */
-	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
-        return straightGatherWalk2D(q, p, startFace, startEdge, stopCondition).peekLast();
+	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
+        return straightGatherWalk2D(q, p, startFace, stopCondition).peekLast();
 	}
 
+	// TODO change centroid to midpoint of a triangle!
 	/**
+	 * <p>Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
+	 * from q to p. Furthermore this method will gather the visited face by placing it into the list of visited faces.
+	 * There are different cases with special cases which make the code complicated:
+	 * <ol>
+	 *     <li>general case:    the line (q, p) intersects two half-edges.
+	 *                          In this case the algorithm walks across the correct line by the definition of the direction</li>
+	 *     <li>special case 1:  there is one point of the face which lies on the line (q, p) but the stop condition is not fulfilled for the corresponding half-edge.
+	 *                          In this case the algorithm walks just across that corresponding half-edge</li>
+	 *     <li>special case 2:  there is two point of the face which lies on the line (q, p) but p is contained or very close to the face.
+	 *                          In this case the walk can return the face as (end-)walk-result.</li>
+	 *     <li>special case 3:  there is two point of the face which lies on the line (q, p) and p is not contained in the face.
+	 *                          This is a bad / expensive case since the algorithm will first move to the vertex v of the face which is closest to p.
+	 *                          Then it will go into a neighbouring face of v which has the centroid closest to p and which is not contained in the
+	 *                          list of visited faces. This can require O(n) where n is the number of faces but should never happen in a "normal" triangulation.</li>
+	 * </ol></p>
 	 *
+	 * <p>Assumption: q is contained in the start face.</p>
 	 *
-	 * @param face
-	 * @param q
-	 * @param p
-	 * @param stopCondition
-	 * @return
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param q             start point of the march / walk
+	 * @param p             end point of the march / walk
+	 * @param face          start face of the walk
+	 * @param stopCondition stop condition of the walk, i.e. the walk stops if the condition is no longer fulfilled
+	 * @param visitedFaces  a list which will be filled with the visited faces in order in which they are visited (first visited = first in)
+	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-	default Optional<F> straightWalkNext(@NotNull final F face, @NotNull final VPoint q, @NotNull final VPoint p, @NotNull final Predicate<E> stopCondition, LinkedList<F> visitedFaces) {
+	default Optional<F> straightWalkNext(
+			@NotNull final F face,
+			@NotNull final VPoint q,
+			@NotNull final VPoint p,
+			@NotNull final Predicate<E> stopCondition,
+			@NotNull final LinkedList<F> visitedFaces) {
 		E e1 = null;
 		E e2 = null;
 
+		/**
+		 * Get the half-edges e which intersects (q, p).
+		 */
 		for(E e : getMesh().getEdgeIt(face)) {
 			boolean intersect = intersects(q, p, e);
 
@@ -1126,24 +1451,51 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				 */
 				else {
 //					log.debug("straight walk: no exit edge found due to collinear exit point.");
-					V v = getMesh().streamVertices(face).min((v1, v2) -> Double.compare(p.distance(v1), p.distance(v2))).get();
 
-					SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+					/**
+					 * Get the vertex v closest to p.
+					 */
+					V v = getMesh().streamVertices(face).min(Comparator.comparingDouble(p::distance)).get();
+
+					/*SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
 					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
 					if(DebugGui.isDebugOn()) {
 						DebugGui.showAndWait(canvas);
-					}
+					}*/
 
+					/**
+					 * Get the face with the centroid closest to p and which was not visited already.
+					 */
 					Optional<F> closestFace = getMesh().streamFaces(v)
-							.filter(f -> !getMesh().isBorder(f)).filter(f -> !visitedFaces.contains(f)).min((f1, f2) -> Double.compare(p.distance(getMesh().toPolygon(f1).getCentroid()), p.distance(getMesh().toPolygon(f2).getCentroid())));
+							.filter(f -> !getMesh().isBorder(f))
+							.filter(f -> !visitedFaces.contains(f))
+							.min(Comparator.comparingDouble(f -> p.distance(getMesh().toPolygon(f).getCentroid())));
 					return closestFace;
 				}
 			}
 		}
 	}
 
-    // TODO: choose a better name
-    default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
+	/**
+	 * <p>Marches / walks along the line defined by q and p from q to p starting inside the startFace.
+	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
+	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
+	 * inside the triangulation. A stop condition like e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1),
+	 * will stop the walk if the point p = (x1, y1) is contained in the face.
+	 * The method goes from one face to the next by calling {@link ITriConnectivity#straightWalkNext(IFace, VPoint, VPoint, Predicate, LinkedList)}
+	 * but adds the resulting face to the list of visited faces and adds some logging to debug the walks / marches.</p>
+	 *
+	 * <p>Assumption: q is contained in the start face.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param q             start point of the march / walk
+	 * @param p             end point of the march / walk
+	 * @param startFace     start face of the walk
+	 * @param stopCondition stop condition of the walk, i.e. the walk stops if the condition is no longer fulfilled
+	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 */
+    default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
 		LinkedList<F> visitedFaces = new LinkedList<>();
 	    visitedFaces.addLast(startFace);
 
@@ -1285,28 +1637,30 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return visitedFaces;
 	}*/
 
-	default boolean isOuterBoundary(final F face) {
-		if(getMesh().isBoundary(face)) {
-			E boundaryEdge = getMesh().getEdge(face);
-			VPoint p = getMesh().toPoint(getMesh().getVertex(getMesh().getNext(boundaryEdge)));
-			return isRightOf(p.getX(), p.getY(), boundaryEdge);
-		}
-		else {
-			return false;
-		}
-	}
-
 	/**
-	 * Marching to the face which triangleContains the point defined by (x2, y2). Inside the startFace.
-	 * This algorithm does NOT works if there are convex polygon (holes) inside the triangulation.
-	 * None mesh changing method.
+	 * <p>Marches / walks to the face which contains the point defined by (x1, y1) starting the walk
+	 * inside the start face (<tt>startFace</tt>). The algorithm is an implementation of the
+	 * Probabilistic / Random walk which is faster in practice, see Walking in a Triangulation by devillers-2001.
+	 * This algorithm does NOT works if there are convex polygon (holes) inside the triangulation.</p>
+	 *
+	 * <p>Assumption:
+	 * <ol>
+	 *     <li>(x1, y1) is contained in some face / triangle</li>
+	 *     <li>the mesh / triangulation does not contain holes</li>
+	 * </ol>
+	 * </p>
+	 *
+	 *
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x1        the x-coordinate of the ending point
 	 * @param y1        the y-coordinate of the ending point
 	 * @param startFace the face where the march start containing (x1,y1).
-	 * @return
+	 * @return the face containing the point (x1, y1)
 	 */
-	default F marchRandom2D(double x1, double y1, F startFace) {
+	default F marchRandom2D(final double x1, final double y1, @NotNull final F startFace) {
+		assert getMesh().getHoles().size() == 0;
+
 		boolean first = true;
 		F face = startFace;
 		F prevFace = null;
@@ -1447,19 +1801,10 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
-	/**
-	 * Returns the point which is closest to the p = (x1, y1) assuming it is in the
-	 * circumcircle defined by the face.
-	 *
-	 * @param x1        the x-coordinate of the starting point
-	 * @param y1        the y-coordinate of the starting point
-	 * @param face      the face where the march start containing (x1,y1).
-	 * @return
-	 */
-	default V locateNearestNeighbour(double x1, double y1, F face) {
+	/*default V locateNearestNeighbour(double x1, double y1, F face) {
 		assert isInsideCircumscribedCycle(face, x1, y1);
 
-		V nn = getNearestPoint(face, x1, y1);
+		V nn = getMesh().getNearestPoint(face, x1, y1);
 		E edge = getMesh().getEdge(face);
 
 
@@ -1482,7 +1827,6 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return locateNearestNeighbour(x1, y1, getMesh().getFace());
 	}
 
-	//TODO: rename
 	default V lookUpNearestNeighbour(double x1, double y1, V nn, E edge) {
 		F face = getMesh().getFace(edge);
 
@@ -1498,16 +1842,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 
 		return nn;
-	}
+	}*/
 
 	/**
-	 * Tests if the point p = (x1, y1) is inside the circumscribedcycle defined by the triangle of the face.
+	 * <p>Tests if the point p = (x1, y1) is inside the circumscribed cycle defined by the triangle of the face.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
 	 * @param face  the face
 	 * @param x1    x-coordinate of the point
 	 * @param y1    y-coordinate of the point
-	 * @return true if the point p = (x1, y1) is inside the circumscribedcycle defined by the triangle of the face, false otherwise.
+	 * @return true if the point p = (x1, y1) is inside the circumscribed cycle defined by the triangle of the face, false otherwise.
 	 */
-	default boolean isInsideCircumscribedCycle(final F face, double x1, double y1) {
+	default boolean isInsideCircumscribedCycle(@NotNull final F face, final double x1, final double y1) {
 		E e1 = getMesh().getEdge(face);
 		E e2 = getMesh().getNext(e1);
 		E e3 = getMesh().getNext(e2);
@@ -1519,32 +1866,6 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return GeometryUtils.isInsideCircle(v1, v2, v3, x1, y1);
 	}
 
-	/**
-	 * Returns vertex of the triangulation of the face with the smallest distance to point.
-	 * Assumption: The face has to be part of the mesh of the triangulation.
-	 *
-	 * @param face          the face of the trianuglation
-	 * @param point         the point
-	 * @return vertex of the triangulation of the face with the smallest distance to point
-	 */
-	default V getNearestPoint(final F face, final P point) {
-		return getNearestPoint(face, point.getX(), point.getY());
-	}
-
-	default V getNearestPoint(final F face, final double x, final double y) {
-		IMesh<P, V, E, F> mesh = getMesh();
-		return mesh.streamEdges(face).map(edge -> mesh.getVertex(edge)).reduce((p1, p2) -> p1.distance(x,y) > p2.distance(x,y) ? p2 : p1).get();
-	}
-
-
-	/**
-	 * None mesh changing method.
-	 *
-	 * @param face
-	 * @param x
-	 * @param y
-	 * @return
-	 */
 	/*default boolean contains(F face, double x, double y) {
 		if(isCloseTo(face, x, y)) {
 			return true;
@@ -1564,15 +1885,8 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	//Optional<F> marchLocate2DLFC(double x, double y, F startFace);
 
-	/**
-	 * None mesh changing method.
-	 *
-	 * @param face
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	default V getMaxDistanceVertex(F face, double x, double y) {
+
+	/*default V getMaxDistanceVertex(F face, double x, double y) {
 		List<V> vertices = getMesh().getVertices(face);
 
 		//assert vertices.size() == 3;
@@ -1581,16 +1895,9 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		result = result.distance(x, y) < vertices.get(1).distance(x, y) ? vertices.get(1) : result;
 		result = result.distance(x, y) < vertices.get(2).distance(x, y) ? vertices.get(2) : result;
 		return result;
-	}
+	}*/
 
-	/**
-	 * None mesh changing method.
-	 * @param face
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	default V getMinDistanceVertex(F face, double x, double y) {
+	/*default V getMinDistanceVertex(F face, double x, double y) {
 		List<V> vertices = getMesh().getVertices(face);
 
 		//assert vertices.size() == 3;
@@ -1599,18 +1906,29 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		result = result.distance(x, y) > vertices.get(1).distance(x, y) ? vertices.get(1) : result;
 		result = result.distance(x, y) > vertices.get(2).distance(x, y) ? vertices.get(2) : result;
 		return result;
-	}
+	}*/
 
+	/**
+	 * <p>Returns the dimension of the triConnectivity.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @return the dimension of the triConnectivity
+	 */
 	default int getDimension() {
 		return getMesh().getNumberOfVertices() - 2;
 	}
 
 	/**
-	 * Returns the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
+	 * <p>Returns the closest half-edge (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
 	 * Three cases are possible:
-	 *  1) p is in the interior of the face
-	 *  2) p lies on the edge which will be returned.
-	 *  3) p is a vertex of the mesh
+	 * <ol>
+	 *     <li>p is in the interior of the face</li>
+	 *     <li>p lies on the edge which will be returned</li>
+	 *     <li>p is a vertex of the mesh</li>
+	 * </ol></p>
+	 *
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x x-coordinate of the point p
 	 * @param y y-coordinate of the point p
@@ -1628,15 +1946,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Returns the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
-	 * Two cases are possible:
-	 *  1) p is in the interior of the face
-	 *  2) p lies on the edge which will be returned.
-	 *  3) p is a vertex of the mesh
+	 * <p>Returns the closest half-edge (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Three cases are possible:
+	 * <ol>
+	 *     <li>p is in the interior of the face</li>
+	 *     <li>p lies on the edge which will be returned</li>
+	 *     <li>p is a vertex of the mesh</li>
+	 * </ol></p>
+	 *
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x         x-coordinate of the point p
 	 * @param y         y-coordinate of the point p
-	 * @param startFace the face the search will start from
+	 * @param startFace the face from which the walk / march / search will start
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<E> getClosestEdge(final double x, final double y, final F startFace) {
@@ -1651,13 +1973,19 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Returns the closest vertex of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
-	 * Note that this might not be the closest point with respect to p in general. There might be a point closer which
-	 * is however not part of the triangle which contains p.
+	 * <p>Returns the closest vertex (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Three cases are possible:
+	 * <ol>
+	 *     <li>p is in the interior of the face</li>
+	 *     <li>p lies on the edge which will be returned</li>
+	 *     <li>p is a vertex of the mesh</li>
+	 * </ol></p>
 	 *
-	 * @param x x-coordinate of the point p
-	 * @param y y-coordinate of the point p
-	 * @return the closest vertex of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param x         x-coordinate of the point p
+	 * @param y         y-coordinate of the point p
+	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<V> getClosestVertex(final double x, final double y) {
 		Optional<F> optFace = locateFace(x, y);
@@ -1670,15 +1998,22 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		}
 	}
 
+
 	/**
-	 * Returns the closest vertex of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
-	 * Note that this might not be the closest point with respect to p in general. There might be a point closer which
-	 * is however not part of the triangle which contains p. The search for the face containing p starts at the startFace.
+	 * <p>Returns the closest vertex (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Three cases are possible:
+	 * <ol>
+	 *     <li>p is in the interior of the face</li>
+	 *     <li>p lies on the edge which will be returned</li>
+	 *     <li>p is a vertex of the mesh</li>
+	 * </ol></p>
+	 *
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x         x-coordinate of the point p
 	 * @param y         y-coordinate of the point p
-	 * @param startFace the face the search will start from
-	 * @return the closest vertex of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
+	 * @param startFace the face from which the walk / march / search will start
+	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<V> getClosestVertex(final double x, final double y, final F startFace) {
 		Optional<F> optFace = locateFace(x, y, startFace);
@@ -1692,7 +2027,10 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * Returns true if and only if this the mesh of this ITriConnectivity is a valid Triangulation.
+	 * <p>Returns true if and only if the mesh of this ITriConnectivity is a valid Triangulation.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
 	 * @return true if this the mesh of this ITriConnectivity is a valid Triangulation, false otherwise
 	 */
 	default boolean isValid() {
@@ -1711,7 +2049,16 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
 	}
 
-	default boolean isValid(@NotNull F face) {
+	/**
+	 * <p>Returns true if and only if the face is a valid triangle.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param face the face which will be tested
+	 *
+	 * @return true if this the mesh of the face is a valid triangle, false otherwise
+	 */
+	default boolean isValid(@NotNull final F face) {
 		Predicate<F> orientationPredicate = f -> {
 			E edge = getMesh().getEdge(f);
 			P p1 = getMesh().getPoint(getMesh().getPrev(edge));

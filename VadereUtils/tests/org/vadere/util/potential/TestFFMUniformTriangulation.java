@@ -15,8 +15,8 @@ import org.vadere.util.potential.calculators.EikonalSolver;
 import org.vadere.util.potential.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.util.potential.calculators.PotentialPoint;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
-import org.vadere.util.triangulation.IPointConstructor;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.geometry.mesh.inter.IPointConstructor;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -37,7 +37,7 @@ public class TestFFMUniformTriangulation {
 
     @Before
     public void setUp() throws Exception {
-        IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new MeshPoint(x, y, false);
+        IPointConstructor<PotentialPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y, false);
         uniformTriangulation = ITriangulation.createUniformTriangulation(
                 IPointLocator.Type.BASE,
                 new VRectangle(0, 0, width, height),
@@ -49,7 +49,7 @@ public class TestFFMUniformTriangulation {
     @Test
     public void testFFM() {
         List<IPoint> targetPoints = new ArrayList<>();
-        targetPoints.add(new MeshPoint(5,5, false));
+        targetPoints.add(new EikMeshPoint(5,5, false));
         //EikonalSolver solver = new EikonalSolverFMMAcuteTriangulation(targetPoints, new UnitTimeCostFunction(), uniformTriangulation);
 
         EikonalSolver solver = new EikonalSolverFMMTriangulation(new UnitTimeCostFunction(), targetPoints, uniformTriangulation);

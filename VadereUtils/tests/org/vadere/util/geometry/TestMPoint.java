@@ -2,7 +2,7 @@ package org.vadere.util.geometry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
 
 import java.util.HashSet;
 
@@ -18,10 +18,10 @@ public class TestMPoint {
 
 	@Test
 	public void testHashSet() {
-		MeshPoint mPoint1 = new MeshPoint(3.0, 1.43545, false);
-		MeshPoint mPoint2 = new MeshPoint(3.0, 1.43545, false);
-		MeshPoint mPoint3 = new MeshPoint(3.0, 1.43545, true);
-		HashSet<MeshPoint> set = new HashSet<>();
+		EikMeshPoint mPoint1 = new EikMeshPoint(3.0, 1.43545, false);
+		EikMeshPoint mPoint2 = new EikMeshPoint(3.0, 1.43545, false);
+		EikMeshPoint mPoint3 = new EikMeshPoint(3.0, 1.43545, true);
+		HashSet<EikMeshPoint> set = new HashSet<>();
 		assertTrue(set.add(mPoint1));
 		assertFalse(set.add(mPoint2));
 		assertFalse(set.add(mPoint3));

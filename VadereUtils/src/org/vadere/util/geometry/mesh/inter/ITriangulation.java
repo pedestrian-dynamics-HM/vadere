@@ -4,16 +4,14 @@ import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.*;
-import org.vadere.util.geometry.mesh.impl.VPMesh;
 import org.vadere.util.geometry.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.triangulation.IPointConstructor;
-import org.vadere.util.triangulation.IncrementalTriangulation;
-import org.vadere.util.triangulation.triangulator.UniformTriangulator;
+import org.vadere.util.geometry.mesh.gen.IncrementalTriangulation;
+import org.vadere.util.geometry.mesh.triangulation.triangulator.UniformTriangulator;
 
 import java.util.Collection;
 import java.util.HashSet;

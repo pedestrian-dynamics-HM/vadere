@@ -3,7 +3,7 @@ package org.vadere.util.geometry;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.triangulation.IPointConstructor;
+import org.vadere.util.geometry.mesh.inter.IPointConstructor;
 
 import java.util.ArrayList;
 import java.util.Iterator;

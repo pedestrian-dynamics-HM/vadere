@@ -4,8 +4,8 @@ import org.vadere.util.debug.gui.canvas.SimpleTriCanvas;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.triangulation.IPointConstructor;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
+import org.vadere.util.geometry.mesh.inter.IPointConstructor;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +26,7 @@ public class TestUniform {
 
 
 	private void tri() {
-		Set<MeshPoint> meshPoints = generateGridPoints(bbox, initialEdgeLen);
+		Set<EikMeshPoint> meshPoints = generateGridPoints(bbox, initialEdgeLen);
 		IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
 		ITriangulation tri = ITriangulation.createVPTriangulation(bbox);
 		System.out.print(meshPoints.size());
@@ -42,21 +42,21 @@ public class TestUniform {
 	/**
 	 * Generates the starting points of the algorithm.
 	 */
-	private Set<MeshPoint> generateGridPoints(VRectangle bound, double initialEdgeLen) {
+	private Set<EikMeshPoint> generateGridPoints(VRectangle bound, double initialEdgeLen) {
 		int elementsInCol = (int) Math.ceil((bound.getWidth()) / initialEdgeLen + 1);
 		int elementsInRow = (int) Math.ceil((bound.getHeight()) / (initialEdgeLen * Math.sqrt(3) / 2));
 		double startX = bound.getX();
 		double startY = bound.getY();
-		Set<MeshPoint> generatedPoints = new HashSet<>(elementsInRow * elementsInCol);
+		Set<EikMeshPoint> generatedPoints = new HashSet<>(elementsInRow * elementsInCol);
 		double sqrt3 = Math.sqrt(3);
 
 		for (int j = 0; j < elementsInRow; j++) {
 			for (int i = 0; i < elementsInCol; i++) {
-				MeshPoint point;
+				EikMeshPoint point;
 				if (j != 0 && j % 2 != 0) {
-					point = new MeshPoint(startX + i * initialEdgeLen + initialEdgeLen / 2, startY + j * initialEdgeLen * sqrt3 / 2, false);
+					point = new EikMeshPoint(startX + i * initialEdgeLen + initialEdgeLen / 2, startY + j * initialEdgeLen * sqrt3 / 2, false);
 				} else {
-					point = new MeshPoint(startX + i * initialEdgeLen, startY + j * initialEdgeLen * sqrt3 / 2, false);
+					point = new EikMeshPoint(startX + i * initialEdgeLen, startY + j * initialEdgeLen * sqrt3 / 2, false);
 				}
 				generatedPoints.add(point);
 			}

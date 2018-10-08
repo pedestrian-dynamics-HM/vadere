@@ -30,10 +30,10 @@ import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.util.potential.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.triangulation.adaptive.DistanceFunction;
+import org.vadere.util.geometry.mesh.triangulation.adaptive.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.improver.PPSMeshing;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.util.geometry.mesh.triangulation.improver.PEikMesh;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -152,7 +152,7 @@ public interface IPotentialField {
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.
 	         */
-	        PPSMeshing meshGenerator = new PPSMeshing(distanceFunc, p -> 1.0, 3.0, bbox, holes);
+	        PEikMesh meshGenerator = new PEikMesh(distanceFunc, p -> 1.0, 3.0, bbox, holes);
 	        meshGenerator.generate();
 
 	        ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
@@ -163,9 +163,9 @@ public interface IPotentialField {
 			        //TODO [refactoring]: this attribute value is used in an not intuitive way, we should introduce an extra attribute value!
 			        1.0 / attributesPotential.getPotentialFieldResolution());
 
-	        ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation = meshGenerator.getTriangulation();
+	        ITriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation = meshGenerator.getTriangulation();
 
-	        List<PVertex<MeshPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+	        List<PVertex<EikMeshPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
 
 	        eikonalSolver = new EikonalSolverFMMTriangulation(
 			        timeCost,

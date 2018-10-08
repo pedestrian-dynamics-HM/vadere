@@ -19,11 +19,11 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.triangulation.adaptive.DistanceFunction;
+import org.vadere.util.geometry.mesh.triangulation.adaptive.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.PSDistmesh;
-import org.vadere.util.triangulation.improver.PSMeshing;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.util.geometry.mesh.triangulation.improver.distmesh.Distmesh;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMesh;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -517,12 +517,12 @@ public class RealWorldPlot {
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
 
-		PSMeshing<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> meshGenerator = new PSMeshing<>(
+		EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshGenerator = new EikMesh<>(
 				approxDistance,
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
 				0.35,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-				() -> new AMesh<>((x, y) -> new MeshPoint(x, y, false)));
+				() -> new AMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
 
 		/*PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshGenerator.getMesh(),
 				f -> false, 1000, 800, bound);
@@ -596,7 +596,7 @@ public class RealWorldPlot {
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
 
-		PSDistmesh meshGenerator = new PSDistmesh(
+		Distmesh meshGenerator = new Distmesh(
 				approxDistance,
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
 				0.18,

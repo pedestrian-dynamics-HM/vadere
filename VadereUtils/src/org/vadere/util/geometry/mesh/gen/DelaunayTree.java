@@ -17,6 +17,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * An implementation of the so called Delaunay Tree which does not suppport deletion of points from the
+ * triangulation {@link ITriangulation<P, V, E, F>}.
+ *
+ * The Delaunay Tree see Computational Geometry: Algorithms and Applications (berg-2008) page 191.
+ *
+ * @param <P> the type of the points (containers)
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
+ */
 public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
 	private DAG<DAGElement<P, F>> dag;
 	private final HashMap<F, DAG<DAGElement<P, F>>> map;
@@ -41,7 +52,7 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	}
 
 	@Override
-	public F locatePoint(final P point, final boolean insertion) {
+	public F locatePoint(final P point) {
 		checkRoot();
 
 		Set<DAG<DAGElement<P, F>>> leafs = new HashSet<>();
@@ -69,7 +80,7 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	@Override
 	public Optional<F> locate(final P point) {
 		checkRoot();
-		return Optional.of(locatePoint(point, false));
+		return Optional.of(locatePoint(point));
 	}
 
     @Override

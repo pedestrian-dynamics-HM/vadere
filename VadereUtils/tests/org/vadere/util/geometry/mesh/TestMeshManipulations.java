@@ -10,7 +10,7 @@ import org.vadere.util.geometry.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPanel;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -79,7 +79,7 @@ public class TestMeshManipulations {
 		//GeometryUtils.getCentroid()
 		test.triangulation.createHole(test.triangulation.locateFace(4, 5).get(), mergePredicate, true);
 		//PFace<VPoint> face = ;
-		PSMeshingPanel<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> panel = new PSMeshingPanel<>(test.triangulation.getMesh(),
+		EikMeshPanel<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> panel = new EikMeshPanel<>(test.triangulation.getMesh(),
 				f -> test.triangulation.getMesh().isHole(f), 800, 800, test.bound);
 		JFrame frame = panel.display();
 		frame.setVisible(true);

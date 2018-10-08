@@ -27,10 +27,10 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.triangulation.adaptive.DistanceFunction;
+import org.vadere.util.geometry.mesh.triangulation.adaptive.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.improver.PPSMeshing;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.util.geometry.mesh.triangulation.improver.PEikMesh;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
@@ -87,7 +87,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	private ITriangulation<MeshPoint, PVertex<MeshPoint>, PHalfEdge<MeshPoint>, PFace<MeshPoint>> triangulation;
+	private ITriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation;
 
 	private Collection<VTriangle> triangles;
 
@@ -557,7 +557,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					0.3,
 					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
 
-			PPSMeshing meshImprover = new PPSMeshing(
+			PEikMesh meshImprover = new PEikMesh(
 					distanceFunc,
 					p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
 					0.35,
@@ -584,7 +584,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					notifyObservers();
 				}
 				//meshImprover.improve();
-				Function<PFace<MeshPoint>, Color> colorFunction = f -> {
+				Function<PFace<EikMeshPoint>, Color> colorFunction = f -> {
 					float grayScale = (float) meshImprover.faceToQuality(f);
 					return triangulation.isValid(f) ? new Color(grayScale, grayScale, grayScale) : Color.RED;
 				};

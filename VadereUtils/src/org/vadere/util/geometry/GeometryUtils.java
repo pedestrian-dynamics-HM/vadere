@@ -271,6 +271,21 @@ public class GeometryUtils {
 
 
 	/**
+	 *
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @param xq
+	 * @param yq
+	 * @return
+	 */
+	public static boolean isRightOf(final double x1, final double y1, final double x2, final double y2, final double xq, final double yq) {
+		return isCW(x1, y1, x2, y2, xq, yq);
+	}
+
+
+	/**
 	 * Returns true if q is right of the oriented-line defined by (p1, p2).
 	 * @param p1
 	 * @param p2
@@ -303,6 +318,10 @@ public class GeometryUtils {
 	 */
 	public static boolean isRightOf(final IPoint p1, final IPoint p2, final double x, final double y) {
 		return isCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+	}
+
+	public static boolean isLeftOf(final double x1, final double y1, final double x2, final double y2, final double xq, final double yq) {
+		return isCCW(x1, y1, x2, y2, xq, yq);
 	}
 
 	public static boolean isLeftOf(final IPoint p1, final IPoint p2, final double x, final double y) {

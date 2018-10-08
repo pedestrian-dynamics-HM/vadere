@@ -29,8 +29,8 @@ public class TestVCircle {
 
 	@Test
 	public void testContainsPoint() {
-		assertTrue(testCircleOrigin.contains(new VPoint(0.5, 0)));
-		assertTrue(testCircleOrigin.contains(new VPoint(0, 0.5)));
+		assertTrue(testCircleOrigin.contains(new VPoint(0.4999999, 0)));
+		assertTrue(testCircleOrigin.contains(new VPoint(0, 0.4999999)));
 		assertTrue(testCircleOrigin.contains(new VPoint(0.2, 0.2)));
 		assertTrue(testCircle1.contains(new VPoint(0.3, -2.4)));
 	}

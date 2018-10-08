@@ -2,7 +2,7 @@ package org.vadere.util.geometry.mesh.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
-import org.vadere.util.triangulation.IncrementalTriangulation;
+import org.vadere.util.geometry.mesh.gen.IncrementalTriangulation;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PVertex;

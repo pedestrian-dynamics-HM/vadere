@@ -1,13 +1,9 @@
 package org.vadere.util.geometry.mesh;
 
-import com.google.common.collect.Iterables;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.lwjgl.system.CallbackI;
 import org.vadere.util.geometry.mesh.gen.PFace;
 import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PMesh;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.mesh.inter.IMesh;
@@ -16,7 +12,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -56,7 +51,7 @@ public class TestTriangulationOperations {
 
 		assertTrue(mesh.getFaces().size() == 2);
 
-		triangulation.collapseAtBoundary(vertex, true);
+		triangulation.collapse3DVertex(vertex, true);
 
 		assertTrue(mesh.getFaces().size() == 1);
 

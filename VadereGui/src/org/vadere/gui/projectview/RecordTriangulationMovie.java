@@ -7,20 +7,15 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.mesh.gen.AFace;
 import org.vadere.util.geometry.mesh.gen.AHalfEdge;
 import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PVertex;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VDisc;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.triangulation.adaptive.MeshPoint;
-import org.vadere.util.triangulation.adaptive.PSMeshingPanel;
-import org.vadere.util.triangulation.improver.APSMeshing;
-import org.vadere.util.triangulation.improver.PPSMeshing;
+import org.vadere.util.geometry.mesh.triangulation.adaptive.DistanceFunction;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.util.geometry.mesh.triangulation.improver.AEikMesh;
 
 import java.awt.*;
 import java.io.IOException;
@@ -48,25 +43,25 @@ public class RecordTriangulationMovie {
 		DistanceFunction distanceFunction = new DistanceFunction(boundary, Arrays.asList(disc));
 		//obstacleShapes.add(rect);
 
-		APSMeshing meshImprover = new APSMeshing(
+		AEikMesh meshImprover = new AEikMesh(
 				distanceFunction,
 				p -> 1.0 + 10*Math.max(0, -distanceFunction.apply(p)),
 				0.05,
 				bbound,
 				obstacleShapes);
 
-		Function<AFace<MeshPoint>, Color> colorFunction1 = f -> {
+		Function<AFace<EikMeshPoint>, Color> colorFunction1 = f -> {
 			float q = Math.max(0.0f, Math.min(1.0f, (float) meshImprover.faceToQuality(f)));
 			return new Color(q, q, q);
 		};
 
-		Function<AFace<MeshPoint>, Color> colorFunction2 = f -> {
+		Function<AFace<EikMeshPoint>, Color> colorFunction2 = f -> {
 			return ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		};
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
-		PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(
+		EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new EikMeshPanel<>(
 		meshImprover.getMesh(), f -> false, bbound.getWidth()*1000, bbound.getHeight()*1000, bbound, colorFunction1);
 
 		JFrame frame = distmeshPanel.display();
@@ -119,7 +114,7 @@ public class RecordTriangulationMovie {
 	}
 
 	public static void addPictures(Recorder recorder,
-	                               PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel,
+	                               EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel,
 	                               int frames) throws IOException {
 
 		for(int i = 0; i < frames; i++) {

@@ -7,7 +7,7 @@ import org.vadere.util.geometry.mesh.gen.PHalfEdge;
 import org.vadere.util.geometry.mesh.gen.PMesh;
 import org.vadere.util.geometry.mesh.gen.PVertex;
 import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.triangulation.PointLocation;
+import org.vadere.util.geometry.mesh.gen.PointLocation;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Arrays;

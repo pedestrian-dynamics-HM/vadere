@@ -271,7 +271,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
     }
 
     @Override
-    public F locatePoint(P point, boolean insertion) {
+    public F locatePoint(@NotNull final P point) {
         Optional<F> optFace = locate(point);
         if(optFace.isPresent()) {
             return optFace.get();

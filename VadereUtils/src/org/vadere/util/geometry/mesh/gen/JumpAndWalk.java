@@ -53,7 +53,7 @@ public class JumpAndWalk<P extends IPoint, V extends IVertex<P>, E extends IHalf
 	}
 
 	@Override
-	public F locatePoint(P point, boolean insertion) {
+	public F locatePoint(P point) {
 		return locate(point).get();
 	}
 

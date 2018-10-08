@@ -7,7 +7,7 @@ import org.vadere.util.geometry.mesh.inter.IMesh;
 import org.vadere.util.geometry.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.triangulation.IPointConstructor;
+import org.vadere.util.geometry.mesh.inter.IPointConstructor;
 
 import java.util.*;
 import java.util.function.Predicate;
