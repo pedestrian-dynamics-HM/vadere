@@ -245,18 +245,18 @@ public class PedestrianBHM extends Pedestrian {
 				if(potentialFieldTarget == null) {
 					VPoint targetPoint = targetShape.closestPoint(getPosition());
 					targetDirection = targetPoint.subtract(getPosition()).norm();
-
-					for (DirectionAddend da : directionAddends) {
-						targetDirection = targetDirection.add(da.getDirectionAddend());
-					}
-
-					if (!targetDirection.equals(VPoint.ZERO)) {
-						targetDirection = targetDirection.norm();
-					}
 				}
 				else {
-					Vector2D vec = potentialFieldTarget.getTargetPotentialGradient(getPosition(), this);
+					Vector2D vec = potentialFieldTarget.getTargetPotentialGradient(getPosition(), this).multiply(-1.0);
 					targetDirection = vec.norm();
+				}
+
+				for (DirectionAddend da : directionAddends) {
+					targetDirection = targetDirection.add(da.getDirectionAddend());
+				}
+
+				if (!targetDirection.equals(VPoint.ZERO)) {
+					targetDirection = targetDirection.norm();
 				}
 			}
 		}

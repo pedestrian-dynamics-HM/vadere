@@ -57,9 +57,18 @@ public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
 		double potential = getPotential(pos, ped);
 		double eps = 0.01;
 
-		getPotential(pos.add(new VPoint(eps, 0)), ped);
+		/*
+		*
+		* double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
+	    double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
+	    VPoint projection = new VPoint(dGradPX * distance * scale, dGradPY * distance * scale);
 
-		throw new UnsupportedOperationException("gradient not yet implemented");
+	    VPoint newPosition = getMesh().toPoint(vertex).subtract(projection);
+		 */
+		double dGradPX = (getPotential(pos.add(new VPoint(eps, 0)), ped) - potential) / eps;
+		double dGradPY = (getPotential(pos.add(new VPoint(0, eps)), ped) - potential) / eps;
+
+		return new Vector2D(dGradPX, dGradPY);
 	}
 
     @Override

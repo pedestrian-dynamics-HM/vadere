@@ -15,7 +15,9 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesBHM;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -64,8 +66,13 @@ public class BehaviouralHeuristicsModel implements MainModel {
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
 
-		potentialFieldTarget = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, PotentialFieldTargetGrid.class.getCanonicalName());
+		try {
+			potentialFieldTarget = IPotentialFieldTargetGrid.createPotentialField(
+					modelAttributesList, topography, attributesPedestrian, PotentialFieldTargetGrid.class.getCanonicalName());
+			this.models.add(potentialFieldTarget);
+		} catch (AttributesNotFoundException e) {
+			potentialFieldTarget = null;
+		}
 
 		this.attributesBHM = Model.findAttributes(modelAttributesList, AttributesBHM.class);
 		this.attributesPedestrian = attributesPedestrian;
