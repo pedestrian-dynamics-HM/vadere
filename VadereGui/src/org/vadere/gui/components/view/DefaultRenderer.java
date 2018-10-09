@@ -1,5 +1,6 @@
 package org.vadere.gui.components.view;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ScenarioElement;
@@ -24,27 +25,28 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 
+/**
+ * @author Benedikt Zoennchen
+ */
 public abstract class DefaultRenderer {
 
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private static final double rotNeg90 = - Math.PI /2;
 
-	public DefaultRenderer(final IDefaultModel defaultModel) {
-		this(defaultModel, true, false);
-	}
-
-	public DefaultRenderer(final IDefaultModel defaultModel, final boolean doubleBuffering,
-			final boolean hideBoundingBoxBorder) {
+	/**
+	 * <p>Default constructor.</p>
+	 *
+	 * @param defaultModel
+	 */
+	public DefaultRenderer(@NotNull final IDefaultModel defaultModel) {
 		this.defaultModel = defaultModel;
 		this.logo = null;
 	}
 
 	/**
-	 * Render the content. If doublebuffering is true, the whole content will be drawn on a new
-	 * image.
-	 * Otherwise the content will be drawn on the graphics object directly.
-	 * 
+	 * <p></p>
+	 *
 	 * @param targetGraphics2D
 	 * @param width
 	 * @param height
@@ -54,32 +56,32 @@ public abstract class DefaultRenderer {
 	}
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
-
-		 //if(doubleBuffering) {
-		 targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
-         //} else {
-		//targetGraphics2D.translate(x, y);
-		//renderGraphics(targetGraphics2D, width, height);
-		// }
+		targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
 		targetGraphics2D.dispose();
 	}
 
+
 	public void renderGraphics(final Graphics2D targetGraphics2D, final int width, final int height) {
 		targetGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// (1) clear background
 		targetGraphics2D.setColor(Color.GRAY);
+		//targetGraphics2D.fill();
 		targetGraphics2D.fillRect(0, 0, width, height);
 
+		// (2) render everything which can be rendered before the transformation
 		renderPreTransformation(targetGraphics2D, width, height);
 
+		// (3)
 		transformGraphics(targetGraphics2D);
 
+		// (4) render everything which can be rendered after the transformation
 		renderPostTransformation(targetGraphics2D, width, height);
 	}
 
 	public BufferedImage renderImage(final int width, final int height) {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
-
 		renderGraphics(bufferGraphics2D, width, height);
 		return image;
 	}
@@ -92,8 +94,10 @@ public abstract class DefaultRenderer {
 
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
 		graphics2D.setColor(Color.WHITE);
-		graphics2D.fill(new VRectangle(defaultModel.getBoundingBoxWidth(),
-				defaultModel.getBoundingBoxWidth(),
+		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
+		graphics2D.fill(new VRectangle(
+				topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
+				topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
 				(defaultModel.getTopographyBound().getWidth() - defaultModel.getBoundingBoxWidth() * 2),
 				(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)));
 
@@ -103,6 +107,7 @@ public abstract class DefaultRenderer {
 		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
 		mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
 		graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
+		//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
 
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
@@ -256,10 +261,10 @@ public abstract class DefaultRenderer {
 	protected void renderGrid(final Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
 		g.setStroke(new BasicStroke(getGridLineWidth()));
-
-		for (double y = 0; y <= defaultModel.getTopographyBound().height + 0.01; y +=
+		Rectangle2D.Double bound = defaultModel.getTopographyBound();
+		for (double y = bound.getMinY(); y <= bound.getMaxY() + 0.01; y +=
 				defaultModel.getGridResolution()) {
-			for (double x = 0; x <= defaultModel.getTopographyBound().width + 0.01; x +=
+			for (double x = bound.getMinX(); x <= bound.getMaxX() + 0.01; x +=
 					defaultModel.getGridResolution()) {
 				g.draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
 						x + defaultModel.getGridResolution()
@@ -611,8 +616,8 @@ public abstract class DefaultRenderer {
 	}
 
 	private static void mirrowHorizonzal(final Graphics2D graphics2D, final int height) {
-		graphics2D.scale(1, -1);
-		graphics2D.translate(0, -height);
+		graphics2D.scale(1.0, -1.0);
+		graphics2D.translate(0.0, -height);
 	}
 
 	private float getGridLineWidth() {

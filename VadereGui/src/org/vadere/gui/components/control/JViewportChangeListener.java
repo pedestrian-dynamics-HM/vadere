@@ -29,8 +29,8 @@ public class JViewportChangeListener implements ChangeListener {
 		JViewport viewPort = (JViewport) e.getSource();
 		if (topographyBound != null) {
 			Rectangle rect = viewPort.getViewRect();
-			double x = Math.max(0.0, rect.getX() / defaultModel.getScaleFactor());
-			double y = Math.max(0.0, topographyBound.getHeight()
+			double x = Math.max(topographyBound.getMinX(), topographyBound.getMinX() + rect.getX() / defaultModel.getScaleFactor());
+			double y = Math.max(topographyBound.getMinY(), topographyBound.getMinY() + topographyBound.getHeight()
 					- ((rect.getY() + verticalScrollBar.getHeight()) / defaultModel.getScaleFactor()));
 			double w = rect.getWidth() / defaultModel.getScaleFactor();
 			double h = rect.getHeight() / defaultModel.getScaleFactor();

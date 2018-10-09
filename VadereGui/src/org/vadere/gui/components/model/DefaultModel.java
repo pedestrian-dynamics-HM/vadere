@@ -430,9 +430,14 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 				getWindowBound().getHeight() / getViewportBound().getHeight());
 	}
 
+	/**
+	 *
+	 * @param pInPixel the mouse position of the mouse event
+	 * @return
+	 */
 	protected VPoint pixelToWorld(final VPoint pInPixel) {
-		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX(),
-				(getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
+				getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
 		/*
 		 * return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX() +
 		 * getViewportBound().getX(),
