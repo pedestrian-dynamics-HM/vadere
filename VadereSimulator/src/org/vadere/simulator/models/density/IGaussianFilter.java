@@ -66,6 +66,14 @@ public interface IGaussianFilter {
 
     double getMinFilteredValue();
 
+	int toXIndex(final double x);
+
+	int toYIndex(final double y);
+
+	double toXCoord(int xIndex);
+
+	double toYCoord(int yIndex);
+
     /**
      * This method has to be called if the Filter will no longer called!
      */

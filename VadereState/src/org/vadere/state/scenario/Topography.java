@@ -156,18 +156,6 @@ public class Topography {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 
-	public CellGrid getDistanceFunctionApproximation(final double cellSize) {
-		CellGrid cellGrid = new CellGrid(getBounds().width, getBounds().height, cellSize, new CellState());
-		for(int row = 0; row < cellGrid.getNumPointsY(); row++){
-			for(int col = 0; col < cellGrid.getNumPointsX(); col++){
-				cellGrid.setValue(col, row, new CellState(
-						distanceToObstacle(cellGrid.pointToCoord(col, row).add(new VPoint(getBounds().getMinX(), getBounds().getMinY()))),
-						PathFindingTag.Reachable));
-			}
-		}
-		return cellGrid;
-	}
-
 	public boolean containsTarget(final Predicate<Target> targetPredicate) {
 		return getTargets().stream().anyMatch(targetPredicate);
 	}

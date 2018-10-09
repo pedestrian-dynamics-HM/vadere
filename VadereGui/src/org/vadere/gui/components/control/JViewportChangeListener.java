@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.IDefaultModel;
 
 import java.awt.*;
@@ -15,6 +17,7 @@ import java.awt.geom.Rectangle2D;
  */
 public class JViewportChangeListener implements ChangeListener {
 
+	private Logger logger = LogManager.getLogger(JViewportChangeListener.class);
 	private final JScrollBar verticalScrollBar;
 	private final IDefaultModel defaultModel;
 

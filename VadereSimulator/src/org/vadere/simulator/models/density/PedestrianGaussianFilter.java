@@ -2,6 +2,7 @@ package org.vadere.simulator.models.density;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -97,37 +98,66 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
         return filter.getMinFilteredValue();
     }
 
-    @Override
+	@Override
+	public int toXIndex(double x) {
+		return filter.toXIndex(x);
+	}
+
+	@Override
+	public int toYIndex(double y) {
+		return filter.toYIndex(y);
+	}
+
+	@Override
+	public double toXCoord(int xIndex) {
+		return filter.toXCoord(xIndex);
+	}
+
+	@Override
+	public double toYCoord(int yIndex) {
+		return filter.toYCoord(yIndex);
+	}
+
+	@Override
     public void destroy() {
         this.filter.destroy();
     }
 
-    private void setValue(E pedestrian) {
-        VPoint position = pedestrian.getPosition();
-        VPoint filteredPosition = new VPoint(Math.max(0, position.x), Math.max(0, position.y));
+    private void setValue(@NotNull final E pedestrian) {
+        VPoint filteredPosition = pedestrian.getPosition();
+        //VPoint filteredPosition = new VPoint(Math.max(0, position.x), Math.max(0, position.y));
 
         // better approximation
-        double indexX = filteredPosition.x * getScale();
-        double indexY = filteredPosition.y * getScale();
 
-        if (indexX == ((int) indexX) && indexY == ((int) indexY)) {
-            setInputValue(filteredPosition.x, filteredPosition.y,
-                    getInputValue((int) indexX, (int) indexY) + pedestrianLoadingStrategy.calculateLoading(pedestrian));
-        } else if (indexX == ((int) indexX) && indexY != ((int) indexY)) {
-            splitY(filteredPosition, (int) indexX, (int) Math.floor(indexY), pedestrian);
-            splitY(filteredPosition, (int) indexX, (int) Math.ceil(indexY), pedestrian);
-        } else if (indexX != ((int) indexX) && indexY == ((int) indexY)) {
-            splitX(filteredPosition, (int) Math.floor(indexX), (int) indexY, pedestrian);
-            splitX(filteredPosition, (int) Math.ceil(indexX), (int) indexY, pedestrian);
+	    int indexX = toXIndex(filteredPosition.x);
+	    int indexY = toYIndex(filteredPosition.y);
+
+	    double coordX = toXCoord(indexX);
+	    double coordY = toYCoord(indexY);
+
+	    int dx = toXCoord(indexX) > filteredPosition.x ? 1 : -1;
+	    int dy = toYCoord(indexY) > filteredPosition.y ? 1 : -1;
+
+	    //TODO: reactivate the split but refactor the code.
+       /* if (Double.compare(coordX, filteredPosition.x) == 0
+		        && Double.compare(coordY, filteredPosition.y) == 0) {
+        	setInputValue(filteredPosition.x, filteredPosition.y,
+			        getInputValue(indexX, indexY) + pedestrianLoadingStrategy.calculateLoading(pedestrian));
+        } else if (Double.compare(coordX, filteredPosition.x) == 0 && Double.compare(coordY, filteredPosition.y) != 0) {
+            splitY(filteredPosition, indexX, indexY, pedestrian);
+            splitY(filteredPosition, indexX, indexY + dy, pedestrian);
+        } else if (Double.compare(coordX, filteredPosition.x) != 0 && Double.compare(coordY, filteredPosition.y) == 0) {
+            splitX(filteredPosition, indexX, indexY, pedestrian);
+            splitX(filteredPosition, indexX + dx, indexY, pedestrian);
         } else {
-            splitXY(filteredPosition, (int) Math.floor(indexX), (int) Math.floor(indexY), pedestrian);
-            splitXY(filteredPosition, (int) Math.floor(indexX), (int) Math.ceil(indexY), pedestrian);
-            splitXY(filteredPosition, (int) Math.ceil(indexX), (int) Math.floor(indexY), pedestrian);
-            splitXY(filteredPosition, (int) Math.ceil(indexX), (int) Math.ceil(indexY), pedestrian);
-        }
 
-        // setInputValue(filteredPosition.x, filteredPosition.y,
-        // pedestrianLoadingStrategy.calculateLoading(pedestrian));
+            splitXY(filteredPosition, indexX, indexY, pedestrian);
+            splitXY(filteredPosition, indexX, indexY + dy, pedestrian);
+            splitXY(filteredPosition, indexX + dx, indexY, pedestrian);
+            splitXY(filteredPosition, indexX + dx, indexY + dy, pedestrian);
+        }*/
+
+        setInputValue(filteredPosition.x, filteredPosition.y, pedestrianLoadingStrategy.calculateLoading(pedestrian));
     }
 
     private void splitXY(final VPoint filteredPosition, final int indexX, final int indexY, Pedestrian pedestrian) {

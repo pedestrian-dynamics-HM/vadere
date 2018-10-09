@@ -77,7 +77,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 		topography.getElements(Pedestrian.class).forEach(this::addPedestrian);
 
 		Rectangle2D bounds = topography.getBounds();
-		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), 0.1, new CellState());
+		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), 0.1, new CellState(), bounds.getMinX(), bounds.getMinY());
 
 		List<VShape> targetShapes =
 				topography.getTargets().stream().map(t -> t.getShape()).collect(Collectors.toList());
