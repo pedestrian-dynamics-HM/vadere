@@ -278,6 +278,14 @@ public class CellGrid {
 
 	public double getMinY() { return yMin; }
 
+	public double getMaxX () {
+		return  xMin + width;
+	}
+
+	public double getMaxY() {
+		return yMin + height;
+	}
+
 	public boolean isValidPoint(Point point) {
 		return isValidPoint(point.x, point.y);
 	}
