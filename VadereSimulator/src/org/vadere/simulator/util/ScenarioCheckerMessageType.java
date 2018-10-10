@@ -6,14 +6,17 @@ package org.vadere.simulator.util;
  */
 public enum ScenarioCheckerMessageType {
 
-	TOPOGRAPHY_ERROR("Error",100, "ScenarioChecker.type.topography.error"),
-	TOPOGRAPHY_WARN("Warning",500, "ScenarioChecker.type.topography.warning"),
-	SIMULATION_ATTR_ERROR("Error",101, "ScenarioChecker.type.simulation.error"),
-	SIMULATION_ATTR_WARN("Warning",501, "ScenarioChecker.type.simulation.warning"),
-	MODEL_ATTR_ERROR("Error",102, "ScenarioChecker.type.model.error"),
-	MODEL_ATTR_WARN("Warning",502, "ScenarioChecker.type.model.warning"),
-	DATA_PROCESSOR_ERROR("Error",103, "ScenarioChecker.type.processor.error"),
-	DATA_PROCESSOR_WARN("Warning",503, "ScenarioChecker.type.processor.warning");
+	SIMULATION_ATTR_ERROR("Error",100, "ScenarioChecker.type.simulation.error"),
+	SIMULATION_ATTR_WARN("Warning",500, "ScenarioChecker.type.simulation.warning"),
+
+	MODEL_ATTR_ERROR("Error",101, "ScenarioChecker.type.model.error"),
+	MODEL_ATTR_WARN("Warning",501, "ScenarioChecker.type.model.warning"),
+
+	DATA_PROCESSOR_ERROR("Error",102, "ScenarioChecker.type.processor.error"),
+	DATA_PROCESSOR_WARN("Warning",502, "ScenarioChecker.type.processor.warning"),
+
+	TOPOGRAPHY_ERROR("Error",103, "ScenarioChecker.type.topography.error"),
+	TOPOGRAPHY_WARN("Warning",503, "ScenarioChecker.type.topography.warning");
 
 	private static final int ERROR_START = 100;
 	private static final int WARN_START = 500;
@@ -22,7 +25,7 @@ public enum ScenarioCheckerMessageType {
 	private String msgId;
 	private int id;
 
-	ScenarioCheckerMessageType(String type,int id, String msgId) {
+	ScenarioCheckerMessageType(String type, int id, String msgId) {
 		this.type = type;
 		this.id = id;
 		this.msgId = msgId;

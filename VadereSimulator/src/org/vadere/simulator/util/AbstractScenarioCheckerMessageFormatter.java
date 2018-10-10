@@ -1,11 +1,12 @@
 package org.vadere.simulator.util;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public abstract class AbstractScenarioCheckerMessageFormatter implements  ScenarioCheckerMessageFormatter{
 
-	private ScenarioCheckerMessageType currentType;
+	protected ScenarioCheckerMessageType currentType;
 	protected StringBuilder sb;
 
 	public AbstractScenarioCheckerMessageFormatter(){
@@ -28,6 +29,14 @@ public abstract class AbstractScenarioCheckerMessageFormatter implements  Scenar
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * default comparator used for PriorityQueue. It sorts messages from Errors to Warnings.
+	 * @return
+	 */
+	protected  Comparator<ScenarioCheckerMessage> getComparator(){
+		return ScenarioCheckerMessage::compareTo;
 	}
 
 	protected boolean isNewType(ScenarioCheckerMessage msg){

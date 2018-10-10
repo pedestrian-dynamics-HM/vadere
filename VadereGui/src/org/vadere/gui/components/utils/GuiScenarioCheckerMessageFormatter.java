@@ -3,20 +3,93 @@ package org.vadere.gui.components.utils;
 import org.vadere.gui.components.control.ScenarioCheckerMessageDocumentView;
 import org.vadere.simulator.util.AbstractScenarioCheckerMessageFormatter;
 import org.vadere.simulator.util.ScenarioCheckerMessage;
+import org.vadere.simulator.util.ScenarioCheckerMessageType;
+import org.vadere.state.types.ScenarioElementType;
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class GuiScenarioCheckerMessageFormatter extends AbstractScenarioCheckerMessageFormatter {
 
 	final ScenarioCheckerMessageDocumentView view;
+	boolean currentTypeChanged;
+	String currTabString;
+	boolean currTabStringChanged;
 
 	public GuiScenarioCheckerMessageFormatter(ScenarioCheckerMessageDocumentView view) {
 		this.view = view;
+		currentTypeChanged = false;
+		currTabStringChanged = false;
+		currentType = null;
+		currTabString = null;
+	}
+
+	/**
+	 * Sort messages by tabs based on gui view
+	 * @return
+	 */
+	@Override
+	protected Comparator<ScenarioCheckerMessage> getComparator() {
+		return ScenarioCheckerMessage::compareOrdinal;
+	}
+
+	@Override
+	protected boolean isNewType(ScenarioCheckerMessage msg) {
+		String tabString = getTabName(msg.getMsgType());
+		if (currTabString == null || !currTabString.equals(tabString)){
+			currTabString = tabString;
+			currTabStringChanged = true;
+		} else {
+			currTabStringChanged = false;
+		}
+
+		if (currentType == null || !currentType.equals(msg.getMsgType())){
+			currentType = msg.getMsgType();
+			currentTypeChanged = true;
+		} else {
+			currentTypeChanged = false;
+		}
+
+		return currentTypeChanged || currTabStringChanged;
+	}
+
+	private String getTabName(ScenarioCheckerMessageType type){
+		String ret="";
+		switch (type){
+			case TOPOGRAPHY_ERROR: case TOPOGRAPHY_WARN:
+				ret = Messages.getString("Tab.Topography.title");
+				break;
+			case DATA_PROCESSOR_ERROR: case DATA_PROCESSOR_WARN:
+				ret = Messages.getString("Tab.OutputProcessors.title");
+				break;
+			case MODEL_ATTR_ERROR: case MODEL_ATTR_WARN:
+				ret = Messages.getString("Tab.Model.title");
+				break;
+			case SIMULATION_ATTR_ERROR: case SIMULATION_ATTR_WARN:
+				ret = Messages.getString("Tab.Simulation.title");
+				break;
+		}
+		return ret;
 	}
 
 	@Override
 	protected void writeHeader(ScenarioCheckerMessage msg) {
-		sb.append("<h4>")
-			.append(Messages.getString(msg.getMsgType().getLocalTypeId()))
-			.append("</h4>");
+		if (currTabStringChanged){
+			if(sb.length() > 0){
+				sb.append("<br>");
+			}
+
+			sb.append("<h3>")
+					.append(currTabString)
+					.append(" Tab")
+					.append("</h3>");
+		}
+
+		if (currentTypeChanged){
+			sb.append("<h4>")
+					.append(Messages.getString(msg.getMsgType().getLocalTypeId()))
+					.append("</h4>");
+		}
 
 	}
 

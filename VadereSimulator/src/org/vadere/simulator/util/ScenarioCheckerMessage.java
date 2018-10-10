@@ -68,7 +68,7 @@ public class ScenarioCheckerMessage implements Comparable<ScenarioCheckerMessage
 		return msgTarget != null;
 	}
 
-	private Comparator<ScenarioCheckerMessage> sortByType() {
+	public Comparator<ScenarioCheckerMessage> sortErrorToWarning() {
 		return (o1, o2) -> {
 			if (o1.equals(o2))
 				return 0;
@@ -82,13 +82,31 @@ public class ScenarioCheckerMessage implements Comparable<ScenarioCheckerMessage
 		};
 	}
 
-	private Comparator<ScenarioCheckerMessage> defaultSort() {
-		return sortByType();
+	public Comparator<ScenarioCheckerMessage> sortOrdinalOnMessageType() {
+		return (o1, o2) -> {
+			if (o1.equals(o2))
+				return 0;
+			if (o1.getMsgType().ordinal() > o2.getMsgType().ordinal()) {
+				return 1;
+			} else if (o1.getMsgType().ordinal() < o2.getMsgType().ordinal()) {
+				return -1;
+			} else {
+				return sortErrorToWarning().compare(o1, o2);
+			}
+		};
 	}
 
 	@Override
 	public int compareTo(@NotNull ScenarioCheckerMessage o) {
-		return defaultSort().compare(this, o);
+		return compareErrorToWarn(o);
+	}
+
+	public int compareOrdinal(@NotNull ScenarioCheckerMessage o){
+		return sortOrdinalOnMessageType().compare(this, o);
+	}
+
+	public int compareErrorToWarn(@NotNull ScenarioCheckerMessage o){
+		return sortErrorToWarning().compare(this, o);
 	}
 
 	@Override
