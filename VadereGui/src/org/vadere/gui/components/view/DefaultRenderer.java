@@ -115,7 +115,7 @@ public abstract class DefaultRenderer {
 		Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
 		double dy = topographyBound.getHeight() - viewportBound.getHeight();
 
-		graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), 0));
+		graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
 		// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
 
 	}

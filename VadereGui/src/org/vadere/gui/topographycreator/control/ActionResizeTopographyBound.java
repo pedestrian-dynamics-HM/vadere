@@ -2,25 +2,23 @@ package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.*;
+import javax.swing.undo.UndoableEditSupport;
 
 public class ActionResizeTopographyBound extends TopographyAction {
 
 	private TopographyAction action;
+	private final UndoableEditSupport undoableEditSupport;
 
 	public ActionResizeTopographyBound(String name, ImageIcon icon, IDrawPanelModel<?> panelModel,
-									   TopographyAction action) {
+									   TopographyAction action, final UndoableEditSupport undoSupport) {
 		super(name, icon, panelModel);
 		this.action = action;
-	}
-
-	public ActionResizeTopographyBound(final String name, final IDrawPanelModel<?> panelModel,
-									   TopographyAction action) {
-		super(name, panelModel);
-		this.action = action;
+		this.undoableEditSupport = undoSupport;
 	}
 
 	@Override
@@ -29,13 +27,13 @@ public class ActionResizeTopographyBound extends TopographyAction {
 		action.actionPerformed(e);
 
 		TopographyCreatorModel model = (TopographyCreatorModel) getScenarioPanelModel();
-		ActionResizeTopographyBoundDialog dialog = new ActionResizeTopographyBoundDialog(
-				model.getTopography().getBounds().width,
-				model.getTopography().getBounds().height
-		);
+		ActionResizeTopographyBoundDialog dialog = new ActionResizeTopographyBoundDialog(model.getTopographyBound());
 
 		if (dialog.getValue()){
-			model.setTopographyBound(dialog.getBound());
+			VRectangle oldBound = new VRectangle(model.getTopographyBound());
+			VRectangle newBound = new VRectangle(dialog.getBound());
+			model.setTopographyBound(newBound);
+			undoableEditSupport.postEdit(new EditResizeTopographyBound(getScenarioPanelModel(), oldBound, newBound));
 		}
 		getScenarioPanelModel().notifyObservers();
 	}

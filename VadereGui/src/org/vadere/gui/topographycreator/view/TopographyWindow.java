@@ -300,7 +300,11 @@ public class TopographyWindow extends JPanel {
 		/* resize Topography */
 		TopographyAction resizeTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
-				panelModel, selectShape);
+				panelModel, selectShape, undoSupport);
+
+		/*TopographyAction translateTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
+				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
+				panelModel, selectShape, undoSupport);*/
 
 		/* Makros */
 		ActionTopographyMakroMenu actionTopographyMakroMenu =
