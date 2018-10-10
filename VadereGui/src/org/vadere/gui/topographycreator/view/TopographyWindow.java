@@ -29,7 +29,6 @@ import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
-import org.vadere.gui.topographycreator.control.ActionScenarioChecker;
 import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;

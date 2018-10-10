@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.topographycreator.control.ActionScenarioChecker;
+import org.vadere.gui.components.control.ActionScenarioChecker;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.simulator.projects.Scenario;
 

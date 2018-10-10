@@ -1,4 +1,4 @@
-package org.vadere.gui.topographycreator.control;
+package org.vadere.gui.components.control;
 
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ScenarioNamePanel;
