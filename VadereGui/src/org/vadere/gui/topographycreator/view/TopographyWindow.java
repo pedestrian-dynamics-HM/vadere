@@ -31,6 +31,7 @@ import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
 import org.vadere.gui.topographycreator.control.ActionTopographyCheckerMenu;
 import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
+import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
@@ -302,9 +303,9 @@ public class TopographyWindow extends JPanel {
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
 				panelModel, selectShape, undoSupport);
 
-		/*TopographyAction translateTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
-				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
-				panelModel, selectShape, undoSupport);*/
+		TopographyAction translateTopography =new ActionTranslateTopography("SetTopograpyBound",
+				new ImageIcon(Resources.class.getResource("/icons/translation_icon.png")),
+				panelModel, selectShape, undoSupport);
 
 		/* Makros */
 		ActionTopographyMakroMenu actionTopographyMakroMenu =
@@ -345,6 +346,7 @@ public class TopographyWindow extends JPanel {
 		// "TopographyCreator.btnMinimizeTopography.tooltip");
 		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
 		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
+		addActionToToolbar(toolbar, translateTopography, "TopographyCreator.btnTranslation.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");

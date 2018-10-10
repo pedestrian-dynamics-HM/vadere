@@ -203,15 +203,25 @@ public abstract class DefaultRenderer {
 		 */
 		double dy = defaultModel.getTopographyBound().getHeight() - defaultModel.getViewportBound().getHeight();
 
+		// undo the viewport translation
 		graphics.translate(defaultModel.getViewportBound().getX(),
-				-Math.max((dy - defaultModel.getViewportBound().getY()), 0));
+				-Math.max((dy - defaultModel.getViewportBound().getY()), -defaultModel.getViewportBound().getY()));
 		graphics.scale(1.0 / scale, 1.0 / scale);
 		graphics.translate(0, +defaultModel.getTopographyBound().getHeight() * defaultModel.getScaleFactor());
 		graphics.scale(1.0, -1.0);
 
 		graphics.translate(0, 2.0);
 		graphics.scale(0.25, 0.25);
+
 		graphics.drawImage(logo, 0, 0, null);
+
+		// undo all scaling and translation
+		graphics.scale(1.0/0.25, 1.0/0.25);
+		graphics.translate(0, 1.0/2.0);
+		graphics.scale(1.0, -1.0);
+		graphics.translate(0, -defaultModel.getTopographyBound().getHeight() * defaultModel.getScaleFactor());
+		graphics.translate(-defaultModel.getViewportBound().getX(),
+				Math.max((dy - defaultModel.getViewportBound().getY()), -defaultModel.getViewportBound().getY()));
 	}
 
 	protected boolean hasLogo() {

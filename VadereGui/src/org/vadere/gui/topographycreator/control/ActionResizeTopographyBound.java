@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.gui.topographycreator.view.ActionResizeTopographyBoundDialog;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.event.ActionEvent;
@@ -9,6 +10,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
 
+/**
+ * @author Benedikt Zoennchen
+ */
 public class ActionResizeTopographyBound extends TopographyAction {
 
 	private TopographyAction action;

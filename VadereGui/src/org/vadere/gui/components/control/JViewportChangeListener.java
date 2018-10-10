@@ -29,14 +29,25 @@ public class JViewportChangeListener implements ChangeListener {
 	@Override
 	public void stateChanged(final ChangeEvent e) {
 		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
+		Rectangle2D.Double viewp = defaultModel.getViewportBound();
 		JViewport viewPort = (JViewport) e.getSource();
 		if (topographyBound != null) {
 			Rectangle rect = viewPort.getViewRect();
 			double x = Math.max(topographyBound.getMinX(), topographyBound.getMinX() + rect.getX() / defaultModel.getScaleFactor());
+
+			double barHeight;
+			if(verticalScrollBar.getHeight() > 0) {
+				barHeight = verticalScrollBar.getHeight();
+			}
+			else {
+				barHeight = rect.getHeight();
+			}
+
 			double y = Math.max(topographyBound.getMinY(), topographyBound.getMinY() + topographyBound.getHeight()
-					- ((rect.getY() + verticalScrollBar.getHeight()) / defaultModel.getScaleFactor()));
+					- ((rect.getY() + barHeight) / defaultModel.getScaleFactor()));
 			double w = rect.getWidth() / defaultModel.getScaleFactor();
 			double h = rect.getHeight() / defaultModel.getScaleFactor();
+
 			defaultModel.setViewportBound(new Rectangle2D.Double(x, y, w, h));
 			defaultModel.notifyObservers();
 		}

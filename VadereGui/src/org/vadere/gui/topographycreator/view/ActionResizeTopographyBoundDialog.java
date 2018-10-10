@@ -1,7 +1,6 @@
-package org.vadere.gui.topographycreator.control;
+package org.vadere.gui.topographycreator.view;
 
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
