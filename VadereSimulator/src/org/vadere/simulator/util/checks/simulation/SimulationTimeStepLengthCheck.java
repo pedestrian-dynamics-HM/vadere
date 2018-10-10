@@ -22,7 +22,8 @@ public class SimulationTimeStepLengthCheck extends AbstractScenarioCheck {
 		if(simTimeStep < LOW_BOUND || simTimeStep > HIGH_BOUND){
 
 			ret.add(msgBuilder.simulationAttrError()
-					.reason(ScenarioCheckerReason.SIM_TIME_STEP_WRONG, String.format("[%3.1f - %3.1f]", LOW_BOUND, HIGH_BOUND))
+					.reason(ScenarioCheckerReason.SIM_TIME_STEP_WRONG,
+							String.format(" [%3.1f - %3.1f] current value: %3.1f", LOW_BOUND, HIGH_BOUND, simTimeStep))
 					.build());
 		}
 		return ret;

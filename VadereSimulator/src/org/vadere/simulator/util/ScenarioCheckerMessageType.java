@@ -1,21 +1,22 @@
 package org.vadere.simulator.util;
 
-import java.util.Comparator;
-
 /**
  * Types of {@link ScenarioChecker} messages. The {@link #msgId} is used as messageId for locale
  * de/en
  */
 public enum ScenarioCheckerMessageType {
 
-	TOPOGRAPHY_ERROR("Error",100, "ScenarioChecker.type.error"),
-	TOPOGRAPHY_WARN("Warning",500, "ScenarioChecker.type.warning"),
-	SIMULATION_ATTR_ERROR("Error",101, "ScenarioChecker.type.error"),
-	SIMULATION_ATTR_WARN("Warning",501, "ScenarioChecker.type.warning"),
-	MODEL_ATTR_ERROR("Error",102, "ScenarioChecker.type.error"),
-	MODEL_ATTR_WARN("Warning",502, "ScenarioChecker.type.warning"),
-	DATA_PROCESSOR_ERROR("Error",103, "ScenarioChecker.type.error"),
-	DATA_PROCESSOR_WARN("Warning",503, "ScenarioChecker.type.warning");
+	TOPOGRAPHY_ERROR("Error",100, "ScenarioChecker.type.topography.error"),
+	TOPOGRAPHY_WARN("Warning",500, "ScenarioChecker.type.topography.warning"),
+	SIMULATION_ATTR_ERROR("Error",101, "ScenarioChecker.type.simulation.error"),
+	SIMULATION_ATTR_WARN("Warning",501, "ScenarioChecker.type.simulation.warning"),
+	MODEL_ATTR_ERROR("Error",102, "ScenarioChecker.type.model.error"),
+	MODEL_ATTR_WARN("Warning",502, "ScenarioChecker.type.model.warning"),
+	DATA_PROCESSOR_ERROR("Error",103, "ScenarioChecker.type.processor.error"),
+	DATA_PROCESSOR_WARN("Warning",503, "ScenarioChecker.type.processor.warning");
+
+	private static final int ERROR_START = 100;
+	private static final int WARN_START = 500;
 
 	private String type;
 	private String msgId;
@@ -25,6 +26,14 @@ public enum ScenarioCheckerMessageType {
 		this.type = type;
 		this.id = id;
 		this.msgId = msgId;
+	}
+
+	public boolean isErrorMsg(){
+		return type.equals("Error");
+	}
+
+	public boolean isWarnMsg(){
+		return type.equals("Warn");
 	}
 
 	public String getType() {
@@ -41,6 +50,7 @@ public enum ScenarioCheckerMessageType {
 	public String toString() {
 		return "ScenarioCheckerMessageType{" +
 				"type='" + type + '\'' +
+				", id=" + id +
 				'}';
 	}
 }

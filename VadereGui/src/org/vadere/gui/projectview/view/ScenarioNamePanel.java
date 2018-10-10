@@ -20,14 +20,13 @@ public class ScenarioNamePanel extends JPanel {
 	private ActionScenarioChecker action;
 
 	public ScenarioNamePanel(){
+		action = new ActionScenarioChecker("ScenarioChecker", this);
 		btnScenarioChecker = new JButton(iconGreen);
 		btnScenarioChecker.setBorderPainted(false);
 		btnScenarioChecker.setBorder(null);
 		btnScenarioChecker.setMargin(new Insets(0, 0, 0, 0));
 		btnScenarioChecker.setContentAreaFilled(false);
-		btnScenarioChecker.addActionListener(e-> System.out.println("ddd"));
-		btnScenarioChecker.setRolloverIcon(iconRed);
-		action = new ActionScenarioChecker("ScenarioChecker", this);
+		btnScenarioChecker.addActionListener(action);
 		add(btnScenarioChecker);
 
 		lblScenarioName = new JLabel();

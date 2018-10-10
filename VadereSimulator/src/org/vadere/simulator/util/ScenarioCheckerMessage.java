@@ -18,7 +18,7 @@ public class ScenarioCheckerMessage implements Comparable<ScenarioCheckerMessage
 	private ScenarioCheckerMessageTarget msgTarget;
 
 
-	public ScenarioCheckerMessage(ScenarioCheckerMessageType type) {
+	public ScenarioCheckerMessage(@NotNull ScenarioCheckerMessageType type) {
 		msgType = type;
 		msgTarget = null;
 		reasonModifier = "";
