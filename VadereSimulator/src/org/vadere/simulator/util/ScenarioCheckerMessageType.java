@@ -36,7 +36,7 @@ public enum ScenarioCheckerMessageType {
 	}
 
 	public boolean isWarnMsg(){
-		return type.equals("Warn");
+		return type.equals("Warning");
 	}
 
 	public String getType() {

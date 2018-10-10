@@ -11,6 +11,7 @@ import org.vadere.gui.projectview.view.ScenarioNamePanel;
 import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.projectview.view.VTable;
+import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.ProjectWriter;
@@ -25,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-public class ProjectViewModel {
+public class ProjectViewModel implements IScenarioChecker {
 	private static Logger logger = LogManager.getLogger(ProjectViewModel.class);
 
 	private VadereProject project;
@@ -43,7 +44,8 @@ public class ProjectViewModel {
 
 	private final Collection<IOutputFileRefreshListener> outputRefreshListeners;
 	private final Collection<IProjectChangeListener> projectChangeListeners;
-	private ScenarioNamePanel scenarioNamePanel; // to add or remove the "*" to indicate unsaved changes
+	private List<IScenarioChecker> scenarioCheckerListeners;
+	private ScenarioNamePanel scenarioNamePanel; // to add or remove the "*" to indicate unsaved changes and ScenarioChecker indicator
 	private boolean showSimulationResultDialog;
 
 	public ProjectViewModel() {
@@ -55,6 +57,7 @@ public class ProjectViewModel {
 		this.refreshOutputExecutor = Executors.newSingleThreadExecutor();
 		this.showSimulationResultDialog = Preferences.userNodeForPackage(VadereApplication.class)
 				.getBoolean("Project.simulationResult.show", true);
+		this.scenarioCheckerListeners = new ArrayList<>();
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
@@ -423,5 +426,23 @@ public class ProjectViewModel {
 
 	public void setShowSimulationResultDialog(boolean showSimulationResultDialog) {
 		this.showSimulationResultDialog = showSimulationResultDialog;
+	}
+
+	public void scenarioCheckerStopObserve(){
+		scenarioNamePanel.stopObserver();
+	}
+
+	public void scenarioCheckerStartObserve(IDrawPanelModel model){
+		scenarioNamePanel.observerIDrawPanelModel(model);
+	}
+
+	public void scenarioCheckerCheck(final Scenario scenario){
+		scenarioNamePanel.check(scenario);
+	}
+
+
+	@Override
+	public void checkScenario(final Scenario scenario) {
+		scenarioNamePanel.check(scenario);
 	}
 }

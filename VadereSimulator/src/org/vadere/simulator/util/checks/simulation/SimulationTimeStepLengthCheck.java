@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
 
 public class SimulationTimeStepLengthCheck extends AbstractScenarioCheck {
 
-	private final static double LOW_BOUND = 0.1;
+	private final static double LOW_BOUND = 0.01;
 	private final static double HIGH_BOUND = 1.0;
 
 	@Override
@@ -19,7 +19,7 @@ public class SimulationTimeStepLengthCheck extends AbstractScenarioCheck {
 		AttributesSimulation simAttr = scenario.getAttributesSimulation();
 		double simTimeStep = simAttr.getSimTimeStepLength();
 
-		if(simTimeStep < LOW_BOUND || simTimeStep > HIGH_BOUND){
+		if(simTimeStep <= LOW_BOUND || simTimeStep >= HIGH_BOUND){
 
 			ret.add(msgBuilder.simulationAttrError()
 					.reason(ScenarioCheckerReason.SIM_TIME_STEP_WRONG,

@@ -680,7 +680,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scenarioNamePanel = new ScenarioNamePanel();
 		rightSidePanel.add(scenarioNamePanel, BorderLayout.NORTH);
 
-		scenarioJPanel = new ScenarioPanel(scenarioNamePanel, model);
+		scenarioJPanel = new ScenarioPanel(model);
 		model.setScenarioNamePanel(scenarioNamePanel); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);

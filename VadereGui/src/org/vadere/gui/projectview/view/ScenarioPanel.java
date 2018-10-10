@@ -33,7 +33,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;
-	private final ScenarioNamePanel scenarioNamePanel;
+//	private final ScenarioNamePanel scenarioNamePanel;
 
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
@@ -58,8 +58,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private static JEditorPane activeTopographyErrorMsg = null;
 
 
-	ScenarioPanel(ScenarioNamePanel scenarioNamePanel, ProjectViewModel model) {
-		this.scenarioNamePanel = scenarioNamePanel;
+	ScenarioPanel(ProjectViewModel model) {
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
         this.model = model;
@@ -86,8 +85,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		tabbedPane.addChangeListener(e -> {
 			// remove ScenarioChecker listener if exists
-
-			scenarioNamePanel.stopObserver();
+			model.scenarioCheckerStopObserve();
 
 			int index = tabbedPane.getSelectedIndex();
 			if (index >= 0 && topographyFileView != null
@@ -98,18 +96,23 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.TopographyCreator.title"))
 					&& scenario != null) {
 				setTopography(scenario.getTopography());
-				scenarioNamePanel.observerIDrawPanelModel(topographyCreatorView.getPanelModel());
+				model.scenarioCheckerStartObserve(topographyCreatorView.getPanelModel());
 				return;
 			}
 
-			scenarioNamePanel.check(scenario);
+//			model.scenarioCheckerCheck(scenario);
 		});
+
+		//Tab
 		attributesSimulationView =
 				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);
+		attributesSimulationView.setScenarioChecker(model);
 
 		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), attributesSimulationView);
 
+		//Tab
 		attributesModelView = new TextView("/attributes", "default_directory_attributes", AttributeType.MODEL);
+		attributesModelView.setScenarioChecker(model);
 
 		JMenuBar presetMenuBar = new JMenuBar();
 
@@ -161,8 +164,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		mnModelNameMenu.add(submenuMainModels);
 
 		ModelHelper.instance().getSortedMainModel()
-//		ClassFinder.getMainModelNames().stream()
-//				.sorted()
 				.forEach(className -> submenuMainModels.add(new JMenuItem(new AbstractAction(className) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -171,8 +172,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				}
 				)));
 		
-//		Map<String, List<String>> groupedPackages = ClassFinder.groupPackages(ClassFinder.getModelNames());
-//		Map<String, List<String>> groupedPackages = ModelHelper.instance().getModelsSortedByPackage();
 
 		ModelHelper.instance().getModelsSortedByPackageStream().forEach( entry -> {
 			JMenu currentSubMenu = new JMenu(entry.getKey());
@@ -193,6 +192,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
+		topographyFileView.setScenarioChecker(model);
+
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 		dataProcessingGUIview = new DataProcessingView();
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
@@ -228,7 +229,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	 */
 	public void setScenario(Scenario scenario, boolean isEditable) {
 		this.scenario = scenario;
-		this.scenarioNamePanel.setScenarioName(scenario.getDisplayName());
+		model.setScenarioNameLabelString(scenario.getDisplayName());
 
 		if (!initialized) {
 			initialize();
@@ -297,7 +298,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	}
 
 	public void clearScenarioView() {
-		scenarioNamePanel.setScenarioName("");
+		model.setScenarioNameLabelString("");
 		initialized = false;
 
 		removeAll();
