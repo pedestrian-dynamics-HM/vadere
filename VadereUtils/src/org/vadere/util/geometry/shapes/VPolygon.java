@@ -7,6 +7,7 @@ import java.awt.geom.PathIterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.ShapeType;
 
@@ -326,7 +327,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public double distance(VPoint target) {
+	public double distance(@NotNull final VPoint target) {
 		if (contains(target)) {
 			return -closestPoint(target).distance(target);
 		} else {

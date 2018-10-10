@@ -128,13 +128,17 @@ public class VPoint implements Cloneable {
 	}
 
 	public VPoint norm() {
-		double abs = distanceToOrigin();
-		return new VPoint(x / abs, y / abs);
+		return norm(1.0);
 	}
 
 	public VPoint norm(final double length) {
 		double rx, ry;
 		double vl = distance(ZERO);
+
+		if(Math.abs(vl) < GeometryUtils.DOUBLE_EPS) {
+			throw new IllegalArgumentException(this + " has length zero (or almost zero) and can not be normalized.");
+		}
+
 		if (Math.abs(x) < GeometryUtils.DOUBLE_EPS) {
 			rx = 0;
 		} else {

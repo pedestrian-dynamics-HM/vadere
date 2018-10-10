@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
@@ -15,6 +16,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -248,14 +250,22 @@ public class PedestrianBHM extends Pedestrian {
 				}
 				else {
 					Vector2D vec = potentialFieldTarget.getTargetPotentialGradient(getPosition(), this).multiply(-1.0);
-					targetDirection = vec.norm();
+					if(vec.getLength() < GeometryUtils.DOUBLE_EPS) {
+						targetDirection = VPoint.ZERO;
+					}
+					else {
+						targetDirection = vec.norm();
+					}
 				}
 
 				for (DirectionAddend da : directionAddends) {
 					targetDirection = targetDirection.add(da.getDirectionAddend());
 				}
 
-				if (!targetDirection.equals(VPoint.ZERO)) {
+				if(targetDirection.distanceToOrigin() < GeometryUtils.DOUBLE_EPS) {
+					targetDirection = VPoint.ZERO;
+				}
+				else {
 					targetDirection = targetDirection.norm();
 				}
 			}
@@ -379,7 +389,7 @@ public class PedestrianBHM extends Pedestrian {
 	/**
 	 * This does not check collisions on the path, just collisions with position!
 	 */
-	List<Obstacle> detectObstacleProximity(VPoint position, double proximity) {
+	List<Obstacle> detectObstacleProximity(@NotNull VPoint position, double proximity) {
 
 		Collection<Obstacle> obstacles = topography.getObstacles();
 		List<Obstacle> result = new LinkedList<>();
