@@ -58,7 +58,7 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
     }
 
     @Override
-    public void setInputValue(double x, double y, double value) {
+    public void  setInputValue(double x, double y, double value) {
         filter.setInputValue(x, y, value);
     }
 
@@ -109,6 +109,16 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
 	}
 
 	@Override
+	public int toFloorXIndex(double x) {
+		return filter.toFloorXIndex(x);
+	}
+
+	@Override
+	public int toFloorYIndex(double y) {
+		return filter.toFloorYIndex(y);
+	}
+
+	@Override
 	public double toXCoord(int xIndex) {
 		return filter.toXCoord(xIndex);
 	}
@@ -127,75 +137,33 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
         VPoint filteredPosition = pedestrian.getPosition();
         //VPoint filteredPosition = new VPoint(Math.max(0, position.x), Math.max(0, position.y));
 
-        // better approximation
+        // maybe find a better approximation. Here we extrapolate by the area of 4 rectangles.
+	    int lowerLeftX = toFloorXIndex(filteredPosition.x);
+	    int lowerLeftY = toFloorYIndex(filteredPosition.y);
 
-	    int indexX = toXIndex(filteredPosition.x);
-	    int indexY = toYIndex(filteredPosition.y);
+	    double coordX = toXCoord(lowerLeftX+1);
+	    double coordY = toYCoord(lowerLeftY+1);
 
-	    double coordX = toXCoord(indexX);
-	    double coordY = toYCoord(indexY);
+	    double dx = Math.abs(coordX - filteredPosition.x) * getScale();
+	    double dy = Math.abs(coordY - filteredPosition.y) * getScale();
 
-	    int dx = toXCoord(indexX) > filteredPosition.x ? 1 : -1;
-	    int dy = toYCoord(indexY) > filteredPosition.y ? 1 : -1;
+	    double max = getScale() * getScale();
 
-	    //TODO: reactivate the split but refactor the code.
-       /* if (Double.compare(coordX, filteredPosition.x) == 0
-		        && Double.compare(coordY, filteredPosition.y) == 0) {
-        	setInputValue(filteredPosition.x, filteredPosition.y,
-			        getInputValue(indexX, indexY) + pedestrianLoadingStrategy.calculateLoading(pedestrian));
-        } else if (Double.compare(coordX, filteredPosition.x) == 0 && Double.compare(coordY, filteredPosition.y) != 0) {
-            splitY(filteredPosition, indexX, indexY, pedestrian);
-            splitY(filteredPosition, indexX, indexY + dy, pedestrian);
-        } else if (Double.compare(coordX, filteredPosition.x) != 0 && Double.compare(coordY, filteredPosition.y) == 0) {
-            splitX(filteredPosition, indexX, indexY, pedestrian);
-            splitX(filteredPosition, indexX + dx, indexY, pedestrian);
-        } else {
+	    double w1 = dx * dy;
+		double w2 = dx * (1.0 - dy);
+	    double w3 = (1.0 - dx) * dy;
+		double w4 = (1.0 - dx) * (1.0 - dy);
 
-            splitXY(filteredPosition, indexX, indexY, pedestrian);
-            splitXY(filteredPosition, indexX, indexY + dy, pedestrian);
-            splitXY(filteredPosition, indexX + dx, indexY, pedestrian);
-            splitXY(filteredPosition, indexX + dx, indexY + dy, pedestrian);
-        }*/
+		assert Math.abs((w1+w2+w3+w4) - 1.0) < 0.00001;
 
-        setInputValue(filteredPosition.x, filteredPosition.y, pedestrianLoadingStrategy.calculateLoading(pedestrian));
+	    double value = pedestrianLoadingStrategy.calculateLoading(pedestrian);
+
+	    setInputValue(lowerLeftX + 1, lowerLeftY + 1, value * w1);
+	    setInputValue(lowerLeftX + 1, lowerLeftY, value * w2);
+	    setInputValue(lowerLeftX, lowerLeftY + 1, value * w3);
+	    setInputValue(lowerLeftX, lowerLeftY, value * w4);
     }
 
-    private void splitXY(final VPoint filteredPosition, final int indexX, final int indexY, Pedestrian pedestrian) {
-        if (checkIndices(indexX, indexY)) {
-            double dx = Math.abs(filteredPosition.x * getScale() - indexX);
-            double dy = Math.abs(filteredPosition.y * getScale() - indexY);
-
-            double weight = ((1.0 - dx) + (1.0 - dy)) / 4.0;
-            // double weight = Math.exp(-(dx * dx + dy * dy) / (2 * 0.7 * 0.7));
-            setInputValue(indexX, indexY,
-                    getInputValue(indexX, indexY) + pedestrianLoadingStrategy.calculateLoading(pedestrian) * weight);
-        }
-    }
-
-    private void splitX(final VPoint filteredPosition, final int indexX, final int indexY, Pedestrian pedestrian) {
-        if (checkIndices(indexX, indexY)) {
-            double dx = Math.abs(filteredPosition.x * getScale() - indexX);
-            double weight = (1.0 - dx);
-            // double weight = Math.exp(-(dx * dx + dy * dy) / (2 * 0.7 * 0.7));
-            setInputValue(indexX, indexY,
-                    getInputValue(indexX, indexY) + pedestrianLoadingStrategy.calculateLoading(pedestrian) * weight);
-        }
-    }
-
-    private void splitY(final VPoint filteredPosition, final int indexX, final int indexY, Pedestrian pedestrian) {
-        if (checkIndices(indexX, indexY)) {
-            double dy = Math.abs(filteredPosition.y * getScale() - indexY);
-
-            double weight = (1.0 - dy);
-            // double weight = Math.exp(-(dx * dx + dy * dy) / (2 * 0.7 * 0.7));
-            setInputValue(indexX, indexY,
-                    getInputValue(indexX, indexY) + pedestrianLoadingStrategy.calculateLoading(pedestrian) * weight);
-        }
-    }
-
-    private boolean checkIndices(int x, int y) {
-        return x >= 0 && y >= 0 && x < filter.getMatrixWidth() && y < filter.getMatrixHeight();
-    }
 
     private void setValues() {
         clear();

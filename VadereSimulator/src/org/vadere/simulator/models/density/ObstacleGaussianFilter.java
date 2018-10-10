@@ -79,6 +79,16 @@ public class ObstacleGaussianFilter implements IGaussianFilter {
 	}
 
 	@Override
+	public int toFloorXIndex(double x) {
+		return filter.toFloorXIndex(x);
+	}
+
+	@Override
+	public int toFloorYIndex(double y) {
+		return filter.toFloorYIndex(y);
+	}
+
+	@Override
 	public double toXCoord(int xIndex) {
 		return filter.toXCoord(xIndex);
 	}
