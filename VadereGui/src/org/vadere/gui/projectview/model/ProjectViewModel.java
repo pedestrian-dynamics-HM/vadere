@@ -7,6 +7,7 @@ import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.view.ProjectView;
+import org.vadere.gui.projectview.view.ScenarioNamePanel;
 import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.projectview.view.VTable;
@@ -42,7 +43,7 @@ public class ProjectViewModel {
 
 	private final Collection<IOutputFileRefreshListener> outputRefreshListeners;
 	private final Collection<IProjectChangeListener> projectChangeListeners;
-	private JLabel scenarioNameLabel; // to add or remove the "*" to indicate unsaved changes
+	private ScenarioNamePanel scenarioNamePanel; // to add or remove the "*" to indicate unsaved changes
 	private boolean showSimulationResultDialog;
 
 	public ProjectViewModel() {
@@ -269,12 +270,12 @@ public class ProjectViewModel {
 		projectChangeListeners.add(listener);
 	}
 
-	public void setScenarioNameLabel(JLabel scenarioName) {
-		this.scenarioNameLabel = scenarioName;
+	public void setScenarioNamePanel(ScenarioNamePanel scenarioNamePanel) {
+		this.scenarioNamePanel = scenarioNamePanel;
 	}
 
-	public void setScenarioNameLabel(final String name) {
-		this.scenarioNameLabel.setText(name);
+	public void setScenarioNameLabelString(final String name) {
+		this.scenarioNamePanel.setScenarioName(name);
 	}
 
 	private class OutputRefresher implements Runnable {
@@ -404,7 +405,7 @@ public class ProjectViewModel {
 	public void refreshScenarioNames() {
 		if (scenarioTable.getRowCount() > 0) {
 			scenarioTable.repaint();
-			scenarioNameLabel.setText(currentScenario.getDisplayName());
+			scenarioNamePanel.setScenarioName(currentScenario.getDisplayName());
 		}
 	}
 

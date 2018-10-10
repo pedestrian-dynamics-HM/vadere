@@ -8,6 +8,7 @@ package org.vadere.simulator.util;
  */
 public enum ScenarioCheckerReason {
 
+	// Topography reasons
 	SOURCE_TARGET_ID_NOT_FOUND("ScenarioChecker.source.targetIdNotFound"),
 	SOURCE_NO_TARGET_ID_SET("ScenarioChecker.source.noTargetIdSet"),
 	SOURCE_NO_TARGET_ID_NO_SPAWN("ScenarioChecker.source.noTargetIdAndNoSpawn"),
@@ -32,7 +33,10 @@ public enum ScenarioCheckerReason {
 	TARGET_OVERLAP("ScenarioChecker.target.overlap"),
 	PEDESTRIAN_SPEED_SETUP("ScenarioChecker.pedestrian.speedsetup"),
 	PEDESTRIAN_SPEED_NOT_LOGICAL("ScenarioChecker.pedestrian.speedNotLogical"),
-	PEDESTRIAN_SPEED_NEGATIVE("ScenarioChecker.pedestrian.speedIsNegative");
+	PEDESTRIAN_SPEED_NEGATIVE("ScenarioChecker.pedestrian.speedIsNegative"),
+
+	// Simulation attribute reasons
+	SIM_TIME_STEP_WRONG("ScenarioChecker.simAttr.simTimeStepWrong");
 
 	private String msgId;
 

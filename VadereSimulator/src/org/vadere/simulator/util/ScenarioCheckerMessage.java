@@ -57,7 +57,15 @@ public class ScenarioCheckerMessage implements Comparable<ScenarioCheckerMessage
 	}
 
 	public boolean isMessageForAllElements(Integer... ids){
-		return  msgTarget.affectsAllTargets(ids);
+		if (hasTarget()){
+			return msgTarget.affectsAllTargets(ids);
+		} else {
+			return  false;
+		}
+	}
+
+	public boolean hasTarget(){
+		return msgTarget != null;
 	}
 
 	private Comparator<ScenarioCheckerMessage> sortByType() {

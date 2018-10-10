@@ -3,6 +3,7 @@ package org.vadere.simulator.util;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.util.checks.ScenarioCheckerTest;
+import org.vadere.simulator.util.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.util.checks.topography.PedestrianSpeedSetupCheck;
 import org.vadere.simulator.util.checks.topography.StairTreadSanityCheck;
 import org.vadere.simulator.util.checks.topography.TopographyOverlapCheck;
@@ -55,6 +56,13 @@ public class ScenarioChecker {
 		ret.addAll(checkStairTreadSanity());
 		ret.addAll(checkPedestrianSpeedSetup());
 		ret.addAll(checkOverlap());
+		ret.addAll(checkSimulationAttribues());
+		return ret;
+	}
+
+	public PriorityQueue<ScenarioCheckerMessage> checkSimulationAttribues(){
+		PriorityQueue<ScenarioCheckerMessage> ret = new PriorityQueue<>();
+		ret.addAll(runCheck(new SimulationTimeStepLengthCheck()));
 		return ret;
 	}
 

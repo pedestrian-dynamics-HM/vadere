@@ -33,7 +33,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;
-	private final JLabel scenarioName;
+	private final ScenarioNamePanel scenarioNamePanel;
 
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
@@ -43,7 +43,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
-	private ScenarioCheckerPanel scenarioCheckerPanel;
 
 	// during simulation-run, only this is shown instead of the tabs above:
 	private final OnlineVisualization onlineVisualization;
@@ -59,8 +58,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private static JEditorPane activeTopographyErrorMsg = null;
 
 
-	ScenarioPanel(JLabel scenarioName, ProjectViewModel model) {
-		this.scenarioName = scenarioName;
+	ScenarioPanel(ScenarioNamePanel scenarioNamePanel, ProjectViewModel model) {
+		this.scenarioNamePanel = scenarioNamePanel;
 		this.onlineVisualization = new OnlineVisualization(true);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
         this.model = model;
@@ -83,14 +82,12 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		editCard.add(tabbedPane, BorderLayout.CENTER);
 
-		scenarioCheckerPanel = new ScenarioCheckerPanel();
-		editCard.add(scenarioCheckerPanel, BorderLayout.SOUTH);
 
 
 		tabbedPane.addChangeListener(e -> {
 			// remove ScenarioChecker listener if exists
 
-			scenarioCheckerPanel.stopObserver();
+			scenarioNamePanel.stopObserver();
 
 			int index = tabbedPane.getSelectedIndex();
 			if (index >= 0 && topographyFileView != null
@@ -101,11 +98,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.TopographyCreator.title"))
 					&& scenario != null) {
 				setTopography(scenario.getTopography());
-				scenarioCheckerPanel.observerIDrawPanelModel(topographyCreatorView.getPanelModel());
+				scenarioNamePanel.observerIDrawPanelModel(topographyCreatorView.getPanelModel());
 				return;
 			}
 
-			scenarioCheckerPanel.check(scenario);
+			scenarioNamePanel.check(scenario);
 		});
 		attributesSimulationView =
 				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);
@@ -231,7 +228,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	 */
 	public void setScenario(Scenario scenario, boolean isEditable) {
 		this.scenario = scenario;
-		this.scenarioName.setText(scenario.getDisplayName());
+		this.scenarioNamePanel.setScenarioName(scenario.getDisplayName());
 
 		if (!initialized) {
 			initialize();
@@ -300,7 +297,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	}
 
 	public void clearScenarioView() {
-		scenarioName.setText("");
+		scenarioNamePanel.setScenarioName("");
 		initialized = false;
 
 		removeAll();

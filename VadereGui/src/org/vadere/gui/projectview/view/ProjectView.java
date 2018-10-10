@@ -100,6 +100,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
 	private ScenarioPanel scenarioJPanel;
+	private ScenarioNamePanel scenarioNamePanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
 	private ProjectRunResultDialog projectRunResultDialog;
@@ -137,7 +138,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	@Override
 	public void preScenarioRun(final Scenario scenario, final int scenariosLeft) {
 		EventQueue.invokeLater(() -> {
-			model.setScenarioNameLabel(scenario.getName());
+			model.setScenarioNameLabelString(scenario.getName());
 			repaint();
 		});
 	}
@@ -676,15 +677,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		rightSidePanel.setLayout(new BorderLayout(0, 0));
 		contentPane.add(rightSidePanel, BorderLayout.CENTER);
 
-		JPanel ScenarioNamePanel = new JPanel();
-		rightSidePanel.add(ScenarioNamePanel, BorderLayout.NORTH);
+		scenarioNamePanel = new ScenarioNamePanel();
+		rightSidePanel.add(scenarioNamePanel, BorderLayout.NORTH);
 
-		JLabel scenarioName = new JLabel();
-		ScenarioNamePanel.add(scenarioName);
-		scenarioName.setHorizontalAlignment(SwingConstants.CENTER);
-
-		scenarioJPanel = new ScenarioPanel(scenarioName, model);
-		model.setScenarioNameLabel(scenarioName); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
+		scenarioJPanel = new ScenarioPanel(scenarioNamePanel, model);
+		model.setScenarioNamePanel(scenarioNamePanel); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);
 	}

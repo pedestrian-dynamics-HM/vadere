@@ -1,7 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.projectview.view.ScenarioCheckerPanel;
+import org.vadere.gui.projectview.view.ScenarioNamePanel;
 import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
@@ -26,10 +26,10 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 	private MsgDocument msgDocument;
 
 	private IDrawPanelModel model;
-	private ScenarioCheckerPanel view;
+	private ScenarioNamePanel view;
 
 	public
-	ActionScenarioChecker(String name, ScenarioCheckerPanel view) {
+	ActionScenarioChecker(String name, ScenarioNamePanel view) {
 		super(name);
 		this.errorMsg = new PriorityQueue<>();
 		this.warnMsg = new PriorityQueue<>();
@@ -76,16 +76,13 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 		addMsg(checker.checkBuildingStep());
 
 		view.setGreen();
-		view.setMsgOK();
 
 		if (warnMsg.size() > 0) {
 			view.setYellow();
-			view.setMsgWarn();
 		}
 
 		if (errorMsg.size() > 0) {
 			view.setRed();
-			view.setMsgErr();
 		}
 	}
 
@@ -117,13 +114,16 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 
 
 	private void msgToDocString(StringBuilder sb, ScenarioCheckerMessage msg, MsgDocument doc) {
-		sb.append("[");
-		msg.getMsgTarget().getTargets().forEach(t -> {
-			doc.makeLink(t, sb);
-			sb.append(", ");
-		});
-		sb.setLength(sb.length()-2);
-		sb.append("] ");
+
+		if (msg.hasTarget()){
+			sb.append("[");
+			msg.getMsgTarget().getTargets().forEach(t -> {
+				doc.makeLink(t, sb);
+				sb.append(", ");
+			});
+			sb.setLength(sb.length()-2);
+			sb.append("] ");
+		}
 
 		sb.append("Reason: ").append(Messages.getString(msg.getReason().getLocalMessageId()));
 		if (!msg.getReasonModifier().isEmpty()) {
