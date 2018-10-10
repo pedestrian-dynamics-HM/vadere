@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.awt.*;
 import java.awt.geom.Line2D;
 
-public class TopographyCreatorRenderer  extends DefaultRenderer{
+public class TopographyCreatorRenderer  extends DefaultRenderer {
 
 	private final IDrawPanelModel<DefaultConfig> panelModel;
 

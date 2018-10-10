@@ -38,7 +38,8 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 	public PotentialFieldDistanceEikonalEq(@NotNull final Collection<VShape> obstacles,
 										   @NotNull final VRectangle bounds,
 										   @NotNull final AttributesFloorField attributesFloorField) {
-		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState());
+		CellGrid cellGrid = new CellGrid(bounds.getWidth(),
+				bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
 		for (VShape shape : obstacles) {
 			FloorDiscretizer.setGridValuesForShape(cellGrid, shape,

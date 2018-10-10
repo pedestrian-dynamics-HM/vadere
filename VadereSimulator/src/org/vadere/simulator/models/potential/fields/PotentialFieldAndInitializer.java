@@ -49,7 +49,7 @@ class PotentialFieldAndInitializer {
 
 		Rectangle2D bounds = topography.getBounds();
 		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(),
-				attributesPotential.getPotentialFieldResolution(), new CellState());
+				attributesPotential.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
 		if (createMethod != EikonalSolverType.NONE) {
 			for (VShape shape : targetShapes) {

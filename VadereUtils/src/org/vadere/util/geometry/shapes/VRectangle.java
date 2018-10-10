@@ -99,7 +99,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public VShape translate(final VPoint vector) {
+	public VRectangle translate(final VPoint vector) {
 		return new VRectangle(getX() + vector.x, getY() + vector.y, getWidth(), getHeight());
 	}
 

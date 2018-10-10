@@ -19,6 +19,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.postvisualization.control.TableListenerLogicExpression;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
@@ -83,22 +84,17 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			}
 		}*/
 
-		this.pedestrianColorTableModel.addTableModelListener(
-				e -> {
-					for (int row = e.getFirstRow(); row <= e.getLastRow(); row++) {
-						if (row >= 0 && e.getColumn() == PedestrianColorTableModel.CIRTERIA_COLUMN) {
-							try {
-								VPredicate<JsonNode> evaluator = new JsonLogicParser(
-										pedestrianColorTableModel.getValueAt(row, e.getColumn()).toString()).parse();
-								colorEvalFunctions.put(row, evaluator);
-							} catch (ParseException e1) {
-								colorEvalFunctions.remove(row);
-								logger.warn(e1.getLocalizedMessage());
-							}
-						}
-					}
-				});
+		this.pedestrianColorTableModel.addTableModelListener(new TableListenerLogicExpression(this, pedestrianColorTableModel));
 	}
+
+	public void putExpression(final int row, @NotNull final VPredicate<JsonNode> predicate) {
+		colorEvalFunctions.put(row, predicate);
+	}
+
+	public void removeExpression(final int row) {
+		colorEvalFunctions.remove(row);
+	}
+
 
 	/**
 	 * Initialize the {@link PostvisualizationModel}.
