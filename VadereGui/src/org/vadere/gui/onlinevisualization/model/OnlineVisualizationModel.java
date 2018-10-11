@@ -149,6 +149,11 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		}
 	}
 
+	@Override
+	public boolean isTopgraphyAvailable() {
+		return topography != null;
+	}
+
 	public void pushObservationAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
         if (observationAreaSnapshots.size() > 0) {
             observationAreaSnapshots.pop();

@@ -22,6 +22,7 @@
     <module>./VadereState</module>
     <module>./VadereUtils</module>
     <module>./VadereAnnotation</module>
+    <module>./VadereZMQ</module>
   </modules>
   
 <!-- global dependencies! -->

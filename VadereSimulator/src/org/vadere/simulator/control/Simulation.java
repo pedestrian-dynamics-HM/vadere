@@ -63,7 +63,7 @@ public class Simulation {
 	private final ScenarioStore scenarioStore;
 	private final MainModel mainModel;
 	/** Hold the topography in an extra field for convenience. */
-	private final Topography topography;
+	protected final Topography topography;
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
@@ -184,58 +184,8 @@ public class Simulation {
 
 			preLoop();
 
-			while (runSimulation) {
-				synchronized (this) {
-					while (paused) {
-						try {
-							wait();
-						} catch (Exception e) {
-							paused = false;
-							Thread.currentThread().interrupt();
-							logger.warn("interrupt while paused.");
-						}
-					}
-				}
+			loop();
 
-				if (attributesSimulation.isVisualizationEnabled()) {
-					sleepTillStartOfNextFrame();
-				}
-
-				for (PassiveCallback c : passiveCallbacks) {
-					c.preUpdate(simTimeInSec);
-				}
-
-				assert assertAllPedestrianInBounds();
-				updateCallbacks(simTimeInSec);
-				updateWriters(simTimeInSec);
-
-				if (attributesSimulation.isWriteSimulationData()) {
-					processorManager.update(this.simulationState);
-				}
-
-
-				for (PassiveCallback c : passiveCallbacks) {
-					c.postUpdate(simTimeInSec);
-				}
-
-				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
-					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
-				} else {
-					runSimulation = false;
-				}
-
-
-				//remove comment to fasten simulation for evacuation simulations
-				//if (topography.getElements(Pedestrian.class).size() == 0){
-				//	runSimulation = false;
-				//}
-
-				if (Thread.interrupted()) {
-					runSimulation = false;
-					simulationResult.setState("Simulation interrupted");
-					logger.info("Simulation interrupted.");
-				}
-			}
 		} finally {
 			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
 			postLoop();
@@ -244,6 +194,61 @@ public class Simulation {
 				processorManager.writeOutput();
 			}
 			logger.info("Finished writing all output files");
+		}
+	}
+
+	protected void loop() {
+		while (runSimulation) {
+			synchronized (this) {
+				while (paused) {
+					try {
+						wait();
+					} catch (Exception e) {
+						paused = false;
+						Thread.currentThread().interrupt();
+						logger.warn("interrupt while paused.");
+					}
+				}
+			}
+
+			if (attributesSimulation.isVisualizationEnabled()) {
+				sleepTillStartOfNextFrame();
+			}
+
+			for (PassiveCallback c : passiveCallbacks) {
+				c.preUpdate(simTimeInSec);
+			}
+
+			assert assertAllPedestrianInBounds();
+			updateCallbacks(simTimeInSec);
+			updateWriters(simTimeInSec);
+
+			if (attributesSimulation.isWriteSimulationData()) {
+				processorManager.update(this.simulationState);
+			}
+
+
+			for (PassiveCallback c : passiveCallbacks) {
+				c.postUpdate(simTimeInSec);
+			}
+
+			if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
+				simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
+			} else {
+				runSimulation = false;
+			}
+
+
+			//remove comment to fasten simulation for evacuation simulations
+			//if (topography.getElements(Pedestrian.class).size() == 0){
+			//	runSimulation = false;
+			//}
+
+			if (Thread.interrupted()) {
+				runSimulation = false;
+				simulationResult.setState("Simulation interrupted");
+				logger.info("Simulation interrupted.");
+			}
 		}
 	}
 

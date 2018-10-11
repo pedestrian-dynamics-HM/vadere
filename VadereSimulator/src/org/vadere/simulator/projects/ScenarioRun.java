@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.CallbackI;
+import org.vadere.simulator.control.OnlineSimulation;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
@@ -53,16 +54,34 @@ public class ScenarioRun implements Runnable {
 
 	private SimulationResult simulationResult;
 
+	private boolean isOnline;
+
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, false);
+	}
+
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, final boolean runsOnline) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, runsOnline);
 	}
 
 	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener);
+		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener, false);
+	}
+
+	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener, final boolean runsOnline) {
+		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener, runsOnline);
 	}
 
 	// if overwriteTimestampSetting is true do note use timestamp in output directory
 	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
+		this(scenario, outputDir, overwriteTimestampSetting, scenarioFinishedListener, false);
+	}
+
+	public ScenarioRun(
+			final Scenario scenario,
+			final String outputDir,
+			boolean overwriteTimestampSetting,
+			final RunnableFinishedListener scenarioFinishedListener, final boolean isOnline) {
 		this.scenario = scenario;
 		this.scenario.setSimulationRunning(true); // create copy of ScenarioStore and redirect getScenarioStore to this copy for simulation.
 		this.scenarioStore = scenario.getScenarioStore();
@@ -70,6 +89,7 @@ public class ScenarioRun implements Runnable {
 		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
 		this.simulationResult = new SimulationResult(scenario.getName());
+		this.isOnline = isOnline;
 	}
 
 
@@ -115,7 +135,12 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
+				if(isOnline) {
+					simulation = new OnlineSimulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
+				}
+				else {
+					simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
+				}
 			}
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");

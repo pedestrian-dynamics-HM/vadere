@@ -20,9 +20,11 @@ public class DefaultModeAdapter implements IMode {
 
 	@Override
 	public void mouseClicked(final MouseEvent event) {
-		panelModel.setMousePosition(event.getPoint());
-		panelModel.setSelectedElement(panelModel.getMousePosition());
-		panelModel.notifyObservers();
+		if(panelModel.isTopgraphyAvailable()) {
+			panelModel.setMousePosition(event.getPoint());
+			panelModel.setSelectedElement(panelModel.getMousePosition());
+			panelModel.notifyObservers();
+		}
 	}
 
 	@Override
@@ -41,47 +43,53 @@ public class DefaultModeAdapter implements IMode {
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		panelModel.setMousePosition(e.getPoint());
+		if(panelModel.isTopgraphyAvailable()) {
+			panelModel.setMousePosition(e.getPoint());
 
-		JScrollBar hBar = panelModel.getScrollPane().getHorizontalScrollBar();
-		JScrollBar vBar = panelModel.getScrollPane().getVerticalScrollBar();
+			JScrollBar hBar = panelModel.getScrollPane().getHorizontalScrollBar();
+			JScrollBar vBar = panelModel.getScrollPane().getVerticalScrollBar();
 
-		double diffX = (lastDragPos.getX() + hDiff) - e.getX();
-		double diffY = (lastDragPos.getY() + vDiff) - e.getY();
-		lastDragPos = e.getPoint();
+			double diffX = (lastDragPos.getX() + hDiff) - e.getX();
+			double diffY = (lastDragPos.getY() + vDiff) - e.getY();
+			lastDragPos = e.getPoint();
 
-		// the cap of 100 and the 0.001 are "empirical" values :) the idea is that faster dragging
-		// also results in faster scrolling. values bigger than 0.001 seem to cause weird side
-		// effects
-		hDiff = hBar.getWidth() * (Math.abs(diffX) < 100 ? diffX : Math.signum(diffX) * 100) * 0.001;
-		vDiff = vBar.getHeight() * (Math.abs(diffY) < 100 ? diffY : Math.signum(diffY) * 100) * 0.001;
+			// the cap of 100 and the 0.001 are "empirical" values :) the idea is that faster dragging
+			// also results in faster scrolling. values bigger than 0.001 seem to cause weird side
+			// effects
+			hDiff = hBar.getWidth() * (Math.abs(diffX) < 100 ? diffX : Math.signum(diffX) * 100) * 0.001;
+			vDiff = vBar.getHeight() * (Math.abs(diffY) < 100 ? diffY : Math.signum(diffY) * 100) * 0.001;
 
-		hBar.setValue((int) (hBar.getValue() + hDiff));
-		vBar.setValue((int) (vBar.getValue() + vDiff));
+			hBar.setValue((int) (hBar.getValue() + hDiff));
+			vBar.setValue((int) (vBar.getValue() + vDiff));
 
-		panelModel.notifyObservers();
+			panelModel.notifyObservers();
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		panelModel.setMousePosition(e.getPoint());
-		panelModel.notifyObservers();
+		if(panelModel.isTopgraphyAvailable()) {
+			panelModel.setMousePosition(e.getPoint());
+			panelModel.notifyObservers();
+		}
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.getWheelRotation() > 0) {
-			if (panelModel.zoomOut()) {
-				panelModel.notifyScaleListeners();
-				panelModel.notifyObservers();
+		if(panelModel.isTopgraphyAvailable()) {
+			if (e.getWheelRotation() > 0) {
+				if (panelModel.zoomOut()) {
+					panelModel.notifyScaleListeners();
+					panelModel.notifyObservers();
+				}
+				delay();
+			} else if (e.getWheelRotation() < 0) {
+				if (panelModel.zoomIn()) {
+					panelModel.notifyScaleListeners();
+					panelModel.notifyObservers();
+				}
+				delay();
 			}
-			delay();
-		} else if (e.getWheelRotation() < 0) {
-			if (panelModel.zoomIn()) {
-				panelModel.notifyScaleListeners();
-				panelModel.notifyObservers();
-			}
-			delay();
 		}
 	}
 

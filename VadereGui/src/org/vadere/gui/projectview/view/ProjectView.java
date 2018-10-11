@@ -25,6 +25,7 @@ import org.vadere.gui.projectview.control.ActionRenameScenario;
 import org.vadere.gui.projectview.control.ActionRunAllScenarios;
 import org.vadere.gui.projectview.control.ActionRunOutput;
 import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
+import org.vadere.gui.projectview.control.ActionRunSelectedScenariosOnline;
 import org.vadere.gui.projectview.control.ActionSaveAsProject;
 import org.vadere.gui.projectview.control.ActionSaveProject;
 import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
@@ -312,14 +313,16 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ActionCloseApplication closeApplicationAction =
 				new ActionCloseApplication(Messages.getString("ProjectView.mntmExit.text"), model);
 		setAcceleratorFromLocalizedShortcut(closeApplicationAction, "ProjectView.mntmExit.shortcut");
+
 		ActionAddScenario addScenarioAction =
 				new ActionAddScenario(Messages.getString("ProjectView.mntmNew_1.text"), model);
 		setAcceleratorFromLocalizedShortcut(addScenarioAction, "ProjectView.mntmNew_1.shortcut");
 		addToProjectSpecificActions(addScenarioAction);
 
-		buildMenuBar(closeApplicationAction, addScenarioAction);
-
 		buildContentPane();
+		ActionRunSelectedScenariosOnline runSelectedScenariosOnline = new ActionRunSelectedScenariosOnline(
+				Messages.getString("ProjectView.runOnline.text"), model, scenarioTable);
+		buildMenuBar(closeApplicationAction, addScenarioAction, runSelectedScenariosOnline);
 		buildOutputTablePopup();
 		buildScenarioTablePopup(addScenarioAction);
 		buildToolBar();
@@ -337,7 +340,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		pack();
 	}
 
-	private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction) {
+	private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction, ActionRunSelectedScenariosOnline runSelectedScenariosOnline) {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -412,6 +415,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 		mnScenario.add(mntmNew_1);
 		mnScenario.add(mntmGenerateScenarioFromOutput);
+
+		JMenuItem mntmRunOnline = new JMenuItem(runSelectedScenariosOnline);
+		mnScenario.add(mntmRunOnline);
 
 		JMenu mnHelp = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
 		menuBar.add(mnHelp);

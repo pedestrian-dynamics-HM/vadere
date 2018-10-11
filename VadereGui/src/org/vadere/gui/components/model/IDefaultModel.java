@@ -126,6 +126,10 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 */
 	VPoint getMousePosition();
 
+	default boolean isTopgraphyAvailable() {
+		return true;
+	}
+
 	/**
 	 * Return the start selection position.
 	 * 

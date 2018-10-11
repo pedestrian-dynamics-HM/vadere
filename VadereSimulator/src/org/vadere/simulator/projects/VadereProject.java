@@ -36,6 +36,7 @@ public class VadereProject {
 	private final BlockingQueue<SingleScenarioFinishedListener> singleScenarioFinishedListener =
 			new LinkedBlockingQueue<>();
 	private LinkedBlockingDeque<Scenario> scenariosLeft;
+	private LinkedBlockingDeque<Boolean> isOnline;
 	private Path outputDirectory;
 	private ProjectOutput projectOutput; //TODO initialize and wire up with rest ....
 
@@ -80,15 +81,24 @@ public class VadereProject {
 	/**
 	 * Runs the given scenarios, each in a separate thread.
 	 */
-	public void runScenarios(final Collection<Scenario> scenariosToRun) {
+	public void runScenarios(final Collection<Scenario> scenariosToRun, final boolean runOnline) {
 		// TODO [priority=normal] [task=bugfix] this is a bug: scenariosLeft may be overwritten even if there are still scenarios in it
 		scenariosLeft = new LinkedBlockingDeque<>();
 		scenariosLeft.addAll(scenariosToRun);
+		isOnline = new LinkedBlockingDeque<>();
+		scenariosToRun.stream().forEach(e -> isOnline.add(runOnline));
 
 		if (!scenariosLeft.isEmpty()) {
 			notifyProjectListenerAboutPreRun();
 			prepareAndStartScenarioRunThread();
 		}
+	}
+
+	/**
+	 * Runs the given scenarios, each in a separate thread.
+	 */
+	public void runScenarios(final Collection<Scenario> scenariosToRun) {
+		runScenarios(scenariosToRun, false);
 	}
 
 	private void prepareAndStartScenarioRunThread() {
@@ -134,10 +144,11 @@ public class VadereProject {
 
 	private ScenarioRun prepareNextScenario() {
 		final Scenario nextScenario = scenariosLeft.remove();
+		final boolean runsOnline = isOnline.remove();
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener);
+		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener, runsOnline);
 		scenarioRun.setOutputPaths(outputDirectory);
 		if (visualization != null) {
 			scenarioRun.addPassiveCallback(visualization);
