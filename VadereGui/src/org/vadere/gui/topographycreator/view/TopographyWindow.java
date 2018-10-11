@@ -29,7 +29,6 @@ import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
-import org.vadere.gui.topographycreator.control.ActionTopographyCheckerMenu;
 import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
 import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
 import org.vadere.gui.topographycreator.control.ActionUndo;
@@ -313,9 +312,9 @@ public class TopographyWindow extends JPanel {
 						new ImageIcon(Resources.class.getResource("/icons/auto_generate_ids.png")),
 						panelModel);
 
-		/* Topography checker*/
-		ActionTopographyCheckerMenu actionTopographyCheckerMenu =
-				new ActionTopographyCheckerMenu("TopographyChecker", panelModel, jsonValidIndicator);
+//		/* Topography checker*/
+//		ActionScenarioChecker actionScenarioChecker =
+//				new ActionScenarioChecker("ScenarioChecker", panelModel, jsonValidIndicator);
 
 
 		/* create toolbar*/
@@ -356,7 +355,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
 		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnMakro.tooltip");
-		addActionToToolbar(toolbar, actionTopographyCheckerMenu, "TopographyCreator.btnChecker.tooltip");
+//		addActionToToolbar(toolbar, actionScenarioChecker, "TopographyCreator.btnChecker.tooltip");
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 

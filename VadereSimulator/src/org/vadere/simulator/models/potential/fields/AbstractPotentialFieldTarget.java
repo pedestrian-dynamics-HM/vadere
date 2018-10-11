@@ -46,7 +46,7 @@ public abstract class AbstractPotentialFieldTarget implements IPotentialFieldTar
      * account. This is specific to agents. See pedestrian perception for more information.
      * The target potential does not exists (i.e. is equal to 0) if the agent has reached
      * his target (geometrically) or the agent does not have a next target or there is no
-     * target potential field computed for the target of the agent (error!).
+     * target potential field computed for the target of the agent (topographyError!).
      *
      * @param pos   the position for which the potential will be evaluated
      * @param agent the agent for which the potential will be evaluated

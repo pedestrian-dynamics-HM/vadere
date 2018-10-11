@@ -139,7 +139,7 @@ public class PotentialFieldContainer {
 					if (y < grid.getNumPointsY() && (x - 2) < grid.getNumPointsX()) {
 						grid.setValue(x - 2, y, state);
 					} else {
-						logger.warn("Index error " + "y=" + y + " rows=" + grid.getNumPointsY() + " x=" + x + " cols="
+						logger.warn("Index topographyError " + "y=" + y + " rows=" + grid.getNumPointsY() + " x=" + x + " cols="
 								+ grid.getNumPointsX());
 					}
 				}
