@@ -77,6 +77,9 @@ Follow the **installation instructions** above i.e. install all required softwar
 - select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
 - open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
 - click the *run*-icon next to the `main` method
+- edit the run configuration for `VadereApplication` to build the project using Maven instead of IntelliJ's internal builder to avoid compilation errors:
+  * click *Edit Configurations* (in dropdown menu next to the play/debug button)
+  * under *Before launch*, add *Run Maven Goal* and use the Maven goal `compile`
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
 
