@@ -68,7 +68,37 @@ public class ObstacleGaussianFilter implements IGaussianFilter {
         return filter.getMinFilteredValue();
     }
 
-    @Override
+	@Override
+	public int toXIndex(double x) {
+		return filter.toXIndex(x);
+	}
+
+	@Override
+	public int toYIndex(double y) {
+		return filter.toYIndex(y);
+	}
+
+	@Override
+	public int toFloorXIndex(double x) {
+		return filter.toFloorXIndex(x);
+	}
+
+	@Override
+	public int toFloorYIndex(double y) {
+		return filter.toFloorYIndex(y);
+	}
+
+	@Override
+	public double toXCoord(int xIndex) {
+		return filter.toXCoord(xIndex);
+	}
+
+	@Override
+	public double toYCoord(int yIndex) {
+		return filter.toYCoord(yIndex);
+	}
+
+	@Override
     public void destroy() {
         this.filter.destroy();
     }
@@ -76,15 +106,16 @@ public class ObstacleGaussianFilter implements IGaussianFilter {
     private void setValues() {
         for (int x = 0; x < getMatrixWidth(); x++) {
             for (int y = 0; y < getMatrixHeight(); y++) {
-                double dx = x / getScale();
-                double dy = y / getScale();
+                double dx = topography.getBounds().getMinX() + x / getScale();
+                double dy = topography.getBounds().getMinY() + y / getScale();
 
                 if (topography.getObstacles().stream().map(obs -> obs.getShape()).anyMatch(s -> s.contains(dx, dy))) {
                     setInputValue(x, y, 1.0f);
                 } else if (topography.isBounded() &&
-                        (dx <= topography.getBoundingBoxWidth() || dy <= topography.getBoundingBoxWidth()
-                                || dx >= topography.getBounds().getWidth() - topography.getBoundingBoxWidth()
-                                || dy >= topography.getBounds().getHeight() - topography.getBoundingBoxWidth())) {
+                        (dx <= topography.getBounds().getMinX() + topography.getBoundingBoxWidth()
+		                        || dy <= topography.getBounds().getMinY() + topography.getBoundingBoxWidth()
+                                || dx >= topography.getBounds().getMaxX() - topography.getBoundingBoxWidth()
+                                || dy >= topography.getBounds().getMaxY() - topography.getBoundingBoxWidth())) {
                     setInputValue(x, y, 1.0f);
                 } else {
                     setInputValue(x, y, 0.0f);

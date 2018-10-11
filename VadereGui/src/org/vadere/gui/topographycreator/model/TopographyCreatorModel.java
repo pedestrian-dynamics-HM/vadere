@@ -321,6 +321,15 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return element;
 	}
 
+	public void translateTopography(final double x, final double y) {
+		double oldX = getTopographyBound().x;
+		double oldY = getTopographyBound().y;
+
+		topographyBuilder.translateElements(x - oldX, y - oldY);
+		setTopographyBound(new VRectangle(x, y, getTopographyBound().getWidth(), getTopographyBound().getHeight()));
+		setChanged();
+	}
+
 	@Override
 	public VShape translate(final Point vector) {
 		VPoint worldVector = new VPoint(vector.x / getScaleFactor(), -vector.y / getScaleFactor());

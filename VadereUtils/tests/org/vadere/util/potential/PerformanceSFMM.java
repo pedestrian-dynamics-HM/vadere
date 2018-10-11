@@ -43,7 +43,7 @@ public class PerformanceSFMM {
 		@Setup(Level.Invocation)
 		public void doSetup() {
 
-			cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), resolution, new CellState());
+			cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), resolution, new CellState(), bounds.getMinX(), bounds.getMinY());
 			for (VShape shape : targets) {
 				FloorDiscretizer.setGridValuesForShape(cellGrid, shape, new CellState(0.0, PathFindingTag.Target));
 			}

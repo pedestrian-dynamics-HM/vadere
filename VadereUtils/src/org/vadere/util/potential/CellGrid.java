@@ -35,6 +35,10 @@ public class CellGrid {
 	/** Number of points along y axis. */
 	protected final int numPointsY;
 
+	protected final double xMin;
+
+	protected final double yMin;
+
 	protected CellState[][] values;
 
 	/**
@@ -42,10 +46,12 @@ public class CellGrid {
 	 * point values are initialized with 'value'.
 	 */
 	public CellGrid(double width, double height, double resolution,
-			CellState value) {
+	                CellState value, double xMin, double yMin) {
 		this.width = width;
 		this.height = height;
 		this.resolution = resolution;
+		this.xMin = xMin;
+		this.yMin = yMin;
 
 		/* 0.001 avoids that numPointsX/Y are too small due to numerical errors. */
 		numPointsX = (int) Math.floor(width / resolution + 0.001) + 1;
@@ -54,6 +60,14 @@ public class CellGrid {
 		values = new CellState[numPointsX][numPointsY];
 
 		reset(value);
+	}
+
+	/**
+	 * Creates an grid with the given width, height and resolution. All grid
+	 * point values are initialized with 'value'.
+	 */
+	public CellGrid(double width, double height, double resolution, CellState value) {
+		this(width, height, resolution, value, 0, 0);
 	}
 
 	/**
@@ -66,6 +80,8 @@ public class CellGrid {
 		numPointsX = grid.numPointsX;
 		numPointsY = grid.numPointsY;
 		values = new CellState[numPointsX][numPointsY];
+		xMin = grid.xMin;
+		yMin = grid.yMin;
 
 		for (int row = 0; row < numPointsY; row++) {
 			for (int col = 0; col < numPointsX; col++) {
@@ -140,7 +156,7 @@ public class CellGrid {
 	 * Converts the matrix indices to coordinates.
 	 */
 	public VPoint pointToCoord(int pointX, int pointY) {
-		return new VPoint(pointX * resolution, pointY * resolution);
+		return new VPoint(xMin + pointX * resolution, yMin + pointY * resolution);
 	}
 
 	/**
@@ -185,66 +201,34 @@ public class CellGrid {
 	 * Returns the closest grid point (matrix index) to the given coordinates.
 	 */
 	public Point getNearestPoint(double x, double y) {
-		if (x < 0) {
-			x = 0;
+		if (x < xMin) {
+			x = xMin;
 		}
-		if (y < 0) {
-			y = 0;
+		if (y < yMin) {
+			y = yMin;
 		}
-		if (y > getHeight()) {
-			y = getHeight();
+		if (y > getHeight() + yMin) {
+			y = getHeight() + yMin;
 		}
-		if (x > getWidth()) {
-			x = getWidth();
+		if (x > getWidth() + xMin) {
+			x = getWidth() + xMin;
 		}
-		return new Point((int) (x / resolution + 0.5),
-				(int) (y / resolution + 0.5));
+		return new Point((int) ((x - xMin) / resolution + 0.5),
+				(int) ((y - yMin) / resolution + 0.5));
 	}
 
 	/**
-	 * Returns the closest grid point (matrix index) to the given coordinates
-	 * towards origin.
-	 */
-	public Point getNearestPointTowardsOrigin(double x, double y) {
-		if (x < 0) {
-			x = 0;
-		}
-		if (y < 0) {
-			y = 0;
-		}
-		if (y > getHeight()) {
-			y = getHeight();
-		}
-		if (x > getWidth()) {
-			x = getWidth();
-		}
-		return new Point((int) (x / resolution), (int) (y / resolution));
-	}
-
-	/**
-	 * Returns the closest grid point (matrix index) to the given coordinates
-	 * towards origin.
-	 */
-	public Point getNearestPointTowardsOrigin(VPoint p) {
-		return getNearestPointTowardsOrigin(p.x, p.y);
-	}
-
-	public Point getNearestPointTowardsOrigin(Point p) {
-		return getNearestPointTowardsOrigin(p.x, p.y);
-	}
-
-	/**
-	 * Resturns the distance of grid points specified by its matrix indices.
+	 * Returns the distance of grid points specified by its matrix indices.
 	 */
 	public double pointDistance(int pointX1, int pointY1, int pointX2,
-			int pointY2) {
+	                            int pointY2) {
 		return Math.sqrt(Math.pow(pointY2 - pointY1, 2)
 				+ Math.pow(pointX2 - pointX1, 2))
 				* resolution;
 	}
 
 	/**
-	 * Resturns the distance of grid points specified by its matrix indices.
+	 * Returns the distance of grid points specified by its matrix indices.
 	 */
 	public double pointDistance(Point p1, Point p2) {
 		return pointDistance(p1.x, p1.y, p2.x, p2.y);
@@ -290,7 +274,19 @@ public class CellGrid {
 				.flatMap(stream -> stream);
 	}
 
-	public boolean isValidPoint(final Point point) {
+	public double getMinX() { return xMin; }
+
+	public double getMinY() { return yMin; }
+
+	public double getMaxX () {
+		return  xMin + width;
+	}
+
+	public double getMaxY() {
+		return yMin + height;
+	}
+
+	public boolean isValidPoint(Point point) {
 		return isValidPoint(point.x, point.y);
 	}
 
@@ -306,55 +302,56 @@ public class CellGrid {
 		return true;
 	}
 
-    /**
-     * Returns a function VPoint (x,y-coordinate) -> Double (potential) which
-     * computes the bilinearInterpolated potential for a given coordinate.
-     *
-     * @return  a function VPoint (x,y-coordinate) -> Double (potential)
-     */
+	/**
+	 * Returns a function VPoint (x,y-coordinate) -> Double (potential) which
+	 * computes the bilinearInterpolated potential for a given coordinate.
+	 *
+	 * @return  a function VPoint (x,y-coordinate) -> Double (potential)
+	 */
 	public Function<VPoint, Double> getInterpolationFunction() {
-        return pos -> {
-            int incX = 1;
-            int incY = 1;
+		return pos -> {
+			int incX = 1;
+			int incY = 1;
 
-            Point gridPoint = getNearestPointTowardsOrigin(pos);
+			Point gridPoint = getNearestPoint(pos.x, pos.y);
 
-            if (gridPoint.x + 1 >= getNumPointsX()) {
-                incX = 0;
-            }
+			if (gridPoint.x + 1 >= getNumPointsX()) {
+				incX = 0;
+			}
 
-            if (gridPoint.y + 1 >= getNumPointsY()) {
-                incY = 0;
-            }
+			if (gridPoint.y + 1 >= getNumPointsY()) {
+				incY = 0;
+			}
 
 
-            VPoint gridPointCoord = pointToCoord(gridPoint);
+			VPoint gridPointCoord = pointToCoord(gridPoint);
 
-            double z1 = getValue(gridPoint).potential;
-            double z2 = getValue(new Point(gridPoint.x + incX, gridPoint.y)).potential;
-            double z3 = getValue(new Point(gridPoint.x + incX, gridPoint.y + incY)).potential;
-            double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
+			double z1 = getValue(gridPoint).potential;
+			double z2 = getValue(new Point(gridPoint.x + incX, gridPoint.y)).potential;
+			double z3 = getValue(new Point(gridPoint.x + incX, gridPoint.y + incY)).potential;
+			double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
 
-            double t = (pos.x - gridPointCoord.x) / getResolution();
-            double u = (pos.y - gridPointCoord.y) / getResolution();
+			double t = (pos.x - gridPointCoord.x) / getResolution();
+			double u = (pos.y - gridPointCoord.y) / getResolution();
 
-            return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
-        };
-    }
+			return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
+		};
+	}
 
-    public Pair<Double, Double> getInterpolatedValueAt(@NotNull final VPoint pos) {
-		Point gridPoint = getNearestPointTowardsOrigin(pos);
+	public Pair<Double, Double> getInterpolatedValueAt(@NotNull final VPoint pos) {
+		Point gridPoint = getNearestPoint(pos.x, pos.y);
 		VPoint gridPointCoord = pointToCoord(gridPoint);
 		int incX = 1, incY = 1;
 		double gridPotentials[] = new double[4];
 
-		if (pos.x >= getWidth()) {
+		if (gridPoint.x + 1 >= getNumPointsX()) {
 			incX = 0;
 		}
 
-		if (pos.y >= getHeight()) {
+		if (gridPoint.y + 1 >= getNumPointsY()) {
 			incY = 0;
 		}
+
 
 		gridPotentials[0] = getValue(gridPoint).potential;
 		gridPotentials[1] = getValue(gridPoint.x + incX, gridPoint.y).potential;

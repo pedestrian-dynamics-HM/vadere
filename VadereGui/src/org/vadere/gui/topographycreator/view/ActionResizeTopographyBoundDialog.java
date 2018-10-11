@@ -1,9 +1,9 @@
-package org.vadere.gui.topographycreator.control;
+package org.vadere.gui.topographycreator.view;
 
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -12,25 +12,23 @@ import javax.swing.event.DocumentListener;
 public class ActionResizeTopographyBoundDialog {
 
 
-	JTextField textField;
-	VRectangle bound;
-	VRectangle boundOld;
-	boolean valid;
+	private JTextField textField;
+	private Rectangle2D.Double bound;
+	private Rectangle2D.Double boundOld;
+	private boolean valid;
 
-
-
-	public ActionResizeTopographyBoundDialog(double width, double height){
+	public ActionResizeTopographyBoundDialog(final Rectangle2D.Double topographyBound){
 
 		textField = new JTextField();
-		textField.setText(String.format("%.3f x %.3f", width, height));
+		textField.setText(String.format("%.3f x %.3f", topographyBound.getWidth(), topographyBound.getHeight()));
 		textField.getDocument().addDocumentListener(new DialogListener());
 
-		bound = new VRectangle(0.0,0.0, width, height);
-		boundOld = new VRectangle(0.0,0.0, width, height);
+		bound = topographyBound;
+		boundOld = topographyBound;
 		valid = false;
 	}
 
-	public VRectangle getBound() {
+	public Rectangle2D.Double getBound() {
 		return valid ? bound : boundOld;
 	}
 
@@ -44,8 +42,8 @@ public class ActionResizeTopographyBoundDialog {
 
 	private class DialogListener implements DocumentListener{
 
-		JTextField textField;
-		String text;
+		private JTextField textField;
+		private String text;
 
 		DialogListener(){
 			textField = ActionResizeTopographyBoundDialog.this.textField;
@@ -75,8 +73,10 @@ public class ActionResizeTopographyBoundDialog {
 			try {
 				width = Double.valueOf(tmp[0]);
 				height = Double.valueOf(tmp[1]);
+
 				ActionResizeTopographyBoundDialog.this.bound =
-						new VRectangle(0.0,0.0, width, height);
+						new Rectangle2D.Double(ActionResizeTopographyBoundDialog.this.boundOld.getMinX(),
+										ActionResizeTopographyBoundDialog.this.boundOld.getMinY(), width, height);
 				ActionResizeTopographyBoundDialog.this.valid = true;
 				textField.setForeground(Color.BLACK);
 			}catch (Exception ex){

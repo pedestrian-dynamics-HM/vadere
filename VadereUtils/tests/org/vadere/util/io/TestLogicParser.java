@@ -48,7 +48,13 @@ public class TestLogicParser {
 
 	@Test
 	public void testSubSet() throws ParseException {
+		// spacing test
 		assertTrue("id:{5,6,7}", new JsonLogicParser("id:{5,6,7}").parse().test(jsonObject));
+		assertTrue("id: {5,6,7}", new JsonLogicParser("id: {5,6,7}").parse().test(jsonObject));
+		assertTrue("id : {5,6,7}", new JsonLogicParser("id : {5,6,7}").parse().test(jsonObject));
+		assertTrue("id :{5,6,7}", new JsonLogicParser("id :{5,6,7}").parse().test(jsonObject));
+		// spacing test end
+
 		assertTrue("shape.x:{0.5,0.7,0.1}", new JsonLogicParser("shape.x:{0.5,0.7,0.1}").parse().test(jsonObject));
 		assertTrue("targetIds:{2,3,4,5.3}", new JsonLogicParser("targetIds:{2,3,4,5.3}").parse().test(jsonObject));
 		assertTrue("targetIds:{1,2,3,4,5}", new JsonLogicParser("targetIds:{1,2,3,4,5}").parse().test(jsonObject));
@@ -62,7 +68,13 @@ public class TestLogicParser {
 
 	@Test
 	public void testSuperSet() throws ParseException {
+		// spacing test
+		assertTrue("{6}: id", new JsonLogicParser("{6}: id").parse().test(jsonObject));
+		assertTrue("{6} :id", new JsonLogicParser("{6} :id").parse().test(jsonObject));
+		assertTrue("{6} : id", new JsonLogicParser("{6} : id").parse().test(jsonObject));
 		assertTrue("{6}:id", new JsonLogicParser("{6}:id").parse().test(jsonObject));
+		// spacing test end
+
 		assertTrue("{0.5}:shape.x", new JsonLogicParser("{0.5}:shape.x").parse().test(jsonObject));
 		assertTrue("{2,3,4}:targetIds", new JsonLogicParser("{2,3,4}:targetIds").parse().test(jsonObject));
 		assertTrue("{2,3.0,4}:targetIds", new JsonLogicParser("{2,3.0,4}:targetIds").parse().test(jsonObject));
@@ -75,7 +87,14 @@ public class TestLogicParser {
 
 	@Test
 	public void testEquals() throws ParseException {
+		// spacing test
+		assertTrue("id ==6", new JsonLogicParser("id ==6").parse().test(jsonObject));
+		assertTrue("id== 6", new JsonLogicParser("id== 6").parse().test(jsonObject));
+		assertTrue("id == 6", new JsonLogicParser("id == 6").parse().test(jsonObject));
+		assertTrue("id= =6", new JsonLogicParser("id= =6").parse().test(jsonObject));
 		assertTrue("id==6", new JsonLogicParser("id==6").parse().test(jsonObject));
+		// spacing end
+
 		assertTrue("shape.x==0.5", new JsonLogicParser("shape.x==0.5").parse().test(jsonObject));
 		assertTrue("shape.type==RECTANGLE", new JsonLogicParser("shape.type==RECTANGLE").parse().test(jsonObject));
 
@@ -86,7 +105,15 @@ public class TestLogicParser {
 
 	@Test
 	public void testNotEquals() throws ParseException {
+		// spacing test
+		assertFalse("id!= 6", new JsonLogicParser("id!= 6").parse().test(jsonObject));
+		assertFalse("id !=6", new JsonLogicParser("id !=6").parse().test(jsonObject));
+		assertFalse("id! =6", new JsonLogicParser("id! =6").parse().test(jsonObject));
+		assertFalse("id != 6", new JsonLogicParser("id != 6").parse().test(jsonObject));
+		assertFalse("id ! = 6", new JsonLogicParser("id ! = 6").parse().test(jsonObject));
 		assertFalse("id!=6", new JsonLogicParser("id!=6").parse().test(jsonObject));
+		// spacing end
+
 		assertFalse("shape.x!=0.5", new JsonLogicParser("shape.x!=0.5").parse().test(jsonObject));
 		assertFalse("shape.type!=RECTANGLE", new JsonLogicParser("shape.type!=RECTANGLE").parse().test(jsonObject));
 
@@ -97,7 +124,12 @@ public class TestLogicParser {
 
 	@Test
 	public void testNot() throws ParseException {
+		// spacing test
 		assertFalse("!(id==6)", new JsonLogicParser("!(id==6)").parse().test(jsonObject));
+		assertFalse("! (id==6)", new JsonLogicParser("! (id==6)").parse().test(jsonObject));
+		assertFalse("! (id= =6)", new JsonLogicParser("! (id= =6)").parse().test(jsonObject));
+		// spacing end
+
 		assertFalse("!(shape.x==0.5)", new JsonLogicParser("!(shape.x==0.5)").parse().test(jsonObject));
 		assertFalse("!(shape.type==RECTANGLE)",
 				new JsonLogicParser("!(shape.type==RECTANGLE)").parse().test(jsonObject));
@@ -109,7 +141,13 @@ public class TestLogicParser {
 
 	@Test
 	public void testGreaterThan() throws ParseException {
+		// spacing test
+		assertTrue("id> 5", new JsonLogicParser("id> 5").parse().test(jsonObject));
+		assertTrue("id >5", new JsonLogicParser("id >5").parse().test(jsonObject));
+		assertTrue("id > 5", new JsonLogicParser("id > 5").parse().test(jsonObject));
 		assertTrue("id>5", new JsonLogicParser("id>5").parse().test(jsonObject));
+		// spacing end
+
 		assertTrue("shape.x>0.4", new JsonLogicParser("shape.x>0.4").parse().test(jsonObject));
 
 		assertFalse("id>6", new JsonLogicParser("id>6").parse().test(jsonObject));

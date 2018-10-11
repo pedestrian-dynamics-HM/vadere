@@ -7,6 +7,7 @@ import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -123,6 +124,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public boolean setScale(final double scale) {
 		boolean hasChanged = true;
+		double oldScale = scaleFactor;
+
 		if (scale < MIN_SCALE_FACTOR) {
 			this.scaleFactor = MIN_SCALE_FACTOR;
 		} else if (scale > MAX_SCALE_FACTOR) {
@@ -133,7 +136,15 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			hasChanged = false;
 		}
 
+		// update the viewport, since it depends on the scaleFactor
 		if (hasChanged) {
+			Rectangle2D.Double oldViewPort = getViewportBound();
+			Rectangle2D.Double newViewPort = new Rectangle2D.Double(
+					oldViewPort.getMinX(),
+					oldViewPort.getMinY(),
+					oldViewPort.getWidth() * oldScale / scaleFactor,
+					oldViewPort.getHeight() * oldScale / scaleFactor);
+			setViewportBound(newViewPort);
 			setChanged();
 		}
 		return hasChanged;
@@ -430,9 +441,14 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 				getWindowBound().getHeight() / getViewportBound().getHeight());
 	}
 
+	/**
+	 *
+	 * @param pInPixel the mouse position of the mouse event
+	 * @return
+	 */
 	protected VPoint pixelToWorld(final VPoint pInPixel) {
-		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX(),
-				(getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
+				getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
 		/*
 		 * return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX() +
 		 * getViewportBound().getX(),

@@ -51,7 +51,7 @@ public class EikonalSolverFMM implements EikonalSolver {
 
 		ComparatorPotentialFieldValue comparator = new ComparatorPotentialFieldValue(
 				potentialField);
-		this.narrowBand = new PriorityQueue<Point>(50, comparator);
+		this.narrowBand = new PriorityQueue<>(50, comparator);
 		this.timeCostFunction = timeCostFunction;
 
 		if (targetPoints.size() == 0) {
