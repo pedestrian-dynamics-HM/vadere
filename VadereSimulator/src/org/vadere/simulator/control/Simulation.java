@@ -157,6 +157,7 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -169,7 +170,7 @@ public class Simulation {
 		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.postLoop(this.simulationState);
 		}
-		topographyController.postLoop(this.simTimeInSec);
+
 	}
 
 	/**
