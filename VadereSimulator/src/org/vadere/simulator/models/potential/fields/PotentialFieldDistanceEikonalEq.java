@@ -71,7 +71,7 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 	@Override
 	public double getPotential(@NotNull VPoint pos, @Nullable Agent agent) {
 		// unknownPenalty = 0.0 since there will be no unknowns such as values at obstacles
-		// the fmm can cause an error mostly an underestimation of 20% near the source which are exactly the points we are interested
+		// the fmm can cause an topographyError mostly an underestimation of 20% near the source which are exactly the points we are interested
 		return eikonalSolver.getPotential(pos, 0.0, 1.2);
 	}
 

@@ -29,6 +29,7 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
@@ -64,7 +65,7 @@ public class TextView extends JPanel implements IJsonView {
 	private boolean isEditable;
 
 	private DocumentListener documentListener;
-
+	private IScenarioChecker scenarioChecker;
 
 	private JTextArea txtrTextfiletextarea;
 	private ActionListener saveToFileActionListener = new ActionListener() {
@@ -193,6 +194,9 @@ public class TextView extends JPanel implements IJsonView {
 						ScenarioPanel.removeJsonParsingErrorMsg();
 						ProjectView.getMainWindow().refreshScenarioNames();
 						jsonValidIndicator.setValid();
+						if (scenarioChecker != null){
+							scenarioChecker.checkScenario(currentScenario);
+						}
 					} catch (Exception e) {
 						ScenarioPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
 						jsonValidIndicator.setInvalid();
@@ -269,5 +273,9 @@ public class TextView extends JPanel implements IJsonView {
 
 	public void insertAtCursor(String text) {
 		txtrTextfiletextarea.insert(text, txtrTextfiletextarea.getCaretPosition());
+	}
+
+	public void setScenarioChecker(IScenarioChecker scenarioChecker) {
+		this.scenarioChecker = scenarioChecker;
 	}
 }

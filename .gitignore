@@ -2,6 +2,7 @@
 target/
 *.out
 *.preferences.xml
+swing-inspector-linux-1.2.3/
 
 #Tools and build utils
 bin/

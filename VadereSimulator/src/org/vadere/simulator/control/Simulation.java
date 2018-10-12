@@ -29,7 +29,7 @@ public class Simulation {
 
 	private static Logger logger = LogManager.getLogger(Simulation.class);
 
-	private final AttributesSimulation attributesSimulation;
+	protected final AttributesSimulation attributesSimulation;
 	private final AttributesAgent attributesAgent;
 
 	private final Collection<SourceController> sourceControllers;
@@ -46,15 +46,15 @@ public class Simulation {
 	/**
 	 * current simulation time (seconds)
 	 */
-	private double simTimeInSec = 0;
+	protected double simTimeInSec = 0;
 	/**
 	 * time (seconds) where the simulation starts
 	 */
-	private double startTimeInSec = 0;
+	protected double startTimeInSec = 0;
 	/**
 	 * time (seconds) that should be simulated, i.e. the final time is startTimeInSec + runTimeInSec
 	 */
-	private double runTimeInSec = 0;
+	protected double runTimeInSec = 0;
 	private long lastFrameInMs = 0;
 	private int step = 0;
 	private SimulationState simulationState;
@@ -197,59 +197,72 @@ public class Simulation {
 		}
 	}
 
-	protected void loop() {
-		while (runSimulation) {
-			synchronized (this) {
-				while (paused) {
-					try {
-						wait();
-					} catch (Exception e) {
-						paused = false;
-						Thread.currentThread().interrupt();
-						logger.warn("interrupt while paused.");
-					}
+	protected void iterate() {
+		synchronized (this) {
+			while (paused) {
+				try {
+					wait();
+				} catch (Exception e) {
+					paused = false;
+					Thread.currentThread().interrupt();
+					logger.warn("interrupt while paused.");
 				}
 			}
-
-			if (attributesSimulation.isVisualizationEnabled()) {
-				sleepTillStartOfNextFrame();
-			}
-
-			for (PassiveCallback c : passiveCallbacks) {
-				c.preUpdate(simTimeInSec);
-			}
-
-			assert assertAllPedestrianInBounds();
-			updateCallbacks(simTimeInSec);
-			updateWriters(simTimeInSec);
-
-			if (attributesSimulation.isWriteSimulationData()) {
-				processorManager.update(this.simulationState);
-			}
-
-
-			for (PassiveCallback c : passiveCallbacks) {
-				c.postUpdate(simTimeInSec);
-			}
-
-			if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
-				simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
-			} else {
-				runSimulation = false;
-			}
-
-
-			//remove comment to fasten simulation for evacuation simulations
-			//if (topography.getElements(Pedestrian.class).size() == 0){
-			//	runSimulation = false;
-			//}
-
-			if (Thread.interrupted()) {
-				runSimulation = false;
-				simulationResult.setState("Simulation interrupted");
-				logger.info("Simulation interrupted.");
-			}
 		}
+		//logger.info("sim step " + simTimeInSec);
+
+		if (attributesSimulation.isVisualizationEnabled()) {
+			sleepTillStartOfNextFrame();
+		}
+
+		for (PassiveCallback c : passiveCallbacks) {
+			c.preUpdate(simTimeInSec);
+		}
+
+		assert assertAllPedestrianInBounds();
+		updateCallbacks(simTimeInSec);
+		updateWriters(simTimeInSec);
+
+		if (attributesSimulation.isWriteSimulationData()) {
+			processorManager.update(this.simulationState);
+		}
+
+
+		for (PassiveCallback c : passiveCallbacks) {
+			c.postUpdate(simTimeInSec);
+		}
+
+		if (!hasFinished()) {
+			simTimeInSec = nextSimTimeInSec();
+		} else {
+			runSimulation = false;
+		}
+
+
+		//remove comment to fasten simulation for evacuation simulations
+		//if (topography.getElements(Pedestrian.class).size() == 0){
+		//	runSimulation = false;
+		//}
+
+		if (Thread.interrupted()) {
+			runSimulation = false;
+			simulationResult.setState("Simulation interrupted");
+			logger.info("Simulation interrupted.");
+		}
+	}
+
+	protected void loop() {
+		while (runSimulation) {
+			iterate();
+		}
+	}
+
+	protected double nextSimTimeInSec() {
+		return simTimeInSec + Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
+	}
+
+	protected boolean hasFinished() {
+		return runTimeInSec + startTimeInSec <= simTimeInSec + 1e-7;
 	}
 
 	private boolean assertAllPedestrianInBounds() {

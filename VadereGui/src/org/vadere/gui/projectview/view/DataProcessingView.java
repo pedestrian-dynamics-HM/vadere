@@ -12,6 +12,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
+import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.gui.projectview.utils.SimpleDocumentListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -63,6 +64,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 	private Scenario currentScenario;
 	private boolean isEditable;
+	private IScenarioChecker scenarioChecker;
 
 	DataProcessingView() {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
@@ -88,6 +90,10 @@ class DataProcessingView extends JPanel implements IJsonView {
 		switchMode();
 	}
 
+	public void setScenarioChecker(IScenarioChecker scenarioChecker) {
+		this.scenarioChecker = scenarioChecker;
+	}
+
 	private void switchMode() {
 		String link = MessageFormat.format(Messages.getString("ProjectView.JSONSwitch.link"), (inGuiViewMode ? jsonViewMode : guiViewMode));
 		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='blue'>" +
@@ -99,11 +105,13 @@ class DataProcessingView extends JPanel implements IJsonView {
 		if (inGuiViewMode) {
             logger.info("switch to gui view");
 			GuiView guiView = new GuiView();
+			guiView.setScenarioChecker(scenarioChecker);
 			activeJsonView = guiView;
 			viewPanel.add(guiView);
 		} else {
             logger.info("switch to expert view");
 			TextView expertView = buildExpertView();
+			expertView.setScenarioChecker(scenarioChecker);
 			activeJsonView = expertView;
 			viewPanel.add(expertView);
 		}
@@ -187,6 +195,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private DataProcessor selectedDataProcessor;
 		private String latestJsonParsingError;
 		private Set<Integer> dataProcessIdsInUse = new HashSet<>();
+		private IScenarioChecker scenarioChecker;
 
 		GuiView() {
 			/* via www.oracle.com/technetwork/java/tablelayout-141489.html,
@@ -323,7 +332,12 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 		private void refreshGUI() {
 			currentScenario.updateCurrentStateSerialized();
+			scenarioChecker.checkScenario(currentScenario);
 			ProjectView.getMainWindow().refreshScenarioNames();
+		}
+
+		public void setScenarioChecker(IScenarioChecker scenarioChecker) {
+			this.scenarioChecker = scenarioChecker;
 		}
 
 		private String getDefaultFilename(){

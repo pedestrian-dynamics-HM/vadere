@@ -21,7 +21,7 @@ public class HashGenerator {
 		String commitHash = getFirstStringTokenFromResource(CURRENT_COMMIT_HASH_RESOURCE);
 
 		if (commitHash == null) {
-			commitHash = "warning: no commit hash";
+			commitHash = "topographyWarning: no commit hash";
 			logger.warn("No commit hash found. The project will not contain a hash of the software source code.");
 		}
 

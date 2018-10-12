@@ -7,15 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class TopographyCheckerMessageTarget {
+public class ScenarioCheckerMessageTarget {
 
 	private  List<ScenarioElement> targets;
 
-	public TopographyCheckerMessageTarget(List<ScenarioElement> targets) {
+	public ScenarioCheckerMessageTarget(List<ScenarioElement> targets) {
 		this.targets = targets;
 	}
 
-	public TopographyCheckerMessageTarget(ScenarioElement... targets) {
+	public ScenarioCheckerMessageTarget(ScenarioElement... targets) {
 		this.targets = new ArrayList<>(Arrays.asList(targets));
 	}
 
@@ -44,7 +44,7 @@ public class TopographyCheckerMessageTarget {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		TopographyCheckerMessageTarget that = (TopographyCheckerMessageTarget) o;
+		ScenarioCheckerMessageTarget that = (ScenarioCheckerMessageTarget) o;
 		return Objects.equals(targets, that.targets);
 	}
 
@@ -57,7 +57,7 @@ public class TopographyCheckerMessageTarget {
 	public String toString() {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TopographyCheckerMessageTarget{ targets=");
+		sb.append("ScenarioCheckerMessageTarget{ targets=");
 		sb.append("[");
 		targets.forEach(t -> sb.append(t.getClass().getSimpleName()).append(", "));
 		sb.setLength(sb.length() -2);

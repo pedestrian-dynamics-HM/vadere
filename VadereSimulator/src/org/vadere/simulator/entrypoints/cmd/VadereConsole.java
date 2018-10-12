@@ -38,7 +38,7 @@ public class VadereConsole {
 			parser.handleError(e);
 			System.exit(1);
 		} catch (Exception e) {
-			logger.error("error in command:" + e.getMessage());
+			logger.error("topographyError in command:" + e.getMessage());
 			System.exit(1);
 		}
 
@@ -53,7 +53,7 @@ public class VadereConsole {
 				.required(false)
 				.type(String.class)
 				.dest("loglevel")
-				.choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "ALL")
+				.choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
 				.setDefault("INFO")
 				.action(new SetLogLevelCommand())
 				.help("Set Log Level for vadere.");

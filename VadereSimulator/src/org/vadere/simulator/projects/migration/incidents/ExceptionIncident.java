@@ -47,7 +47,7 @@ public class ExceptionIncident extends Incident {
 							|| e.getMessage().startsWith("Can't parse \"true\" as boolean")) {
 						logMsg = "One or more (the migration was stopped at the first occurrence) boolean-value " +
 								"is wrapped in quotation marks and is thereby erroneously parsed as String " +
-								"instead of boolean. This is the full error message:\n" + e.getMessage();
+								"instead of boolean. This is the full topographyError message:\n" + e.getMessage();
 					}
 
 					throw new MigrationException(this, logMsg);

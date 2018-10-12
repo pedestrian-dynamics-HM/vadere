@@ -140,7 +140,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         points.forEachOrdered(
                 p -> path.lineTo(p.getX(), p.getY()));
 
-        g.draw(path);
+        draw(path, g);
         g.setColor(color);
         // g.setStroke(stroke);
     }
