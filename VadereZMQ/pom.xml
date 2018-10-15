@@ -93,6 +93,18 @@
             <artifactId>protobuf-java</artifactId>
             <version>3.5.1</version>
         </dependency>
+
+        <!-- module dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>state</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

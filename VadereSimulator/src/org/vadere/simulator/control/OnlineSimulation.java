@@ -1,6 +1,8 @@
 package org.vadere.simulator.control;
 
 
+import com.google.protobuf.Timestamp;
+
 import de.s2ucre.protobuf.generated.Common;
 import de.s2ucre.protobuf.generated.IosbOutput;
 
@@ -24,21 +26,26 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import client.Client;
+import client.Receiver;
+import client.Sender;
 
 /**
  * @author Benedikt Zoennchen
  */
-public class OnlineSimulation extends Simulation {
+public class OnlineSimulation extends Simulation implements Consumer<LinkedList<IosbOutput.AreaInfoAtTime>> {
 
 	private static Logger logger = LogManager.getLogger(OnlineSimulation.class);
 	private String subscriberURI = "tcp://localhost:5556";
 	private Random random;
 	private MainModel mainModel;
 	private Topography topography;
-	private Client client;
+
+	private Receiver receiver;
+
+	private Sender sender;
 
 	public OnlineSimulation(
 			MainModel mainModel,
@@ -53,27 +60,12 @@ public class OnlineSimulation extends Simulation {
 		this.random = random;
 		this.mainModel = mainModel;
 		this.topography = scenarioStore.getTopography();
-		this.client = new Client();
+		this.receiver = Receiver.getInstance();
+		this.sender = Sender.getInstance();
+		this.receiver.addConsumer(this);
 
-		/**
-		 * This code restarts the simulation whenever a new message is received!
-		 */
-		Runnable receiver = () -> {
-			while (true) {
-				PedestriansAtTimeStep receivedPedestrians = receivePedestrians();
-				synchronized (this) {
-					topography.getPedestrianDynamicElements().clear();
-					logger.info("re-initialize simulation.");
-					receivedPedestrians.pedestrians.stream().forEach(ped -> topography.addElement(ped));
-					setStartTime((double) receivedPedestrians.timeStepInSec);
-					resume();
-					notifyAll();
-				}
-			}
-		};
-
-
-		new Thread(receiver).start();
+		this.sender.start();
+		this.receiver.start();
 	}
 
 	private void setStartTime(double startTime) {
@@ -118,14 +110,51 @@ public class OnlineSimulation extends Simulation {
 		return simTimeInSec + attributesSimulation.getSimTimeStepLength();
 	}
 
+	@Override
+	public synchronized void accept(@NotNull final LinkedList<IosbOutput.AreaInfoAtTime> areaInfoAtTimes) {
+		if(topography.getPedestrianDynamicElements().getElements().isEmpty()) {
+			pause();
+			topography.getPedestrianDynamicElements().clear();
+			PedestriansAtTimeStep pedestriansAtTimeStep = generatePedestrians(areaInfoAtTimes);
+			logger.info("re-initialize simulation.");
+			pedestriansAtTimeStep.pedestrians.stream().forEach(ped -> topography.addElement(ped));
+
+			//TODO: this is certainly not correct!
+			setStartTime(pedestriansAtTimeStep.timeStepInSec);
+			resume();
+			notifyAll();
+		}
+	}
+
+	public void sendPedestrians() {
+		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
+			Pedestrian ped = (Pedestrian) dynamicElement;
+			sender.send(ped, (int)(startTimeInSec + simTimeInSec));
+			logger.info("send positions");
+		}
+	}
+
+
+	/*public void sendPedestrians() {
+		double [] positions = new double[topography.getPedestrianDynamicElements().getElements().size() * 2];
+		int[] ids = new int[topography.getPedestrianDynamicElements().getElements().size()];
+		int i = 0;
+		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
+			Pedestrian ped = (Pedestrian) dynamicElement;
+			positions[i * 2] = ped.getPosition().getX();
+			positions[i * 2 + 1] = ped.getPosition().getY();
+			ids[i] = ped.getId();
+		}
+		sender.send(positions, ids, (int)(startTimeInSec + simTimeInSec));
+		logger.info("send positions");
+	}*/
+
 	/**
 	 * This method blocks until new messages has been received.
 	 *
 	 * @return
 	 */
-	public PedestriansAtTimeStep receivePedestrians() {
-		Client client = new Client();
-		LinkedList<IosbOutput.AreaInfoAtTime> areaInfoAtTimes = client.receiveAreaInfoAtTime();
+	public PedestriansAtTimeStep generatePedestrians(@NotNull final LinkedList<IosbOutput.AreaInfoAtTime> areaInfoAtTimes) {
 
 		PedestriansAtTimeStep pedestriansAtTimeStep = new PedestriansAtTimeStep();
 
@@ -138,7 +167,8 @@ public class OnlineSimulation extends Simulation {
 			}
 
 			pedestriansAtTimeStep.pedestrians = allPeds;
-			pedestriansAtTimeStep.timeStepInSec = areaInfoAtTimes.getFirst().getTime().getSeconds();
+			Timestamp timestamp = areaInfoAtTimes.getFirst().getTime();
+			pedestriansAtTimeStep.timeStepInSec = timestamp.getSeconds() + timestamp.getNanos();
 		}
 		else {
 			pedestriansAtTimeStep.pedestrians = Collections.EMPTY_LIST;
@@ -148,20 +178,6 @@ public class OnlineSimulation extends Simulation {
 		return pedestriansAtTimeStep;
 	}
 
-	public void sendPedestrians() {
-		double [] positions = new double[topography.getPedestrianDynamicElements().getElements().size() * 2];
-		int[] ids = new int[topography.getPedestrianDynamicElements().getElements().size()];
-		int i = 0;
-		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
-			Pedestrian ped = (Pedestrian) dynamicElement;
-			positions[i * 2] = ped.getPosition().getX();
-			positions[i * 2 + 1] = ped.getPosition().getY();
-			ids[i] = ped.getId();
-		}
-		client.send(positions, ids, (int)(startTimeInSec + simTimeInSec));
-		logger.info("send positions");
-	}
-
 	private List<DynamicElement> generatePedestrians(final IosbOutput.AreaInfoAtTime msg) {
 		VPolygon polygon = toPolygon(msg);
 		return generatePedestrians(polygon, msg.getPedestrians());
@@ -169,12 +185,13 @@ public class OnlineSimulation extends Simulation {
 
 	private List<DynamicElement> generatePedestrians(@NotNull final VPolygon polygon, final double numberOfPedestrians) {
 		List<DynamicElement> pedestrians = new ArrayList<>();
-		List<VPoint> randomPositions = generateRandomPositions(polygon, (int)Math.round(numberOfPedestrians));
+		int n =  (int)Math.round(numberOfPedestrians);
+		List<VPoint> randomPositions = generateRandomPositions(polygon, n);
 
 		LinkedList<Integer> targetIds = topography.getTargets().stream().map(t -> t.getId()).collect(Collectors.toCollection(LinkedList::new));
 
 
-		for(int id = 1; id < numberOfPedestrians + 1; id++) {
+		for(int id = 1; id < n + 1; id++) {
 			Pedestrian ped = (Pedestrian) mainModel.createElement(randomPositions.get(id-1), -1, Pedestrian.class);
 			ped.setTargets(targetIds);
 			pedestrians.add(ped);
@@ -220,5 +237,4 @@ public class OnlineSimulation extends Simulation {
 		public long timeStepInSec;
 		public List<DynamicElement> pedestrians;
 	}
-
 }

@@ -19,10 +19,10 @@
   	<!--  <module>./VadereExperiments</module>-->
     <module>./VadereGui</module>
     <module>./VadereSimulator</module>
+      <module>./VadereZMQ</module>
     <module>./VadereState</module>
     <module>./VadereUtils</module>
     <module>./VadereAnnotation</module>
-    <module>./VadereZMQ</module>
   </modules>
   
 <!-- global dependencies! -->

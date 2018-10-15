@@ -3,15 +3,22 @@ package server;
 import java.util.Random;
 
 import com.google.protobuf.Timestamp;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.zeromq.ZMQ;
 
 import de.s2ucre.protobuf.generated.Common;
 import de.s2ucre.protobuf.generated.IosbOutput.*;
 
+import client.Sender;
+
 //
 //  Binds PUB socket to tcp://*:5556
 //
 public class Server {
+
+	private static Logger logger = LogManager.getLogger(Server.class);
 
 	/*
 	Kai coordinates of the bridge:
@@ -31,7 +38,7 @@ POINT (564303.4638894079 5933436.907734532) POINT (564311.2959240791
 		ZMQ.Context context = ZMQ.context(1);
 
 		ZMQ.Socket publisher = context.socket(ZMQ.PUB);
-		publisher.bind("tcp://*:5556");
+		publisher.bind("tcp://*:5000");
 
 		//  Initialize random number generator
 		Random srandom = new Random(System.currentTimeMillis());
@@ -93,8 +100,10 @@ POINT (564303.4638894079 5933436.907734532) POINT (564311.2959240791
 							.build())
 					.build();
 			publisher.send(msg.toByteArray());
+			logger.info("send message at " + timeStep);
 			Thread.sleep(4000);
 			timeStep += 1;
+
 		}
 
 		publisher.close();
