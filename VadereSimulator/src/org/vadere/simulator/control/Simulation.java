@@ -155,7 +155,7 @@ public class Simulation {
 		}
 	}
 
-	private void postLoop() {
+	protected void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
 		for (Model m : models) {
@@ -327,7 +327,7 @@ public class Simulation {
 
 	public synchronized void resume() {
 		paused = false;
-		notify();
+		notifyAll();
 	}
 
 	/**

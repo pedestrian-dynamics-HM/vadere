@@ -32,7 +32,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 	}
 
 	/*
-	pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
+	pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timestamp);
 		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {

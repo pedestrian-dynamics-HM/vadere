@@ -24,7 +24,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	protected void update(@NotNull final Collection<Pedestrian> pedestrianOSMS, final double timeStepInSec) {
 		for (Pedestrian pedestrian : pedestrianOSMS) {
 			update((PedestrianOSM) pedestrian, timeStepInSec);
-			//pedestrian.update(timeStepInSec, -1, CallMethod.SEQUENTIAL);
+			//pedestrian.update(timestamp, -1, CallMethod.SEQUENTIAL);
 		}
 	}
 

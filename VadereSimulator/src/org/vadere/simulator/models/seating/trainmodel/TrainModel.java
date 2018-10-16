@@ -100,7 +100,7 @@ public class TrainModel {
 		Rectangle2D longAisle = createFilterRect(leftmostCompartment.getMinY() + trainGeometry.getBenchWidth(),
 				trainGeometry.getAisleWidth());
 
-		// Sort compartment target by x coordinate. Right-most target must be the first in the list.
+		// Sort compartment target by x reference. Right-most target must be the first in the list.
 		compartmentTargets = findTargets(longAisle).stream()
 				.sorted((a, b) -> Double.compare(a.getShape().getBounds().getX(), b.getShape().getBounds().getX()))
 				.collect(Collectors.toList());

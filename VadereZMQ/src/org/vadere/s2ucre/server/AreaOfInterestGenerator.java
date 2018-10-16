@@ -1,4 +1,4 @@
-package server;
+package org.vadere.s2ucre.server;
 
 import java.util.Random;
 
@@ -6,19 +6,15 @@ import com.google.protobuf.Timestamp;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.zeromq.ZMQ;
+import org.vadere.s2ucre.Publisher;
 
-import de.s2ucre.protobuf.generated.Common;
-import de.s2ucre.protobuf.generated.IosbOutput.*;
+import org.vadere.s2ucre.generated.Common;
+import org.vadere.s2ucre.generated.IosbOutput.*;
 
-import client.Sender;
 
-//
-//  Binds PUB socket to tcp://*:5556
-//
-public class Server {
+public class AreaOfInterestGenerator {
 
-	private static Logger logger = LogManager.getLogger(Server.class);
+	private static Logger logger = LogManager.getLogger(AreaOfInterestGenerator.class);
 
 	/*
 	Kai coordinates of the bridge:
@@ -34,11 +30,10 @@ POINT (564303.4638894079 5933436.907734532) POINT (564311.2959240791
 	 */
 
 	public static void main(String[] args) throws Exception {
-		//  Prepare our context and publisher
-		ZMQ.Context context = ZMQ.context(1);
+		Publisher publisher = new Publisher(args[0]);
+		publisher.open();
 
-		ZMQ.Socket publisher = context.socket(ZMQ.PUB);
-		publisher.bind("tcp://*:5000");
+		logger.info("-> " + args[0]);
 
 		//  Initialize random number generator
 		Random srandom = new Random(System.currentTimeMillis());
@@ -107,6 +102,5 @@ POINT (564303.4638894079 5933436.907734532) POINT (564311.2959240791
 		}
 
 		publisher.close();
-		context.term();
 	}
 }

@@ -99,15 +99,15 @@ public class PedestrianOSM extends Pedestrian {
 		this.strides = new LinkedList<>();
 	}
 
-	/*public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
-		double lastSimTimeInSec = currentTimeInSec - timeStepInSec;
+	/*public void update(double timestamp, double currentTimeInSec, CallMethod callMethod) {
+		double lastSimTimeInSec = currentTimeInSec - timestamp;
 
 		// clear the old strides to avoid large linked lists
 		if(!strides.isEmpty() && lastSimTimeInSec < strides.peekFirst().getRight()) {
 			clearStrides();
 		}
 
-		this.updateScheme.update(timeStepInSec, currentTimeInSec, callMethod);
+		this.updateScheme.update(timestamp, currentTimeInSec, callMethod);
 	}*/
 
 	/**

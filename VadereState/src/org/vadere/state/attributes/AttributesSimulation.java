@@ -22,6 +22,20 @@ public class AttributesSimulation extends Attributes {
 	private long fixedSeed = new Random().nextLong();
 	private long simulationSeed;
 
+	private boolean runInOnlineMode = false;
+
+	/**
+	 * The uri at which TranslateIt or Translate sends their data,
+	 * has only an effect if runInOnlineMode == true.
+	 */
+	private String onlineModeSubscriber = "tcp://localhost:5010";
+
+	/**
+	 * The uri at which VADERE sends its simulation results,
+	 * has only an effect if runInOnlineMode == true.
+	 */
+	private String onlineModePublisher = "tcp://localhost:5011";
+
 	// Getter...
 
 	public double getFinishTime() {
@@ -63,6 +77,33 @@ public class AttributesSimulation extends Attributes {
 
 	public long getSimulationSeed() {
 		return simulationSeed;
+	}
+
+	public String getOnlineModePublisher() {
+		return onlineModePublisher;
+	}
+
+	public String getOnlineModeSubscriber() {
+		return onlineModeSubscriber;
+	}
+
+	public boolean isRunInOnlineMode() {
+		return runInOnlineMode;
+	}
+
+	public void setOnlineModePublisher(String onlineModePublisher) {
+		checkSealed();
+		this.onlineModePublisher = onlineModePublisher;
+	}
+
+	public void setOnlineModeSubscriber(String onlineModeSubscriber) {
+		checkSealed();
+		this.onlineModeSubscriber = onlineModeSubscriber;
+	}
+
+	public void setRunInOnlineMode(boolean runInOnlineMode) {
+		checkSealed();
+		this.runInOnlineMode = runInOnlineMode;
 	}
 
 	public void setFinishTime(double finishTime) {

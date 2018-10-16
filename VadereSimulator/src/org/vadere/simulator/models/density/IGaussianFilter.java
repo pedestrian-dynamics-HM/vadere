@@ -30,16 +30,16 @@ public interface IGaussianFilter {
     }
 
     /**
-     * Returns the value of a specified coordinate. This coordinate will be
+     * Returns the value of a specified reference. This reference will be
      * converted to natural numbers of the image.
      *
      * @param x
-     *        the x-coordinate (for example the x-coordinate of a place on
+     *        the x-reference (for example the x-reference of a place on
      *        the floor)
      * @param y
-     *        the y-coordinate (for example the y-coordinate of a place on
+     *        the y-reference (for example the y-reference of a place on
      *        the floor)
-     * @return the value of a specified coordinate
+     * @return the value of a specified reference
      */
     double getFilteredValue(final double x, final double y);
 

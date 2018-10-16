@@ -54,8 +54,6 @@ public class ScenarioRun implements Runnable {
 
 	private SimulationResult simulationResult;
 
-	private boolean isOnline;
-
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, false);
 	}
@@ -89,7 +87,6 @@ public class ScenarioRun implements Runnable {
 		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
 		this.simulationResult = new SimulationResult(scenario.getName());
-		this.isOnline = isOnline;
 	}
 
 
@@ -135,7 +132,7 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				if(isOnline) {
+				if(scenarioStore.getAttributesSimulation().isRunInOnlineMode()) {
 					simulation = new OnlineSimulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
 				}
 				else {

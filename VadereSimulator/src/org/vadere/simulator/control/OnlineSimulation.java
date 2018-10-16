@@ -3,8 +3,12 @@ package org.vadere.simulator.control;
 
 import com.google.protobuf.Timestamp;
 
-import de.s2ucre.protobuf.generated.Common;
-import de.s2ucre.protobuf.generated.IosbOutput;
+import org.jetbrains.annotations.Nullable;
+import org.vadere.s2ucre.Utils;
+import org.vadere.s2ucre.generated.Common;
+import org.vadere.s2ucre.generated.IosbOutput;
+
+import org.vadere.s2ucre.generated.Pedestrian.PedMsg;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -13,14 +17,11 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 
-import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,23 +30,45 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import client.Receiver;
-import client.Sender;
+import org.vadere.s2ucre.client.Receiver;
+import org.vadere.s2ucre.client.Sender;
 
 /**
+ * An OnlineSimulation {@link OnlineSimulation} is a simulation which receives its initial data i.e. the positions of its
+ * pedestrian in an online fashion.The simulation starts if data arrive and re-starts after it has finished and new data arrive.
+ * Therefore, an OnlineSimulation can be seen as multiple simulation runs executing {@link Simulation#preLoop()} and
+ * {@link Simulation#postLoop()} only once. This has, for example the effect that floor-field computation for static floor field is
+ * done once for all those simulation runs. The same is true for the output-processors {@link org.vadere.simulator.projects.dataprocessing.processor.DataProcessor}
+ * which will write as if all those simulations are one large simulation!
+ *
+ * Note: The generation of Pedestrian positions is done by using accu:rate-component TranslateIt or our own implementation Translate.
+ * Both are separated applications communicating via zeroMQ and protobuf and are interchangeable.
+ *
  * @author Benedikt Zoennchen
  */
-public class OnlineSimulation extends Simulation implements Consumer<LinkedList<IosbOutput.AreaInfoAtTime>> {
+public class OnlineSimulation extends Simulation implements Consumer<LinkedList<PedMsg>> {
 
 	private static Logger logger = LogManager.getLogger(OnlineSimulation.class);
-	private String subscriberURI = "tcp://localhost:5556";
 	private Random random;
 	private MainModel mainModel;
 	private Topography topography;
+	private AttributesSimulation attributesSimulation;
 
+	/**
+	 * A helper from which the simulation gets its initial data using zeroMQ and protobuf.
+	 */
 	private Receiver receiver;
 
+	/**
+	 * A helper which sends the simulation results using zeroMQ and protobuf.
+	 */
 	private Sender sender;
+
+	/**
+	 * A container holding the current simulation data and information about the place and time of the simulation.
+	 */
+	private @Nullable PedestriansAtTimeStep currentSimulationData;
+
 
 	public OnlineSimulation(
 			MainModel mainModel,
@@ -58,46 +81,56 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 			SimulationResult simulationResult) {
 		super(mainModel, startTimeInSec, name, scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
 		this.random = random;
+		this.attributesSimulation = scenarioStore.getAttributesSimulation();
+		this.currentSimulationData = null;
 		this.mainModel = mainModel;
 		this.topography = scenarioStore.getTopography();
-		this.receiver = Receiver.getInstance();
-		this.sender = Sender.getInstance();
-		this.receiver.addConsumer(this);
-
+		this.receiver = Receiver.getInstance(attributesSimulation.getOnlineModeSubscriber());
+		this.sender = Sender.getInstance(attributesSimulation.getOnlineModePublisher());
+		this.receiver.addPedMsgConsumer(this);
 		this.sender.start();
 		this.receiver.start();
+
+		logger.info(attributesSimulation.getOnlineModeSubscriber() + " -> VADERE -> " + attributesSimulation.getOnlineModePublisher());
 	}
 
+	/**
+	 * Sets the time at which the current simulation started.
+	 *
+	 * @param startTime
+	 */
 	private void setStartTime(double startTime) {
 		startTimeInSec = startTime;
 	}
 
 	@Override
 	protected synchronized void iterate() {
-		if(topography.getPedestrianDynamicElements().getElements().isEmpty()) {
-			pause();
+		while (topography.getPedestrianDynamicElements().getElements().isEmpty()) {
+			logger.info("wait for data to arrive");
+
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+
 		super.iterate();
 		sendPedestrians();
 	}
 
 	@Override
-	public synchronized void pause() {
-		super.pause();
-		logger.info("pause online simulation");
-	}
-
-	@Override
-	public synchronized void resume() {
-		super.resume();
-		logger.info("resume online simulation");
-	}
-
-	@Override
 	public void loop() {
-		while (!hasFinished()) {
+		while (!Thread.currentThread().isInterrupted() && !hasFinished()) {
 			iterate();
 		}
+	}
+
+	@Override
+	protected void postLoop() {
+		super.postLoop();
+		sender.close();
+		receiver.close();
 	}
 
 	@Override
@@ -110,131 +143,69 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 		return simTimeInSec + attributesSimulation.getSimTimeStepLength();
 	}
 
+	/**
+	 * This will be called by the receiver {@link Receiver} whenever data arrive. The data are
+	 * pre-processed by TranslateIt or {@link org.vadere.s2ucre.translate.Translate}.
+	 *
+	 * @param pedMsgs the arrived data
+	 */
 	@Override
-	public synchronized void accept(@NotNull final LinkedList<IosbOutput.AreaInfoAtTime> areaInfoAtTimes) {
+	public synchronized void accept(@NotNull final LinkedList<PedMsg> pedMsgs) {
 		if(topography.getPedestrianDynamicElements().getElements().isEmpty()) {
 			pause();
 			topography.getPedestrianDynamicElements().clear();
-			PedestriansAtTimeStep pedestriansAtTimeStep = generatePedestrians(areaInfoAtTimes);
+			currentSimulationData = toVaderePedestrians(pedMsgs);
 			logger.info("re-initialize simulation.");
-			pedestriansAtTimeStep.pedestrians.stream().forEach(ped -> topography.addElement(ped));
-
-			//TODO: this is certainly not correct!
-			setStartTime(pedestriansAtTimeStep.timeStepInSec);
+			currentSimulationData.pedestrians.stream().forEach(ped -> topography.addElement(ped));
+			setStartTime(0.0);
 			resume();
 			notifyAll();
 		}
 	}
 
+	/**
+	 * Sends the current simulation state (pedestrians, time, place) using zeroMQ and protobuf.
+	 */
 	public void sendPedestrians() {
 		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
 			Pedestrian ped = (Pedestrian) dynamicElement;
-			sender.send(ped, (int)(startTimeInSec + simTimeInSec));
-			logger.info("send positions");
+			sender.send(ped, Utils.addSeconds(currentSimulationData.timestamp, simTimeInSec), currentSimulationData.reference);
 		}
+		logger.info("send positions");
 	}
 
-
-	/*public void sendPedestrians() {
-		double [] positions = new double[topography.getPedestrianDynamicElements().getElements().size() * 2];
-		int[] ids = new int[topography.getPedestrianDynamicElements().getElements().size()];
-		int i = 0;
-		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
-			Pedestrian ped = (Pedestrian) dynamicElement;
-			positions[i * 2] = ped.getPosition().getX();
-			positions[i * 2 + 1] = ped.getPosition().getY();
-			ids[i] = ped.getId();
-		}
-		sender.send(positions, ids, (int)(startTimeInSec + simTimeInSec));
-		logger.info("send positions");
-	}*/
-
-	/**
-	 * This method blocks until new messages has been received.
-	 *
-	 * @return
-	 */
-	public PedestriansAtTimeStep generatePedestrians(@NotNull final LinkedList<IosbOutput.AreaInfoAtTime> areaInfoAtTimes) {
+	public PedestriansAtTimeStep toVaderePedestrians(@NotNull final List<PedMsg> pedMsgs) {
 
 		PedestriansAtTimeStep pedestriansAtTimeStep = new PedestriansAtTimeStep();
 
-		if(!areaInfoAtTimes.isEmpty()) {
+		if(!pedMsgs.isEmpty()) {
 			List<DynamicElement> allPeds = new ArrayList<>();
+			LinkedList<Integer> targetIds = topography.getTargets().stream().map(t -> t.getId()).collect(Collectors.toCollection(LinkedList::new));
 
-			for(IosbOutput.AreaInfoAtTime areaInfoAtTime : areaInfoAtTimes) {
-				List<DynamicElement> peds = generatePedestrians(areaInfoAtTime);
-				allPeds.addAll(peds);
+			for(PedMsg pedMsg : pedMsgs) {
+				Pedestrian ped = (Pedestrian) mainModel.createElement(Utils.toVPoint(pedMsg.getPosition()), pedMsg.getPedId(), Pedestrian.class);
+				ped.setTargets(targetIds);
+				ped.setVelocity(Utils.toVelocity(pedMsg.getVelocity()));
+				allPeds.add(ped);
 			}
 
 			pedestriansAtTimeStep.pedestrians = allPeds;
-			Timestamp timestamp = areaInfoAtTimes.getFirst().getTime();
-			pedestriansAtTimeStep.timeStepInSec = timestamp.getSeconds() + timestamp.getNanos();
+			Timestamp timestamp = pedMsgs.get(0).getTime();
+			pedestriansAtTimeStep.timestamp = timestamp;
+			pedestriansAtTimeStep.reference = pedMsgs.get(0).getPosition();
 		}
 		else {
 			pedestriansAtTimeStep.pedestrians = Collections.EMPTY_LIST;
-			pedestriansAtTimeStep.timeStepInSec = -1;
+			pedestriansAtTimeStep.timestamp = Timestamp.newBuilder().build();
+			pedestriansAtTimeStep.reference = Common.UTMCoordinate.newBuilder().build();
 		}
 
 		return pedestriansAtTimeStep;
 	}
 
-	private List<DynamicElement> generatePedestrians(final IosbOutput.AreaInfoAtTime msg) {
-		VPolygon polygon = toPolygon(msg);
-		return generatePedestrians(polygon, msg.getPedestrians());
-	}
-
-	private List<DynamicElement> generatePedestrians(@NotNull final VPolygon polygon, final double numberOfPedestrians) {
-		List<DynamicElement> pedestrians = new ArrayList<>();
-		int n =  (int)Math.round(numberOfPedestrians);
-		List<VPoint> randomPositions = generateRandomPositions(polygon, n);
-
-		LinkedList<Integer> targetIds = topography.getTargets().stream().map(t -> t.getId()).collect(Collectors.toCollection(LinkedList::new));
-
-
-		for(int id = 1; id < n + 1; id++) {
-			Pedestrian ped = (Pedestrian) mainModel.createElement(randomPositions.get(id-1), -1, Pedestrian.class);
-			ped.setTargets(targetIds);
-			pedestrians.add(ped);
-		}
-
-		return pedestrians;
-	}
-
-	private List<VPoint> generateRandomPositions(@NotNull final VPolygon polygon, int n) {
-		List<VPoint> randomPoints = new ArrayList<>();
-		for(int i = 0; i < n; i++) {
-			VPoint randomPoint;
-			do {
-				Rectangle2D bound = polygon.getBounds2D();
-				randomPoint = new VPoint(bound.getMinX() + random.nextDouble() * bound.getWidth(), bound.getMinY() + random.nextDouble() * bound.getHeight());
-			}
-			while (!polygon.contains(randomPoint));
-			randomPoints.add(randomPoint);
-		}
-
-		return randomPoints;
-	}
-
-	private VPolygon toPolygon(final IosbOutput.AreaInfoAtTime msg) {
-		Common.RegionOfInterest regionOfInterest = msg.getPolygon();
-
-		Path2D.Double path = new Path2D.Double();
-		boolean first = true;
-		for(Common.UTMCoordinate coord : regionOfInterest.getCoordinateList()) {
-			if(first) {
-				first = false;
-				path.moveTo(coord.getEasting(), coord.getNorthing());
-			}
-			else {
-				path.lineTo(coord.getEasting(), coord.getNorthing());
-			}
-		}
-		path.closePath();
-		return new VPolygon(path);
-	}
-
 	private static class PedestriansAtTimeStep {
-		public long timeStepInSec;
+		public Timestamp timestamp;
+		public Common.UTMCoordinate reference;
 		public List<DynamicElement> pedestrians;
 	}
 }

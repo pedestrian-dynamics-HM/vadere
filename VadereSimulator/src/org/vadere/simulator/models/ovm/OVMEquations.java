@@ -213,7 +213,7 @@ public class OVMEquations extends AbstractModelEquations<Car> implements IAsyncC
 
 		VPoint myPos = new VPoint(position2[0], position2[1]);
 		Vector2D myVelocity = new Vector2D(speed[0], speed[1]);
-		double mySpeed = myVelocity.x; // only the x coordinate is set. Do NOT use "length" here, otherwise negative speeds occur.
+		double mySpeed = myVelocity.x; // only the x reference is set. Do NOT use "length" here, otherwise negative speeds occur.
 
 		// velocity is just passed through, but rotated so that the vector points in target
 		// direction
