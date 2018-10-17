@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -18,13 +19,16 @@ public class ModuleResourceBundle extends ResourceBundle {
 
 	protected static final Control CONTROL = new MultiResourceBundleControl();
 	private Properties properties;
+	private HashSet<String>	usedProperties;
+
 
 	public ModuleResourceBundle(String baseName, Locale locale){
 		setParent(ResourceBundle.getBundle(baseName, locale, CONTROL));
 	}
 
-	protected ModuleResourceBundle(Properties properties){
+	protected ModuleResourceBundle(Properties properties, HashSet<String> usedProperties){
 		this.properties = properties;
+		this.usedProperties = usedProperties;
 	}
 
 	@Override
@@ -70,12 +74,15 @@ public class ModuleResourceBundle extends ResourceBundle {
 
 			Properties properties = load(baseName, locale, loader);
 			String include = properties.getProperty("include");
+			HashSet<String> usedProperties = new HashSet<>();
 			if (include != null){
 				for (String includeBasename : include.split("\\s*,\\s*")){
-					properties.putAll(load(includeBasename, locale, loader));
+					if (usedProperties.add(includeBasename)){
+						properties.putAll(load(includeBasename, locale, loader));
+					}
 				}
 			}
-			return new ModuleResourceBundle(properties);
+			return new ModuleResourceBundle(properties, usedProperties);
 		}
 
 		private Properties load(String baseName, Locale locale, ClassLoader loader) throws IOException {
