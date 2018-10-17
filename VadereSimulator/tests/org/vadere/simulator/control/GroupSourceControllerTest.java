@@ -231,24 +231,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		pedestrianCountEquals(3);
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testSpawnNumber() {
-		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
-		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setSpawnNumber(10)
-				.setSourceDim(12 * d, 12 * d ) // create source with 12x12 spots
-				.setGroupSizeDistribution(0.0, 0.0, 0.0, 1); // only groups of 4
-		initialize(builder);
-
-		first().sourceController.update(1);
-		pedestrianCountEquals(10 * 4);
-		first().sourceController.update(2); 	// use random positioning thus not
-															// not optimal and thus not enough
-															// space for all
-		fail("should not be reached. Exception expected");
-
-	}
-
 	@Test
 	public void testSpawnRateGreaterThanUpdateRate() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()

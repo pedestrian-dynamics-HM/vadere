@@ -1,13 +1,24 @@
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
-# In Progress: v0.7 
+# In Progress: v0.7
 
 ## Added
-- Two new outputprocessors - mainly for the BHM - to evaluaet queueWidth (QueueWidthProcessor) and behavior (PedestrianBehaviorProcessor)
-- In package `org.vadere.simulator.utils`, added `TopographyChecker` to show user if the current topography contains problems. The 
-  `TopographyChecker` will check for overlapping `ScenarioElements` and check for inconsistence settings such as missing 
-  TargetIDs for sources or inconsistenct speed ranges for pedestrians. See this [table](Documentation/changelLogImages/TopographyCheckerMessages.md) for supported warnings and erros
-  as well as this [picture](Documentation/changelLogImages/TopographyChecker.png) to see which kind of overlap produces erros or warnings.
+
+- Two new outputprocessors - mainly for the BHM - to evaluaet queueWidth
+  (QueueWidthProcessor) and behavior (PedestrianBehaviorProcessor)
+
+- In package `org.vadere.simulator.utils`, added `TopographyChecker` to show
+  user if the current topography contains problems. The  `TopographyChecker`
+  will check for overlapping `ScenarioElements` and check for inconsistence
+  settings such as missing  TargetIDs for sources or inconsistenct speed ranges
+  for pedestrians. See this
+  [table](Documentation/changelLogImages/TopographyCheckerMessages.md) for
+  supported warnings and erros as well as this
+  [picture](Documentation/changelLogImages/TopographyChecker.png) to see which
+  kind of overlap produces erros or warnings.
+- Add `--output-dir [on, off]` (default: `on`) switch to  `scenario-run`
+  sub-command. This will will turn the ScenarioChecker on or off for the command
+  line. If the Checker detects an error  the simulation will not be executed.
 
 # v0.6 (2018-09-07)
 
@@ -19,7 +30,7 @@
 - VadereConsole.jar migrate will migrate all scenario files within the specified directory and all child directories. (37fde165: Simulator)
   * To exclude specific sub-trees or only specific directories the igonoreDirs List can be expanded.
   * DO_NOT_MIGRATE or .DO_NOT_MIGRATE: Ignore current directory but continue with existing child directories.
-  * DO_NOT_MIGRATE_TREE or .DO_NOT_MIGRATE_TREE: Ignore the directories and the complete sub-tree. 
+  * DO_NOT_MIGRATE_TREE or .DO_NOT_MIGRATE_TREE: Ignore the directories and the complete sub-tree.
 - Added a new OutputProcessor, NumberOverlapsProcessor. This processor saves the number of overlaps that occurred during a simulation run. It needs the PedestrianOverlapProcessor. (57d90e93: Simulator, State)
 - Added sub commands to "VadereConsole": project-run, scenario-run, suq, migrate (c7e0538c: GUI)
 - In the onlinevisualization it is now possible to display the target potential field of a selected pedestrian. (123457aa: GUI)
