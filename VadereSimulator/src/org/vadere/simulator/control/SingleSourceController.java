@@ -117,8 +117,9 @@ public class SingleSourceController extends SourceController {
 			VPoint randomPoint = new VPoint(rec.getMinX() + random.nextDouble() * rec.getWidth(), rec.getMinY() + random.nextDouble() * rec.getHeight());
 			VShape freeSpaceRequired = dynamicElementFactory.getDynamicElementRequiredPlace(randomPoint);
 
-			// no intersection with other free spaces.
-			if(blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpaceRequired))) {
+			// no intersection with other free spaces (obstacles & other pedestrians)
+			if(blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpaceRequired))
+					&& 	this.getTopography().getObstacles().stream().noneMatch(obs -> obs.getShape().intersects(freeSpaceRequired))) {
 				return Optional.of(randomPoint);
 			}
 		}

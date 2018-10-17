@@ -26,10 +26,11 @@ import java.util.Random;
 public abstract class SourceController {
 
 	protected final double NO_EVENT = Double.MAX_VALUE;
-	public static final double SPAWN_BUFFER_SIZE = 0.01;
+	public static final double SPAWN_BUFFER_SIZE = 0.03;
 
 	protected final Source source;
 	private final DynamicElementFactory dynamicElementFactory;
+
 	private final Topography topography;
 	protected final Random random;
 
@@ -110,6 +111,10 @@ public abstract class SourceController {
 	abstract protected boolean isQueueEmpty();
 
 	abstract protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec);
+
+	protected Topography getTopography() {
+		return topography;
+	}
 
 	protected void createNextEvent() {
 		if (isSourceWithOneSingleSpawnEvent()) {

@@ -6,7 +6,10 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
@@ -95,11 +98,11 @@ public abstract class DefaultRenderer {
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
 		graphics2D.setColor(Color.WHITE);
 		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
-		graphics2D.fill(new VRectangle(
+		fill(new VRectangle(
 				topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
 				topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
 				(defaultModel.getTopographyBound().getWidth() - defaultModel.getBoundingBoxWidth() * 2),
-				(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)));
+				(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)), graphics2D);
 
 	}
 
@@ -107,6 +110,8 @@ public abstract class DefaultRenderer {
 		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
 		mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
 		graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
+
+
 		//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
 
 		/*
@@ -126,10 +131,48 @@ public abstract class DefaultRenderer {
 		g.setColor(color);
 
 		for (ScenarioElement element : elements) {
-			g.fill(element.getShape());
+			fill(element.getShape(), g);
 		}
 
 		g.setColor(tmpColor);
+	}
+
+	public static void fill(@NotNull final Shape shape, @NotNull final Graphics2D g) {
+		if(shape instanceof VCircle) {
+			g.fill(toPolygon((VCircle) shape));
+		}
+		else {
+			g.fill(shape);
+		}
+	}
+
+	public static void draw(@NotNull final Shape shape, @NotNull final Graphics2D g) {
+		if(shape instanceof VCircle) {
+			g.draw(toPolygon((VCircle) shape));
+		}
+		else {
+			g.draw(shape);
+		}
+	}
+
+	private static VPolygon toPolygon(final VCircle circle) {
+		int n = 15;
+		double alpha = 2 * Math.PI / n;
+		VPoint p = new VPoint(0, circle.getRadius());
+
+		Path2D.Double path = new Path2D.Double();
+		VPoint center = circle.getCenter();
+
+		path.moveTo(center.x + p.x, center.y + p.y);
+		for(int i = 1; i < n; i++) {
+			p = p.rotate(alpha);
+			path.lineTo(center.x + p.x, center.y + p.y);
+			///path.moveTo(pointList.get(i).x, pointList.get(i).y);
+		}
+
+		//path.closePath();
+
+		return new VPolygon(path);
 	}
 
 	protected  void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
@@ -169,32 +212,32 @@ public abstract class DefaultRenderer {
 
 		final Color tmpColor = graphics.getColor();
 		graphics.setColor(Color.black);
-		graphics.fill(stairs.getShape());
+		fill(stairs.getShape(), graphics);
 
 		Area hatchArea = getStairShapeWithThreads(stairs);
 
 		graphics.setColor(color);
-		graphics.fill(hatchArea);
+		fill(hatchArea, graphics);
 		graphics.setColor(tmpColor);
 	}
 
 	protected void renderFilledShape(ScenarioElement element, final Graphics2D graphics, Color color){
 		final Color tmpColor = graphics.getColor();
 		graphics.setColor(color);
-		graphics.fill(element.getShape());
+		fill(element.getShape(), graphics);
 		graphics.setColor(tmpColor);
 	}
 
 	protected void renderSelectionShape(final Graphics2D graphics) {
 		graphics.setColor(defaultModel.getMouseSelectionMode().getSelectionColor());
-		graphics.setStroke(new BasicStroke(getSelectionBorderLineWidht()));
-		graphics.draw(defaultModel.getSelectionShape());
+		graphics.setStroke(new BasicStroke(getSelectionBorderLineWidth()));
+		draw(defaultModel.getSelectionShape(), graphics);
 	}
 
 	protected void renderSelectionBorder(final Graphics2D graphics) {
 		graphics.setColor(Color.MAGENTA);
 		graphics.setStroke(new BasicStroke(getSelectedShapeBorderLineWidth()));
-		graphics.draw(defaultModel.getSelectedElement().getShape());
+		draw(defaultModel.getSelectedElement().getShape(), graphics);
 	}
 
 	protected void renderLogo(final Graphics2D graphics, double scale, double height) {
@@ -276,19 +319,18 @@ public abstract class DefaultRenderer {
 				defaultModel.getGridResolution()) {
 			for (double x = bound.getMinX(); x <= bound.getMaxX() + 0.01; x +=
 					defaultModel.getGridResolution()) {
-				g.draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
+				draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
 						x + defaultModel.getGridResolution()
-								* 0.2,
-						y));
-				g.draw(new Line2D.Double(x, y - defaultModel.getGridResolution() * 0.2, x,
+								* 0.2, y), g);
+				draw(new Line2D.Double(x, y - defaultModel.getGridResolution() * 0.2, x,
 						y + defaultModel.getGridResolution()
-								* 0.2));
+								* 0.2), g);
 			}
 		}
 	}
 
 	protected float getLineWidth() {
-		return (float) (2.0 / defaultModel.getScaleFactor());
+		return (float) (1.0 / defaultModel.getScaleFactor());
 	}
 
     /*protected void paintPotentialField(final Graphics2D g, final Function<VPoint, Double> potentialField, final VRectangle bound) {
@@ -547,7 +589,7 @@ public abstract class DefaultRenderer {
 				}
 
 				/* Draw rectangle as pixel to image. */
-				g.fill(new Rectangle2D.Double(coord.x, coord.y, pixToW, pixToW));
+				fill(new Rectangle2D.Double(coord.x, coord.y, pixToW, pixToW), g);
 			}
 		}
 	}
@@ -579,8 +621,8 @@ public abstract class DefaultRenderer {
 							go = false;
 							closed = true;
 						} else {
-							g.draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next
-									.getOrigin().y));
+
+							draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next.getOrigin().y), g);
 
 							if (next == outerComponent) {
 								go = false;
@@ -600,8 +642,7 @@ public abstract class DefaultRenderer {
 						if (next == null || next.getOrigin() == null) {
 							go = false;
 						} else {
-							g.draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next
-									.getOrigin().y));
+							draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next.getOrigin().y), g);
 
 							if (next == outerComponent) {
 								go = false;
@@ -621,7 +662,7 @@ public abstract class DefaultRenderer {
 		return getLineWidth() * 2;
 	}
 
-	private float getSelectionBorderLineWidht() {
+	private float getSelectionBorderLineWidth() {
 		return getLineWidth() / 4;
 	}
 
