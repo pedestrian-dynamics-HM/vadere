@@ -1,4 +1,4 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;

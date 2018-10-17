@@ -1,7 +1,7 @@
-package org.vadere.simulator.util.checks;
+package org.vadere.simulator.utils.scenariochecker.checks;
 
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.util.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
 
 import java.util.PriorityQueue;
 

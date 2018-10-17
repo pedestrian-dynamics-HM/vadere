@@ -1,4 +1,4 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils.scenariochecker;
 
 import org.vadere.state.scenario.ScenarioElement;
 

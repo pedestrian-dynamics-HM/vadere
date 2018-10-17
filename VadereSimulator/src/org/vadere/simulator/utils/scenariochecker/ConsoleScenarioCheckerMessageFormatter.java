@@ -1,8 +1,8 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils.scenariochecker;
 
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.util.AbstractScenarioCheckerMessageFormatter;
-import org.vadere.simulator.util.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.Messages;
+import org.vadere.state.scenario.ScenarioElement;
 
 public class ConsoleScenarioCheckerMessageFormatter extends AbstractScenarioCheckerMessageFormatter {
 
@@ -14,11 +14,15 @@ public class ConsoleScenarioCheckerMessageFormatter extends AbstractScenarioChec
 
 	@Override
 	protected void writeHeader(ScenarioCheckerMessage msg) {
-//		sb.append(Messages.getString(msg.getMsgType().getLocalTypeId())))
+		sb.append(Messages.getString(currentType.getLocalTypeId())).append(":\n");
 	}
 
 	@Override
 	protected void writeMsg(ScenarioCheckerMessage msg) {
-
+		sb.append("   ")
+				.append(Messages.getString(msg.getReason().getLocalMessageId()))
+				.append(" ")
+				.append(msg.getReasonModifier())
+				.append("\n");
 	}
 }

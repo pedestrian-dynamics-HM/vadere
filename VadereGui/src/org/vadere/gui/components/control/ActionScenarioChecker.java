@@ -5,8 +5,8 @@ import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.util.ScenarioChecker;
-import org.vadere.simulator.util.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
 
 import java.awt.event.ActionEvent;
 import java.util.Observable;

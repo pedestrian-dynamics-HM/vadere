@@ -4,7 +4,7 @@
 
 ## Added
 - Two new outputprocessors - mainly for the BHM - to evaluaet queueWidth (QueueWidthProcessor) and behavior (PedestrianBehaviorProcessor)
-- In package `org.vadere.simulator.util`, added `TopographyChecker` to show user if the current topography contains problems. The 
+- In package `org.vadere.simulator.utils`, added `TopographyChecker` to show user if the current topography contains problems. The 
   `TopographyChecker` will check for overlapping `ScenarioElements` and check for inconsistence settings such as missing 
   TargetIDs for sources or inconsistenct speed ranges for pedestrians. See this [table](Documentation/changelLogImages/TopographyCheckerMessages.md) for supported warnings and erros
   as well as this [picture](Documentation/changelLogImages/TopographyChecker.png) to see which kind of overlap produces erros or warnings.

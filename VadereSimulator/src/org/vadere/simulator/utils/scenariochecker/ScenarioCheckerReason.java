@@ -1,4 +1,4 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils.scenariochecker;
 
 /**
  * This enum collects all reasons for {@link ScenarioCheckerMessage}s. The label is the messageId

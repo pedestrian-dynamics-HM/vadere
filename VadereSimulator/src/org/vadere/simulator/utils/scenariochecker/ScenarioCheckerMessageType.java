@@ -1,4 +1,4 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils.scenariochecker;
 
 /**
  * Types of {@link ScenarioChecker} messages. The {@link #msgId} is used as messageId for locale

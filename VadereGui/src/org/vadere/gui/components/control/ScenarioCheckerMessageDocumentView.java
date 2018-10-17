@@ -2,8 +2,8 @@ package org.vadere.gui.components.control;
 
 import org.vadere.gui.components.utils.GuiScenarioCheckerMessageFormatter;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.simulator.util.ScenarioCheckerMessage;
-import org.vadere.simulator.util.ScenarioCheckerMessageFormatter;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessageFormatter;
 import org.vadere.state.scenario.ScenarioElement;
 
 import java.util.HashMap;

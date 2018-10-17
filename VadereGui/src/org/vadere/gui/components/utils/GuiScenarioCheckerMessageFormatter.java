@@ -1,13 +1,11 @@
 package org.vadere.gui.components.utils;
 
 import org.vadere.gui.components.control.ScenarioCheckerMessageDocumentView;
-import org.vadere.simulator.util.AbstractScenarioCheckerMessageFormatter;
-import org.vadere.simulator.util.ScenarioCheckerMessage;
-import org.vadere.simulator.util.ScenarioCheckerMessageType;
-import org.vadere.state.types.ScenarioElementType;
+import org.vadere.simulator.utils.scenariochecker.AbstractScenarioCheckerMessageFormatter;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessageType;
 
 import java.util.Comparator;
-import java.util.PriorityQueue;
 
 public class GuiScenarioCheckerMessageFormatter extends AbstractScenarioCheckerMessageFormatter {
 

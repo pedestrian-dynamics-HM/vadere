@@ -15,6 +15,7 @@ import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SetLogLevelCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
+import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 
 /**
  * Provides the possibility to start VADERE in console mode.
@@ -27,7 +28,7 @@ public class VadereConsole {
 	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
 
-//		args = new String[]{"--loglevel", "OFF", "scenario-run", "-o", "/tmp", "-f", "/home/lphex/hm.d/vadere/VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario"};
+//		args = new String[]{"--loglevel", "INFO", "scenario-run", "-o", "/tmp", "-f", "/home/lphex/hm.d/vadere/VadereModelTests/TestStairs/scenarios/stairs_diagonal_1_+1.scenario"};
 //		args = new String[]{"-h"};
 
 		try {
@@ -78,6 +79,13 @@ public class VadereConsole {
 				.type(String.class)
 				.dest("scenario-file")
 				.help("Name of Scenario file");
+		projectRun.addArgument("--scenario-checker")
+				.required(false)
+				.type(String.class)
+				.dest("scenario-checker")
+				.choices(ScenarioChecker.CHECKER_OFF, ScenarioChecker.CHECKER_OFF)
+				.setDefault(ScenarioChecker.CHECKER_OFF)
+				.help("Turn Scenario Checker on or off.");
 
 		// Run Scenario
 		Subparser scenarioRun = subparsers
@@ -96,6 +104,13 @@ public class VadereConsole {
 				.type(String.class)
 				.dest("scenario-file")
 				.help("Scenario file to run");
+		scenarioRun.addArgument("--scenario-checker")
+				.required(false)
+				.type(String.class)
+				.dest("scenario-checker")
+				.choices(ScenarioChecker.CHECKER_OFF, ScenarioChecker.CHECKER_OFF)
+				.setDefault(ScenarioChecker.CHECKER_ON)
+				.help("Turn Scenario Checker on or off.");
 
 		// Run SUQ
 		Subparser suqRun = subparsers

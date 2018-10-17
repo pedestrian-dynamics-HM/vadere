@@ -1,11 +1,13 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils;
 
-import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessageType;
+import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerReason;
 import org.vadere.state.attributes.scenario.builder.AttributesAgentBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesObstacleBuilder;
 import org.vadere.state.attributes.scenario.builder.AttributesSourceBuilder;

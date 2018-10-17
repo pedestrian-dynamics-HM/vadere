@@ -1,20 +1,24 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils.scenariochecker;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.util.checks.ScenarioCheckerTest;
-import org.vadere.simulator.util.checks.simulation.SimulationTimeStepLengthCheck;
-import org.vadere.simulator.util.checks.topography.PedestrianSpeedSetupCheck;
-import org.vadere.simulator.util.checks.topography.StairTreadSanityCheck;
-import org.vadere.simulator.util.checks.topography.TopographyOverlapCheck;
-import org.vadere.simulator.util.checks.topography.UniqueSourceIdCheck;
-import org.vadere.simulator.util.checks.topography.UnusedTargetsCheck;
-import org.vadere.simulator.util.checks.topography.ValidTargetsInSourceCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
+import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.PedestrianSpeedSetupCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.StairTreadSanityCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.TopographyOverlapCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.UniqueSourceIdCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.UnusedTargetsCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.ValidTargetsInSourceCheck;
 import org.vadere.state.scenario.Topography;
 
 import java.util.PriorityQueue;
 
 public class ScenarioChecker {
+	public static final String CHECKER_ON = "on";
+	public static final String CHECKER_OFF = "off";
+	public static final String CHECKER_ERROR_ONLY = "error-only";
+
 	private final Topography topography;
 	private final Scenario scenario;
 

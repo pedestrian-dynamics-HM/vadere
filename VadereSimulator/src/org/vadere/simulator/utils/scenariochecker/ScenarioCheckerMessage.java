@@ -1,4 +1,4 @@
-package org.vadere.simulator.util;
+package org.vadere.simulator.utils.scenariochecker;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -62,6 +62,10 @@ public class ScenarioCheckerMessage implements Comparable<ScenarioCheckerMessage
 		} else {
 			return  false;
 		}
+	}
+
+	public boolean isError(){
+		return msgType.isErrorMsg();
 	}
 
 	public boolean hasTarget(){
