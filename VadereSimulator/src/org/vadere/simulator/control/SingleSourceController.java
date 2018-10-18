@@ -1,20 +1,17 @@
 package org.vadere.simulator.control;
 
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.SingleSourceSpawnArray;
-import org.vadere.state.util.SpawnArray;
 import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SingleSourceController extends SourceController {
 
@@ -37,7 +33,6 @@ public class SingleSourceController extends SourceController {
 								  AttributesDynamicElement attributesDynamicElement,
 								  Random random) {
 		super(scenario, source, dynamicElementFactory, attributesDynamicElement, random);
-		this.dynamicElementFactory = dynamicElementFactory;
 		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
 		this.spawnArray = new SingleSourceSpawnArray(source.getShape(),
 				new VRectangle(0, 0,elementBound.getWidth(), elementBound.getHeight()),
@@ -106,7 +101,7 @@ public class SingleSourceController extends SourceController {
 		List<VPoint> positions = new ArrayList<>(numberToSpawn);
 
 		for(int i = 0; i < numberToSpawn; i++) {
-			Optional<VPoint> optPosition = getNextPosition(blockPedestrianShapes, spawnArray.getSpawnPoints());
+			Optional<VPoint> optPosition = getNextPosition(blockPedestrianShapes, spawnArray.getAllowedSpawnPoints());
 
 			if (optPosition.isPresent()) {
 				VPoint position = optPosition.get();

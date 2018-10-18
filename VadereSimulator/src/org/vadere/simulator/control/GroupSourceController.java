@@ -5,7 +5,8 @@ import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.util.SpawnArray;
+import org.vadere.state.util.GroupSpawnArray;
+import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -13,12 +14,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GroupSourceController extends SourceController {
 
 	private final GroupModel groupModel;
 	private LinkedList<Integer> groupsToSpawn;
-	protected final SpawnArray spawnArray;
+	protected final GroupSpawnArray spawnArray;
 
 	public GroupSourceController(Topography scenario, Source source,
 								 DynamicElementFactory dynamicElementFactory,
@@ -30,8 +32,9 @@ public class GroupSourceController extends SourceController {
 
 		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
 
-		this.spawnArray = new SpawnArray(new VRectangle(source.getShape().getBounds2D()),
-				new VRectangle(0, 0,elementBound.getWidth() , elementBound.getHeight() ));
+		this.spawnArray = new GroupSpawnArray(source.getShape(),
+				new VRectangle(0, 0,elementBound.getWidth() , elementBound.getHeight()),
+				dynamicElementFactory::getDynamicElementRequiredPlace);
 
 	}
 
@@ -47,7 +50,14 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextFreeGroup(groupSize, random, getDynElementsAtSource());
+							List<VPoint> newGroup = spawnArray.getNextFreeGroup(
+									groupSize,
+									random,
+									getDynElementsAtSource().stream()
+											.map(PointPositioned::getPosition)
+											.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+											.collect(Collectors.toList())
+							);
 							if (newGroup.size() > 0) {
 								// add immediately to Scenario to update DynElementsAtSource
 								addElementToScenario(newGroup);
@@ -60,7 +70,14 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, random, getDynElementsAtSource());
+							List<VPoint> newGroup = spawnArray.getNextGroup(
+									groupSize,
+									random,
+									getDynElementsAtSource().stream()
+											.map(PointPositioned::getPosition)
+											.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+											.collect(Collectors.toList())
+							);
 							if (newGroup.isEmpty())
 								throw new RuntimeException("Cannot spawn new Group. Source " + source.getId() + " is set " +
 										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
@@ -77,7 +94,13 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextFreeGroup(groupSize, getDynElementsAtSource());
+							List<VPoint> newGroup = spawnArray.getNextFreeGroup(
+									groupSize,
+									getDynElementsAtSource().stream()
+											.map(PointPositioned::getPosition)
+											.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+											.collect(Collectors.toList())
+							);
 							if (newGroup != null && !newGroup.isEmpty()) {
 								// add immediately to Scenario to update DynElementsAtSource
 								addElementToScenario(newGroup);
@@ -90,7 +113,13 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextGroup(groupSize, getDynElementsAtSource());
+							List<VPoint> newGroup = spawnArray.getNextGroup(
+									groupSize,
+									getDynElementsAtSource().stream()
+											.map(PointPositioned::getPosition)
+											.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+											.collect(Collectors.toList())
+							);
 							if (newGroup == null || newGroup.isEmpty())
 								throw new RuntimeException("Cannot spawn new Group. Source " + source.getId() + " is set " +
 										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +

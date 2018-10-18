@@ -1,7 +1,11 @@
 package org.vadere.state.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * Simplifies placement of a group within a {@link SpawnArray}. There are two placement strategies
+ * Simplifies placement of a group within a  There are two placement strategies
  * supported.
  * <li>NoneOverlapping:</li>
  * With this strategy a group spawns do not overlap. E.g The first 2x2 Group will start at (0,0) and
@@ -13,8 +17,8 @@ package org.vadere.state.util;
  */
 public class GroupPlacementHelper {
 
-	private final int xBound;
-	private final int yBound;
+	private final int boundedShapeGridCellsX;
+	private final int boundedShapeGridCellsY;
 
 	private final int groupSize;
 	private final int groupDimX;
@@ -23,97 +27,96 @@ public class GroupPlacementHelper {
 	private final int noneOverlapXGroupCount;
 	private final int noneOverlapYGroupCount;
 
-	private final int overlapXGroupCount;
-	private final int overlapYGroupCount;
+	private final int groupPlacementCountX;
+	private final int groupPlacementCountY;
 
+	private ArrayList<Integer> validSpawnPointsForGroupInBound;
 
-	public GroupPlacementHelper(int xBound, int yBound, int groupSize) {
-		if (groupSize > xBound * yBound)
+	public GroupPlacementHelper(int boundedShapeGridCellsX, int boundedShapeGridCellsY,
+								int groupSize, HashMap<Integer, Integer> validSpawnPointMapInBoundShape) {
+		if (groupSize > boundedShapeGridCellsX * boundedShapeGridCellsY)
 			throw new IndexOutOfBoundsException("GroupSize: " + groupSize
-					+ "to big for given Bound " + xBound + " x " + yBound);
+					+ "to big for given Bound " + boundedShapeGridCellsX + " x " + boundedShapeGridCellsY);
 
-		this.xBound = xBound;
-		this.yBound = yBound;
+		this.boundedShapeGridCellsX = boundedShapeGridCellsX;
+		this.boundedShapeGridCellsY = boundedShapeGridCellsY;
 		this.groupSize = groupSize;
 
 		int dimGx, dimGy;
 
 
+		// dimension of smallest square contain a group of size groupSize
 		dimGx = (int) Math.ceil(Math.sqrt(groupSize));
-		dimGx = (dimGx > xBound) ? xBound : dimGx;
+		dimGx = (dimGx > boundedShapeGridCellsX) ? boundedShapeGridCellsX : dimGx;
 		// dimGy set to minimize lost space in resulting rectangle (or square if groupSize is a square number)
 		dimGy = dimGx * (dimGx - 1) < groupSize ? dimGx : dimGx - 1;
 		this.groupDimX = dimGx;
 		this.groupDimY = dimGy;
 
-		this.noneOverlapXGroupCount = xBound / dimGx;
-		this.noneOverlapYGroupCount = yBound / dimGy;
+		this.noneOverlapXGroupCount = boundedShapeGridCellsX / dimGx;
+		this.noneOverlapYGroupCount = boundedShapeGridCellsY / dimGy;
 
-		this.overlapXGroupCount = xBound - (dimGx - 1);
-		this.overlapYGroupCount = yBound - (dimGy - 1);
+		//
+		this.groupPlacementCountX = boundedShapeGridCellsX - (dimGx - 1);
+		this.groupPlacementCountY = boundedShapeGridCellsY - (dimGy - 1);
+
+		validSpawnPointsForGroupInBound = new ArrayList<>();
+		for(int i = 0; i < getOverlappingGroupCount(); i++){ // i  group spawn location
+			if (isGridCellWithinSource(validSpawnPointMapInBoundShape, i)){
+				validSpawnPointsForGroupInBound.add(i);
+			}
+		}
 	}
 
 	/**
-	 * @param groupNumber zero-Based number of group of groupSize with the noneOverlapping strategy
-	 * @return zero-Based index within {@link SpawnArray} corresponding to start index of
-	 * groupNumber.
-	 */
-	public int getNoneOverlappingStart(int groupNumber) {
-		return (groupNumber % noneOverlapXGroupCount) * groupDimX +            // offset in x
-				(groupNumber / noneOverlapXGroupCount) * xBound * groupDimY; // offset in y
-	}
-
-	/**
-	 * NoneOverlapping strategy
 	 *
-	 * @param groupNumber zero-Based number of group
-	 * @param i           zero-Based index within group. Must be smaller than groupSize
-	 * @return zero-Based index within {@link SpawnArray} corresponding to groupNumber and index
-	 * i
+	 * @param validSpawnPointMapInBoundShape mapping of rectangular bound grid to valid coordinates
+	 *                                       within the source shape
+	 * @param groupIndex					 groupIndex specifying the first ped within one group.
+	 * @return								 true if all positions within the group are contained
+	 * 										 within the source shape.
 	 */
-	public int getNoneOverlappingIndex(int groupNumber, int i) {
-		assert i < groupSize;
-		int start = getNoneOverlappingStart(groupNumber);
-		return start + (i % groupDimX) + (i / groupDimX) * xBound;
+	boolean isGridCellWithinSource(HashMap<Integer, Integer> validSpawnPointMapInBoundShape, int groupIndex){
+		for (int pedIndexInGroup = 0; pedIndexInGroup < groupSize; pedIndexInGroup++){
+			boolean isValid = validSpawnPointMapInBoundShape.containsKey(getOverlappingIndex(groupIndex, pedIndexInGroup));
+			if (!isValid){
+				return false;
+			}
+		}
+		return true;
 	}
 
-	public int nextNoneOverlappingGroupNumber(int oldGroupNumber) {
-		return (oldGroupNumber + 1) % (noneOverlapXGroupCount * noneOverlapYGroupCount);
-	}
-
-	/**
-	 * @return Number of groups based on noneOverlapping strategy
-	 */
-	public int getNoneOverlappingGroupCount() {
-		return noneOverlapXGroupCount * noneOverlapYGroupCount;
-	}
 
 
 	/**
 	 * @param groupNumber zero-Based number of group of groupSize with the overlapping strategy
-	 * @return zero-Based index within {@link SpawnArray} corresponding to groupNumber and index i
+	 * @return zero-Based index within {@link GroupSpawnArray} corresponding to groupNumber and index i
 	 */
 	public int getOverlappingStart(int groupNumber) {
-		return (groupNumber % overlapXGroupCount) +            // offset in x
-				(groupNumber / overlapXGroupCount) * xBound;    // offset in y (groupDimY not needed)
+		return (groupNumber % groupPlacementCountX) +            // offset in x
+				(groupNumber / groupPlacementCountX) * boundedShapeGridCellsX;    // offset in y (groupDimY not needed)
 	}
 
 	/**
 	 * Overlapping strategy
 	 *
-	 * @param groupNumber zero-Based number of group
+	 * @param groupNumberInBound zero-Based number of group
 	 * @param i           zero-Based index within group. Must be smaller than groupSize
-	 * @return zero-Based index within {@link SpawnArray} corresponding to groupNumber and index
+	 * @return zero-Based index within {@link GroupSpawnArray} corresponding to groupNumber and index
 	 * i
 	 */
-	public int getOverlappingIndex(int groupNumber, int i) {
+	public int getOverlappingIndex(int groupNumberInBound, int i) {
 		assert i < groupSize;
-		int start = getOverlappingStart(groupNumber);
-		return start + (i % groupDimX) + (i / groupDimX) * xBound;
+		int start = getOverlappingStart(groupNumberInBound);
+		return start + (i % groupDimX) + (i / groupDimX) * boundedShapeGridCellsX;
 	}
 
 	public int getOverlappingGroupCount() {
-		return overlapXGroupCount * overlapYGroupCount;
+		return groupPlacementCountX * groupPlacementCountY;
+	}
+
+	public ArrayList<Integer> getValidSpawnPointsForGroupInBound(){
+		return validSpawnPointsForGroupInBound;
 	}
 
 	public int getGroupSize() {
