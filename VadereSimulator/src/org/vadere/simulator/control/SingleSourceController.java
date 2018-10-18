@@ -6,7 +6,7 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.util.SingleSourceSpawnArray;
+import org.vadere.state.util.SpawnArray;
 import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -27,14 +27,14 @@ public class SingleSourceController extends SourceController {
 	private static final int NUMBER_OF_REPOSITION_TRIES = 10;
 	private static final int NUMBER_OF_POINT_SEARCH = 1_000; // todo based on shape and position of source
 
-	private SingleSourceSpawnArray spawnArray;
+	private SpawnArray spawnArray;
 	public SingleSourceController(Topography scenario, Source source,
 								  DynamicElementFactory dynamicElementFactory,
 								  AttributesDynamicElement attributesDynamicElement,
 								  Random random) {
 		super(scenario, source, dynamicElementFactory, attributesDynamicElement, random);
 		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
-		this.spawnArray = new SingleSourceSpawnArray(source.getShape(),
+		this.spawnArray = new SpawnArray(source.getShape(),
 				new VRectangle(0, 0,elementBound.getWidth(), elementBound.getHeight()),
 				dynamicElementFactory::getDynamicElementRequiredPlace);
 	}

@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractSpawnArray {
-	private static Logger logger = LogManager.getLogger(AbstractSpawnArray.class);
+public class SpawnArray {
+	private static Logger logger = LogManager.getLogger(SpawnArray.class);
 
 	protected final VRectangle spawnElementBound;
 	protected final VRectangle bound;
@@ -28,8 +28,8 @@ public abstract class AbstractSpawnArray {
 	protected HashMap<Integer,Integer> validSpawnPointMapInBoundShape;
 	protected Function<VPoint, VShape> shapeProducer;
 
-	public AbstractSpawnArray(final VShape boundShape, final VRectangle spawnElementBound,
-							  Function<VPoint, VShape> shapeProducer) {
+	public SpawnArray(final VShape boundShape, final VRectangle spawnElementBound,
+					  Function<VPoint, VShape> shapeProducer) {
 		this.spawnElementBound = spawnElementBound;
 		this.bound = new VRectangle(boundShape.getBounds2D());
 		this.shapeProducer = shapeProducer;

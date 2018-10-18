@@ -1,9 +1,6 @@
 package org.vadere.state.util;
 
-import com.oracle.jrockit.jfr.Producer;
-
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.scenario.DynamicElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -15,11 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * <h1>Groups</h1>
@@ -54,7 +47,7 @@ import java.util.stream.IntStream;
  * same as above but it will use a Randomize groupNumber Iterator.
  *
  */
-public class GroupSpawnArray extends AbstractSpawnArray {
+public class GroupSpawnArray extends SpawnArray {
 
 	// not an index put a way to calculate the index 1..n where n is the number of possible ways to place a given group
 	// key: groupSize
