@@ -253,7 +253,7 @@ public class ScenarioCheckerTest implements TestResourceHandler {
 		PriorityQueue<ScenarioCheckerMessage> out = checker.checkOverlap();
 
 		ScenarioCheckerMessage msg = hasOneElement(out);
-		isErrorMsg(msg);
+		isWarnMsg(msg);
 		assertEquals(ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, msg.getReason());
 		assertEquals(testSource, msg.getMsgTarget().getTargets().get(0));
 		assertEquals(testObstacle, msg.getMsgTarget().getTargets().get(1));
@@ -494,16 +494,14 @@ public class ScenarioCheckerTest implements TestResourceHandler {
 		List<ScenarioCheckerMessage> errorMsg = out.stream()
 				.filter(m -> m.getMsgType().equals(ScenarioCheckerMessageType.TOPOGRAPHY_ERROR))
 				.collect(Collectors.toList());
-		assertEquals(6, errorMsg.size());
+		assertEquals(4, errorMsg.size());
 
 		List<ScenarioCheckerMessage> warnMsg = out.stream()
 				.filter(m -> m.getMsgType().equals(ScenarioCheckerMessageType.TOPOGRAPHY_WARN))
 				.collect(Collectors.toList());
-		assertEquals(16, warnMsg.size());
+		assertEquals(18, warnMsg.size());
 
 		// Errors
-		assertIdAndReason(1,6,ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, errorMsg);
-		assertIdAndReason(2,6,ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, errorMsg);
 		assertIdAndReason(9,8,ScenarioCheckerReason.OVERLAP_OBSTACLE_TARGET_ERR, errorMsg);
 		assertIdAndReason(11,13,ScenarioCheckerReason.OVERLAP_OBSTACLE_STAIRS_ERR, errorMsg);
 		assertIdAndReason(35,36,ScenarioCheckerReason.OVERLAP_STAIR_STAIR, errorMsg);
@@ -511,6 +509,8 @@ public class ScenarioCheckerTest implements TestResourceHandler {
 
 
 		// Warnings
+		assertIdAndReason(1,6,ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, warnMsg);
+		assertIdAndReason(2,6,ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE, warnMsg);
 		assertIdAndReason(4,5,ScenarioCheckerReason.OVERLAP_OBSTACLE_OBSTACLE, warnMsg);
 		assertIdAndReason(9,7,ScenarioCheckerReason.OVERLAP_OBSTACLE_TARGET_WARN, warnMsg);
 		assertIdAndReason(11,12,ScenarioCheckerReason.OVERLAP_OBSTACLE_STAIRS_WARN, warnMsg);

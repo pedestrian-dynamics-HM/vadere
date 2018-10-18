@@ -26,7 +26,7 @@ import java.util.Random;
 public abstract class SourceController {
 
 	protected final double NO_EVENT = Double.MAX_VALUE;
-	public static final double SPAWN_BUFFER_SIZE = 0.03;
+//	public static final double SPAWN_BUFFER_SIZE = 0.03;
 
 	protected final Source source;
 	private final DynamicElementFactory dynamicElementFactory;
@@ -40,7 +40,6 @@ public abstract class SourceController {
 	protected final AttributesSource sourceAttributes;
 	protected final AttributesDynamicElement attributesDynamicElement;
 	protected int dynamicElementsCreatedTotal;
-	protected final SpawnArray spawnArray;
 
 
 	public SourceController(Topography scenario, Source source,
@@ -53,11 +52,6 @@ public abstract class SourceController {
 		this.dynamicElementFactory = dynamicElementFactory;
 		this.topography = scenario;
 		this.random = random;
-
-		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
-
-		this.spawnArray = new SpawnArray(new VRectangle(source.getShape().getBounds2D()),
-				new VRectangle(0, 0,elementBound.getWidth() + SPAWN_BUFFER_SIZE, elementBound.getHeight() + SPAWN_BUFFER_SIZE));
 
 		timeOfNextEvent = sourceAttributes.getStartTime();
 		try {

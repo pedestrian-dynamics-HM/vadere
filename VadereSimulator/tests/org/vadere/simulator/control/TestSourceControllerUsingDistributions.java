@@ -101,7 +101,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setStartTime(startTime).setEndTime(endTime)
 				.setSpawnNumber(100)
 				.setUseFreeSpaceOnly(true)
-				.setSourceDim(new VRectangle(0,0,0.1,0.1));
+				.setSourceDim(new VRectangle(0,0,0.4,0.4));
 		initialize(builder);
 
 		doUpdates(0, 100, startTime, endTime + 1);
@@ -125,7 +125,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 				.setOneTimeSpawn(startTime)
 				.setSpawnNumber(100)
 				.setUseFreeSpaceOnly(true)
-				.setSourceDim(new VRectangle(0,0,0.1,0.1));
+				.setSourceDim(new VRectangle(0,0,0.4,0.4));
 		initialize(builder);
 
 		doUpdates(0, 100, 0, startTime + 1);

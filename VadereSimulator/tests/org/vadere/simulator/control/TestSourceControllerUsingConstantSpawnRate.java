@@ -168,7 +168,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
 				.setUseFreeSpaceOnly(true)
-				.setSourceDim(new VRectangle(0,0,0.1,0.1)); // small source
+				.setSourceDim(new VRectangle(0,0,0.4,0.4)); // small source
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < 1000; simTimeInSec += 1.0) {

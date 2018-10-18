@@ -5,7 +5,9 @@ import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.SpawnArray;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,6 +18,7 @@ public class GroupSourceController extends SourceController {
 
 	private final GroupModel groupModel;
 	private LinkedList<Integer> groupsToSpawn;
+	protected final SpawnArray spawnArray;
 
 	public GroupSourceController(Topography scenario, Source source,
 								 DynamicElementFactory dynamicElementFactory,
@@ -24,6 +27,12 @@ public class GroupSourceController extends SourceController {
 		super(scenario, source, dynamicElementFactory, attributesDynamicElement, random);
 		this.groupModel = groupModel;
 		this.groupsToSpawn = new LinkedList<>();
+
+		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
+
+		this.spawnArray = new SpawnArray(new VRectangle(source.getShape().getBounds2D()),
+				new VRectangle(0, 0,elementBound.getWidth() , elementBound.getHeight() ));
+
 	}
 
 	@Override
