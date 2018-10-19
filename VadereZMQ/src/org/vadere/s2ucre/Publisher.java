@@ -15,22 +15,27 @@ public final class Publisher {
 		this.address = address;
 	}
 
-	public void send(byte[] data) {
+	public synchronized void send(byte[] data) {
 		publisher.send(data);
 	}
 
-	public String getAddress() {
+	public synchronized String getAddress() {
 		return address;
 	}
 
-	public void open() {
+	public synchronized void open() {
+		logger.debug("try to open publisher " + address);
 		context = ZMQ.context(1);
 		publisher = context.socket(ZMQ.PUB);
 		publisher.bind(address);
+		logger.debug("publisher opened " + address);
 	}
 
-	public void close() {
+	public synchronized void close() {
+		logger.debug("try to close publisher " + address);
+//		publisher.unbind(address);
 		publisher.close();
 		context.term();
+		logger.debug("publisher closed " + address);
 	}
 }

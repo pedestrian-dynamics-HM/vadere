@@ -21,7 +21,7 @@ public class ActionRunSelectedScenariosOnline extends AbstractAction {
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		if (model.runScenarioIsOk()) {
-			model.getProject().runScenarios(model.getScenarios(scenarioTable.getSelectedRows()), true);
+			model.getProject().runScenarios(model.getScenarios(scenarioTable.getSelectedRows()));
 		}
 	}
 }

@@ -321,9 +321,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		addToProjectSpecificActions(addScenarioAction);
 
 		buildContentPane();
-		ActionRunSelectedScenariosOnline runSelectedScenariosOnline = new ActionRunSelectedScenariosOnline(
-				Messages.getString("ProjectView.runOnline.text"), model, scenarioTable);
-		buildMenuBar(closeApplicationAction, addScenarioAction, runSelectedScenariosOnline);
+		/*ActionRunSelectedScenariosOnline runSelectedScenariosOnline = new ActionRunSelectedScenariosOnline(
+				Messages.getString("ProjectView.runOnline.text"), model, scenarioTable);*/
+		buildMenuBar(closeApplicationAction, addScenarioAction);
 		buildOutputTablePopup();
 		buildScenarioTablePopup(addScenarioAction);
 		buildToolBar();
@@ -341,7 +341,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		pack();
 	}
 
-	private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction, ActionRunSelectedScenariosOnline runSelectedScenariosOnline) {
+	private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction) {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -417,8 +417,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mnScenario.add(mntmNew_1);
 		mnScenario.add(mntmGenerateScenarioFromOutput);
 
-		JMenuItem mntmRunOnline = new JMenuItem(runSelectedScenariosOnline);
-		mnScenario.add(mntmRunOnline);
+		//JMenuItem mntmRunOnline = new JMenuItem(runSelectedScenariosOnline);
+		//mnScenario.add(mntmRunOnline);
 
 		JMenu mnHelp = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
 		menuBar.add(mnHelp);

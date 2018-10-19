@@ -4,7 +4,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Timestamp;
 
 import org.vadere.s2ucre.Subscriber;
-import org.vadere.s2ucre.Utils;
 import org.vadere.s2ucre.generated.IosbOutput;
 
 import org.apache.log4j.LogManager;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -45,26 +45,6 @@ public class Receiver {
 
 	private ExecutorService executor;
 
-	public static Receiver getInstance() {
-		return getInstance(RECEIVER_ADDRESS);
-	}
-
-	public static Receiver getInstance(@NotNull final String address) {
-		if(receiver == null) {
-			receiver = new Receiver(address);
-		}
-		else {
-			if (receiver.subscriber.getAddress().equals(address)) {
-				return receiver;
-			}
-			else {
-				receiver.close();
-				receiver = new Receiver(address);
-			}
-		}
-		return receiver;
-	}
-
 	public Receiver(@NotNull final String address) {
 		this.subscriber = new Subscriber(address);
 		this.pedMsgContainer = new TreeMap<>(new TimestampComparator());
@@ -73,8 +53,7 @@ public class Receiver {
 		this.pedMsgConsumers = new ArrayList<>(1);
 	}
 
-
-	public void start() {
+	public synchronized void start() {
 		running = true;
 		// start the thread which receives messages.
 		Runnable subscriberRun;
@@ -82,11 +61,17 @@ public class Receiver {
 		// start the thread which gives the newest message to the consumer.
 		Runnable messageReceiver;
 
+		subscriber.open();
 		subscriberRun = () -> {
 			try {
 				receivePedMsg();
-			} catch (InvalidProtocolBufferException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
+			}
+			finally {
+				synchronized (this) {
+					notifyAll();
+				}
 			}
 		};
 
@@ -98,15 +83,26 @@ public class Receiver {
 			}
 		};
 
-
 		executor.submit(subscriberRun);
 		executor.submit(messageReceiver);
 	}
 
-	public void close() {
+	public synchronized void close() {
 		running = false;
-		subscriber.close();
-		executor.shutdownNow();
+		executor.shutdown();
+
+		try {
+			// wait a certain amount of time such that running submission can finish their job
+			if(!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+				logger.info("send was interrupted.");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			executor.shutdownNow();
+			subscriber.close();
+		}
+		logger.info("receiver is closed.");
 	}
 
 	public void addPedMsgConsumer(@NotNull final Consumer<LinkedList<Pedestrian.PedMsg>> consumer) {
@@ -114,14 +110,20 @@ public class Receiver {
 	}
 
 	private synchronized LinkedList<Pedestrian.PedMsg> receivePedMsgs() {
+		if(!running) {
+			return new LinkedList<>();
+		}
+
 		if(pedMsgContainer.size() < 2) {
 			try {
 				logger.info("waiting for message " + Thread.currentThread());
 				wait();
+				logger.info("woke up " + Thread.currentThread());
 				return receivePedMsgs();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				Thread.currentThread().interrupt();
+				logger.warn("interrupt while paused.");
+				return new LinkedList<>();
 			}
 		} else {
 			// return the second element since we can only be sure that it is complete i.e. we received all informations.
@@ -137,10 +139,8 @@ public class Receiver {
 	 *
 	 * @throws InvalidProtocolBufferException
 	 */
-	private void receivePedMsg() throws InvalidProtocolBufferException {
-		subscriber.open();
-
-		while (!Thread.currentThread().isInterrupted() && running) {
+	private void receivePedMsg() throws InvalidProtocolBufferException, InterruptedException {
+		while (running) {
 			logger.info("Waiting for Message");
 			Pedestrian.PedMsg msg = Pedestrian.PedMsg.parseFrom(subscriber.receive());
 			//System.out.println(msg);
@@ -155,9 +155,7 @@ public class Receiver {
 				notifyAll();
 			}
 		}
-
 		//  Socket to talk to server
-		subscriber.close();
 	}
 
 	/**

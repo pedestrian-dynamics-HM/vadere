@@ -59,8 +59,8 @@ public class Translate {
 		subscriberRun = () -> {
 			subscriber.open();
 			while (!Thread.currentThread().isInterrupted()) {
-				byte[] msgBytes = subscriber.receive();
 				try {
+					byte[] msgBytes = subscriber.receive();
 					IosbOutput.AreaInfoAtTime message = IosbOutput.AreaInfoAtTime.parseFrom(msgBytes);
 					inQueue.add(message);
 					logger.info("message received");
@@ -69,7 +69,7 @@ public class Translate {
 						inQueue.notifyAll();
 					}
 
-				} catch (InvalidProtocolBufferException e) {
+				} catch (InvalidProtocolBufferException | InterruptedException e) {
 					logger.error(e.getMessage() + " - could not parse message.");
 				}
 			}
@@ -90,7 +90,7 @@ public class Translate {
 					}
 				}
 				publisher.send(outQueue.poll().toByteArray());
-				logger.info("message sent.");
+				//logger.info("message sent.");
 			}
 			publisher.close();
 		};

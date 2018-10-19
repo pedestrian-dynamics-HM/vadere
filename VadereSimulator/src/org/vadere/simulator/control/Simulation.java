@@ -41,7 +41,7 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private List<Model> models;
 
-	private boolean runSimulation = false;
+	protected boolean runSimulation = false;
 	private boolean paused = false;
 	/**
 	 * current simulation time (seconds)
@@ -244,8 +244,8 @@ public class Simulation {
 		//	runSimulation = false;
 		//}
 
-		if (Thread.interrupted()) {
-			runSimulation = false;
+		if (Thread.currentThread().isInterrupted()) {
+			end();
 			simulationResult.setState("Simulation interrupted");
 			logger.info("Simulation interrupted.");
 		}
@@ -255,6 +255,10 @@ public class Simulation {
 		while (runSimulation) {
 			iterate();
 		}
+	}
+
+	public void end() {
+		runSimulation = false;
 	}
 
 	protected double nextSimTimeInSec() {

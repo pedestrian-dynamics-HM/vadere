@@ -151,7 +151,13 @@ public class ScenarioRun implements Runnable {
 //			MDC.remove("scenario.Name");
 		}
 	}
-	
+
+	public synchronized void end() {
+		if(simulation != null) {
+			simulation.end();
+		}
+	}
+
 	public void simulationFailed(Throwable e) {
 			e.printStackTrace();
 			logger.error(e);

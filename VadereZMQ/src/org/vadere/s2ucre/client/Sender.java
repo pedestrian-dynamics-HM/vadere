@@ -13,8 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Pedestrian;
 import org.zeromq.ZMQ;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class receives {@link SimulatorOutput.PedestrianAtTime} by using a {@link ZMQ.Socket}.
@@ -25,52 +29,68 @@ public class Sender {
 
 	private Logger logger = LogManager.getLogger(Sender.class);
 
-	private Publisher publisher;
+	private List<Future<?>> submittedSends;
 
-	private static Sender sender = null;
+	private Publisher publisher;
 
 	private ExecutorService executor;
 
-	public static Sender getInstance() {
-		return getInstance(SENDER_ADDRESS);
-	}
-
-	public static Sender getInstance(@NotNull final String address) {
-		if(sender == null) {
-			sender = new Sender(address);
-		}
-		else {
-			if (sender.publisher.getAddress().equals(address)) {
-				return sender;
-			}
-			else {
-				sender.close();
-				sender = new Sender(address);
-			}
-		}
-		return sender;
-	}
+	private boolean running;
 
 	public Sender (@NotNull final String address) {
-		this.executor = Executors.newSingleThreadExecutor();
 		this.publisher = new Publisher(address);
+		this.running = false;
+		this.submittedSends = new LinkedList<>();
+		this.executor = Executors.newSingleThreadExecutor();
 	}
 
-	public void start() {
+	public synchronized void start() {
 		publisher.open();
+		running = true;
 	}
 
-	public void close() {
-		publisher.close();
-		executor.shutdownNow();
+	public synchronized void close() {
+		running = false;
+
+
+		// cancel all not jet started sends
+		/*for(Future<?> send : submittedSends) {
+			send.cancel(false);
+		}*/
+
+		executor.submit(() -> {
+			publisher.close();
+		});
+
+		// close the publisher in a thread since .close() can hang
+		executor.shutdown();
+
+		try {
+			// wait a certain amount of time such that running submission can finish their job
+			if(!executor.awaitTermination(4000, TimeUnit.MILLISECONDS)) {
+				logger.error("send or socket.close / socked.unbind was interrupted!");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		finally {
+			// hard shut down, might fail!
+			executor.shutdownNow();
+			publisher.close();
+			submittedSends.clear();
+		}
+
+		logger.debug("sender is closed.");
 	}
 
-	public void send(@NotNull final Pedestrian pedestrian, @NotNull final Timestamp timestamp, @NotNull final Common.UTMCoordinate referenc) {
-		Runnable runnable = () -> {
-			org.vadere.s2ucre.generated.Pedestrian.PedMsg simulatedPedestrians = toPedestrianAtTime(pedestrian, timestamp, referenc);
-			publisher.send(simulatedPedestrians.toByteArray());
-		};
-		executor.execute(runnable);
+	public synchronized void send(@NotNull final Pedestrian pedestrian, @NotNull final Timestamp timestamp, @NotNull final Common.UTMCoordinate referenc) {
+		if(running) {
+			Runnable runnable = () -> {
+				org.vadere.s2ucre.generated.Pedestrian.PedMsg simulatedPedestrians = toPedestrianAtTime(pedestrian, timestamp, referenc);
+				publisher.send(simulatedPedestrians.toByteArray());
+			};
+			submittedSends.add(executor.submit(runnable));
+		}
 	}
 
 	private org.vadere.s2ucre.generated.Pedestrian.PedMsg toPedestrianAtTime(

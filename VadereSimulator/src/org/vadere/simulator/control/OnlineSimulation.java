@@ -85,8 +85,8 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 		this.currentSimulationData = null;
 		this.mainModel = mainModel;
 		this.topography = scenarioStore.getTopography();
-		this.receiver = Receiver.getInstance(attributesSimulation.getOnlineModeSubscriber());
-		this.sender = Sender.getInstance(attributesSimulation.getOnlineModePublisher());
+		this.receiver = new Receiver(attributesSimulation.getOnlineModeSubscriber());
+		this.sender = new Sender(attributesSimulation.getOnlineModePublisher());
 		this.receiver.addPedMsgConsumer(this);
 		this.sender.start();
 		this.receiver.start();
@@ -105,37 +105,56 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 
 	@Override
 	protected synchronized void iterate() {
-		while (topography.getPedestrianDynamicElements().getElements().isEmpty()) {
-			logger.info("wait for data to arrive");
+
+		/**
+		 * (1) Wait for data to be arrived see {@link OnlineSimulation#accept(LinkedList)}.
+ 		 */
+		while (runSimulation && !Thread.currentThread().isInterrupted() && topography.getPedestrianDynamicElements().getElements().isEmpty()) {
+			logger.debug("wait for data to arrive " + Thread.currentThread());
 
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.debug("thread interrupted while waiting.");
+				Thread.currentThread().interrupt();
 			}
 		}
-
+		/**
+		 * (2) Simulate as long as there are pedestrians in the topography.
+		 */
 		super.iterate();
+
+		/**
+		 * (3) Send the results.
+		 */
 		sendPedestrians();
 	}
 
 	@Override
 	public void loop() {
-		while (!Thread.currentThread().isInterrupted() && !hasFinished()) {
+		while (runSimulation && !Thread.currentThread().isInterrupted()) {
 			iterate();
 		}
 	}
 
 	@Override
-	protected void postLoop() {
-		super.postLoop();
-		sender.close();
-		receiver.close();
+	protected synchronized void postLoop() {
+		try {
+			super.postLoop();
+		}
+		finally {
+			try {
+				sender.close();
+			}
+			finally {
+				receiver.close();
+			}
+		}
 	}
 
 	@Override
 	protected boolean hasFinished() {
-		return false;
+		return Thread.currentThread().isInterrupted();
 	}
 
 	@Override
@@ -145,7 +164,8 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 
 	/**
 	 * This will be called by the receiver {@link Receiver} whenever data arrive. The data are
-	 * pre-processed by TranslateIt or {@link org.vadere.s2ucre.translate.Translate}.
+	 * pre-processed by TranslateIt or {@link org.vadere.s2ucre.translate.Translate}. This method
+	 * will be called by a thread which is not the simulation thread.
 	 *
 	 * @param pedMsgs the arrived data
 	 */
@@ -155,7 +175,7 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 			pause();
 			topography.getPedestrianDynamicElements().clear();
 			currentSimulationData = toVaderePedestrians(pedMsgs);
-			logger.info("re-initialize simulation.");
+			logger.debug("re-initialize simulation.");
 			currentSimulationData.pedestrians.stream().forEach(ped -> topography.addElement(ped));
 			setStartTime(0.0);
 			resume();
@@ -167,11 +187,12 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 	 * Sends the current simulation state (pedestrians, time, place) using zeroMQ and protobuf.
 	 */
 	public void sendPedestrians() {
+		Timestamp timestamp = Utils.addSeconds(currentSimulationData.timestamp, simTimeInSec);
 		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
 			Pedestrian ped = (Pedestrian) dynamicElement;
-			sender.send(ped, Utils.addSeconds(currentSimulationData.timestamp, simTimeInSec), currentSimulationData.reference);
+			sender.send(ped, timestamp, currentSimulationData.reference);
 		}
-		logger.info("send positions");
+		logger.debug("send positions");
 	}
 
 	public PedestriansAtTimeStep toVaderePedestrians(@NotNull final List<PedMsg> pedMsgs) {
