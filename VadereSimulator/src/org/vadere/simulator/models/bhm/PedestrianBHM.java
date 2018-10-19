@@ -26,9 +26,9 @@ public class PedestrianBHM extends Pedestrian {
 
 	private static Logger logger = LogManager.getLogger(PedestrianBHM.class);
 
-	private final Random random;
+	private final transient Random random;
 	private final AttributesBHM attributesBHM;
-	private final Topography topography;
+	private final transient Topography topography;
 
 	private final double stepLength;
 
@@ -38,7 +38,7 @@ public class PedestrianBHM extends Pedestrian {
 	private VPoint lastPosition;
 	private VPoint targetDirection;
 
-	private final Navigation navigation;
+	private final transient Navigation navigation;
 	private final List<DirectionAddend> directionAddends;
 
 	protected int action;
@@ -46,7 +46,7 @@ public class PedestrianBHM extends Pedestrian {
 	private boolean evadesTangentially;
 	private boolean evadesSideways;
 	private int remainCounter;
-	private @Nullable IPotentialFieldTarget potentialFieldTarget;
+	private transient @Nullable IPotentialFieldTarget potentialFieldTarget;
 
 	public PedestrianBHM(Topography topography, AttributesAgent attributesPedestrian,
 	                     AttributesBHM attributesBHM, Random random) {
