@@ -68,6 +68,10 @@ public class NavigationProximity implements Navigation {
 				(!me.evadesTangentially() &&
 						me.collidesWithPedestrian(result, 2 * attributesBHM.getSpaceToKeep()))) {
 
+			/*if( me.collidesWithObstacle(result) ) {
+				System.out.println("obs collision " + me.getId());
+			}*/
+
 			result = me.getPosition();
 			me.action = 0; // LOGGING
 		}

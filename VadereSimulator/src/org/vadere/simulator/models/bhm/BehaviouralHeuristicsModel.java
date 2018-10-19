@@ -118,7 +118,6 @@ public class BehaviouralHeuristicsModel implements MainModel {
 
 	@Override
 	public void update(final double simTimeInSec) {
-
 		// event driven update
 		if (!pedestrianEventsQueue.isEmpty()) {
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < simTimeInSec) {

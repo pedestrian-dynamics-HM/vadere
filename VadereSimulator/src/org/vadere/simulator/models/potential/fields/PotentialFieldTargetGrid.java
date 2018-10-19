@@ -55,7 +55,7 @@ public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
 	@Override
 	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
 		double potential = getPotential(pos, ped);
-		double eps = 0.01;
+		double eps = 0.001;
 		double dGradPX = (getPotential(pos.add(new VPoint(eps, 0)), ped) - potential) / eps;
 		double dGradPY = (getPotential(pos.add(new VPoint(0, eps)), ped) - potential) / eps;
 		return new Vector2D(dGradPX, dGradPY);

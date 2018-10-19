@@ -9,6 +9,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
+import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerDiscrete;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -18,6 +20,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -249,7 +252,7 @@ public class PedestrianBHM extends Pedestrian {
 					targetDirection = targetPoint.subtract(getPosition()).norm();
 				}
 				else {
-					Vector2D vec = potentialFieldTarget.getTargetPotentialGradient(getPosition(), this).multiply(-1.0);
+					Vector2D vec = new Vector2D(computeTargetDirectionByGradient());
 					if(vec.getLength() < GeometryUtils.DOUBLE_EPS) {
 						targetDirection = VPoint.ZERO;
 					}
@@ -270,6 +273,33 @@ public class PedestrianBHM extends Pedestrian {
 				}
 			}
 		}
+	}
+
+	private VPoint computeTargetDirectionByGradient() {
+		return potentialFieldTarget.getTargetPotentialGradient(getPosition(), this).multiply(-1.0);
+	}
+
+	private VPoint computeTargetDirectionByOptimaization() {
+		Vector2D gradient = potentialFieldTarget.getTargetPotentialGradient(getPosition(), this).multiply(-1.0);
+		double angle = GeometryUtils.angleTo(gradient, new VPoint(1, 0));
+		List<VPoint> possibleNextPositions = GeometryUtils.getDiscDiscretizationPoints(
+				random,
+				false,
+				new VCircle(getPosition(), stepLength),
+				1,
+				15,
+				angle,
+				2*Math.PI);
+
+		VPoint nextOptimalPos = possibleNextPositions.stream()
+				.filter(p -> !collidesWithObstacle(p))
+				.min(
+				(p1, p2) -> Double.compare(potentialFieldTarget.getPotential(p1, this),
+						potentialFieldTarget.getPotential(p2, this))
+
+		).get();
+
+		return nextOptimalPos.subtract(getPosition());
 	}
 
 	/**
