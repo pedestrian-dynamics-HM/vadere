@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 
 public class GroupSourceControllerTest extends TestSourceControllerUsingConstantSpawnRate {
@@ -60,7 +59,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	public void testUpdateEqualStartAndEndTime() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
-				.setSourceDim(5.0, 5.0)
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(15.0, 15.0)
 				.setGroupSizeDistribution(0.0, 0.5, 0.5)
 				.setGroupSizeDistributionMock(2, 2, 3, 3);
 
@@ -144,7 +144,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testUpdateUseFreeSpaceOnly() {
 
-		double d = new AttributesAgent().getRadius() * 2  +  SourceController.SPAWN_BUFFER_SIZE;
+		double d = new AttributesAgent().getRadius() * 2;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
@@ -252,7 +252,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testUseFreeSpaceOnly() {
 		// expected: not stop spawning before all pedestrians are created (even after end time)
-		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
+		double d = new AttributesAgent().getRadius() * 2;
 		double startTime = 0;
 		double endTime = 1;
 		int spawnNumber = 100;
@@ -344,7 +344,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
-
 
 
 	@Test

@@ -8,11 +8,13 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DistributionFactory;
 import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
@@ -30,7 +32,9 @@ public abstract class SourceController {
 	private final Topography topography;
 	protected final Random random;
 
-	/** <code>null</code>, if there is no next event. */
+	/**
+	 * <code>null</code>, if there is no next event.
+	 */
 	protected Double timeOfNextEvent;
 	protected RealDistribution distribution;
 	protected final AttributesSource sourceAttributes;
@@ -98,6 +102,14 @@ public abstract class SourceController {
 				&& dynamicElementsCreatedTotal >= maxNumber;
 	}
 
+	protected boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes) {
+		boolean pedOverlap = blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpace));
+		boolean obstOverlap = this.getTopography().getObstacles().stream()
+				.map(Obstacle::getShape).noneMatch(shape -> shape.intersects(freeSpace));
+
+		return pedOverlap && obstOverlap;
+	}
+
 	abstract protected boolean isQueueEmpty();
 
 	abstract protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec);
@@ -122,8 +134,8 @@ public abstract class SourceController {
 	}
 
 	/**
-	 * note that most models create their own pedestrians and ignore the attributes given here.
-	 * the source is mostly used to set the position and target ids, not the attributes.
+	 * note that most models create their own pedestrians and ignore the attributes given here. the
+	 * source is mostly used to set the position and target ids, not the attributes.
 	 */
 	protected void addNewAgentToScenario(final List<VPoint> position) {
 		position.forEach(p -> addNewAgentToScenario(p));

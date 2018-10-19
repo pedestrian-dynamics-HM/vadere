@@ -1,11 +1,11 @@
 package org.vadere.simulator.control;
 
+import org.vadere.simulator.control.util.GroupSpawnArray;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.util.GroupSpawnArray;
 import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -30,11 +30,12 @@ public class GroupSourceController extends SourceController {
 		this.groupModel = groupModel;
 		this.groupsToSpawn = new LinkedList<>();
 
-		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
+		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0, 0)).getBounds2D());
 
 		this.spawnArray = new GroupSpawnArray(source.getShape(),
-				new VRectangle(0, 0,elementBound.getWidth() , elementBound.getHeight()),
-				dynamicElementFactory::getDynamicElementRequiredPlace);
+				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
+				dynamicElementFactory::getDynamicElementRequiredPlace,
+				this::testFreeSpace);
 
 	}
 

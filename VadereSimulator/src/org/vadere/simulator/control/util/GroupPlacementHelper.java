@@ -1,12 +1,10 @@
-package org.vadere.state.util;
+package org.vadere.simulator.control.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
- * Simplifies placement of a group within a  There are two placement strategies
- * supported.
+ * Simplifies placement of a group within a  There are two placement strategies supported.
  * <li>NoneOverlapping:</li>
  * With this strategy a group spawns do not overlap. E.g The first 2x2 Group will start at (0,0) and
  * the second at (2,0) under the assumption the underlying source is big enough to hold two 2x2
@@ -61,25 +59,24 @@ public class GroupPlacementHelper {
 		this.groupPlacementCountY = boundedShapeGridCellsY - (dimGy - 1);
 
 		validSpawnPointsForGroupInBound = new ArrayList<>();
-		for(int i = 0; i < getOverlappingGroupCount(); i++){ // i  group spawn location
-			if (isGridCellWithinSource(validSpawnPointMapInBoundShape, i)){
+		for (int i = 0; i < getOverlappingGroupCount(); i++) { // i  group spawn location
+			if (isGridCellWithinSource(validSpawnPointMapInBoundShape, i)) {
 				validSpawnPointsForGroupInBound.add(i);
 			}
 		}
 	}
 
 	/**
-	 *
 	 * @param validSpawnPointMapInBoundShape mapping of rectangular bound grid to valid coordinates
 	 *                                       within the source shape
-	 * @param groupIndex					 groupIndex specifying the first ped within one group.
-	 * @return								 true if all positions within the group are contained
-	 * 										 within the source shape.
+	 * @param groupIndex                     groupIndex specifying the first ped within one group.
+	 * @return true if all positions within the group are contained within the source
+	 * shape.
 	 */
-	boolean isGridCellWithinSource(HashMap<Integer, Integer> validSpawnPointMapInBoundShape, int groupIndex){
-		for (int pedIndexInGroup = 0; pedIndexInGroup < groupSize; pedIndexInGroup++){
+	boolean isGridCellWithinSource(HashMap<Integer, Integer> validSpawnPointMapInBoundShape, int groupIndex) {
+		for (int pedIndexInGroup = 0; pedIndexInGroup < groupSize; pedIndexInGroup++) {
 			boolean isValid = validSpawnPointMapInBoundShape.containsKey(getOverlappingIndex(groupIndex, pedIndexInGroup));
-			if (!isValid){
+			if (!isValid) {
 				return false;
 			}
 		}
@@ -87,10 +84,10 @@ public class GroupPlacementHelper {
 	}
 
 
-
 	/**
 	 * @param groupNumber zero-Based number of group of groupSize with the overlapping strategy
-	 * @return zero-Based index within {@link GroupSpawnArray} corresponding to groupNumber and index i
+	 * @return zero-Based index within {@link GroupSpawnArray} corresponding to groupNumber and
+	 * index i
 	 */
 	public int getOverlappingStart(int groupNumber) {
 		return (groupNumber % groupPlacementCountX) +            // offset in x
@@ -101,9 +98,9 @@ public class GroupPlacementHelper {
 	 * Overlapping strategy
 	 *
 	 * @param groupNumberInBound zero-Based number of group
-	 * @param i           zero-Based index within group. Must be smaller than groupSize
-	 * @return zero-Based index within {@link GroupSpawnArray} corresponding to groupNumber and index
-	 * i
+	 * @param i                  zero-Based index within group. Must be smaller than groupSize
+	 * @return zero-Based index within {@link GroupSpawnArray} corresponding to groupNumber and
+	 * index i
 	 */
 	public int getOverlappingIndex(int groupNumberInBound, int i) {
 		assert i < groupSize;
@@ -115,7 +112,7 @@ public class GroupPlacementHelper {
 		return groupPlacementCountX * groupPlacementCountY;
 	}
 
-	public ArrayList<Integer> getValidSpawnPointsForGroupInBound(){
+	public ArrayList<Integer> getValidSpawnPointsForGroupInBound() {
 		return validSpawnPointsForGroupInBound;
 	}
 

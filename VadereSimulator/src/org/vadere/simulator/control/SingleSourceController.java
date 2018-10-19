@@ -6,7 +6,7 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.util.SpawnArray;
+import org.vadere.simulator.control.util.SingleSpawnArray;
 import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -14,7 +14,6 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -23,20 +22,21 @@ import java.util.stream.Collectors;
 public class SingleSourceController extends SourceController {
 
 	private int numberToSpawn;
-	private DynamicElementFactory dynamicElementFactory;
 	private static final int NUMBER_OF_REPOSITION_TRIES = 10;
 	private static final int NUMBER_OF_POINT_SEARCH = 1_000; // todo based on shape and position of source
 
-	private SpawnArray spawnArray;
+	private SingleSpawnArray spawnArray;
+
 	public SingleSourceController(Topography scenario, Source source,
 								  DynamicElementFactory dynamicElementFactory,
 								  AttributesDynamicElement attributesDynamicElement,
 								  Random random) {
 		super(scenario, source, dynamicElementFactory, attributesDynamicElement, random);
-		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0,0)).getBounds2D());
-		this.spawnArray = new SpawnArray(source.getShape(),
-				new VRectangle(0, 0,elementBound.getWidth(), elementBound.getHeight()),
-				dynamicElementFactory::getDynamicElementRequiredPlace);
+		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0, 0)).getBounds2D());
+		this.spawnArray = new SingleSpawnArray(source.getShape(),
+				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
+				this.dynamicElementFactory::getDynamicElementRequiredPlace,
+				this::testFreeSpace);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class SingleSourceController extends SourceController {
 		if (!isSourceFinished(simTimeInSec)) {
 			if (simTimeInSec >= timeOfNextEvent || numberToSpawn > 0) {
 				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
-				List<VPoint> spawnPoints = new LinkedList<>();
+				List<VPoint> spawnPoints;
 
 				if (sourceAttributes.isSpawnAtRandomPositions()) {
 
@@ -54,7 +54,7 @@ public class SingleSourceController extends SourceController {
 								random,
 								getDynElementsAtSource().stream()
 										.map(PointPositioned::getPosition)
-										.map(position -> dynamicElementFactory.getDynamicElementRequiredPlace(position))
+										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
 
@@ -71,7 +71,7 @@ public class SingleSourceController extends SourceController {
 								numberToSpawn,
 								getDynElementsAtSource().stream()
 										.map(PointPositioned::getPosition)
-										.map(position -> dynamicElementFactory.getDynamicElementRequiredPlace(position))
+										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
 						numberToSpawn -= spawnPoints.size();
@@ -97,11 +97,11 @@ public class SingleSourceController extends SourceController {
 		}
 	}
 
-	private List<VPoint> getRealPositions(final int numberToSpawn, @NotNull final List<VShape> blockPedestrianShapes){
+	private List<VPoint> getRealPositions(final int numberToSpawn, @NotNull final List<VShape> blockPedestrianShapes) {
 		List<VPoint> positions = new ArrayList<>(numberToSpawn);
 
-		for(int i = 0; i < numberToSpawn; i++) {
-			Optional<VPoint> optPosition = getNextPosition(blockPedestrianShapes, spawnArray.getAllowedSpawnPoints());
+		for (int i = 0; i < numberToSpawn; i++) {
+			Optional<VPoint> optPosition = spawnArray.getNextPosition(blockPedestrianShapes);
 
 			if (optPosition.isPresent()) {
 				VPoint position = optPosition.get();
@@ -112,32 +112,21 @@ public class SingleSourceController extends SourceController {
 		return positions;
 	}
 
-
-	private Optional<VPoint> getNextPosition(List<VShape> blockPedestrianShapes, List<VPoint> spawnPoints) {
-
-		for (VPoint spawnPoint  : spawnPoints){
-			VShape freeSpaceRequired = dynamicElementFactory.getDynamicElementRequiredPlace(spawnPoint);
-			if (testFreeSpace(freeSpaceRequired, blockPedestrianShapes)){
-				return Optional.of(spawnPoint);
-			}
-		}
-		return Optional.empty();
-	}
-
-
 	/**
-	 * Computes numberToSpawn or less random positions based on the blockPedestrianShapes which contains the shapes representing the required space of each pedestrian.
-	 * For each required position the algorithms tries {@link SingleSourceController#NUMBER_OF_REPOSITION_TRIES} times to get a feasible free position.
+	 * Computes numberToSpawn or less random positions based on the blockPedestrianShapes which
+	 * contains the shapes representing the required space of each pedestrian. For each required
+	 * position the algorithms tries {@link SingleSourceController#NUMBER_OF_REPOSITION_TRIES} times
+	 * to get a feasible free position.
 	 *
 	 * @param numberToSpawn         number of required spawn positions
 	 * @param random                random generator
-	 * @param blockPedestrianShapes  the required space of other pedestrians
+	 * @param blockPedestrianShapes the required space of other pedestrians
 	 * @return numberToSpawn or less random feasible positions
 	 */
 	private List<VPoint> getRealRandomPositions(final int numberToSpawn, @NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes) {
 		List<VPoint> randomPositions = new ArrayList<>(numberToSpawn);
 
-		for(int i = 0; i < numberToSpawn; i++) {
+		for (int i = 0; i < numberToSpawn; i++) {
 			Optional<VPoint> optRandomPosition = getNextRandomPosition(random, blockPedestrianShapes, NUMBER_OF_POINT_SEARCH, NUMBER_OF_REPOSITION_TRIES);
 
 			if (optRandomPosition.isPresent()) {
@@ -155,13 +144,13 @@ public class SingleSourceController extends SourceController {
 												   final int tries_find_valid_point, final int tries_reposition) {
 		Rectangle2D rec = source.getShape().getBounds2D();
 
-		for(int i = 0; i < tries_reposition; i++) {
+		for (int i = 0; i < tries_reposition; i++) {
 			VShape freeSpaceRequired = null;
 			VPoint randomPoint = null;
 			boolean pointFound = false;
 			// find point in source boundary
 			int j = 0;
-			while(j < tries_find_valid_point && !pointFound){
+			while (j < tries_find_valid_point && !pointFound) {
 				randomPoint = new VPoint(rec.getMinX() + random.nextDouble() * rec.getWidth(), rec.getMinY() + random.nextDouble() * rec.getHeight());
 				freeSpaceRequired = dynamicElementFactory.getDynamicElementRequiredPlace(randomPoint);
 				pointFound = source.getShape().containsShape(freeSpaceRequired);
@@ -169,18 +158,12 @@ public class SingleSourceController extends SourceController {
 			}
 
 			// no intersection with other free spaces (obstacles & other pedestrians)
-			if(testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
+			if (testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
 				return Optional.of(randomPoint);
 			}
 		}
 
 		return Optional.empty();
-	}
-
-	private boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes){
-		return blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpace)) &&
-				this.getTopography().getObstacles().stream()
-						.map(Obstacle::getShape).noneMatch(shape -> shape.intersects(freeSpace));
 	}
 
 	@Override
