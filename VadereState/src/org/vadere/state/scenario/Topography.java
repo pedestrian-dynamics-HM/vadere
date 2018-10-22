@@ -159,18 +159,6 @@ public class Topography {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 
-	public CellGrid getDistanceFunctionApproximation(final double cellSize) {
-		CellGrid cellGrid = new CellGrid(getBounds().width, getBounds().height, cellSize, new CellState());
-		for(int row = 0; row < cellGrid.getNumPointsY(); row++){
-			for(int col = 0; col < cellGrid.getNumPointsX(); col++){
-				cellGrid.setValue(col, row, new CellState(
-						distanceToObstacle(cellGrid.pointToCoord(col, row).add(new VPoint(getBounds().getMinX(), getBounds().getMinY()))),
-						PathFindingTag.Reachable));
-			}
-		}
-		return cellGrid;
-	}
-
 	public boolean containsTarget(final Predicate<Target> targetPredicate) {
 		return getTargets().stream().anyMatch(targetPredicate);
 	}
@@ -484,7 +472,53 @@ public class Topography {
 		allOtherAttributes.forEach(a -> a.seal());
 	}
 
-	public static Collection<Obstacle> createObstacleBoundary(final Topography topography) {
+	public void generateUniqueIdIfNotSet(){
+		Set<Integer> usedIds = sources.stream().map(Source::getId).collect(Collectors.toSet());
+		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
+		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
+		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+
+		sources.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		targets.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		obstacles.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
+
+		stairs.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+
+	}
+
+	private int nextIdNotInSet(Set<Integer> usedIDs){
+		int newId = 1;
+		while (usedIDs.contains(newId)){
+			newId++;
+		}
+		usedIDs.add(newId);
+		return newId;
+	}
+
+
+	public ArrayList<ScenarioElement> getAllScenarioElements(){
+		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size()));
+		all.addAll(obstacles);
+		all.addAll(stairs);
+		all.addAll(targets);
+		all.addAll(sources);
+		all.addAll(boundaryObstacles);
+		return  all;
+
+	}
+
+	public static Collection<Obstacle> createObstacleBoundary(@NotNull final Topography topography) {
 		List<Obstacle> obstacles = new ArrayList<>();
 		VPolygon boundary = new VPolygon(topography.getBounds());
 		double width = topography.getBoundingBoxWidth();
@@ -499,6 +533,4 @@ public class Topography {
 
 		return obstacles;
 	}
-
-
 }

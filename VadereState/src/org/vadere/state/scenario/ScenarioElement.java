@@ -7,7 +7,19 @@ import org.vadere.geometry.shapes.VShape;
 public abstract class ScenarioElement {
 
 	public abstract VShape getShape();
-	
+
+	public boolean overlapWith(ScenarioElement element){
+		return getShape().intersects(element.getShape());
+	}
+
+	public boolean totalOverlapWith(ScenarioElement element){
+		return getShape().sameArea(element.getShape());
+	}
+
+	public boolean enclosesScenarioElement(ScenarioElement element){
+		return getShape().containsShape(element.getShape());
+	}
+
 	public abstract void setShape(VShape newShape);
 
 	public abstract int getId();

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -16,7 +17,9 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.geometry.shapes.VCircle;
 import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 @ModelClass(isMainModel = true)
 public class BehaviouralHeuristicsModel implements MainModel {
@@ -70,11 +73,21 @@ public class BehaviouralHeuristicsModel implements MainModel {
 		AttributesAgent pedAttributes = new AttributesAgent(
 				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
 
-		PedestrianBHM pedestrian = new PedestrianBHM(topography, pedAttributes, attributesBHM, random);
-
+		PedestrianBHM pedestrian = createElement(position, pedAttributes);
 		pedestrian.setPosition(position);
 		this.pedestrianEventsQueue.add(pedestrian);
 		return pedestrian;
+	}
+
+	private PedestrianBHM createElement(VPoint position, @NotNull final AttributesAgent pedAttributes) {
+		PedestrianBHM pedestrian = new PedestrianBHM(topography, pedAttributes, attributesBHM, random);
+		pedestrian.setPosition(position);
+		return pedestrian;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
+		return new VCircle(position, new AttributesAgent(attributesPedestrian, -1).getRadius()+new AttributesBHM().getSpaceToKeep());
 	}
 
 	@Override

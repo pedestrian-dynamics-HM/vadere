@@ -14,7 +14,7 @@ import java.util.Collections;
  *
  */
 @DataProcessorClass()
-public class EvacuationTimeProcessor extends DataProcessor<NoDataKey, Double> {
+public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
 
     public EvacuationTimeProcessor() {

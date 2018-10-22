@@ -58,7 +58,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 					nextPos = tmpPos;
 				}
 			} catch (Exception e) {
-				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an error.");
+				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an topographyError.");
 			}
 
 		}

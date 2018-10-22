@@ -51,6 +51,7 @@ public class TopographyController extends OfflineTopographyController {
 			 */
 			realPed.setTargets(new LinkedList<>(initialValues.getTargets()));
 			realPed.setGroupIds(new LinkedList<>(initialValues.getGroupIds()));
+			realPed.setGroupSizes(new LinkedList<>(initialValues.getGroupSizes()));
 			realPed.setChild(initialValues.isChild());
 			realPed.setLikelyInjured(initialValues.isLikelyInjured());
 

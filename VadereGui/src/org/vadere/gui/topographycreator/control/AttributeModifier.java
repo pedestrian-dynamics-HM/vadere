@@ -20,7 +20,7 @@ public class AttributeModifier {
 	 * @param element the attributes
 	 * @param shape the shape
 	 */
-	static void setShapeToAttributes(final ScenarioElement element, final VShape shape) {
+	public static void setShapeToAttributes(final ScenarioElement element, final VShape shape) {
 		try {
 			if (element instanceof AgentWrapper) {
 				double x = shape.getBounds2D().getCenterX();

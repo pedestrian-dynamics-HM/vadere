@@ -17,7 +17,7 @@ public class PedestrianGroupSizeProcessor extends DataProcessor<TimestepPedestri
 	private static Logger logger = LogManager.getLogger(PedestrianGroupIDProcessor.class);
 
 	public PedestrianGroupSizeProcessor() {
-			super("groupSize");
+		super("groupSize");
 	}
 
 	@Override

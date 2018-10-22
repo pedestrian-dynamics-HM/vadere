@@ -59,7 +59,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		CentroidGroup group = groupCollection.getGroup(ped);
 		Pedestrian leader = null;
 
-		if (group != null) {
+		if (group != null && group.getSize() > 1) {
 			leader = group.getPacemaker(ped);
 		}
 

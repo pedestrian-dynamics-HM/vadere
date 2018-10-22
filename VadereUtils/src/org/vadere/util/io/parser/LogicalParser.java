@@ -78,17 +78,24 @@ public abstract class LogicalParser<T> {
 	}
 
 	private String reformatText(final String text) {
+		// remove all spaces
+		String reformatText = text.replaceAll("\\s+", "");
 
-		String reformatText = text.replaceAll("\\(", " ( ");
+		// space for brackets and logic relations
+		reformatText = reformatText.replaceAll("\\(", " ( ");
 		reformatText = reformatText.replaceAll("\\)", " ) ");
-		reformatText = reformatText.replaceAll("\\s==\\s", "==");
+		reformatText = reformatText.replaceAll("&&", " && ");
+		reformatText = reformatText.replaceAll("\\|\\|", " \\|\\| ");
+
+		/*reformatText = reformatText.replaceAll("\\s==\\s", "==");
 		reformatText = reformatText.replaceAll("\\s<\\s", "<");
 		reformatText = reformatText.replaceAll("\\s<=\\s", "<=");
 		reformatText = reformatText.replaceAll("\\s>=\\s", ">=");
 		reformatText = reformatText.replaceAll("\\s>\\s", ">");
 		reformatText = reformatText.replaceAll("\\s<\\s", "<");
 		reformatText = reformatText.replaceAll("\\s!=\\s", "!=");
-		reformatText = reformatText.replaceAll("\\s:\\s", ":");
+		reformatText = reformatText.replaceAll("\\s:\\s", ":");*/
+
 		if (!reformatText.startsWith("(") || !reformatText.endsWith(")")) {
 			reformatText = "( " + reformatText + " )";
 		}

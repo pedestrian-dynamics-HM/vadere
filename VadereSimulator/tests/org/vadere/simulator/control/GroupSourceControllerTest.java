@@ -231,24 +231,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		pedestrianCountEquals(3);
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testSpawnNumber() {
-		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
-		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setSpawnNumber(10)
-				.setSourceDim(12 * d, 12 * d ) // create source with 12x12 spots
-				.setGroupSizeDistribution(0.0, 0.0, 0.0, 1); // only groups of 4
-		initialize(builder);
-
-		first().sourceController.update(1);
-		pedestrianCountEquals(10 * 4);
-		first().sourceController.update(2); 	// use random positioning thus not
-															// not optimal and thus not enough
-															// space for all
-		fail("should not be reached. Exception expected");
-
-	}
-
 	@Test
 	public void testSpawnRateGreaterThanUpdateRate() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
@@ -329,8 +311,9 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 	@Test
 	public void testMaxSpawnNumberTotalWithSmallEndTime() {
+		int maxSpawnNumberTotal = 4;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setMaxSpawnNumberTotal(4) // <-- not exhausted
+				.setMaxSpawnNumberTotal(maxSpawnNumberTotal) // <-- not exhausted
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
@@ -341,7 +324,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		first().sourceController.update(2);
 		first().sourceController.update(3);
 
-		assertEquals(7, countPedestrians(0));
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
 
 	@Test
@@ -353,12 +336,13 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setMaxSpawnNumberTotal(maxSpawnNumberTotal) // <-- exhausted!
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
-				.setGroupSizeDistributionMock(4, 3, 4, 4);
+				.setGroupSizeDistributionMock(4, 3, 4, 4)
+				.setUseFreeSpaceOnly(false);
 		initialize(builder);
 
 		doUpdates(0, 50, 0, 200);
 
-		assertEquals(15, countPedestrians(0));
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
 
 
@@ -377,7 +361,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 		doUpdates(0, 50, 0, 200);
 
-		assertEquals(15, countPedestrians(0));
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
 
 	@Test
@@ -387,14 +371,16 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
 				.setSourceDim(new VRectangle(0, 0, 3, 4))
 				.setEndTime(4)
-				.setMaxSpawnNumberTotal(4)
+				.setMaxSpawnNumberTotal(6)
+				.setUseFreeSpaceOnly(false)
 				.setGroupSizeDistributionMock(3, 4, 4, 4, 3);
 		SourceTestAttributesBuilder builder2 = new SourceTestAttributesBuilder()
 				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setGroupSizeDistribution(0.0, 1.0)
 				.setSourceDim(new VRectangle(20, 20, 3, 2))
 				.setEndTime(6)
-				.setMaxSpawnNumberTotal(6)
+				.setMaxSpawnNumberTotal(20)
+				.setUseFreeSpaceOnly(false)
 				.setGroupSizeDistributionMock(2, 2, 2, 2, 2, 2);
 
 		initialize(builder1);
@@ -408,7 +394,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 		first().sourceController.update(2);
 		first().sourceController.update(3);
-		assertEquals(3 + 4 + 4, countPedestrians(0));
+		assertEquals(3 + 4, countPedestrians(0));
 
 		second().sourceController.update(2);
 		second().sourceController.update(3);

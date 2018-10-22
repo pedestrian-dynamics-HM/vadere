@@ -35,6 +35,8 @@ public class ViewportChangeListener implements IViewportChangeListener {
 		boolean scaleChanges = defaultModel.setScale(scale);
 		if (scaleChanges || !viewport.equals(defaultModel.getViewportBound())) {
 
+			double dx = viewportBound.getMinX() - topographyBound.getMinX();
+			double dy = viewportBound.getMinY() - topographyBound.getMinY();
 			if (scaleChanges) {
 				defaultModel.notifyScaleListeners();
 			}
@@ -44,11 +46,16 @@ public class ViewportChangeListener implements IViewportChangeListener {
 			viewport.getView().setPreferredSize(new Dimension(
 					(int) (topographyBound.getWidth() * scale),
 					(int) (topographyBound.getHeight() * scale)));
-			viewport.setViewSize(new Dimension((int) (topographyBound.getWidth() * scale),
+
+			viewport.setViewSize(new Dimension(
+					(int) (topographyBound.getWidth() * scale),
 					(int) (topographyBound.getHeight() * scale)));
-			viewport.setViewPosition(new Point((int) ((viewportBound.getX()) * scale),
-					(int) ((topographyBound.getHeight() - (viewportBound.getY() + viewportBound.getHeight()))
+
+			viewport.setViewPosition(new Point(
+					(int) (dx * scale),
+					(int) ((topographyBound.getHeight() - (dy + viewportBound.getHeight()))
 							* scale)));
+
 			defaultModel.notifyObservers();
 		}
 	}

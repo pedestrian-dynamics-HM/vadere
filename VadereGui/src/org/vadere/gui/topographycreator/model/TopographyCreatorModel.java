@@ -98,7 +98,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		this.addObserver(scenarioObserver);
 	}
 
+	@Override
 	public Scenario getScenario() {
+		scenario.setTopography(topographyBuilder.build());
 		return scenario;
 	}
 
@@ -131,16 +133,16 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public void scaleTopography(final double scale) {
 		/*
 		 * scalingFactor = scale;
-		 * double error = boundaryWidth - (boundaryWidth * scalingFactor);
+		 * double topographyError = boundaryWidth - (boundaryWidth * scalingFactor);
 		 * Set<Entry<String, ShapeCategory<ScenarioShape>>> entrySet = shapes.entrySet();
 		 * for (Entry<String, ShapeCategory<ScenarioShape>> entry : entrySet) {
 		 * for (ScenarioShape ss : entry.getValue()) {
 		 * if (entry.getKey().equals("pedestrians")
 		 * || (entry.getKey().equals("sources") && ss.getShape() instanceof Ellipse2D.Double)) {
-		 * ss.setPosition(ss.getX() * scalingFactor + error, ss.getY() * scalingFactor + error);
+		 * ss.setPosition(ss.getX() * scalingFactor + topographyError, ss.getY() * scalingFactor + topographyError);
 		 * } else {
 		 * ss.scale(scalingFactor, scalingFactor);
-		 * ss.setPosition(ss.getX() + error, ss.getY() + error);
+		 * ss.setPosition(ss.getX() + topographyError, ss.getY() + topographyError);
 		 * }
 		 * }
 		 * }
@@ -148,8 +150,8 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		 * 
 		 * setScenarioBound(new Rectangle2D.Double(scenarioBound.x * scalingFactor, scenarioBound.y
 		 * * scalingFactor,
-		 * scenarioBound.width * scalingFactor + 2 * error, scenarioBound.height * scalingFactor + 2
-		 * * error));
+		 * scenarioBound.width * scalingFactor + 2 * topographyError, scenarioBound.height * scalingFactor + 2
+		 * * topographyError));
 		 * // boundaryWidth *= scalingFactor; // not supported in vadere!
 		 * setChanged();
 		 */
@@ -328,6 +330,15 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		}
 
 		return element;
+	}
+
+	public void translateTopography(final double x, final double y) {
+		double oldX = getTopographyBound().x;
+		double oldY = getTopographyBound().y;
+
+		topographyBuilder.translateElements(x - oldX, y - oldY);
+		setTopographyBound(new VRectangle(x, y, getTopographyBound().getWidth(), getTopographyBound().getHeight()));
+		setChanged();
 	}
 
 	@Override

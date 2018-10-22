@@ -34,7 +34,7 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
 
     return sorted(scenario_files)
 
-def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereGui/target/vadere-console.jar", scenario_timeout_in_sec=60):
+def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
 
     if not os.path.exists(output_dir):

@@ -284,12 +284,12 @@ public class InterpolationUtil {
 	 */
 	public static void getGradientMollified(CellGrid pot, double[] x,
 			double[] grad, double gradientMollifierRadius) {
-		double aX = Math.max(0, x[0] - gradientMollifierRadius);
-		double bX = Math.min(pot.getNumPointsX() - 1, x[0]
-				+ gradientMollifierRadius);
-		double aY = Math.max(0, x[1] - gradientMollifierRadius);
-		double bY = Math.min(pot.getNumPointsY() - 1, x[1]
-				+ gradientMollifierRadius);
+		double aX = Math.max(pot.getMinX(), x[0] - gradientMollifierRadius);
+		double bX = Math.min(pot.getMaxX(), x[0] + gradientMollifierRadius);
+
+		double aY = Math.max(pot.getMinY(), x[1] - gradientMollifierRadius);
+		double bY = Math.min(pot.getMaxY(), x[1] + gradientMollifierRadius);
+
 		double[] xMoll = new double[2];
 		double[] cgrad = new double[2];
 
@@ -314,10 +314,15 @@ public class InterpolationUtil {
 				MathUtil.cutExpGrad2D(xMoll, gradientMollifierRadius, cgrad);
 
 				// get the potential at the current position
+
+				double xDisplaced = (cx + x[0] - pot.getMinX());
+				double yDisplaced = (cy + x[1] - pot.getMinY());
+
 				double potValue = InterpolationUtil
-						.getValueByTriangleInterpolation(pot,
-								(cx + x[0]) / pot.getResolution(), (cy + x[1])
-										/ pot.getResolution());
+						.getValueByTriangleInterpolation(
+								pot,
+								xDisplaced / pot.getResolution(),
+								yDisplaced / pot.getResolution());
 				if (potValue > 9999 || Double.isInfinite(potValue)
 						|| Double.isNaN(potValue)) {
 					potValue = 9999;

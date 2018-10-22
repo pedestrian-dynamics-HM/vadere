@@ -594,7 +594,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		F twin = getMesh().getTwinFace(edge);
 
 		VTriangle triangle = getMesh().toTriangle(face);
-		return (!triangle.intersect(bbox) && (getMesh().isBoundary(twin) || !getMesh().toTriangle(twin).intersect(bbox)));
+		return (!triangle.intersects(bbox) && (getMesh().isBoundary(twin) || !getMesh().toTriangle(twin).intersects(bbox)));
 	}
 
 	/**

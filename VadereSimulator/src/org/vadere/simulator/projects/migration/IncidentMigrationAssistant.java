@@ -11,7 +11,6 @@ import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,18 +73,18 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 
 	@Override
 	public String convertFile(Path scenarioFilePath, Version targetVersion) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 	@Override
 	public void migrateFile(Path scenarioFilePath, Version targetVersion,  Path outputFile) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 
 	@Override
 	public void revertFile(Path scenarioFile) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 	// if isScenario is false, its output

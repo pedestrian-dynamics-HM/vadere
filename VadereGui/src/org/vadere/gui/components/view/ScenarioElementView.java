@@ -1,25 +1,13 @@
 package org.vadere.gui.components.view;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
-import org.vadere.simulator.entrypoints.ReflectionAttributeModifier;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -31,8 +19,13 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * The ScenarioElementView display's a ScenarioElement in JSON-Format.
@@ -48,26 +41,26 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	private JsonValidIndicator jsonValidIndicator;
 
 	public ScenarioElementView(final IDefaultModel defaultModel) {
-		this(defaultModel, null);
+		this(defaultModel,null, null);
 	}
 
-	public ScenarioElementView(final IDefaultModel defaultModel, final Component topComponent) {
+	public ScenarioElementView(final IDefaultModel defaultModel, final JsonValidIndicator jsonValidIndicator, final Component topComponent) {
 		this.panelModel = defaultModel;
 		this.panelModel.addSelectScenarioElementListener(this);
+		this.jsonValidIndicator = jsonValidIndicator;
 		CellConstraints cc = new CellConstraints();
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setPreferredSize(new Dimension(1, Toolkit.getDefaultToolkit().getScreenSize().height));
 
-		if (topComponent != null) {
+		if (topComponent != null && this.jsonValidIndicator !=null) {
 			setLayout(new FormLayout("default:grow", "pref, default"));
 
 			JPanel jsonMeta = new JPanel(); // name of the scenario element and indicator of
 			// valid/invalid
 			jsonMeta.setLayout(new BoxLayout(jsonMeta, BoxLayout.Y_AXIS));
 
-			jsonValidIndicator = new JsonValidIndicator();
-			jsonMeta.add(jsonValidIndicator);
-			jsonValidIndicator.hide();
+			jsonMeta.add(this.jsonValidIndicator);
+			this.jsonValidIndicator.hide();
 			jsonMeta.add(topComponent);
 
 			add(jsonMeta, cc.xy(1, 1));

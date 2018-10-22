@@ -37,7 +37,7 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 									 @NotNull final AttributesFloorField attributesFloorField) {
 		double ms = System.currentTimeMillis();
 		this.obstacles = obstacles;
-		this.cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState());
+		this.cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 		this.cellGrid.pointStream().forEach(p -> computeDistanceToGridPoint(p));
 		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 	}

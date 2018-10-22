@@ -31,7 +31,20 @@ public interface VShape extends Shape, Cloneable {
 
 	ShapeType getType();
 
-	boolean intersect(VShape shape);
+	default boolean sameArea(VShape shape){
+		Area thisShape = new Area(this);
+		Area otherShape = new Area(shape);
+		thisShape.subtract(otherShape);
+		return thisShape.isEmpty();
+	}
+
+	default boolean containsShape(VShape otherShape){
+		Area thisArea = new Area(this);
+		Area otherArea = new Area(otherShape);
+		thisArea.intersect(otherArea);
+		return thisArea.equals(otherArea);
+
+	}
 
 	/**
 	 * Returns a list of points (p1, p2, ..., pn) such that the line (p1,p2) is part of the boundary

@@ -116,7 +116,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         for(VShape shape : targetShapes) {
             getMesh().streamFaces()
                     .filter(f -> !getMesh().isBoundary(f))
-                    .filter(f -> shape.intersect(getMesh().toTriangle(f)))
+                    .filter(f -> shape.intersects(getMesh().toTriangle(f)))
                     .forEach(f -> initialFace(f, p -> Math.max(shape.distance(p), 0)));
         }
     }

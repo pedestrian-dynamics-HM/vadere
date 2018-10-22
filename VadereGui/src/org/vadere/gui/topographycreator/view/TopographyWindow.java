@@ -13,6 +13,7 @@ import org.vadere.gui.components.view.InfoPanel;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.components.view.ScenarioToolBar;
 import org.vadere.gui.projectview.control.ActionDeselect;
+import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.topographycreator.control.ActionBasic;
 import org.vadere.gui.topographycreator.control.ActionCloseDrawOptionPanel;
 import org.vadere.gui.topographycreator.control.ActionCopyElement;
@@ -29,6 +30,8 @@ import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
+import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
+import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
@@ -112,7 +115,8 @@ public class TopographyWindow extends JPanel {
 		infoPanel = new InfoPanel(panelModel);
 		selectedElementLabel = new JLabelObserver(JLabelObserver.DEFAULT_TEXT);
 
-		final ScenarioElementView textView = new ScenarioElementView(panelModel, selectedElementLabel);
+		JsonValidIndicator jsonValidIndicator = new JsonValidIndicator();
+		final ScenarioElementView textView = new ScenarioElementView(panelModel, jsonValidIndicator, selectedElementLabel);
 
 		final JPanel thisPanel = this;
 
@@ -121,14 +125,6 @@ public class TopographyWindow extends JPanel {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		int windowHeight = screenSize.height - 250;
 		int windowWidth = screenSize.width - 250;
-
-		JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
-		infoButton.setBorderPainted(false);
-		infoButton.addActionListener(e -> {
-			JOptionPane.showMessageDialog(null,
-					"Scenario Creator\nVersion: 2.0\nCooperation: Hochschule München", "About",
-					JOptionPane.INFORMATION_MESSAGE);
-		});
 
 		/* basic action */
 		final TopographyAction basicAction = new ActionBasic("notify", panelModel);
@@ -308,8 +304,24 @@ public class TopographyWindow extends JPanel {
 		/* resize Topography */
 		TopographyAction resizeTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
-				panelModel, selectShape);
+				panelModel, selectShape, undoSupport);
 
+		TopographyAction translateTopography =new ActionTranslateTopography("SetTopograpyBound",
+				new ImageIcon(Resources.class.getResource("/icons/translation_icon.png")),
+				panelModel, selectShape, undoSupport);
+
+		/* Makros */
+		ActionTopographyMakroMenu actionTopographyMakroMenu =
+				new ActionTopographyMakroMenu("TopographyMakros",
+						new ImageIcon(Resources.class.getResource("/icons/auto_generate_ids.png")),
+						panelModel);
+
+//		/* Topography checker*/
+//		ActionScenarioChecker actionScenarioChecker =
+//				new ActionScenarioChecker("ScenarioChecker", panelModel, jsonValidIndicator);
+
+
+		/* create toolbar*/
 		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
 		addActionToToolbar(
 				toolbar,
@@ -338,6 +350,7 @@ public class TopographyWindow extends JPanel {
 		// "TopographyCreator.btnMinimizeTopography.tooltip");
 		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
 		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
+		addActionToToolbar(toolbar, translateTopography, "TopographyCreator.btnTranslation.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
@@ -347,8 +360,8 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
-		toolbar.add(infoButton);
-		infoButton.setToolTipText("About");
+		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnMakro.tooltip");
+//		addActionToToolbar(toolbar, actionScenarioChecker, "TopographyCreator.btnChecker.tooltip");
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 

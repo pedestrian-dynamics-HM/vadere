@@ -148,6 +148,8 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	ScenarioElementType getCurrentType();
 
+	Scenario getScenario();
+
 	void setTopography(Topography topography);
 
 	@Override

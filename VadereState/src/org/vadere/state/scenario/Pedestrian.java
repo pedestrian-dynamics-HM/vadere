@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class Pedestrian extends Agent {
 
+	public static double HUMAN_MAX_SPEED = 12.0; // ms^-1
 	/** Target ID if the pedestrian represents a target, -1 otherwise. */
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
@@ -23,6 +24,8 @@ public class Pedestrian extends Agent {
 	/** Used only for JSON serialization? */
 	// TODO used at all? Car does NOT have this field. remove if unused!
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN;
+
+	private LinkedList<Integer> groupSizes;
 
 	@SuppressWarnings("unused")
 	private Pedestrian() {
@@ -43,6 +46,7 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		groupIds = new LinkedList<>();
+		groupSizes = new LinkedList<>();
 	}
 
 	/**
@@ -58,13 +62,16 @@ public class Pedestrian extends Agent {
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
+			groupSizes = new LinkedList<>(other.groupSizes);
 		} else {
 			groupIds = new LinkedList<>();
+			groupSizes = new LinkedList<>();
 		}
 	}
 
-	public void addGroupId(int groupId){
+	public void addGroupId(int groupId, int size){
 		groupIds.add(groupId);
+		groupSizes.add(size);
 	}
 
 	public <T extends ModelPedestrian> T getModelPedestrian(Class<? extends T> modelType) {
@@ -79,12 +86,20 @@ public class Pedestrian extends Agent {
 		this.groupIds = groupIds;
 	}
 
+	public void setGroupSizes(LinkedList<Integer> groupSizes) {
+		this.groupSizes = groupSizes;
+	}
+
 	public VShape getInformationShape() {
 		return null;
 	}
 
 	public LinkedList<Integer> getGroupIds() {
 		return groupIds;
+	}
+
+	public LinkedList<Integer> getGroupSizes() {
+		return groupSizes;
 	}
 
 	public boolean isTarget() {

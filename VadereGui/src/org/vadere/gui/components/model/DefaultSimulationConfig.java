@@ -72,6 +72,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowGroups(boolean showGroups) {
 		this.showGroups = showGroups;
+		setChanged();
 	}
 
 	public boolean isShowLogo() {

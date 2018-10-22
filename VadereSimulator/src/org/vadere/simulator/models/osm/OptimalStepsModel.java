@@ -36,6 +36,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -250,13 +251,21 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		AttributesAgent pedAttributes = new AttributesAgent(
 				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
 
+		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
+		return pedestrianOSM;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
+		return createElement(position,  new AttributesAgent(attributesPedestrian, -1)).getShape();
+	}
+
+	private PedestrianOSM createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
 		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
-				pedAttributes, topography, random, potentialFieldTarget,
+				attributesAgent, topography, random, potentialFieldTarget,
 				potentialFieldObstacle.copy(), potentialFieldPedestrian,
 				speedAdjusters, stepCircleOptimizer.clone());
-
 		pedestrian.setPosition(position);
-
 		return pedestrian;
 	}
 

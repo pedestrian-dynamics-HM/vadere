@@ -13,6 +13,9 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.state.util.TexGraphGenerator;
 import org.vadere.geometry.mesh.gen.PFace;
 import org.vadere.geometry.mesh.gen.PHalfEdge;
@@ -160,6 +163,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public boolean setScale(final double scale) {
 		boolean hasChanged = true;
+		double oldScale = scaleFactor;
+
 		if (scale < MIN_SCALE_FACTOR) {
 			this.scaleFactor = MIN_SCALE_FACTOR;
 		} else if (scale > MAX_SCALE_FACTOR) {
@@ -170,7 +175,15 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			hasChanged = false;
 		}
 
+		// update the viewport, since it depends on the scaleFactor
 		if (hasChanged) {
+			Rectangle2D.Double oldViewPort = getViewportBound();
+			Rectangle2D.Double newViewPort = new Rectangle2D.Double(
+					oldViewPort.getMinX(),
+					oldViewPort.getMinY(),
+					oldViewPort.getWidth() * oldScale / scaleFactor,
+					oldViewPort.getHeight() * oldScale / scaleFactor);
+			setViewportBound(newViewPort);
 			setChanged();
 		}
 		return hasChanged;
@@ -219,8 +232,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * if (scaleFactor < MAX_SCALE_FACTOR) {
 	 * double w = getViewportBound().width / 1.2;
 	 * double h = getViewportBound().height / 1.2;
-	 * double x = Math.bound(0, cursorWorldPosition.x - w / 2);
-	 * double y = Math.bound(0, cursorWorldPosition.y - h / 2);
+	 * double x = Math.max(0, cursorWorldPosition.x - w / 2);
+	 * double y = Math.max(0, cursorWorldPosition.y - h / 2);
 	 * setViewportBound(new VRectangle(x, y, w, h));
 	 * return true;
 	 * }
@@ -232,9 +245,9 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * double w = Math.min(getTopographyBound().getWidth(), viewportBound.width * 1.2);
 	 * double h = Math.min(getTopographyBound().getWidth(), viewportBound.height * 1.2);
 	 * 
-	 * double x = Math.bound(0, Math.min(cursorWorldPosition.x - w / 2,
+	 * double x = Math.max(0, Math.min(cursorWorldPosition.x - w / 2,
 	 * getTopographyBound().getWidth() - w));
-	 * double y = Math.bound(0, Math.min(cursorWorldPosition.y - h / 2,
+	 * double y = Math.max(0, Math.min(cursorWorldPosition.y - h / 2,
 	 * getTopographyBound().getHeight() - h));
 	 * setViewportBound(new VRectangle(x, y, w, h));
 	 * return true;
@@ -483,9 +496,14 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 				getWindowBound().getHeight() / getViewportBound().getHeight());
 	}
 
+	/**
+	 *
+	 * @param pInPixel the mouse position of the mouse event
+	 * @return
+	 */
 	protected VPoint pixelToWorld(final VPoint pInPixel) {
-		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX(),
-				(getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
+				getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
 		/*
 		 * return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX() +
 		 * getViewportBound().getX(),

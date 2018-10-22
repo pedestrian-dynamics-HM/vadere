@@ -64,4 +64,8 @@ public class AttributesStairs extends AttributesEmbedShape {
 		return upwardDirection;
 	}
 
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
 }

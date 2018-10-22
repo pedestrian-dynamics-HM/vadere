@@ -95,18 +95,18 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public VShape translatePrecise(final IPoint vector) {
+	public VRectangle translatePrecise(final IPoint vector) {
 		VPoint dp = VPoint.addPrecise(vector, new VPoint(getX(), getY()));
 		return new VRectangle(dp.getX(), dp.getY(), getWidth(), getHeight());
 	}
 
 	@Override
-	public VShape translate(final IPoint vector) {
+	public VRectangle translate(final IPoint vector) {
 		return new VRectangle(getX() + vector.getX(), getY() + vector.getY(), getWidth(), getHeight());
 	}
 
 	@Override
-	public VShape scale(final double scalar) {
+	public VRectangle scale(final double scalar) {
 		return new VRectangle(getX() * scalar, getY() * scalar, getWidth() * scalar, getHeight() * scalar);
 	}
 
@@ -134,12 +134,12 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
     @Override
-    public boolean intersect(final VShape shape) {
+    public boolean intersects(final VShape shape) {
         if(shape instanceof VRectangle){
             return super.intersects(((VRectangle)shape));
         }
         else if(shape instanceof VPolygon) {
-            return shape.intersect(this);
+            return ((VPolygon)shape).intersects(this);
         }
         else {
             throw new UnsupportedOperationException("not yet implemented");

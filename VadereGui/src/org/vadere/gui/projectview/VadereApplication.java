@@ -2,11 +2,10 @@ package org.vadere.gui.projectview;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.util.io.IOUtils;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -25,6 +24,9 @@ public class VadereApplication {
 		logger.info("starting Vadere GUI...");
         // load settings
 		loadPreferences();
+
+		// set locale
+		Messages.loadLanguageFromPreferences(VadereApplication.class);
 
 		// start main gui
 		ProjectView.start();

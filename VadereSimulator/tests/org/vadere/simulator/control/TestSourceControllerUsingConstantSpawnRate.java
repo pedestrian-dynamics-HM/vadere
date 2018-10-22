@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
@@ -19,6 +20,7 @@ import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.geometry.shapes.VPoint;
 import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 
 public class TestSourceControllerUsingConstantSpawnRate {
 
@@ -63,6 +65,11 @@ public class TestSourceControllerUsingConstantSpawnRate {
 				Pedestrian ped = new Pedestrian(att, d.random);
 				ped.setPosition(position);
 				return ped;
+			}
+
+			@Override
+			public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+				return createElement(position, -1, Pedestrian.class).getShape();
 			}
 		};
 

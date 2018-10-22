@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.topographycreator.control.AttributeModifier;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
@@ -20,6 +21,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 /**
  * A TopographyBuilder builds a Topography-Object step by step. After the Topography-Object is build
@@ -137,6 +139,13 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topography.setTeleporter(teleporter);
 
 		return topography;
+	}
+
+	public void translateElements(final double x, final double y) {
+		for(ScenarioElement element : topographyElements) {
+			VShape shape = element.getShape().translate(new VPoint(x, y));
+			AttributeModifier.setShapeToAttributes(element, shape);
+		}
 	}
 
 	public ScenarioElement selectElement(final VPoint position) {

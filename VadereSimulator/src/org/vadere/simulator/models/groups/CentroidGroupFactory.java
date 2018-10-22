@@ -34,7 +34,7 @@ public class CentroidGroupFactory extends GroupFactory {
 		}
 
 		currentGroup.addMember(ped);
-		ped.addGroupId(currentGroup.getID());
+		ped.addGroupId(currentGroup.getID(), currentGroup.getSize());
 		groupCollection.registerMember(ped, currentGroup);
 		if (currentGroup.getOpenPersons() == 0) {
 			newGroups.pollFirst(); // remove full group from list.

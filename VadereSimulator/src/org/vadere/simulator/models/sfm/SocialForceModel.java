@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.sfm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
@@ -17,6 +18,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.potential.gradients.GradientProvider;
 
 import java.util.Collection;
@@ -153,9 +155,19 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 		this.pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, id > 0 ? id : pedestrianIdCounter);
-		Pedestrian result = new Pedestrian(pedAttributes, random);
-		result.setPosition(position);
+		Pedestrian result = create(position, pedAttributes);
 		return result;
+	}
+
+	private Pedestrian create(@NotNull final VPoint position, @NotNull final AttributesAgent pedAttributes) {
+		Pedestrian pedestrian = new Pedestrian(pedAttributes, random);
+		pedestrian.setPosition(position);
+		return pedestrian;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
+		return create(position, new AttributesAgent(elementAttributes, -1)).getShape();
 	}
 
 	@Override

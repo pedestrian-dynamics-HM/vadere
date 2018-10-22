@@ -3,6 +3,7 @@
  */
 package org.vadere.simulator.models.ovm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
@@ -16,6 +17,7 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 
 import java.util.Collection;
@@ -81,7 +83,6 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 		models = Collections.singletonList(this);
 	}
 
-
 	@Override
 	/*
 	  Creates a single car with given attributes
@@ -99,6 +100,11 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 		result.setPosition(position);
 		// result.setVelocity(result.getCarAttrributes().getDirection());
 		return result;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+		return new Car(new AttributesCar(elementAttributes, -1), random).getShape();
 	}
 
 	@Override

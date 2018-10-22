@@ -40,7 +40,8 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 	public PotentialFieldDistanceEikonalEq(@NotNull final Collection<VShape> obstacles,
 										   @NotNull final VRectangle bounds,
 										   @NotNull final AttributesFloorField attributesFloorField) {
-		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState());
+		CellGrid cellGrid = new CellGrid(bounds.getWidth(),
+				bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
 
 		for (VShape shape : obstacles) {
@@ -79,7 +80,7 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 	@Override
 	public double getPotential(@NotNull IPoint pos, @Nullable Agent agent) {
 		// unknownPenalty = 0.0 since there will be no unknowns such as values at obstacles
-		// the fmm can cause an error mostly an underestimation of 20% near the source which are exactly the points we are interested
+		// the fmm can cause an topographyError mostly an underestimation of 20% near the source which are exactly the points we are interested
 		return eikonalSolver.getPotential(pos, 0.0, 1.2);
 	}
 

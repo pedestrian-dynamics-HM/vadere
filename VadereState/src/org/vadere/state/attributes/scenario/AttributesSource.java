@@ -216,4 +216,9 @@ public class AttributesSource extends AttributesEmbedShape {
 		checkSealed();
 		this.dynamicElementType = dynamicElementType;
 	}
+
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
 }

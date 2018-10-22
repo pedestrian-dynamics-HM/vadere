@@ -64,6 +64,7 @@ public class ScenarioRun implements Runnable {
 	// if overwriteTimestampSetting is true do note use timestamp in output directory
 	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
+		this.scenario.setSimulationRunning(true); // create copy of ScenarioStore and redirect getScenarioStore to this copy for simulation.
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
@@ -92,7 +93,7 @@ public class ScenarioRun implements Runnable {
 			synchronized (scenarioStore) {
 				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 				scenarioStore.getTopography().reset();
-				System.out.println("StartIt " + scenario.getName());
+				logger.info("StartIt " + scenario.getName());
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 				modelBuilder.createModelAndRandom();
 
@@ -138,6 +139,7 @@ public class ScenarioRun implements Runnable {
 		if (finishedListener != null)
 			finishedListener.finished(this);
 
+		scenario.setSimulationRunning(false); // remove  simulation copy of ScenarioStore and redirect getScenarioStore to base copy.
 		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
 

@@ -221,7 +221,7 @@ public class VRing implements VShape {
 	}
 
 	@Override
-	public boolean intersect(VShape shape) {
+	public boolean intersects(VShape shape) {
 		throw new UnsupportedOperationException("not yet implemented.");
 	}
 

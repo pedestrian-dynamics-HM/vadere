@@ -47,7 +47,7 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
 ### Run the Application
 
 1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
-2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -DskipTests` if you want to skip the unit tests). This will build `vadere.jar`and `postvis.jar`. 
+2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`and `postvis.jar`. 
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
@@ -77,6 +77,9 @@ Follow the **installation instructions** above i.e. install all required softwar
 - select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
 - open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
 - click the *run*-icon next to the `main` method
+- edit the run configuration for `VadereApplication` to build the project using Maven instead of IntelliJ's internal builder to avoid compilation errors:
+  * click *Edit Configurations* (in dropdown menu next to the play/debug button)
+  * under *Before launch*, add *Run Maven Goal* and use the Maven goal `compile`
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
 

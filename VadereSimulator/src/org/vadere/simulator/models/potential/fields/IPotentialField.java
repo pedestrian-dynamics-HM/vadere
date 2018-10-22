@@ -181,7 +181,11 @@ public interface IPotentialField {
     }
 
 
-	static IPotentialField copyAgentField(final @NotNull IPotentialField potentialField, final @NotNull Agent agent, final @NotNull VRectangle bound, final double steps) {
+	static IPotentialField copyAgentField(
+			final @NotNull IPotentialField potentialField,
+			final @NotNull Agent agent,
+			final @NotNull VRectangle bound,
+			final double steps) {
 
 		final int gridWidth = (int)Math.ceil(bound.getWidth() / steps)+1;
 		final int gridHeight = (int)Math.ceil(bound.getHeight() / steps)+1;
@@ -200,8 +204,8 @@ public interface IPotentialField {
 				int incX = 1;
 				int incY = 1;
 
-				int col = (int)(pos.getX() / steps);
-				int row = (int)(pos.getY() / steps);
+				int col = (int)((pos.getX() - bound.getMinX()) / steps);
+				int row = (int)((pos.getY() - bound.getMinY()) / steps);
 
 				if (col + 1 >= gridWidth) {
 					incX = 0;

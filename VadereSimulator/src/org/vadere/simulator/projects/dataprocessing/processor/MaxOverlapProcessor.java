@@ -22,7 +22,7 @@ import java.util.OptionalDouble;
 
 
 @DataProcessorClass()
-public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
+public class MaxOverlapProcessor extends NoDataKeyProcessor<Double> {
 	private PedestrianOverlapProcessor pedOverlapProc;
 
 
@@ -45,12 +45,6 @@ public class MaxOverlapProcessor extends DataProcessor<NoDataKey, Double> {
 		OverlapData maximumOverlap = this.pedOverlapProc.getData().values().stream().max(OverlapData::maxDist).orElse(OverlapData.noOverLap);
 		this.putValue(NoDataKey.key(),maximumOverlap.getOverlap());
 	}
-
-	public void postLoopAddResultInfo(final SimulationState state, SimulationResult result){
-		result.setMaxOverlap(this.getValue(NoDataKey.key()));
-
-	}
-
 
 	@Override
 	public void init(final ProcessorManager manager) {

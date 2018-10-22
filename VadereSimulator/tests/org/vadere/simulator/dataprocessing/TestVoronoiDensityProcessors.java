@@ -13,15 +13,15 @@
 //import org.vadere.state.scenario.Agent;
 //import org.vadere.state.scenario.Pedestrian;
 //import org.vadere.state.scenario.Topography;
-//import org.vadere.util.data.Row;
-//import org.vadere.util.data.Table;
-//import org.vadere.geometry.Utils;
-//import org.vadere.util.geometry.shapes.VPoint;
-//import org.vadere.util.geometry.shapes.VRectangle;
+//import org.vadere.utils.data.Row;
+//import org.vadere.utils.data.Table;
+//import org.vadere.utils.geometry.GeometryUtils;
+//import org.vadere.utils.geometry.shapes.VPoint;
+//import org.vadere.utils.geometry.shapes.VRectangle;
 //
 //import java.net.URISyntaxException;
-//import java.util.ArrayList;
-//import java.util.List;
+//import java.utils.ArrayList;
+//import java.utils.List;
 //
 //import static junit.framework.Assert.assertEquals;
 //import static junit.framework.Assert.assertTrue;
@@ -30,7 +30,7 @@
 //
 //
 ///**
-// * This class triangleContains tests that test both Voronoi-Implementation (the JTS-Version and our own
+// * This class contains tests that test both Voronoi-Implementation (the JTS-Version and our own
 // * version).
 // */
 //public class TestVoronoiDensityProcessors {
@@ -46,7 +46,7 @@
 //
 //	@Before
 //	public void setUp() throws URISyntaxException {
-//		densityEpsilon = Utils.DOUBLE_EPS;
+//		densityEpsilon = GeometryUtils.DOUBLE_EPS;
 //		topographyBounds = new VRectangle(0, 0, 10, 10);
 //		stepCounter = 0;
 //		mockedTopography = mock(Topography.class);
@@ -115,9 +115,9 @@
 //		double density = (double) table2.getEntry(densityVoronoiProcessor.getDensityType(), 0);
 //
 //		assertTrue("high density is not equals to the expected highest density",
-//				Math.abs(highestPossibleDensity - geoDensity) <= Utils.DOUBLE_EPS);
+//				Math.abs(highestPossibleDensity - geoDensity) <= GeometryUtils.DOUBLE_EPS);
 //		assertTrue("high density is not equals to the expected highest density",
-//				Math.abs(highestPossibleDensity - density) <= Utils.DOUBLE_EPS);
+//				Math.abs(highestPossibleDensity - density) <= GeometryUtils.DOUBLE_EPS);
 //	}
 //
 //	/**
@@ -228,7 +228,7 @@
 //		VPoint[] pedestrianPoints =
 //				CreatePoints.generateRandomVPoint(new VRectangle(0, 0, 20, 20), numberOfPedestrians);
 //		VPoint pointOutsideVoronoiArea = pedestrianPoints[0]
-//				.add(new VPoint(voronoiArea.getWidth() - voronoiArea.getX() + Utils.DOUBLE_EPS, 0));
+//				.add(new VPoint(voronoiArea.getWidth() - voronoiArea.getX() + GeometryUtils.DOUBLE_EPS, 0));
 //		pedestrianPoints[0] = pointOutsideVoronoiArea;
 //
 //		VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea, numberOfMeasurePoints);
