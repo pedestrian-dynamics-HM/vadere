@@ -3,7 +3,6 @@ package org.vadere.simulator.models.osm.optimization;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.types.MovementType;
-import org.vadere.geometry.Utils;
 import org.vadere.geometry.Vector2D;
 import org.vadere.geometry.shapes.ICircleSector;
 import org.vadere.geometry.shapes.VCircle;

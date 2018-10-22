@@ -13,11 +13,10 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.Vector2D;
 import org.vadere.geometry.shapes.IPoint;
 import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
 @ModelClass
@@ -73,7 +72,7 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 
 			// include h_epsilon to avoid strange behaviour when peds step exactly on top of each
 			// other
-			if (distance < Utils.DOUBLE_EPS) {
+			if (distance < GeometryUtils.DOUBLE_EPS) {
 				pot = 0;
 			} else {
 				pot = attributes.getPedestrianBodyPotential()

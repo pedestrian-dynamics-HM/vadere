@@ -3,7 +3,7 @@ package org.vadere.state.scenario;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VPolygon;
 import org.vadere.geometry.shapes.VRectangle;
 
@@ -24,8 +24,8 @@ public class TestObstacle {
 	public void setUp() {
 		VRectangle rectangle1 = new VRectangle(0, 0, 10, 10);
 		VRectangle rectangle2 = new VRectangle(0, 0, 10, 10);
-		VPolygon polygon1 = Utils.polygonFromPoints2D(rectangle1.getCornerPoints());
-		VPolygon polygon2 = Utils.polygonFromPoints2D(rectangle2.getCornerPoints());
+		VPolygon polygon1 = GeometryUtils.polygonFromPoints2D(rectangle1.getCornerPoints());
+		VPolygon polygon2 = GeometryUtils.polygonFromPoints2D(rectangle2.getCornerPoints());
 
 		AttributesObstacle attributesObstacle1 = new AttributesObstacle(-1, rectangle1);
 		AttributesObstacle attributesObstacle2 = new AttributesObstacle(-1, rectangle2);

@@ -1,7 +1,7 @@
 package org.vadere.geometry.shapes;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 
 /**
  * @author Benedikt Zoennchen
@@ -29,8 +29,8 @@ public class VCone {
 	}
 
 	public boolean contains(final VPoint point) {
-		double angle1 = Utils.angleTo(point.subtract(position));
-		double angle2 = Utils.angleTo(direction);
+		double angle1 = GeometryUtils.angleTo(point.subtract(position));
+		double angle2 = GeometryUtils.angleTo(direction);
 		return Math.abs(angle1 - angle2) < angle / 2;
 	}
 

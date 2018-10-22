@@ -3,7 +3,7 @@ package org.vadere.util.potential.calculators.mesh;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.inter.IFace;
 import org.vadere.geometry.mesh.inter.IHalfEdge;
 import org.vadere.geometry.mesh.inter.IMesh;
@@ -302,11 +302,11 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         VPoint p2 = getMesh().toPoint(edge);
         VPoint p3 = getMesh().toPoint(getMesh().getNext(edge));
 
-        double angle1 = Utils.angle(p1, p2, p3);
+        double angle1 = GeometryUtils.angle(p1, p2, p3);
 
         // non-acute triangle
         double rightAngle = Math.PI/2;
-        return angle1 > rightAngle + Utils.DOUBLE_EPS;
+        return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
     }
 
     /**
@@ -378,8 +378,8 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         Predicate<E> isPointInCone = e ->
         {
             VPoint point = getMesh().toPoint(e);
-            return  Utils.isLeftOf(p, p.add(direction2), point) &&
-		            Utils.isRightOf(p, p.add(direction1), point);
+            return  GeometryUtils.isLeftOf(p, p.add(direction2), point) &&
+		            GeometryUtils.isRightOf(p, p.add(direction1), point);
         };
 
         Predicate<E> isEdgeInCone = e -> isPointInCone.test(e) || isPointInCone.test(getMesh().getPrev(e));
@@ -419,7 +419,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         // 1. construct the acute cone
         VPoint direction = triangle.getIncenter().subtract(point);
-        double angle = Math.PI - Utils.angle(acceptedPoint, point, unacceptedPoint);
+        double angle = Math.PI - GeometryUtils.angle(acceptedPoint, point, unacceptedPoint);
         VPoint origin = new VPoint(point);
         VCone cone = new VCone(origin, direction, angle);
         E minHe = null;
@@ -475,7 +475,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         // 1. construct the acute cone
         VPoint direction = triangle.getIncenter().subtract(point);
-        double angle = Math.PI - Utils.angle(p1, point, p2);
+        double angle = Math.PI - GeometryUtils.angle(p1, point, p2);
         VPoint origin = new VPoint(point);
         VCone cone = new VCone(origin, direction, angle);
 
@@ -568,7 +568,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         double b = p1.distance(point);
         double c = p1.distance(p2);
 
-        double phi = Utils.angle(p1, point, p2);
+        double phi = GeometryUtils.angle(p1, point, p2);
         double cosphi = Math.cos(phi);
 
         double F = 1.0 / this.timeCostFunction.costAt(point);

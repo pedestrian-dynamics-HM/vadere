@@ -30,8 +30,8 @@ public class ComparablePoint extends VPoint implements
 	 */
 	@Override
 	public int compareTo(ComparablePoint p) {
-		if (Math.abs(this.x - p.x) < Utils.DOUBLE_EPS) {
-			if (Math.abs(this.y - p.y) < Utils.DOUBLE_EPS) {
+		if (Math.abs(this.x - p.x) < GeometryUtils.DOUBLE_EPS) {
+			if (Math.abs(this.y - p.y) < GeometryUtils.DOUBLE_EPS) {
 				return 0;
 			} else {
 				if (this.y > p.y) {

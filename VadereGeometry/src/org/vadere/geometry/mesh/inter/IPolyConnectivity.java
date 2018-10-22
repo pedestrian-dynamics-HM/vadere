@@ -3,7 +3,7 @@ package org.vadere.geometry.mesh.inter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.IncrementalTriangulation;
 import org.vadere.geometry.mesh.iterators.EdgeIterator;
 import org.vadere.geometry.shapes.IPoint;
@@ -750,7 +750,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	default boolean isRightOf(final double x1, final double y1, final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
-		return Utils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
+		return GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
 	}
 
 	/**
@@ -767,7 +767,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	default boolean isLeftOf(final double x1, final double y1, final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
-		return Utils.isLeftOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
+		return GeometryUtils.isLeftOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
 	}
 
     /**
@@ -783,7 +783,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	default boolean intersects(final IPoint p1, final IPoint p2, E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
-		return Utils.intersectLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+		return GeometryUtils.intersectLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
 	}
 
 

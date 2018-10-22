@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.math.BigDecimal;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 
 /**
  * Immutable point.
@@ -174,7 +174,7 @@ public class VPoint implements Cloneable, IPoint {
 		VPoint result;
 		double abs = distanceToOrigin();
 
-		if (abs < Utils.DOUBLE_EPS) {
+		if (abs < GeometryUtils.DOUBLE_EPS) {
 			result = new VPoint(0, 0);
 		} else {
 			result = new VPoint(x / abs, y / abs);

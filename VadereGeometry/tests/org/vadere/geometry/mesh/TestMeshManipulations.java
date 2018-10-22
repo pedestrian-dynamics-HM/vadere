@@ -2,7 +2,7 @@ package org.vadere.geometry.mesh;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.PFace;
 import org.vadere.geometry.mesh.gen.PHalfEdge;
 import org.vadere.geometry.mesh.gen.PVertex;
@@ -68,11 +68,11 @@ public class TestMeshManipulations {
 
 		PFace<VPoint> face = test.triangulation.locateFace(4, 5).get();
 		List<VPoint> points = test.triangulation.getMesh().getPoints(face);
-		VPoint incetner = Utils.getIncenter(points.get(0), points.get(1), points.get(2));
+		VPoint incetner = GeometryUtils.getIncenter(points.get(0), points.get(1), points.get(2));
 
 		Predicate<PFace<VPoint>> mergePredicate = f -> {
 			List<VPoint> pList = test.triangulation.getMesh().getPoints(f);
-			VPoint icetner = Utils.getIncenter(pList.get(0), pList.get(1), pList.get(2));
+			VPoint icetner = GeometryUtils.getIncenter(pList.get(0), pList.get(1), pList.get(2));
 			return icetner.distance(incetner) < 500;
 		};
 

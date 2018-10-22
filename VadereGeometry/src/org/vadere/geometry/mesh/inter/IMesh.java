@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.PFace;
 import org.vadere.geometry.mesh.gen.PHalfEdge;
 import org.vadere.geometry.mesh.gen.PMesh;
@@ -1720,7 +1720,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		E result = null;
 		double minDistance = Double.MAX_VALUE;
 		for (E edge : getEdgeIt(face)) {
-			double distance = Utils.distanceToLineSegment(getPoint(getPrev(edge)), getPoint(edge), x, y);
+			double distance = GeometryUtils.distanceToLineSegment(getPoint(getPrev(edge)), getPoint(edge), x, y);
 			if(distance < minDistance) {
 				result = edge;
 				minDistance = distance;

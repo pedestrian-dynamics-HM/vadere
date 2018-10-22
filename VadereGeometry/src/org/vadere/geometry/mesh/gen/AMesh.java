@@ -3,7 +3,7 @@ package org.vadere.geometry.mesh.gen;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.SpaceFillingCurve;
 import org.vadere.geometry.mesh.inter.IMesh;
 import org.vadere.geometry.mesh.inter.IPointLocator;
@@ -589,7 +589,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         List<VPoint> centroids = new ArrayList<>(this.numberOfFaces);
 
         for(int i = 0; i < this.faces.size(); i++) {
-            VPoint incenter = Utils.getCentroid(this.getVertices(faces.get(i)));
+            VPoint incenter = GeometryUtils.getCentroid(this.getVertices(faces.get(i)));
             centroids.add(incenter);
             maxX = Math.max(maxX, incenter.getX());
             maxY = Math.max(maxY, incenter.getY());

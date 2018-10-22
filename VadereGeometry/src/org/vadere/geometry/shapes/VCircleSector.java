@@ -3,7 +3,7 @@ package org.vadere.geometry.shapes;
 import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,14 +57,14 @@ public class VCircleSector implements ICircleSector {
 
 		List<VPoint> intersectionPoints = new ArrayList<>();
 		if (getLine1().intersectsLine(x1, y1, x2, y2)) {
-			intersectionPoints.add(Utils.lineIntersectionPoint(getLine1(), x1, y1, x2, y2));
+			intersectionPoints.add(GeometryUtils.lineIntersectionPoint(getLine1(), x1, y1, x2, y2));
 		}
 
 		if (getLine2().intersectsLine(x1, y1, x2, y2)) {
-			intersectionPoints.add(Utils.lineIntersectionPoint(getLine2(), x1, y1, x2, y2));
+			intersectionPoints.add(GeometryUtils.lineIntersectionPoint(getLine2(), x1, y1, x2, y2));
 		}
 
-		circle.getIntersectionPoints(x1, y1, x2, y2).stream().filter(p -> insideAngle(Utils.angleTo(getCenter(), p))).forEach(p -> intersectionPoints.add(p));
+		circle.getIntersectionPoints(x1, y1, x2, y2).stream().filter(p -> insideAngle(GeometryUtils.angleTo(getCenter(), p))).forEach(p -> intersectionPoints.add(p));
 
 		return ImmutableList.copyOf(intersectionPoints);
 	}
@@ -86,7 +86,7 @@ public class VCircleSector implements ICircleSector {
 			// intersection points with circle
 			ImmutableList<VPoint> interSectionPoints = circle.getIntersectionPoints(x1, y1, x2, y2);
 			// is one of this intersection points inside the section
-			return interSectionPoints.stream().anyMatch(p -> insideAngle(Utils.angleTo(getCenter(), p)));
+			return interSectionPoints.stream().anyMatch(p -> insideAngle(GeometryUtils.angleTo(getCenter(), p)));
 		}
 	}
 

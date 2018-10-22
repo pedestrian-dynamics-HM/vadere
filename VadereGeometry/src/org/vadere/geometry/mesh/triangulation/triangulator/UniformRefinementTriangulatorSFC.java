@@ -3,7 +3,7 @@ package org.vadere.geometry.mesh.triangulation.triangulator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.IDistanceFunction;
 import org.vadere.geometry.mesh.inter.*;
 import org.vadere.geometry.shapes.*;
@@ -546,8 +546,8 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
 					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 
-					if(Utils.isCCW(r, p, q)) {
-						double angle = Utils.angle(r, p, q);
+					if(GeometryUtils.isCCW(r, p, q)) {
+						double angle = GeometryUtils.angle(r, p, q);
 						if(angle < 0.5*Math.PI) {
 							triangulation.createFaceAtBoundary(edge);
 						}

@@ -4,7 +4,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.inter.IFace;
 import org.vadere.geometry.mesh.inter.IHalfEdge;
 import org.vadere.geometry.mesh.inter.IMesh;
@@ -378,7 +378,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	    E edge = tri.getMesh().closestEdge(face, point.getX(), point.getY());
 	    P p1 = tri.getMesh().getPoint(tri.getMesh().getPrev(edge));
 	    P p2 = tri.getMesh().getPoint(edge);
-	    return Utils.isOnEdge(p1, p2, point, tolerance);
+	    return GeometryUtils.isOnEdge(p1, p2, point, tolerance);
     }
 
     @Override

@@ -2,7 +2,7 @@ package org.vadere.geometry.mesh.gen;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.inter.*;
 import org.vadere.geometry.shapes.IPoint;
 import org.vadere.geometry.shapes.VLine;
@@ -73,6 +73,6 @@ public class ConstrainedTriangulation<P extends IPoint, V extends IVertex<P>, E 
      * @return
      */
     private boolean faceIntersectsLine(final F face, IPoint p1, IPoint p2) {
-        return getMesh().streamEdges(face).anyMatch(edge -> Utils.intersectLine(p1, p2, getMesh().getPoint(edge), getMesh().getPoint(getMesh().getPrev(edge))));
+        return getMesh().streamEdges(face).anyMatch(edge -> GeometryUtils.intersectLine(p1, p2, getMesh().getPoint(edge), getMesh().getPoint(getMesh().getPrev(edge))));
     }
 }

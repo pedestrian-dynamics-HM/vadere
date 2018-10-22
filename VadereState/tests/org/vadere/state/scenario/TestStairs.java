@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.scenario.Stairs.Tread;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import static org.junit.Assert.assertEquals;
 
 public class TestStairs {
@@ -50,10 +50,10 @@ public class TestStairs {
 		Tread[] treads = stairs1.getTreads();
 
 		for (int i = 0; i < treads.length; i++) {
-			assertEquals(0.0, treads[i].treadline.y1, Utils.DOUBLE_EPS);
-			assertEquals(5.0, treads[i].treadline.y2, Utils.DOUBLE_EPS);
-			assertEquals(1 + i * 2, treads[i].treadline.x1, Utils.DOUBLE_EPS);
-			assertEquals(1 + i * 2, treads[i].treadline.x2, Utils.DOUBLE_EPS);
+			assertEquals(0.0, treads[i].treadline.y1, GeometryUtils.DOUBLE_EPS);
+			assertEquals(5.0, treads[i].treadline.y2, GeometryUtils.DOUBLE_EPS);
+			assertEquals(1 + i * 2, treads[i].treadline.x1, GeometryUtils.DOUBLE_EPS);
+			assertEquals(1 + i * 2, treads[i].treadline.x2, GeometryUtils.DOUBLE_EPS);
 		}
 	}
 
@@ -65,10 +65,10 @@ public class TestStairs {
 		Tread[] treads = stairs2.getTreads();
 
 		for (int i = 0; i < treads.length; i++) {
-			assertEquals(10.0, treads[i].treadline.x1, Utils.DOUBLE_EPS);
-			assertEquals(0.0, treads[i].treadline.x2, Utils.DOUBLE_EPS);
-			assertEquals(0.5 + i * 1.0, treads[i].treadline.y1, Utils.DOUBLE_EPS);
-			assertEquals(0.5 + i * 1.0, treads[i].treadline.y2, Utils.DOUBLE_EPS);
+			assertEquals(10.0, treads[i].treadline.x1, GeometryUtils.DOUBLE_EPS);
+			assertEquals(0.0, treads[i].treadline.x2, GeometryUtils.DOUBLE_EPS);
+			assertEquals(0.5 + i * 1.0, treads[i].treadline.y1, GeometryUtils.DOUBLE_EPS);
+			assertEquals(0.5 + i * 1.0, treads[i].treadline.y2, GeometryUtils.DOUBLE_EPS);
 		}
 	}
 

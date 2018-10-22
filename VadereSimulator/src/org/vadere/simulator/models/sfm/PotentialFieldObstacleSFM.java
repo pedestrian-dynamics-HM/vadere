@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
@@ -74,7 +74,7 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 			// compute and normalize the gradient length to the potential
 			double normDV = Math.sqrt(distanceVec[0] * distanceVec[0]
 					+ distanceVec[1] * distanceVec[1]);
-			if (normDV > Utils.DOUBLE_EPS) {
+			if (normDV > GeometryUtils.DOUBLE_EPS) {
 				grad[0] = -distanceVec[0] / normDV * pot;
 				grad[1] = -distanceVec[1] / normDV * pot;
 			} else {

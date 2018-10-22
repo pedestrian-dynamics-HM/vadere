@@ -3,12 +3,15 @@ package org.vadere.util.geometry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
+import org.vadere.geometry.Vector2D;
 import org.vadere.geometry.shapes.VCircle;
 import org.vadere.geometry.shapes.VLine;
 import org.vadere.geometry.shapes.VPoint;
@@ -38,7 +41,7 @@ public class TestGeometry {
 	@Test
 	public void testOrderByAngle() {
 		List<VPoint> allPoints = toTest.getPoints();
-		List<DataPoint> orderedList = GeometryUtils.orderByAngle(allPoints,
+		List<DataPoint> orderedList = orderByAngle(allPoints,
 				new VPoint(roomSideLen / 2, roomSideLen / 2));
 
 		List<VPoint> testList = new LinkedList<VPoint>();
@@ -56,7 +59,7 @@ public class TestGeometry {
 	public void testLineCircleIntersectionZeroResults() {
 		VCircle circle = new VCircle(1, 1, 1);
 		VLine line = new VLine(3,0, 4, 1);
-		VPoint[] intersectionPoints = Utils.intersection(line, circle);
+		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
 		assertTrue(intersectionPoints.length == 0);
 	}
 
@@ -64,7 +67,7 @@ public class TestGeometry {
 	public void testLineCircleIntersectionTwoResults() {
 		VCircle circle = new VCircle(3, 4.1, 3);
 		VLine line = new VLine(3,4.1, 4, 5.1);
-		VPoint[] intersectionPoints = Utils.intersection(line, circle);
+		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
 		// computed with http://www.ambrsoft.com/TrigoCalc/Circles2/circlrLine_.htm
 		VPoint[] expectedIntersectionPoints = new VPoint[]{
 				new VPoint(5.121, 6.221),
@@ -78,7 +81,7 @@ public class TestGeometry {
 	public void testLineCircleIntersectionOneResults() {
 		VCircle circle = new VCircle(1, 1, 1);
 		VLine line = new VLine(3,0, 4, 0);
-		VPoint[] intersectionPoints = Utils.intersection(line, circle);
+		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
 
 		assertTrue(intersectionPoints.length == 1);
 
@@ -111,6 +114,29 @@ public class TestGeometry {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Orders a given list angular relative to a given point, starting with
+	 * angle 0.
+	 *
+	 * @param allPoints
+	 * @param center
+	 * @return an ordered DataPoint list with the angle of the point as data and
+	 *         the original index set.
+	 */
+	private static List<DataPoint> orderByAngle(List<VPoint> allPoints,
+	                                           VPoint center) {
+		List<DataPoint> orderedList = new ArrayList<DataPoint>();
+
+		for (int i = 0; i < allPoints.size(); i++) {
+			Vector2D p = new Vector2D(allPoints.get(i));
+			orderedList.add(new DataPoint(p.x, p.y, GeometryUtils.angleTo(p, center)));
+		}
+		// sort by angle
+		Collections.sort(orderedList, DataPoint.getComparator());
+
+		return orderedList;
 	}
 
 }

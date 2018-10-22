@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VPoint;
 import org.vadere.geometry.shapes.VRectangle;
 
@@ -96,7 +96,7 @@ public class CreatePoints {
 		double x = center.x - hexagonAmbitRadius;
 		double y = center.y;
 		VPoint left = new VPoint(x, y);
-		if (!containsPoint(points, left, Utils.DOUBLE_EPS)
+		if (!containsPoint(points, left, GeometryUtils.DOUBLE_EPS)
 				&& bounds.contains(new VPoint(left.x - hexagonAmbitRadius, left.y))) {
 			points.add(left);
 			addPoint = true;
@@ -105,7 +105,7 @@ public class CreatePoints {
 		x = center.x + hexagonAmbitRadius;
 		y = center.y;
 		VPoint right = new VPoint(x, y);
-		if (!containsPoint(points, right, Utils.DOUBLE_EPS)
+		if (!containsPoint(points, right, GeometryUtils.DOUBLE_EPS)
 				&& bounds.contains(new VPoint(right.x + hexagonAmbitRadius, right.y))) {
 			points.add(right);
 			addPoint = true;
@@ -114,7 +114,7 @@ public class CreatePoints {
 		x = center.x - hexagonAmbitRadius / 2;
 		y = center.y + hexagonInCircleRadius;
 		VPoint topLeft = new VPoint(x, y);
-		if (!containsPoint(points, topLeft, Utils.DOUBLE_EPS)
+		if (!containsPoint(points, topLeft, GeometryUtils.DOUBLE_EPS)
 				&& bounds.contains(new VPoint(topLeft.x - hexagonAmbitRadius, topLeft.y + hexagonAmbitRadius))) {
 			points.add(topLeft);
 			addPoint = true;
@@ -123,7 +123,7 @@ public class CreatePoints {
 		x = center.x + hexagonAmbitRadius / 2;
 		y = center.y + hexagonInCircleRadius;
 		VPoint topRight = new VPoint(x, y);
-		if (!containsPoint(points, topRight, Utils.DOUBLE_EPS)
+		if (!containsPoint(points, topRight, GeometryUtils.DOUBLE_EPS)
 				&& bounds.contains(new VPoint(topRight.x + hexagonAmbitRadius, topRight.y + hexagonAmbitRadius))) {
 			points.add(topRight);
 			addPoint = true;
@@ -132,7 +132,7 @@ public class CreatePoints {
 		x = center.x - hexagonAmbitRadius / 2;
 		y = center.y - hexagonInCircleRadius;
 		VPoint bottomLeft = new VPoint(x, y);
-		if (!containsPoint(points, bottomLeft, Utils.DOUBLE_EPS)
+		if (!containsPoint(points, bottomLeft, GeometryUtils.DOUBLE_EPS)
 				&& bounds.contains(new VPoint(bottomLeft.x - hexagonAmbitRadius, bottomLeft.y - hexagonAmbitRadius))) {
 			points.add(bottomLeft);
 			addPoint = true;
@@ -142,7 +142,7 @@ public class CreatePoints {
 		x = center.x + hexagonAmbitRadius / 2;
 		y = center.y - hexagonInCircleRadius;
 		VPoint bottomRight = new VPoint(x, y);
-		if (!containsPoint(points, bottomRight, Utils.DOUBLE_EPS) && bounds
+		if (!containsPoint(points, bottomRight, GeometryUtils.DOUBLE_EPS) && bounds
 				.contains(new VPoint(bottomRight.x + hexagonAmbitRadius, bottomRight.y - hexagonAmbitRadius))) {
 			points.add(bottomRight);
 			addPoint = true;

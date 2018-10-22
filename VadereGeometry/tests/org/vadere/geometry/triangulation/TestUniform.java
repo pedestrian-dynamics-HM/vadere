@@ -1,5 +1,6 @@
-package org.vadere.geometry.gui;
+package org.vadere.geometry.triangulation;
 
+import org.vadere.geometry.gui.DebugGui;
 import org.vadere.geometry.gui.canvas.SimpleTriCanvas;
 import org.vadere.geometry.mesh.inter.ITriangulation;
 import org.vadere.geometry.shapes.VPoint;

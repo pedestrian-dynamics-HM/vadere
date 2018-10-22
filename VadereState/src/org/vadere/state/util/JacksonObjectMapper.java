@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.vadere.geometry.ShapeType;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.ScenarioElementType;
@@ -173,7 +173,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 		}
 
 		public VPolygon newVPolygon() {
-			return Utils.polygonFromPoints2D(points);
+			return GeometryUtils.polygonFromPoints2D(points);
 		}
 	}
 

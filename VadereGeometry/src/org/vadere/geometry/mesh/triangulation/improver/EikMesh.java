@@ -3,7 +3,7 @@ package org.vadere.geometry.mesh.triangulation.improver;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.IDistanceFunction;
 import org.vadere.geometry.mesh.inter.*;
 import org.vadere.geometry.shapes.IPoint;
@@ -372,7 +372,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	    	VPoint p = getMesh().toPoint(vertex);
 	    	VPoint q = getMesh().toPoint(getMesh().getNext(boundaryEdge));
 	    	VPoint r = getMesh().toPoint(getMesh().getPrev(boundaryEdge));
-	    	double angle = Utils.angle(r, p, q);
+	    	double angle = GeometryUtils.angle(r, p, q);
 
 	    	// back projection to the inside i.e. towards the inside of its triangle
 	    	if(distance > 0) {
@@ -384,7 +384,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 		    }
 		    // back projection to the outside
 		    else {
-			    if(angle > Math.PI || (Utils.isLeftOf(r, p, newPosition) && Utils.isLeftOf(p, q, newPosition))) {
+			    if(angle > Math.PI || (GeometryUtils.isLeftOf(r, p, newPosition) && GeometryUtils.isLeftOf(p, q, newPosition))) {
 				    position.subtract(projection);
 			    }
 			    else {

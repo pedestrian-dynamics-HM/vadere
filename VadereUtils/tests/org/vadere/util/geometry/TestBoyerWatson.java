@@ -4,7 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.*;
 import org.vadere.geometry.mesh.impl.VPTriangulation;
 import org.vadere.geometry.mesh.inter.*;
@@ -113,7 +113,7 @@ public class TestBoyerWatson {
 		PHalfEdge<VPoint> edge = mesh.getEdge(face);
 
 		// triangulations are always ccw ordered!
-		assertTrue(Utils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
+		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
 
 		delaunayTriangulation.splitTriangle(face, centerPoint, false);
 		delaunayTriangulation.finish();

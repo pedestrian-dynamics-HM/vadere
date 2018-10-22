@@ -1,7 +1,7 @@
 package org.vadere.geometry.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.PFace;
 import org.vadere.geometry.mesh.gen.PHalfEdge;
 import org.vadere.geometry.mesh.gen.PVertex;
@@ -255,7 +255,7 @@ public class RealWorldPlot {
 
 	public static void main(String... args) {
 
-		VPolygon boundary = Utils.polygonFromPoints2D(
+		VPolygon boundary = GeometryUtils.polygonFromPoints2D(
 				new VPoint(0,0),
 				new VPoint(0, 1),
 				new VPoint(1, 2),

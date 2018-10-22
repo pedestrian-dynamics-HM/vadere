@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 
 /**
  * A triangle. Points must be given in counter clockwise manner to get correct
@@ -43,7 +43,7 @@ public class VTriangle extends VPolygon {
      * @param p3
      */
     public VTriangle(@NotNull VPoint p1, @NotNull VPoint p2, @NotNull VPoint p3) {
-        super(Utils.polygonFromPoints2D(p1, p2, p3));
+        super(GeometryUtils.polygonFromPoints2D(p1, p2, p3));
 
         if(p1.equals(p2) || p1.equals(p3) || p2.equals(p3)) {
             throw new IllegalArgumentException("" + p1 + p2 + p3 + " is not a feasible set of points.");
@@ -57,15 +57,15 @@ public class VTriangle extends VPolygon {
 
     @Override
     public boolean contains(final IPoint point) {
-        return Utils.triangleContains(p1, p2, p3, point);
+        return GeometryUtils.triangleContains(p1, p2, p3, point);
 
     }
 
     // TODO: find better name
     public boolean isPartOf(final IPoint point, final double eps) {
-        double d1 = Utils.ccw(point, p1, p2);
-        double d2 = Utils.ccw(point, p2, p3);
-        double d3 = Utils.ccw(point, p3, p1);
+        double d1 = GeometryUtils.ccw(point, p1, p2);
+        double d2 = GeometryUtils.ccw(point, p2, p3);
+        double d3 = GeometryUtils.ccw(point, p3, p1);
         return (d1 <= eps && d2 <= eps && d3 <= eps) || (d1 >= -eps && d2 >= -eps && d3 >= -eps);
     }
 
@@ -79,15 +79,15 @@ public class VTriangle extends VPolygon {
         VLine l2 = new VLine(p1, p3);
         VLine l3 = new VLine(p2, p3);
 
-        return l1.ptSegDist(p3) < Utils.DOUBLE_EPS
-                || l2.ptSegDist(p2) < Utils.DOUBLE_EPS
-                || l3.ptSegDist(p1) < Utils.DOUBLE_EPS;
+        return l1.ptSegDist(p3) < GeometryUtils.DOUBLE_EPS
+                || l2.ptSegDist(p2) < GeometryUtils.DOUBLE_EPS
+                || l3.ptSegDist(p1) < GeometryUtils.DOUBLE_EPS;
     }
 
     public boolean isNonAcute() {
-        double angle1 = Utils.angle(p1, p2, p3);
-        double angle2 = Utils.angle(p2, p3, p1);
-        double angle3 = Utils.angle(p3, p1, p2);
+        double angle1 = GeometryUtils.angle(p1, p2, p3);
+        double angle2 = GeometryUtils.angle(p2, p3, p1);
+        double angle3 = GeometryUtils.angle(p3, p1, p2);
 
         // non-acute triangle
         double maxAngle = Math.max(Math.max(angle1, angle2), angle3);
@@ -105,7 +105,7 @@ public class VTriangle extends VPolygon {
 
     public VPoint getIncenter(){
         if(incenter == null) {
-            incenter = Utils.getIncenter(p1, p2, p3);
+            incenter = GeometryUtils.getIncenter(p1, p2, p3);
         }
 
         return incenter;
@@ -137,7 +137,7 @@ public class VTriangle extends VPolygon {
         double currentMinDistance = java.lang.Double.MAX_VALUE;
 
         for(VLine line : lines) {
-            VPoint p = Utils.closestToSegment(line, point);
+            VPoint p = GeometryUtils.closestToSegment(line, point);
             if(p.distance(point) < currentMinDistance) {
                 currentMinDistance = p.distance(point);
                 currentClosest = p;
@@ -149,7 +149,7 @@ public class VTriangle extends VPolygon {
 
     public VPoint getCircumcenter(){
         if(center == null) {
-            center = Utils.getCircumcenter(p1, p2, p3);
+            center = GeometryUtils.getCircumcenter(p1, p2, p3);
         }
         return center;
     }
@@ -174,7 +174,7 @@ public class VTriangle extends VPolygon {
     public VPoint getNormal(final VPoint p1, final VPoint p2) {
         VPoint normal = new VPoint(p2.y - p1.y, -(p2.x - p1.x));
         // if the normal is already inward facing, return it
-        if (Utils.ccw(p1, p2, normal) == Utils.ccw(p1, p2,
+        if (GeometryUtils.ccw(p1, p2, normal) == GeometryUtils.ccw(p1, p2,
                 this.midPoint())) {
             return normal;
         }

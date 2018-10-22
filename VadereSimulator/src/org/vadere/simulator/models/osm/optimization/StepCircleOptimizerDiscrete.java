@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.types.MovementType;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.Vector2D;
 import org.vadere.geometry.shapes.VCircle;
 import org.vadere.geometry.shapes.VPoint;
@@ -113,7 +113,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 			anchorAngle = 0;
 		}
 
-		return Utils.getDiscDiscretizationPoints(
+		return GeometryUtils.getDiscDiscretizationPoints(
 				random,
 				attributesOSM.isVaryStepDirection(),
 				new VCircle(pedestrian.getPosition(),

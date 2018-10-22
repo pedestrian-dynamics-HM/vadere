@@ -2,7 +2,7 @@ package org.vadere.geometry.mesh.inter;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.*;
 import org.vadere.geometry.mesh.impl.VPTriangulation;
 import org.vadere.geometry.shapes.IPoint;
@@ -121,7 +121,7 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
 			final IPointLocator.Type type,
 			final Collection<P> points,
 			final IPointConstructor<P> pointConstructor) {
-		ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = createPTriangulation(type, Utils.bound(points), pointConstructor);
+		ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> triangulation = createPTriangulation(type, GeometryUtils.bound(points), pointConstructor);
 		triangulation.insert(points);
 		return triangulation;
 	}
@@ -130,7 +130,7 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
             final IPointLocator.Type type,
             final Collection<P> points,
             final IPointConstructor<P> pointConstructor) {
-		ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = createATriangulation(type, Utils.bound(points), pointConstructor);
+		ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation = createATriangulation(type, GeometryUtils.bound(points), pointConstructor);
         triangulation.insert(points);
         return triangulation;
     }

@@ -1,6 +1,6 @@
 package org.vadere.geometry.mesh.triangulation.improver.distmesh;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VRectangle;
 import org.vadere.geometry.shapes.VTriangle;
 
@@ -61,7 +61,7 @@ public class DistmeshPanel extends Canvas {
 				graphics.fill(triangle);
 			}
 			else {
-				float quality = (float) Utils.qualityOf(triangle);
+				float quality = (float) GeometryUtils.qualityOf(triangle);
 				graphics.setColor(new Color(quality, quality, quality));
 				graphics.fill(triangle);
 			}

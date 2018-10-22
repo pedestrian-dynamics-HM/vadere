@@ -3,7 +3,7 @@ package org.vadere.gui.projectview;
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.gui.components.utils.Recorder;
 import org.vadere.geometry.color.ColorHelper;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.gen.AFace;
 import org.vadere.geometry.mesh.gen.AHalfEdge;
 import org.vadere.geometry.mesh.gen.AVertex;
@@ -29,7 +29,7 @@ import javax.swing.*;
 public class RecordTriangulationMovie {
 
 	public static void main(String... args) throws IOException {
-		VPolygon boundary = Utils.polygonFromPoints2D(
+		VPolygon boundary = GeometryUtils.polygonFromPoints2D(
 				new VPoint(0,0),
 				new VPoint(0, 1),
 				new VPoint(1, 2),

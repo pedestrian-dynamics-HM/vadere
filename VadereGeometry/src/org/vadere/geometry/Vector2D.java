@@ -30,12 +30,12 @@ public class Vector2D extends VPoint {
 	public Vector2D normalize(double length) {
 		double rx, ry;
 		double vl = distance(ZERO);
-		if (Math.abs(x) < Utils.DOUBLE_EPS) {
+		if (Math.abs(x) < GeometryUtils.DOUBLE_EPS) {
 			rx = 0;
 		} else {
 			rx = x / vl * length;
 		}
-		if (Math.abs(y) < Utils.DOUBLE_EPS) {
+		if (Math.abs(y) < GeometryUtils.DOUBLE_EPS) {
 			ry = 0;
 		} else {
 			ry = y / vl * length;
@@ -71,7 +71,7 @@ public class Vector2D extends VPoint {
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 */
 	public double angleTo(VPoint center) {
-		return Utils.angleTo(this, center);
+		return GeometryUtils.angleTo(this, center);
 	}
 
 	public Vector2D add(VPoint p) {

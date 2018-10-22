@@ -37,9 +37,9 @@ public class TestVCircle {
 	@Test
 	public void testDistanceToPoint() {
 		assertEquals(testCircleOrigin.distance(new VPoint(0.5, 0)), 0,
-				Utils.DOUBLE_EPS);
+				GeometryUtils.DOUBLE_EPS);
 		assertEquals(testCircleOrigin.distance(new VPoint(0, 0.5)), 0,
-				Utils.DOUBLE_EPS);
+				GeometryUtils.DOUBLE_EPS);
 	}
 
 	@Test

@@ -4,7 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.List;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.ShapeType;
 
 @SuppressWarnings("serial")
@@ -48,11 +48,11 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	@Override
 	public VPoint closestPoint(IPoint point) {
 		VLine[] lines = getLines();
-		VPoint result = Utils.closestToSegment(lines[0], point);
+		VPoint result = GeometryUtils.closestToSegment(lines[0], point);
 		double distanceToLine = result.distance(point);
 
 		for (int i = 1; i < 4; i++) {
-			VPoint tmpClosest = Utils.closestToSegment(lines[i], point);
+			VPoint tmpClosest = GeometryUtils.closestToSegment(lines[i], point);
 			double tmpDistance = tmpClosest.distance(point);
 			if (tmpDistance < distanceToLine) {
 				distanceToLine = tmpDistance;

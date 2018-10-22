@@ -11,7 +11,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VCircle;
 import org.vadere.geometry.shapes.VPoint;
 import org.vadere.geometry.shapes.VRectangle;
@@ -467,7 +467,7 @@ public class CLOptimalStepsModel {
 		/*
 		 * (2) circle / disc positions at (0,0)
 		 */
-		circlePositionList = Utils.getDiscDiscretizationPoints(new Random(), false,
+		circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
 				new VCircle(new VPoint(0,0), 1.0),
 				attributesOSM.getNumberOfCircles(),
 				attributesOSM.getStepCircleResolution(),

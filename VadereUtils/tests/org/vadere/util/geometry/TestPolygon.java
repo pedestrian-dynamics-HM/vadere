@@ -7,8 +7,7 @@ import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.Utils;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VPoint;
 import org.vadere.geometry.shapes.VPolygon;
 import org.vadere.geometry.shapes.VTriangle;
@@ -28,12 +27,12 @@ public class TestPolygon {
 
 	@Before
 	public void setUp() throws Exception {
-		testPolygon = Utils.polygonFromPoints2D(new VPoint(0, 0),
+		testPolygon = GeometryUtils.polygonFromPoints2D(new VPoint(0, 0),
 				new VPoint(roomSideLen, 0),
 				new VPoint(roomSideLen, roomSideLen),
 				new VPoint(0, roomSideLen));
 
-		copyTestPolygon = Utils.polygonFromPoints2D(new VPoint(0, 0),
+		copyTestPolygon = GeometryUtils.polygonFromPoints2D(new VPoint(0, 0),
 				new VPoint(roomSideLen, 0),
 				new VPoint(roomSideLen, roomSideLen),
 				new VPoint(0, roomSideLen));

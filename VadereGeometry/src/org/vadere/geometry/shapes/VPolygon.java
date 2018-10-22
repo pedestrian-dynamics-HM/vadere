@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.ShapeType;
 
 /**
@@ -44,7 +44,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 				VPoint q1 = points.get(j);
 				VPoint q2 = points.get((j+1) % points.size());
 
-				if(Utils.intersectLineSegment(p1, p2, q1, q2)) {
+				if(GeometryUtils.intersectLineSegment(p1, p2, q1, q2)) {
 					return false;
 				}
 			}
@@ -56,7 +56,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	public boolean isCCW() {
 		List<VPoint> points = getPath();
 		assert points.size() >= 3;
-		return Utils.isCCW(points.get(0), points.get(1), points.get(2));
+		return GeometryUtils.isCCW(points.get(0), points.get(1), points.get(2));
 	}
 
 	public VPolygon toCWOrder() {
@@ -80,7 +80,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	public VPolygon revertOrder() {
 		List<VPoint> points = getPath();
 		Collections.reverse(points);
-		return Utils.toPolygon(points);
+		return GeometryUtils.toPolygon(points);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 			// check distance of closest point on the line to the center of the
 			// ball
-			if (Utils.closestToSegment(intersectingLine, center)
+			if (GeometryUtils.closestToSegment(intersectingLine, center)
 					.distance(center) < radius) {
 				return true;
 			}
@@ -202,7 +202,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	public double getArea() {
-		return Utils.areaOfPolygon(getPoints());
+		return GeometryUtils.areaOfPolygon(getPoints());
 	}
 
 	// Assumed that first and last point are equal
@@ -273,7 +273,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 		this.reset();
 		if (!newVertices.isEmpty()) {
 			this.moveTo(newVertices.get(0).x, newVertices.get(0).y);
-			this.append(Utils.polygonFromPoints2D(newVertices
+			this.append(GeometryUtils.polygonFromPoints2D(newVertices
 					.toArray(new VPoint[0])), false);
 			this.closePath();
 		}
@@ -402,7 +402,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 			iterator.currentSegment(next);
 
-			currentClosest = Utils.closestToSegment(new VLine(last[0],
+			currentClosest = GeometryUtils.closestToSegment(new VLine(last[0],
 					last[1], next[0], next[1]), point);
 
 			if (currentClosest.distance(point) < currentMinDistance) {
@@ -464,7 +464,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	@Override
 	public VPoint getCentroid() {
-	    return Utils.getCentroid(getPoints());
+	    return GeometryUtils.getCentroid(getPoints());
 	}
 
 	public VPolygon rotate(IPoint anchor, double angle) {

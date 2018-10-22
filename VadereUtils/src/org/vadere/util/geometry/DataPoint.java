@@ -2,7 +2,7 @@ package org.vadere.util.geometry;
 
 import java.util.Comparator;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VPoint;
 
 /**
@@ -15,7 +15,7 @@ import org.vadere.geometry.shapes.VPoint;
 public class DataPoint extends VPoint implements Comparable<VPoint> {
 
 	private static  Comparator<DataPoint> comparator = (d1, d2) -> {
-		if (Math.abs(d1.data - d2.data) < Utils.DOUBLE_EPS) {
+		if (Math.abs(d1.data - d2.data) < GeometryUtils.DOUBLE_EPS) {
 			return 0;// do not compare coordinates
 		} else if (d1.data < d2.data) {
 			return -1;
@@ -24,7 +24,7 @@ public class DataPoint extends VPoint implements Comparable<VPoint> {
 	};
 
 	private static  Comparator<DataPoint> pointComparator = (d1, d2) -> {
-		if (Math.abs(d1.data - d2.data) < Utils.DOUBLE_EPS) {
+		if (Math.abs(d1.data - d2.data) < GeometryUtils.DOUBLE_EPS) {
 			// compare coordinates
 			return d1.compareTo(d2);
 		} else if (d1.data < d2.data) {
@@ -92,8 +92,8 @@ public class DataPoint extends VPoint implements Comparable<VPoint> {
 	 */
 	@Override
 	public int compareTo(final VPoint other) {
-		if (Math.abs(getX() - other.getX()) < Utils.DOUBLE_EPS) {
-			if (Math.abs(getY() - other.getY()) < Utils.DOUBLE_EPS) {
+		if (Math.abs(getX() - other.getX()) < GeometryUtils.DOUBLE_EPS) {
+			if (Math.abs(getY() - other.getY()) < GeometryUtils.DOUBLE_EPS) {
 				return 0;
 			} else {
 				if (getY() > other.getY()) {

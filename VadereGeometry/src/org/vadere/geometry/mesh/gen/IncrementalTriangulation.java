@@ -4,7 +4,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.mesh.inter.ITriConnectivity;
 import org.vadere.geometry.mesh.inter.IVertex;
 import org.vadere.geometry.mesh.iterators.FaceIterator;
@@ -89,7 +89,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.mesh = mesh;
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
-		this.bound = Utils.bound(points, epsilon);
+		this.bound = GeometryUtils.bound(points, epsilon);
 		this.finalized = false;
 		this.initialized = false;
 		this.mesh = mesh;
@@ -157,7 +157,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.mesh = mesh;
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
-		this.bound = Utils.bound(mesh.getPoints(mesh.getBorder()), epsilon);
+		this.bound = GeometryUtils.bound(mesh.getPoints(mesh.getBorder()), epsilon);
 		this.initialized = false;
 		this.finalized = false;
 		this.virtualVertices = new ArrayList<>();
@@ -305,7 +305,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
         initialized = false;
         finalized = false;
         points = mesh.getPoints();
-	    bound = Utils.bound(points, epsilon);
+	    bound = GeometryUtils.bound(points, epsilon);
         mesh.clear();
 	    setPointLocator(type);
         compute();
@@ -331,7 +331,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 			log.info("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
 			return edge;
 		}
-		if(Utils.isOnEdge(p1, p2, point, edgeCoincidenceTolerance)) {
+		if(GeometryUtils.isOnEdge(p1, p2, point, edgeCoincidenceTolerance)) {
 			//log.info("splitEdge()");
 			E newEdge = getAnyEdge(splitEdge(point, edge, true));
 			insertEvent(newEdge);
@@ -589,7 +589,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 			//return Utils.isInCircumscribedCycle(x, y, z, p);
 			//if(Utils.ccw(z,x,y) > 0) {
-			return Utils.isInsideCircle(z, x, y, p);
+			return GeometryUtils.isInsideCircle(z, x, y, p);
 			//}
 			//else {
 			//	return Utils.isInsideCircle(x, z, y, p);
@@ -638,7 +638,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 			//return Utils.isInCircumscribedCycle(x, y, z, p);
 			//if(Utils.ccw(z,x,y) > 0) {
-				return Utils.isInsideCircle(z, x, y, p);
+				return GeometryUtils.isInsideCircle(z, x, y, p);
 			//}
 			//else {
 			//	return Utils.isInsideCircle(x, z, y, p);

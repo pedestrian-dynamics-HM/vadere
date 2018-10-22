@@ -21,11 +21,11 @@ import org.vadere.geometry.shapes.VRectangle;
 import org.vadere.geometry.shapes.VShape;
 import org.vadere.geometry.shapes.VTriangle;
 
-import static org.vadere.geometry.Utils.Orientation.CCW;
-import static org.vadere.geometry.Utils.Orientation.COLLINEAR;
-import static org.vadere.geometry.Utils.Orientation.CW;
+import static org.vadere.geometry.GeometryUtils.Orientation.CCW;
+import static org.vadere.geometry.GeometryUtils.Orientation.COLLINEAR;
+import static org.vadere.geometry.GeometryUtils.Orientation.CW;
 
-public class Utils {
+public class GeometryUtils {
 
 	enum Orientation {
 		CCW,
@@ -33,13 +33,13 @@ public class Utils {
 		COLLINEAR;
 	}
 
-	/**
+	/**T
 	 * Constant for comparison of double values. Everything below this is
 	 * considered equal.
 	 */
 	public static final double DOUBLE_EPS = 1e-8;
 
-	public static final Logger log = LogManager.getLogger(Utils.class);
+	public static final Logger log = LogManager.getLogger(GeometryUtils.class);
 
 	/**
 	 * Interpolates between start and end with the given factor.
@@ -500,9 +500,9 @@ public class Utils {
 	 */
 	public static boolean triangleContains(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint r) {
 		boolean b1, b2, b3;
-		double d1 = Utils.ccw(r, p1, p2);
-		double d2 = Utils.ccw(r, p2, p3);
-		double d3 = Utils.ccw(r, p3, p1);
+		double d1 = GeometryUtils.ccw(r, p1, p2);
+		double d2 = GeometryUtils.ccw(r, p2, p3);
+		double d3 = GeometryUtils.ccw(r, p3, p1);
 		b1 = d1 < 0.0;
 		b2 = d2 < 0.0;
 		b3 = d3 < 0.0;
@@ -836,7 +836,7 @@ public class Utils {
 
 	public static boolean isValid(@NotNull final VTriangle triangle) {
 		List<VPoint> points = triangle.getPoints();
-		return Utils.isLeftOf(points.get(0), points.get(1), points.get(2));
+		return GeometryUtils.isLeftOf(points.get(0), points.get(1), points.get(2));
 	}
 
 	public static double qualityOf(@NotNull final VTriangle triangle) {
@@ -913,7 +913,7 @@ public class Utils {
 						VPoint q2 = path2.get((jj + 1) % path2.size());
 
 						if(intersectLineSegment(p1, p2, q1, q2)) {
-							VPoint intersectionPoint = Utils.lineIntersectionPoint(p1, p2, q1, q2);
+							VPoint intersectionPoint = GeometryUtils.lineIntersectionPoint(p1, p2, q1, q2);
 							intersectionPoints.add(intersectionPoint);
 						}
 					}
@@ -973,7 +973,7 @@ public class Utils {
 				VPoint p2 = filteredList.get(i);
 				VPoint p3 = filteredList.get((i + 1) % filteredList.size());
 
-				if(p2.equals(p1) || p2.equals(p3) || Utils.distanceToLineSegment(p1, p3, p2) <= eps) {
+				if(p2.equals(p1) || p2.equals(p3) || GeometryUtils.distanceToLineSegment(p1, p3, p2) <= eps) {
 					filteredList.remove(i);
 					removePoint = true;
 					break;

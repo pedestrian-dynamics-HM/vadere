@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.VPoint;
 import org.vadere.geometry.shapes.VTriangle;
 
@@ -177,7 +177,7 @@ public class DataTriangle extends VTriangle {
 				((DataPoint) p1).getData() - ((DataPoint) p3).getData()};
 
 		double[] cross = new double[3];
-		Utils.cross(v1d, v2d, cross);
+		GeometryUtils.cross(v1d, v2d, cross);
 		double k = cross[2] * ((DataPoint) p1).getData();
 
 		VPoint p1_minus_toEval = new VPoint(p1.x - toEval.x, p1.y - toEval.y);

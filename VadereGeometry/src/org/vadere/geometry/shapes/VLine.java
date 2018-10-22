@@ -3,7 +3,7 @@ package org.vadere.geometry.shapes;
 import java.awt.geom.Line2D;
 import java.util.stream.Stream;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.Vector2D;
 
 @SuppressWarnings("serial")
@@ -33,7 +33,7 @@ public class VLine extends Line2D.Double {
     }
 
     public double distance(IPoint point) {
-        return Utils.closestToSegment(this, point).distance(point);
+        return GeometryUtils.closestToSegment(this, point).distance(point);
     }
 
     public VPoint midPoint() {
@@ -63,7 +63,7 @@ public class VLine extends Line2D.Double {
         return getP1().distance(getP2());
     }
 	public double distance(VPoint point) {
-		return Utils.closestToSegment(this, point).distance(point);
+		return GeometryUtils.closestToSegment(this, point).distance(point);
 	}
 
 	public Vector2D asVector(){

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.geometry.shapes.IPoint;
 import org.vadere.geometry.shapes.VPoint;
 
@@ -93,7 +93,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param point     the new point of the vertex
 	 */
 	default void replacePoint(@NotNull final V vertex, @NotNull final P point) {
-		assert Utils.toPolygon(getMesh().getPoint(vertex)).contains(point);
+		assert GeometryUtils.toPolygon(getMesh().getPoint(vertex)).contains(point);
 		getMesh().setPoint(vertex, point);
 	}
 
@@ -565,7 +565,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		P p2 = getMesh().getPoint(getMesh().getNext(edge));
 		P p3 = getMesh().getPoint(getMesh().getPrev(edge));
 
-		return Utils.isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
+		return GeometryUtils.isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
 
 	/**
@@ -798,8 +798,8 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		E prev = getMesh().getPrev(boundaryEdge);
 
 		// can we form a triangle
-		assert Utils.isCCW(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next))
-				&& Utils.angle(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next)) < Math.PI;
+		assert GeometryUtils.isCCW(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next))
+				&& GeometryUtils.angle(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next)) < Math.PI;
 
 		E nnext = getMesh().getNext(next);
 
@@ -1141,13 +1141,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	// TODO: still required?
 	default E walkThroughHole(@NotNull VPoint q, @NotNull VPoint p, @NotNull E enteringEdge) {
-		assert Utils.intersectLine(q, p, getMesh().getPoint(enteringEdge), getMesh().getPoint(getMesh().getPrev(enteringEdge)));
+		assert GeometryUtils.intersectLine(q, p, getMesh().getPoint(enteringEdge), getMesh().getPoint(getMesh().getPrev(enteringEdge)));
 		E next = getMesh().getNext(enteringEdge);
 
 		while (enteringEdge != next) {
 			VPoint p1 = getMesh().toPoint(getMesh().getVertex(enteringEdge));
 			VPoint p2 = getMesh().toPoint(getMesh().getVertex(getMesh().getPrev(enteringEdge)));
-			if(Utils.intersectLine(q, p, p1, p2)) {
+			if(GeometryUtils.intersectLine(q, p, p1, p2)) {
 				return next;
 			}
 
@@ -1291,8 +1291,8 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				VPoint q = getMesh().toPoint(getMesh().getNext(edge));
 				VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 
-				if(Utils.isCCW(r, p, q)) {
-					double angle = Utils.angle(r, p, q);
+				if(GeometryUtils.isCCW(r, p, q)) {
+					double angle = GeometryUtils.angle(r, p, q);
 					if(angle < 0.5*Math.PI) {
 						createFaceAtBoundary(edge);
 					}
@@ -1318,8 +1318,8 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
 					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 
-					if(Utils.isCCW(r, p, q)) {
-						double angle = Utils.angle(r, p, q);
+					if(GeometryUtils.isCCW(r, p, q)) {
+						double angle = GeometryUtils.angle(r, p, q);
 						if(angle < 0.5*Math.PI) {
 							createFaceAtBoundary(edge);
 						}
@@ -1689,17 +1689,17 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				first = false;
 				prevFace = face;
 
-				if (Utils.isRightOf(v3, v1, x1, y1)) {
+				if (GeometryUtils.isRightOf(v3, v1, x1, y1)) {
 					face = getMesh().getTwinFace(e1);
 					continue;
 				}
 
-				if (Utils.isRightOf(v1, v2, x1, y1)) {
+				if (GeometryUtils.isRightOf(v1, v2, x1, y1)) {
 					face = getMesh().getTwinFace(e2);
 					continue;
 				}
 
-				if (Utils.isRightOf(v2, v3, x1, y1)) {
+				if (GeometryUtils.isRightOf(v2, v3, x1, y1)) {
 					face = getMesh().getTwinFace(e3);
 					continue;
 				}
@@ -1707,12 +1707,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				if(prevFace == getMesh().getTwinFace(e1)) {
 					prevFace = face;
 
-					if (Utils.isRightOf(v2, v3, x1, y1)) {
+					if (GeometryUtils.isRightOf(v2, v3, x1, y1)) {
 						face = getMesh().getTwinFace(e3);
 						continue;
 					}
 
-					if(Utils.isRightOf(v1, v2, x1, y1)) {
+					if(GeometryUtils.isRightOf(v1, v2, x1, y1)) {
 						face = getMesh().getTwinFace(e2);
 						continue;
 					}
@@ -1721,12 +1721,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				else if(prevFace == getMesh().getTwinFace(e2)) {
 					prevFace = face;
 
-					if (Utils.isRightOf(v3, v1, x1, y1)) {
+					if (GeometryUtils.isRightOf(v3, v1, x1, y1)) {
 						face = getMesh().getTwinFace(e1);
 						continue;
 					}
 
-					if (Utils.isRightOf(v2, v3, x1, y1)) {
+					if (GeometryUtils.isRightOf(v2, v3, x1, y1)) {
 						face = getMesh().getTwinFace(e3);
 						continue;
 					}
@@ -1735,12 +1735,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				else {
 					prevFace = face;
 
-					if(Utils.isRightOf(v1, v2, x1, y1)) {
+					if(GeometryUtils.isRightOf(v1, v2, x1, y1)) {
 						face = getMesh().getTwinFace(e2);
 						continue;
 					}
 
-					if (Utils.isRightOf(v3, v1, x1, y1)) {
+					if (GeometryUtils.isRightOf(v3, v1, x1, y1)) {
 						face = getMesh().getTwinFace(e1);
 						continue;
 					}
@@ -1751,12 +1751,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				if(prevFace == getMesh().getTwinFace(e1)) {
 					prevFace = face;
 
-					if(Utils.isRightOf(v1, v2, x1, y1)) {
+					if(GeometryUtils.isRightOf(v1, v2, x1, y1)) {
 						face = getMesh().getTwinFace(e2);
 						continue;
 					}
 
-					if (Utils.isRightOf(v2, v3, x1, y1)) {
+					if (GeometryUtils.isRightOf(v2, v3, x1, y1)) {
 						face = getMesh().getTwinFace(e3);
 						continue;
 					}
@@ -1765,12 +1765,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				else if(prevFace == getMesh().getTwinFace(e2)) {
 					prevFace = face;
 
-					if (Utils.isRightOf(v2, v3, x1, y1)) {
+					if (GeometryUtils.isRightOf(v2, v3, x1, y1)) {
 						face = getMesh().getTwinFace(e3);
 						continue;
 					}
 
-					if (Utils.isRightOf(v3, v1, x1, y1)) {
+					if (GeometryUtils.isRightOf(v3, v1, x1, y1)) {
 						face = getMesh().getTwinFace(e1);
 						continue;
 					}
@@ -1779,12 +1779,12 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 				else {
 					prevFace = face;
 
-					if (Utils.isRightOf(v3, v1, x1, y1)) {
+					if (GeometryUtils.isRightOf(v3, v1, x1, y1)) {
 						face = getMesh().getTwinFace(e1);
 						continue;
 					}
 
-					if(Utils.isRightOf(v1, v2, x1, y1)) {
+					if(GeometryUtils.isRightOf(v1, v2, x1, y1)) {
 						face = getMesh().getTwinFace(e2);
 						continue;
 					}
@@ -1858,7 +1858,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		V v2 = getMesh().getVertex(e2);
 		V v3 = getMesh().getVertex(e3);
 
-		return Utils.isInsideCircle(v1, v2, v3, x1, y1);
+		return GeometryUtils.isInsideCircle(v1, v2, v3, x1, y1);
 	}
 
 	/*default boolean contains(F face, double x, double y) {
@@ -2034,11 +2034,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
 			P p2 = getMesh().getPoint(edge);
 			P p3 = getMesh().getPoint(getMesh().getNext(edge));
-			boolean valid = Utils.isLeftOf(p1, p2, p3);
+			boolean valid = GeometryUtils.isLeftOf(p1, p2, p3);
 			if(!valid) {
 				log.info(p1 + ", " + p2 + ", " + p3);
 			}
-			return Utils.isLeftOf(p1, p2, p3);
+			return GeometryUtils.isLeftOf(p1, p2, p3);
 		};
 
 		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
@@ -2059,7 +2059,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
 			P p2 = getMesh().getPoint(edge);
 			P p3 = getMesh().getPoint(getMesh().getNext(edge));
-			return Utils.isLeftOf(p1, p2, p3);
+			return GeometryUtils.isLeftOf(p1, p2, p3);
 		};
 
 		return !getMesh().isBoundary(face) && orientationPredicate.test(face);

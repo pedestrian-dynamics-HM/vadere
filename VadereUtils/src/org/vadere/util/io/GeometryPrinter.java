@@ -3,7 +3,7 @@ package org.vadere.util.io;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vadere.geometry.Utils;
+import org.vadere.geometry.GeometryUtils;
 import org.vadere.util.geometry.Geometry;
 import org.vadere.geometry.shapes.VPoint;
 import org.vadere.geometry.shapes.VPolygon;
@@ -60,7 +60,7 @@ public class GeometryPrinter {
 				VPoint p1 = pointList.get(i);
 				VPoint p2 = pointList.get(i + 1);
 				for (double f = 0.0; f < 1.0; f += 1.0 / (p1.distance(p2) / (0.5 * gridBinSideLen))) {
-					VPoint currP = Utils.interpolate(p1, p2, f);
+					VPoint currP = GeometryUtils.interpolate(p1, p2, f);
 					int gridX = (int) ((currP.getX() - minX) / width * (gridSideLen - 1));
 					int gridY = (int) ((currP.getY() - minY) / height * (gridSideLen - 1));
 					if (gridX >= 0 && gridX < gridSideLen && gridY >= 0
