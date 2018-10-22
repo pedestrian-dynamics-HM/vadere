@@ -142,7 +142,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
             return ((VPolygon)shape).intersects(this);
         }
         else {
-            throw new UnsupportedOperationException("not yet implemented");
+            return VShape.super.intersects(shape);
         }
     }
 
