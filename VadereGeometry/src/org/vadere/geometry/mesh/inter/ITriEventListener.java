@@ -42,7 +42,7 @@ public interface ITriEventListener<P extends IPoint, V extends IVertex<P>, E ext
 	/**
 	 * This method is triggered after a point is inserted into the triangulation.
 	 *
-	 * @param vertex
+	 * @param vertex the vertex of the point which was inserted
 	 */
 	void postInsertEvent(V vertex);
 }

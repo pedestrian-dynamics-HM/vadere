@@ -16,6 +16,11 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 
 	/**
 	 * The x and y define the corner of the rectangle with the smallest values.
+	 *
+	 * @param x x-coordinate of the lower-left corner
+	 * @param y y-coordinate of the lower-left corner
+	 * @param w the width of the rectangle
+	 * @param h the height of the rectangle
 	 */
 	public VRectangle(double x, double y, double w, double h) {
 		super(x, y, w, h);

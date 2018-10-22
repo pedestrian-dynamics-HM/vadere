@@ -21,7 +21,7 @@ import javax.swing.*;
  * <ul>
  * <li>Key: n "Next Step": continue with the algorithm and if the gui is called again show the new state.</li>
  * <li>Key: q "Stop Debugging Gui": dispose the gui, turn of the {@link DebugGui} and continue the algorithm.</li>
- * <li>Key: p "print Tikz output": create tex tikzi drawing and log to konsole</li>
+ * <li>Key: p "print Tikz output": create tex tikzi drawing and log to console</li>
  * <li>Key: s "Print State Info": print the State information defined within the {@link TriCanvas} implementation </li>
  * </ul>
  */
@@ -65,6 +65,7 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 
 	/**
 	 * Activate or Deactivate the {@link DebugGui}
+	 * @param debugOn if true the debugger will be active otherwise it will be inactive.
 	 */
 	public static void setDebugOn(boolean debugOn) {
 		get().debugOn = debugOn;
@@ -77,9 +78,9 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 *
 	 * @param canvas canvas to show
 	 * @param <P>    P extends IPoint
-	 * @param <V>    V extends IVertex<P>
-	 * @param <E>    E extends IHalfEdge<P>
-	 * @param <F>    F extends IFace<P>>
+	 * @param <V>    V extends IVertex
+	 * @param <E>    E extends IHalfEdge
+	 * @param <F>    F extends IFace
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
 	void forceShowAndWait(TriCanvas<P, V, E, F> canvas) {
@@ -92,9 +93,9 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 *
 	 * @param canvas canvas to show
 	 * @param <P>    P extends IPoint
-	 * @param <V>    V extends IVertex<P>
-	 * @param <E>    E extends IHalfEdge<P>
-	 * @param <F>    F extends IFace<P>>
+	 * @param <V>    V extends IVertex
+	 * @param <E>    E extends IHalfEdge
+	 * @param <F>    F extends IFace
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
 	void showAndWait(TriCanvas<P, V, E, F> canvas) {

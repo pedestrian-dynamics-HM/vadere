@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * An implementation of the so called Delaunay Tree which does not suppport deletion of points from the
- * triangulation {@link ITriangulation<P, V, E, F>}.
+ * triangulation {@link ITriangulation}.
  *
  * The Delaunay Tree see Computational Geometry: Algorithms and Applications (berg-2008) page 191.
  *

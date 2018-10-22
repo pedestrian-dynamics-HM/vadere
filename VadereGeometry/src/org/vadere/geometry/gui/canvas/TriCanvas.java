@@ -25,6 +25,11 @@ import java.util.function.Consumer;
  *
  * With the stateLog consumer information for the specifc state within the algorithm can be printed
  * from the {@link org.vadere.geometry.gui.DebugGui}.
+ *
+ * @param <P> the type of the points (containers)
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
 public abstract class TriCanvas
 		<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
@@ -105,6 +110,8 @@ public abstract class TriCanvas
 
 	/**
 	 * Add additional graphics primitive which should be drawn to the canvas.
+	 * @param c a Consumer {@link Consumer} of {@link Graphics2D}
+	 * @return this canvas
 	 */
 	public TriCanvas<P, V, E, F> addGuiDecorator(Consumer<Graphics2D> c) {
 		paintDecorator.add(c);
@@ -113,6 +120,8 @@ public abstract class TriCanvas
 
 	/**
 	 * Add a complete line which will be included in the tikzdrawing. Note: add a newline character!
+	 * @param c a Consumer {@link Consumer} of {@link StringBuilder}
+	 * @return this canvas
 	 */
 	public TriCanvas<P, V, E, F> addTexDecorator(Consumer<StringBuilder> c) {
 		texGraphBuilder.addElement(c);
@@ -121,6 +130,7 @@ public abstract class TriCanvas
 
 	/**
 	 * Get current {@link ColorFunctions} object used for java.swing and tex tikz drawing.
+	 * @return the current used color function {@link ColorFunctions}
 	 */
 	public ColorFunctions getColorFunctions() {
 		return colorFunctions;
@@ -128,6 +138,7 @@ public abstract class TriCanvas
 
 	/**
 	 * Add new {@link ColorFunctions} object to the {@link TriCanvas} implementation.
+	 * @param colorFunctions the new color function
 	 */
 	public void setColorFunctions(ColorFunctions<P, V, E, F> colorFunctions) {
 		this.colorFunctions = colorFunctions;

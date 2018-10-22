@@ -83,7 +83,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * the old point of the vertex this will reposition the vertex without any checks, i.e.
 	 * the user has to know what he does and has to make sure that the mesh is valid and feasible
 	 * afterwards and all listeners e.g. the point locators such as the Delaunay-Hierarchy
-	 * {@link org.vadere.geometry.mesh.gen.DelaunayHierarchy<P, V, E, F>} can handle this
+	 * {@link org.vadere.geometry.mesh.gen.DelaunayHierarchy} can handle this
 	 * repositioning!</p>
 	 *
 	 * <p>Does not change the connectivity but may change the position of a vertex and therefore requires
@@ -569,15 +569,15 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>Inserts a new point into the mesh / triangulation by preserving a feasible triangulation. There are different possible
+	 * Inserts a new point into the mesh / triangulation by preserving a feasible triangulation. There are different possible
 	 * outcomes:
 	 * <ol>
 	 *     <li>the face will be split by an edge-split {@link ITriConnectivity#splitEdge(IPoint, IHalfEdge)}</li>
 	 *     <li>the face will be split by an face-split {@link ITriConnectivity#splitTriangle(IFace, IPoint)}</li>
 	 *     <li>the point is very close to some point of the face {@link ITriConnectivity#isClose(double, double, IFace, double)}
-	 * 	 *    and therefore it will not be inserted at all.</li>
+	 *     and therefore it will not be inserted at all.</li>
 	 * </ol>
-	 * This requires amortized O(1) time.</p>
+	 * This requires amortized O(1) time.
 	 *
 	 * <p>Assumption:  the face contains the point or the point lines on an edge of the face
 	 *              and the face is part of the mesh.</p>
@@ -684,7 +684,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param p         the point which splits the triangle
 	 * @param face      the triangle face we split
 	 *
-	 * returns a list of all newly created face.
+	 * @return a list of all newly created face.
 	 */
 	default E splitTriangle(@NotNull final F face, @NotNull final P p) {
 		return splitTriangle(face, p, true);
@@ -776,15 +776,14 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>Creates a new face by connecting two boundary vertices v1, v3 of a boundary path v1->v2->v3 such that
-	 * v1->v2->v3 becomes a new face. This requires O(1) time.</p>
+	 * <p>Creates a new face by connecting two boundary vertices v1, v3 of a boundary path v1 to v2 to v3 such that
+	 * v1 to v2 to v3 becomes a new face. This requires O(1) time.</p>
 	 *
-	 * <p>Assumption:
+	 * Assumption:
 	 * <ul>
-	 *     <li>there is an counter clockwise angle < 180 (PI) at v2 of the triangle (v1,v2,v3)</li>
+	 *     <li>there is an counter clockwise angle smaller than 180 (PI) at v2 of the triangle (v1,v2,v3)</li>
 	 *     <li>the boundaryEdge is a boundary edge</li>
 	 * </ul>
-	 * </p>
 	 *
 	 * <p>Mesh changing method.</p>
 	 *
@@ -1009,12 +1008,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>This method is a plausibility assertion-test. It tests if
+	 * This method is a plausibility assertion-test. It tests if
 	 * <ol>
 	 *  <li>the edge is not a boundary edge</li>
 	 *  <li>the vertex of the next of its twin is not equal to any vertex of the neighbouring edges of its next.</li>
 	 * </ol>
-	 * </p>
 	 * This method requires O(d) time where d is the degree of the involved vertices and should only be used for assertions.
 	 *
 	 * <p>Does not change the connectivity.</p>
@@ -1222,6 +1220,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * <p>Assumption: The stopCondition will be fulfilled at some point.</p>
 	 *
 	 * @param startVertex       the vertex at which the march starts
+	 * @param face              the face at which the march / search starts
 	 * @param direction         the direction in which the march will go
 	 * @param stopCondition     the stop condition at which the march will stop
 	 * @return a face which is reached by starting a march from vertex and marching towards direction until stopCondition
@@ -1247,7 +1246,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * <p>Marches / walks along the line defined by q and p from q to p starting inside the startFace.
 	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
 	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
-	 * inside the triangulation. A stop condition like e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1),
+	 * inside the triangulation. A stop condition like (e to !isRightOf(x1, y1, e)) stops the walk if (x1, y1),
 	 * will stop the walk if the point p = (x1, y1) is contained in the face.</p>
 	 *
 	 * Assumption:
@@ -1336,17 +1335,17 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
     /**
      * <p>Walks along the line defined by q and p. The walking direction should be controlled by the stopCondition e.g.
-     * e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1) is on the left side of each edge which is the case if the
+     * (e to !isRightOf(x1, y1, e)) stops the walk if (x1, y1) is on the left side of each edge which is the case if the
      * point is inside the reached face. The walk starts at the startFace and continues in the direction of line defined
      * by q and p using the any edge which does not fulfill the stopCondition.</p>
      *
      * <p>Does not change the connectivity.</p>
      *
-     * @param q
-     * @param p
-     * @param startFace
-     * @param stopCondition
-     * @return
+     * @param q             start of the oriented-line
+     * @param p             end of the oriented-line
+     * @param startFace     at this face the walk starts
+     * @param stopCondition fulfilling the stopCondition will stop the walk
+     * @return the face containing p
      */
 	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
         return straightGatherWalk2D(q, p, startFace, stopCondition).peekLast();
@@ -1354,7 +1353,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 	// TODO change centroid to midpoint of a triangle!
 	/**
-	 * <p>Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
+	 * Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
 	 * from q to p. Furthermore this method will gather the visited face by placing it into the list of visited faces.
 	 * There are different cases with special cases which make the code complicated:
 	 * <ol>
@@ -1368,7 +1367,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 *                          This is a bad / expensive case since the algorithm will first move to the vertex v of the face which is closest to p.
 	 *                          Then it will go into a neighbouring face of v which has the centroid closest to p and which is not contained in the
 	 *                          list of visited faces. This can require O(n) where n is the number of faces but should never happen in a "normal" triangulation.</li>
-	 * </ol></p>
+	 * </ol>
 	 *
 	 * <p>Assumption: q is contained in the start face.</p>
 	 *
@@ -1475,7 +1474,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * <p>Marches / walks along the line defined by q and p from q to p starting inside the startFace.
 	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
 	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
-	 * inside the triangulation. A stop condition like e -> !isRightOf(x1, y1, e) stops the walk if (x1, y1),
+	 * inside the triangulation. A stop condition like (e to !isRightOf(x1, y1, e)) stops the walk if (x1, y1),
 	 * will stop the walk if the point p = (x1, y1) is contained in the face.
 	 * The method goes from one face to the next by calling {@link ITriConnectivity#straightWalkNext(IFace, VPoint, VPoint, Predicate, LinkedList)}
 	 * but adds the resulting face to the list of visited faces and adds some logging to debug the walks / marches.</p>
@@ -1638,12 +1637,11 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * Probabilistic / Random walk which is faster in practice, see Walking in a Triangulation by devillers-2001.
 	 * This algorithm does NOT works if there are convex polygon (holes) inside the triangulation.</p>
 	 *
-	 * <p>Assumption:
+	 * Assumption:
 	 * <ol>
 	 *     <li>(x1, y1) is contained in some face / triangle</li>
 	 *     <li>the mesh / triangulation does not contain holes</li>
 	 * </ol>
-	 * </p>
 	 *
 	 *
 	 * <p>Does not change the connectivity.</p>
@@ -1915,13 +1913,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>Returns the closest half-edge (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Returns the closest half-edge (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
 	 * Three cases are possible:
 	 * <ol>
 	 *     <li>p is in the interior of the face</li>
 	 *     <li>p lies on the edge which will be returned</li>
 	 *     <li>p is a vertex of the mesh</li>
-	 * </ol></p>
+	 * </ol>
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *
@@ -1941,13 +1939,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>Returns the closest half-edge (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Returns the closest half-edge (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
 	 * Three cases are possible:
 	 * <ol>
 	 *     <li>p is in the interior of the face</li>
 	 *     <li>p lies on the edge which will be returned</li>
 	 *     <li>p is a vertex of the mesh</li>
-	 * </ol></p>
+	 * </ol>
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *
@@ -1968,13 +1966,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>Returns the closest vertex (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Returns the closest vertex (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
 	 * Three cases are possible:
 	 * <ol>
 	 *     <li>p is in the interior of the face</li>
 	 *     <li>p lies on the edge which will be returned</li>
 	 *     <li>p is a vertex of the mesh</li>
-	 * </ol></p>
+	 * </ol>
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *
@@ -1995,13 +1993,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 
 	/**
-	 * <p>Returns the closest vertex (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
+	 * Returns the closest vertex (with respect to (x,y)) of a face containing (x,y) if there is any face that contains p, otherwise empty().
 	 * Three cases are possible:
 	 * <ol>
 	 *     <li>p is in the interior of the face</li>
 	 *     <li>p lies on the edge which will be returned</li>
 	 *     <li>p is a vertex of the mesh</li>
-	 * </ol></p>
+	 * </ol>
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *

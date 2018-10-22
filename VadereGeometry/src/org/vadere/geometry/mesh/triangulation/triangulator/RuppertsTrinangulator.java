@@ -20,19 +20,13 @@ import java.util.stream.Stream;
  * @param <E> generic type of the half-edge
  * @param <F> generic type of the face
  */
+@Deprecated
 public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F>{
 
     private final ITriangulation<P, V, E, F> triangulation;
     private final Collection<VLine> constrains;
     private final Set<P> points;
 
-    /**
-     *
-     *
-     * @param triangulation the triangulation which will be manipulated
-     * @param constrains
-     * @param points        a set of additional points, this set might be empty
-     */
     public RuppertsTrinangulator(final ITriangulation<P, V, E, F> triangulation, final Collection<VLine> constrains, final Set<P> points) {
         this.triangulation = triangulation;
         this.constrains = constrains;

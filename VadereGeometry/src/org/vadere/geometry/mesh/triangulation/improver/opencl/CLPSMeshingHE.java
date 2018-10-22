@@ -78,6 +78,7 @@ public class CLPSMeshingHE<P extends EikMeshPoint> implements IMeshImprover<P, A
 
     /**
      * Start with a uniform refined triangulation
+     * @throws OpenCLException if OpenCL is not or not correct installed.
      */
     public void initialize() throws OpenCLException {
         log.info("##### (start) compute a uniform refined triangulation #####");

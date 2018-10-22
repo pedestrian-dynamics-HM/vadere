@@ -102,14 +102,6 @@ public interface ITriangulation<P extends IPoint, V extends IVertex<P>, E extend
         return triangulation;
     }
 
-	/**
-	 * Creates a triangulation where the bound of it is determined by the mesh
-	 *
-	 * @param type
-	 * @param mesh
-	 * @param <P>
-	 * @return
-	 */
 	static <P extends IPoint> ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> createATriangulation(
 			final IPointLocator.Type type,
 			final IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>  mesh) {

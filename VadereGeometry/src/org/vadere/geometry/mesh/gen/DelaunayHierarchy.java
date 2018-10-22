@@ -107,7 +107,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	 * triangulation which already contains points.
 	 *
 	 * @param base                  T_0
-	 * @param triangulationSupplier a supplier to construct T_k, k > 0.
+	 * @param triangulationSupplier a supplier to construct T_k, k greater 0.
 	 */
 	public DelaunayHierarchy(
     		@NotNull final ITriangulation<P, V, E, F> base,

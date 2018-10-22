@@ -22,10 +22,10 @@ import javax.swing.*;
 /**
  * @author Benedikt Zoennchen
  *
- * @param <P>
- * @param <V>
- * @param <E>
- * @param <F>
+ * @param <P> the type of the points (containers)
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
 public class EikMeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
 

@@ -3,8 +3,7 @@ package org.vadere.geometry;
 import org.vadere.geometry.shapes.VPoint;
 
 /**
- * VPoint with implementation of the comparable interface.
- * 
+ * @author Benedikt Zoennchen
  */
 public class ComparablePoint extends VPoint implements
 		Comparable<ComparablePoint> {
@@ -20,8 +19,15 @@ public class ComparablePoint extends VPoint implements
 
 	/**
 	 * Checks whether the given point is greater than the current point with
-	 * respect to:<br>
-	 * 1. x-coordinate -> 2. y-coordinate
+	 * respect to:
+	 * <ol>
+	 *     <li>
+	 *         x-coordinate and then to the
+	 *     </li>
+	 *     <li>
+	 *         y-coordinate
+	 *     </li>
+	 * </ol>
 	 * 
 	 * @param p
 	 *        point to compare with
@@ -48,9 +54,6 @@ public class ComparablePoint extends VPoint implements
 		return -1;
 	}
 
-	/**
-	 * Uses compareTo to implement the object.equals method.
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)

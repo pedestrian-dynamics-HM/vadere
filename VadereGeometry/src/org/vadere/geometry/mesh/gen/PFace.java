@@ -93,9 +93,9 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	}
 
 	/**
-	 * non-deep cloning!
-	 * @return
-	 * @throws CloneNotSupportedException
+	 * Construct a deep clone / copy of this face!
+	 * @return a deep clone of the face
+	 * @throws CloneNotSupportedException if the method is not jet implemented.
 	 */
 	@Override
 	protected PFace<P> clone() throws CloneNotSupportedException {

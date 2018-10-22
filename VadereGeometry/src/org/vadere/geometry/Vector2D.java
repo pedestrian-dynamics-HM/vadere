@@ -54,6 +54,8 @@ public class Vector2D extends VPoint {
 	/**
 	 * Computes the angle between the x-axis through the given Point (0,0) and this.
 	 * Result is in interval (0,2*PI) according to standard math usage.
+	 *
+	 * @return the angle between the x-axis through the given Point (0,0) and this
 	 */
 	public double angleToZero() {
 		double atan2 = Math.atan2(this.y, this.x);
@@ -66,9 +68,11 @@ public class Vector2D extends VPoint {
 	}
 
 	/**
-	 *
-	 * Computes the angle between the x-axis through the given Point "center" and this.
+	 * Computes the angle between the x-axis through the given Point center and this.
 	 * Result is in interval (0,2*PI) according to standard math usage.
+	 *
+	 * @param center the given center
+	 * @return the angle between the x-axis through the given Point center and this
 	 */
 	public double angleTo(VPoint center) {
 		return GeometryUtils.angleTo(this, center);

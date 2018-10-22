@@ -37,10 +37,12 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	/**
-	 * A circle at 0,0.
+	 * Construct a circle at (0,0) with a specific radius.
+	 * @param radius the radius of this circle
 	 */
 	public VCircle(double radius) {
 		this(0, 0, radius);
+		assert radius > 0.0;
 	}
 
 	public double getRadius() {
@@ -49,6 +51,7 @@ public class VCircle implements VShape, ICircleSector {
 
 	/**
 	 * The distance to the boundary of the circle.
+	 * @param pos the position to which the distance will be computed
 	 */
 	@Override
 	public double distance(IPoint pos) {
@@ -75,6 +78,11 @@ public class VCircle implements VShape, ICircleSector {
 	/**
 	 * Returns zero, one or two points which are the intersection of this circle and the line
 	 * defined by p = (x11, y11) and q = (x22, y22).
+	 * @param x11   x-coordinate of the first point p
+	 * @param y11   y-coordinate of the first point p
+	 * @param x22   x-coordinate of the second point q
+	 * @param y22   y-coordinate of the second point q
+	 * @return  returns an immutable list {@link ImmutableList} of all immutable points {@link VPoint} intersecting the circle by the line defined by (p, q)
 	 */
 	public ImmutableList<VPoint> getIntersectionPoints(final double x11, final double y11, final double x22, final double y22) {
 

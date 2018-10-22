@@ -38,11 +38,11 @@ public class VTriangle extends VPolygon {
     /**
      * Creates a triangle. Points must be given in ccw order.
      *
-     * @param p1
-     * @param p2
-     * @param p3
+     * @param p1 first point of the triangle
+     * @param p2 second point of the triangle
+     * @param p3 third point of the triangle
      */
-    public VTriangle(@NotNull VPoint p1, @NotNull VPoint p2, @NotNull VPoint p3) {
+    public VTriangle(@NotNull final VPoint p1, @NotNull final VPoint p2, @NotNull final VPoint p3) {
         super(GeometryUtils.polygonFromPoints2D(p1, p2, p3));
 
         if(p1.equals(p2) || p1.equals(p3) || p2.equals(p3)) {
@@ -159,34 +159,8 @@ public class VTriangle extends VPolygon {
     }
 
     public boolean isInCircumscribedCycle(final IPoint point) {
-        double diff = getCircumcenter().distance(point) - getCircumscribedRadius();
         return getCircumcenter().distance(point) < getCircumscribedRadius();
     }
-
-    /**
-     * Computes the inward facing normal vector for the given points of the
-     * triangle.
-     *
-     * @param p1
-     * @param p2
-     * @return inward facing normal vector
-     */
-    public VPoint getNormal(final VPoint p1, final VPoint p2) {
-        VPoint normal = new VPoint(p2.y - p1.y, -(p2.x - p1.x));
-        // if the normal is already inward facing, return it
-        if (GeometryUtils.ccw(p1, p2, normal) == GeometryUtils.ccw(p1, p2,
-                this.midPoint())) {
-            return normal;
-        }
-        // otherwise, reflect it
-        else {
-            return new VPoint(-normal.x, -normal.y);
-        }
-    }
-
-    /*public boolean hasBoundaryPoint(final DataPoint point) {
-        return this.p1.equals(point) || this.p2.equals(point) || this.p3.equals(point);
-    }*/
 
     public Stream<VLine> getLineStream() {
         return Arrays.stream(getLines());

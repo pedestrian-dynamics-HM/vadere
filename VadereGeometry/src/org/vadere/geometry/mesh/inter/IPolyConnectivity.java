@@ -41,9 +41,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	Logger log = LogManager.getLogger(IPolyConnectivity.class);
 
 	/**
-	 * Returns the mesh of this poly-connectivity {@link IPolyConnectivity<P, V, E, F>}.
+	 * <p>Returns the mesh of this poly-connectivity {@link IPolyConnectivity}.</p>
 	 *
-	 * Does not change the connectivity.
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @return the mesh of this IPolyConnectivity
 	 */
@@ -55,12 +55,12 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
-	 * Searches and returns the face containing the point (x,y) in O(n),
+	 * <p>Searches and returns the face containing the point (x,y) in O(n),
 	 * where n is the number of faces of the mesh. For each polygon of the mesh
 	 * the contained method will be evaluated until it returns <tt>true</tt> which
-	 * is rather time consuming.
+	 * is rather time consuming.</p>
 	 *
-	 * Does not change the connectivity.
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x x-coordinate of the location point
 	 * @param y y-coordinate of the location point
@@ -71,10 +71,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
-	 * Searches and returns the face containing the point (x,y) in O(n),
-	 * where n is the number of faces of the mesh.
+	 * <p>Searches and returns the face containing the point (x,y) in O(n),
+	 * where n is the number of faces of the mesh.</p>
 	 *
-	 * Does not change the connectivity.
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param point the location point
 	 * @return the face containing the point or empty() if there is none
@@ -85,12 +85,12 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 
 	/**
-	 * Adjust the edge of a vertex in O(d) where d is the degree of the vertex.
+	 * <p>Adjust the edge of a vertex in O(d) where d is the degree of the vertex.
 	 * If there is an half-edge e which is at the boundary (i.e. hole or border) and has the vertex v
 	 * as its end point, this method will set the half-edge of v to e. This is helpful to speed up the
-	 * test whether a vertex is a boundary vertex!
+	 * test whether a vertex is a boundary vertex!</p>
 	 *
-	 * Does not change the connectivity.
+	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param vertex v
 	 */
@@ -144,13 +144,17 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
-	 * Splits the edge (s)->(e)  into two edges (s)->(p)->(e) in O(1).
-	 *                    <-                       <-   <-
+	 * <p>Splits the edge (s) to (e) into two edges (s) to (p) to (e) in O(1).</p>
 	 *
-	 * Changes the connectivity.
+	 * <p>Changes the connectivity.</p>
 	 *
 	 * @param edge  the edge
 	 * @param p     the split point.
+	 * @param mesh  the mesh containing the edge and which will contain p afterwards
+	 * @param <P>   the type of the points (containers)
+	 * @param <V>   the type of the vertices
+	 * @param <E>   the type of the half-edges
+	 * @param <F>   the type of the faces
 	 *
 	 * @return returns the new vertex
 	 */
@@ -214,9 +218,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * Splitting the face i.e. a polygon into as many faces as the face has edges which
 	 * triangulates the face / polygon. This requires the time to locate the face which is O(n),
 	 * where n is the number of faces for a basic implementation and O(log(n)) for more sophisticated
-	 * point location algorithms see {@link IPointLocator<P, V, E, F>} and the actual split which
+	 * point location algorithms see {@link IPointLocator} and the actual split which
 	 * requires O(1) but which might require additional changes e.g. in case for a Delaunay Triangulation
-	 * see {@link IncrementalTriangulation <P, V, E, F>}.
+	 * see {@link IncrementalTriangulation}.
 	 *
 	 * Assumption: the vertex is valid i.e. it is contained in some face.
 	 *
@@ -287,17 +291,18 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
-	 * Removes all links between the face and the otherFace. This essentially merges these two
+	 * <p>Removes all links between the face and the otherFace. This essentially merges these two
 	 * faces together if and only if there share a common edge. If one of these faces is the outer
 	 * boundary i.e. the border the other one will be deleted. This requires O(max(n,m)), where n and m
-	 * is the number of edges of the involved faces.
+	 * is the number of edges of the involved faces.</p>
 	 *
-	 * Assumption: both faces aren't destroyed.
+	 * <p>Assumption: both faces aren't destroyed.</p>
 	 *
-	 * Changes the connectivity.
+	 * <p>Changes the connectivity.</p>
 	 *
-	 * @param face      face one
-	 * @param otherFace face two
+	 * @param face                      face one
+	 * @param otherFace                 face two
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
 	 * @return the remaining face (which might be face or otherFace)
 	 */
 	default Optional<F> removeEdges(@NotNull final F face, @NotNull F otherFace, final boolean deleteIsolatedVertices) {
@@ -397,14 +402,15 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	// TODO: improve performance by remembering faces
 	/**
-	 * A virus like working algorithm which merges neighbouring faces by starting at the face until
+	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
 	 * the mergeCondition does no longer hold. This requires in the worst case O(n), where n is the number
-	 * of edges of all involved faces (i.e. the face and the merged faces).
+	 * of edges of all involved faces (i.e. the face and the merged faces).</p>
 	 *
-	 * Changes the connectivity.
+	 * <p>Changes the connectivity.</p>
 	 *
-	 * @param face              the face
-	 * @param mergeCondition    the merge condition
+	 * @param face                      the face
+	 * @param mergeCondition            the merge condition
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
 	 *
 	 * @return the merge result i.e. the resulting face.
 	 */
@@ -463,7 +469,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * Changes the connectivity.
 	 *
 	 * @param removeCondition           the remove condition
-	 * @param deleteIsolatedVertices    true => isolated vertices (they are not connected to an edge) will be removed.
+	 * @param deleteIsolatedVertices    true then isolated vertices (they are not connected to an edge) will be removed.
 	 */
 	default void shrinkBorder(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
 		boolean modified = true;
@@ -855,7 +861,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * Changes the connectivity.
 	 *
 	 * @param face                      the face that will be removed from the mesh
-	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
+	 * @param deleteIsolatedVertices    true means that all vertices with degree smaller equals 1 will be removed as well
 	 */
 	default void removeFace(@NotNull final F face, final boolean deleteIsolatedVertices) {
 		throw new UnsupportedOperationException("doest not work correctly jet.");
@@ -880,18 +886,19 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
-	 * Removes a face from the mesh by removing all boundary edges of the face.
+	 * <p>Removes a face from the mesh by removing all boundary edges of the face.
 	 * If there is no boundary edge this method will not change the mesh topology.
 	 * This requires O(n) (if the face is no island) where n is the number of edges of
 	 * the face. If the face is an island (a very special case) this can require O(m), where m is the number of
-	 * all edges of the mesh!
+	 * all edges of the mesh!</p>
 	 *
-	 * Changes the connectivity.
+	 * <p>Changes the connectivity.</p>
 	 *
-	 * Assumption: a neighbour of the face is the boundary and there is no other neighbouring boundary.
+	 * <p>Assumption: boundary is in fact a boundary and is neighbouring the face and there is no other neighbouring boundary.</p>
 	 *
 	 * @param face                      the face that will be removed from the mesh
-	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
+	 * @param boundary                  the boundary which has to be a neighbouring boundary of the face
+	 * @param deleteIsolatedVertices    true means that all vertices with degree smaller equals 1 will be removed as well
 	 */
 	default void removeFaceAtBoundary(@NotNull final F face, final F boundary, final boolean deleteIsolatedVertices) {
 		if(!getMesh().isDestroyed(face)) {
@@ -1042,7 +1049,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * Assumption: the face is at the border
 	 *
 	 * @param face                      the face that will be removed from the mesh
-	 * @param deleteIsolatedVertices    true means that all vertices with degree <= 1 will be removed as well
+	 * @param deleteIsolatedVertices    true means that all vertices with degree smaller equals 1 will be removed as well
 	 */
 	default void removeFaceAtBorder(@NotNull final F face, final boolean deleteIsolatedVertices) {
 		removeFaceAtBoundary(face, getMesh().getBorder(), deleteIsolatedVertices);

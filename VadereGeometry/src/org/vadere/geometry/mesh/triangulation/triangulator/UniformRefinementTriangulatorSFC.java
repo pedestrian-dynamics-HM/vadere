@@ -120,7 +120,9 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
      * @param bound                 the bounding box containing all boundaries and the topography with respect to the distance function distFunc
      * @param boundary              the boundaries e.g. obstacles
      * @param lenFunc               an edge length function
+	 * @param minEdgeLength         the minimal edge length of the refined triangulation
      * @param distFunc              a signed distance function
+	 * @param fixPoints             a collection of fix points which will be included if they are inside the bound. Furthermore they will not move.
      */
 	public UniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, V, E, F> meshSupplier,

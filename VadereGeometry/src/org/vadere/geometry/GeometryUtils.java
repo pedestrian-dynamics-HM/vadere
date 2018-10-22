@@ -42,9 +42,15 @@ public class GeometryUtils {
 	public static final Logger log = LogManager.getLogger(GeometryUtils.class);
 
 	/**
-	 * Interpolates between start and end with the given factor.
+	 * Interpolates between start and end with the given factor i.e. two values at once.
+	 *
+	 * @param start     the start / min values
+	 * @param end       the end / max values times factor
+	 * @param factor    the scale of the max value
+	 *
+	 * @return the two interpolated values (x,y)
 	 */
-	public static VPoint interpolate(VPoint start, VPoint end, double factor) {
+	public static VPoint interpolate(@NotNull final VPoint start, @NotNull final VPoint end, double factor) {
 		VPoint result = new VPoint(start.x + factor * (end.x - start.x),
 				start.y + factor * (end.y - start.y));
 		return result;
@@ -109,7 +115,7 @@ public class GeometryUtils {
 		return false;
 	}
 
-	public static VPoint getCircumcenter(final IPoint p1, final IPoint p2, final IPoint p3) {
+	public static VPoint getCircumcenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
 		double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
 				+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
@@ -121,14 +127,14 @@ public class GeometryUtils {
 		return new VPoint(x,y);
 	}
 
-	public static boolean isInCircumscribedCycle(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint point) {
+	public static boolean isInCircumscribedCycle(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3, @NotNull final IPoint point) {
 		VPoint circumcenter = getCircumcenter(p1, p2, p3);
 		return circumcenter.distance(point) < circumcenter.distance(p1);
 	}
 
 	/**
 	 * Generates a set of points which are positioned inside a disc segment. The points are placed equidistant on one or multiple circles
-	 * with the center at the center of the disc and the radius <= the radius of the disc.
+	 * with the center at the center of the disc and the radius smaller or equals the radius of the disc.
 	 *
 	 * @param random                            a random number generator which will only be used if varyDirection is true.
 	 * @param varyDirection                     if true the generated points will be rotated by a random offset
@@ -190,7 +196,7 @@ public class GeometryUtils {
 	 *        line representing the segment
 	 * @return the point on the line that is closest to p
 	 */
-	public static VPoint closestToSegment(VLine line, IPoint point) {
+	public static VPoint closestToSegment(@NotNull final VLine line, @NotNull final IPoint point) {
 		if (new VPoint((Point2D.Double) line.getP1()).equals(point)) {
 			return new VPoint(line.x1, line.y1);
 		}
@@ -215,7 +221,7 @@ public class GeometryUtils {
 	 * @param qY y-coordinate of q
 	 * @param rX x-coordinate of r
 	 * @param rY y-coordinate of r
-	 * @return
+	 * @return area or negative area of the parallelogram defined by p, q, r
 	 */
 	public static double ccw(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
 		return -((qX - pX) * (rY - pY) - (rX - pX) * (qY - pY));
@@ -230,7 +236,7 @@ public class GeometryUtils {
 	 * @param qY y-coordinate of q
 	 * @param rX x-coordinate of r
 	 * @param rY y-coordinate of r
-	 * @return
+	 * @return area or negative area of the parallelogram defined by p, q, r
 	 */
 	public static double ccwRobust(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
 		double result = -((qX - pX) * (rY - pY) - (rX - pX) * (qY - pY));
@@ -242,54 +248,56 @@ public class GeometryUtils {
 		}
 	}
 
-
 	/**
+	 * Returns true if q = (xq, yq) is right of the oriented-line defined by (p1 = (x1, y1), p2 = (x2, y2)).
+	 * @param x1 the x-coordinate of p1
+	 * @param y1 the y-coordinate of p1
+	 * @param x2 the x-coordinate of p2
+	 * @param y2 the y-coordinate of p2
+	 * @param xq the x-coordinate of q
+	 * @param yq the y-coordinate of q
 	 *
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 * @param xq
-	 * @param yq
-	 * @return
+	 * @return true if q is right of the oriented-line defined by (p1, p2), false otherwise
 	 */
 	public static boolean isRightOf(final double x1, final double y1, final double x2, final double y2, final double xq, final double yq) {
 		return isCW(x1, y1, x2, y2, xq, yq);
 	}
 
-
 	/**
 	 * Returns true if q is right of the oriented-line defined by (p1, p2).
-	 * @param p1
-	 * @param p2
-	 * @param q
+	 * @param p1 the start point of the oriented line
+	 * @param p2 the end point of the oriented line
+	 * @param q  the point which will be tested with respect toe the oriented line
+	 *
 	 * @return true if q is right of the oriented-line defined by (p1, p2), false otherwise
 	 */
-	public static boolean isRightOf(final IPoint p1, final IPoint p2, final IPoint q) {
+	public static boolean isRightOf(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint q) {
 		return isRightOf(p1, p2, q.getX(), q.getY());
 	}
 
 	/**
 	 * Returns true if q is left of the oriented-line defined by (p1, p2).
 	 *
-	 * @param p1
-	 * @param p2
-	 * @param q
+	 * @param p1 the start point of the oriented line
+	 * @param p2 the end point of the oriented line
+	 * @param q  the point which will be tested with respect toe the oriented line
+	 *
 	 * @return true if q is left of the oriented-line defined by (p1, p2), false otherwise
 	 */
-	public static boolean isLeftOf(final IPoint p1, final IPoint p2, final IPoint q) {
+	public static boolean isLeftOf(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint q) {
 		return isLeftOf(p1, p2, q.getX(), q.getY());
 	}
 
 	/**
+	 * Returns true if q = (x, y) is right of the oriented-line defined by (p1, p2).
+	 * @param p1 the start point of the oriented-line
+	 * @param p2 the end point of the oriented-line
+	 * @param x  x-coordinate of q
+	 * @param y  y-coordinate of q
 	 *
-	 * @param p1
-	 * @param p2
-	 * @param x
-	 * @param y
-	 * @return
+	 * @return true if q is right of the oriented-line defined by (p1, p2), false otherwise
 	 */
-	public static boolean isRightOf(final IPoint p1, final IPoint p2, final double x, final double y) {
+	public static boolean isRightOf(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
 		return isCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
@@ -297,7 +305,7 @@ public class GeometryUtils {
 		return isCCW(x1, y1, x2, y2, xq, yq);
 	}
 
-	public static boolean isLeftOf(final IPoint p1, final IPoint p2, final double x, final double y) {
+	public static boolean isLeftOf(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
 		return isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
@@ -327,8 +335,12 @@ public class GeometryUtils {
 
 	/**
 	 * Returns the angle between the x-axis, p1 and p2.
+	 * @param p1 the first point
+	 * @param p2 the second point
+	 *
+	 * @return the angle between the x-axis, p1 and p2
 	 */
-	public static double angleTo(VPoint p1, VPoint p2) {
+	public static double angleTo(@NotNull final VPoint p1, @NotNull final VPoint p2) {
 		double atan2 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
 
 		if (atan2 < 0.0) {
@@ -339,20 +351,19 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Calculate the counter clockwise result for the three given points.<br>
-	 * ccw(p1,p2,p3) < 0 if p3 is left of Line(p1,p2)<br>
-	 * ccw(p1,p2,p3) = 0 if p3 lies on Line(p1,p2)<br>
-	 * ccw(p1,p2,p3) > 0 if p3 is right of Line(p1,p2)<br>
+	 * Calculate the counter clockwise result for the three given points.
+	 * <ol>
+	 *     <li>ccw(p1,p2,p3) smaller than 0 if p3 is left of Line(p1,p2)</li>
+	 *     <li>ccw(p1,p2,p3) equals 0 if p3 lies on Line(p1,p2)</li>
+	 *     <li>ccw(p1,p2,p3) larger than 0 if p3 is right of Line(p1,p2)</li>
+	 * </ol>
 	 *
-	 * @param p1
-	 *        first point
-	 * @param p2
-	 *        second point
-	 * @param p3
-	 *        third point
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
 	 * @return ccw(p1 p2 p3)
 	 */
-	public static double ccw(final IPoint p1, final IPoint p2, final IPoint p3) {
+	public static double ccw(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		return ccwRobust(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
 
@@ -372,7 +383,7 @@ public class GeometryUtils {
 		return ccw(p1, p2, p3) < 0;
 	}
 
-	public static Orientation orientation(final IPoint p1, final IPoint p2, final IPoint p3) {
+	public static Orientation orientation(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		double ccw = ccw(p1, p2, p3);
 		if(ccw < 0) {
 			return CW;
@@ -387,13 +398,15 @@ public class GeometryUtils {
 
 	/**
 	 * Tests if the line-segment (p1, p2) intersects the line defined by p, q.
+	 *
 	 * @param p     point defining the line
 	 * @param q     point defining the line
 	 * @param p1    point defining the line-segment
 	 * @param p2    point defining the line-segment
+	 *
 	 * @return true if the line-segment intersects the line defined, otherwise false.
 	 */
-	public static boolean intersectLine(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
+	public static boolean intersectLine(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
 		double ccw1 = ccw(p, q, p1);
 		double ccw2 = ccw(p, q, p2);
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
@@ -405,7 +418,7 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
-	public static VPoint getIncenter(final IPoint p1, final IPoint p2, final IPoint p3) {
+	public static VPoint getIncenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		double a = p1.distance(p2);
 		double b = p2.distance(p3);
 		double c = p3.distance(p1);
@@ -419,13 +432,15 @@ public class GeometryUtils {
 
 	/**
 	 * Tests if the half-line-segment starting at p in the direction (q-p) intersects the line-segment (p1,p2).
+	 *
 	 * @param p     the starting point of the half-line-segment
 	 * @param q     the point defining the direction (q-p) of the half-line-segment
 	 * @param p1    point defining the line-segment
 	 * @param p2    point defining the line-segment
+	 *
 	 * @return true if the line-segment intersects the  half-line-segment defined, otherwise false.
 	 */
-	public static boolean intersectHalfLineSegment(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
+	public static boolean intersectHalfLineSegment(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
 		double ccw1 = ccw(p, q, p1);
 		double ccw2 = ccw(p, q, p2);
 
@@ -442,47 +457,44 @@ public class GeometryUtils {
 
 	/**
 	 * Tests if the first line-segment (p,q) intersects the second line-segment (p1,p2).
+	 *
 	 * @param p     point defining the first line-segment
 	 * @param q     point defining the first line-segment
 	 * @param p1    point defining the second line-segment
 	 * @param p2    point defining the second line-segment
+	 *
 	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
 	 */
-	public static boolean intersectLineSegment(final IPoint p, final IPoint q, final IPoint p1, final IPoint p2) {
+	public static boolean intersectLineSegment(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
 		return intersectLine(p, q, p1, p2) && intersectLine(p1, p2, p, q);
 	}
 
 	/**
 	 * Tests if the first line-segment (p,q) intersects the second line-segment (p1,p2).
+	 *
 	 * @param p     point defining the first line-segment
 	 * @param q     point defining the first line-segment
 	 * @param p1    point defining the second line-segment
 	 * @param p2    point defining the second line-segment
+	 *
 	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
 	 */
-	public static boolean intersectLineSegment(final Point2D.Double p, final Point2D.Double q, final Point2D.Double p1, final Point2D.Double p2) {
+	public static boolean intersectLineSegment(@NotNull final Point2D.Double p, @NotNull final Point2D.Double q, @NotNull final Point2D.Double p1, @NotNull final Point2D.Double p2) {
 		return intersectLine(p.x, p.y, q.x, q.y, p1.x, p1.y, p2.x, p2.y) && intersectLine(p1.x, p1.y, p2.x, p2.y, p.x, p.y, q.x, q.y);
 	}
 
 	/**
-	 * Tests if the first line-segment (p,q) intersects the second line-segment (p1,p2).
-	 * @param p     point defining the first line-segment
-	 * @param q     point defining the first line-segment
-	 * @param p1    point defining the second line-segment
-	 * @param p2    point defining the second line-segment
-	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
-	 */
-
-	/**
 	 * Tests if the first line-segment (p = (x1, y1), q = (x2, y2)) intersects the second line-segment (p1 = (x3, y3), p2 = (x4, y4)).
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 * @param x3
-	 * @param y3
-	 * @param x4
-	 * @param y4
+	 *
+	 * @param x1 x-coordinate of p
+	 * @param y1 y-coordinate of p
+	 * @param x2 x-coordinate of q
+	 * @param y2 y-coordinate of q
+	 * @param x3 x-coordinate of p1
+	 * @param y3 y-coordinate of p1
+	 * @param x4 x-coordinate of p2
+	 * @param y4 y-coordinate of p2
+	 *
 	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
 	 */
 	public static boolean intersectLineSegment(final double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
@@ -496,9 +508,10 @@ public class GeometryUtils {
 	 * @param p2    point of the triangle
 	 * @param p3    point of the triangle
 	 * @param r     point which the triangle might contain.
+	 *
 	 * @return true if the triangle (p1,p2,p3) contains the point r, otherwise false.
 	 */
-	public static boolean triangleContains(final IPoint p1, final IPoint p2, final IPoint p3, final IPoint r) {
+	public static boolean triangleContains(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3, @NotNull final IPoint r) {
 		boolean b1, b2, b3;
 		double d1 = GeometryUtils.ccw(r, p1, p2);
 		double d2 = GeometryUtils.ccw(r, p2, p3);
@@ -510,24 +523,25 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Tests if the circle defined by three non-lin points (p1,p2,p3) contains the point p.
+	 * <p>Tests if the circle defined by three non-lin points (p1,p2,p3) contains the point p.
 	 * The center of the circle is the circumcenter of the triangle and the radius is equalt to the
-	 * distance between the circumcenter and any point of {p1, p2, p3}.
+	 * distance between the circumcenter and any point of {p1, p2, p3}.</p>
 	 *
-	 * Assumtion: a, b, c are in ccw-order!
+	 * <p>Assumption: a, b, c are in ccw-order!</p>
 	 *
 	 * @param a    point of the triangle
 	 * @param b    point of the triangle
 	 * @param c    point of the triangle
 	 * @param p    point which the circle might contain.
+	 *
 	 * @return true, if the circle defined by three non-lin points (p1,p2,p3) contains the point p, otherwise false
 	 */
-	public static boolean isInsideCircle(final IPoint a, final IPoint b, final IPoint c, final IPoint p) {
+	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, @NotNull final IPoint p) {
 		return isInsideCircle(a, b, c, p.getX(), p.getY());
 	}
 
 
-	public static boolean isInsideCircle(final IPoint a, final IPoint b, final IPoint c, double x , double y) {
+	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, double x , double y) {
 		/*IPoint qp = q.subtract(p);
 		IPoint rp = r.subtract(p);
 		IPoint tp = t.subtract(p);
@@ -561,19 +575,19 @@ public class GeometryUtils {
 
 	/**
 	 * Computes the cross product of two vectors and store it in the cross
-	 * vector.
+	 * vector. This is a c-like call.
 	 *
-	 * @param v1
-	 * @param v2
-	 * @param cross
+	 * @param v1    the first vector
+	 * @param v2    the second vector
+	 * @param cross the result vector
 	 */
-	public static void cross(double[] v1, double[] v2, double[] cross) {
+	public static void cross(@NotNull final double[] v1, @NotNull double[] v2, @NotNull double[] cross) {
 		cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
 		cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
 		cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
 	}
 
-	public static VPolygon polygonFromPoints2D(final List<VPoint> vertices) {
+	public static VPolygon polygonFromPoints2D(@NotNull final List<VPoint> vertices) {
 		return polygonFromPoints2D(vertices.toArray(new VPoint[0]));
 	}
 
@@ -582,9 +596,10 @@ public class GeometryUtils {
 	 * all vertices are distinct.
 	 *
 	 * @param vertices the defining distinct vertices.
+	 *
 	 * @return a new Polygon
 	 */
-	public static VPolygon polygonFromPoints2D(final IPoint... vertices) {
+	public static VPolygon polygonFromPoints2D(@NotNull final IPoint... vertices) {
 		Path2D.Double result = new Path2D.Double();
 		if (vertices.length == 0)
 			return new VPolygon(result);
@@ -603,9 +618,10 @@ public class GeometryUtils {
 	 * Computes the area of a Polygon.
 	 *
 	 * @param vertices distinct vertices defining the polygon.
+	 *
 	 * @return the area of a polygon
 	 */
-	public static double areaOfPolygon(final List<? extends IPoint> vertices) {
+	public static double areaOfPolygon(@NotNull final List<? extends IPoint> vertices) {
 		double result = 0;
 		if(vertices.size() >= 3) {
 			for (int i = 0; i < vertices.size() - 1; i++) {
@@ -619,16 +635,18 @@ public class GeometryUtils {
 
 	/**
 	 * Computes the distance from the line-segment defined by (p1,p2) to the point p.
+	 *
 	 * @param p1    first point of the line-segment
 	 * @param p2    second point of the line-segment
 	 * @param p     the point
+	 *
 	 * @return he distance from the line-segment defined by (p1,p2) to the point p.
 	 */
-	public static double distanceToLineSegment(final IPoint p1, final IPoint p2, final IPoint p) {
+	public static double distanceToLineSegment(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p) {
 		return distanceToLineSegment(p1, p2, p.getX(), p.getY());
 	}
 
-	public static double distanceToLineSegment(final IPoint p1, final IPoint p2, final double x, final double y) {
+	public static double distanceToLineSegment(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
 		if (p1.getX() == p2.getX() && p1.getY() == p2.getY())
 			return p1.distance(x,y);
 
@@ -644,7 +662,7 @@ public class GeometryUtils {
 		return Math.abs(s) * Math.sqrt(len2);
 	}
 
-	public static boolean isOnEdge(final IPoint p1, final IPoint p2, final IPoint p, double tolerance) {
+	public static boolean isOnEdge(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p, double tolerance) {
 		return distanceToLineSegment(p1, p2, p) < tolerance;
 	}
 
@@ -655,9 +673,10 @@ public class GeometryUtils {
 	 *
 	 * @param line      the line
 	 * @param circle    the circle
+	 *
 	 * @return  all intersection poins of the line with the circle i.e. 1, 2 or 0 results.
 	 */
-	public static VPoint[] intersection(final VLine line, final VCircle circle) {
+	public static VPoint[] intersection(@NotNull final VLine line, @NotNull final VCircle circle) {
 		double m = line.slope();
 		double d = line.getY1() - m * line.getX1();
 		double a = circle.getCenter().getX();
@@ -688,12 +707,13 @@ public class GeometryUtils {
 	/**
 	 * The (smallest possible) angle at C from the triangle ACB.
 	 *
-	 * @param A
-	 * @param C
-	 * @param B
-	 * @return
+	 * @param A first point of the triangle
+	 * @param C second point of the triangle
+	 * @param B third point of the triangle
+	 *
+	 * @return the (smallest possible) angle at C from the triangle ACB.
 	 */
-	public static double angle(IPoint A, IPoint C, IPoint B) {
+	public static double angle(@NotNull final IPoint A, @NotNull final IPoint C, @NotNull final IPoint B) {
 		double phi1 = angleTo(A, C);
 		double phi2 = angleTo(B, C);
 		double phi = Math.abs(phi1 - phi2);
@@ -701,12 +721,15 @@ public class GeometryUtils {
 	}
 
 	/**
-	 *
-	 * Computes the angle between the positive x-axis through the given Point "center" and this.
-	 * see: https://en.wikipedia.org/wiki/Atan2
+	 * Computes the angle between the positive x-axis and the point (to - from).
 	 * Result is in interval (0,2*PI) according to standard math usage.
+	 *
+	 * @see <a href="https://en.wikipedia.org/wiki/Atan2">https://en.wikipedia.org/wiki/Atan2</a>
+	 * @param from the first point / vector
+	 * @param to   the second point / vector
+	 * @return the angle between the positive x-axis
 	 */
-	public static double angleTo(final IPoint from, final IPoint to) {
+	public static double angleTo(@NotNull final IPoint from, @NotNull final IPoint to) {
 		double atan2 = Math.atan2(to.getY() - from.getY(), to.getX() - from.getX());
 
 		if (atan2 < 0.0) {
@@ -716,17 +739,18 @@ public class GeometryUtils {
 		return atan2;
 	}
 
-	public static double angleTo(final IPoint to) {
+	public static double angleTo(@NotNull final IPoint to) {
 		return angleTo(new VPoint(0,0), to);
 	}
 
 	/**
-	 * Returns the angle between line1 and line2 in clock wise order (cw).
-	 * @param line1
-	 * @param line2
-	 * @return
+	 * Returns the angle between two lines in clock wise order (cw).
+	 *
+	 * @param line1 the first line
+	 * @param line2 the second line
+	 * @return the angle between two lines in clock wise order (cw).
 	 */
-	public static double angleBetween2Lines(final VLine line1, final VLine line2)
+	public static double angleBetween2Lines(@NotNull final VLine line1, @NotNull final VLine line2)
 	{
 		double angle1 = Math.atan2(line1.getY1() - line1.getY2(),
 				line1.getX1() - line1.getX2());
@@ -756,21 +780,22 @@ public class GeometryUtils {
 
 
 	/**
-	 * This method follows the construction from
-	 * https://proofwiki.org/wiki/Obtuse_Triangle_Divided_into_Acute_Triangles
-	 * i.e. divides an non-acute triangle acb into 7 acute triangles:
-	 *  new VTriangle(a, f, e),
-	 *  new VTriangle(e, f, d),
-	 *  new VTriangle(d, c, e),
-	 *  new VTriangle(d, h ,c),
-	 *  new VTriangle(d, g, h),
-	 *  new VTriangle(f, g, d),
-	 *  new VTriangle(g, b, h);.
-	 *  if the triangle is non-acute at c. If the triangle is already acute the method
-	 *  returns the original triangle.
+	 *  This method divides an non-acute triangle ACB into 7 acute triangles
+	 *  <ul>
+	 *      <li>AFE</li>
+	 *      <li>EFD</li>
+	 *      <li>DCE</li>
+	 *      <li>DHC</li>
+	 *      <li>DGH</li>
+	 *      <li>FGD</li>
+	 *      <li>GBH</li>
+	 *  </ul>
+	 *  If the triangle is non-acute at C. If the triangle is already acute the method returns the original triangle.
+	 *  throws an illegal argument exception if the triangle is not a feasible triangle.
 	 *
-	 * @param triangle
-	 * @throws throws an illegal argument exception if the triangle is not a feasible triangle.
+	 * @see <a href="https://proofwiki.org/wiki/Obtuse_Triangle_Divided_into_Acute_Triangles">https://proofwiki.org/wiki/Obtuse_Triangle_Divided_into_Acute_Triangles</a>
+	 * @param triangle the triangle which might be divided into 7 acute triangles
+	 * @return if the triangle is acute this method returns it, otherwise it returns 7 acute triangles
 	 */
 	public static VTriangle[] generateAcuteTriangles(final VTriangle triangle) {
 		double angle1 = angle(triangle.p1, triangle.p2, triangle.p3);
@@ -889,10 +914,10 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * A brute force method to get the set of all intersection points of a list of shapes.
-	 * For two shapes this requires O(n * m) time where n, m are the number of points of the shapes.
+	 * <p>A brute force method to get the set of all intersection points of a list of shapes.
+	 * For two shapes this requires O(n * m) time where n, m are the number of points of the shapes.</p>
 	 *
-	 * Note: A sweepline algorithm could improve the performance significantly.
+	 * <p>Note: A sweepline algorithm could improve the performance significantly.</p>
 	 *
 	 * @param shapes a list of shapes
 	 * @return a set of intersection points
@@ -926,13 +951,13 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Transforms a list of distinct points (p1,p2,p3,...,pn) into a polygon.
+	 * <p>Transforms a list of distinct points (p1,p2,p3,...,pn) into a polygon.</p>
 	 *
-	 * Assumption: the points are in the correct order i.e. ccw or cw. and the list contains
-	 * more than 2 points.
+	 * <p>Assumption: the points are in the correct order i.e. ccw or cw. and the list contains
+	 * more than 2 points.</p>
 	 *
 	 * @param points a list of points in order
-	 * @return a polygon
+	 * @return a polygon which is constructed via a list of points
 	 */
 	public static VPolygon toPolygon(@NotNull final List<? extends IPoint> points) {
 		assert points.size() >= 3;
@@ -952,10 +977,13 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * This method removes duplicated and co-linear points from a list (p1, ..., pn) of points which form a simple polygon.
-	 * Assumption: p1 - ... - pn forms a simple polygon.
+	 * <p>This method removes duplicated and co-linear points from a list (p1, ..., pn) of points which form a simple polygon.
+	 * points p1, p2, p3 are seen as co-linear if the distance from p3 to line p1 to p2 is smaller or equals eps.</p>
 	 *
-	 * @param points points of a polygon.
+	 * <p>Assumption: p1 to ... to pn forms a simple polygon.</p>
+	 *
+	 * @param points    points of a polygon.
+	 * @param eps       the distance which determines if three points are co-linear
 	 *
 	 * @return a list of points forming a simple polygon such that there are no duplicated or co-linear points.
 	 */
@@ -963,7 +991,7 @@ public class GeometryUtils {
 		assert points.size() >= 3;
 		List<VPoint> filteredList = new ArrayList<>(points);
 
-		boolean removePoint = false;
+		boolean removePoint;
 
 		do {
 			removePoint = false;
@@ -985,10 +1013,10 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Transforms a list of distinct points (p1,p2,p3,...,pn) into a polygon.
+	 * <p>Transforms a list of distinct points (p1,p2,p3,...,pn) into a polygon.</p>
 	 *
-	 * Assumption: the points are in the correct order i.e. ccw or cw. and the list contains
-	 * more than 2 points.
+	 * <p>Assumption: the points are in the correct order i.e. ccw or cw. and the list contains
+	 * more than 2 points.</p>
 	 *
 	 * @param points an array / list of points in order
 	 * @return a polygon

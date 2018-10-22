@@ -40,18 +40,17 @@ import java.util.stream.StreamSupport;
 
 /**
  * <p>
- * A {@link IMesh} is a set of {@link IFace}, their half-edges {@link IHalfEdge}, vertices {@link IVertex<P>} and points {@link P}
+ * A {@link IMesh} is a set of {@link IFace}, their half-edges {@link IHalfEdge}, vertices {@link IVertex} and points {@link P}
  * defining a geometry. It also is a factory for those geometric base elements: points, vertices, half-edges and faces. The user should use one mesh
  * for exactly one geometric and the user should never create any base element without calling its mesh. Furthermore, the user is responsible for the
  * correctness of the mesh definition e.g. no overlapping edges. There are some classes for automatic mesh generation like
  * {@link org.vadere.geometry.mesh.triangulation.triangulator.ITriangulator} or other factory methods like {@link IMesh#createSimpleTriMesh}
  * </p>
- * <p>It uses the half-edge data structure to store all information and is a generic interface to provide different implementations such as:
+ It uses the half-edge data structure to store all information and is a generic interface to provide different implementations such as:
  * <ul>
  *     <li>A pointer based version which implements a doubled-linked-list data structure {@link org.vadere.geometry.mesh.gen.PMesh}</li>
  *     <li>An index based version which implements an array data structure {@link org.vadere.geometry.mesh.gen.AMesh}</li>
  * </ul>
- * </p>
  * <p>
  * It should be impossible to create faces, edges, and vertices of the mesh without using the mesh i.e. IMesh is a factory for faces, edges and vertices.
  * A boundary can be a hole or the border. A hole is surrounded by faces and the border is the infinite large face representing the space which is not
@@ -63,16 +62,15 @@ import java.util.stream.StreamSupport;
  * iterate over the list {@link List} while changing elements in the mesh. The mesh offers a large set of different iterators and streams to iterate over all neighbouring
  * faces of a face, vertices of a vertex, edges of a vertex or over all edges / vertices / points of a face.
  * </p>
- * <p>
  *     We define as base elements: points {@link P}, vertices {@link V}, half-edges {@link E} and faces {@link F}.
  *     <ul>
  *         <li>
- *             point {@link P}: </br>
+ *             point {@link P}:
  *                 A point is a container object which can be identified by its 2-D coordinates (x,y) and is part of a vertex {@link V}. A point has no reference to
  *                 any other base element of the mesh data structure.
  *         </li>
  *         <li>
- *             vertex {@link V}: </br>
+ *             vertex {@link V}:
  *                  A vertex is the end node / point of a half-edge. Each vertex has exactly one distinct point {@link P}. One can access the point
  *                  of a vertex in O(1). A vertex has also a 1 to 1 relation to a half-edge and the half-edge of a vertex can accessed in O(1) time. Furthermore, it has
  *                  a reference to one arbitrary of its half-edges (half-edges ending in it). If the vertex is at the boundary (hole or border) the half-edge should be
@@ -81,18 +79,17 @@ import java.util.stream.StreamSupport;
  *                  its half-edge and extracting from the half-edge the face.
  *         </li>
  *         <li>
- *             half-edge {@link E}: </br>
+ *             half-edge {@link E}:
  *                  A half-edge is part of a full-edge i.e. the half-edge and its twin fully define the full-edge. Each half-edge has a predecessor
  *					and a successor and a twin half-edge {@link E} which can be accessed in O(1). Furthermore, each half-edge is part of exactly one face {@link F} and ends
  *                  in exactly one vertex {@link V} both can be accessed in O(1) time. As one can see the half-edge has the most amount of references (5).
  *         </li>
  *         <li>
- *             face {@link F}: </br>
+ *             face {@link F}:
  *                  A face can be a interior face i.e. a simple polygon, a hole (also a polygon but representing empty space) or the border i.e. the infinite
  *                  face which represents all the space which is not represented by any finite face. An arbitrary half-edge {@link E} can be accessed in O(1).
  *         </li>
  *     </ul>
- * </p>
  * <p>
  * We say a half-edge is a boundary / border / hole edge if it is part of a boundary / hole or the border. A boundary can be a hole or the border (there is only one border).
  * We say a half-edge is at the boundary / border / hole if itself is a boundary / border / hole edge or its twin. Therefore a boundary / border / hole edge is via definition
@@ -111,12 +108,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	/**
 	 * construct a new empty mesh.
-	 * @return
+	 *
+	 * @return a new fresh empty mesh
 	 */
 	IMesh<P, V, E, F> construct();
 
 	/**
-	 * removes deleted base elements from this data structure.
+	 * Removes deleted base elements from this data structure.
 	 * This might be used if removing an element from the mesh does not removes
 	 * this element from the data structure i.e. the mesh representing the geometry.
 	 * This operation might be expensive O(n) for n points.
@@ -231,7 +229,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * Returns the (end-)point of the half-edge in O(1).
 	 *
 	 * @param halfEdge the half-edge
-	 * @returnthe (end-)point of the half-edge
+	 * @return the (end-)point of the half-edge
 	 */
 	P getPoint(@NotNull E halfEdge);
 
@@ -256,7 +254,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	// TODO: this is for the delaunay-hierarchy only!
 	/**
-	 * This is specifically used by {@link org.vadere.geometry.mesh.gen.DelaunayHierarchy<P, V, E, F>}
+	 * This is specifically used by {@link org.vadere.geometry.mesh.gen.DelaunayHierarchy}
 	 * to establish the link of the different hierarchies in O(1).
 	 *
 	 * @param v a vertex of hierarchy k
@@ -266,7 +264,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 
 	// TODO: this is for the delaunay-hierarchy only!
 	/**
-	 * This is specifically used by {@link org.vadere.geometry.mesh.gen.DelaunayHierarchy<P, V, E, F>}
+	 * This is specifically used by {@link org.vadere.geometry.mesh.gen.DelaunayHierarchy}
 	 * to establish the link of the different hierarchies. Connects two vertices up and down such that
 	 * up is at the hierarchy k and down is at hierarchy k+1 in O(1).
 	 *
@@ -496,7 +494,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * (Optional) returns the half-edge of a face which has a twin which is a boundary edge
 	 * i.e. the link to the boundary.
 	 *
-	 * @param face
+	 * @param face (optional) the link to the boundary
+	 *
 	 * @return (optional) the half-edge of a face which has a twin which is a boundary edge
 	 */
 	default Optional<E> getLinkToBoundary(@NotNull final F face){
@@ -736,7 +735,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	/**
 	 * Inserts the point into the mesh data structure, returning its vertex
 	 *
-	 * @param point
+	 * @param point the point
 	 * @return the vertex of the point
 	 */
 	default V insertPoint(final P point) {
@@ -750,6 +749,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 *
 	 * @param x x-coordinate
 	 * @param y y-coordinate
+	 * @return the vertex of the point defiend by (x,y)
 	 */
 	default V insertVertex(final double x, final double y) {
 		V vertex = createVertex(x, y);
@@ -758,13 +758,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	/**
-	 * A factory method which creates a new face from a list {@link List}
+	 * <p>A factory method which creates a new face from a list {@link List}
 	 * of vertices which forms a simple (non-intersecting) polygon.
 	 * All base elements of the face and the face itself will be
-	 * added to the mesh data structure.
+	 * added to the mesh data structure.</p>
 	 *
-	 * Assumption: points (p1, ..., pn) is a valid simple polygon
-	 * and p1 != pn and vertices are already added to the mesh data structure.
+	 * <p>Assumption: points (p1, ..., pn) is a valid simple polygon
+	 * and p1 != pn and vertices are already added to the mesh data structure.</p>
 	 *
 	 * @param points a list {@link List} of vertices representing a simple polygon (non-intersecting)
 	 * @return a face
@@ -1738,13 +1738,13 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	IMesh<P, V, E, F> clone();
 
 	/**
-	 * Transforms the mesh into a rich triangulation {@link ITriangulation<P, V, E, F>}.
+	 * Transforms the mesh into a rich triangulation {@link ITriangulation}.
 	 * There will be no connectivity changes performed!
 	 *
 	 * Assumption: The mesh is a valid triangulation.
 	 *
 	 * @param type  specifies the used {@link IPointLocator}
-	 * @return a triangulation {@link ITriangulation<P, V, E, F>} of this mesh
+	 * @return a triangulation {@link ITriangulation} of this mesh
 	 */
 	ITriangulation<P, V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
 

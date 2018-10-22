@@ -7,8 +7,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * The A pointer based version of {@link IVertex}.
+ *
  * @author Benedikt Zoennchen
- * @param <P>
+ * @param <P> the type of the points (containers)
  */
 public class PVertex<P extends IPoint> implements IVertex<P> {
 
@@ -86,9 +88,9 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 	}
 
 	/**
-	 * Non-deep cloning.
+	 * Returns a deep clone of the vertex.
 	 *
-	 * @return
+	 * @return a deep clone of the vertex.
 	 */
     @Override
     public PVertex<P> clone() {

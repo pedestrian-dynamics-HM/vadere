@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
  */
 public class CLPSMeshing<P extends EikMeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
     private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
@@ -78,6 +80,7 @@ public class CLPSMeshing<P extends EikMeshPoint> implements IMeshImprover<P, AVe
 
     /**
      * Start with a uniform refined triangulation
+     * @throws OpenCLException if there is OpenCL is not or not correct installed.
      */
     public void initialize() throws OpenCLException {
         log.info("##### (start) compute a uniform refined triangulation #####");

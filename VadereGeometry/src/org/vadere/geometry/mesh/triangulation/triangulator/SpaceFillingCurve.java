@@ -40,7 +40,7 @@ public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends
 	}
 
 	/**
-	 * <p>Replaces the anchor element by two elements i.e. consecutive elements left->right.</p>
+	 * <p>Replaces the anchor element by two elements i.e. consecutive elements left followed by right.</p>
 	 *
 	 * @param left      the left element
 	 * @param right     the right element

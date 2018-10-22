@@ -30,7 +30,7 @@ public class DAG<E> {
 
 	/**
 	 * Default constructor.
-	 * @param element
+	 * @param element the element of the Dag-node
 	 */
 	public DAG(@NotNull final E element) {
 		this.element = element;
@@ -63,7 +63,7 @@ public class DAG<E> {
 
 	/**
 	 * Returns the element of the DAG.
-	 * @return
+	 * @return the element of the DAG
 	 */
 	public E getElement() {
 		return element;
@@ -87,6 +87,7 @@ public class DAG<E> {
 
 	/**
 	 * Test whether this DAG-Node is a child or not.
+	 *
 	 * @return true if this node is a child node, false otherwise.
 	 */
 	public boolean isLeaf(){
@@ -95,8 +96,10 @@ public class DAG<E> {
 
 	/**
 	 * Finds the first DAG-node element in a dept first fashion.
+	 *
 	 * @param test the predicate the element of the DAG-node has to fulfill.
-	 * @return
+	 *
+	 * @return (optional) the first DAG-node element in a dept first fashion
 	 */
 	public Optional<E> findFirstElement(final Predicate<E> test){
 		Optional<DAG<E>> optDag = findFirst(test);
@@ -111,7 +114,8 @@ public class DAG<E> {
 	/**
 	 * Finds the first DAG-node in a dept first fashion.
 	 * @param test the predicate the element of the DAG-node has to fulfill.
-	 * @return
+	 *
+	 * @return (optional) the first DAG-node in a dept first fashion.
 	 */
 	public Optional<DAG<E>> findFirst(final Predicate<E> test){
 		LinkedList<DAG<E>> nodesToVisit = new LinkedList<>();
@@ -133,8 +137,8 @@ public class DAG<E> {
 	 * The path will be constructed in a dept first fashion, therefore there
 	 * may exist other paths.
 	 *
-	 * @param test
-	 * @return
+	 * @param test the test that has to be satisfied
+	 * @return the last node of a path of elements that satisfy the test
 	 */
 	public Optional<DAG<E>> matchFirst(final Predicate<E> test) {
 
@@ -165,8 +169,8 @@ public class DAG<E> {
 	 * to the leaf and for each node on the path the condition is feasible including
 	 * the leaf itself.
 	 *
-	 * @param test
-	 * @return
+	 * @param test a condition which has to be feasible for the path from leaf to leaf
+	 * @return a set of leaf Dag elements
 	 */
 	public Set<DAG<E>> matchAll(final Predicate<E> test) {
 		Set<DAG<E>> leafs = new HashSet<>();

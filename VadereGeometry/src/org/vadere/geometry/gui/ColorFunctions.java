@@ -1,5 +1,6 @@
 package org.vadere.geometry.gui;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.geometry.mesh.inter.IFace;
 import org.vadere.geometry.mesh.inter.IHalfEdge;
 import org.vadere.geometry.mesh.inter.IMesh;
@@ -12,14 +13,14 @@ import java.util.HashMap;
 import java.util.function.BiFunction;
 
 /**
- * Provides color values for mesh drawings depending on some functions.
+ * <p>Provides color values for mesh drawings depending on some functions.
  * default implementations for faceDrawColor (boarder lines) and faceFillColor (filling)
- * are present.
+ * are present.</p>
  *
  * @param <P> P extends IPoint
- * @param <V> V extends IVertex<P>
- * @param <E> E extends IHalfEdge<P>
- * @param <F> F extends IFace<P>
+ * @param <V> V extends IVertex
+ * @param <E> E extends IHalfEdge
+ * @param <F> F extends IFace
  */
 public class ColorFunctions
 		<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
@@ -30,6 +31,9 @@ public class ColorFunctions
 	private HashMap<F, Color> faceDrawColorMap;
 
 
+	/**
+	 * <p>The default constructor.</p>
+	 */
 	public ColorFunctions() {
 		faceFillColorFunc = (mesh, face) -> ColorFunctions.qualityToGrayScale(mesh, face);
 		faceDrawColorFunc = (m, f) -> Color.BLACK;
@@ -38,11 +42,17 @@ public class ColorFunctions
 	}
 
 	/**
-	 * Create gray scale color codes for 'goodness' of a triangle from black (bad) to white (good)
+	 * <p>Computes the triangle quality of this face / triangle.</p>
+	 *
+	 * <p>Assumption: The face is a valid triangle.</p>
 	 *
 	 * @param mesh Mesh used for coloring
-	 * @param face Face to color
-	 * @return double value used for Color (only one needed for gray scale)
+	 * @param face face / triangle of which the quality will be computed
+	 * @param <P> P extends IPoint
+	 * @param <V> V extends IVertex<P>
+	 * @param <E> E extends IHalfEdge<P>
+	 * @param <F> F extends IFace<P>
+	 * @return the quality in (0;1) of the triangle
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double faceToQuality(final IMesh<P, V, E, F> mesh, final F face) {
 		VLine[] lines = mesh.toTriangle(face).getLines();
@@ -59,11 +69,14 @@ public class ColorFunctions
 	}
 
 	/**
-	 * Create gray scale color codes for 'goodness' of a triangle from black (bad) to white (good)
 	 *
 	 * @param mesh Mesh used for coloring
-	 * @param face Face to color
-	 * @return Gray scale color object
+	 * @param face face / triangle of which the color will be computed
+	 * @param <P> P extends IPoint
+	 * @param <V> V extends IVertex<P>
+	 * @param <E> E extends IHalfEdge<P>
+	 * @param <F> F extends IFace<P>
+	 * @return gray scale color object
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> Color qualityToGrayScale(final IMesh<P, V, E, F> mesh, final F face) {
 		float quality = (float) faceToQuality(mesh, face);
@@ -76,12 +89,12 @@ public class ColorFunctions
 	}
 
 	/**
-	 * Select face FillColor based on {@link #faceFillColorFunc} set in this object. If the color is
-	 * overwritten for the specified face by {@link #faceFillColorMap} then use this color.
+	 * <p>Select face FillColor based on {@link #faceFillColorFunc} set in this object. If the color is
+	 * overwritten for the specified face by {@link #faceFillColorMap} then use this color.</p>
 	 *
 	 * @param mesh Mesh used for coloring
 	 * @param face Face to color
-	 * @return Color object
+	 * @return color object
 	 */
 	public Color faceFillColor(final IMesh<P, V, E, F> mesh, final F face) {
 		if (faceFillColorMap.containsKey(face)) {
@@ -91,8 +104,8 @@ public class ColorFunctions
 	}
 
 	/**
-	 * Select face DrawColor based on {@link #faceDrawColorFunc} set in this object. If the color is
-	 * overwritten for the specified face by {@link #faceDrawColorMap} then use this color.
+	 * <p>Select face DrawColor based on {@link #faceDrawColorFunc} set in this object. If the color is
+	 * overwritten for the specified face by {@link #faceDrawColorMap} then use this color.</p>
 	 *
 	 * @param mesh Mesh used for coloring
 	 * @param face Face to color
@@ -107,45 +120,45 @@ public class ColorFunctions
 	}
 
 	/**
-	 * Overwrite color returned by {@link #faceFillColorFunc} for specified face with specified color
+	 * <p>Overwrite color returned by {@link #faceFillColorFunc} for specified face with specified color.</p>
 	 *
 	 * @param face  Face which color will be overwritten
 	 * @param color New color for face
 	 */
-	public void overwriteFillColor(F face, Color color) {
+	public void overwriteFillColor(@NotNull final F face, @NotNull final Color color) {
 		faceFillColorMap.put(face, color);
 	}
 
 	/**
-	 * Set a new faceFillColorFunc for this object.
+	 * <p>Set a new faceFillColorFunc for this object.</p>
 	 *
 	 * @param faceFillColorFunc BiFunction which specifies which color a face interior will get.
 	 */
-	public void setFaceFillColorFunc(BiFunction<IMesh<P, V, E, F>, F, Color> faceFillColorFunc) {
+	public void setFaceFillColorFunc(@NotNull final BiFunction<IMesh<P, V, E, F>, F, Color> faceFillColorFunc) {
 		this.faceFillColorFunc = faceFillColorFunc;
 	}
 
 	/**
-	 * Set a new faceFillColorFunc for this object.
+	 * <p>Set a new faceFillColorFunc for this object.</p>
 	 *
 	 * @param faceDrawColorFunc BiFunction which specifies which color the face contour will get.
 	 */
-	public void setFaceDrawColorFunc(BiFunction<IMesh<P, V, E, F>, F, Color> faceDrawColorFunc) {
+	public void setFaceDrawColorFunc(@NotNull final BiFunction<IMesh<P, V, E, F>, F, Color> faceDrawColorFunc) {
 		this.faceDrawColorFunc = faceDrawColorFunc;
 	}
 
 	/**
-	 * Overwrite color returned by {@link #faceDrawColorFunc} for specified face with specified color
+	 * <p>Overwrite color returned by {@link #faceDrawColorFunc} for specified face with specified color.</p>
 	 *
 	 * @param face  Face which color will be overwritten
 	 * @param color New color for face
 	 */
-	public void overwriteDrawColor(F face, Color color) {
+	public void overwriteDrawColor(@NotNull final F face, @NotNull final Color color) {
 		faceDrawColorMap.put(face, color);
 	}
 
 	/**
-	 * delete previously overwritten face/color pairs.
+	 * <p>delete previously overwritten face/color pairs.</p>
 	 */
 	public void clear() {
 		faceDrawColorMap.clear();

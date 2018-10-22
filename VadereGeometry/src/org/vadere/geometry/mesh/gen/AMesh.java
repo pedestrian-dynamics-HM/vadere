@@ -446,13 +446,13 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
     /**
-     * Rearranges all indices of faces, vertices and halfEdges of the mesh according to
+     * <p>Rearranges all indices of faces, vertices and halfEdges of the mesh according to
      * the {@link Iterable} faceOrder. All indices start at 0 and will be incremented one by one.
-     * For example, the vertices of the first face of faceOrder will receive id 0,1 and 2.
+     * For example, the vertices of the first face of faceOrder will receive id 0,1 and 2.</p>
      *
-     * Note: that any mapping id -> vertex or id -> halfEdge or id -> face has to be recomputed!
-     * Assumption: faceOrder contains all faces of this mesh.
-     * Invariant: the geometry i.e. the connectivity and the vertex positions will not change.
+     * <p>Note: that every mapping id to vertex or id to halfEdge or id to face has to be recomputed!</p>
+     * <p>Assumption: faceOrder contains all faces of this mesh.</p>
+     * <p>Invariant: the geometry i.e. the connectivity and the vertex positions will not change.</p>
      *
      * @param faceOrder the new order
      */
@@ -577,7 +577,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
      * This method rearranges the indices of faces, vertices and edges according to their positions.
      * After the call, neighbouring faces are near arrange inside the face {@link ArrayList}.
      *
-     * Note: that any mapping id -> vertex or id -> halfEdge or id -> face has to be recomputed!
+     * Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!
      */
     public void spatialSort() {
         // get the bound for the space filling curve!
@@ -624,7 +624,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	/**
 	 * removes all destroyed object from this mesh and re-arranges all indices.
      *
-     * Note: that any mapping id -> vertex or id -> halfEdge or id -> face has to be recomputed!
+     * Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!
 	 */
 	public void garbageCollection() {
 		Map<Integer, Integer> faceIdMap = new HashMap<>();

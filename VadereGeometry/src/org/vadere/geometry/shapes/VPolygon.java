@@ -87,8 +87,8 @@ public class VPolygon extends Path2D.Double implements VShape {
 	 * Check whether the given polygon intersects with the open ball around
 	 * "center" with given radius.
 	 * 
-	 * @param center
-	 * @param radius
+	 * @param center the center of the open ball
+	 * @param radius the radius of the open ball
 	 * @return true if any point of the polygon lies within the open ball.
 	 */
 	public boolean intersects(VPoint center, double radius) {
@@ -167,11 +167,10 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	/**
-	 * Check whether all lines of this polygon intersect somewhere with the
-	 * given polygon.
+	 * Checks whether two polygons (this and another polygon) do intersect.
 	 * 
-	 * @param intersectingPolygon
-	 * @return
+	 * @param intersectingPolygon   the other polygon
+	 * @return true if the two polygons intersect
 	 */
 	public boolean intersects(final VPolygon intersectingPolygon) {
 

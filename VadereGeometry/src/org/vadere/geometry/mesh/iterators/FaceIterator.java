@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 /**
  * @author Benedikt Zoennchen
  *
- * @param <P>
+ * @param <P> the type of the points (containers)
  */
 public class FaceIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<F> {
 

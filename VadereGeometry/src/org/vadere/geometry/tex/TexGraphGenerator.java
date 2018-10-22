@@ -23,7 +23,11 @@ public class TexGraphGenerator {
 	 *
 	 * @param mesh      the mesh
 	 * @param scaling   the scaling of the tikz graphics
-	 * @return a string representing a tikz graphics
+	 * @param <P>       the type of the points (containers)
+	 * @param <V>       the type of the vertices
+	 * @param <E>       the type of the half-edges
+	 * @param <F>       the type of the faces
+	 * @return a string representing a tikz graphic
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
 			@NotNull final IMesh<P, V, E, F> mesh, final float scaling){
@@ -50,7 +54,11 @@ public class TexGraphGenerator {
 	/**
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling.
 	 *
-	 * @param mesh  the mesh
+	 * @param mesh      the mesh
+	 * @param <P>       the type of the points (containers)
+	 * @param <V>       the type of the vertices
+	 * @param <E>       the type of the half-edges
+	 * @param <F>       the type of the faces
 	 * @return a string representing a tikz graphics
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
@@ -65,6 +73,10 @@ public class TexGraphGenerator {
 	 * @param mesh      the mesh
 	 * @param coloring  the coloring function
 	 * @param scaling   the scaling of the tikz graphics
+	 * @param <P>       the type of the points (containers)
+	 * @param <V>       the type of the vertices
+	 * @param <E>       the type of the half-edges
+	 * @param <F>       the type of the faces
 	 * @return a string representing a tikz graphics
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
@@ -127,6 +139,10 @@ public class TexGraphGenerator {
 	 *
 	 * @param mesh  the mesh which used to access components of each face
 	 * @param faces the list of faces
+	 * @param <P>       the type of the points (containers)
+	 * @param <V>       the type of the vertices
+	 * @param <E>       the type of the half-edges
+	 * @param <F>       the type of the faces
 	 * @return a string representing a tikz graphics
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(

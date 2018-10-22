@@ -4,7 +4,6 @@ import org.vadere.geometry.shapes.IPoint;
 import java.util.Optional;
 
 /**
- * <p>
  * A point-locator {@link IPointLocator} implements one of the strategies to find a specific triangle
  * represented by a face {@link F} inside a mesh {@link ITriangulation}. i.e. a set of connected non-overlapping
  * triangles including holes. The most famous strategies are so called triangle walks described in:
@@ -14,7 +13,6 @@ import java.util.Optional;
  *     <li>Fast randomized point location without preprocessing in two- and three-dimensional Delaunay triangulations (mucke-1999)</li>
  *     <li>The Delaunay Tree see Computational Geometry: Algorithms and Applications (berg-2008) page 191</li>
  * </ul>
- * </p>
  *
  * @author Benedikt Zoennchen
  *
@@ -28,7 +26,7 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 	/**
 	 * Starts the point location of the point and returns the face which is found.
 	 *
-	 * Assumption: the point is inside the {@link ITriangulation<P, V, E, F>}.
+	 * Assumption: the point is inside the {@link ITriangulation}.
 	 *
 	 * @param point     the point
 	 * @return the face containing the point
@@ -44,8 +42,10 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 	Optional<F> locate(final P point);
 
 	/**
-	 * Starts the point location of the point and returns the face which is found.
+	 * Starts the point (x,y) location of the point and returns the face which is found.
 	 *
+	 * @param x x-coordinate of the point
+	 * @param y y-coordinate of the point
 	 * @return the face containing the point
 	 */
 	Optional<F> locate(final double x, final double y);

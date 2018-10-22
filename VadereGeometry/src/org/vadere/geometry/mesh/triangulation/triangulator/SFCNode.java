@@ -8,9 +8,9 @@ import org.vadere.geometry.shapes.IPoint;
 
 /**
  * <p>A {@link SFCNode} is part of the {@link SpaceFillingCurve} containing a
- * half-edge which referst to a specific face and a direction which indicate its traversal
- * direction with respect to the direction of the half-edge, i.e. true => in direction of the
- * half-edge, false => in the reverse direction of the half-edge.</p>
+ * half-edge which refers to a specific face and a direction which indicate its traversal
+ * direction with respect to the direction of the half-edge, i.e. true means in direction of the
+ * half-edge, false means in the reverse direction of the half-edge.</p>
  *
  * @author Benedikt Zoennchen
  *

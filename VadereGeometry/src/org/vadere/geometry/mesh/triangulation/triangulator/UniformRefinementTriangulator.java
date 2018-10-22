@@ -49,7 +49,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
     /**
      * <p>Default constructor.</p>
      *
-     * @param supplier
+     * @param supplier      a supplier to construct a completely fresh and empty triangulation {@link ITriangulation}
      * @param bound         the bounding box containing all boundaries and the topography with respect to the distance function distFunc
      * @param boundary      the boundaries e.g. obstacles
      * @param lenFunc       a edge length function
@@ -114,12 +114,12 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
     }
 
 	/**
-	 * <p>Generates the triangulation, i.e.
+	 * Generates the triangulation, i.e.
 	 * <ol>
 	 *     <li>{@link UniformRefinementTriangulator#init()}</li>
 	 *     <li>{@link UniformRefinementTriangulator#step()} until {@link UniformRefinementTriangulator#isFinished()}</li>
 	 *     <li>{@link UniformRefinementTriangulator#finish()}</li>
-	 * </ol></p>
+	 * </ol>
 	 *
 	 * @return the generated triangulation
 	 */

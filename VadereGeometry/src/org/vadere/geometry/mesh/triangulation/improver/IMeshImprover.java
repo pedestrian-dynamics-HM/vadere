@@ -13,14 +13,14 @@ import java.util.Collection;
 public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
 
     /**
-     * returns a collection of triangles i.e. all the faces of the current mesh.
+     * Returns a collection of triangles i.e. all the faces of the current mesh.
      *
      * @return a collection of triangles i.e. all the faces of the current mesh
      */
     Collection<VTriangle> getTriangles();
 
     /**
-     * returns the current mesh (reference) i.e. with the current state of improvement.
+     * Returns the current mesh (reference) i.e. with the current state of improvement.
      *
      * @return  the current mesh (reference)
      */
@@ -33,26 +33,39 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
     void improve();
 
     /**
-     * returns the current triangulation / mesh.
+     * Returns the current triangulation / mesh.
      *
-     * @return
+     * @return the current triangulation / mesh
      */
     ITriangulation<P, V, E, F> getTriangulation();
 
 	/**
+	 * Returns the current triangulation / mesh.
 	 *
-	 * @return
+	 * @return the overall quality of the triangulation.
 	 */
 	default double getQuality() {
 		Collection<F> faces = getMesh().getFaces();
 		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> d1 + d2).get() / faces.size();
 	}
 
+	/**
+	 * Returns the quality of the triangle with the lowest / worst quality in O(n),
+	 * where n is the number of faces.
+	 *
+	 * @return the quality of the triangle with the lowest quality
+	 */
 	default double getMinQuality() {
 		Collection<F> faces = getMesh().getFaces();
 		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> Math.min(d1, d2)).get();
 	}
 
+	/**
+	 * Returns the quality of a face / triangle.
+	 *
+	 * @param face the face which has to be a valid triangle
+	 * @return the quality of a face / triangle
+	 */
 	default double faceToQuality(final F face) {
 		VLine[] lines = getMesh().toTriangle(face).getLines();
 		double a = lines[0].length();

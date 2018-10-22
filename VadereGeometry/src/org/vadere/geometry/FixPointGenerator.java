@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 /**
  * @author Benedikt Zoennchen
- * @param <P>
+ * @param <P> the type of the points (containers)
  */
 public class FixPointGenerator<P extends IPoint> {
 

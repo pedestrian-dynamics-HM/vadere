@@ -13,14 +13,6 @@ public class VoronoiFactory {
 		geometryFactory = new GeometryFactory();
 	}
 
-	/**
-	 * Calcluates/Creates a new voronoiDiagramm subtracted by polygons.
-	 *
-	 * @param coordinates the coordinates of the sites
-	 * @param polygons the polygons that will be subtracted from the diagram
-	 * @param envolve
-	 * @return a new voronoiDiagramm subtracted by polygons
-	 */
 	public Geometry createVoronoiDiagram(final Collection<Coordinate> coordinates, final Collection<Polygon> polygons,
 			final Envelope envolve) {
 		VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
