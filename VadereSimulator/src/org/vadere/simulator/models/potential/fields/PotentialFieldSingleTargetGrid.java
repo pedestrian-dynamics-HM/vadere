@@ -11,9 +11,9 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.potential.calculators.EikonalSolver;
 
 /**

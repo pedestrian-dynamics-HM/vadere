@@ -14,7 +14,7 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 import junit.framework.TestCase;
 

@@ -1,6 +1,6 @@
 package org.vadere.util.potential.gradients;
 
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
 /**

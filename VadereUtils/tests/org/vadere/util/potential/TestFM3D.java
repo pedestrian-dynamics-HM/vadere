@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.io.GeometryPrinter;
 import org.vadere.util.io.IOUtils;
-import org.vadere.util.potential.CellStateFD;
 import org.vadere.util.potential.calculators.PotentialFieldCalculatorFastMarching3D;
 import org.vadere.util.potential.timecost.ITimeCostFunction3D;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction3D;

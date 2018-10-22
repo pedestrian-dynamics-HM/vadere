@@ -1,9 +1,8 @@
 package org.vadere.state.scenario;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VShape;
 
 import java.util.HashMap;
 import java.util.LinkedList;

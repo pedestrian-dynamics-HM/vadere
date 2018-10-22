@@ -5,22 +5,18 @@
  */
 package org.vadere.simulator.models.ovm;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import org.vadere.simulator.models.ode.AbstractModelEquations;
 import org.vadere.simulator.models.ode.ODEModel;
-import org.vadere.state.attributes.models.AttributesODEIntegrator;
 import org.vadere.state.attributes.models.AttributesOVM;
 import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.parallel.AParallelWorker;
 import org.vadere.util.parallel.CountableParallelWorker;
 import org.vadere.util.parallel.IAsyncComputable;

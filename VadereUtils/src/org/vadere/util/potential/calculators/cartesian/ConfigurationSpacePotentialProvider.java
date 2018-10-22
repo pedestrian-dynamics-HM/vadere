@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.Vector3D;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.potential.CellStateFD;
 import org.vadere.util.potential.calculators.PotentialFieldCalculatorFastMarching3D;
 import org.vadere.util.potential.timecost.TimeCost2D1ConfigurationSpace;

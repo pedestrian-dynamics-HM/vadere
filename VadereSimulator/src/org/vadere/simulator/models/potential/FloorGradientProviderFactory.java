@@ -10,7 +10,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.potential.gradients.FloorGradientProviderDiscrete;
 import org.vadere.util.potential.gradients.FloorGradientProviderEuclidean;
 import org.vadere.util.potential.gradients.FloorGradientProviderEuclideanMollified;

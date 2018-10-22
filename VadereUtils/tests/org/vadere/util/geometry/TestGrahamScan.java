@@ -3,8 +3,8 @@ package org.vadere.util.geometry;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.geometry.GrahamScan;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
 
 import java.util.Stack;
 

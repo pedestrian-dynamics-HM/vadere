@@ -8,9 +8,9 @@ import java.util.Random;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
 
 public class UtilsBHM {
 

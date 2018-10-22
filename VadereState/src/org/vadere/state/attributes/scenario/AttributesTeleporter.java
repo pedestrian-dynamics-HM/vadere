@@ -1,8 +1,8 @@
 package org.vadere.state.attributes.scenario;
 
+import org.vadere.geometry.Vector2D;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public class AttributesTeleporter extends Attributes {
 	private Vector2D shift = new Vector2D(0, 0);

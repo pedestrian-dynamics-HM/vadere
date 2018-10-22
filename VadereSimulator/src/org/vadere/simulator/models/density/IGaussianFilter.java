@@ -11,7 +11,7 @@ import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestria
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.opencl.OpenCLException;
 
 /**
  * IGaussianFilter is a refershable image processing calculator that can be used

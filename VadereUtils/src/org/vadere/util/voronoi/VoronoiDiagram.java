@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
 
 /**
  * The Voronoi Diagram is constructed according to the algorithm described in

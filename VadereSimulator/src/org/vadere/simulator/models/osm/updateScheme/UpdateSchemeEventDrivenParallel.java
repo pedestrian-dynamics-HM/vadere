@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.List;

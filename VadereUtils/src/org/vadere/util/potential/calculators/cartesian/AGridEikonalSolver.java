@@ -1,7 +1,7 @@
 package org.vadere.util.potential.calculators.cartesian;
 
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.potential.CellGrid;
 import java.util.function.Function;
 

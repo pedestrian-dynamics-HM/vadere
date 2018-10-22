@@ -14,9 +14,9 @@ import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.SpawnArray;
 import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
 
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;

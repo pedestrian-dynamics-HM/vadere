@@ -5,10 +5,9 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;

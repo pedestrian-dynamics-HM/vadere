@@ -12,7 +12,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VRectangle;
 
 public class OnlineVisualization implements PassiveCallback {
 

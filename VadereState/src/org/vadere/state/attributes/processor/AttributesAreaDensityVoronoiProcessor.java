@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VRectangle;
 
 /**
  * @author Mario Teixeira Parente

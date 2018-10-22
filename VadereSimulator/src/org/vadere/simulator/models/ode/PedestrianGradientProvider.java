@@ -3,7 +3,7 @@ package org.vadere.simulator.models.ode;
 import java.util.List;
 
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public interface PedestrianGradientProvider {
 

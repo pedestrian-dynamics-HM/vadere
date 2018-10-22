@@ -11,7 +11,7 @@ import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

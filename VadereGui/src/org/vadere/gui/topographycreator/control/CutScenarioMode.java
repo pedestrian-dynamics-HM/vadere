@@ -9,8 +9,8 @@ import javax.swing.undo.UndoableEditSupport;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.control.RectangleSelectionMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 
 /**
  * In this mode the user can cut the Topography with the mouse.

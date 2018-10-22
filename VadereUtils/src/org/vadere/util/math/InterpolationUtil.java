@@ -1,10 +1,10 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VTriangle;
 import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.calculators.PotentialPoint;
+import org.vadere.util.potential.calculators.IPotentialPoint;
 
 import java.util.List;
 
@@ -14,12 +14,12 @@ import java.util.List;
  */
 public class InterpolationUtil {
 
-	public static double barycentricInterpolation(final List<? extends PotentialPoint> points, final double x, final double y){
+	public static double barycentricInterpolation(final List<? extends IPotentialPoint> points, final double x, final double y){
 		assert points.size() == 3;
 
-		PotentialPoint p1 = points.get(0);
-		PotentialPoint p2 = points.get(1);
-		PotentialPoint p3 = points.get(2);
+		IPotentialPoint p1 = points.get(0);
+		IPotentialPoint p2 = points.get(1);
+		IPotentialPoint p3 = points.get(2);
 
 		VTriangle vtriangle = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
 

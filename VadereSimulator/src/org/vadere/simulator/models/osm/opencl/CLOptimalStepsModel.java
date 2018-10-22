@@ -11,13 +11,13 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.opencl.CLInfo;
-import org.vadere.util.opencl.CLUtils;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.opencl.CLInfo;
+import org.vadere.geometry.opencl.CLUtils;
+import org.vadere.geometry.opencl.OpenCLException;
 import org.vadere.util.potential.calculators.EikonalSolver;
 
 import java.io.IOException;
@@ -467,7 +467,7 @@ public class CLOptimalStepsModel {
 		/*
 		 * (2) circle / disc positions at (0,0)
 		 */
-		circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
+		circlePositionList = Utils.getDiscDiscretizationPoints(new Random(), false,
 				new VCircle(new VPoint(0,0), 1.0),
 				attributesOSM.getNumberOfCircles(),
 				attributesOSM.getStepCircleResolution(),

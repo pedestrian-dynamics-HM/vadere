@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.opencl.CLConvolution;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.opencl.OpenCLException;
 
 import java.io.IOException;
 

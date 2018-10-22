@@ -8,9 +8,9 @@ import org.vadere.state.attributes.models.AttributesBMM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.VPoint;
 
 public class PedestrianBMM extends Pedestrian {
 
@@ -61,7 +61,7 @@ public class PedestrianBMM extends Pedestrian {
 			updateStepPosition(simTime);
 		} else if (!attributesBMM.isStepwiseDecisions() ||
 				pedestrianBHM.getStepLength() < stepSum ||
-				getVelocity().distanceToOrigin() < GeometryUtils.DOUBLE_EPS) {
+				getVelocity().distanceToOrigin() < Utils.DOUBLE_EPS) {
 			updateStepPosition(simTime);
 		}
 
@@ -103,7 +103,7 @@ public class PedestrianBMM extends Pedestrian {
 		Vector2D motionStep = new Vector2D(nextMotionPosition.x - currentPosition.x,
 				nextMotionPosition.y - currentPosition.y);
 
-		if (deltaTime < GeometryUtils.DOUBLE_EPS) {
+		if (deltaTime < Utils.DOUBLE_EPS) {
 			setVelocity(new Vector2D(0, 0));
 		} else {
 			// compute velocity by forward difference

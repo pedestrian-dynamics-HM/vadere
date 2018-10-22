@@ -3,14 +3,13 @@ package org.vadere.simulator.models.osm.optimization;
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.math.util.MathUtils;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * The Class StepCircleOptimizerEvolStrat.

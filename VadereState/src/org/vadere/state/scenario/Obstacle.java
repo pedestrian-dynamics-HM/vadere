@@ -2,10 +2,9 @@ package org.vadere.state.scenario;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VShape;
 
 public class Obstacle extends ScenarioElement {
 

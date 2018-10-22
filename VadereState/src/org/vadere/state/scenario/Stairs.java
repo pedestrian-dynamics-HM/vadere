@@ -11,10 +11,10 @@ import org.apache.log4j.Logger;
 
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.geometry.shapes.VShape;
 
 public class Stairs extends ScenarioElement {
 

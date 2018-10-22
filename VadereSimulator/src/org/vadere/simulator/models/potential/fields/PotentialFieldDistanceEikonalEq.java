@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
@@ -20,7 +20,7 @@ import org.vadere.util.potential.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.util.potential.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.util.potential.calculators.PotentialFieldCalculatorNone;
 import org.vadere.util.potential.timecost.UnitTimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
+import org.vadere.geometry.IDistanceFunction;
 
 import java.util.Collection;
 

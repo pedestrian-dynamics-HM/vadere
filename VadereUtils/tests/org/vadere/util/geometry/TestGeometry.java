@@ -8,9 +8,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * Basic unit test for the {@link Geometry} class. NOT complete.
@@ -55,7 +56,7 @@ public class TestGeometry {
 	public void testLineCircleIntersectionZeroResults() {
 		VCircle circle = new VCircle(1, 1, 1);
 		VLine line = new VLine(3,0, 4, 1);
-		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
+		VPoint[] intersectionPoints = Utils.intersection(line, circle);
 		assertTrue(intersectionPoints.length == 0);
 	}
 
@@ -63,7 +64,7 @@ public class TestGeometry {
 	public void testLineCircleIntersectionTwoResults() {
 		VCircle circle = new VCircle(3, 4.1, 3);
 		VLine line = new VLine(3,4.1, 4, 5.1);
-		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
+		VPoint[] intersectionPoints = Utils.intersection(line, circle);
 		// computed with http://www.ambrsoft.com/TrigoCalc/Circles2/circlrLine_.htm
 		VPoint[] expectedIntersectionPoints = new VPoint[]{
 				new VPoint(5.121, 6.221),
@@ -77,7 +78,7 @@ public class TestGeometry {
 	public void testLineCircleIntersectionOneResults() {
 		VCircle circle = new VCircle(1, 1, 1);
 		VLine line = new VLine(3,0, 4, 0);
-		VPoint[] intersectionPoints = GeometryUtils.intersection(line, circle);
+		VPoint[] intersectionPoints = Utils.intersection(line, circle);
 
 		assertTrue(intersectionPoints.length == 1);
 

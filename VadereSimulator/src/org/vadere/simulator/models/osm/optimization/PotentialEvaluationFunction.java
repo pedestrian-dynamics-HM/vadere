@@ -7,8 +7,8 @@ import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
 
 import java.util.List;
 

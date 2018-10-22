@@ -3,7 +3,7 @@ package org.vadere.simulator.models.osm.optimization;
 import java.awt.Shape;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * The Interface StepCircleOptimizer.

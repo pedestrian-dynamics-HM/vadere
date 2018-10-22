@@ -3,14 +3,15 @@ package org.vadere.util.geometry;
 import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PHalfEdge;
-import org.vadere.util.geometry.mesh.gen.PMesh;
-import org.vadere.util.geometry.mesh.gen.PVertex;
-import org.vadere.util.geometry.mesh.inter.IPolyConnectivity;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.mesh.gen.PFace;
+import org.vadere.geometry.mesh.gen.PHalfEdge;
+import org.vadere.geometry.mesh.gen.PMesh;
+import org.vadere.geometry.mesh.gen.PVertex;
+import org.vadere.geometry.mesh.inter.IPolyConnectivity;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -140,16 +141,16 @@ public class WeilerAtherton {
 						VPoint intersectionPoint = null;
 
 						if(!(l1.getP1().equals(l2.getP1()) || l1.getP1().equals(l2.getP2()) || l1.getP2().equals(l2.getP1()) || l1.getP2().equals(l2.getP2()))) {
-							if(GeometryUtils.distanceToLineSegment(new VPoint(l1.getP1()), new VPoint(l1.getP2()), new VPoint(l2.getP1())) <= EPSILON) {
+							if(Utils.distanceToLineSegment(new VPoint(l1.getP1()), new VPoint(l1.getP2()), new VPoint(l2.getP1())) <= EPSILON) {
 								intersectionPoint = new VPoint(l2.getP1());
-							} else if(GeometryUtils.distanceToLineSegment(new VPoint(l1.getP1()), new VPoint(l1.getP2()), new VPoint(l2.getP2())) <= EPSILON) {
+							} else if(Utils.distanceToLineSegment(new VPoint(l1.getP1()), new VPoint(l1.getP2()), new VPoint(l2.getP2())) <= EPSILON) {
 								intersectionPoint = new VPoint(l2.getP2());
-							} else if(GeometryUtils.distanceToLineSegment(new VPoint(l2.getP1()), new VPoint(l2.getP2()), new VPoint(l1.getP1())) <= EPSILON) {
+							} else if(Utils.distanceToLineSegment(new VPoint(l2.getP1()), new VPoint(l2.getP2()), new VPoint(l1.getP1())) <= EPSILON) {
 								intersectionPoint = new VPoint(l1.getP1());
-							} else if(GeometryUtils.distanceToLineSegment(new VPoint(l2.getP1()), new VPoint(l2.getP2()), new VPoint(l1.getP2())) <= EPSILON) {
+							} else if(Utils.distanceToLineSegment(new VPoint(l2.getP1()), new VPoint(l2.getP2()), new VPoint(l1.getP2())) <= EPSILON) {
 								intersectionPoint = new VPoint(l1.getP2());
-							} else if (GeometryUtils.intersectLineSegment(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY())) {
-								intersectionPoint = GeometryUtils.intersectionPoint(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY());
+							} else if (Utils.intersectLineSegment(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY())) {
+								intersectionPoint = Utils.intersectionPoint(l1.getP1().getX(), l1.getP1().getY(), l1.getP2().getX(), l1.getP2().getY(), l2.getP1().getX(), l2.getP1().getY(), l2.getP2().getX(), l2.getP2().getY());
 							}
 						}
 
@@ -314,8 +315,8 @@ public class WeilerAtherton {
 	 */
 	public Pair<VPolygon, VPolygon> merge(@NotNull final VPolygon subjectCandidat, @NotNull final VPolygon clippingCandidat) {
 
-		VPolygon subject = GeometryUtils.isCCW(subjectCandidat) ? subjectCandidat.revertOrder() : subjectCandidat;
-		VPolygon clipping = GeometryUtils.isCCW(clippingCandidat) ? clippingCandidat.revertOrder() : clippingCandidat;
+		VPolygon subject = Utils.isCCW(subjectCandidat) ? subjectCandidat.revertOrder() : subjectCandidat;
+		VPolygon clipping = Utils.isCCW(clippingCandidat) ? clippingCandidat.revertOrder() : clippingCandidat;
 
 
 		PMesh<WeilerPoint> subjectMesh = new PMesh<>((x,y) -> new WeilerPoint(new VPoint(x,y), false, false));
@@ -391,6 +392,6 @@ public class WeilerAtherton {
 		}
 		while (!next.equals(first));
 
-		return Pair.create(GeometryUtils.toPolygon(GeometryUtils.filterUselessPoints(points, EPSILON)), null);
+		return Pair.create(Utils.toPolygon(Utils.filterUselessPoints(points, EPSILON)), null);
 	}
 }

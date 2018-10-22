@@ -1,7 +1,7 @@
 package org.vadere.util.potential.calculators;
 
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
 import java.util.function.Function;
 
 public class PotentialFieldCalculatorNone implements EikonalSolver {

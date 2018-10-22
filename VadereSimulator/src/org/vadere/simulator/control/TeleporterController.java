@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public class TeleporterController {
 	private final Teleporter teleporter;

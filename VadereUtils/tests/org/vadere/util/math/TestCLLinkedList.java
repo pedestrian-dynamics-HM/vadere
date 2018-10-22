@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.CLLinkedCell;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.opencl.OpenCLException;
 
 import java.io.IOException;
 import java.util.ArrayList;

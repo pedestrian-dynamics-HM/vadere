@@ -4,7 +4,7 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * @author Mario Teixeira Parente

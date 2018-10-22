@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -14,8 +13,8 @@ import org.apache.commons.math.optimization.direct.NelderMead;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * The Class StepCircleOptimizerNelderMead.

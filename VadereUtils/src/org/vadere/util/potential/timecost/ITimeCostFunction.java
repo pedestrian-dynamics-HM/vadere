@@ -1,6 +1,6 @@
 package org.vadere.util.potential.timecost;
 
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.IPoint;
 
 /**
  * Interface for a generic time cost function in 2D.

@@ -15,8 +15,8 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.TrafficLightPhase;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 public class TargetController {
 

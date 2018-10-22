@@ -1,11 +1,10 @@
 package org.vadere.state.attributes.scenario;
 
 import org.apache.log4j.Logger;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.geometry.Vector2D;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Stairs;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VShape;
 
 /**
  * Attributes of {@link Stairs} objects.

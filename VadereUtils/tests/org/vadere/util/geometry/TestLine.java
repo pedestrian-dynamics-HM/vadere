@@ -4,13 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import javax.sound.sampled.Line;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.geometry.Utils;
 import org.vadere.util.geometry.Geometry;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
 
 /**
  * Basic tests of the {@link Line} class.
@@ -38,13 +40,13 @@ public class TestLine {
 		lineToTest3 = new VLine(new VPoint(0, 100), new VPoint(0, 0));
 
 		geometry1 = new Geometry();
-		obstacle1 = GeometryUtils.polygonFromPoints2D(
+		obstacle1 = Utils.polygonFromPoints2D(
 				// create a small rectangle that line1 crosses through its edges
 				new VPoint(50, 50), new VPoint(60, 50), new VPoint(60, 60),
 				new VPoint(50, 60));
 		// create another obstacle that touches the first to check touching
 		// behaviour
-		obstacle2 = GeometryUtils.polygonFromPoints2D(new VPoint(55, 40),
+		obstacle2 = Utils.polygonFromPoints2D(new VPoint(55, 40),
 				new VPoint(65, 40), new VPoint(65, 50), new VPoint(55, 50));
 
 		geometry1.addPolygon(obstacle1);

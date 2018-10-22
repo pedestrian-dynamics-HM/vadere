@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.geometry.Utils;
 import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
@@ -14,10 +15,9 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.potential.gradients.GradientProvider;
 
 /**
@@ -74,7 +74,7 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 			// compute and normalize the gradient length to the potential
 			double normDV = Math.sqrt(distanceVec[0] * distanceVec[0]
 					+ distanceVec[1] * distanceVec[1]);
-			if (normDV > GeometryUtils.DOUBLE_EPS) {
+			if (normDV > Utils.DOUBLE_EPS) {
 				grad[0] = -distanceVec[0] / normDV * pot;
 				grad[1] = -distanceVec[1] / normDV * pot;
 			} else {

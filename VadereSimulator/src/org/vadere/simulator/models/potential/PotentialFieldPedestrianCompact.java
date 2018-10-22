@@ -2,7 +2,6 @@ package org.vadere.simulator.models.potential;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -16,10 +15,10 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
 
 // This potential is explained in seitz-2015 (The effect of stepping on pedestrians trajectories)
 // p. 596, eq. 1

@@ -3,8 +3,8 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.density.IGaussianFilter;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
 
 /**

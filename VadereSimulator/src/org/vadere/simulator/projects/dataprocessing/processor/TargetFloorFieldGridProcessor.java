@@ -13,7 +13,7 @@ import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.FloorFieldGridRow;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 import java.awt.*;
 import java.util.ArrayList;

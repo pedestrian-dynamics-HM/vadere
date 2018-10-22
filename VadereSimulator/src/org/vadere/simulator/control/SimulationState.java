@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 import java.util.Map;
 import java.util.Optional;

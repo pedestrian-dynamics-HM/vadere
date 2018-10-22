@@ -4,7 +4,7 @@ import java.awt.geom.RectangularShape;
 import java.util.*;
 
 import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public class DynamicElementContainer<T extends DynamicElement> {
 	private transient final List<DynamicElementAddListener<T>> addListener;

@@ -9,21 +9,21 @@ import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.geometry.mesh.gen.AFace;
-import org.vadere.util.geometry.mesh.gen.AHalfEdge;
-import org.vadere.util.geometry.mesh.gen.AMesh;
-import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.mesh.gen.AFace;
+import org.vadere.geometry.mesh.gen.AHalfEdge;
+import org.vadere.geometry.mesh.gen.AMesh;
+import org.vadere.geometry.mesh.gen.AVertex;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.geometry.mesh.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.math.IDistanceFunction;
-import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.util.geometry.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.util.geometry.mesh.triangulation.improver.EikMesh;
+import org.vadere.geometry.mesh.triangulation.adaptive.DistanceFunction;
+import org.vadere.geometry.IDistanceFunction;
+import org.vadere.geometry.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.geometry.mesh.triangulation.improver.distmesh.Distmesh;
+import org.vadere.geometry.mesh.triangulation.improver.EikMesh;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -643,7 +643,7 @@ public class RealWorldPlot {
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
 		/*Function<VTriangle, Color> colorFunction = f -> {
-			float grayScale = (float) GeometryUtils.qualityOf(f);
+			float grayScale = (float) Utils.qualityOf(f);
 			return new Color(grayScale, grayScale, grayScale);
 		};
 		log.info(TexGraphGenerator.toTikz(meshGenerator.getTriangles(), colorFunction, 1.0f));*/

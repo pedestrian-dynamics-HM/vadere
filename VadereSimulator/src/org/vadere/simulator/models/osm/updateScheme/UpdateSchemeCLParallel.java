@@ -9,7 +9,7 @@ import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.CollectionUtils;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.opencl.OpenCLException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

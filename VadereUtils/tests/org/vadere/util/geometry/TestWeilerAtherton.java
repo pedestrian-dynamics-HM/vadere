@@ -3,16 +3,19 @@ package org.vadere.util.geometry;
 import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.mesh.gen.PFace;
-import org.vadere.util.geometry.mesh.gen.PMesh;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.mesh.gen.PFace;
+import org.vadere.geometry.mesh.gen.PMesh;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.rmi.CORBA.Util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,8 +28,8 @@ public class TestWeilerAtherton {
 
 	@Test
 	public void testNoIntersection() {
-		VPolygon poly1 = GeometryUtils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
-		VPolygon poly2 = GeometryUtils.toPolygon(new VPoint(-0.01, 0), new VPoint(-1, 1), new VPoint(-1, -1));
+		VPolygon poly1 = Utils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
+		VPolygon poly2 = Utils.toPolygon(new VPoint(-0.01, 0), new VPoint(-1, 1), new VPoint(-1, -1));
 
 		List<VPolygon> originalList = new ArrayList<>(2);
 		originalList.add(poly1);
@@ -42,8 +45,8 @@ public class TestWeilerAtherton {
 
 	@Test
 	public void testIntersectionFaceConstructionNoIntersections() {
-		VPolygon poly1 = GeometryUtils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
-		VPolygon poly2 = GeometryUtils.toPolygon(new VPoint(-0.01, 0), new VPoint(-1, 1), new VPoint(-1, -1));
+		VPolygon poly1 = Utils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
+		VPolygon poly2 = Utils.toPolygon(new VPoint(-0.01, 0), new VPoint(-1, 1), new VPoint(-1, -1));
 
 		List<VPolygon> originalList = new ArrayList<>(2);
 		originalList.add(poly1);
@@ -74,8 +77,8 @@ public class TestWeilerAtherton {
 
 	@Test
 	public void testIntersectionFaceConstructionIntersections() {
-		VPolygon poly1 = GeometryUtils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
-		VPolygon poly2 = GeometryUtils.toPolygon(new VPoint(0.3, 0), new VPoint(-1, 1), new VPoint(-1, -1));
+		VPolygon poly1 = Utils.toPolygon(new VPoint(0, 0), new VPoint(1, 1), new VPoint(1, -1));
+		VPolygon poly2 = Utils.toPolygon(new VPoint(0.3, 0), new VPoint(-1, 1), new VPoint(-1, -1));
 
 		List<VPolygon> originalList = new ArrayList<>(2);
 		originalList.add(poly1);

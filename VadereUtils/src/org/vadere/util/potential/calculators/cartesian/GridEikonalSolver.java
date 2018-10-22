@@ -2,9 +2,8 @@ package org.vadere.util.potential.calculators.cartesian;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.InterpolationUtil;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.calculators.EikonalSolver;

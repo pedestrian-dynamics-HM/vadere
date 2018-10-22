@@ -4,8 +4,8 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.util.geometry.WeilerAtherton;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.geometry.shapes.VRectangle;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

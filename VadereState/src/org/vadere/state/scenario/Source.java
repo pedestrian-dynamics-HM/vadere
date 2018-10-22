@@ -3,7 +3,7 @@ package org.vadere.state.scenario;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VShape;
 
 public class Source extends ScenarioElement {
 

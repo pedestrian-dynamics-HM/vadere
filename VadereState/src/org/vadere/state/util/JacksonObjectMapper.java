@@ -3,16 +3,16 @@ package org.vadere.state.util;
 import java.io.IOException;
 import java.util.List;
 
+import org.vadere.geometry.ShapeType;
+import org.vadere.geometry.Utils;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.ShapeType;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -173,7 +173,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 		}
 
 		public VPolygon newVPolygon() {
-			return GeometryUtils.polygonFromPoints2D(points);
+			return Utils.polygonFromPoints2D(points);
 		}
 	}
 

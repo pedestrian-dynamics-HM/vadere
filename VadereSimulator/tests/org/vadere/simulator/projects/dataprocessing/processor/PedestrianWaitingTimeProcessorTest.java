@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VRectangle;
 
 import static org.junit.Assert.*;
 

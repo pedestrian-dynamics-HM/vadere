@@ -10,9 +10,9 @@ import javax.swing.undo.UndoableEditSupport;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 /**
  * Insert the last copied element in the topography if this element is not null.

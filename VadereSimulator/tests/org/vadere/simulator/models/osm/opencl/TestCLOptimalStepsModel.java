@@ -12,9 +12,9 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.TextOutOfNodeException;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.opencl.OpenCLException;
 
 import java.io.IOException;
 import java.util.ArrayList;

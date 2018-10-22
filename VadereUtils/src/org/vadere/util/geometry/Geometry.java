@@ -8,9 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.shapes.VLine;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
 
 /**
  * A generic geometry. Represented by a polygon (borders) with inner polygons
@@ -102,10 +103,10 @@ public class Geometry {
 		// them
 		if (createMidpoints && !pointList.isEmpty()) {
 			for (int i = 0; i < pointList.size() - 1; i++) {
-				points.add(GeometryUtils.interpolate(pointList.get(i),
+				points.add(Utils.interpolate(pointList.get(i),
 						pointList.get(i + 1), 0.5));
 			}
-			VPoint interpolated = GeometryUtils.interpolate(
+			VPoint interpolated = Utils.interpolate(
 					pointList.get(pointList.size() - 1), pointList.get(0), 0.5);
 			points.add(interpolated);
 		}

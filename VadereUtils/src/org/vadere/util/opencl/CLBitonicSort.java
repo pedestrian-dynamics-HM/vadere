@@ -9,6 +9,9 @@ import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.vadere.geometry.opencl.CLInfo;
+import org.vadere.geometry.opencl.CLUtils;
+import org.vadere.geometry.opencl.OpenCLException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

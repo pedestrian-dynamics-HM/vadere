@@ -7,27 +7,16 @@ import java.util.Random;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.gnm.PotentialFieldPedestrianGNM;
 import org.vadere.simulator.models.potential.PedestrianRepulsionPotentialCycle;
-import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact;
-import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell;
-import org.vadere.simulator.models.potential.PotentialFieldPedestrianOSM;
-import org.vadere.simulator.models.sfm.PotentialFieldPedestrianSFM;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesPotentialCompact;
-import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
-import org.vadere.state.attributes.models.AttributesPotentialGNM;
-import org.vadere.state.attributes.models.AttributesPotentialOSM;
-import org.vadere.state.attributes.models.AttributesPotentialSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.reflection.DynamicClassInstantiator;
-import org.vadere.util.reflection.VadereClassNotFoundException;
 
 public interface PotentialFieldAgent extends Model {
 

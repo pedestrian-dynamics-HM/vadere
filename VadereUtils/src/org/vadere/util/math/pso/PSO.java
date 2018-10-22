@@ -1,8 +1,8 @@
 package org.vadere.util.math.pso;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.shapes.ICircleSector;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.ICircleSector;
+import org.vadere.geometry.shapes.VPoint;
 
 import java.util.List;
 import java.util.Random;

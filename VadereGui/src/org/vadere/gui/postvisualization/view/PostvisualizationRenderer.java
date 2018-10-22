@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.color.ColorHelper;
+import org.vadere.geometry.color.ColorHelper;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -17,7 +17,7 @@ import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public class PostvisualizationRenderer extends SimulationRenderer {
 

@@ -2,9 +2,8 @@ package org.vadere.util.potential.gradients;
 
 import java.util.Map;
 
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 import org.vadere.util.math.MathUtil;
 
 /**

@@ -9,8 +9,11 @@ import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.opencl.CLInfo;
+import org.vadere.geometry.opencl.CLUtils;
+import org.vadere.geometry.opencl.OpenCLException;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

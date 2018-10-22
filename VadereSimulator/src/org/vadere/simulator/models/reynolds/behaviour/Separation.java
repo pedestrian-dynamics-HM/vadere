@@ -6,7 +6,7 @@ import java.util.Iterator;
 import org.vadere.simulator.models.reynolds.PedestrianReynolds;
 import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.geometry.Vector2D;
 
 public class Separation {
 

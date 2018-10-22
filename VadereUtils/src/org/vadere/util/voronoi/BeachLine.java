@@ -3,7 +3,7 @@ package org.vadere.util.voronoi;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public class BeachLine {
 	private BeachLineNode root = null;

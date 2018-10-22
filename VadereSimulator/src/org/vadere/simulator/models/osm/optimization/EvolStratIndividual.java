@@ -1,6 +1,6 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * The Class EvolStratIndividual.

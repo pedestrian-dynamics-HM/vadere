@@ -2,20 +2,20 @@ package org.vadere.gui.projectview;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.gui.components.utils.Recorder;
-import org.vadere.util.color.ColorHelper;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.mesh.gen.AFace;
-import org.vadere.util.geometry.mesh.gen.AHalfEdge;
-import org.vadere.util.geometry.mesh.gen.AVertex;
-import org.vadere.util.geometry.shapes.VDisc;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.mesh.triangulation.adaptive.DistanceFunction;
-import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.util.geometry.mesh.triangulation.improver.EikMeshPanel;
-import org.vadere.util.geometry.mesh.triangulation.improver.AEikMesh;
+import org.vadere.geometry.color.ColorHelper;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.mesh.gen.AFace;
+import org.vadere.geometry.mesh.gen.AHalfEdge;
+import org.vadere.geometry.mesh.gen.AVertex;
+import org.vadere.geometry.shapes.VDisc;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VShape;
+import org.vadere.geometry.mesh.triangulation.adaptive.DistanceFunction;
+import org.vadere.geometry.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.geometry.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.geometry.mesh.triangulation.improver.AEikMesh;
 
 import java.awt.*;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import javax.swing.*;
 public class RecordTriangulationMovie {
 
 	public static void main(String... args) throws IOException {
-		VPolygon boundary = GeometryUtils.polygonFromPoints2D(
+		VPolygon boundary = Utils.polygonFromPoints2D(
 				new VPoint(0,0),
 				new VPoint(0, 1),
 				new VPoint(1, 2),

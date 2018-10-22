@@ -1,6 +1,6 @@
 package org.vadere.util.geometry;
 
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 public interface PointPositioned {
 	VPoint getPosition();

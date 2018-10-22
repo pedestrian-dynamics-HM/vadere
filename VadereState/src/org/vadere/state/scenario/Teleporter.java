@@ -1,11 +1,11 @@
 package org.vadere.state.scenario;
 
+import org.vadere.geometry.Vector2D;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 public class Teleporter extends ScenarioElement {
 

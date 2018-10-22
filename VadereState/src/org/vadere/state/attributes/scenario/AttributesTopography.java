@@ -3,7 +3,7 @@ package org.vadere.state.attributes.scenario;
 import java.awt.geom.Rectangle2D;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VRectangle;
 
 public class AttributesTopography extends Attributes {
 

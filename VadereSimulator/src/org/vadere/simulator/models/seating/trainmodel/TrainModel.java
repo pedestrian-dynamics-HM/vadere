@@ -17,7 +17,7 @@ import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 /**
  * The front of the train is on the right side. Indexes increase from the train's front to rear.

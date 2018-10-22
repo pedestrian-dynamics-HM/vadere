@@ -5,7 +5,7 @@ import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VPoint;
 
 import java.util.Iterator;
 import java.util.LinkedList;

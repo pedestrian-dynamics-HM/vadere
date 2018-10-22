@@ -7,13 +7,13 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.mesh.inter.IFace;
-import org.vadere.util.geometry.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.mesh.inter.IMesh;
-import org.vadere.util.geometry.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.mesh.inter.IFace;
+import org.vadere.geometry.mesh.inter.IHalfEdge;
+import org.vadere.geometry.mesh.inter.IMesh;
+import org.vadere.geometry.mesh.inter.IVertex;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 import java.awt.Color;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.function.Function;
 /**
  * @author Benedikt Zoennchen
  */
-public class TexGraphGenerator extends org.vadere.util.tex.TexGraphGenerator {
+public class TexGraphGenerator extends org.vadere.geometry.tex.TexGraphGenerator {
 
 	/**
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face

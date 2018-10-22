@@ -6,7 +6,7 @@ import org.vadere.util.potential.CellGrid;
 import org.vadere.util.potential.CellState;
 import org.vadere.util.potential.PathFindingTag;
 import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
+import org.vadere.geometry.IDistanceFunction;
 
 import java.awt.*;
 import java.util.List;

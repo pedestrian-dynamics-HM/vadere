@@ -3,9 +3,8 @@ package org.vadere.gui.components.control;
 import javax.swing.*;
 
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.VRectangle;
 
-import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class DefaultSelectionMode extends RectangleSelectionMode {

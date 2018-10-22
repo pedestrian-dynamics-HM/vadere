@@ -17,11 +17,12 @@
 <!-- modules -->
   <modules>
   	<!--  <module>./VadereExperiments</module>-->
-    <module>./VadereGui</module>
-    <module>./VadereSimulator</module>
-    <module>./VadereState</module>
-    <module>./VadereUtils</module>
-    <module>./VadereAnnotation</module>
+      <module>./VadereGui</module>
+      <module>./VadereSimulator</module>
+      <module>./VadereState</module>
+      <module>./VadereUtils</module>
+      <module>./VadereGeometry</module>
+      <module>./VadereAnnotation</module>
   </modules>
   
 <!-- global dependencies! -->

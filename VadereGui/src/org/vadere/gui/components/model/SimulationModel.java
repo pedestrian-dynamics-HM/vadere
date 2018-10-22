@@ -1,16 +1,13 @@
 package org.vadere.gui.components.model;
 
 
-import java.awt.*;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.vadere.state.scenario.Agent;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.geometry.shapes.IPoint;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VRectangle;
 
 public abstract class SimulationModel<T extends DefaultSimulationConfig> extends DefaultModel {
 

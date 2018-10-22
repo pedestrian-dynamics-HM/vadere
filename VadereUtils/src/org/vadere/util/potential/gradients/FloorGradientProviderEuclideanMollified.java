@@ -2,8 +2,8 @@ package org.vadere.util.potential.gradients;
 
 import java.util.Map;
 
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.geometry.shapes.VPoint;
+import org.vadere.geometry.shapes.VShape;
 
 /**
  * Provides a floor gradient. It is computed by the directions to the targets of

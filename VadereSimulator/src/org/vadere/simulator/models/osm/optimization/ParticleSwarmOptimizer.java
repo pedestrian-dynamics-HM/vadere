@@ -1,17 +1,14 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.MovementType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.ICircleSector;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VCircleSector;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.geometry.Utils;
+import org.vadere.geometry.Vector2D;
+import org.vadere.geometry.shapes.ICircleSector;
+import org.vadere.geometry.shapes.VCircle;
+import org.vadere.geometry.shapes.VCircleSector;
+import org.vadere.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.math.pso.PSO;
 

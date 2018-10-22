@@ -5,14 +5,13 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.opencl.CLBitonicSort;
-import org.vadere.util.opencl.OpenCLException;
+import org.vadere.geometry.opencl.OpenCLException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
 
