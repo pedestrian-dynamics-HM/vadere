@@ -1,4 +1,4 @@
-package org.vadere.meshing.gui.canvas;
+package org.vadere.meshing.utils.debug;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;

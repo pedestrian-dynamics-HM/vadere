@@ -1,6 +1,5 @@
-package org.vadere.meshing.gui;
+package org.vadere.meshing.utils.debug;
 
-import org.vadere.meshing.gui.canvas.TriCanvas;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IVertex;

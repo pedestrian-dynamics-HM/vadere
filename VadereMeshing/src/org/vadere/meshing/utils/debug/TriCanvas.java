@@ -1,14 +1,13 @@
-package org.vadere.meshing.gui.canvas;
+package org.vadere.meshing.utils.debug;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.meshing.gui.ColorFunctions;
-import org.vadere.meshing.gui.DebugGui;
+import org.vadere.meshing.utils.color.ColorFunctions;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.tex.TexGraphBuilder;
+import org.vadere.meshing.utils.tex.TexGraphBuilder;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 

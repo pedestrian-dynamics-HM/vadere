@@ -9,9 +9,9 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
 
 import java.util.ArrayList;
 import java.util.List;

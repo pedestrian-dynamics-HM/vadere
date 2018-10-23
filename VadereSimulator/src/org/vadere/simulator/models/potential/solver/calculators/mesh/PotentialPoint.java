@@ -1,7 +1,7 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 

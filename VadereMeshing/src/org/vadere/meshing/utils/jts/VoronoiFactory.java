@@ -1,4 +1,4 @@
-package org.vadere.meshing.jts;
+package org.vadere.meshing.utils.jts;
 
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;

@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.improver;
+package org.vadere.meshing.mesh.triangulation.improver.eikmesh;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -9,6 +9,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
@@ -22,7 +23,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

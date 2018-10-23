@@ -18,7 +18,7 @@ import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolv
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;

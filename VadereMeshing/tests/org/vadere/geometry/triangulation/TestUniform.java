@@ -1,12 +1,12 @@
 package org.vadere.geometry.triangulation;
 
-import org.vadere.meshing.gui.DebugGui;
-import org.vadere.meshing.gui.canvas.SimpleTriCanvas;
+import org.vadere.meshing.utils.debug.DebugGui;
+import org.vadere.meshing.utils.debug.SimpleTriCanvas;
 import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 
 import java.util.HashSet;
 import java.util.Set;

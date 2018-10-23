@@ -1,4 +1,4 @@
-package org.vadere.meshing.gui;
+package org.vadere.meshing.utils.color;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;

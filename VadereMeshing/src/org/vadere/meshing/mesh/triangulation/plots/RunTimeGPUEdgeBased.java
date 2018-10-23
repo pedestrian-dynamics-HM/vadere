@@ -13,10 +13,10 @@ import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.opencl.CLPSMeshing;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl.CLEikMesh;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 		List<Long> runTimes = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
-			CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 			StopWatch overAllTime = new StopWatch();
 			overAllTime.start();
@@ -92,7 +92,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
-			CLPSMeshing meshGenerator = new CLPSMeshing(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 			meshGenerator.initialize();
 
 			StopWatch overAllTime = new StopWatch();

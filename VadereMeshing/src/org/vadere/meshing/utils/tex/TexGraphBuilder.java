@@ -1,9 +1,9 @@
-package org.vadere.meshing.tex;
+package org.vadere.meshing.utils.tex;
 
-import org.vadere.meshing.color.ColorHelper;
-import org.vadere.meshing.gui.ColorFunctions;
+import org.vadere.util.visualization.ColorHelper;
+import org.vadere.meshing.utils.color.ColorFunctions;
 import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.gui.canvas.TriCanvas;
+import org.vadere.meshing.utils.debug.TriCanvas;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;

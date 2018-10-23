@@ -29,8 +29,8 @@ import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;

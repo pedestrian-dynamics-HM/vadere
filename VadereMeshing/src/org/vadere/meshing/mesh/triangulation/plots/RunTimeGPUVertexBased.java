@@ -9,10 +9,10 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.opencl.CLPSMeshingHE;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl.CLEikMeshHE;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -45,7 +45,7 @@ public class RunTimeGPUVertexBased extends JFrame {
 
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
-			CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLEikMeshHE meshGenerator = new CLEikMeshHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 			StopWatch overAllTime = new StopWatch();
 			overAllTime.start();
@@ -87,7 +87,7 @@ public class RunTimeGPUVertexBased extends JFrame {
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
-			CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLEikMeshHE meshGenerator = new CLEikMeshHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 			meshGenerator.initialize();
 
 			StopWatch overAllTime = new StopWatch();

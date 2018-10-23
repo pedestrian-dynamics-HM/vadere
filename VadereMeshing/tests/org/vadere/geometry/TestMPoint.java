@@ -2,7 +2,7 @@ package org.vadere.geometry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 
 import java.util.HashSet;
 

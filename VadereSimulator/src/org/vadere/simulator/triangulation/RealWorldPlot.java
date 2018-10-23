@@ -21,9 +21,9 @@ import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.meshing.mesh.triangulation.improver.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
 
 import java.io.IOException;
 import java.util.Collection;

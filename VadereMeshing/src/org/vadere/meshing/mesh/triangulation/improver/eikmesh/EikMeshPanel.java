@@ -1,9 +1,9 @@
-package org.vadere.meshing.mesh.triangulation.improver;
+package org.vadere.meshing.mesh.triangulation.improver.eikmesh;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.color.ColorHelper;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;

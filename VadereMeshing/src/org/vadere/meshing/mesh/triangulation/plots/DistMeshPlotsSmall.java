@@ -13,8 +13,8 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
 

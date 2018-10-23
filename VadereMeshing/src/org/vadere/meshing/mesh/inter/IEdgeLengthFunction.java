@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.adaptive;
+package org.vadere.meshing.mesh.inter;
 
 import org.vadere.util.geometry.shapes.IPoint;
 

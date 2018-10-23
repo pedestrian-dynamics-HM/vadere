@@ -1,12 +1,12 @@
-package org.vadere.meshing.mesh.triangulation;
+package org.vadere.meshing.examples;
 
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;

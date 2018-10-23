@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.improver;
+package org.vadere.meshing.mesh.triangulation.improver.eikmesh;
 
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;

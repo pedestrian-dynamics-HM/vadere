@@ -1,4 +1,4 @@
-package org.vadere.meshing.color;
+package org.vadere.util.visualization;
 
 import java.awt.*;
 import java.util.ArrayList;

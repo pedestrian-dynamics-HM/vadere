@@ -2,7 +2,7 @@ package org.vadere.gui.projectview;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.gui.components.utils.Recorder;
-import org.vadere.meshing.color.ColorHelper;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
@@ -13,9 +13,9 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.AEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.AEikMesh;
 
 import java.awt.*;
 import java.io.IOException;

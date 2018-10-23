@@ -10,7 +10,7 @@ import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
 
 import java.util.List;
 import java.util.function.Predicate;

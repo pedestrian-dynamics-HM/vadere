@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.adaptive;
+package org.vadere.geometry.triangulation;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
@@ -10,7 +10,7 @@ import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.ITriangulation;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPoint;

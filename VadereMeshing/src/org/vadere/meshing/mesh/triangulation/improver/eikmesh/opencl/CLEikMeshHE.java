@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.improver.opencl;
+package org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
@@ -15,8 +15,8 @@ import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 import org.vadere.meshing.opencl.CLDistMeshHE;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  */
-public class CLPSMeshingHE<P extends EikMeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
-    private static final Logger log = LogManager.getLogger(CLPSMeshing.class);
+public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
+    private static final Logger log = LogManager.getLogger(CLEikMesh.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
@@ -61,7 +61,7 @@ public class CLPSMeshingHE<P extends EikMeshPoint> implements IMeshImprover<P, A
     private CLDistMeshHE<P> clDistMesh;
     private boolean hasToRead = false;
 
-    public CLPSMeshingHE(
+    public CLEikMeshHE(
             final IDistanceFunction distanceFunc,
             final IEdgeLengthFunction edgeLengthFunc,
             final double initialEdgeLen,

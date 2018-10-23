@@ -13,10 +13,10 @@ import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.opencl.CLPSMeshingHE;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl.CLEikMeshHE;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class VisualTestGPUVertexBased {
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		CLPSMeshingHE meshGenerator = new CLPSMeshingHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		CLEikMeshHE meshGenerator = new CLEikMeshHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 
 		EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new EikMeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);

@@ -10,11 +10,11 @@ import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.tex.TexGraphGenerator;
+import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
 
 import java.util.*;
 import java.util.function.Predicate;

@@ -1,4 +1,4 @@
-package org.vadere.meshing.tex;
+package org.vadere.meshing.utils.tex;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;

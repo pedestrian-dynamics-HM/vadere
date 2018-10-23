@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.color.ColorHelper;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.components.utils.Resources;

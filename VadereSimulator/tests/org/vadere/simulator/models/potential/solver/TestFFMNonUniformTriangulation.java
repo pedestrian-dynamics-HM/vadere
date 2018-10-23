@@ -13,7 +13,7 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.triangulation.improver.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -23,7 +23,7 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;

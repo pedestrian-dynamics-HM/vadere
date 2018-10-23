@@ -5,9 +5,9 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.EikMeshPanel;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.LaplacianSmother;
 
 import javax.swing.*;

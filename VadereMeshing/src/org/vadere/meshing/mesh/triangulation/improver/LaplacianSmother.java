@@ -9,10 +9,11 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.RandomPointsSetTriangulator;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.triangulation.adaptive.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;

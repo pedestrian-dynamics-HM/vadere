@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.meshing.color.ColorHelper;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
