@@ -2,7 +2,7 @@ package org.vadere.meshing.mesh.triangulation.triangulator;
 
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -23,7 +23,7 @@ public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E exte
 	/**
 	 * the triangulation which determines how points will be inserted.
 	 */
-    private final ITriangulation<P, V, E, F> triangulation;
+    private final IIncrementalTriangulation<P, V, E, F> triangulation;
 
 	/**
 	 * the collection of points P.
@@ -36,13 +36,13 @@ public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param points        the collection of points P
 	 * @param triangulation a triangulation which determines how points will be inserted
 	 */
-    public PointSetTriangulator(final Collection<P> points, final ITriangulation<P, V, E, F> triangulation) {
+    public PointSetTriangulator(final Collection<P> points, final IIncrementalTriangulation<P, V, E, F> triangulation) {
         this.triangulation = triangulation;
         this.points = points;
     }
 
     @Override
-    public ITriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, V, E, F> generate() {
         triangulation.init();
         triangulation.insert(points);
         triangulation.finish();

@@ -2,7 +2,7 @@ package org.vadere.meshing.mesh.triangulation.improver.distmesh.deprecated;
 
 
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;

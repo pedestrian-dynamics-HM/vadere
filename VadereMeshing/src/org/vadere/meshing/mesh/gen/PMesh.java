@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -361,8 +361,8 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
     }
 
 	@Override
-	public ITriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
-		return ITriangulation.createPTriangulation(type, this);
+	public IIncrementalTriangulation<P, PVertex<P>, PHalfEdge<P>, PFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
+		return IIncrementalTriangulation.createPTriangulation(type, this);
 	}
 
 	@Override

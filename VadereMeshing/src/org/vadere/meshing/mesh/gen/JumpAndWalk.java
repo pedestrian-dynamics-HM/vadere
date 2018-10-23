@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -18,10 +18,10 @@ import java.util.Random;
  */
 public class JumpAndWalk<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
 
-	private final ITriangulation<P, V, E, F> triangulation;
+	private final IIncrementalTriangulation<P, V, E, F> triangulation;
 	private final Random random;
 
-	public JumpAndWalk(@NotNull final ITriangulation<P, V, E, F> triangulation) {
+	public JumpAndWalk(@NotNull final IIncrementalTriangulation<P, V, E, F> triangulation) {
 		this.triangulation = triangulation;
 		this.random = new Random();
 	}

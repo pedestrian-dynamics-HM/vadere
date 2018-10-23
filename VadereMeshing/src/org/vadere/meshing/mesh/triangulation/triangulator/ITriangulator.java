@@ -2,7 +2,7 @@ package org.vadere.meshing.mesh.triangulation.triangulator;
 
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -26,5 +26,5 @@ public interface ITriangulator<P extends IPoint, V extends IVertex<P>, E extends
 	 *
 	 * @return the generated triangulation
 	 */
-	ITriangulation<P, V, E, F> generate();
+	IIncrementalTriangulation<P, V, E, F> generate();
 }

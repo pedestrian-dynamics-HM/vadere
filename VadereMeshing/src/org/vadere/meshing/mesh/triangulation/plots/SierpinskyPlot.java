@@ -8,13 +8,13 @@ import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 
 import java.util.ArrayList;
@@ -54,8 +54,8 @@ public class SierpinskyPlot {
 				distanceFunc,
 				new ArrayList<>());
 
-		ITriangulation<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> triangulation = uniformRefinementTriangulation.init();
-		EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> panel = new EikMeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800, bbox);
+		IIncrementalTriangulation<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> triangulation = uniformRefinementTriangulation.init();
+		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> panel = new MeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800, bbox);
 		JFrame frame = panel.display();
 		frame.setVisible(true);
 

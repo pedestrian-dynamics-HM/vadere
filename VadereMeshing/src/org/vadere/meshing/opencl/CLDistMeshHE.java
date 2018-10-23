@@ -141,7 +141,7 @@ public class CLDistMeshHE<P extends IPoint> {
         }
         this.e = CLGatherer.getHalfEdges(mesh);
         this.t = CLGatherer.getFaces(mesh);
-        this.vToE = CLGatherer.getVertexToEdge(mesh);
+        this.vToE = CLGatherer.getEdgeOfVertex(mesh);
         this.borderV = CLGatherer.getBorderVertices(mesh);
 
         this.numberOfVertices = mesh.getNumberOfVertices();
@@ -588,7 +588,7 @@ public class CLDistMeshHE<P extends IPoint> {
         mesh.setPositions(pointSet);
         CLGatherer.scatterFaces(mesh, t);
         CLGatherer.scatterHalfEdges(mesh, e);
-        CLGatherer.scatterVertexToEdge(mesh, vToE);
+        CLGatherer.scatterEdgeOfVertex(mesh, vToE);
     }
 
     private int ceilPowerOf2(int value) {

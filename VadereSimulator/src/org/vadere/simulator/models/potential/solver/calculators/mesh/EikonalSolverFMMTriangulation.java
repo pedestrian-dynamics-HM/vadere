@@ -7,7 +7,7 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCone;
@@ -54,7 +54,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
 
     private ITimeCostFunction timeCostFunction;
-    private ITriangulation<P, V, E, F> triangulation;
+    private IIncrementalTriangulation<P, V, E, F> triangulation;
     private boolean calculationFinished;
     private PriorityQueue<V> narrowBand;
     private Collection<VRectangle> targetAreas;
@@ -85,7 +85,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
                                          @NotNull final Collection<IPoint> targetPoints,
-                                         @NotNull final ITriangulation<P, V, E, F> triangulation
+                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation
     ) {
         this.triangulation = triangulation;
         this.calculationFinished = false;
@@ -106,7 +106,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     public EikonalSolverFMMTriangulation(@NotNull final Collection<VShape> targetShapes,
                                          @NotNull final ITimeCostFunction timeCostFunction,
-                                         @NotNull final ITriangulation<P, V, E, F> triangulation
+                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation
     ) {
         this.triangulation = triangulation;
         this.calculationFinished = false;
@@ -128,7 +128,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      * @param targetVertices    vertices which are part of the triangulation where the propagating wave starts i.e. points that are part of the target area.
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
-                                         @NotNull final ITriangulation<P, V, E, F> triangulation,
+                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
                                          @NotNull final Collection<V> targetVertices,
                                          @NotNull final IDistanceFunction distFunc
     ) {
@@ -208,7 +208,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
 	@Override
     public Function<IPoint, Double> getPotentialField() {
-	    ITriangulation<P, V, E, F> clone = triangulation.clone();
+	    IIncrementalTriangulation<P, V, E, F> clone = triangulation.clone();
 	    return p -> getPotential(clone, p.getX(), p.getY());
     }
 
@@ -218,7 +218,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
     private static <P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double getPotential(
-    		@NotNull final ITriangulation<P, V, E, F> triangulation,
+    		@NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
 		    final double x,
 		    final double y) {
 

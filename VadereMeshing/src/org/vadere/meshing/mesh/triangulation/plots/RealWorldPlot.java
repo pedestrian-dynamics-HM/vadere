@@ -10,7 +10,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
 
 import java.util.ArrayList;
@@ -271,12 +271,12 @@ public class RealWorldPlot {
 				0.1,
 				obstacleShapes);
 
-		EikMeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> eikMeshPanel = new EikMeshPanel<>(meshImprover.getMesh(), f -> false, 1000, 800, new VRectangle(boundary.getBounds()));
-		JFrame frame = eikMeshPanel.display();
+		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(meshImprover.getMesh(), f -> false, 1000, 800, new VRectangle(boundary.getBounds()));
+		JFrame frame = meshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		eikMeshPanel.repaint();
+		meshPanel.repaint();
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
@@ -296,12 +296,12 @@ public class RealWorldPlot {
 			overAllTime.resume();
 			meshImprover.improve();
 			overAllTime.suspend();
-			eikMeshPanel.repaint();
+			meshPanel.repaint();
 		}
 		meshImprover.improve();
 		overAllTime.resume();
 		overAllTime.stop();
-		eikMeshPanel.repaint();
+		meshPanel.repaint();
 	}
 
 }

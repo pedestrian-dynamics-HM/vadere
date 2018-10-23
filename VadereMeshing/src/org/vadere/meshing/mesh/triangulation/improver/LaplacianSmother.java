@@ -8,12 +8,12 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.RandomPointsSetTriangulator;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +30,7 @@ public class LaplacianSmother implements IMeshImprover<EikMeshPoint, PVertex<Eik
 
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private ITriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation;
+    private IIncrementalTriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
     private final VRectangle bound;
@@ -54,7 +54,7 @@ public class LaplacianSmother implements IMeshImprover<EikMeshPoint, PVertex<Eik
         this.deps = 1.4901e-8 * initialEdgeLen;
         this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
-        this.triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new EikMeshPoint(x, y, false));
+        this.triangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new EikMeshPoint(x, y, false));
 
         /**
          * Start with a uniform refined triangulation
@@ -86,7 +86,7 @@ public class LaplacianSmother implements IMeshImprover<EikMeshPoint, PVertex<Eik
     }
 
     @Override
-    public ITriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> getTriangulation() {
+    public IIncrementalTriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> getTriangulation() {
         return triangulation;
     }
 
@@ -198,7 +198,7 @@ public class LaplacianSmother implements IMeshImprover<EikMeshPoint, PVertex<Eik
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        triangulation = ITriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new EikMeshPoint(x, y, false));
+        triangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new EikMeshPoint(x, y, false));
         removeTrianglesInsideObstacles();
         triangulation.finish();
     }

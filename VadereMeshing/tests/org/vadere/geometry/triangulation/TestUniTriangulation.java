@@ -9,8 +9,8 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.ITriangulation;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -56,10 +56,10 @@ public class TestUniTriangulation extends JFrame {
 	    /*
 	     * GUI-Code
 	     */
-	    ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
+	    IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
 	    Function<AFace<VPoint>, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
-        EikMeshPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> meshPanel =
-                new EikMeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, bbox, colorFunction);
+        MeshPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> meshPanel =
+                new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, bbox, colorFunction);
         JFrame frame = meshPanel.display();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);

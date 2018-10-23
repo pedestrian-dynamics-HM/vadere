@@ -6,7 +6,7 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * An implementation of the so called Delaunay Tree which does not suppport deletion of points from the
- * triangulation {@link ITriangulation}.
+ * triangulation {@link IIncrementalTriangulation}.
  *
  * The Delaunay Tree see Computational Geometry: Algorithms and Applications (berg-2008) page 191.
  *
@@ -34,7 +34,7 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	private final IMesh<P, V, E, F> mesh;
 	private double eps = 0.0000001;
 
-	public DelaunayTree(final ITriangulation<P, V, E, F> triangulation) {
+	public DelaunayTree(final IIncrementalTriangulation<P, V, E, F> triangulation) {
 		this.mesh = triangulation.getMesh();
 		this.map = new HashMap<>();
 	}

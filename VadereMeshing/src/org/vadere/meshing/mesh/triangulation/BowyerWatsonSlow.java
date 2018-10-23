@@ -2,6 +2,8 @@ package org.vadere.meshing.mesh.triangulation;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -13,7 +15,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,71 +23,115 @@ import java.util.stream.Stream;
 /**
  * @author Benedikt Zoennchen
  *
- * This class is for computing the DelaunayTriangulation using the BowyerWatson-Algorithm. In average the algorithm should perfom in O(n log(n)) but
- * in degenerated cases its runtime can be in O(n^2) where n is the number of points.
+ * This class is for computing the Delaunay triangulation using the Bowyer-Watson algorithm.
+ * In average the algorithm should perfom in O(n log(n)) but in degenerated cases its runtime can be in O(n^2)
+ * where n is the number of points. This implementation is only used to compare results since it is an easy
+ * version of the Bowyer-Watson algorithm. It can be used to check for correctness of more sophisticated
+ * implementations line {@link org.vadere.meshing.mesh.gen.IncrementalTriangulation}.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
  */
 @Deprecated
-public class BowyerWatsonSlow<P extends IPoint> {
-    private List<Triple<P, P, P>> triangles;
-    private Collection<P> points;
-    private List<P> initPoints;
-	private final BiFunction<Double, Double, P> pointConstructor;
+public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 
-    public BowyerWatsonSlow(final Collection<P> points, final BiFunction<Double, Double, P> pointConstructor) {
+	/**
+	 * a {@link List} of triples {@link Triple} each defining a triangle.
+	 */
+    private List<Triple<P, P, P>> triangles;
+
+	/**
+	 * a {@link Collection} containing all points of the triangulation.
+	 */
+	private Collection<P> points;
+
+	/**
+	 * the so called virtual points i.e. points that are not part of the actual triangulation but
+	 * help by constructing it.
+	 */
+    private List<P> virtualPoints;
+
+	/**
+	 * the point constructor which is required to construct additional helper points, i.e. the virtual points.
+	 */
+	private final IPointConstructor<P> pointConstructor;
+
+	/**
+	 * indicates if the computation has been executed.
+	 */
+	private boolean finished;
+
+	/**
+	 * The default constructor.
+	 *
+	 * @param points            a {@link Collections} of points which will be part of the Delaunay triangulation
+	 * @param pointConstructor  a point constructor to create additional helper points.
+	 */
+    public BowyerWatsonSlow(final Collection<P> points, final IPointConstructor<P> pointConstructor) {
         this.points = points;
 	    this.pointConstructor = pointConstructor;
+	    this.finished = false;
     }
 
-    public void execute() {
-       // P bound = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE, Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.bound(a.getX(), b.getX()), Math.bound(a.getY(), b.getY())));
-       // P min = points.parallelStream().reduce(pointConstructor.apply(Double.MAX_VALUE, Double.MAX_VALUE), (a, b) -> pointConstructor.apply(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
+	/**
+	 * Computes the Delaunay triangulation of the points.
+	 */
+	public void execute() {
+		// construct a new point which is upper right point of all points
+	    P max = points.parallelStream().reduce(pointConstructor.create(Double.MIN_VALUE,Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
 
-	    P max = points.parallelStream().reduce(pointConstructor.apply(Double.MIN_VALUE,Double.MIN_VALUE), (a, b) -> pointConstructor.apply(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
-	    P min = points.parallelStream().reduce(pointConstructor.apply(Double.MAX_VALUE,Double.MAX_VALUE), (a, b) -> pointConstructor.apply(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
+	    // construct a new point which is lower left of all points.
+	    P min = points.parallelStream().reduce(pointConstructor.create(Double.MAX_VALUE,Double.MAX_VALUE), (a, b) -> pointConstructor.create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
 
-
+	    // construct a bound containing all points by using the upper right and lower left point.
 	    VRectangle bound = new VRectangle(min.getX(), min.getY(), max.getX()-min.getX(), max.getY()- min.getY());
+
+	    // initialize the the computation by constructing a super triangle
 	    init(bound);
-        points.stream().forEach(point -> handle(point));
+
+	    // compute the triangulation by inserting all points
+        points.stream().forEach(point -> insert(point));
+
+        // remove the super triangle and its faces / triangles
         cleanUp();
+
+        finished = true;
     }
-
-    /*public List<Triple<P, P, P>> getTriangles() {
-        return triangles;
-    }*/
-
-	/*public void setTriangles(List<VTriangle> triangles) {
-		this.triangles = triangles;
-	}*/
 
     public List<VTriangle> getTriangles() {
-	    return triangles.stream().map(this::pointsToTriangle).collect(Collectors.toList());
+		if(!finished) {
+			execute();
+		}
+	    return streamTriangles().collect(Collectors.toList());
     }
 
     public Set<VLine> getEdges() {
+	    if(!finished) {
+		    execute();
+	    }
         return triangles.parallelStream().map(triple -> pointsToTriangle(triple)).flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
     }
 
-    private void init(final VRectangle bound) {
-        triangles = new ArrayList<>();
-        initPoints = new ArrayList<>();
-	    Triple<P, P, P> superTriangle = getSuperTriangle(bound);
-        triangles.add(superTriangle);
-	    initPoints.add(superTriangle.getLeft());
-	    initPoints.add(superTriangle.getMiddle());
-	    initPoints.add(superTriangle.getRight());
-    }
+	private void init(final VRectangle bound) {
+		triangles = new ArrayList<>();
+		virtualPoints = new ArrayList<>();
+		Triple<P, P, P> superTriangle = getSuperTriangle(bound);
+		triangles.add(superTriangle);
+		virtualPoints.add(superTriangle.getLeft());
+		virtualPoints.add(superTriangle.getMiddle());
+		virtualPoints.add(superTriangle.getRight());
+	}
 
     private Triple<P, P, P> getSuperTriangle(final VRectangle bound) {
         double gap = 1.0;
         double max = Math.max(bound.getWidth(), bound.getHeight());
-        P p1 = pointConstructor.apply(bound.getX() - max - gap, bound.getY() - gap);
-        P p2 = pointConstructor.apply(bound.getX() + 2 * max + gap, bound.getY() - gap);
-        P p3 = pointConstructor.apply(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max+ gap);
+        P p1 = pointConstructor.create(bound.getX() - max - gap, bound.getY() - gap);
+        P p2 = pointConstructor.create(bound.getX() + 2 * max + gap, bound.getY() - gap);
+        P p3 = pointConstructor.create(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max+ gap);
         return ImmutableTriple.of(p1, p2, p3);
     }
 
-    private void handle(final P point) {
+    private void insert(final P point) {
         HashSet<Line> edges = new HashSet<>();
 
 	    // This is way to expensive O(n) instead of O(log(n))
@@ -124,15 +169,11 @@ public class BowyerWatsonSlow<P extends IPoint> {
         triangles = triangles.stream().filter(triangle -> !isTriangleConnectedToInitialPoints(triangle)).collect(Collectors.toList());
     }
 
-	public void removeTriangleIf(final Predicate<Triple<P, P, P>> predicate) {
-		triangles.removeIf(predicate);
-	}
-
     private boolean isTriangleConnectedToInitialPoints(final Triple<P, P, P> trianglePoints) {
         return Stream.of(pointsToTriangle(trianglePoints).getLines()).anyMatch(edge -> {
             VPoint p1 = new VPoint(edge.getP1().getX(), edge.getP1().getY());
             VPoint p2 = new VPoint(edge.getP2().getX(), edge.getP2().getY());
-            return initPoints.stream().anyMatch(initPoint -> p1.equals(initPoint) || p2.equals(initPoint));
+            return virtualPoints.stream().anyMatch(initPoint -> p1.equals(initPoint) || p2.equals(initPoint));
         });
     }
 
@@ -143,7 +184,23 @@ public class BowyerWatsonSlow<P extends IPoint> {
 			    new VPoint(points.getRight().getX(), points.getRight().getY()));
     }
 
-    private class Line {
+	@Override
+	public Stream<Triple<P, P, P>> streamTriples() {
+		if(!finished) {
+			execute();
+		}
+		return triangles.stream();
+	}
+
+	@Override
+	public Stream<P> streamPoints() {
+		if(!finished) {
+			execute();
+		}
+		return points.stream();
+	}
+
+	private class Line {
 		final P p1;
 		final P p2;
 
@@ -194,7 +251,7 @@ public class BowyerWatsonSlow<P extends IPoint> {
             points.add(point);
         }
 
-        BowyerWatsonSlow<VPoint> bw = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
+        BowyerWatsonSlow<VPoint> bw = new BowyerWatsonSlow<>(points, (x, y) -> new VPoint(x, y));
         bw.execute();
         Set<VLine> edges = bw.getEdges();
 

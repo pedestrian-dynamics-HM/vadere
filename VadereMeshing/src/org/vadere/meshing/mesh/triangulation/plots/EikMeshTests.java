@@ -7,9 +7,9 @@ import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
@@ -62,7 +62,7 @@ public class EikMeshTests {
 				supplier);
 
 		Predicate<AFace<EikMeshPoint>> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
-		EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new EikMeshPanel(meshGenerator.getMesh(),
+		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
 				predicate, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);

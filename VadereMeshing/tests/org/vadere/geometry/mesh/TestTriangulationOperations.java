@@ -7,7 +7,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -31,7 +31,7 @@ public class TestTriangulationOperations {
 
 	@Before
 	public void setUp() throws Exception {
-		triangulation = ITriangulation.createVPTriangulation(bound);
+		triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
 		points.add(new VPoint(0,0));
 		points.add(collapsePoint);
 		points.add(new VPoint(1, 0));

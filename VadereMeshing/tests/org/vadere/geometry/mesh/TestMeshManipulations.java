@@ -7,10 +7,10 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.VPTriangulation;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -32,7 +32,7 @@ public class TestMeshManipulations {
 	@Before
 	public void setUp() throws Exception {
 		bound = new VRectangle(-1, -1, 12, 12);
-		triangulation = ITriangulation.createVPTriangulation(bound);
+		triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
 		triangulation.insert(new VPoint(0,0));
 		triangulation.insert(new VPoint(2,0));
 		triangulation.insert(new VPoint(1, 1.5));
@@ -79,7 +79,7 @@ public class TestMeshManipulations {
 		//Utils.getCentroid()
 		test.triangulation.createHole(test.triangulation.locateFace(4, 5).get(), mergePredicate, true);
 		//PFace<VPoint> face = ;
-		EikMeshPanel<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> panel = new EikMeshPanel<>(test.triangulation.getMesh(),
+		MeshPanel<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> panel = new MeshPanel<>(test.triangulation.getMesh(),
 				f -> test.triangulation.getMesh().isHole(f), 800, 800, test.bound);
 		JFrame frame = panel.display();
 		frame.setVisible(true);

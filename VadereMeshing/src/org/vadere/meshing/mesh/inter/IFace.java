@@ -11,6 +11,6 @@ import org.vadere.util.geometry.shapes.IPoint;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the vertices
+ * @param <P> the type of the points
  */
 public interface IFace<P extends IPoint> {}

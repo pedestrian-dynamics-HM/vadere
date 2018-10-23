@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.gen;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -10,7 +11,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.ITriConnectivity;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.meshing.mesh.triangulation.BowyerWatsonSlow;
@@ -40,7 +41,26 @@ import java.util.stream.StreamSupport;
 
 import javax.swing.*;
 
-public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulation<P, V, E, F> {
+/**
+ * This class implements the Bowyer-Watson algorithm efficiently by using the mesh data structure {@link IMesh} and
+ * sophisticated point locators {@link IPointLocator} where {@link JumpAndWalk} is the default. The incremental nature
+ * of the implementation allows to insert points after the triangulation is finished, i.e. after the virtual points and
+ * their neighbouring faces are removed. However, points have to lie inside some interior face of the current triangulation.
+ * Furthermore, this implementation allows for other criteria {@link Predicate} for flipping edges {@link E} than the
+ * Delaunay criterion, e.g. a more relaxed version. However it is only guaranteed to generate a valid triangulation if
+ * the Delaunay criterion is used. Otherwise, the user has to make sure that the triangulation remains valid.
+ *
+ * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
+ */
+public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IIncrementalTriangulation<P, V, E, F> {
 
 	protected Collection<P> points;
 	private VRectangle bound;
@@ -134,6 +154,18 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	}
 
 	/**
+	 * Construct a triangulation using an empty mesh and {@link JumpAndWalk} as point location algorithm.
+	 *
+	 * @param mesh  the empty mesh
+	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
+	 *              bound to be inserted into the triangulation
+	 */
+	public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh,
+	                                @NotNull final VRectangle bound) {
+		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, halfEdge -> true);
+	}
+
+	/**
 	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
 	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
 	 * the bound i.e. outside the mesh.
@@ -160,6 +192,21 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this.virtualVertices = new ArrayList<>();
 		this.virtualVertices.addAll(mesh.getVertices());
 		this.setPointLocator(type);
+	}
+
+	/**
+	 * Construct a triangulation using non-empty mesh and {@link JumpAndWalk} as point location algorithm.
+	 * The border of the mesh specifies the bound. Therefore the bound has to specify some polygon and
+	 * there will be no points inserted outside the bound i.e. outside the mesh.
+	 *
+	 * @param mesh              the non-empty mesh which will be used and which specifies the bound
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
+	 */
+	public IncrementalTriangulation(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final Predicate<E> illegalPredicate) {
+		this(mesh, IPointLocator.Type.JUMP_AND_WALK, illegalPredicate);
 	}
 
 	/**
@@ -192,6 +239,17 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		this(mesh, type, halfEdge -> true);
 	}
 
+	/**
+	 * Construct a triangulation using non-empty mesh and {@link JumpAndWalk} as point location algorithm.
+	 * The border of the mesh specifies the bound. Therefore the bound has to specify some polygon and
+	 * there will be no points inserted outside the bound i.e. outside the mesh.
+	 *
+	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
+	 */
+	public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh) {
+		this(mesh, IPointLocator.Type.JUMP_AND_WALK, halfEdge -> true);
+	}
+
 	// end constructors
 
 	@Override
@@ -210,7 +268,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				pointLocator = new DelaunayTree<>(this);
 				break;
 			case DELAUNAY_HIERARCHY:
-				Supplier<ITriangulation<P, V, E, F>> supplier;
+				Supplier<IIncrementalTriangulation<P, V, E, F>> supplier;
 				if(useMeshForBound) {
 					supplier = () -> new IncrementalTriangulation<>(mesh.clone(), IPointLocator.Type.BASE, illegalPredicate);
 				}
@@ -542,12 +600,31 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	}
 
 	@Override
+	public Stream<Triple<P, P, P>> streamTriples() {
+		return mesh.streamFaces().map(f -> faceToTriple(f));
+	}
+
+	@Override
+	public Stream<P> streamPoints() {
+		return mesh.streamPoints();
+	}
+
+	@Override
 	public void remove(P point) {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	public Collection<VTriangle> getTriangles() {
 		return stream().map(face -> faceToTriangle(face)).collect(Collectors.toSet());
+	}
+
+	private Triple<P, P, P> faceToTriple(final F face) {
+		List<P> points = mesh.getPoints(face);
+		assert points.size() == 3;
+		P p1 = points.get(0);
+		P p2 = points.get(1);
+		P p3 = points.get(2);
+		return Triple.of(p1, p2, p3);
 	}
 
 	private VTriangle faceToTriangle(final F face) {
@@ -557,7 +634,6 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		V p3 = points.get(2);
 		return new VTriangle(new VPoint(p1.getX(), p1.getY()), new VPoint(p2.getX(), p2.getY()), new VPoint(p3.getX(), p3.getY()));
 	}
-
 
 	/**
 	 * Checks if the edge xy of the triangle xyz is illegal with respect to a point p, which is the case if:
@@ -774,7 +850,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 		long ms = System.currentTimeMillis();
 
 		PMesh<VPoint> mesh = new PMesh<>(pointConstructor);
-		ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> bw = ITriangulation.createPTriangulation(
+		IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> bw = IIncrementalTriangulation.createPTriangulation(
 				IPointLocator.Type.DELAUNAY_HIERARCHY,
 				points,
 				pointConstructor);
@@ -790,7 +866,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 
         ms = System.currentTimeMillis();
-        ITriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> bw2 = ITriangulation.createATriangulation(
+        IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> bw2 = IIncrementalTriangulation.createATriangulation(
                 IPointLocator.Type.DELAUNAY_HIERARCHY,
                 points,
                 pointConstructor);
@@ -805,7 +881,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
         window2.setVisible(true);
 
 		ms = System.currentTimeMillis();
-		BowyerWatsonSlow<VPoint> bw3 = new BowyerWatsonSlow<VPoint>(points, (x, y) -> new VPoint(x, y));
+		BowyerWatsonSlow<VPoint> bw3 = new BowyerWatsonSlow<>(points, (x, y) -> new VPoint(x, y));
 		bw3.execute();
 		Set<VLine> edges3 = bw3.getTriangles().stream()
 				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());

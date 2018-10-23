@@ -2,7 +2,7 @@ package org.vadere.meshing.mesh.triangulation.triangulator;
 
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -22,7 +22,7 @@ import java.util.Random;
  */
 public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
 
-    private final ITriangulation<P, V, E, F> triangulation;
+    private final IIncrementalTriangulation<P, V, E, F> triangulation;
     private final int numberOfPoints;
     private Random random;
     private final VRectangle bound;
@@ -37,7 +37,7 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
 	 * @param distFunc          a distance function which has to be positive at positions where
 	 *                          no point should be inserted and negative elsewhere.
 	 */
-    public RandomPointsSetTriangulator(final ITriangulation<P, V, E, F> triangulation,
+    public RandomPointsSetTriangulator(final IIncrementalTriangulation<P, V, E, F> triangulation,
                                        final int numberOfPoints, final VRectangle bound,
                                        final IDistanceFunction distFunc
                                 ) {
@@ -48,8 +48,24 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
         this.distFunc = distFunc;
     }
 
+	/**
+	 *
+	 * @param triangulation     a triangulation which determines how points will be inserted
+	 * @param numberOfPoints    the number of random points which will be inserted
+	 * @param bound             the bound containing all points
+	 */
+	public RandomPointsSetTriangulator(final IIncrementalTriangulation<P, V, E, F> triangulation,
+	                                   final int numberOfPoints, final VRectangle bound
+	) {
+		this.triangulation = triangulation;
+		this.numberOfPoints = numberOfPoints;
+		this.random = new Random();
+		this.bound = bound;
+		this.distFunc = p -> -1.0;
+	}
+
     @Override
-    public ITriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, V, E, F> generate() {
         triangulation.init();
         int numberOfInsertedPoints = 0;
 

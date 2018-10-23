@@ -10,7 +10,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.meshing.ConstantLineIterator;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MLine;
@@ -26,7 +26,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * The original DistMesh algorithm (see http://persson.berkeley.edu/distmesh/)
+ * The original DistMesh algorithm
+ *
+ * @see <a href="http://persson.berkeley.edu/distmesh/">DistMesh</a>
  */
 public class Distmesh {
 	private static final Logger log = LogManager.getLogger(Distmesh.class);

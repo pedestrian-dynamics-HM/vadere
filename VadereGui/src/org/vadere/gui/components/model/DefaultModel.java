@@ -20,7 +20,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -87,7 +87,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	private ITriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation;
+	private IIncrementalTriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation;
 
 	private Collection<VTriangle> triangles;
 

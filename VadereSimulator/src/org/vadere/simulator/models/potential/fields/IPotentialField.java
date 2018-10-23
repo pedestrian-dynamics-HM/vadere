@@ -13,7 +13,7 @@ import org.vadere.state.types.EikonalSolverType;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -163,7 +163,7 @@ public interface IPotentialField {
 			        //TODO [refactoring]: this attribute value is used in an not intuitive way, we should introduce an extra attribute value!
 			        1.0 / attributesPotential.getPotentialFieldResolution());
 
-	        ITriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation = meshGenerator.getTriangulation();
+	        IIncrementalTriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation = meshGenerator.getTriangulation();
 
 	        List<PVertex<EikMeshPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
 

@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.improver.eikmesh;
+package org.vadere.meshing.mesh.gen;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -20,6 +20,8 @@ import java.util.function.Predicate;
 import javax.swing.*;
 
 /**
+ * This {@link Canvas} can be used to display a {@link IMesh}.
+ *
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)
@@ -27,39 +29,111 @@ import javax.swing.*;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class EikMeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
+public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
 
-    private static final Logger log = LogManager.getLogger(EikMeshPanel.class);
+    private static final Logger log = LogManager.getLogger(MeshPanel.class);
+
+	/**
+	 * The mesh which will be rendered.
+	 */
 	private IMesh<P, V, E, F> mesh;
-	private double width;
-	private double height;
-	private Collection<F> faces;
-    private final Predicate<F> alertPred;
-    private Collection<VTriangle> triangles;
-    private VRectangle bound;
-    private final double scale;
-    private Function<F, Color> colorFunction;
 
-	public EikMeshPanel(
+	/**
+	 * The width of the canvas.
+	 */
+	private double width;
+
+	/**
+	 * The height of the canvas.
+	 */
+	private double height;
+
+	/**
+	 * A {@link Collection} of {@link F} from the mesh.
+	 * Ths collection exist to avoid the {@link java.util.ConcurrentModificationException}.
+	 */
+	private Collection<F> faces;
+
+	/**
+	 * A {@link Predicate} of {@link F} which marks a face to be drawn (not filled) in a special way.
+	 */
+    private final Predicate<F> alertPred;
+
+	/**
+	 * The bound of the mesh.
+	 */
+	private VRectangle bound;
+
+	/**
+	 * The scaling between the mesh bound-size and the canvas bound-size.
+	 */
+    private final double scale;
+
+	/**
+	 * A function which decides by which color the face should be filled.
+	 */
+	private Function<F, Color> colorFunction;
+
+	/**
+	 * Default constructor.
+	 *
+	 * @param mesh          the mesh which will be rendered
+	 * @param alertPred     a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
+	 * @param width         width of the canvas
+	 * @param height        height of the canvas
+	 * @param bound         bound of the mesh
+	 * @param colorFunction color function coloring faces
+	 */
+	public MeshPanel(
 			@NotNull final IMesh<P, V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
-			final double width, final double height,
-			final VRectangle bound,
-			final Function<F, Color> colorFunction) {
+			final double width,
+			final double height,
+			@NotNull final VRectangle bound,
+			@NotNull final Function<F, Color> colorFunction) {
 		this.mesh = mesh;
 		this.width = width;
 		this.height = height;
 		this.alertPred = alertPred;
-		this.triangles = new ArrayList<>();
 		this.bound = bound;
 		this.scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
 		this.faces = new ArrayList<>();
 		this.colorFunction = colorFunction;
 	}
 
-    public EikMeshPanel(final IMesh<P, V, E, F> mesh, final Predicate<F> alertPred, final double width, final double height, final VRectangle bound) {
+	/**
+	 * Construct a mesh panel filling all faces with the color white.
+	 *
+	 * @param mesh          the mesh which will be rendered
+	 * @param alertPred     a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
+	 * @param width         width of the canvas
+	 * @param height        height of the canvas
+	 * @param bound         bound of the mesh
+	 */
+    public MeshPanel(
+    		@NotNull final IMesh<P, V, E, F> mesh,
+		    @NotNull final Predicate<F> alertPred,
+		    final double width,
+		    final double height,
+		    @NotNull final VRectangle bound) {
     	this(mesh, alertPred, width, height, bound, f -> Color.WHITE);
     }
+
+	/**
+	 * Construct a mesh panel filling all faces with the color white.
+	 *
+	 * @param mesh          the mesh which will be rendered
+	 * @param width         width of the canvas
+	 * @param height        height of the canvas
+	 * @param bound         bound of the mesh
+	 */
+	public MeshPanel(
+			@NotNull final IMesh<P, V, E, F> mesh,
+			final double width,
+			final double height,
+			@NotNull final VRectangle bound) {
+		this(mesh, f -> false, width, height, bound, f -> Color.WHITE);
+	}
 
 	@Override
 	public void update(Graphics g) {
@@ -77,6 +151,11 @@ public class EikMeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHal
 		}
 	}
 
+	/**
+	 * Constructs the image {@link BufferedImage} which will be drawn to the canvas / panel.
+	 *
+	 * @return an image of the mesh
+	 */
 	public BufferedImage getImage() {
 		BufferedImage image = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
@@ -96,21 +175,22 @@ public class EikMeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHal
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 
-		int groupSize = 64;
-		ColorHelper colorHelper = new ColorHelper(faces.size());
+		/*int groupSize = 64;
+		ColorHelper colorHelper = new ColorHelper(faces.size());*/
 
 		for(F face : faces) {
 			VPolygon polygon = mesh.toTriangle(face);
+			graphics.setColor(colorFunction.apply(face));
+			graphics.fill(polygon);
+
 			if(alertPred.test(face)) {
 				graphics.setColor(Color.RED);
 				graphics.draw(polygon);
 			}
 			else {
-				graphics.setColor(colorFunction.apply(face));
-				graphics.fill(polygon);
+				graphics.setColor(Color.GRAY);
+				graphics.draw(polygon);
 			}
-			graphics.setColor(Color.GRAY);
-			graphics.draw(polygon);
 		}
 
 		return image;
@@ -127,8 +207,12 @@ public class EikMeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHal
 		JFrame jFrame = new JFrame();
 		jFrame.setSize((int)width+10, (int)height+10);
 		jFrame.add(this);
+		jFrame.setTitle("Mesh");
 		jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
+		jFrame.setVisible(true);
+		repaint();
+		jFrame.repaint();
 		return jFrame;
 	}
 }

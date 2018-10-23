@@ -3,7 +3,7 @@ package org.vadere.meshing.mesh.triangulation.triangulator;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -27,11 +27,11 @@ import java.util.stream.Stream;
 @Deprecated
 public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F>{
 
-    private final ITriangulation<P, V, E, F> triangulation;
+    private final IIncrementalTriangulation<P, V, E, F> triangulation;
     private final Collection<VLine> constrains;
     private final Set<P> points;
 
-    public RuppertsTrinangulator(final ITriangulation<P, V, E, F> triangulation, final Collection<VLine> constrains, final Set<P> points) {
+    public RuppertsTrinangulator(final IIncrementalTriangulation<P, V, E, F> triangulation, final Collection<VLine> constrains, final Set<P> points) {
         this.triangulation = triangulation;
         this.constrains = constrains;
         this.points = points;
@@ -39,7 +39,7 @@ public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E ext
 
     // TODO: not finished jet
     @Override
-    public ITriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, V, E, F> generate() {
         triangulation.init();
         Collection<P> allPoints = new ArrayList<>();
         IMesh<P, V, E, F> mesh = triangulation.getMesh();

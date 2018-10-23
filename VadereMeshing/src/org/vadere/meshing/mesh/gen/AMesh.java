@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.SpaceFillingCurve;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -20,7 +20,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * An array-based implementation of {@link IMesh}.
+ *
  * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
  */
 public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, Cloneable {
 	private final static Logger log = LogManager.getLogger(AMesh.class);
@@ -426,8 +430,8 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
     }
 
 	@Override
-	public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
-		return ITriangulation.createATriangulation(type, this);
+	public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
+		return IIncrementalTriangulation.createATriangulation(type, this);
 	}
 
 	public void setPositions(final List<P> positions) {
@@ -574,10 +578,10 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
     }
 
     /**
-     * This method rearranges the indices of faces, vertices and edges according to their positions.
-     * After the call, neighbouring faces are near arrange inside the face {@link ArrayList}.
+     * <p>This method rearranges the indices of faces, vertices and edges according to their positions.
+     * After the call, neighbouring faces are near arrange inside the face {@link ArrayList}.</p>
      *
-     * Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!
+     * <p>Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!</p>
      */
     public void spatialSort() {
         // get the bound for the space filling curve!
@@ -622,9 +626,9 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 
 	/**
-	 * removes all destroyed object from this mesh and re-arranges all indices.
+	 * <p>Removes all destroyed object from this mesh and re-arranges all indices.</p>
      *
-     * Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!
+     * <p>Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!</p>
 	 */
 	public void garbageCollection() {
 		Map<Integer, Integer> faceIdMap = new HashMap<>();
@@ -706,7 +710,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	/**
-	 * Creates a very simple mesh consisting of two triangles ((-100, 0), (100, 0), (0, 1)) and ((0, -1), (-100, 0), (100, 0)).
+	 * <p>Creates a very simple mesh consisting of two triangles ((-100, 0), (100, 0), (0, 1)) and ((0, -1), (-100, 0), (100, 0)).</p>
 	 *
 	 * @return the created mesh
 	 */

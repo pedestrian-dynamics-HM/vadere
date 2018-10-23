@@ -7,7 +7,7 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
@@ -23,7 +23,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	private UniformRefinementTriangulatorSFC triangulatorSFC;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
-	private ITriangulation<P, V, E, F> triangulation;
+	private IIncrementalTriangulation<P, V, E, F> triangulation;
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
@@ -149,7 +149,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	}
 
 	@Override
-	public ITriangulation<P, V, E, F> generate() {
+	public IIncrementalTriangulation<P, V, E, F> generate() {
 
 		if(!initializationFinished()) {
 			initialize();
@@ -226,7 +226,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	}
 
     @Override
-    public ITriangulation<P, V, E, F> getTriangulation() {
+    public IIncrementalTriangulation<P, V, E, F> getTriangulation() {
 		return triangulation;
     }
 

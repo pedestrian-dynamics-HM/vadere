@@ -4,7 +4,7 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -17,7 +17,12 @@ import java.util.List;
 
 import javax.swing.*;
 
-public class Example {
+/**
+ * Shows a very basic example how {@link org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh} can be used
+ * to mesh a simple geometry.
+ */
+public class EikMeshExamples {
+
 	public static void main(String... args) {
 
 		// define a bounding box
@@ -39,18 +44,15 @@ public class Example {
 				0.1,
 				obstacleShapes);
 
-		// (optional) define the gui only to display the mesh
-		EikMeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> eikMeshPanel = new EikMeshPanel<>(
-				meshImprover.getMesh(),
-				f -> false, 1000, 800,
+		// (optional) define the gui to display the mesh
+		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
+				meshImprover.getMesh(), 1000, 800,
 				new VRectangle(boundary.getBounds()));
-		JFrame frame = eikMeshPanel.display();
-		frame.setVisible(true);
-		frame.setTitle("uniformRing()");
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		// generate the mesh
 		meshImprover.generate();
-		eikMeshPanel.repaint();
+
+		// display the mesh
+		meshPanel.display();
 	}
 }

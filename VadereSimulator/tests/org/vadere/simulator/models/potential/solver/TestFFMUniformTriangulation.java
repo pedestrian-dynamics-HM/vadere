@@ -9,7 +9,7 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
@@ -32,7 +32,7 @@ public class TestFFMUniformTriangulation {
 
     private static Logger log = LogManager.getLogger(TestFFMUniformTriangulation.class);
 
-    private ITriangulation<IPotentialPoint, PVertex<IPotentialPoint>, PHalfEdge<IPotentialPoint>, PFace<IPotentialPoint>> uniformTriangulation;
+    private IIncrementalTriangulation<IPotentialPoint, PVertex<IPotentialPoint>, PHalfEdge<IPotentialPoint>, PFace<IPotentialPoint>> uniformTriangulation;
     private int width = 10;
     private int height = 10;
     private double minTriangleSideLength = 0.4;
@@ -40,7 +40,7 @@ public class TestFFMUniformTriangulation {
     @Before
     public void setUp() throws Exception {
         IPointConstructor<IPotentialPoint> pointConstructor = (x, y) -> new PotentialPoint(x, y);
-        uniformTriangulation = ITriangulation.createUniformTriangulation(
+        uniformTriangulation = IIncrementalTriangulation.createUniformTriangulation(
                 IPointLocator.Type.BASE,
                 new VRectangle(0, 0, width, height),
                 minTriangleSideLength,

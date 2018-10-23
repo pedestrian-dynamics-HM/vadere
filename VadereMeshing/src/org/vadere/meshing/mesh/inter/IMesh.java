@@ -1741,15 +1741,15 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	IMesh<P, V, E, F> clone();
 
 	/**
-	 * Transforms the mesh into a rich triangulation {@link ITriangulation}.
+	 * Transforms the mesh into a rich triangulation {@link IIncrementalTriangulation}.
 	 * There will be no connectivity changes performed!
 	 *
 	 * Assumption: The mesh is a valid triangulation.
 	 *
 	 * @param type  specifies the used {@link IPointLocator}
-	 * @return a triangulation {@link ITriangulation} of this mesh
+	 * @return a triangulation {@link IIncrementalTriangulation} of this mesh
 	 */
-	ITriangulation<P, V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
+	IIncrementalTriangulation<P, V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
 
 	/**
 	 * Rearranges the memory location of faces, vertices and halfEdges of the mesh according to

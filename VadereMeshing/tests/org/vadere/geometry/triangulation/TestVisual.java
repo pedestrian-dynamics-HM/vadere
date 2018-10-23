@@ -3,7 +3,7 @@ package org.vadere.geometry.triangulation;
 import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.impl.VPUniformRefinement;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -37,12 +37,12 @@ public class TestVisual {
 	public static void testUniformRefinement() {
 
 		VPUniformRefinement uniformRefinement = new VPUniformRefinement(
-                () -> ITriangulation.createVPTriangulation(bound),
+                () -> IIncrementalTriangulation.createVPTriangulation(bound),
 				bound,
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
 				p -> 40.0);
 
-        ITriangulation triangulation = uniformRefinement.generate();
+        IIncrementalTriangulation triangulation = uniformRefinement.generate();
         Set<VLine> edges4 = triangulation.getEdges();
 
 		JFrame window = new JFrame();
@@ -65,7 +65,7 @@ public class TestVisual {
 		IPointConstructor<VPoint> pointConstructor =  (x, y) -> new VPoint(x, y);
 		long ms = System.currentTimeMillis();
 
-		VPTriangulation triangulation = ITriangulation.createVPTriangulation(bound);
+		VPTriangulation triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
 		triangulation.insert(points);
 		triangulation.finish();
 		Set<VLine> edges = triangulation.getEdges();

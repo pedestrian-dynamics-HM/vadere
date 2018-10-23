@@ -9,13 +9,13 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 import org.vadere.meshing.opencl.CLDistMeshHE;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.geometry.shapes.*;
@@ -33,7 +33,7 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
     private final IMeshSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> meshSupplier;
-    private ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation;
+    private IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
     private VRectangle bound;
@@ -110,12 +110,12 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
         log.info("##### (end) generate a triangulation #####");
     }
 
-    public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> getTriangulation() {
+    public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> getTriangulation() {
         return triangulation;
     }
 
     @Override
-    public ITriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
+    public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
 		try {
 			if(!initialized) {
 				initialize();

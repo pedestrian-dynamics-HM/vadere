@@ -9,7 +9,7 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -59,7 +59,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	/**
 	 * Contains T_0, T_1, ..., T_k
 	 */
-	private List<ITriangulation<P, V, E, F>> hierarchySets;
+	private List<IIncrementalTriangulation<P, V, E, F>> hierarchySets;
 
 	/**
 	 * Connects t_{k} and t_{k-1}' by connecting its vertices. This is done via the vertices itself.
@@ -69,18 +69,18 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	/**
 	 * T_0, which might contain holes i.e. polygons which are not triangulated.
 	 */
-	private ITriangulation<P, V, E, F> base;
+	private IIncrementalTriangulation<P, V, E, F> base;
 
 	/**
 	 * T_1, which contains all the points of T_0 but no holes. Therefore we can
 	 * walk through T_1 to find the face of T_0.
 	 */
-	private ITriangulation<P, V, E, F> preBase;
+	private IIncrementalTriangulation<P, V, E, F> preBase;
 
 	/**
 	 * A supplier to create T_1, ..., T_k.
 	 */
-	private Supplier<ITriangulation<P, V, E, F>> triangulationSupplier;
+	private Supplier<IIncrementalTriangulation<P, V, E, F>> triangulationSupplier;
 
 	/**
 	 * Parameters choosen from devillers-2002 (The Delaunay Hierarchy)
@@ -111,8 +111,8 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	 * @param triangulationSupplier a supplier to construct T_k, k greater 0.
 	 */
 	public DelaunayHierarchy(
-    		@NotNull final ITriangulation<P, V, E, F> base,
-		    @NotNull final Supplier<ITriangulation<P, V, E, F>> triangulationSupplier) {
+    		@NotNull final IIncrementalTriangulation<P, V, E, F> base,
+		    @NotNull final Supplier<IIncrementalTriangulation<P, V, E, F>> triangulationSupplier) {
         this.hierarchySets = new ArrayList<>(maxLevel);
         //this.hierarchyConnector = new ArrayList<>(maxLevel);
         this.random = new Random();
@@ -134,7 +134,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         //hierarchyConnector.add(new HashMap<>());
 
         for(int i = 1; i <= maxLevel; i++) {
-            ITriangulation<P, V, E, F> triangulation = triangulationSupplier.get();
+            IIncrementalTriangulation<P, V, E, F> triangulation = triangulationSupplier.get();
             triangulation.init();
             hierarchySets.add(triangulation);
 
@@ -158,7 +158,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         }
     }
 
-	private F getStartFace(@NotNull final IPoint endPoint, @NotNull final ITriangulation<P, V, E, F> triangulation) {
+	private F getStartFace(@NotNull final IPoint endPoint, @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation) {
 		List<V> vertices = triangulation.getMesh().getVertices();
 		int n = vertices.size();
 
@@ -227,7 +227,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         //log.debug(this.print());
         for(int i = 1; i <= vertexLevel; i++) {
             V v;
-            ITriangulation<P, V, E, F> tri = getLevel(i);
+            IIncrementalTriangulation<P, V, E, F> tri = getLevel(i);
             if(locatedFaces.hasNext()) {
             	F f = locatedFaces.next();
             	//log.info("insert " + p + " into " + tri.getMesh().toPath(f));
@@ -243,7 +243,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	    //log.debug(this.print());
     }
 
-    private ITriangulation<P, V, E, F> getLevel(final int level) {
+    private IIncrementalTriangulation<P, V, E, F> getLevel(final int level) {
         if(level > maxLevel) {
             throw new IllegalArgumentException("level is greater than the maximum level.");
         }
@@ -301,7 +301,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         F face;
         //log.debug(this.print() + "\n");
         while (level >= 1) {
-            ITriangulation<P, V, E, F> tri = getLevel(level);
+            IIncrementalTriangulation<P, V, E, F> tri = getLevel(level);
             //TODO: SE-Architecture dirty here!
             if(v == null) {
                 if(level == 1) {
@@ -349,7 +349,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 		/**
 		 * Now get the face containing point for T_0 which might contains holes.
 		 */
-		ITriangulation<P, V, E, F> tri = getLevel(level);
+		IIncrementalTriangulation<P, V, E, F> tri = getLevel(level);
 
 	    /**
 	     * Contains should also work for holes!
@@ -375,7 +375,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
         return faces;
     }
 
-    private boolean isOnEdge(@NotNull final ITriangulation<P, V, E, F> tri, @NotNull F face, @NotNull P point, final double tolerance) {
+    private boolean isOnEdge(@NotNull final IIncrementalTriangulation<P, V, E, F> tri, @NotNull F face, @NotNull P point, final double tolerance) {
 	    E edge = tri.getMesh().closestEdge(face, point.getX(), point.getY());
 	    P p1 = tri.getMesh().getPoint(tri.getMesh().getPrev(edge));
 	    P p2 = tri.getMesh().getPoint(edge);
@@ -423,7 +423,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
      * @param point         the point
      * @return vertex of the triangulation of the face with the smallest distance to point
      */
-    public V getNearestPoint(final ITriangulation<P, V, E, F> triangulation, final F face, final P point) {
+    public V getNearestPoint(final IIncrementalTriangulation<P, V, E, F> triangulation, final F face, final P point) {
         IMesh<P, V, E, F> mesh = triangulation.getMesh();
         return mesh.streamEdges(face).map(edge -> mesh.getVertex(edge)).reduce((p1, p2) -> p1.distance(point) > p2.distance(point) ? p2 : p1).get();
 	}

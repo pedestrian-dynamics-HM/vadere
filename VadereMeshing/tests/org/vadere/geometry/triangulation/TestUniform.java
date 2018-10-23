@@ -2,7 +2,7 @@ package org.vadere.geometry.triangulation;
 
 import org.vadere.meshing.utils.debug.DebugGui;
 import org.vadere.meshing.utils.debug.SimpleTriCanvas;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
@@ -29,7 +29,7 @@ public class TestUniform {
 	private void tri() {
 		Set<EikMeshPoint> meshPoints = generateGridPoints(bbox, initialEdgeLen);
 		IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
-		ITriangulation tri = ITriangulation.createVPTriangulation(bbox);
+		IIncrementalTriangulation tri = IIncrementalTriangulation.createVPTriangulation(bbox);
 		System.out.print(meshPoints.size());
 		System.out.println("Start inserting");
 		DebugGui.setDebugOn(true);

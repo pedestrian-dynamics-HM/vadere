@@ -11,7 +11,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -23,7 +23,7 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
@@ -45,7 +45,7 @@ public class TestFFMNonUniformTriangulation {
     private int width;
     private int height;
     private VRectangle bbox;
-    private ITriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation;
+    private IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation;
     private IDistanceFunction distanceFunc;
 
     @Before
@@ -308,7 +308,7 @@ public class TestFFMNonUniformTriangulation {
     }
 
 
-    private double computeL2Error(@NotNull final ITriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation, final IDistanceFunction distanceFunc) {
+    private double computeL2Error(@NotNull final IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation, final IDistanceFunction distanceFunc) {
         double sum = 0.0;
         for(IVertex<PotentialPoint> vertex : triangulation.getMesh().getVertices()) {
             double diff = vertex.getPoint().getPotential() + distanceFunc.apply(vertex);

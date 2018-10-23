@@ -7,4 +7,4 @@ import java.util.function.Supplier;
 /**
  * @author Benedikt Zoennchen
  */
-public interface ITriangulationSupplier<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Supplier<ITriangulation<P, V, E, F>> {}
+public interface ITriangulationSupplier<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Supplier<IIncrementalTriangulation<P, V, E, F>> {}

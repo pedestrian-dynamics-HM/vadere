@@ -7,7 +7,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import static org.junit.Assert.assertTrue;
@@ -18,13 +18,13 @@ import static org.junit.Assert.assertTrue;
 public class TestSimplePointLocation {
 
 	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
-	private ITriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> triangulation;
+	private IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> triangulation;
 	private long numberOfPoints = 100;
 
 	@Before
 	public void setUp() throws Exception {
 		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
-		triangulation = ITriangulation.generateRandomTriangulation(numberOfPoints);
+		triangulation = IIncrementalTriangulation.generateRandomTriangulation(numberOfPoints);
 	}
 
 	@Test

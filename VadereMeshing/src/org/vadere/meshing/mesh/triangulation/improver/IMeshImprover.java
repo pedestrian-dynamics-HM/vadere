@@ -3,7 +3,7 @@ package org.vadere.meshing.mesh.triangulation.improver;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -41,7 +41,7 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
      *
      * @return the current triangulation / mesh
      */
-    ITriangulation<P, V, E, F> getTriangulation();
+    IIncrementalTriangulation<P, V, E, F> getTriangulation();
 
 	/**
 	 * Returns the current triangulation / mesh.

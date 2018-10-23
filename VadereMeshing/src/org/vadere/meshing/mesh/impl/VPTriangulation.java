@@ -23,19 +23,19 @@ public class VPTriangulation extends IncrementalTriangulation<VPoint, PVertex<VP
 	public VPTriangulation(
 			@NotNull final Collection<VPoint> points,
 			@NotNull final Predicate<PHalfEdge<VPoint>> illegalPredicate) {
-		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, points, illegalPredicate);
+		super(new VPMesh(), IPointLocator.Type.JUMP_AND_WALK, points, illegalPredicate);
 	}
 
 	public VPTriangulation(final Set<VPoint> points) {
-		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, points);
+		super(new VPMesh(), IPointLocator.Type.JUMP_AND_WALK, points);
 	}
 
 	public VPTriangulation(final VRectangle bound,
 	                       final Predicate<PHalfEdge<VPoint>> illegalPredicate){
-		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, bound, illegalPredicate);
+		super(new VPMesh(), IPointLocator.Type.JUMP_AND_WALK, bound, illegalPredicate);
 	}
 
 	public VPTriangulation(final VRectangle bound) {
-		super(new VPMesh(), IPointLocator.Type.DELAUNAY_HIERARCHY, bound);
+		super(new VPMesh(), IPointLocator.Type.JUMP_AND_WALK, bound);
 	}
 }

@@ -3,7 +3,7 @@ package org.vadere.meshing.mesh.triangulation.triangulator;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -30,7 +30,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	private double height;
 	private double minTriangleSideLength;
 	private VRectangle bound;
-	private final ITriangulation<P, V, E, F> triangulation;
+	private final IIncrementalTriangulation<P, V, E, F> triangulation;
 
 	/**
 	 * The default constructor.
@@ -41,7 +41,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	 */
 	public UniformTriangulator(final VRectangle bound,
                                final double minTriangleSideLength,
-                               final ITriangulation<P, V, E, F> triangulation) {
+                               final IIncrementalTriangulation<P, V, E, F> triangulation) {
 		this.bound = bound;
 		this.triangulation = triangulation;
 		this.left = bound.getMinX();
@@ -52,7 +52,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	}
 
     @Override
-    public ITriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, V, E, F> generate() {
         triangulation.init();
 
         List<P> pointList = new ArrayList<>(generatePointSet());

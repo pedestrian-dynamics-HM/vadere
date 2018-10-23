@@ -14,7 +14,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPanel;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.AEikMesh;
 
 import java.awt.*;
@@ -61,7 +61,7 @@ public class RecordTriangulationMovie {
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
-		EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new EikMeshPanel<>(
+		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(
 		meshImprover.getMesh(), f -> false, bbound.getWidth()*1000, bbound.getHeight()*1000, bbound, colorFunction1);
 
 		JFrame frame = distmeshPanel.display();
@@ -114,7 +114,7 @@ public class RecordTriangulationMovie {
 	}
 
 	public static void addPictures(Recorder recorder,
-	                               EikMeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel,
+	                               MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel,
 	                               int frames) throws IOException {
 
 		for(int i = 0; i < frames; i++) {

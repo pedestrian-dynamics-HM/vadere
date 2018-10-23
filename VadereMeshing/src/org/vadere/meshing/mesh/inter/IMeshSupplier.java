@@ -5,6 +5,8 @@ import org.vadere.util.geometry.shapes.IPoint;
 import java.util.function.Supplier;
 
 /**
+ * A {@link Supplier} of {@link IMesh} which gives supply to fresh and empty meshes.
+ *
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)

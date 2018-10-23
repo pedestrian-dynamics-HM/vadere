@@ -5,34 +5,45 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
+ * An array-based implementation of {@link IHalfEdge}.
+ *
  * @author Benedikt Zoennchen
  */
 public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 
+	/**
+	 * The array-index of this half-edge
+	 */
 	private int id;
 
 	/**
-	 * point at the end of the half edge.
+	 * The array-index of the point at the end of the half edge.
 	 */
 	private int end;
 
 	/**
-	 * next half-edge around the face.
+	 * The array-index of the next half-edge around the face.
 	 */
 	private int next;
 
 	/**
-	 * previous half-edge around the face.
+	 * The array-index of the previous half-edge around the face.
 	 */
 	private int previous;
 
+	/**
+	 * The array-index of the twin half-edge
+	 */
 	private int twin;
 
 	/**
-	 * the face the half-edge borders.
+	 * The array-index of the face the half-edge borders.
 	 */
 	private int face;
 
+	/**
+	 * Indicates that the half-edge is destroyed and can be removed from the array-based data structure.
+	 */
 	private boolean destroyed;
 
 	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
@@ -114,10 +125,13 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 		return destroyed;
 	}
 
-    /**
-     * This method should only be called by the garbage collector in AMesh.
-     * @param id
-     */
+	/**
+	 * Sets the array-index of this half-edge. Note that this method should
+	 * only be called by the garbage collector in {@link AMesh} which
+	 * adjust indices to remove destroyed base elements.
+	 *
+	 * @param id the new array-index of this face
+	 */
     void setId(@NotNull final int id) {
         this.id = id;
     }

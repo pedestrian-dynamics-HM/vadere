@@ -6,11 +6,11 @@ import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.*;
 
@@ -22,7 +22,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
     private final Collection<VShape> boundary;
     private final VRectangle bbox;
     private final IEdgeLengthFunction lenFunc;
-    private ITriangulation<P, V, E, F> triangulation;
+    private IIncrementalTriangulation<P, V, E, F> triangulation;
     private Set<P> points;
     private IMesh<P, V, E, F> mesh;
     private static final Logger logger = LogManager.getLogger(UniformSFCTriangulator.class);
@@ -38,7 +38,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
      * @param distFunc      a signed distance function
      */
     public UniformSFCTriangulator(
-            final ITriangulation<P, V, E, F> triangulation,
+            final IIncrementalTriangulation<P, V, E, F> triangulation,
             final VRectangle bound,
             final Collection<VShape> boundary,
             final IEdgeLengthFunction lenFunc,
@@ -54,7 +54,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
         this.sortedFaces = new LinkedList<>();
     }
 
-    public ITriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, V, E, F> generate() {
         triangulation.init();
 
         logger.info("start triangulation generation");

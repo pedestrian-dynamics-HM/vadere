@@ -8,13 +8,13 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -65,7 +65,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	/**
 	 * The triangulation which will be constructed.
 	 */
-	private ITriangulation<P, V, E, F> triangulation;
+	private IIncrementalTriangulation<P, V, E, F> triangulation;
 
 	/**
 	 * The mesh supplier to construct an empty mesh which containing the data (points, vertices, edges, faces).
@@ -180,7 +180,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 *
 	 * @return a triangulation consisting of two triangles containing the bounding box
 	 */
-    public ITriangulation<P, V, E, F> init() {
+    public IIncrementalTriangulation<P, V, E, F> init() {
 	    initialized = true;
     	double xMin = bbox.getMinX();
 	    double yMin = bbox.getMinY();
@@ -378,7 +378,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 *
 	 * @return the triangulation of this refinement
 	 */
-	public ITriangulation<P, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<P, V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
@@ -387,7 +387,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 *
 	 * @return returns the refined triangulation
 	 */
-	public ITriangulation<P, V, E, F> generate() {
+	public IIncrementalTriangulation<P, V, E, F> generate() {
         logger.info("start triangulation generation");
         init();
 

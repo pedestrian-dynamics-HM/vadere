@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriangulation;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.ITriangulationSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.math.IDistanceFunction;
@@ -15,7 +15,7 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.meshing.mesh.inter.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 	private final Collection<? extends VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
-	private ITriangulation<P, V, E, F> triangulation;
+	private IIncrementalTriangulation<P, V, E, F> triangulation;
 	private Set<P> points;
 	private IMesh<P, V, E, F> mesh;
 	private  LinkedList<F> toRefineEdges;
@@ -49,7 +49,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
     /**
      * <p>Default constructor.</p>
      *
-     * @param supplier      a supplier to construct a completely fresh and empty triangulation {@link ITriangulation}
+     * @param supplier      a supplier to construct a completely fresh and empty triangulation {@link IIncrementalTriangulation}
      * @param bound         the bounding box containing all boundaries and the topography with respect to the distance function distFunc
      * @param boundary      the boundaries e.g. obstacles
      * @param lenFunc       a edge length function
@@ -123,7 +123,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 	 *
 	 * @return the generated triangulation
 	 */
-	public ITriangulation<P, V, E, F> generate() {
+	public IIncrementalTriangulation<P, V, E, F> generate() {
         logger.info("start triangulation generation");
         init();
 

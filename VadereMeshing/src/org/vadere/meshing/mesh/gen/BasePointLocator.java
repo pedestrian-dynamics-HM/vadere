@@ -12,11 +12,10 @@ import java.util.Optional;
 /**
  * @author Benedikt Zoennchen
  *
- * The BasePointLocatetor only uses the mesh itself and does not use any additional data structure
- * to find the face for a given point. It runs a march starting from some (not known) face of the
- * mesh and end up at the face that triangleContains the point. In worst case this is not faster than
- * checking each each face of the mesh but it is more clever and faste in the most cases.
- *
+ * The {@link BasePointLocator} only uses the mesh itself and does not use any additional data structure
+ * to find the face for a given point. It runs a march starting from some arbitrary face of the
+ * mesh and end up at the face that contains the point, if there is one. In worst case this is not faster than
+ * checking each face of the mesh but it is more clever and faste in most cases.
  *
  * @param <P> the type of the points (containers)
  * @param <V> the type of the vertices

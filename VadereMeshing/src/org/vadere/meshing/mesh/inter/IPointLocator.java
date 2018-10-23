@@ -5,7 +5,7 @@ import java.util.Optional;
 
 /**
  * A point-locator {@link IPointLocator} implements one of the strategies to find a specific triangle
- * represented by a face {@link F} inside a mesh {@link ITriangulation}. i.e. a set of connected non-overlapping
+ * represented by a face {@link F} inside a mesh {@link IIncrementalTriangulation}. i.e. a set of connected non-overlapping
  * triangles including holes. The most famous strategies are so called triangle walks described in:
  * <ul>
  *     <li>Walking in a Triangulation (devillers-2001)</li>
@@ -26,7 +26,7 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 	/**
 	 * Starts the point location of the point and returns the face which is found.
 	 *
-	 * Assumption: the point is inside the {@link ITriangulation}.
+	 * Assumption: the point is inside the {@link IIncrementalTriangulation}.
 	 *
 	 * @param point     the point
 	 * @return the face containing the point
