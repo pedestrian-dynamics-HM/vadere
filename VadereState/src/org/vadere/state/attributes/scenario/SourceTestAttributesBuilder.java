@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class SourceTestAttributesBuilder {
 

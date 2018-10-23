@@ -3,7 +3,7 @@ package org.vadere.state.attributes.scenario.builder;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.types.DynamicElementType;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.Arrays;
 import java.util.Collections;

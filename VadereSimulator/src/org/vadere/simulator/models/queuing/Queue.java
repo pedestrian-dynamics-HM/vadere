@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.*;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * A Queue is connected to a Target. All Pedestrians with the Target are out of the queue.

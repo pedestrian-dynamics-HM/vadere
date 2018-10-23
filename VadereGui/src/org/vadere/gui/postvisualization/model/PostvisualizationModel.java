@@ -30,11 +30,9 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.util.io.parser.JsonLogicParser;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.io.parser.VPredicate;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.data.cellgrid.CellGrid;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

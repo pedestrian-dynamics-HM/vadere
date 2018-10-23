@@ -2,7 +2,6 @@ package org.vadere.simulator.control;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Agent;
@@ -14,9 +13,9 @@ import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.SpawnArray;
 import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;

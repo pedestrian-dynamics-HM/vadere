@@ -15,7 +15,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.io.CollectionUtils;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {

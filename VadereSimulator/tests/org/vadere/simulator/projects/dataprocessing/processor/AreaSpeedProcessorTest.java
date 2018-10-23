@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.processor.AttributesAreaProcessor;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import static org.junit.Assert.assertEquals;
 

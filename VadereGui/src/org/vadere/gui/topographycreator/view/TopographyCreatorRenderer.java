@@ -5,7 +5,7 @@ import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
 import java.awt.geom.Line2D;

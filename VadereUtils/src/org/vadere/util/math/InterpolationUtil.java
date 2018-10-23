@@ -1,10 +1,10 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VTriangle;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.calculators.IPotentialPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 
 import java.util.List;
 
@@ -283,7 +283,7 @@ public class InterpolationUtil {
 	 * @param grad
 	 */
 	public static void getGradientMollified(CellGrid pot, double[] x,
-			double[] grad, double gradientMollifierRadius) {
+	                                        double[] grad, double gradientMollifierRadius) {
 		double aX = Math.max(pot.getMinX(), x[0] - gradientMollifierRadius);
 		double bX = Math.min(pot.getMaxX(), x[0] + gradientMollifierRadius);
 

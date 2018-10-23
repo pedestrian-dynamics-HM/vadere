@@ -1,7 +1,7 @@
 package org.vadere.state.attributes.scenario.builder;
 
 import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VShape;
 
 public final class AttributesObstacleBuilder {
 	private VShape shape;

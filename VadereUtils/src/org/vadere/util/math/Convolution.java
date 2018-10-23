@@ -3,7 +3,7 @@ package org.vadere.util.math;
 import java.util.Random;
 import java.util.function.BiFunction;
 
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 public class Convolution {
 

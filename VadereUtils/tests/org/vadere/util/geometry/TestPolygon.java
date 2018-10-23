@@ -7,10 +7,10 @@ import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
-import org.vadere.geometry.shapes.VTriangle;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.io.GeometryPrinter;
 import org.vadere.util.io.IOUtils;
 

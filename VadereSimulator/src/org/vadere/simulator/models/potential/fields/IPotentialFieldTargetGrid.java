@@ -11,7 +11,7 @@ import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
 import org.vadere.state.attributes.models.AttributesQueuingGame;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 

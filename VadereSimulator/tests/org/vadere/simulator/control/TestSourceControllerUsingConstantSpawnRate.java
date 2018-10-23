@@ -18,9 +18,9 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 public class TestSourceControllerUsingConstantSpawnRate {
 

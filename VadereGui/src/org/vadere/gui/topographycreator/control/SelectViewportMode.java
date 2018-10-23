@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.control.RectangleSelectionMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * In this mode the user can redefine the viewport with his mouse.

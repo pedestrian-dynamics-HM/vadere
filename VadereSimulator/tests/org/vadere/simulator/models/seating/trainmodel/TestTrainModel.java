@@ -18,7 +18,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TrainGeometry;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import static org.vadere.simulator.models.seating.TestTopographyAndModelBuilder.*;
 

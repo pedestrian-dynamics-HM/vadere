@@ -10,11 +10,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.Vector2D;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VLine;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * Basic unit test for the {@link Geometry} class. NOT complete.

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * The PedestrianLoadingStrategyPotentialDifference calculates an individual

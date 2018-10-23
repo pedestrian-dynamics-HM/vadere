@@ -10,7 +10,7 @@ import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.data.FloorFieldGridRow;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

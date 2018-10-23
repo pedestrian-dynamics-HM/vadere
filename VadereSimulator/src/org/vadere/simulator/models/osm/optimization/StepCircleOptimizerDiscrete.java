@@ -6,10 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.types.MovementType;
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.Vector2D;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.Shape;
 import java.util.List;

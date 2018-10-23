@@ -2,8 +2,8 @@ package org.vadere.util.geometry;
 
 import java.util.Comparator;
 
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * Point class representing one {@link VPoint} in 2D space with an additional

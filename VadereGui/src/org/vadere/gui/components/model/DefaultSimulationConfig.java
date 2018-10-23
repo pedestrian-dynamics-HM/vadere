@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.geometry.color.ColorHelper;
+import org.vadere.meshing.color.ColorHelper;
 
 public class DefaultSimulationConfig extends DefaultConfig {
 	private static Resources resources = Resources.getInstance("global");

@@ -3,8 +3,8 @@ package org.vadere.util.geometry;
 import java.awt.geom.Path2D;
 import java.util.*;
 
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  *

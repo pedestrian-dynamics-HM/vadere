@@ -7,7 +7,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.*;
 import java.util.Random;

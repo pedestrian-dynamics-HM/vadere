@@ -7,12 +7,12 @@ import java.util.Random;
 
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
 public abstract class Agent extends DynamicElement {

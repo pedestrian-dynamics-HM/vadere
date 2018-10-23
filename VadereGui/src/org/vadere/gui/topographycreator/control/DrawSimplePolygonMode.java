@@ -3,9 +3,9 @@ package org.vadere.gui.topographycreator.control;
 import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.geometry.shapes.VLine;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;

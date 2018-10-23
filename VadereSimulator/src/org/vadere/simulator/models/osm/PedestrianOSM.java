@@ -2,7 +2,7 @@ package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
@@ -17,9 +17,9 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Topography;
 ;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 import java.util.HashSet;

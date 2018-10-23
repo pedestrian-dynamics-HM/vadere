@@ -20,8 +20,8 @@
       <module>./VadereGui</module>
       <module>./VadereSimulator</module>
       <module>./VadereState</module>
+      <module>./VadereMeshing</module>
       <module>./VadereUtils</module>
-      <module>./VadereGeometry</module>
       <module>./VadereAnnotation</module>
   </modules>
   

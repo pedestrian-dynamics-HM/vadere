@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VTriangle;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
 
 /**
  * A triangle with additional double data at each point.

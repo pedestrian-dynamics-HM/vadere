@@ -4,7 +4,7 @@ import javax.swing.*;
 
 import org.vadere.gui.components.control.IScaleChangeListener;
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
 

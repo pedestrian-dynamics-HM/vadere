@@ -1,6 +1,6 @@
 package org.vadere.util.voronoi;
 
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 public class BeachLineLeaf implements BeachLineNode {
 

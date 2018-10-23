@@ -2,9 +2,7 @@ package org.vadere.state.attributes.scenario.builder;
 
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.geometry.shapes.VShape;
-
-import javax.xml.stream.events.Attribute;
+import org.vadere.util.geometry.shapes.VShape;
 
 public final class AttributesTargetBuilder {
 	private int id = Attributes.ID_NOT_SET;

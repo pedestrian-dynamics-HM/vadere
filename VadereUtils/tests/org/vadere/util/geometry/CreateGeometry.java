@@ -1,8 +1,8 @@
 package org.vadere.util.geometry;
 
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  * Utility class for tests of geometry classes. Generates several test

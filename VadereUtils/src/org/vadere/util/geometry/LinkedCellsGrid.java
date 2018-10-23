@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * A grid augmenting the position of generic objects, for faster access. O(1)

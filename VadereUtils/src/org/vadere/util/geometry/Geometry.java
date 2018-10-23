@@ -8,10 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VLine;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  * A generic geometry. Represented by a polygon (borders) with inner polygons

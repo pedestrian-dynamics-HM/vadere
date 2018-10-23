@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VShape;
 
 public class EditUpdateElementShape extends AbstractUndoableEdit {
 	private static final long serialVersionUID = 3895685571385728777L;

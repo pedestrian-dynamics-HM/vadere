@@ -1,10 +1,9 @@
 package org.vadere.util.math;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.IDistanceFunction;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VShape;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.data.cellgrid.CellGrid;
 
 import java.util.Collection;
 

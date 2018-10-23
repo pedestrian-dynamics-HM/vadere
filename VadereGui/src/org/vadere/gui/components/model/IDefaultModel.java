@@ -9,8 +9,8 @@ import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;

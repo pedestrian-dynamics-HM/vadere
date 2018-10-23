@@ -7,9 +7,9 @@ import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 
 import java.util.Collection;
 

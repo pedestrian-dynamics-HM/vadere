@@ -6,10 +6,10 @@ import javax.sound.sampled.Line;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VLine;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  * Basic tests of the {@link Line} class.

@@ -5,8 +5,6 @@ import org.apache.log4j.Logger;
 import org.lwjgl.*;
 import org.lwjgl.opencl.*;
 import org.lwjgl.system.*;
-import org.vadere.geometry.opencl.CLInfo;
-import org.vadere.geometry.opencl.OpenCLException;
 
 import java.nio.*;
 import java.util.concurrent.*;

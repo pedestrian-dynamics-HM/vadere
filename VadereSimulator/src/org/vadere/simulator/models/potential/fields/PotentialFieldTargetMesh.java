@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.Vector2D;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * Created by bzoennchen on 05.03.18.

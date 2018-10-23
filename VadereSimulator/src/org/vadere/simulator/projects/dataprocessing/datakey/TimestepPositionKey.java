@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.datakey;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * @author Mario Teixeira Parente

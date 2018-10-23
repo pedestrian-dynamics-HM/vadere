@@ -3,8 +3,8 @@ package org.vadere.gui.topographycreator.control;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * Setter implementation to modify shape of Attributes.

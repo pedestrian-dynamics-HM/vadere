@@ -35,8 +35,8 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.Comparator;
 import java.util.LinkedList;

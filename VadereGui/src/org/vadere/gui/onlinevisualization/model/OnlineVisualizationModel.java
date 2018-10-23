@@ -13,7 +13,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.state.scenario.*;
-import org.vadere.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationConfig> {

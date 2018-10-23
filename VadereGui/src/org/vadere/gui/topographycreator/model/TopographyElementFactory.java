@@ -7,9 +7,9 @@ import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.geometry.Vector2D;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * A Factory to create new ScenarioElements.

@@ -6,8 +6,8 @@ import java.util.Random;
 
 import org.apache.commons.math3.optimization.direct.BOBYQAOptimizer;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
 import org.apache.commons.math3.analysis.MultivariateFunction;

@@ -8,9 +8,9 @@ import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class TestScenarioToJson {

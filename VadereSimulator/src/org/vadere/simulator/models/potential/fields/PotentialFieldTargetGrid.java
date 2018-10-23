@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.calculators.EikonalSolver;
-import org.vadere.util.potential.calculators.cartesian.AGridEikonalSolver;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.AGridEikonalSolver;
 
 import java.util.HashMap;
 import java.util.Map;

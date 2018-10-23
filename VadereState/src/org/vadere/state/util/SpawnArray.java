@@ -3,8 +3,8 @@ package org.vadere.state.util;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.Arrays;

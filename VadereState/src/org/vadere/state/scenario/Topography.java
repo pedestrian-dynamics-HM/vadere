@@ -24,13 +24,10 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
-import org.vadere.geometry.shapes.VShape;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellState;
-import org.vadere.util.potential.PathFindingTag;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VShape;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
 public class Topography {

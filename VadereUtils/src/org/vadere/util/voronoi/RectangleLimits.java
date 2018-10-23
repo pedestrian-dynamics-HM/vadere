@@ -3,7 +3,7 @@ package org.vadere.util.voronoi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /* ToDo: Remove class. */
 public class RectangleLimits {

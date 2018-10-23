@@ -2,8 +2,8 @@ package org.vadere.simulator.models;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 public interface DynamicElementFactory {
 

@@ -5,8 +5,8 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

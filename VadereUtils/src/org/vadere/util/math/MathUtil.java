@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
 import org.apache.commons.math3.complex.Complex;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * Math utilities not covered by java.lang.Math

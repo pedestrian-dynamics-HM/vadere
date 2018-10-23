@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * Utility class for tests. Helps to generate random positions and special position on an hexagon

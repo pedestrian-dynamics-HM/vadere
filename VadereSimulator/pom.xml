@@ -214,6 +214,11 @@
           <artifactId>annotation</artifactId>
           <version>${project.version}</version>
       </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>meshing</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
    <dependency>
    	<groupId>net.sourceforge.argparse4j</groupId>

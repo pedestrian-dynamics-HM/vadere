@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;

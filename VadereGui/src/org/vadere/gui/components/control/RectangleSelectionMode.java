@@ -5,8 +5,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class RectangleSelectionMode extends DefaultModeAdapter {
 

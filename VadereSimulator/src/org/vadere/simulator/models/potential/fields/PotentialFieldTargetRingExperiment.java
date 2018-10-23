@@ -7,10 +7,10 @@ import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.Vector2D;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.data.cellgrid.CellGrid;
 
 import java.util.HashMap;
 import java.util.List;

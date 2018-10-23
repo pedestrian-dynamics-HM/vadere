@@ -10,9 +10,8 @@ import org.apache.commons.math3.ode.FirstOrderDifferentialEquations;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.potential.gradients.GradientProvider;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
 /**
  * Abstract model equations for an ODE based model of pedestrian motion.

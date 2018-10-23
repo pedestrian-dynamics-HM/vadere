@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.vadere.simulator.dataprocessing.CreatePoints;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.Collection;

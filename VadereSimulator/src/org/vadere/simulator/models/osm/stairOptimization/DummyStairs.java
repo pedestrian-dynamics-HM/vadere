@@ -2,9 +2,9 @@ package org.vadere.simulator.models.osm.stairOptimization;
 
 import java.util.ArrayList;
 
-import org.vadere.geometry.shapes.VLine;
-import org.vadere.geometry.shapes.VRectangle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 @Deprecated
 public class DummyStairs {

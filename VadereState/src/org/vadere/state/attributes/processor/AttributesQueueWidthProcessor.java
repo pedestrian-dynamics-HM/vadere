@@ -1,7 +1,7 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * @author Marion Gödel

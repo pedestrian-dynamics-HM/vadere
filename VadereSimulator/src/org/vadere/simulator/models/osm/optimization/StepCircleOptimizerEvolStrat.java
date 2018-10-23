@@ -8,8 +8,8 @@ import java.util.Random;
 
 import org.apache.commons.math.util.MathUtils;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * The Class StepCircleOptimizerEvolStrat.

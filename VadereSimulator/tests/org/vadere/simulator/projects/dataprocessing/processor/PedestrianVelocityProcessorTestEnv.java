@@ -5,7 +5,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
 import java.util.Comparator;

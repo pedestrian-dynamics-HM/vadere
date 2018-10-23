@@ -20,8 +20,8 @@ import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * A TopographyBuilder builds a Topography-Object step by step. After the Topography-Object is build

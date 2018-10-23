@@ -1,7 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;

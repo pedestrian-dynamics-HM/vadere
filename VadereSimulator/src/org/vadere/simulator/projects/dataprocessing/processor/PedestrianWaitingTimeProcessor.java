@@ -7,8 +7,8 @@ import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Collection;
 

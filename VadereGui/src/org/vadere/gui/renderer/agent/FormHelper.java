@@ -1,7 +1,7 @@
 package org.vadere.gui.renderer.agent;
 
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 import java.awt.geom.Path2D;
 

@@ -18,9 +18,9 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.tests.util.reflection.TestResourceHandler;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VRectangle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Area;
 import java.nio.file.Path;

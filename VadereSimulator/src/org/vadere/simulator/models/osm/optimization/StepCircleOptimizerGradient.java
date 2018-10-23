@@ -9,11 +9,11 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.Vector2D;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.util.potential.gradients.FloorGradientProviderDiscrete;
-import org.vadere.util.potential.gradients.GradientProvider;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.simulator.models.potential.solver.gradients.FloorGradientProviderDiscrete;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
 public class StepCircleOptimizerGradient implements StepCircleOptimizer {
 

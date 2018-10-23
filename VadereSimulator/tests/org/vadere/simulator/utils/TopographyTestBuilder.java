@@ -12,8 +12,8 @@ import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VRectangle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.Random;
 

@@ -13,8 +13,8 @@ import org.apache.commons.math.optimization.direct.NelderMead;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.geometry.shapes.VCircle;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * The Class StepCircleOptimizerNelderMead.

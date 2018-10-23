@@ -5,7 +5,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * Part of the command pattern to re- and undo setTopographyBound.

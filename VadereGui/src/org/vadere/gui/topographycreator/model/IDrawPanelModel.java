@@ -19,9 +19,9 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<T>, Iterable<ScenarioElement> {
 

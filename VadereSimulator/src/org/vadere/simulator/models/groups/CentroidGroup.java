@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 public class CentroidGroup implements Group {
 

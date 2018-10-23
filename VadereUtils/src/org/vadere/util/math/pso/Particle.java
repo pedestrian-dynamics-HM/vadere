@@ -1,7 +1,7 @@
 package org.vadere.util.math.pso;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * @author Benedikt Zoennchen

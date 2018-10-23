@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CollectionUtils {
@@ -40,6 +41,12 @@ public class CollectionUtils {
 		Collection<EquatorWrapper<T>> ewA = a.stream().map(obj -> new EquatorWrapper<>(equator, obj)).collect(Collectors.toList());
 		Collection<EquatorWrapper<T>> ewB = b.stream().map(obj -> new EquatorWrapper<>(equator, obj)).collect(Collectors.toList());
 		return Iterables.elementsEqual(ewA, ewB);
+	}
+
+	public static <T> boolean isEqualSet(final Set<? extends T> a, final Set<? extends T> b, final IEquator<T> equator) {
+		Set<EquatorWrapper<T>> ewA = a.stream().map(obj -> new EquatorWrapper<>(equator, obj)).collect(Collectors.toSet());
+		Set<EquatorWrapper<T>> ewB = b.stream().map(obj -> new EquatorWrapper<>(equator, obj)).collect(Collectors.toSet());
+		return ewA.equals(ewB);
 	}
 
 	public interface IEquator<T> {

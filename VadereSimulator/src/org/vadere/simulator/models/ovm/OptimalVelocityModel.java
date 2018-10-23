@@ -16,8 +16,8 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 
 import java.util.Collection;

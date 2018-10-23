@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.scenario.Stairs.Tread;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.geometry.GeometryUtils;
+import org.vadere.util.geometry.GeometryUtils;
 import static org.junit.Assert.assertEquals;
 
 public class TestStairs {

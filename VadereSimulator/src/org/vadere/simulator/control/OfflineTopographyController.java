@@ -10,10 +10,10 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.IPoint;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 public class OfflineTopographyController {
 

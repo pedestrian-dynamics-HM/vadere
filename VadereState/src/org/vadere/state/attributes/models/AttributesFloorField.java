@@ -12,7 +12,7 @@ public class AttributesFloorField extends Attributes {
 	/**
 	 * These attribute values should only be used if createMethod.isUsingCellGrid() == true.
 	 *
-	 * TODO [refactoring]: However potentialFieldResolution is also used for the {@link org.vadere.util.potential.timecost.ITimeCostFunction}
+	 * TODO [refactoring]: However potentialFieldResolution is also used for the {@link org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction}
 	 * for the density computation, i.e. it is the resolution of the matrix used in the discrete convolution. This should be changed!
 	 */
 	private double potentialFieldResolution = 0.1;

@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.util.opencl.CLConvolution;
-import org.vadere.geometry.opencl.OpenCLException;
+import org.vadere.util.opencl.OpenCLException;
 
 class CLGaussianFilter extends GaussianFilter {
 

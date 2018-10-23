@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 public class NavigationFollower implements Navigation {
 

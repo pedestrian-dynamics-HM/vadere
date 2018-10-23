@@ -3,10 +3,10 @@ package org.vadere.gui.postvisualization.utils;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellGridConverter;
-import org.vadere.util.potential.CellState;
-import org.vadere.util.potential.PathFindingTag;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellGridConverter;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.PathFindingTag;
 
 import java.io.BufferedReader;
 import java.io.File;

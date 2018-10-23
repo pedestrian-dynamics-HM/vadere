@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Agent;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * A Trajectory is a list of {@link org.vadere.state.scenario.Pedestrian} objects, that can be seen
@@ -179,7 +179,7 @@ public class Trajectory {
 
 	/**
 	 * Return a {@link java.util.stream.Stream<>} stream of
-	 * {@link org.vadere.geometry.shapes.VPoint} pedestrian positions
+	 * {@link org.vadere.util.geometry.shapes.VPoint} pedestrian positions
 	 * from the first step (1) to the (step.getStepNumber()) in reverse order.
 	 * 
 	 * @param step the step of the last pedestrian position

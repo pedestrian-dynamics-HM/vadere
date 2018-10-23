@@ -12,9 +12,9 @@ import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.util.geometry.GrahamScan;
-import org.vadere.geometry.shapes.VLine;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  * In this mode VPolygons will be generated.

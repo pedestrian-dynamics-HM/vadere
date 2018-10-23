@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.attributes.processor.AttributesQueueWidthProcessor;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.List;
 import java.util.stream.Collectors;

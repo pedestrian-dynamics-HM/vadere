@@ -2,8 +2,8 @@ package org.vadere.gui.topographycreator.control;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;

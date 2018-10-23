@@ -3,9 +3,9 @@ package org.vadere.state.scenario;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.geometry.GeometryUtils;
-import org.vadere.geometry.shapes.VPolygon;
-import org.vadere.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

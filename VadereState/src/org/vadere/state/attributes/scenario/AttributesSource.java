@@ -8,7 +8,7 @@ import java.util.List;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.types.DynamicElementType;
-import org.vadere.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VShape;
 
 public class AttributesSource extends AttributesEmbedShape {
 

@@ -3,10 +3,10 @@ package org.vadere.util.io;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vadere.geometry.GeometryUtils;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Geometry;
-import org.vadere.geometry.shapes.VPoint;
-import org.vadere.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  * Prints a {@link Geometry} or a double array in a MATLAB friendly format to

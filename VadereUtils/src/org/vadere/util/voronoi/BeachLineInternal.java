@@ -2,7 +2,7 @@ package org.vadere.util.voronoi;
 
 import java.util.List;
 
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
 /**

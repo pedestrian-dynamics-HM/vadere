@@ -8,7 +8,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
 import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 
