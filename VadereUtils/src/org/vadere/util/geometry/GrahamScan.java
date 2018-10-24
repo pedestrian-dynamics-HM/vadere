@@ -8,7 +8,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 
 /**
  *
- *         Use the pseudo code from http://en.wikipedia.org/wiki/Graham_scan
+ * Use the pseudo code from http://en.wikipedia.org/wiki/Graham_scan
  */
 public class GrahamScan {
 

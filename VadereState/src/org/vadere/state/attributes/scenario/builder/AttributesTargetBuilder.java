@@ -4,8 +4,6 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.util.geometry.shapes.VShape;
 
-import javax.xml.stream.events.Attribute;
-
 public final class AttributesTargetBuilder {
 	private int id = Attributes.ID_NOT_SET;
 	private boolean absorbing = true;

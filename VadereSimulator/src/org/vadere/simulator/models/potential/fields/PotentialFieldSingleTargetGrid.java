@@ -11,10 +11,10 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
 /**
  * A IPotentialTargetGrid, that creates for a single target the a floor field
@@ -22,35 +22,36 @@ import org.vadere.util.potential.calculators.EikonalSolver;
  *
  */
 @ModelClass
-public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget {
+public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 
-	private Topography topography;
-	private AttributesFloorField attributesFloorField;
-	private AttributesAgent attributesPedestrian;
-	private final int targetId;
-	private EikonalSolver eikonalSolver;
+    /**
+     * configuration of the potential fields.
+     */
+    private AttributesFloorField attributesFloorField;
+
+    /**
+     * configuration of the agents.
+     */
+    private AttributesAgent attributesPedestrian;
+
+    /**
+     * the id for which this potential field will be created.
+     */
+    private final int targetId;
 
 	public PotentialFieldSingleTargetGrid(final Topography topography,
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential,
 			final int targetId) {
-		super(topography);
+		super(topography, attributesPedestrian, attributesPotential);
 		this.attributesFloorField = attributesPotential;
-		this.topography = topography;
 		this.attributesPedestrian = attributesPedestrian;
 		this.targetId = targetId;
 	}
 
 	@Override
-	protected boolean isNeedsUpdate(double simTimeInSec) {
-		return needsUpdate() && Math.abs(lastUpdateTimestamp - simTimeInSec) > EPSILON_SIM_TIME;
-	}
-
-	@Override
 	public boolean needsUpdate() {
-		return (getPotentialFieldAndInitializer(targetId).isPresent()
-				&& getPotentialFieldAndInitializer(targetId).get().eikonalSolver.needsUpdate())
-				|| topography.containsTarget(t -> t.isMovingTarget() || t.isTargetPedestrian(), targetId);
+		return (getSolver(targetId).isPresent() && getSolver(targetId).get().needsUpdate());
 	}
 
 	@Override
@@ -58,27 +59,21 @@ public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget
 		throw new UnsupportedOperationException("method not jet implemented.");
 	}
 
-	@Override
+    @Override
 	public void preLoop(double simTimeInSec) {
-		if (!getPotentialFieldAndInitializer(targetId).isPresent()) {
+		if (!getSolver(targetId).isPresent()) {
 			List<Target> targets = topography.getTargets(targetId);
 			List<VShape> shapes = targets.stream().map(t -> t.getShape()).collect(Collectors.toList());
-			createNewPotentialFieldAndInitializer(targetId, shapes);
+			addEikonalSolver(targetId, shapes);
 		}
 	}
 
 	@Override
-	protected void createNewPotentialFieldAndInitializer(final int targetId, final List<VShape> shapes) {
+	protected void addEikonalSolver(final int targetId, final List<VShape> shapes) {
 		if (targetId == this.targetId) {
-			PotentialFieldAndInitializer potentialFieldAndInitializer = PotentialFieldAndInitializer.create(topography,
-					targetId, shapes, this.attributesPedestrian, this.attributesFloorField);
-			targetPotentialFields.put(targetId, potentialFieldAndInitializer);
-			eikonalSolver = potentialFieldAndInitializer.eikonalSolver;
+			EikonalSolver eikonalSolver = IPotentialField.create(topography, targetId, shapes, this.attributesPedestrian, this.attributesFloorField);
+			eikonalSolvers.put(targetId, eikonalSolver);
 		}
-	}
-
-	public EikonalSolver getEikonalSolver() {
-		return eikonalSolver;
 	}
 
 	@Override
@@ -88,6 +83,10 @@ public class PotentialFieldSingleTargetGrid extends AbstractPotentialFieldTarget
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
+	}
+
+	public EikonalSolver getEikonalSolver() {
+		return eikonalSolvers.get(targetId);
 	}
 
 }

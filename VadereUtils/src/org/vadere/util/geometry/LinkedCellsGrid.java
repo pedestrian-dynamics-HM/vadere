@@ -3,12 +3,9 @@ package org.vadere.util.geometry;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,7 +29,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	private int size;
 
 	/**
-	 * One cell in the grid. It contains a mapping from points to lists of
+	 * One cell in the grid. It triangleContains a mapping from points to lists of
 	 * objects. This means that one can store multiple objects in one cell.
 	 * 
 	 * 
@@ -141,9 +138,9 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 
 		// create grid
 		/*
-		 * this.gridSize = (int) Math.max(1,
-		 * Math.ceil(Math.max(width, height) / sideLength));
-		 * this.cellSize = Math.max(width, height) / gridSize;
+		 * this.gridSize = (int) Math.bound(1,
+		 * Math.ceil(Math.bound(width, height) / sideLength));
+		 * this.cellSize = Math.bound(width, height) / gridSize;
 		 * this.grid = generateGrid(gridSize, gridSize);
 		 */
 
@@ -288,7 +285,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	}
 
 	/**
-	 * Tests whether the linked cells grid contains an object that equals(the
+	 * Tests whether the linked cells grid triangleContains an object that equals(the
 	 * given object). The complexity of this operation is O(N), N = number of
 	 * objects in the grid.
 	 * 

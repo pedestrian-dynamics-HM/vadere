@@ -8,7 +8,7 @@ import java.util.Random;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -84,7 +84,7 @@ public class UtilsBHM {
 		}
 
 		if (Double.isNaN(x1) || Double.isNaN(y1) || Double.isNaN(x2) || Double.isNaN(y2)) {
-			logger.error("Could not compute tangential point at (" +
+			logger.error("Could not generate tangential point at (" +
 					pointOutside + ") with radius=" + radius + ".");
 		}
 
@@ -99,7 +99,7 @@ public class UtilsBHM {
 
 		List<VPoint> result = new ArrayList<VPoint>(2);
 
-		// compute new position on tangent line
+		// generate new position on tangent line
 		result.add(tangentialPoints.get(0).subtract(relativePosition));
 		result.add(tangentialPoints.get(1).subtract(relativePosition));
 

@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class PedestrianReynolds extends Pedestrian {

@@ -17,11 +17,12 @@
 <!-- modules -->
   <modules>
   	<!--  <module>./VadereExperiments</module>-->
-    <module>./VadereGui</module>
-    <module>./VadereSimulator</module>
-    <module>./VadereState</module>
-    <module>./VadereUtils</module>
-    <module>./VadereAnnotation</module>
+      <module>./VadereGui</module>
+      <module>./VadereSimulator</module>
+      <module>./VadereState</module>
+      <module>./VadereMeshing</module>
+      <module>./VadereUtils</module>
+      <module>./VadereAnnotation</module>
   </modules>
   
 <!-- global dependencies! -->
@@ -41,6 +42,7 @@
   		<artifactId>commons-math3</artifactId>
   		<version>3.6.1</version>
   	</dependency>
+      <!-- reading and writing csv-files -->
       <dependency>
       <groupId>net.sf.opencsv</groupId>
 	<artifactId>opencsv</artifactId>

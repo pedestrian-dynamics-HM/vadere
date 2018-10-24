@@ -2,7 +2,7 @@ package org.vadere.state.attributes.scenario.builder;
 
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesStairs;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VShape;
 
 public final class AttributesStairsBuilder {

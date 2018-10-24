@@ -7,11 +7,11 @@ import java.util.Map;
 import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.voronoi.RectangleLimits;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -67,13 +67,13 @@ public class TimeCostDensityVoronoi implements ITimeCostFunction {
 		this.voronoiDiagram = new VoronoiDiagram(new RectangleLimits(0, 0,
 				floor.getBounds().getWidth(), floor.getBounds().getHeight()));
 		this.measurementAreaRadius = 1.5;
-		this.voronoiAreas = new HashMap<Integer, Double>();
+		this.voronoiAreas = new HashMap<>();
 		this.scaleFactor = attributesPedestrian.getRadius() * 2
 				* attributesPedestrian.getRadius() * 2 * Math.sqrt(3) * 0.5;
 	}
 
 	@Override
-	public double costAt(VPoint p) {
+	public double costAt(final IPoint p) {
 		double density = 0.0;
 		int numberPedestriansInPolygon = 0;
 		double pedestrianSpaceSum = 0;
@@ -83,8 +83,8 @@ public class TimeCostDensityVoronoi implements ITimeCostFunction {
 		List<org.vadere.util.voronoi.Face> faces = null;
 
 		// the area
-		VRectangle measurementArea = new VRectangle(p.x - measurementAreaRadius
-				/ 2, p.y - measurementAreaRadius / 2, measurementAreaRadius,
+		VRectangle measurementArea = new VRectangle(p.getX() - measurementAreaRadius
+				/ 2, p.getY() - measurementAreaRadius / 2, measurementAreaRadius,
 				measurementAreaRadius);
 
 		// voronoiDiagram.computeVoronoiDiagram( pedBodies );

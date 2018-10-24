@@ -2,14 +2,10 @@ package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeEventDriven;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeParallel;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeSequential;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
@@ -20,8 +16,8 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.types.UpdateType;
-import org.vadere.util.geometry.Vector2D;
+;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -180,7 +176,7 @@ public class PedestrianOSM extends Pedestrian {
 		return desiredSpeed;
 	}
 
-	public double getPotential(VPoint newPos) {
+	public double getPotential(IPoint newPos) {
 
 		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
 

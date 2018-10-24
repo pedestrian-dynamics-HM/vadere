@@ -12,11 +12,11 @@ import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.UpdateType;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.OpenCLException;
-import org.vadere.util.potential.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
 import java.util.Random;
 

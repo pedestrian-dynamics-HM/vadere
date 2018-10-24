@@ -6,12 +6,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellState;
-import org.vadere.util.potential.PathFindingTag;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.PathFindingTag;
 import java.awt.*;
 import java.util.Collection;
 
@@ -48,7 +49,7 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 	}
 
 	@Override
-	public double getPotential(@NotNull VPoint pos, @Nullable Agent agent) {
+	public double getPotential(@NotNull IPoint pos, @Nullable Agent agent) {
 		return cellGrid.getInterpolatedValueAt(pos).getLeft();
 	}
 }

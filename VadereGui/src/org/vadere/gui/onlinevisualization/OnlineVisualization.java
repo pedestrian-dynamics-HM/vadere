@@ -116,7 +116,7 @@ public class OnlineVisualization implements PassiveCallback {
 
 		synchronized (model.getDataSynchronizer()) {
 			/* Push new snapshot of the observation area to the draw thread. */
-			IPotentialField pft = (model.config.isShowTargetPotentialField() && potentialFieldTarget != null) ? potentialFieldTarget.copyFields() : null;
+			IPotentialField pft = (model.config.isShowTargetPotentialField() && potentialFieldTarget != null) ? potentialFieldTarget.getSolution() : null;
 			IPotentialField pedPotentialField = null;
 			Agent selectedAgent = null;
 

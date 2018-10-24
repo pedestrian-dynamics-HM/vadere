@@ -30,10 +30,9 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.io.parser.JsonLogicParser;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.io.parser.VPredicate;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.data.cellgrid.CellGrid;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -146,6 +145,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	public void init(final Scenario vadere, final String projectPath) {
+		// avoid the long computation
+		this.hideTriangulation();
+		this.triangulationTriggered = false;
+
 		this.vadere = vadere;
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();
@@ -175,8 +178,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	@Override
-	public Function<VPoint, Double> getPotentialField() {
-        Function<VPoint, Double> f = p -> 0.0;
+	public Function<IPoint, Double> getPotentialField() {
+        Function<IPoint, Double> f = p -> 0.0;
         try {
             if (potentialContainer != null && step != null) {
                 final CellGrid potentialField = potentialContainer.getPotentialField(step.getStepNumber());

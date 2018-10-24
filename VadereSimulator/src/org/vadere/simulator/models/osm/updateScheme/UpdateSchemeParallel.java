@@ -15,8 +15,8 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.io.ListUtils;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.io.CollectionUtils;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
@@ -38,7 +38,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 		for (CallMethod callMethod : callMethods) {
 			futures = new LinkedList<>();
-			for (final PedestrianOSM pedestrian : ListUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
+			for (final PedestrianOSM pedestrian : CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
 				Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
 				futures.add(executorService.submit(worker));
 			}

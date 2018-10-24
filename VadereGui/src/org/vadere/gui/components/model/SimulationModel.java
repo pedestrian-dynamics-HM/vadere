@@ -1,13 +1,11 @@
 package org.vadere.gui.components.model;
 
 
-import java.awt.*;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.vadere.state.scenario.Agent;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -27,7 +25,7 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 
 	public abstract double getSimTimeInSec();
 
-	public abstract Function<VPoint, Double> getPotentialField();
+	public abstract Function<IPoint, Double> getPotentialField();
 
 	public abstract boolean isFloorFieldAvailable();
 

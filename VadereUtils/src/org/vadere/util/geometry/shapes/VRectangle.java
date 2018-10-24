@@ -1,9 +1,11 @@
 package org.vadere.util.geometry.shapes;
 
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
+import java.util.List;
 
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.ShapeType;
+import org.vadere.util.geometry.shapes.ShapeType;
 
 @SuppressWarnings("serial")
 /**
@@ -14,6 +16,11 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 
 	/**
 	 * The x and y define the corner of the rectangle with the smallest values.
+	 *
+	 * @param x x-coordinate of the lower-left corner
+	 * @param y y-coordinate of the lower-left corner
+	 * @param w the width of the rectangle
+	 * @param h the height of the rectangle
 	 */
 	public VRectangle(double x, double y, double w, double h) {
 		super(x, y, w, h);
@@ -33,7 +40,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public double distance(VPoint point) {
+	public double distance(IPoint point) {
 		VPoint closestPoint = closestPoint(point);
 
 		if (contains(point)) {
@@ -44,7 +51,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
+	public VPoint closestPoint(IPoint point) {
 		VLine[] lines = getLines();
 		VPoint result = GeometryUtils.closestToSegment(lines[0], point);
 		double distanceToLine = result.distance(point);
@@ -88,23 +95,23 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public boolean contains(VPoint point) {
-		return super.contains(point.x, point.y);
+	public boolean contains(IPoint point) {
+		return super.contains(point.getX(), point.getY());
 	}
 
 	@Override
-	public VShape translatePrecise(final VPoint vector) {
+	public VRectangle translatePrecise(final IPoint vector) {
 		VPoint dp = VPoint.addPrecise(vector, new VPoint(getX(), getY()));
 		return new VRectangle(dp.getX(), dp.getY(), getWidth(), getHeight());
 	}
 
 	@Override
-	public VRectangle translate(final VPoint vector) {
-		return new VRectangle(getX() + vector.x, getY() + vector.y, getWidth(), getHeight());
+	public VRectangle translate(final IPoint vector) {
+		return new VRectangle(getX() + vector.getX(), getY() + vector.getY(), getWidth(), getHeight());
 	}
 
 	@Override
-	public VShape scale(final double scalar) {
+	public VRectangle scale(final double scalar) {
 		return new VRectangle(getX() * scalar, getY() * scalar, getWidth() * scalar, getHeight() * scalar);
 	}
 
@@ -125,5 +132,27 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	@Override
 	public ShapeType getType() {
 		return ShapeType.RECTANGLE;
+	}
+
+	public VPolygon toPolygon() {
+		return new VPolygon(this);
+	}
+
+    @Override
+    public boolean intersects(final VShape shape) {
+        if(shape instanceof VRectangle){
+            return super.intersects(((VRectangle)shape));
+        }
+        else if(shape instanceof VPolygon) {
+            return ((VPolygon)shape).intersects(this);
+        }
+        else {
+            return VShape.super.intersects(shape);
+        }
+    }
+
+	@Override
+	public List<VPoint> getPath() {
+		return Arrays.asList(new VPoint(x,y), new VPoint(x+width, y), new VPoint(x+width, y+height), new VPoint(x, y+height));
 	}
 }

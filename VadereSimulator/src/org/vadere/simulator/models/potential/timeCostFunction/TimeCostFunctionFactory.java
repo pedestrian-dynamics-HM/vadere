@@ -8,8 +8,8 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
-import org.vadere.util.potential.timecost.UnitTimeCostFunction;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 
 /**
  * The TimeCostFunctionFactory creates the TimeCostFunctions with the currently

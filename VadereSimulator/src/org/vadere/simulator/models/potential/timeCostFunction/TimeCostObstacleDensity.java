@@ -3,8 +3,8 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.density.IGaussianFilter;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 
 /**
  * TimeCostObstacleDensity is a time cost function for the obstacle density that
@@ -57,9 +57,9 @@ public class TimeCostObstacleDensity implements ITimeCostFunction {
 	}
 
 	@Override
-	public double costAt(VPoint p) {
+	public double costAt(final IPoint p) {
 		double obstacleDensity = 0.0;
-		obstacleDensity = obstacleImageFilter.getFilteredValue(p.x, p.y);
+		obstacleDensity = obstacleImageFilter.getFilteredValue(p.getX(), p.getY());
 		if (obstacleDensity > highest) {
 			highest = obstacleDensity;
 			// logger.info("obstacle density: " + obstacleDensity);

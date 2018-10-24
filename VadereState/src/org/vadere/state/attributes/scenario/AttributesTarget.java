@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VShape;

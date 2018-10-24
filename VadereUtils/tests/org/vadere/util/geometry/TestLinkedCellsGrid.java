@@ -12,7 +12,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**

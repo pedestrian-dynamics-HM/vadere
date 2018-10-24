@@ -14,7 +14,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;

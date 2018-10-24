@@ -36,7 +36,6 @@ import static org.lwjgl.opencl.CL10.clCreateKernel;
 import static org.lwjgl.opencl.CL10.clCreateProgramWithSource;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
-import static org.lwjgl.opencl.CL10.clEnqueueWaitForEvents;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;

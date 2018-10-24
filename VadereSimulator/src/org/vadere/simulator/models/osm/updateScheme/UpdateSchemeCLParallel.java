@@ -8,7 +8,7 @@ import org.vadere.simulator.models.osm.opencl.CLOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.io.ListUtils;
+import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 	public void update(double timeStepInSec, double currentTimeInSec) {
 		try {
 			movedPedestrians.clear();
-			List<PedestrianOSM> pedestrianOSMList = ListUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
+			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 			// CallMethod.SEEK runs on the GPU
 
 			List<CLOptimalStepsModel.PedestrianOpenCL> pedestrians = new ArrayList<>();

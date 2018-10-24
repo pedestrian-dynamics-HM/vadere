@@ -4,7 +4,10 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.AttributeModifier;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -259,6 +262,10 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return obstacles.iterator();
 	}
 
+	public List<Obstacle> getObstacles() {
+		return obstacles;
+	}
+
 	public Iterator<Stairs> getStairsIterator() {
 		return stairs.iterator();
 	}
@@ -273,6 +280,11 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 	public Iterator<AgentWrapper> getPedestrianIterator() {
 		return pedestrians.iterator();
+	}
+
+	public void removeObstacleIf(@NotNull final Predicate<Obstacle> predicate) {
+		topographyElements.removeIf(scenarioElement -> scenarioElement instanceof Obstacle && predicate.test((Obstacle)scenarioElement));
+		obstacles.removeIf(predicate);
 	}
 
 	@Override

@@ -13,7 +13,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationConfig> {
@@ -185,8 +185,8 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	@Override
-	public Function<VPoint, Double> getPotentialField() {
-	    Function<VPoint, Double> f = pos -> 0.0;
+	public Function<IPoint, Double> getPotentialField() {
+	    Function<IPoint, Double> f = pos -> 0.0;
 
 	    if(potentialField != null && config.isShowPotentialField() && agent.equals(getSelectedElement())) {
 	    	f = pos -> potentialField.getPotential(pos, agent);

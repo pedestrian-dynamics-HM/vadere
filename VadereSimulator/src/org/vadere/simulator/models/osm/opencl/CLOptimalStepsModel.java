@@ -18,7 +18,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
-import org.vadere.util.potential.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

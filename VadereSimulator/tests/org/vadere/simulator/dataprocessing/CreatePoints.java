@@ -48,7 +48,7 @@ public class CreatePoints {
 	/**
 	 * Adds for each point in the list at most 6 new points around the point (hexagon pattern).
 	 * The hexagonAmbitRadius decides how big these the hexagon is. If a point already in the
-	 * list (with a distance tolerance of GeometryUtils.DOUBLE_EPS) it won't be added. You
+	 * list (with a distance tolerance of Utils.DOUBLE_EPS) it won't be added. You
 	 * can call this method multiple times to construct centered hexagons. If you start with
 	 * 1 Point you will receive 7 points than 19 and so on (see
 	 * http://en.wikipedia.org/wiki/Centered_hexagonal_number).

@@ -20,6 +20,7 @@ import org.vadere.gui.topographycreator.control.ActionCopyElement;
 import org.vadere.gui.topographycreator.control.ActionDeleteElement;
 import org.vadere.gui.topographycreator.control.ActionInsertCopiedElement;
 import org.vadere.gui.topographycreator.control.ActionMaximizeSize;
+import org.vadere.gui.topographycreator.control.ActionMergeObstacles;
 import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
 import org.vadere.gui.topographycreator.control.ActionQuickSaveTopography;
 import org.vadere.gui.topographycreator.control.ActionRedo;
@@ -155,6 +156,9 @@ public class TopographyWindow extends JPanel {
 				.getResource("/icons/undo_icon.png")), undoManager, basicAction);
 		Action redoAction = new ActionRedo("redo", new ImageIcon(Resources.class
 				.getResource("/icons/redo_icon.png")), undoManager, basicAction);
+
+		Action mergeObstaclesAction = new ActionMergeObstacles("mergeObstacles", new ImageIcon(Resources.class
+				.getResource("/icons/merge.png")), panelModel, undoSupport);
 
 		FormLayout layout = new FormLayout("2dlu, default:grow(0.75), 2dlu, default:grow(0.25), 2dlu", // col
 				"2dlu, default, 2dlu, default, 2dlu, default, 2dlu"); // rows
@@ -340,6 +344,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
 				stairsButton);
 		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, mergeObstaclesAction, "TopographyCreator.btnMergeObstacles.tooltip");
 		// addActionToToolbar(toolbar, scrollAction, "TopographyCreator.btnScroll.tooltip");
 		addActionToToolbar(toolbar, zoomInAction, "TopographyCreator.btnZoomIn.tooltip");
 		addActionToToolbar(toolbar, zoomOutAction, "TopographyCreator.btnZoomOut.tooltip");
@@ -352,6 +357,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
 		addActionToToolbar(toolbar, saveScenarioAction, "TopographyCreator.btnQuickSave.tooltip");
+
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");

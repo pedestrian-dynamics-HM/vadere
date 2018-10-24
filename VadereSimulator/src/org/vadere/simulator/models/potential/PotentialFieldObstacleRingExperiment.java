@@ -11,7 +11,8 @@ import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -57,7 +58,7 @@ public class PotentialFieldObstacleRingExperiment implements PotentialFieldObsta
 	}
 
 	@Override
-	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
+	public double getObstaclePotential(IPoint pos, Agent pedestrian) {
 		double potential = 0;
 
 		double distanceCenterToPoint = center.distance(pos);
