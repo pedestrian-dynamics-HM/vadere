@@ -2,20 +2,16 @@ package org.vadere.geometry.mesh;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 
-import java.util.List;
 import java.util.function.Predicate;
 
-import javax.swing.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Benedikt Zoennchen
@@ -49,40 +45,38 @@ public class TestMeshManipulations {
 	}
 
 	@Test
-	public void testRemoveFace() {
+	public void testRemoveSomeFacesByHoleCreation() {
+		int numberOfFaces = triangulation.getMesh().getNumberOfFaces();
 
+		// locate a face / triangle containing (4, 5)
+		PFace<VPoint> face = triangulation.locateFace(6, 6).get();
+
+		// merge faces until infinity, therefore consumes all faces!
+		Predicate<PFace<VPoint>> mergePredicate = f -> true;
+
+		int maxDept = 1;
+
+		// since max dept is equal to 1 we merge 4 (the face and its 3 neighbours) triangles into 1 polygon
+		assertTrue(triangulation.mergeFaces(face, mergePredicate, true, maxDept).isPresent());
+
+		// and therefore the number of faces decreases by 3!
+		assertEquals(numberOfFaces-3, triangulation.getMesh().getNumberOfFaces());
 	}
 
-	public static void main(String... args) {
-		TestMeshManipulations test = new TestMeshManipulations();
-		try {
-			test.setUp();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	@Test
+	public void testRemoveAllFaces() {
+		// locate a face / triangle containing (4, 5)
+		PFace<VPoint> face = triangulation.locateFace(4, 5).get();
 
-		/*test.triangulation.removeFace(test.triangulation.locateFace(3, 5).get(), true);
-		test.triangulation.removeFace(test.triangulation.locateFace(8, 3).get(), true);
-		test.triangulation.removeFace(test.triangulation.locateFace(4, 5).get(), true);
-		test.triangulation.removeFace(test.triangulation.locateFace(4, 9).get(), true);*/
+		// merge faces until infinity, therefore consumes all faces!
+		Predicate<PFace<VPoint>> shrinkCondition = f -> true;
 
-		PFace<VPoint> face = test.triangulation.locateFace(4, 5).get();
-		List<VPoint> points = test.triangulation.getMesh().getPoints(face);
-		VPoint incetner = GeometryUtils.getIncenter(points.get(0), points.get(1), points.get(2));
+		triangulation.shrinkBorder(shrinkCondition, true);
 
-		Predicate<PFace<VPoint>> mergePredicate = f -> {
-			List<VPoint> pList = test.triangulation.getMesh().getPoints(f);
-			VPoint icetner = GeometryUtils.getIncenter(pList.get(0), pList.get(1), pList.get(2));
-			return icetner.distance(incetner) < 500;
-		};
-
-		//Utils.getCentroid()
-		test.triangulation.createHole(test.triangulation.locateFace(4, 5).get(), mergePredicate, true);
-		//PFace<VPoint> face = ;
-		MeshPanel<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> panel = new MeshPanel<>(test.triangulation.getMesh(),
-				f -> test.triangulation.getMesh().isHole(f), 800, 800, test.bound);
-		JFrame frame = panel.display();
-		frame.setVisible(true);
-		panel.repaint();
+		assertEquals(0, triangulation.getMesh().getNumberOfFaces());
+		assertEquals(0, triangulation.getMesh().getNumberOfHoles());
+		assertEquals(0, triangulation.getMesh().getNumberOfVertices());
+		triangulation.getMesh().garbageCollection();
+		assertEquals(0, triangulation.getMesh().getNumberOfEdges());
 	}
 }

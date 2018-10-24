@@ -397,6 +397,11 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
+	public int getNumberOfHoles() {
+		return numberOfHoles;
+	}
+
+	@Override
 	public boolean tryLock(@NotNull AVertex<P> vertex) {
 		return vertex.getLock().tryLock();
 	}

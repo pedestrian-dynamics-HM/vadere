@@ -303,7 +303,8 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param face                      face one
 	 * @param otherFace                 face two
 	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
-	 * @return the remaining face (which might be face or otherFace)
+	 * @return  (optional) the remaining face (which might be face or otherFace)
+	 *          or empty if both edges share no common edge and therefore nothing changes
 	 */
 	default Optional<F> removeEdges(@NotNull final F face, @NotNull F otherFace, final boolean deleteIsolatedVertices) {
 		// TODO: test it!
@@ -325,7 +326,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		}
 
 		final F finalFace = delFace;
-		List<E> toDeleteEdges = getMesh().streamEdges(remFace).filter(e -> getMesh().getTwinFace(e).equals(finalFace)).collect(Collectors.toList());
+		List<E> toDeleteEdges = getMesh().getEdges(remFace).stream().filter(e -> getMesh().getTwinFace(e).equals(finalFace)).collect(Collectors.toList());
+
+		assert getMesh().getEdges(remFace).size() > toDeleteEdges.size() : "can not remove all of the edges, since this could lead to an invalid mesh";
+
 		//List<E> survivalEdges = getMesh().streamEdges(remFace).filter(e -> !getMesh().getTwinFace(e).equals(finalFace)).collect(Collectors.toList());
 
 		// face and otherFace share no common edge.
@@ -396,11 +400,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		}
 
 		getMesh().destroyFace(delFace);
-
 		return Optional.of(remFace);
 	}
 
-	// TODO: improve performance by remembering faces
 	/**
 	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
 	 * the mergeCondition does no longer hold. This requires in the worst case O(n), where n is the number
@@ -414,14 +416,38 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 *
 	 * @return the merge result i.e. the resulting face.
 	 */
-	default F mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices) {
+	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices) {
+		return mergeFaces(face, mergeCondition, deleteIsolatedVertices, -1);
+	}
+
+	// TODO: improve performance by remembering faces
+	/**
+	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
+	 * the mergeCondition does no longer hold or the maximal dept is reached.
+	 * This requires in the worst case O(n), where n is the number of edges of all involved faces
+	 * (i.e. the face and the merged faces).</p>
+	 *
+	 * <p>Changes the connectivity.</p>
+	 *
+	 * @param face                      the face
+	 * @param mergeCondition            the merge condition
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
+	 * @param maxDept                   the maximum dept / neighbouring distance at which faces can be removed
+	 *
+	 * @return the merge result i.e. the resulting face.
+	 */
+	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices, final int maxDept) {
 		boolean modified = true;
 		F currentFace = face;
+		int dept = 0;
 
 		while (modified) {
 			modified = false;
-
+			dept++;
 			List<F> neighbouringFaces = getMesh().getFaces(currentFace);
+
+			assert neighbouringFaces.isEmpty() || neighbouringFaces.stream().anyMatch(f -> !f.equals(neighbouringFaces.get(0))) : "each edge of both faces is a link to the other face";
+
 			for(F neighbouringFace : neighbouringFaces) {
 				// the face might be destroyed by an operation before
 				if(!getMesh().isDestroyed(neighbouringFace) && mergeCondition.test(neighbouringFace)) {
@@ -431,11 +457,25 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 						modified = true;
 						currentFace = optionalMergeResult.get();
 					}
+					else {
+						if(getMesh().isDestroyed(currentFace)) {
+							return Optional.empty();
+						}
+					}
+				}
+			}
+
+			if(maxDept > 0 && dept >= maxDept) {
+				if(getMesh().isDestroyed(currentFace)) {
+					return Optional.empty();
+				}
+				else {
+					return Optional.of(currentFace);
 				}
 			}
 		}
 
-		return currentFace;
+		return Optional.of(currentFace);
 	}
 
 	/**
@@ -447,16 +487,20 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param face                      they face which will be transformed into a hole
 	 * @param mergeCondition            the merge condition
 	 * @param deleteIsoletedVertices    if true isolated vertices, i.e. vertices without any edges, will be removed from the mesh
-	 * @return the hole or face itself it the face does not fulfill the merge condition
+	 * @return  (optional) the hole or face itself it the face does not fulfill the merge condition
+	 *          or empty if due to the creation of the hole all faces will be removed!
 	 */
-	default F createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
+	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
 		if(mergeCondition.test(face)) {
-			F remainingFace = mergeFaces(face, mergeCondition, deleteIsoletedVertices);
-			getMesh().toHole(remainingFace);
+			Optional<F> remainingFace = mergeFaces(face, mergeCondition, deleteIsoletedVertices);
+			if(remainingFace.isPresent()) {
+				getMesh().toHole(remainingFace.get());
+			}
+
 			return remainingFace;
 		}
 		else {
-			return face;
+			return Optional.of(face);
 		}
 	}
 
@@ -959,10 +1003,24 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				// no such candidate was found. This can happen if an island will be deleted.
 				if(twinFace.equals(face)) {
 					log.warn("no boundary candidate was found, we search through all edges of the mesh.");
-					boundaryEdge = getMesh().streamEdges()
+					Optional<E> optBoundaryEdge = getMesh().streamEdges()
 							.filter(e -> getMesh().getFace(e).equals(boundary))
 							.filter(e -> !getMesh().getTwinFace(e).equals(face))
-							.findAny().get();
+							.findAny();
+
+					if(!optBoundaryEdge.isPresent()) {
+						if(getMesh().getEdges(boundary).size() == delEdges.size()) {
+							log.warn(face + " is the last remaining face which will be deletes as well, therefore the mesh will be emoty!");
+							assert getMesh().getNumberOfFaces() == 1;
+							getMesh().clear();
+							return;
+						}
+						else {
+
+						}
+					} else {
+						boundaryEdge = optBoundaryEdge.get();
+					}
 				}
 
 				getMesh().setFace(boundaryEdge, boundary);

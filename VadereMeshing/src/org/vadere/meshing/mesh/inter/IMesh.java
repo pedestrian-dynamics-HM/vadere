@@ -1645,11 +1645,18 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	int getNumberOfVertices();
 
 	/**
-	 * Returns the number of alive faces in O(1).
+	 * Returns the number of alive interior faces in O(1), i.e. holes and the border are excluded.
 	 *
 	 * @return the number of alive faces
 	 */
 	int getNumberOfFaces();
+
+	/**
+	 * Returns the number of alive holes in O(1).
+	 *
+	 * @return the number of alive faces
+	 */
+	int getNumberOfHoles();
 
 	/**
 	 * Returns the number of alive edges in O(1).

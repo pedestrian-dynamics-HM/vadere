@@ -415,6 +415,10 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 
 	@Override
 	public E insert(P point) {
+		if(!initialized) {
+			init();
+		}
+
 		if(contains(point)) {
 			F face = this.pointLocator.locatePoint(point);
 			return insert(point, face);

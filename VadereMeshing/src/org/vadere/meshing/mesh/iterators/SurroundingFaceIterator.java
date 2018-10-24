@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.iterators;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -22,7 +23,8 @@ public class SurroundingFaceIterator<P extends IPoint, V extends IVertex<P>, E e
 	private EdgeIterator<P, V, E, F> edgeIterator;
 	private IMesh<P, V, E, F> mesh;
 
-	public SurroundingFaceIterator(final IMesh<P, V, E, F> mesh, final F face) {
+	public SurroundingFaceIterator(@NotNull final IMesh<P, V, E, F> mesh, @NotNull final F face) {
+		assert mesh.isAlive(face);
 		this.mesh = mesh;
 		this.edgeIterator = new EdgeIterator<>(mesh, face);
 	}

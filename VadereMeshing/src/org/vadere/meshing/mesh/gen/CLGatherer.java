@@ -280,7 +280,7 @@ public class CLGatherer {
 	 *     <li>the index of the face of the half-edge or -1 if there is no face, i.e. the half-edge is a boundary edge</li>
 	 *     <li>the index of the face of the twin of the half-edge or - if thre is no face, i.e. the half-edge is a boundary edge</li>
 	 * </ol>
-	 * to the heap memory {@link IntBuffer} in order of the mesh-ordering of {@link AMesh}.</p>
+	 * to the heap memory {@link IntBuffer} in order of the mesh-ordering of {@link AMesh}.
 	 *
 	 * @param mesh  the mesh from which the boundary information is received
 	 * @param <P>   the type of the points (containers)
