@@ -21,6 +21,25 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface IDistanceFunction extends Function<IPoint, Double> {
 
+	static IDistanceFunction createRing(final double xCenter, final double yCenter, final double innerRadius, final double outerRadius) {
+		final double x1 = (outerRadius + innerRadius) / 2.0;
+		final double x2 = (outerRadius - innerRadius) / 2.0;
+		return p -> {
+			double dx = p.getX() - xCenter;
+			double dy = p.getY() - yCenter;
+			double len = Math.sqrt(dx * dx + dy * dy);
+			return Math.abs(len - x1) - x2;
+		};
+	}
+
+	static IDistanceFunction createDisc(final double xCenter, final double yCenter, final double radius) {
+		return p -> {
+			double dx = p.getX() - xCenter;
+			double dy = p.getY() - yCenter;
+			return Math.sqrt(dx * dx + dy * dy) - radius;
+		};
+	}
+
 	static IDistanceFunction create(final VRectangle regionBoundingBox, final Collection<? extends VShape> obstacles) {
 		return new DistanceFunction(regionBoundingBox, obstacles);
 	}
@@ -39,6 +58,10 @@ public interface IDistanceFunction extends Function<IPoint, Double> {
 
 	static IDistanceFunction intersect(final IDistanceFunction dist1, final IDistanceFunction dist2) {
 		return p -> Math.max(dist1.apply(p), dist2.apply(p));
+	}
+
+	static IDistanceFunction substract(final IDistanceFunction dist1, final IDistanceFunction dist2) {
+		return p -> Math.max(dist1.apply(p), -dist2.apply(p));
 	}
 
 	default double doDDiff(double d1, double d2)

@@ -28,6 +28,7 @@ import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +57,6 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	private boolean profiling = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
-	private final Collection<? extends VShape> obstacleShapes;
 	private List<V> collapseVertices;
 	private List<E> splitEdges;
 
@@ -76,7 +76,6 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 		this.edgeLengthFunc = edgeLengthFunc;
 		this.initialEdgeLen =initialEdgeLen;
 		this.deps = 0.00001 * initialEdgeLen;
-		this.obstacleShapes = obstacleShapes;
 		this.nSteps = 0;
 		this.collapseVertices = new ArrayList<>();
 		this.splitEdges = new ArrayList<>();
@@ -95,6 +94,15 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
         log.info("##### (end) generate a triangulation #####");
 	}
 
+	public EikMesh(
+			final IDistanceFunction distanceFunc,
+			final IEdgeLengthFunction edgeLengthFunc,
+			final double initialEdgeLen,
+			final VRectangle bound,
+			final IMeshSupplier<P, V, E, F> meshSupplier) {
+		this(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, Collections.EMPTY_LIST, meshSupplier);
+	}
+
 	public EikMesh(final VPolygon boundary,
 	               final double initialEdgeLen,
 	               final Collection<? extends VShape> obstacleShapes,
@@ -107,7 +115,6 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 		this.edgeLengthFunc = p -> 1.0;
 		this.initialEdgeLen =initialEdgeLen;
 		this.deps = 0.00001 * initialEdgeLen;
-		this.obstacleShapes = obstacleShapes;
 		this.nSteps = 0;
 		this.collapseVertices = new ArrayList<>();
 		this.splitEdges = new ArrayList<>();

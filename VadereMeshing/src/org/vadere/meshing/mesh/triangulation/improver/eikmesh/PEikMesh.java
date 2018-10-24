@@ -30,6 +30,25 @@ public class PEikMesh extends EikMesh<EikMeshPoint, PVertex<EikMeshPoint>, PHalf
     }
 
 	public PEikMesh(
+			@NotNull IDistanceFunction distanceFunc,
+			@NotNull IEdgeLengthFunction edgeLengthFunc,
+			double initialEdgeLen,
+			@NotNull VRectangle bound) {
+
+		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound,
+				() -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+	}
+
+	public PEikMesh(
+			@NotNull IDistanceFunction distanceFunc,
+			double initialEdgeLen,
+			@NotNull VRectangle bound) {
+
+		super(distanceFunc, e -> 1.0, initialEdgeLen, bound,
+				() -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+	}
+
+	public PEikMesh(
 			@NotNull VPolygon polygon,
 			double initialEdgeLen,
 			@NotNull Collection<? extends VShape> obstacleShapes) {

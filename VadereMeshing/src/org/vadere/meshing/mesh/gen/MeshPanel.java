@@ -204,10 +204,14 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	public JFrame display() {
+		return display("Mesh");
+	}
+
+	public JFrame display(final String title) {
 		JFrame jFrame = new JFrame();
 		jFrame.setSize((int)width+10, (int)height+10);
 		jFrame.add(this);
-		jFrame.setTitle("Mesh");
+		jFrame.setTitle(title);
 		jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
 		jFrame.setVisible(true);
