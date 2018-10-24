@@ -1,5 +1,6 @@
 package org.vadere.simulator.control;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.util.GroupSpawnArray;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
@@ -9,7 +10,11 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class GroupSourceController extends SourceController {
+
+	private static final int NUMBER_OF_REPOSITION_TRIES = 20;
 
 	private final GroupModel groupModel;
 	private LinkedList<Integer> groupsToSpawn;
@@ -51,7 +58,7 @@ public class GroupSourceController extends SourceController {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
-							List<VPoint> newGroup = spawnArray.getNextFreeGroup(
+							List<VPoint> newGroup = getRealRandomPositions(
 									groupSize,
 									random,
 									getDynElementsAtSource().stream()
@@ -136,6 +143,72 @@ public class GroupSourceController extends SourceController {
 
 			}
 		}
+	}
+
+
+	/**
+	 * Computes random positions for ONE group  based on the blockPedestrianShapes which contains
+	 * the shapes representing the required space for the specified group size. For each required
+	 * position the algorithms tries {@link GroupSourceController#NUMBER_OF_REPOSITION_TRIES} times
+	 * to get a feasible free position for this group.
+	 *
+	 * @param groupSize             size of group to spawn at a random positions
+	 * @param random                random generator
+	 * @param blockPedestrianShapes the required space of other pedestrians
+	 * @return list of Points representing the group members or an empty list if group cannot be
+	 * placed after {@link GroupSourceController#NUMBER_OF_REPOSITION_TRIES} of tries.
+	 */
+	private List<VPoint> getRealRandomPositions(final int groupSize, @NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes) {
+		List<VPoint> randomPositions = new ArrayList<>(groupSize);
+
+		List<VPoint> defaultPoints = spawnArray.getDefaultGroup(groupSize);
+		for (int i = 0; i < NUMBER_OF_REPOSITION_TRIES; i++) {
+			randomPositions = moveRandomInSourceBound(defaultPoints, random);
+			boolean groupValid = randomPositions.stream()
+					.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+					.allMatch(candidateShape ->
+							source.getShape().containsShape(candidateShape) &&
+									testFreeSpace(candidateShape, blockPedestrianShapes));
+			if (groupValid) {
+				return randomPositions;
+			}
+		}
+
+		return new ArrayList<>();
+	}
+
+	/**
+	 * @param points default points of group members. First allowed position if the spawn would be
+	 *               based on the spawn grid.
+	 * @param random random object
+	 * @return transformed set of points based on a random translation and rotation within the
+	 * bound of the source
+	 */
+	private List<VPoint> moveRandomInSourceBound(List<VPoint> points, @NotNull final Random random) {
+		Rectangle2D bound = source.getShape().getBounds2D();
+		double angle = random.nextDouble() * 2 * Math.PI;
+		VPoint p0 = points.get(0);
+		double dxBound = (bound.getX() - p0.getX());
+		double dyBound = (bound.getY() - p0.getY());
+		double dxRnd = random.nextDouble() * (bound.getMaxX() - bound.getX());
+		double dyRnd = random.nextDouble() * (bound.getMaxY() - bound.getY());
+		AffineTransform at0 = new AffineTransform();
+		at0.setToTranslation(dxBound, dyBound);
+		AffineTransform at1 = new AffineTransform();
+		at1.setToRotation(angle, bound.getX(), bound.getY());
+		AffineTransform at2 = new AffineTransform();
+		at2.setToTranslation(dxRnd, dyRnd);
+
+		List<VPoint> ret = new ArrayList<>();
+
+		points.stream().map(VPoint::asPoint2D).forEach(p -> {
+					at0.transform(p, p);
+					at1.transform(p, p);
+					at2.transform(p, p);
+					ret.add(new VPoint(p));
+				}
+		);
+		return ret;
 	}
 
 	private void addElementToScenario(List<VPoint> group) {

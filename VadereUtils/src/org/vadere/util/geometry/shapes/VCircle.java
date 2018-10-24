@@ -257,12 +257,19 @@ public class VCircle implements VShape, ICircleSector {
 
 	@Override
 	public boolean intersects(VShape shape) {
-		if(shape instanceof VCircle) {
-			VCircle otherCircle = (VCircle)shape;
+		if (shape instanceof VCircle) {
+			VCircle otherCircle = (VCircle) shape;
 			return otherCircle.getCenter().distance(this.getCenter()) < (otherCircle.getRadius() + this.getRadius());
-		}
-		else {
+		} else {
 			return VShape.super.intersects(shape);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "VCircle{" +
+				"center=" + center +
+				", radius=" + radius +
+				'}';
 	}
 }

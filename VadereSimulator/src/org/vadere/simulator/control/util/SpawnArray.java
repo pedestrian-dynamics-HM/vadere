@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 public class SpawnArray {
 	private static Logger logger = LogManager.getLogger(SpawnArray.class);
+	private static double SPAWN_BUFFER = 0.001;
 
 	protected final VRectangle spawnElementBound;
 	protected final VRectangle bound;
@@ -49,8 +50,8 @@ public class SpawnArray {
 
 			allowedSpawnPoints = new ArrayList<>(xDim * yDim);
 			//offset left upper corner to center point.
-			eX = (xDim == 1) ? bound.getCenterX() : spawnElementBound.x + spawnElementBound.width / 2;
-			eY = (yDim == 1) ? bound.getCenterY() : spawnElementBound.y + spawnElementBound.height / 2;
+			eX = (xDim == 1) ? bound.getCenterX() : spawnElementBound.x + spawnElementBound.width / 2 + SPAWN_BUFFER;
+			eY = (yDim == 1) ? bound.getCenterY() : spawnElementBound.y + spawnElementBound.height / 2 + SPAWN_BUFFER;
 			logger.info(String.format(
 					"Dimension of Source is to small for at least one dimension to contain designated spawnElement with Bound (%.2f x %.2f) Set to (%d x %d)",
 					spawnElementBound.width, spawnElementBound.height, xDim, yDim));
@@ -58,8 +59,8 @@ public class SpawnArray {
 		} else {
 			allowedSpawnPoints = new ArrayList<>(xDim * yDim);
 			//offset left upper corner to center point.
-			eX = spawnElementBound.x + spawnElementBound.width / 2;
-			eY = spawnElementBound.y + spawnElementBound.height / 2;
+			eX = spawnElementBound.x + spawnElementBound.width / 2 + SPAWN_BUFFER;
+			eY = spawnElementBound.y + spawnElementBound.height / 2 + SPAWN_BUFFER;
 		}
 
 		firstSpawnPoint = new VPoint(bound.x + eX, bound.y + eY);

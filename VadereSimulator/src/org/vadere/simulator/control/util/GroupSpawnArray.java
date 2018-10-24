@@ -85,6 +85,17 @@ public class GroupSpawnArray extends SpawnArray {
 	}
 
 	// Groups
+	public List<VPoint> getDefaultGroup(int groupSize) {
+		GroupPlacementHelper pHelper = getHelper(groupSize);
+		int firstValidIndex = pHelper.getValidSpawnPointsForGroupInBound().get(0);
+		List<VPoint> points = new ArrayList<>();
+		for (int i = 0; i < groupSize; i++) {
+			int index = validSpawnPointMapInBoundShape.get(pHelper.getOverlappingIndex(firstValidIndex, i));
+			VPoint candidatePoint = allowedSpawnPoints.get(index).clone();
+			points.add(candidatePoint);
+		}
+		return points;
+	}
 
 	@Deprecated
 	public LinkedList<VPoint> getNextGroup(int groupSize, @NotNull final List<VShape> blockPedestrianShapes) {
@@ -159,7 +170,6 @@ public class GroupSpawnArray extends SpawnArray {
 		}
 		return points;
 	}
-
 
 	private GroupPlacementHelper getHelper(int groupSize) {
 		GroupPlacementHelper pHelper;

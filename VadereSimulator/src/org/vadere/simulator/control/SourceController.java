@@ -13,10 +13,10 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -64,15 +64,16 @@ public abstract class SourceController {
 		}
 	}
 
+	/**
+	 * @return List of DynamicElements within a circle, which surrounds the source shape completely
+	 */
 	protected List<DynamicElement> getDynElementsAtSource() {
-		Rectangle2D rec = source.getShape().getBounds2D();
-		double maxDim = rec.getWidth() > rec.getHeight() ? rec.getWidth() : rec.getHeight();
-		return getDynElementsAtPosition(source.getShape().getCentroid(), maxDim / 2);
+		return getDynElementsAtPosition(source.getShape().getCircumCircle());
 	}
 
-	protected List<DynamicElement> getDynElementsAtPosition(VPoint sourcePosition, double radius) {
+	protected List<DynamicElement> getDynElementsAtPosition(VCircle circumCircle) {
 		LinkedCellsGrid<DynamicElement> dynElements = topography.getSpatialMap(DynamicElement.class);
-		return dynElements.getObjects(sourcePosition, radius);
+		return dynElements.getObjects(circumCircle.getCenter(), circumCircle.getRadius());
 	}
 
 	abstract public void update(double simTimeInSec);

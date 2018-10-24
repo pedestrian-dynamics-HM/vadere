@@ -8,8 +8,6 @@ import org.vadere.util.geometry.GeometryUtils;
 
 /**
  * Immutable point.
- * 
- * 
  */
 public class VPoint implements Cloneable {
 
@@ -18,7 +16,8 @@ public class VPoint implements Cloneable {
 	public double x;
 	public double y;
 
-	public VPoint() {}
+	public VPoint() {
+	}
 
 	public VPoint(double x, double y) {
 		this.x = x;
@@ -187,5 +186,9 @@ public class VPoint implements Cloneable {
 
 	public double distanceToOrigin() {
 		return Math.sqrt(x * x + y * y);
+	}
+
+	public Point2D.Double asPoint2D() {
+		return new Point2D.Double(x, y);
 	}
 }
