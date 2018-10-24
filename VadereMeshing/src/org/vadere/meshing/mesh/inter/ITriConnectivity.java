@@ -5,10 +5,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
+import org.vadere.meshing.utils.debug.DebugGui;
+import org.vadere.meshing.utils.debug.SimpleTriCanvas;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.awt.*;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -1452,12 +1455,6 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 					 */
 					V v = getMesh().streamVertices(face).min(Comparator.comparingDouble(p::distance)).get();
 
-					/*SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
-					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
-					if(DebugGui.isDebugOn()) {
-						DebugGui.showAndWait(canvas);
-					}*/
-
 					/**
 					 * Get the face with the centroid closest to p and which was not visited already.
 					 */
@@ -1465,6 +1462,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 							.filter(f -> !getMesh().isBorder(f))
 							.filter(f -> !visitedFaces.contains(f))
 							.min(Comparator.comparingDouble(f -> p.distance(getMesh().toPolygon(f).getCentroid())));
+
+					SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+					DebugGui.setDebugOn(true);
+					if(DebugGui.isDebugOn() &&  !closestFace.isPresent()) {
+						DebugGui.showAndWait(canvas);
+					}
 
 					assert closestFace.isPresent() : visitedFaces.size();
 					return closestFace;

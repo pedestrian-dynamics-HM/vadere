@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
-import org.vadere.tests.util.reflection.ReflectionHelper;
+import org.vadere.simulator.utils.reflection.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
@@ -35,7 +36,7 @@ public class TestFFMUniformTriangulation {
     private IIncrementalTriangulation<IPotentialPoint, PVertex<IPotentialPoint>, PHalfEdge<IPotentialPoint>, PFace<IPotentialPoint>> uniformTriangulation;
     private int width = 10;
     private int height = 10;
-    private double minTriangleSideLength = 0.4;
+    private double minTriangleSideLength = 1.0;
 
     @Before
     public void setUp() throws Exception {
@@ -55,6 +56,14 @@ public class TestFFMUniformTriangulation {
         targetPoints.add(new EikMeshPoint(5,5, false));
         //EikonalSolver solver = new EikonalSolverFMMAcuteTriangulation(targetPoints, new UnitTimeCostFunction(), uniformTriangulation);
 
+		/*MeshPanel panel = new MeshPanel(uniformTriangulation.getMesh(), 500, 500, new VRectangle(0, 0, width, height));
+		panel.display();
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}*/
         EikonalSolver solver = new EikonalSolverFMMTriangulation(new UnitTimeCostFunction(), targetPoints, uniformTriangulation);
         log.info("start FFM");
         solver.initialize();

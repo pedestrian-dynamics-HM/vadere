@@ -1,4 +1,4 @@
-package org.vadere.tests.util.reflection;
+package org.vadere.simulator.utils.reflection;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -11,7 +11,6 @@ import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jolttranformation.JsonNodeExplorer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.StringJoiner;
 
 import static org.hamcrest.CoreMatchers.not;

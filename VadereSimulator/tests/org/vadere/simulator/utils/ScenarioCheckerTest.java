@@ -17,7 +17,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.tests.util.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;

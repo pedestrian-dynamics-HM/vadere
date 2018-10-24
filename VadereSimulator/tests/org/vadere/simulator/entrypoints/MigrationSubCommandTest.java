@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.vadere.simulator.entrypoints.cmd.SubCommand;
 import org.vadere.simulator.entrypoints.cmd.VadereConsole;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
-import org.vadere.tests.util.reflection.TestJsonNodeExplorer;
-import org.vadere.tests.util.reflection.TestJsonNodeHelper;
-import org.vadere.tests.util.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
+import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

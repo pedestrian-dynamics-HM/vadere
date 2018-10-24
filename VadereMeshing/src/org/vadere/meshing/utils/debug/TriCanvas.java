@@ -36,9 +36,9 @@ public abstract class TriCanvas
 		extends Canvas {
 
 	static final Logger log = LogManager.getLogger(TriCanvas.class);
-	static final VRectangle defaultBound = new VRectangle(-11, -11, 11, 11);
-	static final int defaultWidth = 1200;
-	static final int defaultHeight = 920;
+	static final VRectangle defaultBound = new VRectangle(0,0,10,10);
+	static final int defaultWidth = 500;
+	static final int defaultHeight = 500;
 
 	protected final IMesh<P, V, E, F> mesh;
 	public double width;

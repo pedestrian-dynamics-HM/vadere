@@ -1,4 +1,4 @@
-package org.vadere.tests.util.reflection;
+package org.vadere.simulator.utils.reflection;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
