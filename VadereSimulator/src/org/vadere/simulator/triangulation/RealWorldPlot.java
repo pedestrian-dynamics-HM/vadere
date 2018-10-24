@@ -23,7 +23,7 @@ import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 
 import java.io.IOException;
 import java.util.Collection;

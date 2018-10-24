@@ -11,7 +11,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 
 import java.util.ArrayList;
 import java.util.List;

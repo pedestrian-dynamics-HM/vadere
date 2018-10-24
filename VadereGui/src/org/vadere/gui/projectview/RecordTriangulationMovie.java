@@ -15,7 +15,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.AEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 
 import java.awt.*;
 import java.io.IOException;

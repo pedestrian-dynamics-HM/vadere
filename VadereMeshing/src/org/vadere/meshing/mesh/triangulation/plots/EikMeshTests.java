@@ -8,7 +8,7 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.math.IDistanceFunction;

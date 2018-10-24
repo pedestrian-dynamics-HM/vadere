@@ -33,7 +33,7 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

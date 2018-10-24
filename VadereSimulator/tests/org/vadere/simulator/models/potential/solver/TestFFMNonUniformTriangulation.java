@@ -13,7 +13,7 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;

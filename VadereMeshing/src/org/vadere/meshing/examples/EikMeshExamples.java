@@ -1,13 +1,16 @@
 package org.vadere.meshing.examples;
 
+import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -17,20 +20,20 @@ import org.vadere.util.math.IDistanceFunction;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
-
 /**
- * Shows a very basic example how {@link org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh} can be used
+ * Shows a very basic example how {@link EikMesh} can be used
  * to mesh a simple geometry.
  */
 public class EikMeshExamples {
 
 	public static void main(String... args) {
+		uniformMeshShapes();
 		uniformMeshDiscFunction();
 		uniformMeshRingFunction();
 		combineDistanceFunctions();
 		edgeLengthFunction();
 		edgeLengthAndDistanceFunction();
+		userDefinedPoints();
 	}
 
 	/**
@@ -245,4 +248,62 @@ public class EikMeshExamples {
 		meshPanel.display("Distance dependent edge lengths");
 	}
 
+	/**
+	 * This example is equal to {@link EikMeshExamples#edgeLengthAndDistanceFunction} but here we show how the user
+	 * can introduce new data types. The user might want to define a new type of container / point to work with.
+	 * This is easy to do due to the generic implementation of the meshing data structures and algorithms.
+	 * First of all, new data type has to extends {@link EikMeshPoint}! Secondly, since the algorithm creates new points
+	 * of an unknown data type to this implementation, it requires the information how such points can be created,
+	 * i.e. it requires a {@link IPointConstructor} of points defined by the user. That is all!
+	 */
+	public static void userDefinedPoints() {
+
+		/**
+		 * Some user defined
+		 */
+		class MyPoint extends EikMeshPoint {
+
+			private double value;
+
+			public MyPoint(double x, double y, boolean fixPoint) {
+				super(x, y, fixPoint);
+				this.value = 0;
+			}
+		}
+
+		// define a bounding box
+		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
+
+		// distance function that defines a ring with inner-radius 0.2 and outer-radius 1 at (1,1).
+		IDistanceFunction ringDistance = IDistanceFunction.createRing(1, 1, 0.2, 1.0);
+
+		final double factor = 6.0;
+		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + factor * Math.abs(ringDistance.apply(p));
+
+		// define the EikMesh-Improver
+		double edgeLength = 0.05;
+
+		// define your point constructor which will be used during the algorithm to create new points.
+		IPointConstructor<MyPoint> pointConstructor = (x, y) -> new MyPoint(x, y, false);
+
+		// like before but we have to add the point-constructor to the constructor of EikMesh and we use
+		// the more generic type PEikMeshGen instead of PEikMes!
+		PEikMeshGen<MyPoint> meshImprover = new PEikMeshGen<>(
+				ringDistance,
+				edgeLengthFunction,
+				edgeLength,
+				bound,
+				pointConstructor);
+
+		// (optional) define the gui to display the mesh
+		MeshPanel<MyPoint, PVertex<MyPoint>, PHalfEdge<MyPoint>, PFace<MyPoint>> meshPanel = new MeshPanel<>(
+				meshImprover.getMesh(), 1000, 800,
+				bound);
+
+		// generate the mesh
+		meshImprover.generate();
+
+		// display the mesh
+		meshPanel.display("Distance dependent edge lengths");
+	}
 }

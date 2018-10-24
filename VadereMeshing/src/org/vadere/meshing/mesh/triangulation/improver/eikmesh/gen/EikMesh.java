@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.improver.eikmesh;
+package org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -11,6 +11,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 import org.vadere.util.geometry.GeometryUtils;

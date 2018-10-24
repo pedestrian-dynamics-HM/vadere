@@ -1,10 +1,13 @@
-package org.vadere.meshing.mesh.triangulation.improver.eikmesh;
+package org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.AEikMeshGen;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -16,7 +19,7 @@ import java.util.Collection;
 /**
  * @author Benedikt Zoennchen
  */
-public class AEikMesh extends EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> {
+public class AEikMesh extends AEikMeshGen<EikMeshPoint> {
     public AEikMesh(
             @NotNull IDistanceFunction distanceFunc,
             @NotNull IEdgeLengthFunction edgeLengthFunc,
@@ -24,7 +27,7 @@ public class AEikMesh extends EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalf
             @NotNull VRectangle bound,
             @NotNull Collection<? extends VShape> obstacleShapes) {
         super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
-		        () -> new AMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+		        (x, y) -> new EikMeshPoint(x, y, false));
     }
 
 	public AEikMesh(
@@ -32,6 +35,6 @@ public class AEikMesh extends EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalf
 			double initialEdgeLen,
 			@NotNull Collection<? extends VShape> obstacleShapes) {
 		super(polygon, initialEdgeLen, obstacleShapes,
-				() -> new AMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+				(x, y) -> new EikMeshPoint(x, y, false));
 	}
 }

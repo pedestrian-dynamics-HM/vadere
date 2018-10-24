@@ -22,7 +22,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 
 import java.awt.*;
 import java.util.ArrayList;
