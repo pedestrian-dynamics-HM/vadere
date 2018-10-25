@@ -226,7 +226,8 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ ],
-        "type" : "PEDESTRIAN"
+        "type" : "PEDESTRIAN",
+        "groupSizes" : [ ]
       } ],
       "attributesPedestrian" : {
         "radius" : 0.195,
