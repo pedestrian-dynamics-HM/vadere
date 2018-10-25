@@ -82,6 +82,7 @@ public class TestFFMNonUniformTriangulation {
 	    return eikMesh;
     }
 
+    @Ignore
     @Test
     public void testTriangulationFMM() {
 
