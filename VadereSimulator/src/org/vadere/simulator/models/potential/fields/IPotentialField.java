@@ -86,12 +86,16 @@ public interface IPotentialField {
         Rectangle2D.Double bounds = topography.getBounds();
 	    EikonalSolver eikonalSolver;
 
+	    if(createMethod == EikonalSolverType.NONE) {
+	    	return new PotentialFieldCalculatorNone();
+	    }
+
 	    /**
 	     * Use a regular grid based method.
 	     */
         if(createMethod.isUsingCellGrid()) {
 	        CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(),
-			        attributesPotential.getPotentialFieldResolution(), new CellState());
+			        attributesPotential.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
 	        if (createMethod != EikonalSolverType.NONE) {
 		        for (VShape shape : targetShapes) {

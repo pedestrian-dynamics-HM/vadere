@@ -36,9 +36,9 @@ public abstract class TriCanvas
 		extends Canvas {
 
 	static final Logger log = LogManager.getLogger(TriCanvas.class);
-	static final VRectangle defaultBound = new VRectangle(0,0,10,10);
-	static final int defaultWidth = 500;
-	static final int defaultHeight = 500;
+	static final VRectangle defaultBound = new VRectangle(-12, -12, 24, 24);
+	static final int defaultWidth = 1000;
+	static final int defaultHeight = 1000;
 
 	protected final IMesh<P, V, E, F> mesh;
 	public double width;
@@ -84,12 +84,12 @@ public abstract class TriCanvas
 		graphics.setColor(Color.WHITE);
 		graphics.fill(new VRectangle(0, 0, getWidth(), getHeight()));
 		Font currentFont = graphics.getFont();
-		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.024f);
+		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.010f);
 		graphics.setFont(newFont);
 		graphics.setColor(Color.GRAY);
 		graphics.scale(scale, scale);
 		graphics.translate(-bound.getMinX() + (0.5 * Math.max(0, bound.getWidth() - bound.getHeight())), -bound.getMinY() + (bound.getHeight() - height / scale));
-		graphics.setStroke(new BasicStroke(0.003f));
+		graphics.setStroke(new BasicStroke(0.001f));
 		graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 

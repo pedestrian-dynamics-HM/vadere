@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,7 +67,9 @@ public class TestFFMNonUniformTriangulation {
         bbox = new VRectangle(-12, -12, 24, 24);
     }
 
-    private EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> createEikMesh(@NotNull final IEdgeLengthFunction edgeLengthFunc, final double initialEdgeLen) {
+    private EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> createEikMesh(
+    		@NotNull final IEdgeLengthFunction edgeLengthFunc,
+		    final double initialEdgeLen) {
 	    IMeshSupplier<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> meshSupplier = () -> new PMesh<>((x, y) -> new PotentialPoint(x, y));
 	    EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> eikMesh = new EikMesh<>(
 			    distanceFunc,
@@ -78,13 +82,12 @@ public class TestFFMNonUniformTriangulation {
 	    return eikMesh;
     }
 
-	@Ignore
     @Test
     public void testTriangulationFMM() {
 
         //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + 0.5*Math.min(Math.abs(distanceFunc.apply(p) + 4), Math.abs(distanceFunc.apply(p)));
-        //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
-        IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 0.5;
+        IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
+        //IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 0.5;
         List<VRectangle> targetAreas = new ArrayList<>();
         List<IPoint> targetPoints = new ArrayList<>();
 
@@ -96,7 +99,17 @@ public class TestFFMNonUniformTriangulation {
 	    meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
-        //targetPoints.add(new MeshPoint(0, 0, false));
+	    Predicate<PFace<PotentialPoint>> nonAccute = f -> triangulation.getMesh().toTriangle(f).isNonAcute();
+	    MeshPanel meshPanel = new MeshPanel(meshGenerator.getMesh(), nonAccute, 1000, 1000, bbox);
+	    meshPanel.display();
+
+	    try {
+		    Thread.sleep(10000);
+	    } catch (InterruptedException e) {
+		    e.printStackTrace();
+	    }
+
+	    //targetPoints.add(new MeshPoint(0, 0, false));
 
 
         VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);

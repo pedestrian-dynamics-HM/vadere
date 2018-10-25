@@ -561,7 +561,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 					new AttributesFloorField());
 			Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
-			CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState());
+			CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState(), bound.getMinX(), bound.getMinY());
 			cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
 			Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 			IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);

@@ -3,6 +3,8 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.utils.debug.DebugGui;
+import org.vadere.meshing.utils.debug.SimpleTriCanvas;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -10,6 +12,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCone;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -25,6 +28,7 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.util.math.IDistanceFunction;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -40,11 +44,11 @@ import java.util.stream.Collectors;
 
 
 /**
- * This class computes the travelling time T(x) using the Fast Marching Method for arbitrary triangulated meshes.
- * The quality of the result depends on the quality of the triangulation. Therefore, the triangualtion shouldn't contain
+ * This class computes the travelling time T(x) using the fast marching method for arbitrary triangulated meshes.
+ * The quality of the result depends on the quality of the triangulation. Therefore, the triangulation should not contain
  * too many non-acute triangles.
  *
- * @param <P>   the type of the points of the triangulation (they have to be an extension of potential points)
+ * @param <P>   the type of the points of the triangulation extending {@link IPotentialPoint}
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
@@ -53,11 +57,25 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
     private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
 
-    private ITimeCostFunction timeCostFunction;
+	/**
+	 * The time cost function defined on the geometry.
+	 */
+	private ITimeCostFunction timeCostFunction;
+
+	/**
+	 * The triangulation the solver uses.
+	 */
     private IIncrementalTriangulation<P, V, E, F> triangulation;
-    private boolean calculationFinished;
+
+	/**
+	 * Indicates that the computation of T has been completed.
+	 */
+	private boolean calculationFinished;
+
+	/**
+	 * The narrow-band of the fast marching method.
+	 */
     private PriorityQueue<V> narrowBand;
-    private Collection<VRectangle> targetAreas;
 
     /**
      * Comparator for the heap. Vertices of points with small potentials are at the top of the heap.
@@ -79,6 +97,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
     /**
      * Constructor for certain target points.
+     *
      * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
      * @param targetPoints      Points where the propagating wave starts i.e. points that are part of the target area.
      * @param triangulation     the triangulation the propagating wave moves on.
@@ -100,6 +119,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
     /**
      * Constructor for certain target shapes.
+     *
      * @param targetShapes      shapes that define the whole target area.
      * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
      * @param triangulation     the triangulation the propagating wave moves on.
@@ -123,9 +143,11 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
     /**
      * Constructor for certain vertices of the triangulation.
+     *
      * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
      * @param triangulation     the triangulation the propagating wave moves on.
      * @param targetVertices    vertices which are part of the triangulation where the propagating wave starts i.e. points that are part of the target area.
+     * @param distFunc          the distance function (distance to the target) which is negative inside and positive outside the area of interest
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
                                          @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
@@ -135,7 +157,6 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         this.triangulation = triangulation;
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
-        this.targetAreas = new ArrayList<>();
         this.narrowBand = new PriorityQueue<>(pointComparator);
 
         for(V vertex : targetVertices) {
@@ -151,9 +172,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
             narrowBand.add(vertex);
 
             for(V v : triangulation.getMesh().getAdjacentVertexIt(vertex)) {
-                if(!narrowBand.contains(v)) {
-                    P potentialP = getMesh().getPoint(v);
+	            P potentialP = getMesh().getPoint(v);
 
+	            if(potentialP.getPathFindingTag() == PathFindingTag.Undefined) {
                     double dist = Math.max(-distFunc.apply(potentialP), 0);
                     logger.info(dist);
                     potentialP.setPotential(Math.min(potentialP.getPotential(), dist / timeCostFunction.costAt(potentialP)));
@@ -166,6 +187,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
     /**
      * Computes and sets the potential of all points of a face based on the distance function.
+     *
      * @param face              the face
      * @param distanceFunction  the distance function
      */
@@ -202,7 +224,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
     // unknownPenalty is ignored.
 	@Override
-	public double getPotential(IPoint pos, double unknownPenalty, double weight) {
+	public double getPotential(@NotNull final IPoint pos, final double unknownPenalty, final double weight) {
 		return weight * getPotential(pos.getX(), pos.getY());
 	}
 
@@ -313,8 +335,8 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      * Updates a point given a triangle. The point can only be updated if the
      * triangle triangleContains it and the other two points are in the frozen band.
      *
-     * @param point
-     * @param face
+     * @param point a point for which the potential should be re-computed
+     * @param face  a face neighbouring the point
      */
     private double computePotential(@NotNull final P point, @NotNull final F face) {
         // check whether the triangle does contain useful data
@@ -328,11 +350,14 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         P p2 = getMesh().getPoint(edges.get(1));
 
         if(isFeasibleForComputation(p1) && isFeasibleForComputation(p2)) {
-            if(!isNonAcute(halfEdge)) {
+
+        	if(!isNonAcute(halfEdge)) {
+        		double potential = computePotential(point, p1, p2);
+        		//logger.info("compute potential " + potential);
                 return computePotential(point, p1, p2);
             } // we only try to find a virtual vertex if both points are already frozen
             else {
-                //logger.info("special case for non-acute triangle");
+                logger.info("special case for non-acute triangle");
                 Optional<P> optPoint = walkToFeasiblePoint(halfEdge, face);
 
                 if(optPoint.isPresent()) {
@@ -372,6 +397,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         VPoint direction1 = pNext.subtract(p).rotate(+Math.PI/2);
         VPoint direction2 = pPrev.subtract(p).rotate(-Math.PI/2);
 
+	    VPoint direction11 = pNext.subtract(p);
+	    VPoint direction22 = pPrev.subtract(p);
+
         //logger.info(p + ", " + pNext + ", " + pPrev);
         //logger.info(direction1 + ", " + direction2);
 
@@ -384,7 +412,27 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         Predicate<E> isEdgeInCone = e -> isPointInCone.test(e) || isPointInCone.test(getMesh().getPrev(e));
 
-        F destination = triangulation.straightWalk2D(halfEdge, face, direction1, isEdgeInCone);
+        LinkedList<F> visitedFaces = triangulation.straightWalk2DGather(halfEdge, face, direction2, isEdgeInCone);
+        F destination = visitedFaces.getLast();
+
+	    SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+	    visitedFaces.stream().forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+	    DebugGui.setDebugOn(true);
+	    if(DebugGui.isDebugOn()) {
+	    	// attention the view is mirrowed.
+		    canvas.addGuiDecorator(graphics -> {
+			    Graphics2D graphics2D = (Graphics2D)graphics;
+			    graphics2D.setColor(Color.GREEN);
+			    graphics2D.setStroke(new BasicStroke(0.05f));
+			    logger.info("p: " + p);
+			    graphics2D.draw(new VLine(p, p.add(direction1.scalarMultiply(10))));
+			    graphics2D.setColor(Color.BLUE);
+			    graphics2D.draw(new VLine(p, p.add(direction2.scalarMultiply(10))));
+			    //graphics2D.fill(new VCircle(new VPoint(getMesh().toPoint(startVertex)), 0.05));
+			    //graphics2D.fill(new VCircle(q, 0.05));
+		    });
+		    DebugGui.showAndWait(canvas);
+	    }
 
         assert !destination.equals(face);
 

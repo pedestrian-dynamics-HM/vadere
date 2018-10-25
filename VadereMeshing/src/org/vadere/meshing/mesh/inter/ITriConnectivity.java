@@ -9,6 +9,8 @@ import org.vadere.meshing.utils.debug.DebugGui;
 import org.vadere.meshing.utils.debug.SimpleTriCanvas;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
@@ -1238,8 +1240,38 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		assert intersects(p1, p1.add(direction), edge);
 		assert getMesh().getEdges(face).contains(startVertex);
 		// TODO: quick solution!
-        VPoint q = p1.add(direction.scalarMultiply(Double.MAX_VALUE * 0.5));
+        VPoint q = p1.add(direction.scalarMultiply(Double.MAX_VALUE / 10_000.0));
 		return straightWalk2D(p1, q, face, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
+	}
+
+	/**
+	 * Marching from a vertex which is the vertex (<tt>startVertex</tt>) of face (<tt>face</tt>) in the direction (<tt>direction</tt>)
+	 * until the stop-condition (<tt>stopCondition</tt>) is fulfilled. This requires O(n) worst case time, where n is the number of faces of the mesh.
+	 *
+	 * <p>Assumption: The stopCondition will be fulfilled at some point.</p>
+	 *
+	 * @param startVertex       the vertex at which the march starts
+	 * @param face              the face at which the march / search starts
+	 * @param direction         the direction in which the march will go
+	 * @param stopCondition     the stop condition at which the march will stop
+	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 */
+	default LinkedList<F> straightWalk2DGather(@NotNull final E startVertex, @NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> stopCondition) {
+
+		E edge = getMesh().getPrev(startVertex);
+		VPoint p1 = getMesh().toPoint(startVertex);
+
+
+		assert intersects(p1, p1.add(direction), edge);
+		assert getMesh().getEdges(face).contains(startVertex);
+		// TODO: quick solution!
+		VPoint q = p1.add(direction.scalarMultiply(Double.MAX_VALUE / 10_000.0));
+		Predicate<E> defaultStopCondion = e -> !isRightOf(q.x, q.y, e);
+
+		LinkedList<F> visitedFaces = straightGatherWalk2D(p1, q, face, defaultStopCondion.or(stopCondition));
+
+		return visitedFaces;
+		//return straightWalk2D(p1, q, face, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
 	}
 
 	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
@@ -1459,16 +1491,27 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 					 * Get the face with the centroid closest to p and which was not visited already.
 					 */
 					Optional<F> closestFace = getMesh().streamFaces(v)
-							.filter(f -> !getMesh().isBorder(f))
+							.filter(f -> !getMesh().isBoundary(f))
 							.filter(f -> !visitedFaces.contains(f))
-							.min(Comparator.comparingDouble(f -> p.distance(getMesh().toPolygon(f).getCentroid())));
+							.min(Comparator.comparingDouble(f -> p.distance(getMesh().toTriangle(f).midPoint())));
 
-					SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
-					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
-					DebugGui.setDebugOn(true);
-					if(DebugGui.isDebugOn() &&  !closestFace.isPresent()) {
-						DebugGui.showAndWait(canvas);
-					}
+					/*if(!closestFace.isPresent()) {
+						SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+						getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+						DebugGui.setDebugOn(true);
+						if(DebugGui.isDebugOn()) {
+							canvas.addGuiDecorator(graphics -> {
+								Graphics2D graphics2D = (Graphics2D)graphics;
+								graphics2D.setColor(Color.GREEN);
+								graphics2D.setStroke(new BasicStroke(0.01f));
+								graphics2D.draw(new VLine(q, p));
+								log.info("p: " + p);
+								graphics2D.fill(new VCircle(q, 0.05));
+							});
+							DebugGui.showAndWait(canvas);
+						}
+					}*/
+
 
 					assert closestFace.isPresent() : visitedFaces.size();
 					return closestFace;
@@ -1557,7 +1600,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	    /*if(!(getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast()))) {
 		    boolean test = contains(p.getX(), p.getY(), visitedFaces.peekLast());
 	    }*/
-	    assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
+//	    assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
         return visitedFaces;
     }
 

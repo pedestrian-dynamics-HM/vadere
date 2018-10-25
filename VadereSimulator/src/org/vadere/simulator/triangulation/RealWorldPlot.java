@@ -512,7 +512,7 @@ public class RealWorldPlot {
 		//IDistanceFunction distanceFunc = p -> -obstacleDistance.apply(p);
 
 
-		CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState());
+		CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState(), bound.getMinX(), bound.getMinY());
 		cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
@@ -591,7 +591,7 @@ public class RealWorldPlot {
 		//IDistanceFunction distanceFunc = p -> -obstacleDistance.apply(p);
 
 
-		CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState());
+		CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState(), bound.getMinX(), bound.getMinY());
 		cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);

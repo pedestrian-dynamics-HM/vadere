@@ -79,12 +79,17 @@ public class ColorFunctions
 	 * @return gray scale color object
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> Color qualityToGrayScale(final IMesh<P, V, E, F> mesh, final F face) {
-		float quality = (float) faceToQuality(mesh, face);
-		if(quality <= 1 && quality >= 0) {
-			return new Color(quality, quality, quality);
+		if(!mesh.isBoundary(face)) {
+			float quality = (float) faceToQuality(mesh, face);
+			if(quality <= 1 && quality >= 0) {
+				return new Color(quality, quality, quality);
+			}
+			else {
+				return Color.RED;
+			}
 		}
 		else {
-			return Color.RED;
+			return Color.WHITE;
 		}
 	}
 

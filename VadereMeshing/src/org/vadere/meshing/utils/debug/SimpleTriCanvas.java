@@ -91,11 +91,12 @@ public class SimpleTriCanvas
 
 					polygon.getPoints().forEach(p -> {
 						graphics.setColor(Color.RED);
-						graphics.fill(new VCircle(p, 0.1));
+						graphics.fill(new VCircle(p, 0.025));
 					});
 
 					VPoint center = polygon.getCentroid();
-					graphics.drawString(Integer.toString(i), (float) center.x, (float) center.y);
+					graphics.fill(new VCircle(center, 0.05));
+					//graphics.drawString(Integer.toString(i), (float) center.x, (float) center.y);
 					i++;
 
 				} catch (ArrayIndexOutOfBoundsException e) {
