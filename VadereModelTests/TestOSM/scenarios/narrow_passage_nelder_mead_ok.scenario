@@ -297,7 +297,8 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ ],
-        "type" : "PEDESTRIAN"
+        "type" : "PEDESTRIAN",
+        "groupSizes" : [ ]
       }, {
         "source" : null,
         "targetIds" : [ 1 ],
@@ -326,7 +327,8 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ ],
-        "type" : "PEDESTRIAN"
+        "type" : "PEDESTRIAN",
+        "groupSizes" : [ ]
       } ],
       "attributesPedestrian" : {
         "radius" : 0.195,

@@ -73,7 +73,7 @@ public class GeometryUtils {
 	}
 
 	public static VPoint getCentroid(@NotNull final List<? extends IPoint> polygon){
-        double area = areaOfPolygon(polygon);
+        double area = signedAreaOfPolygon(polygon);
         double xValue = 0;
         double yValue = 0;
 
@@ -621,7 +621,7 @@ public class GeometryUtils {
 	 *
 	 * @return the area of a polygon
 	 */
-	public static double areaOfPolygon(@NotNull final List<? extends IPoint> vertices) {
+	public static double signedAreaOfPolygon(@NotNull final List<? extends IPoint> vertices) {
 		double result = 0;
 		if(vertices.size() >= 3) {
 			for (int i = 0; i < vertices.size() - 1; i++) {
@@ -630,7 +630,11 @@ public class GeometryUtils {
 			int n = vertices.size() - 1;
 			result += vertices.get(n).getX() * vertices.get(0).getY() - vertices.get(0).getX() * vertices.get(n).getY();
 		}
-		return Math.abs(result) / 2.0;
+		return result / 2.0;
+	}
+
+	public static double areaOfPolygon(@NotNull final List<? extends IPoint> vertices){
+		return Math.abs(signedAreaOfPolygon(vertices));
 	}
 
 	/**
