@@ -202,4 +202,8 @@ public class VPoint implements Cloneable, IPoint {
 	public double distanceToOrigin() {
 		return Math.sqrt(x * x + y * y);
 	}
+
+	public Point2D.Double asPoint2D() {
+		return new Point2D.Double(x, y);
+	}
 }

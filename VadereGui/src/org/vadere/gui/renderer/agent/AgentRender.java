@@ -51,6 +51,8 @@ public class AgentRender implements Renderer {
 	}
 
 	private void renderGroup(Pedestrian ped, Graphics2D g) {
+		g.setColor(Color.DARK_GRAY);
+		g.fill(ped.getShape());
 		g.setColor(getGroupColor(ped));
 		DefaultRenderer.fill(getShape(ped), g);
 	}

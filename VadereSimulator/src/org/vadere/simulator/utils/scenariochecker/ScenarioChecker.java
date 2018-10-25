@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.PedestrianSpeedSetupCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceSpawnSettingCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.StairTreadSanityCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.TopographyOverlapCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.UniqueSourceIdCheck;
@@ -61,6 +62,7 @@ public class ScenarioChecker {
 		ret.addAll(checkPedestrianSpeedSetup());
 		ret.addAll(checkOverlap());
 		ret.addAll(checkSimulationAttribues());
+		ret.addAll(checkSourceSpawnSetting());
 		return ret;
 	}
 
@@ -68,6 +70,10 @@ public class ScenarioChecker {
 		PriorityQueue<ScenarioCheckerMessage> ret = new PriorityQueue<>();
 		ret.addAll(runCheck(new SimulationTimeStepLengthCheck()));
 		return ret;
+	}
+
+	public PriorityQueue<ScenarioCheckerMessage> checkSourceSpawnSetting(){
+		return runCheck(new SourceSpawnSettingCheck());
 	}
 
 	public PriorityQueue<ScenarioCheckerMessage> checkPedestrianSpeedSetup() {

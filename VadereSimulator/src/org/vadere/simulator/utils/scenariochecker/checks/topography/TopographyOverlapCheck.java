@@ -130,7 +130,7 @@ public class TopographyOverlapCheck extends AbstractScenarioCheck implements Top
 		Source source  = (Source) elementOfType(e1, e2, ScenarioElementType.SOURCE);
 
 		if (source.overlapWith(obstacle)) {
-			ret.add(msgBuilder.topographyError().target(source, obstacle)
+			ret.add(msgBuilder.topographyWarning().target(source, obstacle)
 					.reason(ScenarioCheckerReason.OVERLAP_OBSTACLE_SOURCE).build());
 		}
 	}

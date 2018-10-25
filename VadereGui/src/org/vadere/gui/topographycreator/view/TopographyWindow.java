@@ -260,6 +260,8 @@ public class TopographyWindow extends JPanel {
 		obstacleAndTargetDrawModes.add(pen2);
 
 		sourceDrawModes.add(rectangle);
+		sourceDrawModes.add(pen);
+		sourceDrawModes.add(pen2);
 		sourceDrawModes.add(dot);
 
 		/* open obstacle paint method dialog action */
