@@ -28,6 +28,7 @@ import org.vadere.gui.projectview.control.ActionSaveAsProject;
 import org.vadere.gui.projectview.control.ActionSaveProject;
 import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
 import org.vadere.gui.projectview.control.ActionShowAboutDialog;
+import org.vadere.gui.projectview.control.ActionToClipboard;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.control.ShowResultDialogAction;
@@ -586,6 +587,35 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				new ActionOutputToScenario(Messages.getString("ProjectView.mntmOutputToSceneario.text"), model)));
 		outputListPopupMenu
 				.add(new JMenuItem(new ActionRunOutput(Messages.getString("ProjectView.mntmRunOutput.text"), model)));
+
+		JMenu copyPath = new JMenu(Messages.getString("ProjectView.mntmCopyOutputDir.text"));
+		outputTable.getSelectionModel().addListSelectionListener(new TableSelectionListener(outputTable) {
+			@Override
+			public void onSelect(ListSelectionEvent e) {
+				try {
+					OutputBundle bundle = model.getSelectedOutputBundle();
+					File outDir = bundle.getDirectory();
+					copyPath.removeAll();
+					copyPath.add(new JMenuItem(
+							new ActionToClipboard(outDir.getName() + "/", outDir.getAbsolutePath()))
+					);
+					File[] children = outDir.listFiles();
+					if (children != null){
+						for (File file : children) {
+							String name = file.isDirectory() ? file.getName() + "/" : file.getName();
+							copyPath.add(new JMenuItem(
+									new ActionToClipboard(name, file.getAbsolutePath()))
+							);
+						}
+					}
+
+				} catch (IOException ex) {
+					logger.error(ex);
+				}
+			}
+		});
+
+				outputListPopupMenu.add(copyPath);
 
 		JPopupMenu outputListPopupMenuMultiSelect = new JPopupMenu();
 		outputListPopupMenuMultiSelect.add(new JMenuItem(deleteOutputFileAction));
