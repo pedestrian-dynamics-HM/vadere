@@ -56,7 +56,7 @@ public class TestVisual {
 
 		Set<VPoint> points = new HashSet<>();
 
-		Random r = new Random();
+		Random r = new Random(1);
 		for(int i=0; i< 20; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
 			points.add(point);
@@ -67,7 +67,7 @@ public class TestVisual {
 
 		VPTriangulation triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
 		triangulation.insert(points);
-		triangulation.finish();
+		//triangulation.finish();
 		Set<VLine> edges = triangulation.getEdges();
 
 		JFrame window = new JFrame();

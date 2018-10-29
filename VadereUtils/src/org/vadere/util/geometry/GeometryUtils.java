@@ -418,6 +418,12 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	public static boolean intersectLine(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y, final double eps) {
+		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
+		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
+		return (ccw1-eps < 0 && ccw2+eps > 0) || (ccw1+eps > 0 && ccw2-eps < 0);
+	}
+
 	public static VPoint getIncenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		double a = p1.distance(p2);
 		double b = p2.distance(p3);
@@ -441,14 +447,18 @@ public class GeometryUtils {
 	 * @return true if the line-segment intersects the  half-line-segment defined, otherwise false.
 	 */
 	public static boolean intersectHalfLineSegment(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
-		double ccw1 = ccw(p, q, p1);
-		double ccw2 = ccw(p, q, p2);
+		return intersectHalfLineSegment(p.getX(), p.getY(), q.getX(), q.getY(), p1.getX(), p1.getY(), p2.getX(), p2.getY());
+	}
+
+	public static boolean intersectHalfLineSegment(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
+		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1X);
+		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
 
 		if((ccw1 < 0 && ccw2 > 0)) {
-			return isCCW(p, p2, p1);
+			return isCCW(pX, pY, p2X, p2Y, p1X, p1Y);
 		}
 		else if((ccw1 > 0 && ccw2 < 0)) {
-			return isCCW(p, p1, p2);
+			return isCCW(pX, pY, p1X, p1Y, p2X, p2Y);
 		}
 		else {
 			return false;

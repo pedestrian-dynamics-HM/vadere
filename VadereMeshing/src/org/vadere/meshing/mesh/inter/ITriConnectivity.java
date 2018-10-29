@@ -99,7 +99,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param point     the new point of the vertex
 	 */
 	default void replacePoint(@NotNull final V vertex, @NotNull final P point) {
-		assert GeometryUtils.toPolygon(getMesh().getPoint(vertex)).contains(point);
+		assert GeometryUtils.toPolygon(getMesh().getPoints(vertex)).contains(point);
 		getMesh().setPoint(vertex, point);
 	}
 
@@ -1184,38 +1184,38 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
-	 * <p>Marching to the face which contains the point defined by (x2, y2) starting inside the startFace.
+	 * <p>Marching to the face which contains the point defined by (x1, y1) starting inside the startFace.
 	 * This algorithm also works if there are convex polygon (holes) inside the triangulation.</p>
 	 *
-	 * <p>Assumption: (x, y) is contained in some face.</p>
+	 * <p>Assumption: (x1, y1) is contained in some face.</p>
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x1        the x-coordinate of the ending point
 	 * @param y1        the y-coordinate of the ending point
 	 * @param startFace the face where the march start containing (x1,y1).
-	 * @return returns the face containing (x, y)
+	 * @return returns the face containing (x1, y1)
 	 */
 	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace) {
 		return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
 	}
 
 	/**
-	 * <p>Marching to the face which contains the point defined by (x2, y2) starting inside the startFace.
-	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
+	 * <p>Marching to the face which contains the point defined by (x1, y1) starting inside the startFace.
+	 * Furthermore this method will gather all visited edges and requires O(n) time. However, if the face is close
 	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
 	 * inside the triangulation.</p>
 	 *
-	 * <p>Assumption: (x, y) is contained in some face.</p>
+	 * <p>Assumption: (x1, y1) is contained in some face.</p>
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *
 	 * @param x1        the x-coordinate of the point at which the march will start
 	 * @param y1        the y-coordinate of the point at which the march will start
 	 * @param startFace the face where the march start containing (x1,y1).
-	 * @return returns all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 * @return returns all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
+    default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
         return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
     }
 
@@ -1231,7 +1231,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param stopCondition     the stop condition at which the march will stop
 	 * @return a face which is reached by starting a march from vertex and marching towards direction until stopCondition
 	 */
-	default F straightWalk2D(@NotNull final E startVertex, @NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> stopCondition) {
+	default F straightWalk2DDirectional(@NotNull final E startVertex, @NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> stopCondition) {
 
         E edge = getMesh().getPrev(startVertex);
 		VPoint p1 = getMesh().toPoint(startVertex);
@@ -1250,32 +1250,27 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 *
 	 * <p>Assumption: The stopCondition will be fulfilled at some point.</p>
 	 *
-	 * @param startVertex       the vertex at which the march starts
-	 * @param face              the face at which the march / search starts
-	 * @param direction         the direction in which the march will go
-	 * @param stopCondition     the stop condition at which the march will stop
+	 * @param startVertex               the vertex at which the march starts
+	 * @param face                      the face at which the march / search starts
+	 * @param direction                 the direction in which the march will go
+	 * @param additionalStopCondition   the stop condition at which the march will stop
 	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-	default LinkedList<F> straightWalk2DGather(@NotNull final E startVertex, @NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> stopCondition) {
-
-		E edge = getMesh().getPrev(startVertex);
-		VPoint p1 = getMesh().toPoint(startVertex);
-
-
-		assert intersects(p1, p1.add(direction), edge);
-		assert getMesh().getEdges(face).contains(startVertex);
+	default LinkedList<E> straightWalk2DGatherDirectional(@NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> additionalStopCondition) {
+		VPoint q = getMesh().toTriangle(face).midPoint();
+		assert getMesh().getEdges(face).contains(q);
 		// TODO: quick solution!
-		VPoint q = p1.add(direction.scalarMultiply(Double.MAX_VALUE / 10_000.0));
-		Predicate<E> defaultStopCondion = e -> !isRightOf(q.x, q.y, e);
+		VPoint q1 = q.add(direction.scalarMultiply(Double.MAX_VALUE / 10_000.0));
+		Predicate<E> defaultStopCondion = e -> !isLeftOf(q.x, q.y, e);
 
-		LinkedList<F> visitedFaces = straightGatherWalk2D(p1, q, face, defaultStopCondion.or(stopCondition));
+		LinkedList<E> visitedFaces = straightGatherWalk2DDirectional(q, direction, face, defaultStopCondion.or(additionalStopCondition));
 
 		return visitedFaces;
-		//return straightWalk2D(p1, q, face, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
+		//return straightWalk2DDirectional(p1, q, face, e -> (stopCondition.test(e) || !isRightOf(q.x, q.y, e)));
 	}
 
 	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
-		return straightGatherWalk2D(x1, y1, startFace, stopCondition).peekLast();
+		return getMesh().getFace(straightGatherWalk2D(x1, y1, startFace, stopCondition).peekLast());
 	}
 
 	/**
@@ -1299,12 +1294,13 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param stopCondition the stopCondition at which the march will stop.
 	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-    default LinkedList<F> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
+    default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace, @NotNull final Predicate<E> stopCondition) {
         assert !getMesh().isBorder(startFace);
 
         // initialize
         F face = startFace;
-        VPoint q = getMesh().toPolygon(startFace).getCentroid(); // walk from q to p
+        // for convex polygons we could also use: VPoint q = getMesh().toPolygon(startFace).getCentroid();
+        VPoint q = getMesh().toTriangle(startFace).midPoint(); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
         return straightGatherWalk2D(q, p, face, stopCondition);
@@ -1384,25 +1380,25 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
      * @return the face containing p
      */
 	default F straightWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
-        return straightGatherWalk2D(q, p, startFace, stopCondition).peekLast();
+        return getMesh().getFace(straightGatherWalk2D(q, p, startFace, stopCondition).peekLast());
 	}
 
-	// TODO change centroid to midpoint of a triangle!
 	/**
 	 * Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
 	 * from q to p. Furthermore this method will gather the visited face by placing it into the list of visited faces.
 	 * There are different cases with special cases which make the code complicated:
 	 * <ol>
-	 *     <li>general case:    the line (q, p) intersects two half-edges.
-	 *                          In this case the algorithm walks across the correct line by the definition of the direction</li>
-	 *     <li>special case 1:  there is one point of the face which lies on the line (q, p) but the stop condition is not fulfilled for the corresponding half-edge.
-	 *                          In this case the algorithm walks just across that corresponding half-edge</li>
-	 *     <li>special case 2:  there is two point of the face which lies on the line (q, p) but p is contained or very close to the face.
-	 *                          In this case the walk can return the face as (end-)walk-result.</li>
-	 *     <li>special case 3:  there is two point of the face which lies on the line (q, p) and p is not contained in the face.
-	 *                          This is a bad / expensive case since the algorithm will first move to the vertex v of the face which is closest to p.
-	 *                          Then it will go into a neighbouring face of v which has the centroid closest to p and which is not contained in the
-	 *                          list of visited faces. This can require O(n) where n is the number of faces but should never happen in a "normal" triangulation.</li>
+	 *     <li>general case (1):    the line (q, p) intersects two half-edges.
+	 *                              In this case the algorithm walks across the correct line by the definition of the direction (i.e. towards p)</li>
+	 *     <li>special case (2.1):  there is one point of the face which lies on the line (q, p) but the stop condition is not fulfilled for another corresponding half-edge.
+	 *                              In this case the algorithm walks just across that corresponding half-edge</li>
+	 *     <li>special case (2.2):  there is two point of the face which lies on the line (q, p) but p is contained or very close to the face.
+	 *                              In this case the walk can return the face as (end-)walk-result.</li>
+	 *     <li>special case (2.3):  there is two point of the face which lies on the line (q, p) and p is not contained in the face.
+	 *                              This is a bad / expensive case since the algorithm will first move to the vertex v of the face which is closest to p.
+	 *                              Then it will go into a neighbouring face of v which has its midpoint closest to p and which is not contained in the
+	 *                              list of visited faces. This can require O(n) where n is the number of faces but should never happen in a "normal" triangulation.
+	 *                              And it can only toke O(n) in very degenerated triangulations.</li>
 	 * </ol>
 	 *
 	 * <p>Assumption: q is contained in the start face.</p>
@@ -1495,7 +1491,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 							.filter(f -> !visitedFaces.contains(f))
 							.min(Comparator.comparingDouble(f -> p.distance(getMesh().toTriangle(f).midPoint())));
 
-					/*if(!closestFace.isPresent()) {
+					if(!closestFace.isPresent()) {
 						SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
 						getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
 						DebugGui.setDebugOn(true);
@@ -1503,15 +1499,20 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 							canvas.addGuiDecorator(graphics -> {
 								Graphics2D graphics2D = (Graphics2D)graphics;
 								graphics2D.setColor(Color.GREEN);
-								graphics2D.setStroke(new BasicStroke(0.01f));
+								graphics2D.setStroke(new BasicStroke(0.05f));
 								graphics2D.draw(new VLine(q, p));
 								log.info("p: " + p);
-								graphics2D.fill(new VCircle(q, 0.05));
+								graphics2D.fill(new VCircle(q, 0.05f));
 							});
 							DebugGui.showAndWait(canvas);
 						}
-					}*/
+					}
 
+					/*graphics2D.setStroke(new BasicStroke(0.05f));
+			    logger.info("p: " + p);
+			    graphics2D.draw(new VLine(p, p.add(direction1.scalarMultiply(10))));
+			    graphics2D.setColor(Color.BLUE);
+			    graphics2D.draw(new VLine(p, p.add(direction2.scalarMultiply(10))));*/
 
 					assert closestFace.isPresent() : visitedFaces.size();
 					return closestFace;
@@ -1521,13 +1522,180 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	}
 
 	/**
+	 * There is two point of the face which lies on the line (q, p) and p is not contained in the face.
+	 * This is a bad / expensive case since the algorithm will first move to the vertex v of the face which is closest to p.
+	 * Then it will go into a neighbouring face of v which has its midpoint closest to p and which is not contained in the
+	 * list of visited faces. This can require O(n) where n is the number of faces but should never happen in a "normal" triangulation.
+	 * And it can only toke O(n) in very degenerated triangulations.
+	 *
+	 * @param inEdge
+	 * @param q
+	 * @param p
+	 * @return
+	 */
+	default E straightWalkSpecialCase(@NotNull final E inEdge,
+	                                            @NotNull final VPoint q,
+	                                            @NotNull final VPoint p) {
+		E edge = getMesh().getNext(inEdge);
+		V vertex = getMesh().getVertex(edge);
+		E nextInEdge = null;
+		for(E e : getMesh().getEdgeIt(vertex)) {
+			E prev = getMesh().getPrev(e);
+			E other = getMesh().getNext(getMesh().getTwin(e));
+			V v1 = getMesh().getVertex(prev);
+			V v2 = getMesh().getVertex(other);
+
+			if(intersects(q, p, v1, v2)) {
+				if(!inEdge.equals(prev) && intersects(q, p, prev)) {
+					nextInEdge = prev;
+					break;
+				}
+				else if(!inEdge.equals(other) && intersects(q, p, other)) {
+					nextInEdge = other;
+					break;
+				}
+				else {
+					nextInEdge = prev;
+				}
+			}
+		}
+
+		if(nextInEdge == null) {
+			throw new IllegalArgumentException("this should never happen!");
+		}
+
+		return nextInEdge;
+	}
+
+	/**
+	 * Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
+	 * from q to p. Furthermore this method will gather the visited face by placing it into the list of visited faces.
+	 * There are different cases with special cases which make the code complicated:
+	 * <ol>
+	 *     <li>general case (1):    the line (q, p) intersects two half-edges.
+	 *                              In this case the algorithm walks across the correct line by the definition of the direction (i.e. towards p)</li>
+	 *     <li>special case (2.1):  there is one point of the face which lies on the line (q, p) but the stop condition is not fulfilled for another corresponding half-edge.
+	 *                              In this case the algorithm walks just across that corresponding half-edge</li>
+	 *     <li>special case (2.2):  there is two point of the face which lies on the line (q, p) but p is contained or very close to the face.
+	 *                              In this case the walk can return the face as (end-)walk-result.</li>
+	 *     <li>special case (2.3):  there is two point of the face which lies on the line (q, p) and p is not contained in the face.
+	 *                              This is a bad / expensive case since the algorithm will first move to the vertex v of the face which is closest to p.
+	 *                              Then it will go into a neighbouring face of v which has its midpoint closest to p and which is not contained in the
+	 *                              list of visited faces. This can require O(n) where n is the number of faces but should never happen in a "normal" triangulation.
+	 *                              And it can only toke O(n) in very degenerated triangulations.</li>
+	 * </ol>
+	 *
+	 * <p>Assumption: q is contained in the start face.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @param q             start point of the march / walk
+	 * @param p             end point of the march / walk
+	 * @param face          start face of the walk
+	 * @param stopCondition stop condition of the walk, i.e. the walk stops if the condition is no longer fulfilled
+	 * @param visitedFaces  a list which will be filled with the visited faces in order in which they are visited (first visited = first in)
+	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 */
+	default Optional<E> straightWalkNextE(
+			@NotNull final E inEdge,
+			@NotNull final VPoint q,
+			@NotNull final VPoint p,
+			@NotNull final Predicate<E> stopCondition,
+			@NotNull final LinkedList<E> visitedEdges) {
+		E outEdge = null;
+		F face = getMesh().getFace(inEdge);
+
+		/**
+		 * Get the half-edges e which intersects (q, p).
+		 */
+		for(E e : getMesh().getEdgeIt(face)) {
+			if(!e.equals(inEdge) && intersects(q, p, e)) {
+				outEdge = e;
+			}
+		}
+
+		/**
+		 * General case (1): The line defined by (q,p) intersects 2 edges of the convex polygon.
+		 */
+		if(outEdge != null) {
+			//log.debug("straight walk: general case");
+			if(!stopCondition.test(outEdge)) {
+				return Optional.of(getMesh().getTwin(outEdge));
+			}
+			else {
+				return Optional.empty();
+			}
+		}
+		/**
+		 * Special case (2): There is one or two points of the polygon which are collinear with the line defined by (q,p).
+		 */
+		else {
+			/**
+			 * Good case (2.2) There are two collinear points but the face contains p => p lies on an edge of the face.
+			 */
+			if(contains(p.getX(), p.getY(), face) || getMesh().isCloseTo(face, p.getX(), p.getY())) {
+				log.debug("no intersection line and not contained.");
+				return Optional.empty();
+			}
+			/**
+			 * Bad case (2.3): This which should not happen in general: q, the exit point v and p are collinear, therefore there is no exit intersection line!
+			 * We continue the search with the face which centroid is closest to p! v has to be the closest p as well.
+			 */
+			else {
+				log.debug("straight walk: no exit edge found due to collinear exit point.");
+
+				/**
+				 * Get the face with the centroid closest to p and which was not visited already.
+				 */
+				E nextInEdge = straightWalkSpecialCase(inEdge, q, p);
+				if(!stopCondition.test(nextInEdge)) {
+					return Optional.of(getMesh().getTwin(nextInEdge));
+				}
+				else {
+					visitedEdges.add(nextInEdge);
+					return Optional.empty();
+				}
+
+				/*if(!closestFace.isPresent()) {
+					SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+					getMesh().streamFaces(v).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+					DebugGui.setDebugOn(true);
+					if(DebugGui.isDebugOn()) {
+						canvas.addGuiDecorator(graphics -> {
+							Graphics2D graphics2D = (Graphics2D)graphics;
+							graphics2D.setColor(Color.GREEN);
+							graphics2D.setStroke(new BasicStroke(0.05f));
+							graphics2D.draw(new VLine(q, p));
+							log.info("p: " + p);
+							graphics2D.fill(new VCircle(q, 0.05f));
+						});
+						DebugGui.showAndWait(canvas);
+					}
+				}*/
+
+				/*graphics2D.setStroke(new BasicStroke(0.05f));
+		    logger.info("p: " + p);
+		    graphics2D.draw(new VLine(p, p.add(direction1.scalarMultiply(10))));
+		    graphics2D.setColor(Color.BLUE);
+		    graphics2D.draw(new VLine(p, p.add(direction2.scalarMultiply(10))));*/
+
+				//assert closestFace.isPresent() : visitedFaces.size();
+				//return Optional.of(getMesh().getTwin(outEdge));
+			}
+
+		}
+	}
+
+
+
+	/**
 	 * <p>Marches / walks along the line defined by q and p from q to p starting inside the startFace.
-	 * Furthermore this method will gather all visited faces and requires O(n) time. However, if the face is close
+	 * Furthermore this method will gather all visited edges and requires O(n) time. However, if the face is close
 	 * the amount of time required is small. This algorithm also works if there are convex polygon (holes)
 	 * inside the triangulation. A stop condition like (e to !isRightOf(x1, y1, e)) stops the walk if (x1, y1),
 	 * will stop the walk if the point p = (x1, y1) is contained in the face.
 	 * The method goes from one face to the next by calling {@link ITriConnectivity#straightWalkNext(IFace, VPoint, VPoint, Predicate, LinkedList)}
-	 * but adds the resulting face to the list of visited faces and adds some logging to debug the walks / marches.</p>
+	 * but adds the resulting edge to the list of visited edges and adds some logging to debug the walks / marches.</p>
 	 *
 	 * <p>Assumption: q is contained in the start face.</p>
 	 *
@@ -1537,18 +1705,76 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param p             end point of the march / walk
 	 * @param startFace     start face of the walk
 	 * @param stopCondition stop condition of the walk, i.e. the walk stops if the condition is no longer fulfilled
-	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
+	 * @return all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-    default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
-		LinkedList<F> visitedFaces = new LinkedList<>();
-	    visitedFaces.addLast(startFace);
+	default LinkedList<E> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
+		return straightGatherWalk2D(q, p, startFace, stopCondition, false);
+	}
 
-	    assert contains(q.getX(), q.getY(), startFace);
+	default LinkedList<E> straightGatherWalk2DDirectional(final VPoint q, final VPoint direction, final F startFace, final Predicate<E> stopCondition) {
+		return straightGatherWalk2D(q, direction, startFace, stopCondition, true);
+	}
 
-        Optional<F> optFace;
-        F face = startFace;
+	default LinkedList<E> straightGatherWalk2D(
+			@NotNull final VPoint q,
+			@NotNull final VPoint pDirection,
+			@NotNull final F startFace,
+			@NotNull final Predicate<E> stopCondition,
+			@NotNull final boolean direcitonal) {
+		LinkedList<E> visitedEdges = new LinkedList<>();
 
-        do {
+		assert contains(q.getX(), q.getY(), startFace);
+
+		E inEdge = null;
+		if(!direcitonal) {
+			if(contains(pDirection.getX(), pDirection.getY(), startFace)) {
+				visitedEdges.add(getMesh().getEdge(startFace));
+				return visitedEdges;
+			}
+			// find the entering edge
+			for(E e : getMesh().getEdgeIt(startFace)) {
+				// line intersection
+				if(intersects(q, pDirection, e) && isLeftOf(pDirection.x, pDirection.y, e)) {
+					inEdge = e;
+					break;
+				}
+			}
+
+			/**
+			 * this might happen if the line intersects a point.
+			 */
+			if(inEdge == null) {
+				inEdge = getMesh().streamEdges(startFace).filter(e -> isLeftOf(pDirection.x, pDirection.y, e)).findAny().get();
+			}
+		}
+		else {
+			// find the entering edge
+			for(E e : getMesh().getEdgeIt(startFace)) {
+				// line intersection
+				if(intersects(q, pDirection, e) && !intersectsDirectional(q, pDirection, e)) {
+					inEdge = e;
+					break;
+				}
+			}
+
+			/**
+			 * this might happen if the line intersects a point.
+			 */
+			if(inEdge == null) {
+				inEdge = getMesh().streamEdges(startFace).filter(e -> !intersectsDirectional(q, pDirection, e)).findAny().get();
+			}
+		}
+
+		if(inEdge == null) {
+			throw new IllegalArgumentException("did not find any edge.");
+		}
+
+		visitedEdges.addLast(inEdge);
+
+
+		Optional<E> optEdge;
+
+		do {
 
         	/*if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
 		        DebugGui.showAndWait(WalkCanvas.getDefault(
@@ -1563,47 +1789,114 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 
 //			log.debug(getMesh().toPath(face));
-	        // TODO: this might be slow
-	        optFace = straightWalkNext(face, q, p, stopCondition, visitedFaces);
-
-	        if(!optFace.isPresent()) {
-	        	//log.info("expensive fix");
-		        //optFace = straightWalkNext(face, q, p, stopCondition);
-	        }
-	        else {
-	        	//log.info("fast");
-	        }
-
-            if(optFace.isPresent()) {
-                face = optFace.get();
-                visitedFaces.addLast(face);
-
-                // special case (1): hitting the border i.e. outer boundary
-	            // special case (2): hitting a hole
-                if(getMesh().isBorder(face)) {
-                   //log.debug("walked towards the border!");
-                   // return the border
-	               // log.debug(getMesh().toPath(face));
-                   break;
-                }
-                else if(getMesh().isHole(face)) {
-	                //log.debug("walked towards a hole!");
-	                // just go on with the normal straight walk which works for CONVEX polygons!
-                }
-            }
-        } while (optFace.isPresent());
+			// TODO: this might be slow
+			if(direcitonal) {
+				optEdge = straightWalkNextE(inEdge, q, pDirection, stopCondition, visitedEdges);
+			}
+			else {
+				optEdge = straightWalkNextE(inEdge, q, pDirection, stopCondition, visitedEdges);
+			}
 
 
-	    //log.debug("start walk: from " + q + " to " + p + " by walking through:");
-	    //visitedFaces.forEach(f -> log.debug(getMesh().toPath(f)));
+			if(!optEdge.isPresent()) {
+				//log.info("expensive fix");
+				//optFace = straightWalkNext(face, q, p, stopCondition);
+			}
+			else {
+				//log.info("fast");
+			}
+
+			if(optEdge.isPresent()) {
+				inEdge = optEdge.get();
+				visitedEdges.addLast(inEdge);
+
+				// special case (1): hitting the border i.e. outer boundary
+				// special case (2): hitting a hole
+				if(getMesh().isBorder(inEdge)) {
+					//log.debug("walked towards the border!");
+					// return the border
+					// log.debug(getMesh().toPath(face));
+					break;
+				}
+				else if(getMesh().isHole(inEdge)) {
+					//log.debug("walked towards a hole!");
+					// just go on with the normal straight walk which works for CONVEX polygons!
+				}
+			}
+		} while (optEdge.isPresent());
+
+
+		//log.debug("start walk: from " + q + " to " + p + " by walking through:");
+		//visitedFaces.forEach(f -> log.debug(getMesh().toPath(f)));
 
 	    /*if(!(getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast()))) {
 		    boolean test = contains(p.getX(), p.getY(), visitedFaces.peekLast());
 	    }*/
 //	    assert getMesh().isBorder(visitedFaces.peekLast()) || contains(p.getX(), p.getY(), visitedFaces.peekLast());
-        return visitedFaces;
+		return visitedEdges;
     }
 
+	default LinkedList<E> straightGatherWalk2DE(final VPoint q, final VPoint pDirection, final E startEdge, final Predicate<E> stopCondition, final boolean direcitonal) {
+		LinkedList<E> visitedEdges = new LinkedList<>();
+		visitedEdges.addLast(startEdge);
+
+		assert contains(q.getX(), q.getY(), getMesh().getFace(startEdge));
+
+		Optional<E> optFace;
+		E edge = startEdge;
+
+		do {
+
+        	/*if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
+		        DebugGui.showAndWait(WalkCanvas.getDefault(
+				        getMesh(),
+				        q,
+				        p,
+				        startFace,
+				        startEdge,
+				        visitedFaces));
+	        }*/
+
+
+
+//			log.debug(getMesh().toPath(face));
+			// TODO: this might be slow
+			if(direcitonal) {
+				optFace = straightWalkNextE(edge, q, pDirection, stopCondition, visitedEdges);
+			}
+			else {
+				optFace = straightWalkNextE(edge, q, pDirection, stopCondition, visitedEdges);
+			}
+
+
+			if(!optFace.isPresent()) {
+				//log.info("expensive fix");
+				//optFace = straightWalkNext(face, q, p, stopCondition);
+			}
+			else {
+				//log.info("fast");
+			}
+
+			if(optFace.isPresent()) {
+				edge = optFace.get();
+				visitedEdges.addLast(edge);
+
+				// special case (1): hitting the border i.e. outer boundary
+				// special case (2): hitting a hole
+				if(getMesh().isBorder(edge)) {
+					//log.debug("walked towards the border!");
+					// return the border
+					// log.debug(getMesh().toPath(face));
+					break;
+				}
+				else if(getMesh().isHole(edge)) {
+					//log.debug("walked towards a hole!");
+					// just go on with the normal straight walk which works for CONVEX polygons!
+				}
+			}
+		} while (optFace.isPresent());
+		return visitedEdges;
+	}
 
     /*default LinkedList<F> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final E startEdge, final Predicate<E> stopCondition) {
 		log.info("start walk: from " + q + " to " + p);

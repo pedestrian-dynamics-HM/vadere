@@ -12,11 +12,9 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCone;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.InterpolationUtil;
@@ -29,7 +27,6 @@ import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -412,7 +409,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         Predicate<E> isEdgeInCone = e -> isPointInCone.test(e) || isPointInCone.test(getMesh().getPrev(e));
 
-        LinkedList<F> visitedFaces = triangulation.straightWalk2DGather(halfEdge, face, direction2, isEdgeInCone);
+        LinkedList<F> visitedFaces = triangulation.straightWalk2DGatherDirectional(halfEdge, face, direction2, isEdgeInCone);
         F destination = visitedFaces.getLast();
 
 	    SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
@@ -451,7 +448,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 			return mesh.isAtBoundary(e) || feasableEdgePred.test(e) || Utils.isRightOf(midPoint, midPoint.add(direction1), mesh.toPoint(e));
 		};
 
-		F newFace = triangulation.straightWalk2D(halfEdge, direction1, stopCondition);
+		F newFace = triangulation.straightWalk2DDirectional(halfEdge, direction1, stopCondition);
 
 		if(!mesh.isBoundary(newFace)) {
 			return mesh.streamVertices(newFace).filter(v -> feasableVertexPred.test(v)).map(v -> mesh.getPoint(v)).findAny();

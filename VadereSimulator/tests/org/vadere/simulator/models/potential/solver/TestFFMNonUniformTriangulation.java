@@ -82,7 +82,6 @@ public class TestFFMNonUniformTriangulation {
 	    return eikMesh;
     }
 
-    @Ignore
     @Test
     public void testTriangulationFMM() {
 
@@ -101,14 +100,8 @@ public class TestFFMNonUniformTriangulation {
         triangulation = meshGenerator.getTriangulation();
 
 	    Predicate<PFace<PotentialPoint>> nonAccute = f -> triangulation.getMesh().toTriangle(f).isNonAcute();
-	    MeshPanel meshPanel = new MeshPanel(meshGenerator.getMesh(), nonAccute, 1000, 1000, bbox);
-	    meshPanel.display();
-
-	    try {
-		    Thread.sleep(10000);
-	    } catch (InterruptedException e) {
-		    e.printStackTrace();
-	    }
+	    //MeshPanel meshPanel = new MeshPanel(meshGenerator.getMesh(), nonAccute, 1000, 1000, bbox);
+	    //meshPanel.display();
 
 	    //targetPoints.add(new MeshPoint(0, 0, false));
 

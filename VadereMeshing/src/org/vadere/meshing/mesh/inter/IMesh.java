@@ -351,6 +351,17 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	boolean isHole(@NotNull F face);
 
 	/**
+	 * Returns true if the edge is a hole edge i.e. part of a hole in O(1) (there might be multiple holes
+	 * and each hole is a boundary).
+	 *
+	 * @param edge the edge
+	 * @return true if the edge is a hole edge, false otherwise
+	 */
+	default boolean isHole(@NotNull E edge) {
+		return isHole(getFace(edge));
+	}
+
+	/**
 	 * Returns true if the vertex is a boundary vertex in O(d) worst case where d
 	 * is the degree of the vertex. In general this should only cost O(1) if the data
 	 * structure well maintained and this method returns true (otherwise it will check each
