@@ -304,7 +304,7 @@ public class TopographyWindow extends JPanel {
 				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
 
 		/* resize Topography */
-		TopographyAction resizeTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
+		TopographyAction resizeTopographyBound = new ActionResizeTopographyBound(Messages.getString("TopographyBoundDialog.tooltip"),
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
 				panelModel, selectShape, undoSupport);
 
