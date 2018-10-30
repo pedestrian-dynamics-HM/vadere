@@ -24,8 +24,6 @@ import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.math.IDistanceFunction;
 
-import sun.jvm.hotspot.debugger.cdbg.Sym;
-
 import java.awt.*;
 import java.util.Collection;
 import java.util.Comparator;
