@@ -3,6 +3,8 @@ package org.vadere.simulator.models.queuing;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
@@ -36,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ModelClass
@@ -162,7 +165,12 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
         throw new UnsupportedOperationException("not jet implemented");
     }
 
-    @Override
+	@Override
+	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
+	@Override
     public PotentialFieldTargetQueuingGrid clone() {
         throw new UnsupportedOperationException("this method is not jet implemented");
     }

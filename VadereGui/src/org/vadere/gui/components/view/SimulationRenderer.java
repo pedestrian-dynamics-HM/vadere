@@ -100,7 +100,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         }
 
         if(model.config.isShowTargetPotentielFieldMesh()) {
-	        renderMesh(graphics, model.getDiscretization(), width, height);
+	        renderMesh(graphics, model.getDiscretization(), new VRectangle(model.getTopographyBound()));
         }
 
         renderSimulationContent(graphics);
@@ -181,7 +181,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     private void renderPotentialFieldOnViewport(final Graphics2D g, final int xPos, final int yPos, final int width, final int height) {
 
-    	logger.info("resolution = " + width + ", " + height);
+    	//logger.info("resolution = " + width + ", " + height);
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
 		 */

@@ -6,40 +6,17 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
-import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
-import org.vadere.simulator.utils.TexGraphGenerator;
-import org.vadere.state.attributes.models.AttributesFloorField;
-import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.util.data.cellgrid.CellState;
-import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.util.math.DistanceFunction;
-import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -63,8 +40,6 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	private boolean showVoroniDiagram;
 
-	private boolean showTriangulation;
-
 	private VPoint cursorWorldPosition;
 
 	private VPoint startSelectionPoint;
@@ -87,12 +62,6 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	public T config;
 
-	private IIncrementalTriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation;
-
-	private Collection<VTriangle> triangles;
-
-	protected boolean triangulationTriggered = false;
-
 	public DefaultModel(final T config) {
 		this.config = config;
 		this.scaleFactor = 50;
@@ -101,13 +70,11 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.cursorWorldPosition = VPoint.ZERO;
 		this.selectScenarioElementListener = new LinkedList<>();
 		this.voronoiDiagram = null;
-		this.showTriangulation = false;
 		this.showVoroniDiagram = true;
 		this.showSelection = false;
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();
 		this.scaleChangeListeners = new ArrayList<>();
-		this.triangulation = null;
 	}
 
 	@Override
@@ -190,10 +157,6 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		for (IViewportChangeListener listener : viewportChangeListeners) {
 			listener.viewportChange(event);
 		}
-	}
-
-	public boolean isTriangulationVisible() {
-		return showTriangulation;
 	}
 
 	@Override
@@ -386,18 +349,6 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public void showTriangulation() {
-		showTriangulation = true;
-		setChanged();
-	}
-
-	@Override
-	public void hideTriangulation() {
-		showTriangulation = false;
-		setChanged();
-	}
-
-	@Override
 	public void showSelection() {
 		showSelection = true;
 		setChanged();
@@ -541,95 +492,6 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public T getConfig() {
 		return config;
-	}
-
-	/*
-	 * returns the adaptive triangulation (see persson-2004 'A Simple Mesh Generator in MATLAB.')
-	 */
-	public void startTriangulation() {
-		if(!triangulationTriggered) {
-			triangulationTriggered = true;
-			VRectangle bound = new VRectangle(getTopographyBound());
-			Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
-			obstacles.addAll(getTopography().getObstacles());
-
-			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
-
-			IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
-					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-					new VRectangle(getTopography().getBounds()),
-					new AttributesFloorField());
-			Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
-			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
-			CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState(), bound.getMinX(), bound.getMinY());
-			cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
-			Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
-			IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
-
-			/*PPSMeshing meshImprover = new PPSMeshing(
-					distanceFunc,
-					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0)*0.8, 2), 6.0),
-					0.3,
-					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
-
-			PEikMesh meshImprover = new PEikMesh(
-					distanceFunc,
-					p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
-					0.35,
-					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
-
-			/*PPSMeshing meshImprover = new PPSMeshing(
-					distanceFunc,
-					p -> 1.0,
-					1.0,
-					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));*/
-
-
-			triangulation = meshImprover.getTriangulation();
-
-			Thread t = new Thread(() -> {
-				while(!meshImprover.isFinished()) {
-					meshImprover.improve();
-					/*try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}*/
-					setChanged();
-					notifyObservers();
-				}
-				//meshImprover.improve();
-				Function<PFace<EikMeshPoint>, Color> colorFunction = f -> {
-					float grayScale = (float) meshImprover.faceToQuality(f);
-					return triangulation.isValid(f) ? new Color(grayScale, grayScale, grayScale) : Color.RED;
-				};
-
-				log.info(TexGraphGenerator.toTikz(meshImprover.getMesh(), colorFunction, 1.0f));
-				log.info("number of points = " + meshImprover.getMesh().getVertices().size());
-				log.info("number of triangle = " + meshImprover.getMesh().getFaces().size());
-				log.info("avg-quality = " + meshImprover.getQuality());
-				log.info("min-quality = " + meshImprover.getMinQuality());
-			});
-			t.start();
-		}
-	}
-
-	public Collection<VTriangle> getTriangles() {
-		if(triangulation == null) {
-			return Collections.EMPTY_LIST;
-		}
-		synchronized (triangulation.getMesh()) {
-			return triangulation.streamTriangles().collect(Collectors.toList());
-		}
-	}
-
-	public Collection<VPolygon> getHoles() {
-		if(triangulation == null) {
-			return Collections.EMPTY_LIST;
-		}
-		synchronized (triangulation.getMesh()) {
-			return triangulation.getMesh().streamHoles().map(f -> triangulation.getMesh().toPolygon(f)).collect(Collectors.toList());
-		}
 	}
 
 	/*public void startTriangulation() {

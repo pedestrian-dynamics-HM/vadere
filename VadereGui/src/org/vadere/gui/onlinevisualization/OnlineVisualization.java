@@ -128,8 +128,11 @@ public class OnlineVisualization implements PassiveCallback {
 			IPotentialField pedPotentialField = null;
 			Agent selectedAgent = null;
 
-			if(model.config.isShowPotentialField() && model.getSelectedElement() instanceof Agent && potentialField != null) {
+			if(model.getSelectedElement() instanceof Agent){
 				selectedAgent = (Agent)model.getSelectedElement();
+			}
+
+			if(model.config.isShowPotentialField() && selectedAgent != null && potentialField != null) {
 				pedPotentialField = IPotentialField.copyAgentField(potentialField, selectedAgent, new VRectangle(model.getTopographyBound()), 0.1);
 			}
 

@@ -596,9 +596,12 @@ public abstract class DefaultRenderer {
 		}
 	}
 
-	protected void renderMesh(final Graphics2D g, @NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?> mesh, final int width, final int height) {
+	protected void renderMesh(
+			@NotNull final Graphics2D g,
+			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?> mesh,
+			@NotNull final VRectangle bound) {
 		MeshRenderer<? extends IPotentialPoint, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
-		meshRenderer.render(g, width, height);
+		meshRenderer.renderGraphics(g, bound);
 	}
 
 	protected void renderVoronoiDiagram(final Graphics2D g, final VoronoiDiagram voronoiDiagram) {

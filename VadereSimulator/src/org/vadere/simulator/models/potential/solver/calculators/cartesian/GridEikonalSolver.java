@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -23,7 +24,7 @@ public interface GridEikonalSolver extends EikonalSolver {
 
 	// TODO: implement this!
 	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization(final CellGrid potentialField) {
-		throw new UnsupportedOperationException("not jet implemented.");
+		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
 	}
 
 	@Override

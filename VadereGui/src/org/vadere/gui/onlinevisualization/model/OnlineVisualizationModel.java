@@ -195,7 +195,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	public Function<IPoint, Double> getPotentialField() {
 	    Function<IPoint, Double> f = pos -> 0.0;
 
-	    if(potentialField != null && config.isShowPotentialField() && agent.equals(getSelectedElement())) {
+	    if(agent != null && potentialField != null && config.isShowPotentialField() && agent.equals(getSelectedElement())) {
 	    	f = pos -> potentialField.getPotential(pos, agent);
 	    }
 		else if(potentialFieldTarget != null && config.isShowTargetPotentialField()) {
@@ -210,7 +210,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	@Override
 	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
-		if(discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
+		if(agent != null && discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
 			return discretizations.apply(agent);
 		}
 
