@@ -409,11 +409,39 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         Predicate<E> isEdgeInCone = e -> isPointInCone.test(e) || isPointInCone.test(getMesh().getPrev(e));
 
-        LinkedList<F> visitedFaces = triangulation.straightWalk2DGatherDirectional(halfEdge, face, direction2, isEdgeInCone);
-        F destination = visitedFaces.getLast();
+        LinkedList<E> visitedFaces = triangulation.straightWalk2DGatherDirectional(face, direction2, isEdgeInCone);
+        F destination = triangulation.getMesh().getFace(visitedFaces.getLast());
 
-	    SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
-	    visitedFaces.stream().forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+	    /*SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+	    visitedFaces.stream().map(e -> triangulation.getMesh().getFace(e)).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+	    DebugGui.setDebugOn(true);
+	    if(DebugGui.isDebugOn()) {
+	    	// attention the view is mirrowed.
+		    canvas.addGuiDecorator(graphics -> {
+			    Graphics2D graphics2D = (Graphics2D)graphics;
+			    graphics2D.setColor(Color.GREEN);
+			    graphics2D.setStroke(new BasicStroke(0.05f));
+			    logger.info("p: " + p);
+			    graphics2D.draw(new VLine(p, p.add(direction1.scalarMultiply(10))));
+			    graphics2D.setColor(Color.BLUE);
+			    graphics2D.draw(new VLine(p, p.add(direction2.scalarMultiply(10))));
+			    //graphics2D.fill(new VCircle(new VPoint(getMesh().toPoint(startVertex)), 0.05));
+			    //graphics2D.fill(new VCircle(q, 0.05));
+		    });
+		    DebugGui.showAndWait(canvas);
+	    }*/
+
+        assert !destination.equals(face);
+
+        if(!getMesh().isBoundary(destination)) {
+            return getMesh().streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> getMesh().getPoint(v)).findAny();
+        }
+        else {
+            logger.warn("walked to boundary");
+
+	        visitedFaces = triangulation.straightWalk2DGatherDirectional(face, direction2, isEdgeInCone);
+            SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+	    visitedFaces.stream().map(e -> triangulation.getMesh().getFace(e)).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
 	    DebugGui.setDebugOn(true);
 	    if(DebugGui.isDebugOn()) {
 	    	// attention the view is mirrowed.
@@ -430,14 +458,6 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 		    });
 		    DebugGui.showAndWait(canvas);
 	    }
-
-        assert !destination.equals(face);
-
-        if(!getMesh().isBoundary(destination)) {
-            return getMesh().streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> getMesh().getPoint(v)).findAny();
-        }
-        else {
-            logger.warn("walked to boundary");
             return Optional.empty();
         }
 
@@ -510,83 +530,6 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         }
 
         return minHe;
-    }
-
-
-    //TODO: refactoring!
-    private E findPointInCone(final E halfEdge, final P p1, final P p2) {
-        P point = getMesh().getPoint(halfEdge);
-        VTriangle triangle = new VTriangle(new VPoint(point), new VPoint(p1), new VPoint(p2));
-
-        // 1. construct the acute cone
-        VPoint direction = triangle.getIncenter().subtract(point);
-        double angle = Math.PI - GeometryUtils.angle(p1, point, p2);
-        VPoint origin = new VPoint(point);
-        VCone cone = new VCone(origin, direction, angle);
-
-        // 2. search for the nearest point inside the cone
-        Set<F> visitedFaces = new HashSet<>();
-        LinkedList<E> pointList = new LinkedList<>();
-
-        E edge = getMesh().getNext(getMesh().getTwin(getMesh().getPrev(halfEdge)));
-        pointList.add(edge);
-        visitedFaces.add(getMesh().getFace(edge));
-
-        while (!pointList.isEmpty()) {
-            E candidate = pointList.removeFirst();
-
-            // we can not search further since we reach the boundary.
-            if (!getMesh().isBoundary(candidate)) {
-                P vertex = getMesh().getPoint(candidate);
-                if (isFeasibleForComputation(vertex) && cone.contains(new VPoint(vertex))) {
-                    return candidate;
-                } else if(cone.contains(new VPoint(vertex))) {
-                    E newCandidate = getMesh().getNext(getMesh().getTwin(candidate));
-                    if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
-                        visitedFaces.add(getMesh().getFace(newCandidate));
-                        pointList.add(newCandidate);
-                    }
-
-                    newCandidate = getMesh().getNext(getMesh().getTwin(getMesh().getNext(candidate)));
-                    if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
-                        visitedFaces.add(getMesh().getFace(newCandidate));
-                        pointList.add(newCandidate);
-                    }
-                }
-                else {
-                    P v1 = getMesh().getPoint(candidate);
-                    P v2 = getMesh().getPoint(getMesh().getPrev(candidate));
-                    P v3 = getMesh().getPoint(getMesh().getNext(candidate));
-
-                    VLine line1 = new VLine(new VPoint(v1), new VPoint(v2));
-                    VLine line2 = new VLine(new VPoint(v1), new VPoint(v3));
-
-                    if (cone.overlapLineSegment(line1)) {
-                        E newCandidate = getMesh().getNext(getMesh().getTwin(candidate));
-
-                        if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
-                            visitedFaces.add(getMesh().getFace(newCandidate));
-                            pointList.add(newCandidate);
-                        }
-                    }
-
-                    if (cone.overlapLineSegment(line2)) {
-                        E newCandidate = getMesh().getNext(getMesh().getTwin(getMesh().getNext(candidate)));
-
-                        if (!visitedFaces.contains(getMesh().getFace(newCandidate))) {
-                            visitedFaces.add(getMesh().getFace(newCandidate));
-                            pointList.add(newCandidate);
-                        }
-                    }
-                }
-            }
-            else {
-                logger.warn("boundary reached!");
-            }
-        }
-
-        logger.warn("no virtual vertex was found");
-        return null;
     }
 
     private double computePotential(final P point, final P point1, final P point2) {

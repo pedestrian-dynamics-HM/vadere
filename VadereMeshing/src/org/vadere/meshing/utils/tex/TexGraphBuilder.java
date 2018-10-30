@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 
 /**
  * Builder class for Tikz Graphics used in tex / latex documents.
+ * @author Stefan Schuhbaeck
  */
 public class TexGraphBuilder<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
 

@@ -706,8 +706,14 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param face  the face
 	 * @return true if the point (x, y) is contained in the face, false otherwise
 	 */
-	default boolean contains(final double x, final double y, final F face) {
+	default boolean contains(final double x, final double y, @NotNull final F face) {
 		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x, y, edge));
+	}
+
+	default boolean contains(final double x, final double y, @NotNull final V v1, @NotNull final V v2, @NotNull final V v3) {
+		return !GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x, y)
+				&& !GeometryUtils.isRightOf(v2.getX(), v2.getY(), v3.getX(), v3.getY(), x, y)
+				&& !GeometryUtils.isRightOf(v3.getX(), v3.getY(), v1.getX(), v1.getY(), x, y);
 	}
 
 	/**

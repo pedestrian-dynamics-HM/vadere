@@ -15,6 +15,7 @@ import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -35,6 +36,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -99,6 +101,8 @@ public class TestFFMNonUniformTriangulation {
 	    meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
+
+
 	    Predicate<PFace<PotentialPoint>> nonAccute = f -> triangulation.getMesh().toTriangle(f).isNonAcute();
 	    //MeshPanel meshPanel = new MeshPanel(meshGenerator.getMesh(), nonAccute, 1000, 1000, bbox);
 	    //meshPanel.display();
@@ -116,33 +120,40 @@ public class TestFFMNonUniformTriangulation {
                 triangulation,
 		        targetVertices,
                 distanceFunc);
-
+		long ms = System.currentTimeMillis();
         log.info("start FFM");
         solver.initialize();
         log.info("FFM finished");
+        log.info("time: " + (System.currentTimeMillis() - ms));
         double maxError = 0;
         double sum = 0;
         int counter = 0;
         try {
             //System.out.println(getClass().getClassLoader().getResource("./potentialField.csv").getFile());
-            FileWriter writer = new FileWriter("./potentialField_adapt_0_7.csv");
+	        Date timestamp = new Date();
+
+            FileWriter potentialFieldWriter = new FileWriter("./output/" + timestamp.getTime() + "potentialField_adapt_0_7.csv");
+	        FileWriter meshWriter = new FileWriter("./output/"+ timestamp.getTime() + "mesh.tex");
+	        meshWriter.write(TexGraphGenerator.toTikz(triangulation.getMesh(), true));
 
             for(double y = bbox.getMinY()+2; y <= bbox.getMaxY()-2; y += 0.1) {
                 for(double x = bbox.getMinX()+2; x < bbox.getMaxX()-2; x += 0.1) {
                     double val = solver.getPotential(x ,y);
-                    if(val >= 0.0) {
+                    if(val >= 0.0 && val < Double.MAX_VALUE) {
                         double side = Math.min((new VPoint(x, y).distanceToOrigin()-2.0), (10 - new VPoint(x, y).distanceToOrigin()));
                         side = Math.max(side, 0.0);
                         maxError = Math.max(maxError, Math.abs(val - side));
                         sum +=  Math.abs(val - side) *  Math.abs(val - side);
                         counter++;
                     }
-                    writer.write(""+solver.getPotential(x ,y) + " ");
+                    potentialFieldWriter.write(""+solver.getPotential(x ,y) + " ");
                 }
-                writer.write("\n");
+                potentialFieldWriter.write("\n");
             }
-            writer.flush();
-
+            potentialFieldWriter.flush();
+            potentialFieldWriter.close();
+	        meshWriter.flush();
+			meshWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -393,6 +404,7 @@ public class TestFFMNonUniformTriangulation {
         //assertTrue(0.0 < solver.getValue(1, 7));
     }
 
+    @Ignore
     @Test
     public void testRegularFMMCase2() {
 

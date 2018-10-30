@@ -1,6 +1,7 @@
 package org.vadere.util.geometry;
 
 import org.junit.Test;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -8,7 +9,9 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Path2D;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class GeometryUtilsTest {
 
@@ -27,6 +30,59 @@ public class GeometryUtilsTest {
 
 		assertTrue( GeometryUtils.signedAreaOfPolygon(polygon.getPoints()) < 0) ;
 		assertTrue(GeometryUtils.signedAreaOfPolygon(polygon.revertOrder().getPoints()) > 0);
+	}
+
+	@Test
+	public void testDistanceToLineSegment() {
+		VPoint p = new VPoint(0,0);
+		VPoint q = new VPoint(2, 0);
+
+		VPoint p1 = new VPoint(0,0);
+		VPoint p2 = new VPoint(1, 1);
+
+		VLine line1 = new VLine(p, q);
+		VLine line2 = new VLine(p1, p2);
+
+		assertEquals(0, GeometryUtils.distanceToLineSegment(p, q, 1, 0), GeometryUtils.DOUBLE_EPS);
+		assertEquals(1, GeometryUtils.distanceToLineSegment(p, q, 2, 1), GeometryUtils.DOUBLE_EPS);
+		assertEquals(Math.sqrt(1*1 + 4*4), GeometryUtils.distanceToLineSegment(p, q, 6, -1), GeometryUtils.DOUBLE_EPS);
+
+		assertEquals(Math.sqrt(3*3 + 3*3), GeometryUtils.distanceToLineSegment(p1, p2, 4,4), GeometryUtils.DOUBLE_EPS);
+		assertEquals(Math.sqrt(4*4 + 4*4), GeometryUtils.distanceToLineSegment(p1, p2, -4,-4), GeometryUtils.DOUBLE_EPS);
+		assertEquals(Math.sqrt(0.5 * 0.5 + 0.5 * 0.5), GeometryUtils.distanceToLineSegment(p1, p2, 1,0), GeometryUtils.DOUBLE_EPS);
+
+		assertEquals(line1.distance(new VPoint(3.21, -123.123)), GeometryUtils.distanceToLineSegment(p, q, 3.21, -123.123), GeometryUtils.DOUBLE_EPS);
+		assertEquals(line2.distance(new VPoint(313.21, 3.123)), GeometryUtils.distanceToLineSegment(p1, p2, 313.21, 3.123), GeometryUtils.DOUBLE_EPS);
+	}
+
+	@Test
+	public void testDistanceToLine() {
+		VPoint p = new VPoint(0,0);
+		VPoint q = new VPoint(2, 0);
+
+		VPoint p1 = new VPoint(0,0);
+		VPoint p2 = new VPoint(1, 1);
+
+		assertEquals(0, GeometryUtils.distanceToLine(p, q, 1, 0), GeometryUtils.DOUBLE_EPS);
+		assertEquals(1, GeometryUtils.distanceToLine(p, q, 2, 1), GeometryUtils.DOUBLE_EPS);
+		assertEquals(1, GeometryUtils.distanceToLine(p, q, 6, -1), GeometryUtils.DOUBLE_EPS);
+		assertEquals(4, GeometryUtils.distanceToLine(p, q, 4,4), GeometryUtils.DOUBLE_EPS);
+
+		assertEquals(0, GeometryUtils.distanceToLine(p1, p2, 4,4), GeometryUtils.DOUBLE_EPS);
+		assertEquals(0, GeometryUtils.distanceToLine(p1, p2, -4,-4), GeometryUtils.DOUBLE_EPS);
+		assertEquals(Math.sqrt(0.5 * 0.5 + 0.5 * 0.5), GeometryUtils.distanceToLine(p1, p2, 1,0), GeometryUtils.DOUBLE_EPS);
+	}
+
+	@Test
+	public void testHalfLineIntersect() {
+
+		VPoint p1 = new VPoint(0, 0);
+		VPoint p2 = new VPoint(3, 3);
+
+		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(1, 0), new VPoint(0, 1), p1, p2));
+		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(1, 0), new VPoint(0.5, 0.5), p1, p2));
+		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(1, 0), new VPoint(1, 1), p1, p2));
+		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(2, 1), new VPoint(-1, 31), p1, p2));
 	}
 
 	@Test
