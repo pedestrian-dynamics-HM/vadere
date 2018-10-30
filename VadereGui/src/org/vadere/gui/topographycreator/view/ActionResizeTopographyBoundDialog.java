@@ -4,6 +4,8 @@ import org.vadere.gui.projectview.view.ProjectView;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Locale;
+import org.vadere.gui.components.utils.Messages;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -20,7 +22,7 @@ public class ActionResizeTopographyBoundDialog {
 	public ActionResizeTopographyBoundDialog(final Rectangle2D.Double topographyBound){
 
 		textField = new JTextField();
-		textField.setText(String.format("%.3f x %.3f", topographyBound.getWidth(), topographyBound.getHeight()));
+		textField.setText(String.format(Locale.US, "%.3f x %.3f", topographyBound.getWidth(), topographyBound.getHeight()));
 		textField.getDocument().addDocumentListener(new DialogListener());
 
 		bound = topographyBound;
@@ -36,7 +38,7 @@ public class ActionResizeTopographyBoundDialog {
 		return JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
 				textField,
-				"width x heigt",
+				Messages.getString("TopographyBoundDialog.title"),
 				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
 	}
 
