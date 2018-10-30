@@ -338,8 +338,10 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public void destroyVertex(@NotNull final PVertex<P> vertex) {
 		//vertices.remove(vertex);
-		vertex.destroy();
-		numberOfVertices--;
+		if(!isDestroyed(vertex)) {
+			vertex.destroy();
+			numberOfVertices--;
+		}
 	}
 
 	@Override
@@ -368,6 +370,28 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	@Override
 	public Iterable<PHalfEdge<P>> getEdgeIt() {
 		return () -> edges.iterator();
+	}
+
+	@Override
+	public PVertex<P> getRandomVertex(@NotNull final Random random) {
+		int startIndex = random.nextInt(vertices.size());
+		int index = startIndex;
+
+		// look above
+		while (index < vertices.size() && isDestroyed(vertices.get(index))) {
+			index++;
+		}
+
+		// look below
+		if(isDestroyed(vertices.get(index))) {
+			index = startIndex - 1;
+
+			while (index >= 0 && isDestroyed(vertices.get(index))) {
+				index--;
+			}
+		}
+
+		return vertices.get(index);
 	}
 
 	@Override
@@ -405,7 +429,7 @@ public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P
 	}
 
 	@Override
-	public synchronized IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> clone() {
+	public synchronized PMesh<P> clone() {
 		try {
 			PMesh<P> clone = (PMesh<P>)super.clone();
 			clone.pointConstructor = pointConstructor;

@@ -382,6 +382,28 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
+	public AVertex<P> getRandomVertex(@NotNull Random random) {
+		int startIndex = random.nextInt(vertices.size());
+		int index = startIndex;
+
+		// look above
+		while (index < vertices.size() && isDestroyed(vertices.get(index))) {
+			index++;
+		}
+
+		// look below
+		if(isDestroyed(vertices.get(index))) {
+			index = startIndex - 1;
+
+			while (index >= 0 && isDestroyed(vertices.get(index))) {
+				index--;
+			}
+		}
+
+		return vertices.get(index);
+	}
+
+	@Override
 	public int getNumberOfVertices() {
 		return numberOfVertices;
 	}

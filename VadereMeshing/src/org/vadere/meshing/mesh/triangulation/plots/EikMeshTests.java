@@ -63,7 +63,7 @@ public class EikMeshTests {
 
 		Predicate<AFace<EikMeshPoint>> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
 		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
-				predicate, 1000, 800, bbox);
+				predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("EikMesh: uniformCircle("+ initialEdgeLength +")");

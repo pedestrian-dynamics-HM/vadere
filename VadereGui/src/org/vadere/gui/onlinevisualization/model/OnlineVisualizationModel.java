@@ -11,8 +11,12 @@ import java.util.stream.Collectors;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.state.scenario.*;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
@@ -32,6 +36,8 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	private IPotentialField potentialFieldTarget = null;
 
 	private IPotentialField potentialField = null;
+
+	private Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations = null;
 
 	private Agent agent = null;
 
@@ -112,6 +118,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
             potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
 			potentialField = observationAreaSnapshot.potentialField;
 			agent = observationAreaSnapshot.selectedAgent;
+			discretizations = observationAreaSnapshot.discretizations;
 
 			/*
 			 * if(topography == null ||
@@ -199,6 +206,15 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
         }
 
 		return f;
+	}
+
+	@Override
+	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+		if(discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
+			return discretizations.apply(agent);
+		}
+
+		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
 	}
 
 	@Override

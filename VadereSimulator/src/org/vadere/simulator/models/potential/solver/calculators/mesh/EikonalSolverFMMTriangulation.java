@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -12,38 +13,34 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCone;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.util.math.IDistanceFunction;
+
+import sun.jvm.hotspot.debugger.cdbg.Sym;
 
 import java.awt.*;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 /**
- * This class computes the travelling time T(x) using the fast marching method for arbitrary triangulated meshes.
- * The quality of the result depends on the quality of the triangulation. Therefore, the triangulation should not contain
- * too many non-acute triangles.
+ * This class computes the traveling time T using the fast marching method for arbitrary triangulated meshes.
+ * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
+ * should not contain too many non-acute triangles.
  *
  * @param <P>   the type of the points of the triangulation extending {@link IPotentialPoint}
  * @param <V>   the type of the vertices of the triangulation
@@ -53,6 +50,10 @@ import java.util.stream.Collectors;
 public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements EikonalSolver {
 
     private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
+
+    static {
+    	logger.setLevel(Level.INFO);
+    }
 
 	/**
 	 * The time cost function defined on the geometry.
@@ -173,7 +174,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
 	            if(potentialP.getPathFindingTag() == PathFindingTag.Undefined) {
                     double dist = Math.max(-distFunc.apply(potentialP), 0);
-                    logger.info(dist);
+                    logger.debug("T at " + potentialP + " = " + dist);
                     potentialP.setPotential(Math.min(potentialP.getPotential(), dist / timeCostFunction.costAt(potentialP)));
                     potentialP.setPathFindingTag(PathFindingTag.Reachable);
                     narrowBand.add(v);
@@ -210,12 +211,12 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     @Override
     public void initialize() {
 	    if (!calculationFinished) {
-		    while (this.narrowBand.size() > 0) {
-			    V vertex = this.narrowBand.poll();
+		    while (narrowBand.size() > 0) {
+			    V vertex = narrowBand.poll();
 			    getMesh().getPoint(vertex).setPathFindingTag(PathFindingTag.Reached);
 			    updatePotentialOfNeighbours(vertex);
 		    }
-		    this.calculationFinished = true;
+		    calculationFinished = true;
 	    }
     }
 
@@ -236,6 +237,26 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         return getPotential(triangulation, x, y);
     }
 
+	@Override
+	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+		return triangulation.getMesh().clone();
+	}
+
+	/**
+	 * Returns the interpolated value of the traveling time T at (x, y) for a triangulation on which the
+	 * eikonal equation was solved.
+	 *
+	 * @param triangulation the triangulation for which the triangulation was solved
+	 * @param x             the x-coordinate of the point
+	 * @param y             the y-coordinate of the point
+	 *
+	 * @param <P>   the type of the points of the triangulation extending {@link IPotentialPoint}
+	 * @param <V>   the type of the vertices of the triangulation
+	 * @param <E>   the type of the half-edges of the triangulation
+	 * @param <F>   the type of the faces of the triangulation
+	 *
+	 * @return the interpolated value of the traveling time T at (x, y)
+	 */
     private static <P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double getPotential(
     		@NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
 		    final double x,
@@ -261,9 +282,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
     /**
-     * Updates the potential values of all neighbours of a certain vertex inside the triangulation.
+     * Updates the the traveling times T of all neighbours of <tt>vertex</tt>.
      *
-     * @param vertex    the vertex
+     * @param vertex the vertex
      */
     private void updatePotentialOfNeighbours(@NotNull final V vertex) {
         for(V neighbour : getMesh().getAdjacentVertexIt(vertex)) {
@@ -272,8 +293,11 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
     /**
-     * Updates the potential values a certain vertex by recomputing its potential.
-     * @param vertex
+     * Updates the traveling time T of a certain vertex by recomputing it and
+     * updates the narrow band if necessary. If the recomputed value is larger
+     * than the old value, nothing will change.
+     *
+     * @param vertex the vertex for which T will be updated
      */
     private void updatePotential(@NotNull final V vertex) {
         double potential = recomputePotential(vertex);
@@ -289,17 +313,17 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         }
 
         if(potentialPoint.getPathFindingTag() == PathFindingTag.Undefined) {
-            logger.warn("could not set neighbour vertex" + vertex);
+            logger.debug("could not set neighbour vertex" + vertex);
         }
     }
 
     /**
-     * Recomputes the potential of a potential point of a certain vertex by
-     * computing all possible potentials for each neighbouring points and returns it.
-     * If the new potential is not smaller than the old potential of the point, the old
-     * value will be returned.
+     * Recomputes traveling time T of a potential point of a certain vertex by
+     * computing all possible traveling times for each neighbouring points
+     * returning the minimum.
      *
-     * @param vertex    the vertex which represents the potential point.
+     * @param vertex the vertex which represents the potential point.
+     *
      * @return the recomputed potential of a potential point
      */
     private double recomputePotential(@NotNull final V vertex) {
@@ -316,7 +340,15 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
 
-    public boolean isNonAcute(@NotNull final E edge) {
+	/**
+	 * Tests whether the triangle / face of <tt>edge</tt> is non-acute. In this case we can not use
+	 * the triangle for computation but have to search for numerical support.
+	 *
+	 * @param edge  the edge defining the face / triangle
+	 *
+	 * @return true if the face / triangle is non-acute, false otherwise
+	 */
+	private boolean isNonAcute(@NotNull final E edge) {
         VPoint p1 = getMesh().toPoint(getMesh().getPrev(edge));
         VPoint p2 = getMesh().toPoint(edge);
         VPoint p3 = getMesh().toPoint(getMesh().getNext(edge));
@@ -354,8 +386,8 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
                 return computePotential(point, p1, p2);
             } // we only try to find a virtual vertex if both points are already frozen
             else {
-                logger.info("special case for non-acute triangle");
-                Optional<P> optPoint = walkToFeasiblePoint(halfEdge, face);
+                logger.debug("special case for non-acute triangle");
+                Optional<P> optPoint = walkToNumericalSupport(halfEdge, face);
 
                 if(optPoint.isPresent()) {
                     P surrogatePoint = optPoint.get();
@@ -376,12 +408,30 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         return Double.MAX_VALUE;
     }
 
-    private boolean isFeasibleForComputation(final P p){
+	/**
+	 * Defines the porperties for which a point is used to compute the traveling time of neighbouring points.
+	 *
+	 * @param p the point which is tested
+	 *
+	 * @return true if the point can be used for computation, false otherwise
+	 */
+	private boolean isFeasibleForComputation(final P p){
         //return p.getPathFindingTag().frozen;
         return p.getPathFindingTag() == PathFindingTag.Reachable || p.getPathFindingTag() == PathFindingTag.Reached;
     }
 
-    private Optional<P> walkToFeasiblePoint(@NotNull final E halfEdge, @NotNull final F face) {
+	/**
+	 * In case of a non-acute triangle / face this method searches for numerical support. The point which offers this support
+	 * has to lie inside a certain cone which starts at the vertex of <tt>halfedge</tt> and which contains only points p such
+	 * that p and the vertex of <tt>halfedge</tt> and each of the other points of <tt>face</tt> form a acute and therefore
+	 * valid triangle.
+	 *
+	 * @param halfEdge  the half-edge of the vertex for which a numerical support will be searched
+	 * @param face      the face containing the <tt>halfedge</tt> for which a numerical support will be searched
+	 *
+	 * @return (optional) a numerical support such that a acute triangle can be formed or empty if no support can be found
+	 */
+	private Optional<P> walkToNumericalSupport(@NotNull final E halfEdge, @NotNull final F face) {
         assert getMesh().toTriangle(face).isNonAcute();
 
         E next = getMesh().getNext(halfEdge);
@@ -393,12 +443,6 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         VPoint direction1 = pNext.subtract(p).rotate(+Math.PI/2);
         VPoint direction2 = pPrev.subtract(p).rotate(-Math.PI/2);
-
-	    VPoint direction11 = pNext.subtract(p);
-	    VPoint direction22 = pPrev.subtract(p);
-
-        //logger.info(p + ", " + pNext + ", " + pPrev);
-        //logger.info(direction1 + ", " + direction2);
 
         Predicate<E> isPointInCone = e ->
         {
@@ -412,34 +456,39 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         LinkedList<E> visitedFaces = triangulation.straightWalk2DGatherDirectional(face, direction2, isEdgeInCone);
         F destination = triangulation.getMesh().getFace(visitedFaces.getLast());
 
-	    /*SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
-	    visitedFaces.stream().map(e -> triangulation.getMesh().getFace(e)).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
-	    DebugGui.setDebugOn(true);
-	    if(DebugGui.isDebugOn()) {
-	    	// attention the view is mirrowed.
-		    canvas.addGuiDecorator(graphics -> {
-			    Graphics2D graphics2D = (Graphics2D)graphics;
-			    graphics2D.setColor(Color.GREEN);
-			    graphics2D.setStroke(new BasicStroke(0.05f));
-			    logger.info("p: " + p);
-			    graphics2D.draw(new VLine(p, p.add(direction1.scalarMultiply(10))));
-			    graphics2D.setColor(Color.BLUE);
-			    graphics2D.draw(new VLine(p, p.add(direction2.scalarMultiply(10))));
-			    //graphics2D.fill(new VCircle(new VPoint(getMesh().toPoint(startVertex)), 0.05));
-			    //graphics2D.fill(new VCircle(q, 0.05));
-		    });
-		    DebugGui.showAndWait(canvas);
-	    }*/
-
         assert !destination.equals(face);
 
         if(!getMesh().isBoundary(destination)) {
+
+	        /*System.out.println(isPointInCone.test(visitedFaces.getLast()));
+
+	        SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
+	        visitedFaces.stream().map(e -> triangulation.getMesh().getFace(e)).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
+	        DebugGui.setDebugOn(true);
+	        if(DebugGui.isDebugOn()) {
+		        // attention the view is mirrowed.
+		        canvas.addGuiDecorator(graphics -> {
+			        Graphics2D graphics2D = (Graphics2D)graphics;
+			        graphics2D.setColor(Color.GREEN);
+			        graphics2D.setStroke(new BasicStroke(0.05f));
+			        logger.info("p: " + p);
+			        graphics2D.draw(new VLine(p, p.add(direction1.scalarMultiply(10))));
+			        graphics2D.setColor(Color.BLUE);
+			        graphics2D.draw(new VLine(p, p.add(direction2.scalarMultiply(10))));
+			        //graphics2D.fill(new VCircle(new VPoint(getMesh().toPoint(startVertex)), 0.05));
+			        //graphics2D.fill(new VCircle(q, 0.05));
+		        });
+		        DebugGui.showAndWait(canvas);
+	        }*/
+	        /**
+	         * find the support inside the face in O(3).
+	         */
             return getMesh().streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> getMesh().getPoint(v)).findAny();
         }
         else {
             logger.warn("walked to boundary");
 
-	        visitedFaces = triangulation.straightWalk2DGatherDirectional(face, direction2, isEdgeInCone);
+	      /*  visitedFaces = triangulation.straightWalk2DGatherDirectional(face, direction2, isEdgeInCone);
             SimpleTriCanvas canvas = SimpleTriCanvas.simpleCanvas(getMesh());
 	    visitedFaces.stream().map(e -> triangulation.getMesh().getFace(e)).forEach(f -> canvas.getColorFunctions().overwriteFillColor(f, Color.MAGENTA));
 	    DebugGui.setDebugOn(true);
@@ -457,82 +506,22 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 			    //graphics2D.fill(new VCircle(q, 0.05));
 		    });
 		    DebugGui.showAndWait(canvas);
-	    }
+	    }*/
             return Optional.empty();
         }
-
-		/*Predicate<V> feasableVertexPred = v -> Utils.isLeftOf(p, p.add(direction2), mesh.toPoint(v)) && Utils.isRightOf(p, p.add(direction1), mesh.toPoint(v));
-		Predicate<E> feasableEdgePred = e -> feasableVertexPred.test(mesh.getVertex(halfEdge));
-		Predicate<E> stopCondition = e -> {
-			VPoint midPoint = mesh.toLine(e).midPoint();
-			return mesh.isAtBoundary(e) || feasableEdgePred.test(e) || Utils.isRightOf(midPoint, midPoint.add(direction1), mesh.toPoint(e));
-		};
-
-		F newFace = triangulation.straightWalk2DDirectional(halfEdge, direction1, stopCondition);
-
-		if(!mesh.isBoundary(newFace)) {
-			return mesh.streamVertices(newFace).filter(v -> feasableVertexPred.test(v)).map(v -> mesh.getPoint(v)).findAny();
-		}
-		else {
-			return Optional.empty();
-		}*/
     }
 
-    private E findIntersectionPoint(final E halfEdge, final P acceptedPoint, final P unacceptedPoint) {
-        P point = getMesh().getPoint(halfEdge);
-        VTriangle triangle = new VTriangle(new VPoint(point), new VPoint(acceptedPoint), new VPoint(unacceptedPoint));
 
-        // 1. construct the acute cone
-        VPoint direction = triangle.getIncenter().subtract(point);
-        double angle = Math.PI - GeometryUtils.angle(acceptedPoint, point, unacceptedPoint);
-        VPoint origin = new VPoint(point);
-        VCone cone = new VCone(origin, direction, angle);
-        E minHe = null;
-
-        //
-		/*Predicate<Face<? extends PotentialPoint>> pred = f -> {
-			List<HalfEdge<? extends PotentialPoint>> pointList = f.stream()
-				//.filter(he -> he.getEnd().getPathFindingTag().frozen)
-				.filter(he -> !he.getEnd().equals(acceptedPoint))
-				.filter(he -> !he.getEnd().equals(point))
-				.collect(Collectors.toList());
-
-			for(HalfEdge<? extends PotentialPoint> he : pointList) {
-				VTriangle vTriangle = new VTriangle(new VPoint(he.getEnd()), new VPoint(point), new VPoint(acceptedPoint));
-				if(cone.intersect(vTriangle)) {
-					return true;
-				}
-			}
-			return false;
-		};*/
-        //
-
-
-
-        // 2. search for the nearest point inside the cone
-        FaceIterator<P, V, E, F> faceIterator = new FaceIterator<>(getMesh());
-        while (faceIterator.hasNext()) {
-            F face = faceIterator.next();
-            List<E> pointList = getMesh().getEdges(face).stream()
-                    .filter(he -> isFeasibleForComputation(getMesh().getPoint(he)))
-                    .filter(he -> !getMesh().getVertex(he).equals(acceptedPoint))
-                    .filter(he -> !getMesh().getVertex(he).equals(point))
-                    .collect(Collectors.toList());
-
-            for(E he : pointList) {
-                if(cone.contains(new VPoint(getMesh().getVertex(he)))) {
-                    if(minHe == null || getMesh().getPoint(minHe).getPotential() > getMesh().getPoint(he).getPotential()) {
-                        minHe = he;
-                        return minHe;
-                    }
-                }
-            }
-        }
-
-        return minHe;
-    }
-
-    private double computePotential(final P point, final P point1, final P point2) {
+	/**
+	 * Computes the traveling time T at <tt>point</tt> by using the neighbouring points <tt>point1</tt> and <tt>point2</tt>.
+	 *
+	 * @param point     the point for which the traveling time is computed
+	 * @param point1    one neighbouring point
+	 * @param point2    another neighbouring point
+	 *
+	 * @return the traveling time T at <tt>point</tt> by using the triangle (point, point1, point2) for the computation
+	 */
+	private double computePotential(final P point, final P point1, final P point2) {
 
         // see: Sethian, Level Set Methods and Fast Marching Methods, page 124.
         P p1;   // A
@@ -559,7 +548,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         double phi = GeometryUtils.angle(p1, point, p2);
         double cosphi = Math.cos(phi);
 
-        double F = 1.0 / this.timeCostFunction.costAt(point);
+        double F = 1.0 / timeCostFunction.costAt(point);
 
         // solve x2 t^2 + x1 t + x0 == 0
         double x2 = a * a + b * b - 2 * a * b * cosphi;
@@ -576,13 +565,14 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
     /**
-     * Solves the quadratic equation given by a x^2+bx+c=0.
+     * Solves the quadratic equation given by (a*x^2+b*x+c=0).
      *
-     * @param a
-     * @param b
-     * @param c
-     * @return the maximum of both solutions, if any. If det=b^2-4ac < 0, it
-     *         returns Double.MIN_VALUE
+     * @param a a real number in the equation
+     * @param b a real number in the equation
+     * @param c a real number in the equation
+     *
+     * @return the maximum of both solutions, if any.
+     *         Double.MIN_VALUE if there is no real solution i.e. the determinant (det = b^2-4ac is negative)
      */
     private double solveQuadratic(double a, double b, double c) {
         List<Double> solutions = MathUtil.solveQuadratic(a, b, c);

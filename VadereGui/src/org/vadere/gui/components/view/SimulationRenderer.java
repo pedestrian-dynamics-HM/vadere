@@ -99,6 +99,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
         }
 
+        if(model.config.isShowTargetPotentielFieldMesh()) {
+	        renderMesh(graphics, model.getDiscretization(), width, height);
+        }
+
         renderSimulationContent(graphics);
 
         if (model.isElementSelected()) {

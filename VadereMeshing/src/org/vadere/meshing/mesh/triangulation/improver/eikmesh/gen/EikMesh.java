@@ -173,6 +173,8 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 
 		removeTrianglesInsideObstacles();
 
+		getMesh().garbageCollection();
+
 		return getTriangulation();
 	}
 
@@ -202,6 +204,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 				else {
 					log.info("EikMesh re-triangulates in step " + nSteps);
 					retriangulate();
+					log.info("end re-triangulates in step " + nSteps);
 					removeTrianglesOutsideBBox();
 					removeTrianglesInsideObstacles();
 				}

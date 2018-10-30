@@ -43,7 +43,7 @@ public class CPULaplacianSmoothing extends JFrame {
 
 
         Predicate<PFace<EikMeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
-        MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), predicate, 1000, 800, bbox);
+        MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), predicate, 1000, 800);
 
         JFrame frame = distmeshPanel.display();
         frame.setVisible(true);

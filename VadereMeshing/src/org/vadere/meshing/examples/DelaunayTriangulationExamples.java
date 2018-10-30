@@ -30,7 +30,7 @@ public class DelaunayTriangulationExamples {
 		randomTriangulator.generate();
 
 		// display the result
-		MeshPanel meshPanel = new MeshPanel(triangulation.getMesh(), 500, 500, bound);
+		MeshPanel meshPanel = new MeshPanel(triangulation.getMesh(), 500, 500);
 		meshPanel.display();
 	}
 

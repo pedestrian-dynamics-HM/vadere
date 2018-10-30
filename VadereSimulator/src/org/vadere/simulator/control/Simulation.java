@@ -94,26 +94,31 @@ public class Simulation {
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
 		// ::start:: this code is to visualize the potential fields. It may be refactored later.
-		IPotentialFieldTarget pft = null;
-		IPotentialField pt = null;
-		if(mainModel instanceof PotentialFieldModel) {
-			pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
-			pt = (pos, agent) -> {
-				if(agent instanceof PedestrianOSM) {
-					return ((PedestrianOSM)agent).getPotential(pos);
-				}
-				else {
-					return 0.0;
-				}
-			};
+		if(attributesSimulation.isVisualizationEnabled()) {
+			IPotentialFieldTarget pft = null;
+			IPotentialField pt = null;
+			if(mainModel instanceof PotentialFieldModel) {
+				pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+				pt = (pos, agent) -> {
+					if(agent instanceof PedestrianOSM) {
+						return ((PedestrianOSM)agent).getPotential(pos);
+					}
+					else {
+						return 0.0;
+					}
+				};
+			}
+
+			for (PassiveCallback pc : this.passiveCallbacks) {
+				pc.setPotentialFieldTarget(pft);
+				pc.setPotentialField(pt);
+			}
 		}
+		// ::end::
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
-			pc.setPotentialFieldTarget(pft);
-			pc.setPotentialField(pt);
 		}
-		// ::end::
 
 		// create source and target controllers
 		for (Source source : topography.getSources()) {

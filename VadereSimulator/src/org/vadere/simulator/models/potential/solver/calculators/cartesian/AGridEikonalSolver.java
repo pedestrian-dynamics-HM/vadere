@@ -18,22 +18,18 @@ public abstract class AGridEikonalSolver implements GridEikonalSolver {
 
     public Function<IPoint, Double> getPotentialField() {
         CellGrid clone = potentialField.clone();
-        return p -> getPotential(clone, p.getX(), p.getY());
+        return p -> getPotential(clone, p.getX(), p.getY(), unknownPenalty, weight);
     }
 
+    @Override
     public CellGrid getCellGrid() {
 	    return potentialField;
     }
 
-
-    private double getPotential(final CellGrid cellGrid, final double x, final double y) {
-		return getPotential(cellGrid, x, y, unknownPenalty, weight);
-    }
-
     @Override
 	public double getPotential(final double x, final double y) {
-        return getPotential(potentialField, x, y);
-	}
+		return getPotential(x, y, unknownPenalty, weight);
+    }
 
 	@Override
 	public double getPotential(IPoint pos, double unknownPenalty, double weight) {

@@ -55,7 +55,7 @@ public class SierpinskyPlot {
 				new ArrayList<>());
 
 		IIncrementalTriangulation<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> triangulation = uniformRefinementTriangulation.init();
-		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> panel = new MeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800, bbox);
+		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> panel = new MeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800);
 		JFrame frame = panel.display();
 		frame.setVisible(true);
 

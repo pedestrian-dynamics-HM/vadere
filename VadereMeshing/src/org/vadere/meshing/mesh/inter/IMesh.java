@@ -25,6 +25,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.awt.geom.Path2D;
@@ -35,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -1649,6 +1651,15 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	}
 
 	/**
+	 * Returns valid vertex uniformly randomly chosen from the set of all vertices.
+	 *
+	 * @param random a pseudo-random number generator
+	 *
+	 * @return valid vertex uniformly randomly chosen from the set of all vertices.
+	 */
+	V getRandomVertex(@NotNull final Random random);
+
+	/**
 	 * Returns the number of alive vertices in O(1).
 	 *
 	 * @return the number of alive vertices
@@ -1757,6 +1768,32 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return a deep clone of this mesh
 	 */
 	IMesh<P, V, E, F> clone();
+
+	/**
+	 * Returns a rectangular bound containing all vertices of the mesh.
+	 *
+	 * @return a rectangular bound containing all vertices of the mesh
+	 */
+	default VRectangle getBound() {
+
+		if(getNumberOfVertices() <= 2) {
+			return new VRectangle(0,0,1,1);
+		}
+
+		double minX = Double.MAX_VALUE;
+		double maxX = Double.MIN_VALUE;
+		double minY = Double.MAX_VALUE;
+		double maxY = Double.MIN_VALUE;
+
+		for(P p : getPoints()) {
+			minX = Math.min(minX, p.getX());
+			minY = Math.min(minY, p.getY());
+			maxX = Math.max(maxX, p.getX());
+			maxY = Math.max(maxY, p.getY());
+		}
+
+		return new VRectangle(minX, minY, maxX-minX, maxY-minY);
+	}
 
 	/**
 	 * Transforms the mesh into a rich triangulation {@link IIncrementalTriangulation}.

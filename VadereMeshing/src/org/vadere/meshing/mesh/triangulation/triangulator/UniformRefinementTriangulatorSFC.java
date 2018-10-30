@@ -445,10 +445,11 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 				List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
 				logger.info("#holes:" + holes.size());
 				sierpinksyFaceOrder.addAll(holes);
-				logger.info(sierpinksyFaceOrder.size() + ", " + getMesh().getNumberOfFaces());
+				logger.info("#faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfFaces());
 
 				getMesh().arrangeMemory(sierpinksyFaceOrder);
 				triangulation.getMesh().garbageCollection();
+				logger.info("#faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfFaces());
 			}
 		}
     }
