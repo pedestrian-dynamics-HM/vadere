@@ -4,7 +4,11 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.topographycreator.control.AttributeModifier;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
@@ -17,6 +21,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * A TopographyBuilder builds a Topography-Object step by step. After the Topography-Object is build
@@ -136,6 +141,13 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return topography;
 	}
 
+	public void translateElements(final double x, final double y) {
+		for(ScenarioElement element : topographyElements) {
+			VShape shape = element.getShape().translate(new VPoint(x, y));
+			AttributeModifier.setShapeToAttributes(element, shape);
+		}
+	}
+
 	public ScenarioElement selectElement(final VPoint position) {
 		for (ScenarioElement element : topographyElements)
 			if (element.getShape().intersects(new Rectangle2D.Double(position.x - 0.1, position.y - 0.1, 0.2, 0.2)))
@@ -250,6 +262,10 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return obstacles.iterator();
 	}
 
+	public List<Obstacle> getObstacles() {
+		return obstacles;
+	}
+
 	public Iterator<Stairs> getStairsIterator() {
 		return stairs.iterator();
 	}
@@ -264,6 +280,11 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 	public Iterator<AgentWrapper> getPedestrianIterator() {
 		return pedestrians.iterator();
+	}
+
+	public void removeObstacleIf(@NotNull final Predicate<Obstacle> predicate) {
+		topographyElements.removeIf(scenarioElement -> scenarioElement instanceof Obstacle && predicate.test((Obstacle)scenarioElement));
+		obstacles.removeIf(predicate);
 	}
 
 	@Override

@@ -11,10 +11,10 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.gradients.FloorGradientProviderDiscrete;
-import org.vadere.util.potential.gradients.FloorGradientProviderEuclidean;
-import org.vadere.util.potential.gradients.FloorGradientProviderEuclideanMollified;
-import org.vadere.util.potential.gradients.GradientProvider;
+import org.vadere.simulator.models.potential.solver.gradients.FloorGradientProviderDiscrete;
+import org.vadere.simulator.models.potential.solver.gradients.FloorGradientProviderEuclidean;
+import org.vadere.simulator.models.potential.solver.gradients.FloorGradientProviderEuclideanMollified;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
 /**
  * Factory for {@link GradientProvider}.

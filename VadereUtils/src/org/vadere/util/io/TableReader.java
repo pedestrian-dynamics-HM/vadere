@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.util.data.Row;
 import org.vadere.util.data.Table;
-import org.vadere.util.data.Tripel;
-import org.vadere.util.data.Tupel;
 
 /**
  * This class convert a stream of table lines {@link java.util.stream.Stream<String>} into a
@@ -55,10 +55,10 @@ public class TableReader {
 
 			long limit = headerFormat.chars().filter(c -> c == '%').count();
 			return Stream
-					.iterate(Tupel.of(headerFormat, line.get()), t -> nextResidual(t))
+					.iterate(Pair.of(headerFormat, line.get()), t -> nextResidual(t))
 					.limit(limit)
-					.filter(t -> t.isPresent())
-					.map(t -> toValue(t.v1, t.v2).toString()).toArray(String[]::new);
+					.filter(pair -> pair.getValue() != null)
+					.map(pair -> toValue(pair.getLeft(), pair.getRight()).toString()).toArray(String[]::new);
 		}
 		return headline;
 	}
@@ -74,9 +74,9 @@ public class TableReader {
 			format = Arrays.stream(line.split(" ")).reduce("", (s1, s2) -> s1.concat("%s ")).trim();
 		}
 		Row row = Stream
-				.iterate(Tripel.of(0, format, line), t -> nextResidual(t))
+				.iterate(Triple.of(0, format, line), t -> nextResidual(t))
 				.limit(variables.length)
-				.map(tripel -> toColumn(variables[tripel.v1], tripel.v2, tripel.v3))
+				.map(tripel -> toColumn(variables[tripel.getLeft()], tripel.getMiddle(), tripel.getRight()))
 				.reduce(new Row(), (r1, r2) -> r1.combine(r2));
 		return row;
 	}
@@ -105,37 +105,37 @@ public class TableReader {
 		return row;
 	}
 
-	private Tripel<Integer, String, String> nextResidual(final Tripel<Integer, String, String> tripel) {
-		Integer varCount = tripel.v1;
-		Tupel<String, String> tupel = nextResidual(Tupel.of(tripel.v2, tripel.v3));
+	private Triple<Integer, String, String> nextResidual(final Triple<Integer, String, String> tripel) {
+		Integer varCount = tripel.getLeft();
+		Pair<String, String> tupel = nextResidual(Pair.of(tripel.getMiddle(), tripel.getRight()));
 
-		return tupel.isPresent() ? Tripel.of(varCount + 1, tupel.v1, tupel.v2) : Tripel.empty();
+		return tupel.getValue() != null ? Triple.of(varCount + 1, tupel.getLeft(), tupel.getRight()) : Triple.of(null, null, null);
 	}
 
-	private Tupel<String, String> nextResidual(final Tupel<String, String> tupel) {
-		if (!tupel.isPresent()) {
-			return tupel;
+	private Pair<String, String> nextResidual(final Pair<String, String> pair) {
+		if (pair.getValue() == null) {
+			return pair;
 		}
 
-		String residualFormat = tupel.v1;
-		String residualLine = tupel.v2;
+		String residualFormat = pair.getLeft();
+		String residualLine = pair.getRight();
 
 		int first = residualFormat.indexOf('%');
 		residualFormat = residualFormat.substring(first + TYPE_PATTERN_LENGTH);
 
 		first = residualFormat.indexOf('%');
 
-		Tupel<String, String> resultTupel;
+		Pair<String, String> resultPair;
 		if (first != -1) {
 			String seperator = residualFormat.substring(0, first);
 			residualFormat = residualFormat.substring(residualFormat.indexOf('%'));
 			residualLine = residualLine.substring(residualLine.indexOf(seperator) + seperator.length());
-			resultTupel = Tupel.of(residualFormat, residualLine);
+			resultPair = Pair.of(residualFormat, residualLine);
 		} else {
-			resultTupel = Tupel.empty();
+			resultPair = Pair.of(null, null);
 		}
 
-		return resultTupel;
+		return resultPair;
 	}
 
 	/**

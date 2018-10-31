@@ -13,15 +13,15 @@
 //import org.vadere.state.scenario.Agent;
 //import org.vadere.state.scenario.Pedestrian;
 //import org.vadere.state.scenario.Topography;
-//import org.vadere.util.data.Row;
-//import org.vadere.util.data.Table;
-//import org.vadere.util.geometry.GeometryUtils;
-//import org.vadere.util.geometry.shapes.VPoint;
-//import org.vadere.util.geometry.shapes.VRectangle;
+//import org.vadere.utils.data.Row;
+//import org.vadere.utils.data.Table;
+//import org.vadere.utils.geometry.GeometryUtils;
+//import org.vadere.utils.geometry.shapes.VPoint;
+//import org.vadere.utils.geometry.shapes.VRectangle;
 //
 //import java.net.URISyntaxException;
-//import java.util.ArrayList;
-//import java.util.List;
+//import java.utils.ArrayList;
+//import java.utils.List;
 //
 //import static junit.framework.Assert.assertEquals;
 //import static junit.framework.Assert.assertTrue;

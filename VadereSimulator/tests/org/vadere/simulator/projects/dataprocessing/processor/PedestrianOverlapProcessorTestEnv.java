@@ -1,32 +1,42 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Integer> {
+public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdOverlapKey, OverlapData> {
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
-	PedestrianOverlapProcessorTestEnv() {
+	PedestrianOverlapProcessorTestEnv(){
+		this(1);
+	}
+
+	PedestrianOverlapProcessorTestEnv(int processorId) {
 		try {
 			testedProcessor = processorFactory.createDataProcessor(PedestrianOverlapProcessor.class);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		testedProcessor.setId(nextProcessorId());
+		testedProcessor.setId(processorId);
 
 		try {
 			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdKey.class,
+					TimestepPedestrianIdOverlapKey.class,
 					testedProcessor.getId());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -34,8 +44,17 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
+	protected LinkedCellsGrid<DynamicElement> getCellGridMock(PedestrianListBuilder b) {
+		LinkedCellsGrid<DynamicElement> cellsGrid = new LinkedCellsGrid<>(0.0, 0.0, 10.0, 10.0, 1);
+		b.getDynamicElementList().forEach(cellsGrid::addObject);
+		return cellsGrid;
+	}
+
 	@Override
 	public void loadDefaultSimulationStateMocks() {
+
+		double minDist = 0.195*2;
+
 		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
@@ -44,12 +63,9 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(3, new VPoint(1.5, 1.0));
 				b.add(4, new VPoint(1.0, 1.5));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
-				int step = state.getStep();
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 0);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 0);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 0);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 4), 0);
 			}
 		});
 
@@ -63,13 +79,14 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(4, new VPoint(1.0, 1.5));
 				b.add(5, new VPoint(0.8, 0.8));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 2);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 0);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 1);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 4), 0);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 5), 1);
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 5), b.overlapData(1,5,minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 5, 1), b.overlapData(5,1,minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 3), b.overlapData(1,3,minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 1), b.overlapData(3,1, minDist));
 			}
 		});
 
@@ -77,19 +94,98 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 			@Override
 			public void mockIt() {
 				b.clear().add(1, new VPoint(1.0, 1.0));
-				b.add(2, new VPoint(1.0, 1.0));
-				b.add(3, new VPoint(1.0, 1.0));
-				b.add(4, new VPoint(1.0, 1.0));
+				b.add(2, new VPoint(1.01, 1.0));
+				b.add(3, new VPoint(1.0, 1.01));
+				b.add(4, new VPoint(1.01, 1.01));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 3);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 3);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 3);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 4), 3);
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 2), b.overlapData(1, 2, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 3), b.overlapData(1, 3, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 4), b.overlapData(1, 4, minDist));
+
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 1), b.overlapData(2, 1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 3), b.overlapData(2, 3, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 4), b.overlapData(2, 4, minDist));
+
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 1), b.overlapData(3, 1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 2), b.overlapData(3, 2, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 4), b.overlapData(3, 4, minDist));
+
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 1), b.overlapData(4, 1, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 2), b.overlapData(4, 2, minDist));
+				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 3), b.overlapData(4, 3, minDist));
 			}
 		});
 	}
+
+	void verySmallOverlapping(){
+		AttributesAgent a = new AttributesAgent();
+		double distAtAxis =  a.getRadius()*2 - 0.001; // this should count as overlap
+		double vertDistAt45deg = 2*Math.sqrt(0.5)*a.getRadius() - 0.001;
+		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
+		double minDist = 0.195*2;
+		int step = 1;
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 2), b.overlapData(1, 2, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 1), b.overlapData(2, 1, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 3, 4), b.overlapData(3, 4, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 4, 3), b.overlapData(4, 3, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 5, 6), b.overlapData(5, 6, minDist));
+		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 6, 5), b.overlapData(6, 5, minDist));
+
+	}
+
+	void verySmallNotOverlapping() {
+		AttributesAgent a = new AttributesAgent();
+		double distAtAxis =  a.getRadius()*2 + 0.001; // this should count as overlap
+		double vertDistAt45deg = Math.sqrt(2)*a.getRadius() + 0.001;
+		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
+	}
+
+	void touching() {
+		AttributesAgent a = new AttributesAgent();
+		double distAtAxis =  a.getRadius()*2; // this should count as overlap
+		double vertDistAt45deg = round(Math.sqrt(2)*a.getRadius(), 16);
+		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
+	}
+
+	private static double round(double val, int places){
+		if(places < 0)
+			throw new IllegalArgumentException();
+
+		BigDecimal bigDecimal = new BigDecimal(val);
+		bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);
+		return bigDecimal.doubleValue();
+	}
+
+
+	private void addMockStates(double radius, double distAtAxis, VPoint vertDistAt45deg) {
+		clearStates();
+		addSimState(new SimulationStateMock(1) {
+			@Override
+			public void mockIt() {
+				b.clear();
+				b.add(1, new VPoint(1.0, 1.0));
+				b.add(2, new VPoint(1.0, 1.0 + distAtAxis));
+
+				b.add(3, new VPoint(3.0, 3.0));
+				b.add(4, new VPoint(3.0 + distAtAxis, 3.0));
+
+				b.add(5, new VPoint(6.0, 6.0));
+				b.add(6, new VPoint(6.0 , 6.0 ).add(vertDistAt45deg));
+
+				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
+				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(radius);
+
+			}
+		});
+
+	}
+
+
 
 	@Override
 	List<String> getExpectedOutputAsList() {
@@ -99,9 +195,11 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				.sorted(Comparator.comparing(Map.Entry::getKey))
 				.forEach(e -> {
 					StringJoiner js = new StringJoiner(getDelimiter());
-					js.add(Integer.toString(e.getKey().getTimestep()))
-							.add(Integer.toString(e.getKey().getPedestrianId()))
-							.add(Integer.toString(e.getValue()));
+					js.add(Integer.toString(e.getKey().getTimeStep()))
+							.add(Integer.toString(e.getKey().getPedId1()))
+							.add(Integer.toString(e.getKey().getPedId2()))
+							.add(e.getValue().toStrings()[0])
+							.add(e.getValue().toStrings()[1]);
 					outputList.add(js.toString());
 				});
 		return outputList;

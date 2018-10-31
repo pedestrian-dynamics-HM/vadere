@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -21,8 +22,9 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 @ModelClass(isMainModel = true)
 public class ReynoldsSteeringModel implements MainModel {
@@ -117,9 +119,19 @@ public class ReynoldsSteeringModel implements MainModel {
 		this.pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(
 				attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
-		Pedestrian result = new PedestrianReynolds(pedAttributes, random);
-		result.setPosition(position);
+		Pedestrian result = create(position, pedAttributes);
 		return result;
+	}
+
+	private Pedestrian create(@NotNull final VPoint position, @NotNull final AttributesAgent attributesAgent) {
+		Pedestrian pedestrian = new PedestrianReynolds(attributesAgent, random);
+		pedestrian.setPosition(position);
+		return pedestrian;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
+		return create(position, new AttributesAgent(attributesPedestrian, -1)).getShape();
 	}
 
 	@Override

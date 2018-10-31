@@ -1,6 +1,6 @@
 package org.vadere.gui.onlinevisualization.view;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -57,10 +57,11 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 
 	private void renderPedestrians(final Graphics2D g) {
 		AgentRender agentRender = getAgentRender();
-		g.setColor(model.config.getPedestrianDefaultColor());
 		for (Agent ped : model.getAgents()) {
+			Color nonGroupColor = getPedestrianColor(ped);
+			g.setColor(nonGroupColor);
 			VPoint position = ped.getPosition();
-			agentRender.render(ped, g);
+			agentRender.render(ped, nonGroupColor, g);
 
 			if (!pedestrianPositions.containsKey(ped.getId())) {
 				pedestrianPositions.put(ped.getId(), new LinkedList());

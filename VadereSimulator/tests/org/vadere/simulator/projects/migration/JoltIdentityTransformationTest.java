@@ -144,7 +144,7 @@ public class JoltIdentityTransformationTest {
 			return get(new JsonObj(node.getMap().get(next)), path2);
 		}
 		if (node.type == ARRAY) {
-			throw new RuntimeException("only last element of path can be an array");
+			throw new RuntimeException("only last element of pathMustExist can be an array");
 		}
 		return new JsonObj(node);
 	}

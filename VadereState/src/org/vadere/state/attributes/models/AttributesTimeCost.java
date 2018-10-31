@@ -24,10 +24,10 @@ public class AttributesTimeCost extends Attributes {
 		/** a dynamic middle scale navigation (queuing). */
 		QUEUEING,
 
-		/** for the queuing game */
+		/** for the queueing game */
 		QUEUEING_GAME,
 
-		/** for the queuing game */
+		/** for the queueing game */
 		NAVIGATION_GAME,
 
 		/**
@@ -41,12 +41,12 @@ public class AttributesTimeCost extends Attributes {
 		/** use one single loading for all pedestrians. */
 		CONSTANT,
 		/**
-		 * use c_D and c_D' for differ pedestrains of the some target and other
+		 * use c_D and c_D' for differ pedestrians of the some target and other
 		 * target.
 		 */
 		CONSTANT_RESPECT_TARGETS,
 		/**
-		 * use the dynamic loading strategy to calculate for each pedestrain an
+		 * use the dynamic loading strategy to calculate for each pedestrian an
 		 * individual loading.
 		 */
 		DYNAMIC,
@@ -61,35 +61,35 @@ public class AttributesTimeCost extends Attributes {
 	private double obstacleDensityWeight = 3.5;
 	/**
 	 * (hartmann-2012, c_D) = the weight of the pedestrian that has the some
-	 * target as the potentialfield that will be generated.
+	 * target as the potential field that will be generated.
 	 */
 	private double pedestrianSameTargetDensityWeight = 3.5;
 	/**
 	 * (hartmann-2012, c_D') = the weight of the pedestrian that has on other
-	 * target than the potentialfield that will be generated.
+	 * target than the potential field that will be generated.
 	 */
 	private double pedestrianOtherTargetDensityWeight = 3.5;
-	/** the weight for the constant laoding c in hartmann-2012. */
+	/** the weight for the constant loading c in hartmann-2012. */
 	private double pedestrianWeight = 3.5;
 	/**
-	 * (queuing only) the factor that influences the queue width. = 1 > means
-	 * lower width. The value should be in the intervall [1;infty[.
+	 * (queueing only) the factor that influences the queue width. = 1 > means
+	 * lower width. The value should be in the interval [1;infty[.
 	 */
-	// @SerializedName("queueWidthLaoding")
+	// @SerializedName("queueWidthLoading")
 	private double queueWidthLoading = 1;
 
-	/** the laoding that will be multiplied to the dynamic loading. */
+	/** the loading that will be multiplied to the dynamic loading. */
 	private double pedestrianDynamicWeight = 6.0;
 	/**
 	 * indicate that the dynamic potential field should calculate a individual
-	 * loading for each pedestrian or uses a constant laoding strategy. This
+	 * loading for each pedestrian or uses a constant loading strategy. This
 	 * will be done by the loading strategies. If the
 	 * loadingType=CONSTANT_RESPECT_TARGETS than
 	 * pedestrianSameTargetDensityWeight and pedestrianOtherTargetDensityWeight
 	 * has to be set. If loadingType=CONSTANT than pedestrianWeight has to be
 	 * set.
 	 */
-	// @SerializedName("laodingType")
+	// @SerializedName("loadingType")
 	private LoadingType loadingType = LoadingType.CONSTANT;
 
 	// Getters...

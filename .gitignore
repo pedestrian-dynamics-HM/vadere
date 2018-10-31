@@ -2,6 +2,10 @@
 target/
 *.out
 *.preferences.xml
+swing-inspector-linux-1.2.3/
+
+#Tools and build utils
+bin/
 
 #IntelliJ
 .idea/
@@ -17,9 +21,11 @@ target/
 VadereGui/*.png
 VadereGui/*.svg
 VadereGui/*.mov
+VadereGui/testResources/**/*.legacy
 VadereUtils/testreports/*.txt
 VadereUtils/output/*
 VadereSimulator/resources/current_commit_hash.txt
+VadereSimulator/testResources/**/*.legacy
 
 #model test output
 VadereModelTests/TestOSM/output/*
@@ -41,7 +47,6 @@ VadereModelTests/TestOVM/processed output/*
 VadereUtils/output/*
 
 #deprecated: can potentially be removed
-bin/
 VadereGui/output/
 
 #mac osx files

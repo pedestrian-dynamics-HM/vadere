@@ -4,8 +4,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 
 /**
  * TimeCostPedestrianDensity is a time cost function for the pedestrian density
@@ -40,17 +40,14 @@ public class TimeCostPedestrianDensity implements ITimeCostFunction {
 		logger.info("timeCostFunction:  " + timeCostFunction);
 		logger.info("gaussianCalculator:  " + filter);
 
-		// the initial filtering (convolution)
+		// the initial filtering (convolution), TODO: we have to destroy the filter if it is no longer needed!
 		this.gaussianCalculator.filterImage();
 	}
 
 	@Override
-	public double costAt(final VPoint p) {
-		double cost = 0.0;
-
+	public double costAt(final IPoint p) {
 		long ms = System.currentTimeMillis();
-
-		cost = gaussianCalculator.getFilteredValue(p.x, p.y);
+		double cost = gaussianCalculator.getFilteredValue(p.getX(), p.getY());
 
 		if (heighestDensity < cost) {
 			heighestDensity = cost;

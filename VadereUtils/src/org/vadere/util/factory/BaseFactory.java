@@ -28,25 +28,18 @@ public abstract class BaseFactory<T, O extends FactoryObject<T>> {
 	}
 
 
-	public T getInstanceOf(String clazz) throws ClassNotFoundException {
-		if (supplierMap.containsKey(clazz))
-			return supplierMap.get(clazz).getSupplier().get();
+	public T getInstanceOf(String key) throws ClassNotFoundException {
+		if (supplierMap.containsKey(key))
+			return supplierMap.get(key).getSupplier().get();
 
-		throw new ClassNotFoundException(clazz + " is not a class or is not contained within Factory");
+		throw new ClassNotFoundException("No class associated With Key: " + key + " in this Factory");
 	}
 
-	public T getInstanceOf(Class clazz) throws ClassNotFoundException {
-		return getInstanceOf(clazz.getCanonicalName());
+	public Supplier<T> getSupplierOf(String key) throws ClassNotFoundException {
+		if (supplierMap.containsKey(key))
+			return supplierMap.get(key).getSupplier();
+
+		throw new ClassNotFoundException("No class associated With Key: " + key + " in this Factory");
 	}
 
-	public Supplier<T> getSupplierOf(String clazz) throws ClassNotFoundException {
-		if (supplierMap.containsKey(clazz))
-			return supplierMap.get(clazz).getSupplier();
-
-		throw new ClassNotFoundException(clazz + " is not a class or is not contained within Factory");
-	}
-
-	public Supplier<T> getSupplierOf(Class clazz) throws ClassNotFoundException {
-		return getSupplierOf(clazz.getCanonicalName());
-	}
 }

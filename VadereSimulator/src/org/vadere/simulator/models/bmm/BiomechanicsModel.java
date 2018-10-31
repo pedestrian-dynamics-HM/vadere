@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -15,6 +16,7 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * 
@@ -61,12 +63,20 @@ public class BiomechanicsModel implements MainModel {
 		AttributesAgent pedAttributes = new AttributesAgent(
 				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
 
-		PedestrianBMM pedestrian = new PedestrianBMM(position, topography, pedAttributes,
-				attributesBMM, attributesBHM, random);
-
+		PedestrianBMM pedestrian = createElement(position, pedAttributes);
 		this.pedestriansBMM.add(pedestrian);
 
 		return pedestrian;
+	}
+
+	private PedestrianBMM createElement(@NotNull final VPoint position, @NotNull final AttributesAgent pedAttributes) {
+		PedestrianBMM pedestrian = new PedestrianBMM(position, topography, pedAttributes, attributesBMM, attributesBHM, random);
+		return pedestrian;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
+		return createElement(position, new AttributesAgent(attributesPedestrian, -1)).getShape();
 	}
 
 	@Override

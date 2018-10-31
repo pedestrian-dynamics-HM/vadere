@@ -1,17 +1,14 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.MovementType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.ICircleSector;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCircleSector;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.MathUtil;
 import org.vadere.util.math.pso.PSO;
 
 import java.awt.Shape;
@@ -37,10 +34,6 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 		VCircle circle = ((VCircle) reachableArea);
 		double stepSize = circle.getRadius();
 
-		final PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
-		potentialEvaluationFunction.setStepSize(stepSize);
-
-
 		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
 		// maximum possible angle of movement relative to ankerAngle
 		double angle;
@@ -54,8 +47,16 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 			angle = StepCircleOptimizerDiscrete.getMovementAngle(pedestrian);
 			Vector2D velocity = pedestrian.getVelocity();
 			anchorAngle = velocity.angleToZero() - angle;
-			angle = 2 * angle;
-			circleSector = new VCircleSector(circle.getCenter(), circle.getRadius(), anchorAngle, anchorAngle + 2 * angle);
+			anchorAngle = MathUtil.toPositiveSmallestRadian(anchorAngle);
+			double maxAngle = MathUtil.toPositiveSmallestRadian(anchorAngle + 2 * angle);
+
+			if(maxAngle < anchorAngle) {
+				double tmp = maxAngle;
+				maxAngle = anchorAngle;
+				anchorAngle = tmp;
+			}
+
+			circleSector = new VCircleSector(circle.getCenter(), circle.getRadius(), anchorAngle, maxAngle);
 		} else {
 			angle = 2 * Math.PI;
 			anchorAngle = 0;
@@ -64,12 +65,13 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 
 		PSO pso = new PSO(p -> getValue(p, pedestrian, stepSize), circleSector, anchorAngle, anchorAngle + 2 * angle, random, stepSize / 5.0, positions);
 
-		VPoint nextPos = pso.getOptimumArg();
 		VPoint curPos = pedestrian.getPosition();
 		double curPosPotential = pedestrian.getPotential(curPos);
 		double potential = pso.getOptimum();
 
-		if (curPosPotential - potential < movementThreshold) {
+		VPoint nextPos = pso.getOptimumArg();
+
+		if (curPosPotential - potential <= movementThreshold) {
 			nextPos = curPos;
 		}
 

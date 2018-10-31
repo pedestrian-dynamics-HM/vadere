@@ -25,7 +25,7 @@ public class PedestrianEndTimeProcessor extends DataProcessor<PedestrianIdKey, D
 
     @Override
     public void postLoop(final SimulationState state) {
-        this.setValues(state.getTopography().getElements(Pedestrian.class), Double.NaN);
+        this.setValues(state.getTopography().getElements(Pedestrian.class), Double.POSITIVE_INFINITY);
     }
 
     @Override

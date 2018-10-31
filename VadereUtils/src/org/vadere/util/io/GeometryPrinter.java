@@ -3,8 +3,8 @@ package org.vadere.util.io;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 

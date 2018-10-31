@@ -38,6 +38,7 @@ public class MovRecorder implements IRecorder {
 		this.viewport = model.getViewportBound();
 		this.generator = new ImageGenerator(renderer, renderer.getModel());
 		this.step = 0;
+		this.enc = null;
 	}
 
 	@Override
@@ -68,24 +69,31 @@ public class MovRecorder implements IRecorder {
 		try {
 			enc.finish();
 		} catch (IndexOutOfBoundsException error) {
-			logger.log(Priority.DEBUG, "Nothing recorded! " + error.getMessage());
+			logger.debug("Nothing recorded! " + error.getMessage());
+			throw error;
 		}
 		logger.info(this + " stop recording");
 	}
 
 	@Override
 	public synchronized void startRecording(final Rectangle2D.Double imageSize) throws IOException {
-		this.imageSize = imageSize;
-		this.viewport = model.getViewportBound();
-		startRecording();
+		try {
+			this.imageSize = imageSize;
+			this.viewport = model.getViewportBound();
+			startRecording();
+			logger.info(this + " start recording");
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
 	}
 
 	@Override
-	public synchronized void startRecording() {
+	public synchronized void startRecording() throws IOException {
 		Date todaysDate = new java.util.Date();
-		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("View.dataFormat"));
+		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("SettingsDialog.dataFormat"));
 		String formattedDate = formatter.format(todaysDate);
-		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("PostVis.snapshotDirectory.path", "."));
+		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
 		File outputFile = new File("pv_snapshot_" + formattedDate + ".mov");
 		fileChooser.setSelectedFile(outputFile);
 
@@ -96,14 +104,12 @@ public class MovRecorder implements IRecorder {
 			outputFile = fileChooser.getSelectedFile().toString().endsWith(".mov") ? fileChooser.getSelectedFile()
 					: new File(fileChooser.getSelectedFile().toString() + ".mov");
 			try {
-				this.enc = new SequenceEncoder(outputFile);
+				enc = new SequenceEncoder(outputFile);
 			} catch (IOException e) {
-				e.printStackTrace();
-				logger.error(e.getMessage());
+				enc = null;
+				throw e;
 			}
-			logger.info(this + " start recording");
 		}
-
 	}
 
 	@Override

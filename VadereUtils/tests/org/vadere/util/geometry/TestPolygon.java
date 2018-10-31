@@ -53,7 +53,10 @@ public class TestPolygon {
 				testPolygon.contains(new VPoint(-5, 0)));
 
 		assertEquals("The triangle should not contain this point.", false,
-				testTriangle.contains(new VPoint(40, 40)));
+				testTriangle.contains(new VPoint(40, 40.000000001)));
+
+		assertEquals("The triangle should not contain this point.", true,
+				testTriangle.contains(new VPoint(40, 39.999999999)));
 	}
 
 	@Test

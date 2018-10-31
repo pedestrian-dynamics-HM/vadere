@@ -36,7 +36,6 @@ import static org.lwjgl.opencl.CL10.clCreateKernel;
 import static org.lwjgl.opencl.CL10.clCreateProgramWithSource;
 import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
-import static org.lwjgl.opencl.CL10.clEnqueueWaitForEvents;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
@@ -61,81 +60,81 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
 public class CLLinkedCell {
-    private static Logger log = LogManager.getLogger(CLLinkedCell.class);
+	private static Logger log = LogManager.getLogger(CLLinkedCell.class);
 
-    // CL ids
-    private long clPlatform;
-    private long clDevice;
-    private long clContext;
-    private long clQueue;
-    private long clProgram;
+	// CL ids
+	private long clPlatform;
+	private long clDevice;
+	private long clContext;
+	private long clQueue;
+	private long clProgram;
 
-    // CL Memory
-    private long clHashes;
-    private long clIndices;
-    private long clCellStarts;
-    private long clCellEnds;
-    private long clReorderedPositions;
-    private long clPositions;
-    private long clCellSize;
-    private long clWorldOrigin;
-    private long clGridSize;
+	// CL Memory
+	private long clHashes;
+	private long clIndices;
+	private long clCellStarts;
+	private long clCellEnds;
+	private long clReorderedPositions;
+	private long clPositions;
+	private long clCellSize;
+	private long clWorldOrigin;
+	private long clGridSize;
 
-    // Host Memory
-    private IntBuffer hashes;
-    private IntBuffer indices;
-    private IntBuffer cellStarts;
-    private IntBuffer cellEnds;
-    private FloatBuffer reorderedPositions;
-    private FloatBuffer positions;
-    private FloatBuffer worldOrigin;
-    private FloatBuffer cellSize;
-    private IntBuffer gridSize;
+	// Host Memory
+	private IntBuffer hashes;
+	private IntBuffer indices;
+	private IntBuffer cellStarts;
+	private IntBuffer cellEnds;
+	private FloatBuffer reorderedPositions;
+	private FloatBuffer positions;
+	private FloatBuffer worldOrigin;
+	private FloatBuffer cellSize;
+	private IntBuffer gridSize;
 
 
 	private IntBuffer inValues;
 	private IntBuffer outValues;
 
-    private ByteBuffer source;
+	private ByteBuffer source;
 	private ByteBuffer particleSource;
 
-    // CL callbacks
-    private CLContextCallback contextCB;
-    private CLProgramCallback programCB;
+	// CL callbacks
+	private CLContextCallback contextCB;
+	private CLProgramCallback programCB;
 
-    // CL kernel
-    private long clBitonicSortLocal;
+	// CL kernel
+	private long clBitonicSortLocal;
 	private long clBitonicSortLocal1;
 	private long clBitonicMergeGlobal;
-    private long clBitonicMergeLocal;
-    private long clCalcHash;
-    private long clFindCellBoundsAndReorder;
+	private long clBitonicMergeLocal;
+	private long clCalcHash;
+	private long clFindCellBoundsAndReorder;
 
-    private int numberOfElements;
-    private int numberOfGridCells;
-    private VRectangle bound;
-    private float iCellSize;
-    private int[] iGridSize;
-    private List<VPoint> positionList;
+	private int numberOfElements;
+	private int numberOfGridCells;
+	private VRectangle bound;
+	private float iCellSize;
+	private int[] iGridSize;
+	private List<VPoint> positionList;
 
-    private int[] keys;
-    private int[] values;
+	private int[] keys;
+	private int[] values;
 
-    private int[] resultValues;
-    private int[] resultKeys;
+	private int[] resultValues;
+	private int[] resultKeys;
 
-    private static final Logger logger = LogManager.getLogger(CLLinkedCell.class);
+	private static final Logger logger = LogManager.getLogger(CLLinkedCell.class);
 
-    private int max_work_group_size;
+	private int max_work_group_size;
 
-    private boolean debug = false;
+	private boolean debug = false;
 
-    public enum KernelType {
-        Separate,
-        Col,
-        Row,
-        NonSeparate
-    }
+	public enum KernelType {
+		Separate,
+		Col,
+		Row,
+		NonSeparate
+	}
 
 	/**
 	 * Default constructor.
@@ -146,20 +145,20 @@ public class CLLinkedCell {
 	 *
 	 * @throws OpenCLException
 	 */
-    public CLLinkedCell(final int numberOfElements, final VRectangle bound, final double cellSize) throws OpenCLException {
-	    this.numberOfElements = numberOfElements;
-	    this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
-	    this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
+	public CLLinkedCell(final int numberOfElements, final VRectangle bound, final double cellSize) throws OpenCLException {
+		this.numberOfElements = numberOfElements;
+		this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
+		this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
 		this.bound = bound;
 		this.iCellSize = (float)cellSize;
 
-    	if(debug) {
-		    Configuration.DEBUG.set(true);
-		    Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
-		    Configuration.DEBUG_STACK.set(true);
-	    }
-	    init();
-    }
+		if(debug) {
+			Configuration.DEBUG.set(true);
+			Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
+			Configuration.DEBUG_STACK.set(true);
+		}
+		init();
+	}
 
 	/**
 	 * The data structure representing the linked cell. The elements of cell i
@@ -170,7 +169,7 @@ public class CLLinkedCell {
 		/**
 		 * the starting index at which the cell starts, i.e. cell i starts at cellStart[i].
 		 */
-	    public int[] cellStarts;
+		public int[] cellStarts;
 
 		/**
 		 * the ending index at which the cell starts, i.e. cell i ends at cellStart[i].
@@ -180,13 +179,13 @@ public class CLLinkedCell {
 		/**
 		 * the ordered 2D-coordinates.
 		 */
-	    public float[] reorderedPositions;
+		public float[] reorderedPositions;
 
 		/**
 		 * the mapping between the unordered (original) positions and the reorderedPositions,
 		 * i.e. reorderedPositions[i] == positions[indices[i]]
 		 */
-	    public int[] indices;
+		public int[] indices;
 
 		/**
 		 * the hashes i.e. the cell of the positions, i.e. hashes[i] is the cell of positions[i].
@@ -197,7 +196,7 @@ public class CLLinkedCell {
 		 * the original positions in original order.
 		 */
 		public float[] positions;
-    }
+	}
 
 	/**
 	 * Computes the {@link LinkedCell} of the list of positions.
@@ -282,23 +281,23 @@ public class CLLinkedCell {
 	 * @return the (unsorted) hashes.
 	 * @throws OpenCLException
 	 */
-    public int[] calcHashes(@NotNull final List<VPoint> positions) throws OpenCLException {
-	    assert positions.size() == numberOfElements;
+	public int[] calcHashes(@NotNull final List<VPoint> positions) throws OpenCLException {
+		assert positions.size() == numberOfElements;
 		this.positionList = positions;
 		allocHostMemory();
-	    allocDeviceMemory();
+		allocDeviceMemory();
 
-	    clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
-	    clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
-	    int[] result = CLUtils.toIntArray(hashes, numberOfElements);
+		clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements);
+		clEnqueueReadBuffer(clQueue, clHashes, true, 0, hashes, null, null);
+		int[] result = CLUtils.toIntArray(hashes, numberOfElements);
 
-	    clearMemory();
-	    clearCL();
-	    return result;
+		clearMemory();
+		clearCL();
+		return result;
 
-	    //clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
-	    //clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
-    }
+		//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
+		//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPositions, clHashes, clIndices, clPositions, numberOfElements, numberOfGridCells);
+	}
 
 	/**
 	 * Returns the gridSizes of the linked cell, i.e. result[0] is the x and
@@ -307,8 +306,8 @@ public class CLLinkedCell {
 	 * @return the gridSizes (2D) stored in an array.
 	 */
 	public int[] getGridSize() {
-    	return new int[]{iGridSize[0], iGridSize[1]};
-    }
+		return new int[]{iGridSize[0], iGridSize[1]};
+	}
 
 	/**
 	 * Returns the gridSize which is equal in x and y direction.
@@ -316,12 +315,12 @@ public class CLLinkedCell {
 	 * @return the gridSize
 	 */
 	public float getCellSize() {
-    	return iCellSize;
-    }
+		return iCellSize;
+	}
 
-    public VPoint getWorldOrign() {
-    	return new VPoint(bound.getMinX(), bound.getMinY());
-    }
+	public VPoint getWorldOrign() {
+		return new VPoint(bound.getMinX(), bound.getMinY());
+	}
 
 	public void allocHostMemory() {
 		assert positionList.size() == numberOfElements;
@@ -347,21 +346,21 @@ public class CLLinkedCell {
 		this.reorderedPositions = MemoryUtil.memAllocFloat(numberOfElements * 2);
 	}
 
-    private void allocDeviceMemory() {
-	    try (MemoryStack stack = stackPush()) {
-		    IntBuffer errcode_ret = stack.callocInt(1);
-		    clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, cellSize, errcode_ret);
-		    clWorldOrigin = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, worldOrigin, errcode_ret);
-		    clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, gridSize, errcode_ret);
-		    clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
-		    clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
-		    clCellStarts = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
-		    clCellEnds = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
-		    clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
-		    clPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
-		    clEnqueueWriteBuffer(clQueue, clPositions, true, 0, positions, null, null);
-	    }
-    }
+	private void allocDeviceMemory() {
+		try (MemoryStack stack = stackPush()) {
+			IntBuffer errcode_ret = stack.callocInt(1);
+			clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, cellSize, errcode_ret);
+			clWorldOrigin = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, worldOrigin, errcode_ret);
+			clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, gridSize, errcode_ret);
+			clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
+			clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfElements, errcode_ret);
+			clCellStarts = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
+			clCellEnds = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * numberOfGridCells, errcode_ret);
+			clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
+			clPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
+			clEnqueueWriteBuffer(clQueue, clPositions, true, 0, positions, null, null);
+		}
+	}
 
 	public int[] getResultKeys() {
 		return resultKeys;
@@ -372,160 +371,180 @@ public class CLLinkedCell {
 	}
 
 	private void init() throws OpenCLException {
-        initCallbacks();
-        initCL();
-        buildProgram();
-    }
+		initCallbacks();
+		initCL();
+		buildProgram();
+	}
 
-    private void clCalcHash(
-    		final long clHashes,
-		    final long clIndices,
-		    final long clPositions,
-		    final long clCellSize,
-		    final long clWorldOrign,
-		    final long clGridSize,
-		    final int numberOfElements) throws OpenCLException {
-	    try (MemoryStack stack = stackPush()) {
-		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 0, clHashes));
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 1, clIndices));
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 2, clPositions));
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 3, clCellSize));
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 4, clWorldOrign));
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 5, clGridSize));
-		    CLInfo.checkCLError(clSetKernelArg1i(clCalcHash, 6, numberOfElements));
-		    clGlobalWorkSize.put(0, numberOfElements);
-		    //TODO: local work size?
-		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clCalcHash, 1, null, clGlobalWorkSize, null, null, null));
-	    }
-    }
+	private void clCalcHash(
+			final long clHashes,
+			final long clIndices,
+			final long clPositions,
+			final long clCellSize,
+			final long clWorldOrign,
+			final long clGridSize,
+			final int numberOfElements) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 0, clHashes));
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 1, clIndices));
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 2, clPositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 3, clCellSize));
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 4, clWorldOrign));
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 5, clGridSize));
+			CLInfo.checkCLError(clSetKernelArg1i(clCalcHash, 6, numberOfElements));
+			clGlobalWorkSize.put(0, numberOfElements);
+			//TODO: local work size?
+			CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clCalcHash, 1, null, clGlobalWorkSize, null, null, null));
+		}
+	}
 
-    private void clFindCellBoundsAndReorder(
-    		final long clCellStarts,
-		    final long clCellEnds,
-		    final long clReorderedPositions,
-		    final long clHashes,
-		    final long clIndices,
-		    final long clPositions,
-		    final int numberOfElements) throws OpenCLException {
+	private void clFindCellBoundsAndReorder(
+			final long clCellStarts,
+			final long clCellEnds,
+			final long clReorderedPositions,
+			final long clHashes,
+			final long clIndices,
+			final long clPositions,
+			final int numberOfElements) throws OpenCLException {
 
-	    try (MemoryStack stack = stackPush()) {
+		try (MemoryStack stack = stackPush()) {
 
-		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
-		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
-		    IntBuffer errcode_ret = stack.callocInt(1);
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
+			IntBuffer errcode_ret = stack.callocInt(1);
 
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 0, clCellStarts));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 1, clCellEnds));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 2, clReorderedPositions));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clHashes));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clIndices));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clPositions));
-		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (max_work_group_size+1) * 4)); // local memory
-		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
+			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 0, clCellStarts));
+			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 1, clCellEnds));
+			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 2, clReorderedPositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clHashes));
+			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clIndices));
+			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clPositions));
+			CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (Math.min(numberOfElements, max_work_group_size)+1) * 4)); // local memory
+			CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
 
-		    clGlobalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
-		    clLocalWorkSize.put(0, Math.min(max_work_group_size, numberOfElements));
-		    //TODO: local work size? + check 2^n constrain!
-		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
-	    }
-    }
 
-    private void clBitonicSort(
-    		final long clKeysIn,
-		    final long clValuesIn,
-		    final long clKeysOut,
-		    final long clValuesOut,
-		    final int numberOfElements,
-		    final int dir) throws OpenCLException {
-	    try (MemoryStack stack = stackPush()) {
+			int globalWorkSize;
+			int localWorkSize;
+			if(numberOfElements <= max_work_group_size){
+				localWorkSize = numberOfElements;
+				globalWorkSize = numberOfElements;
+			}
+			else {
+				localWorkSize = max_work_group_size;
+				globalWorkSize = multipleOf(numberOfElements, localWorkSize);
+			}
 
-	    	PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
-		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
-		    IntBuffer errcode_ret = stack.callocInt(1);
+			clGlobalWorkSize.put(0, globalWorkSize);
+			clLocalWorkSize.put(0, localWorkSize);
+			//TODO: local work size? + check 2^n constrain!
+			CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+		}
+	}
 
-		    // small sorts
-		    if (numberOfElements <= max_work_group_size) {
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 0, clKeysOut));
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 1, clValuesOut));
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 2, clKeysIn));
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 3, clValuesIn));
-			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 4, numberOfElements));
-			    CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 5, dir));
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 6, numberOfElements * 4)); // local memory
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 7, numberOfElements * 4)); // local memory
-			    clGlobalWorkSize.put(0, numberOfElements / 2);
-			    clLocalWorkSize.put(0, numberOfElements / 2);
+	private int multipleOf(int value, int multiple) {
+		int result = multiple;
+		while (result < value) {
+			result += multiple;
+		}
+		return result;
+	}
 
-			    // run the kernel and read the result
-			    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
-			    CLInfo.checkCLError(clFinish(clQueue));
-		    } else {
-			    //Launch bitonicSortLocal1
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 0, clKeysOut));
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 1, clValuesOut));
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 2, clKeysIn));
-			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 3, clValuesIn));
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 4, max_work_group_size * 4)); // local memory
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 5, max_work_group_size * 4)); // local memory
+	private void clBitonicSort(
+			final long clKeysIn,
+			final long clValuesIn,
+			final long clKeysOut,
+			final long clValuesOut,
+			final int numberOfElements,
+			final int dir) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
 
-			    clGlobalWorkSize = stack.callocPointer(1);
-			    clLocalWorkSize = stack.callocPointer(1);
-			    clGlobalWorkSize.put(0, numberOfElements / 2);
-			    clLocalWorkSize.put(0, max_work_group_size / 2);
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
+			IntBuffer errcode_ret = stack.callocInt(1);
 
-			    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
-			    CLInfo.checkCLError(clFinish(clQueue));
+			// small sorts
+			if (numberOfElements <= max_work_group_size) {
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 0, clKeysOut));
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 1, clValuesOut));
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 2, clKeysIn));
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 3, clValuesIn));
+				CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 4, numberOfElements));
+				CLInfo.checkCLError(clSetKernelArg1i(clBitonicSortLocal, 5, dir));
+				CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 6, numberOfElements * 4)); // local memory
+				CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal, 7, numberOfElements * 4)); // local memory
+				clGlobalWorkSize.put(0, numberOfElements / 2);
+				clLocalWorkSize.put(0, numberOfElements / 2);
 
-			    for (int size = 2 * max_work_group_size; size <= numberOfElements; size <<= 1) {
-				    for (int stride = size / 2; stride > 0; stride >>= 1) {
-					    if (stride >= max_work_group_size) {
-						    //Launch bitonicMergeGlobal
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 0, clKeysOut));
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 1, clValuesOut));
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 2, clKeysOut));
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 3, clValuesOut));
+				// run the kernel and read the result
+				CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+				CLInfo.checkCLError(clFinish(clQueue));
+			} else {
+				//Launch bitonicSortLocal1
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 0, clKeysOut));
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 1, clValuesOut));
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 2, clKeysIn));
+				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 3, clValuesIn));
+				CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 4, max_work_group_size * 4)); // local memory
+				CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 5, max_work_group_size * 4)); // local memory
 
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 4, numberOfElements));
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 5, size));
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 6, stride));
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 7, dir));
+				clGlobalWorkSize = stack.callocPointer(1);
+				clLocalWorkSize = stack.callocPointer(1);
+				clGlobalWorkSize.put(0, numberOfElements / 2);
+				clLocalWorkSize.put(0, max_work_group_size / 2);
 
-						    clGlobalWorkSize = stack.callocPointer(1);
-						    clLocalWorkSize = stack.callocPointer(1);
-						    clGlobalWorkSize.put(0, numberOfElements / 2);
-						    clLocalWorkSize.put(0, max_work_group_size / 4);
+				CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+				CLInfo.checkCLError(clFinish(clQueue));
 
-						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
-						    CLInfo.checkCLError(clFinish(clQueue));
-					    } else {
-						    //Launch bitonicMergeLocal
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 0, clKeysOut));
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 1, clValuesOut));
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 2, clKeysOut));
-						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 3, clValuesOut));
+				for (int size = 2 * max_work_group_size; size <= numberOfElements; size <<= 1) {
+					for (int stride = size / 2; stride > 0; stride >>= 1) {
+						if (stride >= max_work_group_size) {
+							//Launch bitonicMergeGlobal
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 0, clKeysOut));
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 1, clValuesOut));
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 2, clKeysOut));
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 3, clValuesOut));
 
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 4, numberOfElements));
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 5, stride));
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 6, size));
-						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 7, dir));
-						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 8, max_work_group_size * 4)); // local memory
-						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 9, max_work_group_size * 4)); // local memory
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 4, numberOfElements));
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 5, size));
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 6, stride));
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 7, dir));
 
-						    clGlobalWorkSize = stack.callocPointer(1);
-						    clLocalWorkSize = stack.callocPointer(1);
-						    clGlobalWorkSize.put(0, numberOfElements / 2);
-						    clLocalWorkSize.put(0, max_work_group_size / 2);
+							clGlobalWorkSize = stack.callocPointer(1);
+							clLocalWorkSize = stack.callocPointer(1);
+							clGlobalWorkSize.put(0, numberOfElements / 2);
+							clLocalWorkSize.put(0, max_work_group_size / 4);
 
-						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
-						    CLInfo.checkCLError(clFinish(clQueue));
-						    break;
-					    }
-				    }
-			    }
-		    }
-	    }
-    }
+							CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError(clFinish(clQueue));
+						} else {
+							//Launch bitonicMergeLocal
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 0, clKeysOut));
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 1, clValuesOut));
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 2, clKeysOut));
+							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 3, clValuesOut));
+
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 4, numberOfElements));
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 5, stride));
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 6, size));
+							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 7, dir));
+							CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 8, max_work_group_size * 4)); // local memory
+							CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 9, max_work_group_size * 4)); // local memory
+
+							clGlobalWorkSize = stack.callocPointer(1);
+							clLocalWorkSize = stack.callocPointer(1);
+							clGlobalWorkSize.put(0, numberOfElements / 2);
+							clLocalWorkSize.put(0, max_work_group_size / 2);
+
+							CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError(clFinish(clQueue));
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	static long factorRadix2(long L){
 		if(L==0){
@@ -540,141 +559,141 @@ public class CLLinkedCell {
 		clearMemory();
 	}
 
-    private void clearMemory() throws OpenCLException {
-        // release memory and devices
-	    try {
-		    CLInfo.checkCLError(clReleaseMemObject(clHashes));
-		    CLInfo.checkCLError(clReleaseMemObject(clIndices));
-		    CLInfo.checkCLError(clReleaseMemObject(clCellStarts));
-		    CLInfo.checkCLError(clReleaseMemObject(clCellEnds));
-		    CLInfo.checkCLError(clReleaseMemObject(clReorderedPositions));
-		    CLInfo.checkCLError(clReleaseMemObject(clPositions));
-		    CLInfo.checkCLError(clReleaseMemObject(clCellSize));
-		    CLInfo.checkCLError(clReleaseMemObject(clWorldOrigin));
-		    CLInfo.checkCLError(clReleaseMemObject(clGridSize));
-	    }
-	    catch (OpenCLException ex) {
+	private void clearMemory() throws OpenCLException {
+		// release memory and devices
+		try {
+			CLInfo.checkCLError(clReleaseMemObject(clHashes));
+			CLInfo.checkCLError(clReleaseMemObject(clIndices));
+			CLInfo.checkCLError(clReleaseMemObject(clCellStarts));
+			CLInfo.checkCLError(clReleaseMemObject(clCellEnds));
+			CLInfo.checkCLError(clReleaseMemObject(clReorderedPositions));
+			CLInfo.checkCLError(clReleaseMemObject(clPositions));
+			CLInfo.checkCLError(clReleaseMemObject(clCellSize));
+			CLInfo.checkCLError(clReleaseMemObject(clWorldOrigin));
+			CLInfo.checkCLError(clReleaseMemObject(clGridSize));
+		}
+		catch (OpenCLException ex) {
 			throw ex;
-	    }
+		}
 		finally {
-		    MemoryUtil.memFree(hashes);
-		    MemoryUtil.memFree(indices);
-		    MemoryUtil.memFree(cellStarts);
-		    MemoryUtil.memFree(cellEnds);
-		    MemoryUtil.memFree(reorderedPositions);
-		    MemoryUtil.memFree(positions);
-		    MemoryUtil.memFree(worldOrigin);
-		    MemoryUtil.memFree(cellSize);
-		    MemoryUtil.memFree(gridSize);
-	    }
-    }
+			MemoryUtil.memFree(hashes);
+			MemoryUtil.memFree(indices);
+			MemoryUtil.memFree(cellStarts);
+			MemoryUtil.memFree(cellEnds);
+			MemoryUtil.memFree(reorderedPositions);
+			MemoryUtil.memFree(positions);
+			MemoryUtil.memFree(worldOrigin);
+			MemoryUtil.memFree(cellSize);
+			MemoryUtil.memFree(gridSize);
+		}
+	}
 
-    private void clearCL() throws OpenCLException {
-	    CLInfo.checkCLError(clReleaseKernel(clBitonicSortLocal));
-	    CLInfo.checkCLError(clReleaseKernel(clBitonicSortLocal1));
-	    CLInfo.checkCLError(clReleaseKernel(clBitonicMergeGlobal));
-	    CLInfo.checkCLError(clReleaseKernel(clBitonicMergeLocal));
-	    CLInfo.checkCLError(clReleaseKernel(clCalcHash));
-	    CLInfo.checkCLError(clReleaseKernel(clFindCellBoundsAndReorder));
+	private void clearCL() throws OpenCLException {
+		CLInfo.checkCLError(clReleaseKernel(clBitonicSortLocal));
+		CLInfo.checkCLError(clReleaseKernel(clBitonicSortLocal1));
+		CLInfo.checkCLError(clReleaseKernel(clBitonicMergeGlobal));
+		CLInfo.checkCLError(clReleaseKernel(clBitonicMergeLocal));
+		CLInfo.checkCLError(clReleaseKernel(clCalcHash));
+		CLInfo.checkCLError(clReleaseKernel(clFindCellBoundsAndReorder));
 
-	    CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
-	    CLInfo.checkCLError(clReleaseProgram(clProgram));
-	    CLInfo.checkCLError(clReleaseContext(clContext));
-	    contextCB.free();
-	    programCB.free();
-    }
+		CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
+		CLInfo.checkCLError(clReleaseProgram(clProgram));
+		CLInfo.checkCLError(clReleaseContext(clContext));
+		contextCB.free();
+		programCB.free();
+	}
 
-    // private helpers
-    private void initCallbacks() {
-        contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
-        {
-            log.debug("[LWJGL] cl_context_callback" + "\tInfo: " + memUTF8(errinfo));
-        });
+	// private helpers
+	private void initCallbacks() {
+		contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
+		{
+			log.debug("[LWJGL] cl_context_callback" + "\tInfo: " + memUTF8(errinfo));
+		});
 
-        programCB = CLProgramCallback.create((program, user_data) ->
-        {
-	        try {
-		        log.debug("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-	        } catch (OpenCLException e) {
-		        e.printStackTrace();
-	        }
-        });
-    }
+		programCB = CLProgramCallback.create((program, user_data) ->
+		{
+			try {
+				log.debug("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
+			} catch (OpenCLException e) {
+				e.printStackTrace();
+			}
+		});
+	}
 
-    private void initCL() throws OpenCLException {
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer errcode_ret = stack.callocInt(1);
-            IntBuffer numberOfPlatforms = stack.mallocInt(1);
+	private void initCL() throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			IntBuffer errcode_ret = stack.callocInt(1);
+			IntBuffer numberOfPlatforms = stack.mallocInt(1);
 
-	        CLInfo.checkCLError(clGetPlatformIDs(null, numberOfPlatforms));
-            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
-	        CLInfo.checkCLError(clGetPlatformIDs(platformIDs, numberOfPlatforms));
+			CLInfo.checkCLError(clGetPlatformIDs(null, numberOfPlatforms));
+			PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
+			CLInfo.checkCLError(clGetPlatformIDs(platformIDs, numberOfPlatforms));
 
-            clPlatform = platformIDs.get(0);
+			clPlatform = platformIDs.get(0);
 
-            IntBuffer numberOfDevices = stack.mallocInt(1);
-	        CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices));
-            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-	        CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices));
+			IntBuffer numberOfDevices = stack.mallocInt(1);
+			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices));
+			PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
+			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices));
 
-            clDevice = deviceIDs.get(0);
+			clDevice = deviceIDs.get(0);
 
-	        log.debug("CL_DEVICE_NAME = " + CLInfo.getDeviceInfoStringUTF8(clDevice, CL_DEVICE_NAME));
+			log.debug("CL_DEVICE_NAME = " + CLInfo.getDeviceInfoStringUTF8(clDevice, CL_DEVICE_NAME));
 
-	        PointerBuffer ctxProps = stack.mallocPointer(3);
-            ctxProps.put(CL_CONTEXT_PLATFORM)
-                    .put(clPlatform)
-                    .put(NULL)
-                    .flip();
+			PointerBuffer ctxProps = stack.mallocPointer(3);
+			ctxProps.put(CL_CONTEXT_PLATFORM)
+					.put(clPlatform)
+					.put(NULL)
+					.flip();
 
-            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
+			clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
 
-            clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
-        }
-    }
+			clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+		}
+	}
 
-    private void buildProgram() throws OpenCLException {
-	    try (MemoryStack stack = stackPush()) {
-		    IntBuffer errcode_ret = stack.callocInt(1);
+	private void buildProgram() throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			IntBuffer errcode_ret = stack.callocInt(1);
 
-		    PointerBuffer strings = stack.mallocPointer(1);
-		    PointerBuffer lengths = stack.mallocPointer(1);
+			PointerBuffer strings = stack.mallocPointer(1);
+			PointerBuffer lengths = stack.mallocPointer(1);
 
-		    // TODO delete memory?
+			// TODO delete memory?
 
-		    try {
-			    source = CLUtils.ioResourceToByteBuffer("Particles.cl", 4096);
-		    } catch (IOException e) {
-			    throw new OpenCLException(e.getMessage());
-		    }
+			try {
+				source = CLUtils.ioResourceToByteBuffer("Particles.cl", 4096);
+			} catch (IOException e) {
+				throw new OpenCLException(e.getMessage());
+			}
 
-		    strings.put(0, source);
-		    lengths.put(0, source.remaining());
+			strings.put(0, source);
+			lengths.put(0, source.remaining());
 
-		    clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
-		    CLInfo.checkCLError(clBuildProgram(clProgram, clDevice, "", programCB, NULL));
-		    clBitonicSortLocal = clCreateKernel(clProgram, "bitonicSortLocal", errcode_ret);
-		    CLInfo.checkCLError(errcode_ret);
-		    clBitonicSortLocal1 = clCreateKernel(clProgram, "bitonicSortLocal1", errcode_ret);
-		    CLInfo.checkCLError(errcode_ret);
-		    clBitonicMergeGlobal = clCreateKernel(clProgram, "bitonicMergeGlobal", errcode_ret);
-		    CLInfo.checkCLError(errcode_ret);
-		    clBitonicMergeLocal = clCreateKernel(clProgram, "bitonicMergeLocal", errcode_ret);
-		    CLInfo.checkCLError(errcode_ret);
+			clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
+			CLInfo.checkCLError(clBuildProgram(clProgram, clDevice, "", programCB, NULL));
+			clBitonicSortLocal = clCreateKernel(clProgram, "bitonicSortLocal", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clBitonicSortLocal1 = clCreateKernel(clProgram, "bitonicSortLocal1", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clBitonicMergeGlobal = clCreateKernel(clProgram, "bitonicMergeGlobal", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clBitonicMergeLocal = clCreateKernel(clProgram, "bitonicMergeLocal", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
 
-		    clCalcHash = clCreateKernel(clProgram, "calcHash", errcode_ret);
-		    CLInfo.checkCLError(errcode_ret);
-		    clFindCellBoundsAndReorder = clCreateKernel(clProgram, "findCellBoundsAndReorder", errcode_ret);
-		    CLInfo.checkCLError(errcode_ret);
+			clCalcHash = clCreateKernel(clProgram, "calcHash", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clFindCellBoundsAndReorder = clCreateKernel(clProgram, "findCellBoundsAndReorder", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
 
-		    PointerBuffer pp = stack.mallocPointer(1);
-		    clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-		    max_work_group_size = (int)pp.get(0);
+			PointerBuffer pp = stack.mallocPointer(1);
+			clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+			max_work_group_size = (int)pp.get(0);
 
-		    logger.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
-	    }
+			logger.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
+		}
 
-    }
+	}
 }

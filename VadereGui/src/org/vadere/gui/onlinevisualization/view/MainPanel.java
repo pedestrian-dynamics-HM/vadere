@@ -7,7 +7,9 @@ import java.util.*;
 import javax.swing.*;
 
 import org.vadere.gui.components.control.DefaultModeAdapter;
+import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.control.RectangleSelectionMode;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.ScaleablePanel;
 import org.vadere.gui.onlinevisualization.control.OnlineVisSelectionMode;
@@ -34,6 +36,9 @@ public class MainPanel extends ScaleablePanel implements Observer {
 	private OnlinevisualizationRenderer renderer;
 	private final OnlineVisualizationModel model;
 	private List<IRendererChangeListener> rendererChangeListeners;
+	private static Resources resources = Resources.getInstance("global");
+
+	private IMode selectionMode = null;
 
 	/** Creates a new main panel. */
 	public MainPanel(final OnlineVisualizationModel model) {
@@ -113,12 +118,28 @@ public class MainPanel extends ScaleablePanel implements Observer {
 
 	public void preLoop() {
 		this.renderer = new OnlinevisualizationRenderer(model);
+		renderer.setLogo(resources.getImage("vadere.png"));
 		setRenderer(renderer);
 		rendererChangeListeners.stream().forEach(l -> l.update(renderer));
 	}
 
+	// TODO: duplicated code see org.vadere.gui.postvisualization.view.ScenarioPanel
+	private void setMouseSelectionMode(final IMode selectionMode) {
+		if (selectionMode != null && !selectionMode.equals(this.selectionMode)) {
+			removeMouseListener(this.selectionMode);
+			removeMouseMotionListener(this.selectionMode);
+			removeMouseWheelListener(this.selectionMode);
+
+			addMouseListener(selectionMode);
+			addMouseMotionListener(selectionMode);
+			addMouseWheelListener(selectionMode);
+			this.selectionMode = selectionMode;
+		}
+	}
+
 	@Override
 	public void update(Observable o, Object arg) {
+		setMouseSelectionMode(model.getMouseSelectionMode());
 		repaint();
 	}
 }

@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VShape;
@@ -144,4 +143,8 @@ public class AttributesTarget extends AttributesEmbedShape {
 		this.deletionDistance = reachedDistance;
 	}
 
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
 }

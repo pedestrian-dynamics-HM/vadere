@@ -1,50 +1,58 @@
 package org.vadere.gui.components.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
+import org.vadere.meshing.mesh.gen.MeshRenderer;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.voronoi.Face;
 import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.RectangleLimits;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+
+/**
+ * @author Benedikt Zoennchen
+ */
 public abstract class DefaultRenderer {
 
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
+	private static final double rotNeg90 = - Math.PI /2;
 
-	public DefaultRenderer(final IDefaultModel defaultModel) {
-		this(defaultModel, true, false);
-	}
-
-	public DefaultRenderer(final IDefaultModel defaultModel, final boolean doubleBuffering,
-			final boolean hideBoundingBoxBorder) {
+	/**
+	 * <p>Default constructor.</p>
+	 *
+	 * @param defaultModel
+	 */
+	public DefaultRenderer(@NotNull final IDefaultModel defaultModel) {
 		this.defaultModel = defaultModel;
 		this.logo = null;
 	}
 
 	/**
-	 * Render the content. If doublebuffering is true, the whole content will be drawn on a new
-	 * image.
-	 * Otherwise the content will be drawn on the graphics object directly.
-	 * 
+	 * <p></p>
+	 *
 	 * @param targetGraphics2D
 	 * @param width
 	 * @param height
@@ -54,32 +62,31 @@ public abstract class DefaultRenderer {
 	}
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
-
-		 //if(doubleBuffering) {
-		 targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
-         //} else {
-		//targetGraphics2D.translate(x, y);
-		//renderGraphics(targetGraphics2D, width, height);
-		// }
+		targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
 		targetGraphics2D.dispose();
 	}
 
 	public void renderGraphics(final Graphics2D targetGraphics2D, final int width, final int height) {
 		targetGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// (1) clear background
 		targetGraphics2D.setColor(Color.GRAY);
+		//targetGraphics2D.fill();
 		targetGraphics2D.fillRect(0, 0, width, height);
 
+		// (2) render everything which can be rendered before the transformation
 		renderPreTransformation(targetGraphics2D, width, height);
 
+		// (3)
 		transformGraphics(targetGraphics2D);
 
+		// (4) render everything which can be rendered after the transformation
 		renderPostTransformation(targetGraphics2D, width, height);
 	}
 
 	public BufferedImage renderImage(final int width, final int height) {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
-
 		renderGraphics(bufferGraphics2D, width, height);
 		return image;
 	}
@@ -92,10 +99,12 @@ public abstract class DefaultRenderer {
 
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
 		graphics2D.setColor(Color.WHITE);
-		graphics2D.fill(new VRectangle(defaultModel.getBoundingBoxWidth(),
-				defaultModel.getBoundingBoxWidth(),
+		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
+		fill(new VRectangle(
+				topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
+				topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
 				(defaultModel.getTopographyBound().getWidth() - defaultModel.getBoundingBoxWidth() * 2),
-				(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)));
+				(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)), graphics2D);
 
 	}
 
@@ -104,13 +113,16 @@ public abstract class DefaultRenderer {
 		mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
 		graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
 
+
+		//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
+
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
 		 */
 		Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
 		double dy = topographyBound.getHeight() - viewportBound.getHeight();
 
-		graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), 0));
+		graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
 		// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
 
 	}
@@ -121,22 +133,113 @@ public abstract class DefaultRenderer {
 		g.setColor(color);
 
 		for (ScenarioElement element : elements) {
-			g.fill(element.getShape());
+			fill(element.getShape(), g);
 		}
 
 		g.setColor(tmpColor);
 	}
 
+	public static void fill(@NotNull final Shape shape, @NotNull final Graphics2D g) {
+		if(shape instanceof VCircle) {
+			g.fill(toPolygon((VCircle) shape));
+		}
+		else {
+			g.fill(shape);
+		}
+	}
+
+	public static void draw(@NotNull final Shape shape, @NotNull final Graphics2D g) {
+		if(shape instanceof VCircle) {
+			g.draw(toPolygon((VCircle) shape));
+		}
+		else {
+			g.draw(shape);
+		}
+	}
+
+	private static VPolygon toPolygon(final VCircle circle) {
+		int n = 15;
+		double alpha = 2 * Math.PI / n;
+		VPoint p = new VPoint(0, circle.getRadius());
+
+		Path2D.Double path = new Path2D.Double();
+		VPoint center = circle.getCenter();
+
+		path.moveTo(center.x + p.x, center.y + p.y);
+		for(int i = 1; i < n; i++) {
+			p = p.rotate(alpha);
+			path.lineTo(center.x + p.x, center.y + p.y);
+			///path.moveTo(pointList.get(i).x, pointList.get(i).y);
+		}
+
+		//path.closePath();
+
+		return new VPolygon(path);
+	}
+
+	protected  void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
+								 final Color color){
+		for (Stairs s : stairs) {
+			renderStair(s, g, color);
+		}
+	}
+
+	public static Area getStairShapeWithThreads(Stairs stairs){
+		Area hatchArea = new Area(stairs.getShape());
+		double stroke = stairs.getTreadDepth() * 0.05;
+		double halfTreadDepth = stairs.getTreadDepth()/2;
+
+		for (Stairs.Tread tread : stairs.getTreads()) {
+
+			VLine tLine = tread.treadline;
+			Vector2D vec = tLine.asVector();
+			vec = vec.normalize(stroke);
+			vec = vec.rotate(rotNeg90);
+			Vector2D trans = vec.normalize(halfTreadDepth);
+			Path2D p = new Path2D.Double();
+			p.moveTo(tLine.x1, tLine.y1);
+			p.lineTo(tLine.x2, tLine.y2);
+			p.lineTo(tLine.x2 + vec.x, tLine.y2  + vec.y);
+			p.lineTo(tLine.x1 + vec.x, tLine.y1 + vec.y);
+			p.closePath();
+
+			p.transform(AffineTransform.getTranslateInstance(trans.x, trans.y));
+			hatchArea.subtract(new Area(p));
+		}
+		return hatchArea;
+	}
+
+	protected void renderStair(ScenarioElement element, final Graphics2D graphics, Color color){
+		Stairs stairs = (Stairs) element;
+
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(Color.black);
+		fill(stairs.getShape(), graphics);
+
+		Area hatchArea = getStairShapeWithThreads(stairs);
+
+		graphics.setColor(color);
+		fill(hatchArea, graphics);
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderFilledShape(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		graphics.setColor(color);
+		fill(element.getShape(), graphics);
+		graphics.setColor(tmpColor);
+	}
+
 	protected void renderSelectionShape(final Graphics2D graphics) {
 		graphics.setColor(defaultModel.getMouseSelectionMode().getSelectionColor());
-		graphics.setStroke(new BasicStroke(getSelectionBorderLineWidht()));
-		graphics.draw(defaultModel.getSelectionShape());
+		graphics.setStroke(new BasicStroke(getSelectionBorderLineWidth()));
+		draw(defaultModel.getSelectionShape(), graphics);
 	}
 
 	protected void renderSelectionBorder(final Graphics2D graphics) {
 		graphics.setColor(Color.MAGENTA);
 		graphics.setStroke(new BasicStroke(getSelectedShapeBorderLineWidth()));
-		graphics.draw(defaultModel.getSelectedElement().getShape());
+		draw(defaultModel.getSelectedElement().getShape(), graphics);
 	}
 
 	protected void renderLogo(final Graphics2D graphics, double scale, double height) {
@@ -145,15 +248,25 @@ public abstract class DefaultRenderer {
 		 */
 		double dy = defaultModel.getTopographyBound().getHeight() - defaultModel.getViewportBound().getHeight();
 
+		// undo the viewport translation
 		graphics.translate(defaultModel.getViewportBound().getX(),
-				-Math.max((dy - defaultModel.getViewportBound().getY()), 0));
+				-Math.max((dy - defaultModel.getViewportBound().getY()), -defaultModel.getViewportBound().getY()));
 		graphics.scale(1.0 / scale, 1.0 / scale);
 		graphics.translate(0, +defaultModel.getTopographyBound().getHeight() * defaultModel.getScaleFactor());
 		graphics.scale(1.0, -1.0);
 
 		graphics.translate(0, 2.0);
 		graphics.scale(0.25, 0.25);
+
 		graphics.drawImage(logo, 0, 0, null);
+
+		// undo all scaling and translation
+		graphics.scale(1.0/0.25, 1.0/0.25);
+		graphics.translate(0, 1.0/2.0);
+		graphics.scale(1.0, -1.0);
+		graphics.translate(0, -defaultModel.getTopographyBound().getHeight() * defaultModel.getScaleFactor());
+		graphics.translate(-defaultModel.getViewportBound().getX(),
+				Math.max((dy - defaultModel.getViewportBound().getY()), -defaultModel.getViewportBound().getY()));
 	}
 
 	protected boolean hasLogo() {
@@ -203,24 +316,23 @@ public abstract class DefaultRenderer {
 	protected void renderGrid(final Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
 		g.setStroke(new BasicStroke(getGridLineWidth()));
-
-		for (double y = 0; y <= defaultModel.getTopographyBound().height + 0.01; y +=
+		Rectangle2D.Double bound = defaultModel.getTopographyBound();
+		for (double y = bound.getMinY(); y <= bound.getMaxY() + 0.01; y +=
 				defaultModel.getGridResolution()) {
-			for (double x = 0; x <= defaultModel.getTopographyBound().width + 0.01; x +=
+			for (double x = bound.getMinX(); x <= bound.getMaxX() + 0.01; x +=
 					defaultModel.getGridResolution()) {
-				g.draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
+				draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
 						x + defaultModel.getGridResolution()
-								* 0.2,
-						y));
-				g.draw(new Line2D.Double(x, y - defaultModel.getGridResolution() * 0.2, x,
+								* 0.2, y), g);
+				draw(new Line2D.Double(x, y - defaultModel.getGridResolution() * 0.2, x,
 						y + defaultModel.getGridResolution()
-								* 0.2));
+								* 0.2), g);
 			}
 		}
 	}
 
 	protected float getLineWidth() {
-		return (float) (2.0 / defaultModel.getScaleFactor());
+		return (float) (1.0 / defaultModel.getScaleFactor());
 	}
 
     /*protected void paintPotentialField(final Graphics2D g, final Function<VPoint, Double> potentialField, final VRectangle bound) {
@@ -479,9 +591,17 @@ public abstract class DefaultRenderer {
 				}
 
 				/* Draw rectangle as pixel to image. */
-				g.fill(new Rectangle2D.Double(coord.x, coord.y, pixToW, pixToW));
+				fill(new Rectangle2D.Double(coord.x, coord.y, pixToW, pixToW), g);
 			}
 		}
+	}
+
+	protected void renderMesh(
+			@NotNull final Graphics2D g,
+			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?> mesh,
+			@NotNull final VRectangle bound) {
+		MeshRenderer<? extends IPotentialPoint, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
+		meshRenderer.renderGraphics(g, bound);
 	}
 
 	protected void renderVoronoiDiagram(final Graphics2D g, final VoronoiDiagram voronoiDiagram) {
@@ -511,8 +631,8 @@ public abstract class DefaultRenderer {
 							go = false;
 							closed = true;
 						} else {
-							g.draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next
-									.getOrigin().y));
+
+							draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next.getOrigin().y), g);
 
 							if (next == outerComponent) {
 								go = false;
@@ -532,8 +652,7 @@ public abstract class DefaultRenderer {
 						if (next == null || next.getOrigin() == null) {
 							go = false;
 						} else {
-							g.draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next
-									.getOrigin().y));
+							draw(new Line2D.Double(last.getOrigin().x, last.getOrigin().y, next.getOrigin().x, next.getOrigin().y), g);
 
 							if (next == outerComponent) {
 								go = false;
@@ -553,13 +672,13 @@ public abstract class DefaultRenderer {
 		return getLineWidth() * 2;
 	}
 
-	private float getSelectionBorderLineWidht() {
+	private float getSelectionBorderLineWidth() {
 		return getLineWidth() / 4;
 	}
 
 	private static void mirrowHorizonzal(final Graphics2D graphics2D, final int height) {
-		graphics2D.scale(1, -1);
-		graphics2D.translate(0, -height);
+		graphics2D.scale(1.0, -1.0);
+		graphics2D.translate(0.0, -height);
 	}
 
 	private float getGridLineWidth() {

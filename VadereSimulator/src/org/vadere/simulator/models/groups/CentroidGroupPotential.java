@@ -10,7 +10,8 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -37,8 +38,8 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
-									Collection<? extends Agent> closePedestrians) {
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Collection<? extends Agent> closePedestrians) {
 		double result = 0;
 
 		if (!(pedestrian instanceof Pedestrian))
@@ -53,12 +54,12 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		return result;
 	}
 
-	private double getPedestrianGroupPotential(Pedestrian ped, VPoint pos) {
+	private double getPedestrianGroupPotential(Pedestrian ped, IPoint pos) {
 		double result = 0;
 		CentroidGroup group = groupCollection.getGroup(ped);
 		Pedestrian leader = null;
 
-		if (group != null) {
+		if (group != null && group.getSize() > 1) {
 			leader = group.getPacemaker(ped);
 		}
 
@@ -79,7 +80,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		return result;
 	}
 
-	private double getPedestrianRepulsionPotential(Pedestrian ped, VPoint pos,
+	private double getPedestrianRepulsionPotential(Pedestrian ped, IPoint pos,
 												   Collection<? extends Agent> closePedestrians) {
 		double potential = 0;
 
@@ -93,7 +94,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	}
 
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 											  Vector2D velocity, Agent pedestrian,
 											  Collection<? extends Agent> closePedestrians) {
 		// TODO [priority=low] [task=refactoring] not implemented
@@ -102,7 +103,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 									Agent otherPedestrian) {
 //		System.out.printf("Ped1: %s, Ped1: %s %n", pedestrian.getId(), otherPedestrian.getId());
 		CentroidGroup group = groupCollection.getGroup(pedestrian);

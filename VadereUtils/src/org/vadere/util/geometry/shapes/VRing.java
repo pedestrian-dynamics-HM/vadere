@@ -8,7 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vadere.util.geometry.ShapeType;
+import org.vadere.util.geometry.shapes.ShapeType;
 
 /**
  * A ring consists of two circles of different size.
@@ -91,7 +91,7 @@ public class VRing implements VShape {
 		 * vertices.add(new VPoint(x, y + h));
 		 * 
 		 * for (int i = 0; i < vertices.size(); i++) {
-		 * if (!(contains(vertices.get(i)))) {
+		 * if (!(triangleContains(vertices.get(i)))) {
 		 * return false;
 		 * }
 		 * }
@@ -149,29 +149,29 @@ public class VRing implements VShape {
 	}
 
 	@Override
-	public double distance(VPoint point) {
+	public double distance(IPoint point) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
+	public VPoint closestPoint(IPoint point) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
 	@Override
-	public boolean contains(VPoint point) {
+	public boolean contains(IPoint point) {
 		double distanceFromCenterToPoint = center.distance(point);
 
 		return distanceFromCenterToPoint >= radiusInnerCircle && distanceFromCenterToPoint <= radiusOuterCircle;
 	}
 
 	@Override
-	public VShape translate(VPoint vector) {
+	public VShape translate(IPoint vector) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
 	@Override
-	public VShape translatePrecise(VPoint vector) {
+	public VShape translatePrecise(IPoint vector) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
 	}
 
@@ -218,6 +218,16 @@ public class VRing implements VShape {
 	@Override
 	public ShapeType getType() {
 		return ShapeType.RING;
+	}
+
+	@Override
+	public boolean intersects(VShape shape) {
+		throw new UnsupportedOperationException("not yet implemented.");
+	}
+
+	@Override
+	public List<VPoint> getPath() {
+		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 }

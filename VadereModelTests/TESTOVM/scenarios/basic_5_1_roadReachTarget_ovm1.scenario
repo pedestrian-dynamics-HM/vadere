@@ -1,7 +1,8 @@
 {
   "name" : "basic_5_1_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "0.3",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -51,10 +52,10 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
-      "useRandomSeed" : true,
-      "randomSeed" : 1
+      "useFixedSeed" : true,
+      "fixedSeed" : 1,
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
@@ -103,12 +104,11 @@
         "startTime" : 0.0,
         "endTime" : 60.0,
         "spawnAtRandomPositions" : false,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "CAR"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -133,7 +133,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      }
+      },
+      "dynamicElements" : [ ]
     }
   }
 }

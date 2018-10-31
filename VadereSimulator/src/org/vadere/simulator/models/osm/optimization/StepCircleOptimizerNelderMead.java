@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 

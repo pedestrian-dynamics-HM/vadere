@@ -83,7 +83,7 @@ public class Resources {
 				properties.load(in);
 			} catch (IOException e) {
 				e.printStackTrace();
-				logger.error("error while loading properties for application: " + applicationName);
+				logger.error("topographyError while loading properties for application: " + applicationName);
 			} finally {
 				try {
 					in.close();

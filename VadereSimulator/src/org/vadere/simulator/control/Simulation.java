@@ -7,9 +7,12 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -65,10 +68,11 @@ public class Simulation {
 	private final Topography topography;
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
+	private SimulationResult simulationResult;
 	private final EventController eventController;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-			List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager) {
+					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
 		this.name = name;
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
@@ -80,6 +84,7 @@ public class Simulation {
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
+		this.simulationResult = simulationResult;
 
 		this.models = mainModel.getSubmodels();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
@@ -92,17 +97,31 @@ public class Simulation {
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
 		this.eventController = new EventController(scenarioStore);
+		// ::start:: this code is to visualize the potential fields. It may be refactored later.
+		if(attributesSimulation.isVisualizationEnabled()) {
+			IPotentialFieldTarget pft = null;
+			IPotentialField pt = null;
+			if(mainModel instanceof PotentialFieldModel) {
+				pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+				pt = (pos, agent) -> {
+					if(agent instanceof PedestrianOSM) {
+						return ((PedestrianOSM)agent).getPotential(pos);
+					}
+					else {
+						return 0.0;
+					}
+				};
+			}
 
-        IPotentialFieldTarget pft = null;
-        if(mainModel instanceof PotentialFieldModel) {
-            pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
-        }
+			for (PassiveCallback pc : this.passiveCallbacks) {
+				pc.setPotentialFieldTarget(pft);
+				pc.setPotentialField(pt);
+			}
+		}
+		// ::end::
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
-            if(pft != null) {
-                pc.setPotentialFieldTarget(pft);
-            }
 		}
 
 		// create source and target controllers
@@ -147,6 +166,7 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -159,7 +179,7 @@ public class Simulation {
 		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.postLoop(this.simulationState);
 		}
-		topographyController.postLoop(this.simTimeInSec);
+
 	}
 
 	/**
@@ -222,6 +242,7 @@ public class Simulation {
 
 				if (Thread.interrupted()) {
 					runSimulation = false;
+					simulationResult.setState("Simulation interrupted");
 					logger.info("Simulation interrupted.");
 				}
 			}

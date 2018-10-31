@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_1Source1Place",
   "description" : "",
-  "release" : "0.3",
+  "release" : "0.6",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -23,6 +23,27 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
+      },
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution" : 0.1,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "timeCostAttributes" : {
+          "standardDeviation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT"
+        }
+      },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
         "numberOfCircles" : 1,
@@ -42,10 +63,6 @@
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
         "submodels" : [ "org.vadere.simulator.models.groups.CentroidGroupModel" ]
       },
-      "org.vadere.state.attributes.models.AttributesCGM" : {
-        "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
-      },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
         "pedPotentialPersonalSpaceWidth" : 1.2,
@@ -55,23 +72,6 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
-      },
-      "org.vadere.state.attributes.models.AttributesFloorField" : {
-        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
-        "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
-        "timeCostAttributes" : {
-          "standardDeviation" : 0.7,
-          "type" : "UNIT",
-          "obstacleDensityWeight" : 3.5,
-          "pedestrianSameTargetDensityWeight" : 3.5,
-          "pedestrianOtherTargetDensityWeight" : 3.5,
-          "pedestrianWeight" : 3.5,
-          "queueWidthLoading" : 1.0,
-          "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
-        }
       }
     },
     "attributesSimulation" : {
@@ -81,10 +81,10 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
-      "useRandomSeed" : true,
-      "randomSeed" : 1
+      "useFixedSeed" : true,
+      "fixedSeed" : 1,
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {

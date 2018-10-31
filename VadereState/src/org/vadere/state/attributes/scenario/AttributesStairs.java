@@ -1,10 +1,9 @@
 package org.vadere.state.attributes.scenario;
 
 import org.apache.log4j.Logger;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Stairs;
-import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VShape;
 
 /**
@@ -65,4 +64,8 @@ public class AttributesStairs extends AttributesEmbedShape {
 		return upwardDirection;
 	}
 
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
 }

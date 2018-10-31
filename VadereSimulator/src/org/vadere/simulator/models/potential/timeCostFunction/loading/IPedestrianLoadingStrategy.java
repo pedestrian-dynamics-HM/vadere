@@ -32,7 +32,7 @@ public interface IPedestrianLoadingStrategy<T extends Pedestrian> {
 	 * @param targetId
 	 * @return
 	 */
-	public static IPedestrianLoadingStrategy create(final Topography topography,
+	static IPedestrianLoadingStrategy create(final Topography topography,
 			final AttributesTimeCost timeCostAttributes, final AttributesAgent attributesPedestrian,
 			final int targetId) {
 		IPedestrianLoadingStrategy loadingStrategy = null;
@@ -72,16 +72,16 @@ public interface IPedestrianLoadingStrategy<T extends Pedestrian> {
 		return loadingStrategy;
 	}
 
-	public static <E extends Pedestrian> IPedestrianLoadingStrategy create(
+	static <E extends Pedestrian> IPedestrianLoadingStrategy create(
 			final IPedestrianLoadingStrategy loadingStrategy, final Predicate<E> predicate) {
 		return new PedestrianLoadingStrategyConditioned(loadingStrategy, predicate);
 	}
 
-	public static IPedestrianLoadingStrategy create() {
+	static IPedestrianLoadingStrategy create() {
 		return create(1.0);
 	}
 
-	public static IPedestrianLoadingStrategy create(final double loading) {
+	static IPedestrianLoadingStrategy create(final double loading) {
 		return new PedestrianLoadingStrategyUnit(loading);
 	}
 }

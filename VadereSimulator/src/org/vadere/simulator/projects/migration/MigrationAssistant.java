@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.migration;
 
 import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -24,11 +25,14 @@ public abstract class MigrationAssistant {
 		}
 	}
 
+	public static Path getBackupPath(Path scenarioFile){
+		return IOUtils.addSuffix(scenarioFile, "." + IOUtils.LEGACY_DIR, false);
+	}
+
 	public abstract String getLog();
 
 	public abstract void restLog();
 
-//	public abstract void analyzeSingleScenario(Path path) throws IOException;
 
 	public abstract MigrationResult analyzeProject(String projectFolderPath) throws IOException;
 
@@ -36,5 +40,9 @@ public abstract class MigrationAssistant {
 		return new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
 	}
 
-	public abstract String convertFile(Path scenarioFilePath, Version targetVersion) throws IOException, MigrationException;
+	public abstract String convertFile(Path scenarioFilePath, Version targetVersion) throws MigrationException;
+
+
+	public abstract void migrateFile(Path scenarioFilePath, Version targetVersion,  Path outputFile) throws MigrationException;
+	public abstract void revertFile(Path scenarioFile) throws MigrationException;
 }

@@ -111,6 +111,35 @@
                 <skipTests>${skip.unit.tests}</skipTests>
             </configuration>
         </plugin>
+
+        <plugin>
+            <!-- NOTE: We don't need a groupId specification because the group is
+                 org.apache.maven.plugins ...which is assumed by default.
+             -->
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+                <execution>
+                    <id>build-vadere-console</id> <!-- this is used for inheritance merges -->
+                    <phase>package</phase> <!-- bind to the packaging phase -->
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>org.vadere.simulator.entrypoints.cmd.VadereConsole</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>vadere-console</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
     <pluginManagement>
     	<plugins>
@@ -183,6 +212,11 @@
       <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>annotation</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>meshing</artifactId>
           <version>${project.version}</version>
       </dependency>
 

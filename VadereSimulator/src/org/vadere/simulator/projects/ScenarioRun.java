@@ -51,6 +51,8 @@ public class ScenarioRun implements Runnable {
 
 	private final RunnableFinishedListener finishedListener;
 
+	private SimulationResult simulationResult;
+
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
 	}
@@ -62,10 +64,12 @@ public class ScenarioRun implements Runnable {
 	// if overwriteTimestampSetting is true do note use timestamp in output directory
 	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
+		this.scenario.setSimulationRunning(true); // create copy of ScenarioStore and redirect getScenarioStore to this copy for simulation.
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
 		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
+		this.simulationResult = new SimulationResult(scenario.getName());
 	}
 
 
@@ -79,6 +83,7 @@ public class ScenarioRun implements Runnable {
 		try {
 			//add Scenario Name to Log4j Mapped Diagnostic Context to filter log by ScenarioRun
 //			MDC.put("scenario.Name", outputPath.getFileName().toString());
+			simulationResult.startTime();
 
 			/**
 			 * To make sure that no other Thread changes the scenarioStore object during the initialization of a scenario run
@@ -88,7 +93,7 @@ public class ScenarioRun implements Runnable {
 			synchronized (scenarioStore) {
 				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 				scenarioStore.getTopography().reset();
-				System.out.println("StartIt " + scenario.getName());
+				logger.info("StartIt " + scenario.getName());
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 				modelBuilder.createModelAndRandom();
 
@@ -98,6 +103,7 @@ public class ScenarioRun implements Runnable {
 				// prepare processors and simulation data writer
 				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
 					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+					processorManager.setSimulationResult(simulationResult);
 				}
 
 				// Only create output directory and write .scenario file if there is any output.
@@ -109,13 +115,15 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager);
+				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
 			}
 			simulation.run();
+			simulationResult.setState("SimulationRun completed");
 
 		} catch (Exception e) {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
+			simulationResult.stopTime();
 			doAfterSimulation();
 			//remove Log4j Mapped Diagnostic Context after ScenarioRun
 //			MDC.remove("scenario.Name");
@@ -131,6 +139,7 @@ public class ScenarioRun implements Runnable {
 		if (finishedListener != null)
 			finishedListener.finished(this);
 
+		scenario.setSimulationRunning(false); // remove  simulation copy of ScenarioStore and redirect getScenarioStore to base copy.
 		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
 
@@ -199,6 +208,10 @@ public class ScenarioRun implements Runnable {
 
 	public Scenario getScenario() {
 		return scenario;
+	}
+
+	public SimulationResult getSimulationResult() {
+		return simulationResult;
 	}
 
 	private void sealAllAttributes() {

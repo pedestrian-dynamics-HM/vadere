@@ -119,7 +119,7 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(40.0);
 
-				addToExpectedOutput(new PedestrianIdKey(1), Double.NaN);
+				addToExpectedOutput(new PedestrianIdKey(1), Double.POSITIVE_INFINITY);
 
 			}
 		});

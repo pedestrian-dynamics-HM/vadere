@@ -19,6 +19,9 @@ import org.vadere.util.geometry.shapes.VShape;
 public class Stairs extends ScenarioElement {
 
 	private static Logger logger = LogManager.getLogger(Stairs.class);
+	public static double MIN_TREAD_DEPTH = 0.100;
+	public static double MAX_TREAD_DEPTH = 0.350;
+
 	public static class Tread {
 		public final VLine treadline;
 

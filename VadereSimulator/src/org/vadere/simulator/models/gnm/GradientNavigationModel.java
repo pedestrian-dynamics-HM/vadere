@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.gnm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
@@ -19,8 +20,9 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
-import org.vadere.util.potential.gradients.GradientProvider;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -160,9 +162,19 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 			throw new IllegalArgumentException("GNM cannot initialize " + type.getCanonicalName());
 		this.pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, id > 0 ? id : pedestrianIdCounter);
-		Pedestrian result = new Pedestrian(pedAttributes, random);
-		result.setPosition(position);
+		Pedestrian result = create(position, pedAttributes);
 		return result;
+	}
+
+	private Pedestrian create(@NotNull final VPoint point, @NotNull final AttributesAgent attributesAgent) {
+		Pedestrian pedestrian = new Pedestrian(attributesAgent, random);
+		pedestrian.setPosition(point);
+		return pedestrian;
+	}
+
+	@Override
+	public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+		return create(position, new AttributesAgent(elementAttributes, -1)).getShape();
 	}
 
 	@Override

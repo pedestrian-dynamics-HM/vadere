@@ -1,24 +1,26 @@
 package org.vadere.simulator.projects.migration.jolttranformation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import org.junit.Test;
-import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.io.IOUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-
-import static org.junit.Assert.*;
-
-class JoltTransformationTest {
+import org.junit.After;
+import org.junit.Before;
+import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
+import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 
 
-	JsonNode getJson(String resources) throws IOException, URISyntaxException {
-		URL url = getClass().getResource(resources);
-		String json = IOUtils.readTextFile(Paths.get(url.toURI()));
-		return StateJsonConverter.deserializeToNode(json);
+abstract class JoltTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
+
+	org.vadere.simulator.projects.migration.jolttranformation.JoltTransformationFactory factory = org.vadere.simulator.projects.migration.jolttranformation.JoltTransformationFactory.instance();
+
+
+	@Before
+	public void init() {
+		backupTestDir();
 	}
+
+	@After
+	public void cleaUp() {
+		loadFromBackup();
+	}
+
+
 }
