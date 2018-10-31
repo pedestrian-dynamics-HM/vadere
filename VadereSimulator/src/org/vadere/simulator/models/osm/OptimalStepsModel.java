@@ -29,6 +29,9 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
@@ -38,13 +41,10 @@ import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel, DynamicElementRemoveListener<Pedestrian> {
@@ -239,7 +239,58 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		lastSimTimeInSec = simTimeInSec;
 	}
 
-	/*
+	@Override
+	public void update(final List<Event> events) {
+		// TODO: improve proof of concept (prioritize events etc.)
+		Event mostImportantEvent = prioritizeEvents(events);
+
+        if (mostImportantEvent instanceof ElapsedTimeEvent) {
+            handleElapsedTimeEvent(mostImportantEvent);
+        } else if (mostImportantEvent instanceof WaitEvent) {
+            handleWaitEvent(mostImportantEvent);
+        } else {
+            throw new IllegalArgumentException("Cannot handle event: " + mostImportantEvent);
+        }
+	}
+
+	private Event prioritizeEvents(List<Event> events) {
+		Event mostImportantEvent = null;
+
+		List<Event> waitEvents = events.stream().filter(event -> event instanceof WaitEvent).collect(Collectors.toList());
+
+		if (waitEvents.size() >= 1) {
+		    mostImportantEvent = waitEvents.get(0);
+        } else {
+		    List<Event> elapsedTimeEvents = events.stream().filter(event -> event instanceof ElapsedTimeEvent).collect(Collectors.toList());
+            mostImportantEvent = elapsedTimeEvents.get(0);
+        }
+
+        return mostImportantEvent;
+	}
+
+	private void handleElapsedTimeEvent(final Event event) {
+		if (!(event instanceof ElapsedTimeEvent)) {
+			throw new IllegalArgumentException("Wrong event type passed, expected: " + ElapsedTimeEvent.class.getName());
+		}
+
+		update(event.getTime());
+	}
+
+	private void handleWaitEvent(final Event event) {
+		if (!(event instanceof WaitEvent)) {
+			throw new IllegalArgumentException(String.format("Wrong event type passed, expected: %s", WaitEvent.class.getName()));
+		}
+
+		Collection<PedestrianOSM> pedestrians = topography.getElements(PedestrianOSM.class);
+
+		for (PedestrianOSM pedestrian : pedestrians) {
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		}
+
+		this.lastSimTimeInSec = event.getTime();
+	}
+
+		/*
 	 * At the moment all pedestrians also the initalPedestrians get this.attributesPedestrain!!!
 	 */
 	@Override

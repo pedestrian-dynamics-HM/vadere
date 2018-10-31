@@ -2,10 +2,7 @@ package org.vadere.state.events.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.EventTimeframe;
-import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.state.events.types.*;
 import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -61,7 +58,8 @@ public class EventInfoStore {
         EventTimeframe eventTimeframe = new EventTimeframe(5, 30, false, 0);
 
         List<Event> events = new ArrayList<>();
-        events.add(new WaitInAreaEvent(0, new VRectangle(12.5, 0, 5, 6)));
+        events.add(new WaitEvent());
+        // events.add(new WaitInAreaEvent(0, new VRectangle(12.5, 0, 5, 6)));
         // events.add(new WaitInAreaEvent(0, new VCircle(5, 5, 5)));
 
         EventInfo eventInfo1 = new EventInfo();
