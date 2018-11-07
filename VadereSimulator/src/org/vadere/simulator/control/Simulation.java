@@ -280,6 +280,9 @@ public class Simulation {
 	private void updateCallbacks(double simTimeInSec) {
         List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
+        // TODO: Implement "CognitionLayer" class and use it here, e.g. cognitionLayer(events, pedestrians)
+		// which calls pedestrian.setBehavior(...) or this methods returns List<Behavior, Pedestrian).
+
         // TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
