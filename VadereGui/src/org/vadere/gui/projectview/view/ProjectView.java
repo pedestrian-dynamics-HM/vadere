@@ -602,7 +602,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 					File[] children = outDir.listFiles();
 					if (children != null){
 						for (File file : children) {
-							String name = file.isDirectory() ? file.getName() + "/" : file.getName();
+							String name = file.isDirectory() ? "---*" + file.getName() + "/" : "---*" + file.getName();
 							copyPath.add(new JMenuItem(
 									new ActionToClipboard(name, file.getAbsolutePath()))
 							);
