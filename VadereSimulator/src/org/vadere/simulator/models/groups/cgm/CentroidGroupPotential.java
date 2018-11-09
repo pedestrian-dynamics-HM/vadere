@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.groups;
+package org.vadere.simulator.models.groups.cgm;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -105,7 +105,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	@Override
 	public double getAgentPotential(IPoint pos, Agent pedestrian,
 									Agent otherPedestrian) {
-//		System.out.printf("Ped1: %s, Ped1: %s %n", pedestrian.getId(), otherPedestrian.getId());
+		//System.out.printf("Ped1: %s, Ped1: %s %n", pedestrian.getId(), otherPedestrian.getId());
 		CentroidGroup group = groupCollection.getGroup(pedestrian);
 		CentroidGroup groupOther = groupCollection.getGroup(otherPedestrian);
 		double potential = potentialFieldPedestrian.getAgentPotential(pos,

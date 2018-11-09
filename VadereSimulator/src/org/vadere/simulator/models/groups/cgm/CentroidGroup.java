@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.groups;
+package org.vadere.simulator.models.groups.cgm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.vadere.simulator.models.groups.Group;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -25,7 +26,7 @@ public class CentroidGroup implements Group {
 	private final List<Pedestrian> lostMembers;
 	private Map<Pedestrian, Map<Pedestrian, VPoint>> lastVision;
 	private final Map<Pedestrian, Integer> noVisionOfLeaderCount;
-	private final IPotentialFieldTarget potentialFieldTarget;
+	private  IPotentialFieldTarget potentialFieldTarget;
 
 	public CentroidGroup(int id, int size,
 			IPotentialFieldTarget potentialFieldTarget) {
@@ -231,5 +232,9 @@ public class CentroidGroup implements Group {
 		}
 
 		return pacemaker;
+	}
+
+	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
+		this.potentialFieldTarget = potentialFieldTarget;
 	}
 }

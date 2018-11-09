@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.groups;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.groups.cgm.CentroidGroup;
 import org.vadere.state.scenario.ScenarioElement;
 
 import java.util.List;

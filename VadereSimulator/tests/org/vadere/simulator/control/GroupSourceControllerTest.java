@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.models.groups.CentroidGroupFactory;
-import org.vadere.simulator.models.groups.CentroidGroupModel;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupFactory;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.simulator.models.groups.GroupSizeDeterminatorRandom;
 import org.vadere.state.attributes.Attributes;
@@ -24,7 +24,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

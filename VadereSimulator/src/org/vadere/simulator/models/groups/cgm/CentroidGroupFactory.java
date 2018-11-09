@@ -1,5 +1,7 @@
-package org.vadere.simulator.models.groups;
+package org.vadere.simulator.models.groups.cgm;
 
+import org.vadere.simulator.models.groups.GroupFactory;
+import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.LinkedList;
