@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -29,18 +30,22 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
-		VPoint oldPosition = pedestrian.getPosition();
-		pedestrian.clearStrides();
-		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
-
-		while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-			pedestrian.updateNextPosition();
-			makeStep(topography, pedestrian, timeStepInSec);
+		if (pedestrian.getMostImportantEvent() instanceof ElapsedTimeEvent) {
+			VPoint oldPosition = pedestrian.getPosition();
+			pedestrian.clearStrides();
+			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 			pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
-		}
 
-		topography.moveElement(pedestrian, oldPosition);
+			while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
+				pedestrian.updateNextPosition();
+				makeStep(topography, pedestrian, timeStepInSec);
+				pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
+			}
+
+			topography.moveElement(pedestrian, oldPosition);
+		} else {
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		}
 	}
 
 	@Override
