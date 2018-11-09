@@ -109,14 +109,18 @@ import java.util.stream.StreamSupport;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>, Cloneable {
+public interface IMesh<
+		P extends IPoint,
+		CE,
+		CF,
+		V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends Iterable<F>, Cloneable {
 
 	/**
 	 * construct a new empty mesh.
 	 *
 	 * @return a new fresh empty mesh
 	 */
-	IMesh<P, V, E, F> construct();
+	IMesh<P, CE, CF, V, E, F> construct();
 
 	/**
 	 * Removes deleted base elements from this data structure.
@@ -1535,7 +1539,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return a list {@link List} of all vertices of a face.
 	 */
 	default List<V> getVertices(@NotNull final F face) {
-		EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
+		EdgeIterator<P, CE, CF, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
 
 		List<V> vertices = new ArrayList<>();
 		while (edgeIterator.hasNext()) {
@@ -1553,7 +1557,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @return a list {@link List} of all points of a face.
 	 */
 	default List<P> getPoints(@NotNull final F face) {
-		EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
+		EdgeIterator<P, CE, CF, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
 
 		List<P> points = new ArrayList<>();
 		while (edgeIterator.hasNext()) {
@@ -1694,7 +1698,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param <P>               the type of the points (containers)
 	 * @return a new pointer based mesh
 	 */
-	static <P extends IPoint> IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> createPMesh(@NotNull final IPointConstructor<P> pointConstructor) {
+	static <P extends IPoint> PMesh<P> createPMesh(@NotNull final IPointConstructor<P> pointConstructor) {
 		return new PMesh<>(pointConstructor);
 	}
 
@@ -1767,7 +1771,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 *
 	 * @return a deep clone of this mesh
 	 */
-	IMesh<P, V, E, F> clone();
+	IMesh<P, CE, CF, V, E, F> clone();
 
 	/**
 	 * Returns a rectangular bound containing all vertices of the mesh.
@@ -1804,7 +1808,7 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param type  specifies the used {@link IPointLocator}
 	 * @return a triangulation {@link IIncrementalTriangulation} of this mesh
 	 */
-	IIncrementalTriangulation<P, V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
+	IIncrementalTriangulation<P, CE, CF, V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
 
 	/**
 	 * Rearranges the memory location of faces, vertices and halfEdges of the mesh according to
@@ -1861,8 +1865,8 @@ public interface IMesh<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param <E>   the type of the edge
 	 * @param <F>   the type of the face
 	 */
-	static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> void createSimpleTriMesh(
-			@NotNull final IMesh<P, V, E, F> mesh
+	static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> void createSimpleTriMesh(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh
 	) {
 		F face1;
 		F face2;

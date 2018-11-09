@@ -7,7 +7,7 @@ import org.vadere.util.geometry.shapes.IPoint;
  *
  * @author Benedikt Zoennchen
  */
-public interface ITriEventListener<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public interface ITriEventListener<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 
 	/**
 	 * This method is triggered after a triangle is split into 3 new faces by inserting a

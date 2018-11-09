@@ -12,12 +12,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Benedikt Zoennchen
  * @param <P> the type of the points (containers)
  */
-public class PVertex<P extends IPoint> implements IVertex<P> {
+public class PVertex<P extends IPoint, CE, CF> implements IVertex<P> {
 
 	private Lock lock;
 	private P point;
-	private PVertex<P> down;
-	private PHalfEdge<P> halfEdge;
+	private PVertex<P, CE, CF> down;
+	private PHalfEdge<P, CE, CF> halfEdge;
 	private boolean destroyed;
 
 	public PVertex(final P point) {
@@ -36,19 +36,19 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 		return point;
 	}
 
-	public PHalfEdge<P> getEdge() {
+	public PHalfEdge<P, CE, CF> getEdge() {
 		return halfEdge;
 	}
 
-	public void setEdge(final PHalfEdge<P> halfEdge) {
+	public void setEdge(final PHalfEdge<P, CE, CF> halfEdge) {
 		this.halfEdge = halfEdge;
 	}
 
-	public PVertex<P> getDown() {
+	public PVertex<P, CE, CF> getDown() {
 		return down;
 	}
 
-	public void setDown(final PVertex<P> down) {
+	public void setDown(final PVertex<P, CE, CF> down) {
 		this.down = down;
 	}
 
@@ -93,9 +93,9 @@ public class PVertex<P extends IPoint> implements IVertex<P> {
 	 * @return a deep clone of the vertex.
 	 */
     @Override
-    public PVertex<P> clone() {
+    public PVertex<P, CE, CF> clone() {
 	    try {
-		    PVertex<P> clone = (PVertex<P>)super.clone();
+		    PVertex<P, CE, CF> clone = (PVertex<P, CE, CF>)super.clone();
 		    clone.point = (P)point.clone();
 		    clone.lock = new ReentrantLock();
 		    return clone;

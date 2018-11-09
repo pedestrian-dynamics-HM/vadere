@@ -21,7 +21,7 @@ import java.util.Optional;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends ITriEventListener<P, V, E, F> {
+public interface IPointLocator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends ITriEventListener<P, CE, CF, V, E, F> {
 
 	/**
 	 * Starts the point location of the point and returns the face which is found.

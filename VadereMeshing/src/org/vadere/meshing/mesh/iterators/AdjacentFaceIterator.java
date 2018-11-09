@@ -18,11 +18,11 @@ import java.util.Iterator;
  * @param <E> the type of the half-edge
  * @param <F> the type of the face
  */
-public class AdjacentFaceIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<F> {
-	private IncidentEdgeIterator<P, V, E, F> neighbourIterator;
-	private IMesh<P, V, E, F> mesh;
+public class AdjacentFaceIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<F> {
+	private IncidentEdgeIterator<P, CE, CF, V, E, F> neighbourIterator;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 
-	public AdjacentFaceIterator(final IMesh<P, V, E, F> mesh, E edge) {
+	public AdjacentFaceIterator(final IMesh<P, CE, CF, V, E, F> mesh, E edge) {
 		this.neighbourIterator = new IncidentEdgeIterator<>(mesh, edge);
 		this.mesh = mesh;
 	}

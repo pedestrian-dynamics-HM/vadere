@@ -60,13 +60,13 @@ import javax.swing.*;
  * @see <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>
  * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
  */
-public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IIncrementalTriangulation<P, V, E, F> {
+public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IIncrementalTriangulation<P, CE, CF, V, E, F> {
 
 	protected Collection<P> points;
 	private VRectangle bound;
 	private boolean finalized = false;
-	private IMesh<P, V, E, F> mesh;
-	private IPointLocator<P, V, E, F> pointLocator;
+	private IMesh<P, CE, CF, V, E, F> mesh;
+	private IPointLocator<P, CE, CF, V, E, F> pointLocator;
 	private boolean initialized;
 	private List<V> virtualVertices;
 	private boolean useMeshForBound;
@@ -95,7 +95,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
 			@NotNull final Collection<P> points,
 			@NotNull final Predicate<E> illegalPredicate) {
@@ -123,7 +123,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
 			@NotNull final VRectangle bound,
 			@NotNull final Predicate<E> illegalPredicate) {
@@ -147,7 +147,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 * @param type              the type of the point location algorithm
 	 * @param bound             the bound of the triangulation, i.e. there will be no points outside the bound to be inserted into the triangulation
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh,
+	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 	                                @NotNull final IPointLocator.Type type,
 	                                @NotNull final VRectangle bound) {
 		this(mesh, type, bound, halfEdge -> true);
@@ -160,7 +160,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
 	 *              bound to be inserted into the triangulation
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh,
+	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 	                                @NotNull final VRectangle bound) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, halfEdge -> true);
 	}
@@ -176,7 +176,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
 			@NotNull final Predicate<E> illegalPredicate) {
 
@@ -204,7 +204,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Predicate<E> illegalPredicate) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, illegalPredicate);
 	}
@@ -219,7 +219,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 * @param points    points to be inserted, which also specify the bounding box
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
 			@NotNull final Collection<P> points) {
 		this(mesh, type, points, halfEdge -> true);
@@ -234,7 +234,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 * @param type      the type of the used point location algorithm
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final IPointLocator.Type type) {
 		this(mesh, type, halfEdge -> true);
 	}
@@ -246,7 +246,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	 *
 	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<P, V, E, F> mesh) {
+	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, halfEdge -> true);
 	}
 
@@ -268,7 +268,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 				pointLocator = new DelaunayTree<>(this);
 				break;
 			case DELAUNAY_HIERARCHY:
-				Supplier<IIncrementalTriangulation<P, V, E, F>> supplier;
+				Supplier<IIncrementalTriangulation<P, CE, CF, V, E, F>> supplier;
 				if(useMeshForBound) {
 					supplier = () -> new IncrementalTriangulation<>(mesh.clone(), IPointLocator.Type.BASE, illegalPredicate);
 				}
@@ -579,7 +579,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	}
 
 	@Override
-	public IMesh<P, V, E, F> getMesh() {
+	public IMesh<P, CE, CF, V, E, F> getMesh() {
 		return mesh;
 	}
 

@@ -26,17 +26,17 @@ import java.util.stream.Stream;
  *
  * @param <P> the type of the points (containers)
  */
-public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, Cloneable {
+public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>>, Cloneable {
 	private final static Logger log = LogManager.getLogger(AMesh.class);
-	private List<AFace<P>> faces;
+	private List<AFace<CF>> faces;
 	private boolean elementRemoved;
 	private int numberOfVertices;
 	private int numberOfEdges;
 	private int numberOfFaces;
 	private int numberOfHoles;
-	private List<AFace<P>> holes;
-	private AFace<P> boundary;
-	private List<AHalfEdge<P>> edges;
+	private List<AFace<CF>> holes;
+	private AFace<CF> boundary;
+	private List<AHalfEdge<CE>> edges;
 	private IPointConstructor<P> pointConstructor;
 	private List<AVertex<P>> vertices;
 
@@ -60,7 +60,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>> construct() {
+	public IMesh<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> construct() {
 		return new AMesh<>(pointConstructor);
 	}
 
@@ -70,22 +70,22 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public AHalfEdge<P> getNext(@NotNull AHalfEdge<P> halfEdge) {
+	public AHalfEdge<CE> getNext(@NotNull AHalfEdge<CE> halfEdge) {
 		return edges.get(halfEdge.getNext());
 	}
 
 	@Override
-	public AHalfEdge<P> getPrev(@NotNull AHalfEdge<P> halfEdge) {
+	public AHalfEdge<CE> getPrev(@NotNull AHalfEdge<CE> halfEdge) {
 		return edges.get(halfEdge.getPrevious());
 	}
 
 	@Override
-	public AHalfEdge<P> getTwin(@NotNull AHalfEdge<P> halfEdge) {
+	public AHalfEdge<CE> getTwin(@NotNull AHalfEdge<CE> halfEdge) {
 		return edges.get(halfEdge.getTwin());
 	}
 
 	@Override
-	public AFace<P> getFace(@NotNull AHalfEdge<P> halfEdge) {
+	public AFace<CF> getFace(@NotNull AHalfEdge<CE> halfEdge) {
 		int edgeId = halfEdge.getFace();
 		if (edgeId == -1) {
 			if (halfEdge.isDestroyed()) {
@@ -98,12 +98,12 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public AHalfEdge<P> getEdge(@NotNull AVertex<P> vertex) {
+	public AHalfEdge<CE> getEdge(@NotNull AVertex<P> vertex) {
 		return edges.get(vertex.getEdge());
 	}
 
 	@Override
-	public AHalfEdge<P> getEdge(@NotNull AFace<P> face) {
+	public AHalfEdge<CE> getEdge(@NotNull AFace<CF> face) {
 		try {
 			edges.get(face.getEdge());
 		}
@@ -114,12 +114,12 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public P getPoint(@NotNull AHalfEdge<P> halfEdge) {
+	public P getPoint(@NotNull AHalfEdge<CE> halfEdge) {
 		return getVertex(halfEdge).getPoint();
 	}
 
 	@Override
-	public AVertex<P> getVertex(@NotNull AHalfEdge<P> halfEdge) {
+	public AVertex<P> getVertex(@NotNull AHalfEdge<CE> halfEdge) {
 		return vertices.get(halfEdge.getEnd());
 	}
 
@@ -141,32 +141,32 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public AFace<P> getFace() {
+	public AFace<CF> getFace() {
 		return faces.stream().filter(f -> !isDestroyed(f)).filter(f -> !isBoundary(f)).findAny().get();
 	}
 
 	@Override
-	public boolean isBoundary(@NotNull AFace<P> face) {
+	public boolean isBoundary(@NotNull AFace<CF> face) {
 		return face.isBorder();
 	}
 
 	@Override
-	public boolean isBoundary(@NotNull AHalfEdge<P> halfEdge) {
+	public boolean isBoundary(@NotNull AHalfEdge<CE> halfEdge) {
 		return halfEdge.getFace() == boundary.getId() || isBoundary(getFace(halfEdge));
 	}
 
 	@Override
-	public boolean isHole(@NotNull AFace<P> face) {
+	public boolean isHole(@NotNull AFace<CF> face) {
 		return isBoundary(face) && face != boundary;
 	}
 
 	@Override
-	public boolean isDestroyed(@NotNull AFace<P> face) {
+	public boolean isDestroyed(@NotNull AFace<CF> face) {
 		return face.isDestroyed();
 	}
 
 	@Override
-	public boolean isDestroyed(@NotNull AHalfEdge<P> edge) {
+	public boolean isDestroyed(@NotNull AHalfEdge<CE> edge) {
 		return edge.isDestroyed();
 	}
 
@@ -176,35 +176,35 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public void setTwin(@NotNull AHalfEdge<P> halfEdge, @NotNull AHalfEdge<P> twin) {
+	public void setTwin(@NotNull AHalfEdge<CE> halfEdge, @NotNull AHalfEdge<CE> twin) {
 		halfEdge.setTwin(twin.getId());
 		twin.setTwin(halfEdge.getId());
 	}
 
 	@Override
-	public void setNext(@NotNull AHalfEdge<P> halfEdge, @NotNull AHalfEdge<P> next) {
+	public void setNext(@NotNull AHalfEdge<CE> halfEdge, @NotNull AHalfEdge<CE> next) {
 		halfEdge.setNext(next.getId());
 		next.setPrevious(halfEdge.getId());
 	}
 
 	@Override
-	public void setPrev(@NotNull AHalfEdge<P> halfEdge, @NotNull AHalfEdge<P> prev) {
+	public void setPrev(@NotNull AHalfEdge<CE> halfEdge, @NotNull AHalfEdge<CE> prev) {
 		halfEdge.setPrevious(prev.getId());
 		prev.setNext(halfEdge.getId());
 	}
 
 	@Override
-	public void setFace(@NotNull AHalfEdge<P> halfEdge, @NotNull AFace<P> face) {
+	public void setFace(@NotNull AHalfEdge<CE> halfEdge, @NotNull AFace<CF> face) {
 		halfEdge.setFace(face.getId());
 	}
 
 	@Override
-	public void setEdge(@NotNull AFace<P> face, @NotNull AHalfEdge<P> edge) {
+	public void setEdge(@NotNull AFace<CF> face, @NotNull AHalfEdge<CE> edge) {
 		face.setEdge(edge.getId());
 	}
 
 	@Override
-	public void setEdge(@NotNull AVertex<P> vertex, @NotNull AHalfEdge<P> edge) {
+	public void setEdge(@NotNull AVertex<P> vertex, @NotNull AHalfEdge<CE> edge) {
 		assert edge.getEnd() == vertex.getId();
 		if(edge.getEnd() != vertex.getId()) {
 			throw new IllegalArgumentException("end of the edge is not equals to the vertex:" + vertex.getId() + " != " + edge.getEnd());
@@ -213,37 +213,37 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public void setVertex(@NotNull AHalfEdge<P> halfEdge, @NotNull AVertex<P> vertex) {
+	public void setVertex(@NotNull AHalfEdge<CE> halfEdge, @NotNull AVertex<P> vertex) {
 		halfEdge.setEnd(vertex.getId());
 	}
 
 	@Override
-	public AHalfEdge<P> createEdge(@NotNull AVertex<P> vertex) {
+	public AHalfEdge<CE> createEdge(@NotNull AVertex<P> vertex) {
 		int id = edges.size();
-		AHalfEdge<P> edge = new AHalfEdge<>(id, vertex.getId());
+		AHalfEdge<CE> edge = new AHalfEdge<>(id, vertex.getId());
 		edges.add(edge);
 		numberOfEdges++;
 		return edge;
 	}
 
 	@Override
-	public AHalfEdge<P> createEdge(@NotNull AVertex<P> vertex, @NotNull AFace<P> face) {
+	public AHalfEdge<CE> createEdge(@NotNull final AVertex<P> vertex, @NotNull final AFace<CF> face) {
 		int id = edges.size();
-		AHalfEdge<P> edge = new AHalfEdge<>(id, vertex.getId(), face.getId());
+		AHalfEdge<CE> edge = new AHalfEdge<>(id, vertex.getId(), face.getId());
 		edges.add(edge);
 		numberOfEdges++;
 		return edge;
 	}
 
 	@Override
-	public AFace<P> createFace() {
+	public AFace<CF> createFace() {
 		return createFace(false);
 	}
 
 	@Override
-	public AFace<P> createFace(boolean hole) {
+	public AFace<CF> createFace(boolean hole) {
 		int id = faces.size();
-		AFace<P> face = new AFace<>(id, -1, hole);
+		AFace<CF> face = new AFace<>(id, -1, hole);
 		faces.add(face);
 		if(!hole) {
 			numberOfFaces++;
@@ -273,7 +273,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public AFace<P> getBorder() {
+	public AFace<CF> getBorder() {
 		return boundary;
 	}
 
@@ -298,7 +298,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public void toHole(@NotNull AFace<P> face) {
+	public void toHole(@NotNull AFace<CF> face) {
 		assert !isDestroyed(face);
 		if(!isHole(face)) {
 			holes.add(face);
@@ -310,7 +310,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 	// these methods assume that all elements are contained in the mesh!
 	@Override
-	public void destroyFace(@NotNull final AFace<P> face) {
+	public void destroyFace(@NotNull final AFace<CF> face) {
 		if (!isDestroyed(face)) {
 			elementRemoved = true;
 			numberOfFaces--;
@@ -324,7 +324,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public void destroyEdge(@NotNull final AHalfEdge<P> edge) {
+	public void destroyEdge(@NotNull final AHalfEdge<CE> edge) {
 		if (!isDestroyed(edge)) {
 			elementRemoved = true;
 			numberOfEdges--;
@@ -347,22 +347,22 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public Stream<AFace<P>> streamFaces(@NotNull Predicate<AFace<P>> predicate) {
+	public Stream<AFace<CF>> streamFaces(@NotNull Predicate<AFace<CF>> predicate) {
 		return faces.stream().filter(f -> isAlive(f)).filter(predicate);
 	}
 
 	@Override
-	public Stream<AFace<P>> streamHoles() {
+	public Stream<AFace<CF>> streamHoles() {
 		return holes.stream().filter(f -> !isDestroyed(f));
 	}
 
 	@Override
-	public Stream<AHalfEdge<P>> streamEdges() {
+	public Stream<AHalfEdge<CE>> streamEdges() {
 		return edges.stream().filter(e -> !isDestroyed(e));
 	}
 
 	@Override
-	public Stream<AHalfEdge<P>> streamEdgesParallel() {
+	public Stream<AHalfEdge<CE>> streamEdgesParallel() {
 		return edges.parallelStream().filter(e -> !e.isDestroyed());
 	}
 
@@ -377,7 +377,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-	public Iterable<AHalfEdge<P>> getEdgeIt() {
+	public Iterable<AHalfEdge<CE>> getEdgeIt() {
 		return () -> streamEdges().iterator();
 	}
 
@@ -434,12 +434,12 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	}
 
 	@Override
-    public synchronized AMesh<P> clone() {
+    public synchronized AMesh<P, CE, CF> clone() {
         try {
-            AMesh<P> clone = (AMesh<P>)super.clone();
+            AMesh<P, CE, CF> clone = (AMesh<P, CE, CF>)super.clone();
 
-            List<AFace<P>> cFaces = faces.stream().map(f -> f.clone()).collect(Collectors.toList());
-            List<AHalfEdge<P>> cEdges = edges.stream().map(e -> e.clone()).collect(Collectors.toList());
+            List<AFace<CF>> cFaces = faces.stream().map(f -> f.clone()).collect(Collectors.toList());
+            List<AHalfEdge<CE>> cEdges = edges.stream().map(e -> e.clone()).collect(Collectors.toList());
             List<AVertex<P>> cVertices = vertices.stream().map(v -> v.clone()).collect(Collectors.toList());
 
             clone.faces = cFaces;
@@ -457,7 +457,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
     }
 
 	@Override
-	public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> toTriangulation(final @NotNull IPointLocator.Type type) {
+	public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> toTriangulation(final @NotNull IPointLocator.Type type) {
 		return IIncrementalTriangulation.createATriangulation(type, this);
 	}
 
@@ -487,9 +487,9 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
      *
      * @param faceOrder the new order
      */
-    public void arrangeMemory(@NotNull Iterable<AFace<P>> faceOrder) {
+    public void arrangeMemory(@NotNull Iterable<AFace<CF>> faceOrder) {
         // clone the old one!
-        AMesh<P> cMesh = clone();
+        AMesh<P, CE, CF> cMesh = clone();
 
         // merge some of them?
         int nullIdentifier = -2;
@@ -509,23 +509,23 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         Arrays.fill(faceMap, nullIdentifier);
 
         // adjust all id's in order of faceOrder
-        for(AFace<P> face : faceOrder) {
+        for(AFace<CF> face : faceOrder) {
             copyFace(face, vertexMap, edgeMap, faceMap, cMesh);
         }
 
 	    // adjust all id's not contained in faceOrder in any order
-	    for(AFace<P> face : cMesh.faces) {
+	    for(AFace<CF> face : cMesh.faces) {
         	if(!isDestroyed(face)) {
 		        copyFace(face, vertexMap, edgeMap, faceMap, cMesh);
 	        }
 	    }
 
         // repair the rest
-        for(AFace<P> face : faces) {
+        for(AFace<CF> face : faces) {
 	        face.setEdge(edgeMap[face.getEdge()]);
         }
 
-        for(AHalfEdge<P> halfEdge : edges) {
+        for(AHalfEdge<CE> halfEdge : edges) {
         	if(vertexMap[halfEdge.getEnd()] == nullIdentifier) {
 		        vertexMap[halfEdge.getEnd()] = vertices.size();
 	        }
@@ -553,13 +553,13 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         boundary.setEdge(edgeMap[boundary.getEdge()]);
     }
 
-    private void copyFace(@NotNull final AFace<P> face, @NotNull int[] vertexMap, @NotNull int[] edgeMap, @NotNull int[] faceMap, @NotNull final AMesh<P> cMesh) {
+    private void copyFace(@NotNull final AFace<CF> face, @NotNull int[] vertexMap, @NotNull int[] edgeMap, @NotNull int[] faceMap, @NotNull final AMesh<P, CE, CF> cMesh) {
 	    // merge some of them?
 	    int nullIdentifier = -2;
 
 	    // face not jet copied
 	    if(faceMap[face.getId()] == nullIdentifier) {
-		    AFace<P> fClone = face.clone();
+		    AFace<CF> fClone = face.clone();
 
 		    // 1. face
 		    faceMap[face.getId()] = faces.size();
@@ -581,12 +581,12 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		    }
 
 		    // 3. edges
-		    for(AHalfEdge<P> halfEdge : cMesh.getEdgeIt(face)) {
+		    for(AHalfEdge<CE> halfEdge : cMesh.getEdgeIt(face)) {
 
 			    // origin
 			    if(edgeMap[halfEdge.getId()] == nullIdentifier) {
 				    edgeMap[halfEdge.getId()] = edges.size();
-				    AHalfEdge<P> cHalfEdge = halfEdge.clone();
+				    AHalfEdge<CE> cHalfEdge = halfEdge.clone();
 				    cHalfEdge.setId(edges.size());
 				    edges.add(cHalfEdge);
 			    }
@@ -596,7 +596,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 			    if(edgeMap[halfEdge.getId()] == nullIdentifier) {
 				    // origin
 				    edgeMap[halfEdge.getId()] = edges.size();
-				    AHalfEdge<P> cHalfEdge = halfEdge.clone();
+				    AHalfEdge<CE> cHalfEdge = halfEdge.clone();
 				    cHalfEdge.setId(edges.size());
 				    edges.add(cHalfEdge);
 			    }
@@ -633,7 +633,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
         // TODO: implement faster sorting using radix sort see: http://www.diss.fu-berlin.de/diss/servlets/MCRFileNodeServlet/FUDISS_derivate_000000003494/2_kap2.pdf?hosts=
         // page 18
-        List<AFace<P>> sortedFaces = new ArrayList<>(faces.size());
+        List<AFace<CF>> sortedFaces = new ArrayList<>(faces.size());
         sortedFaces.addAll(this.faces);
         Collections.sort(sortedFaces, (f1, f2) -> {
             double i1 = spaceFillingCurve.compute(centroids.get(f1.getId()));
@@ -664,7 +664,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 		int i = 0;
 		int j = 0;
-		for (AFace<P> face : faces) {
+		for (AFace<CF> face : faces) {
 			if (face.isDestroyed()) {
 				j--;
 			} else {
@@ -676,7 +676,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 
 		i = 0;
 		j = 0;
-		for (AHalfEdge<P> edge : edges) {
+		for (AHalfEdge<CE> edge : edges) {
 			if (edge.isDestroyed()) {
 				j--;
 			} else {
@@ -703,7 +703,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		vertices = vertices.stream().filter(v -> !v.isDestroyed()).collect(Collectors.toList());
 
 		i = 0;
-		for (AFace<P> face : faces) {
+		for (AFace<CF> face : faces) {
 			face.setId(faceIdMap.get(face.getId()));
 			face.setEdge(edgeIdMap.get(face.getEdge()));
 			assert face.getId() == i;
@@ -719,7 +719,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 		}
 
 		i = 0;
-		for (AHalfEdge<P> edge : edges) {
+		for (AHalfEdge<CE> edge : edges) {
 			edge.setId(edgeIdMap.get(edge.getId()));
 			edge.setEnd(vertexIdMap.get(edge.getEnd()));
 			edge.setNext(edgeIdMap.get(edge.getNext()));
@@ -741,8 +741,8 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
 	 *
 	 * @return the created mesh
 	 */
-	public static AMesh<MPoint> createSimpleTriMesh() {
-		AMesh<MPoint> mesh = new AMesh<>((x1, y1) -> new MPoint(x1, y1));
+	public static AMesh<MPoint, ?, ?> createSimpleTriMesh() {
+		AMesh<MPoint, ?, ?> mesh = new AMesh<>((x1, y1) -> new MPoint(x1, y1));
 		IMesh.createSimpleTriMesh(mesh);
 		return mesh;
 	}

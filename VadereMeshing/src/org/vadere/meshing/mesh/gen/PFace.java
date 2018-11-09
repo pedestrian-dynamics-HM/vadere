@@ -10,12 +10,12 @@ import org.vadere.util.geometry.shapes.IPoint;
  * @author Benedikt Zoennchen
  * @param <P> the type of the coordinates the face uses.
  */
-public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
+public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 
 	/**
 	 * One of the half-edges bordering this face.
 	 */
-	private PHalfEdge<P> edge;
+	private PHalfEdge<P, CE, CF> edge;
 
 	private boolean boundary;
 
@@ -27,11 +27,11 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 *
 	 * @param edge one of the half-edges bordering this face.
 	 */
-	protected PFace(@NotNull final PHalfEdge<P> edge) {
+	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge) {
 		this(edge, false);
 	}
 
-	protected PFace(@NotNull final PHalfEdge<P> edge, boolean boundary) {
+	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge, boolean boundary) {
 		this.boundary = boundary;
 		this.edge = edge;
 	}
@@ -66,11 +66,11 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 *
 	 * @param edge half-edge bordering this face
 	 */
-	void setEdge(final PHalfEdge<P> edge) {
+	void setEdge(final PHalfEdge<P, CE, CF> edge) {
 		this.edge = edge;
 	}
 
-	PHalfEdge<P> getEdge() {
+	PHalfEdge<P, CE, CF> getEdge() {
 		return edge;
 	}
 
@@ -80,8 +80,8 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 
 	@Override
 	public String toString() {
-		PHalfEdge<P> current = edge;
-		PHalfEdge<P> next = edge.getNext();
+		PHalfEdge<P, CE, CF> current = edge;
+		PHalfEdge<P, CE, CF> next = edge.getNext();
 		StringBuilder builder = new StringBuilder();
 		while (!edge.equals(next)) {
 			builder.append(current + " ");
@@ -98,9 +98,9 @@ public class PFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 * @throws CloneNotSupportedException if the method is not jet implemented.
 	 */
 	@Override
-	protected PFace<P> clone() throws CloneNotSupportedException {
+	protected PFace<P, CE, CF> clone() throws CloneNotSupportedException {
 		try {
-			PFace<P> clone = (PFace<P>)super.clone();
+			PFace<P, CE, CF> clone = (PFace<P, CE, CF>)super.clone();
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError(e.getMessage());

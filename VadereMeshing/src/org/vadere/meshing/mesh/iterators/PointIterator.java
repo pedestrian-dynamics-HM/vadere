@@ -8,11 +8,11 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.Iterator;
 
-public class PointIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<P> {
-	private VertexIterator<P, V, E, F> vertexIterator;
-	private IMesh<P, V, E, F> mesh;
+public class PointIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<P> {
+	private VertexIterator<P, CE, CF, V, E, F> vertexIterator;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 
-	public PointIterator(final IMesh<P, V, E, F> mesh, final F face){
+	public PointIterator(final IMesh<P, CE, CF, V, E, F> mesh, final F face){
 		this.mesh = mesh;
 		this.vertexIterator = new VertexIterator<>(mesh, face);
 	}

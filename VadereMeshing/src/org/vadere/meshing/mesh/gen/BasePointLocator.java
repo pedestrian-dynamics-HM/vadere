@@ -22,11 +22,11 @@ import java.util.Optional;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
+public class BasePointLocator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPointLocator<P, CE, CF, V, E, F> {
 
-	private ITriConnectivity<P, V, E, F> triConnectivity;
+	private ITriConnectivity<P, CE, CF, V, E, F> triConnectivity;
 
-	public BasePointLocator(final ITriConnectivity<P, V, E, F> triConnectivity) {
+	public BasePointLocator(final ITriConnectivity<P, CE, CF, V, E, F> triConnectivity) {
 		this.triConnectivity = triConnectivity;
 	}
 

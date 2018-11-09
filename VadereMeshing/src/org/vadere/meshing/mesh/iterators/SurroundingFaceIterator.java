@@ -18,12 +18,12 @@ import java.util.Iterator;
  * @param <E> the type of the half-edge
  * @param <F> the type of the face
  */
-public class SurroundingFaceIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<F> {
+public class SurroundingFaceIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<F> {
 
-	private EdgeIterator<P, V, E, F> edgeIterator;
-	private IMesh<P, V, E, F> mesh;
+	private EdgeIterator<P, CE, CF, V, E, F> edgeIterator;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 
-	public SurroundingFaceIterator(@NotNull final IMesh<P, V, E, F> mesh, @NotNull final F face) {
+	public SurroundingFaceIterator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh, @NotNull final F face) {
 		assert mesh.isAlive(face);
 		this.mesh = mesh;
 		this.edgeIterator = new EdgeIterator<>(mesh, face);

@@ -34,7 +34,7 @@ public class CLGatherer {
 	 *
 	 * @return the heap memory {@link DoubleBuffer} containing all coordinates of all all vertices / points in a successive order
 	 */
-    public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh, @NotNull final DoubleBuffer vertexBuffer) {
+    public static <P extends IPoint, CE, CF> DoubleBuffer getVerticesD(@NotNull final AMesh<P, CE, CF> mesh, @NotNull final DoubleBuffer vertexBuffer) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         int index = 0;
         for(AVertex<P> vertex : vertices) {
@@ -56,7 +56,7 @@ public class CLGatherer {
 	 *
 	 * @return the heap memory {@link DoubleBuffer} containing all coordinates of all all vertices / points in a successive order
 	 */
-	public static <P extends IPoint> DoubleBuffer getVerticesD(@NotNull final AMesh<P> mesh) {
+	public static <P extends IPoint, CE, CF> DoubleBuffer getVerticesD(@NotNull final AMesh<P, CE, CF> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         return getVerticesD(mesh, MemoryUtil.memAllocDouble(vertices.size()*2));
     }
@@ -74,7 +74,7 @@ public class CLGatherer {
 	 *
 	 * @return the heap memory {@link FloatBuffer} containing all coordinates of all all vertices / points in a successive order
 	 */
-    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh, @NotNull final FloatBuffer vertexBuffer) {
+    public static <P extends IPoint, CE, CF> FloatBuffer getVerticesF(@NotNull final AMesh<P, CE, CF> mesh, @NotNull final FloatBuffer vertexBuffer) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         int index = 0;
         for(AVertex<P> vertex : vertices) {
@@ -96,7 +96,7 @@ public class CLGatherer {
 	 *
 	 * @return the heap memory {@link FloatBuffer} containing all coordinates of all all vertices / points in a successive order
 	 */
-    public static <P extends IPoint> FloatBuffer getVerticesF(@NotNull final AMesh<P> mesh) {
+    public static <P extends IPoint, CE, CF> FloatBuffer getVerticesF(@NotNull final AMesh<P, CE, CF> mesh) {
         Collection<AVertex<P>> vertices = mesh.getVertices();
         return getVerticesF(mesh, MemoryUtil.memAllocFloat(vertices.size()*2));
     }
@@ -113,11 +113,11 @@ public class CLGatherer {
 	 * @param edgeBuffer    the heap memory from which the indices will be read
 	 * @param <P>           the type of the points (containers)
 	 */
-	public static <P extends IPoint> void scatterHalfEdges(@NotNull final AMesh<P> mesh, @NotNull final IntBuffer edgeBuffer) {
-        List<AHalfEdge<P>> edges = mesh.getEdges();
+	public static <P extends IPoint, CE, CF> void scatterHalfEdges(@NotNull final AMesh<P, CE, CF> mesh, @NotNull final IntBuffer edgeBuffer) {
+        List<AHalfEdge<CE>> edges = mesh.getEdges();
 
         int index = 0;
-        for(AHalfEdge<P> edge : edges) {
+        for(AHalfEdge<CE> edge : edges) {
             int edgeId = index / 4;
             int vertexId = edgeBuffer.get(index);
             int nextId = edgeBuffer.get(index+1);
@@ -142,7 +142,7 @@ public class CLGatherer {
 	 * @param <P>   the type of the points (containers)
 	 * @return      the heap memory {@link IntBuffer} containing all indices of all half-edges
 	 */
-	public static <P extends IPoint> IntBuffer getHalfEdges(@NotNull final AMesh<P> mesh) {
+	public static <P extends IPoint, CE, CF> IntBuffer getHalfEdges(@NotNull final AMesh<P, CE, CF> mesh) {
         Collection<AHalfEdge<P>> edges = mesh.getEdges();
         IntBuffer edgeBuffer =  MemoryUtil.memAllocInt(edges.size()*4);
 
@@ -171,11 +171,11 @@ public class CLGatherer {
 	 * @param faceBuffer    the heap memory from which the indices will be read
 	 * @param <P>           the type of the points (containers)
 	 */
-    public static <P extends IPoint> void scatterFaces(@NotNull final AMesh<P> mesh, @NotNull final IntBuffer faceBuffer) {
-        Collection<AFace<P>> faces = mesh.getFaces();
+    public static <P extends IPoint, CE, CF> void scatterFaces(@NotNull final AMesh<P, CE, CF> mesh, @NotNull final IntBuffer faceBuffer) {
+        Collection<AFace<CF>> faces = mesh.getFaces();
 
         int index = 0;
-        for(AFace<P> face : faces) {
+        for(AFace<CF> face : faces) {
             face.setEdge(faceBuffer.get(index));
             // TODO: why +2 instead of +1 here?
             index += 2;

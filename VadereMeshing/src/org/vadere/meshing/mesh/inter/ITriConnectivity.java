@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  *
  * @author Benedikt Zoennchen
  */
-public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IPolyConnectivity<P, V, E, F> {
+public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends IPolyConnectivity<P, CE, CF, V, E, F> {
 
 	/**
 	 * A logger for debug and information reasons.
@@ -231,7 +231,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
      *         edges and their twins are the faces which took part / where modified / added by the split.
      */
 	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
-        IMesh<P, V, E, F> mesh = getMesh();
+        IMesh<P, CE, CF, V, E, F> mesh = getMesh();
         V v = mesh.createVertex(p);
         mesh.insertVertex(v);
 
@@ -430,7 +430,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param edge the edge which will be flipped.
 	 */
 	default void flipSync(@NotNull final E edge) {
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 
 		E a0 = edge;
 		E a1 = mesh.getNext(a0);
@@ -492,7 +492,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	 */
 	default void flip(@NotNull final E edge) {
 
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 
 		// 1. gather all the references required
 		E a0 = edge;
@@ -609,7 +609,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 
 		V p = getMesh().createVertex(point);
 		getMesh().insertVertex(p);
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 
 		F xyp = mesh.createFace();
 		F yzp = mesh.createFace();
@@ -971,7 +971,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 		// this should be the same afterwards
 		//E halfEdge = getMesh().getNext(edge);
 
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 		E startEdge = mesh.getPrev(edge);
 		E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
 		E currentEdge = mesh.getPrev(edge);

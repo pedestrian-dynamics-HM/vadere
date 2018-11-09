@@ -6,58 +6,58 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
+public class PHalfEdge<P extends IPoint, CE, CF> implements IHalfEdge<CE>, Cloneable {
 
 	/**
 	 * point at the end of the half edge.
 	 */
-	private PVertex<P> end;
+	private PVertex<P, CE, CF> end;
 
 	/**
 	 * next half-edge around the face.
 	 */
-	private PHalfEdge<P> next;
+	private PHalfEdge<P, CE, CF> next;
 
 	/**
 	 * previous half-edge around the face.
 	 */
-	private PHalfEdge<P> previous;
+	private PHalfEdge<P, CE, CF> previous;
 
 	/**
 	 * oppositely oriented adjacnet half-edge. If the face is a the boundary
 	 * there is no twin.
 	 */
-	private PHalfEdge<P> twin;
+	private PHalfEdge<P, CE, CF> twin;
 
 	/**
 	 * the face the half-edge borders.
 	 */
-	private PFace<P> face;
+	private PFace<P, CE, CF> face;
 
 	private boolean destroyed;
 
 
-	protected PHalfEdge(@NotNull final PVertex<P> end, @NotNull final PFace<P> face) {
+	protected PHalfEdge(@NotNull final PVertex<P, CE, CF> end, @NotNull final PFace<P, CE, CF> face) {
 		this.end = end;
 		this.face = face;
 		this.destroyed = false;
 	}
 
-	protected PHalfEdge(@NotNull final PVertex<P> end) {
+	protected PHalfEdge(@NotNull final PVertex<P, CE, CF> end) {
 		this.end = end;
 		this.face = null;
 		this.destroyed = false;
 	}
 
-	PFace<P> getFace() {
+	PFace<P, CE, CF> getFace() {
 		return face;
 	}
 
-	void setFace(final PFace<P> face) {
+	void setFace(final PFace<P, CE, CF> face) {
 		this.face = face;
 	}
 
-	PVertex<P> getEnd() {
+	PVertex<P, CE, CF> getEnd() {
 		return end;
 	}
 
@@ -69,15 +69,15 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 		return twin != null;
 	}
 
-	PHalfEdge<P> getNext() {
+	PHalfEdge<P, CE, CF> getNext() {
 		return next;
 	}
 
-	PHalfEdge<P> getPrevious() {
+	PHalfEdge<P, CE, CF> getPrevious() {
 		return previous;
 	}
 
-	PHalfEdge<P> getTwin() {
+	PHalfEdge<P, CE, CF> getTwin() {
 		return twin;
 	}
 
@@ -104,15 +104,15 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 		this.twin = twin;
 	}
 
-	void setPrevious(final PHalfEdge<P> previous) {
+	void setPrevious(final PHalfEdge<P, CE, CF> previous) {
 		this.previous = previous;
 	}
 
-	void setNext(final PHalfEdge<P> next) {
+	void setNext(final PHalfEdge<P, CE, CF> next) {
 		this.next = next;
 	}
 
-	void setEnd(PVertex<P> end) {
+	void setEnd(PVertex<P, CE, CF> end) {
 		this.end = end;
 	}
 
@@ -130,9 +130,9 @@ public class PHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 	}
 
 	@Override
-	protected PHalfEdge<P> clone() throws CloneNotSupportedException {
+	protected PHalfEdge<P, CE, CF> clone() throws CloneNotSupportedException {
 		try {
-			PHalfEdge<P> clone = (PHalfEdge<P>)super.clone();
+			PHalfEdge<P, CE, CF> clone = (PHalfEdge<P, CE, CF>)super.clone();
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError(e.getMessage());

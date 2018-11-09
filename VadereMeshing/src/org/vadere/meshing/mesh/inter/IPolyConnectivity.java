@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  *
  * @author Benedikt Zoennchen
  */
-public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>{
+public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends Iterable<F>{
 
 	/**
 	 * A logger to debug some code.
@@ -47,10 +47,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 *
 	 * @return the mesh of this IPolyConnectivity
 	 */
-	IMesh<P, V, E, F> getMesh();
+	IMesh<P, CE, CF, V, E, F> getMesh();
 
 	default boolean isAtBoundary(@NotNull final E halfEdge) {
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 		return mesh.isBoundary(halfEdge) || mesh.isBoundary(mesh.getTwin(halfEdge));
 	}
 
@@ -110,7 +110,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @return a half-edge (begin, end) if there is any, otherwise empty()
 	 */
 	default Optional<E> findEdge(@NotNull final V begin, @NotNull final V end) {
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 		return mesh.getIncidentEdges(mesh.getEdge(begin)).stream()
 				.filter(edge -> mesh.getPrev(edge).equals(end))
 				.map(edge -> mesh.getTwin(edge)).findAny();
@@ -158,8 +158,8 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 *
 	 * @return returns the new vertex
 	 */
-	static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> V splitEdge(
-			@NotNull final E edge, @NotNull P p, @NotNull IMesh<P, V, E, F> mesh) {
+	static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> V splitEdge(
+			@NotNull final E edge, @NotNull P p, @NotNull IMesh<P, CE, CF, V, E, F> mesh) {
 		V u = mesh.createVertex(p);
 		E twin = mesh.getTwin(edge);
 		E prev = mesh.getPrev(edge);
@@ -1027,7 +1027,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				assert survivingEdge == null;
 
 				// all edges are border edges!
-				EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), boundaryEdge);
+				EdgeIterator<P, CE, CF, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), boundaryEdge);
 
 				F twinFace = getMesh().getTwinFace(boundaryEdge);
 

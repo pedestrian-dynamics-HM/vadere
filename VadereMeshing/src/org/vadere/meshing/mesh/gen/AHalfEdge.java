@@ -9,7 +9,7 @@ import org.vadere.util.geometry.shapes.IPoint;
  *
  * @author Benedikt Zoennchen
  */
-public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
+public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
 
 	/**
 	 * The array-index of this half-edge
@@ -142,9 +142,9 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
     }
 
     @Override
-    protected AHalfEdge<P> clone() {
+    protected AHalfEdge<CE> clone() {
         try {
-            return (AHalfEdge<P>)super.clone();
+            return (AHalfEdge<CE>)super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
         }

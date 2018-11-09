@@ -23,13 +23,13 @@ import java.util.Iterator;
 public class IncidentEdgeIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<E> {
 
 	private static Logger log = LogManager.getLogger(IncidentEdgeIterator.class);
-	private IMesh<P, V, E, F> mesh;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 	private E current;
 	private E edge;
 	private boolean first;
 	int count = 0;
 
-	public IncidentEdgeIterator(final IMesh<P, V, E, F> mesh, final V vertex) {
+	public IncidentEdgeIterator(final IMesh<P, CE, CF, V, E, F> mesh, final V vertex) {
 		this(mesh, mesh.getEdge(vertex));
 	}
 

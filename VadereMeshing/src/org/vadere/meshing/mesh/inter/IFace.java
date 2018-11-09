@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.inter;
 
-import org.vadere.util.geometry.shapes.IPoint;
-
 /**
  * A face {@link IFace} is a generic 2D-face i.e. a polygon consisting of points of type {@link P}
  * and is part of the half-edge data structure. A 2D-face is defined by its half-edges {@link IHalfEdge}
@@ -11,6 +9,6 @@ import org.vadere.util.geometry.shapes.IPoint;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points
+ * @param <C> container of the face
  */
-public interface IFace<P extends IPoint> {}
+public interface IFace<C> {}
