@@ -13,7 +13,9 @@ import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
@@ -49,17 +51,27 @@ public class ScenarioRun implements Runnable {
 
 	private final RunnableFinishedListener finishedListener;
 
+	private SimulationResult simulationResult;
+
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
 	}
 
 	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
+		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener);
+	}
+
+	// if overwriteTimestampSetting is true do note use timestamp in output directory
+	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
 		this.scenario = scenario;
+		this.scenario.setSimulationRunning(true); // create copy of ScenarioStore and redirect getScenarioStore to this copy for simulation.
 		this.scenarioStore = scenario.getScenarioStore();
 		this.dataProcessingJsonManager = scenario.getDataProcessingJsonManager();
-		this.setOutputPaths(Paths.get(outputDir)); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
+		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
+		this.simulationResult = new SimulationResult(scenario.getName());
 	}
+
 
 	/**
 	 * This method runs a simulation. It must not catch any exceptions! The
@@ -69,6 +81,10 @@ public class ScenarioRun implements Runnable {
 	@Override
 	public void run() {
 		try {
+			//add Scenario Name to Log4j Mapped Diagnostic Context to filter log by ScenarioRun
+//			MDC.put("scenario.Name", outputPath.getFileName().toString());
+			simulationResult.startTime();
+
 			/**
 			 * To make sure that no other Thread changes the scenarioStore object during the initialization of a scenario run
 			 * this is an atomic operation with respect to the scenarioStore. We observed that with Linux 18.04 KUbunto
@@ -77,7 +93,7 @@ public class ScenarioRun implements Runnable {
 			synchronized (scenarioStore) {
 				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 				scenarioStore.getTopography().reset();
-
+				logger.info("StartIt " + scenario.getName());
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 				modelBuilder.createModelAndRandom();
 
@@ -85,8 +101,9 @@ public class ScenarioRun implements Runnable {
 				final Random random = modelBuilder.getRandom();
 
 				// prepare processors and simulation data writer
-				if (scenarioStore.attributesSimulation.isWriteSimulationData()) {
+				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
 					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+					processorManager.setSimulationResult(simulationResult);
 				}
 
 				// Only create output directory and write .scenario file if there is any output.
@@ -98,14 +115,18 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0, scenarioStore.name, scenarioStore, passiveCallbacks, random, processorManager);
+				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
 			}
 			simulation.run();
+			simulationResult.setState("SimulationRun completed");
 
 		} catch (Exception e) {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
+			simulationResult.stopTime();
 			doAfterSimulation();
+			//remove Log4j Mapped Diagnostic Context after ScenarioRun
+//			MDC.remove("scenario.Name");
 		}
 	}
 	
@@ -118,6 +139,7 @@ public class ScenarioRun implements Runnable {
 		if (finishedListener != null)
 			finishedListener.finished(this);
 
+		scenario.setSimulationRunning(false); // remove  simulation copy of ScenarioStore and redirect getScenarioStore to base copy.
 		logger.info(String.format("Simulation of scenario %s finished.", scenario.getName()));
 	}
 
@@ -129,6 +151,14 @@ public class ScenarioRun implements Runnable {
 		passiveCallbacks.add(pc);
 	}
 
+	public void setOutputPaths(final Path outputPath, boolean overwriteTimestampSetting){
+		if (overwriteTimestampSetting){
+			this.outputPath = outputPath;
+		} else {
+			setOutputPaths(outputPath);
+		}
+	}
+
 	public void setOutputPaths(final Path outputPath) {
 		if (dataProcessingJsonManager.isTimestamped()) {
 			String dateString = new SimpleDateFormat(IOUtils.DATE_FORMAT).format(new Date());
@@ -136,6 +166,10 @@ public class ScenarioRun implements Runnable {
 		} else {
 			this.outputPath = Paths.get(outputPath.toString(), scenario.getName());
 		}
+	}
+
+	public Path getOutputPath() {
+		return Paths.get(this.outputPath.toString());
 	}
 
 	public void pause() {
@@ -166,14 +200,18 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public String readyToRunResponse() { // TODO [priority=medium] [task=check] add more conditions
-		if (scenarioStore.mainModel == null) {
-			return scenarioStore.name + ": no mainModel is set";
+		if (scenarioStore.getMainModel() == null) {
+			return scenarioStore.getName() + ": no mainModel is set";
 		}
 		return null;
 	}
 
 	public Scenario getScenario() {
 		return scenario;
+	}
+
+	public SimulationResult getSimulationResult() {
+		return simulationResult;
 	}
 
 	private void sealAllAttributes() {

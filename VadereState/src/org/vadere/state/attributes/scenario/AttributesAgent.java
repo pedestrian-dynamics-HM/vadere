@@ -79,4 +79,38 @@ public class AttributesAgent extends AttributesDynamicElement {
 		return acceleration;
 	}
 
+	public void setRadius(double radius) {
+		checkSealed();
+		this.radius = radius;
+	}
+
+	public void setDensityDependentSpeed(boolean densityDependentSpeed) {
+		checkSealed();
+		this.densityDependentSpeed = densityDependentSpeed;
+	}
+
+	public void setSpeedDistributionMean(double speedDistributionMean) {
+		checkSealed();
+		this.speedDistributionMean = speedDistributionMean;
+	}
+
+	public void setSpeedDistributionStandardDeviation(double speedDistributionStandardDeviation) {
+		checkSealed();
+		this.speedDistributionStandardDeviation = speedDistributionStandardDeviation;
+	}
+
+	public void setMinimumSpeed(double minimumSpeed) {
+		checkSealed();
+		this.minimumSpeed = minimumSpeed;
+	}
+
+	public void setMaximumSpeed(double maximumSpeed) {
+		checkSealed();
+		this.maximumSpeed = maximumSpeed;
+	}
+
+	public void setAcceleration(double acceleration) {
+		checkSealed();
+		this.acceleration = acceleration;
+	}
 }

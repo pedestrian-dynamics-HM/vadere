@@ -1,10 +1,6 @@
 package org.vadere.gui.topographycreator.control;
 
-import java.lang.reflect.Field;
-
 import org.vadere.gui.topographycreator.model.AgentWrapper;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -24,7 +20,7 @@ public class AttributeModifier {
 	 * @param element the attributes
 	 * @param shape the shape
 	 */
-	static void setShapeToAttributes(final ScenarioElement element, final VShape shape) {
+	public static void setShapeToAttributes(final ScenarioElement element, final VShape shape) {
 		try {
 			if (element instanceof AgentWrapper) {
 				double x = shape.getBounds2D().getCenterX();

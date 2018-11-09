@@ -2,6 +2,7 @@ package org.vadere.gui.postvisualization.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import javax.swing.*;
@@ -11,9 +12,11 @@ import java.awt.event.ActionEvent;
 
 public class ActionSetTimeStep extends ActionVisualization implements ChangeListener {
 	private static Logger logger = LogManager.getLogger(ActionSetTimeStep.class);
+	private PostvisualizationModel model;
 
 	public ActionSetTimeStep(final String name, PostvisualizationModel model) {
 		super(name, model);
+		this.model = model;
 	}
 
 	@Override

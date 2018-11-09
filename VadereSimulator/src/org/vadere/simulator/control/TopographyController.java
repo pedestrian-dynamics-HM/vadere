@@ -1,18 +1,11 @@
 package org.vadere.simulator.control;
 
 import java.util.LinkedList;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.ObstacleDistancePotential;
-import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 public class TopographyController extends OfflineTopographyController {
 
@@ -58,6 +51,7 @@ public class TopographyController extends OfflineTopographyController {
 			 */
 			realPed.setTargets(new LinkedList<>(initialValues.getTargets()));
 			realPed.setGroupIds(new LinkedList<>(initialValues.getGroupIds()));
+			realPed.setGroupSizes(new LinkedList<>(initialValues.getGroupSizes()));
 			realPed.setChild(initialValues.isChild());
 			realPed.setLikelyInjured(initialValues.isLikelyInjured());
 

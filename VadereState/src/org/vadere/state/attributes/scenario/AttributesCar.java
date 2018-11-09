@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 public class AttributesCar extends AttributesAgent {
 

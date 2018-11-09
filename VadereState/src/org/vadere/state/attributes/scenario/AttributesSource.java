@@ -41,11 +41,28 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * wave. When the endTime is reached and not enough pedestrians have been
 	 * created yet, there will be less pedestrians than spawnNumber *
 	 * (endTime-startTime)/spawnDelay in the scenario.
+	 *
+	 * useFreeSpaceOnly = false can cause errors if tow pedestrians arw spawned at
+	 * exactly the same place. Maybe Deprecate this switch.
 	 */
-	private boolean useFreeSpaceOnly;
+	private boolean useFreeSpaceOnly = true;
 	private List<Integer> targetIds = new LinkedList<>();
 
-	private List<Double> groupSizeDistribution = Arrays.asList(0.0, 0.0, 1.0);
+	/**
+	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
+	 *  is present in the scenario. When this is the case this list defines the group size
+	 *  distribution of this source. The list can be arbitrary long but must add up to 1.
+	 *  The index of the list represents the size of the  groups and the value the probability
+	 *  index 0 => GroupSize = 1
+	 *  index 1 => GroupSize = 2
+	 *  ...
+	 *
+	 *  Example: ----------------------------------------------------------------------------------
+	 *  probability [ 0.0, 0.0, 0.25, 0.25, 0.25, .... ] ------------------------------------------
+  	 *  GroupSize   [  1    2    3     4     5         ] ------------------------------------------
+	 *  uniform distribution of groups of the size from 3 to 5 ------------------------------------
+	 */
+	private List<Double> groupSizeDistribution = Arrays.asList(1.0);
 
 	/**
 	 * The type of dynamic elements this source creates.
@@ -178,5 +195,30 @@ public class AttributesSource extends AttributesEmbedShape {
 	public void setGroupSizeDistribution(List<Double> groupSizeDistribution) {
 		checkSealed();
 		this.groupSizeDistribution = groupSizeDistribution;
+	}
+
+	public void setSpawnNumber(int spawnNumber) {
+		checkSealed();
+		this.spawnNumber = spawnNumber;
+	}
+
+	public void setUseFreeSpaceOnly(boolean useFreeSpaceOnly) {
+		checkSealed();
+		this.useFreeSpaceOnly = useFreeSpaceOnly;
+	}
+
+	public void setTargetIds(List<Integer> targetIds) {
+		checkSealed();
+		this.targetIds = targetIds;
+	}
+
+	public void setDynamicElementType(DynamicElementType dynamicElementType) {
+		checkSealed();
+		this.dynamicElementType = dynamicElementType;
+	}
+
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
 	}
 }

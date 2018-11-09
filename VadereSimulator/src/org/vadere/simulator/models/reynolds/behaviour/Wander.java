@@ -2,7 +2,7 @@ package org.vadere.simulator.models.reynolds.behaviour;
 
 import org.vadere.simulator.models.reynolds.PedestrianReynolds;
 import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 public class Wander {
 

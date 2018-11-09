@@ -6,13 +6,17 @@ import java.awt.geom.Rectangle2D.Double;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observer;
+import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
@@ -94,13 +98,22 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		this.addObserver(scenarioObserver);
 	}
 
+	@Override
 	public Scenario getScenario() {
+		scenario.setTopography(topographyBuilder.build());
 		return scenario;
 	}
 
 	@Override
 	public Topography getTopography() {
 		return topographyBuilder.build();
+	}
+
+
+
+	@Override
+	public double getBoundingBoxWidth() {
+		return topographyBuilder.getAttributes().getBoundingBoxWidth();
 	}
 
 	@Override
@@ -120,16 +133,16 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public void scaleTopography(final double scale) {
 		/*
 		 * scalingFactor = scale;
-		 * double error = boundaryWidth - (boundaryWidth * scalingFactor);
+		 * double topographyError = boundaryWidth - (boundaryWidth * scalingFactor);
 		 * Set<Entry<String, ShapeCategory<ScenarioShape>>> entrySet = shapes.entrySet();
 		 * for (Entry<String, ShapeCategory<ScenarioShape>> entry : entrySet) {
 		 * for (ScenarioShape ss : entry.getValue()) {
 		 * if (entry.getKey().equals("pedestrians")
 		 * || (entry.getKey().equals("sources") && ss.getShape() instanceof Ellipse2D.Double)) {
-		 * ss.setPosition(ss.getX() * scalingFactor + error, ss.getY() * scalingFactor + error);
+		 * ss.setPosition(ss.getX() * scalingFactor + topographyError, ss.getY() * scalingFactor + topographyError);
 		 * } else {
 		 * ss.scale(scalingFactor, scalingFactor);
-		 * ss.setPosition(ss.getX() + error, ss.getY() + error);
+		 * ss.setPosition(ss.getX() + topographyError, ss.getY() + topographyError);
 		 * }
 		 * }
 		 * }
@@ -137,8 +150,8 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		 * 
 		 * setScenarioBound(new Rectangle2D.Double(scenarioBound.x * scalingFactor, scenarioBound.y
 		 * * scalingFactor,
-		 * scenarioBound.width * scalingFactor + 2 * error, scenarioBound.height * scalingFactor + 2
-		 * * error));
+		 * scenarioBound.width * scalingFactor + 2 * topographyError, scenarioBound.height * scalingFactor + 2
+		 * * topographyError));
 		 * // boundaryWidth *= scalingFactor; // not supported in vadere!
 		 * setChanged();
 		 */
@@ -319,6 +332,15 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return element;
 	}
 
+	public void translateTopography(final double x, final double y) {
+		double oldX = getTopographyBound().x;
+		double oldY = getTopographyBound().y;
+
+		topographyBuilder.translateElements(x - oldX, y - oldY);
+		setTopographyBound(new VRectangle(x, y, getTopographyBound().getWidth(), getTopographyBound().getHeight()));
+		setChanged();
+	}
+
 	@Override
 	public VShape translate(final Point vector) {
 		VPoint worldVector = new VPoint(vector.x / getScaleFactor(), -vector.y / getScaleFactor());
@@ -334,6 +356,26 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public VShape translateElement(ScenarioElement element, VPoint vector) {
 		// double factor = Math.max(10,1/getGridResulution()); // ?? related to scaleTopography?
 		return element.getShape().translatePrecise(alignToGrid(vector));
+	}
+
+	@Override
+	public List<Obstacle> getObstacles() {
+		return topographyBuilder.getObstacles();
+	}
+
+	@Override
+	public Double getBounds() {
+		return topographyBuilder.getAttributes().getBounds();
+	}
+
+	@Override
+	public void removeObstacleIf(@NotNull final Predicate predicate) {
+		if(selectedElement instanceof Obstacle) {
+			selectedElement = null;
+		}
+
+		topographyBuilder.removeObstacleIf(predicate);
+		setChanged();
 	}
 
 	@Override

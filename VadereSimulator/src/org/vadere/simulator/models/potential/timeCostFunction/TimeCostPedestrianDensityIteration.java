@@ -3,13 +3,13 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
-import org.vadere.simulator.models.potential.timeCostFunction.loading.LoadingFactory;
 import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 
 import java.util.Collection;
 
@@ -61,8 +61,8 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 			final Topography floor) {
 		this.timeCostFunction = timeCostFunction;
 		this.floor = floor;
-		this.varianz = attributes.getStandardDerivation()
-				* attributes.getStandardDerivation();
+		this.varianz = attributes.getStandardDeviation()
+				* attributes.getStandardDeviation();
 		this.scaleFactor = attributesPedestrian.getRadius() * 2
 				* attributesPedestrian.getRadius() * 2 * Math.sqrt(3) * 0.5
 				/ (Math.PI * 2 * varianz);
@@ -70,7 +70,7 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 		loadingStrategy = IPedestrianLoadingStrategy.create(floor, attributes, attributesPedestrian, targetId);
 		logger.info("torso:  " + attributesPedestrian.getRadius() * 2);
 		logger.info("standard derivation:  "
-				+ attributes.getStandardDerivation());
+				+ attributes.getStandardDeviation());
 		logger.info("varianz:  " + this.varianz);
 		logger.info("scaleFactor (S_p):  " + this.scaleFactor);
 		logger.info("use dynamic loading:  " + useDynamicLoading);
@@ -79,7 +79,7 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 	}
 
 	@Override
-	public double costAt(VPoint p) {
+	public double costAt(final IPoint p) {
 		long ms = System.currentTimeMillis();
 		double cost = calculatePedestrianDensity(new VPoint(p.getX(), p.getY()));
 
@@ -108,12 +108,12 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 		return true;
 	}
 
-	private double calculatePedestrianDensity(final VPoint position) {
+	private double calculatePedestrianDensity(final IPoint position) {
 		double densitySum = 0.0;
 
 		double radius = 4;
 		Collection<Pedestrian> pedestrianBodies = floor
-				.getSpatialMap(Pedestrian.class).getObjects(position, radius);
+				.getSpatialMap(Pedestrian.class).getObjects(new VPoint(position), radius);
 
 		if (!pedestrianBodies.isEmpty()) {
 			for (Pedestrian pedestrianBody : pedestrianBodies) {

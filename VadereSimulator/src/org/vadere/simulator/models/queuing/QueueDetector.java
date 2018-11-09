@@ -4,24 +4,20 @@ import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.stream.Collectors;
 
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellState;
-import org.vadere.util.potential.FloorDiscretizer;
-import org.vadere.util.potential.PathFindingTag;
-import org.vadere.util.potential.calculators.EikonalSolverFMM;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 public class QueueDetector extends EikonalSolverFMM {
 
@@ -37,30 +33,25 @@ public class QueueDetector extends EikonalSolverFMM {
      * Initializes the FM potential calculator with a time cost function F > 0.
      *
      * @param potentialField
-     * @param targetShapes
+     * @param distFunc
      * @param isHighAccuracy
      * @param timeCostFunction
      */
-    public QueueDetector(CellGrid potentialField, List<VShape> targetShapes, boolean isHighAccuracy,
-                         ITimeCostFunction timeCostFunction, AttributesAgent attributesPedestrian, Topography topography) {
-        super(potentialField, targetShapes, isHighAccuracy, timeCostFunction);
+    public QueueDetector(
+            CellGrid potentialField,
+            IDistanceFunction distFunc,
+            boolean isHighAccuracy,
+            ITimeCostFunction timeCostFunction,
+            AttributesAgent attributesPedestrian,
+            Topography topography,
+            double weight,
+            double unknownPenalty) {
+        super(potentialField, distFunc, isHighAccuracy, timeCostFunction, weight, unknownPenalty);
         this.orderedPoints = new LinkedList<>();
         this.attributesPedestrian = attributesPedestrian;
         this.topography = topography;
         this.targetPoints = new PriorityQueue<>();
         this.polytope = null;
-
-        for (VShape shape : targetShapes) {
-            FloorDiscretizer.setGridValuesForShapeCentered(cellGrid, shape,
-                    new CellState(0.0, PathFindingTag.Target));
-        }
-
-        for (Obstacle obstacle : topography.getObstacles()) {
-            FloorDiscretizer.setGridValuesForShapeCentered(
-                    cellGrid, obstacle.getShape(),
-                    new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
-        }
-
     }
 
     public double getResolution() {
@@ -74,7 +65,7 @@ public class QueueDetector extends EikonalSolverFMM {
                 topography.getBounds(),
                 topography.getElements(Pedestrian.class),
                 1.0 / cellGrid.getResolution(),
-                new AttributesTimeCost().getStandardDerivation(),
+                new AttributesTimeCost().getStandardDeviation(),
                 attributesPedestrian,
                 loadingStrategy, IGaussianFilter.Type.OpenCL);
 
@@ -101,10 +92,10 @@ public class QueueDetector extends EikonalSolverFMM {
     protected void setNeighborDistances(Point point) {
         super.setNeighborDistances(point);
         VPoint worldCoord = cellGrid.pointToCoord(point);
-        orderedPoints = orderedPoints.stream().filter(p -> p.distance(worldCoord) > radius)
-                .collect(Collectors.toCollection(LinkedList::new));
-        if (targetShapes.stream().noneMatch(shape -> shape.distance(worldCoord) <= radius)) {
-            orderedPoints.addFirst(cellGrid.pointToCoord(point));
+        orderedPoints.removeIf(p -> p.distance(worldCoord) <= radius);
+
+        if (Math.max(0, -distFunc.apply(worldCoord)) <= radius) {
+            orderedPoints.addFirst(worldCoord);
         }
     }
 

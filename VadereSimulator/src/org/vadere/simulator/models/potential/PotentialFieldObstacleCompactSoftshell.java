@@ -11,7 +11,8 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -49,13 +50,17 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 
 
 	@Override
-	public double getObstaclePotential(VPoint pos, Agent pedestrian) {
+	public double getObstaclePotential(IPoint pos, Agent pedestrian) {
 
 		double potential = 0;
 		//for (Obstacle obstacle : obstacles) {
 
 			//double distance = obstacle.getShape().distance(pos);
 			double distance = topography.distanceToObstacle(pos);
+
+			/*if(distance > 0) {
+				log.info("distance: " + distance);
+			}*/
 
 			double radius = pedestrian.getRadius();
 			double currentPotential = 0;

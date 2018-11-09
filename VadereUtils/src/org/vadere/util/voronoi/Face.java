@@ -77,9 +77,9 @@ public class Face {
 				* (limits.yHigh - limits.yLow);
 
 		try {
-			if (result < 0 || result > maxArea) {
-				String message = result + " is a illegal area size (Object "
-						+ id + ").";
+			if (result < 0 || (result > maxArea && Math.abs(result-maxArea) > 1E-15)) {
+				String message = "(Object " + id + ") Area of face is: " + result + ". This is an illegal area size " +
+						"because result has to be positive and less than maxArea (= " + maxArea + ")";
 				throw new IllegalStateException(message);
 			}
 		} catch (IllegalStateException e) {

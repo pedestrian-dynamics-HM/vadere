@@ -1,11 +1,10 @@
 package org.vadere.gui.components.utils;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.ColorHelper;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 
@@ -20,11 +19,7 @@ public class CLGaussianCalculator {
     private IGaussianFilter filterPedestrians;
 
     public CLGaussianCalculator(final SimulationModel model,
-                                final double scale,
-                                final double measurementRadius,
-                                final Color color,
-                                final boolean visualisation,
-                                final boolean scenarioBound) {
+                                final double scale) {
 
         this.scenarioWidth = (int) model.getTopographyBound().getWidth();
         this.scenarioHeight = (int) model.getTopographyBound().getHeight();
@@ -60,7 +55,7 @@ public class CLGaussianCalculator {
         // double bound = filter.getMaxFilteredValue();
         double max = 1.00;
         double factor = maxColorValue / max;
-        System.out.println(filterPedestrians.getMaxFilteredValue()); // 0.1259
+        //System.out.println(filterPedestrians.getMaxFilteredValue()); // 0.1259
 
         for (int x = 0; x < filterPedestrians.getMatrixWidth(); x++) {
             for (int y = 0; y < filterPedestrians.getMatrixHeight(); y++) {

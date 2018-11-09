@@ -1,7 +1,8 @@
 {
   "name" : "rimea_05_react_sfm1",
   "description" : "",
-  "release" : "0.2",
+  "release" : "0.6",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -10,6 +11,23 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
     "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution" : 0.1,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "timeCostAttributes" : {
+          "standardDeviation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT"
+        }
+      },
       "org.vadere.state.attributes.models.AttributesPotentialSFM" : {
         "pedestrianBodyPotential" : 2.72,
         "pedestrianRecognitionDistance" : 0.3,
@@ -28,36 +46,19 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.sfm.PotentialFieldPedestrianSFM",
         "obstaclePotentialModel" : "org.vadere.simulator.models.sfm.PotentialFieldObstacleSFM"
-      },
-      "org.vadere.state.attributes.models.AttributesFloorField" : {
-        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
-        "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
-        "timeCostAttributes" : {
-          "standardDerivation" : 0.7,
-          "type" : "UNIT",
-          "obstacleDensityWeight" : 3.5,
-          "pedestrianSameTargetDensityWeight" : 3.5,
-          "pedestrianOtherTargetDensityWeight" : 3.5,
-          "pedestrianWeight" : 3.5,
-          "queueWidthLoading" : 1.0,
-          "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
-        }
       }
     },
     "attributesSimulation" : {
       "finishTime" : 120.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
-      "useRandomSeed" : true,
-      "randomSeed" : 1
+      "useFixedSeed" : true,
+      "fixedSeed" : 1,
+      "simulationSeed" : 0
     },
     "topography" : {
       "attributes" : {
@@ -123,12 +124,12 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "useFreeSpaceOnly" : false,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -138,6 +139,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "dynamicElements" : [ ],
       "attributesCar" : null
     }
   }

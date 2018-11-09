@@ -1,89 +1,40 @@
 package org.vadere.simulator.models.potential.fields;
 
-import java.util.*;
-
-import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.state.attributes.Attributes;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.AGridEikonalSolver;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * The default IPotentialTargetGrid, that creates for each target the same floor field type
- * based on the AttributesFloorField.
  *
  */
+public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IPotentialFieldTargetGrid {
 
-@ModelClass
-public class PotentialFieldTargetGrid extends AbstractPotentialFieldTarget {
-
-	// private HashMap<Integer, PotentialFieldAndInitializer> staticPotentialFields;
-
-	/* Optimization */
-	private boolean potentialFieldsNeedUpdate;
-	private AttributesFloorField attributes;
-	private AttributesAgent attributesPedestrian;
-
-	public PotentialFieldTargetGrid(
-			final Topography topography,
-			final AttributesAgent attributesPedestrian,
-			final AttributesFloorField attributesPotential) {
-		super(topography);
-		this.attributesPedestrian = attributesPedestrian;
-		this.potentialFieldsNeedUpdate = false;
-		this.lastUpdateTimestamp = -1;
-
-		this.attributes = attributesPotential;
-	}
-
-	@Override
-	protected boolean isNeedsUpdate(final double simTimeInSec) {
-		return (potentialFieldsNeedUpdate
-				|| topography.containsTarget(t -> (t.isMovingTarget() || t.isTargetPedestrian())))
-				&& Math.abs(lastUpdateTimestamp - simTimeInSec) > EPSILON_SIM_TIME;
-	}
-
-	@Override
-	public boolean needsUpdate() {
-		return potentialFieldsNeedUpdate;
-	}
-
-
-	@Override
-	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
-		throw new UnsupportedOperationException("gradient not yet implemented");
-	}
+    public PotentialFieldTargetGrid(@NotNull final Topography topography,
+                                    @NotNull final AttributesAgent attributesPedestrian,
+                                    @NotNull final AttributesFloorField attributesPotential) {
+    	super(topography, attributesPedestrian, attributesPotential);
+    }
 
     @Override
-	public void preLoop(final double simTimeInSec) {
-		createMissingPotentialFieldAndInitializers();
-	}
+    public Map<Integer, CellGrid> getCellGrids() {
+        Map<Integer, CellGrid> map = new HashMap<>();
 
-	private void createMissingPotentialFieldAndInitializers() {
-		Map<Integer, List<VShape>> mergeMap = topography.getTargetShapes();
-		topography.getTargets().stream().filter(t -> !getPotentialFieldAndInitializer(t.getId()).isPresent())
-				.forEach(t -> createNewPotentialFieldAndInitializer(t.getId(), mergeMap.get(t.getId())));
-	}
+        for (Map.Entry<Integer, EikonalSolver> entry : eikonalSolvers.entrySet()) {
+            Integer targetId = entry.getKey();
+            EikonalSolver eikonalSolver = entry.getValue();
 
-	@Override
-	protected void createNewPotentialFieldAndInitializer(final int targetId, final List<VShape> shapes) {
-		PotentialFieldAndInitializer potentialFieldAndInitializer = PotentialFieldAndInitializer.create(topography,
-				targetId, shapes, this.attributesPedestrian, this.attributes);
-		potentialFieldsNeedUpdate =
-				potentialFieldsNeedUpdate || potentialFieldAndInitializer.eikonalSolver.needsUpdate();
-		targetPotentialFields.put(targetId, potentialFieldAndInitializer);
-	}
+            if(eikonalSolver instanceof AGridEikonalSolver){
+                map.put(targetId, ((AGridEikonalSolver)eikonalSolver).getCellGrid());
+            }
+        }
 
-	@Override
-	public void postLoop(final double simTimeInSec) {}
-
-	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
-	}
-
+        return map;
+    }
 }

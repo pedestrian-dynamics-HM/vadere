@@ -7,10 +7,16 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.onlinevisualization.view.MainPanel;
 import org.vadere.gui.onlinevisualization.view.OnlineVisualisationWindow;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+
+import java.util.function.Function;
 
 public class OnlineVisualization implements PassiveCallback {
 
@@ -24,11 +30,23 @@ public class OnlineVisualization implements PassiveCallback {
 		public final double simTimeInSec;
 		public final Topography scenario;
 		public final IPotentialField potentialFieldTarget;
+		public final Agent selectedAgent;
+		public final IPotentialField potentialField;
+		public final Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations;
 
-		public ObservationAreaSnapshotData(double simTimeInSec, @NotNull Topography scenario, @Nullable IPotentialField potentialFieldTarget) {
+		public ObservationAreaSnapshotData(
+				final double simTimeInSec,
+				@NotNull final Topography scenario,
+				@Nullable final IPotentialField potentialFieldTarget,
+				@Nullable final IPotentialField potentialField,
+				@Nullable final Agent selectedAgent,
+				@Nullable final Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations) {
 			this.simTimeInSec = simTimeInSec;
 			this.scenario = scenario;
 			this.potentialFieldTarget = potentialFieldTarget;
+			this.potentialField = potentialField;
+			this.selectedAgent = selectedAgent;
+			this.discretizations = discretizations;
 		}
 	}
 
@@ -36,8 +54,17 @@ public class OnlineVisualization implements PassiveCallback {
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
 	private Topography scenario;
-	private @Nullable
-	IPotentialFieldTarget potentialFieldTarget;
+
+	/**
+	 * Target potential.
+	 */
+	private @Nullable IPotentialFieldTarget potentialFieldTarget;
+
+	/**
+	 * The overall potential.
+	 */
+	private @Nullable IPotentialField potentialField;
+
 	private boolean enableVisualization;
 
 	public OnlineVisualization(boolean enableVisualization) {
@@ -59,6 +86,11 @@ public class OnlineVisualization implements PassiveCallback {
 	public void setPotentialFieldTarget(final IPotentialFieldTarget potentialFieldTarget) {
 	    this.potentialFieldTarget = potentialFieldTarget;
     }
+
+	@Override
+	public void setPotentialField(final IPotentialField potentialField) {
+		this.potentialField = potentialField;
+	}
 
 	@Override
 	public void preLoop(double simTimeInSec) {
@@ -91,11 +123,21 @@ public class OnlineVisualization implements PassiveCallback {
 
 		synchronized (model.getDataSynchronizer()) {
 			/* Push new snapshot of the observation area to the draw thread. */
-			model.pushObersavtionAreaSnapshot(
-					new ObservationAreaSnapshotData(
-					        simTimeInSec,
-                            scenario.clone(),
-							(model.config.isShowPotentialField() && potentialFieldTarget != null) ? potentialFieldTarget.copyFields() : null));
+			IPotentialField pft = (model.config.isShowTargetPotentialField() && potentialFieldTarget != null) ? potentialFieldTarget.getSolution() : null;
+			Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations = (model.config.isShowTargetPotentielFieldMesh() && potentialFieldTarget != null) ? potentialFieldTarget.getDiscretization() : null;
+			IPotentialField pedPotentialField = null;
+			Agent selectedAgent = null;
+
+			if(model.getSelectedElement() instanceof Agent){
+				selectedAgent = (Agent)model.getSelectedElement();
+			}
+
+			if(model.config.isShowPotentialField() && selectedAgent != null && potentialField != null) {
+				pedPotentialField = IPotentialField.copyAgentField(potentialField, selectedAgent, new VRectangle(model.getTopographyBound()), 0.1);
+			}
+
+			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, scenario.clone(), pft, pedPotentialField, selectedAgent, discretizations);
+			model.pushObservationAreaSnapshot(data);
 		}
 	}
 

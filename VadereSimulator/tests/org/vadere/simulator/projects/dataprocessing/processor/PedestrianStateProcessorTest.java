@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.tests.reflection.ReflectionHelper;
 
 public class PedestrianStateProcessorTest extends ProcessorTest {
 

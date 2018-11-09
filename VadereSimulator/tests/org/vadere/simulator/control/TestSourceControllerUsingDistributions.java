@@ -1,14 +1,18 @@
 package org.vadere.simulator.control;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.commons.math3.distribution.ConstantRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestSourceControllerUsingDistributions extends TestSourceControllerUsingConstantSpawnRate {
 
@@ -99,7 +103,8 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0, 0, 0.4, 0.4));
 		initialize(builder);
 
 		doUpdates(0, 100, startTime, endTime + 1);
@@ -122,7 +127,8 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(startTime)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0, 0, 0.4, 0.4));
 		initialize(builder);
 
 		doUpdates(0, 100, 0, startTime + 1);
@@ -137,7 +143,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		assertEquals(spawnNumber, countPedestrians(0));
 
 	}
-	
+
 	@Test
 	public void testMaxSpawnNumberTotalSetTo0() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
@@ -205,6 +211,72 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
 	}
 
+	/**
+	 * Test if in a polygon shape (diamond in this case) the pedestrians are placed within the
+	 * source and not within its bound and that no overlap occurs.
+	 */
+	@Test
+	public void testPolygonShapedSourceNoRandom() {
+		int maxSpawnNumberTotal = 5;
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setEndTime(100)
+				.setSpawnNumber(5)
+				.setDiamondShapeSource()
+				.setUseFreeSpaceOnly(true)
+				.setSpawnAtRandomPositions(false)
+				.setMaxSpawnNumberTotal(5);
+		initialize(builder);
 
-	
+		VShape sourceShape = builder.getSourceShape();
+
+		doUpdates(0, 10, 0, 10);
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
+
+		SourceTestData testData = sourceTestData.get(0);
+		testData.topography.getPedestrianDynamicElements()
+				.getElements().forEach(p -> assertTrue(sourceShape.containsShape(p.getShape())));
+
+		Collection<Pedestrian> peds = testData.topography.getPedestrianDynamicElements().getElements();
+		for (Pedestrian p : peds) {
+			assertTrue(peds.stream()
+					.filter(ped -> !ped.equals(p))
+					.map(Pedestrian::getShape)
+					.noneMatch(s -> s.intersects(p.getShape())));
+		}
+	}
+
+	/**
+	 * Test if in a polygon shape (diamond in this case) the pedestrians are placed within the
+	 * source and not within its bound and that no overlap occurs.
+	 */
+	@Test
+	public void testPolygonShapedSourceWithRandom() {
+		int maxSpawnNumberTotal = 5;
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
+				.setEndTime(100)
+				.setSpawnNumber(5)
+				.setDiamondShapeSource()
+				.setUseFreeSpaceOnly(true)
+				.setSpawnAtRandomPositions(true)
+				.setRandomSeed(13)
+				.setMaxSpawnNumberTotal(5);
+		initialize(builder);
+
+		VShape sourceShape = builder.getSourceShape();
+
+		doUpdates(0, 10, 0, 10);
+		assertEquals(maxSpawnNumberTotal, countPedestrians(0));
+
+		SourceTestData testData = sourceTestData.get(0);
+		testData.topography.getPedestrianDynamicElements()
+				.getElements().forEach(p -> assertTrue(sourceShape.containsShape(p.getShape())));
+
+		Collection<Pedestrian> peds = testData.topography.getPedestrianDynamicElements().getElements();
+		for (Pedestrian p : peds) {
+			assertTrue(peds.stream()
+					.filter(ped -> !ped.equals(p))
+					.map(Pedestrian::getShape)
+					.noneMatch(s -> s.intersects(p.getShape())));
+		}
+	}
 }

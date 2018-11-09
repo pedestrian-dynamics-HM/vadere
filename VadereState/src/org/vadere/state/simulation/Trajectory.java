@@ -1,20 +1,20 @@
 package org.vadere.state.simulation;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.math3.optim.OptimizationData;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * A Trajectory is a list of {@link org.vadere.state.scenario.Pedestrian} objects, that can be seen
- * as pedestrian states of the same
- * pedestrian. The representing pedestrian is the same, so all
+ * as pedestrian states of the same pedestrian. The representing pedestrian is the same, so all
  * {@link org.vadere.state.scenario.Pedestrian} objects has
  * the same id but the state of a pedestrian changes over time.
  *
@@ -30,6 +30,13 @@ public class Trajectory {
 	private Optional<Step> lastStep;
 
 	private int pedestrianId;
+
+	public Trajectory(final int pedestrianId) {
+		this.pedestrianId = pedestrianId;
+		this.trajectoryPoints = new HashMap<>();
+		this.firstStep = Optional.empty();
+		this.lastStep = Optional.empty();
+	}
 
 	public Trajectory(final Map<Step, List<Agent>> pedestrianByStep, final int pedestrianId) {
 		this.pedestrianId = pedestrianId;
@@ -59,6 +66,42 @@ public class Trajectory {
 		if (trajectoryPoints == null || trajectoryPoints.isEmpty()) {
 			throw new IllegalArgumentException("empty trajectory map is not allowed");
 		}
+	}
+
+	public void fill() {
+		if(!trajectoryPoints.isEmpty()) {
+			for(Step step : trajectoryPoints.keySet()) {
+				if(!firstStep.isPresent() || firstStep.get().getStepNumber() > step.getStepNumber()) {
+					firstStep = Optional.of(step);
+				}
+
+				if(!lastStep.isPresent() || lastStep.get().getStepNumber() < step.getStepNumber()) {
+					lastStep = Optional.of(step);
+				}
+			}
+
+			int start = firstStep.get().getStepNumber();
+			int end = lastStep.get().getStepNumber();
+
+			for(int i = start+1; i < end; i++) {
+				Step currentStep = new Step(i);
+				if(!trajectoryPoints.containsKey(currentStep)) {
+					trajectoryPoints.put(currentStep, trajectoryPoints.get(new Step(currentStep.getStepNumber()-1)));
+				}
+			}
+		}
+
+	}
+
+	public void addStep(final Step step, @NotNull final Agent agent) {
+		if(!firstStep.isPresent() || firstStep.get().getStepNumber() > step.getStepNumber()) {
+			firstStep = Optional.of(step);
+		}
+
+		if(!lastStep.isPresent() || lastStep.get().getStepNumber() < step.getStepNumber()) {
+			firstStep = Optional.of(step);
+		}
+		trajectoryPoints.put(step, agent);
 	}
 
 	public Optional<Integer> getLifeTime() {
@@ -109,36 +152,6 @@ public class Trajectory {
 		return !trajectoryPoints.containsKey(step) && (!lastStep.isPresent() || lastStep.get().compareTo(step) <= 0);
 	}
 
-	/**
-	 * Returns an Optional<Pedestrian> object. If the pedestrian is not appeared at the given time
-	 * step,
-	 * the Optional will be empty, the Optional will contain the Pedestrian object that is the last
-	 * one
-	 * in the list before (step+1).
-	 * 
-	 * @param step the time step that specify the pedestrian state
-	 * @return an Optional<Pedestrian> object which is empty if the pedestrian is not alive at the
-	 *         specific time step
-	 */
-	/*
-	 * public Optional<Pedestrian> getAgent(final Step step) {
-	 * Optional<Pedestrian> optionalPedestrian;
-	 * if(trajectoryPoints.containsKey(step)) {
-	 * optionalPedestrian = Optional.of(trajectoryPoints.get(step));
-	 * }
-	 * else {
-	 * Optional<Step> optionalStep = sortedSteps.stream().filter(s -> s.getStepNumber() <=
-	 * step.getStepNumber()).max((Step::compareTo));
-	 * if(optionalStep.isPresent()) {
-	 * optionalPedestrian = Optional.of(trajectoryPoints.get(optionalStep.get()));
-	 * }
-	 * else {
-	 * optionalPedestrian = Optional.empty();
-	 * }
-	 * }
-	 * return optionalPedestrian;
-	 * }
-	 */
 
 	/**
 	 * Returns an Optional<Pedestrian> object. If the pedestrain has not appeared at step, the

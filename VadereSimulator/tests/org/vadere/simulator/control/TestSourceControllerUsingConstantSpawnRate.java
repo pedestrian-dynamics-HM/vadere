@@ -1,10 +1,6 @@
 package org.vadere.simulator.control;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Random;
-
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
@@ -18,10 +14,16 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestSourceControllerUsingConstantSpawnRate {
 
-	protected long randomSeed = 0;
 
 	ArrayList<SourceTestData> sourceTestData;
 
@@ -42,6 +44,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		return new SingleSourceControllerFactory();
 	}
 
+
 	public void initialize(SourceTestAttributesBuilder builder) {
 
 		SourceTestData d = new SourceTestData();
@@ -49,7 +52,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		d.attributesSource = builder.getResult();
 		d.attributesPedestrian = new AttributesAgent();
 
-		d.random = new Random(randomSeed);
+		d.random = new Random(builder.getRandomSeed());
 
 		d.source = new Source(d.attributesSource);
 		d.pedestrianFactory = new DynamicElementFactory() {
@@ -62,6 +65,11 @@ public class TestSourceControllerUsingConstantSpawnRate {
 				Pedestrian ped = new Pedestrian(att, d.random);
 				ped.setPosition(position);
 				return ped;
+			}
+
+			@Override
+			public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+				return createElement(position, -1, Pedestrian.class).getShape();
 			}
 		};
 
@@ -159,7 +167,8 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
-				.setUseFreeSpaceOnly(true);
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(new VRectangle(0, 0, 0.4, 0.4)); // small source
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < 1000; simTimeInSec += 1.0) {

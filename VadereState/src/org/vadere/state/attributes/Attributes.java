@@ -16,14 +16,14 @@ package org.vadere.state.attributes;
  * VPoint,...).
  * 
  * The standard clone method makes a flat copy. This is enough if the subclass
- * only contains immutable fields. If the subclass contains other Attributes
+ * only triangleContains immutable fields. If the subclass triangleContains other Attributes
  * objects, it must implement a copy constructor and override {@link #clone()}
  * to make a deep copy.
  * 
  */
 public abstract class Attributes extends DefaultSealable implements Cloneable {
 	/** Used for default ID values of some scenario elements. */
-	protected static final int ID_NOT_SET = -1;
+	public static final int ID_NOT_SET = -1;
 
 	public Attributes() {}
 	

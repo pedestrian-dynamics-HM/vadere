@@ -9,7 +9,16 @@ import java.util.Set;
 /**
  * This {@link org.vadere.util.io.parser.JsonLogicParser} is able to generate a {@linkg VPredicate}
  * based on a logical expression ({@link String})
- * that tests a Object of type {@link com.google.gson.JsonObject}.
+ * that tests a Object of type {@link JsonNode}.
+ *
+ * Example expressions:
+ *      attributes.id : {1,2,3,4,5,6,7,8,9,10}
+ *      attributes.id != 5
+ *      position.x > 5.3 && position.x <= 10
+ *      position.x < 4 || position.x > 10
+ *      targetIds:{1,3,4}
+ *      {1,2,3}:targetIds
+ *      (position.x < 4 || position.x > 10) || position.x > 5.3 && position.x <= 10
  *
  */
 public class JsonLogicParser extends LogicalParser<JsonNode> {
@@ -26,6 +35,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		} else if (expression.equals("true")) {
 			return jsonObj -> true;
 		} else if (expression.contains(":")) {
+			// {0,1,2}:targetIds is true if targetIds is a superset of {0,1,2}
 			String[] split = expression.split(":");
 			// superset
 			if (split[0].contains("{")) {
@@ -41,6 +51,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 				};
 			} // subset
 			else {
+				// targetIds:{0,1,2} is true if targetIds is a subset of {0,1,2}
 				return (JsonNode jsonObj) -> {
 					Set<Double> set = getSetFromString(split[1]);
 					JsonNode element = getJsonElement(split[0], jsonObj);

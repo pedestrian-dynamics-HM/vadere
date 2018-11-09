@@ -2,11 +2,12 @@ package org.vadere.gui.postvisualization.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.gui.postvisualization.view.DialogFactory;
+import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
@@ -22,7 +23,7 @@ import java.util.prefs.Preferences;
 public class ActionOpenFile extends ActionVisualization {
 	private static Logger logger = LogManager.getLogger(ActionOpenFile.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
-
+	private final PostvisualizationModel model;
 	private String path = null;
 
 
@@ -33,10 +34,12 @@ public class ActionOpenFile extends ActionVisualization {
 
 	public ActionOpenFile(final String name, final Icon icon, final PostvisualizationModel model) {
 		super(name, icon, model);
+		this.model = model;
 	}
 
 	public ActionOpenFile(String name, final PostvisualizationModel model) {
 		super(name, model);
+		this.model = model;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class ActionOpenFile extends ActionVisualization {
 
 		File file = null;
 		if (path == null) {
-			String path = Preferences.userNodeForPackage(PostVisualisation.class).get("View.outputDirectory.path", "/");
+			String path = Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.outputDirectory.path", "/");
 
 			final JFileChooser fc = new JFileChooser(path);
 			int returnVal = fc.showOpenDialog(null);
@@ -58,8 +61,8 @@ public class ActionOpenFile extends ActionVisualization {
 		final File threadFile = file;
 
 		if (file != null) {
-			resources.setProperty("View.outputDirectory.path", file.getParent());
-			Preferences.userNodeForPackage(PostVisualisation.class).put("View.outputDirectory.path", file.getParent());
+			resources.setProperty("SettingsDialog.outputDirectory.path", file.getParent());
+			Preferences.userNodeForPackage(PostVisualisation.class).put("SettingsDialog.outputDirectory.path", file.getParent());
 			try {
 				IOUtils.saveUserPreferences(PostVisualisation.preferencesFilename,
 						Preferences.userNodeForPackage(PostVisualisation.class));

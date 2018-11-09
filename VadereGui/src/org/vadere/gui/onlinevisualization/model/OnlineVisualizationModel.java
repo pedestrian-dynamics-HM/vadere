@@ -6,14 +6,18 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationConfig> {
@@ -29,7 +33,13 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	 * pontetial field of a certain pedestrian. See 'Simulation' for more
 	 * information. For debug purposes. Updated by popDrawData().
 	 */
+	private IPotentialField potentialFieldTarget = null;
+
 	private IPotentialField potentialField = null;
+
+	private Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations = null;
+
+	private Agent agent = null;
 
 	/**
 	 * Latest snapshot of the jts diagram to be displayed. Updated by
@@ -104,8 +114,11 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 					observationAreaSnapshots.getFirst();
 			simTimeInSec = observationAreaSnapshot.simTimeInSec;
 
-			// potentialField might be null!
-            potentialField = observationAreaSnapshot.potentialFieldTarget;
+			// potentialFieldTarget might be null!
+            potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
+			potentialField = observationAreaSnapshot.potentialField;
+			agent = observationAreaSnapshot.selectedAgent;
+			discretizations = observationAreaSnapshot.discretizations;
 
 			/*
 			 * if(topography == null ||
@@ -132,15 +145,18 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 				setSelectedElement(ped);
 			}
 
-			if (!voronoiSnapshots.isEmpty()) {
-				voronoiDiagram = voronoiSnapshots.getFirst();
+			if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
+				getVoronoiDiagram().computeVoronoiDiagram(topography.getPedestrianDynamicElements().getElements()
+								.stream()
+								.map(ped -> ped.getPosition())
+								.collect(Collectors.toList()));
 			}
 
 			return true;
 		}
 	}
 
-	public void pushObersavtionAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
+	public void pushObservationAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
         if (observationAreaSnapshots.size() > 0) {
             observationAreaSnapshots.pop();
         }
@@ -176,17 +192,34 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	@Override
-	public Function<VPoint, Double> getPotentialField() {
-	    Function<VPoint, Double> f = pos -> 0.0;
+	public Function<IPoint, Double> getPotentialField() {
+	    Function<IPoint, Double> f = pos -> 0.0;
 
-	    if(potentialField != null) {
+	    if(agent != null && potentialField != null && config.isShowPotentialField() && agent.equals(getSelectedElement())) {
+	    	f = pos -> potentialField.getPotential(pos, agent);
+	    }
+		else if(potentialFieldTarget != null && config.isShowTargetPotentialField()) {
             if(getSelectedElement() instanceof Agent) {
                 Agent selectedAgent = (Agent)getSelectedElement();
-                f = pos -> potentialField.getPotential(pos, selectedAgent);
+                f = pos -> potentialFieldTarget.getPotential(pos, selectedAgent);
             }
         }
 
 		return f;
+	}
+
+	@Override
+	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+		if(agent != null && discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
+			return discretizations.apply(agent);
+		}
+
+		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
+	}
+
+	@Override
+	public double getGridResolution() {
+		return config.getGridWidth();
 	}
 
 	@Override

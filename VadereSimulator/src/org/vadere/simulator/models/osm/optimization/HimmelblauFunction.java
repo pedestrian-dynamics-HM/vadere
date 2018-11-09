@@ -4,7 +4,6 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.potential.timeCostFunction.TimeCostPedestrianDensity;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**

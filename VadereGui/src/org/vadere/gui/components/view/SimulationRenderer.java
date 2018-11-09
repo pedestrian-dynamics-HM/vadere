@@ -12,13 +12,15 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
-import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
@@ -48,10 +50,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     @Override
     protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
-        if (model.isFloorFieldAvailable() && model.config.isShowPotentialField()) {
+        if (model.isFloorFieldAvailable() && (model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
             synchronized (model) {
-                renderPotentialField(graphics2D,
-                        (int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
+	            renderPotentialFieldOnViewport(graphics2D,
+                        0, 0,
+		                (int)(Math.min(model.getTopographyBound().width, model.getViewportBound().width) * model.getScaleFactor()),
                         (int)(Math.min(model.getTopographyBound().height, model.getViewportBound().height) * model.getScaleFactor()));
             }
         }
@@ -64,7 +67,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
         // if there is no potential field than draw the default background (white)
         // otherwise do not overdraw the potential field!!!
-        if (!model.isFloorFieldAvailable() || !model.config.isShowPotentialField()) {
+        if (!model.isFloorFieldAvailable() || !(model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
             super.renderPostTransformation(graphics, width, height);
         }
 
@@ -81,12 +84,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         }
 
         if (model.config.isShowStairs()) {
-            renderScenarioElement(model.getTopography().getStairs(), graphics, model.config.getStairColor());
+            renderStairs(model.getTopography().getStairs(), graphics, model.config.getStairColor());
         }
 
-        if (model.config.isShowTargets()) {
-            renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
-        }
+		if (model.config.isShowTargets()) {
+			renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
+		}
 
         if (model.config.isShowSources()) {
             renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
@@ -94,6 +97,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
         if (model.isVoronoiDiagramAvailable() && model.isVoronoiDiagramVisible()) {
             renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
+        }
+
+        if(model.config.isShowTargetPotentielFieldMesh()) {
+	        renderMesh(graphics, model.getDiscretization(), new VRectangle(model.getTopographyBound()));
         }
 
         renderSimulationContent(graphics);
@@ -133,7 +140,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         points.forEachOrdered(
                 p -> path.lineTo(p.getX(), p.getY()));
 
-        g.draw(path);
+        draw(path, g);
         g.setColor(color);
         // g.setStroke(stroke);
     }
@@ -145,9 +152,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
     }
 
     private void renderDensity(final Graphics2D g) {
-        CLGaussianCalculator densityCalculator = new CLGaussianCalculator(model, model.config.getDensityScale(),
-                model.config.getDensityMeasurementRadius(),
-                model.config.getDensityColor(), true, true);
+        CLGaussianCalculator densityCalculator = new CLGaussianCalculator(model, model.config.getDensityScale());
 		/*
 		 * if (obstacleDensity == null || !model.config.getDensityColor().equals(lastDensityColor)
 		 * || model.getTopographyId() != topographyId) {
@@ -164,44 +169,93 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		 */
 
         BufferedImage densityImage = densityCalculator.getDensityImage();
-
+	    Rectangle2D.Double bound = model.getTopographyBound();
+		g.translate(bound.getX(), bound.getY());
         g.scale(1.0 / model.config.getDensityScale(), 1.0 / model.config.getDensityScale());
         g.drawImage(densityImage, 0, 0, null);
         // g.drawImage(pedestrianDensity, 0, 0, null);
-        g.scale(model.config.getDensityScale(), model.config.getDensityScale());
+	    g.scale(model.config.getDensityScale(), model.config.getDensityScale());
+	    g.translate(-bound.getX(), -bound.getY());
         densityCalculator.destroy();
     }
 
-    private void renderPotentialField(final Graphics2D g, final int width, final int height) {
+    private void renderPotentialFieldOnViewport(final Graphics2D g, final int xPos, final int yPos, final int width, final int height) {
 
+    	//logger.info("resolution = " + width + ", " + height);
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
 		 */
+		VRectangle bound = new VRectangle(model.getTopographyBound());
         Rectangle2D.Double viewportBound = model.getViewportBound();
         double dy = model.getTopographyBound().getHeight() - viewportBound.getHeight();
 
         int startX = (int) (viewportBound.getX() * model.getScaleFactor());
         int startY = (int) (Math.max((dy - viewportBound.getY()), 0) * model.getScaleFactor());
-        potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
+        potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
             for (int y = 0; y < potentialFieldImage.getHeight(); y++) {
                 Color c;
-                double potential = model.getPotential(x + startX, y + startY);
+                VPoint pos = new VPoint(
+		                viewportBound.getMinX() + x / model.getScaleFactor(),
+		                viewportBound.getMinY() + (potentialFieldImage.getHeight() - 1 - y) / model.getScaleFactor());
 
-                if (potential >= MAX_POTENTIAL) {
-                    c = model.config.getObstacleColor();
-                } else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
-                    c = Color.BLACK;
-                } else {
-                    c = colorHelper.numberToColor(potential % 100);
+                if(bound.contains(pos)) {
+	                double potential = (double)model.getPotentialField().apply(pos);
+
+	                if (potential >= MAX_POTENTIAL) {
+		                c = model.config.getObstacleColor();
+	                } else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
+		                c = Color.BLACK;
+	                } else {
+		                c = colorHelper.numberToColor(potential % 100);
+	                }
+	                potentialFieldImage.setRGB(x, y, c.getRGB());
                 }
-                potentialFieldImage.setRGB(x, y, c.getRGB());
             }
         }
-        g.drawImage(potentialFieldImage, 0, 0, null);
+        g.drawImage(potentialFieldImage, xPos, yPos, null);
     }
+
+	private void renderPotentialField(final Graphics2D g, final int xPos, final int yPos, final int width, final int height) {
+
+		/*
+		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
+		 */
+		VRectangle bound = new VRectangle(model.getTopographyBound());
+		Rectangle2D.Double viewportBound = model.getViewportBound();
+		double dy = model.getTopographyBound().getHeight() - viewportBound.getHeight();
+
+		int startX = (int) (viewportBound.getX() * model.getScaleFactor());
+		int startY = (int) (Math.max((dy - viewportBound.getY()), 0) * model.getScaleFactor());
+
+		potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+
+		for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
+			for (int y = 0; y < potentialFieldImage.getHeight(); y++) {
+				Color c;
+				VPoint pos = new VPoint(
+						bound.getMinX() + x / model.getScaleFactor(),
+						bound.getMinY() + bound.getHeight() - y / model.getScaleFactor());
+
+				if(bound.contains(pos)) {
+					double potential = (double)model.getPotentialField().apply(pos);
+
+					if (potential >= MAX_POTENTIAL) {
+						c = model.config.getObstacleColor();
+					} else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
+						c = Color.BLACK;
+					} else {
+						c = colorHelper.numberToColor(potential % 100);
+					}
+					potentialFieldImage.setRGB(x, y, c.getRGB());
+				}
+			}
+		}
+		g.drawImage(potentialFieldImage, xPos, yPos, null);
+	}
 
     protected abstract void renderSimulationContent(final Graphics2D g);
 
@@ -215,5 +269,15 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     public void setAgentRender(AgentRender agentRender) {
         this.agentRender = agentRender;
+    }
+
+    public Color getPedestrianColor(@NotNull final Agent agent) {
+	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
+	    if (model.config.isUseRandomPedestrianColors()) {
+		   return model.config.getRandomColor(agent.getId());
+	    }
+
+	    return model.config.getColorByTargetId(targetId)
+			    .orElseGet(model.config::getPedestrianColor);
     }
 }

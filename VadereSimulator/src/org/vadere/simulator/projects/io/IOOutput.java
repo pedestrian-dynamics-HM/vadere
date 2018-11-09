@@ -131,7 +131,7 @@ public abstract class IOOutput {
 				try {
 					Files.delete(file.toPath());
 				} catch (IOException e) {
-					logger.error("could not delete scenario-file: " + file.getAbsolutePath() + ", "
+					logger.error("could not deleteEdge scenario-file: " + file.getAbsolutePath() + ", "
 							+ e.getLocalizedMessage());
 				}
 			}
@@ -140,7 +140,7 @@ public abstract class IOOutput {
 				try {
 					Files.delete(file.toPath());
 				} catch (IOException e) {
-					logger.error("could not delete trajectory-file: " + file.getAbsolutePath() + ", "
+					logger.error("could not deleteEdge trajectory-file: " + file.getAbsolutePath() + ", "
 							+ e.getLocalizedMessage());
 				}
 			}
@@ -148,7 +148,7 @@ public abstract class IOOutput {
 			try {
 				Files.delete(directory.toPath());
 			} catch (IOException e) {
-				logger.error("could not delete output-directory: " + directory.getAbsolutePath() + ", "
+				logger.error("could not deleteEdge output-directory: " + directory.getAbsolutePath() + ", "
 						+ e.getLocalizedMessage());
 			}
 
@@ -162,7 +162,7 @@ public abstract class IOOutput {
 	private static List<File> listAllDirs(final VadereProject project) {
 		List<File> outputDirectories = new LinkedList<>();
 		if (Files.exists(project.getOutputDir())) {
-			File[] files = new File(project.getOutputDir().toString()).listFiles(File::isDirectory);
+			File[] files = new File(project.getOutputDir().toString()).listFiles(f -> f.isDirectory());
 			if (files != null) {
 				outputDirectories = Arrays.stream(files).filter(dir -> !dir.getName().equals(IOUtils.CORRUPT_DIR))
 						.collect(Collectors.toList());

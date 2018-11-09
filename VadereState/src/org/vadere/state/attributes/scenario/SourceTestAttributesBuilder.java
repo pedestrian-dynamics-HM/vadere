@@ -1,11 +1,14 @@
 package org.vadere.state.attributes.scenario;
 
-import java.util.Arrays;
-
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+
+import java.awt.geom.Path2D;
+import java.util.Arrays;
 
 public class SourceTestAttributesBuilder {
 
@@ -14,19 +17,21 @@ public class SourceTestAttributesBuilder {
 	private double endTime = 2;
 	private int spawnNumber = 1;
 	private boolean useFreeSpaceOnly = false;
+	private boolean spawnAtRandomPositions = false;
 	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
-	private double[] distributionParams = new double[] { 1 };
+	private double[] distributionParams = new double[]{1};
 	private double[] groupSizeDistribution = new double[]{0.0, 0.0, 1.0};
 	private Integer[] groupSizeDistributionMock = new Integer[]{};
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
 	private double x0 = 0.0;
 	private double y0 = 0.0;
-	private double x1 = 0.1;
+	private double x1 = 5.0;
 	private double y1 = 0.0;
-	private double x2 = 0.1;
-	private double y2 = 0.1;
+	private double x2 = 5.0;
+	private double y2 = 5.0;
 	private double x3 = 0.0;
-	private double y3 = 0.1;
+	private double y3 = 5.0;
+	private long randomSeed = 0;
 
 	public AttributesSource getResult() {
 		String json = generateSourceAttributesJson();
@@ -55,7 +60,7 @@ public class SourceTestAttributesBuilder {
 	}
 
 	public SourceTestAttributesBuilder setSpawnIntervalForConstantDistribution(double spawnDelay) {
-		this.distributionParams = new double[] {spawnDelay};
+		this.distributionParams = new double[]{spawnDelay};
 		return this;
 	}
 
@@ -64,11 +69,16 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
+	public SourceTestAttributesBuilder setSpawnAtRandomPositions(boolean spawnAtRandomPositions) {
+		this.spawnAtRandomPositions = spawnAtRandomPositions;
+		return this;
+	}
+
 	public SourceTestAttributesBuilder setDistributionClass(Class<? extends RealDistribution> distributionClass) {
 		this.distributionClass = distributionClass;
 		return this;
 	}
-	
+
 	public SourceTestAttributesBuilder setMaxSpawnNumberTotal(int maxSpawnNumberTotal) {
 		this.maxSpawnNumberTotal = maxSpawnNumberTotal;
 		return this;
@@ -82,6 +92,15 @@ public class SourceTestAttributesBuilder {
 	public SourceTestAttributesBuilder setId(int id) {
 		this.id = id;
 		return this;
+	}
+
+	public SourceTestAttributesBuilder setRandomSeed(long seed) {
+		this.randomSeed = seed;
+		return this;
+	}
+
+	public long getRandomSeed() {
+		return randomSeed;
 	}
 
 	public SourceTestAttributesBuilder setSourceDim(VRectangle rect) {
@@ -134,6 +153,27 @@ public class SourceTestAttributesBuilder {
 		return sb.toString();
 	}
 
+	public SourceTestAttributesBuilder setDiamondShapeSource() {
+		x1 = 3.0;
+		y1 = 3.0;
+		x2 = 0.0;
+		y2 = 6.0;
+		x3 = -3.0;
+		y3 = 3.0;
+		return this;
+	}
+
+	public VShape getSourceShape() {
+		Path2D.Double path = new Path2D.Double();
+		path.moveTo(0.0, 0.0);
+		path.lineTo(x1, y1);
+		path.lineTo(x2, y2);
+		path.lineTo(x3, y3);
+		path.closePath();
+
+		return new VPolygon(path);
+	}
+
 	private String generateSourceAttributesJson() {
 		return "{  \"id\" : " + id + "," +
 				"\"shape\": {\"type\": \"POLYGON\",\"points\":"
@@ -147,7 +187,7 @@ public class SourceTestAttributesBuilder {
 				+ ",\"distributionParameters\": " + Arrays.toString(distributionParams)
 				+ ",\"startTime\": " + startTime
 				+ ",\"endTime\": " + endTime
-				+ ",\"spawnAtRandomPositions\": true"
+				+ ",\"spawnAtRandomPositions\": " + spawnAtRandomPositions
 				+ ",\"useFreeSpaceOnly\": " + useFreeSpaceOnly
 				+ ",\"groupSizeDistribution\" : " + groupSizeDistribution() + "\n"
 				+ ",\"targetIds\": [1]}";

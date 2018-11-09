@@ -7,10 +7,20 @@ import org.vadere.util.geometry.shapes.VShape;
 public abstract class ScenarioElement {
 
 	public abstract VShape getShape();
-	
-	public void setShape(VShape newShape) {
-		throw new UnsupportedOperationException("This concrete scenario element does not support setting the shape.");
+
+	public boolean overlapWith(ScenarioElement element){
+		return getShape().intersects(element.getShape());
 	}
+
+	public boolean totalOverlapWith(ScenarioElement element){
+		return getShape().sameArea(element.getShape());
+	}
+
+	public boolean enclosesScenarioElement(ScenarioElement element){
+		return getShape().containsShape(element.getShape());
+	}
+
+	public abstract void setShape(VShape newShape);
 
 	public abstract int getId();
 

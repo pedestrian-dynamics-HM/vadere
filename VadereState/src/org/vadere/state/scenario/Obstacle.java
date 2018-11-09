@@ -1,7 +1,7 @@
 package org.vadere.state.scenario;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
@@ -10,10 +10,7 @@ public class Obstacle extends ScenarioElement {
 
 	private AttributesObstacle attributes;
 
-	public Obstacle(AttributesObstacle attributes) {
-		if (attributes == null)
-			throw new IllegalArgumentException("Attributes must not be null.");
-
+	public Obstacle(@NotNull AttributesObstacle attributes) {
 		this.attributes = attributes;
 	}
 	
@@ -30,6 +27,10 @@ public class Obstacle extends ScenarioElement {
 	@Override
 	public int getId() {
 		return attributes.getId();
+	}
+
+	public void setId(int id){
+		((AttributesObstacle)getAttributes()).setId(id);
 	}
 
 	@Override

@@ -1,0 +1,427 @@
+[
+  {
+    "operation": "shift",
+    "spec": {
+      "name": "&",
+      "description": "&",
+      "release": "&",
+      "commithash": "&",
+      "processWriters": {
+        "*": {
+          "*": "processWriters[&1].&"
+        }
+      },
+      "vadere": {
+        "mainModel": "vadere.&",
+        "attributesModel": {
+          "org.vadere.state.attributes.models.AttributesOSM": {
+            "stepCircleResolution" : "vadere.&2.&1.&0",
+            "numberOfCircles" : "vadere.&2.&1.&0",
+            "varyStepDirection" : "vadere.&2.&1.&0",
+            "stepLengthIntercept" : "vadere.&2.&1.&0",
+            "stepLengthSlopeSpeed" : "vadere.&2.&1.&0",
+            "stepLengthSD" : "vadere.&2.&1.&0",
+            "movementThreshold" : "vadere.&2.&1.&0",
+            "optimizationType" : "vadere.&2.&1.&0",
+            "movementType" : "vadere.&2.&1.&0",
+            "dynamicStepLength" : "vadere.&2.&1.&0",
+            "updateType" : "vadere.&2.&1.&0",
+            "seeSmallWalls" : "vadere.&2.&1.&0",
+            "minimumStepLength" : "vadere.&2.&1.&0",
+            "targetPotentialModel" : "vadere.&2.&1.&0",
+            "pedestrianPotentialModel" : "vadere.&2.&1.&0",
+            "obstaclePotentialModel" : "vadere.&2.&1.&0",
+            "submodels" : "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesBHM": {
+            "stepLengthIntercept": "vadere.&2.&1.&0",
+            "stepLengthSlopeSpeed": "vadere.&2.&1.&0",
+            "stepLengthSD": "vadere.&2.&1.&0",
+            "stepLengthDeviation": "vadere.&2.&1.&0",
+            "navigationCluster": "vadere.&2.&1.&0",
+            "navigationFollower": "vadere.&2.&1.&0",
+            "directionWallDistance": "vadere.&2.&1.&0",
+            "tangentialEvasion": "vadere.&2.&1.&0",
+            "sidewaysEvasion": "vadere.&2.&1.&0",
+            "onlyEvadeContraFlow": "vadere.&2.&1.&0",
+            "makeSmallSteps": "vadere.&2.&1.&0",
+            "followerProximityNavigation": "vadere.&2.&1.&0",
+            "differentBehaviour": "vadere.&2.&1.&0",
+            "differentEvasionBehaviourPercentage": "vadere.&2.&1.&0",
+            "varyingBehaviour": "vadere.&2.&1.&0",
+            "adaptiveBehaviourDensity": "vadere.&2.&1.&0",
+            "adaptiveBehaviourStepsRemained": "vadere.&2.&1.&0",
+            "switchBehaviour": "vadere.&2.&1.&0",
+            "evasionDetourThreshold": "vadere.&2.&1.&0",
+            "onlyEvadeContraFlowAngle": "vadere.&2.&1.&0",
+            "followerAngleMovement": "vadere.&2.&1.&0",
+            "followerAnglePosition": "vadere.&2.&1.&0",
+            "followerDistance": "vadere.&2.&1.&0",
+            "smallStepResolution": "vadere.&2.&1.&0",
+            "plannedStepsAhead": "vadere.&2.&1.&0",
+            "obstacleRepulsionReach": "vadere.&2.&1.&0",
+            "obstacleRepulsionMaxWeight": "vadere.&2.&1.&0",
+            "distanceToKeep": "vadere.&2.&1.&0",
+            "backwardsAngle": "vadere.&2.&1.&0",
+            "reconsiderOldTargets": "vadere.&2.&1.&0",
+            "targetThresholdX": "vadere.&2.&1.&0",
+            "targetThresholdY": "vadere.&2.&1.&0",
+            "spaceToKeep": "vadere.&2.&1.&0",
+            "stepAwayFromCollisions": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesBMM": {
+            "reachedStepTolerance": "vadere.&2.&1.&0",
+            "acceleration": "vadere.&2.&1.&0",
+            "stepwiseDecisions": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesGNM": {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.&2.&1.&0",
+              "stepSizeMin": "vadere.&3.&2.&1.&0",
+              "stepSizeMax": "vadere.&3.&2.&1.&0",
+              "toleranceAbsolute": "vadere.&3.&2.&1.&0",
+              "toleranceRelative": "vadere.&3.&2.&1.&0"
+            },
+            "floorGradientProviderType": "vadere.&2.&1.&0",
+            "targetPotentialModel": "vadere.&2.&1.&0",
+            "pedestrianPotentialModel": "vadere.&2.&1.&0",
+            "obstaclePotentialModel": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesSFM": {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.&2.&1.&0",
+              "stepSizeMin": "vadere.&3.&2.&1.&0",
+              "stepSizeMax": "vadere.&3.&2.&1.&0",
+              "toleranceAbsolute": "vadere.&3.&2.&1.&0",
+              "toleranceRelative": "vadere.&3.&2.&1.&0"
+            },
+            "floorGradientProviderType": "vadere.&2.&1.&0",
+            "targetPotentialModel": "vadere.&2.&1.&0",
+            "pedestrianPotentialModel": "vadere.&2.&1.&0",
+            "obstaclePotentialModel": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesOVM": {
+            "attributesODEIntegrator": {
+              "solverType": "vadere.&3.&2.&1.&0",
+              "stepSizeMin": "vadere.&3.&2.&1.&0",
+              "stepSizeMax": "vadere.&3.&2.&1.&0",
+              "toleranceAbsolute": "vadere.&3.&2.&1.&0",
+              "toleranceRelative": "vadere.&3.&2.&1.&0"
+            },
+            "sensitivity": "vadere.&2.&1.&0",
+            "sightDistance": "vadere.&2.&1.&0",
+            "sightDistanceFactor": "vadere.&2.&1.&0",
+            "firstDistanceRandom": {
+              "x": "vadere.&3.&2.&1.&0",
+              "y": "vadere.&3.&2.&1.&0"
+            },
+            "ignoreOtherCars": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesCGM": {
+            "groupMemberRepulsionFactor": "vadere.&2.&1.&0",
+            "leaderAttractionFactor": "vadere.&2.&1.&0",
+            "groupSizeDistribution": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesGFM":  {
+            "gravityFactor": "vadere.&2.&1.&0",
+            "normalParticleStiffness": "vadere.&2.&1.&0",
+            "dampingParticle": "vadere.&2.&1.&0",
+            "normalObstacleStiffness": "vadere.&2.&1.&0",
+            "dampingObstacle": "vadere.&2.&1.&0",
+            "timeStepSize": "vadere.&2.&1.&0",
+            "dynamicFrictionParticle": "vadere.&2.&1.&0",
+            "staticFrictionParticle": "vadere.&2.&1.&0",
+            "dynamicFrictionObstacle": "vadere.&2.&1.&0",
+            "staticFrictionObstacle": "vadere.&2.&1.&0",
+            "addhesionCoefficient": "vadere.&2.&1.&0",
+            "tangentialStiffness": "vadere.&2.&1.&0",
+            "tangentialDissipation": "vadere.&2.&1.&0",
+            "startAccelerationX": "vadere.&2.&1.&0",
+            "startAccelerationY": "vadere.&2.&1.&0",
+            "accelerationTime": "vadere.&2.&1.&0",
+            "accelerationId": "vadere.&2.&1.&0",
+            "massParticle": "vadere.&2.&1.&0",
+            "momOfInertia": "vadere.&2.&1.&0",
+            "startOmega": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesParticles":  {
+            "attributesODEIntegrator":  {
+              "solverType": "vadere.&3.&1.&1.&0",
+              "stepSizeMin": "vadere.&3.&1.&1.&0",
+              "stepSizeMax": "vadere.&3.&1.&1.&0",
+              "toleranceAbsolute": "vadere.&3.&1.&1.&0",
+              "toleranceRelative": "vadere.&3.&1.&1.&0"
+            },
+            "floorGradientProviderType": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialCompact":  {
+            "pedPotentialWidth": "vadere.&2.&1.&0",
+            "pedPotentialHeight": "vadere.&2.&1.&0",
+            "obstPotentialWidth": "vadere.&2.&1.&0",
+            "obstPotentialHeight": "vadere.&2.&1.&0",
+            "useHardBodyShell": "vadere.&2.&1.&0",
+            "obstDistanceDeviation": "vadere.&2.&1.&0",
+            "visionFieldRadius": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell":  {
+            "pedPotentialIntimateSpaceWidth": "vadere.&2.&1.&0",
+            "pedPotentialPersonalSpaceWidth": "vadere.&2.&1.&0",
+            "pedPotentialHeight": "vadere.&2.&1.&0",
+            "obstPotentialWidth": "vadere.&2.&1.&0",
+            "obstPotentialHeight": "vadere.&2.&1.&0",
+            "intimateSpaceFactor": "vadere.&2.&1.&0",
+            "personalSpacePower": "vadere.&2.&1.&0",
+            "intimateSpacePower": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesFloorField": {
+            "createMethod": "vadere.&2.&1.&0",
+            "potentialFieldResolution": "vadere.&2.&1.&0",
+            "obstacleGridPenalty": "vadere.&2.&1.&0",
+            "targetAttractionStrength": "vadere.&2.&1.&0",
+            "timeCostAttributes": {
+              "standardDerivation": "vadere.&3.&2.&1.&0",
+              "type": "vadere.&3.&2.&1.&0",
+              "obstacleDensityWeight": "vadere.&3.&2.&1.&0",
+              "pedestrianSameTargetDensityWeight": "vadere.&3.&2.&1.&0",
+              "pedestrianOtherTargetDensityWeight": "vadere.&3.&2.&1.&0",
+              "pedestrianWeight": "vadere.&3.&2.&1.&0",
+              "queueWidthLoading": "vadere.&3.&2.&1.&0",
+              "pedestrianDynamicWeight": "vadere.&3.&2.&1.&0",
+              "loadingType": "vadere.&3.&2.&1.&0"
+            }
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialGNM": {
+            "pedestrianBodyPotential": "vadere.&2.&1.&0",
+            "pedestrianRecognitionDistance": "vadere.&2.&1.&0",
+            "obstacleBodyPotential": "vadere.&2.&1.&0",
+            "obstacleRepulsionStrength": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialOSM":  {
+            "pedestrianBodyPotential": "vadere.&2.&1.&0",
+            "pedestrianRepulsionWidth": "vadere.&2.&1.&0",
+            "pedestrianRepulsionStrength": "vadere.&2.&1.&0",
+            "aPedOSM": "vadere.&2.&1.&0",
+            "bPedOSM": "vadere.&2.&1.&0",
+            "pedestrianRecognitionDistance": "vadere.&2.&1.&0",
+            "personalDensityFactor": "vadere.&2.&1.&0",
+            "obstacleBodyPotential": "vadere.&2.&1.&0",
+            "obstacleRepulsionWidth": "vadere.&2.&1.&0",
+            "obstacleRepulsionStrength": "vadere.&2.&1.&0",
+            "aObsOSM": "vadere.&2.&1.&0",
+            "bObsOSM": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialParticles":  {
+            "pedestrianBodyPotential": "vadere.&2.&1.&0",
+            "pedestrianRecognitionDistance": "vadere.&2.&1.&0",
+            "obstacleBodyPotential": "vadere.&2.&1.&0",
+            "obstacleRepulsionStrength": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialRingExperiment":  {
+            "center": {
+              "x": "vadere.&3.&2.&1.&0",
+              "y": "vadere.&3.&2.&1.&0"
+            },
+            "radius1": "vadere.&2.&1.&0",
+            "radius2": "vadere.&2.&1.&0",
+            "pedestrianTrajectory1": "vadere.&2.&1.&0",
+            "pedestrianTrajectory2": "vadere.&2.&1.&0",
+            "allowedTrajectoryWidth": "vadere.&2.&1.&0",
+            "pedestrianRadius": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesPotentialSFM":  {
+            "pedestrianBodyPotential": "vadere.&2.&1.&0",
+            "pedestrianRecognitionDistance": "vadere.&2.&1.&0",
+            "obstacleBodyPotential": "vadere.&2.&1.&0",
+            "obstacleRepulsionStrength": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.models.AttributesQueuingGame": {
+            "queuingFloorField": "vadere.&2.&1.&0",
+            "navigationFloorField": "vadere.&2.&1.&0",
+            "competitiveProbability": "vadere.&2.&1.&0",
+            "expectedGentleTimeInSec": "vadere.&2.&1.&0",
+            "expectedCompetitiveTimeInSec": "vadere.&2.&1.&0"
+          },
+          "org.vadere.state.attributes.scenario.AttributesCar": {
+            "id": "vadere.&2.&1.&0",
+            "radius": "vadere.&2.&1.&0",
+            "densityDependentSpeed": "vadere.&2.&1.&0",
+            "speedDistributionMean": "vadere.&2.&1.&0",
+            "speedDistributionStandardDeviation": "vadere.&2.&1.&0",
+            "minimumSpeed": "vadere.&2.&1.&0",
+            "maximumSpeed": "vadere.&2.&1.&0",
+            "acceleration": "vadere.&2.&1.&0",
+            "length": "vadere.&2.&1.&0",
+            "width": "vadere.&2.&1.&0",
+            "direction": {
+              "x": "vadere.&3.&1.&1.&0",
+              "y": "vadere.&3.&1.&1.&0"
+            }
+          }
+        },
+        "attributesSimulation": {
+          "finishTime": "vadere.&1.&0",
+          "simTimeStepLength": "vadere.&1.&0",
+          "realTimeSimTimeRatio": "vadere.&1.&0",
+          "writeSimulationData": "vadere.&1.&0",
+          "visualizationEnabled": "vadere.&1.&0",
+          "printFPS": "vadere.&1.&0",
+          "needsBoundary": "vadere.&1.&0",
+          "digitsPerCoordinate": "vadere.&1.&0",
+          "useRandomSeed": "vadere.&1.&0",
+          "randomSeed": "vadere.&1.&0"
+        },
+        "topography": {
+          "attributes": {
+            "bounds": "vadere.&2.&1.&0",
+            "boundingBoxWidth": "vadere.&2.&1.&0",
+            "bounded": "vadere.&2.&1.&0"
+          },
+          "obstacles": "vadere.&1.&0",
+          "stairs": "vadere.&1.&0",
+          "targets": {
+            "*": {
+              "id": "vadere.&3.&2.[&1].&0",
+              "absorbing": "vadere.&3.&2.[&1].&0",
+              "shape": "vadere.&3.&2.[&1].&0",
+              "waitingTime": "vadere.&3.&2.[&1].&0",
+              "waitingTimeYellowPhase": "vadere.&3.&2.[&1].&0",
+              "parallelWaiters": "vadere.&3.&2.[&1].&0",
+              "individualWaiting": "vadere.&3.&2.[&1].&0",
+              "deletionDistance": "vadere.&3.&2.[&1].&0",
+              "startingWithRedLight": "vadere.&3.&2.[&1].&0",
+              "nextSpeed": "vadere.&3.&2.[&1].&0"
+            }
+          },
+          "sources": {
+            "*": {
+              "id": "vadere.&3.&2.[&1].&0",
+              "shape": "vadere.&3.&2.[&1].&0",
+              "interSpawnTimeDistribution": "vadere.&3.&2.[&1].&0",
+              "distributionParameters": "vadere.&3.&2.[&1].&0",
+              "spawnNumber": "vadere.&3.&2.[&1].&0",
+              "startTime": "vadere.&3.&2.[&1].&0",
+              "endTime": "vadere.&3.&2.[&1].&0",
+              "spawnAtRandomPositions": "vadere.&3.&2.[&1].&0",
+              "useFreeSpaceOnly": "vadere.&3.&2.[&1].&0",
+              "targetIds": "vadere.&3.&2.[&1].&0",
+              "dynamicElementType": "vadere.&3.&2.[&1].&0",
+              "spawnDelay": "vadere.&3.&2.[&1].&0"
+            }
+          },
+          "dynamicElements": {
+            "*": {
+              "source": "vadere.&3.&2.[&1].&0",
+              "targetIds": "vadere.&3.&2.[&1].&0",
+              "position": {
+                "x": "vadere.&4.&3.[&2].&1.&0",
+                "y": "vadere.&4.&3.[&2].&1.&0"
+              },
+              "velocity": {
+                "x": "vadere.&4.&3.[&2].&1.&0",
+                "y": "vadere.&4.&3.[&2].&1.&0"
+              },
+              "nextTargetListIndex": "vadere.&3.&2.[&1].&0",
+              "freeFlowSpeed": "vadere.&3.&2.[&1].&0",
+              "attributes": {
+                "id": "vadere.&4.&3.[&2].&1.&0",
+                "radius": "vadere.&4.&3.[&2].&1.&0",
+                "densityDependentSpeed": "vadere.&4.&3.[&2].&1.&0",
+                "speedDistributionMean": "vadere.&4.&3.[&2].&1.&0",
+                "speedDistributionStandardDeviation": "vadere.&4.&3.[&2].&1.&0",
+                "minimumSpeed": "vadere.&4.&3.[&2].&1.&0",
+                "maximumSpeed": "vadere.&4.&3.[&2].&1.&0",
+                "acceleration": "vadere.&4.&3.[&2].&1.&0"
+              },
+              "idAsTarget": "vadere.&3.&2.[&1].&0",
+              "modelPedestrianMap": "vadere.&3.&2.[&1].&0",
+              "isChild": "vadere.&3.&2.[&1].&0",
+              "isLikelyInjured": "vadere.&3.&2.[&1].&0",
+              "groupIds": "vadere.&3.&2.[&1].&0",
+              "type": "vadere.&3.&2.[&1].&0"
+            }
+          },
+          "attributesPedestrian": {
+            "radius": "vadere.&2.&1.&0",
+            "densityDependentSpeed": "vadere.&2.&1.&0",
+            "speedDistributionMean": "vadere.&2.&1.&0",
+            "speedDistributionStandardDeviation": "vadere.&2.&1.&0",
+            "minimumSpeed": "vadere.&2.&1.&0",
+            "maximumSpeed": "vadere.&2.&1.&0",
+            "acceleration": "vadere.&2.&1.&0"
+          },
+          "attributesCar": null
+        }
+      }
+    }
+  },
+  {
+    "operation": "default",
+    "spec": {
+      "name": "",
+      "description": "",
+      "release": "0.1",
+      "commithash": "warning: no commit hash",
+      "processWriters": {
+        "files[]": {
+          "0": {
+            "type": "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+            "filename": "postvis.trajectories",
+            "processors": [
+              1
+            ]
+          }
+        },
+        "processors[]": {
+          "0": {
+            "type": "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+            "id": 1
+          }
+        },
+        "isTimestamped": true
+      },
+      "vadere": {
+        "mainModel": "null",
+        "attributesModel": {},
+        "attributesSimulation": {
+          "finishTime": "500.0",
+          "simTimeStepLength": "0.4",
+          "realTimeSimTimeRatio": "0.1",
+          "writeSimulationData": true,
+          "visualizationEnabled": true,
+          "printFPS": false,
+          "needsBoundary": false,
+          "digitsPerCoordinate": "2",
+          "useRandomSeed": true,
+          "randomSeed": "1"
+        },
+        "topography": {
+          "attributes": {
+            "bounds": {
+              "x": "0.0",
+              "y": "0.0",
+              "width": "10.0",
+              "height": "10.0"
+            },
+            "boundingBoxWidth": "0.5",
+            "bounded": true
+          },
+          "obstacles": [],
+          "stairs": [],
+          "targets": [],
+          "sources": [],
+          "dynamicElements": [],
+          "attributesPedestrian": {
+            "radius": "0.195",
+            "densityDependentSpeed": false,
+            "speedDistributionMean": "1.34",
+            "speedDistributionStandardDeviation": "0.0",
+            "minimumSpeed": "0.3",
+            "maximumSpeed": "3.0",
+            "acceleration": "2.0"
+          },
+          "attributesCar": null
+        }
+      }
+    }
+  }
+]

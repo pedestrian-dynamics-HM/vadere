@@ -38,6 +38,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 
 		if (optMainModel.isPresent() && optMainModel.get() instanceof PotentialFieldModel) {
 			IPotentialFieldTarget pft = ((PotentialFieldModel) optMainModel.get()).getPotentialFieldTarget();
+
 			Rectangle.Double bound = state.getTopography().getBounds();
 
 			/*
@@ -49,7 +50,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 				 * For example in the cooperative and competitive queueing model, pedestrians use different floor fields.
 				 */
 				Optional<Pedestrian> optPed = state.getTopography().getPedestrianDynamicElements().getElements().stream().findAny();
-
+				System.out.println("Ped present: " + optPed.isPresent());
 				if (optPed.isPresent()) {
 					int row = 0;
 					for (double y = bound.y; y < bound.y + bound.height; y += att.getResolution()) {

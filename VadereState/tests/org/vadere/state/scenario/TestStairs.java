@@ -3,7 +3,6 @@ package org.vadere.state.scenario;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesStairs;
-import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Stairs.Tread;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.GeometryUtils;

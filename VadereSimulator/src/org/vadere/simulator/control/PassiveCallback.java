@@ -1,7 +1,13 @@
 package org.vadere.simulator.control;
 
+import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.Map;
 
 /**
  * This interface defines a callbacks for the simulation loop.
@@ -20,5 +26,9 @@ public interface PassiveCallback {
 
 	void setTopography(Topography scenario);
 
-	default void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget){}
+	default void setPotentialFieldTarget(@Nullable IPotentialFieldTarget potentialFieldTarget){}
+
+	default void setPotentialField(@Nullable IPotentialField potentialField) {}
+
+	default void setPotentialFieldTargetMesh(@Nullable Map<Integer, PMesh<VPoint>> meshMap) {}
 }

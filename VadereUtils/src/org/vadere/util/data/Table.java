@@ -243,9 +243,9 @@ public class Table implements Iterable<Row> {
 	}
 
 	/**
-	 * Returns true if this table contains no elements.
+	 * Returns true if this table triangleContains no elements.
 	 * 
-	 * @return true if this table contains no elements
+	 * @return true if this table triangleContains no elements
 	 */
 	public boolean isEmpty() {
 		return columns() == 0 || size() == 0 || getEntry(getColumnNames()[0], 0) == null;

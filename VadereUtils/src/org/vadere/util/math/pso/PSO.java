@@ -38,7 +38,7 @@ public class PSO {
 		this.random = random;
 		this.circle = circle;
 		this.gBest = Double.MAX_VALUE;
-		this.gBestLocation = new VPoint(0, 0);
+		this.gBestLocation = circle.getCenter();
 		this.iterationCounter = 0;
 		this.maxVelocity = maxVelocity;
 		this.minAngle = minAngle;
@@ -97,7 +97,7 @@ public class PSO {
 		VPoint velocity = particle.getVelocity().scalarMultiply(omega)
 				.add(dirLocalBest.scalarMultiply(rLocal * attributesPSO.c1))
 				.add(dirGobalBest.scalarMultiply(rGlobal * attributesPSO.c2))
-				.limit(maxVelocity);
+				.norm(maxVelocity);
 
 		VPoint currentLocation = particle.getLocation();
 		particle.setVelocity(velocity);
@@ -188,7 +188,7 @@ public class PSO {
 		double vDelta = random.nextDouble() * (maxAngle - minAngle);
 		double vMag = Math.sqrt(random.nextDouble()) * circle.getRadius();
 		VPoint v = new VPoint(Math.cos(vDelta), Math.sin(vDelta)).norm(vMag);
-		VPoint velocity = v.subtract(location).scalarMultiply(0.5).limit(maxVelocity);
+		VPoint velocity = v.subtract(location).scalarMultiply(0.5).norm(maxVelocity);
 
 		double fitnessValue = f.apply(location);
 		return new Particle(location, velocity, fitnessValue);
