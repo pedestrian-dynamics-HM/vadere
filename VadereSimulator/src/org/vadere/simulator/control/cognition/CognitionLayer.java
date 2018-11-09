@@ -5,6 +5,7 @@ import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.WaitEvent;
 import org.vadere.state.scenario.Pedestrian;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class CognitionLayer {
 
-    public void prioritizeEventsForPedestrians(List<Event> events, List<Pedestrian> pedestrians){
+    public void prioritizeEventsForPedestrians(List<Event> events, Collection<Pedestrian> pedestrians){
         for (Pedestrian pedestrian : pedestrians) {
             // TODO: prioritize the events for the current time step for each pedestrian individually.
             // by using a finite state machine, weight pedestrian's attributes or any other good mechanism.

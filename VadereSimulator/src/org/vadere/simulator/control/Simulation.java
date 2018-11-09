@@ -2,6 +2,7 @@ package org.vadere.simulator.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.control.cognition.CognitionLayer;
 import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -70,6 +71,7 @@ public class Simulation {
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
 	private final EventController eventController;
+	private final CognitionLayer cognitionLayer;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
@@ -97,6 +99,8 @@ public class Simulation {
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
 		this.eventController = new EventController(scenarioStore);
+		this.cognitionLayer = new CognitionLayer();
+
 		// ::start:: this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
 			IPotentialFieldTarget pft = null;
@@ -280,8 +284,8 @@ public class Simulation {
 	private void updateCallbacks(double simTimeInSec) {
         List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
-        // TODO: Implement "CognitionLayer" class and use it here, e.g. cognitionLayer(events, pedestrians)
-		// which calls pedestrian.setBehavior(...) or this methods returns List<Behavior, Pedestrian).
+		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
 
         // TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();
@@ -301,7 +305,7 @@ public class Simulation {
 		step++;
 
 		for (Model m : models) {
-			m.update(events);
+			m.update(simTimeInSec);
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {

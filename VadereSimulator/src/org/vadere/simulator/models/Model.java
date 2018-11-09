@@ -33,15 +33,6 @@ public interface Model {
 
 	void update(final double simTimeInSec);
 
-	default void update(final List<Event> events) {
-	    // In the first run, ignore everything else "ElapsedTimeEvent".
-	    for (Event event : events) {
-	        if (event instanceof ElapsedTimeEvent) {
-	            this.update(event.getTime());
-            }
-        }
-    }
-
 	static <T extends Attributes> T findAttributes(List<Attributes> attributesList, final Class<T> type) {
 		try {
 			final T a = FindByClass.findSingleObjectOfClass(attributesList, type);

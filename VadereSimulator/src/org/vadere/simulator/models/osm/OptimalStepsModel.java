@@ -234,38 +234,10 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 	@Override
 	public void update(final double simTimeInSec) {
+		// TODO: handle each pedestrian individually based on its "mostImportantEvent".
 		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
 		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
 		lastSimTimeInSec = simTimeInSec;
-	}
-
-	@Override
-	public void update(final List<Event> events) {
-		// TODO: improve proof of concept (prioritize events etc.)
-		Event mostImportantEvent = prioritizeEvents(events);
-
-        if (mostImportantEvent instanceof ElapsedTimeEvent) {
-            handleElapsedTimeEvent(mostImportantEvent);
-        } else if (mostImportantEvent instanceof WaitEvent) {
-            handleWaitEvent(mostImportantEvent);
-        } else {
-            throw new IllegalArgumentException("Cannot handle event: " + mostImportantEvent);
-        }
-	}
-
-	private Event prioritizeEvents(List<Event> events) {
-		Event mostImportantEvent = null;
-
-		List<Event> waitEvents = events.stream().filter(event -> event instanceof WaitEvent).collect(Collectors.toList());
-
-		if (waitEvents.size() >= 1) {
-		    mostImportantEvent = waitEvents.get(0);
-        } else {
-		    List<Event> elapsedTimeEvents = events.stream().filter(event -> event instanceof ElapsedTimeEvent).collect(Collectors.toList());
-            mostImportantEvent = elapsedTimeEvents.get(0);
-        }
-
-        return mostImportantEvent;
 	}
 
 	private void handleElapsedTimeEvent(final Event event) {
