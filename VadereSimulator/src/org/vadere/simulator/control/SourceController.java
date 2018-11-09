@@ -2,17 +2,21 @@ package org.vadere.simulator.control;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.scenario.*;
-import org.vadere.state.util.SpawnArray;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Car;
+import org.vadere.state.scenario.DistributionFactory;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
-import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -20,22 +24,23 @@ import java.util.Random;
 public abstract class SourceController {
 
 	protected final double NO_EVENT = Double.MAX_VALUE;
-	private final double SPAWN_BUFFER_SIZE = 0.001;
+//	public static final double SPAWN_BUFFER_SIZE = 0.03;
 
 	protected final Source source;
-	private final DynamicElementFactory dynamicElementFactory;
+	protected final DynamicElementFactory dynamicElementFactory;
+
 	private final Topography topography;
 	protected final Random random;
 	private TargetDistribution targetDistribution;
 
-
-	/** <code>null</code>, if there is no next event. */
+	/**
+	 * <code>null</code>, if there is no next event.
+	 */
 	protected Double timeOfNextEvent;
 	protected RealDistribution distribution;
 	protected final AttributesSource sourceAttributes;
 	protected final AttributesDynamicElement attributesDynamicElement;
 	protected int dynamicElementsCreatedTotal;
-	protected final SpawnArray spawnArray;
 
 
 	public SourceController(Topography scenario, Source source,
@@ -48,8 +53,6 @@ public abstract class SourceController {
 		this.dynamicElementFactory = dynamicElementFactory;
 		this.topography = scenario;
 		this.random = random;
-		this.spawnArray = new SpawnArray(new VRectangle(source.getShape().getBounds2D()),
-				new VRectangle(0, 0, (getDynamicElementShape().getRadius()) * 2 + SPAWN_BUFFER_SIZE, (getDynamicElementShape().getRadius()) * 2 + SPAWN_BUFFER_SIZE));
 
 		timeOfNextEvent = sourceAttributes.getStartTime();
 		try {
@@ -64,15 +67,16 @@ public abstract class SourceController {
 		this.targetDistribution = new TargetDistribution(random);
 	}
 
+	/**
+	 * @return List of DynamicElements within a circle, which surrounds the source shape completely
+	 */
 	protected List<DynamicElement> getDynElementsAtSource() {
-		Rectangle2D rec = source.getShape().getBounds2D();
-		double maxDim = rec.getWidth() > rec.getHeight() ? rec.getWidth() : rec.getHeight();
-		return getDynElementsAtPosition(source.getShape().getCentroid(), maxDim / 2);
+		return getDynElementsAtPosition(source.getShape().getCircumCircle());
 	}
 
-	protected List<DynamicElement> getDynElementsAtPosition(VPoint sourcePosition, double radius) {
+	protected List<DynamicElement> getDynElementsAtPosition(VCircle circumCircle) {
 		LinkedCellsGrid<DynamicElement> dynElements = topography.getSpatialMap(DynamicElement.class);
-		return dynElements.getObjects(sourcePosition, radius);
+		return dynElements.getObjects(circumCircle.getCenter(), circumCircle.getRadius());
 	}
 
 	abstract public void update(double simTimeInSec);
@@ -102,16 +106,21 @@ public abstract class SourceController {
 				&& dynamicElementsCreatedTotal >= maxNumber;
 	}
 
-	private VCircle getDynamicElementShape() {
-		if (attributesDynamicElement instanceof AttributesAgent) {
-			return new VCircle(((AttributesAgent) attributesDynamicElement).getRadius());
-		}
-		return new VCircle(0.2);
+	protected boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes) {
+		boolean pedOverlap = blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpace));
+		boolean obstOverlap = this.getTopography().getObstacles().stream()
+				.map(Obstacle::getShape).noneMatch(shape -> shape.intersects(freeSpace));
+
+		return pedOverlap && obstOverlap;
 	}
 
 	abstract protected boolean isQueueEmpty();
 
 	abstract protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec);
+
+	protected Topography getTopography() {
+		return topography;
+	}
 
 	protected void createNextEvent() {
 		if (isSourceWithOneSingleSpawnEvent()) {
@@ -129,8 +138,8 @@ public abstract class SourceController {
 	}
 
 	/**
-	 * note that most models create their own pedestrians and ignore the attributes given here.
-	 * the source is mostly used to set the position and target ids, not the attributes.
+	 * note that most models create their own pedestrians and ignore the attributes given here. the
+	 * source is mostly used to set the position and target ids, not the attributes.
 	 */
 	protected void addNewAgentToScenario(final List<VPoint> position) {
 		position.forEach(p -> addNewAgentToScenario(p));

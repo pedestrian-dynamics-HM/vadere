@@ -1,60 +1,67 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor;
-import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
+import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mario Teixeira Parente
  */
+
 @DataProcessorClass()
-public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer> {
-	private static Logger logger = LogManager.getLogger(PedestrianOverlapProcessor.class);
-	private double pedRadius;
+public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlapKey, OverlapData> {
+	private double minDist;
 
 
 	public PedestrianOverlapProcessor() {
-		super("overlaps");
-		setAttributes(new AttributesPedestrianOverlapProcessor());
+		super("distance", "overlaps");
 	}
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
-		this.pedRadius = state.getTopography().getAttributesPedestrian().getRadius();  // in init there is no access to the state
+		double pedRadius = state.getTopography().getAttributesPedestrian().getRadius();
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
-		peds.forEach(p -> this.putValue(
-				new TimestepPedestrianIdKey(state.getStep(), p.getId()),
-				this.calculateOverlaps(peds, p.getPosition())));
+		minDist = pedRadius * 2;
+		int timeStep = state.getStep();
+		for (Pedestrian ped : peds) {
+			// get all Pedestrians with at most pedRadius*2.5 distance away
+			// this reduces the amount of overlap tests
+			VPoint pedPos = ped.getPosition();
+			List<DynamicElement> neighbours = getDynElementsAtPosition(state.getTopography(), ped.getPosition(), pedRadius *2.5);
+			// collect pedIds and distance of all overlaps for the current ped in the current timestep
+			List<OverlapData> overlaps = neighbours
+					.parallelStream()
+					.map(p -> new OverlapData(ped, p, minDist))
+					.filter(OverlapData::isNotSelfOverlap)
+					.filter(OverlapData::isOverlap)
+					.collect(Collectors.toList());
+			overlaps.forEach(o -> this.putValue(new TimestepPedestrianIdOverlapKey(timeStep, o.getPed1Id(), o.getPed2Id()), o));
+		}
+	}
+
+	public String[] toStrings(final TimestepPedestrianIdOverlapKey key) {
+		return  this.hasValue(key) ? this.getValue(key).toStrings() : new String[]{"N/A", "N/A"};
 	}
 
 	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
-		AttributesPedestrianOverlapProcessor att = (AttributesPedestrianOverlapProcessor) this.getAttributes();
-
-		this.pedRadius = att.getPedRadius();
 	}
 
-	private int calculateOverlaps(final Collection<Pedestrian> peds, VPoint pos) {
-		long overlap = peds.stream().filter(p -> p.getPosition().distance(pos) <= 2 * this.pedRadius).count() - 1;
-		return (int)overlap;
+	private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {
+		LinkedCellsGrid<DynamicElement> dynElements = topography.getSpatialMap(DynamicElement.class);
+		return dynElements.getObjects(sourcePosition, radius);
 	}
 
-	@Override
-	public AttributesProcessor getAttributes() {
-		if (super.getAttributes() == null) {
-			setAttributes(new AttributesPedestrianOverlapProcessor());
-		}
-
-		return super.getAttributes();
-	}
 }

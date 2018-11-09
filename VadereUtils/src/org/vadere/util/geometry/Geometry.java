@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -89,7 +90,7 @@ public class Geometry {
 	 * 
 	 * @param polygon
 	 * @param createMidpoints
-	 *        if true, every line is split into two by inserting a midpoint.
+	 *        if true, every line is splitEdge into two by inserting a midpoint.
 	 * @return
 	 */
 	public boolean intersects(VPolygon polygon, boolean createMidpoints,

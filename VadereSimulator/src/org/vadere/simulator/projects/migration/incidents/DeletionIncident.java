@@ -21,7 +21,7 @@ public class DeletionIncident extends Incident {
 	@Override
 	public void resolve(Tree graph, StringBuilder log) throws MigrationException {
 		super.stillApplies(graph);
-		log.append("\t- delete node " + graph.pathToString(path) + "\n");
+		log.append("\t- deleteEdge node " + graph.pathToString(path) + "\n");
 		graph.deleteNode(path);
 	}
 

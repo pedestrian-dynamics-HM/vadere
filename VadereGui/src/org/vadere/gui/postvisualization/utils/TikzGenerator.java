@@ -5,21 +5,19 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.simulator.projects.dataprocessing.processor.PedestrianOSMStrideLengthProcessor;
 import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import javax.swing.text.html.Option;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -83,7 +81,7 @@ public class TikzGenerator {
 		tikzCode += generateTikzColorDefinitions(model);
 		tikzCode += convertScenarioElementsToTikz();
 
-		String output = (generateCompleteDocument) ? String.format(texTemplate, tikzCode) : tikzCode;
+		String output = (generateCompleteDocument) ? String.format(Locale.US, texTemplate, tikzCode) : tikzCode;
 
 		// TODO: maybe uses Java's resources notation (in general, writing the file should be done by the caller not here).
 		try {
@@ -104,19 +102,19 @@ public class TikzGenerator {
 		String colorTextPattern = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
 
 		Color sourceColor = model.getConfig().getSourceColor();
-		colorDefinitions += String.format(colorTextPattern, "SourceColor", sourceColor.getRed(), sourceColor.getGreen(), sourceColor.getBlue());
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "SourceColor", sourceColor.getRed(), sourceColor.getGreen(), sourceColor.getBlue());
 
 		Color targetColor = model.getConfig().getTargetColor();
-		colorDefinitions += String.format(colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
 
 		Color obstacleColor = model.getConfig().getObstacleColor();
-		colorDefinitions += String.format(colorTextPattern, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
 
 		Color stairColor = model.getConfig().getStairColor();
-		colorDefinitions += String.format(colorTextPattern, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
 
 		Color agentColor = model.getConfig().getPedestrianDefaultColor();
-		colorDefinitions += String.format(colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
 		return colorDefinitions;
 	}
@@ -127,10 +125,19 @@ public class TikzGenerator {
 		DefaultSimulationConfig config = model.getConfig();
 		Topography topography = model.getTopography();
 
-		// Draw background elements first, then other scenario elements on toph.
+		// Clip everything outside of topography bound.
+		generatedCode += "% Clipping\n";
+		String clipTextPattern = "\\clip (%f,%f) rectangle (%f,%f);\n";
+		generatedCode += String.format(Locale.US, clipTextPattern,
+				topography.getBounds().x,
+				topography.getBounds().y,
+				topography.getBounds().x + topography.getBounds().width,
+				topography.getBounds().y + topography.getBounds().height);
+
+		// Draw background elements first, then other scenario elements.
 		generatedCode += "% Ground\n";
 		String groundTextPattern = (config.isShowGrid()) ? "\\draw[help lines] (%f,%f) grid (%f,%f);\n" : "\\fill[white] (%f,%f) rectangle (%f,%f);\n";
-		generatedCode += String.format(groundTextPattern,
+		generatedCode += String.format(Locale.US, groundTextPattern,
 				topography.getBounds().x,
 				topography.getBounds().y,
 				topography.getBounds().x + topography.getBounds().width,
@@ -139,7 +146,7 @@ public class TikzGenerator {
 		if (config.isShowSources()) {
 			generatedCode += "% Sources\n";
 			for (Source source : topography.getSources()) {
-				generatedCode += String.format("\\fill[SourceColor] %s;\n", generatePathForScenarioElement(source));
+				generatedCode += String.format(Locale.US, "\\fill[SourceColor] %s;\n", generatePathForScenarioElement(source));
 			}
 		} else {
 			generatedCode += "% Sources (not enabled in config)\n";
@@ -148,7 +155,7 @@ public class TikzGenerator {
 		if (config.isShowTargets()) {
 			generatedCode += "% Targets\n";
 			for (Target target : topography.getTargets()) {
-				generatedCode += String.format("\\fill[TargetColor] %s;\n", generatePathForScenarioElement(target));
+				generatedCode += String.format(Locale.US, "\\fill[TargetColor] %s;\n", generatePathForScenarioElement(target));
 			}
 		} else {
 			generatedCode += "% Targets (not enabled in config)\n";
@@ -157,7 +164,7 @@ public class TikzGenerator {
 		if (config.isShowObstacles()) {
 			generatedCode += "% Obstacles\n";
 			for (Obstacle obstacle : topography.getObstacles()) {
-				generatedCode += String.format("\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
+				generatedCode += String.format(Locale.US, "\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
 			}
 		} else {
 			generatedCode += "% Obstacles (not enabled in config)\n";
@@ -166,7 +173,8 @@ public class TikzGenerator {
 		if (config.isShowStairs()) {
 			generatedCode += "% Stairs\n";
 			for (Stairs stair : topography.getStairs()) {
-				generatedCode += String.format("\\fill[StairColor] %s\n", generatePathForScenarioElement(stair));
+				generatedCode += String.format(Locale.US, "\\fill[black] %s;\n", generatePathForScenarioElement(stair));
+				generatedCode += String.format(Locale.US, "\\fill[StairColor] %s;\n", generatePathForStairs(stair));
 			}
 		} else {
 			generatedCode += "% Stairs (not enabled in config)\n";
@@ -178,7 +186,7 @@ public class TikzGenerator {
             if (model instanceof PostvisualizationModel) {
                 generatedCode += drawTrajectories((PostvisualizationModel)model);
             } else {
-                generatedCode += String.format("%% Passed model %s does not contain trajectories\n", model.getClass().getSimpleName());
+                generatedCode += String.format(Locale.US, "%% Passed model %s does not contain trajectories\n", model.getClass().getSimpleName());
             }
         } else {
             generatedCode += "% Trajectories (not enabled in config)\n";
@@ -207,7 +215,7 @@ public class TikzGenerator {
 
                 // Use a newline ("to\n") for joining because TeX could possibly choke up on long lines.
                 String trajectoryAsTikzString = trajectoryPoints
-                        .map(point -> String.format("(%f,%f)", point.x, point.y))
+                        .map(point -> String.format(Locale.US, "(%f,%f)", point.x, point.y))
                         .collect(Collectors.joining(" to\n"));
 
                 String coloredTrajectory = applyAgentColorToTrajectory(trajectoryAsTikzString, trajectory.getAgent(currentTimeStep));
@@ -217,7 +225,7 @@ public class TikzGenerator {
                 String trajectoryEndStepAsString = (trajectoryEndStep.isPresent()) ? "" + trajectoryEndStep.get().toString() : "unknown end step" ;
                 String currentTimeStepAsString = currentTimeStep.toString();
 
-                generatedCode.append(String.format("%% Trajectory Agent %d @ step %s of %s\n", pedestrianId, currentTimeStepAsString, trajectoryEndStepAsString));
+                generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ step %s of %s\n", pedestrianId, currentTimeStepAsString, trajectoryEndStepAsString));
                 generatedCode.append(coloredTrajectory);
             });
         }
@@ -230,13 +238,19 @@ public class TikzGenerator {
 	    String colorString = "AgentColor";
 
 	    if (agent.get() instanceof Pedestrian) {
+		    Color pedestrianColor;
 	        Pedestrian pedestrian = (Pedestrian)agent.get();
-	        Color pedestrianColor = renderer.getAgentRender().getColor(pedestrian);
+	        if(model.config.isShowGroups()) {
+		        pedestrianColor = renderer.getAgentRender().getGroupColor(pedestrian);
+	        }
+	        else {
+		        pedestrianColor = renderer.getPedestrianColor(pedestrian);
+	        }
 
-            colorString = String.format("{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+            colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
         }
 
-        return String.format("\\draw[draw=%s]\n%s;\n", colorString, trajectory);
+        return String.format(Locale.US, "\\draw[draw=%s]\n%s;\n", colorString, trajectory);
     }
 
     @NotNull
@@ -244,30 +258,38 @@ public class TikzGenerator {
 	    String generatedCode = "";
 
         for (Agent agent : model.getAgents()) {
-            if (model.getConfig().isShowGroups()) {
-                try {
-                    Pedestrian pedestrian = (Pedestrian) agent;
-                    Color pedestrianColor = renderer.getAgentRender().getColor(pedestrian);
-                    Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
+        	if(agent instanceof Pedestrian) {
+		        if (model.getConfig().isShowGroups()) {
+			        try {
+				        Pedestrian pedestrian = (Pedestrian) agent;
+				        Color pedestrianColor = renderer.getAgentRender().getGroupColor(pedestrian);
+				        Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
 
-                    String colorString = String.format("{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
-                    generatedCode += String.format("\\fill[fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
-                } catch (ClassCastException cce) {
-                    logger.error("Error casting to Pedestrian");
-                    cce.printStackTrace();
-                    // TODO: render agent as circle!
-                }
-            } else {
-                String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
-                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-            }
+				        String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+				        generatedCode += String.format(Locale.US, "\\fill[fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
+			        } catch (ClassCastException cce) {
+				        logger.error("Error casting to Pedestrian");
+				        cce.printStackTrace();
 
-            if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
-                String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
-                generatedCode += String.format(agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
-            }
-            // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
-            // generatedCode += String.format("\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
+				        // Fall back to default rendering of agents.
+				        String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
+				        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+			        }
+		        } else {
+			        Pedestrian pedestrian = (Pedestrian) agent;
+			        Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
+			        String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+			        // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
+			        // generatedCode += String.format(Locale.US, "\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
+			        String agentTextPattern = "\\fill[fill=%s] (%f,%f) circle [radius=%fcm];\n";
+			        generatedCode += String.format(Locale.US, agentTextPattern, colorString, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+		        }
+
+		        if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
+			        String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
+			        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+		        }
+	        }
         }
 
         return generatedCode;
@@ -278,6 +300,24 @@ public class TikzGenerator {
 
 		AffineTransform noTransformation = new AffineTransform();
 		PathIterator pathIterator = element.getShape().getPathIterator(noTransformation);
+
+		while (!pathIterator.isDone()) {
+			float[] coords = new float[6];
+			int type = pathIterator.currentSegment(coords);
+
+			generatedPath += convertJavaToTikzPath(type, coords);
+			pathIterator.next();
+		}
+
+		return generatedPath.trim();
+	}
+
+	private String generatePathForStairs(Stairs element) {
+		String generatedPath = "";
+
+		AffineTransform noTransformation = new AffineTransform();
+		Shape shape = DefaultRenderer.getStairShapeWithThreads(element);
+		PathIterator pathIterator = shape.getPathIterator(noTransformation);
 
 		while (!pathIterator.isDone()) {
 			float[] coords = new float[6];
@@ -309,19 +349,19 @@ public class TikzGenerator {
 
 	private String convertJavaToTikzPath(int type, float[] coords) {
 		if (type < SEG_MOVETO || type > SEG_CLOSE) {
-			throw new IllegalStateException(String.format("Cannot process path segment type: %d (coordinates: %s)", type, Arrays.toString(coords)));
+			throw new IllegalStateException(String.format(Locale.US, "Cannot process path segment type: %d (coordinates: %s)", type, Arrays.toString(coords)));
 		}
 
 		String convertedPath = translationTable[type];
 
 		if (type == SEG_MOVETO) {
-			convertedPath = String.format(convertedPath, coords[0], coords[1]);
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1]);
 		} else if (type == SEG_LINETO) {
-			convertedPath = String.format(convertedPath, coords[0], coords[1]);
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1]);
 		} else if (type == SEG_QUADTO) {
-			convertedPath = String.format(convertedPath, coords[0], coords[1], coords[2], coords[3]);
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1], coords[2], coords[3]);
 		} else if (type == SEG_CUBICTO) {
-			convertedPath = String.format(convertedPath, coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
 		}
 
 		return convertedPath;

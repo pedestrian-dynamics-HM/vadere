@@ -37,15 +37,15 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		this.moveListener = new LinkedList<>();
 	}
 
-	public LinkedCellsGrid<T> getCellsElements() {
+	public synchronized LinkedCellsGrid<T> getCellsElements() {
 		return cellsElements;
 	}
 
-	public Collection<T> getElements() {
+	public synchronized Collection<T> getElements() {
 		return elementMap.values();
 	}
 
-	public T getElement(int id) {
+	public synchronized T getElement(int id) {
 		return elementMap.get(id);
 	}
 
@@ -57,7 +57,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		return this.initialElements;
 	}
 
-	public void addElement(T element) {
+	public synchronized void addElement(T element) {
 		this.elementMap.put(element.getId(), element);
 		this.cellsElements.addObject(element);
 
@@ -66,7 +66,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		}
 	}
 
-	public void moveElement(T element, VPoint oldPosition) {
+	public synchronized void moveElement(T element, VPoint oldPosition) {
 		this.cellsElements.moveObject(element, oldPosition);
 
 		for (DynamicElementMoveListener<T> listener : moveListener) {
@@ -74,7 +74,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		}
 	}
 
-	public void removeElement(T element) {
+	public synchronized void removeElement(T element) {
 		this.elementMap.remove(element.getId());
 		this.cellsElements.removeObject(element);
 
@@ -83,11 +83,11 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		}
 	}
 
-	public void addElementRemovedListener(DynamicElementRemoveListener<T> listener) {
+	public synchronized void addElementRemovedListener(DynamicElementRemoveListener<T> listener) {
 		this.removeListener.add(listener);
 	}
 
-	public void addElementAddedListener(DynamicElementAddListener<T> listener) {
+	public synchronized void addElementAddedListener(DynamicElementAddListener<T> listener) {
 		this.addListener.add(listener);
 	}
 

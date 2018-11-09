@@ -1,69 +1,61 @@
 package org.vadere.simulator.entrypoints;
 
-import org.hamcrest.core.StringContains;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.entrypoints.cmd.SubCommand;
+import org.vadere.simulator.entrypoints.cmd.VadereConsole;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
-import org.vadere.util.io.IOUtils;
+import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
+import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MigrationSubCommandTest {
+public class MigrationSubCommandTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
 
-	private Path baseScenario;
-	private Path baseScenarioBackup;
-	private StringContains v01 = new StringContains("\"release\" : \"0.1\"");
-	private StringContains vlatest = new StringContains("\"release\" : \"" + Version.latest().label() + "\"");
+	private Path scenario1;
+	private JsonNode scenario1Json;
+	private Path scenario2;
+	private JsonNode scenario2Json;
+
 	private Path rootIgnore;
 	private Path[] ignore = new Path[4];
-	private Path[] ignoreBackup = new Path[4];
+
+
+	@Override
+	public Path getTestDir() {
+		return getPathFromResources("/migration/VadererConsole");
+	}
 
 	@Before
-	public void init() throws URISyntaxException, IOException {
-		baseScenario = Paths.get(getClass()
-				.getResource("/migration/VadererConsole/v0.1_to_LATEST_Test1.scenario").toURI());
-		baseScenarioBackup = IOUtils.makeBackup(baseScenario, ".bak", true);
+	public void init() {
+		backupTestDir();
 
-		rootIgnore = Paths.get(getClass()
-				.getResource("/migration/VadererConsole/testDoNotMigrate").toURI());
+		scenario1 = getRelativeTestPath("v0.1_to_LATEST_Test1.scenario");
+		scenario1Json = getJsonFromPath(scenario1);
+
+		scenario2 = getRelativeTestPath("v0.1_to_LATEST_Test2.scenario");
+		scenario2Json = getJsonFromPath(scenario2);
+
+		rootIgnore = getRelativeTestPath("testDoNotMigrate");
 		ignore[0] = rootIgnore.resolve("1").resolve("1.scenario");
 		ignore[1] = rootIgnore.resolve("1/2").resolve("2.scenario");
 		ignore[2] = rootIgnore.resolve("1/2/3").resolve("3.scenario");
 		ignore[3] = rootIgnore.resolve("1/2/3/4").resolve("4.scenario");
-		for (int i = 0; i < ignore.length; i++) {
-			ignoreBackup[i] = IOUtils.makeBackup(ignore[i], ".bak", true);
-		}
 	}
 
 	@After
-	public void clenaup() throws IOException {
-		if (baseScenario != null && baseScenarioBackup != null) {
-			Files.copy(baseScenarioBackup, baseScenario, StandardCopyOption.REPLACE_EXISTING);
-			Files.deleteIfExists(baseScenarioBackup);
-		}
-
-		for (int i = 0; i < ignore.length; i++) {
-			if (ignore[i] != null && ignoreBackup[i] != null) {
-				Path orig = ignore[i];
-				Path bak = ignoreBackup[i];
-				Files.copy(bak, orig, StandardCopyOption.REPLACE_EXISTING);
-				Files.deleteIfExists(bak);
-			}
-		}
-
-		Path legacyFile = MigrationAssistant.getBackupPath(baseScenario);
-		Files.deleteIfExists(legacyFile);
+	public void clenaup() {
+		loadFromBackup();
 	}
 
 	/**
@@ -71,56 +63,72 @@ public class MigrationSubCommandTest {
 	 * create correctly.
 	 */
 	@Test
-	public void testMigrateAndRevertSingleFile() throws IOException {
+	public void testMigrateAndRevertSingleFile() {
 
-		assertThat("Old Version must be 0.1", getText(baseScenario), v01);
-		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), baseScenario.toString()};
+		assertReleaseVersion(scenario1Json, Version.V0_1, "Old Version must be 0.1");
+
+		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), scenario1.toString()};
 		VadereConsole.main(args);
-		Path legacyFile = MigrationAssistant.getBackupPath(baseScenario);
+		Path legacyFile = MigrationAssistant.getBackupPath(scenario1);
 		assertTrue("There must be legacyFile", legacyFile.toFile().exists());
-		assertThat("New Version must be latest: " + Version.latest().toString(), getText(baseScenario), vlatest);
 
-		args = new String[]{SubCommand.MIGRATE.getCmdName(), "--revert-migration", baseScenario.toString()};
+		scenario1Json = getJsonFromPath(scenario1);
+		assertLatestReleaseVersion(scenario1Json);
+
+
+		args = new String[]{SubCommand.MIGRATE.getCmdName(), "--revert-migration", scenario1.toString()};
 		VadereConsole.main(args);
-		assertThat("After revert the version must be 0.1", getText(baseScenario), v01);
+
+		scenario1Json = getJsonFromPath(scenario1);
+		assertReleaseVersion(scenario1Json, Version.V0_1, "After revert the version must be 0.1");
 		assertFalse("legacy file should be deleted after revert", legacyFile.toFile().exists());
 	}
 
 	@Test
-	public void testMigrateAndRevertListOfFiles() throws IOException {
+	public void testMigrateAndRevertListOfFiles() {
 
-		Path f2 = Files.copy(baseScenario, baseScenario.getParent().resolve("copy.scenario"), StandardCopyOption.REPLACE_EXISTING);
-		assertThat("Old Version must be 0.1", getText(baseScenario), v01);
-		assertThat("Old Version must be 0.1", getText(f2), v01);
-		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), baseScenario.toString(), f2.toString()};
+		assertReleaseVersion(scenario1Json, Version.V0_1, "Old Version must be 0.1");
+		assertReleaseVersion(scenario2Json, Version.V0_1, "Old Version must be 0.1");
+
+		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), scenario1.toString(), scenario2.toString()};
 		VadereConsole.main(args);
-		Path legacyFile1 = MigrationAssistant.getBackupPath(baseScenario);
-		Path legacyFile2 = MigrationAssistant.getBackupPath(f2);
+
+		scenario1Json = getJsonFromPath(scenario1);
+		scenario2Json = getJsonFromPath(scenario2);
+		assertLatestReleaseVersion(scenario1Json);
+		assertLatestReleaseVersion(scenario2Json);
+
+
+		Path legacyFile1 = MigrationAssistant.getBackupPath(scenario1);
+		Path legacyFile2 = MigrationAssistant.getBackupPath(scenario2);
 		assertTrue("There must be legacyFile1", legacyFile1.toFile().exists());
-		assertThat("New Version must be latest: " + Version.latest().toString(), getText(baseScenario), vlatest);
 		assertTrue("There must be legacyFile2", legacyFile2.toFile().exists());
-		assertThat("New Version must be latest: " + Version.latest().toString(), getText(f2), vlatest);
 
-		args = new String[]{SubCommand.MIGRATE.getCmdName(), "--revert-migration", baseScenario.toString(), f2.toString()};
+
+		args = new String[]{SubCommand.MIGRATE.getCmdName(), "--revert-migration", scenario1.toString(), scenario2.toString()};
 		VadereConsole.main(args);
-		assertThat("File 1: After revert the version must be 0.1", getText(baseScenario), v01);
-		assertFalse("File 1: legacy file should be deleted after revert", legacyFile1.toFile().exists());
-		assertThat("File 2: After revert the version must be 0.1", getText(f2), v01);
-		assertFalse("File 2: legacy file should be deleted after revert", legacyFile2.toFile().exists());
 
-		Files.deleteIfExists(f2);
+		scenario1Json = getJsonFromPath(scenario1);
+		scenario2Json = getJsonFromPath(scenario2);
+		assertReleaseVersion(scenario1Json, Version.V0_1, "After revert Version must be 0.1");
+		assertReleaseVersion(scenario2Json, Version.V0_1, "After revert Version must be 0.1");
+
+		assertFalse("File 1: legacy file should be deleted after revert", legacyFile1.toFile().exists());
+		assertFalse("File 2: legacy file should be deleted after revert", legacyFile2.toFile().exists());
 
 	}
 
 
 	@Test
-	public void testMigrationSameVersion() throws IOException {
+	public void testMigrationSameVersion() {
 
-		assertThat("Old Version must be 0.1", getText(baseScenario), v01);
-		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), "--target-version", Version.V0_1.label(), baseScenario.toString()};
+		assertReleaseVersion(scenario1Json, Version.V0_1, "Old Version must be 0.1");
+		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), "--target-version", Version.V0_1.label(), scenario1.toString()};
+
 		VadereConsole.main(args);
-		Path legacyFile = MigrationAssistant.getBackupPath(baseScenario);
-		assertThat("New Version must be the same", getText(baseScenario), v01);
+		Path legacyFile = MigrationAssistant.getBackupPath(scenario1);
+		scenario1Json = getJsonFromPath(scenario1);
+		assertReleaseVersion(scenario1Json, Version.V0_1, "NewVersion Version must be 0.1");
 
 		assertFalse("No Transformation performed thus the should not be a legacyFile", legacyFile.toFile().exists());
 	}
@@ -129,41 +137,39 @@ public class MigrationSubCommandTest {
 	 * Migrate a directory recursively
 	 */
 	@Test
-	public void testIgnoreDirectoryAndDirectoryTreesRecursive() throws IOException {
+	public void testIgnoreDirectoryAndDirectoryTreesRecursive() {
 		for (Path path : ignore) {
-			assertThat("Old Version must be 0.1", getText(path), v01);
+			assertReleaseVersion(getJsonFromPath(path), Version.V0_1, "Old Version must be 0.1");
 		}
 		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), "-r", rootIgnore.toString()};
 		VadereConsole.main(args);
 		//only the second
-		StringContains[] matcher = new StringContains[]{v01, vlatest, v01, v01};
+		Version[] versions = new Version[]{Version.V0_1, Version.latest(), Version.V0_1, Version.V0_1};
 		Boolean[] hasLegacyFile = new Boolean[]{false, true, false, false};
 		for (int i = 0; i < ignore.length; i++) {
-			assertThat("(" + String.valueOf(i + 1) + ") Version of file not as accepted", getText(ignore[i]), matcher[i]);
+			assertReleaseVersion(
+					getJsonFromPath(ignore[i]),
+					versions[i],
+					"(" + String.valueOf(i + 1) + ") Version of file not as accepted");
 			Path legacy = MigrationAssistant.getBackupPath(ignore[i]);
 			assertEquals("(" + String.valueOf(i + 1) + ") Existence of Backup File not as accented", legacy.toFile().exists(), hasLegacyFile[i]);
-			Files.deleteIfExists(legacy);
 		}
 
 	}
 
 	@Test
-	public void testIgnoreDirectoryAndDirectoryTreesNoneRecursive() throws IOException {
+	public void testIgnoreDirectoryAndDirectoryTreesNoneRecursive() {
 		for (Path path : ignore) {
-			assertThat("Old Version must be 0.1", getText(path), v01);
+			assertReleaseVersion(getJsonFromPath(path), Version.V0_1, "Old Version must be 0.1");
 		}
 		String[] args = new String[]{SubCommand.MIGRATE.getCmdName(), rootIgnore.toString()};
 		VadereConsole.main(args);
 		for (Path path : ignore) {
-			assertThat("Old Version must be 0.1", getText(path), v01);
+			assertReleaseVersion(getJsonFromPath(path), Version.V0_1, "There should not be a new version");
 			Path legacy = MigrationAssistant.getBackupPath(path);
 			assertFalse(Files.exists(legacy));
 		}
 
-	}
-
-	private String getText(Path path) throws IOException {
-		return IOUtils.readTextFile(path);
 	}
 }
 

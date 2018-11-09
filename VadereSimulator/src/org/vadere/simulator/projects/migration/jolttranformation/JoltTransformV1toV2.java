@@ -2,16 +2,18 @@ package org.vadere.simulator.projects.migration.jolttranformation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.state.util.StateJsonConverter;
 
 import java.util.LinkedHashMap;
 
+@MigrationTransformation(targetVersionLabel = "0.2")
 public class JoltTransformV1toV2 extends JoltTransformation {
 
-	public JoltTransformV1toV2(String transformation, String identity, Version version) throws MigrationException {
-		super(transformation, identity, version);
+	public JoltTransformV1toV2() {
+		super(Version.V0_2);
 	}
 
 

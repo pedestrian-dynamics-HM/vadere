@@ -50,8 +50,8 @@ public class PostVisualisation {
 	 * @param prefs
 	 */
 	private static void defaultPreferences(final Preferences prefs) {
-		prefs.put("View.outputDirectory.path", ".");
-		prefs.put("PostVis.snapshotDirectory.path", ".");
+		prefs.put("SettingsDialog.outputDirectory.path", ".");
+		prefs.put("SettingsDialog.snapshotDirectory.path", ".");
 		prefs.put("recentlyOpenedFiles", "");
 	}
 }

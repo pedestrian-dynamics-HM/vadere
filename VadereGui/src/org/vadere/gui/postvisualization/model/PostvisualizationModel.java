@@ -17,7 +17,9 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.postvisualization.control.TableListenerLogicExpression;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
@@ -28,10 +30,9 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.io.parser.JsonLogicParser;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.io.parser.VPredicate;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.data.cellgrid.CellGrid;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -74,31 +75,25 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.pedestrianColorTableModel = new PedestrianColorTableModel();
 		this.steps = new ArrayList<>();
 
-		for (int i = 0; i < 5; i++) {
+		/*for (int i = 0; i < 5; i++) {
 			try {
 				colorEvalFunctions.put(i, new JsonLogicParser("false").parse());
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 
-		this.pedestrianColorTableModel.addTableModelListener(
-				e -> {
-					for (int row = e.getFirstRow(); row <= e.getLastRow(); row++) {
-						if (row >= 0 && colorEvalFunctions.containsKey(row)
-								&& e.getColumn() == PedestrianColorTableModel.CIRTERIA_COLUMN) {
-							try {
-								VPredicate<JsonNode> evaluator = new JsonLogicParser(
-										pedestrianColorTableModel.getValueAt(row, e.getColumn()).toString()).parse();
-								colorEvalFunctions.put(row, evaluator);
-							} catch (ParseException e1) {
-								colorEvalFunctions.remove(row);
-								logger.warn(e1.getLocalizedMessage());
-							}
-						}
-					}
-				});
+		this.pedestrianColorTableModel.addTableModelListener(new TableListenerLogicExpression(this, pedestrianColorTableModel));
 	}
+
+	public void putExpression(final int row, @NotNull final VPredicate<JsonNode> predicate) {
+		colorEvalFunctions.put(row, predicate);
+	}
+
+	public void removeExpression(final int row) {
+		colorEvalFunctions.remove(row);
+	}
+
 
 	/**
 	 * Initialize the {@link PostvisualizationModel}.
@@ -179,8 +174,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	@Override
-	public Function<VPoint, Double> getPotentialField() {
-        Function<VPoint, Double> f = p -> 0.0;
+	public Function<IPoint, Double> getPotentialField() {
+        Function<IPoint, Double> f = p -> 0.0;
         try {
             if (potentialContainer != null && step != null) {
                 final CellGrid potentialField = potentialContainer.getPotentialField(step.getStepNumber());
@@ -238,21 +233,26 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 	}
 
-	public Optional<Color> getColor(final Agent agent) {
+	private boolean parseIgnoreException(@NotNull final VPredicate<JsonNode> predicate, @NotNull final JsonNode node) {
+		try {
+			return predicate.test(node);
+		} catch (ParseException e) {
+			return false;
+		}
+	}
+
+	public Optional<Color> getColorByPredicate(final Agent agent) {
 		JsonNode jsonObj = StateJsonConverter.toJsonNode(agent);
-		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet().stream().filter(
-				entry -> {
-					try {
-						return entry.getValue().test(jsonObj);
-					} catch (ParseException e) {
-						return false;
-					}
-				}).findFirst();
+		Optional<Map.Entry<Integer, VPredicate<JsonNode>>> firstEntry = colorEvalFunctions.entrySet()
+				.stream()
+				.filter(entry -> parseIgnoreException(entry.getValue(), jsonObj))
+				.findFirst();
 
 		if (firstEntry.isPresent()) {
 			return Optional.of((Color) pedestrianColorTableModel.getValueAt(firstEntry.get().getKey(),
 					PedestrianColorTableModel.COLOR_COLUMN));
 		}
+
 		return Optional.empty();
 	}
 

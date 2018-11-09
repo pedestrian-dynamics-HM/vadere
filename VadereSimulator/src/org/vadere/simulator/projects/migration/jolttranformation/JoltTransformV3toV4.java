@@ -3,19 +3,21 @@ package org.vadere.simulator.projects.migration.jolttranformation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 
 import java.util.Random;
 
 
+@MigrationTransformation(targetVersionLabel = "0.4")
 public class JoltTransformV3toV4 extends JoltTransformation {
-	public JoltTransformV3toV4(String transformation, String identity, Version version) throws MigrationException {
-		super(transformation, identity, version);
+	public JoltTransformV3toV4() {
+		super(Version.V0_4);
 	}
 
 	@Override
-	protected void initPostHooks() throws MigrationException {
+	protected void initPostHooks()  {
 		postTransformHooks.add(this::presetSeedValues);
 		postTransformHooks.add(JoltTransformV1toV2::sort);
 	}

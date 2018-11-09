@@ -27,7 +27,7 @@ public class VCircleSector implements ICircleSector {
 	private VLine line2;
 
 	public VCircleSector(@NotNull final VPoint center, final double radius, final double minAngle, final double maxAngle) {
-		assert minAngle < maxAngle;
+		assert minAngle < maxAngle : minAngle + "<" + maxAngle;
 		assert minAngle >= 0 && minAngle < 2 * Math.PI;
 		assert maxAngle > 0 && maxAngle <= 2 * Math.PI;
 		assert !(minAngle <= 0 && maxAngle >= 2 * Math.PI); // circle!
@@ -61,7 +61,7 @@ public class VCircleSector implements ICircleSector {
 		}
 
 		if (getLine2().intersectsLine(x1, y1, x2, y2)) {
-			intersectionPoints.add(GeometryUtils.lineIntersectionPoint(getLine1(), x1, y1, x2, y2));
+			intersectionPoints.add(GeometryUtils.lineIntersectionPoint(getLine2(), x1, y1, x2, y2));
 		}
 
 		circle.getIntersectionPoints(x1, y1, x2, y2).stream().filter(p -> insideAngle(GeometryUtils.angleTo(getCenter(), p))).forEach(p -> intersectionPoints.add(p));

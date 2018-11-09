@@ -4,7 +4,12 @@ package org.vadere.gui.components.model;
 import java.util.Collection;
 import java.util.function.Function;
 
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.state.scenario.Agent;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -24,7 +29,7 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 
 	public abstract double getSimTimeInSec();
 
-	public abstract Function<VPoint, Double> getPotentialField();
+	public abstract Function<IPoint, Double> getPotentialField();
 
 	public abstract boolean isFloorFieldAvailable();
 
@@ -37,8 +42,8 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		return config;
 	}
 
-	public double getPotential(final int x, final int y) {
-		return getPotentialField().apply(pixelToWorld(new VPoint(x, y)));
+	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+		return new PMesh<IPotentialPoint>((x,y) -> new PotentialPoint(x,y));
 	}
 
     /*public double getPotential(final int x, final int y) {
@@ -87,6 +92,9 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		if (config.hasChanged()) {
 			setChanged();
 			config.clearChange();
+			if(!config.isUseRandomPedestrianColors()) {
+				config.clearRandomColors();
+			}
 		}
 		// }
 		super.notifyObservers();

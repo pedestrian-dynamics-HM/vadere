@@ -3,14 +3,13 @@ package org.vadere.util.geometry;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * A grid augmenting the position of generic objects, for faster access. O(1)
@@ -30,7 +29,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	private int size;
 
 	/**
-	 * One cell in the grid. It contains a mapping from points to lists of
+	 * One cell in the grid. It triangleContains a mapping from points to lists of
 	 * objects. This means that one can store multiple objects in one cell.
 	 * 
 	 * 
@@ -100,6 +99,18 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 		return this.grid;
 	}
 
+	public int getGridWidth() {
+		return gridSize[0];
+	}
+
+	public int getGridHeight() {
+		return gridSize[1];
+	}
+
+	public LinkedCellsGrid(@NotNull final VRectangle bound, double sideLength) {
+		this(bound.x, bound.y, bound.width, bound.height, sideLength);
+	}
+
 	/**
 	 * Generates a LinkedCellsGrid with given dimension, position and number of
 	 * items on one side.
@@ -127,9 +138,9 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 
 		// create grid
 		/*
-		 * this.gridSize = (int) Math.max(1,
-		 * Math.ceil(Math.max(width, height) / sideLength));
-		 * this.cellSize = Math.max(width, height) / gridSize;
+		 * this.gridSize = (int) Math.bound(1,
+		 * Math.ceil(Math.bound(width, height) / sideLength));
+		 * this.cellSize = Math.bound(width, height) / gridSize;
 		 * this.grid = generateGrid(gridSize, gridSize);
 		 */
 
@@ -139,8 +150,6 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 		this.cellSize[1] = this.height / gridSize[1];
 
 		this.grid = generateGrid(this.gridSize[0], this.gridSize[1]);
-
-
 	}
 
 	/**
@@ -152,7 +161,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	 * @return the position in the grid, from 0 to this.gridSize-1 in both
 	 *         coordinates.
 	 */
-	private int[] gridPos(VPoint pos) {
+	public int[] gridPos(VPoint pos) {
 		// compute position in the grid
 		int iX = (int) Math.max(
 				0,
@@ -276,7 +285,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	}
 
 	/**
-	 * Tests whether the linked cells grid contains an object that equals(the
+	 * Tests whether the linked cells grid triangleContains an object that equals(the
 	 * given object). The complexity of this operation is O(N), N = number of
 	 * objects in the grid.
 	 * 

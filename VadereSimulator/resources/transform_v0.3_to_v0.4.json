@@ -1,5 +1,9 @@
 [
   {
+    // Changes
+    // rename: scenario/attributesSimulation/useRandomSeed to useFixedSeed
+    // rename: scenario/attributesSimulation/randomSeed to fixedSeed
+    // add: scenario/attributesSimulation/randomSeed/simulationSeed
     "operation": "shift",
     "spec": {
       "name": "&",

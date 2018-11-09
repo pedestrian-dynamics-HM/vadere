@@ -2,6 +2,7 @@ package org.vadere.util.opencl;
 
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
+import org.vadere.util.opencl.OpenCLException;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;

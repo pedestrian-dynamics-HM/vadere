@@ -17,7 +17,6 @@ public class AttributesSimulation extends Attributes {
 	private boolean writeSimulationData = true;
 	private boolean visualizationEnabled = true;
 	private boolean printFPS = false;
-	private boolean needsBoundary = false;
 	private int digitsPerCoordinate = 2;
 	private boolean useFixedSeed = true;
 	private long fixedSeed = new Random().nextLong();
@@ -49,9 +48,6 @@ public class AttributesSimulation extends Attributes {
 		return printFPS;
 	}
 
-	public boolean isNeedsBoundary() {
-		return needsBoundary;
-	}
 
 	public int getDigitsPerCoordinate() {
 		return digitsPerCoordinate;
@@ -99,10 +95,6 @@ public class AttributesSimulation extends Attributes {
 		this.printFPS = printFPS;
 	}
 
-	public void setNeedsBoundary(boolean needsBoundary) {
-		checkSealed();
-		this.needsBoundary = needsBoundary;
-	}
 
 	public void setDigitsPerCoordinate(int digitsPerCoordinate) {
 		checkSealed();
@@ -135,7 +127,6 @@ public class AttributesSimulation extends Attributes {
 				writeSimulationData == that.writeSimulationData &&
 				visualizationEnabled == that.visualizationEnabled &&
 				printFPS == that.printFPS &&
-				needsBoundary == that.needsBoundary &&
 				digitsPerCoordinate == that.digitsPerCoordinate &&
 				useFixedSeed == that.useFixedSeed &&
 				fixedSeed == that.fixedSeed &&
@@ -145,6 +136,6 @@ public class AttributesSimulation extends Attributes {
 	@Override
 	public int hashCode() {
 
-		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, needsBoundary, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed);
+		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed);
 	}
 }

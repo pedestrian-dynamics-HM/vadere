@@ -1,9 +1,7 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.commons.codec.language.bm.Lang;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.vadere.gui.components.utils.Language;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
@@ -32,6 +30,7 @@ import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
 import org.vadere.gui.projectview.control.ActionShowAboutDialog;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.control.ShowResultDialogAction;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
@@ -42,7 +41,6 @@ import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
@@ -101,9 +99,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
 	private ScenarioPanel scenarioJPanel;
+	private ScenarioNamePanel scenarioNamePanel;
 	private boolean scenariosRunning = false;
 	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
-
+	private ProjectRunResultDialog projectRunResultDialog;
 
 	// ####################### Part of the control this should also be part of another class
 	// ##################
@@ -138,7 +137,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	@Override
 	public void preScenarioRun(final Scenario scenario, final int scenariosLeft) {
 		EventQueue.invokeLater(() -> {
-			model.setScenarioNameLabel(scenario.getName());
+			model.setScenarioNameLabelString(scenario.getName());
 			repaint();
 		});
 	}
@@ -225,6 +224,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			model.getProject().addProjectFinishedListener(this);
 			model.getProject().addSingleScenarioFinishedListener(this);
 			model.getProject().addProjectFinishedListener(scenarioJPanel);
+			model.getProject().addProjectFinishedListener(projectRunResultDialog);
 		});
 	}
 
@@ -303,6 +303,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		model.addOutputFileRefreshListener(this);
 		model.addProjectChangeListener(this);
 		this.model = model;
+		projectRunResultDialog = new ProjectRunResultDialog(this, model);
 
 		setTitle("Vadere GUI");
 		setBounds(100, 100, 1000, 600);
@@ -384,6 +385,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		addToProjectSpecificActions(saveProjectAsAction);
 		mnFile.add(mntmSaveAs);
 
+		// Checkbox menu item to turn off result dialog of project run.
+		mnFile.addSeparator();
+		boolean showDialogDefault = Preferences.userNodeForPackage(VadereApplication.class)
+				.getBoolean("Project.simulationResult.show", false);
+		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, showDialogDefault);
+		Action showResultDialogMenuAction = new ShowResultDialogAction(Messages.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
+		showResultDialogMenu.setAction(showResultDialogMenuAction);
+		mnFile.add(showResultDialogMenu);
+
 		JMenuItem mntmExit = new JMenuItem(closeApplicationAction);
 		mnFile.addSeparator();
 		mnFile.add(mntmExit);
@@ -435,7 +445,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ButtonGroup languageChoicesGroup = new ButtonGroup();
 		languageChoicesGroup.add(mntmEnglishLocale);
 		languageChoicesGroup.add(mntmGermanLocale);
-		if (Language.languageIsGerman())
+		if (Messages.languageIsGerman())
 			mntmGermanLocale.setSelected(true);
 		else
 			mntmEnglishLocale.setSelected(true);
@@ -666,15 +676,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		rightSidePanel.setLayout(new BorderLayout(0, 0));
 		contentPane.add(rightSidePanel, BorderLayout.CENTER);
 
-		JPanel ScenarioNamePanel = new JPanel();
-		rightSidePanel.add(ScenarioNamePanel, BorderLayout.NORTH);
+		scenarioNamePanel = new ScenarioNamePanel();
+		rightSidePanel.add(scenarioNamePanel, BorderLayout.NORTH);
 
-		JLabel scenarioName = new JLabel();
-		ScenarioNamePanel.add(scenarioName);
-		scenarioName.setHorizontalAlignment(SwingConstants.CENTER);
-
-		scenarioJPanel = new ScenarioPanel(scenarioName, model);
-		model.setScenarioNameLabel(scenarioName); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
+		scenarioJPanel = new ScenarioPanel(model);
+		model.setScenarioNamePanel(scenarioNamePanel); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);
 	}

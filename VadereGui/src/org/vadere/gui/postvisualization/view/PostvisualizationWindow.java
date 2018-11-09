@@ -7,10 +7,16 @@ import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
+import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.control.*;
@@ -124,27 +130,8 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 			add(adjustPanel, cc.xy(2, 6));
 		}
 
-		final String test = java.text.MessageFormat.format(Messages.getString("PostVis.about.text"), "0.1");
-		JButton infoButton = new JButton(new ImageIcon(Resources.class.getResource("/icons/info_icon.png")));
-		infoButton.setBorderPainted(false);
-		infoButton.addActionListener(e -> {
-			String text = "<html><font size =\"5\"><b>"+Messages.getString("PostVis.title") + "</font></b><br>" +
-					"<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("PostVis.version"), HashGenerator.releaseNumber()) + "</em></font><br>" +
-					"<font size =\"3\">" + MessageFormat.format(Messages.getString("PostVis.license.text"), "<a href=\"https://www.gnu.org/licenses/lgpl-3.0.txt\">LGPL</a>")+".</font></html>";
-			JOptionPane.showMessageDialog(null, text,
-					Messages.getString("PostVis.about.title"),
-					JOptionPane.INFORMATION_MESSAGE);
-		});
-
-		/*
-
-		"<html>" + java.text.MessageFormat.format(Messages.getString("PostVis.about.text"), "0.1")
-						 + "<a href=\"http://www.gnu.org/licenses/lgpl-3.0.txt/\">a link</a></html>"
-
-		 */
-
-		int iconHeight = Integer.valueOf(resources.getProperty("View.icon.height.value"));
-		int iconWidth = Integer.valueOf(resources.getProperty("View.icon.width.value"));
+		int iconHeight = Integer.valueOf(resources.getProperty("ProjectView.icon.height.value"));
+		int iconWidth = Integer.valueOf(resources.getProperty("ProjectView.icon.width.value"));
 		addActionToToolbar(toolbar,
 				new ActionPlay("play", resources.getIcon("play.png", iconWidth, iconHeight), model),
 				"PostVis.btnPlay.tooltip");
@@ -165,7 +152,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.notifyObservers();
 					}
 
-				}, "View.btnShowPedestrian.tooltip");
+				}, "ProjectView.btnShowPedestrian.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_trajectory",
@@ -177,7 +164,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowTrajectories.tooltip");
+				}, "ProjectView.btnShowTrajectories.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_direction",
@@ -189,7 +176,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowWalkingDirection.tooltip");
+				}, "ProjectView.btnShowWalkingDirection.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_groups",
@@ -200,12 +187,12 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 						model.config.setShowGroups(!model.config.isShowGroups());
 						model.notifyObservers();
 					}
-				}, "View.btnShowGroupInformation.tooltip");
+				}, "ProjectView.btnShowGroupInformation.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
 						resources.getIcon("voronoi.png", iconWidth, iconHeight), model),
-				"View.btnDrawVoronoiDiagram.tooltip");
+				"ProjectView.btnDrawVoronoiDiagram.tooltip");
 
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -213,7 +200,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				toolbar,
 				new ActionShowPotentialField("show_potentialField", resources.getIcon("potentialField.png", iconWidth,
 						iconHeight), model),
-				"View.btnShowPotentialfield.tooltip");
+				"ProjectView.btnShowPotentialfield.tooltip");
 
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_grid", resources.getIcon("grid.png", iconWidth, iconHeight), model) {
@@ -224,7 +211,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowGrid.tooltip");
+				}, "ProjectView.btnShowGrid.tooltip");
 
 		addActionToToolbar(
 				toolbar,
@@ -237,7 +224,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 
-				}, "View.btnShowDensity.tooltip");
+				}, "ProjectView.btnShowDensity.tooltip");
 
 
 		// toolbar.addSeparator(new Dimension(5, 50));
@@ -249,12 +236,12 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 		toolbar.addSeparator(new Dimension(5, 50));
 		ArrayList<Action> imgOptions = new ArrayList<>();
-		ActionVisualization pngImg = new ActionGeneratePNG(Messages.getString("PostVis.btnPNGSnapshot.tooltip"), resources.getIcon("camera_png.png", iconWidth, iconHeight),
-				renderer);
-		ActionVisualization svgImg = new ActionGenerateSVG(Messages.getString("PostVis.btnSVGSnapshot.tooltip"), resources.getIcon("camera_svg.png", iconWidth, iconHeight),
-				renderer);
-		ActionVisualization tikzImg = new ActionGenerateTikz(Messages.getString("PostVis.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
-				renderer);
+		AbstractAction pngImg = new ActionGeneratePNG(Messages.getString("ProjectView.btnPNGSnapshot.tooltip"), resources.getIcon("camera_png.png", iconWidth, iconHeight),
+				renderer, model);
+		AbstractAction svgImg = new ActionGenerateSVG(Messages.getString("ProjectView.btnSVGSnapshot.tooltip"), resources.getIcon("camera_svg.png", iconWidth, iconHeight),
+				renderer, model);
+		AbstractAction tikzImg = new ActionGenerateTikz(Messages.getString("ProjectView.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer, model);
 		// add new ImageGenerator Action ...
 
 		imgOptions.add(pngImg);
@@ -266,9 +253,9 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 				"camera_menu",
 				resources.getIcon("camera.png", iconWidth, iconHeight),
 				model, null, imgOptions);
-		addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("PostVis.btnSnapshot.tooltip"));
+		addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
 
-		toolbar.addSeparator(new Dimension(5, 50));
+		toolbar.add(Box.createHorizontalGlue());
 
 		addActionToToolbar(
 				toolbar,
@@ -279,12 +266,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 					}
 
 				;
-				}, "View.btnSettings.tooltip");
-
-
-		toolbar.add(Box.createHorizontalGlue());
-		toolbar.add(infoButton);
-		infoButton.setToolTipText(Messages.getString("PostVis.btnAbout.tooltip"));
+				}, "ProjectView.btnSettings.tooltip");
 
 		menuBar = new JMenuBar();
 		JMenu mFile = new JMenu(Messages.getString("PostVis.menuFile.title"));

@@ -3,6 +3,7 @@ package org.vadere.state.scenario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,9 +21,12 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
@@ -31,7 +35,7 @@ public class Topography {
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
-	private Function<VPoint, Double> obstacleDistanceFunction;
+	private Function<IPoint, Double> obstacleDistanceFunction;
 	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
@@ -144,11 +148,11 @@ public class Topography {
 		return null;
 	}
 
-	public double distanceToObstacle(@NotNull VPoint point) {
+	public double distanceToObstacle(@NotNull IPoint point) {
 		return this.obstacleDistanceFunction.apply(point);
 	}
 
-	public void setObstacleDistanceFunction(@NotNull Function<VPoint, Double> obstacleDistanceFunction) {
+	public void setObstacleDistanceFunction(@NotNull Function<IPoint, Double> obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 
@@ -371,18 +375,18 @@ public class Topography {
 
 		for (Obstacle obstacle : this.getObstacles()) {
 			if (boundaryObstacles.contains(obstacle))
-				s.addBoundary((Obstacle) obstacle.clone());
+				s.addBoundary(obstacle.clone());
 			else
-				s.addObstacle((Obstacle) obstacle.clone());
+				s.addObstacle(obstacle.clone());
 		}
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
 		for (Target target : getTargets()) {
-			s.addTarget((Target) target.clone());
+			s.addTarget(target.clone());
 		}
 		for (Source source : getSources()) {
-			s.addSource((Source) source.clone());
+			s.addSource(source.clone());
 		}
 		for (Pedestrian pedestrian : getElements(Pedestrian.class)) {
 			s.addElement(pedestrian);
@@ -398,7 +402,7 @@ public class Topography {
 		}
 
 		if (hasTeleporter()) {
-			s.setTeleporter((Teleporter) teleporter.clone());
+			s.setTeleporter(teleporter.clone());
 		}
 
 		for (DynamicElementAddListener<Pedestrian> pedestrianAddListener : this.pedestrians.getElementAddedListener()) {
@@ -465,4 +469,65 @@ public class Topography {
 		allOtherAttributes.forEach(a -> a.seal());
 	}
 
+	public void generateUniqueIdIfNotSet(){
+		Set<Integer> usedIds = sources.stream().map(Source::getId).collect(Collectors.toSet());
+		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
+		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
+		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+
+		sources.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		targets.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		obstacles.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
+
+		stairs.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+
+	}
+
+	private int nextIdNotInSet(Set<Integer> usedIDs){
+		int newId = 1;
+		while (usedIDs.contains(newId)){
+			newId++;
+		}
+		usedIDs.add(newId);
+		return newId;
+	}
+
+
+	public ArrayList<ScenarioElement> getAllScenarioElements(){
+		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size()));
+		all.addAll(obstacles);
+		all.addAll(stairs);
+		all.addAll(targets);
+		all.addAll(sources);
+		all.addAll(boundaryObstacles);
+		return  all;
+
+	}
+
+	public static Collection<Obstacle> createObstacleBoundary(@NotNull final Topography topography) {
+		List<Obstacle> obstacles = new ArrayList<>();
+		VPolygon boundary = new VPolygon(topography.getBounds());
+		double width = topography.getBoundingBoxWidth();
+		Collection<VPolygon> boundingBoxObstacleShapes = boundary.borderAsShapes(width, width / 2.0, 0.0001);
+
+		for (VPolygon obstacleShape : boundingBoxObstacleShapes) {
+			AttributesObstacle obstacleAttributes = new AttributesObstacle(
+					-1, obstacleShape);
+			Obstacle obstacle = new Obstacle(obstacleAttributes);
+			obstacles.add(obstacle);
+		}
+
+		return obstacles;
+	}
 }

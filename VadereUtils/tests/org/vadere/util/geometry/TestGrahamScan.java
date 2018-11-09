@@ -2,7 +2,6 @@ package org.vadere.util.geometry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.GrahamScan;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 
@@ -32,7 +31,7 @@ public class TestGrahamScan {
 		});
 
 		Stack<VPoint> stack = grahamScan.getConvexHull();
-		assertTrue("convex hull contains to many points", stack.size() == 4);
+		assertTrue("convex hull triangleContains to many points", stack.size() == 4);
 		assertTrue("convex hull does not contain " + new VPoint(2.0, 2.0), stack.contains(new VPoint(2.0, 2.0)));
 		assertTrue("convex hull does not contain " + new VPoint(-2.0, -2.0), stack.contains(new VPoint(-2.0, -2.0)));
 		assertTrue("convex hull does not contain " + new VPoint(2.0, -2.0), stack.contains(new VPoint(2.0, -2.0)));
@@ -83,6 +82,6 @@ public class TestGrahamScan {
 		});
 
 		Stack<VPoint> stack = grahamScan.getConvexHull();
-		assertTrue("convex hull contains to many points", stack.size() == 2);
+		assertTrue("convex hull triangleContains to many points", stack.size() == 2);
 	}
 }

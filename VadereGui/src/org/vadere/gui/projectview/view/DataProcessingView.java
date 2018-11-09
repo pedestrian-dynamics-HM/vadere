@@ -12,6 +12,8 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
+import org.vadere.gui.projectview.model.IScenarioChecker;
+import org.vadere.gui.projectview.utils.SimpleDocumentListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
@@ -25,6 +27,8 @@ import org.vadere.util.io.IOUtils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -60,6 +64,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 	private Scenario currentScenario;
 	private boolean isEditable;
+	private IScenarioChecker scenarioChecker;
 
 	DataProcessingView() {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
@@ -85,6 +90,10 @@ class DataProcessingView extends JPanel implements IJsonView {
 		switchMode();
 	}
 
+	public void setScenarioChecker(IScenarioChecker scenarioChecker) {
+		this.scenarioChecker = scenarioChecker;
+	}
+
 	private void switchMode() {
 		String link = MessageFormat.format(Messages.getString("ProjectView.JSONSwitch.link"), (inGuiViewMode ? jsonViewMode : guiViewMode));
 		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='blue'>" +
@@ -96,11 +105,13 @@ class DataProcessingView extends JPanel implements IJsonView {
 		if (inGuiViewMode) {
             logger.info("switch to gui view");
 			GuiView guiView = new GuiView();
+			guiView.setScenarioChecker(scenarioChecker);
 			activeJsonView = guiView;
 			viewPanel.add(guiView);
 		} else {
             logger.info("switch to expert view");
 			TextView expertView = buildExpertView();
+			expertView.setScenarioChecker(scenarioChecker);
 			activeJsonView = expertView;
 			viewPanel.add(expertView);
 		}
@@ -184,6 +195,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private DataProcessor selectedDataProcessor;
 		private String latestJsonParsingError;
 		private Set<Integer> dataProcessIdsInUse = new HashSet<>();
+		private IScenarioChecker scenarioChecker;
 
 		GuiView() {
 			/* via www.oracle.com/technetwork/java/tablelayout-141489.html,
@@ -214,11 +226,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					String filename = "out.txt";
-					int count = 1;
-					while (outputFileNameAlreadyExists(filename)) { // ensure unique suggested filename
-						filename = "out" + (count ++) + ".txt";
-					}
+					String filename = getDefaultFilename();
 					OutputFileStore outputFileStore = new OutputFileStore();
 					outputFileStore.setFilename(filename);
 					currentScenario.getDataProcessingJsonManager().addOutputFile(outputFileStore);
@@ -324,7 +332,21 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 		private void refreshGUI() {
 			currentScenario.updateCurrentStateSerialized();
+			scenarioChecker.checkScenario(currentScenario);
 			ProjectView.getMainWindow().refreshScenarioNames();
+		}
+
+		public void setScenarioChecker(IScenarioChecker scenarioChecker) {
+			this.scenarioChecker = scenarioChecker;
+		}
+
+		private String getDefaultFilename(){
+			String filename = "out.txt";
+			int count = 1;
+			while (outputFileNameAlreadyExists(filename) > 0) { // ensure unique suggested filename
+				filename = "out" + (count ++) + ".txt";
+			}
+			return filename;
 		}
 
 		@Override
@@ -476,29 +498,52 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 1;
 			c.gridy = 0;
 			JTextField nameField = new JTextField(outputFile.toString());
-			nameField.addActionListener(ae -> {
-				String oldName = outputFile.toString();
-				String newName = nameField.getText();
-				if (!oldName.equals(newName)) {
-					String msg = "";
-					if (newName.isEmpty()) {
-						msg = Messages.getString("DataProcessingView.msgFileEmpty");
-					}
-					if (outputFileNameAlreadyExists(newName)) {
-						msg = Messages.getString("DataProcessingView.msgFileInUse");
-					}
-					if (msg.isEmpty()) {
-						outputFile.setRelativeFileName(newName);
-						outputFilesTable.repaint();
-						refreshGUI();
-					} else {
-						nameField.setText(oldName);
-						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
-								Messages.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
-					}
+			// add DocumentLister to update outputFiles character at a time
+			nameField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+				@Override
+				public void update(DocumentEvent e){
+					SwingUtilities.invokeLater(() -> {
+						String oldName = outputFile.toString();
+						String newName = nameField.getText();
+						if (!oldName.equals(newName)) {
+							outputFile.setRelativeFileName(newName);
+							outputFilesTable.repaint();
+							refreshGUI();
+						}
+					});
 				}
+			});
+
+			// check at focus loss for invalid file names. If found reset to a default free value.
+			nameField.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					SwingUtilities.invokeLater(() -> {
+						String newName = nameField.getText();
+
+						String msg = "";
+						if (newName.isEmpty()) {
+							msg = Messages.getString("DataProcessingView.msgFileEmpty");
+							newName = getDefaultFilename();
+						} else if (outputFileNameAlreadyExists(newName) > 1) { // is automatically updated.
+							msg = Messages.getString("DataProcessingView.msgFileInUse");
+							newName = getDefaultFilename();
+						}
+						if (!msg.isEmpty()) {
+							nameField.setText(newName);
+							JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
+									Messages.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
+						}
+					});
+				}
+			});
+
+			// got to next element. Note: this will trigger the focus loss event above.
+			nameField.addActionListener(ae -> {
 				passFocusOn();
 			});
+
+
 			addEditableComponent(nameField);
 			panel.add(nameField, c);
 
@@ -567,6 +612,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			revalidate();
 			repaint(); // inelegantly, it needs both revalidate() and repaint() stackoverflow.com/a/5812780
 		}
+
 
 		private void handleDataProcessorSelected(DataProcessor dataProcessor) {
 			selectedDataProcessor = dataProcessor;
@@ -689,9 +735,9 @@ class DataProcessingView extends JPanel implements IJsonView {
 			return type.getTypeName().substring(type.getTypeName().lastIndexOf(".") + 1);
 		}
 
-		private boolean outputFileNameAlreadyExists(String filename) {
+		private long outputFileNameAlreadyExists(String filename) {
 			return currentScenario.getDataProcessingJsonManager().getOutputFiles().stream()
-					.anyMatch(oFile -> oFile.getFileName().equals(filename));
+					.filter(oFile -> oFile.getFileName().equals(filename)).count();
 		}
 	}
 }

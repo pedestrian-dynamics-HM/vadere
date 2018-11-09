@@ -1,8 +1,7 @@
 {
   "name" : "stairs_upward_direction_to_right_-1",
   "description" : "",
-  "release" : "0.4",
-  "commithash" : "warning: no commit hash",
+  "release" : "0.6",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -75,11 +74,10 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : null
+      "simulationSeed" : 1
     },
     "topography" : {
       "attributes" : {
@@ -179,6 +177,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -203,8 +202,7 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      },
-      "dynamicElements" : [ ]
+      }
     }
   }
 }

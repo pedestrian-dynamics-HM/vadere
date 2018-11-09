@@ -146,13 +146,13 @@ public class ActionLoadProject extends AbstractAction {
 										"Log-files have been created in legacy/scenarios and legacy/output.\n\n";
 
 						if (untouched > 0)
-							message += untouched + " of the scenarios were already up to date.\n\n";
+							message += "(" + untouched + "/" + total  + ") of the scenarios were already up to date.\n\n";
 						if (nonmigratable > 0)
-							message += nonmigratable
-									+ " scenarios could not automatically be upgraded and were moved to the legacy-folder. They can't be opened unless the upgrade is done manually.\n\n";
+							message += "(" + nonmigratable + "/" + total
+									+ ") scenarios could not automatically be upgraded and were moved to the legacy-folder. They can't be opened unless the upgrade is done manually.\n\n";
 						if (migrated > 0)
-							message += migrated
-									+ " scenarios were successfully upgraded. The old versions were moved to the legacy-folder.\n\n";
+							message += "(" + migrated + "/" + total
+									+ ") scenarios were successfully upgraded. The old versions were moved to the legacy-folder.\n\n";
 
 						JOptionPane.showMessageDialog(
 								ProjectView.getMainWindow(),

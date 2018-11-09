@@ -46,7 +46,7 @@ public class MigrationUtil {
 		return Arrays.stream(addAll).collect(Collectors.toCollection(ArrayList::new));
 	}
 
-	private void generateNewVersionTransform(Path resourceDir, String newVersionLabel) throws URISyntaxException, IOException {
+	public void generateNewVersionTransform(Path resourceDir, String newVersionLabel) throws URISyntaxException, IOException {
 
 		Path oldTransform = JoltTransformation.getTransforamtionFile(Version.latest());
 		Path oldIdentity = JoltTransformation.getIdenityFile(Version.latest());
@@ -63,7 +63,7 @@ public class MigrationUtil {
 		json = json.replace("\"release\": \"" + Version.latest().label('-') + "\",", "\"release\": \"" + newVersionLabel + "\",");
 		IOUtils.writeTextFile(newIdenity.toString(), json);
 
-		json = json.replace("\"release\": \"&\",", "// no relase here to overwrite it with default at the default operation down below");
+		json = json.replace("\"release\": \"&\",", "// no release here to overwrite it with default at the default operation down below");
 		IOUtils.writeTextFile(newTransform.toString(), json);
 
 	}
@@ -78,7 +78,7 @@ public class MigrationUtil {
 			e.printStackTrace();
 		}
 		if (this.err != null) {
-			throw new MigrationException("error while processing MigrationTaskHandler in walkFileTree", this.err);
+			throw new MigrationException("topographyError while processing MigrationTaskHandler in walkFileTree", this.err);
 		}
 
 	}
@@ -89,16 +89,16 @@ public class MigrationUtil {
 		try {
 			Files.walkFileTree(p, visitor);
 		} catch (IOException e) {
-			throw new MigrationException("error in walkFileTree", e);
+			throw new MigrationException("topographyError in walkFileTree", e);
 		}
 		if (this.err != null) {
-			throw new MigrationException("error while processing MigrationTaskHandler in walkFileTree", this.err);
+			throw new MigrationException("topographyError while processing MigrationTaskHandler in walkFileTree", this.err);
 		}
 	}
 
 	/**
 	 * Called in walkFileTree call and thus cannot throw exception. save Throwable and aboard the
-	 * FileTreeWalk the calling funtion will check if an error occurred and will throw the Throwable
+	 * FileTreeWalk the calling funtion will check if an topographyError occurred and will throw the Throwable
 	 * upstream.
 	 */
 	private boolean migrate(Path path, Version version) {
@@ -116,7 +116,7 @@ public class MigrationUtil {
 
 	/**
 	 * Called in walkFileTree call and thus cannot throw exception. save Throwable and aboard the
-	 * FileTreeWalk the calling funtion will check if an error occurred and will throw the Throwable
+	 * FileTreeWalk the calling funtion will check if an topographyError occurred and will throw the Throwable
 	 * upstream.
 	 */
 	private boolean revert(Path path) {

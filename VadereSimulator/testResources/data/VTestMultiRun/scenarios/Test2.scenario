@@ -1,7 +1,7 @@
 {
   "name" : "Test2",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.6",
   "commithash" : "c45f1d26328baaec22418c15e6351a059e910f5f",
   "processWriters" : {
     "files" : [ {
@@ -66,7 +66,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
@@ -103,9 +102,9 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
-      "targets" : [ ],
       "attributesCar" : null,
+      "targets" : [ ],
+      "dynamicElements" : [ ],
       "sources" : [ ]
     }
   }

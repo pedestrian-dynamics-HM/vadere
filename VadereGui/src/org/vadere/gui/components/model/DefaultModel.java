@@ -2,6 +2,8 @@ package org.vadere.gui.components.model;
 
 import javax.swing.*;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
@@ -21,6 +23,8 @@ import java.util.stream.StreamSupport;
 public abstract class DefaultModel<T extends DefaultConfig> extends Observable implements IDefaultModel<T> {
 	// private static final int BORDER_WIDTH = 20;
 	// private static final int BORDER_HEIGHT = 20;
+
+	private static Logger log = LogManager.getLogger(DefaultModel.class);
 
 	private IMode mouseSelectionMode;
 
@@ -66,7 +70,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.cursorWorldPosition = VPoint.ZERO;
 		this.selectScenarioElementListener = new LinkedList<>();
 		this.voronoiDiagram = null;
-		this.showVoroniDiagram = false;
+		this.showVoroniDiagram = true;
 		this.showSelection = false;
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();
@@ -75,7 +79,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	@Override
 	public Color getScenarioElementColor(final ScenarioElementType elementType) {
-		Color c = null;
+		Color c;
 		switch (elementType) {
 			case OBSTACLE:
 				c = getConfig().getObstacleColor();
@@ -123,6 +127,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public boolean setScale(final double scale) {
 		boolean hasChanged = true;
+		double oldScale = scaleFactor;
+
 		if (scale < MIN_SCALE_FACTOR) {
 			this.scaleFactor = MIN_SCALE_FACTOR;
 		} else if (scale > MAX_SCALE_FACTOR) {
@@ -133,7 +139,15 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			hasChanged = false;
 		}
 
+		// update the viewport, since it depends on the scaleFactor
 		if (hasChanged) {
+			Rectangle2D.Double oldViewPort = getViewportBound();
+			Rectangle2D.Double newViewPort = new Rectangle2D.Double(
+					oldViewPort.getMinX(),
+					oldViewPort.getMinY(),
+					oldViewPort.getWidth() * oldScale / scaleFactor,
+					oldViewPort.getHeight() * oldScale / scaleFactor);
+			setViewportBound(newViewPort);
 			setChanged();
 		}
 		return hasChanged;
@@ -430,9 +444,14 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 				getWindowBound().getHeight() / getViewportBound().getHeight());
 	}
 
+	/**
+	 *
+	 * @param pInPixel the mouse position of the mouse event
+	 * @return
+	 */
 	protected VPoint pixelToWorld(final VPoint pInPixel) {
-		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX(),
-				(getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
+				getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
 		/*
 		 * return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX() +
 		 * getViewportBound().getX(),
@@ -474,4 +493,47 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	public T getConfig() {
 		return config;
 	}
+
+	/*public void startTriangulation() {
+		if(!triangulationTriggered) {
+			triangulationTriggered = true;
+			VRectangle bound = new VRectangle(getTopographyBound());
+			Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
+			obstacles.addAll(getTopography().getObstacles());
+
+			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
+
+			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+			PSDistmesh meshImprover = new PSDistmesh(
+					distanceFunc,
+					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2), 4.0),
+					0.3,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
+
+
+			triangles = meshImprover.getTriangles();
+			//	meshImprover.improve();
+			Thread t = new Thread(() -> {
+				while(!meshImprover.isFinished()) {
+					meshImprover.improve();
+					setChanged();
+					notifyObservers();
+				}
+				Function<VTriangle, Color> colorFunction = f -> {
+					float grayScale = (float) meshImprover.getQuality(f);
+					return new Color(grayScale, grayScale, grayScale);
+				};
+
+				log.info(TexGraphGenerator.toTikz(meshImprover.getTriangles(), colorFunction, 1.0f, getTopography()));
+			});
+			t.start();
+		}
+	}
+
+	public Collection<VTriangle> getTriangles() {
+		if(triangles == null) {
+			return Collections.EMPTY_LIST;
+		}
+		return triangles;
+	}*/
 }

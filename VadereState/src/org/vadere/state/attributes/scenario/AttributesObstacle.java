@@ -33,6 +33,11 @@ public class AttributesObstacle extends AttributesEmbedShape {
 		return id;
 	}
 
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

@@ -1,13 +1,13 @@
 {
   "name" : "Neues_Szenario",
   "description" : "",
-  "release" : "0.4",
+  "release" : "0.6",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "output_ts_pid.txt",
-      "processors" : [ 1, 2, 3, 5, 13, 14, 17 ],
+      "processors" : [ 1, 2, 3, 5, 13, 17 ],
       "separator" : ";"
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -29,6 +29,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
       "filename" : "evacuationTimes.txt",
       "processors" : [ 20, 21 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
+      "filename" : "out1.txt",
+      "processors" : [ "14" ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -138,11 +142,7 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 14,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianOverlapProcessor",
-      "attributes" : {
-        "pedRadius" : 0.21
-      }
+      "id" : 14
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
       "id" : 15,
@@ -247,7 +247,6 @@
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "needsBoundary" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
@@ -339,8 +338,8 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }
