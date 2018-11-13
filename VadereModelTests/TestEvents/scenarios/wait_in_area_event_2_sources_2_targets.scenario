@@ -217,7 +217,7 @@
     "eventInfos" : [ {
       "eventTimeframe" : {
         "startTime" : 10.0,
-        "endTime" : 30.0,
+        "endTime" : 60.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },

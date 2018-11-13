@@ -3,6 +3,9 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
+import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -42,7 +45,9 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
-		if (pedestrian.getMostImportantEvent() instanceof ElapsedTimeEvent) {
+		Event mostImportantEvent = pedestrian.getMostImportantEvent();
+
+		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			VPoint oldPosition = pedestrian.getPosition();
 
 			// for the first step after creation, timeOfNextStep has to be initialized
@@ -57,7 +62,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 			topography.moveElement(pedestrian, oldPosition);
-		} else {
+		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
