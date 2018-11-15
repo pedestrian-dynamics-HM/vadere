@@ -29,7 +29,7 @@ def install_package_if_needed(package_name='VadereAnalysisTool', search_path='To
             dist_dir = os.path.join(search_path, "dist")
             wheel_files = [f for f in os.listdir(dist_dir) if f.endswith(".whl")]
             if len(wheel_files) > 0:
-                dist_path = os.path.join(search_path, "dist", wheel_files[0])
+                dist_path = os.path.join("dist", wheel_files[0])
                 user = getpass.getuser()
 
                 print("\nInstall package {} locally for user {} ...".format(dist_path, user))
