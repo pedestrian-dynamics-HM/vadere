@@ -2,12 +2,16 @@ import getpass
 import os
 import re
 import subprocess
+import shutil
 
 
 def install_package_if_needed(package_name='VadereAnalysisTool', search_path='Tools/VadereAnalysisTool'):
     try:
 
         make_package_cwd = os.path.abspath(search_path)
+
+        if os.path.exists(os.path.join(search_path, "dist")):
+            shutil.rmtree(os.path.join(search_path, "dist"))
 
         print("Build package {}...".format(package_name))
         p_make_package = subprocess.run(
@@ -22,12 +26,13 @@ def install_package_if_needed(package_name='VadereAnalysisTool', search_path='To
                                                                p_make_package.stderr.decode('utf8')))
         if p_make_package.returncode == 0:
             stdout = p_make_package.stdout.decode('utf8')
-            re_res = re.search("creating '(?P<name>.*?)'", stdout)
-            if re_res is not None:
-                dist_path = re_res.group('name')
+            dist_dir = os.path.join(search_path, "dist")
+            wheel_files = [f for f in os.listdir(dist_dir) if f.endswith(".whl")]
+            if len(wheel_files) > 0:
+                dist_path = os.path.join(search_path, "dist", wheel_files[0])
                 user = getpass.getuser()
 
-                print("Install package {} locally for user {} ...".format(package_name, user))
+                print("\nInstall package {} locally for user {} ...".format(dist_path, user))
                 p_install_package = subprocess.run(
                     args=["python3", "-m", "pip", "install", "--user",  dist_path],
                     cwd=make_package_cwd,
