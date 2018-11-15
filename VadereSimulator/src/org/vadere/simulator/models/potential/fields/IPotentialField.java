@@ -2,6 +2,9 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -145,19 +148,20 @@ public interface IPotentialField {
 	        Collection<VShape> holes = new ArrayList<>();
 
 	        holes.addAll(topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
-	        //holes.addAll(topography.getTargets(targetId).stream().map(target -> target.getShape()).collect(Collectors.toList()));
+	        holes.addAll(topography.getTargets(targetId).stream().map(target -> target.getShape()).collect(Collectors.toList()));
 			VRectangle bbox = new VRectangle(bounds);
 
 	        /**
 	         * A default distance function which uses all shapes to compute the distance.
 	         */
 			IDistanceFunction distanceFunc = new DistanceFunction(bbox, holes);
+	        IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(0, -distanceFunc.apply(p));
 
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.
 	         */
-	        PEikMesh meshGenerator = new PEikMesh(distanceFunc, p -> 1.0, 3.0, bbox, holes);
-	        meshGenerator.generate();
+	        PEikMeshGen<PotentialPoint> meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes, (x, y) -> new PotentialPoint(x ,y));
+	        IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation = meshGenerator.generate();
 
 	        ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
 			        attributesPotential.getTimeCostAttributes(),
@@ -167,9 +171,13 @@ public interface IPotentialField {
 			        //TODO [refactoring]: this attribute value is used in an not intuitive way, we should introduce an extra attribute value!
 			        1.0 / attributesPotential.getPotentialFieldResolution());
 
-	        IIncrementalTriangulation<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> triangulation = meshGenerator.getTriangulation();
-
-	        List<PVertex<EikMeshPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+	        // TODO: here we assume the shapes are convex!
+	        List<PVertex<PotentialPoint>> targetVertices = new ArrayList<>();
+	        for(VShape shape : targetShapes) {
+	        	VPoint point = shape.getCentroid();
+	        	PFace<PotentialPoint> targetFace = triangulation.locateFace(point.getX(), point.getY()).get();
+				targetVertices.addAll(triangulation.getMesh().getVertices(targetFace));
+	        }
 
 	        eikonalSolver = new EikonalSolverFMMTriangulation(
 			        timeCost,

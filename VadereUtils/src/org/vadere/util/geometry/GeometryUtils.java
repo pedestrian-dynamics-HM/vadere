@@ -418,6 +418,12 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	public static boolean intersectLine(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y, final double eps) {
+		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
+		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
+		return (ccw1-eps < 0 && ccw2+eps > 0) || (ccw1+eps > 0 && ccw2-eps < 0);
+	}
+
 	public static VPoint getIncenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		double a = p1.distance(p2);
 		double b = p2.distance(p3);
@@ -441,14 +447,30 @@ public class GeometryUtils {
 	 * @return true if the line-segment intersects the  half-line-segment defined, otherwise false.
 	 */
 	public static boolean intersectHalfLineSegment(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
-		double ccw1 = ccw(p, q, p1);
-		double ccw2 = ccw(p, q, p2);
+		return intersectHalfLineSegment(p.getX(), p.getY(), q.getX(), q.getY(), p1.getX(), p1.getY(), p2.getX(), p2.getY());
+	}
 
-		if((ccw1 < 0 && ccw2 > 0)) {
-			return isCCW(p, p2, p1);
-		}
-		else if((ccw1 > 0 && ccw2 < 0)) {
-			return isCCW(p, p1, p2);
+	/*public static boolean intersectHalfLineSegment(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
+		GeometryUtils.distanceToLineSegment()
+	}*/
+
+	public static boolean intersectHalfLineSegment(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
+		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
+		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
+
+		// p1 and p2 are on different sides of directed line (q,p) if this is not the case there is no intersection
+		if((ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0)) {
+
+			double ccwq = ccw(p1X, p1Y, p2X, p2Y, qX, qY);
+			double ccwp = ccw(p1X, p1Y, p2X, p2Y, pX, pY);
+
+			// p and q on different sides, therefore the half-segment (q,p) intersects with the line (p1,p2)
+			if((ccwq < 0 && ccwp > 0) || (ccwq > 0 && ccwp < 0)) {
+				return true;
+			} // otherwise p has to be closer to the line-segment p1, p2 than q
+			else {
+				return GeometryUtils.distanceToLineSegment(p1X, p1Y, p2X, p2Y, qX, qY) < GeometryUtils.distanceToLineSegment(p1X, p1Y, p2X, p2Y, pX, pY);
+			}
 		}
 		else {
 			return false;
@@ -651,25 +673,71 @@ public class GeometryUtils {
 	}
 
 	public static double distanceToLineSegment(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
-		if (p1.getX() == p2.getX() && p1.getY() == p2.getY())
-			return p1.distance(x,y);
+		return distanceToLineSegment(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+	}
 
-		double len2 = (p2.getX() - p1.getX()) * (p2.getX() - p1.getX()) + (p2.getY() - p1.getY()) * (p2.getY() - p1.getY());
-		double r = ((x - p1.getX()) * (p2.getX() - p1.getX()) + (y - p1.getY()) * (p2.getY() - p1.getY())) / len2;
+	public static double distance(final double px, final double py, final double qx, final double qy) {
+		return Math.sqrt((px - qx) * (px - qx) + (py - qy) * (py - qy));
+	}
+
+	public static double distanceToLineSegment(final double p1X, final double p1Y, final double p2X, final double p2Y, final double x, final double y) {
+		// special cases
+		/*if(p1X == p2X) {
+			if((y > p1Y && p1Y > p2Y) || (y < p1Y && p1Y < p2Y)) {
+				return distance(p1X, p1Y, x, y);
+			}
+			else if((y > p2Y && p2Y > p1Y) || (y < p2Y && p2Y < p1Y)) {
+				return distance(p2X, p2Y, x, y);
+			}
+			else {
+				return Math.abs(p1X - x);
+			}
+		}
+
+		if(p1Y == p2Y) {
+
+			if((x > p1X && p1X > p2X) || (x < p1X && p1X < p2X)) {
+				return distance(p1X, p1Y, x, y);
+			}
+			else if((x > p2X && p2X > p1X) || (x < p2X && p2X < p1X)) {
+				return distance(p2X, p2Y, x, y);
+			}
+			else {
+				return Math.abs(p1Y - y);
+			}
+		}*/
+
+		double len2 = (p2X - p1X) * (p2X - p1X) + (p2Y - p1Y) * (p2Y - p1Y);
+		double r = ((x - p1X) * (p2X - p1X) + (y - p1Y) * (p2Y - p1Y)) / len2;
 
 		if (r <= 0.0)
-			return p1.distance(x,y);
+			return GeometryUtils.distance(p1X, p1Y, x, y);
 		if (r >= 1.0)
-			return p2.distance(x,y);
+			return GeometryUtils.distance(p2X, p2Y, x, y);
 
-		double s = ((p1.getY() - y) * (p2.getX() - p1.getX()) - (p1.getX() - x) * (p2.getY() - p1.getY())) / len2;
+		double s = ((p1Y - y) * (p2X - p1X) - (p1X - x) * (p2Y - p1Y)) / len2;
 		return Math.abs(s) * Math.sqrt(len2);
+	}
+
+	public static double distanceToLine(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
+		return distanceToLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+	}
+
+	public static double distanceToLine(final double p1X, final double p1Y, final double p2X, final double p2Y, final double x, final double y) {
+		double a = p1Y - p2Y;
+		double b = p2X - p1X;
+		double c = p1X * p2Y - p2X * p1Y;
+		if(a == 0 && b == 0) {
+			return 0.0;
+		}
+		else {
+			return Math.abs(a * x + b * y + c) / Math.sqrt(a * a + b * b);
+		}
 	}
 
 	public static boolean isOnEdge(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p, double tolerance) {
 		return distanceToLineSegment(p1, p2, p) < tolerance;
 	}
-
 
 	/**
 	 * Computes the intersection points of a line and a circle. The line is supposed to have infinity

@@ -65,8 +65,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				new VRectangle(boundary.getBounds()));
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -99,8 +98,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				bound);
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -133,8 +131,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				bound);
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -166,8 +163,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				bound);
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -201,8 +197,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				bound);
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -238,8 +233,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				bound);
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -297,8 +291,7 @@ public class EikMeshExamples {
 
 		// (optional) define the gui to display the mesh
 		MeshPanel<MyPoint, PVertex<MyPoint>, PHalfEdge<MyPoint>, PFace<MyPoint>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800,
-				bound);
+				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();

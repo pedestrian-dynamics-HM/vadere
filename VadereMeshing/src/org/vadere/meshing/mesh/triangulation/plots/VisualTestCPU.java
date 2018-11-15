@@ -53,7 +53,7 @@ public class VisualTestCPU {
 		ColorHelper colorHelper = new ColorHelper(meshGenerator.getMesh().getNumberOfFaces());
 		Function<AFace<EikMeshPoint>, Color> colorFunction = f -> colorHelper.numberToColor(f.getId());
 
-		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, bbox, colorFunction);
+		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, colorFunction);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -107,7 +107,7 @@ public class VisualTestCPU {
 
 		EikMesh meshGenerator = new EikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
-		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");

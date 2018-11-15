@@ -17,6 +17,7 @@ import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
 import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
 import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
 import org.vadere.gui.onlinevisualization.control.ActionOnlineVisMenu;
+import org.vadere.gui.onlinevisualization.control.ActionShowMesh;
 import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
@@ -126,6 +127,9 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		AbstractAction drawVoronoiDiagram = new ActionSwapSelectionMode("draw_voronoi_diagram", resources.getIcon("voronoi.png", iconWidth, iconHeight), model);
 
+		AbstractAction drawMesh = new ActionShowMesh("draw_mesh", resources.getIcon("triangulation.png", iconWidth, iconHeight), model);
+
+
 		AbstractAction paintGridAction = new AbstractAction("paintGridAction",
 				resources.getIcon("grid.png", iconWidth, iconHeight)) {
 
@@ -204,7 +208,8 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				Messages.getString("ProjectView.btnShowGroupInformation.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, drawVoronoiDiagram,
 				Messages.getString("ProjectView.btnDrawVoronoiDiagram.tooltip"));
-
+		SwingUtils.addActionToToolbar(toolbar, drawMesh,
+				Messages.getString("ProjectView.btnDrawMesh.tooltip"));
 
 		toolbar.addSeparator();
 

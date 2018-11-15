@@ -59,7 +59,7 @@ public class RunTimeGPUVertexBased extends JFrame {
 			log.info("quality" + meshGenerator.getQuality());
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
@@ -121,7 +121,7 @@ public class RunTimeGPUVertexBased extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");

@@ -16,7 +16,23 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+
+/**
+ * @author Benedikt Zoennchen
+ */
 public class TexGraphGenerator {
+
+
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
+			@NotNull final IMesh<P, V, E, F> mesh, final float scaling){
+		return toTikz(mesh, scaling, false);
+	}
+
+
+	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
+			@NotNull final IMesh<P, V, E, F> mesh, boolean standalone){
+		return toTikz(mesh, 1.0f, standalone);
+	}
 
 	/**
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling.
@@ -30,8 +46,13 @@ public class TexGraphGenerator {
 	 * @return a string representing a tikz graphic
 	 */
 	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh, final float scaling){
+			@NotNull final IMesh<P, V, E, F> mesh, final float scaling, final boolean standalone){
 		StringBuilder builder = new StringBuilder();
+		if(standalone) {
+			builder.append("\\documentclass[usenames,dvipsnames]{standalone}\n");
+			builder.append("\\usepackage{tikz}\n");
+			builder.append("\\begin{document}\n");
+		}
 		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
 
 		for(VPoint point : mesh.getUniquePoints()) {
@@ -47,6 +68,10 @@ public class TexGraphGenerator {
 		builder.append(";\n");
 
 		builder.append("\\end{tikzpicture}");
+
+		if(standalone) {
+			builder.append("\\end{document}");
+		}
 
 		return builder.toString();
 	}

@@ -26,6 +26,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showPedestrians = true;
 	private boolean showWalkdirection = false;
 	private boolean showTargetPotentialField = false;
+	private boolean showTargetPotentielFieldMesh = false;
 	private boolean showPotentialField = false;
 	private boolean showTrajectories = false;
 	private boolean showGrid = false;
@@ -64,6 +65,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.showStairs = config.showStairs;
 		this.showGroups = config.showGroups;
 		this.showPotentialField = config.showPotentialField;
+		this.showTargetPotentielFieldMesh = config.showTargetPotentielFieldMesh;
 	}
 
 	public boolean isShowGroups() {
@@ -108,6 +110,15 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public boolean isShowTargets() {
 		return showTargets;
+	}
+
+	public void setShowTargetPotentielFieldMesh(final boolean showTargetPotentielFieldMesh) {
+		this.showTargetPotentielFieldMesh = showTargetPotentielFieldMesh;
+		setChanged();
+	}
+
+	public boolean isShowTargetPotentielFieldMesh() {
+		return showTargetPotentielFieldMesh;
 	}
 
 	public void setShowTargets(boolean showTargets) {

@@ -1,8 +1,12 @@
 package org.vadere.simulator.models.potential.fields;
 
+import com.fasterxml.jackson.databind.ser.AnyGetterWriter;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -11,6 +15,7 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -85,6 +90,19 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		}
 
 		return (pos, agent) -> clone.get(agent.getNextTargetId()).apply(pos);
+	}
+
+	@Override
+	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
+		Map<Integer, IMesh<? extends IPotentialPoint, ?, ?, ?>> clone = new HashMap<>();
+
+		for(Map.Entry<Integer, EikonalSolver> entry : eikonalSolvers.entrySet()) {
+			Integer targetId = entry.getKey();
+			EikonalSolver eikonalSolver = entry.getValue();
+			clone.put(targetId, eikonalSolver.getDiscretization());
+		}
+
+		return agent -> clone.get(agent.getNextTargetId());
 	}
 
 	@Override

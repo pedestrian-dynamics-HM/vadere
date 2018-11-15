@@ -99,6 +99,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
         }
 
+        if(model.config.isShowTargetPotentielFieldMesh()) {
+	        renderMesh(graphics, model.getDiscretization(), new VRectangle(model.getTopographyBound()));
+        }
+
         renderSimulationContent(graphics);
 
         if (model.isElementSelected()) {
@@ -177,7 +181,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     private void renderPotentialFieldOnViewport(final Graphics2D g, final int xPos, final int yPos, final int width, final int height) {
 
-    	logger.info("resolution = " + width + ", " + height);
+    	//logger.info("resolution = " + width + ", " + height);
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
 		 */

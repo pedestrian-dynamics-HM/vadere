@@ -2,6 +2,10 @@ package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
@@ -9,11 +13,24 @@ import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
 import java.awt.*;
+import java.util.function.Function;
 
 /**
  * @author Benedikt Zoennchen
  */
 public interface GridEikonalSolver extends EikonalSolver {
+
+	CellGrid getCellGrid();
+
+	// TODO: implement this!
+	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization(final CellGrid potentialField) {
+		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
+	}
+
+	@Override
+	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+		return getDiscretization(getCellGrid());
+	}
 
 	default double getPotential(final CellGrid potentialField, final double x, final double y, final double unknownPenalty, final double weight) {
 		double targetPotential = Double.MAX_VALUE;
@@ -56,8 +73,16 @@ public interface GridEikonalSolver extends EikonalSolver {
 		return targetPotential;
 	}
 
+	default double getPotential(final double x, final double y, final double unknownPenalty, final double weight) {
+		return getPotential(getCellGrid(), x, y, unknownPenalty, weight);
+	}
+
 	default double getPotential(final CellGrid potentialField, final IPoint pos, final double unknownPenalty, final double weight) {
 		return getPotential(potentialField, pos.getX(), pos.getY(), unknownPenalty, weight);
+	}
+
+	default double getPotential(final IPoint pos, final double unknownPenalty, final double weight) {
+		return getPotential(getCellGrid(), pos.getX(), pos.getY(), unknownPenalty, weight);
 	}
 
 	default double computeGodunovDifference(final Point point, final CellGrid cellGrid, final Direction direction) {
@@ -183,6 +208,10 @@ public interface GridEikonalSolver extends EikonalSolver {
 		return result;
 	}
 
+	default double computeGodunovDifference(final Point point, final Direction direction) {
+		return computeGodunovDifference(point, getCellGrid(), direction);
+	}
+
 	default double computeGodunovDifference(final Point point, final CellGrid cellGrid) {
 		double result = Double.MAX_VALUE;
 
@@ -255,8 +284,16 @@ public interface GridEikonalSolver extends EikonalSolver {
 		return result;
 	}
 
+	default double computeGodunovDifference(final Point point) {
+		return computeGodunovDifference(point, getCellGrid());
+	}
+
 	default boolean isValidPoint(@NotNull final CellGrid potentialField, @NotNull final Point point) {
 		return potentialField.isValidPoint(point);
+	}
+
+	default boolean isValidPoint(@NotNull final Point point) {
+		return isValidPoint(getCellGrid(), point);
 	}
 
 }

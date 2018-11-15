@@ -2,9 +2,12 @@ package org.vadere.gui.components.view;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
+import org.vadere.meshing.mesh.gen.MeshRenderer;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -62,7 +65,6 @@ public abstract class DefaultRenderer {
 		targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
 		targetGraphics2D.dispose();
 	}
-
 
 	public void renderGraphics(final Graphics2D targetGraphics2D, final int width, final int height) {
 		targetGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -592,6 +594,14 @@ public abstract class DefaultRenderer {
 				fill(new Rectangle2D.Double(coord.x, coord.y, pixToW, pixToW), g);
 			}
 		}
+	}
+
+	protected void renderMesh(
+			@NotNull final Graphics2D g,
+			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?> mesh,
+			@NotNull final VRectangle bound) {
+		MeshRenderer<? extends IPotentialPoint, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
+		meshRenderer.renderGraphics(g, bound);
 	}
 
 	protected void renderVoronoiDiagram(final Graphics2D g, final VoronoiDiagram voronoiDiagram) {

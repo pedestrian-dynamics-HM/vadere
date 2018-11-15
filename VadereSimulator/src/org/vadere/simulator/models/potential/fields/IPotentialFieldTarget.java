@@ -1,9 +1,13 @@
 package org.vadere.simulator.models.potential.fields;
 
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.scenario.Agent;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.function.Function;
 
 
 /**
@@ -37,4 +41,6 @@ public interface IPotentialFieldTarget extends IPotentialField, Model {
      * @return a copy of the current target potential field
      */
     IPotentialField getSolution();
+
+	Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization();
 }

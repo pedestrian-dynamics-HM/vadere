@@ -59,7 +59,7 @@ public class TestUniTriangulation extends JFrame {
 	    IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
 	    Function<AFace<VPoint>, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
         MeshPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> meshPanel =
-                new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, bbox, colorFunction);
+                new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, colorFunction);
         JFrame frame = meshPanel.display();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);

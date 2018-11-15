@@ -706,8 +706,14 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param face  the face
 	 * @return true if the point (x, y) is contained in the face, false otherwise
 	 */
-	default boolean contains(final double x, final double y, final F face) {
+	default boolean contains(final double x, final double y, @NotNull final F face) {
 		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x, y, edge));
+	}
+
+	default boolean contains(final double x, final double y, @NotNull final V v1, @NotNull final V v2, @NotNull final V v3) {
+		return !GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x, y)
+				&& !GeometryUtils.isRightOf(v2.getX(), v2.getY(), v3.getX(), v3.getY(), x, y)
+				&& !GeometryUtils.isRightOf(v3.getX(), v3.getY(), v1.getX(), v1.getY(), x, y);
 	}
 
 	/**
@@ -826,14 +832,45 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
      * Does not change the connectivity.
      *
      * @param p1    the first point of the undirected line
-     * @param p2    the first point of the undirected line
+     * @param p2    the second point of the undirected line
      * @param edge  the half-edge defining the line-segment
      * @return true if the line-segment defined by the half-edge intersects the line (p1, p2)
      */
 	default boolean intersects(final IPoint p1, final IPoint p2, E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
+		return intersects(p1, p2, v1, v2);
+	}
+
+	/**
+	 * Tests if the line-segment defined by the (v1,v2) intersects the line defined by p1 and p2 in O(1).
+	 *
+	 * Does not change the connectivity.
+	 *
+	 * @param p1 the first point of the undirected line
+	 * @param p2 the second point of the undirected line
+	 * @param v1 the first point of the line-segment
+	 * @param v2 the second point of the line-segment
+	 * @return true if the line-segment defined by (v1,v2) intersects the line (p1, p2)
+	 */
+	default boolean intersects(final IPoint p1, final IPoint p2, V v1, V v2) {
 		return GeometryUtils.intersectLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+	}
+
+	/**
+	 * Tests if the half-line-segment starting at p1 in the direction (p2-p1) intersects the line-segment defined by the half-edge in O(1).
+	 *
+	 * Does not change the connectivity.
+	 *
+	 * @param p1    the start point of the directed half-line-segment
+	 * @param p2    the second point of the directed half-line-segment of direction (p2-p1).
+	 * @param edge  the half-edge defining the line-segment
+	 * @return true if the half-line-segment starting at p1 in the direction (p2-p1) intersects the line-segment defined by the half-edge, false otherwise
+	 */
+	default boolean intersectsDirectional(final IPoint p1, final IPoint p2, E edge) {
+		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
+		V v2 = getMesh().getVertex(edge);
+		return GeometryUtils.intersectHalfLineSegment(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
 	}
 
 

@@ -2,6 +2,7 @@ package org.vadere.gui.projectview;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.gui.components.utils.Recorder;
+import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.util.visualization.ColorHelper;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.AFace;
@@ -61,8 +62,11 @@ public class RecordTriangulationMovie {
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
+		MeshRenderer<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshRenderer = new MeshRenderer<>(
+				meshImprover.getMesh(), f -> false, colorFunction1);
+
 		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(
-		meshImprover.getMesh(), f -> false, bbound.getWidth()*1000, bbound.getHeight()*1000, bbound, colorFunction1);
+				meshRenderer, bbound.getWidth()*1000, bbound.getHeight()*1000);
 
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
@@ -84,16 +88,15 @@ public class RecordTriangulationMovie {
 		while (nSteps < 300) {
 			nSteps++;
 
-			distmeshPanel.refresh();
 			if(!meshImprover.initializationFinished()) {
-				addPictures(recorder, distmeshPanel, 10);
+				addPictures(recorder, meshRenderer, 10, (int)bbound.getWidth()*1000, (int)bbound.getHeight()*1000);
 			}
 			else if(finished) {
 				finished = false;
-				addPictures(recorder, distmeshPanel, 20);
+				addPictures(recorder, meshRenderer, 20, (int)bbound.getWidth()*1000, (int)bbound.getHeight()*1000);
 			}
 
-			addPictures(recorder, distmeshPanel, 5);
+			addPictures(recorder, meshRenderer, 5, (int)bbound.getWidth()*1000, (int)bbound.getHeight()*1000);
 
 
 			/*try {
@@ -114,11 +117,13 @@ public class RecordTriangulationMovie {
 	}
 
 	public static void addPictures(Recorder recorder,
-	                               MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel,
-	                               int frames) throws IOException {
+	                               MeshRenderer<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> renderer,
+	                               int frames,
+	                               int width,
+	                               int height) throws IOException {
 
 		for(int i = 0; i < frames; i++) {
-			recorder.addPicture(distmeshPanel.getImage());
+			recorder.addPicture(renderer.renderImage(width, height));
 		}
 
 	}

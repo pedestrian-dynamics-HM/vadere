@@ -297,9 +297,5 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 */
 	void notifyObservers(final Object args);
 
-	void hideTriangulation();
-
-	void showTriangulation();
-
 	T getConfig();
 }

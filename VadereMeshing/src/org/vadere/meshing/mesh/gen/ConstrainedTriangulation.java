@@ -51,7 +51,7 @@ public class ConstrainedTriangulation<P extends IPoint, V extends IVertex<P>, E 
         if(optFace.isPresent()) {
             F startFace = optFace.get();
             boolean startFaceIsInvalid = faceIntersectsLine(startFace, new VPoint(line.x1, line.y1), new VPoint(line.x2, line.y2));
-            LinkedList<F> invalidFaces = straightGatherWalk2D(line.x2, line.y2, startFace);
+            LinkedList<E> invalidFaces = straightGatherWalk2D(line.x2, line.y2, startFace);
 
             if(!startFaceIsInvalid) {
                 invalidFaces.removeFirst();

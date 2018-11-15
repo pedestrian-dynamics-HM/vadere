@@ -27,8 +27,7 @@ public class JumpAndWalk<P extends IPoint, V extends IVertex<P>, E extends IHalf
 	}
 
 	private Optional<F> getStartFace(final IPoint endPoint) {
-		List<V> vertices = triangulation.getMesh().getVertices();
-		int n = vertices.size();
+		int n = triangulation.getMesh().getNumberOfVertices();
 
 		if(n < 20) {
 			return Optional.empty();
@@ -38,8 +37,8 @@ public class JumpAndWalk<P extends IPoint, V extends IVertex<P>, E extends IHalf
 			double max = Math.pow(n, 1.0/3.0);
 
 			for(int i = 0; i < max; i++) {
-				int index = random.nextInt(n);
-				V vertex = vertices.get(index);
+
+				V vertex = triangulation.getMesh().getRandomVertex(random);
 
 				if(result == null || endPoint.distanceSq(vertex) < endPoint.distanceSq(result)) {
 					result = vertex;
