@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: VadereAnalysisTool
+Version: 0.0.1
+Summary: Import VadereProject to ease analysis
+Home-page: UNKNOWN
+Author: Stefan Schuhbäck
+Author-email: stefan.schuhbaeck@hm.edu
+License: UNKNOWN
+Description: # Vadere Analysis Tool
+        
+        Simplify import and analysis of simulation output in python an juypter-notebooks
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
