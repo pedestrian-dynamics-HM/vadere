@@ -54,7 +54,6 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
 
 		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-		topography.moveElement(pedestrian, oldPosition);
 	}
 
 	@Override
