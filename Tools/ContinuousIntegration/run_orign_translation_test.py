@@ -63,7 +63,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
 def get_output_pairs(path="Tools/ContinuousIntegration/run_orign_translation_test.d/output"):
     _output_pairs = []
-    output_without_offset = [d for d in os.listdir(path) if dir.endswith("without_offset")]
+    output_without_offset = [d for d in os.listdir(path) if d.endswith("without_offset")]
     for dir_without in output_without_offset:
         dir_with_offset = dir_without.replace("without_offset", "with_offset")
         name = dir_with_offset[:-len("without_offset")]
