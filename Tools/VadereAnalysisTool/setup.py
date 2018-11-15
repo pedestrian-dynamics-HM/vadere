@@ -10,7 +10,6 @@ setuptools.setup(
     author_email="stefan.schuhbaeck@hm.edu",
     description="Import VadereProject to ease analysis",
     long_description=long_description,
-    long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
