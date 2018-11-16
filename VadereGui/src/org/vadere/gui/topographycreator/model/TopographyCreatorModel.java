@@ -335,9 +335,13 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public void translateTopography(final double x, final double y) {
 		double oldX = getTopographyBound().x;
 		double oldY = getTopographyBound().y;
-
-		topographyBuilder.translateElements(x - oldX, y - oldY);
+		translateElements(x - oldX, y - oldY);
 		setTopographyBound(new VRectangle(x, y, getTopographyBound().getWidth(), getTopographyBound().getHeight()));
+		setChanged();
+	}
+
+	public void translateElements(final double dx, final double dy) {
+		topographyBuilder.translateElements(dx, dy);
 		setChanged();
 	}
 
