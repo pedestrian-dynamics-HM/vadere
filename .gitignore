@@ -32,6 +32,7 @@ VadereModelTests/TestOSM/output/*
 VadereModelTests/TestOSM_Group/output/*
 VadereModelTests/TestSFM/output/*
 VadereModelTests/TestGNM/output/*
+VadereModelTests/TestBHM/output/*
 VadereModelTests/TestOVM/output/*
 VadereModelTests/TestOSM/legacy/*
 VadereModelTests/TestOSM_Group/legacy/*
@@ -52,7 +53,7 @@ VadereGui/output/
 #mac osx files
 .DS_Store
 
-#linux deskopt dotfiles
+#linux desktop dotfiles
 **/.directory
 /VadereModelTests/TestStairs/output
 /VadereModelTests/TestStairs/legacy
