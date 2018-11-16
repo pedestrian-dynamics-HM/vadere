@@ -1,7 +1,6 @@
 import csv
 from glob import glob
 import numpy as np
-import math
 
 ################################################################################
 # run with `python main.py`                                                    #
@@ -24,11 +23,6 @@ INDEX_TARGET_ID = 4
 def get_all_trajectory_files(root_dir):
     files = glob(root_dir + '/**/*.trajectories')
     return files
-
-def get_all_overlap_files(root_dir):
-    files = glob(root_dir + '/**/overlap.txt')
-    return files
-
 
 def read_trajectory_file(path):
     #print(path)
@@ -68,41 +62,19 @@ def extract_observation_area(data, area):
 # number of targets hardcoded, currently 3
 # target ids hardcoded
 # also calculate total distribution
-def calculate_pedestrian_target_distribution(data, target_size):
+def calculate_pedestrian_target_distribution(data):
     current_dist = []
     timesteps = []
-    unique_target_IDs = set()
-    for timestep in data:
-        for row in timestep:
-            unique_target_IDs.add(row[INDEX_TARGET_ID])
-    unique_target_IDs = sorted(unique_target_IDs, key=int)
-            
-    
     for timestep in data:
         timesteps.append(timestep[0][0])
-
-        target_id_counts = np.zeros(target_size)
-        
-        
-        
-        
-        
-        
-        
-        
+        target_id_counts = [0, 0, 0]
         for row in timestep:
-            
-            '''
             if row[INDEX_TARGET_ID] == 1: # LEFT
                 target_id_counts[0] += 1
             elif row[INDEX_TARGET_ID] == 2: # STRAIGHT
                 target_id_counts[1] += 1
             elif row[INDEX_TARGET_ID]: # RIGHT
                 target_id_counts[2] += 1
-            '''
-            for i,target_ID in enumerate(unique_target_IDs):
-                if row[INDEX_TARGET_ID] == target_ID:
-                    target_id_counts[i] += 1
 
         n_pedestrians_timestep = len(timestep)  # No. of pedestrians in simulation in the measurement area
         target_dist = [(x / n_pedestrians_timestep) for x in target_id_counts]
@@ -113,35 +85,22 @@ def calculate_pedestrian_target_distribution(data, target_size):
 
     length = len(current_dist)
     tmp = np.array(current_dist)
-    sum = []
-    total_dist = np.sum(tmp)/length
-    for i in range(len(tmp[0])):
-        sum += [np.sum(tmp[:,i])]
-    total_dist = np.array(sum)/length
-    #total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
-    
-    for i in current_dist:
-        for j in i:
-            if math.isnan(j):
-                print("we have a nan Value!")
-    
+    total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
 
     return current_dist, total_dist, timesteps
 
 
 def sort_chronological(data):
 
-    #print("Len(trajectory file data): %d" % len(data))
+    print("Len(trajectory file data): %d" % len(data))
     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])
 
     # compare data to data_sorted
-    '''
     if data_sorted.__eq__(data):
         print("Sorting of data is not necessary.")
     else:
         print("Sorting of data is necessary.")
-    '''
-    
+
     # find rows that have the same timestep
     current_time = data_sorted[0][INDEX_TIME_STEP]
     data_chron = []
@@ -160,7 +119,7 @@ def sort_chronological(data):
 def extract_period_from_to(data_chron, time_step_bounds, data_numerical):
 
     start_time_step = time_step_bounds[0]
-    #print("Start time step %d" % start_time_step)
+    print("Start time step %d" % start_time_step)
 
     t_max_chron = data_chron[-1][INDEX_TIME_STEP]
     t_max = data_numerical[-1][INDEX_TIME_STEP]
@@ -171,7 +130,7 @@ def extract_period_from_to(data_chron, time_step_bounds, data_numerical):
     else:
         stop_time_step = t_max - time_step_bounds[1]
 
-    #print("Stop time step %d" % stop_time_step)
+    print("Stop time step %d" % stop_time_step)
 
     data_chron_bounds = []
     for time_step in data_chron:

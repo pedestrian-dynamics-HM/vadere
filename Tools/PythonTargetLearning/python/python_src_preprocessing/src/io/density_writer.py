@@ -9,15 +9,8 @@ def write_matrix_to_file(matrix, dist, file):
     file.write(row_string)
     file.flush()
 
-def get_output_file_name(dist, name='density'):
-    extended_name = name
-    for i in range(len(dist)):
-        
-        extended_name += '_' + str(int(np.round(dist[i], 2)*100))
-    return extended_name
-    
-    
-    #return name + str(int(dist[0] * 100)) + '_' + str(int(dist[1] * 100)) + '_' + str(int(dist[2] * 100))
+def get_output_file_name(dist, name='density_'):
+    return name + str(int(dist[0] * 100)) + '_' + str(int(dist[1] * 100)) + '_' + str(int(dist[2] * 100))
 
 ####################################### OLD functions
 
