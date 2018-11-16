@@ -13,7 +13,7 @@ research group at the [Munich University of Applied Sciences](https://www.hm.edu
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
 However, we welcome contributions from external sources. 
 
-The VADERE framework includes a mesh generator for unstructured high quality 2D meshes called EikMesh which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
+The VADERE framework includes a mesh generator for unstructured high quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
 
 ## Pipeline Status
 
