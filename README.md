@@ -11,7 +11,9 @@ This software runs on OS X, Windows, and Linux.
 VADERE has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
 research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
-However, we welcome contributions from external sources.
+However, we welcome contributions from external sources. 
+
+The VADERE framework includes a mesh generator for unstructured high quality 2D meshes called EikMesh which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
 
 ## Pipeline Status
 
