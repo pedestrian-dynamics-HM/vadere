@@ -18,6 +18,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
+		clearStrides(topography);
 		update(topography.getElements(Pedestrian.class), timeStepInSec);
 	}
 

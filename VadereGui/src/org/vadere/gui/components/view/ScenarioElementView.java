@@ -174,12 +174,12 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			} else {
 				if (scenarioElement instanceof AgentWrapper) {
 					this.txtrTextfiletextarea.setText(
-							StateJsonConverter.serializeObject(((AgentWrapper) scenarioElement).getAgentInitialStore()));
+							StateJsonConverter.serializeObjectPretty(((AgentWrapper) scenarioElement).getAgentInitialStore()));
 				} else if (scenarioElement instanceof Pedestrian) {
-					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
+					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObjectPretty(scenarioElement));
 				} else {
 					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObject(scenarioElement.getAttributes()));
+							.serializeObjectPretty(scenarioElement.getAttributes()));
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -20,6 +21,15 @@ public class Pedestrian extends Agent {
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
+
+	/**
+	 * Footsteps is a list of foot steps a pedestrian made during the duration of one time step.
+	 * For all non event driven models this is exactly one foot step. For the event driven update
+	 * one pedestrian can move multiple times during one time step. To save memory the list of foot steps
+	 * will be cleared after each completion of a time step. The output processor <tt>PedestrianStrideProcessor</tt>
+	 * can write out those foot steps.
+	 */
+	private LinkedList<FootStep> footSteps;
 
 	/** Used only for JSON serialization? */
 	// TODO used at all? Car does NOT have this field. remove if unused!
@@ -47,6 +57,7 @@ public class Pedestrian extends Agent {
 		isLikelyInjured = false;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
+		footSteps = new LinkedList<>();
 	}
 
 	/**
@@ -67,6 +78,17 @@ public class Pedestrian extends Agent {
 			groupIds = new LinkedList<>();
 			groupSizes = new LinkedList<>();
 		}
+
+		footSteps = new LinkedList<>();
+		footSteps.addAll(other.footSteps);
+	}
+
+	public void clearFootSteps() {
+		footSteps.clear();
+	}
+
+	public LinkedList<FootStep> getFootSteps() {
+		return footSteps;
 	}
 
 	public void addGroupId(int groupId, int size){
