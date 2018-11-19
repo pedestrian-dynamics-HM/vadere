@@ -33,12 +33,6 @@ public class PedestrianFootStepProcessor extends DataProcessor<TimestepPedestria
 		lastSimTime = 0.0;
 	}
 
-	Map<PedestrianIdKey, LinkedList<FootStep>> getPositions(TimestepKey timestepKey) {
-		return this.getData().entrySet().stream()
-				.filter(e -> e.getKey().getTimestep().equals(timestepKey.getTimestep()))
-				.collect(Collectors.toMap(e -> new PedestrianIdKey(e.getKey().getPedestrianId()), Map.Entry::getValue));
-	}
-
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		Integer timeStep = state.getStep();

@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
 	private int backSteps;
+	private int lastTimeStep;
 
 	private LinkedList<Double> lastSimTimes;
 
@@ -32,17 +33,22 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 
 	@Override
 	public void doUpdate(final SimulationState state) {
-		this.pedPosProc.update(state);
+		if(state.getStep() > lastTimeStep) {
+			pedPosProc.update(state);
 
-		Integer timeStep = state.getStep();
-		Stream<Integer> pedIds = state.getTopography().getElements(Pedestrian.class).stream().map(ped -> ped.getId());
+			Integer timeStep = state.getStep();
+			Stream<Integer> pedIds = state.getTopography().getElements(Pedestrian.class).stream().map(ped -> ped.getId());
 
-		pedIds.forEach(pedId -> this.putValue(new TimestepPedestrianIdKey(timeStep, pedId),
-				this.getVelocity(timeStep, state.getSimTimeInSec(), pedId)));
+			pedIds.forEach(pedId -> putValue(new TimestepPedestrianIdKey(timeStep, pedId),
+					getVelocity(timeStep, state.getSimTimeInSec(), pedId)));
 
-		if (this.lastSimTimes.size() >= this.backSteps)
-			this.lastSimTimes.removeLast();
-		this.lastSimTimes.addFirst(state.getSimTimeInSec());
+			if (lastSimTimes.size() >= backSteps) {
+				lastSimTimes.removeLast();
+			}
+
+			lastSimTimes.addFirst(state.getSimTimeInSec());
+			lastTimeStep = state.getStep();
+		}
 	}
 
 	@Override
@@ -57,17 +63,18 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 		this.lastSimTimes.add(0.0);
 	}
 
-	private Double getVelocity(int timeStep, double currentSimTime, int pedId) {
-		TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(timeStep - this.backSteps > 0 ? timeStep - this.backSteps : 1, pedId);
+	private double getVelocity(int timeStep, double currentSimTime, int pedId) {
+		TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(timeStep - backSteps > 0 ? timeStep - backSteps : 1, pedId);
 
-		if (timeStep <= 1 || !this.pedPosProc.hasValue(keyBefore))
+		if (timeStep <= 1 || !pedPosProc.hasValue(keyBefore))
 			return 0.0; // For performance
 
-		VPoint posBefore = this.pedPosProc.getValue(keyBefore);
-		VPoint posNow = this.pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
+		VPoint posBefore = pedPosProc.getValue(keyBefore);
+		VPoint posNow = pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
 
-		return posNow.subtract(posBefore).scalarMultiply(1 / (currentSimTime - this.lastSimTimes.getFirst()))
-				.distanceToOrigin();
+		double velocity = posNow.subtract(posBefore).scalarMultiply(1 / (currentSimTime - lastSimTimes.getFirst())).distanceToOrigin();
+
+		return velocity;
 	}
 
     @Override

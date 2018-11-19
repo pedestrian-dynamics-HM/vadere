@@ -62,7 +62,6 @@ public class PerformanceTriangleFMM {
 	}
 
 	private static void solve(EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> solver) {
-		solver.reset();
 		long ms = System.currentTimeMillis();
 		System.out.println("start FFM");
 		solver.initialize();

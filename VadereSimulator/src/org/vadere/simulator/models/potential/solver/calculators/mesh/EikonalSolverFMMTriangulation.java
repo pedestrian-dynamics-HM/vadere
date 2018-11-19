@@ -199,6 +199,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 */
     @Override
     public void initialize() {
+    	reset();
 	    if (!calculationFinished) {
 		    while (narrowBand.size() > 0) {
 			    V vertex = narrowBand.poll();
@@ -209,7 +210,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	    }
     }
 
-    public void reset() {
+    private void reset() {
 	    triangulation.getMesh().streamPoints().forEach(p -> p.setPathFindingTag(PathFindingTag.Undefined));
 	    triangulation.getMesh().streamPoints().forEach(p -> p.setPotential(Double.MAX_VALUE));
 	    calculationFinished = false;
@@ -404,12 +405,12 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         if(isFeasibleForComputation(p1) && isFeasibleForComputation(p2)) {
 
-        	if(!nonAccuteTris.contains(face)) {
-        		double potential = computePotential(point, p1, p2);
+        	//if(!nonAccuteTris.contains(face)) {
+        		//double potential = computePotential(point, p1, p2);
         		//logger.info("compute potential " + potential);
 		        return computePotential(point, p1, p2);
-            } // we only try to find a virtual vertex if both points are already frozen
-            else {
+            //} // we only try to find a virtual vertex if both points are already frozen
+            /*else {
                 logger.debug("special case for non-acute triangle");
                 Optional<P> optPoint = walkToNumericalSupport(halfEdge, face);
 
@@ -426,7 +427,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
                 else {
                     logger.warn("no point found for " + point + " and " + face);
                 }
-            }
+            }*/
         }
 
         return Double.MAX_VALUE;
