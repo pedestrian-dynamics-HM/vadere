@@ -85,3 +85,8 @@ if __name__ == '__main__':
     print("Total scenario runs: {}".format(len(seed_results)))
     print("Passed: {}".format(len(seed_ok)))
     print("Failed: {}".format(len(seed_err)))
+
+    if len(seed_err) > 0:
+        exit(1)
+    else:
+        exit(0)
