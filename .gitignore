@@ -11,8 +11,9 @@ __pycache__/
 *$py.class
 **/venv/
 Tools/VadereAnalysisTool/dist/
+Tools/VadereAnalysisTool/build/
 Tools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
-
+Tools/ContinuousIntegration/**/output
 # C extensions
 *.so
 vadere_analysis_tool/build

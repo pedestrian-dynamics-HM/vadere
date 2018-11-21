@@ -1,6 +1,7 @@
 import os
 import re
 import fnmatch
+import shutil
 from vadere_analysis_tool import helper, scenario_output
 
 
@@ -88,7 +89,6 @@ class VadereProject():
     def _load_scenario_files(self, path='scenarios', scenario_search_pattern = "*.scenario", exclude_patterns = []):
 
         scenario_files = []
-        scenarios = []
         for root, dirnames, filenames in os.walk(os.path.join(self.project_path, path)):
             for filename in fnmatch.filter(filenames, scenario_search_pattern):
                 scenario_path = os.path.join(root, filename)
@@ -105,6 +105,10 @@ class VadereProject():
 
         self.scenario_files = sorted(scenario_files)
 
+    def clear_output_dir(self):
+        if os.path.exists(self.output_path):
+            shutil.rmtree(self.output_path)
+            os.makedirs(self.output_path, mode=0o755)
 
     def _load_output_directories(self):
         ret_msg = "loaded {} out of {} output directories. {}"

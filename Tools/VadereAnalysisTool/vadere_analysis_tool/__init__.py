@@ -3,5 +3,7 @@ from vadere_analysis_tool.scenario_output import NamedFiles
 from vadere_analysis_tool.vadere_project import VadereProject
 from vadere_analysis_tool.vadere_project import NamedOutput
 from vadere_analysis_tool.analysis.origin_deviation import OriginDeviation
+from vadere_analysis_tool.analysis.seed_same_trajectory import SameSeedTrajectory
+
 
 name = 'vadere_analysis_tool'

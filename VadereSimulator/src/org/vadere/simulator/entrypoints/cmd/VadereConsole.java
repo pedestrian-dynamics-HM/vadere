@@ -75,7 +75,7 @@ public class VadereConsole {
 				.dest("project-dir")
 				.help("Path to project directory");
 		projectRun.addArgument("--scenario-file", "-f")
-				.required(true)
+				.required(false)
 				.type(String.class)
 				.dest("scenario-file")
 				.help("Name of Scenario file");

@@ -2,6 +2,7 @@ import os
 from vadere_analysis_tool import helper
 import pandas as pd
 import json
+import hashlib
 
 
 class NamedFiles:
@@ -11,6 +12,19 @@ class NamedFiles:
 
 
 class ScenarioOutput:
+    """
+    attributes:
+    output_dir:         path to output directory (may be relative or absolute
+    output_dir_name:    name of output directory
+    scenario_path:      path to scenario file within output directory
+    scenario:           dict representing the whole scenario file
+    scenario_hash:      hash of scenario file based on string.strip(' \s\r\n') to ensure cross platform comparison
+    trajectories_hash:  hash of trajectory file base ond string.strip(' \s\r\n') to ensure cross platform comparison
+    file:               dict containing lambdas to create DataFrames for each output file.
+                        The Key is the file name with '.' and '-' replaced with '_'
+    named_files:        dummpy object containing attributes for each file in *file* with '.' and '-' replaced with '_'
+                        These attributes are also lambdas
+    """
 
     def __init__(self, output_dir):
 
@@ -25,7 +39,13 @@ class ScenarioOutput:
 
         if len(scenario_files) < 1:
             raise FileNotFoundError("Output directory has no scenario")
-        self.scenario = helper.read_json_to_dict(os.path.join(output_dir, scenario_files[0]))
+        self.scenario_path = os.path.join(output_dir, scenario_files[0])
+        self.scenario = helper.read_json_to_dict(self.scenario_path)
+        self.scenario_hash = self._get_md5_sum(self.scenario_path)
+        if os.path.exists(os.path.join(self.output_dir, 'postvis.trajectories')):
+            self.trajectories_hash = self._get_md5_sum(os.path.join(self.output_dir, 'postvis.trajectories'))
+        else:
+            raise FileNotFoundError("postvis.trajectories not found in {}.".format(output_dir))
 
         # add attributes for output files programmatically to the ScenarioOutput object. These attributes
         # are recognized by the code completion tool of jupyter-notebook and allow easy access to the each
@@ -59,8 +79,8 @@ class ScenarioOutput:
 
     def _load_df_(self, path):
         """
-        :return: lambda function to lazy load pandas DataFrame. This reduces the load time of a vadere_analysis_tool project in
-        a jupyter-notebook because the DataFrames of an output file is loaded only when needed.
+        :return: lambda function to lazy load pandas DataFrame. This reduces the load time of a vadere_analysis_tool
+        project in a jupyter-notebook because the DataFrames of an output file is loaded only when needed.
         """
         return lambda: self._get_dataframe_(path)
 
@@ -74,14 +94,33 @@ class ScenarioOutput:
         print("attributesModel:")
         print(json.dumps(self.scenario['scenario']['attributesModel'], indent=2))
 
+    def get_scenario_name(self):
+        try:
+            name = self.scenario['name']
+        except KeyError as err:
+            raise KeyError("The scenario file in output {} is corrupt. Scenario file not found. Err:{}".format(
+                self.output_dir_name, err))
+
+        return name
+
     def get_bound_offset(self):
         try:
             offset = [self.scenario['scenario']['topography']['attributes']['bounds']['x'],
-                     self.scenario['scenario']['topography']['attributes']['bounds']['y']]
+                      self.scenario['scenario']['topography']['attributes']['bounds']['y']]
         except KeyError as err:
-            raise KeyError("The scenario file in output {} is corrupt. topograhpy bound not found. Err:{}".format(self.output_dir_name, err))
+            raise KeyError("The scenario file in output {} is corrupt. topograhpy bound not found. Err:{}".format(
+                self.output_dir_name, err))
 
         return offset
+
+    @staticmethod
+    def _get_md5_sum(path):
+
+        with open(path, "r", encoding='utf-8') as f:
+            text = f.read()
+            text = text.strip(' \t\n\r')
+            hash_md5 = hashlib.md5(text.encode('utf-8'))
+        return hash_md5.hexdigest()
 
     @staticmethod
     def _get_dataframe_(path):

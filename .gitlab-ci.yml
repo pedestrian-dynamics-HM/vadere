@@ -65,3 +65,12 @@ run_origin_test:
       - python3 Tools/ContinuousIntegration/install_vadere_analysis_tool.py
       - python3 Tools/ContinuousIntegration/run_orign_translation_test.py
 
+run_seed_test:
+  stage: deploy
+
+  script:
+      - Documentation/version-control/git-hook-vadere-software
+      - mvn clean
+      - mvn -Dmaven.test.skip=true package
+      - python3 Tools/ContinuousIntegration/install_vadere_analysis_tool.py
+      - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py

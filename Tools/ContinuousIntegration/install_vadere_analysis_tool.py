@@ -21,9 +21,12 @@ def install_package_if_needed(package_name='VadereAnalysisTool', search_path='To
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        print("ReturnCode: {}\nStdOut: {} \nStdErr: {}".format(p_make_package.returncode,
-                                                               p_make_package.stdout.decode('utf8'),
-                                                               p_make_package.stderr.decode('utf8')))
+        if p_make_package.stdout:
+            print("StdOut: {}".format(p_make_package.stdout.decode('utf8')))
+        if p_make_package.stderr:
+            print("StdErr: {}".format(p_make_package.stderr.decode('utf8')))
+        print("ReturnCode: {}".format(p_make_package.returncode))
+
         if p_make_package.returncode == 0:
             stdout = p_make_package.stdout.decode('utf8')
             dist_dir = os.path.join(search_path, "dist")
@@ -41,9 +44,12 @@ def install_package_if_needed(package_name='VadereAnalysisTool', search_path='To
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE)
 
-                print("ReturnCode: {}\nStdOut: {} \nStdErr: {}".format(p_install_package.returncode,
-                                                                       p_install_package.stdout.decode('utf8'),
-                                                                       p_install_package.stderr.decode('utf8')))
+                if p_install_package.stdout:
+                    print("StdOut: {}".format(p_install_package.stdout.decode('utf8')))
+                if p_install_package.stderr:
+                    print("StdErr: {}".format(p_install_package.stderr.decode('utf8')))
+                print("ReturnCode: {}".format(p_install_package.returncode))
+
             else:
                 exit(1)
         else:
