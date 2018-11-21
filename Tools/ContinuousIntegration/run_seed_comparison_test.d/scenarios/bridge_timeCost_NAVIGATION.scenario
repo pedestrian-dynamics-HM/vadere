@@ -2,7 +2,6 @@
   "name" : "bridge_timeCost_NAVIGATION",
   "description" : "",
   "release" : "0.6",
-  "commithash" : "7083c1b72bc0488b47da0d0116a94f58ff462db7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

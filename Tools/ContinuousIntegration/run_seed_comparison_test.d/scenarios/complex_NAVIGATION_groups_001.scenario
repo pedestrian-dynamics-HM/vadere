@@ -1,5 +1,5 @@
 {
-  "name" : "complex_NAVIGATION_001",
+  "name" : "complex_NAVIGATION_groups_001",
   "description" : "",
   "release" : "0.6",
   "processWriters" : {
@@ -46,7 +46,7 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "NELDER_MEAD",
+        "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
@@ -55,7 +55,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.groups.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -83,10 +83,14 @@
           "pedestrianDynamicWeight" : 6.0,
           "loadingType" : "CONSTANT"
         }
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 90.0,
+      "finishTime" : 45.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -323,6 +327,32 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 13,
+        "absorbing" : false,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 14.8,
+            "y" : 11.5
+          }, {
+            "x" : 12.4,
+            "y" : 15.2
+          }, {
+            "x" : 19.3,
+            "y" : 15.9
+          }, {
+            "x" : 19.2,
+            "y" : 11.8
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "sources" : [ {
         "id" : 2,
@@ -338,7 +368,7 @@
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 15.0,
+        "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 8 ],
@@ -358,7 +388,7 @@
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 15.0,
+        "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 15, 8 ],
@@ -378,7 +408,7 @@
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 15.0,
+        "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6, 7 ],
@@ -398,11 +428,11 @@
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 15.0,
+        "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 6, 7 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "targetIds" : [ 13, 6, 7 ],
+        "groupSizeDistribution" : [ 0.3, 0.4, 0.3 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],
