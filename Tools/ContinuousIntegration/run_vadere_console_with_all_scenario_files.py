@@ -4,7 +4,7 @@
 # Note: script contains some print statements so that progress can be tracked
 # a little bit while script is running in continuous integration pipeline.
 
-# Wach out: call this script from root directory of project. E.g.
+# Watch out: call this script from root directory of project. E.g.
 #
 #   python Tools/my_script.py
 
@@ -46,6 +46,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
     failed_scenarios_with_exception = []
 
     for i, scenario_file in enumerate(scenario_files):
+
         try:
             print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
 
@@ -96,6 +97,7 @@ def print_summary(passed_and_failed_scenarios):
     print("Failed: {}".format(total_failed_scenarios))
 
 if __name__ == "__main__":
+
     long_running_scenarios = [
             "basic_4_1_wall_gnm1",
             "queueing",
@@ -103,8 +105,10 @@ if __name__ == "__main__":
             "rimea_11",
             "TestSFM",
             "thin_wall_and_closer_source_nelder_mead_ok",
-            "thin_wall_and_closer_source_pso_could_fail"
+            "thin_wall_and_closer_source_pso_could_fail",
+            "rimea_04_flow_osm1_550_up",
     ]
+
     excluded_scenarios = ["TESTOVM", "output", "legacy"]
     excluded_scenarios.extend(long_running_scenarios)
 

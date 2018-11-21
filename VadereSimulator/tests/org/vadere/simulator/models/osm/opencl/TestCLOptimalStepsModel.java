@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm.opencl;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistanceEikonalEq;
 import org.vadere.simulator.models.potential.fields.PotentialFieldSingleTargetGrid;
@@ -145,6 +146,7 @@ public class TestCLOptimalStepsModel {
 				  List<SpeedAdjuster> speedAdjusters,
 				  StepCircleOptimizer stepCircleOptimizer
 	 */
+	@Ignore
 	@Before
 	public void setUp() throws IOException, TextOutOfNodeException {
 		random = new Random();
@@ -177,7 +179,7 @@ public class TestCLOptimalStepsModel {
 		pedestrians.add(pedestrian);
 	}
 
-
+	@Ignore
 	@Test
 	public void testIdentity() throws OpenCLException {
 		CLOptimalStepsModel clOptimalStepsModel = new CLOptimalStepsModel(

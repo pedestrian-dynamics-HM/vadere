@@ -60,7 +60,9 @@ public abstract class StateJsonConverter {
 	private static ObjectMapper mapper = new JacksonObjectMapper();
 
 	/** Connection to jackson library. */
-	private static ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+	private static ObjectWriter prettyWriter = mapper.writerWithDefaultPrettyPrinter();
+
+	private static ObjectWriter writer = mapper.writer();
 
 	public static ObjectMapper getMapper() {
 		return mapper;
@@ -76,6 +78,18 @@ public abstract class StateJsonConverter {
 		} catch (TextOutOfNodeException | IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static <T> T deserializeObjectFromJson(String json, final TypeReference<T> type) {
+		T data = null;
+
+		try {
+			data = mapper.readValue(json, type);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// Handle the problem
+		}
+		return data;
 	}
 
 	// - - - - DESERIALIZING - - - -
@@ -202,7 +216,7 @@ public abstract class StateJsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, modelDefinition.getMainModel());
 		node.set("attributesModel", serializeAttributesModelToNode(modelDefinition.getAttributesList()));
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 
 	public static ObjectNode serializeAttributesModelToNode(final List<Attributes> attributesList) {
@@ -271,11 +285,11 @@ public abstract class StateJsonConverter {
 
 	public static String serializeAttributesSimulation(AttributesSimulation attributesSimulation)
 			throws JsonProcessingException {
-		return writer.writeValueAsString(mapper.convertValue(attributesSimulation, JsonNode.class));
+		return prettyWriter.writeValueAsString(mapper.convertValue(attributesSimulation, JsonNode.class));
 	}
 
 	public static String serializeTopography(Topography topography) throws JsonProcessingException {
-		return writer.writeValueAsString(serializeTopographyToNode(topography));
+		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
 
 	public static String serializeMainModelAttributesModelBundle(List<Attributes> attributesList, String mainModel)
@@ -283,10 +297,18 @@ public abstract class StateJsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 
-	public static String serializeObject(Object object) {
+	public static String serializeObjectPretty(Object object) {
+		try {
+			return prettyWriter.writeValueAsString(mapper.convertValue(object, JsonNode.class));
+		} catch (JsonProcessingException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String serialidzeObject(Object object) {
 		try {
 			return writer.writeValueAsString(mapper.convertValue(object, JsonNode.class));
 		} catch (JsonProcessingException | IllegalArgumentException e) {
@@ -304,7 +326,7 @@ public abstract class StateJsonConverter {
 		}
 
 		try {
-			String scenarioString = writer.writeValueAsString(jsonNode);
+			String scenarioString = prettyWriter.writeValueAsString(jsonNode);
 			return DigestUtils.sha1Hex(scenarioString);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
@@ -316,7 +338,7 @@ public abstract class StateJsonConverter {
 	}
 
 	public static String serializeJsonNode(JsonNode node) throws JsonProcessingException {
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 
 	// CLONE VIA SERIALIZE -> DESERIALIZE
@@ -330,7 +352,7 @@ public abstract class StateJsonConverter {
 		((ObjectNode) attributesModelNode).set(
 				attributesClassName,
 				mapper.convertValue(instantiator.createObject(attributesClassName), JsonNode.class));
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 	
 	public static JsonNode readTree(String json) throws IOException {
@@ -346,6 +368,6 @@ public abstract class StateJsonConverter {
 	}
 	
 	public static String writeValueAsString(Object value) throws JsonProcessingException {
-		return writer.writeValueAsString(value);
+		return prettyWriter.writeValueAsString(value);
 	}
 }
