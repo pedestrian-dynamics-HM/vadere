@@ -73,11 +73,12 @@ class VadereProject():
 
         self.project_name = str.strip(helper.read_lines(os.path.join(project_dir, 'vadere.project'))[0])
 
+        self.output_path = os.path.join(self.project_path, 'output')
         if os.path.exists(os.path.join(self.project_path, 'output')):
-            self.output_path = os.path.join(self.project_path, 'output')
             self._load_output_directories()
         else:
-            raise FileNotFoundError("Project does not have output folder.")
+            print("Warn: project {} has no output folder, an empty folder will be created.".format(self.project_name))
+            os.makedirs(self.output_path, mode=0o755)
 
 
         if os.path.exists(os.path.join(self.project_path, 'scenarios')):

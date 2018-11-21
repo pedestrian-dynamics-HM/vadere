@@ -1,4 +1,6 @@
 import unittest
+import os
+import shutil
 from vadere_analysis_tool import vadere_project
 
 
@@ -12,7 +14,10 @@ class VadereProjectTests(unittest.TestCase):
         self.assertRaises(FileNotFoundError, vadere_project.VadereProject, "testData/s2uSSScre")
 
     def test_no_output_dir(self):
-        self.assertRaises(FileNotFoundError, vadere_project.VadereProject, "testData/s2ucreInvalid")
+        shutil.rmtree(os.path.join("testData/s2ucreInvalid", "output"), ignore_errors=True)
+        self.assertFalse(os.path.exists(os.path.join("testData/s2ucreInvalid", "output")))
+        p = vadere_project.VadereProject("testData/s2ucreInvalid")
+        self.assertTrue(os.path.exists(os.path.join("testData/s2ucreInvalid", "output")))
 
     def test_load_output_dir(self):
         project = vadere_project.VadereProject("testData/s2ucre")
