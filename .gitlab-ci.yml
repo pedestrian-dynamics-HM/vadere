@@ -54,6 +54,7 @@ unit_tests_with_coverage:
 #       - mvn clean
 #       - mvn -Dmaven.test.skip=true package
 #       - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+# 
 
 run_origin_test:
   stage: deploy
