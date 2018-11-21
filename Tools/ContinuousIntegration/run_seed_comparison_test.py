@@ -8,7 +8,7 @@ from vadere_analysis_tool import SameSeedTrajectory
 
 
 def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_console="VadereSimulator/target/vadere-console.jar",
-                                           scenario_timeout_in_sec=60*5):
+                                           scenario_timeout_in_sec=60*8):
 
     scenario_files = project.scenario_files
     total_scenario_files = len(scenario_files)
