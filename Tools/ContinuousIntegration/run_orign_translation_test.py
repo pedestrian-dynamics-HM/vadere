@@ -90,14 +90,19 @@ if __name__ == '__main__':
 
     output_pairs = get_output_pairs()
     print("comparing {} output pairs".format(len(output_pairs)))
-    results = [pair.get_origin_deviation_result() for pair in output_pairs]
+    # results = [pair.get_origin_deviation_result() for pair in output_pairs]
     return_val = 0
     space_offset = ''
+    all_results_count = len(output_pairs)
+    err_results_count = 0
+    warn_results_count = 0
+    ok_results_coutn = 0
 
     for pair in output_pairs:
         result = pair.get_origin_deviation_result()
         print("*** compare trajectories for {} ... ".format(result['output_name']), end='')
         if result['err_count'] > 0:
+            err_results_count += 1
             print("ERROR")
             return_val = 1
             print("    Error: Found {} pedestrians with maximal diff bigger than {}.".format(result['err_count'],
@@ -111,6 +116,7 @@ if __name__ == '__main__':
 
         if result['warn_count'] > 0:
             if result['err_count'] == 0:
+                warn_results_count += 1
                 print("WARN")
             print("    Warning: Found {} pedestrians with maximal diff between {} and {}.".format(result['warn_count'],
                                                                                                   pair.max_diff_ok,
@@ -123,6 +129,7 @@ if __name__ == '__main__':
                 print("    [{}, {}, {}]".format(row['pedestrianId'], row['timeStep'], row['diff']))
 
         if result['err_count'] == 0 and result['warn_count'] == 0:
+            ok_results_coutn += 1
             print("OK")
 
         if result['err_count'] > 0 or result['warn_count'] > 0:
@@ -139,5 +146,12 @@ if __name__ == '__main__':
             ))
 
 
-    pair.get_figure([p.get_origin_deviation_result() for p in output_pairs]).show()
+    print("###########")
+    print("# Summary #")
+    print("###########")
+    print("")
+    print("Total scenario runs: {}".format(all_results_count))
+    print("Passed: {}".format(ok_results_coutn))
+    print("Warning: {}".format(warn_results_count))
+    print("Failed: {}".format(err_results_count))
     exit(return_val)

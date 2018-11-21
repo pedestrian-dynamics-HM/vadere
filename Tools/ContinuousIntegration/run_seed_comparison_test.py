@@ -25,8 +25,6 @@ def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_con
                 # Measure wall time and not CPU time simply because it is the simplest method.
                 wall_time_start = time.time()
 
-
-
                 # Use timout feature, check return value and capture stdout/stderr to a PIPE (use
                 # completed_process.stdout to get it).
                 # print("subprocess call: {}".format(' '.join(
@@ -78,3 +76,12 @@ if __name__ == '__main__':
     if seed_ok:
         for res in seed_ok:
             print("Scenario {} with scenario-hash {} - OK".format(res['scenario_name'], res['scenario_hash']))
+
+
+    print("###########")
+    print("# Summary #")
+    print("###########")
+    print("")
+    print("Total scenario runs: {}".format(len(seed_results)))
+    print("Passed: {}".format(len(seed_ok)))
+    print("Failed: {}".format(len(seed_err)))

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="VadereAnalysisTool",
-    version="0.0.9",
+    version="0.1.0",
     author="Stefan Schuhbäck",
     author_email="stefan.schuhbaeck@hm.edu",
     description="Import VadereProject to ease analysis",
