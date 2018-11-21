@@ -1,7 +1,8 @@
 {
-  "name" : "wait_in_area_event_2_sources_2_targets",
+  "name" : "wait_event_2_sources_2_targets_osm_sequential",
   "description" : "",
   "release" : "0.6",
+  "commithash" : "45917996dc1d7ac7f31aff96d40e2886d36a5cd3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -102,7 +103,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 100.0,
+      "finishTime" : 150.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -222,15 +223,8 @@
         "waitTimeBetweenRepetition" : 0.0
       },
       "events" : [ {
-        "type" : "WaitInAreaEvent",
-        "targets" : [ ],
-        "area" : {
-          "x" : 15.0,
-          "y" : 0.0,
-          "width" : 6.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
+        "type" : "WaitEvent",
+        "targets" : [ ]
       } ]
     } ]
   }
