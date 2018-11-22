@@ -58,7 +58,7 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, IOUtils.OUTPUT_DIR, false, scenarioFinishedListener);
+		this(scenario, outputDir, false, scenarioFinishedListener);
 	}
 
 	// if overwriteTimestampSetting is true do note use timestamp in output directory

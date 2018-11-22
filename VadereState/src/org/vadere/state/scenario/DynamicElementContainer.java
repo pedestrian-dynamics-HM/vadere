@@ -61,6 +61,8 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		this.elementMap.put(element.getId(), element);
 		this.cellsElements.addObject(element);
 
+		assert (elementMap.size() == cellsElements.size());
+
 		for (DynamicElementAddListener<T> listener : addListener) {
 			listener.elementAdded(element);
 		}
@@ -69,6 +71,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 	public synchronized void moveElement(T element, VPoint oldPosition) {
 		this.cellsElements.moveObject(element, oldPosition);
 
+		assert (elementMap.size() == cellsElements.size());
 		for (DynamicElementMoveListener<T> listener : moveListener) {
 			listener.elementMove(element);
 		}
@@ -78,6 +81,7 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		this.elementMap.remove(element.getId());
 		this.cellsElements.removeObject(element);
 
+		assert (elementMap.size() == cellsElements.size());
 		for (DynamicElementRemoveListener<T> listener : removeListener) {
 			listener.elementRemoved(element);
 		}

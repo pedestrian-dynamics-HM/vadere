@@ -75,7 +75,7 @@ public class VadereConsole {
 				.dest("project-dir")
 				.help("Path to project directory");
 		projectRun.addArgument("--scenario-file", "-f")
-				.required(true)
+				.required(false)
 				.type(String.class)
 				.dest("scenario-file")
 				.help("Name of Scenario file");
@@ -98,6 +98,12 @@ public class VadereConsole {
 				.dest("output-dir") // set name in namespace
 				.type(String.class)
 				.help("Supply different output directory path to use.");
+		scenarioRun.addArgument("--override-timestep-setting")
+				.dest("override-timestep-setting")
+				.required(false)
+				.setDefault(false)
+				.action(Arguments.storeTrue())
+				.help("This will ignore the TimestampSetting in the scenario file.");
 
 		scenarioRun.addArgument("--scenario-file", "-f")
 				.required(true)
