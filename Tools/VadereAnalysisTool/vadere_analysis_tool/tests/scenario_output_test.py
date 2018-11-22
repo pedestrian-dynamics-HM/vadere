@@ -5,22 +5,22 @@ from vadere_analysis_tool import ScenarioOutput
 class ScenarioOutputTests(unittest.TestCase):
 
     def test_output_dir(self):
-        out = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
-        self.assertEqual(out.output_dir, "testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
+        out = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
+        self.assertEqual(out.output_dir, "testData/s2ucre/output/b_2018-11-16_13-42-54.117")
 
     def test_scenario_dict(self):
-        out = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
+        out = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
         self.assertEqual(out.scenario['name'], 'bridge_coordinates_kai')
 
     def test_invalid_scenario_dict(self):
         self.assertRaises(FileNotFoundError, ScenarioOutput, "testData/s2ucre/output/invalid")
 
     def test_scenario_output_dict(self):
-        out = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
+        out = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
         self.assertEqual(len(out.files), 3)
 
     def test_settattr_works(self):
-        out = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
+        out = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
         self.assertTrue('df_overlapCount_txt' in dir(out.named_files))
         self.assertTrue('df_overlaps_csv' in dir(out.named_files))
         self.assertTrue('df_postvis_trajectories' in dir(out.named_files))
@@ -29,38 +29,38 @@ class ScenarioOutputTests(unittest.TestCase):
         self.assertTrue('info_postvis_trajectories' in dir(out.named_files))
 
     def test_offset(self):
-        out = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
+        out = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
         self.assertEqual([564280.0,5933391.0], out.get_bound_offset())
 
     def test_get_scenario_name(self):
-        out = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
+        out = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
         self.assertEqual('bridge_coordinates_kai', out.get_scenario_name())
 
     def test_scenario_md5sum(self):
-        out_1 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
-        out_2 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-57-42.894")
-        out_3 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_navigation_2018-11-16_13-43-08.160")
-        out_4 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_navigation_2018-11-16_13-57-58.997")
+        out_1 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
+        out_2 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-57-42.894")
+        out_3 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-43-08.160")
+        out_4 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-57-58.997")
         out_5 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_navigation_random_pos_2018-11-16_13-46-13.488")
+            "testData/s2ucre/output/b_2018-11-16_13-46-13.488")
         out_6 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_navigation_random_pos_2018-11-16_14-01-07.289")
-        out_7 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_origin_0_2018-11-16_13-49-31.248")
-        out_8 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_origin_0_2018-11-16_14-04-19.882")
+            "testData/s2ucre/output/b_2018-11-16_14-01-07.289")
+        out_7 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-49-31.248")
+        out_8 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_14-04-19.882")
         out_9 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_2018-11-16_13-49-48.269")
+            "testData/s2ucre/output/b_2018-11-16_13-49-48.269")
         out_11 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_2018-11-16_14-04-35.721")
+            "testData/s2ucre/output/b_2018-11-16_14-04-35.721")
         out_12 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_random_pos_2018-11-16_13-53-04.555")
+            "testData/s2ucre/output/b_2018-11-16_13-53-04.555")
         out_13 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_random_pos_2018-11-16_14-08-14.82")
+            "testData/s2ucre/output/b_2018-11-16_14-08-14.82")
         out_14 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_random_pos_2018-11-16_13-56-18.210")
+            "testData/s2ucre/output/b_2018-11-16_13-56-18.210")
         out_15 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_random_pos_2018-11-16_14-11-36.817")
-        out_16 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_random_pos_2018-11-16_13-56-34.297")
-        out_17 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_random_pos_2018-11-16_14-11-53.469")
+            "testData/s2ucre/output/b_2018-11-16_14-11-36.817")
+        out_16 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-56-34.297")
+        out_17 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_14-11-53.469")
         out_18 = ScenarioOutput("testData/s2ucre/output/empty_2018-11-16_13-56-50.397")
         out_19 = ScenarioOutput("testData/s2ucre/output/empty_2018-11-16_14-12-09.609")
 
@@ -85,30 +85,30 @@ class ScenarioOutputTests(unittest.TestCase):
 
 
     def test_trajectories_md5sum(self):
-        out_1 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-42-54.117")
-        out_2 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_2018-11-16_13-57-42.894")
-        out_3 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_navigation_2018-11-16_13-43-08.160")
-        out_4 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_navigation_2018-11-16_13-57-58.997")
+        out_1 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-42-54.117")
+        out_2 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-57-42.894")
+        out_3 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-43-08.160")
+        out_4 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-57-58.997")
         out_5 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_navigation_random_pos_2018-11-16_13-46-13.488")
+            "testData/s2ucre/output/b_2018-11-16_13-46-13.488")
         out_6 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_navigation_random_pos_2018-11-16_14-01-07.289")
-        out_7 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_origin_0_2018-11-16_13-49-31.248")
-        out_8 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_origin_0_2018-11-16_14-04-19.882")
+            "testData/s2ucre/output/b_2018-11-16_14-01-07.289")
+        out_7 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-49-31.248")
+        out_8 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_14-04-19.882")
         out_9 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_2018-11-16_13-49-48.269")
+            "testData/s2ucre/output/b_2018-11-16_13-49-48.269")
         out_11 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_2018-11-16_14-04-35.721")
+            "testData/s2ucre/output/b_2018-11-16_14-04-35.721")
         out_12 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_random_pos_2018-11-16_13-53-04.555")
+            "testData/s2ucre/output/b_2018-11-16_13-53-04.555")
         out_13 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_navigation_random_pos_2018-11-16_14-08-14.82")
+            "testData/s2ucre/output/b_2018-11-16_14-08-14.82")
         out_14 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_random_pos_2018-11-16_13-56-18.210")
+            "testData/s2ucre/output/b_2018-11-16_13-56-18.210")
         out_15 = ScenarioOutput(
-            "testData/s2ucre/output/bridge_coordinates_kai_origin_0_random_pos_2018-11-16_14-11-36.817")
-        out_16 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_random_pos_2018-11-16_13-56-34.297")
-        out_17 = ScenarioOutput("testData/s2ucre/output/bridge_coordinates_kai_random_pos_2018-11-16_14-11-53.469")
+            "testData/s2ucre/output/b_2018-11-16_14-11-36.817")
+        out_16 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_13-56-34.297")
+        out_17 = ScenarioOutput("testData/s2ucre/output/b_2018-11-16_14-11-53.469")
         out_18 = ScenarioOutput("testData/s2ucre/output/empty_2018-11-16_13-56-50.397")
         out_19 = ScenarioOutput("testData/s2ucre/output/empty_2018-11-16_14-12-09.609")
 
