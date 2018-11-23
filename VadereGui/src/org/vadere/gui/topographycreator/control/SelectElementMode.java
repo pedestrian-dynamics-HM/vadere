@@ -9,6 +9,7 @@ import javax.swing.undo.UndoableEditSupport;
 import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+import org.vadere.simulator.utils.builder.topography.AttributeModifier;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;

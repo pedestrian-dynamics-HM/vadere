@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.model;
 
+import org.vadere.simulator.utils.builder.topography.AgentWrapper;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesSource;

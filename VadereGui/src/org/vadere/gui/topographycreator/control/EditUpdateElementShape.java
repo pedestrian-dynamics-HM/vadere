@@ -5,6 +5,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+import org.vadere.simulator.utils.builder.topography.AttributeModifier;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
 

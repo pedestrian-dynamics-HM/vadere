@@ -1,4 +1,4 @@
-package org.vadere.gui.topographycreator.model;
+package org.vadere.simulator.utils.builder.topography;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -25,6 +25,7 @@ public final class AgentWrapper extends ScenarioElement {
 	/** The wrapped store object. */
 	private Agent agent;
 
+	public
 	AgentWrapper(final VPoint position) {
 		// use a Pedestrian as default
 		// TODO this default does not make much sense

@@ -1,6 +1,6 @@
-package org.vadere.gui.topographycreator.control;
+package org.vadere.simulator.utils.builder.topography;
 
-import org.vadere.gui.topographycreator.model.AgentWrapper;
+import org.vadere.simulator.utils.builder.topography.AgentWrapper;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;

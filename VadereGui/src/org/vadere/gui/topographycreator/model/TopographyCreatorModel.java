@@ -15,6 +15,8 @@ import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.utils.builder.topography.AgentWrapper;
+import org.vadere.simulator.utils.builder.topography.TopographyBuilder;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;

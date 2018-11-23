@@ -1,4 +1,4 @@
-package org.vadere.gui.topographycreator.model;
+package org.vadere.simulator.utils.builder.topography;
 
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Field;
@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.topographycreator.control.AttributeModifier;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;

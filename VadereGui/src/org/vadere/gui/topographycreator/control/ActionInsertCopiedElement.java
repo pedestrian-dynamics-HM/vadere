@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
-import org.vadere.gui.topographycreator.model.AgentWrapper;
+import org.vadere.simulator.utils.builder.topography.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VCircle;
