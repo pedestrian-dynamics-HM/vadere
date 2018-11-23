@@ -31,9 +31,19 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		Integer timeStep = state.getStep();
-		for (Pedestrian p : state.getTopography().getElements(Pedestrian.class)) {
-			this.putValue(new TimestepPedestrianIdKey(timeStep, p.getId()), p.getPosition());
+
+		VPoint offset = new VPoint(0,0);
+		if (state.getName().contains("_with_offset")){
+			offset = new VPoint(564280.000000, 5933391.000000);
 		}
+
+		for (Pedestrian p : state.getTopography().getElements(Pedestrian.class)) {
+			this.putValue(new TimestepPedestrianIdKey(timeStep, p.getId()), getPosition(offset, p));
+		}
+	}
+
+	private VPoint getPosition(VPoint offset, Pedestrian p){
+		return p.getPosition().add(offset);
 	}
 
 	@Override

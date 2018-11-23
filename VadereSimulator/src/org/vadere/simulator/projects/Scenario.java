@@ -14,10 +14,12 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.simulator.utils.builder.topography.TopographyBuilder;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
@@ -31,6 +33,7 @@ import difflib.DiffUtils;
  * 
  */
 public class Scenario {
+
 
 	private static Logger logger = LogManager.getLogger(Scenario.class);
 	private ScenarioStore scenarioStore;
@@ -66,10 +69,17 @@ public class Scenario {
 	public void setSimulationRunning(boolean simulationRunning) {
 		if (simulationRunning){
 			simulationScenarioStore = copyScenarioStore();
+			setSimulationOrigin(0.0, 0.0);
 		} else {
 			simulationScenarioStore = null;
 		}
 		this.simulationRunning = simulationRunning;
+	}
+
+	public void setSimulationOrigin(double x, double y){
+		TopographyBuilder builder = new TopographyBuilder(getScenarioStore().getTopography());
+		builder.setOrigin(x, y);
+		simulationScenarioStore.setTopography(builder.build());
 	}
 
 	public ScenarioStore copyScenarioStore() {

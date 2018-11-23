@@ -71,7 +71,8 @@ public class JsonConverter {
 		return null;
 	}
 
-	public static String serializeScenarioRunManager(Scenario scenarioRunManager, boolean commitHashIncluded)
+	public static String
+	serializeScenarioRunManager(Scenario scenarioRunManager, boolean commitHashIncluded)
 			throws IOException {
 		return StateJsonConverter.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}

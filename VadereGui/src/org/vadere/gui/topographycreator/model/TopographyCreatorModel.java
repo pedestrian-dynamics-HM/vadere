@@ -237,14 +237,7 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 	@Override
 	public void setTopographyBound(final VRectangle scenarioBound) {
-		try {
-			Field field = AttributesTopography.class.getDeclaredField("bounds");
-			field.setAccessible(true);
-			field.set(topographyBuilder.getAttributes(), scenarioBound);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-
-			e.printStackTrace();
-		}
+		topographyBuilder.getAttributes().setBounds(scenarioBound);
 		boundId++;
 		calculateScaleFactor();
 		setChanged();

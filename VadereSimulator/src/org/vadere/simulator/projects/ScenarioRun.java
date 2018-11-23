@@ -95,7 +95,7 @@ public class ScenarioRun implements Runnable {
 				scenarioStore.getTopography().reset();
 				logger.info("StartIt " + scenario.getName());
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
-				modelBuilder.createModelAndRandom();
+				modelBuilder.createModelAndRandom(); // save selected seed in output-scenario file
 
 				final MainModel mainModel = modelBuilder.getModel();
 				final Random random = modelBuilder.getRandom();

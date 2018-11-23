@@ -20,6 +20,7 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
 /**
@@ -138,6 +139,15 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topography.setTeleporter(teleporter);
 
 		return topography;
+	}
+
+	public void setOrigin(double x, double y){
+		double oldX = this.attributes.getBounds().x;
+		double oldY = this.attributes.getBounds().y;
+		double width = this.attributes.getBounds().width;
+		double height = this.attributes.getBounds().height;
+		translateElements(x - oldX, y - oldY);
+		this.attributes.setBounds(new VRectangle(x, y, width, height));
 	}
 
 	public void translateElements(final double x, final double y) {

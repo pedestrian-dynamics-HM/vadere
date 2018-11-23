@@ -8,7 +8,7 @@ from vadere_analysis_tool.analysis import OriginDeviation
 
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar",
-                                           scenario_timeout_in_sec=60):
+                                           scenario_timeout_in_sec=60*5):
     output_dir = "Tools/ContinuousIntegration/run_orign_translation_test.d/output"
 
     if os.path.exists(output_dir):
@@ -61,16 +61,16 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
     return {"passed": passed_scenarios, "failed": failed_scenarios_with_exception}
 
 
-def get_output_pairs(path="Tools/ContinuousIntegration/run_orign_translation_test.d/output"):
-    _output_pairs = []
-    output_without_offset = [d for d in os.listdir(path) if d.endswith("without_offset")]
-    for dir_without in output_without_offset:
-        dir_with_offset = dir_without.replace("without_offset", "with_offset")
-        name = dir_with_offset[:-len("without_offset")]
-        pair = [os.path.join(path, dir_without), os.path.join(path, dir_with_offset)]
-        _output_pairs.append(OriginDeviation(pair, name))
-
-    return _output_pairs
+#def get_output_pairs(path="Tools/ContinuousIntegration/run_orign_translation_test.d/output"):
+#    _output_pairs = []
+#    output_without_offset = [d for d in os.listdir(path) if d.endswith("without_offset")]
+#    for dir_without in output_without_offset:
+#        dir_with_offset = dir_without.replace("without_offset", "with_offset")
+#        name = dir_with_offset[:-len("without_offset")]
+#        pair = [os.path.join(path, dir_without), os.path.join(path, dir_with_offset)]
+#        _output_pairs.append(OriginDeviation(pair, name))
+#
+#    return _output_pairs
 
 
 def run_simulations(test_project_path):
@@ -86,9 +86,9 @@ def run_simulations(test_project_path):
 if __name__ == '__main__':
     test_project_path = "Tools/ContinuousIntegration/run_orign_translation_test.d"
 
-    # run_simulations(test_project_path)
+#    run_simulations(test_project_path)
 
-    output_pairs = get_output_pairs()
+    output_pairs = OriginDeviation.create_origin_deviation_pairs_from_project(project_path=test_project_path)
     print("comparing {} output pairs".format(len(output_pairs)))
     # results = [pair.get_origin_deviation_result() for pair in output_pairs]
     return_val = 0
