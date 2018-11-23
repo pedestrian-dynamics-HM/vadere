@@ -10,16 +10,11 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
-import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
-import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
-import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
-import org.vadere.simulator.entrypoints.cmd.commands.SetLogLevelCommand;
-import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.*;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 
 /**
- * Provides the possibility to start VADERE in console mode.
- * 
+ * Provides the possibility to start Vadere in console mode.
  */
 public class VadereConsole {
 
@@ -27,9 +22,6 @@ public class VadereConsole {
 
 	public static void main(String[] args) {
 		ArgumentParser parser = createArgumentParser();
-
-//		args = new String[]{"--loglevel", "INFO", "scenario-run", "-o", "/tmp", "-f", "/home/lphex/hm.d/vadere/VadereModelTests/TestStairs/scenarios/stairs_diagonal_1_+1.scenario"};
-//		args = new String[]{"-h"};
 
 		try {
 			Namespace ns = parser.parseArgs(args);
@@ -50,15 +42,24 @@ public class VadereConsole {
 				.defaultHelp(true)
 				.description("Runs the VADERE pedestrian simulator.");
 
-		parser.addArgument("--loglevel")
-				.required(false)
-				.type(String.class)
-				.dest("loglevel")
-				.choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
-				.setDefault("INFO")
-				.action(new SetLogLevelCommand())
-				.help("Set Log Level for vadere.");
+		addOptionsToParser(parser);
+		addSubCommandsToParser(parser);
 
+		return parser;
+	}
+
+    private static void addOptionsToParser(ArgumentParser parser) {
+        parser.addArgument("--loglevel")
+                .required(false)
+                .type(String.class)
+                .dest("loglevel")
+                .choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
+                .setDefault("INFO")
+                .action(new SetLogLevelCommand())
+                .help("Set Log Level for vadere.");
+    }
+
+	private static void addSubCommandsToParser(ArgumentParser parser) {
 		Subparsers subparsers = parser.addSubparsers()
 										.title("subcommands")
 										.description("valid subcommands")
@@ -83,7 +84,7 @@ public class VadereConsole {
 				.required(false)
 				.type(String.class)
 				.dest("scenario-checker")
-				.choices(ScenarioChecker.CHECKER_OFF, ScenarioChecker.CHECKER_OFF)
+				.choices(ScenarioChecker.CHECKER_ON, ScenarioChecker.CHECKER_OFF)
 				.setDefault(ScenarioChecker.CHECKER_OFF)
 				.help("Turn Scenario Checker on or off.");
 
@@ -192,8 +193,6 @@ public class VadereConsole {
 				.help("Create new transformation and identity file based on current latest version" +
 						"PATH must point to the directory containing the old transformation files." +
 						" This Argument takes the new Version Label as input");
-
-		return parser;
 	}
 
 }
