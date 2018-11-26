@@ -49,6 +49,8 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 		if (lastSimTimes.size() >= backSteps) {
 			lastSimTimes.removeLast();
 		}
+
+		lastSimTimes.addFirst(state.getSimTimeInSec());
 	}
 
 	@Override

@@ -73,8 +73,8 @@ public class PedestrianFundamentalDiagramAProcessor extends DataProcessor<Timest
 			deltaSimTime = state.getSimTimeInSec();
 		}
 
-		pedestrianLineCrossProcessor.doUpdate(state);
-		pedestrianVelocityProcessor.doUpdate(state);
+		pedestrianLineCrossProcessor.update(state);
+		pedestrianVelocityProcessor.update(state);
 		double simTime = state.getSimTimeInSec();
 		double measureTime = simTime - deltaTime / 2.0;
 

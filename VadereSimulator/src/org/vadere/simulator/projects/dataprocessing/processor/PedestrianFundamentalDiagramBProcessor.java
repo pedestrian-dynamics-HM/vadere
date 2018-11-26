@@ -67,7 +67,7 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 
 	@Override
 	protected void doUpdate(SimulationState state) {
-		pedestrianTrajectoryProcessor.doUpdate(state);
+		pedestrianTrajectoryProcessor.update(state);
 	}
 
 	@Override

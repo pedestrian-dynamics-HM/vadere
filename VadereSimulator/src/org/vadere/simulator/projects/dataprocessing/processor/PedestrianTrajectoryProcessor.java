@@ -23,8 +23,6 @@ import java.util.Collection;
 @DataProcessorClass()
 public class PedestrianTrajectoryProcessor extends DataProcessor<PedestrianIdKey, VTrajectory> {
 
-	private static double epsilon = 1.0E-9;
-
 	public PedestrianTrajectoryProcessor() {
 		super("trajectory");
 		setAttributes(new AttributesPedestrianLineCrossProcessor());
