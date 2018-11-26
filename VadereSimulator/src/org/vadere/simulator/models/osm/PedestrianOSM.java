@@ -249,7 +249,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void refreshRelevantPedestrians() {
 		VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-		relevantPedestrians = potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography());
+		setRelevantPedestrians(potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography()));
 	}
 
 

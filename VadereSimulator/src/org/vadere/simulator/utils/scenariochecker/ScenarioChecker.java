@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.PedestrianSpeedSetupCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceMinRadiusCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceSpawnSettingCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.StairTreadSanityCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.TopographyOverlapCheck;
@@ -23,7 +24,7 @@ public class ScenarioChecker {
 	private final Topography topography;
 	private final Scenario scenario;
 
-	public ScenarioChecker(@NotNull final Topography topography){
+	public ScenarioChecker(@NotNull final Topography topography) {
 		Scenario s = new Scenario("");
 		s.setTopography(topography);
 		this.scenario = s;
@@ -44,12 +45,12 @@ public class ScenarioChecker {
 	}
 
 
-	public PriorityQueue<ScenarioCheckerMessage> checkOverlap(){
+	public PriorityQueue<ScenarioCheckerMessage> checkOverlap() {
 		return runCheck(new TopographyOverlapCheck());
 	}
 
 
-	private PriorityQueue<ScenarioCheckerMessage> runCheck(ScenarioCheckerTest checkerTest){
+	private PriorityQueue<ScenarioCheckerMessage> runCheck(ScenarioCheckerTest checkerTest) {
 		return checkerTest.runScenarioCheckerTest(scenario);
 	}
 
@@ -63,16 +64,21 @@ public class ScenarioChecker {
 		ret.addAll(checkOverlap());
 		ret.addAll(checkSimulationAttribues());
 		ret.addAll(checkSourceSpawnSetting());
+		ret.addAll(checkMinSourceRadius());
 		return ret;
 	}
 
-	public PriorityQueue<ScenarioCheckerMessage> checkSimulationAttribues(){
+	public PriorityQueue<ScenarioCheckerMessage> checkMinSourceRadius() {
+		return runCheck(new SourceMinRadiusCheck());
+	}
+
+	public PriorityQueue<ScenarioCheckerMessage> checkSimulationAttribues() {
 		PriorityQueue<ScenarioCheckerMessage> ret = new PriorityQueue<>();
 		ret.addAll(runCheck(new SimulationTimeStepLengthCheck()));
 		return ret;
 	}
 
-	public PriorityQueue<ScenarioCheckerMessage> checkSourceSpawnSetting(){
+	public PriorityQueue<ScenarioCheckerMessage> checkSourceSpawnSetting() {
 		return runCheck(new SourceSpawnSettingCheck());
 	}
 
