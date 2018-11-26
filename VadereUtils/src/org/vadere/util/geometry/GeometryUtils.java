@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Random;
 
@@ -58,6 +59,32 @@ public class GeometryUtils {
 
 	public static double derterminant2D(double x1, double y1, double x2, double y2) {
 		return x1 * y2 - y1 * x2;
+	}
+
+	/**
+	 *
+	 * @param rectangle
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return
+	 */
+	public static Optional<VPoint> intersectionPoint(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
+		if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2));
+		}
+		else if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2));
+		}
+		else if(intersectLineSegment(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2));
+		}
+		if(intersectLineSegment(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2));
+		}
+
+		return Optional.empty();
 	}
 
 	//http://mathworld.wolfram.com/Line-LineIntersection.html

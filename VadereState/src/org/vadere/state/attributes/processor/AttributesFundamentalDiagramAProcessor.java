@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-public class AttributesFlowOverTimeProcessor extends AttributesProcessor {
+public class AttributesFundamentalDiagramAProcessor extends AttributesProcessor {
 	private int pedestrianLineCrossProcessorId;
 	private int pedestrianVelocityProcessorId;
 	private double deltaTime;

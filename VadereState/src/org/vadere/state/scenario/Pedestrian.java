@@ -2,6 +2,7 @@ package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -29,7 +30,7 @@ public class Pedestrian extends Agent {
 	 * will be cleared after each completion of a time step. The output processor <tt>PedestrianStrideProcessor</tt>
 	 * can write out those foot steps.
 	 */
-	private LinkedList<FootStep> footSteps;
+	private VTrajectory trajectory;
 
 	/** Used only for JSON serialization? */
 	// TODO used at all? Car does NOT have this field. remove if unused!
@@ -57,7 +58,7 @@ public class Pedestrian extends Agent {
 		isLikelyInjured = false;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
-		footSteps = new LinkedList<>();
+		trajectory = new VTrajectory();
 	}
 
 	/**
@@ -79,16 +80,16 @@ public class Pedestrian extends Agent {
 			groupSizes = new LinkedList<>();
 		}
 
-		footSteps = new LinkedList<>();
-		footSteps.addAll(other.footSteps);
+		trajectory = new VTrajectory();
+		trajectory = other.trajectory;
 	}
 
 	public void clearFootSteps() {
-		footSteps.clear();
+		trajectory.clear();
 	}
 
-	public LinkedList<FootStep> getFootSteps() {
-		return footSteps;
+	public VTrajectory getFootSteps() {
+		return trajectory;
 	}
 
 	public void addGroupId(int groupId, int size){
@@ -161,5 +162,4 @@ public class Pedestrian extends Agent {
 	public Pedestrian clone() {
 		return new Pedestrian(this);
 	}
-
 }

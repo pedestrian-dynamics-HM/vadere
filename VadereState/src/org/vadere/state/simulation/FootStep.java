@@ -1,7 +1,11 @@
 package org.vadere.state.simulation;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * A foot step is a simple java bean which represents one pedestrian foot step which is defined by
@@ -58,5 +62,63 @@ public final class FootStep {
 
 	public VPoint getStart() {
 		return start;
+	}
+
+	public double length() {
+		return start.distance(end);
+	}
+
+	public double duration() {
+		return endTime - startTime;
+	}
+
+	public boolean intersects(@NotNull final VRectangle rectangle) {
+		return rectangle.intersects(new VLine(getStart(), getEnd()));
+	}
+
+	public boolean intersects(@NotNull final VLine line) {
+		VPoint start = getStart();
+		VPoint end = getEnd();
+		return GeometryUtils.intersectLineSegment(new VPoint(line.getP1()), new VPoint(line.getP2()), start, end);
+	}
+
+
+	public Pair<FootStep, FootStep> cut(final double simTimeInSec) {
+		if(simTimeInSec >= endTime || simTimeInSec <= startTime) {
+			throw new IllegalArgumentException("invalid time.");
+		}
+
+		VPoint vector = end.subtract(start);
+		double duration = duration();
+		double portion = simTimeInSec - startTime;
+		VPoint portionStep = vector.norm(portion / duration);
+
+		VPoint middle = start.add(portionStep);
+
+		FootStep first = new FootStep(start, middle, startTime, simTimeInSec);
+		FootStep second = new FootStep(middle, end, simTimeInSec, endTime);
+		return Pair.of(first, second);
+	}
+
+	public double computeIntersectionTime(@NotNull final VRectangle rectangle) {
+		VPoint start = getStart();
+		VPoint end = getEnd();
+		VPoint intersectionPoint = GeometryUtils.intersectionPoint(rectangle, start.getX(), start.getY(), end.getX(), end.getY()).get();
+		double dStart = intersectionPoint.distance(start);
+		double stepLength = start.distance(end);
+		double duration = getEndTime() - getStartTime();
+		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
+		return intersectionTime;
+	}
+
+	public double computeIntersectionTime(@NotNull final VLine line) {
+		VPoint start = getStart();
+		VPoint end = getEnd();
+		VPoint intersectionPoint = GeometryUtils.intersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), start.getX(), start.getY(), end.getX(), end.getY());
+		double dStart = intersectionPoint.distance(start);
+		double stepLength = start.distance(end);
+		double duration = getEndTime() - getStartTime();
+		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
+		return intersectionTime;
 	}
 }

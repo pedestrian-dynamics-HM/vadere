@@ -1,13 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.state.attributes.processor.AttributesFlowOverTimeProcessor;
+import org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.Arrays;
@@ -15,26 +14,41 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * see zhang-2011 Method A.
+ * <p>This processor computes the fundamental diagram by computing an (average) <tt>flow, density</tt> and
+ * <tt>velocity</tt> over a certain time (<tt>deltaTime</tt>). This is done by counting the number of pedestrians crossing
+ * a line for some <tt>deltaTime</tt>. If P is the set of pedestrians crossing in that duration
+ * (<tt>deltaTime</tt>) the <tt>flow</tt> is defined by: the size of P divided by (te - ts) where
+ * ts is the time the first pedestrian crossed the line and te is the time the last pedestrian crossed
+ * the line i.e. (te - ts) is smaller or equals <tt>deltaTime</tt>. The <tt>velocity</tt> of a pedestrian
+ * crossing the line is its velocity the time-step time in which the crossing happens. So it is not
+ * exactly the crossing time (plus, minis simTimeStep). The <tt>density</tt> is defined by:
+ * <tt>flow</tt> divided by (<tt>velocity</tt> times the length of the crossing line). Therefore, the
+ * crossing line has to be defined appropriately. In addition the processor writes out <tt>deltaTime</tt>,
+ * and the <tt>measurementTime</tt>. The first <tt>measurementTime</tt> is equal to <tt>deltaTime</tt> divided
+ * by 2, the second is <tt>deltaTime</tt> plus <tt>deltaTime</tt> divided by 2 and so on.</p>
+ *
+ * <p>For more details see zhang-2011 (doi:10.1088/1742-5468/2011/06/P06004) Method A.</p>
+ *
+ * @author Benedikt Zoennchen
+ *
  */
 @DataProcessorClass()
-public class PedestrianFlowOverTimeProcessor extends DataProcessor<TimestepKey, List<Double>>  {
+public class PedestrianFundamentalDiagramAProcessor extends DataProcessor<TimestepKey, List<Double>>  {
 
 	private double deltaTime;
 	private double deltaSimTime;
 	private PedestrianLineCrossProcessor pedestrianLineCrossProcessor;
 	private PedestrianVelocityProcessor pedestrianVelocityProcessor;
 
-	public PedestrianFlowOverTimeProcessor() {
-		super("time", "deltaTime", "flow", "velocity", "density");
+	public PedestrianFundamentalDiagramAProcessor() {
+		super("measurementTime", "deltaTime", "flow", "velocity", "density");
 	}
 
 	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
-		AttributesFlowOverTimeProcessor att = (AttributesFlowOverTimeProcessor) this.getAttributes();
+		AttributesFundamentalDiagramAProcessor att = (AttributesFundamentalDiagramAProcessor) this.getAttributes();
 		deltaTime = att.getDeltaTime();
-		deltaSimTime = -1;
 		pedestrianLineCrossProcessor = (PedestrianLineCrossProcessor) manager.getProcessor(att.getPedestrianLineCrossProcessorId());
 		pedestrianVelocityProcessor = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
 	}
@@ -42,9 +56,15 @@ public class PedestrianFlowOverTimeProcessor extends DataProcessor<TimestepKey, 
 	@Override
 	public AttributesProcessor getAttributes() {
 		if (super.getAttributes() == null) {
-			setAttributes(new AttributesFlowOverTimeProcessor());
+			setAttributes(new AttributesFundamentalDiagramAProcessor());
 		}
 		return super.getAttributes();
+	}
+
+	@Override
+	public void preLoop(SimulationState state) {
+		super.preLoop(state);
+		deltaSimTime = -1;
 	}
 
 	@Override
