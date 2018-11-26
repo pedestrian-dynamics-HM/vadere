@@ -116,6 +116,7 @@ class VadereProject():
         err_dir = list()
 
         out_dirs = [dir for dir in os.listdir(self.output_path) if dir != 'corrupt' and dir != 'legacy' and if not dir.startswith('.')]
+        print out_dirs
         self.output_dirs = dict()
         self.named_output = NamedOutput()
 
