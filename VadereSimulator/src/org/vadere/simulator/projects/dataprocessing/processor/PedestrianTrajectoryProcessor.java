@@ -3,7 +3,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.util.StateJsonConverter;
@@ -25,7 +24,6 @@ public class PedestrianTrajectoryProcessor extends DataProcessor<PedestrianIdKey
 
 	public PedestrianTrajectoryProcessor() {
 		super("trajectory");
-		setAttributes(new AttributesPedestrianLineCrossProcessor());
 	}
 
 	@Override
@@ -34,7 +32,7 @@ public class PedestrianTrajectoryProcessor extends DataProcessor<PedestrianIdKey
 
 		for(Pedestrian ped : peds) {
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
-			ped.getFootSteps().concat(getValue(key));
+			getValue(key).concat(ped.getFootSteps());
 		}
 	}
 

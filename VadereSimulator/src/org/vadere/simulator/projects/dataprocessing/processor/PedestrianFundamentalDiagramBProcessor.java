@@ -8,7 +8,6 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor;
-import org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -55,7 +54,7 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 	@Override
 	public AttributesProcessor getAttributes() {
 		if (super.getAttributes() == null) {
-			setAttributes(new AttributesFundamentalDiagramAProcessor());
+			setAttributes(new AttributesFundamentalDiagramBProcessor());
 		}
 		return super.getAttributes();
 	}
@@ -83,8 +82,7 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 		for(Map.Entry<PedestrianIdKey, VTrajectory> trajectoryEntry : trajectoryMap.entrySet()) {
 			PedestrianIdKey key = trajectoryEntry.getKey();
 			VTrajectory trajectory = trajectoryEntry.getValue();
-			VTrajectory clone = trajectory.clone();
-			clone.cut(measurementArea);
+			VTrajectory clone = trajectory.cut(measurementArea);
 			cutTrajectoryMap.put(key, clone);
 		}
 
@@ -94,22 +92,31 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 		for(Map.Entry<PedestrianIdKey, VTrajectory> trajectoryEntry : cutTrajectoryMap.entrySet()) {
 			PedestrianIdKey key = trajectoryEntry.getKey();
 			VTrajectory trajectory = trajectoryEntry.getValue();
-			double density = density(key, cutTrajectoryMap);
-			double velocity = trajectory.speed().orElse(0.0);
-			putValue(key, Pair.of(velocity, density));
+			if(!trajectory.isEmpty()) {
+				double density = density(key, cutTrajectoryMap);
+				double velocity = trajectory.speed().orElse(0.0);
+				putValue(key, Pair.of(velocity, density));
+			}
 		}
 	}
 
 	private double density(@NotNull final PedestrianIdKey key, @NotNull final Map<PedestrianIdKey, VTrajectory> cutTrajectoryMap) {
 		VTrajectory pedTrajectory = cutTrajectoryMap.get(key);
 		double duration = pedTrajectory.duration();
-		List<VTrajectory> sortedTrajectories = cutTrajectoryMap.values()
+		double densityIntegral = cutTrajectoryMap.values()
 				.stream()
-				.filter(trajectory -> trajectory.isInBetween(pedTrajectory))
-				.sorted(Comparator.comparingDouble(t -> t.getStartTime().get()))
-				.collect(Collectors.toList());
+				.map(trajectory -> trajectory.cut(pedTrajectory.getStartTime().get(), pedTrajectory.getEndTime().get()))
+				.filter(trajectory -> !trajectory.isEmpty())
+				//.filter(trajectory -> trajectory.isInBetween(pedTrajectory))
+				//.sorted(Comparator.comparingDouble(t -> t.getStartTime().get()))
+				.mapToDouble(trajectory -> (trajectory.getEndTime().get() - trajectory.getStartTime().get()))
+				.sum();
 
-		List<Triple<Double, Double, Integer>> integralValues = new LinkedList<>();
+		densityIntegral /= duration;
+		densityIntegral /= measurementArea.getArea();
+		return densityIntegral;
+
+		/*List<Triple<Double, Double, Integer>> integralValues = new LinkedList<>();
 
 		double start;
 		double end;
@@ -124,7 +131,7 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 			VTrajectory next = hasNext ? sortedTrajectories.get(i+1) : null;
 			double nextStartTime = hasNext ? next.getStartTime().get() : -1.0;
 
-			while(hasNext && integralElements.peek().getEndTime().get() <= nextStartTime) {
+			while(!integralElements.isEmpty() && (!hasNext || integralElements.peek().getEndTime().get() <= nextStartTime)) {
 				double endTime = integralElements.peek().getEndTime().get();
 				end = endTime;
 				integralValues.add(Triple.of(start, end, integralElements.size()));
@@ -136,8 +143,8 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 				end = nextStartTime;
 				integralValues.add(Triple.of(start, end, integralElements.size()));
 				integralElements.add(next);
-				i++;
 			}
+			i++;
 		}
 
 		double densityIntegral = 0.0;
@@ -145,11 +152,11 @@ public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<Pedest
 			double tStart = entry.getLeft();
 			double tEnd = entry.getMiddle();
 			int N = entry.getRight();
-			densityIntegral = N * (tEnd - tStart);
+			densityIntegral += (N * (tEnd - tStart));
 		}
 		densityIntegral /= duration;
 		densityIntegral /= measurementArea.getArea();
-		return densityIntegral;
+		return densityIntegral;*/
 	}
 
 	@Override

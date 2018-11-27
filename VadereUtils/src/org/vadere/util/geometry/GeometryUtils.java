@@ -87,6 +87,13 @@ public class GeometryUtils {
 		return Optional.empty();
 	}
 
+	public static boolean intersectsRectangleBoundary(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
+		return intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2) ||
+				intersectLineSegment(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2) ||
+				intersectLineSegment(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2) ||
+				intersectLineSegment(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2);
+	}
+
 	//http://mathworld.wolfram.com/Line-LineIntersection.html
 	public static VPoint intersectionPoint(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
 		double a = derterminant2D(x1, x2, y1, y2);

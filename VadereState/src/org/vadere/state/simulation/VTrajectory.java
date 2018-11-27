@@ -84,13 +84,17 @@ public class VTrajectory implements Iterable<FootStep> {
 		footSteps.add(footStep);
 	}
 
-	public void cut(@NotNull final VRectangle rectangle) {
+	public VTrajectory cut(@NotNull final VRectangle rectangle) {
 		List<FootStep> intersectionSteps = footSteps.stream().filter(footStep -> footStep.intersects(rectangle)).collect(Collectors.toList());
 		if(intersectionSteps.size() == 2) {
 			double startSimTime = intersectionSteps.get(0).computeIntersectionTime(rectangle);
 			double endSimTime = intersectionSteps.get(1).computeIntersectionTime(rectangle);
-			cut(startSimTime, endSimTime);
+			return cut(startSimTime, endSimTime);
 		}
+		else if(intersectionSteps.size() > 0) {
+			throw new IllegalArgumentException("the number of intersection points is not zero or 2.");
+		}
+		return this;
 	}
 
 	public void cutHead(final double simTimeInSec) {
@@ -98,7 +102,7 @@ public class VTrajectory implements Iterable<FootStep> {
 			footSteps.removeFirst();
 		}
 
-		if(footSteps.peekFirst().getStartTime() < simTimeInSec) {
+		if(!footSteps.isEmpty() && footSteps.peekFirst().getStartTime() < simTimeInSec) {
 			FootStep footStep = footSteps.removeFirst();
 			footSteps.addFirst(footStep.cut(simTimeInSec).getRight());
 		}
@@ -106,11 +110,11 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	public void cutTail(final double simTimeInSec) {
-		while (!footSteps.isEmpty() && footSteps.peekLast().getStartTime() > simTimeInSec) {
+		while (!footSteps.isEmpty() && footSteps.peekLast().getStartTime() >= simTimeInSec) {
 			footSteps.removeLast();
 		}
 
-		if(footSteps.peekLast().getEndTime() > simTimeInSec) {
+		if(!footSteps.isEmpty() && footSteps.peekLast().getEndTime() > simTimeInSec) {
 			FootStep footStep = footSteps.removeLast();
 			footSteps.addLast(footStep.cut(simTimeInSec).getLeft());
 		}
@@ -118,7 +122,7 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	public void concat(@NotNull final VTrajectory trajectory) {
 		for (FootStep footStep : trajectory) {
-			if(footStep.getStartTime() >= footSteps.peekLast().getEndTime()) {
+			if(isEmpty() || (footStep.getStartTime() >= footSteps.peekLast().getEndTime())) {
 				footSteps.addLast(footStep);
 			}
 		}

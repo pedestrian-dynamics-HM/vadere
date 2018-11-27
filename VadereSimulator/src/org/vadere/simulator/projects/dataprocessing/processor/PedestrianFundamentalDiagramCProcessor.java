@@ -7,7 +7,6 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor;
-import org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -41,7 +40,7 @@ public class PedestrianFundamentalDiagramCProcessor extends AreaDataProcessor<Pa
 	@Override
 	public AttributesProcessor getAttributes() {
 		if (super.getAttributes() == null) {
-			setAttributes(new AttributesFundamentalDiagramAProcessor());
+			setAttributes(new AttributesFundamentalDiagramCProcessor());
 		}
 		return super.getAttributes();
 	}

@@ -73,7 +73,7 @@ public final class FootStep {
 	}
 
 	public boolean intersects(@NotNull final VRectangle rectangle) {
-		return rectangle.intersects(new VLine(getStart(), getEnd()));
+		return GeometryUtils.intersectsRectangleBoundary(rectangle, getStart().x, getStart().y, getEnd().x, getEnd().y);
 	}
 
 	public boolean intersects(@NotNull final VLine line) {
@@ -91,7 +91,7 @@ public final class FootStep {
 		VPoint vector = end.subtract(start);
 		double duration = duration();
 		double portion = simTimeInSec - startTime;
-		VPoint portionStep = vector.norm(portion / duration);
+		VPoint portionStep = vector.scalarMultiply(portion / duration);
 
 		VPoint middle = start.add(portionStep);
 
