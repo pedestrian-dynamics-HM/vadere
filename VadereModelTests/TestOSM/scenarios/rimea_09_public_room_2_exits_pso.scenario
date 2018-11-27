@@ -88,7 +88,7 @@
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
-        "numberOfCircles" : 1,
+        "numberOfCircles" : 3,
         "varyStepDirection" : false,
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,

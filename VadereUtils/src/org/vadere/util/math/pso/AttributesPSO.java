@@ -6,7 +6,9 @@ package org.vadere.util.math.pso;
 public class AttributesPSO {
 	final int numberOfInformedParticles = 3;
 	final int swarmSize = 30;
-	final int maxIteration = 15;
+	final int minIteration = 4;
+	final int maxNoUpdate = 6;
+	final int maxIteration = 10;
 	final int problemDimension = 2;
 	final double c1 = 2.0;
 	final double c2 = 2.0;

@@ -19,12 +19,14 @@ public class PSO {
 	private final ICircleSector circle;
 	private final double errorToleranz = 0.0001;
 	private double gBest;
+	private double gLastBest;
 	private VPoint gBestLocation;
 	private final Function<VPoint, Double> f;
 	private int iterationCounter;
 	private final double maxVelocity;
 	private final double minAngle;
 	private final double maxAngle;
+	private int improvementIterations;
 
 	public PSO(
 			@NotNull final Function<VPoint, Double> f,
@@ -44,6 +46,7 @@ public class PSO {
 		this.minAngle = minAngle;
 		this.maxAngle = maxAngle;
 		this.particles = initialSwarm(swarmPositions);
+		this.improvementIterations = 0;
 	}
 
 	public VPoint getOptimumArg() {
@@ -69,20 +72,21 @@ public class PSO {
 	}
 
 	public boolean hasFinished() {
-		return iterationCounter >= attributesPSO.maxIteration || hasConverged();
+		return iterationCounter >= attributesPSO.maxIteration || (iterationCounter >= attributesPSO.minIteration && hasConverged());
 	}
 
 	public boolean hasConverged() {
-		return false;
+		return improvementIterations >= attributesPSO.maxNoUpdate;
 	}
 
 	public void update() {
-		if (iterationCounter < attributesPSO.maxIteration) {
+		if (!hasFinished()) {
 			iterationCounter++;
 			updateLocalBest();
 			updateGlobalBest();
 
-			double omega = attributesPSO.wUpperBound - (iterationCounter / attributesPSO.maxIteration) * (attributesPSO.wUpperBound - attributesPSO.wLowerBound);
+			double omega = attributesPSO.wUpperBound - (iterationCounter / attributesPSO.minIteration) * (attributesPSO.wUpperBound - attributesPSO.wLowerBound);
+
 			particles.forEach(particle -> updateParticle(particle, omega));
 		}
 	}
@@ -134,7 +138,7 @@ public class PSO {
 	 * than the old one, particles inform each other about their best values and locations.
 	 */
 	private void updateGlobalBest() {
-		double lastGBest = gBest;
+		gLastBest = gBest;
 
 		for (Particle particle : particles) {
 			double globalBest = particle.getGlobalBestFitnessValue();
@@ -144,7 +148,16 @@ public class PSO {
 			}
 		}
 
-		if (gBest >= lastGBest) {
+		// no or small improvement
+		if (gBest >= gLastBest || Math.abs(gBest-gLastBest) < 0.001) {
+			improvementIterations++;
+		}
+		else {
+			improvementIterations = 0;
+		}
+
+		// no global improvement
+		if (gBest >= gLastBest) {
 			informKParticle();
 		}
 	}
