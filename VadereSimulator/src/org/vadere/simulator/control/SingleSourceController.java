@@ -48,21 +48,18 @@ public class SingleSourceController extends SourceController {
 
 				if (sourceAttributes.isSpawnAtRandomPositions()) {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
-						spawnPoints = getRealRandomPositions(
-								numberToSpawn,
-								random,
-								getDynElementsAtSource().stream()
-										.map(PointPositioned::getPosition)
-										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
-										.collect(Collectors.toList())
-						);
+					spawnPoints = getRealRandomPositions(
+							numberToSpawn,
+							random,
+							getDynElementsAtSource().stream()
+									.map(PointPositioned::getPosition)
+									.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+									.collect(Collectors.toList())
+					);
 
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
-					} else {
-						throw new IllegalArgumentException("use random position without free space only makes no sense.");
-					}
+					numberToSpawn -= spawnPoints.size();
+					assert (numberToSpawn >= 0);
+
 
 				} else {
 
@@ -158,7 +155,8 @@ public class SingleSourceController extends SourceController {
 			}
 
 			// no intersection with other free spaces (obstacles & other pedestrians)
-			if (testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
+
+			if (!sourceAttributes.isUseFreeSpaceOnly() || testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
 				return Optional.of(randomPoint);
 			}
 		}
