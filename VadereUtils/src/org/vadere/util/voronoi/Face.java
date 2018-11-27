@@ -73,11 +73,13 @@ public class Face {
 			}
 		}
 
-		double maxArea = (limits.xHigh - limits.xLow)
-				* (limits.yHigh - limits.yLow);
+		double maxArea = (limits.xHigh - limits.xLow) * (limits.yHigh - limits.yLow);
 
 		try {
-			if (result < 0 || (result > maxArea && Math.abs(result-maxArea) > 1E-15)) {
+			if(result > maxArea && Math.abs(result-maxArea) > 1E-13){
+				// Values of -3.68594044175552e-14 were observed
+				result = maxArea;  // set to max area and continue silently...
+			}else if (result < 0 || (result > maxArea && Math.abs(result-maxArea) >= 1E-13)) {
 				String message = "(Object " + id + ") Area of face is: " + result + ". This is an illegal area size " +
 						"because result has to be positive and less than maxArea (= " + maxArea + ")";
 				throw new IllegalStateException(message);

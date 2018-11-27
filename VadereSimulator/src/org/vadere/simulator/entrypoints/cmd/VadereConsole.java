@@ -56,7 +56,14 @@ public class VadereConsole {
                 .choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
                 .setDefault("INFO")
                 .action(new SetLogLevelCommand())
-                .help("Set Log Level for vadere.");
+                .help("Set Log Level.");
+
+		parser.addArgument("--logname")
+				.required(false)
+				.type(String.class)
+				.dest("logname")
+				.action(new SetLogNameCommand())
+				.help("Write log to given file.");
     }
 
 	private static void addSubCommandsToParser(ArgumentParser parser) {
@@ -74,12 +81,12 @@ public class VadereConsole {
 				.required(true)
 				.type(String.class)
 				.dest("project-dir")
-				.help("Path to project directory");
+				.help("Path to project directory.");
 		projectRun.addArgument("--scenario-file", "-f")
 				.required(false)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Name of Scenario file");
+				.help("Name of Scenario file.");
 		projectRun.addArgument("--scenario-checker")
 				.required(false)
 				.type(String.class)
@@ -91,7 +98,7 @@ public class VadereConsole {
 		// Run Scenario
 		Subparser scenarioRun = subparsers
 				.addParser(SubCommand.SCENARO_RUN.getCmdName())
-				.help("Run scenario without a project")
+				.help("Run scenario without a project.")
 				.setDefault("func", new ScenarioRunSubCommand());
 		scenarioRun.addArgument("--output-dir", "-o")
 				.required(false)
@@ -110,7 +117,7 @@ public class VadereConsole {
 				.required(true)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Scenario file to run");
+				.help("Scenario file to run.");
 		scenarioRun.addArgument("--scenario-checker")
 				.required(false)
 				.type(String.class)
@@ -136,7 +143,7 @@ public class VadereConsole {
 				.required(true)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Scenario files to run");
+				.help("Scenario files to run.");
 
 
 		// Run Migration Assistant
@@ -176,7 +183,7 @@ public class VadereConsole {
 				.action(Arguments.storeTrue())
 				.dest("revert-migration")
 				.help("If set vadere will search for a <scenario-file>.legacy and will replace the current version with this backup." +
-						" The Backup must be in the same directory");
+						" The Backup must be in the same directory.");
 
 		migrationAssistant.addArgument("--recursive", "-r")
 				.required(false)
@@ -184,7 +191,7 @@ public class VadereConsole {
 				.dest("recursive")
 				.setDefault(false)
 				.help("If PATH contains a directory instead of a scenario file recursively search " +
-						"the directory tree for scenario files and apply the command");
+						"the directory tree for scenario files and apply the command.");
 
 		migrationAssistant.addArgument("--create-new-version")
 				.required(false)
@@ -192,7 +199,7 @@ public class VadereConsole {
 				.dest("create-new-version")
 				.help("Create new transformation and identity file based on current latest version" +
 						"PATH must point to the directory containing the old transformation files." +
-						" This Argument takes the new Version Label as input");
+						" This Argument takes the new Version Label as input.");
 	}
 
 }

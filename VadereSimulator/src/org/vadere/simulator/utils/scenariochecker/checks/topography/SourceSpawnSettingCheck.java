@@ -21,7 +21,7 @@ public class SourceSpawnSettingCheck extends AbstractScenarioCheck implements To
 			AttributesSource attr = source.getAttributes();
 
 			if (attr.isSpawnAtRandomPositions() && !attr.isUseFreeSpaceOnly()){
-				messages.add(msgBuilder.topographyError().target(source)
+				messages.add(msgBuilder.topographyWarning().target(source)
 						.reason(ScenarioCheckerReason.SOURCE_SPAWN_RND_POS_NOT_FREE_SPACE).build());
 			} else if (!attr.isUseFreeSpaceOnly()){
 				messages.add(msgBuilder.topographyWarning().target(source)
