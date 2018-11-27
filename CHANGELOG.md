@@ -4,11 +4,12 @@
 
 ## Added
 
-- Two new outputprocessors - mainly for the BHM - to evaluaet queueWidth
-  (QueueWidthProcessor) and behavior (PedestrianBehaviorProcessor)
+- New outputprocessors 
+  * mainly for the BHM: QueueWidthProcessor (to evaluate queueWidth) and PedestrianBehaviorProcessor (evaluate behavior: step / tangential step / sideways step / wait)
+  * solely for the OSM: PedestrianFootStepProcessor (logs every step instead of the positions at each time step )
 
-- In package `org.vadere.simulator.utils`, added `TopographyChecker` to show
-  user if the current topography contains problems. The  `TopographyChecker`
+- `TopographyChecker`: In package org.vadere.simulator.utils, added TopographyChecker to show
+  user if the current topography contains problems. The  TopographyChecker
   will check for overlapping `ScenarioElements` and check for inconsistence
   settings such as missing  TargetIDs for sources or inconsistenct speed ranges
   for pedestrians. See this
@@ -16,7 +17,7 @@
   supported warnings and erros as well as this
   [picture](Documentation/changelLogImages/TopographyChecker.png) to see which
   kind of overlap produces erros or warnings.
-- Add `--output-dir [on, off]` (default: `on`) switch to  `scenario-run`
+- `VadereConsole`: Add `--output-dir [on, off]` (default: `on`) switch to  `scenario-run`
   sub-command. This will will turn the ScenarioChecker on or off for the command
   line. If the Checker detects an error  the simulation will not be executed.
 
