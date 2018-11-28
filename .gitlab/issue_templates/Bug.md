@@ -1,11 +1,4 @@
-<!---
-Please read this!
-
-Before opening a new issue, make sure to search for keywords in the issues
-filtered by the "Bug" or "Broken" label:
-
-https://gitlab.lrz.de/vadere/vadere/issues
---->
+First, choose a meaningful and short title and mention context in square brackets. E.g., [GUI] Agents overlap if radius greater than 0.2 m
 
 ### Summary
 
@@ -26,13 +19,13 @@ How can you reproduce the issue?
 ### Relevant data
 
 - [If you report a bug] Git branch name and commit hash: branch/hash
-- [If you report a bug in a scenario] Please, provide the scenario file. No matter how simple the scenario is.
+- [If you report a bug in a scenario] Provide the scenario file --- no matter how simple the scenario is.
 
 ### Logs and outputs
 
 [If relevant] Provide log files or console output with error/warning message.
 
-Please, use code blocks (backticks) and if it is much text encapsulate the text in `<details>` tag:
+Please, use code blocks (backticks) and if it is much text, encapsulate the text in `<details>` tag:
 
 <details>
 <summary>Expand file xy...</summary>
