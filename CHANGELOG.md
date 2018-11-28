@@ -4,6 +4,9 @@
 
 ## Added
 
+- `VadereConsole`: Add option `--logname <filename>` to specify the name for the log file.
+  Please note that the log file `log.out` is always written (because this file is configured
+  in the `log4j.properties` of each Vadere module (i.e., "gui", "meshing", ...). (c61a3946: Simulator)
 - New outputprocessors 
   * mainly for the BHM: QueueWidthProcessor (to evaluate queueWidth) and PedestrianBehaviorProcessor (evaluate behavior: step / tangential step / sideways step / wait)
   * solely for the OSM: PedestrianFootStepProcessor (logs every step instead of the positions at each time step )
