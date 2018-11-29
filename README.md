@@ -53,9 +53,9 @@ Please, use following instructions to set up the OpenCL components for your oper
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
-### Use Pre-Shipped Examples
+### Run Built-In Examples
 
-With the following steps, you can run a simulation with one of the pre-shipped examples from [VadereModelTests](VadereModelTests):
+With the following steps, you can run a simulation with one of the built-in examples from [VadereModelTests](VadereModelTests):
 
 - start Vadere 
 - *Project* > *Open* 
