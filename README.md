@@ -4,16 +4,16 @@
 
 # VADERE
 
-VADERE is an open source framework for the simulation of microscopic pedestrian dynamics. In addition to this core domain, other systems including cars and granular flow can be introduced into the framework. VADERE provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of simulation models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies.
+VADERE is an open source framework for the simulation of microscopic pedestrian dynamics. VADERE provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of pedestrian locomotion models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies. In addition to pedestrians, other systems including cars and granular flow can be introduced into the framework.
 
-This software runs on OS X, Windows, and Linux.
+This software runs on Windows, OS X and Linux.
 
 VADERE has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
 research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
 However, we welcome contributions from external sources. 
 
-The VADERE framework includes a mesh generator for unstructured high quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
+The VADERE framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
 
 ## Pipeline Status
 
@@ -33,12 +33,12 @@ The VADERE framework includes a mesh generator for unstructured high quality 2D 
 
 ### Install OpenCL
 
-For this project, GPGPU with OpenCL is used to speed up some computations. Therefore, the following requirements have to be met:
+VADERE uses computer's video card to speed up some computations. Therefore, following OpenCL components must be installed:
 
 * the latest drivers for your OpenCL device(s)
 * an OpenCL SDK
 
-#### Operating Systems
+Please, use following instructions to set up the OpenCL components for your operating system:
 
 * Windows: For further information using OpenCL on Windows [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
 * OS X: OpenCL is pre-installed for OS X.
@@ -46,46 +46,23 @@ For this project, GPGPU with OpenCL is used to speed up some computations. There
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
   * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
-### Run the Application
+## Run the Application
 
 1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
 2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`and `postvis.jar`. 
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
-## Usage Example
+### Use Pre-Shipped Examples
 
-With the following steps, you can start a scenario of one of the model test projects in [VadereModelTests](VadereModelTests):
+With the following steps, you can run a simulation with one of the pre-shipped examples from [VadereModelTests](VadereModelTests):
 
 - start Vadere 
 - *Project* > *Open* 
 - choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
 - select the scenario on the left and press *run selected scenario*
 
-
-## Development Setup
-
-Follow the **installation instructions** above i.e. install all required software and get the source. Go to the project directory and run `mvn clean install`. The project can now be imported *As Maven Project* in your IDE.
-
-### Eclipse
-
-- *File* > *Import* > *Maven* > *Existing Maven Projects*
-- choose `pom.xml` as *Root Directory* and click *Finish*
-- open *Vaderegui (gui)* > *src* > *org.vadere.gui.projectview* > `Vadereapplication`
-
-### IntelliJ IDEA
-
-- on the welcome-screen select *Import Project*
-- select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
-- open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
-- click the *run*-icon next to the `main` method
-- edit the run configuration for `VadereApplication` to build the project using Maven instead of IntelliJ's internal builder to avoid compilation errors:
-  * click *Edit Configurations* (in dropdown menu next to the play/debug button)
-  * under *Before launch*, add *Run Maven Goal* and use the Maven goal `compile`
-
-Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
-
-### Git Hooks
+### Use Git Hooks
 
 Since it is important to reproduce simulation results, we have the guidline that each output file has to provide its commit-hash. This commit-hash identifies
 the state the software was in when the output file was generated. Therefore, git hooks save the commit-hash in the **current_commit_hash.txt** which
@@ -102,19 +79,13 @@ These files start the script [git-hook-vadere-software](Documentation/version-co
 To create the **current_commit_hash.txt** without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
 switch to another branch and switch back again using the command line or any other tool you prefer.
 
-## Contribution
-
-Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
-
-## Contributors
-
-People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
-
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Marion Gödel, Benedikt Kleinmeier, Daniel Lehmberg, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
-
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
+
+## Contribution
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up the development environment and the coding guidelines.
 
 ## License
 
