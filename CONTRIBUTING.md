@@ -4,7 +4,7 @@ This guide explains the repository structure, how to set up the development envi
 
 ## Repository Structure
 
-The repository contains following `folders`:
+The repository contains following `files` and `folders`:
 
 - The Vadere source code: divided into the sofware modules `VadereGui`, `VadereMeshing`, `VaderSimulator`, `VadereState`, `VadereUtils`
 - `VadereModelTests`: pre-shipped tests for different locomotion models (e.g., gradient navigation model, optimal steps model, social force model)
@@ -48,7 +48,9 @@ Please contact us and we will send you an invitation.
 Please, use the [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues) for both
 
 - to request a feature or to report a bug (see [how to write new issues](https://gitlab.lrz.de/vadere/vadere/issues/179))
-- to work on a feature (see [how to work on an issue]())
+- to work on a feature (see [how to work on an issue](https://gitlab.lrz.de/vadere/vadere/issues/184))
+
+**Tip:** Sort the issues in the [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues) by `Label priority`.
 
 ### Steps for External Contributors
 
