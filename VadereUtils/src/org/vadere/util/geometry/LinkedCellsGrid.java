@@ -76,6 +76,33 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 		}
 	}
 
+	private class ContainerisedElement {
+		final private int[] cell;
+		final private T object;
+
+		ContainerisedElement(int[] cell, T object){
+			this.cell = cell;
+			this.object = object;
+		}
+
+		public int[] getCell() {
+			return cell;
+		}
+
+		public T getObject() {
+			return object;
+		}
+
+		@Override
+		public String toString() {
+			return "ContainerisedElement{" +
+					"cell=" + Arrays.toString(cell) +
+					", object=" + object +
+					", pos= " + ((PointPositioned)object).getPosition() +
+					'}';
+		}
+	}
+
 	/**
 	 * Generates an empty grid of GridCell&lt;T&gt; objects.
 	 * 
@@ -299,6 +326,19 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 			}
 		}
 		return false;
+	}
+
+	public List<ContainerisedElement> getElementContainer(final T element){
+		List<ContainerisedElement> elements  = new ArrayList<>();
+		for (int r = 0; r < grid.length; r++) {
+			// TODO [priority=medium] [task=test] changed this [20.08.2014] here 1 to r - pls check this
+			for (int c = 0; c < grid[r].length; c++) {
+				if (grid[r][c].objects.contains(element)){
+					elements.add(new ContainerisedElement(new int[]{r, c}, element));
+				}
+			}
+		}
+		return elements;
 	}
 
 	@Override
