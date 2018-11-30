@@ -6,6 +6,7 @@
 
 ### Added
 
+- * Added script "osm2vadere.py" to "Tools" folder, to convert OpenStreetMap maps to a Vadere topography. (929d4775: Tools).
 - `VadereConsole`: Add option `--logname <filename>` to specify the name for the log file.
   Please note that the log file `log.out` is always written (because this file is configured
   in the `log4j.properties` of each Vadere module (i.e., "gui", "meshing", ...). (c61a3946: Simulator)
