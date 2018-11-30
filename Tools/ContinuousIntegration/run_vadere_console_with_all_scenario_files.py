@@ -38,9 +38,13 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
+    log_dir = "log_dir"
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
     total_scenario_files = len(scenario_files)
 
@@ -53,7 +57,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         try:
             print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
             scenario_name = os.path.basename(scenario_file).split('.')[0]
-            log_file = os.path.join(scenario_name + ".log")
+            log_file = os.path.join(log_dir, scenario_name + ".log")
 
             # Measure wall time and not CPU time simply because it is the simplest method.
             wall_time_start = time.time()
@@ -77,6 +81,8 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         except subprocess.TimeoutExpired as exception:
             print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: timeout after {} s".format(exception.timeout))
+            failed_summary.append("Scenario file failed: {}".format(scenario_file))
+            failed_summary.append("->  Reason: timeout after {} s".format(exception.timeout))
             failed_scenarios_with_exception.append((scenario_file, exception))
         except subprocess.CalledProcessError as exception:
             prefix = ""
@@ -112,7 +118,7 @@ def print_summary(passed_and_failed_scenarios):
 
     if len(faild_summary) > 0:
         print("#################")
-        print("# Faild Summary #")
+        print("# Failed Summary #")
         print("#################")
         for line in faild_summary:
             print(line)
@@ -126,6 +132,7 @@ def print_summary(passed_and_failed_scenarios):
     print("Passed: {}".format(total_passed_scenarios))
     print("Failed: {}".format(total_failed_scenarios))
 
+
 def run_all():
     long_running_scenarios = [
         "basic_4_1_wall_gnm1",
@@ -136,6 +143,7 @@ def run_all():
         "thin_wall_and_closer_source_nelder_mead_ok",
         "thin_wall_and_closer_source_pso_could_fail",
         "rimea_04_flow_osm1_550_up",
+        "stairs_diagonal_both_1_2_+1.scenario",
     ]
 
     excluded_scenarios = ["TESTOVM", "output", "legacy"]

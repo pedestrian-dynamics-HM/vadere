@@ -211,7 +211,7 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
-				assert assertAllPedestrianInBounds();
+				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 
