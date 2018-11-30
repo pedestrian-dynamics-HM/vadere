@@ -1,0 +1,42 @@
+{
+  "attributes" : {
+    "bounds" : {
+      "x" : 0.0,
+      "y" : 0.0,
+      "width" : $width,
+      "height" : $height
+    },
+    "boundingBoxWidth" : 0.5,
+    "bounded" : true
+  },
+  "obstacles" : [ $obstacles],
+  "stairs" : [ ],
+  "targets" : [ ],
+  "sources" : [ ],
+  "dynamicElements" : [ ],
+  "attributesPedestrian" : {
+    "radius" : 0.195,
+    "densityDependentSpeed" : false,
+    "speedDistributionMean" : 1.34,
+    "speedDistributionStandardDeviation" : 0.26,
+    "minimumSpeed" : 0.5,
+    "maximumSpeed" : 2.2,
+    "acceleration" : 2.0
+  },
+  "attributesCar" : {
+    "id" : -1,
+    "radius" : 0.195,
+    "densityDependentSpeed" : false,
+    "speedDistributionMean" : 1.34,
+    "speedDistributionStandardDeviation" : 0.26,
+    "minimumSpeed" : 0.5,
+    "maximumSpeed" : 2.2,
+    "acceleration" : 2.0,
+    "length" : 4.5,
+    "width" : 1.7,
+    "direction" : {
+      "x" : 1.0,
+      "y" : 0.0
+    }
+  }
+}
