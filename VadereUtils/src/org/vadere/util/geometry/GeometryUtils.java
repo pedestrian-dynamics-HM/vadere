@@ -231,12 +231,19 @@ public class GeometryUtils {
 	 * @return the point on the line that is closest to p
 	 */
 	public static VPoint closestToSegment(@NotNull final VLine line, @NotNull final IPoint point) {
-		if (new VPoint((Point2D.Double) line.getP1()).equals(point)) {
+		VPoint a2p = new VPoint(point.getX() - line.x1, point.getY() - line.y1);
+		VPoint a2b = new VPoint(line.x2 - line.x1, line.y2 - line.y1);
+
+		// the line is not a line or a very short line
+		if(Math.abs(a2b.x) < GeometryUtils.DOUBLE_EPS && Math.abs(a2b.y) < GeometryUtils.DOUBLE_EPS) {
 			return new VPoint(line.x1, line.y1);
 		}
 
-		VPoint a2p = new VPoint(point.getX() - line.x1, point.getY() - line.y1);
-		VPoint a2b = new VPoint(line.x2 - line.x1, line.y2 - line.y1);
+		// the point is very close or equal to one of the points of the line
+		if(Math.abs(a2p.x) < GeometryUtils.DOUBLE_EPS && Math.abs(a2p.y) < GeometryUtils.DOUBLE_EPS) {
+			return new VPoint(point.getX(), point.getY());
+		}
+
 		double distAB = a2b.x * a2b.x + a2b.y * a2b.y;
 		double a2p_dot_a2b = a2p.x * a2b.x + a2p.y * a2b.y;
 

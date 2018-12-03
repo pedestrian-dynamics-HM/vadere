@@ -63,7 +63,7 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 			circleSector = circle;
 		}
 
-		PSO pso = new PSO(p -> getValue(p, pedestrian, stepSize), circleSector, anchorAngle, anchorAngle + 2 * angle, random, stepSize / 5.0, positions);
+		PSO pso = new PSO(p -> getValue(p, pedestrian, stepSize), circleSector, anchorAngle, anchorAngle + 2 * angle, random, stepSize, positions);
 
 		VPoint curPos = pedestrian.getPosition();
 		double curPosPotential = pedestrian.getPotential(curPos);

@@ -38,6 +38,31 @@ public interface IPoint extends Cloneable {
 
 	IPoint norm(double len);
 
+	 default IPoint setMagnitude(double len) {
+	 	assert len >= 0;
+	 	double length = distanceToOrigin();
+	 	if(length <= 0) {
+	 		if(len != 0.0) {
+				 throw new IllegalArgumentException("a vector with zero length can not be set to a specific magnitude != 0.");
+			 }
+			 else {
+				 return this;
+			 }
+		 }
+		 return scalarMultiply(len / distanceToOrigin());
+	 }
+
+	 default IPoint limit(double len) {
+	 	assert len >= 0;
+	 	double length = distanceToOrigin();
+	 	if(length > len) {
+	 		return setMagnitude(len);
+	    }
+	    else {
+	    	return this;
+	    }
+	 }
+
 	IPoint normZeroSafe();
 
 	/**

@@ -27,7 +27,8 @@ public interface ICircleSector {
 	}
 
 	default Optional<VPoint> getClosestIntersectionPoint(@NotNull final VPoint p, @NotNull final VPoint q, @NotNull final VPoint r) {
-		return getClosestIntersectionPoint(p.getX(), p.getY(), q.getX(), q.getY(), r.getX(), r.getY());
+		Optional<VPoint> result = getClosestIntersectionPoint(p.getX(), p.getY(), q.getX(), q.getY(), r.getX(), r.getY());
+		return result;
 	}
 
 	Optional<VPoint> getClosestIntersectionPoint(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3);
