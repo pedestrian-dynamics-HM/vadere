@@ -35,7 +35,7 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 	public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) {
 
 		double stepSize = ((VCircle) reachableArea).getRadius();
-		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle)reachableArea, random);
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
