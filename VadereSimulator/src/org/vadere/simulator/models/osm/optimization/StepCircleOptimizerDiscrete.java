@@ -36,7 +36,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 		assert reachableArea instanceof VCircle;
 		double stepSize = ((VCircle) reachableArea).getRadius();
 
-		List<VPoint> positions = getReachablePositions(pedestrian, random);
+		List<VPoint> positions = getReachablePositions(pedestrian, (VCircle) reachableArea, random);
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
@@ -75,7 +75,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 		return new StepCircleOptimizerDiscrete(movementThreshold, random);
 	}
 
-	public static List<VPoint> getReachablePositions(@NotNull final PedestrianOSM pedestrian, @NotNull final Random random) {
+	public static List<VPoint> getReachablePositions(@NotNull final PedestrianOSM pedestrian, @NotNull VCircle reachableArea, @NotNull final Random random) {
 
 		final AttributesOSM attributesOSM = pedestrian.getAttributesOSM();
 		int numberOfCircles = attributesOSM.getNumberOfCircles();
@@ -116,8 +116,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 		return GeometryUtils.getDiscDiscretizationPoints(
 				random,
 				attributesOSM.isVaryStepDirection(),
-				new VCircle(pedestrian.getPosition(),
-						pedestrian.getStepSize()),
+				reachableArea,
 				numberOfCircles,
 				attributesOSM.getStepCircleResolution(),
 				anchorAngle,
