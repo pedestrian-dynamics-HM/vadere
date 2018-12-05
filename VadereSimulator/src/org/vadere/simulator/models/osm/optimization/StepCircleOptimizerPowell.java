@@ -38,7 +38,7 @@ public class StepCircleOptimizerPowell implements StepCircleOptimizer {
 
 		PointValuePair newMinimum = new PointValuePair(position, potentialEvaluationFunction.value(position));
 
-		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle)reachableArea, random);
 
 		try {
 			newMinimum = optimizer.optimize(1000, (MultivariateFunction) potentialEvaluationFunction, GoalType.MINIMIZE,
