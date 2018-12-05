@@ -121,4 +121,9 @@ public final class FootStep {
 		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
 		return intersectionTime;
 	}
+
+	@Override
+	public String toString() {
+		return start + "->" + end;
+	}
 }

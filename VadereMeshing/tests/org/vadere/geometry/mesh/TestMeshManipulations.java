@@ -51,12 +51,12 @@ public class TestMeshManipulations {
 		// locate a face / triangle containing (4, 5)
 		PFace<VPoint> face = triangulation.locateFace(6, 6).get();
 
-		// merge faces until infinity, therefore consumes all faces!
+		// cup faces until infinity, therefore consumes all faces!
 		Predicate<PFace<VPoint>> mergePredicate = f -> true;
 
 		int maxDept = 1;
 
-		// since max dept is equal to 1 we merge 4 (the face and its 3 neighbours) triangles into 1 polygon
+		// since max dept is equal to 1 we cup 4 (the face and its 3 neighbours) triangles into 1 polygon
 		assertTrue(triangulation.mergeFaces(face, mergePredicate, true, maxDept).isPresent());
 
 		// and therefore the number of faces decreases by 3!
@@ -68,7 +68,7 @@ public class TestMeshManipulations {
 		// locate a face / triangle containing (4, 5)
 		PFace<VPoint> face = triangulation.locateFace(4, 5).get();
 
-		// merge faces until infinity, therefore consumes all faces!
+		// cup faces until infinity, therefore consumes all faces!
 		Predicate<PFace<VPoint>> shrinkCondition = f -> true;
 
 		triangulation.shrinkBorder(shrinkCondition, true);

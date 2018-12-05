@@ -26,7 +26,6 @@ import org.vadere.util.geometry.shapes.VRectangle;
 @DataProcessorClass()
 public class PedestrianFundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
-	private VRectangle measurementArea;
 	private IntegralVoronoiAlgorithm integralVoronoiAlgorithm;
 
 	public PedestrianFundamentalDiagramDProcessor() {
@@ -37,7 +36,7 @@ public class PedestrianFundamentalDiagramDProcessor extends AreaDataProcessor<Pa
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesFundamentalDiagramDProcessor att = (AttributesFundamentalDiagramDProcessor) this.getAttributes();
-		measurementArea = att.getMeasurementArea();
+		integralVoronoiAlgorithm = new IntegralVoronoiAlgorithm(att.getMeasurementArea(), att.getVoronoiArea());
 	}
 
 	@Override

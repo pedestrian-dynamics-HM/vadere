@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.WeilerAtherton;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.GeometryUtils;
@@ -12,10 +13,12 @@ import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Given a Simulation state this Algorithm computes the Voronoi density and Voronoi velocity
@@ -26,12 +29,14 @@ import java.util.TreeMap;
  */
 public class IntegralVoronoiAlgorithm extends AreaDensityAlgorithm implements IAreaVelocityAlgorithm {
     private VRectangle measurementArea;
+    private VPolygon measurementAreaPolygon;
     private VRectangle voronoiArea;
 
     public IntegralVoronoiAlgorithm(@NotNull final VRectangle measurementArea, @NotNull final VRectangle voronoiArea) {
         super("areaVoronoi");
 
         this.measurementArea = measurementArea;
+        this.measurementAreaPolygon = new VPolygon(measurementArea);
         this.voronoiArea = voronoiArea;
     }
 
@@ -42,7 +47,10 @@ public class IntegralVoronoiAlgorithm extends AreaDensityAlgorithm implements IA
 	    double area = 0.0;
         for (Face face : faces) {
             if (intersectMeasurementArea(face)) {
-	            area += face.computeArea();
+				VPolygon cell = face.toPolygon();
+	            WeilerAtherton weilerAtherton = new WeilerAtherton(Arrays.asList(cell, measurementAreaPolygon));
+	            VPolygon capPolygon = weilerAtherton.cap().get();
+	            area += cell.getArea() / capPolygon.getArea();
             }
         }
 
@@ -63,14 +71,16 @@ public class IntegralVoronoiAlgorithm extends AreaDensityAlgorithm implements IA
 
 	@Override
 	public double getVelocity(SimulationState state) {
-		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(this.voronoiArea);
+		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(voronoiArea);
 
 		// convert pedestrians to positions
 		List<VPoint> pedestrianPositions = Agent.getPositions(state.getTopography().getElements(Agent.class));
+
+		// compute the voronoi diagram
 		voronoiDiagram.computeVoronoiDiagram(pedestrianPositions);
 
-		// compute everything
-		List<Face> faces = voronoiDiagram.getFaces();
+		// filter invalid faces (which do not form a simple polygon)
+		List<Face> faces = voronoiDiagram.getFaces().stream().filter(f -> f.getNumberOfEdges() > 2).collect(Collectors.toList());
 
 		Map<Integer, Double> areaMap = new TreeMap<>();
 		Map<Integer, Face> faceMap = new TreeMap<>();
@@ -104,9 +114,9 @@ public class IntegralVoronoiAlgorithm extends AreaDensityAlgorithm implements IA
 	    HalfEdge next = start;
 
 	    do {
-		    points.add(next.getOrigin());
 		    next = next.getNext();
-	    } while (start.equals(next));
+		    points.add(next.getOrigin());
+	    } while (!start.equals(next));
 
 	    return GeometryUtils.toPolygon(points);
     }

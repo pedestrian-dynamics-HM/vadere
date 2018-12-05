@@ -1,10 +1,13 @@
 package org.vadere.util.voronoi;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.math.MathUtil;
 
 public class Face {
@@ -42,6 +45,34 @@ public class Face {
 
 	public VPoint getSite() {
 		return site;
+	}
+
+	public int getNumberOfEdges() {
+		int count = 0;
+		HalfEdge start = outerComponent.getNext();
+		HalfEdge next = start;
+		if(start == null) {
+			return count;
+		}
+
+		do {
+			next = next.getNext();
+			count++;
+		} while (!start.equals(next));
+
+		return count;
+	}
+
+	public VPolygon toPolygon() {
+		List<VPoint> points = new ArrayList<>();
+		HalfEdge start = outerComponent.getNext();
+		HalfEdge next = start;
+		do {
+			next = next.getNext();
+			points.add(next.getOrigin());
+		} while (!start.equals(next));
+
+		return GeometryUtils.toPolygon(points);
 	}
 
 	// http://mathworld.wolfram.com/PolygonArea.html

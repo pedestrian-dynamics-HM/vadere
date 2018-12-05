@@ -91,32 +91,44 @@ public class VTrajectory implements Iterable<FootStep> {
 			double endSimTime = intersectionSteps.get(1).computeIntersectionTime(rectangle);
 			return cut(startSimTime, endSimTime);
 		}
+		else if(intersectionSteps.size() == 1) {
+			double simTime = intersectionSteps.get(0).computeIntersectionTime(rectangle);
+			VTrajectory clone = clone();
+
+			if(rectangle.contains(footSteps.peekLast().getEnd())) {
+				clone.cutHead(simTime);
+			}
+			else {
+				clone.cutTail(simTime);
+			}
+			return clone;
+		}
 		else if(intersectionSteps.size() > 0) {
 			throw new IllegalArgumentException("the number of intersection points is not zero or 2.");
 		}
 		return this;
 	}
 
-	public void cutHead(final double simTimeInSec) {
-		while (!footSteps.isEmpty() && footSteps.peekFirst().getEndTime() <= simTimeInSec) {
+	public void cutTail(final double simStartTime) {
+		while (!footSteps.isEmpty() && footSteps.peekFirst().getEndTime() <= simStartTime) {
 			footSteps.removeFirst();
 		}
 
-		if(!footSteps.isEmpty() && footSteps.peekFirst().getStartTime() < simTimeInSec) {
+		if(!footSteps.isEmpty() && footSteps.peekFirst().getStartTime() < simStartTime) {
 			FootStep footStep = footSteps.removeFirst();
-			footSteps.addFirst(footStep.cut(simTimeInSec).getRight());
+			footSteps.addFirst(footStep.cut(simStartTime).getRight());
 		}
 
 	}
 
-	public void cutTail(final double simTimeInSec) {
-		while (!footSteps.isEmpty() && footSteps.peekLast().getStartTime() >= simTimeInSec) {
+	public void cutHead(final double simEndTime) {
+		while (!footSteps.isEmpty() && footSteps.peekLast().getStartTime() >= simEndTime) {
 			footSteps.removeLast();
 		}
 
-		if(!footSteps.isEmpty() && footSteps.peekLast().getEndTime() > simTimeInSec) {
+		if(!footSteps.isEmpty() && footSteps.peekLast().getEndTime() > simEndTime) {
 			FootStep footStep = footSteps.removeLast();
-			footSteps.addLast(footStep.cut(simTimeInSec).getLeft());
+			footSteps.addLast(footStep.cut(simEndTime).getLeft());
 		}
 	}
 
@@ -147,8 +159,8 @@ public class VTrajectory implements Iterable<FootStep> {
 		LinkedList<FootStep> copy = new LinkedList<>(footSteps);
 		VTrajectory subTrajectory = new VTrajectory();
 		subTrajectory.footSteps = copy;
-		subTrajectory.cutHead(startTime);
-		subTrajectory.cutTail(endTime);
+		subTrajectory.cutHead(endTime);
+		subTrajectory.cutTail(startTime);
 		return subTrajectory;
 	}
 
@@ -168,6 +180,8 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	@Override
 	public String toString() {
-		return footSteps.toString();
+		StringBuilder builder = new StringBuilder();
+		footSteps.stream().forEach(footStep -> builder.append(footStep));
+		return builder.toString();
 	}
 }

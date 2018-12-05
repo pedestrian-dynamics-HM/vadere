@@ -1080,13 +1080,65 @@ public class GeometryUtils {
 
 		Path2D path2D = new Path2D.Double();
 		path2D.moveTo(points.get(0).getX(), points.get(0).getY());
-		path2D.lineTo(points.get(0).getX(), points.get(0).getY());
+		//path2D.lineTo(points.get(0).getX(), points.get(0).getY());
 
 		for(int i = 1; i < points.size(); i++) {
 			path2D.lineTo(points.get(i).getX(), points.get(i).getY());
 		}
 
+		path2D.lineTo(points.get(0).getX(), points.get(0).getY());
+
 		return new VPolygon(path2D);
+	}
+
+	/**
+	 * Tests if two polygons are equals, i.e. they are defined by the same list of points.
+	 * The list of the first polygon might be shifted and/or reversed with respect to the second polygon.
+	 *
+	 * @param poly1 the first polygon
+	 * @param poly2 the second polygon
+	 * @return true if both polygons are defined by the same path, false otherwise
+	 */
+	public static boolean equalsPolygons(@NotNull final VPolygon poly1, @NotNull final VPolygon poly2) {
+		return equalsPolygonsInOrder(poly1, poly2) || equalsPolygonsInOrder(poly1.revertOrder(), poly2);
+	}
+
+	/**
+	 * Tests if two polygons are equals, i.e. they are defined by the same list of points.
+	 * The list of the first polygon might be shifted with respect to the second polygon.
+	 *
+	 * @param poly1 the first polygon
+	 * @param poly2 the second polygon
+	 * @return true if both polygons are defined by the same path, false otherwise
+	 */
+	private static boolean equalsPolygonsInOrder(@NotNull final VPolygon poly1, @NotNull final VPolygon poly2) {
+		List<VPoint> pointList1 = poly1.getPoints();
+		List<VPoint> pointList2 = poly2.getPoints();
+
+		if(pointList1.size() != pointList2.size()) {
+			return false;
+		}
+
+		if(pointList1.isEmpty() && pointList2.isEmpty()) {
+			return true;
+		}
+
+		int j = -1;
+		for(int i = 0; i < pointList1.size(); i++) {
+			VPoint p0 = pointList2.get(0);
+			if(p0.equals(pointList1.get(i))) {
+				j = i;
+				break;
+			}
+		}
+
+		for(int i = 0; i < pointList2.size(); i++) {
+			if(!pointList2.get(i).equals(pointList1.get((j+i) % pointList1.size()))) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1142,11 +1194,13 @@ public class GeometryUtils {
 
 		Path2D path2D = new Path2D.Double();
 		path2D.moveTo(points[0].getX(), points[0].getY());
-		path2D.lineTo(points[0].getX(), points[0].getY());
+		//path2D.lineTo(points[0].getX(), points[0].getY());
 
 		for(int i = 1; i < points.length; i++) {
 			path2D.lineTo(points[i].getX(), points[i].getY());
 		}
+
+		path2D.lineTo(points[0].getX(), points[0].getY());
 
 		return new VPolygon(path2D);
 	}
