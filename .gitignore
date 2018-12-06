@@ -10,9 +10,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 **/venv/
-Tools/VadereAnalysisTool/dist/
-Tools/VadereAnalysisTool/build/
-Tools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/build/
+Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
 Tools/ContinuousIntegration/**/output
 # C extensions
 *.so
