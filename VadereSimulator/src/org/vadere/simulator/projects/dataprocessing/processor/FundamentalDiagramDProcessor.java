@@ -27,6 +27,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private IntegralVoronoiAlgorithm integralVoronoiAlgorithm;
+	private PedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramDProcessor() {
 		super("velocity", "density");

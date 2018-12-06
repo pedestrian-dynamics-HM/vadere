@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 @DataProcessorClass()
 public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
 	private PedestrianPositionProcessor pedPosProc;
+	//private PedestrianTrajectoryProcessor
 	private int backSteps;
 
 	private LinkedList<Double> lastSimTimes;
@@ -47,10 +48,10 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 				.forEach(pedId -> putValue(new TimestepPedestrianIdKey(timeStep, pedId), getVelocity(timeStep, state.getSimTimeInSec(), pedId)));
 
 		if (lastSimTimes.size() >= backSteps) {
-			lastSimTimes.removeLast();
+			lastSimTimes.removeFirst();
 		}
 
-		lastSimTimes.addFirst(state.getSimTimeInSec());
+		lastSimTimes.addLast(state.getSimTimeInSec());
 	}
 
 	@Override
@@ -66,16 +67,23 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 	}
 
 	private double getVelocity(int timeStep, double currentSimTime, int pedId) {
-		TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(timeStep - backSteps > 0 ? timeStep - backSteps : 1, pedId);
 
-		if (timeStep <= 1 || !pedPosProc.hasValue(keyBefore))
-			return 0.0; // For performance
+		int pastStep = timeStep - backSteps;
+		double velocity = 0.0;
+		if(pastStep >= 0) {
+			TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(pastStep, pedId);
 
-		VPoint posBefore = pedPosProc.getValue(keyBefore);
-		VPoint posNow = pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
-		double duration = (currentSimTime - lastSimTimes.getFirst());
+			if (timeStep <= 1 || !pedPosProc.hasValue(keyBefore))
+				return 0.0; // For performance
 
-		double velocity = duration > 0 ? posNow.subtract(posBefore).scalarMultiply(1 / duration).distanceToOrigin() : 0;
+			VPoint posBefore = pedPosProc.getValue(keyBefore);
+			VPoint posNow = pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
+			double duration = (currentSimTime - lastSimTimes.getFirst());
+
+			velocity = duration > 0 ? posNow.subtract(posBefore).scalarMultiply(1 / duration).distanceToOrigin() : 0;
+
+			return velocity;
+		}
 
 		return velocity;
 	}
