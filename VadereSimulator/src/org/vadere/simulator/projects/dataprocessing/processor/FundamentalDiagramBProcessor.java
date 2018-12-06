@@ -28,12 +28,12 @@ import java.util.Map;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
+public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
 
 	private VRectangle measurementArea;
 	private PedestrianTrajectoryProcessor pedestrianTrajectoryProcessor;
 
-	public PedestrianFundamentalDiagramBProcessor() {
+	public FundamentalDiagramBProcessor() {
 		super("velocity", "density");
 	}
 

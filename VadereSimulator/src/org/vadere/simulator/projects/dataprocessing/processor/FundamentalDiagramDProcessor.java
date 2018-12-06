@@ -24,11 +24,11 @@ import org.vadere.util.geometry.shapes.VRectangle;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private IntegralVoronoiAlgorithm integralVoronoiAlgorithm;
 
-	public PedestrianFundamentalDiagramDProcessor() {
+	public FundamentalDiagramDProcessor() {
 		super("velocity", "density");
 	}
 

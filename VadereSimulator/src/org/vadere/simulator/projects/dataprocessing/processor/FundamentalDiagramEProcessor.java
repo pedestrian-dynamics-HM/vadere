@@ -14,11 +14,11 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramEProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramEProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private SumVoronoiAlgorithm sumVoronoiAlgorithm;
 
-	public PedestrianFundamentalDiagramEProcessor() {
+	public FundamentalDiagramEProcessor() {
 		super("velocity", "density");
 	}
 

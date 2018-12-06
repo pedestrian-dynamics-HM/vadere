@@ -52,7 +52,7 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFootStepProcessor",
       "id" : 5
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFundamentalDiagramAProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramAProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {
@@ -83,7 +83,7 @@
         }
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFundamentalDiagramBProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor",
       "id" : 9,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor",
       "attributes" : {
@@ -111,7 +111,7 @@
         }
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFundamentalDiagramCProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
@@ -124,7 +124,7 @@
         }
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFundamentalDiagramDProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor",
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
       "attributes" : {

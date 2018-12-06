@@ -22,11 +22,11 @@ import org.vadere.util.geometry.shapes.VRectangle;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private VRectangle measurementArea;
 
-	public PedestrianFundamentalDiagramCProcessor() {
+	public FundamentalDiagramCProcessor() {
 		super("velocity", "density");
 	}
 
