@@ -40,7 +40,7 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFootStepProcessor",
       "id" : 5
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFundamentalDiagramAProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramAProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {

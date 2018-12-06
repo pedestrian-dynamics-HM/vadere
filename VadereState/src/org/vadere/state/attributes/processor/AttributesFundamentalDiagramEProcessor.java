@@ -2,7 +2,7 @@ package org.vadere.state.attributes.processor;
 
 import org.vadere.util.geometry.shapes.VRectangle;
 
-public class AttributesFundamentalDiagramDProcessor extends AttributesAreaProcessor {
+public class AttributesFundamentalDiagramEProcessor extends AttributesAreaProcessor {
 	private VRectangle measurementArea;
 	private VRectangle voronoiArea;
 

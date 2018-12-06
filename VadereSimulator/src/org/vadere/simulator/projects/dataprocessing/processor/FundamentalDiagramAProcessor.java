@@ -33,14 +33,14 @@ import java.util.Map;
  *
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramAProcessor extends DataProcessor<TimestepKey, List<Double>>  {
+public class FundamentalDiagramAProcessor extends DataProcessor<TimestepKey, List<Double>>  {
 
 	private double deltaTime;
 	private double deltaSimTime;
 	private PedestrianLineCrossProcessor pedestrianLineCrossProcessor;
 	private PedestrianVelocityProcessor pedestrianVelocityProcessor;
 
-	public PedestrianFundamentalDiagramAProcessor() {
+	public FundamentalDiagramAProcessor() {
 		super("measurementTime", "deltaTime", "flow", "velocity", "density");
 	}
 

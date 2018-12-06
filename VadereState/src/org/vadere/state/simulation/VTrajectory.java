@@ -1,9 +1,11 @@
 package org.vadere.state.simulation;
 
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,38 +87,58 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
-		List<FootStep> intersectionSteps = footSteps.stream().filter(footStep -> footStep.intersects(rectangle)).collect(Collectors.toList());
-		if(intersectionSteps.size() == 2) {
-			double startSimTime = intersectionSteps.get(0).computeIntersectionTime(rectangle);
-			double endSimTime = intersectionSteps.get(1).computeIntersectionTime(rectangle);
-			return cut(startSimTime, endSimTime);
+		LinkedList<FootStep> newFootSteps = new LinkedList<>();
+		boolean inside = rectangle.contains(footSteps.peekFirst().getStart());
+
+		for(FootStep footStep : footSteps) {
+			if(footStep.intersects(rectangle)) {
+				Pair<FootStep, FootStep> splitStep = footStep.cut(footStep.computeIntersectionTime(rectangle));
+
+				if(!inside) {
+					newFootSteps.clear();
+					newFootSteps.add(splitStep.getRight());
+				}
+				else {
+					newFootSteps.add(splitStep.getLeft());
+				}
+
+				inside = !inside;
+
+			}
+			else if(inside) {
+				newFootSteps.add(footStep);
+			}
 		}
-		else if(intersectionSteps.size() > 0) {
-			throw new IllegalArgumentException("the number of intersection points is not zero or 2.");
-		}
-		return this;
+
+		VTrajectory copy = new VTrajectory();
+		copy.footSteps = newFootSteps;
+		return copy;
 	}
 
-	public void cutHead(final double simTimeInSec) {
-		while (!footSteps.isEmpty() && footSteps.peekFirst().getEndTime() <= simTimeInSec) {
+	private boolean isEntering(@NotNull final VRectangle rectangle, @NotNull FootStep intersectionStep) {
+		return rectangle.contains(intersectionStep.getEnd());
+	}
+
+	public void cutTail(final double simStartTime) {
+		while (!footSteps.isEmpty() && footSteps.peekFirst().getEndTime() <= simStartTime) {
 			footSteps.removeFirst();
 		}
 
-		if(!footSteps.isEmpty() && footSteps.peekFirst().getStartTime() < simTimeInSec) {
+		if(!footSteps.isEmpty() && footSteps.peekFirst().getStartTime() < simStartTime) {
 			FootStep footStep = footSteps.removeFirst();
-			footSteps.addFirst(footStep.cut(simTimeInSec).getRight());
+			footSteps.addFirst(footStep.cut(simStartTime).getRight());
 		}
 
 	}
 
-	public void cutTail(final double simTimeInSec) {
-		while (!footSteps.isEmpty() && footSteps.peekLast().getStartTime() >= simTimeInSec) {
+	public void cutHead(final double simEndTime) {
+		while (!footSteps.isEmpty() && footSteps.peekLast().getStartTime() >= simEndTime) {
 			footSteps.removeLast();
 		}
 
-		if(!footSteps.isEmpty() && footSteps.peekLast().getEndTime() > simTimeInSec) {
+		if(!footSteps.isEmpty() && footSteps.peekLast().getEndTime() > simEndTime) {
 			FootStep footStep = footSteps.removeLast();
-			footSteps.addLast(footStep.cut(simTimeInSec).getLeft());
+			footSteps.addLast(footStep.cut(simEndTime).getLeft());
 		}
 	}
 
@@ -147,8 +169,8 @@ public class VTrajectory implements Iterable<FootStep> {
 		LinkedList<FootStep> copy = new LinkedList<>(footSteps);
 		VTrajectory subTrajectory = new VTrajectory();
 		subTrajectory.footSteps = copy;
-		subTrajectory.cutHead(startTime);
-		subTrajectory.cutTail(endTime);
+		subTrajectory.cutHead(endTime);
+		subTrajectory.cutTail(startTime);
 		return subTrajectory;
 	}
 
@@ -168,6 +190,8 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	@Override
 	public String toString() {
-		return footSteps.toString();
+		StringBuilder builder = new StringBuilder();
+		footSteps.stream().forEach(footStep -> builder.append(footStep));
+		return builder.toString();
 	}
 }

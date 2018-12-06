@@ -1,7 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
@@ -12,13 +11,8 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.stream.Collectors;
 
 /**
  * <p>This processor computes the fundamental diagram by computing an (average) velocity and the density
@@ -34,12 +28,12 @@ import java.util.stream.Collectors;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
+public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
 
 	private VRectangle measurementArea;
 	private PedestrianTrajectoryProcessor pedestrianTrajectoryProcessor;
 
-	public PedestrianFundamentalDiagramBProcessor() {
+	public FundamentalDiagramBProcessor() {
 		super("velocity", "density");
 	}
 

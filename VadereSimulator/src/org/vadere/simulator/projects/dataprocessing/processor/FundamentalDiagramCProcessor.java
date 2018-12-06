@@ -22,11 +22,11 @@ import org.vadere.util.geometry.shapes.VRectangle;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianFundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private VRectangle measurementArea;
 
-	public PedestrianFundamentalDiagramCProcessor() {
+	public FundamentalDiagramCProcessor() {
 		super("velocity", "density");
 	}
 
@@ -62,7 +62,13 @@ public class PedestrianFundamentalDiagramCProcessor extends AreaDataProcessor<Pa
 				.mapToDouble(pedestrian -> pedestrian.getVelocity().getLength())
 				.sum();
 
-		velocity /= N;
+		if(N == 0) {
+			velocity = 0.0;
+		}
+		else {
+			velocity /= N;
+		}
+
 		double density = N / measurementArea.getArea();
 
 		putValue(new TimestepKey(state.getStep()), Pair.of(velocity, density));

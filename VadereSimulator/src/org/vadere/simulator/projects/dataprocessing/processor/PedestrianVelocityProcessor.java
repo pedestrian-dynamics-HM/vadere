@@ -75,7 +75,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 		VPoint posNow = pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
 		double duration = (currentSimTime - lastSimTimes.getFirst());
 
-		double velocity = posNow.subtract(posBefore).scalarMultiply(1 / duration).distanceToOrigin();
+		double velocity = duration > 0 ? posNow.subtract(posBefore).scalarMultiply(1 / duration).distanceToOrigin() : 0;
 
 		return velocity;
 	}
