@@ -96,9 +96,11 @@ public class VCircle implements VShape, ICircleSector {
 		double D = radius * radius * dr * dr - disc * disc;
 		double sign = dy < 0 ? -1 : 1;
 
+		assert (Math.abs(dx) > 0.0 || Math.abs(dy) > 0.0) && dr * dr > 0.0;
+
 		if (D == 0) {
-			x1 = (disc * dy + sign * dx * Math.sqrt(D)) / (dr * dr);
-			y1 = (-disc * dx + Math.abs(dy) * Math.sqrt(D)) / (dr * dr);
+			x1 = (disc * dy) / (dr * dr);
+			y1 = (-disc * dx) / (dr * dr);
 			return ImmutableList.of(new VPoint(x1 + this.getCenter().x, y1 + this.getCenter().y));
 		} else if (D < 0) {
 			return ImmutableList.of();
