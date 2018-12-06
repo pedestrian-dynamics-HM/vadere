@@ -295,7 +295,6 @@ public class Simulation {
 		for (Model m : models) {
 			m.update(simTimeInSec);
 		}
-		topographyController.update(simTimeInSec); //rebuild CellGrid
 
 		if (topographyController.getTopography().hasTeleporter()) {
 			teleporterController.update(simTimeInSec);

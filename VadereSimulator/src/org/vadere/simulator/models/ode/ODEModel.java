@@ -179,7 +179,10 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 			equations.getVelocity(counter, y, newVelocity);
 
 			// set data to ped
+			VPoint oldPosition = element.getPosition();
 			setPosition(element, newPos);
+			topography.moveElement(element, oldPosition);
+
 			setVelocity(element, new Vector2D(newVelocity[0], newVelocity[1]));
 			counter++;
 		}
