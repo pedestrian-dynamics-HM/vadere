@@ -9,6 +9,7 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IPolyConnectivity;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -349,6 +350,10 @@ public class WeilerAtherton {
 		}
 	}
 
+	private boolean contains(@NotNull final VPolygon polygon, @NotNull final IPoint point) {
+		return polygon.contains(point) || Math.abs(polygon.distance(point)) <= GeometryUtils.DOUBLE_EPS;
+	}
+
 	private List<VPolygon> construct(
 			@NotNull final VPolygon subjectCandidat,
 			@NotNull final VPolygon clippingCandidat,
@@ -375,15 +380,18 @@ public class WeilerAtherton {
 		Set<PHalfEdge<WeilerPoint>> subjectExitingEdges = subjectMesh
 				.streamEdges(subjectFace)
 				.filter(edge -> subjectMesh.getPoint(edge).isIntersectionPoint())
-				.filter(edge -> !subjectMesh.getPoint(subjectMesh.getNext(edge)).isIntersectionPoint() &&
-						!clipping.contains(subjectMesh.getPoint(subjectMesh.getNext(edge))))
+				.filter(edge ->
+						contains(clipping, subjectMesh.getPoint(subjectMesh.getPrev(edge))) &&
+						!contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))))
 				.collect(Collectors.toSet());
 
 		Set<PHalfEdge<WeilerPoint>> subjectEnteringEdges = subjectMesh
 				.streamEdges(subjectFace)
 				.filter(edge -> subjectMesh.getPoint(edge).isIntersectionPoint())
-				.filter(edge -> subjectMesh.getPoint(subjectMesh.getNext(edge)).isIntersectionPoint() ||
-						clipping.contains(subjectMesh.getPoint(subjectMesh.getNext(edge))))
+				.filter(edge ->
+						contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))) &&
+						!contains(clipping, subjectMesh.getPoint(subjectMesh.getPrev(edge)))
+				)
 				.collect(Collectors.toSet());
 
 		List<VPoint> points = new ArrayList<>();
@@ -393,13 +401,42 @@ public class WeilerAtherton {
 		Set<PHalfEdge<WeilerPoint>> intersectionSet = cap ? subjectEnteringEdges : subjectExitingEdges;
 
 		// cup will preserve the polyons.
-		if(!cap && intersectionSet.isEmpty()) {
-			polygons.add(subjectCandidat);
-			polygons.add(clippingCandidat);
+		if(intersectionSet.isEmpty()) {
+			boolean subInClip = subjectMesh
+					.streamPoints(subjectFace)
+					.allMatch(p -> contains(clipping, p));
+
+			boolean clipInSub = clippingMesh
+					.streamPoints(clippingFace)
+					.allMatch(p -> contains(subject, p));
+
+			if(cap) {
+				if(subInClip) {
+					polygons.add(subjectCandidat);
+				}
+				else if(clipInSub) {
+					polygons.add(clippingCandidat);
+				}
+			}
+			else {
+				if(subInClip) {
+					polygons.add(clippingCandidat);
+				}
+				else if(clipInSub) {
+					polygons.add(subjectCandidat);
+				}
+				else {
+					polygons.add(subjectCandidat);
+					polygons.add(clippingCandidat);
+				}
+			}
+
+			return polygons;
 		}
 
 		while (!intersectionSet.isEmpty()) {
 			PHalfEdge<WeilerPoint> subjectEdge = intersectionSet.iterator().next();
+			PHalfEdge<WeilerPoint> subjectTwin = clippingMesh.getEdge(subjectMesh.getPoint(subjectEdge).getTwinPoint());
 			PHalfEdge<WeilerPoint> next = subjectEdge;
 			intersectionSet.remove(subjectEdge);
 
@@ -407,14 +444,28 @@ public class WeilerAtherton {
 				next = mesh.getNext(next);
 
 				// adaptPath
-				if(mesh.getPoint(next).isIntersectionPoint() && !intersectionSet.contains(next)) {
-					mesh = mesh.equals(subjectMesh) ? clippingMesh : subjectMesh;
-					next = mesh.getEdge(mesh.getPoint(next).getTwinPoint());
+				if(mesh.getPoint(next).isIntersectionPoint()) {
+					/*
+					 * Special case!
+					 */
+					PVertex<WeilerPoint> twinPoint = mesh.getPoint(next).getTwinPoint();
+					PMesh<WeilerPoint> twinMesh = mesh.equals(subjectMesh) ? clippingMesh : subjectMesh;
+					PHalfEdge<WeilerPoint> twinPointEdge = twinMesh.getEdge(twinPoint);
+					VPoint prevTwinPoint = new VPoint(twinMesh.getPoint(twinMesh.getPrev(twinPointEdge)));
+					VPoint prevPoint = new VPoint(mesh.getPoint(mesh.getPrev(next)));
+
 					intersectionSet.remove(next);
+					intersectionSet.remove(twinMesh.getEdge(twinPoint));
+
+					if(!prevTwinPoint.equals(prevPoint)) {
+						mesh = mesh.equals(subjectMesh) ? clippingMesh : subjectMesh;
+						next = mesh.getEdge(mesh.getPoint(next).getTwinPoint());
+					}
+
 				}
 				points.add(new VPoint(mesh.getPoint(next)));
 
-			} while (!next.equals(subjectEdge));
+			} while (!next.equals(subjectEdge) && !next.equals(subjectTwin));
 
 			polygons.add(GeometryUtils.toPolygon(GeometryUtils.filterUselessPoints(points, EPSILON)));
 		}

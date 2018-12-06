@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.ShapeType;
 
 /**
  * Note: A polygon which has the same points as a rectangle is not equals to the rectangle.
@@ -174,6 +173,10 @@ public class VPolygon extends Path2D.Double implements VShape {
 	 */
 	public boolean intersects(final VPolygon intersectingPolygon) {
 
+		if(containsShape(intersectingPolygon) || intersectingPolygon.containsShape(this)) {
+			return true;
+		}
+
 		List<VPoint> pointList = getPoints();
 		for (int i = 0; i < pointList.size() - 1; i++) {
 			VLine polyLine;
@@ -193,7 +196,22 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return false;
 	}
 
+	/**
+	 * Checks whether this polygon and the rectangle intersects.
+	 *
+	 * @param rectangle   the rectangle
+	 * @return true if this polygon intersects with the rectangle
+	 */
 	public boolean intersects(final VRectangle rectangle) {
+
+		if(containsShape(rectangle) || rectangle.containsShape(this)) {
+			return true;
+		}
+
+		return intersectsRectangleLine(rectangle);
+	}
+
+	public boolean intersectsRectangleLine(final VRectangle rectangle) {
 		return intersects(new VLine(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMinY()))
 				|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMaxY()))
 				|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMaxY()))
@@ -518,7 +536,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 			return intersects((VPolygon) shape);
 		}
 		else if(shape instanceof VRectangle){
-			return intersects(((VRectangle)shape));
+			return intersectsRectangleLine(((VRectangle)shape));
 		}
 		else {
 			return VShape.super.intersects(shape);
@@ -528,5 +546,18 @@ public class VPolygon extends Path2D.Double implements VShape {
 	@Override
 	public List<VPoint> getPath() {
 		return getPoints();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		for(VPoint point : getPoints()) {
+			builder.append("[" + point.getX() + "," + point.getY() + "],");
+		}
+		// remove the last ","
+		builder.deleteCharAt(builder.length()-1);
+		builder.append("]");
+		return builder.toString();
 	}
 }

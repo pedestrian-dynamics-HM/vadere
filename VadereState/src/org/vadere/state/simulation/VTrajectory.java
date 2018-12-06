@@ -1,9 +1,11 @@
 package org.vadere.state.simulation;
 
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,28 +87,36 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
-		List<FootStep> intersectionSteps = footSteps.stream().filter(footStep -> footStep.intersects(rectangle)).collect(Collectors.toList());
-		if(intersectionSteps.size() == 2) {
-			double startSimTime = intersectionSteps.get(0).computeIntersectionTime(rectangle);
-			double endSimTime = intersectionSteps.get(1).computeIntersectionTime(rectangle);
-			return cut(startSimTime, endSimTime);
-		}
-		else if(intersectionSteps.size() == 1) {
-			double simTime = intersectionSteps.get(0).computeIntersectionTime(rectangle);
-			VTrajectory clone = clone();
+		LinkedList<FootStep> newFootSteps = new LinkedList<>();
+		boolean inside = rectangle.contains(footSteps.peekFirst().getStart());
 
-			if(rectangle.contains(footSteps.peekLast().getEnd())) {
-				clone.cutHead(simTime);
+		for(FootStep footStep : footSteps) {
+			if(footStep.intersects(rectangle)) {
+				Pair<FootStep, FootStep> splitStep = footStep.cut(footStep.computeIntersectionTime(rectangle));
+
+				if(!inside) {
+					newFootSteps.clear();
+					newFootSteps.add(splitStep.getRight());
+				}
+				else {
+					newFootSteps.add(splitStep.getLeft());
+				}
+
+				inside = !inside;
+
 			}
-			else {
-				clone.cutTail(simTime);
+			else if(inside) {
+				newFootSteps.add(footStep);
 			}
-			return clone;
 		}
-		else if(intersectionSteps.size() > 0) {
-			throw new IllegalArgumentException("the number of intersection points is not zero or 2.");
-		}
-		return this;
+
+		VTrajectory copy = new VTrajectory();
+		copy.footSteps = newFootSteps;
+		return copy;
+	}
+
+	private boolean isEntering(@NotNull final VRectangle rectangle, @NotNull FootStep intersectionStep) {
+		return rectangle.contains(intersectionStep.getEnd());
 	}
 
 	public void cutTail(final double simStartTime) {

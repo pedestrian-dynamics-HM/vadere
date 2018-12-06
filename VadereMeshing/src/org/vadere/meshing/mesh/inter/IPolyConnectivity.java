@@ -162,6 +162,15 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 			@NotNull final E edge, @NotNull P p, @NotNull IMesh<P, V, E, F> mesh) {
 
 		E twin = mesh.getTwin(edge);
+
+		if(mesh.getPoint(edge).equals(p)) {
+			return mesh.getVertex(edge);
+		}
+
+		if(mesh.getPoint(twin).equals(p)) {
+			return mesh.getVertex(mesh.getPrev(edge));
+		}
+
 		E prev = mesh.getPrev(edge);
 		E tNext = mesh.getNext(twin);
 

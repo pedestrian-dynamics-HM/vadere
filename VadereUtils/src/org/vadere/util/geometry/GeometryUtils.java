@@ -1,6 +1,8 @@
 package org.vadere.util.geometry;
 
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1123,13 +1125,19 @@ public class GeometryUtils {
 			return true;
 		}
 
+		boolean found = false;
 		int j = -1;
 		for(int i = 0; i < pointList1.size(); i++) {
 			VPoint p0 = pointList2.get(0);
 			if(p0.equals(pointList1.get(i))) {
 				j = i;
+				found = true;
 				break;
 			}
+		}
+
+		if(!found) {
+			return false;
 		}
 
 		for(int i = 0; i < pointList2.size(); i++) {

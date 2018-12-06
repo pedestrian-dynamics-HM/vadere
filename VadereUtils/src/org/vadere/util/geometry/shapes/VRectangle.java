@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.ShapeType;
 
 @SuppressWarnings("serial")
 /**
