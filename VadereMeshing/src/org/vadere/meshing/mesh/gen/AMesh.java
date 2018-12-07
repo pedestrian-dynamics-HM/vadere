@@ -491,7 +491,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
         // clone the old one!
         AMesh<P> cMesh = clone();
 
-        // merge some of them?
+        // cup some of them?
         int nullIdentifier = -2;
 
         // rebuild
@@ -554,7 +554,7 @@ public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P
     }
 
     private void copyFace(@NotNull final AFace<P> face, @NotNull int[] vertexMap, @NotNull int[] edgeMap, @NotNull int[] faceMap, @NotNull final AMesh<P> cMesh) {
-	    // merge some of them?
+	    // cup some of them?
 	    int nullIdentifier = -2;
 
 	    // face not jet copied

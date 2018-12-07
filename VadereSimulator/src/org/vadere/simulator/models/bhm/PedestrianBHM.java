@@ -13,6 +13,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -152,8 +153,10 @@ public class PedestrianBHM extends Pedestrian {
 		updateTargetDirection();
 
 		this.nextPosition = navigation.getNavigationPosition();
-
+		VPoint position = getPosition();
 		makeStep();
+
+		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
 
 		this.timeOfNextStep = timeOfNextStep + durationNextStep;
 	}

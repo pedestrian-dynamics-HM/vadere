@@ -32,6 +32,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
+		clearStrides(topography);
+
 		movedPedestrians.clear();
 		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
 		List<Future<?>> futures;

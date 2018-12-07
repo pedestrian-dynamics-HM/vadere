@@ -4,6 +4,20 @@ target/
 *.preferences.xml
 swing-inspector-linux-1.2.3/
 
+#Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+**/venv/
+Tools/VadereAnalysisTools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/build/
+Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
+Tools/ContinuousIntegration/**/output
+# C extensions
+*.so
+vadere_analysis_tool/build
+
 #Tools and build utils
 bin/
 
@@ -32,6 +46,7 @@ VadereModelTests/TestOSM/output/*
 VadereModelTests/TestOSM_Group/output/*
 VadereModelTests/TestSFM/output/*
 VadereModelTests/TestGNM/output/*
+VadereModelTests/TestBHM/output/*
 VadereModelTests/TestOVM/output/*
 VadereModelTests/TestOSM/legacy/*
 VadereModelTests/TestOSM_Group/legacy/*
@@ -45,6 +60,7 @@ VadereModelTests/TestSFM/processed output/*
 VadereModelTests/TestGNM/processed output/*
 VadereModelTests/TestOVM/processed output/*
 VadereUtils/output/*
+VadereModelTests/*_private
 
 #deprecated: can potentially be removed
 VadereGui/output/
@@ -52,7 +68,7 @@ VadereGui/output/
 #mac osx files
 .DS_Store
 
-#linux deskopt dotfiles
+#linux desktop dotfiles
 **/.directory
 /VadereModelTests/TestStairs/output
 /VadereModelTests/TestStairs/legacy

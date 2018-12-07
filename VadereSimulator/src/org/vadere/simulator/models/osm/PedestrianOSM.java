@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -39,6 +40,7 @@ public class PedestrianOSM extends Pedestrian {
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
 	private transient List<SpeedAdjuster> speedAdjusters;
+	private transient List<StepSizeAdjuster> stepSizeAdjusters;
 	private double durationNextStep;
 	private VPoint nextPosition;
 	private VPoint lastPosition;
@@ -62,7 +64,7 @@ public class PedestrianOSM extends Pedestrian {
 				  Random random, IPotentialFieldTarget potentialFieldTarget,
 				  PotentialFieldObstacle potentialFieldObstacle,
 				  PotentialFieldAgent potentialFieldPedestrian,
-				  List<SpeedAdjuster> speedAdjusters,
+				  List<StepSizeAdjuster> stepSizeAdjusters,
 				  StepCircleOptimizer stepCircleOptimizer) {
 
 		super(attributesPedestrian, random);
@@ -74,7 +76,8 @@ public class PedestrianOSM extends Pedestrian {
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
 		this.stepCircleOptimizer = stepCircleOptimizer;
 
-		this.speedAdjusters = speedAdjusters;
+		this.speedAdjusters = new LinkedList<>();
+		this.stepSizeAdjusters = stepSizeAdjusters;
 		this.relevantPedestrians = new HashSet<>();
 		this.timeCredit = 0;
 
@@ -125,7 +128,7 @@ public class PedestrianOSM extends Pedestrian {
 		} else if (topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
 			this.nextPosition = getPosition();
 		} else {
-			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
+			VCircle reachableArea = new VCircle(getPosition(), getDesiredStepSize());
 
 			// get stairs pedestrian is on - remains null if on area
 			Stairs stairs = null;
@@ -164,6 +167,16 @@ public class PedestrianOSM extends Pedestrian {
 		} else {
 			return stepLength;
 		}
+	}
+
+	public double getDesiredStepSize() {
+		double desiredStepSize = getStepSize();
+
+		for (StepSizeAdjuster adjuster : stepSizeAdjusters) {
+			desiredStepSize = adjuster.getAdjustedStepSize(this, desiredStepSize);
+		}
+
+		return desiredStepSize;
 	}
 
 	public double getDesiredSpeed() {
@@ -249,7 +262,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void refreshRelevantPedestrians() {
 		VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-		relevantPedestrians = potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography());
+		setRelevantPedestrians(potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography()));
 	}
 
 

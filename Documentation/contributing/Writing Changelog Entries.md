@@ -11,11 +11,11 @@ The first example doest not provide any context where the change was made or wha
 
 ## Writing into Changelog.md
 
-1. Each new version number gets an own section prefixed with `#` and a date, e.g., `# v0.1 (2018-01-31)`.
+1. Each new version number gets an own subsection prefixed with `##` and a date, e.g., `## v0.1 (2018-01-31)`.
    Notes:
-   * Unreleased versions should be marked explicitly, e.g., `# 0.1 (unreleased)`.
+   * Unreleased versions should be marked explicitly, e.g., `## 0.1 (unreleased)`.
    * New versions should be added on top (and not at bottom).
-2. Each change type gets an own subsection prefixed with `##`, e.g., `Added`.
+2. Each change type gets an own subsubsection prefixed with `###`, e.g., `Added`.
 3. Each changelog entry should contain following parts:
    1. An own bullet point.
    2. The description of the change.
@@ -26,9 +26,9 @@ The first example doest not provide any context where the change was made or wha
 For instance:
 
 ```
-# v0.1 (2018-01-31)
+## v0.1 (2018-01-31)
 
-## Removed
+### Removed
 
 - Removed obsolete model attribute "foo" from class "bar". (e8af1b77: State).
   * ...

@@ -1,5 +1,7 @@
 package org.vadere.simulator.models.groups.cgm;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
@@ -20,8 +22,10 @@ import java.util.stream.IntStream;
 public class CentroidGroupModel
 		implements GroupModel, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
 
+	private static Logger logger = LogManager.getLogger(CentroidGroupModel.class);
+
 	private Random random;
-	private Map<Integer, CentroidGroupFactory> groupFactories;
+	private Map<Integer, CentroidGroupFactory> groupFactories;		// for each source a separate group factory.
 	private Map<ScenarioElement, CentroidGroup> pedestrianGroupData;
 
 	private Topography topography;
@@ -122,7 +126,7 @@ public class CentroidGroupModel
 
 	@Override
 	public CentroidGroup getGroup(final ScenarioElement ped) {
-        System.out.println(String.format("Get Group for Pedestrian %s", ped));
+        logger.debug(String.format("Get Group for Pedestrian %s", ped));
         CentroidGroup group = pedestrianGroupData.get(ped);
         if(group == null) {
         	for (ScenarioElement p : pedestrianGroupData.keySet()) {
@@ -139,7 +143,7 @@ public class CentroidGroupModel
 
 	@Override
 	public void registerMember(final ScenarioElement ped, final Group group) {
-	    System.out.println(String.format("Register Pedestrian %s, Group %s", ped, group));
+	    logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
 		pedestrianGroupData.put(ped, (CentroidGroup) group);
 	}
 

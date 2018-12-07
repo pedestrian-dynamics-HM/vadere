@@ -8,14 +8,14 @@ import java.util.LinkedList;
 
 public class CentroidGroupFactory extends GroupFactory {
 
-	transient private CentroidGroupModel groupCollection;
+	transient private CentroidGroupModel centroidGroupModel;
 	transient private GroupSizeDeterminator groupSizeDeterminator;
 
 	private LinkedList<CentroidGroup> newGroups;
 
-	public CentroidGroupFactory(CentroidGroupModel groupCollection,
+	public CentroidGroupFactory(CentroidGroupModel centroidGroupModel,
 								GroupSizeDeterminator groupSizeDet) {
-		this.groupCollection = groupCollection;
+		this.centroidGroupModel = centroidGroupModel;
 		this.groupSizeDeterminator = groupSizeDet;
 		this.newGroups = new LinkedList<>();
 	}
@@ -37,14 +37,14 @@ public class CentroidGroupFactory extends GroupFactory {
 
 		currentGroup.addMember(ped);
 		ped.addGroupId(currentGroup.getID(), currentGroup.getSize());
-		groupCollection.registerMember(ped, currentGroup);
+		centroidGroupModel.registerMember(ped, currentGroup);
 		if (currentGroup.getOpenPersons() == 0) {
 			newGroups.pollFirst(); // remove full group from list.
 		}
 	}
 
 	public int createNewGroup() {
-		CentroidGroup newGroup = groupCollection.getNewGroup(groupSizeDeterminator
+		CentroidGroup newGroup = centroidGroupModel.getNewGroup(groupSizeDeterminator
 				.nextGroupSize());
 		newGroups.addLast(newGroup);
 		return newGroup.getSize();
@@ -56,7 +56,7 @@ public class CentroidGroupFactory extends GroupFactory {
 	}
 
 	public void elementRemoved(Pedestrian ped) {
-		CentroidGroup group = groupCollection.removeMember(ped);
+		CentroidGroup group = centroidGroupModel.removeMember(ped);
 //		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group != null ? group.getID() : "noGroup");
 	}
 

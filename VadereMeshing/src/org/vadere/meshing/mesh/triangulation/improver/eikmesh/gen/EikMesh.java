@@ -253,7 +253,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
         //removeTrianglesInsideObstacles();
     }
 
-	/*public void execute() {
+	/*public void cup() {
 		double quality = getQuality();
 		while (quality < Parameters.qualityMeasurement) {
 			improve();

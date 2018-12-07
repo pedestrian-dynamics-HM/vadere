@@ -202,10 +202,18 @@ public class CentroidGroup implements Group {
 		double result;
 		VPoint pedLocation = ped.getPosition();
 
-		double pedDistance = potentialFieldTarget.getPotential(pedLocation, ped);
-		double centroidDistance = potentialFieldTarget.getPotential(getCentroidOthers(ped), ped);
+		double potentialSum = 0.0;
+		int size = 0;
+		for (Pedestrian p : members) {
+			if (!ped.equals(p) && !isLostMember(p)) {
+				potentialSum += potentialFieldTarget.getPotential(p.getPosition(), p);
+				size++;
+			}
+		}
 
-		result = centroidDistance - pedDistance;
+		double pedDistance = potentialFieldTarget.getPotential(pedLocation, ped);
+
+		result = (potentialSum / size) - pedDistance;
 
 		if (result > POTENTIAL_DISTANCE_THRESHOLD) {
 			result = 0;

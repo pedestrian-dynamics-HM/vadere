@@ -42,6 +42,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 	@Override
 	public void run(Namespace ns, ArgumentParser parser) {
 		Path outputDir = Paths.get(ns.getString("output-dir"));
+		boolean overrideTimeStepSetting = ns.getBoolean("override-timestep-setting");
 		String scenarioCheckerSwitch = ns.getString("scenario-checker");
 		if (!outputDir.toFile().exists()){
 			if ( ! outputDir.toFile().mkdirs() ) {
@@ -64,7 +65,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
 			if (checkScenario(scenario, scenarioCheckerSwitch)){
-				new ScenarioRun(scenario, outputDir.toFile().toString() , null).run();
+				new ScenarioRun(scenario, outputDir.toFile().toString() , overrideTimeStepSetting, null).run();
 			} else {
 				System.exit(-1);
 			}

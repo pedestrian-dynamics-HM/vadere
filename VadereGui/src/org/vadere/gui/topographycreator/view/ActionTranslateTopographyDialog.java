@@ -4,6 +4,7 @@ import org.vadere.gui.projectview.view.ProjectView;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Locale;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -22,7 +23,7 @@ public class ActionTranslateTopographyDialog {
 	public ActionTranslateTopographyDialog(final double x, double y){
 
 		this.textField = new JTextField(30);
-		this.textField.setText(String.format("%f, %f", x, y));
+		this.textField.setText(String.format(Locale.ENGLISH, "%f, %f", x, y));
 		this.textField.getDocument().addDocumentListener(new DialogListener());
 		this.valid = false;
 		this.x = x;

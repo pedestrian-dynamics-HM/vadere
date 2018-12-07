@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -11,12 +12,14 @@ public class PedestrianReynolds extends Pedestrian {
 
 	private Vector2D lastMovement;
 	private double startTime;
+	private double lastSimTimeInSec;
 
 	public PedestrianReynolds(AttributesAgent attributesPedestrian, Random random) {
 		super(attributesPedestrian, random);
 
 		this.lastMovement = new Vector2D(0, 0);
 		this.startTime = -1;
+		this.lastSimTimeInSec = -1;
 	}
 
 	public VPoint getLastMovement() {
@@ -32,9 +35,16 @@ public class PedestrianReynolds extends Pedestrian {
 
 		if (startTime < 0) {
 			startTime = simTime;
+			lastSimTimeInSec = 0;
 		}
 
-		this.setPosition(this.getPosition().add(mov));
+		VPoint oldPosition = getPosition();
+		VPoint newPosition = oldPosition.add(mov);
+
+		setPosition(newPosition);
+		clearFootSteps();
+		getFootSteps().add(new FootStep(oldPosition, newPosition, lastSimTimeInSec, simTime));
+		lastSimTimeInSec = simTime;
 	}
 
 }

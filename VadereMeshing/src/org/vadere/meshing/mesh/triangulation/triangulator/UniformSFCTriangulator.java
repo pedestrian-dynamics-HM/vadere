@@ -212,7 +212,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
         VLine line = mesh.toLine(edge);
 
         return (line.length() <= lenFunc.apply(line.midPoint()) && random.nextDouble() < 0.96)
-                || (!triangle.intersects(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersects(bbox)))
+                || (!triangle.intersectsRectangleLine(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersectsRectangleLine(bbox)))
                 || boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.isBoundary(twin) && shape.contains(mesh.toTriangle(twin).getBounds2D())));
     }
 

@@ -9,7 +9,13 @@ import java.util.List;
 public interface GroupModel extends Model {
 	public Group getGroup(ScenarioElement ped);
 
-	public void registerMember(ScenarioElement ped, Group currentGroup);
+	/**
+	 * Register a Pedestrian to the specified group. The function does not check if the
+	 * pedestrian is already a member of another group. The caller must make sure of that.
+	 * @param ped
+	 * @param currentGroup
+	 */
+	void registerMember(ScenarioElement ped, Group currentGroup);
 
 	public CentroidGroup removeMember(ScenarioElement ped);
 
