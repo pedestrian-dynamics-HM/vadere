@@ -15,6 +15,8 @@ public interface Group {
 
 	public void addMember(Pedestrian ped);
 
+	public void removeMember(Pedestrian ped);
+
 	public boolean isFull();
 
 	public int getOpenPersons();

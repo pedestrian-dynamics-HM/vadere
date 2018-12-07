@@ -40,7 +40,6 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private IPotentialFieldTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private int pedestrianIdCounter;
 	private List<Model> models = new LinkedList<>();
 
 	@Deprecated
@@ -63,12 +62,10 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
 		this.potentialFieldTarget = potentialFieldTarget;
-		this.pedestrianIdCounter = 0;
 	}
 
 	public GradientNavigationModel() {
 		this.targets = new TreeMap<>();
-		this.pedestrianIdCounter = 0;
 	}
 
 	@Override
@@ -160,8 +157,8 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Class<T> type) {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("GNM cannot initialize " + type.getCanonicalName());
-		this.pedestrianIdCounter++;
-		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, id > 0 ? id : pedestrianIdCounter);
+
+		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(topography, id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}

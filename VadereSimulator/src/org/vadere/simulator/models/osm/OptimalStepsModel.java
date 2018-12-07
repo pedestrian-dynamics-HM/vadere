@@ -49,7 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @ModelClass(isMainModel = true)
-public class OptimalStepsModel implements MainModel, PotentialFieldModel, DynamicElementRemoveListener<Pedestrian> {
+public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private UpdateSchemeOSM updateSchemeOSM;
 	private AttributesOSM attributesOSM;
@@ -63,12 +63,10 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	private List<StepSizeAdjuster> stepSizeAdjusters;
 	private Topography topography;
 	private double lastSimTimeInSec;
-	private int pedestrianIdCounter;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
 
 	public OptimalStepsModel() {
-		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = new LinkedList<>();
 		this.stepSizeAdjusters = new LinkedList<>();
 	}
@@ -131,8 +129,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
 		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
 		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
-
-		topography.addElementRemovedListener(Pedestrian.class, this);
 
 		models.add(this);
 	}
@@ -253,9 +249,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
-		pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
+				this.attributesPedestrian, registerDynamicElementId(topography, id));
 
 		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
 		return pedestrianOSM;
@@ -294,9 +289,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	public PotentialFieldAgent getPotentialFieldAgent() {
 		return potentialFieldPedestrian;
 	}
-
-	@Override
-	public void elementRemoved(Pedestrian ped) {}
 
 	@Override
 	public SourceControllerFactory getSourceControllerFactory() {

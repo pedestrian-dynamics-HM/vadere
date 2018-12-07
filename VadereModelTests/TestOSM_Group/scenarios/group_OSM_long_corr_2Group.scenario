@@ -180,7 +180,10 @@
         "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
-        "groupIds" : [ 1 ],
+        "groupIds" : [ 99 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 2 ]
       }, {
@@ -210,7 +213,10 @@
         "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
-        "groupIds" : [ 1 ],
+        "groupIds" : [ 99 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 2 ]
       }, {
@@ -241,6 +247,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 7 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 3 ]
       }, {
@@ -271,6 +280,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 7 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 3 ]
       }, {
@@ -301,6 +313,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 7 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 3 ]
       } ],

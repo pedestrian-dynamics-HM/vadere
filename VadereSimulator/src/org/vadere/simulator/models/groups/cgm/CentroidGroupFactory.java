@@ -55,11 +55,6 @@ public class CentroidGroupFactory extends GroupFactory {
 		assignToGroup(pedestrian);
 	}
 
-	public void elementRemoved(Pedestrian ped) {
-		CentroidGroup group = centroidGroupModel.removeMember(ped);
-//		System.out.printf("Remove ped %s from group %s %n", ped.getId(), group != null ? group.getID() : "noGroup");
-	}
-
 	public GroupSizeDeterminator getGroupSizeDeterminator() {
 		return groupSizeDeterminator;
 	}

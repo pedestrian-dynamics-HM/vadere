@@ -33,7 +33,6 @@ public class ReynoldsSteeringModel implements MainModel {
 	private AttributesAgent attributesPedestrian;
 	private Random random;
 	private Topography topography;
-	private int pedestrianIdCounter;
 
 	private Seek bSeek;
 	private Separation bSeparation;
@@ -44,7 +43,6 @@ public class ReynoldsSteeringModel implements MainModel {
 	private List<Model> submodels;
 
 	public ReynoldsSteeringModel() {
-		this.pedestrianIdCounter = 0;
 		this.bSeek = new Seek(this);
 		this.bSeparation = new Separation(this);
 		this.bContainment = new Containment(this);
@@ -115,10 +113,8 @@ public class ReynoldsSteeringModel implements MainModel {
 	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Class<T> type) {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("RSM cannot initialize " + type.getCanonicalName());
-
-		this.pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(
-				attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
+				attributesPedestrian, registerDynamicElementId(topography, id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}

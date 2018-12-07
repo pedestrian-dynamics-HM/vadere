@@ -40,7 +40,6 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<Model> models = new LinkedList<>();
 
-	private int pedestrianIdCounter;
 
 	@Deprecated
 	public SocialForceModel(Topography scenario, AttributesSFM attributes,
@@ -153,8 +152,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("SFM cannot initialize " + type.getCanonicalName());
 
-		this.pedestrianIdCounter++;
-		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, id > 0 ? id : pedestrianIdCounter);
+		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(topography, id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}

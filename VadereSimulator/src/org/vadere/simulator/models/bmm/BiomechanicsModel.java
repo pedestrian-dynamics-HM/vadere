@@ -36,12 +36,10 @@ public class BiomechanicsModel implements MainModel {
 	private AttributesAgent attributesPedestrian;
 	private Random random;
 	private Topography topography;
-	private int pedestrianIdCounter;
 	private List<PedestrianBMM> pedestriansBMM;
 	protected double lastSimTimeInSec;
 
 	public BiomechanicsModel() {
-		this.pedestrianIdCounter = 0;
 		this.pedestriansBMM = new LinkedList<>();
 	}
 
@@ -60,10 +58,8 @@ public class BiomechanicsModel implements MainModel {
 	public <T extends DynamicElement> PedestrianBMM createElement(VPoint position, int id, Class<T> type) {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("BMM cannot initialize " + type.getCanonicalName());
-
-		pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
+				this.attributesPedestrian, registerDynamicElementId(topography, id));
 
 		PedestrianBMM pedestrian = createElement(position, pedAttributes);
 		this.pedestriansBMM.add(pedestrian);

@@ -185,7 +185,10 @@ public class CentroidGroupModel
 
 	@Override
 	public void elementRemoved(Pedestrian pedestrian) {
-		getGroupFactory(pedestrian.getSource().getId()).elementRemoved(pedestrian);
+		Group group = removeMember(pedestrian);
+		if (group != null){
+			group.removeMember(pedestrian);
+		}
 	}
 
 }

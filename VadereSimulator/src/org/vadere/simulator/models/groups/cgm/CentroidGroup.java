@@ -161,6 +161,14 @@ public class CentroidGroup implements Group {
 
 	}
 
+	@Override
+	public void removeMember(Pedestrian ped){
+		members.remove(ped);
+		lastVision.remove(ped);
+		lostMembers.remove(ped);
+		noVisionOfLeaderCount.remove(ped);
+	}
+
 	public double getGroupVelocity() {
 		return groupVelocity;
 	}

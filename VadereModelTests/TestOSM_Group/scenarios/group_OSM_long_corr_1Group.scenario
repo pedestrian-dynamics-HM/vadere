@@ -159,6 +159,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 1 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 5 ]
       }, {
@@ -189,6 +192,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ ]
       }, {
@@ -219,6 +225,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 1 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 5 ]
       }, {
@@ -249,6 +258,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 2 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 5 ]
       }, {
@@ -279,6 +291,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 3 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 5 ]
       } ],
