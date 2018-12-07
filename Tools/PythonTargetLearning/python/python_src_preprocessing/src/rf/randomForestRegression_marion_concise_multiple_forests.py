@@ -13,10 +13,10 @@ import pandas as pd
 import numpy as np
 import time
 import os
-from src.rf.error_calculation import calc_and_print_errors_rf
+from rf.error_calculation import calc_and_print_errors_rf
 
 
-############# Parameters
+# Parameters
 
 
 

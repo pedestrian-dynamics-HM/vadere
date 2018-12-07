@@ -11,6 +11,12 @@ bin/
 .idea/
 *.iml
 
+#PyCharm
+__pycache__
+
+#Jupyter
+.ipynb_checkpoints
+
 #Eclipse
 .settings/
 .metadata/

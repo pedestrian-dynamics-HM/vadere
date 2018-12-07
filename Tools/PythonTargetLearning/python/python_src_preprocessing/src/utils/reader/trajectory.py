@@ -3,7 +3,7 @@ from glob import glob
 import numpy as np
 
 ################################################################################
-# run with `python main.py`                                                    #
+# run with `python main_rf.py`                                                    #
 #                                                                              #
 # vadere trajectories file has following format:                               #
 # timeStep {int} | pedestrianId {int} | x {float} | y {float} | targetId {int} #

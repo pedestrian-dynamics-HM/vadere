@@ -7,8 +7,8 @@ section_header = ["# Datatype", "# script version tag","# OBSERVATION_AREA",
                   "# TIME_STEP_BOUNDS", "# RESOLUTION ", "# SIGMA", "# GAUSS_DENSITY_BOUNDS","# FRAMERATE" ,"# scenarios used"]
 
 
-def generate_attributes_file(out_dir, section_fields):
-    with open(out_dir+"\\"+"attributes.txt", mode='w', newline='\n') as file:
+def generate_attributes_file(output_directory, section_fields):
+    with open(output_directory + "\\" + "attributes.txt", mode='w', newline='\n') as file:
         file.writelines(header)
         file.writelines('\n')
         file.writelines('\n')

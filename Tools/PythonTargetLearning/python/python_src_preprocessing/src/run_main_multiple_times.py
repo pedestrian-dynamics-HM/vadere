@@ -1,4 +1,4 @@
-import main
+import main_rf
 
 # main.run_main(obs_area = [20, 10, 10, 10], resolution = 0.5)
 # main.run_main(obs_area = [20, 15, 10, 10])
@@ -28,11 +28,11 @@ import main
 ## Camera position
 
 for i in range(0,4):
-    main.run_main(obs_area = [20,10,10,10]  , resolution=0.5, framerate = 10, numberOfTrees=20)
-    main.run_main(obs_area = [20,15,10,10]  , resolution=0.5, framerate = 10, numberOfTrees=20)
-    main.run_main(obs_area = [20,20,10,10]  , resolution=0.5, framerate = 10, numberOfTrees=20)
-    main.run_main(obs_area = [20,25,10,10]  , resolution=0.5, framerate = 10, numberOfTrees=20)
-    main.run_main(obs_area = [20,30,10,10]  , resolution=0.5, framerate = 10, numberOfTrees=20)
+    main_rf.run_main(observation_area= [20, 10, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
+    main_rf.run_main(observation_area= [20, 15, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
+    main_rf.run_main(observation_area= [20, 20, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
+    main_rf.run_main(observation_area= [20, 25, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
+    main_rf.run_main(observation_area= [20, 30, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
 
 
 

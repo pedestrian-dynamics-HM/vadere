@@ -1,10 +1,9 @@
 import numpy as np
 from numpy import linalg as LA
-from ..tests.density_plot_tests import read_density
-from ..io.density_writer import write_matrix_to_file
+from tests.density_plot_tests import read_density
+import utils.writer.density as writer
 import matplotlib.pyplot as plt
-from time import *
-
+import time
 
 # before processing trajectories file check attribute's column position
 INDEX_TIME_STEP = 0
@@ -51,7 +50,7 @@ def calculate_density_timeseries_formula(data, obs_area, resolution, sigma, curr
         # print("Density calculation: %f s" %(t2-t1))
 
         # Write to file
-        write_matrix_to_file(density, current_dist[i_timestep],file)
+        writer.write_matrix_to_file(density, current_dist[i_timestep],file)
         i_timestep += 1
 
 
@@ -113,7 +112,7 @@ def calculate_density_timeseries(data, obs_area, resolution, gauss_density_bound
             i_ped = i_ped+1
 
         # Write to file
-        write_matrix_to_file(density_approx, current_dist[index],file)
+        writer.write_matrix_to_file(density_approx, current_dist[index],file)
         index += 1
 
 
@@ -133,7 +132,7 @@ def calculate_density_timeseries_both_methods(data, obs_area, resolution, gauss_
         density_approx = np.zeros(size)
         ped_list = np.zeros([len(timestep),2])
         i_ped = 0
-        t1 = clock()
+        t1 = time.clock()
         for ped in timestep:
             # relative to origin of camera cutout
             # ped_pos_rel = np.array([ped[INDEX_POS_X], ped[INDEX_POS_Y]]) - np.array([obs_area[0], obs_area[1]])
@@ -142,7 +141,7 @@ def calculate_density_timeseries_both_methods(data, obs_area, resolution, gauss_
             i_ped = i_ped+1
 
 
-        t2 = clock()
+        t2 = time.clock()
 
         print("Density matrix calculation #1 (bounds ): %f s " % (t2-t1))
 
@@ -154,13 +153,13 @@ def calculate_density_timeseries_both_methods(data, obs_area, resolution, gauss_
 
         density_formula = np.zeros([nodes_y.__len__(), nodes_x.__len__()])
 
-        t1 = clock()
+        t1 = time.clock()
 
         for i_node_x in range(0, nodes_x.__len__()):
             for i_node_y in range(0, nodes_y.__len__()):
                 position = np.array([nodes_x[i_node_x], nodes_y[i_node_y]])
                 density_formula[i_node_y, i_node_x] = calculate_density_position(position, ped_list, sigma)
-        t2 = clock()
+        t2 = time.clock()
 
         print("Density matrix calculation #2 (formula): %f s" % (t2 - t1))
 
@@ -173,20 +172,20 @@ def calculate_density_timeseries_both_methods(data, obs_area, resolution, gauss_
         fig = plt.figure()
         plt.subplot(121)
         plt.imshow(np.flipud(density_approx), extent =[obs_area[0], obs_area[0]+obs_area[2] ,obs_area[1], obs_area[1] + obs_area[3]])
-        plt.hold
+        # plt.hold
         plt.plot(ped_list[:,0], ped_list[:,1],'kx')
         plt.title('Bounds')
         plt.colorbar()
 
         plt.subplot(122)
         plt.imshow(np.flipud(density_formula), extent =[obs_area[0], obs_area[0]+obs_area[2] ,obs_area[1], obs_area[1] + obs_area[3]])
-        plt.hold
+        # plt.hold
         plt.plot(ped_list[:,0], ped_list[:,1],'kx')
         plt.title('Formula [seitz-2012]')
         plt.colorbar()
 
         # Write to file
-        write_matrix_to_file(density_approx, current_dist[index],file)
+        writer.write_matrix_to_file(density_approx, current_dist[index],file)
         index += 1
 
 def get_gaussian_grid(gauss_bound, resolution, sigma, ped_pos):

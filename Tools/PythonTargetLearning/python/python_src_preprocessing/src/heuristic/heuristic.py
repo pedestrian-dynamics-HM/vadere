@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from src.rf.error_calculation import  calc_and_print_errors
+from rf.error_calculation import  calc_and_print_errors
 
 
 

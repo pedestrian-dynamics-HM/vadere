@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from src.io.density_writer import write_matrix_to_file
+import utils.writer.density as writer
 
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
@@ -25,7 +25,7 @@ def calculate_pedestrian_density(data, observation_area, resolution, output_root
         for ped in timestep:
             add_pedestrian(ped, matrix, observation_area, resolution)
 
-        write_matrix_to_file(matrix, output_root_directory, output_file_name, timestep[0][0], count)  # write matrix directly to file
+        writer.write_matrix_to_file(matrix, output_root_directory, output_file_name, timestep[0][0], count)  # write matrix directly to file
 
 
 # add density of ped depending on current possition
