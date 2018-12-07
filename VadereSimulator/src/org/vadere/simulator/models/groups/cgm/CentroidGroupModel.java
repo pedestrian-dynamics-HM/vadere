@@ -2,7 +2,6 @@ package org.vadere.simulator.models.groups.cgm;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.groups.*;
@@ -11,13 +10,14 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.*;
-import org.vadere.state.types.ScenarioElementType;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 
+/**
+ *	Implementation of group behavior model described in
+ *	'Pedestrian Group Behavior in a Cellular Automaton' (bib-key: seitz-2014)
+ */
 @ModelClass
 public class CentroidGroupModel
 		implements GroupModel, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
@@ -84,7 +84,7 @@ public class CentroidGroupModel
 
 	@Override
 	public CentroidGroup getGroup(final ScenarioElement ped) {
-        logger.debug(String.format("Get Group for Pedestrian %s", ped));
+        //logger.debug(String.format("Get Group for Pedestrian %s", ped));
         CentroidGroup group = pedestrianGroupData.get(ped);
         assert group != null: "No group found for pedestrian";
 		return group;
@@ -92,7 +92,7 @@ public class CentroidGroupModel
 
 	@Override
 	public void registerMember(final ScenarioElement ped, final Group group) {
-	    logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
+	    //logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
 		pedestrianGroupData.put(ped, (CentroidGroup) group);
 	}
 

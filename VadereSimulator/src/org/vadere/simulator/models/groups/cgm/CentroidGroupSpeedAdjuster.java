@@ -24,6 +24,8 @@ public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 			aheadDistance = group.getRelativeDistanceCentroid(ped);
 
 			// TODO [priority=low] [task=refactoring] move Parameters to AttributesCGM
+			// equations taken from 'Pedestrian Group Behavior in a Cellular Automaton'
+			// BibTex-Key: seitz-2014
 			if (!group.isLostMember(ped)) {
 				if (aheadDistance > 8) {
 					result = Double.MIN_VALUE;

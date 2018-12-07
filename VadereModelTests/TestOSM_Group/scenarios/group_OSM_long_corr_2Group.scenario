@@ -213,10 +213,7 @@
         "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
-        "groupIds" : [ 99 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
+        "groupIds" : [ 1 ],
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 2 ]
       }, {
