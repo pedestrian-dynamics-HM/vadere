@@ -47,48 +47,6 @@ public class CentroidGroupModel
 		this.topography = topography;
 		this.random = random;
 
-		// get all pedestrians already in topography
-		DynamicElementContainer<Pedestrian> c = topography.getPedestrianDynamicElements();
-
-		if (c.getInitialElements().size() > 0) {
-			Map<Integer, List<Pedestrian>> groups = new HashMap<>();
-
-			// aggregate group data
-			c.getInitialElements().stream().forEach(p -> {
-				for (Integer id : p.getGroupIds()) {
-					List<Pedestrian> peds = groups.get(id);
-					if (peds == null) {
-						peds = new ArrayList<>();
-						groups.put(id, peds);
-					}
-					// empty group id and size values, will be set later on
-					p.setGroupIds(new LinkedList<>());
-					p.setGroupSizes(new LinkedList<>());
-
-
-					peds.add(p);
-				}
-			});
-
-
-			// build groups depending on group ids and register pedestrian
-			for (Integer id : groups.keySet()) {
-				System.out.println("GroupId: " + id);
-				List<Pedestrian> peds = groups.get(id);
-				CentroidGroup group = getNewGroup(id, peds.size());
-				peds.stream().forEach(p -> {
-					// update group id / size info on ped
-					p.getGroupIds().add(id);
-					p.getGroupSizes().add(peds.size());
-					group.addMember(p);
-					registerMember(p, group);
-				});
-			}
-
-			// set latest groupid to max id + 1
-			Integer max = groups.keySet().stream().max(Integer::compareTo).get();
-			nextFreeGroupId = new AtomicInteger(max+1);
-		}
 	}
 
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
@@ -128,16 +86,7 @@ public class CentroidGroupModel
 	public CentroidGroup getGroup(final ScenarioElement ped) {
         logger.debug(String.format("Get Group for Pedestrian %s", ped));
         CentroidGroup group = pedestrianGroupData.get(ped);
-        if(group == null) {
-        	for (ScenarioElement p : pedestrianGroupData.keySet()) {
-        		if (p.getId() == ped.getId()) {
-        			group = pedestrianGroupData.get(p);
-        			pedestrianGroupData.put(ped, group);
-        			pedestrianGroupData.remove(p);
-        			break;
-				}
-			}
-		}
+        assert group != null: "No group found for pedestrian";
 		return group;
 	}
 
@@ -166,8 +115,52 @@ public class CentroidGroupModel
 		return new CentroidGroup(id, size, this.potentialFieldTarget);
 	}
 
+	private void initializeGroupsOfInitialPedestrians(){
+		// get all pedestrians already in topography
+		DynamicElementContainer<Pedestrian> c = topography.getPedestrianDynamicElements();
+
+		if (c.getElements().size() > 0) {
+			Map<Integer, List<Pedestrian>> groups = new HashMap<>();
+
+			// aggregate group data
+			c.getElements().stream().forEach(p -> {
+				for (Integer id : p.getGroupIds()) {
+					List<Pedestrian> peds = groups.get(id);
+					if (peds == null) {
+						peds = new ArrayList<>();
+						groups.put(id, peds);
+					}
+					// empty group id and size values, will be set later on
+					p.setGroupIds(new LinkedList<>());
+					p.setGroupSizes(new LinkedList<>());
+					peds.add(p);
+				}
+			});
+
+
+			// build groups depending on group ids and register pedestrian
+			for (Integer id : groups.keySet()) {
+				logger.debug("GroupId: " + id);
+				List<Pedestrian> peds = groups.get(id);
+				CentroidGroup group = getNewGroup(id, peds.size());
+				peds.stream().forEach(p -> {
+					// update group id / size info on ped
+					p.getGroupIds().add(id);
+					p.getGroupSizes().add(peds.size());
+					group.addMember(p);
+					registerMember(p, group);
+				});
+			}
+
+			// set latest groupid to max id + 1
+			Integer max = groups.keySet().stream().max(Integer::compareTo).get();
+			nextFreeGroupId = new AtomicInteger(max+1);
+		}
+	}
+
 	@Override
 	public void preLoop(final double simTimeInSec) {
+		initializeGroupsOfInitialPedestrians();
 		topography.addElementAddedListener(Pedestrian.class, this);
 		topography.addElementRemovedListener(Pedestrian.class, this);
 	}
