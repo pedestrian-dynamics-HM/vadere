@@ -277,6 +277,13 @@ public abstract class StateJsonConverter {
 		if (attributesPedestrianNode != null)
 			((ObjectNode) attributesPedestrianNode).remove("id");
 
+		AttributesTeleporter attributesTeleporter = null;
+		if(topography.getTeleporter() != null) {
+			attributesTeleporter = topography.getTeleporter().getAttributes();
+		}
+		JsonNode node = mapper.convertValue(attributesTeleporter, JsonNode.class);
+		topographyNode.set("teleporter", node);
+
 		JsonNode attributesCarNode = mapper.convertValue(topography.getAttributesCar(), JsonNode.class);
 		topographyNode.set("attributesCar", attributesCarNode);
 

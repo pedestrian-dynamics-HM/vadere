@@ -42,7 +42,7 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 		//add ProcessorId of required Processors to current Processor under test
 		AttributesPedestrianVelocityProcessor attr =
 				(AttributesPedestrianVelocityProcessor) testedProcessor.getAttributes();
-		attr.setPedestrianPositionProcessorId(pedPosProcId);
+		attr.setPedestrianTrajectoryProcessorId(pedPosProcId);
 
 		//create required Processor enviroment and add it to current Processor under test
 		pedPosProcEnv = new PedestrianPositionProcessorTestEnv(pedPosProcId);

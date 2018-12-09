@@ -6,16 +6,16 @@ package org.vadere.state.attributes.processor;
  */
 
 public class AttributesPedestrianVelocityProcessor extends AttributesProcessor {
-	private int pedestrianPositionProcessorId;
+	private int pedestrianTrajectoryProcessorId;
 	private int backSteps = 1;
 
-	public int getPedestrianPositionProcessorId() {
-		return this.pedestrianPositionProcessorId;
+	public int getPedestrianTrajectoryProcessorId() {
+		return pedestrianTrajectoryProcessorId;
 	}
 
-	public void setPedestrianPositionProcessorId(int pedestrianPositionProcessorId) {
+	public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {
 		checkSealed();
-		this.pedestrianPositionProcessorId = pedestrianPositionProcessorId;
+		this.pedestrianTrajectoryProcessorId = pedestrianTrajectoryProcessorId;
 	}
 
 	public int getBackSteps() {
