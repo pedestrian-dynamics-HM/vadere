@@ -26,7 +26,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private VRectangle measurementArea;
-	private PedestrianVelocityProcessor pedestrianVelocityProcessor;
+	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramCProcessor() {
 		super("velocity", "density");
@@ -37,7 +37,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 		super.init(manager);
 		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
 		measurementArea = att.getMeasurementArea();
-		pedestrianVelocityProcessor = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
 	}
 
 	@Override

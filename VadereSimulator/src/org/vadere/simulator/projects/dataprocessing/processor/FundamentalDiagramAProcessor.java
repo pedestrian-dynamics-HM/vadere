@@ -38,7 +38,7 @@ public class FundamentalDiagramAProcessor extends DataProcessor<TimestepKey, Lis
 	private double deltaTime;
 	private double deltaSimTime;
 	private PedestrianLineCrossProcessor pedestrianLineCrossProcessor;
-	private PedestrianVelocityProcessor pedestrianVelocityProcessor;
+	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramAProcessor() {
 		super("measurementTime", "deltaTime", "flow", "velocity", "density");
@@ -50,7 +50,7 @@ public class FundamentalDiagramAProcessor extends DataProcessor<TimestepKey, Lis
 		AttributesFundamentalDiagramAProcessor att = (AttributesFundamentalDiagramAProcessor) this.getAttributes();
 		deltaTime = att.getDeltaTime();
 		pedestrianLineCrossProcessor = (PedestrianLineCrossProcessor) manager.getProcessor(att.getPedestrianLineCrossProcessorId());
-		pedestrianVelocityProcessor = (PedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
 	}
 
 	@Override

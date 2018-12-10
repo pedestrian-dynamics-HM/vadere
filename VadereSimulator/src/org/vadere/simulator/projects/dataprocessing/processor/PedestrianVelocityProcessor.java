@@ -3,16 +3,13 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.LinkedList;
-import java.util.stream.Stream;
 
 /**
  * This processor computes the velocity based on pedestrian positions and the simulation time.
@@ -25,14 +22,14 @@ import java.util.stream.Stream;
  *
  */
 @DataProcessorClass()
-public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
-	private PedestrianTrajectoryProcessor pedTrajProc;
+public class PedestrianVelocityProcessor extends APedestrianVelocityProcessor {
+	private PedestrianPositionProcessor pedestrianPositionProcessor;
 	private int backSteps;
 
 	private LinkedList<Double> lastSimTimes;
 
 	public PedestrianVelocityProcessor() {
-		super("velocity");
+		super();
 		setAttributes(new AttributesPedestrianVelocityProcessor());
 		this.lastSimTimes = new LinkedList<>();
 		this.lastSimTimes.add(0.0);
@@ -40,7 +37,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 
 	@Override
 	public void doUpdate(final SimulationState state) {
-		pedTrajProc.update(state);
+		pedestrianPositionProcessor.update(state);
 
 		Integer timeStep = state.getStep();
 		state.getTopography().getElements(Pedestrian.class)
@@ -59,7 +56,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesPedestrianVelocityProcessor attVelProc = (AttributesPedestrianVelocityProcessor) getAttributes();
-		this.pedTrajProc = (PedestrianTrajectoryProcessor) manager.getProcessor(attVelProc.getPedestrianTrajectoryProcessorId());
+		this.pedestrianPositionProcessor = (PedestrianPositionProcessor) manager.getProcessor(attVelProc.getPedestrianPositionProcessorId());
 		this.backSteps = attVelProc.getBackSteps();
 		this.lastSimTimes = new LinkedList<>();
 		this.lastSimTimes.add(0.0);
@@ -69,20 +66,18 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 
 		int pastStep = timeStep - backSteps;
 		double velocity = 0.0;
-		if(pastStep >= 0) {
-			TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(pastStep, pedId);
+		if(pastStep >= 1) {
 
-			if (timeStep <= 1)
-				return 0.0; // For performance
+			VPoint pastPosition = pedestrianPositionProcessor.getValue(new TimestepPedestrianIdKey(pastStep, pedId));
+			VPoint position = pedestrianPositionProcessor.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
 
-			VTrajectory trajectory = pedTrajProc.getValue(new PedestrianIdKey(pedId));
-			double startTime = lastSimTimes.getFirst();
-			double endTime = currentSimTime;
-			double duration = (endTime - startTime);
+			if(pastPosition != null) {
+				double startTime = lastSimTimes.getFirst();
+				double endTime = currentSimTime;
+				double duration = (endTime - startTime);
 
-			velocity = trajectory.cut(startTime, endTime).speed().orElse(0.0);
-
-			return velocity;
+				velocity = position.subtract(pastPosition).scalarMultiply(1.0 / duration).distanceToOrigin();
+			}
 		}
 
 		return velocity;
