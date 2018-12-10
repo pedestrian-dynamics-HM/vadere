@@ -27,9 +27,9 @@ public class TargetController {
 
 	public TrafficLightPhase phase = TrafficLightPhase.GREEN;
 
-	public TargetController(Topography scenario, Target target) {
+	public TargetController(Topography topography, Target target) {
 		this.target = target;
-		this.topography = scenario;
+		this.topography = topography;
 
 		if (this.target.isStartingWithRedLight()) {
 			phase = TrafficLightPhase.RED;

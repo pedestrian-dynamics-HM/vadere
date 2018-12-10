@@ -148,7 +148,9 @@ def create_vadere_obstacles_from_points(cartesian_points):
     vadere_obstacle_string = """{
         "shape" : {
             "type" : "POLYGON",
-            "points" : [ $points ]
+            "points" : [
+                $points
+            ]
         },
         "id" : -1
 }"""
@@ -158,7 +160,7 @@ def create_vadere_obstacles_from_points(cartesian_points):
     point_string_template = Template(vadere_point_string)
 
     points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in cartesian_points]
-    points_as_string_concatenated = ", ".join(points_as_string)
+    points_as_string_concatenated = ",\n".join(points_as_string)
 
     vadere_obstacle_as_string = obstacle_string_template.substitute(points=points_as_string_concatenated)
 

@@ -21,6 +21,9 @@ public class VadereConsole {
 	private final static Logger logger = Logger.getLogger(VadereConsole.class);
 
 	public static void main(String[] args) {
+//		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
+	//		String[] tmp = {"scenario-run", "-f", "VadereModelTests/TestGNM/scenarios/rimea_04_flow_gnm1_050_h.scenario"};
+	//		args = tmp;
 		ArgumentParser parser = createArgumentParser();
 
 		try {

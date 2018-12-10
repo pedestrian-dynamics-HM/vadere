@@ -86,7 +86,7 @@ def run_simulations(test_project_path):
 if __name__ == '__main__':
     test_project_path = "Tools/ContinuousIntegration/run_orign_translation_test.d"
 
-    # run_simulations(test_project_path)
+    run_simulations(test_project_path)
 
     output_pairs = get_output_pairs()
     print("comparing {} output pairs".format(len(output_pairs)))

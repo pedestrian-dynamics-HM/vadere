@@ -8,6 +8,7 @@ import org.vadere.simulator.utils.scenariochecker.checks.topography.PedestrianSp
 import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceMinRadiusCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceSpawnSettingCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.StairTreadSanityCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.topography.TopographyOffsetCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.TopographyOverlapCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.UniqueSourceIdCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.UnusedTargetsCheck;
@@ -65,6 +66,7 @@ public class ScenarioChecker {
 		ret.addAll(checkSimulationAttribues());
 		ret.addAll(checkSourceSpawnSetting());
 		ret.addAll(checkMinSourceRadius());
+		ret.addAll(runCheck(new TopographyOffsetCheck()));
 		return ret;
 	}
 

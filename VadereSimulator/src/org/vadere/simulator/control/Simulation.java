@@ -211,7 +211,7 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
-				assert assertAllPedestrianInBounds();
+				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 
@@ -289,7 +289,7 @@ public class Simulation {
 			targetController.update(simTimeInSec);
 		}
 
-		topographyController.update(simTimeInSec);
+		topographyController.update(simTimeInSec); //rebuild CellGrid
 		step++;
 
 		for (Model m : models) {
