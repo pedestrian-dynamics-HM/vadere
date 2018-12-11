@@ -284,9 +284,6 @@ public class Simulation {
 	private void updateCallbacks(double simTimeInSec) {
         List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
-		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
-		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
-
         // TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
@@ -303,6 +300,9 @@ public class Simulation {
 
 		topographyController.update(simTimeInSec);
 		step++;
+
+		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
 
 		for (Model m : models) {
 			m.update(simTimeInSec);
