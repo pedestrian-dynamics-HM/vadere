@@ -128,7 +128,8 @@
           "width" : 45.0,
           "height" : 3.2,
           "type" : "RECTANGLE"
-        }
+        },
+        "pedestrianVelocityProcessorId" : 16
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",

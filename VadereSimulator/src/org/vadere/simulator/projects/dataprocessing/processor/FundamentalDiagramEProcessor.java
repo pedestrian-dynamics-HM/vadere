@@ -17,6 +17,7 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 public class FundamentalDiagramEProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private SumVoronoiAlgorithm sumVoronoiAlgorithm;
+	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramEProcessor() {
 		super("velocity", "density");
@@ -26,7 +27,8 @@ public class FundamentalDiagramEProcessor extends AreaDataProcessor<Pair<Double,
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesFundamentalDiagramEProcessor att = (AttributesFundamentalDiagramEProcessor) this.getAttributes();
-		sumVoronoiAlgorithm = new SumVoronoiAlgorithm(att.getMeasurementArea(), att.getVoronoiArea());
+		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+		sumVoronoiAlgorithm = new SumVoronoiAlgorithm(key -> pedestrianVelocityProcessor.getValue(key), att.getMeasurementArea(), att.getVoronoiArea());
 	}
 
 	@Override
