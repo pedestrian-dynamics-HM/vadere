@@ -64,9 +64,9 @@ public class PedestrianVelocityProcessor extends APedestrianVelocityProcessor {
 
 	private double getVelocity(int timeStep, double currentSimTime, int pedId) {
 
-		int pastStep = timeStep - backSteps;
+		int pastStep = Math.max(1, timeStep - backSteps);
 		double velocity = 0.0;
-		if(pastStep >= 1) {
+		if(timeStep > 1) {
 
 			VPoint pastPosition = pedestrianPositionProcessor.getValue(new TimestepPedestrianIdKey(pastStep, pedId));
 			VPoint position = pedestrianPositionProcessor.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
