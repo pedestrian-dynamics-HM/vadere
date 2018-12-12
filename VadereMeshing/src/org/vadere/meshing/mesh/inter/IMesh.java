@@ -105,6 +105,8 @@ import java.util.stream.StreamSupport;
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
@@ -113,7 +115,10 @@ public interface IMesh<
 		P extends IPoint,
 		CE,
 		CF,
-		V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends Iterable<F>, Cloneable {
+		V extends IVertex<P>,
+		E extends IHalfEdge<CE>,
+		F extends IFace<CF>>
+			extends Iterable<F>, Cloneable {
 
 	/**
 	 * construct a new empty mesh.
@@ -1698,7 +1703,7 @@ public interface IMesh<
 	 * @param <P>               the type of the points (containers)
 	 * @return a new pointer based mesh
 	 */
-	static <P extends IPoint> PMesh<P> createPMesh(@NotNull final IPointConstructor<P> pointConstructor) {
+	static <P extends IPoint> PMesh<P, ?, ?> createPMesh(@NotNull final IPointConstructor<P> pointConstructor) {
 		return new PMesh<>(pointConstructor);
 	}
 
