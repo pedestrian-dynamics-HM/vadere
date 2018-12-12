@@ -175,7 +175,7 @@
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
-        "minimumStepLength" : false,
+        "minimumStepLength" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -251,7 +251,7 @@
         "startTime" : 0.0,
         "endTime" : 1800.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
@@ -262,8 +262,8 @@
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.62,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 3.0,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
       "teleporter" : {
