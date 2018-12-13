@@ -50,7 +50,6 @@ public class CentroidGroupFactory extends GroupFactory {
 		return newGroup.getSize();
 	}
 
-	//listener methode (aufruf
 	public void elementAdded(Pedestrian pedestrian) {
 		assignToGroup(pedestrian);
 	}

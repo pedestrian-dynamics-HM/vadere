@@ -2,6 +2,7 @@ package org.vadere.simulator.models.groups;
 
 import java.util.List;
 
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Pedestrian;
 
 public interface Group {
@@ -22,4 +23,8 @@ public interface Group {
 	public int getOpenPersons();
 
 	boolean equals(Group other);
+
+	void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);
+
+	IPotentialFieldTarget getPotentialFieldTarget();
 }

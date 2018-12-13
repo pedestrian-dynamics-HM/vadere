@@ -29,7 +29,7 @@ public class CentroidGroup implements Group {
 	private  IPotentialFieldTarget potentialFieldTarget;
 
 	public CentroidGroup(int id, int size,
-			IPotentialFieldTarget potentialFieldTarget) {
+				 IPotentialFieldTarget potentialFieldTarget) {
 		this.id = id;
 		this.size = size;
 		this.potentialFieldTarget = potentialFieldTarget;
@@ -51,7 +51,7 @@ public class CentroidGroup implements Group {
 	}
 
 	@Override
-	public boolean equals(Group o) {
+	public boolean equals(org.vadere.simulator.models.groups.Group o) {
 		boolean result = false;
 		if (o == null){
 			return result;
@@ -59,8 +59,8 @@ public class CentroidGroup implements Group {
 
 		if (this == o) {
 			result = true;
-		} else if (o instanceof CentroidGroup) {
-			Group other = o;
+		} else if (o instanceof Group) {
+			org.vadere.simulator.models.groups.Group other = o;
 
 			if (this.getID() == other.getID()) {
 				result = true;
@@ -250,7 +250,13 @@ public class CentroidGroup implements Group {
 		return pacemaker;
 	}
 
+	@Override
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
 		this.potentialFieldTarget = potentialFieldTarget;
+	}
+
+	@Override
+	public IPotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
 	}
 }

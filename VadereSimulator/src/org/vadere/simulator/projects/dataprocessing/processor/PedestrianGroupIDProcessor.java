@@ -31,7 +31,7 @@ public class PedestrianGroupIDProcessor extends DataProcessor<TimestepPedestrian
 					.map(m -> (CentroidGroupModel) m).findAny();
 
 			if (model.isPresent()){
-				model.get().getPedestrianGroupData().entrySet().forEach(entry ->{
+				model.get().getPedestrianGroupMap().entrySet().forEach(entry ->{
 					this.putValue(new TimestepPedestrianIdKey(timeStep, entry.getKey().getId()), entry.getValue().getID());
 				});
 			}

@@ -19,14 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  *	'Pedestrian Group Behavior in a Cellular Automaton' (bib-key: seitz-2014)
  */
 @ModelClass
-public class CentroidGroupModel
-		implements GroupModel, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
+public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 
 	private static Logger logger = LogManager.getLogger(CentroidGroupModel.class);
 
 	private Random random;
 	private Map<Integer, CentroidGroupFactory> groupFactories;		// for each source a separate group factory.
-	private Map<ScenarioElement, CentroidGroup> pedestrianGroupData;
+	private Map<ScenarioElement, CentroidGroup> pedestrianGroupMap;
 
 	private Topography topography;
 	private IPotentialFieldTarget potentialFieldTarget;
@@ -36,7 +35,7 @@ public class CentroidGroupModel
 
 	public CentroidGroupModel() {
 		this.groupFactories = new HashMap<>();
-		this.pedestrianGroupData = new HashMap<>();
+		this.pedestrianGroupMap = new HashMap<>();
 		this.nextFreeGroupId = new AtomicInteger(0);
 	}
 
@@ -49,12 +48,18 @@ public class CentroidGroupModel
 
 	}
 
+	@Override
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
 		this.potentialFieldTarget = potentialFieldTarget;
 		// update all existing groups
-        for(CentroidGroup group : pedestrianGroupData.values()) {
+        for(CentroidGroup group : pedestrianGroupMap.values()) {
             group.setPotentialFieldTarget(potentialFieldTarget);
         }
+	}
+
+	@Override
+	public IPotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
 	}
 
 	protected int getFreeGroupId() {
@@ -83,27 +88,22 @@ public class CentroidGroupModel
 	}
 
 	@Override
-	public CentroidGroup getGroup(final ScenarioElement ped) {
+	public CentroidGroup getGroup(final ScenarioElement pedestrian) {
         //logger.debug(String.format("Get Group for Pedestrian %s", ped));
-        CentroidGroup group = pedestrianGroupData.get(ped);
+        CentroidGroup group = pedestrianGroupMap.get(pedestrian);
         assert group != null: "No group found for pedestrian";
 		return group;
 	}
 
 	@Override
-	public void registerMember(final ScenarioElement ped, final Group group) {
+	public void registerMember(final ScenarioElement ped, final CentroidGroup group) {
 	    //logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
-		pedestrianGroupData.put(ped, (CentroidGroup) group);
+		pedestrianGroupMap.put(ped, (CentroidGroup) group);
 	}
 
 	@Override
-	public CentroidGroup removeMember(ScenarioElement ped) {
-		return pedestrianGroupData.remove(ped);
-	}
-
-
-	public Map<ScenarioElement, CentroidGroup> getPedestrianGroupData() {
-		return pedestrianGroupData;
+	public Map<ScenarioElement, CentroidGroup> getPedestrianGroupMap() {
+		return pedestrianGroupMap;
 	}
 
 	@Override
@@ -158,6 +158,32 @@ public class CentroidGroupModel
 		}
 	}
 
+
+
+	public AttributesCGM getAttributesCGM() {
+		return attributesCGM;
+	}
+
+
+
+	/* DynamicElement Listeners */
+
+	@Override
+	public void elementAdded(Pedestrian pedestrian) {
+		// call GroupFactory for selected Source
+		getGroupFactory(pedestrian.getSource().getId()).elementAdded(pedestrian);
+	}
+
+	@Override
+	public void elementRemoved(Pedestrian pedestrian) {
+		Group group = pedestrianGroupMap.remove(pedestrian);
+		if (group != null){
+			group.removeMember(pedestrian);
+		}
+	}
+
+	/* Model Interface */
+
 	@Override
 	public void preLoop(final double simTimeInSec) {
 		initializeGroupsOfInitialPedestrians();
@@ -172,23 +198,4 @@ public class CentroidGroupModel
 	@Override
 	public void update(final double simTimeInSec) {
 	}
-
-	public AttributesCGM getAttributesCGM() {
-		return attributesCGM;
-	}
-
-	@Override
-	public void elementAdded(Pedestrian pedestrian) {
-		// call GroupFactory for selected Source
-		getGroupFactory(pedestrian.getSource().getId()).elementAdded(pedestrian);
-	}
-
-	@Override
-	public void elementRemoved(Pedestrian pedestrian) {
-		Group group = removeMember(pedestrian);
-		if (group != null){
-			group.removeMember(pedestrian);
-		}
-	}
-
 }
