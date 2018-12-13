@@ -56,7 +56,7 @@ run_scenario_files:
       - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
   artifacts:
       paths:
-          - "log_dir"
+          - *.out
 
 # exclude. Finde solution an then add this test again.
 # run_origin_test:

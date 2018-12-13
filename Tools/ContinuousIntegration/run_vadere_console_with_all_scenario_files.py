@@ -38,13 +38,10 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar", scenario_timeout_in_sec=60):
     output_dir = "output"
-    log_dir = "log_dir"
+    log_dir = ""
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
 
     total_scenario_files = len(scenario_files)
 
@@ -57,7 +54,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         try:
             print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
             scenario_name = os.path.basename(scenario_file).split('.')[0]
-            log_file = os.path.join(log_dir, scenario_name + ".log")
+            log_file = os.path.join(log_dir, "log_"scenario_name + ".out")
 
             # Measure wall time and not CPU time simply because it is the simplest method.
             wall_time_start = time.time()
