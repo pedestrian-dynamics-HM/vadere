@@ -4,28 +4,39 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.groups.*;
+import org.vadere.simulator.models.groups.AbstractGroupModel;
+import org.vadere.simulator.models.groups.Group;
+import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.DynamicElementContainer;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Topography;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *	Implementation of group behavior model described in
- *	'Pedestrian Group Behavior in a Cellular Automaton' (bib-key: seitz-2014)
+ * Implementation of group behavior model described in 'Pedestrian Group Behavior in a Cellular
+ * Automaton' (bib-key: seitz-2014)
  */
 @ModelClass
-public class CentroidGroupModel implements GroupModel<CentroidGroup> {
+public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	private static Logger logger = LogManager.getLogger(CentroidGroupModel.class);
 
 	private Random random;
-	private Map<Integer, CentroidGroupFactory> groupFactories;		// for each source a separate group factory.
 	private Map<ScenarioElement, CentroidGroup> pedestrianGroupMap;
+	private Map<Integer, LinkedList<CentroidGroup>> sourceNextGroups;
+	private Map<Integer, GroupSizeDeterminator> sourceGroupSizeDeterminator;
 
 	private Topography topography;
 	private IPotentialFieldTarget potentialFieldTarget;
@@ -34,8 +45,10 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 	private AtomicInteger nextFreeGroupId;
 
 	public CentroidGroupModel() {
-		this.groupFactories = new HashMap<>();
 		this.pedestrianGroupMap = new HashMap<>();
+		this.sourceNextGroups = new HashMap<>();
+		this.sourceGroupSizeDeterminator = new HashMap<>();
+
 		this.nextFreeGroupId = new AtomicInteger(0);
 	}
 
@@ -52,9 +65,9 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
 		this.potentialFieldTarget = potentialFieldTarget;
 		// update all existing groups
-        for(CentroidGroup group : pedestrianGroupMap.values()) {
-            group.setPotentialFieldTarget(potentialFieldTarget);
-        }
+		for (CentroidGroup group : pedestrianGroupMap.values()) {
+			group.setPotentialFieldTarget(potentialFieldTarget);
+		}
 	}
 
 	@Override
@@ -62,43 +75,42 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 		return potentialFieldTarget;
 	}
 
-	protected int getFreeGroupId() {
+	private int getFreeGroupId() {
 		return nextFreeGroupId.getAndIncrement();
 	}
 
+
 	@Override
-	public GroupFactory getGroupFactory(final int sourceId) {
-
-		CentroidGroupFactory result = groupFactories.get(sourceId);
-
-		if (result == null) {
-			throw new IllegalArgumentException("For SourceID: " + sourceId + " no GroupFactory exists. " +
-					"Is this really a valid source?");
-		}
-
-		return result;
+	public void registerGroupSizeDeterminator(int sourceId, GroupSizeDeterminator gsD) {
+		sourceGroupSizeDeterminator.put(sourceId, gsD);
+		sourceNextGroups.put(sourceId, new LinkedList<>());
 	}
 
 	@Override
-	public void initializeGroupFactory(int sourceId, List<Double> groupSizeDistribution) {
-		GroupSizeDeterminator gsD = new GroupSizeDeterminatorRandom(groupSizeDistribution, random);
-		CentroidGroupFactory result =
-				new CentroidGroupFactory(this, gsD);
-		groupFactories.put(sourceId, result);
+	public int nextGroupForSource(int sourceId) {
+		GroupSizeDeterminator gsD = sourceGroupSizeDeterminator.get(sourceId);
+		assert gsD != null : "GroupSizeDeterminator not initialized for source";
+
+		CentroidGroup newGroup = getNewGroup(gsD.nextGroupSize());
+		LinkedList<CentroidGroup> groups = sourceNextGroups.get(sourceId);
+		assert groups != null : "SourceNextGroupMap not initialized for group";
+		groups.addLast(newGroup);
+
+		return newGroup.getSize();
 	}
 
 	@Override
 	public CentroidGroup getGroup(final ScenarioElement pedestrian) {
-        //logger.debug(String.format("Get Group for Pedestrian %s", ped));
-        CentroidGroup group = pedestrianGroupMap.get(pedestrian);
-        assert group != null: "No group found for pedestrian";
+		//logger.debug(String.format("Get Group for Pedestrian %s", ped));
+		CentroidGroup group = pedestrianGroupMap.get(pedestrian);
+		assert group != null : "No group found for pedestrian";
 		return group;
 	}
 
 	@Override
-	public void registerMember(final ScenarioElement ped, final CentroidGroup group) {
-	    //logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
-		pedestrianGroupMap.put(ped, (CentroidGroup) group);
+	protected void registerMember(final ScenarioElement ped, final CentroidGroup group) {
+		//logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
+		pedestrianGroupMap.put(ped, group);
 	}
 
 	@Override
@@ -107,15 +119,16 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 	}
 
 	@Override
-	public CentroidGroup getNewGroup(final int size) {
+	protected CentroidGroup getNewGroup(final int size) {
 		return getNewGroup(getFreeGroupId(), size);
 	}
 
-	private CentroidGroup getNewGroup(final int id, final int size) {
+	@Override
+	protected CentroidGroup getNewGroup(final int id, final int size) {
 		return new CentroidGroup(id, size, this.potentialFieldTarget);
 	}
 
-	private void initializeGroupsOfInitialPedestrians(){
+	private void initializeGroupsOfInitialPedestrians() {
 		// get all pedestrians already in topography
 		DynamicElementContainer<Pedestrian> c = topography.getPedestrianDynamicElements();
 
@@ -123,13 +136,9 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 			Map<Integer, List<Pedestrian>> groups = new HashMap<>();
 
 			// aggregate group data
-			c.getElements().stream().forEach(p -> {
+			c.getElements().forEach(p -> {
 				for (Integer id : p.getGroupIds()) {
-					List<Pedestrian> peds = groups.get(id);
-					if (peds == null) {
-						peds = new ArrayList<>();
-						groups.put(id, peds);
-					}
+					List<Pedestrian> peds = groups.computeIfAbsent(id, k -> new ArrayList<>());
 					// empty group id and size values, will be set later on
 					p.setGroupIds(new LinkedList<>());
 					p.setGroupSizes(new LinkedList<>());
@@ -140,10 +149,9 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 
 			// build groups depending on group ids and register pedestrian
 			for (Integer id : groups.keySet()) {
-				logger.debug("GroupId: " + id);
 				List<Pedestrian> peds = groups.get(id);
 				CentroidGroup group = getNewGroup(id, peds.size());
-				peds.stream().forEach(p -> {
+				peds.forEach(p -> {
 					// update group id / size info on ped
 					p.getGroupIds().add(id);
 					p.getGroupSizes().add(peds.size());
@@ -154,30 +162,44 @@ public class CentroidGroupModel implements GroupModel<CentroidGroup> {
 
 			// set latest groupid to max id + 1
 			Integer max = groups.keySet().stream().max(Integer::compareTo).get();
-			nextFreeGroupId = new AtomicInteger(max+1);
+			nextFreeGroupId = new AtomicInteger(max + 1);
 		}
 	}
 
+
+	protected void assignToGroup(Pedestrian ped) {
+		// get first group for current source.
+		LinkedList<CentroidGroup> groups = sourceNextGroups.get(ped.getSource().getId());
+		CentroidGroup currentGroup = groups.peekFirst();
+		if (currentGroup == null) {
+			throw new IllegalStateException("No empty group exists to add Pedestrian: " + ped.getId());
+		}
+
+		// add ped to group. If group is full remove it from the sourceNextGroups list.
+		currentGroup.addMember(ped);
+		ped.addGroupId(currentGroup.getID(), currentGroup.getSize());
+		registerMember(ped, currentGroup);
+		if (currentGroup.getOpenPersons() == 0) {
+			groups.pollFirst(); // remove full group from list.
+		}
+	}
 
 
 	public AttributesCGM getAttributesCGM() {
 		return attributesCGM;
 	}
 
-
-
 	/* DynamicElement Listeners */
 
 	@Override
 	public void elementAdded(Pedestrian pedestrian) {
-		// call GroupFactory for selected Source
-		getGroupFactory(pedestrian.getSource().getId()).elementAdded(pedestrian);
+		assignToGroup(pedestrian);
 	}
 
 	@Override
 	public void elementRemoved(Pedestrian pedestrian) {
 		Group group = pedestrianGroupMap.remove(pedestrian);
-		if (group != null){
+		if (group != null) {
 			group.removeMember(pedestrian);
 		}
 	}
