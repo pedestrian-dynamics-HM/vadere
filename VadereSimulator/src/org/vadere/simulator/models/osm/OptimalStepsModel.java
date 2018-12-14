@@ -13,7 +13,6 @@ import org.vadere.simulator.models.SubModelBuilder;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupStepSizeAdjuster;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupPotential;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupSpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
@@ -32,7 +31,6 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
@@ -108,8 +106,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 					new CentroidGroupPotential(centroidGroupModel,
 							potentialFieldPedestrian, potentialFieldTarget, centroidGroupModel.getAttributesCGM());
 
-			SpeedAdjuster speedAdjusterCGM = new CentroidGroupSpeedAdjuster(centroidGroupModel);
-			this.speedAdjusters.add(speedAdjusterCGM);
 			this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
 		}
 
