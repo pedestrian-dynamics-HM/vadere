@@ -8,6 +8,11 @@ import org.vadere.state.attributes.Attributes;
 @ModelAttributeClass
 public class AttributesBHM extends Attributes {
 
+    /**
+     * My documentation for xyz.
+     * @author BK
+     * @see AttributesBMM
+     */
 	private double stepLengthIntercept = 0.4625;
 	private double stepLengthSlopeSpeed = 0.2345;
 	private double stepLengthSD = 0.036;

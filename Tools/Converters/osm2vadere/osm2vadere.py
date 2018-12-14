@@ -1,4 +1,4 @@
-# Convert OpenStreetMap XML file exported from https://www.openstreetmap.org/
+# Convert an OpenStreetMap XML file exported from https://www.openstreetmap.org/
 # to a Vadere topology (in Cartesian coordinates).
 #
 # Steps to run this script:
@@ -110,36 +110,24 @@ def extract_base_point(xml_tree):
 
     return base_point
 
-def extract_end_point(xml_tree):
-    end_node = xml_tree.xpath("/osm/bounds")[0]
-    end_point = (end_node.get("maxlat"), end_node.get("maxlon"))
-
-    return end_point
 
 def assert_that_start_and_end_point_are_equal(node_references):
     assert node_references[0].get("ref") == node_references[-1].get("ref")
 
 
-def convert_nodes_to_cartesian_points(nodes, lookup_table_latitude_and_longitude, base_point):
+def convert_nodes_to_cartesian_points(nodes, lookup_table_latitude_and_longitude):
     cartesian_points = []
-
-    # Use base point to normalize coordinates to (0,0).
-    (baseX, baseY, base_zone_number, base_zone_letter) = utm.from_latlon(float(base_point[0]), float(base_point[1]))
 
     # Omit last node because it should be the same as the first one.
     for node in nodes[:len(nodes) - 1]:
         reference = node.get("ref")
         latitude, longitude = lookup_table_latitude_and_longitude[reference]
 
-        (x, y, zone_number, zone_letter) = utm.from_latlon(float(latitude), float(longitude))
+        x, y, zone_number, zone_letter = utm.from_latlon(float(latitude), float(longitude))
+        point = (x, y)
 
-        # TODO: handle coordinates from different segments properly.
-        assert base_zone_number == zone_number, "Overstepped UTM boundary(zone number)"
-        assert base_zone_letter == zone_letter, "Overstepped UTM boundary(zone letter)"
-
-        point_to_add = (x-baseX, y - baseY)
-
-        cartesian_points.append(point_to_add)
+        # TODO: assert that ALL nodes fall into same zone_number and zone_letter!
+        cartesian_points.append(point)
 
     return cartesian_points
 
@@ -148,9 +136,7 @@ def create_vadere_obstacles_from_points(cartesian_points):
     vadere_obstacle_string = """{
         "shape" : {
             "type" : "POLYGON",
-            "points" : [
-                $points
-            ]
+            "points" : [ $points ]
         },
         "id" : -1
 }"""
@@ -167,17 +153,14 @@ def create_vadere_obstacles_from_points(cartesian_points):
     return vadere_obstacle_as_string
 
 
-def build_vadere_topography_input_with_obstacles(obstacles, base_point, end_point):
+def build_vadere_topography_input_with_obstacles(obstacles, width, height):
     with open("vadere_topography_default.txt", "r") as myfile:
         vadere_topography_input = myfile.read().replace('\n', '')
-    base_point_cartesian = utm.from_latlon(float(base_point[0]), float(base_point[1]))
-    end_point_cartesian = utm.from_latlon(float(end_point[0]), float(end_point[1]))
 
-    width = math.ceil(end_point_cartesian[0] - base_point_cartesian[0])
-    height = math.ceil(end_point_cartesian[1] - base_point_cartesian[1])
     vadere_topography_output = Template(vadere_topography_input).substitute(width=width, height=height, obstacles=obstacles)
 
     return vadere_topography_output
+
 
 def print_xml_parsing_statistics(filename, nodes_dictionary, simple_buildings, complex_buildings, base_point):
     print("File: {}".format(filename))
@@ -186,12 +169,65 @@ def print_xml_parsing_statistics(filename, nodes_dictionary, simple_buildings, c
     print("  Complex buildings: {}".format(len(complex_buildings)))
     print("  Base point: {}".format(base_point))
 
+
 def print_output(outputfile, output):
     if outputfile == None:
         print(output)
     else:
         with open(outputfile, "w") as text_file:
             print(output, file=text_file)
+
+
+def find_width_and_height(buildings_cartesian):
+    # search for the highest x- and y-coordinates within the points
+    width = 0
+    height = 0
+    for cartesian_points in buildings_cartesian:
+        for point in cartesian_points:
+            width = max(width, point[0])
+            height = max(height, point[1])
+    return math.ceil(width), math.ceil(height)
+
+def find_new_basepoint(buildings_cartesian):
+    # "buildings_cartesian" is a list of lists!!!
+    # The inner list contains the (x,y) tuples!
+    # search for the lowest x- and y-coordinates within the points
+    all_points = [point for building in buildings_cartesian for point in building]
+
+    tuple_with_min_x = min(all_points, key=lambda point: point[0])
+    tuple_with_min_y = min(all_points, key=lambda point: point[1])
+
+    return (tuple_with_min_x[0], tuple_with_min_y[1])
+
+
+def shift_points(buildings_utm, shift_in_x_direction, shift_in_y_direction):
+    new_buildings = []
+    for cartesian_points in buildings_utm:
+        shifted_cartesian_points = \
+            [(point[0] + shift_in_x_direction, point[1] + shift_in_y_direction) for point in cartesian_points]
+        new_buildings.append(shifted_cartesian_points)
+    return new_buildings
+
+
+def convert_buildings_to_cartesian(buildings_as_xml_nodes):
+    buildings_in_cartesian = []
+    for building in buildings_as_xml_nodes:
+        # Collect nodes that belong to the current building.
+        node_references = building.xpath("./nd")
+
+        assert_that_start_and_end_point_are_equal(node_references)
+        cartesian_points = convert_nodes_to_cartesian_points(node_references, nodes_dictionary_with_lat_and_lon)
+
+        buildings_in_cartesian.append(cartesian_points)
+    return buildings_in_cartesian
+
+
+def convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings_as_cartesian):
+    list_of_vadere_obstacles_as_strings = []
+    for cartesian_points in buildings_as_cartesian:
+        vadere_obstacles_as_strings = create_vadere_obstacles_from_points(cartesian_points)
+        list_of_vadere_obstacles_as_strings.append(vadere_obstacles_as_strings)
+    return list_of_vadere_obstacles_as_strings
 
 
 if __name__ == "__main__":
@@ -203,24 +239,20 @@ if __name__ == "__main__":
 
     simple_buildings = filter_for_buildings(xml_tree)
     complex_buildings = filter_for_buildings_in_relations(xml_tree)
+    extracted_base_point = extract_base_point(xml_tree)
 
-    base_point = extract_base_point(xml_tree)
-    end_point = extract_end_point(xml_tree)
+    print_xml_parsing_statistics(args.filename, nodes_dictionary_with_lat_and_lon, simple_buildings, complex_buildings, extracted_base_point)
 
-    print_xml_parsing_statistics(args.filename, nodes_dictionary_with_lat_and_lon, simple_buildings, complex_buildings, base_point)
+    buildings_as_cartesian = convert_buildings_to_cartesian(simple_buildings + complex_buildings)
 
-    list_of_vadere_obstacles_as_strings = []
+    # make sure everything lies within the topography
+    new_base = find_new_basepoint(buildings_as_cartesian)
+    buildings_as_cartesian = shift_points(buildings_as_cartesian, -new_base[0], -new_base[1])
+    width_topography, height_topography = find_width_and_height(buildings_as_cartesian)
 
-    for building in simple_buildings + complex_buildings:
-        # Collect nodes that belong to the current building.
-        node_references = building.xpath("./nd")
-
-        assert_that_start_and_end_point_are_equal(node_references)
-        cartesian_points = convert_nodes_to_cartesian_points(node_references, nodes_dictionary_with_lat_and_lon, base_point)
-        vadere_obstacles_as_strings = create_vadere_obstacles_from_points(cartesian_points)
-        list_of_vadere_obstacles_as_strings.append(vadere_obstacles_as_strings)
+    list_of_vadere_obstacles_as_strings = convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings_as_cartesian)
 
     obstacles_joined = ",\n".join(list_of_vadere_obstacles_as_strings)
 
-    vadere_topography_output = build_vadere_topography_input_with_obstacles(obstacles_joined, base_point, end_point)
+    vadere_topography_output = build_vadere_topography_input_with_obstacles(obstacles_joined, width_topography, height_topography)
     print_output(args.output, vadere_topography_output)
