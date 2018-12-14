@@ -55,6 +55,7 @@ run_scenario_files:
       - mvn -Dmaven.test.skip=true package
       - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
   artifacts:
+      when: on_failure
       paths:
           - '*.out'
 
