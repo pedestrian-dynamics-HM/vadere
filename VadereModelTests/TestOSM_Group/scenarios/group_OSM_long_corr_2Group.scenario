@@ -180,7 +180,7 @@
         "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
-        "groupIds" : [ 99 ],
+        "groupIds" : [ 1 ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -214,6 +214,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ 1 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ 2 ]
       }, {

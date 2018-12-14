@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -161,8 +162,10 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 			}
 
 			// set latest groupid to max id + 1
-			Integer max = groups.keySet().stream().max(Integer::compareTo).get();
-			nextFreeGroupId = new AtomicInteger(max + 1);
+			Optional<Integer> max = groups.keySet().stream().max(Integer::compareTo);
+			if (max.isPresent()) {
+				nextFreeGroupId = new AtomicInteger(max.get() + 1);
+			}
 		}
 	}
 
