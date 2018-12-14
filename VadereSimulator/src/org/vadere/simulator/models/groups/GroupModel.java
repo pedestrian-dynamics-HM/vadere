@@ -7,33 +7,32 @@ import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 
-import java.util.List;
 import java.util.Map;
 
-public interface GroupModel<T extends Group> extends Model, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
+
+/**
+ * The {@link GroupModel} manges the behaviour from Groups. The generation of groups is manged
+ * internally for each source generating groups. Each source must register a groupSizeDistribution
+ * which will be used to generate the groups.
+ *
+ * At the time a pedestrian is placed in the topography the {@link GroupModel} is triggered over the
+ * {@link DynamicElementAddListener} and will assign the pedestrian to a group based on the source.
+ *
+ * @param <T> Group Type
+ */
+public interface GroupModel<T extends Group>
+		extends Model, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
 
 	/**
-	 * @param pedestrian	Pedestrian object
-	 * @return		The group the pedestrian object is a part of.
+	 * @param pedestrian Pedestrian object
+	 * @return The group the pedestrian object is a part of.
 	 */
 	T getGroup(ScenarioElement pedestrian);
 
 	/**
 	 * @return Map of Pedestrians and their group.
 	 */
-	Map<ScenarioElement, T > getPedestrianGroupMap();
-
-	/**
-	 * Register a Pedestrian to the specified group. The function does not check if the
-	 * pedestrian is already a member of another group. The caller must make sure of that.
-	 * TODO: why is the group not created within the GroupModel.
-	 * @param ped
-	 * @param currentGroup
-	 */
-	void registerMember(ScenarioElement ped, T currentGroup);
-
-	T getNewGroup(int size);
-
+	Map<ScenarioElement, T> getPedestrianGroupMap();
 
 
 	void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);
@@ -41,17 +40,19 @@ public interface GroupModel<T extends Group> extends Model, DynamicElementAddLis
 	IPotentialFieldTarget getPotentialFieldTarget();
 
 	/**
+	 * Register groupSizeDistribution for a source.
 	 *
-	 * @param sourceId		{@link org.vadere.state.scenario.Source}Id for which the
-	 * 						{@link GroupFactory} is needed.
+	 * @param sourceId Source Id
+	 * @param gsD      Distribution for group size
 	 */
-	GroupFactory getGroupFactory(int sourceId);
+	void registerGroupSizeDeterminator(int sourceId, GroupSizeDeterminator gsD);
+
 
 	/**
+	 * Generate groups for source based on initializedSizeDistribution.
 	 *
-	 * @param sourceId					{@link org.vadere.state.scenario.Source}Id for which the
-	 * @param groupSizeDistribution		Distribution indicating the size of the groups
-	 *                                  generated for this source.
+	 * @param sourceId Source Id
+	 * @return Size of next group for given source
 	 */
-	void initializeGroupFactory(int sourceId, List<Double> groupSizeDistribution);
+	int nextGroupForSource(int sourceId);
 }

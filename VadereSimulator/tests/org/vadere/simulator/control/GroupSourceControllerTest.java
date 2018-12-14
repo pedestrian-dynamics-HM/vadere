@@ -1,16 +1,19 @@
 package org.vadere.simulator.control;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupFactory;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
+import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
+import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.simulator.models.groups.GroupSizeDeterminatorRandom;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.DynamicElement;
@@ -37,6 +40,29 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 	private GroupModel m;
 
+
+	private SourceControllerFactory getTestGroupFactory(GroupModel groupModel, GroupSizeDeterminator gsd) {
+		return new SourceControllerFactory() {
+			@Override
+			public SourceController create(Topography scenario, Source source,
+										   DynamicElementFactory dynamicElementFactory,
+										   AttributesDynamicElement attributesDynamicElement,
+										   Random random) {
+				return new GroupSourceController(scenario, source, dynamicElementFactory,
+						attributesDynamicElement, random, groupModel, gsd);
+			}
+		};
+	}
+
+	public SourceControllerFactory getSourceControllerFactory(SourceTestData d, GroupSizeDeterminatorRandom gsd) {
+		m = new CentroidGroupModel();
+		ArrayList<Attributes> attrs = new ArrayList<>();
+		attrs.add(new AttributesCGM());
+		m.initialize(attrs, d.topography, d.attributesPedestrian, d.random);
+
+		return getTestGroupFactory(m, gsd);
+	}
+
 	public SourceControllerFactory getSourceControllerFactory(SourceTestData d) {
 		m = new CentroidGroupModel();
 		ArrayList<Attributes> attrs = new ArrayList<>();
@@ -46,10 +72,47 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		return new GroupSourceControllerFactory(m);
 	}
 
+
 	@Override
 	public void initialize(SourceTestAttributesBuilder builder) {
-		super.initialize(builder);
-		SourceTestData d = sourceTestData.get(sourceTestData.size() - 1);
+		SourceTestData d = new SourceTestData();
+
+		d.attributesSource = builder.getResult();
+		d.attributesPedestrian = new AttributesAgent();
+
+		d.random = new Random(builder.getRandomSeed());
+
+		d.source = new Source(d.attributesSource);
+		d.pedestrianFactory = new DynamicElementFactory() {
+			private int pedestrianIdCounter = 0;
+
+			@Override
+			public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
+				AttributesAgent att = new AttributesAgent(
+						d.attributesPedestrian, registerDynamicElementId(null, id));
+				Pedestrian ped = new Pedestrian(att, d.random);
+				ped.setPosition(position);
+				return ped;
+			}
+
+			@Override
+			public int registerDynamicElementId(Topography topography, int id) {
+				return id > 0 ? id : ++pedestrianIdCounter;
+			}
+
+			@Override
+			public int getNewDynamicElementId(Topography topography) {
+				return registerDynamicElementId(topography, AttributesAgent.ID_NOT_SET);
+			}
+
+			@Override
+			public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+				return createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class).getShape();
+			}
+
+
+		};
+
 
 		if (builder.getGroupSizeDistributionMock().length > 0) {
 			Integer[] groupSizeDistributionMock = builder.getGroupSizeDistributionMock();
@@ -59,9 +122,17 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 					.thenReturn(groupSizeDistributionMock[0],
 							Arrays.copyOfRange(groupSizeDistributionMock,
 									1, groupSizeDistributionMock.length));
-			CentroidGroupFactory cgf = (CentroidGroupFactory) m.getGroupFactory(d.source.getId());
-			cgf.setGroupSizeDeterminator(gsdRnd);
+			d.sourceControllerFactory = getSourceControllerFactory(d, gsdRnd);
+		} else {
+			d.sourceControllerFactory = getSourceControllerFactory(d);
 		}
+
+
+		d.sourceController = d.sourceControllerFactory.create(d.topography, d.source,
+				d.pedestrianFactory, d.attributesPedestrian, d.random);
+
+		sourceTestData.add(d);
+
 
 	}
 
@@ -171,7 +242,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		// ist could also be the case that only one group can be placed.
 		assertEquals("wrong pedestrian number.", 6, countPedestrians(0));
 
-		// now, move the peds away after creating them
+		// now, move the pedestrian away after creating them
 		for (double simTimeInSec = 1000; simTimeInSec < 2000; simTimeInSec += 1.0) {
 			first().sourceController.update(simTimeInSec);
 
@@ -289,7 +360,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testMaxSpawnNumberTotalSetTo0() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setMaxSpawnNumberTotal(0) // <-- max 0 -> spawn no peds at all
+				.setMaxSpawnNumberTotal(0) // <-- max 0 -> spawn no pedestrian at all
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
 				.setGroupSizeDistributionMock(4, 3, 4, 4);
