@@ -118,6 +118,12 @@ public class CentroidGroup implements Group {
 		return new VPoint(result[0], result[1]);
 	}
 
+	/**
+	 *
+	 * @param ped
+	 * @return
+	 */
+	@Deprecated
 	public VPoint getCentroidOthers(Pedestrian ped) {
 
 		double sumx = 0.0;
@@ -172,6 +178,46 @@ public class CentroidGroup implements Group {
 	public double getGroupVelocity() {
 		return groupVelocity;
 	}
+
+	/**
+	 *
+	 * @param ped	Pedestrian to which the distances is measured.
+	 * @return		The maxDist within the group.
+	 */
+	public double getMaxDistToPedInGroup(Pedestrian ped){
+		return members.stream()
+				.mapToDouble(p-> p.getPosition().distance(ped.getPosition()))
+				.max()
+				.orElse(0.0);
+	}
+
+	/**
+	 *
+	 * @param ped	Pedestrian to which the distances is measured.
+	 * @return		Id of other pedestrian
+	 */
+	public int getMaxDistPedIdInGroup(Pedestrian ped){
+		double maxDist = getMaxDistToPedInGroup(ped);
+		return members.stream()
+				.filter(p-> p.getPosition().distance(ped.getPosition()) == maxDist)
+				.findFirst().get().getId();
+	}
+
+	/**
+	 *
+	 * @return 	The maximal euclidean distance between two group members.
+	 */
+	public double getMaxDistInGroup(){
+		double maxDist = 0.0;
+		for (int i = 0; i < members.size(); i++) {
+			for (int j = 1; j < members.size(); j++) {
+				double tmpDist = members.get(i).getPosition().distance(members.get(j).getPosition());
+				maxDist = tmpDist > maxDist ? tmpDist : maxDist;
+			}
+		}
+		return maxDist;
+	}
+
 
 	void setLastVision(Pedestrian ped, Pedestrian p) {
 		lastVision.get(ped).put(p, p.getPosition());

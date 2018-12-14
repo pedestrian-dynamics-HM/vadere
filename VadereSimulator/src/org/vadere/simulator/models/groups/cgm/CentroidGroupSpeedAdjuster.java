@@ -1,21 +1,20 @@
 package org.vadere.simulator.models.groups.cgm;
 
-import org.vadere.simulator.models.StepSizeAdjuster;
+import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.state.scenario.Pedestrian;
 
-public class CentroidGroupStepSizeAdjuster implements StepSizeAdjuster {
+
+@Deprecated
+public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 
 	private final CentroidGroupModel groupCollection;
 
-	public CentroidGroupStepSizeAdjuster(CentroidGroupModel groupCollection) {
+	public CentroidGroupSpeedAdjuster(CentroidGroupModel groupCollection) {
 		this.groupCollection = groupCollection;
 	}
 
-	/**
-	 * Attributes
-	 */
 	@Override
-	public double getAdjustedStepSize(Pedestrian ped, double originalStepSize) {
+	public double getAdjustedSpeed(Pedestrian ped, double originalSpeed) {
 		double result = 1.0;
 		double aheadDistance = 0;
 
@@ -25,6 +24,9 @@ public class CentroidGroupStepSizeAdjuster implements StepSizeAdjuster {
 			aheadDistance = group.getRelativeDistanceCentroid(ped);
 
 			// TODO [priority=low] [task=refactoring] move Parameters to AttributesCGM
+			// equations taken from 'Pedestrian Group Behavior in a Cellular Automaton'
+			// BibTex-Key: seitz-2014
+			// formular not completely the smae to seitz-2014 line 34 is  8/(delta +15) and not 8/(delta + 17)
 			if (!group.isLostMember(ped)) {
 				if (aheadDistance > 8) {
 					result = Double.MIN_VALUE;
@@ -40,6 +42,6 @@ public class CentroidGroupStepSizeAdjuster implements StepSizeAdjuster {
 			}
 		}
 
-		return originalStepSize * result;
+		return originalSpeed * result;
 	}
 }
