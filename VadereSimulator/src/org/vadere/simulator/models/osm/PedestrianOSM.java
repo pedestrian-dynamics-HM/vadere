@@ -154,9 +154,9 @@ public class PedestrianOSM extends Pedestrian {
 			}
 		}
 
-		/*if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
+		if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
 			nextPosition = getPosition();
-		}*/
+		}
 
 	}
 
