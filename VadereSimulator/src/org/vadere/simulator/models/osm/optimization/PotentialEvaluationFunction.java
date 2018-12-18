@@ -135,8 +135,8 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 		}
 
 		if (Math.pow(newPos.x - pedPos.x, 2) + Math.pow(newPos.y - pedPos.y, 2) <= Math.pow(stepSize, 2) + 0.00001
-				/*&& Math.pow(newPos.x - pedPos.x, 2) + Math.pow(newPos.y - pedPos.y, 2) >= Math.pow(this.minStepSize, 2)
-						- 0.00001*/) {
+				&& Math.pow(newPos.x - pedPos.x, 2) + Math.pow(newPos.y - pedPos.y, 2) >= Math.pow(this.minStepSize, 2)
+						- 0.00001) {
 			result = pedestrian.getPotential(newPos);
 		}
 		counter++;
