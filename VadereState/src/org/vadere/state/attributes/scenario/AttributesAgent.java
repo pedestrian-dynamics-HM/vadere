@@ -10,7 +10,10 @@ package org.vadere.state.attributes.scenario;
  */
 public class AttributesAgent extends AttributesDynamicElement {
 
-	private double radius = 0.195;
+	// from weidmann-1992 page 18, deviates in seitz-2016c page 2 (Methods): 2.0
+	private double radius = 0.2;
+
+	// use a weidmann speed adjuster, this is not implemented jet => only densityDependentSpeed = false works.
 	private boolean densityDependentSpeed = false;
 
 	// from weidmann-1992 page 18, seitz-2016c page 2 (Methods)
@@ -25,6 +28,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	// from weidmann-1992 page 18, deviates in seitz-2016c page 2 (Methods): 2.0
 	private double maximumSpeed = 2.2;
 
+	// only used for the GNM and SFM
 	private double acceleration = 2.0;
 
 	public AttributesAgent() {

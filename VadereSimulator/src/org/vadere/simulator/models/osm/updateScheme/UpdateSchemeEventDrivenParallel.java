@@ -47,7 +47,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		double maxDesiredSpeed = 0;
 		for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
 			pedestrianOSM.clearStrides();
-			maxStepSize = Math.max(pedestrianOSM.getStepSize(), maxStepSize);
+			maxStepSize = Math.max(pedestrianOSM.getDesiredStepSize(), maxStepSize);
 			maxDesiredSpeed = Math.max(pedestrianOSM.getDesiredSpeed(), maxDesiredSpeed);
 		}
 

@@ -118,8 +118,10 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.stepCircleOptimizer = createStepCircleOptimizer(
 				attributesOSM, random, topography, iPotentialTargetGrid);
 
+		// TODO implement a step speed adjuster for this!
 		if (attributesPedestrian.isDensityDependentSpeed()) {
-			this.speedAdjusters.add(new SpeedAdjusterWeidmann());
+			throw new UnsupportedOperationException("densityDependentSpeed not jet implemented.");
+			//this.speedAdjusters.add(new SpeedAdjusterWeidmann());
 		}
 
 		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
@@ -270,7 +272,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
 				attributesAgent, topography, random, potentialFieldTarget,
 				potentialFieldObstacle.copy(), potentialFieldPedestrian,
-				stepSizeAdjusters, stepCircleOptimizer.clone());
+				speedAdjusters, stepCircleOptimizer.clone());
 		pedestrian.setPosition(position);
 		return pedestrian;
 	}

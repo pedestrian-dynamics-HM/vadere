@@ -48,11 +48,14 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		}
 
 		// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
-		pedestrian.updateNextPosition();
-		makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
+		if(pedestrian.getDesiredSpeed() >= pedestrian.getAttributes().getMinimumSpeed()) {
+			pedestrian.updateNextPosition();
+			makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
+		}
 
-		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+
+		double stepDuration = Math.min(pedestrian.getAttributesOSM().getMaxStepDuration(), pedestrian.getDurationNextStep());
+		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 	}
 
 	@Override

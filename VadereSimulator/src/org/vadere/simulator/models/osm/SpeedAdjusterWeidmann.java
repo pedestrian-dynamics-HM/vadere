@@ -10,6 +10,7 @@ import org.vadere.state.scenario.Pedestrian;
  * TODO: [priority=low] [task=feature] NOT IMPLEMENTED!
  * 
  */
+@Deprecated
 public class SpeedAdjusterWeidmann implements SpeedAdjuster {
 
 	@Override

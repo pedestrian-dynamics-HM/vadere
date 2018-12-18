@@ -172,6 +172,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : null
     }
   }

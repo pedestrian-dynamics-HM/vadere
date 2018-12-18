@@ -33,12 +33,10 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 		VPoint oldPosition = pedestrian.getPosition();
 		pedestrian.clearStrides();
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
 		while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();
 			makeStep(topography, pedestrian, timeStepInSec);
-			pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 		}
 
 		topography.moveElement(pedestrian, oldPosition);
