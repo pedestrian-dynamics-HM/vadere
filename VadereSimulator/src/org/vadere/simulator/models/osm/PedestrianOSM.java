@@ -319,7 +319,7 @@ public class PedestrianOSM extends Pedestrian {
 	 * @return the step duration of this agent
 	 */
 	public double getDurationNextStep() {
-		return getDesiredStepSize() / getDesiredSpeed();
+		return Math.min(getAttributesOSM().getMaxStepDuration(), getDesiredStepSize() / getDesiredSpeed());
 	}
 
 	public AttributesOSM getAttributesOSM() {
