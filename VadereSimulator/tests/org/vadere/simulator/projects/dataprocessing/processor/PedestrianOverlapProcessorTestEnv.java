@@ -53,7 +53,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 	@Override
 	public void loadDefaultSimulationStateMocks() {
 
-		double minDist = 0.195*2;
+		double minDist = new AttributesAgent().getRadius()*2;
 
 		addSimState(new SimulationStateMock(1) {
 			@Override
