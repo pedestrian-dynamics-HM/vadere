@@ -42,7 +42,7 @@ public class ActionMergeObstacles extends TopographyAction {
 				.collect(Collectors.toList());
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(polygons);
-		List<VPolygon> mergedPolygons = weilerAtherton.execute();
+		List<VPolygon> mergedPolygons = weilerAtherton.cup();
 
 		// remove polygon obstacles
 		getScenarioPanelModel().removeObstacleIf(obstacle ->

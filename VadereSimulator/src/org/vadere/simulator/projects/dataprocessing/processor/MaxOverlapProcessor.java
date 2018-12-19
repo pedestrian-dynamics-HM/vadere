@@ -35,7 +35,7 @@ public class MaxOverlapProcessor extends NoDataKeyProcessor<Double> {
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		//ensure that all required DataProcessors are updated.
-		this.pedOverlapProc.doUpdate(state);
+		this.pedOverlapProc.update(state);
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class MeanPedestrianEvacuationTimeProcessor extends NoDataKeyProcessor<Do
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		//ensure that all required DataProcessors are updated.
-		this.pedEvacTimeProc.doUpdate(state);
+		this.pedEvacTimeProc.update(state);
 	}
 
 	@Override

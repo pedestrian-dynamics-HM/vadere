@@ -2,6 +2,8 @@ package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 
 import java.util.HashMap;
@@ -20,6 +22,15 @@ public class Pedestrian extends Agent {
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 	private Event mostImportantEvent; /** Evaluated in each time step in "CognitionLayer". */
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
+	/**
+	 * Footsteps is a list of foot steps a pedestrian made during the duration of one time step.
+	 * For all non event driven models this is exactly one foot step. For the event driven update
+	 * one pedestrian can move multiple times during one time step. To save memory the list of foot steps
+	 * will be cleared after each completion of a time step. The output processor <tt>PedestrianStrideProcessor</tt>
+	 * can write out those foot steps.
+	 */
+	private VTrajectory trajectory;
+
 	private LinkedList<Integer> groupSizes;
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN; // TODO used at all? For JSON de-/serialization? Car does NOT have this field. remove if unused!
@@ -45,6 +56,7 @@ public class Pedestrian extends Agent {
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
+		trajectory = new VTrajectory();
 	}
 
 	private Pedestrian(Pedestrian other) {
@@ -63,7 +75,16 @@ public class Pedestrian extends Agent {
 			groupSizes = new LinkedList<>();
 		}
 
-		modelPedestrianMap = new HashMap<>(other.modelPedestrianMap);
+		trajectory = new VTrajectory();
+		trajectory = other.trajectory;
+	}
+
+	public void clearFootSteps() {
+		trajectory.clear();
+	}
+
+	public VTrajectory getFootSteps() {
+		return trajectory;
 	}
 	// Getter
 	public int getIdAsTarget() {

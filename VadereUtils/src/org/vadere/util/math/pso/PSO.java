@@ -1,6 +1,7 @@
 package org.vadere.util.math.pso;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.ICircleSector;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -19,12 +20,14 @@ public class PSO {
 	private final ICircleSector circle;
 	private final double errorToleranz = 0.0001;
 	private double gBest;
+	private double gLastBest;
 	private VPoint gBestLocation;
 	private final Function<VPoint, Double> f;
 	private int iterationCounter;
 	private final double maxVelocity;
 	private final double minAngle;
 	private final double maxAngle;
+	private int improvementIterations;
 
 	public PSO(
 			@NotNull final Function<VPoint, Double> f,
@@ -43,7 +46,9 @@ public class PSO {
 		this.maxVelocity = maxVelocity;
 		this.minAngle = minAngle;
 		this.maxAngle = maxAngle;
+		assert swarmPositions.stream().allMatch(p -> circle.getCenter().distance(p) < circle.getRadius() + GeometryUtils.DOUBLE_EPS);
 		this.particles = initialSwarm(swarmPositions);
+		this.improvementIterations = 0;
 	}
 
 	public VPoint getOptimumArg() {
@@ -69,41 +74,42 @@ public class PSO {
 	}
 
 	public boolean hasFinished() {
-		return iterationCounter >= attributesPSO.maxIteration || hasConverged();
+		return iterationCounter >= attributesPSO.maxIteration || (iterationCounter >= attributesPSO.minIteration && hasConverged());
 	}
 
 	public boolean hasConverged() {
-		return false;
+		return improvementIterations >= attributesPSO.maxNoUpdate;
 	}
 
 	public void update() {
-		if (iterationCounter < attributesPSO.maxIteration) {
+		if (!hasFinished()) {
 			iterationCounter++;
 			updateLocalBest();
 			updateGlobalBest();
 
-			double omega = attributesPSO.wUpperBound - (iterationCounter / attributesPSO.maxIteration) * (attributesPSO.wUpperBound - attributesPSO.wLowerBound);
+			double omega = attributesPSO.wUpperBound - (iterationCounter / attributesPSO.minIteration) * (attributesPSO.wUpperBound - attributesPSO.wLowerBound);
+
 			particles.forEach(particle -> updateParticle(particle, omega));
 		}
 	}
 
 	private void updateParticle(@NotNull final Particle particle, final double omega) {
-		double rLocal = random.nextDouble();
-		double rGlobal = random.nextDouble();
+		double rLocal = random();
+		double rGlobal = random();
 
 		VPoint dirLocalBest = particle.getLocalBestLocation().subtract(particle.getLocation());
-		VPoint dirGobalBest = particle.getGlobalBestLocation().subtract(particle.getLocation());
+		VPoint dirGlobalBest = particle.getGlobalBestLocation().subtract(particle.getLocation());
 
 		VPoint velocity = particle.getVelocity().scalarMultiply(omega)
 				.add(dirLocalBest.scalarMultiply(rLocal * attributesPSO.c1))
-				.add(dirGobalBest.scalarMultiply(rGlobal * attributesPSO.c2))
-				.norm(maxVelocity);
+				.add(dirGlobalBest.scalarMultiply(rGlobal * attributesPSO.c2))
+				.limit(maxVelocity);
 
 		VPoint currentLocation = particle.getLocation();
 		particle.setVelocity(velocity);
 		particle.setLocation(particle.getLocation().add(particle.getVelocity()));
 
-		if (!circle.contains(particle.getLocation())) {
+		if (!particle.getLocation().equals(currentLocation) && !circle.contains(particle.getLocation())) {
 			particle.setVelocity(particle.getVelocity().scalarMultiply(-0.5));
 			particle.setLocation(circle.getClosestIntersectionPoint(currentLocation, particle.getLocation(), particle.getLocation()).orElse(particle.getLocation()));
 		}
@@ -134,7 +140,7 @@ public class PSO {
 	 * than the old one, particles inform each other about their best values and locations.
 	 */
 	private void updateGlobalBest() {
-		double lastGBest = gBest;
+		gLastBest = gBest;
 
 		for (Particle particle : particles) {
 			double globalBest = particle.getGlobalBestFitnessValue();
@@ -144,8 +150,17 @@ public class PSO {
 			}
 		}
 
-		if (gBest >= lastGBest) {
-			informKParticle();
+		// no or small improvement
+		if (gBest >= gLastBest || Math.abs(gBest-gLastBest) < 0.001) {
+			improvementIterations++;
+		}
+		else {
+			improvementIterations = 0;
+		}
+
+		// no global improvement
+		if (gBest >= gLastBest) {
+			informAllParticles();
 		}
 	}
 
@@ -162,11 +177,28 @@ public class PSO {
 	private void informKParticle() {
 		for (Particle particle : particles) {
 			for (int i = 0; i < attributesPSO.numberOfInformedParticles; i++) {
-				int index = (int) Math.floor(random.nextDouble() * particles.size());
+				int index = (int) Math.floor(random() * particles.size());
 				Particle otherParticle = particles.get(index);
 				informParticles(particle, otherParticle);
 			}
 		}
+	}
+
+	private double random() {
+		return random.nextDouble();
+	}
+
+	private double quickRandom() {
+		int id = 1;
+		int n;
+		n = (int)(System.currentTimeMillis() + System.currentTimeMillis() * id);
+		//n = 1;
+		n = n^(n << 21);
+		n = n^(n >> 35);
+		n = n^(n << 4);
+		if (n < 0)
+			n = -n;
+		return (double)n / Integer.MAX_VALUE;
 	}
 
 	private void informAllParticles() {
@@ -184,11 +216,18 @@ public class PSO {
 		return swarmPositions.stream().map(location -> locationToParticle(location)).collect(Collectors.toList());
 	}
 
+	/*private Particle locationToParticle(@NotNull final VPoint location) {
+		double vMag = random.nextDouble() * maxVelocity;
+		VPoint velocity = location.subtract(circle.getCenter()).setMagnitude(vMag).limit(maxVelocity);
+		double fitnessValue = f.apply(location);
+		return new Particle(location, velocity, fitnessValue);
+	}*/
+
 	private Particle locationToParticle(@NotNull final VPoint location) {
-		double vDelta = random.nextDouble() * (maxAngle - minAngle);
-		double vMag = Math.sqrt(random.nextDouble()) * circle.getRadius();
-		VPoint v = new VPoint(Math.cos(vDelta), Math.sin(vDelta)).norm(vMag);
-		VPoint velocity = v.subtract(location).scalarMultiply(0.5).norm(maxVelocity);
+		double vDelta = random() * (maxAngle - minAngle);
+		double vMag = Math.sqrt(random()) * maxVelocity;
+		VPoint v = new VPoint(Math.cos(vDelta), Math.sin(vDelta)).setMagnitude(vMag);
+		VPoint velocity = v.subtract(location).scalarMultiply(0.5).limit(maxVelocity);
 
 		double fitnessValue = f.apply(location);
 		return new Particle(location, velocity, fitnessValue);

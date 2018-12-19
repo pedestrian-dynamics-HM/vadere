@@ -66,7 +66,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private boolean isEditable;
 	private IScenarioChecker scenarioChecker;
 
-	DataProcessingView() {
+	DataProcessingView(IScenarioChecker scenarioChecker) {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
 
 		viewPanel = new JPanel(new GridLayout(1, 1));
@@ -87,6 +87,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		togglePanel.add(switchJsonViewModeLabel);
 		add(togglePanel, BorderLayout.SOUTH);
+		setScenarioChecker(scenarioChecker);
 		switchMode();
 	}
 

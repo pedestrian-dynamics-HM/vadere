@@ -4,6 +4,21 @@ target/
 *.preferences.xml
 swing-inspector-linux-1.2.3/
 
+#Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+**/venv/
+Tools/VadereAnalysisTools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/build/
+Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
+Tools/ContinuousIntegration/**/output
+
+# C extensions
+*.so
+vadere_analysis_tool/build
+
 #Tools and build utils
 bin/
 

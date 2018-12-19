@@ -111,7 +111,6 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		// to have fast access to the key values.
 		Map<Integer, Step> map = agentsByStep
 				.keySet().stream()
-				.sorted(stepComparator)
 				.collect(Collectors.toMap(s -> s.getStepNumber(), s -> s));
 
 

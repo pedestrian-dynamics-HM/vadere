@@ -30,7 +30,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
-public class Topography {
+public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
@@ -216,14 +216,17 @@ public class Topography {
 		return getContainer(elementType).getElement(id);
 	}
 
+	@Override
 	public <T extends DynamicElement> void addElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).addElement(element);
 	}
 
+	@Override
 	public <T extends DynamicElement> void removeElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).removeElement(element);
 	}
 
+	@Override
 	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
 	}

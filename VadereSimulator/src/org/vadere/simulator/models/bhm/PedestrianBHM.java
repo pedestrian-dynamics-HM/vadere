@@ -17,6 +17,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -152,7 +153,7 @@ public class PedestrianBHM extends Pedestrian {
 		durationNextStep = stepLength / getFreeFlowSpeed();
 
 		Event mostImportantEvent = getMostImportantEvent();
-
+		VPoint position = getPosition();
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			updateTargetDirection();
 			nextPosition = navigation.getNavigationPosition();
@@ -161,6 +162,8 @@ public class PedestrianBHM extends Pedestrian {
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			timeOfNextStep += durationNextStep;
 		}
+		
+		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
 	}
 
 	/**

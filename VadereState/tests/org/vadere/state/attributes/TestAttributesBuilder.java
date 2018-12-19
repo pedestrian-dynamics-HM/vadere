@@ -1,5 +1,6 @@
 package org.vadere.state.attributes;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 
@@ -12,7 +13,6 @@ public class TestAttributesBuilder {
 
     private AttributesBuilder<AttributesAgent> attributesAgentAttributesBuilder;
     private double radius = 0.195;
-
 
     @Test
     public void testChangeAttributes() {

@@ -8,10 +8,12 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
+import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.SubModelBuilder;
 import org.vadere.simulator.models.groups.CentroidGroupModel;
 import org.vadere.simulator.models.groups.CentroidGroupPotential;
 import org.vadere.simulator.models.groups.CentroidGroupSpeedAdjuster;
+import org.vadere.simulator.models.groups.CentroidGroupStepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
@@ -58,14 +60,17 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<SpeedAdjuster> speedAdjusters;
+	private List<StepSizeAdjuster> stepSizeAdjusters;
 	private Topography topography;
 	private double lastSimTimeInSec;
 	private int pedestrianIdCounter;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
+
 	public OptimalStepsModel() {
 		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = new LinkedList<>();
+		this.stepSizeAdjusters = new LinkedList<>();
 	}
 
 	@Override
@@ -103,17 +108,20 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 			this.potentialFieldPedestrian =
 					new CentroidGroupPotential(centroidGroupModel,
-							potentialFieldPedestrian, centroidGroupModel.getAttributesCGM());
+							potentialFieldPedestrian, potentialFieldTarget, centroidGroupModel.getAttributesCGM());
 
 			SpeedAdjuster speedAdjusterCGM = new CentroidGroupSpeedAdjuster(centroidGroupModel);
 			this.speedAdjusters.add(speedAdjusterCGM);
+			this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
 		}
 
 		this.stepCircleOptimizer = createStepCircleOptimizer(
 				attributesOSM, random, topography, iPotentialTargetGrid);
 
+		// TODO implement a step speed adjuster for this!
 		if (attributesPedestrian.isDensityDependentSpeed()) {
-			this.speedAdjusters.add(new SpeedAdjusterWeidmann());
+			throw new UnsupportedOperationException("densityDependentSpeed not jet implemented.");
+			//this.speedAdjusters.add(new SpeedAdjusterWeidmann());
 		}
 
 		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {

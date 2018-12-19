@@ -29,9 +29,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
-		for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
-			pedestrianOSM.clearStrides();
-		}
+
+		clearStrides(topography);
 
 		if(!pedestrianEventsQueue.isEmpty()) {
 			// event driven update ignores time credits!
@@ -54,14 +53,15 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			if (pedestrian.getTimeOfNextStep() == 0) {
 				pedestrian.setTimeOfNextStep(currentTimeInSec);
 			}
-
+			
 			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-			pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
-			pedestrian.updateNextPosition();
-			makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
+			if(pedestrian.getDesiredSpeed() >= pedestrian.getAttributes().getMinimumSpeed()) {
+				pedestrian.updateNextPosition();
+				makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
+			}
 
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-			topography.moveElement(pedestrian, oldPosition);
+			double stepDuration = Math.min(pedestrian.getAttributesOSM().getMaxStepDuration(), pedestrian.getDurationNextStep());
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}

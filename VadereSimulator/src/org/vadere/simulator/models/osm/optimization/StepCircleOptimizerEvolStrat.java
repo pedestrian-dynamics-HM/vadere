@@ -37,7 +37,7 @@ public class StepCircleOptimizerEvolStrat implements StepCircleOptimizer {
 	public VPoint getNextPosition(PedestrianOSM ped, Shape reachableArea) {
 
 		double stepSize = ((VCircle) reachableArea).getRadius();
-		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(ped, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(ped, (VCircle)reachableArea, random);
 		int numberOfParents = positions.size();
 		int numberOfChildren = numberOfParents * 7;
 

@@ -53,6 +53,16 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianWaitingTimeProcessor",
+      "id" : 6,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "pedestrianWaitingTimeProcessorId" : 2,
+        "maximalWaitingTime" : 0.0,
+        "minimalWaitingTime" : 0.0
+      }
     } ],
     "isTimestamped" : true
   },

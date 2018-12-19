@@ -297,6 +297,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ ]
       }, {
@@ -327,6 +330,9 @@
         "isChild" : false,
         "isLikelyInjured" : false,
         "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
         "type" : "PEDESTRIAN",
         "groupSizes" : [ ]
       } ],

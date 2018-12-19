@@ -4,6 +4,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 
 public class MPoint implements IPoint, Cloneable{
     private VPoint point;
+    private int hashCode = -1;
 
     public MPoint(final double x, final double y){
         this.point = new VPoint(x, y);
@@ -30,36 +31,42 @@ public class MPoint implements IPoint, Cloneable{
     @Override
     public MPoint add(final IPoint point) {
         this.point = this.point.add(point);
+        hashCode = -1;
         return this;
     }
 
     @Override
     public MPoint addPrecise(final IPoint point) {
         this.point = this.point.addPrecise(point);
+	    hashCode = -1;
         return this;
     }
 
     @Override
     public MPoint subtract(IPoint point) {
         this.point = this.point.subtract(point);
+	    hashCode = -1;
         return this;
     }
 
     @Override
     public MPoint multiply(IPoint point) {
         this.point = this.point.multiply(point);
+	    hashCode = -1;
         return this;
     }
 
     @Override
     public MPoint scalarMultiply(double factor) {
         this.point = this.point.scalarMultiply(factor);
+	    hashCode = -1;
         return this;
     }
 
     @Override
     public MPoint rotate(double radAngle) {
         this.point = this.point.rotate(radAngle);
+	    hashCode = -1;
         return this;
     }
 
@@ -71,6 +78,7 @@ public class MPoint implements IPoint, Cloneable{
     @Override
     public MPoint norm() {
         this.point = this.point.norm();
+	    hashCode = -1;
         return this;
     }
 
@@ -82,15 +90,19 @@ public class MPoint implements IPoint, Cloneable{
 	@Override
     public MPoint normZeroSafe() {
         this.point = this.point.normZeroSafe();
+		hashCode = -1;
         return this;
     }
 
     @Override
     public int hashCode() {
-        // hashCode of java.awt.geom.Point2D
-        long bits = java.lang.Double.doubleToLongBits(getX());
-        bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
-        return (((int) bits) ^ ((int) (bits >> 32)));
+    	if(hashCode == -1) {
+		    // hashCode of java.awt.geom.Point2D
+		    long bits = java.lang.Double.doubleToLongBits(getX());
+		    bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
+		    hashCode = (((int) bits) ^ ((int) (bits >> 32)));
+	    }
+        return hashCode;
     }
 
     @Override

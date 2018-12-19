@@ -4,11 +4,11 @@
     // * add description key on root level
     // * move and rename  vadere/topography/attributes to vadere/attributesSimulation
     // * move all attributesModles from ALL_CAPS_NAMES to the canonical class name
-    //   * merge PEDESTRIAN_POTENTIAL_GNM and OBSTACLE_POTENTIAL_GNM under org.vadere.state.attributes.models.AttributesPotentialGNM
-    //   * merge PEDESTRIAN_POTENTIAL_OSM and OBSTACLE_POTENTIAL_OSM under org.vadere.state.attributes.models.AttributesPotentialOSM
-    //   * merge PEDESTRIAN_POTENTIAL_PARTICLES and OBSTACLE_POTENTIAL_PARTICLES  under org.vadere.state.attributes.models.AttributesPotentialParticles
-    //   * merge TARGET_POTENTIAL_RING_EXPERIMENT and OBSTACLE_POTENTIAL_RING_EXPERIMENT under org.vadere.state.attributes.models.AttributesPotentialRingExperiment
-    //   * merge PEDESTRIAN_POTENTIAL_SFM and OBSTACLE_POTENTIAL_SFM under org.vadere.state.attributes.models.AttributesPotentialSFM
+    //   * cup PEDESTRIAN_POTENTIAL_GNM and OBSTACLE_POTENTIAL_GNM under org.vadere.state.attributes.models.AttributesPotentialGNM
+    //   * cup PEDESTRIAN_POTENTIAL_OSM and OBSTACLE_POTENTIAL_OSM under org.vadere.state.attributes.models.AttributesPotentialOSM
+    //   * cup PEDESTRIAN_POTENTIAL_PARTICLES and OBSTACLE_POTENTIAL_PARTICLES  under org.vadere.state.attributes.models.AttributesPotentialParticles
+    //   * cup TARGET_POTENTIAL_RING_EXPERIMENT and OBSTACLE_POTENTIAL_RING_EXPERIMENT under org.vadere.state.attributes.models.AttributesPotentialRingExperiment
+    //   * cup PEDESTRIAN_POTENTIAL_SFM and OBSTACLE_POTENTIAL_SFM under org.vadere.state.attributes.models.AttributesPotentialSFM
     // * remove vadere/topography/pedestrians (is not shown in the transformaiton description thus removed.
     // * for all items under vadere/topography/dynamicElements rename nextTargetListPosition to nextTargetListIndex
     // * add under vadere/mainModel the main model debending on used model attributes. (==> PostTransformHook in JoltTransformV0toV1.java)

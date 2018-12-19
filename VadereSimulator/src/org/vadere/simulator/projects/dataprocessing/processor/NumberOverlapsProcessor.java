@@ -32,7 +32,7 @@ public class NumberOverlapsProcessor extends NoDataKeyProcessor<Long> {
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		//ensure that all required DataProcessors are updated.
-		this.pedOverlapProc.doUpdate(state);
+		this.pedOverlapProc.update(state);
 	}
 
 	@Override

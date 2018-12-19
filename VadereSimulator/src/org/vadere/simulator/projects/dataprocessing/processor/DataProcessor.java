@@ -101,7 +101,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		this.data.put(key, value);
 	}
 
-	public void preLoop(final SimulationState state) { }
+	public void preLoop(final SimulationState state) { data.clear(); }
 
 	protected abstract void doUpdate(final SimulationState state);
 

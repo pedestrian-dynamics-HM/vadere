@@ -56,3 +56,28 @@ run_scenario_files:
         - Documentation/version-control/git-hook-vadere-software
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+  artifacts:
+    paths:
+      - "log_dir"
+    expire_in: 1 week
+
+# exclude. Finde solution an then add this test again.
+# run_origin_test:
+#   stage: deploy
+
+#   script:
+#       - Documentation/version-control/git-hook-vadere-software
+#       - mvn clean
+#       - mvn -Dmaven.test.skip=true package
+#       - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
+#       - python3 Tools/ContinuousIntegration/run_orign_translation_test.py
+
+run_seed_test:
+  stage: deploy
+
+  script:
+      - Documentation/version-control/git-hook-vadere-software
+      - mvn clean
+      - mvn -Dmaven.test.skip=true package
+      - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
+      - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py
