@@ -197,6 +197,14 @@ public class VadereConsole {
 				.help("If PATH contains a directory instead of a scenario file recursively search " +
 						"the directory tree for scenario files and apply the command.");
 
+		migrationAssistant.addArgument("--consider-projects-only")
+				.required(false)
+				.dest("consider-projects-only")
+				.action(Arguments.storeTrue())
+				.setDefault(false)
+				.help("If set only directories containing a vadere project will be migrated. " +
+						"The migraion will use the legacy folder in the project.");
+
 		migrationAssistant.addArgument("--create-new-version")
 				.required(false)
 				.type(String.class)
