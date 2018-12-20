@@ -50,7 +50,7 @@
   * "overlaps": The amount the two pedestrian overlap
 - Moved and renamed attributes in scenario files. (c7e0538c: State)
   * Move /scenario/attributesModel/org.vadere.state.attributes.models.AttributesCGM/groupSizeDistribution to each source in /scenario/topography/sources/[]/groupSizeDistribution. This allows different group size distribution for each source
-  * Rename /scenario/attributesModel/*/timeCostAttributes/standardDerivation to standardDeviation.
+  * Rename /scenario/attributesModel/*/timeCostAttributes/standardDeviation to standardDeviation.
 
 ### Performance
 

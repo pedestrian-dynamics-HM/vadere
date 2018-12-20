@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_gnm1_075_h",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],

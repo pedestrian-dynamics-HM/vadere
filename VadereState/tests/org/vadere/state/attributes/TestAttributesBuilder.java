@@ -12,7 +12,7 @@ import static junit.framework.TestCase.assertTrue;
 public class TestAttributesBuilder {
 
     private AttributesBuilder<AttributesAgent> attributesAgentAttributesBuilder;
-    private double radius = 0.195;
+    private double radius = 0.2;
 
     @Test
     public void testChangeAttributes() {
@@ -20,8 +20,8 @@ public class TestAttributesBuilder {
         assertTrue(attributesAgent.getRadius() == radius);
 
         AttributesBuilder<AttributesAgent> builder = new AttributesBuilder<>(attributesAgent);
-        builder.setField("radius", 2.0);
-        assertTrue(builder.build().getRadius() == 2.0);
+        builder.setField("radius", 2.1);
+        assertTrue(builder.build().getRadius() == 2.1);
         assertTrue(attributesAgent.getRadius() == radius);
     }
 }

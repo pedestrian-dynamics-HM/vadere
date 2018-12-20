@@ -1,7 +1,8 @@
 {
   "name" : "Reynolds_test_displaced",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -58,9 +59,7 @@
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.reynolds.ReynoldsSteeringModel",
-    "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesReynolds" : { }
-    },
+    "attributesModel" : { },
     "attributesSimulation" : {
       "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
@@ -125,7 +124,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -135,7 +133,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }

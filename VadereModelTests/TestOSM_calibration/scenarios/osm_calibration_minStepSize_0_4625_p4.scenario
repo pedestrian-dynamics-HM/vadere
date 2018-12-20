@@ -1,7 +1,8 @@
 {
   "name" : "osm_calibration_minStepSize_0_4625_p4",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -136,6 +137,23 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution" : 0.1,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "timeCostAttributes" : {
+          "standardDeviation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT"
+        }
+      },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
@@ -166,23 +184,6 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
-      },
-      "org.vadere.state.attributes.models.AttributesFloorField" : {
-        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
-        "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
-        "timeCostAttributes" : {
-          "standardDeviation" : 0.7,
-          "type" : "UNIT",
-          "obstacleDensityWeight" : 3.5,
-          "pedestrianSameTargetDensityWeight" : 3.5,
-          "pedestrianOtherTargetDensityWeight" : 3.5,
-          "pedestrianWeight" : 3.5,
-          "queueWidthLoading" : 1.0,
-          "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
-        }
       }
     },
     "attributesSimulation" : {
@@ -249,7 +250,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.2,
         "densityDependentSpeed" : false,
@@ -259,17 +259,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "teleporter" : {
-        "shift" : {
-          "x" : -40.0,
-          "y" : 0.0
-        },
-        "position" : {
-          "x" : 42.0,
-          "y" : 0.0
-        }
-      },
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }

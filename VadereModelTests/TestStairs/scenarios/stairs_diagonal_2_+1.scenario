@@ -1,7 +1,8 @@
 {
   "name" : "stairs_diagonal_2_+1",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -54,7 +55,9 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ ],
+        "minStepLength" : "0.4625",
+        "maxStepDuration" : "1.7976931348623157E308"
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -190,7 +193,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -215,7 +217,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      }
+      },
+      "dynamicElements" : [ ]
     }
   }
 }
