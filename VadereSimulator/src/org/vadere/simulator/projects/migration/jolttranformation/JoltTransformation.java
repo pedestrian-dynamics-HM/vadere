@@ -54,7 +54,7 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 		return ret;
 	}
 
-	public static Path getTransforamtionFile(Version toVersion) {
+	public static Path getTransforamtionFileFromRessource(Version toVersion) {
 		String transformString = getTransforamtionResourcePath(
 				toVersion.previousVersion().label('-'),
 				toVersion.label('-'));
@@ -67,7 +67,7 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 		return Paths.get(res);
 	}
 
-	public static Path getIdenityFile(Version v) {
+	public static Path getIdenityFileFromRessource(Version v) {
 		String idenityString = getIdentiyResoucrePath(v.label('-'));
 		URI res = null;
 		try {
@@ -77,6 +77,23 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 		}
 		return Paths.get(res);
 	}
+
+
+	public static Path getTransforamtionFileFromFileSystem(Path baseDir, Version toVersion) {
+		String transformString = getTransforamtionResourcePath(
+				toVersion.previousVersion().label('-'),
+				toVersion.label('-'));
+
+		return baseDir.resolve(transformString.substring(1));
+	}
+
+	public static Path getIdenityFileFromFileSystem(Path baseDir, Version v) {
+		String idenityString = getIdentiyResoucrePath(v.label('-'));
+		return baseDir.resolve(idenityString.substring(1));
+	}
+
+
+
 
 	public static String getTransforamtionResourcePath(String from, String to) {
 		return "/transform_v" + from.toUpperCase() + "_to_v" + to.toUpperCase() + ".json";
