@@ -183,10 +183,10 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 			LinkedHashMap<Object, Object> parent = (LinkedHashMap<Object, Object>) obj;
 			for (String childKey : children) {
 				Object childObj = parent.get(childKey);
-				if (childObj == null) {
-					throw new MigrationException("Object with Key " + key + " does not has child with key" + childKey);
+				if (childObj != null) {
+//					throw new MigrationException("Object with Key " + key + " does not has child with key" + childKey);
+					node.put(childKey, childObj);
 				}
-				node.put(childKey, childObj);
 			}
 			obj = node;
 		}

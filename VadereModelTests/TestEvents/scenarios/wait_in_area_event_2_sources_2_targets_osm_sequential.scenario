@@ -1,7 +1,7 @@
 {
   "name" : "wait_in_area_event_2_sources_2_targets_osm_sequential",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "45917996dc1d7ac7f31aff96d40e2886d36a5cd3",
   "processWriters" : {
     "files" : [ {
@@ -89,7 +89,9 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ ],
+        "minStepLength" : "0.4625",
+        "maxStepDuration" : "1.7976931348623157E308"
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -114,6 +116,25 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ {
+      "eventTimeframe" : {
+        "startTime" : 10.0,
+        "endTime" : 60.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "events" : [ {
+        "type" : "WaitInAreaEvent",
+        "targets" : [ ],
+        "area" : {
+          "x" : 15.0,
+          "y" : 0.0,
+          "width" : 6.0,
+          "height" : 8.0,
+          "type" : "RECTANGLE"
+        }
+      } ]
+    } ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -203,7 +224,6 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -213,26 +233,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null
-    },
-    "eventInfos" : [ {
-      "eventTimeframe" : {
-        "startTime" : 10.0,
-        "endTime" : 60.0,
-        "repeat" : false,
-        "waitTimeBetweenRepetition" : 0.0
-      },
-      "events" : [ {
-        "type" : "WaitInAreaEvent",
-        "targets" : [ ],
-        "area" : {
-          "x" : 15.0,
-          "y" : 0.0,
-          "width" : 6.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
-      } ]
-    } ]
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
+    }
   }
 }
