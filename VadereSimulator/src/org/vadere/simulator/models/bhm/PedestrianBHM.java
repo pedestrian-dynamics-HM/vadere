@@ -9,6 +9,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
+import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -137,28 +141,29 @@ public class PedestrianBHM extends Pedestrian {
 	 * Updates the pedestrian. Changes the object's state!
 	 */
 	public void update(double currentTimeInSec) {
-
 		if (attributesBHM.isVaryingBehaviour()) {
 			setEvasionStrategy();
 		}
 
 		// for the first step after creation, timeOfNextStep has to be initialized
 		if (getTimeOfNextStep() == 0) {
-			this.timeOfNextStep = currentTimeInSec;
+			timeOfNextStep = currentTimeInSec;
 		}
 
-		this.durationNextStep = this.stepLength / getFreeFlowSpeed();
+		durationNextStep = stepLength / getFreeFlowSpeed();
 
-		// This has to happen here! The call has side effects on navigation!
-		updateTargetDirection();
-
-		this.nextPosition = navigation.getNavigationPosition();
+		Event mostImportantEvent = getMostImportantEvent();
 		VPoint position = getPosition();
-		makeStep();
-
+		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+			updateTargetDirection();
+			nextPosition = navigation.getNavigationPosition();
+			makeStep();
+			timeOfNextStep += durationNextStep;
+		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+			timeOfNextStep += durationNextStep;
+		}
+		
 		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
-
-		this.timeOfNextStep = timeOfNextStep + durationNextStep;
 	}
 
 	/**

@@ -155,7 +155,9 @@ public interface IPotentialField {
 	         * A default distance function which uses all shapes to compute the distance.
 	         */
 			IDistanceFunction distanceFunc = new DistanceFunction(bbox, holes);
-	        IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(0, -distanceFunc.apply(p));
+	        IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(0, Math.min(-distanceFunc.apply(p), 22));
+
+	        //IEdgeLengthFunction edgeLengthFunction = p -> 1.0;
 
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.

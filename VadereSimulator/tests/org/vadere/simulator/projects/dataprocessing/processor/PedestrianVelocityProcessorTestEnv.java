@@ -115,8 +115,8 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 				when(state.getSimTimeInSec()).thenReturn(2.0);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 0.5);
-				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 5.0);
+				addToExpectedOutput(new TimestepPedestrianIdKey(step, 1), 0.25);
+				addToExpectedOutput(new TimestepPedestrianIdKey(step, 2), 2.5);
 				addToExpectedOutput(new TimestepPedestrianIdKey(step, 3), 0.0);
 
 			}

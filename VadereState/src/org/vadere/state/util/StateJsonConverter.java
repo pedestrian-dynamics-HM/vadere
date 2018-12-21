@@ -22,6 +22,9 @@ import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.events.json.EventInfo;
+import org.vadere.state.events.json.EventInfoStore;
+import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Obstacle;
@@ -176,6 +179,28 @@ public abstract class StateJsonConverter {
 		}
 	}
 
+	/**
+	 * Pass a node representing an array of @see EventInfo objects.
+	 *
+	 * Usually, this array is extracted by reading in a scenario file as @see JsonNode
+	 * an you call "get("eventInfos") on this @see JsonNode.
+	 */
+	public static EventInfoStore deserializeEventsFromArrayNode(JsonNode node) throws IllegalArgumentException {
+		EventInfoStore eventInfoStore = new EventInfoStore();
+
+		if (node != null) {
+			List<EventInfo> eventInfoList = new ArrayList<>();
+			node.forEach(eventInfoNode -> eventInfoList.add(mapper.convertValue(eventInfoNode, EventInfo.class)));
+			eventInfoStore.setEventInfos(eventInfoList);
+		}
+
+		return eventInfoStore;
+	}
+
+	public static EventInfoStore deserializeEvents(String json) throws IOException {
+		return mapper.readValue(json, EventInfoStore.class);
+	}
+
 	public static Pedestrian deserializePedestrian(String json) throws IOException {
 		return mapper.readValue(json, Pedestrian.class);
 	}
@@ -277,6 +302,13 @@ public abstract class StateJsonConverter {
 		if (attributesPedestrianNode != null)
 			((ObjectNode) attributesPedestrianNode).remove("id");
 
+		AttributesTeleporter attributesTeleporter = null;
+		if(topography.getTeleporter() != null) {
+			attributesTeleporter = topography.getTeleporter().getAttributes();
+		}
+		JsonNode node = mapper.convertValue(attributesTeleporter, JsonNode.class);
+		topographyNode.set("teleporter", node);
+
 		JsonNode attributesCarNode = mapper.convertValue(topography.getAttributesCar(), JsonNode.class);
 		topographyNode.set("attributesCar", attributesCarNode);
 
@@ -298,6 +330,15 @@ public abstract class StateJsonConverter {
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
 		return prettyWriter.writeValueAsString(node);
+	}
+
+	public static String serializeEvents(EventInfoStore eventInfoStore)
+			throws JsonProcessingException {
+		return writer.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
+	}
+
+	public static ObjectNode serializeEventsToNode(EventInfoStore eventInfoStore) {
+		return mapper.valueToTree(eventInfoStore);
 	}
 
 	public static String serializeObjectPretty(Object object) {

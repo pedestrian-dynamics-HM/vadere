@@ -54,8 +54,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.targets = new TreeMap<>();
 		this.floorGradient = FloorGradientProviderFactory
 				.createFloorGradientProvider(
-						GradientProviderType.FLOOR_EUCLIDEAN_CONTINUOUS,
-						scenario, targets, null);
+						attributes.getFloorGradientProviderType(),
+						scenario, targets, potentialFieldTarget);
 
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;

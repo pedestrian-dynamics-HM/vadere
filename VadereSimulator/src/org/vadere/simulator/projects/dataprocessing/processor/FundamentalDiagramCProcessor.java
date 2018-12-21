@@ -6,6 +6,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -25,6 +26,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private VRectangle measurementArea;
+	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramCProcessor() {
 		super("velocity", "density");
@@ -35,6 +37,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 		super.init(manager);
 		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
 		measurementArea = att.getMeasurementArea();
+		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
 	}
 
 	@Override
@@ -52,6 +55,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 
 	@Override
 	protected void doUpdate(SimulationState state) {
+		pedestrianVelocityProcessor.update(state);
 		long N = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
 				.filter(pedestrian -> measurementArea.contains(pedestrian.getPosition()))
@@ -59,7 +63,10 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 		double velocity = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
 				.filter(pedestrian -> measurementArea.contains(pedestrian.getPosition()))
-				.mapToDouble(pedestrian -> pedestrian.getVelocity().getLength())
+				.mapToDouble(pedestrian ->
+						//pedestrian.getVelocity().getLength()
+						pedestrianVelocityProcessor.getValue(new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId()))
+				)
 				.sum();
 
 		if(N == 0) {
