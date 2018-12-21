@@ -140,7 +140,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 
 	void verySmallNotOverlapping() {
 		AttributesAgent a = new AttributesAgent();
-		double distAtAxis =  a.getRadius()*2 + 0.001; // this should count as overlap
+		double distAtAxis =  a.getRadius()*2 + 0.001; // this should not count as overlap
 		double vertDistAt45deg = Math.sqrt(2)*a.getRadius() + 0.001;
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
 	}
