@@ -17,19 +17,21 @@ import java.util.List;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
-	private SFCNode<P, V, E, F> head;
+public class SpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+	private SFCNode<P, CE, CF, V, E, F> head;
 
 	public SpaceFillingCurve(){
 		head = null;
 	}
 
-	public void insertFirst(final SFCNode<P, V, E, F> node) {
+	public void insertFirst(final SFCNode<P, CE, CF, V, E, F> node) {
 		assert head == null;
 
 		if(head != null) {
@@ -47,9 +49,9 @@ public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends
 	 * @param anchor    the replaced element
 	 */
 	public void replace(
-			@NotNull final SFCNode<P, V, E, F> left,
-			@NotNull final SFCNode<P, V, E, F> right,
-			@NotNull SFCNode<P, V, E, F> anchor) {
+			@NotNull final SFCNode<P, CE, CF, V, E, F> left,
+			@NotNull final SFCNode<P, CE, CF, V, E, F> right,
+			@NotNull SFCNode<P, CE, CF, V, E, F> anchor) {
 		assert asList().contains(anchor);
 		insertNext(right, anchor);
 		insertNext(left, anchor);
@@ -61,7 +63,7 @@ public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends
 	 *
 	 * @param anchor the element which will be removed
 	 */
-	public void remove(@NotNull final SFCNode<P, V, E, F> anchor) {
+	public void remove(@NotNull final SFCNode<P, CE, CF, V, E, F> anchor) {
 		assert asList().contains(anchor);
 
 		if(anchor == head) {
@@ -82,10 +84,10 @@ public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends
 	 * @param node      the node
 	 * @param anchor    the anchor element
 	 */
-	public void insertNext(@NotNull final SFCNode<P, V, E, F> node, @NotNull SFCNode<P, V, E, F> anchor) {
+	public void insertNext(@NotNull final SFCNode<P, CE, CF, V, E, F> node, @NotNull SFCNode<P, CE, CF, V, E, F> anchor) {
 		assert asList().contains(anchor);
 
-		SFCNode<P, V, E, F> anchorNext = anchor.next;
+		SFCNode<P, CE, CF, V, E, F> anchorNext = anchor.next;
 		anchor.next = node;
 		node.prev = anchor;
 		node.next = anchorNext;
@@ -101,14 +103,14 @@ public class SpaceFillingCurve<P extends IPoint, V extends IVertex<P>, E extends
 	 * Returns the SFC as ordered <tt>List</tt>.
 	 * @return the whole SFC as in an ordered list
 	 */
-	public List<SFCNode<P, V, E, F>> asList() {
-		List<SFCNode<P, V, E, F>> list;
+	public List<SFCNode<P, CE, CF, V, E, F>> asList() {
+		List<SFCNode<P, CE, CF, V, E, F>> list;
 		if(head == null) {
 			list = Collections.EMPTY_LIST;
 		}
 		else {
 			list = new ArrayList<>();
-			SFCNode<P, V, E, F> node = head;
+			SFCNode<P, CE, CF, V, E, F> node = head;
 			while (node != null) {
 				list.add(node);
 				node = node.next;

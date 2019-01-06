@@ -271,7 +271,7 @@ public class RealWorldPlot {
 				0.1,
 				obstacleShapes);
 
-		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(meshImprover.getMesh(), f -> false, 1000, 800);
+		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(meshImprover.getMesh(), f -> false, 1000, 800);
 		JFrame frame = meshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");

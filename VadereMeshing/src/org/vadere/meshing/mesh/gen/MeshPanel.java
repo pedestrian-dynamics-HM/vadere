@@ -19,13 +19,15 @@ import javax.swing.*;
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
+public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends Canvas {
 
-	private  MeshRenderer<P, V, E, F> meshRenderer;
+	private  MeshRenderer<P, CE, CF, V, E, F> meshRenderer;
 
 	/**
 	 * The width of the canvas.
@@ -46,7 +48,7 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param height        the height of the canvas
 	 */
 	public MeshPanel(
-			@NotNull final MeshRenderer<P, V, E, F> meshRenderer,
+			@NotNull final MeshRenderer<P, CE, CF, V, E, F> meshRenderer,
 			final double width,
 			final double height) {
 		this.meshRenderer = meshRenderer;
@@ -64,7 +66,7 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param colorFunction color function coloring faces
 	 */
 	public MeshPanel(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
 			final double width,
 			final double height,
@@ -83,7 +85,7 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param height        height of the canvas
 	 */
     public MeshPanel(
-    		@NotNull final IMesh<P, V, E, F> mesh,
+    		@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 		    @NotNull final Predicate<F> alertPred,
 		    final double width,
 		    final double height) {
@@ -98,7 +100,7 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param height        height of the canvas
 	 */
 	public MeshPanel(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			final double width,
 			final double height) {
 		this(mesh, f -> false, width, height, f -> Color.WHITE);

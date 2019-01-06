@@ -7,6 +7,8 @@ import org.vadere.util.geometry.shapes.IPoint;
 /**
  * An array-based implementation of {@link IFace}.
  *
+ * @param <CF> the type of the container of the faces
+ *
  * @author Benedikt Zoennchen
  */
 public class AFace<CF> implements IFace<CF>, Cloneable {

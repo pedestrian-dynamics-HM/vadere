@@ -7,6 +7,8 @@ import org.vadere.util.geometry.shapes.IPoint;
 /**
  * An array-based implementation of {@link IHalfEdge}.
  *
+ * @param <CE> the type of container of the half-edges
+ *
  * @author Benedikt Zoennchen
  */
 public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {

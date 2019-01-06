@@ -15,7 +15,7 @@ import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
 
-public class PEikMeshGen<P extends EikMeshPoint> extends EikMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
+public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends EikMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> {
 
 	public PEikMeshGen(
 			@NotNull IDistanceFunction distanceFunc,

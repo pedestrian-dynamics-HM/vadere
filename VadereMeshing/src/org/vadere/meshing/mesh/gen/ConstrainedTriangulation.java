@@ -16,7 +16,7 @@ import java.util.*;
  * unfinished!
  * @author Benedikt Zoennchen
  */
-public class ConstrainedTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, V, E, F> {
+public class ConstrainedTriangulation<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends IncrementalTriangulation<P, CE, CF, V, E, F> {
 
     private static Logger log = LogManager.getLogger(ConstrainedTriangulation.class);
 

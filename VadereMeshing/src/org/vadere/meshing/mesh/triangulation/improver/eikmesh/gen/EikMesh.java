@@ -40,13 +40,13 @@ import java.util.stream.Stream;
 /**
  * @author Benedikt Zoennchen
  */
-public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IMeshImprover<P, V, E, F>, ITriangulator<P, V, E, F> {
+public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IMeshImprover<P, CE, CF, V, E, F>, ITriangulator<P, CE, CF, V, E, F> {
 
 	private boolean illegalMovement = false;
 	private UniformRefinementTriangulatorSFC triangulatorSFC;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
-	private IIncrementalTriangulation<P, V, E, F> triangulation;
+	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
@@ -70,7 +70,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
             final double initialEdgeLen,
             final VRectangle bound,
             final Collection<? extends VShape> obstacleShapes,
-            final IMeshSupplier<P, V, E, F> meshSupplier) {
+            final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier) {
 
 		this.bound = bound;
 		this.distanceFunc = distanceFunc;
@@ -100,14 +100,14 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 			final IEdgeLengthFunction edgeLengthFunc,
 			final double initialEdgeLen,
 			final VRectangle bound,
-			final IMeshSupplier<P, V, E, F> meshSupplier) {
+			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier) {
 		this(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, Collections.EMPTY_LIST, meshSupplier);
 	}
 
 	public EikMesh(final VPolygon boundary,
 	               final double initialEdgeLen,
 	               final Collection<? extends VShape> obstacleShapes,
-	               final IMeshSupplier<P, V, E, F> meshSupplier){
+	               final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier){
 
 		Rectangle2D rect = boundary.getBounds2D();
 		this.bound = new VRectangle(
@@ -157,7 +157,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, V, E, F> generate() {
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
 
 		if(!initializationFinished()) {
 			initialize();
@@ -183,7 +183,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	}
 
 	@Override
-	public IMesh<P, V, E, F> getMesh() {
+	public IMesh<P, CE, CF, V, E, F> getMesh() {
 		return triangulation.getMesh();
 	}
 
@@ -237,7 +237,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	}
 
     @Override
-    public IIncrementalTriangulation<P, V, E, F> getTriangulation() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
 		return triangulation;
     }
 
@@ -504,7 +504,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 		getMesh().getPoint(vertex).add(movement);
 	}
 
-	private Set<P> getFixPoints(final IMesh<P, V, E, F> mesh, @NotNull VShape... shapes) {
+	private Set<P> getFixPoints(final IMesh<P, CE, CF, V, E, F> mesh, @NotNull VShape... shapes) {
 		Set<P> pointSet = new HashSet<>();
 		for(VShape shape : shapes) {
 			addFixPoints(mesh, shape, pointSet);
@@ -513,7 +513,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 		return pointSet;
 	}
 
-	private Set<P> getFixPoints(final IMesh<P, V, E, F> mesh, @NotNull Collection<? extends  VShape> shapes) {
+	private Set<P> getFixPoints(final IMesh<P, CE, CF, V, E, F> mesh, @NotNull Collection<? extends  VShape> shapes) {
 		Set<P> pointSet = new HashSet<>();
 		for(VShape shape : shapes) {
 			addFixPoints(mesh, shape, pointSet);
@@ -522,7 +522,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 		return pointSet;
 	}
 
-	private void addFixPoints(@NotNull final IMesh<P, V, E, F> mesh, @NotNull final VShape shape, @NotNull final Set<P> fixPoints) {
+	private void addFixPoints(@NotNull final IMesh<P, CE, CF, V, E, F> mesh, @NotNull final VShape shape, @NotNull final Set<P> fixPoints) {
 		shape.getPath()
 				.stream()
 				.filter(p -> bound.contains(p))

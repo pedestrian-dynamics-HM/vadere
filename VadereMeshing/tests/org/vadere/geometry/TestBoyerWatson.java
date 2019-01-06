@@ -57,13 +57,13 @@ public class TestBoyerWatson {
 		points.add(p5);
 
 
-		List<IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>>> triangulationList = new ArrayList<>();
+		List<IIncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>>> triangulationList = new ArrayList<>();
 
 		triangulationList.add(IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y)));
 		triangulationList.add(IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points, (x, y) -> new VPoint(x, y)));
 		triangulationList.add(IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y)));
 
-		for(IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation : triangulationList) {
+		for(IIncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> delaunayTriangulation : triangulationList) {
 			delaunayTriangulation.finish();
 			Set<VTriangle> triangulation = delaunayTriangulation.streamTriangles().collect(Collectors.toSet());
 
@@ -114,10 +114,10 @@ public class TestBoyerWatson {
 		points.add(p2);
 		points.add(p3);
 
-		IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunayTriangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y));
-		PFace<VPoint> face = delaunayTriangulation.locateFace(centerPoint).get();
-		IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh = delaunayTriangulation.getMesh();
-		PHalfEdge<VPoint> edge = mesh.getEdge(face);
+		IIncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> delaunayTriangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y));
+		PFace<VPoint, Object, Object> face = delaunayTriangulation.locateFace(centerPoint).get();
+		IMesh<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> mesh = delaunayTriangulation.getMesh();
+		PHalfEdge<VPoint, Object, Object> edge = mesh.getEdge(face);
 
 		// triangulations are always ccw ordered!
 		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
@@ -185,7 +185,7 @@ public class TestBoyerWatson {
 		return true;
 	}
 
-	private static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> boolean hasCorrectEdgeVertexRealtion(final IIncrementalTriangulation<P, V, E, F> triangulation) {
+	private static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> boolean hasCorrectEdgeVertexRealtion(final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
 		return triangulation.getMesh()
 				.streamVertices()
 				.filter(v -> triangulation.getMesh().isAlive(v))

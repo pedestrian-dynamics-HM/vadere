@@ -16,15 +16,22 @@ import java.util.*;
 
 /**
  * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
 @Deprecated
-public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class UniformSFCTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
     private final Collection<VShape> boundary;
     private final VRectangle bbox;
     private final IEdgeLengthFunction lenFunc;
-    private IIncrementalTriangulation<P, V, E, F> triangulation;
+    private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
     private Set<P> points;
-    private IMesh<P, V, E, F> mesh;
+    private IMesh<P, CE, CF, V, E, F> mesh;
     private static final Logger logger = LogManager.getLogger(UniformSFCTriangulator.class);
     private final IDistanceFunction distFunc;
     private final static Random random = new Random();
@@ -38,7 +45,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
      * @param distFunc      a signed distance function
      */
     public UniformSFCTriangulator(
-            final IIncrementalTriangulation<P, V, E, F> triangulation,
+            final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation,
             final VRectangle bound,
             final Collection<VShape> boundary,
             final IEdgeLengthFunction lenFunc,
@@ -54,7 +61,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
         this.sortedFaces = new LinkedList<>();
     }
 
-    public IIncrementalTriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         triangulation.init();
 
         logger.info("start triangulation generation");

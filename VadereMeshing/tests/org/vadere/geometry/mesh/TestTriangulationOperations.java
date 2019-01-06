@@ -24,7 +24,7 @@ import static junit.framework.TestCase.assertTrue;
 public class TestTriangulationOperations {
 
 	private VPTriangulation triangulation;
-	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
+	private IMesh<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> mesh;
 	private VPoint collapsePoint = new VPoint(0.5, 0);
 	private List<VPoint> points = new ArrayList<>();
 	private VRectangle bound = new VRectangle(-0.5, -0.5, 2.0, 2.0);
@@ -43,7 +43,7 @@ public class TestTriangulationOperations {
 
 	@Test
 	public void testCollapse() {
-		PVertex<VPoint> vertex = mesh
+		PVertex<VPoint, Object, Object> vertex = mesh
 				.streamVertices().filter(v -> mesh.getPoint(v).equals(collapsePoint))
 				.findAny().get();
 
@@ -57,7 +57,7 @@ public class TestTriangulationOperations {
 
 		assertFalse(new HashSet<>(points).equals(new HashSet<>(mesh.getPoints())));
 
-		PFace<VPoint> face = triangulation.getMesh().getFaces().get(0);
+		PFace<VPoint, Object, Object> face = triangulation.getMesh().getFaces().get(0);
 
 		assertTrue(mesh.streamEdges(face).allMatch(e -> mesh.getFace(e).equals(face)));
 

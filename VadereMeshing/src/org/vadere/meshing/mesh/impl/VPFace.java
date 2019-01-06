@@ -7,7 +7,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 /**
  * @author Benedikt Zoennchen
  */
-public class VPFace extends PFace<VPoint> {
+public class VPFace extends APFace<VPoint> {
 	VPFace(@NotNull VPHalfEdge edge) {
 		super(edge);
 	}

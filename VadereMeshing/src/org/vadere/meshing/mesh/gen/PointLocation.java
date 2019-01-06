@@ -16,13 +16,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PointLocation<P extends VPoint> {
+public class PointLocation<P extends VPoint, CE, CF> {
 
-	private final Collection<PFace<P>> faces;
+	private final Collection<PFace<P, CE, CF>> faces;
 	private final List<P> orderedPointList;
-	private final List<List<PHalfEdge<P>>> halfeEdgesSegments;
+	private final List<List<PHalfEdge<P, CE, CF>>> halfeEdgesSegments;
 	private final List<List<P>> intersectionPointsInSegment;
-	private final IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh;
+	private final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh;
 
 	private Comparator<P> pointComparatorX = (p1, p2) -> {
 		double dx = p1.getX() - p2.getX();
@@ -38,7 +38,7 @@ public class PointLocation<P extends VPoint> {
 		else return 0;
 	};
 
-	private class BetweenTwoPoints implements Predicate<PHalfEdge<P>> {
+	private class BetweenTwoPoints implements Predicate<PHalfEdge<P, CE, CF>> {
 
 		private P p1;
 		private P p2;
@@ -49,14 +49,14 @@ public class PointLocation<P extends VPoint> {
 		}
 
 		@Override
-		public boolean test(final PHalfEdge<P> halfEdge) {
+		public boolean test(final PHalfEdge<P, CE, CF> halfEdge) {
 			P v1 = mesh.getPoint(halfEdge);
 			P v2 = mesh.getPoint(mesh.getPrev(halfEdge));
 			return (v1.getX() <= p1.getX() && v2.getX() >= p2.getX()) || (v2.getX() <= p1.getX() && v1.getX() >= p2.getX());
 		}
 	}
 
-	private class HalfEdgeComparator implements Comparator<PHalfEdge<P>> {
+	private class HalfEdgeComparator implements Comparator<PHalfEdge<P, CE, CF>> {
 
 		private double x1;
 		private double x2;
@@ -67,7 +67,7 @@ public class PointLocation<P extends VPoint> {
 		}
 
 		@Override
-		public int compare(final PHalfEdge<P> edge1, final PHalfEdge<P> edge2) {
+		public int compare(final PHalfEdge<P, CE, CF> edge1, final PHalfEdge<P, CE, CF> edge2) {
 			VLine line1 = edge1.toLine();
 			VLine line2 = edge2.toLine();
 			double slope1 = line1.slope();
@@ -82,7 +82,7 @@ public class PointLocation<P extends VPoint> {
 		}
 	}
 
-	public PointLocation(final Collection<PFace<P>> faces, final IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> mesh) {
+	public PointLocation(final Collection<PFace<P, CE, CF>> faces, final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh) {
 		this.faces = faces;
 		this.mesh = mesh;
 
@@ -98,7 +98,7 @@ public class PointLocation<P extends VPoint> {
 		for(int i = 0; i < orderedPointList.size() - 1; i++) {
 			P p1 = orderedPointList.get(i);
 			P p2 = orderedPointList.get(i+1);
-			List<PHalfEdge<P>> halfEdges = faces.stream()
+			List<PHalfEdge<P, CE, CF>> halfEdges = faces.stream()
 					.flatMap(face -> mesh.streamEdges(face)).filter(new BetweenTwoPoints(p1, p2))
 					.sorted(new HalfEdgeComparator(p1.getX(), p2.getX())).collect(Collectors.toList());
 
@@ -127,7 +127,7 @@ public class PointLocation<P extends VPoint> {
 		return mesh.getPoint(mesh.createVertex(x, (p.getY() + (p.getX()-x) * line.slope())));
 	}
 
-	public Optional<PFace<P>> getFace(final P point) {
+	public Optional<PFace<P, CE, CF>> getFace(final P point) {
 		int xSegmentIndex = Collections.binarySearch(orderedPointList, point, pointComparatorX);
 
 		xSegmentIndex = xSegmentIndex < 0 ? -xSegmentIndex - 2 : xSegmentIndex;
@@ -146,15 +146,15 @@ public class PointLocation<P extends VPoint> {
 			return Optional.empty();
 		}
 
-		PHalfEdge<P> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
+		PHalfEdge<P, CE, CF> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
 
-		PFace<P> face = mesh.getFace(edge);
+		PFace<P, CE, CF> face = mesh.getFace(edge);
 		VPolygon polygon = mesh.toPolygon(face);
 		if(polygon.contains(point)) {
 			return Optional.of(face);
 		}
 		else {
-			PFace<P> f = mesh.getTwinFace(edge);
+			PFace<P, CE, CF> f = mesh.getTwinFace(edge);
 			if(mesh.isBoundary(f)) {
 				return Optional.empty();
 			}

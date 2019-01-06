@@ -20,21 +20,21 @@ import java.util.function.Consumer;
  * Builder class for Tikz Graphics used in tex / latex documents.
  * @author Stefan Schuhbaeck
  */
-public class TexGraphBuilder<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class TexGraphBuilder<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 
 	private StringBuilder sb;
 	private boolean generated;
 	private DrawType drawType;
-	private ColorFunctions<P, V, E, F> colorFunctions;
-	private BiFunction<IMesh<P, V, E, F>, F, StringBuilder> drawFace;
+	private ColorFunctions<P, CE, CF, V, E, F> colorFunctions;
+	private BiFunction<IMesh<P, CE, CF, V, E, F>, F, StringBuilder> drawFace;
 	private ArrayList<Consumer<StringBuilder>> decorator;
-	private IMesh<P, V, E, F> mesh;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 	/**
 	 * @param mesh           Mesh to draw
 	 * @param scaling        Scaling factor
 	 * @param colorFunctions {@link ColorFunctions} object used for color information
 	 */
-	public TexGraphBuilder(IMesh<P, V, E, F> mesh, float scaling, ColorFunctions<P, V, E, F> colorFunctions) {
+	public TexGraphBuilder(IMesh<P, CE, CF, V, E, F> mesh, float scaling, ColorFunctions<P, CE, CF, V, E, F> colorFunctions) {
 		this.drawType = DrawType.faceFillDraw;
 		this.sb = new StringBuilder();
 		this.mesh = mesh;
@@ -220,14 +220,14 @@ public class TexGraphBuilder<P extends IPoint, V extends IVertex<P>, E extends I
 		this.drawType = drawType;
 	}
 
-	public void setDrawFace(BiFunction<IMesh<P, V, E, F>, F, StringBuilder> drawFace) {
+	public void setDrawFace(BiFunction<IMesh<P, CE, CF, V, E, F>, F, StringBuilder> drawFace) {
 		this.drawFace = drawFace;
 	}
 
 	/**
 	 * Creates contour plott with no filling
 	 */
-	private StringBuilder faceDraw(IMesh<P, V, E, F> mesh, F face) {
+	private StringBuilder faceDraw(IMesh<P, CE, CF, V, E, F> mesh, F face) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\\draw ").append("[")
 				.append("color=").append(color(colorFunctions.faceDrawColor(mesh, face)))
@@ -240,7 +240,7 @@ public class TexGraphBuilder<P extends IPoint, V extends IVertex<P>, E extends I
 	/**
 	 * Creates plot with filling only (no boarders around faces)
 	 */
-	private StringBuilder faceFill(IMesh<P, V, E, F> mesh, F face) {
+	private StringBuilder faceFill(IMesh<P, CE, CF, V, E, F> mesh, F face) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\\fill ").append("[")
 				.append("fill=").append(color(colorFunctions.faceDrawColor(mesh, face)))
@@ -254,7 +254,7 @@ public class TexGraphBuilder<P extends IPoint, V extends IVertex<P>, E extends I
 	 * Creates plot with contour and filling (default)
 	 */
 
-	private StringBuilder faceFillDraw(IMesh<P, V, E, F> mesh, F face) {
+	private StringBuilder faceFillDraw(IMesh<P, CE, CF, V, E, F> mesh, F face) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\\filldraw ").append("[")
 				.append("color=").append(color(colorFunctions.faceDrawColor(mesh, face)))
@@ -265,7 +265,7 @@ public class TexGraphBuilder<P extends IPoint, V extends IVertex<P>, E extends I
 		return sb;
 	}
 
-	public StringBuilder shape(IMesh<P, V, E, F> mesh, F face) {
+	public StringBuilder shape(IMesh<P, CE, CF, V, E, F> mesh, F face) {
 		StringBuilder sb = new StringBuilder();
 		V first = mesh.streamVertices(face).findFirst().get();
 		String poly = mesh.streamVertices(face).map(v -> "(" + v.getX() + "," + v.getY() + ")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- (" + first.getX() + "," + first.getY() + ")";

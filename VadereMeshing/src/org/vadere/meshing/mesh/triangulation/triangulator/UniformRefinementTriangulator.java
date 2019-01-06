@@ -28,18 +28,20 @@ import java.util.*;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class UniformRefinementTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 	private final Collection<? extends VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
-	private IIncrementalTriangulation<P, V, E, F> triangulation;
+	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private Set<P> points;
-	private IMesh<P, V, E, F> mesh;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 	private  LinkedList<F> toRefineEdges;
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulator.class);
 	private final IDistanceFunction distFunc;
@@ -56,7 +58,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
      * @param distFunc      a signed distance function
      */
 	public UniformRefinementTriangulator(
-			final ITriangulationSupplier<P, V, E, F> supplier,
+			final ITriangulationSupplier<P, CE, CF, V, E, F> supplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -123,7 +125,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 	 *
 	 * @return the generated triangulation
 	 */
-	public IIncrementalTriangulation<P, V, E, F> generate() {
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         logger.info("start triangulation generation");
         init();
 

@@ -8,7 +8,7 @@ import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.List;
 
-public class DAGElement<P extends IPoint, F extends IFace<P>> {
+public class DAGElement<P extends IPoint, CF, F extends IFace<CF>> {
 	private F face;
 	private Triple<P, P, P> vertices;
 	private VTriangle triangle;

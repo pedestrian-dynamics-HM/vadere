@@ -53,6 +53,8 @@ import javax.swing.*;
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
@@ -440,7 +442,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		}
 	}
 
-	protected IPointLocator<P, V, E, F> getPointLocator() {
+	protected IPointLocator<P, CE, CF, V, E, F> getPointLocator() {
 	    return pointLocator;
     }
 
@@ -699,7 +701,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		return false;
 	}*/
 
-	public static <P extends IPoint, V extends  IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> boolean isIllegal(E edge, V p, IMesh<P, V, E, F> mesh) {
+	public static <P extends IPoint, CE, CF, V extends  IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> boolean isIllegal(E edge, V p, IMesh<P, CE, CF, V, E, F> mesh) {
 		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
 			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 			//V p = mesh.getVertex(mesh.getNext(edge));
@@ -746,7 +748,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 			// this should be the same afterwards
 			//E halfEdge = getMesh().getNext(edge);
 
-			IMesh<P, V, E, F> mesh = getMesh();
+			IMesh<P, CE, CF, V, E, F> mesh = getMesh();
 			E startEdge = mesh.getPrev(edge);
 			E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
 			E currentEdge = mesh.getPrev(edge);
@@ -800,9 +802,9 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public IncrementalTriangulation<P, V, E, F> clone() {
+	public IncrementalTriangulation<P, CE, CF, V, E, F> clone() {
 		try {
-			IncrementalTriangulation<P, V, E, F> clone = (IncrementalTriangulation<P, V, E, F>)super.clone();
+			IncrementalTriangulation<P, CE, CF, V, E, F> clone = (IncrementalTriangulation<P, CE, CF, V, E, F>)super.clone();
 			clone.mesh = mesh.clone();
 
 			List<V> cVirtualVertices = new ArrayList<>();
@@ -853,8 +855,8 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		IPointConstructor<VPoint> pointConstructor =  (x, y) -> new VPoint(x, y);
 		long ms = System.currentTimeMillis();
 
-		PMesh<VPoint> mesh = new PMesh<>(pointConstructor);
-		IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> bw = IIncrementalTriangulation.createPTriangulation(
+		PMesh<VPoint, ?, ?> mesh = new PMesh<>(pointConstructor);
+		IIncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> bw = IIncrementalTriangulation.createPTriangulation(
 				IPointLocator.Type.DELAUNAY_HIERARCHY,
 				points,
 				pointConstructor);
@@ -870,7 +872,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 
 
         ms = System.currentTimeMillis();
-        IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> bw2 = IIncrementalTriangulation.createATriangulation(
+        IIncrementalTriangulation<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> bw2 = IIncrementalTriangulation.createATriangulation(
                 IPointLocator.Type.DELAUNAY_HIERARCHY,
                 points,
                 pointConstructor);

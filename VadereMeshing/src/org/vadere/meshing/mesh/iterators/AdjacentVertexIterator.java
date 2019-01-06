@@ -14,17 +14,21 @@ import java.util.Iterator;
  * This iterator iterates over the adjacent vertices of the vertex of this iterator.
  *
  * @author Benedikt Zoennchen
- * @param <P> the type of the vertex
- * @param <E> the type of the half-edge
- * @param <F> the type of the face
+ *
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class AdjacentVertexIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<V> {
+public class AdjacentVertexIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<V> {
 
 	private static Logger log = LogManager.getLogger(AdjacentVertexIterator.class);
-	private IMesh<P, V, E, F> mesh;
-	private IncidentEdgeIterator<P, V, E, F> incidentEdgeIterator;
+	private IMesh<P, CE, CF, V, E, F> mesh;
+	private IncidentEdgeIterator<P, CE, CF, V, E, F> incidentEdgeIterator;
 
-	public AdjacentVertexIterator(final IMesh<P, V, E, F> mesh, final V vertex) {
+	public AdjacentVertexIterator(final IMesh<P, CE, CF, V, E, F> mesh, final V vertex) {
 		this.mesh = mesh;
 		this.incidentEdgeIterator = new IncidentEdgeIterator<>(mesh, mesh.getEdge(vertex));
 	}

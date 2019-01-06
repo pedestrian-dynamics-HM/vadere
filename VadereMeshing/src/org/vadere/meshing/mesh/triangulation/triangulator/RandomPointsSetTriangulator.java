@@ -15,14 +15,16 @@ import java.util.Random;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class RandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
-    private final IIncrementalTriangulation<P, V, E, F> triangulation;
+    private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
     private final int numberOfPoints;
     private Random random;
     private final VRectangle bound;
@@ -37,7 +39,7 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
 	 * @param distFunc          a distance function which has to be positive at positions where
 	 *                          no point should be inserted and negative elsewhere.
 	 */
-    public RandomPointsSetTriangulator(final IIncrementalTriangulation<P, V, E, F> triangulation,
+    public RandomPointsSetTriangulator(final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation,
                                        final int numberOfPoints, final VRectangle bound,
                                        final IDistanceFunction distFunc
                                 ) {
@@ -54,7 +56,7 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
 	 * @param numberOfPoints    the number of random points which will be inserted
 	 * @param bound             the bound containing all points
 	 */
-	public RandomPointsSetTriangulator(final IIncrementalTriangulation<P, V, E, F> triangulation,
+	public RandomPointsSetTriangulator(final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation,
 	                                   final int numberOfPoints, final VRectangle bound
 	) {
 		this.triangulation = triangulation;
@@ -65,7 +67,7 @@ public class RandomPointsSetTriangulator<P extends IPoint, V extends IVertex<P>,
 	}
 
     @Override
-    public IIncrementalTriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         triangulation.init();
         int numberOfInsertedPoints = 0;
 

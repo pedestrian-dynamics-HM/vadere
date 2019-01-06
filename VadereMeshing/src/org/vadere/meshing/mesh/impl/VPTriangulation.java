@@ -18,11 +18,11 @@ import java.util.function.Predicate;
  *
  * Note: Use factory i.e. ITriangulation for the creation!
  */
-public class VPTriangulation extends IncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> {
+public class VPTriangulation extends IncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> {
 
 	public VPTriangulation(
 			@NotNull final Collection<VPoint> points,
-			@NotNull final Predicate<PHalfEdge<VPoint>> illegalPredicate) {
+			@NotNull final Predicate<PHalfEdge<VPoint, Object, Object>> illegalPredicate) {
 		super(new VPMesh(), IPointLocator.Type.JUMP_AND_WALK, points, illegalPredicate);
 	}
 
@@ -31,7 +31,7 @@ public class VPTriangulation extends IncrementalTriangulation<VPoint, PVertex<VP
 	}
 
 	public VPTriangulation(final VRectangle bound,
-	                       final Predicate<PHalfEdge<VPoint>> illegalPredicate){
+	                       final Predicate<PHalfEdge<VPoint, Object, Object>> illegalPredicate){
 		super(new VPMesh(), IPointLocator.Type.JUMP_AND_WALK, bound, illegalPredicate);
 	}
 

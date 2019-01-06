@@ -14,7 +14,7 @@ import java.util.Collection;
 /**
  * @author Benedikt Zoennchen
  */
-public class PEikMesh extends PEikMeshGen<EikMeshPoint> {
+public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
 
     public PEikMesh(
             @NotNull IDistanceFunction distanceFunc,

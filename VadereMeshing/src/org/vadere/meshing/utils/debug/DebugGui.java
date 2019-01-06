@@ -23,14 +23,21 @@ import javax.swing.*;
  * <li>Key: p "print Tikz output": create tex tikzi drawing and log to console</li>
  * <li>Key: s "Print State Info": print the State information defined within the {@link TriCanvas} implementation </li>
  * </ul>
+ *
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class DebugGui<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 
 	private static DebugGui instance;
 	private final Object o;
 
 	//Displayed canvas. This will be set with at each  call to #showAndWait
-	public TriCanvas<P, V, E, F> canvas;
+	public TriCanvas<P, CE, CF, V, E, F> canvas;
 	private JFrame frame;    //contains canvas
 	private JMenuBar menuBar = new JMenuBar();    // Menu bar with supported actions.
 	private boolean debugOn;
@@ -76,13 +83,16 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 * This call will also active the {@link DebugGui} no matter what.
 	 *
 	 * @param canvas canvas to show
-	 * @param <P>    P extends IPoint
-	 * @param <V>    V extends IVertex
-	 * @param <E>    E extends IHalfEdge
-	 * @param <F>    F extends IFace
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-	void forceShowAndWait(TriCanvas<P, V, E, F> canvas) {
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
+	void forceShowAndWait(TriCanvas<P, CE, CF, V, E, F> canvas) {
 		setDebugOn(true);
 		showAndWait(canvas);
 	}
@@ -91,13 +101,16 @@ public class DebugGui<P extends IPoint, V extends IVertex<P>, E extends IHalfEdg
 	 * If activated show canvas and block here and wait for user input.
 	 *
 	 * @param canvas canvas to show
-	 * @param <P>    P extends IPoint
-	 * @param <V>    V extends IVertex
-	 * @param <E>    E extends IHalfEdge
-	 * @param <F>    F extends IFace
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-	void showAndWait(TriCanvas<P, V, E, F> canvas) {
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
+	void showAndWait(TriCanvas<P, CE, CF, V, E, F> canvas) {
 		if (isDebugOn()) {
 			get().updateGui(canvas);
 			get().waitForClick();

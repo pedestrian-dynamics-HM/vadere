@@ -35,12 +35,14 @@ import java.util.stream.Collectors;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
 	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorSFC.class);
 
@@ -65,12 +67,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	/**
 	 * The triangulation which will be constructed.
 	 */
-	private IIncrementalTriangulation<P, V, E, F> triangulation;
+	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 
 	/**
 	 * The mesh supplier to construct an empty mesh which containing the data (points, vertices, edges, faces).
 	 */
-	private final IMeshSupplier<P, V, E, F> meshSupplier;
+	private final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier;
 
 	/**
 	 * The set of inserted points.
@@ -80,7 +82,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	/**
 	 * The candidates which will be refined in the next iteration.
 	 */
-	private ArrayList<SFCNode<P, V, E, F>> candidates;
+	private ArrayList<SFCNode<P, CE, CF, V, E, F>> candidates;
 
 	/**
 	 * A distance function which has to be negative at positions which should be triangulated
@@ -106,12 +108,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	/**
 	 * The space filling curve.
 	 */
-	private final SpaceFillingCurve<P, V, E, F> sfc;
+	private final SpaceFillingCurve<P, CE, CF, V, E, F> sfc;
 
 	/**
 	 * The mesh which containing the data (points, vertices, edges, faces).
 	 */
-	private final IMesh<P, V, E, F> mesh;
+	private final IMesh<P, CE, CF, V, E, F> mesh;
 
 	private boolean initialized;
 
@@ -131,7 +133,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 * @param fixPoints             a collection of fix points which will be included if they are inside the bound. Furthermore they will not move.
      */
 	public UniformRefinementTriangulatorSFC(
-			final IMeshSupplier<P, V, E, F> meshSupplier,
+			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -155,7 +157,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	}
 
 	public UniformRefinementTriangulatorSFC(
-			final IMeshSupplier<P, V, E, F> meshSupplier,
+			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
 			final double minEdgeLength,
@@ -165,7 +167,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	}
 
 	public UniformRefinementTriangulatorSFC(
-			final IMeshSupplier<P, V, E, F> meshSupplier,
+			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
 			final double minEdgeLength,
@@ -180,7 +182,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 *
 	 * @return a triangulation consisting of two triangles containing the bounding box
 	 */
-    public IIncrementalTriangulation<P, V, E, F> init() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> init() {
 	    initialized = true;
     	double xMin = bbox.getMinX();
 	    double yMin = bbox.getMinY();
@@ -233,8 +235,8 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 		// end divide the square into 2 triangles
 
 	    E halfEdge = getLongestEdge(mesh.getFace());
-	    SFCNode<P, V, E, F> node1 = new SFCNode<>(halfEdge, SFCDirection.FORWARD);
-	    SFCNode<P, V, E, F> node2 = new SFCNode<>(getMesh().getTwin(halfEdge), SFCDirection.FORWARD);
+	    SFCNode<P, CE, CF, V, E, F> node1 = new SFCNode<>(halfEdge, SFCDirection.FORWARD);
+	    SFCNode<P, CE, CF, V, E, F> node2 = new SFCNode<>(getMesh().getTwin(halfEdge), SFCDirection.FORWARD);
 
 	    candidates.add(node1);
 	    candidates.add(node2);
@@ -244,7 +246,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	    return triangulation;
     }
 
-    private IMesh<P, V, E, F> getMesh() {
+    private IMesh<P, CE, CF, V, E, F> getMesh() {
     	return mesh;
     }
 
@@ -271,14 +273,14 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	private void nextSFCLevel(@NotNull final Predicate<E> refinePredicate) {
 		//System.out.println(curveToTikz());
 		//List<SFCNode<P, V, E ,F>> candidates = sfc.asList();
-		ArrayList<SFCNode<P, V, E ,F>> newCandidates = new ArrayList<>(candidates.size() * 2);
+		ArrayList<SFCNode<P, CE, CF, V, E ,F>> newCandidates = new ArrayList<>(candidates.size() * 2);
 		//Map<E, SFCNode<P, V, E, F>> newEdgeToNode = new HashMap<>();
 
 		ArrayList<E> toRefineEdges = new ArrayList<>();
 		boolean tFinished = true;
 
 		// 1. update CFS before refinement!
-		for(SFCNode<P, V, E ,F> node : candidates) {
+		for(SFCNode<P, CE, CF, V, E ,F> node : candidates) {
 			E edge = node.getEdge();
 
 			if(refinePredicate.test(edge)) {
@@ -288,8 +290,8 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 				E t1 = getMesh().getNext(edge);
 				E t2 = getMesh().getPrev(edge);
 
-				SFCNode<P, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
-				SFCNode<P, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
+				SFCNode<P, CE, CF, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
+				SFCNode<P, CE, CF, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
 
 				if(dir == SFCDirection.FORWARD) {
 					newCandidates.add(element2);
@@ -378,7 +380,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 *
 	 * @return the triangulation of this refinement
 	 */
-	public IIncrementalTriangulation<P, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
@@ -387,7 +389,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, V extends IVerte
 	 *
 	 * @return returns the refined triangulation
 	 */
-	public IIncrementalTriangulation<P, V, E, F> generate() {
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         logger.info("start triangulation generation");
         init();
 

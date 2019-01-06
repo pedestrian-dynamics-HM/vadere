@@ -49,10 +49,10 @@ public class TestMeshManipulations {
 		int numberOfFaces = triangulation.getMesh().getNumberOfFaces();
 
 		// locate a face / triangle containing (4, 5)
-		PFace<VPoint> face = triangulation.locateFace(6, 6).get();
+		PFace<VPoint, Object, Object> face = triangulation.locateFace(6, 6).get();
 
 		// merge faces until infinity, therefore consumes all faces!
-		Predicate<PFace<VPoint>> mergePredicate = f -> true;
+		Predicate<PFace<VPoint, Object, Object>> mergePredicate = f -> true;
 
 		int maxDept = 1;
 
@@ -66,10 +66,10 @@ public class TestMeshManipulations {
 	@Test
 	public void testRemoveAllFaces() {
 		// locate a face / triangle containing (4, 5)
-		PFace<VPoint> face = triangulation.locateFace(4, 5).get();
+		PFace<VPoint, Object, Object> face = triangulation.locateFace(4, 5).get();
 
 		// merge faces until infinity, therefore consumes all faces!
-		Predicate<PFace<VPoint>> shrinkCondition = f -> true;
+		Predicate<PFace<VPoint, Object, Object>> shrinkCondition = f -> true;
 
 		triangulation.shrinkBorder(shrinkCondition, true);
 

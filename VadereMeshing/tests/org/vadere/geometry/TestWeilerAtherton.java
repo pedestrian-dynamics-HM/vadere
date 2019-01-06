@@ -52,16 +52,16 @@ public class TestWeilerAtherton {
 		originalList.add(poly2);
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
-		Pair<PFace<WeilerAtherton.WeilerPoint>, PFace<WeilerAtherton.WeilerPoint>> pair = weilerAtherton.constructIntersectionFaces(
+		Pair<PFace<WeilerAtherton.WeilerPoint, Object, Object>, PFace<WeilerAtherton.WeilerPoint, Object, Object>> pair = weilerAtherton.constructIntersectionFaces(
 				poly1, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false)),
 				poly2, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false))
 		);
 
-		PFace<WeilerAtherton.WeilerPoint> face1 = pair.getFirst();
-		PFace<WeilerAtherton.WeilerPoint> face2 = pair.getSecond();
+		PFace<WeilerAtherton.WeilerPoint, Object, Object> face1 = pair.getFirst();
+		PFace<WeilerAtherton.WeilerPoint, Object, Object> face2 = pair.getSecond();
 
 		// we need a mesh to iterate
-		PMesh<WeilerAtherton.WeilerPoint> mesh = new PMesh<>((x,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false));
+		PMesh<WeilerAtherton.WeilerPoint, Object, Object> mesh = new PMesh<>((x,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false));
 
 		Set<VPoint> expectedPoints1 = new HashSet<>();
 		Set<VPoint> expectedPoints2 = new HashSet<>();
@@ -84,16 +84,16 @@ public class TestWeilerAtherton {
 		originalList.add(poly2);
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
-		Pair<PFace<WeilerAtherton.WeilerPoint>, PFace<WeilerAtherton.WeilerPoint>> pair = weilerAtherton.constructIntersectionFaces(
+		Pair<PFace<WeilerAtherton.WeilerPoint, Object, Object>, PFace<WeilerAtherton.WeilerPoint, Object, Object>> pair = weilerAtherton.constructIntersectionFaces(
 				poly1, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false)),
 				poly2, new PMesh<>((x ,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false))
 		);
 
-		PFace<WeilerAtherton.WeilerPoint> face1 = pair.getFirst();
-		PFace<WeilerAtherton.WeilerPoint> face2 = pair.getSecond();
+		PFace<WeilerAtherton.WeilerPoint, Object, Object> face1 = pair.getFirst();
+		PFace<WeilerAtherton.WeilerPoint, Object, Object> face2 = pair.getSecond();
 
 		// we need a mesh to iterate
-		PMesh<WeilerAtherton.WeilerPoint> mesh = new PMesh<>((x,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false));
+		PMesh<WeilerAtherton.WeilerPoint, Object, Object> mesh = new PMesh<>((x,y) -> new WeilerAtherton.WeilerPoint(new VPoint(x,y), false, false));
 
 		assertEquals(5, mesh.streamPoints(face1).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
 		assertEquals(5, mesh.streamPoints(face2).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());

@@ -16,12 +16,12 @@ import java.util.Random;
 /**
  * @author Benedikt Zoennchen
  */
-public class JumpAndWalk<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
+public class JumpAndWalk<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPointLocator<P, CE, CF, V, E, F> {
 
-	private final IIncrementalTriangulation<P, V, E, F> triangulation;
+	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private final Random random;
 
-	public JumpAndWalk(@NotNull final IIncrementalTriangulation<P, V, E, F> triangulation) {
+	public JumpAndWalk(@NotNull final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
 		this.triangulation = triangulation;
 		this.random = new Random();
 	}

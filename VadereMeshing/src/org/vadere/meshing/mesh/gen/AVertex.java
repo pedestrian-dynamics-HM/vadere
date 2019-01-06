@@ -10,6 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * An array-based implementation of {@link IVertex}.
  *
+ * @param <P> the type of the points (containers)
+ *
  * @author Benedikt Zoennchen
  */
 public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {

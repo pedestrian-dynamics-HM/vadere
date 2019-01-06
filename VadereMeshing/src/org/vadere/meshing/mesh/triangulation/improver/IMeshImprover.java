@@ -12,9 +12,17 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import java.util.Collection;
 
 /**
+ *
  * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public interface IMeshImprover<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 
     /**
      * Returns a collection of triangles i.e. all the faces of the current mesh.
@@ -28,7 +36,7 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
      *
      * @return  the current mesh (reference)
      */
-    IMesh<P, V, E, F> getMesh();
+    IMesh<P, CE, CF, V, E, F> getMesh();
 
     /**
      * improves the current triangulation / mesh.
@@ -41,7 +49,7 @@ public interface IMeshImprover<P extends IPoint, V extends IVertex<P>, E extends
      *
      * @return the current triangulation / mesh
      */
-    IIncrementalTriangulation<P, V, E, F> getTriangulation();
+    IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation();
 
 	/**
 	 * Returns the current triangulation / mesh.

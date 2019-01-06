@@ -25,20 +25,25 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ *
  * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  */
-public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
+public class CLEikMeshHE<P extends EikMeshPoint, CE, CF> implements IMeshImprover<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>>, ITriangulator<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> {
     private static final Logger log = LogManager.getLogger(CLEikMesh.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private final IMeshSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> meshSupplier;
-    private IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation;
+    private final IMeshSupplier<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> meshSupplier;
+    private IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
     private VRectangle bound;
     private double scalingFactor;
-    private PriorityQueue<Pair<PFace<EikMeshPoint>, Double>> heap;
+    private PriorityQueue<Pair<PFace<EikMeshPoint, CE, CF>, Double>> heap;
 
     private double initialEdgeLen = 0.4;
     private double deps;
@@ -67,7 +72,7 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
             final double initialEdgeLen,
             final VRectangle bound,
             final Collection<? extends VShape> obstacleShapes,
-            final IMeshSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> meshSupplier) {
+            final IMeshSupplier<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> meshSupplier) {
 
         this.bound = bound;
         this.distanceFunc = distanceFunc;
@@ -103,19 +108,19 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.
-        clDistMesh = new CLDistMeshHE<>((AMesh<P>)triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE<>((AMesh<P, CE, CF>)triangulation.getMesh());
         clDistMesh.init();
         clDistMesh.refresh();
         initialized = true;
         log.info("##### (end) generate a triangulation #####");
     }
 
-    public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> getTriangulation() {
+    public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> getTriangulation() {
         return triangulation;
     }
 
     @Override
-    public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
+    public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> generate() {
 		try {
 			if(!initialized) {
 				initialize();
@@ -159,12 +164,12 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
     }
 
     private void removeLowQualityTriangles() {
-        List<AFace<P>> faces = getMesh().getFaces();
-        for(AFace<P> face : faces) {
+        List<AFace<CF>> faces = getMesh().getFaces();
+        for(AFace<CF> face : faces) {
             if(faceToQuality(face) < Parameters.MIN_TRIANGLE_QUALITY) {
-                Optional<AHalfEdge<P>> optEdge = getMesh().getLinkToBoundary(face);
+                Optional<AHalfEdge<CE>> optEdge = getMesh().getLinkToBoundary(face);
                 if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
-                    AHalfEdge<P> edge = getMesh().getNext(optEdge.get());
+                    AHalfEdge<CE> edge = getMesh().getNext(optEdge.get());
                     projectToBoundary(getMesh().getVertex(edge));
                     triangulation.removeFaceAtBorder(face, true);
                 }
@@ -173,7 +178,7 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
     }
 
     public boolean isMovementIllegal() {
-        for(AFace<P> face : getMesh().getFaces()) {
+        for(AFace<CF> face : getMesh().getFaces()) {
             if(!getMesh().isBoundary(face) && !getMesh().isDestroyed(face) && !triangulation.isCCW(face)) {
                 return true;
             }
@@ -181,16 +186,16 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
         return false;
     }
 
-    public synchronized AMesh<P> getMesh() {
+    public synchronized AMesh<P, CE, CF> getMesh() {
         if(hasToRead) {
             hasToRead = false;
             clDistMesh.refresh();
         }
         // TODO: dirty casting
-        return (AMesh<P>) triangulation.getMesh();
+        return (AMesh<P, CE, CF>) triangulation.getMesh();
     }
 
-    public double faceToQuality(final AFace<P> face) {
+    public double faceToQuality(final AFace<CF> face) {
 
         VLine[] lines = getMesh().toTriangle(face).getLines();
         double a = lines[0].length();
@@ -218,8 +223,8 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<AFace<P>> faces = triangulation.getMesh().getFaces();
-        for(AFace<P> face : faces) {
+        List<AFace<CF>> faces = triangulation.getMesh().getFaces();
+        for(AFace<CF> face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
                 triangulation.removeFaceAtBorder(face, true);
             }

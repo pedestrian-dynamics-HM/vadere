@@ -19,7 +19,7 @@ import java.util.Collection;
 /**
  * @author Benedikt Zoennchen
  */
-public class AEikMesh extends AEikMeshGen<EikMeshPoint> {
+public class AEikMesh extends AEikMeshGen<EikMeshPoint, Object, Object> {
     public AEikMesh(
             @NotNull IDistanceFunction distanceFunc,
             @NotNull IEdgeLengthFunction edgeLengthFunc,

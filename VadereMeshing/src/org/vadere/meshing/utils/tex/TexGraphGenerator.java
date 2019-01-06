@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 public class TexGraphGenerator {
 
 
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh, final float scaling){
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh, final float scaling){
 		return toTikz(mesh, scaling, false);
 	}
 
 
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh, boolean standalone){
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh, boolean standalone){
 		return toTikz(mesh, 1.0f, standalone);
 	}
 
@@ -39,14 +39,18 @@ public class TexGraphGenerator {
 	 *
 	 * @param mesh      the mesh
 	 * @param scaling   the scaling of the tikz graphics
-	 * @param <P>       the type of the points (containers)
-	 * @param <V>       the type of the vertices
-	 * @param <E>       the type of the half-edges
-	 * @param <F>       the type of the faces
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
 	 * @return a string representing a tikz graphic
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh, final float scaling, final boolean standalone){
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh, final float scaling, final boolean standalone){
 		StringBuilder builder = new StringBuilder();
 		if(standalone) {
 			builder.append("\\documentclass[usenames,dvipsnames]{standalone}\n");
@@ -80,14 +84,18 @@ public class TexGraphGenerator {
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling.
 	 *
 	 * @param mesh      the mesh
-	 * @param <P>       the type of the points (containers)
-	 * @param <V>       the type of the vertices
-	 * @param <E>       the type of the half-edges
-	 * @param <F>       the type of the faces
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
 	 * @return a string representing a tikz graphics
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh){
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh){
 		return toTikz(mesh, 1.0f);
 	}
 
@@ -98,14 +106,18 @@ public class TexGraphGenerator {
 	 * @param mesh      the mesh
 	 * @param coloring  the coloring function
 	 * @param scaling   the scaling of the tikz graphics
-	 * @param <P>       the type of the points (containers)
-	 * @param <V>       the type of the vertices
-	 * @param <E>       the type of the half-edges
-	 * @param <F>       the type of the faces
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
 	 * @return a string representing a tikz graphics
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh,
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
 			final float scaling) {
 
@@ -164,14 +176,18 @@ public class TexGraphGenerator {
 	 *
 	 * @param mesh  the mesh which used to access components of each face
 	 * @param faces the list of faces
-	 * @param <P>       the type of the points (containers)
-	 * @param <V>       the type of the vertices
-	 * @param <E>       the type of the half-edges
-	 * @param <F>       the type of the faces
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
 	 * @return a string representing a tikz graphics
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh,
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final List<F> faces) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("\\begin{tikzpicture}[scale=1.0]\n");

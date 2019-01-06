@@ -13,17 +13,19 @@ import java.util.Collection;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class PointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
 	/**
 	 * the triangulation which determines how points will be inserted.
 	 */
-    private final IIncrementalTriangulation<P, V, E, F> triangulation;
+    private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 
 	/**
 	 * the collection of points P.
@@ -36,13 +38,13 @@ public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E exte
 	 * @param points        the collection of points P
 	 * @param triangulation a triangulation which determines how points will be inserted
 	 */
-    public PointSetTriangulator(final Collection<P> points, final IIncrementalTriangulation<P, V, E, F> triangulation) {
+    public PointSetTriangulator(final Collection<P> points, final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
         this.triangulation = triangulation;
         this.points = points;
     }
 
     @Override
-    public IIncrementalTriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         triangulation.init();
         triangulation.insert(points);
         triangulation.finish();

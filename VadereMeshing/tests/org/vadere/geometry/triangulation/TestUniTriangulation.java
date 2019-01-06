@@ -44,10 +44,10 @@ public class TestUniTriangulation extends JFrame {
 	    IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
 
 	    // a mesh supplier for a default mesh
-	    IMeshSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> new AMesh<>(pointConstructor);
+	    IMeshSupplier<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
 
 	    // the mesh refinement triangulator
-        UniformRefinementTriangulatorSFC<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
+        UniformRefinementTriangulatorSFC<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation =
                 new UniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.1, 1.5, distanceFunc, new ArrayList<>());
 
         // to measure the time consumption
@@ -56,9 +56,9 @@ public class TestUniTriangulation extends JFrame {
 	    /*
 	     * GUI-Code
 	     */
-	    IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
-	    Function<AFace<VPoint>, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
-        MeshPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> meshPanel =
+	    IIncrementalTriangulation<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> triangulation = uniformRefinementTriangulation.init();
+	    Function<AFace<Object>, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
+        MeshPanel<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> meshPanel =
                 new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, colorFunction);
         JFrame frame = meshPanel.display();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

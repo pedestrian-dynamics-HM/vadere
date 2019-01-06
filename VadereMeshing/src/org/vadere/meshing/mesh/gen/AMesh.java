@@ -25,6 +25,8 @@ import java.util.stream.Stream;
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  */
 public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>>, Cloneable {
 	private final static Logger log = LogManager.getLogger(AMesh.class);

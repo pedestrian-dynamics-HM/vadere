@@ -25,18 +25,20 @@ import java.util.function.Predicate;
  * @author Benedikt Zoennchen
  *
  * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 
 	private static final Logger log = LogManager.getLogger(MeshRenderer.class);
 
 	/**
 	 * The mesh which will be rendered.
 	 */
-	private IMesh<P, V, E, F> mesh;
+	private IMesh<P, CE, CF, V, E, F> mesh;
 
 	/**
 	 * A {@link Collection} of {@link F} from the mesh.
@@ -64,7 +66,7 @@ public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHal
 	 * @param colorFunction color function coloring faces
 	 */
 	public MeshRenderer(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
 			@Nullable final Function<F, Color> colorFunction) {
 		this.mesh = mesh;
@@ -80,7 +82,7 @@ public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHal
 	 * @param alertPred     a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
 	 */
 	public MeshRenderer(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred) {
 		this(mesh, alertPred, null);
 	}
@@ -91,7 +93,7 @@ public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHal
 	 * @param mesh          the mesh which will be rendered
 	 */
 	public MeshRenderer(
-			@NotNull final IMesh<P, V, E, F> mesh) {
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
 		this(mesh, f -> false, null);
 	}
 

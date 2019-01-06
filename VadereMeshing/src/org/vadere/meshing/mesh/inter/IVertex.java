@@ -3,10 +3,13 @@ package org.vadere.meshing.mesh.inter;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
+ *
  * A vertex {@link IVertex} can be the end of multiple half-edges {@link IHalfEdge} and allows the
  * access to the container i.e. the point {@link P} in O(1). Furthermore itself is a {@link IPoint}.
  *
  * @author Benedikt Zoennchen
+ *
+ * @param <P> the type of the points (containers)
  */
 public interface IVertex<P extends IPoint> extends IPoint {
 

@@ -24,19 +24,19 @@ public class TestAFace {
      * Building a geometry containing 2 triangles
      * xyz and wyx
      */
-    private IMesh<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> mesh;
+    private IMesh<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> mesh;
     private AFace face1;
     private AFace face2;
     private AFace border;
     private AVertex<VPoint> x, y, z, w;
-    private AHalfEdge<VPoint> zx ;
-    private AHalfEdge<VPoint> xy;
-    private AHalfEdge<VPoint> yz;
+    private AHalfEdge<Object> zx ;
+    private AHalfEdge<Object> xy;
+    private AHalfEdge<Object> yz;
 
-    private AHalfEdge<VPoint> wx;
-    private AHalfEdge<VPoint> xz;
-    private AHalfEdge<VPoint> yw;
-    private AHalfEdge<VPoint> zy;
+    private AHalfEdge<Object> wx;
+    private AHalfEdge<Object> xz;
+    private AHalfEdge<Object> yw;
+    private AHalfEdge<Object> zy;
 
     @Before
     public void setUp() throws Exception {
@@ -103,7 +103,7 @@ public class TestAFace {
     @Test
     public void testFaceIterator() {
         mesh.getAdjacentFacesIt(xy);
-        List<AFace<VPoint>> incidentFaces = mesh.getAdjacentFaces(xy);;
+        List<AFace<Object>> incidentFaces = mesh.getAdjacentFaces(xy);;
         assertEquals(incidentFaces.size(), 3);
     }
 

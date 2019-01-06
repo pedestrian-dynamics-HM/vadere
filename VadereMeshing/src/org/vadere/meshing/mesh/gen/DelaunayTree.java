@@ -28,13 +28,13 @@ import java.util.Set;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
-	private DAG<DAGElement<P, F>> dag;
-	private final HashMap<F, DAG<DAGElement<P, F>>> map;
-	private final IMesh<P, V, E, F> mesh;
+public class DelaunayTree<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPointLocator<P, CE, CF, V, E, F> {
+	private DAG<DAGElement<P, CF, F>> dag;
+	private final HashMap<F, DAG<DAGElement<P, CF, F>>> map;
+	private final IMesh<P, CE, CF, V, E, F> mesh;
 	private double eps = 0.0000001;
 
-	public DelaunayTree(final IIncrementalTriangulation<P, V, E, F> triangulation) {
+	public DelaunayTree(final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
 		this.mesh = triangulation.getMesh();
 		this.map = new HashMap<>();
 	}
@@ -55,12 +55,12 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	public F locatePoint(final P point) {
 		checkRoot();
 
-		Set<DAG<DAGElement<P, F>>> leafs = new HashSet<>();
-		LinkedList<DAG<DAGElement<P, F>>> nodesToVisit = new LinkedList<>();
+		Set<DAG<DAGElement<P, CF, F>>> leafs = new HashSet<>();
+		LinkedList<DAG<DAGElement<P, CF, F>>> nodesToVisit = new LinkedList<>();
 		nodesToVisit.add(dag);
 
 		while(!nodesToVisit.isEmpty()) {
-			DAG<DAGElement<P, F>> currentNode = nodesToVisit.removeLast();
+			DAG<DAGElement<P, CF, F>> currentNode = nodesToVisit.removeLast();
 			if(currentNode.getElement().getTriangle().isPartOf(point, eps)) {
 				if(currentNode.isLeaf() && !mesh.isDestroyed(currentNode.getElement().getFace())) {
 					leafs.add(currentNode);
@@ -95,24 +95,23 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 
 	@Override
 	public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {
-		checkRoot();
-		DAG<DAGElement<P, F>> faceDag = map.remove(original);
+		DAG<DAGElement<P, CF, F>> faceDag = map.remove(original);
 
 		F face = f1;
 		List<V> points1 = mesh.getVertices(face);
-		DAG<DAGElement<P, F>> newFaceDag1 = new DAG<>(new DAGElement(face, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
+		DAG<DAGElement<P, CF, F>> newFaceDag1 = new DAG<>(new DAGElement(face, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
 		faceDag.addChild(newFaceDag1);
 		map.put(face, newFaceDag1);
 
 		face = f2;
 		List<V> points2 = mesh.getVertices(face);
-		DAG<DAGElement<P, F>> newFaceDag2 = new DAG<>(new DAGElement(face, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
+		DAG<DAGElement<P, CF, F>> newFaceDag2 = new DAG<>(new DAGElement(face, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
 		faceDag.addChild(newFaceDag2);
 		map.put(face, newFaceDag2);
 
 		face = f3;
 		List<V> points3 = mesh.getVertices(face);
-		DAG<DAGElement<P, F>> newFaceDag3 = new DAG<>(new DAGElement(face, Triple.of(points3.get(0), points3.get(1), points3.get(2))));
+		DAG<DAGElement<P, CF, F>> newFaceDag3 = new DAG<>(new DAGElement(face, Triple.of(points3.get(0), points3.get(1), points3.get(2))));
 		faceDag.addChild(newFaceDag3);
 		map.put(face, newFaceDag3);
 	}
@@ -120,17 +119,17 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	@Override
 	public void postSplitHalfEdgeEvent(F original, F f1, F f2) {
 		checkRoot();
-		DAG<DAGElement<P, F>> faceDag = map.remove(original);
+		DAG<DAGElement<P, CF, F>> faceDag = map.remove(original);
 
 		F face = f1;
 		List<V> points1 = mesh.getVertices(face);
-		DAG<DAGElement<P, F>> newFaceDag1 = new DAG<>(new DAGElement(face, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
+		DAG<DAGElement<P, CF, F>> newFaceDag1 = new DAG<>(new DAGElement(face, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
 		faceDag.addChild(newFaceDag1);
 		map.put(face, newFaceDag1);
 
 		face = f2;
 		List<V> points2 = mesh.getVertices(face);
-		DAG<DAGElement<P, F>> newFaceDag2 = new DAG<>(new DAGElement(face, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
+		DAG<DAGElement<P, CF, F>> newFaceDag2 = new DAG<>(new DAGElement(face, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
 		faceDag.addChild(newFaceDag2);
 		map.put(face, newFaceDag2);
 	}
@@ -138,13 +137,13 @@ public class DelaunayTree<P extends IPoint, V extends IVertex<P>, E extends IHal
 	@Override
 	public void postFlipEdgeEvent(final F f1, final F f2) {
 		checkRoot();
-		DAG<DAGElement<P, F>> f1Dag = map.remove(f1);
-		DAG<DAGElement<P, F>> f2Dag = map.remove(f2);
+		DAG<DAGElement<P, CF, F>> f1Dag = map.remove(f1);
+		DAG<DAGElement<P, CF, F>> f2Dag = map.remove(f2);
 		List<V> points1 = mesh.getVertices(f1);
 		List<V> points2 = mesh.getVertices(f2);
 
-		DAG<DAGElement<P, F>> newf1Dag = new DAG<>(new DAGElement(f1, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
-		DAG<DAGElement<P, F>> newf2Dag = new DAG<>(new DAGElement(f2, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
+		DAG<DAGElement<P, CF, F>> newf1Dag = new DAG<>(new DAGElement(f1, Triple.of(points1.get(0), points1.get(1), points1.get(2))));
+		DAG<DAGElement<P, CF, F>> newf2Dag = new DAG<>(new DAGElement(f2, Triple.of(points2.get(0), points2.get(1), points2.get(2))));
 
 		f1Dag.addChild(newf1Dag);
 		f1Dag.addChild(newf2Dag);

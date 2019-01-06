@@ -40,12 +40,12 @@ public class SierpinskyPlot {
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void uniformCircle(final double initialEdgeLength) {
-		IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + (Math.abs(distanceFunc.apply(p)) * Math.abs(distanceFunc.apply(p)));
 
-		UniformRefinementTriangulatorSFC<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+		UniformRefinementTriangulatorSFC<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
 				supplier,
 				bbox,
 				obstacles,
@@ -54,8 +54,8 @@ public class SierpinskyPlot {
 				distanceFunc,
 				new ArrayList<>());
 
-		IIncrementalTriangulation<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> triangulation = uniformRefinementTriangulation.init();
-		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> panel = new MeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800);
+		IIncrementalTriangulation<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> triangulation = uniformRefinementTriangulation.init();
+		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> panel = new MeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800);
 		JFrame frame = panel.display();
 		frame.setVisible(true);
 

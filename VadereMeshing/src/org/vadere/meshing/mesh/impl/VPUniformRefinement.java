@@ -15,9 +15,9 @@ import java.util.Collection;
 /**
  * @author Benedikt Zoennchen
  */
-public class VPUniformRefinement extends UniformRefinementTriangulator<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> {
+public class VPUniformRefinement extends UniformRefinementTriangulator<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> {
 	public VPUniformRefinement(
-			final ITriangulationSupplier<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> supplier,
+			final ITriangulationSupplier<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> supplier,
 			final VRectangle bound,
 			final Collection<VShape> boundary,
 			final IEdgeLengthFunction lenFunc) {

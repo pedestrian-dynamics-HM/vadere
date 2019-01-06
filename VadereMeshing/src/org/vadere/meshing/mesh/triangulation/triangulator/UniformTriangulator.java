@@ -17,12 +17,14 @@ import java.util.List;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F> {
+public class UniformTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
 	private double left;
 	private double top;
@@ -30,7 +32,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	private double height;
 	private double minTriangleSideLength;
 	private VRectangle bound;
-	private final IIncrementalTriangulation<P, V, E, F> triangulation;
+	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 
 	/**
 	 * The default constructor.
@@ -41,7 +43,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	 */
 	public UniformTriangulator(final VRectangle bound,
                                final double minTriangleSideLength,
-                               final IIncrementalTriangulation<P, V, E, F> triangulation) {
+                               final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
 		this.bound = bound;
 		this.triangulation = triangulation;
 		this.left = bound.getMinX();
@@ -52,7 +54,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
 	}
 
     @Override
-    public IIncrementalTriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         triangulation.init();
 
         List<P> pointList = new ArrayList<>(generatePointSet());
@@ -68,7 +70,7 @@ public class UniformTriangulator<P extends IPoint, V extends IVertex<P>, E exten
         return triangulation;
     }
 
-	private IMesh<P, V, E, F> getMesh() {
+	private IMesh<P, CE, CF, V, E, F> getMesh() {
         return triangulation.getMesh();
 	}
 

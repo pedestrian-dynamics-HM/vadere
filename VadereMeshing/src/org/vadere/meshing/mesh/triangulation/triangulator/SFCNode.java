@@ -14,17 +14,19 @@ import org.vadere.util.geometry.shapes.IPoint;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class SFCNode<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+public class SFCNode<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 	private final E edge;
 	private final SFCDirection direction;
 
-	SFCNode<P, V, E, F> next = null;
-	SFCNode<P, V, E, F> prev = null;
+	SFCNode<P, CE, CF, V, E, F> next = null;
+	SFCNode<P, CE, CF, V, E, F> prev = null;
 
 	public SFCNode(@NotNull final E edge, @NotNull final SFCDirection direction) {
 		this.edge = edge;

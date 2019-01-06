@@ -19,19 +19,21 @@ import java.util.stream.Stream;
  *
  * @author Benedikt Zonnchen
  *
- * @param <P> generic type of the point
- * @param <V> generic type of the vertex
- * @param <E> generic type of the half-edge
- * @param <F> generic type of the face
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
 @Deprecated
-public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements ITriangulator<P, V, E, F>{
+public class RuppertsTrinangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F>{
 
-    private final IIncrementalTriangulation<P, V, E, F> triangulation;
+    private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
     private final Collection<VLine> constrains;
     private final Set<P> points;
 
-    public RuppertsTrinangulator(final IIncrementalTriangulation<P, V, E, F> triangulation, final Collection<VLine> constrains, final Set<P> points) {
+    public RuppertsTrinangulator(final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation, final Collection<VLine> constrains, final Set<P> points) {
         this.triangulation = triangulation;
         this.constrains = constrains;
         this.points = points;
@@ -39,10 +41,10 @@ public class RuppertsTrinangulator<P extends IPoint, V extends IVertex<P>, E ext
 
     // TODO: not finished jet
     @Override
-    public IIncrementalTriangulation<P, V, E, F> generate() {
+    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
         triangulation.init();
         Collection<P> allPoints = new ArrayList<>();
-        IMesh<P, V, E, F> mesh = triangulation.getMesh();
+        IMesh<P, CE, CF, V, E, F> mesh = triangulation.getMesh();
 
         triangulation.insert(points);
         Collection<P> constraintPoints = constrains.stream()
