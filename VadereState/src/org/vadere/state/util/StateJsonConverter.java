@@ -334,7 +334,7 @@ public abstract class StateJsonConverter {
 
 	public static String serializeEvents(EventInfoStore eventInfoStore)
 			throws JsonProcessingException {
-		return writer.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
+		return prettyWriter.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
 	}
 
 	public static ObjectNode serializeEventsToNode(EventInfoStore eventInfoStore) {
