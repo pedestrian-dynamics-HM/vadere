@@ -7,7 +7,7 @@ This guide explains the repository structure, how to set up the development envi
 The repository contains following `files` and `folders`:
 
 - The Vadere source code: divided into the sofware modules `VadereGui`, `VadereMeshing`, `VaderSimulator`, `VadereState`, `VadereUtils`
-- `VadereModelTests`: pre-shipped tests for different locomotion models (e.g., gradient navigation model, optimal steps model, social force model)
+- `VadereModelTests`: pre-shipped tests for different locomotion models (e.g., gradient navigation model, optimal steps model and the social force model)
 - `Tools`: scripts which are executing during the continuous integration phase.
 - `.gitlab`: templates for creating issues in the Vadere [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues) (this files are implicitly used by GitLab).
 - `.gitlab-ci.yml`: instructions which are executed during the [continuous integration pipeline](https://docs.gitlab.com/ee/ci/quick_start/).
