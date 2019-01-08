@@ -84,7 +84,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
 
 	static {
-		ITriConnectivity.log.setLevel(Level.INFO);
+		ITriConnectivity.log.setLevel(Level.DEBUG);
 	}
 
 	/**
@@ -396,6 +396,11 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		}
 		else {
 			//log.info("splitTriangle()");
+			if(!contains(point.getX(), point.getY(), face)) {
+				Optional<F> f = locateFace(point);
+				f = locateFace(point);
+			}
+
 			assert contains(point.getX(), point.getY(), face);
 
 			E newEdge = splitTriangle(face, point,  true);
@@ -422,7 +427,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		}
 
 		if(contains(point)) {
-			F face = this.pointLocator.locatePoint(point);
+			F face = pointLocator.locatePoint(point);
 			return insert(point, face);
 		}
 		else {

@@ -46,7 +46,7 @@ import java.util.function.Predicate;
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
-public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements EikonalSolver {
+public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<Double>, F extends IFace<Object>> implements EikonalSolver {
 
     private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
     private Set<F> nonAccuteTris = new HashSet<>();
@@ -70,7 +70,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	/**
 	 * The triangulation the solver uses.
 	 */
-    private IIncrementalTriangulation<P, V, E, F> triangulation;
+    private IIncrementalTriangulation<P, Double, Object, V, E, F> triangulation;
 
 	/**
 	 * Indicates that the computation of T has been completed.
@@ -109,7 +109,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
                                          @NotNull final Collection<IPoint> targetPoints,
-                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation
+                                         @NotNull final IIncrementalTriangulation<P, Double, Object, V, E, F> triangulation
     ) {
         this.triangulation = triangulation;
         this.calculationFinished = false;
@@ -131,7 +131,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     public EikonalSolverFMMTriangulation(@NotNull final Collection<VShape> targetShapes,
                                          @NotNull final ITimeCostFunction timeCostFunction,
-                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation
+                                         @NotNull final IIncrementalTriangulation<P, Double, Object, V, E, F> triangulation
     ) {
         this.triangulation = triangulation;
         this.calculationFinished = false;
@@ -155,7 +155,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      * @param distFunc          the distance function (distance to the target) which is negative inside and positive outside the area of interest
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
-                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
+                                         @NotNull final IIncrementalTriangulation<P, Double, Object, V, E, F> triangulation,
                                          @NotNull final Collection<V> targetVertices,
                                          @NotNull final IDistanceFunction distFunc
     ) {
@@ -248,7 +248,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
 	@Override
     public Function<IPoint, Double> getPotentialField() {
-	    IIncrementalTriangulation<P, V, E, F> clone = triangulation.clone();
+	    IIncrementalTriangulation<P, Double, Object, V, E, F> clone = triangulation.clone();
 	    return p -> getPotential(clone, p.getX(), p.getY());
     }
 
@@ -258,7 +258,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
 	@Override
-	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+	public IMesh<? extends IPotentialPoint, Double, Object, ?, ?, ?> getDiscretization() {
 		return triangulation.getMesh().clone();
 	}
 
@@ -277,8 +277,8 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 *
 	 * @return the interpolated value of the traveling time T at (x, y)
 	 */
-    private static <P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double getPotential(
-    		@NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
+    private static <P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<Double>, F extends IFace<Object>> double getPotential(
+    		@NotNull final IIncrementalTriangulation<P, Double, Object, V, E, F> triangulation,
 		    final double x,
 		    final double y) {
 
@@ -297,7 +297,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	    return result;
     }
 
-    private IMesh<P, V, E, F> getMesh() {
+    private IMesh<P, Double, Object, V, E, F> getMesh() {
     	return triangulation.getMesh();
     }
 

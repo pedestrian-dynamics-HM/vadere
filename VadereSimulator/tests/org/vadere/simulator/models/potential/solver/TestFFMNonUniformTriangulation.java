@@ -49,7 +49,7 @@ public class TestFFMNonUniformTriangulation {
     private int width;
     private int height;
     private VRectangle bbox;
-    private IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation;
+    private IIncrementalTriangulation<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> triangulation;
     private IDistanceFunction distanceFunc;
 
     @Before
@@ -69,11 +69,11 @@ public class TestFFMNonUniformTriangulation {
         bbox = new VRectangle(-12, -12, 24, 24);
     }
 
-    private EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> createEikMesh(
+    private EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> createEikMesh(
     		@NotNull final IEdgeLengthFunction edgeLengthFunc,
 		    final double initialEdgeLen) {
-	    IMeshSupplier<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> meshSupplier = () -> new PMesh<>((x, y) -> new PotentialPoint(x, y));
-	    EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> eikMesh = new EikMesh<>(
+	    IMeshSupplier<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshSupplier = () -> new PMesh<>((x, y) -> new PotentialPoint(x, y));
+	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> eikMesh = new EikMesh<>(
 			    distanceFunc,
 			    edgeLengthFunc,
 			    initialEdgeLen,
@@ -97,14 +97,14 @@ public class TestFFMNonUniformTriangulation {
 	    /**
 	     * We use the pointer based implementation
 	     */
-	    EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
+	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
         // () -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false))
 	    meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
 
 
-	    Predicate<PFace<PotentialPoint>> nonAccute = f -> triangulation.getMesh().toTriangle(f).isNonAcute();
+	    Predicate<PFace<PotentialPoint, Double, Object>> nonAccute = f -> triangulation.getMesh().toTriangle(f).isNonAcute();
 	    //MeshPanel meshPanel = new MeshPanel(meshGenerator.getMesh(), nonAccute, 1000, 1000, bbox);
 	    //meshPanel.display();
 
@@ -114,7 +114,7 @@ public class TestFFMNonUniformTriangulation {
         VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
         targetAreas.add(rect);
 
-	    List<PVertex<PotentialPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+	    List<PVertex<PotentialPoint, Double, Object>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
 
         EikonalSolver solver = new EikonalSolverFMMTriangulation(
                 new UnitTimeCostFunction(),
@@ -187,7 +187,7 @@ public class TestFFMNonUniformTriangulation {
         //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
-	    EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
+	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
         meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
@@ -197,7 +197,7 @@ public class TestFFMNonUniformTriangulation {
         VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
         targetAreas.add(rect);
 
-        List<PVertex<PotentialPoint>> targetPoints = triangulation.getMesh().getVertices().stream()
+        List<PVertex<PotentialPoint, Double, Object>> targetPoints = triangulation.getMesh().getVertices().stream()
                 .filter(v -> triangulation.getMesh().isAtBoundary(v))
                 .filter(p->  (Math.abs(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0)) < 2).collect(Collectors.toList());
 
@@ -260,7 +260,7 @@ public class TestFFMNonUniformTriangulation {
         //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
-	    EikMesh<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
+	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
         meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
@@ -270,7 +270,7 @@ public class TestFFMNonUniformTriangulation {
         VRectangle rect = new VRectangle(width / 2, height / 2, 100, 100);
         targetAreas.add(rect);
 
-        List<PVertex<PotentialPoint>> targetPoints = triangulation.getMesh().getVertices().stream()
+        List<PVertex<PotentialPoint, Double, Object>> targetPoints = triangulation.getMesh().getVertices().stream()
                 .filter(v -> triangulation.getMesh().isAtBoundary(v))
                 //.filter(p->  (Math.abs(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0)) < 2)
 		        .collect(Collectors.toList());
@@ -327,7 +327,7 @@ public class TestFFMNonUniformTriangulation {
     }
 
 
-    private double computeL2Error(@NotNull final IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation, final IDistanceFunction distanceFunc) {
+    private double computeL2Error(@NotNull final IIncrementalTriangulation<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> triangulation, final IDistanceFunction distanceFunc) {
         double sum = 0.0;
         for(IVertex<PotentialPoint> vertex : triangulation.getMesh().getVertices()) {
             double diff = vertex.getPoint().getPotential() + distanceFunc.apply(vertex);

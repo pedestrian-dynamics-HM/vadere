@@ -85,7 +85,8 @@ public class EikMeshPoint extends MPoint implements Cloneable {
 
 	@Override
 	public String toString() {
-		return super.toString() + "/" + fixPoint + "/" + velocity;
+		return super.toString();
+		//return super.toString() + "/" + fixPoint + "/" + velocity;
 	}
 
 	@Override

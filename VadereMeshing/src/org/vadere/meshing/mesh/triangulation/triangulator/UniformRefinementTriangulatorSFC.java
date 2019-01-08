@@ -327,7 +327,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 		nextSFCLevel(edge -> !isCompleted(edge) && isLongestEdge(edge));
 	}
 
-	private void nextSFCLevel(int ran) {
+	private void nextSFCLevel(double ran) {
 		nextSFCLevel(edge -> (random.nextDouble() < ran) && isLongestEdge(edge));
 	}
 
@@ -397,7 +397,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 			step();
 		}
 
-		//nextSFCLevel(0.23);
+		nextSFCLevel(0.23);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;
@@ -434,13 +434,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 
 				// TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
-				insertFixPoints(fixPoints);
+				//insertFixPoints(fixPoints);
 				triangulation.finish();
 
 				// the following calls are quite expensive
 				shrinkBorder();
 				createHoles();
-
 				triangulation.smoothBorder();
 
 				sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));

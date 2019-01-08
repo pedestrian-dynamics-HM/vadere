@@ -55,13 +55,13 @@ public class PerformanceTriangleFMM {
 		//LogManager.shutdown();
 	}
 
-	private static IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> createTriangulation() {
+	private static IIncrementalTriangulation<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint,Double, Object>> createTriangulation() {
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-		PEikMeshGen<PotentialPoint> meshGenerator = new PEikMeshGen<>(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox, (x, y) -> new PotentialPoint(x, y));
+		PEikMeshGen<PotentialPoint, Double, Object> meshGenerator = new PEikMeshGen<>(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox, (x, y) -> new PotentialPoint(x, y));
 		return meshGenerator.generate();
 	}
 
-	private static void solve(EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> solver) {
+	private static void solve(EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> solver) {
 		solver.reset();
 		long ms = System.currentTimeMillis();
 		System.out.println("start FFM");
@@ -75,7 +75,7 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (1) create mesh
 		 */
-		IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation = createTriangulation();
+		IIncrementalTriangulation<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> triangulation = createTriangulation();
 
 		/**
 		 * (2) define target points
@@ -83,12 +83,12 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (2) define target points
 		 */
-		List<PVertex<PotentialPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+		List<PVertex<PotentialPoint, Double, Object>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
 
 		/**
 		 * (3) solve the eikonal equation on the mesh
 		 */
-		EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> solver = new EikonalSolverFMMTriangulation(
+		EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> solver = new EikonalSolverFMMTriangulation(
 				new UnitTimeCostFunction(),
 				triangulation,
 				targetVertices,

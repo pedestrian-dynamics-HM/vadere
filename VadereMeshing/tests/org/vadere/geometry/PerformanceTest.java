@@ -103,6 +103,7 @@ public class PerformanceTest {
 		testSweepline();
 		testJTSDelaunayBuilder();
 		testPointerDelaunayHierarchy();
+		testArrayDelaunayHierarchy();
 		testPointerJumpAndWalk();
 		testPointerWalk();
 	}

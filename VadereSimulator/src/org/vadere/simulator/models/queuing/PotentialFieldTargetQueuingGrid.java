@@ -166,7 +166,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
     }
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
+	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> getDiscretization() {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 

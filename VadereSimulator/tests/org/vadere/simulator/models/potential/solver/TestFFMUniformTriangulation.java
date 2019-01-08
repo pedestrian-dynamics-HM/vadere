@@ -33,7 +33,7 @@ public class TestFFMUniformTriangulation {
 
     private static Logger log = LogManager.getLogger(TestFFMUniformTriangulation.class);
 
-    private IIncrementalTriangulation<IPotentialPoint, PVertex<IPotentialPoint>, PHalfEdge<IPotentialPoint>, PFace<IPotentialPoint>> uniformTriangulation;
+    private IIncrementalTriangulation<IPotentialPoint, Double, Object, PVertex<IPotentialPoint, Double, Object>, PHalfEdge<IPotentialPoint, Double, Object>, PFace<IPotentialPoint, Double, Object>> uniformTriangulation;
     private int width = 10;
     private int height = 10;
     private double minTriangleSideLength = 1.0;

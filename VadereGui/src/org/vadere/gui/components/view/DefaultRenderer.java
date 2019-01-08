@@ -598,9 +598,9 @@ public abstract class DefaultRenderer {
 
 	protected void renderMesh(
 			@NotNull final Graphics2D g,
-			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?> mesh,
+			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?> mesh,
 			@NotNull final VRectangle bound) {
-		MeshRenderer<? extends IPotentialPoint, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
+		MeshRenderer<? extends IPotentialPoint, ?, ?, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
 		meshRenderer.renderGraphics(g, bound);
 	}
 

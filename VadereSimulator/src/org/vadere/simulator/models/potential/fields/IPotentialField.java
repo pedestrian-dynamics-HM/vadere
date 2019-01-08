@@ -160,8 +160,8 @@ public interface IPotentialField {
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.
 	         */
-	        PEikMeshGen<PotentialPoint> meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes, (x, y) -> new PotentialPoint(x ,y));
-	        IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation = meshGenerator.generate();
+	        PEikMeshGen<PotentialPoint, Double, Object> meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes, (x, y) -> new PotentialPoint(x ,y));
+	        IIncrementalTriangulation<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> triangulation = meshGenerator.generate();
 
 	        ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
 			        attributesPotential.getTimeCostAttributes(),
@@ -172,10 +172,10 @@ public interface IPotentialField {
 			        1.0 / attributesPotential.getPotentialFieldResolution());
 
 	        // TODO: here we assume the shapes are convex!
-	        List<PVertex<PotentialPoint>> targetVertices = new ArrayList<>();
+	        List<PVertex<PotentialPoint, Double, Object>> targetVertices = new ArrayList<>();
 	        for(VShape shape : targetShapes) {
 	        	VPoint point = shape.getCentroid();
-	        	PFace<PotentialPoint> targetFace = triangulation.locateFace(point.getX(), point.getY()).get();
+	        	PFace<PotentialPoint, Double, Object> targetFace = triangulation.locateFace(point.getX(), point.getY()).get();
 				targetVertices.addAll(triangulation.getMesh().getVertices(targetFace));
 	        }
 

@@ -145,7 +145,7 @@ public class VisualTestCPU {
 	}
 
 	public static void main(String[] args) {
-		overallUniformRingP();
+		overallUniformRingA();
 	}
 
 }

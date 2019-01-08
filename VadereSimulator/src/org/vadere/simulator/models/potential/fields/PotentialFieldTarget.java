@@ -93,8 +93,8 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	}
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
-		Map<Integer, IMesh<? extends IPotentialPoint, ?, ?, ?>> clone = new HashMap<>();
+	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> getDiscretization() {
+		Map<Integer, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> clone = new HashMap<>();
 
 		for(Map.Entry<Integer, EikonalSolver> entry : eikonalSolvers.entrySet()) {
 			Integer targetId = entry.getKey();

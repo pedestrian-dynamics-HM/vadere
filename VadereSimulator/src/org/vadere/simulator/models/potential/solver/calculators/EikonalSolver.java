@@ -67,5 +67,5 @@ public interface EikonalSolver {
 		return new UnitTimeCostFunction();
 	}
 
-	IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization();
+	IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?> getDiscretization();
 }

@@ -37,7 +37,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	private IPotentialField potentialField = null;
 
-	private Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations = null;
+	private Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> discretizations = null;
 
 	private Agent agent = null;
 
@@ -209,12 +209,12 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	@Override
-	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+	public IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?> getDiscretization() {
 		if(agent != null && discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
 			return discretizations.apply(agent);
 		}
 
-		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
+		return new PMesh<IPotentialPoint, Object, Object>((x, y) -> new PotentialPoint(x, y));
 	}
 
 	@Override

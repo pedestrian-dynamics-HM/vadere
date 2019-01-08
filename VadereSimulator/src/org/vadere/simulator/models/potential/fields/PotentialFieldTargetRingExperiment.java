@@ -88,7 +88,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
     }
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
+	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> getDiscretization() {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 

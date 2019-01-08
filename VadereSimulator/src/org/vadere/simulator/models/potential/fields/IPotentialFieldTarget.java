@@ -42,5 +42,5 @@ public interface IPotentialFieldTarget extends IPotentialField, Model {
      */
     IPotentialField getSolution();
 
-	Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization();
+	Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> getDiscretization();
 }

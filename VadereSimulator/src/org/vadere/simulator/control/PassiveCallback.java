@@ -30,5 +30,5 @@ public interface PassiveCallback {
 
 	default void setPotentialField(@Nullable IPotentialField potentialField) {}
 
-	default void setPotentialFieldTargetMesh(@Nullable Map<Integer, PMesh<VPoint>> meshMap) {}
+	default void setPotentialFieldTargetMesh(@Nullable Map<Integer, PMesh<VPoint, Object, Object>> meshMap) {}
 }

@@ -1162,6 +1162,10 @@ public interface IMesh<
 	 */
 	default VTriangle toTriangle(@NotNull final F face) {
 		List<V> vertices = getVertices(face);
+
+		if(vertices.size() != 3) {
+			System.out.print("wtf?");
+		}
 		assert vertices.size() == 3;
 		return new VTriangle(new VPoint(vertices.get(0)), new VPoint(vertices.get(1)), new VPoint(vertices.get(2)));
 	}

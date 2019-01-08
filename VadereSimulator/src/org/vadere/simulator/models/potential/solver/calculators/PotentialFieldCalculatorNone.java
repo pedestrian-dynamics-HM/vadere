@@ -42,7 +42,7 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 	 * @return an empty mesh
 	 */
 	@Override
-	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+	public IMesh<? extends IPotentialPoint,?, ?, ?, ?, ?> getDiscretization() {
 		return new PMesh<>((x, y) -> new PotentialPoint(x, y));
 	}
 }

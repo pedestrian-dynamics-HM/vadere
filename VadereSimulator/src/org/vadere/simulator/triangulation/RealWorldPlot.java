@@ -3,6 +3,11 @@ package org.vadere.simulator.triangulation;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -30,6 +35,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.swing.*;
 
 /**
  * @author Benedikt Zoennchen
@@ -494,6 +501,84 @@ public class RealWorldPlot {
 			"  \"attributesCar\" : null\n" +
 			"}";
 
+	private static void realWorldExampleEikMeshP() throws IOException {
+		Topography topography = StateJsonConverter.deserializeTopographyFromNode(StateJsonConverter.readTree(topographyString));
+		VRectangle bound = new VRectangle(topography.getBounds());
+		Collection<Obstacle> obstacles = Topography.createObstacleBoundary(topography);
+		obstacles.addAll(topography.getObstacles());
+
+		List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
+
+		IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+
+		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
+				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+				new VRectangle(topography.getBounds()),
+				new AttributesFloorField());
+		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
+		//IDistanceFunction distanceFunc = p -> -obstacleDistance.apply(p);
+
+
+		double maxSize = Math.max(bound.getWidth(), bound.getHeight());
+		CellGrid cellGrid = new CellGrid(maxSize, maxSize, 0.1, new CellState(), bound.getMinX(), bound.getMinY());
+		cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
+		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
+		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
+
+		EikMesh<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshGenerator = new EikMesh<>(
+				approxDistance,
+				//p -> 1.0 + Math.abs(approxDistance.apply(p)),
+				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),
+				0.4,
+				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+				() -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+
+		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
+				meshGenerator.getMesh(), 1000, 800);
+
+
+		StopWatch overAllTime = new StopWatch();
+		overAllTime.start();
+		//meshGenerator.improve();
+		//meshGenerator.improve();
+		//meshGenerator.improve();
+
+
+		int nSteps = 0;
+		meshPanel.display();
+		while (nSteps < 300) {
+			nSteps++;
+			meshGenerator.improve();
+			overAllTime.suspend();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			meshPanel.repaint();
+			/*distmeshPanel.repaint();
+			log.info("quality: " + meshGenerator.getQuality());
+			log.info("min-quality: " + meshGenerator.getMinQuality());*/
+			overAllTime.resume();
+		}
+		overAllTime.stop();
+
+		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
+		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
+		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("quality: " + meshGenerator.getQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());
+		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+
+		/*Function<AFace<MeshPoint>, Color> colorFunction = f -> {
+			float grayScale = (float) meshGenerator.faceToQuality(f);
+			return new Color(grayScale, grayScale, grayScale);
+		};
+		log.info(TexGraphGenerator.toTikz(meshGenerator.getMesh(), colorFunction, 1.0f));
+		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());*/
+	}
+
 	private static void realWorldExampleEikMesh() throws IOException {
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(StateJsonConverter.readTree(topographyString));
 		VRectangle bound = new VRectangle(topography.getBounds());
@@ -512,25 +597,22 @@ public class RealWorldPlot {
 		//IDistanceFunction distanceFunc = p -> -obstacleDistance.apply(p);
 
 
-		CellGrid cellGrid = new CellGrid(bound.getWidth(), bound.getHeight(), 0.1, new CellState(), bound.getMinX(), bound.getMinY());
+		double maxSize = Math.max(bound.getWidth(), bound.getHeight());
+		CellGrid cellGrid = new CellGrid(maxSize, maxSize, 0.1, new CellState(), bound.getMinX(), bound.getMinY());
 		cellGrid.pointStream().forEach(p -> cellGrid.setValue(p, new CellState(distanceFunc.apply(cellGrid.pointToCoord(p)), PathFindingTag.Reachable)));
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
 
-		EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshGenerator = new EikMesh<>(
+		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
 				approxDistance,
-				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
-				0.35,
+				//p -> 1.0 + Math.abs(approxDistance.apply(p)),
+				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),
+				0.4,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				() -> new AMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
 
-		/*PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel<>(meshGenerator.getMesh(),
-				f -> false, 1000, 800, bound);
-		JFrame frame = distmeshPanel.display();
-		frame.setVisible(true);
-		frame.setTitle("Real world example EikMesh");
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		distmeshPanel.repaint();*/
+		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshPanel = new MeshPanel<>(
+				meshGenerator.getMesh(), 1000, 800);
 
 
 		StopWatch overAllTime = new StopWatch();
@@ -541,16 +623,18 @@ public class RealWorldPlot {
 
 
 		int nSteps = 0;
+		meshPanel.display();
 		while (nSteps < 300) {
 			nSteps++;
 			meshGenerator.improve();
 			overAllTime.suspend();
-			/*try {
-				Thread.sleep(200);
+			try {
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}*/
+			}
 
+			meshPanel.repaint();
 			/*distmeshPanel.repaint();
 			log.info("quality: " + meshGenerator.getQuality());
 			log.info("min-quality: " + meshGenerator.getMinQuality());*/
@@ -598,17 +682,10 @@ public class RealWorldPlot {
 
 		Distmesh meshGenerator = new Distmesh(
 				approxDistance,
-				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
+				p -> 1.0 + Math.abs(approxDistance.apply(p)),
+				//p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.3, 5.0),
 				0.18,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
-
-		/*PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator,
-				 1000, 800, bound, f -> false);
-		JFrame frame = distmeshPanel.display();
-		frame.setVisible(true);
-		frame.setTitle("Real world example DistMesh");
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		distmeshPanel.repaint();*/
 
 
 		StopWatch overAllTime = new StopWatch();
@@ -651,8 +728,9 @@ public class RealWorldPlot {
 	}
 
 	public static void main(String ... args) throws IOException {
+		realWorldExampleEikMeshP();
 		//realWorldExampleEikMesh();
-		realWorldExampleDistMesh();
+		//realWorldExampleDistMesh();
 	}
 
 }

@@ -32,7 +32,7 @@ public class OnlineVisualization implements PassiveCallback {
 		public final IPotentialField potentialFieldTarget;
 		public final Agent selectedAgent;
 		public final IPotentialField potentialField;
-		public final Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations;
+		public final Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> discretizations;
 
 		public ObservationAreaSnapshotData(
 				final double simTimeInSec,
@@ -40,7 +40,7 @@ public class OnlineVisualization implements PassiveCallback {
 				@Nullable final IPotentialField potentialFieldTarget,
 				@Nullable final IPotentialField potentialField,
 				@Nullable final Agent selectedAgent,
-				@Nullable final Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations) {
+				@Nullable final Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> discretizations) {
 			this.simTimeInSec = simTimeInSec;
 			this.scenario = scenario;
 			this.potentialFieldTarget = potentialFieldTarget;
@@ -124,7 +124,7 @@ public class OnlineVisualization implements PassiveCallback {
 		synchronized (model.getDataSynchronizer()) {
 			/* Push new snapshot of the observation area to the draw thread. */
 			IPotentialField pft = (model.config.isShowTargetPotentialField() && potentialFieldTarget != null) ? potentialFieldTarget.getSolution() : null;
-			Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> discretizations = (model.config.isShowTargetPotentielFieldMesh() && potentialFieldTarget != null) ? potentialFieldTarget.getDiscretization() : null;
+			Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> discretizations = (model.config.isShowTargetPotentielFieldMesh() && potentialFieldTarget != null) ? potentialFieldTarget.getDiscretization() : null;
 			IPotentialField pedPotentialField = null;
 			Agent selectedAgent = null;
 

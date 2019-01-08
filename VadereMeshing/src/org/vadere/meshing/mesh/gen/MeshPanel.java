@@ -106,10 +106,13 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 		this(mesh, f -> false, width, height, f -> Color.WHITE);
 	}
 
+	@Override
+	public void update(Graphics g) {
+		paint(g);
+	}
 
 	@Override
 	public void paint(Graphics g) {
-    	// double buffering => draw into an image
 		meshRenderer.render((Graphics2D) g, (int)Math.ceil(width), (int)Math.ceil(height));
 	}
 
@@ -125,7 +128,7 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 		jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
 		jFrame.setVisible(true);
-		repaint();
+		//jFrame.setIgnoreRepaint(true);
 		jFrame.repaint();
 		return jFrame;
 	}

@@ -57,6 +57,8 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	 */
 	@Nullable private Function<F, Color> colorFunction;
 
+	private BufferedImage bufferedImage = null;
+
 
 	/**
 	 * Default constructor.
@@ -102,17 +104,12 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	}
 
 	public void render(@NotNull final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
-		targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+		renderImage(width, height);
+		targetGraphics2D.drawImage(bufferedImage, x, y, null);
 		targetGraphics2D.dispose();
 	}
 
-	public void renderGraphics(@NotNull final Graphics2D graphics, @NotNull final VRectangle bound) {
-		renderGraphics(graphics, 1.0, bound);
-	}
-
-	private void renderGraphics(@NotNull final Graphics2D graphics, final double scale, @NotNull final VRectangle bound) {
-		//graphics.setColor(Color.WHITE);
-		//graphics.fill(new VRectangle(0, 0, width, height));
+	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height) {
 		/*Font currentFont = graphics.getFont();
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
 		graphics.setFont(newFont);
@@ -120,18 +117,19 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 
 		Color c = graphics.getColor();
 		Stroke stroke = graphics.getStroke();
-		synchronized (mesh) {
-			faces = mesh.clone().getFaces();
-		}
+
+		VRectangle bound = mesh.getBound();
+		double scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+		faces = mesh.clone().getFaces();
 
 		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
 		graphics.scale(scale, scale);
+		graphics.fill(bound);
 
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
 		graphics.setStroke(new BasicStroke(0.003f));
-		graphics.setColor(Color.BLACK);
-		//graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+		//graphics.setColor(Color.BLACK);
+		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		/*int groupSize = 64;
 		ColorHelper colorHelper = new ColorHelper(faces.size());*/
@@ -140,10 +138,9 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 			VPolygon polygon = mesh.toTriangle(face);
 
 			if(colorFunction != null) {
-				graphics.setColor(colorFunction.apply(face));
-				graphics.fill(polygon);
+				//graphics.setColor(colorFunction.apply(face));
+				//graphics.fill(polygon);
 			}
-
 
 			if(alertPred.test(face)) {
 				graphics.setColor(Color.RED);
@@ -154,28 +151,38 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 				graphics.draw(polygon);
 			}
 		}
-
 		graphics.setColor(c);
 		graphics.setStroke(stroke);
 		graphics.scale(1.0 / scale, 1.0 / scale);
 		graphics.translate(bound.getMinX() * scale, bound.getMinY() * scale);
+
 	}
 
-	public void renderGraphics(@NotNull final Graphics2D graphics, final double width, final double height) {
+	/*public void renderGraphics(@NotNull final Graphics2D graphics, final double width, final double height) {
 		VRectangle bound;
 		synchronized (mesh) {
 			bound = mesh.getBound();
 		}
-
 		double scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+	//	graphics.setColor(Color.WHITE);
+	//	graphics.fill(new VRectangle(0, 0, width, height));
 		renderGraphics(graphics, scale, bound);
-	}
+	}*/
 
 	public BufferedImage renderImage(final int width, final int height) {
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		renderGraphics(graphics, width, height);
-		return image;
+		synchronized (mesh) {
+			if(bufferedImage == null) {
+				bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			}
+
+			if(mesh.getNumberOfVertices() > 6) {
+				Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+				graphics.fillRect(0, 0, width, height);
+				renderGraphics(graphics, width, height);
+			}
+
+			return bufferedImage;
+		}
 	}
 
 }

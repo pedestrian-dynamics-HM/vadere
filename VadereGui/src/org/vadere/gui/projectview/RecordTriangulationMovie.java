@@ -51,7 +51,7 @@ public class RecordTriangulationMovie {
 				bbound,
 				obstacleShapes);
 
-		Function<AFace<EikMeshPoint>, Color> colorFunction1 = f -> {
+		Function<AFace<Object>, Color> colorFunction1 = f -> {
 			float q = Math.max(0.0f, Math.min(1.0f, (float) meshImprover.faceToQuality(f)));
 			return new Color(q, q, q);
 		};
@@ -62,10 +62,10 @@ public class RecordTriangulationMovie {
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
-		MeshRenderer<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshRenderer = new MeshRenderer<>(
+		MeshRenderer<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshRenderer = new MeshRenderer<>(
 				meshImprover.getMesh(), f -> false, colorFunction1);
 
-		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(
+		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel<>(
 				meshRenderer, bbound.getWidth()*1000, bbound.getHeight()*1000);
 
 		JFrame frame = distmeshPanel.display();
@@ -117,7 +117,7 @@ public class RecordTriangulationMovie {
 	}
 
 	public static void addPictures(Recorder recorder,
-	                               MeshRenderer<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> renderer,
+	                               MeshRenderer<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> renderer,
 	                               int frames,
 	                               int width,
 	                               int height) throws IOException {

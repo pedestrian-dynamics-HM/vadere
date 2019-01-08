@@ -35,7 +35,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  *
  * DistMesh GPU implementation.
  */
-public class CLDistMeshHE<P extends IPoint> {
+public class CLDistMeshHE<P extends IPoint, CE, CF> {
 
     private static Logger log = LogManager.getLogger(CLDistMeshHE.class);
 
@@ -123,14 +123,14 @@ public class CLDistMeshHE<P extends IPoint> {
     private PointerBuffer retSize;
     private ByteBuffer source;
 
-    private AMesh<P> mesh;
+    private AMesh<P, CE, CF> mesh;
 
     private boolean doublePrecision = true;
     private boolean profiling = false;
 
     private boolean hasToRead = false;
 
-    public CLDistMeshHE(@NotNull AMesh<P> mesh) {
+    public CLDistMeshHE(@NotNull AMesh<P, CE, CF> mesh) {
         this.mesh = mesh;
         this.mesh.garbageCollection();
         if(doublePrecision) {
@@ -704,7 +704,7 @@ public class CLDistMeshHE<P extends IPoint> {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        AMesh<MPoint> mesh = AMesh.createSimpleTriMesh().createSimpleTriMesh();
+        AMesh<MPoint, ?, ?> mesh = AMesh.createSimpleTriMesh().createSimpleTriMesh();
         log.info("before");
         Collection<AVertex<MPoint>> vertices = mesh.getVertices();
         log.info(vertices);

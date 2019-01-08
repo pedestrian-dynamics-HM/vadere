@@ -143,6 +143,54 @@ public class TexGraphGenerator {
 		return builder.toString();
 	}
 
+	/**
+	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face
+	 * of the mesh is filled by the color defined by the coloring-function.
+	 *
+	 * @param mesh      the mesh
+	 * @param coloring  the coloring function
+	 * @param scaling   the scaling of the tikz graphics
+	 * @param line      a line which will be additionally be drawn
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
+	 * @return a string representing a tikz graphics
+	 */
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Function<F, Color> coloring,
+			final float scaling,
+			final VLine line) {
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
+
+		for(F face : mesh.getFaces()) {
+			Color c = coloring.apply(face);
+			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+			V first = mesh.streamVertices(face).findFirst().get();
+			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
+
+			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
+			builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
+		}
+
+		/*for(F face : mesh.getFaces()) {
+			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get();
+			builder.append("\\draw[black,thick]" + poly + ";\n");
+		}*/
+
+		builder.append("\\draw ("+line.getX1() + "," + line.getY1() + ") -- ("+ line.getX2() +"," + line.getY2()+");");
+		builder.append("\\end{tikzpicture}");
+		return builder.toString();
+	}
+
+
 	public static String toTikz(
 			@NotNull final Collection<VTriangle> faces,
 			@NotNull final Function<VTriangle, Color> coloring,

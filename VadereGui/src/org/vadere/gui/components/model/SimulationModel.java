@@ -42,8 +42,8 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		return config;
 	}
 
-	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
-		return new PMesh<IPotentialPoint>((x,y) -> new PotentialPoint(x,y));
+	public IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?> getDiscretization() {
+		return new PMesh<IPotentialPoint, Object, Object>((x,y) -> new PotentialPoint(x,y));
 	}
 
     /*public double getPotential(final int x, final int y) {

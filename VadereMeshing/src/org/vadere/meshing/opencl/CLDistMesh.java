@@ -40,7 +40,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  *
  * DistMesh GPU implementation.
  */
-public class CLDistMesh<P extends IPoint> {
+public class CLDistMesh<P extends IPoint, CE, CF> {
 
     private static Logger log = LogManager.getLogger(CLDistMesh.class);
 
@@ -138,7 +138,7 @@ public class CLDistMesh<P extends IPoint> {
     private ByteBuffer endTime;
     private PointerBuffer retSize;
 
-    private AMesh<P> mesh;
+    private AMesh<P, CE, CF> mesh;
 
     private boolean doublePrecision = true;
     private boolean profiling = true;
@@ -146,7 +146,7 @@ public class CLDistMesh<P extends IPoint> {
     private List<P> result;
     private boolean hasToRead = false;
 
-    public CLDistMesh(@NotNull AMesh<P> mesh) {
+    public CLDistMesh(@NotNull AMesh<P, CE, CF> mesh) {
         /*if(profiling) {
             Configuration.DEBUG.set(true);
             Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
@@ -719,11 +719,11 @@ public class CLDistMesh<P extends IPoint> {
         }
 
         mesh.setPositions(pointSet);
-        List<AHalfEdge<P>> edges = mesh.getEdges();
+        List<AHalfEdge<CE>> edges = mesh.getEdges();
         List<AVertex<P>> vertices = mesh.getVertices();
-        List<AFace<P>> faces = mesh.getFaces();
+        List<AFace<CF>> faces = mesh.getFaces();
 
-        Map<Integer, LinkedList<AHalfEdge<P>>> triangles = new HashMap<>();
+        Map<Integer, LinkedList<AHalfEdge<CE>>> triangles = new HashMap<>();
         Set<AHalfEdge<P>> toRemoveEdges = new HashSet<>();
 
         for(int i = 0; i < numberOfFaces; i++) {
@@ -749,7 +749,7 @@ public class CLDistMesh<P extends IPoint> {
                 if(ta != -1) {
                     mesh.setFace(edges.get(edgeId), faces.get(ta));
                     mesh.setEdge(faces.get(ta), edges.get(edgeId));
-                    LinkedList<AHalfEdge<P>> tri = triangles.get(ta);
+                    LinkedList<AHalfEdge<CE>> tri = triangles.get(ta);
                     if(tri.isEmpty()) {
                         tri.addLast(edges.get(edgeId));
                     }
@@ -784,7 +784,7 @@ public class CLDistMesh<P extends IPoint> {
 
 
         for(int i = 0; i < numberOfFaces; i++) {
-            List<AHalfEdge<P>> tri = triangles.get(i);
+            List<AHalfEdge<CE>> tri = triangles.get(i);
             // face still exist
             assert tri.size() == 3;
             mesh.setNext(tri.get(0), tri.get(1));
@@ -794,18 +794,18 @@ public class CLDistMesh<P extends IPoint> {
     }
 
 
-    private void fixBorderFace(@NotNull final AFace<P> borderFace, @NotNull final Set<AHalfEdge<P>> toRemoveEdges) {
+    private void fixBorderFace(@NotNull final AFace<CF> borderFace, @NotNull final Set<AHalfEdge<CE>> toRemoveEdges) {
         // 1. get edge which is not destroyed
 
-        AHalfEdge<P> startEdge = mesh.getEdge(borderFace);
+        AHalfEdge<CE> startEdge = mesh.getEdge(borderFace);
         while (toRemoveEdges.contains(startEdge)) {
             startEdge = mesh.getNext(startEdge);
         }
 
-        AHalfEdge<P> edge = startEdge;
+        AHalfEdge<CE> edge = startEdge;
         do {
             if(toRemoveEdges.contains(edge)) {
-                AFace<P> twinFace = mesh.getTwinFace(edge);
+                AFace<CF> twinFace = mesh.getTwinFace(edge);
                 if(mesh.isDestroyed(twinFace)) {
                     removeFaceAtBorder(twinFace);
                 }
@@ -980,7 +980,7 @@ public class CLDistMesh<P extends IPoint> {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        AMesh<MPoint> mesh = AMesh.createSimpleTriMesh();
+        AMesh<MPoint, ?, ?> mesh = AMesh.createSimpleTriMesh();
         log.info("before");
         Collection<AVertex<MPoint>> vertices = mesh.getVertices();
         log.info(vertices);
@@ -1014,21 +1014,21 @@ public class CLDistMesh<P extends IPoint> {
     }
 
 
-    private AMesh<P> getMesh() {
+    private AMesh<P, CE, CF> getMesh() {
         return mesh;
     }
 
-    private void removeFaceAtBorder(@NotNull final AFace<P> face) {
+    private void removeFaceAtBorder(@NotNull final AFace<CF> face) {
         if(!getMesh().isDestroyed(face)) {
-            List<AHalfEdge<P>> delEdges = new ArrayList<>();
+            List<AHalfEdge<CE>> delEdges = new ArrayList<>();
             List<AVertex<P>> vertices = new ArrayList<>();
 
             // we only need the boundary if the face isNeighbourBorder
-            AFace<P> boundary = getMesh().getBorder();
+            AFace<CF> boundary = getMesh().getBorder();
 
             int count = 0;
-            for(AHalfEdge<P> edge : getMesh().getEdgeIt(face)) {
-                AFace<P>  twinFace = getMesh().getTwinFace(edge);
+            for(AHalfEdge<CE> edge : getMesh().getEdgeIt(face)) {
+                AFace<CF>  twinFace = getMesh().getTwinFace(edge);
                 count++;
                 if(twinFace.equals(boundary)) {
                     delEdges.add(edge);
@@ -1045,15 +1045,15 @@ public class CLDistMesh<P extends IPoint> {
 
             //TODO: this might be computational expensive!
             // special case: all edges will be deleted => adjust the border edge
-            AHalfEdge<P> borderEdge = null;
+            AHalfEdge<CE> borderEdge = null;
             if(getMesh().getTwinFace(getMesh().getEdge(boundary)) == face && delEdges.size() == count) {
 
                 // all edges are border edges!
                 borderEdge = getMesh().getTwin(getMesh().getEdge(face));
-                EdgeIterator<P, AVertex<P>, AHalfEdge<P>, AFace<P> > edgeIterator = new EdgeIterator<>(getMesh(), borderEdge);
+                EdgeIterator<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF> > edgeIterator = new EdgeIterator<>(getMesh(), borderEdge);
 
                 // walk along the border away from this faces to get another edge which won't be deleted
-                AFace<P>  twinFace = getMesh().getTwinFace(borderEdge);
+                AFace<CF>  twinFace = getMesh().getTwinFace(borderEdge);
                 while (edgeIterator.hasNext() && twinFace == face) {
                     borderEdge = edgeIterator.next();
                     twinFace = getMesh().getTwinFace(borderEdge);
@@ -1069,10 +1069,10 @@ public class CLDistMesh<P extends IPoint> {
             }
 
             if(!delEdges.isEmpty()) {
-                AHalfEdge<P> h0, h1, next0, next1, prev0, prev1;
+                AHalfEdge<CE> h0, h1, next0, next1, prev0, prev1;
                 AVertex<P> v0, v1;
 
-                for(AHalfEdge<P> delEdge : delEdges) {
+                for(AHalfEdge<CE> delEdge : delEdges) {
                     h0 = delEdge;
                     v0 = getMesh().getVertex(delEdge);
                     next0 = getMesh().getNext(h0);

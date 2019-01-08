@@ -60,7 +60,7 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
 
     private Object gobalAcessSynchronizer = new Object();
 
-    private CLDistMesh<P> clDistMesh;
+    private CLDistMesh<P, CE, CF> clDistMesh;
     private boolean hasToRead = false;
     private int nSteps;
     private final static int MAX_STEPS = 200;
@@ -96,7 +96,7 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
         log.info("##### (end) compute a uniform refined triangulation #####");
 
         log.info("##### (start) generate a triangulation #####");
-        UniformRefinementTriangulatorSFC<P, AVertex<P>, AHalfEdge<P>, AFace<P>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+        UniformRefinementTriangulatorSFC<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
                 meshSupplier,
                 bound,
                 obstacleShapes,

@@ -6,14 +6,21 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
+import org.vadere.meshing.utils.debug.DebugGui;
+import org.vadere.meshing.utils.debug.WalkCanvas;
+import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * <p>A tri-connectivity {@link ITriConnectivity} is the connectivity of a mesh of non-intersecting connected triangles including holes.
@@ -1235,7 +1242,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * inside the triangulation. A stop condition like (e to !isRightOf(x1, y1, e)) stops the walk if (x1, y1),
 	 * will stop the walk if the point p = (x1, y1) is contained in the face.</p>
 	 *
-	 * Assumption:
+	 * Assumption:asd
 	 * <ol>
 	 *     <li>q is contained in the start face</li>
 	 *     <li>the stop condition will be fulfilled at some point</li>
@@ -1362,45 +1369,47 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		 * (1) get the vertex v which intersects with (q,p)
 		 */
 		V vertex = getSpecialVertex(inEdge, q, p);
-		E nextInEdge = null;
+		E nextOutEdge = null;
 		for(E e : getMesh().getEdgeIt(vertex)) {
-			E prev = getMesh().getPrev(e);
-			E next = getMesh().getNext(getMesh().getTwin(e));
-			// get the start of prev
-			V v1 = getMesh().getVertex(getMesh().getPrev(prev));
-			// get the end of next
-			V v2 = getMesh().getVertex(next);
+			E prev = getMesh().getPrev(e);          // v1 -> v3
+			E next = getMesh().getNext(e);          // vertex -> v1
+			E twin = getMesh().getTwin(e);          // vertex -> v3
+			E twinNext = getMesh().getNext(twin);   // v3 -> v2
 
-			V v3 = getMesh().getVertex(prev);
+			V v1 = getMesh().getVertex(next);
+			V v2 = getMesh().getVertex(twinNext);
+			V v3 = getMesh().getVertex(twin);
 
 			if(contains(p.getX(), p.getY(), v2, vertex, v3)) {
-				return next;
+				nextOutEdge = twinNext;
 			}
 
 			if(contains(p.getX(), p.getY(), vertex, v1, v3)) {
-				return prev;
+				nextOutEdge = prev;
 			}
 
-			if(GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), p.getX(), p.getY()) && intersects(q, p, v1, v2)) {
+			if(nextOutEdge == null && GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), p.getX(), p.getY()) && intersects(q, p, v1, v2)) {
 				if(!inEdge.equals(prev) && intersects(q, p, prev)) {
-					nextInEdge = prev;
-					break;
+					nextOutEdge = prev;
 				}
-				else if(!inEdge.equals(next) && intersects(q, p, next)) {
-					nextInEdge = next;
-					break;
+				else if(!inEdge.equals(twinNext) && intersects(q, p, twinNext)) {
+					nextOutEdge = twinNext;
 				}
 				else {
-					nextInEdge = prev;
+					nextOutEdge = prev;
 				}
+			}
+
+			if(nextOutEdge != null) {
+				break;
 			}
 		}
 
-		if(nextInEdge == null) {
+		if(nextOutEdge == null) {
 			throw new IllegalArgumentException("this should never happen!");
 		}
 
-		return nextInEdge;
+		return nextOutEdge;
 	}
 
 	default V getSpecialVertex(@NotNull final E inEdge,
@@ -1495,12 +1504,12 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 				/**
 				 * Get the face with the centroid closest to p and which was not visited already.
 				 */
-				E nextInEdge = straightWalkSpecialCase(inEdge, q, p);
-				if(!stopCondition.test(nextInEdge)) {
-					return Optional.of(getMesh().getTwin(nextInEdge));
+				E nextOutEdge = straightWalkSpecialCase(inEdge, q, p);
+				if(!stopCondition.test(nextOutEdge)) {
+					return Optional.of(getMesh().getTwin(nextOutEdge));
 				}
 				else {
-					visitedEdges.add(nextInEdge);
+					visitedEdges.add(nextOutEdge);
 					return Optional.empty();
 				}
 
@@ -1730,6 +1739,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 				}
 			}
 		} while (optEdge.isPresent());
+
+		/*if (!contains(p.getX(), p.getY(), getMesh().getFace(visitedEdges.peekLast()))) {
+			java.util.List<F> visitedFaces = visitedEdges.stream().map(e -> getMesh().getFace(e)).collect(Collectors.toList());
+			Function<F, Color> colorFunction = f -> visitedFaces.contains(f) ? Color.GREEN : Color.WHITE;
+			System.out.println(TexGraphGenerator.toTikz(getMesh(), colorFunction, 1.0f, new VLine(q, pDirection)));
+
+		}*/
+
+
 		return visitedEdges;
     }
 
@@ -2141,6 +2159,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			return GeometryUtils.isLeftOf(p1, p2, p3);
 		};
 
+		log.debug(getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).filter(e -> !orientationPredicate.test(e)).count() + " invalid triangles");
 		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
 	}
 
