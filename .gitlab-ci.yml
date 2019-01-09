@@ -46,6 +46,7 @@ unit_tests_with_coverage:
         - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
         - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
     artifacts:
+        when: on_success
         paths:
             - "*/target/site/coverage-reports"
 
@@ -57,6 +58,7 @@ run_scenario_files:
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
     artifacts:
+        when: on_failure
         paths:
             - "log_dir"
         expire_in: 1 week
