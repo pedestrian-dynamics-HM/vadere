@@ -2,7 +2,6 @@
   "name" : "stairs_diagonal_1_-1",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -46,6 +45,8 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
+        "minStepLength" : 0.4625,
+        "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
@@ -55,9 +56,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ],
-        "minStepLength" : "0.4625",
-        "maxStepDuration" : "1.7976931348623157E308"
+        "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -98,16 +97,16 @@
           "type" : "POLYGON",
           "points" : [ {
             "x" : 2.2,
-            "y" : 0.5
+            "y" : 0.3
           }, {
             "x" : 9.6,
-            "y" : 8.2
+            "y" : 7.999999999999999
           }, {
             "x" : 9.7,
-            "y" : 7.7
+            "y" : 7.5
           }, {
             "x" : 2.4,
-            "y" : 0.2
+            "y" : 0.0
           } ]
         },
         "id" : -1
@@ -115,17 +114,17 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 7.0,
-            "y" : 9.8
+            "x" : 6.6000000000000005,
+            "y" : 9.700000000000001
           }, {
-            "x" : 0.0,
-            "y" : 2.4
+            "x" : -0.3999999999999999,
+            "y" : 2.3
           }, {
-            "x" : 0.2,
-            "y" : 2.1
+            "x" : -0.19999999999999996,
+            "y" : 2.0
           }, {
-            "x" : 7.4,
-            "y" : 9.7
+            "x" : 7.000000000000001,
+            "y" : 9.6
           } ]
         },
         "id" : -1
@@ -134,34 +133,34 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 1.8,
-            "y" : 3.9
+            "x" : 3.8000000000000003,
+            "y" : 2.0
           }, {
-            "x" : 3.8,
-            "y" : 2.2
+            "x" : 1.7000000000000002,
+            "y" : 4.0
           }, {
-            "x" : 8.0,
-            "y" : 6.4
+            "x" : 5.8999999999999995,
+            "y" : 8.399999999999999
           }, {
-            "x" : 5.7,
-            "y" : 8.2
+            "x" : 8.1,
+            "y" : 6.5
           } ]
         },
         "id" : -1,
-        "treadCount" : 6,
+        "treadCount" : 20,
         "upwardDirection" : {
-          "x" : -1.0,
-          "y" : -1.0
+          "x" : 1.0,
+          "y" : 1.0
         }
       } ],
       "targets" : [ {
-        "id" : 1,
+        "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 7.4,
-          "y" : 7.8,
-          "width" : 1.9,
-          "height" : 1.6,
+          "x" : 6.8,
+          "y" : 7.7,
+          "width" : 2.0,
+          "height" : 1.5,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -173,26 +172,27 @@
         "nextSpeed" : -1.0
       } ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 1,
         "shape" : {
-          "x" : 0.6,
-          "y" : 0.6,
-          "width" : 1.6,
+          "x" : 0.8,
+          "y" : 1.2,
+          "width" : 1.8,
           "height" : 1.4,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 5,
+        "spawnNumber" : 2,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 50.0,
-        "spawnAtRandomPositions" : true,
+        "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 1 ],
+        "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -202,6 +202,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
         "radius" : 0.195,
@@ -217,8 +218,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      },
-      "dynamicElements" : [ ]
-    }
+      }
+    },
+    "eventInfos" : [ ]
   }
 }
