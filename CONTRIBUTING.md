@@ -34,7 +34,7 @@ The project can now be imported *As Maven Project* into your IDE.
 4. lick the *run*-icon next to the `main` method
 5. Edit the run configuration for `VadereApplication` to build the project using Maven instead of IntelliJ's internal builder to avoid compilation errors:
 6. Click *Edit Configurations* (in dropdown menu next to the play/debug button)
-7. Under *Before launch*, add *Run Maven Goal* and use the Maven goal `compile`
+7. Under *Before launch*, **remove all existing** build instructions and add *Run Maven Goal* and use the Maven goal `compile`
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
 
