@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -19,18 +20,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 public class SumVoronoiAlgorithm extends AreaDensityAlgorithm implements IAreaVelocityAlgorithm {
 	private VRectangle measurementArea;
 	private VPolygon measurementAreaPolygon;
 	private VRectangle voronoiArea;
+	private final Function<TimestepPedestrianIdKey, Double> agentVelocityFunc;
 
-	public SumVoronoiAlgorithm(@NotNull final VRectangle measurementArea, @NotNull final VRectangle voronoiArea) {
+	public SumVoronoiAlgorithm(@NotNull final Function<TimestepPedestrianIdKey, Double> agentVelocityFunc, @NotNull final VRectangle measurementArea, @NotNull final VRectangle voronoiArea) {
 		super("areaVoronoi");
 
 		this.measurementArea = measurementArea;
 		this.measurementAreaPolygon = new VPolygon(measurementArea);
 		this.voronoiArea = voronoiArea;
+		this.agentVelocityFunc = agentVelocityFunc;
 	}
 
 	@Override
@@ -82,7 +86,8 @@ public class SumVoronoiAlgorithm extends AreaDensityAlgorithm implements IAreaVe
 
 				double faceArea = face.toPolygon().getArea();
 				area += faceArea;
-				velocity += (faceArea * ped.getVelocity().getLength());
+				TimestepPedestrianIdKey key = new TimestepPedestrianIdKey(state.getStep(), ped.getId());
+				velocity += (faceArea * agentVelocityFunc.apply(key));
 			}
 		}
 

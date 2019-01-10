@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>This processor computes the fundamental diagram by computing an (average) velocity and the density
- * over a certain area <tt>measurementArea</tt>. The <tt>velocity</tt> of a pedestrian is the distance walked inside
+ * <p>This processor computes the fundamental diagram by computing an (average) velocity and the density for each
+ * pedestrian over a certain area <tt>measurementArea</tt>. The <tt>velocity</tt> of a pedestrian is the distance walked inside
  * the <tt>measurementArea</tt> divided by the required time. The <tt>density</tt> of a pedestrian is the integral
  * of the number of pedestrians inside the <tt>measurementArea</tt> (integrated over the time) divided by the area
  * of the <tt>measurementArea</tt> and the time required to walk through the <tt>measurementArea</tt>. The bound of
@@ -24,6 +24,8 @@ import java.util.Map;
  * the <tt>measurementArea</tt>.</p>
  *
  * <p>For more details see zhang-2011 (doi:10.1088/1742-5468/2011/06/P06004) Method B.</p>
+ *
+ * <p>Note that this processor does only work if pedestrians do not move multiple times through <tt>measurementArea</tt></p>
  *
  * @author Benedikt Zoennchen
  */

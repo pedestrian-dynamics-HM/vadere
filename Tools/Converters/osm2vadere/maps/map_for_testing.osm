@@ -1,0 +1,5 @@
+<osm>
+<node id="1" visible="true" version="11" changeset="10291545" timestamp="2012-01-04T14:39:37Z" user="mawi42" uid="42393" lat="1.1" lon="1.2"/>
+<node id="2" visible="true" version="9" changeset="2270948" timestamp="2009-08-26T20:02:36Z" user="pfui_osm_korinthenkacker" uid="36809" lat="2.1" lon="2.2"/>
+<node id="3" visible="true" version="10" changeset="6745590" timestamp="2010-12-23T14:00:32Z" user="mawi42" uid="42393" lat="3.1" lon="3.2"/>
+ </osm>

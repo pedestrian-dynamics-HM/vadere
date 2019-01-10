@@ -13,19 +13,23 @@ import org.vadere.state.types.UpdateType;
 @ModelAttributeClass
 public class AttributesOSM extends Attributes {
 
-	private int stepCircleResolution = 18;
+	private int stepCircleResolution = 4;
 	private int numberOfCircles = 1;
-	private boolean varyStepDirection = false;
+	private boolean varyStepDirection = true;
 	private double stepLengthIntercept = 0.4625;
 	private double stepLengthSlopeSpeed = 0.2345;
 	private double stepLengthSD = 0.036;
 	private double movementThreshold = 0;
-	private OptimizationType optimizationType = OptimizationType.DISCRETE;
+
+	private double minStepLength = 0.4625;
+	private double maxStepDuration = Double.MAX_VALUE;
+
+	private OptimizationType optimizationType = OptimizationType.NELDER_MEAD;
 	private MovementType movementType = MovementType.ARBITRARY;
 	private boolean dynamicStepLength = false;
 	private UpdateType updateType = UpdateType.EVENT_DRIVEN;
 	private boolean seeSmallWalls = false;
-	private boolean minimumStepLength = false;
+	private boolean minimumStepLength = true;
 	private String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
 	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell";
 	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
@@ -40,6 +44,10 @@ public class AttributesOSM extends Attributes {
 
 	public int getNumberOfCircles() {
 		return numberOfCircles;
+	}
+
+	public double getMaxStepDuration() {
+		return maxStepDuration;
 	}
 
 	public boolean isVaryStepDirection() {
@@ -103,6 +111,7 @@ public class AttributesOSM extends Attributes {
 		return new ArrayList<>(submodels);
 	}
 
-
-
+	public double getMinStepLength() {
+		return minStepLength;
+	}
 }

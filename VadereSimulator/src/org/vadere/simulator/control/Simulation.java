@@ -2,6 +2,8 @@ package org.vadere.simulator.control;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.vadere.simulator.control.cognition.CognitionLayer;
+import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -15,15 +17,16 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.json.EventInfo;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Simulation {
 
@@ -67,6 +70,8 @@ public class Simulation {
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
+	private final EventController eventController;
+	private final CognitionLayer cognitionLayer;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
@@ -92,6 +97,9 @@ public class Simulation {
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
 		this.topographyController = new TopographyController(topography, dynamicElementFactory);
+
+		this.eventController = new EventController(scenarioStore);
+		this.cognitionLayer = new CognitionLayer();
 
 		// ::start:: this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
@@ -267,7 +275,6 @@ public class Simulation {
 	}
 
 	private void updateWriters(double simTimeInSec) {
-
 		SimulationState simulationState =
 				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
@@ -275,7 +282,9 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
+        List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
+        // TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -292,8 +301,15 @@ public class Simulation {
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 		step++;
 
+		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
+
 		for (Model m : models) {
 			m.update(simTimeInSec);
+			if (topography.isRecomputeCells()){
+				// rebuild CellGrid if model does not manage the CellGrid state while updating
+				topographyController.update(simTimeInSec); //rebuild CellGrid
+			}
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {

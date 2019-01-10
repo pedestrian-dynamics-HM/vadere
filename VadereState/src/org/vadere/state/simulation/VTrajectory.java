@@ -88,7 +88,7 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
 		LinkedList<FootStep> newFootSteps = new LinkedList<>();
-		boolean inside = rectangle.contains(footSteps.peekFirst().getStart());
+		boolean inside = !footSteps.isEmpty() ? rectangle.contains(footSteps.peekFirst().getStart()) : false;
 
 		for(FootStep footStep : footSteps) {
 			if(footStep.intersects(rectangle)) {

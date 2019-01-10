@@ -26,12 +26,14 @@ public class TeleporterController {
 				VPoint newPos = new VPoint(position.x
 						+ teleporter.getTeleporterShift().x, position.y);
 				ped.setPosition(newPos);
+				scenario.moveElement(ped, position);
 			}
 			if (position.x < teleporter.getTeleporterPosition().x
 					+ teleporter.getTeleporterShift().x) {
 				VPoint newPos = new VPoint(position.x
 						- teleporter.getTeleporterShift().x, position.y);
 				ped.setPosition(newPos);
+				scenario.moveElement(ped, position);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_nelder_mead_ok",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -86,6 +86,8 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
+        "minStepLength" : 0.4625,
+        "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
@@ -293,15 +295,16 @@
           "acceleration" : 2.0
         },
         "idAsTarget" : -1,
-        "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
+        "mostImportantEvent" : null,
         "groupIds" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "type" : "PEDESTRIAN",
-        "groupSizes" : [ ]
+        "groupSizes" : [ ],
+        "modelPedestrianMap" : { },
+        "type" : "PEDESTRIAN"
       }, {
         "source" : null,
         "targetIds" : [ 1 ],
@@ -326,15 +329,16 @@
           "acceleration" : 2.0
         },
         "idAsTarget" : -1,
-        "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
+        "mostImportantEvent" : null,
         "groupIds" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "type" : "PEDESTRIAN",
-        "groupSizes" : [ ]
+        "groupSizes" : [ ],
+        "modelPedestrianMap" : { },
+        "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {
         "radius" : 0.195,
@@ -345,6 +349,7 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
         "radius" : 0.195,
@@ -361,6 +366,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

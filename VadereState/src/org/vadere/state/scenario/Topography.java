@@ -73,6 +73,7 @@ public class Topography implements DynamicElementMover{
 
 	private transient final DynamicElementContainer<Pedestrian> pedestrians;
 	private transient final DynamicElementContainer<Car> cars;
+	private boolean recomputeCells;
 
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
@@ -120,6 +121,7 @@ public class Topography implements DynamicElementMover{
 
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
+		recomputeCells = false;
 
 		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
 		this.dynamicElementIdCounter = new AtomicInteger(1);
@@ -270,6 +272,14 @@ public class Topography implements DynamicElementMover{
 		int maxIdUsed  = pedestrians.getElements().stream().mapToInt(Pedestrian::getId).max().orElse(0);
 		this.dynamicElementIdCounter.set(maxIdUsed + 1);
 		logger.info(String.format("Set PedestrianIdCount to start value: %d", this.dynamicElementIdCounter.get()));
+	}
+
+	public boolean isRecomputeCells() {
+		return recomputeCells;
+	}
+
+	public void setRecomputeCells(boolean recomputeCells) {
+		this.recomputeCells = recomputeCells;
 	}
 
 	public List<Source> getSources() {

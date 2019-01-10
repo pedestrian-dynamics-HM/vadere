@@ -1,7 +1,7 @@
 {
   "name" : "thin_wall_nelder_mead_ok",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -90,6 +90,8 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
+        "minStepLength" : 0.4625,
+        "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
@@ -195,7 +197,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

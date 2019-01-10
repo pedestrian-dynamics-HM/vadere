@@ -125,6 +125,7 @@ public class BehaviouralHeuristicsModel implements MainModel {
 				}
 			}
 		}
+		topography.setRecomputeCells(true);
 	}
 
 	@Override

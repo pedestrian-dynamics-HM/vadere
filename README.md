@@ -1,19 +1,19 @@
-![VADERE](vadere.png "VADERE")
+![Vadere Logo](vadere.png "Vadere Logo")
 
 ---
 
-# VADERE
+# Vadere
 
-VADERE is an open source framework for the simulation of microscopic pedestrian dynamics. VADERE provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of pedestrian locomotion models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies. In addition to pedestrians, other systems including cars and granular flow can be introduced into the framework.
+Vadere is an open source framework for the simulation of microscopic pedestrian dynamics. Vadere provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of pedestrian locomotion models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies. In addition to pedestrians, other systems including cars and granular flow can be introduced into the framework.
 
 This software runs on Windows, OS X and Linux.
 
-VADERE has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
+Vadere has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
 research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
 However, we welcome contributions from external sources. 
 
-The VADERE framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
+The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/blob/master/VadereMeshing/README.md). 
 
 ## Pipeline Status
 
@@ -33,7 +33,7 @@ The VADERE framework includes a mesh generator for unstructured high-quality 2D 
 
 ### Install OpenCL
 
-VADERE uses computer's video card to speed up some computations. Therefore, following OpenCL components must be installed:
+Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components must be installed:
 
 * the latest drivers for your OpenCL device(s)
 * an OpenCL SDK

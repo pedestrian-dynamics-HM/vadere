@@ -261,7 +261,7 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 			transformedNode = transform(transformedNode, v);
 		}
 		if (legacyDir != null) {
-			logger.info("Scenario Migrated. Move olde version to legacyDir");
+			logger.info("Scenario Migrated - OK. Move copy of old version to legacllyDir");
 			moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getLegacyExtension(), false);
 		}
 		IOUtils.writeTextFile(scenarioFilePath.toString(), StateJsonConverter.serializeJsonNode(transformedNode));

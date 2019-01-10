@@ -26,13 +26,13 @@ public class PedestrianSpeedSetupCheck extends AbstractScenarioCheck implements 
 										") current SpeedDistributionMean is: " + String.format("%.2f", speedMean))
 						.build());
 			}
-			if (p.getAttributes().getMinimumSpeed() > Pedestrian.HUMAN_MAX_SPEED || p.getAttributes().getMaximumSpeed() > Pedestrian.HUMAN_MAX_SPEED) {
+			if (p.getAttributes().getMinimumSpeed() > Pedestrian.PEDESTRIAN_MAX_SPEED_METER_PER_SECOND || p.getAttributes().getMaximumSpeed() > Pedestrian.PEDESTRIAN_MAX_SPEED_METER_PER_SECOND) {
 				ret.add(msgBuilder
 						.topographyWarning()
 						.target(p)
 						.reason(ScenarioCheckerReason.PEDESTRIAN_SPEED_NOT_LOGICAL,
 								String.format("[max: %.2f min: %.2f threshold: %.2f]", p.getAttributes().getMinimumSpeed(),
-										p.getAttributes().getMaximumSpeed(), Pedestrian.HUMAN_MAX_SPEED))
+										p.getAttributes().getMaximumSpeed(), Pedestrian.PEDESTRIAN_MAX_SPEED_METER_PER_SECOND))
 						.build());
 			}
 			if (p.getAttributes().getMinimumSpeed() < 0 || p.getAttributes().getMaximumSpeed() < 0) {

@@ -10,7 +10,6 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.LinkedList;
-import java.util.stream.Stream;
 
 /**
  * This processor computes the velocity based on pedestrian positions and the simulation time.
@@ -23,14 +22,14 @@ import java.util.stream.Stream;
  *
  */
 @DataProcessorClass()
-public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
-	private PedestrianPositionProcessor pedPosProc;
+public class PedestrianVelocityProcessor extends APedestrianVelocityProcessor {
+	private PedestrianPositionProcessor pedestrianPositionProcessor;
 	private int backSteps;
 
 	private LinkedList<Double> lastSimTimes;
 
 	public PedestrianVelocityProcessor() {
-		super("velocity");
+		super();
 		setAttributes(new AttributesPedestrianVelocityProcessor());
 		this.lastSimTimes = new LinkedList<>();
 		this.lastSimTimes.add(0.0);
@@ -38,7 +37,7 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 
 	@Override
 	public void doUpdate(final SimulationState state) {
-		pedPosProc.update(state);
+		pedestrianPositionProcessor.update(state);
 
 		Integer timeStep = state.getStep();
 		state.getTopography().getElements(Pedestrian.class)
@@ -47,35 +46,39 @@ public class PedestrianVelocityProcessor extends DataProcessor<TimestepPedestria
 				.forEach(pedId -> putValue(new TimestepPedestrianIdKey(timeStep, pedId), getVelocity(timeStep, state.getSimTimeInSec(), pedId)));
 
 		if (lastSimTimes.size() >= backSteps) {
-			lastSimTimes.removeLast();
+			lastSimTimes.removeFirst();
 		}
 
-		lastSimTimes.addFirst(state.getSimTimeInSec());
+		lastSimTimes.addLast(state.getSimTimeInSec());
 	}
 
 	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesPedestrianVelocityProcessor attVelProc = (AttributesPedestrianVelocityProcessor) getAttributes();
-
-		this.pedPosProc =
-				(PedestrianPositionProcessor) manager.getProcessor(attVelProc.getPedestrianPositionProcessorId());
+		this.pedestrianPositionProcessor = (PedestrianPositionProcessor) manager.getProcessor(attVelProc.getPedestrianPositionProcessorId());
 		this.backSteps = attVelProc.getBackSteps();
 		this.lastSimTimes = new LinkedList<>();
 		this.lastSimTimes.add(0.0);
 	}
 
 	private double getVelocity(int timeStep, double currentSimTime, int pedId) {
-		TimestepPedestrianIdKey keyBefore = new TimestepPedestrianIdKey(timeStep - backSteps > 0 ? timeStep - backSteps : 1, pedId);
 
-		if (timeStep <= 1 || !pedPosProc.hasValue(keyBefore))
-			return 0.0; // For performance
+		int pastStep = Math.max(1, timeStep - backSteps);
+		double velocity = 0.0;
+		if(timeStep > 1) {
 
-		VPoint posBefore = pedPosProc.getValue(keyBefore);
-		VPoint posNow = pedPosProc.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
-		double duration = (currentSimTime - lastSimTimes.getFirst());
+			VPoint pastPosition = pedestrianPositionProcessor.getValue(new TimestepPedestrianIdKey(pastStep, pedId));
+			VPoint position = pedestrianPositionProcessor.getValue(new TimestepPedestrianIdKey(timeStep, pedId));
 
-		double velocity = duration > 0 ? posNow.subtract(posBefore).scalarMultiply(1 / duration).distanceToOrigin() : 0;
+			if(pastPosition != null) {
+				double startTime = lastSimTimes.getFirst();
+				double endTime = currentSimTime;
+				double duration = (endTime - startTime);
+
+				velocity = position.subtract(pastPosition).scalarMultiply(1.0 / duration).distanceToOrigin();
+			}
+		}
 
 		return velocity;
 	}

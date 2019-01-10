@@ -651,7 +651,7 @@ public class RealWorldPlot {
 	}
 
 	public static void main(String ... args) throws IOException {
-		//realWorldExampleEikMesh();
+		realWorldExampleEikMesh();
 		realWorldExampleDistMesh();
 	}
 

@@ -1,7 +1,7 @@
 {
   "name" : "Neues_Szenario",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -67,8 +67,8 @@
       "attributes" : {
         "pedestrianPositionProcessorId" : 1,
         "scale" : 10.0,
-        "standardDerivation" : 0.7,
-        "obstacleDensity" : true
+        "obstacleDensity" : true,
+        "standardDeviation" : 0.7
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor",
@@ -228,7 +228,9 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
-        "submodels" : [ ]
+        "submodels" : [ ],
+        "minStepLength" : "0.4625",
+        "maxStepDuration" : "1.7976931348623157E308"
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
         "pedPotentialWidth" : 0.5,
@@ -338,8 +340,8 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "dynamicElements" : [ ],
+      "attributesCar" : null
     }
   }
 }
