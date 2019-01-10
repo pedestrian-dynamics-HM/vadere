@@ -318,7 +318,8 @@
               "x": "scenario.&3.&2.&1.&0",
               "y": "scenario.&3.&2.&1.&0"
             }
-          }
+          },
+          "org.vadere.state.attributes.models.AttributesReynolds" :  "scenario.&1.&0"
 
           //end attributesModel
         },

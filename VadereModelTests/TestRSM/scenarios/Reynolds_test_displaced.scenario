@@ -59,7 +59,9 @@
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.reynolds.ReynoldsSteeringModel",
-    "attributesModel" : { },
+    "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesReynolds" : { }
+    },
     "attributesSimulation" : {
       "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
@@ -72,6 +74,7 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -133,8 +136,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "dynamicElements" : [ ],
+      "attributesCar" : null
     }
   }
 }
