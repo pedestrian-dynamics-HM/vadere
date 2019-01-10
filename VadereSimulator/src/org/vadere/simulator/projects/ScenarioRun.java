@@ -121,6 +121,7 @@ public class ScenarioRun implements Runnable {
 			simulationResult.setState("SimulationRun completed");
 
 		} catch (Exception e) {
+			logger.error("Simulation failed", e);
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
 			simulationResult.stopTime();
