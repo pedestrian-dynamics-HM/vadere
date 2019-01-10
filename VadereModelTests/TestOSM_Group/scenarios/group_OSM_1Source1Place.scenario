@@ -6,7 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 3 ]
+      "processors" : [ 1, 2, 3, 4 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -22,7 +22,7 @@
       "id" : 4,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor",
       "attributes" : {
-        "pedestrianPositionProcessorId" : 0,
+        "pedestrianPositionProcessorId" : 1,
         "scale" : 10.0,
         "standardDeviation" : 0.0,
         "obstacleDensity" : true
