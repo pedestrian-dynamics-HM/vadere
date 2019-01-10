@@ -63,5 +63,6 @@ public class OfflineTopographyController {
 		for (Car car : this.topography.getElements(Car.class)) {
 			this.topography.getSpatialMap(Car.class).addObject(car);
 		}
+		this.topography.setRecomputeCells(false);
 	}
 }
