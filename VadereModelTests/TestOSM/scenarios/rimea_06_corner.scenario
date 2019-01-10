@@ -2,7 +2,6 @@
   "name" : "rimea_06_corner",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -105,6 +104,8 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
+        "minStepLength" : 0.4625,
+        "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
@@ -114,9 +115,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ],
-        "minStepLength" : "0.4625",
-        "maxStepDuration" : "1.7976931348623157E308"
+        "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -211,6 +210,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -220,8 +220,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
-    }
+      "teleporter" : null,
+      "attributesCar" : null
+    },
+    "eventInfos" : [ ]
   }
 }
