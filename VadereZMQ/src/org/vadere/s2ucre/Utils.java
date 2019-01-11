@@ -106,7 +106,10 @@ public class Utils {
 				randomPoint = new VPoint(bound.getMinX() + random.nextDouble() * bound.getWidth(), bound.getMinY() + random.nextDouble() * bound.getHeight());
 			}
 			while (!polygon.contains(randomPoint));
+
+			// TODO: remove hack if the iosb coordinates are correct!
 			randomPoints.add(randomPoint);
+			//randomPoints.add(randomPoint.add(new VPoint(11,0)));
 		}
 
 		return randomPoints;

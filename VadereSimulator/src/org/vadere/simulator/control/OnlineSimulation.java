@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import org.vadere.s2ucre.client.Receiver;
 import org.vadere.s2ucre.client.Sender;
+import org.vadere.util.geometry.shapes.VPoint;
 
 /**
  * An OnlineSimulation {@link OnlineSimulation} is a simulation which receives its initial data i.e. the positions of its
@@ -101,6 +102,7 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 	 */
 	private void setStartTime(double startTime) {
 		startTimeInSec = startTime;
+		simTimeInSec = startTime;
 	}
 
 	@Override
@@ -177,7 +179,7 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 			currentSimulationData = toVaderePedestrians(pedMsgs);
 			logger.debug("re-initialize simulation.");
 			currentSimulationData.pedestrians.stream().forEach(ped -> topography.addElement(ped));
-			setStartTime(0.0);
+			setStartTime(Utils.toSeconds(currentSimulationData.timestamp));
 			resume();
 			notifyAll();
 		}
@@ -204,10 +206,21 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 			LinkedList<Integer> targetIds = topography.getTargets().stream().map(t -> t.getId()).collect(Collectors.toCollection(LinkedList::new));
 
 			for(PedMsg pedMsg : pedMsgs) {
-				Pedestrian ped = (Pedestrian) mainModel.createElement(Utils.toVPoint(pedMsg.getPosition()), pedMsg.getPedId(), Pedestrian.class);
-				ped.setTargets(targetIds);
-				ped.setVelocity(Utils.toVelocity(pedMsg.getVelocity()));
-				allPeds.add(ped);
+
+				VPoint position = Utils.toVPoint(pedMsg.getPosition());
+				double radius = topography.getAttributesPedestrian().getRadius();
+
+				if(topography.getBounds().contains(position.getX(), position.getY()) && topography.getObstacles().stream().allMatch(obs -> obs.getShape().distance(position) >= radius)) {
+
+					Pedestrian ped = (Pedestrian) mainModel.createElement(position, pedMsg.getPedId(), Pedestrian.class);
+					ped.setTargets(targetIds);
+					ped.setVelocity(Utils.toVelocity(pedMsg.getVelocity()));
+					allPeds.add(ped);
+				}
+				else {
+					logger.error("invalid initial pedestrian position!");
+				}
+
 			}
 
 			pedestriansAtTimeStep.pedestrians = allPeds;
