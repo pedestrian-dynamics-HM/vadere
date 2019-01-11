@@ -96,7 +96,7 @@ public class VCircle implements VShape, ICircleSector {
 		double D = radius * radius * dr * dr - disc * disc;
 		double sign = dy < 0 ? -1 : 1;
 
-		assert (Math.abs(dx) > 0.0 || Math.abs(dy) > 0.0) && dr * dr > 0.0;
+		assert (Math.abs(dx) > 0.0 || Math.abs(dy) > 0.0) && dr * dr > 0.0 : "the line ("+x1+","+y1+") -- ("+x2+","+y2+") is invalid";
 
 		if (D == 0) {
 			x1 = (disc * dy) / (dr * dr);
