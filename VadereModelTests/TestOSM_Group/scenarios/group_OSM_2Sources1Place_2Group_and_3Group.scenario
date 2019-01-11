@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_2Sources1Place_2Group_and_3Group",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -223,6 +223,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

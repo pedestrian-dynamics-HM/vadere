@@ -7,7 +7,7 @@ This guide explains the repository structure, how to set up the development envi
 The repository contains following `files` and `folders`:
 
 - The Vadere source code: divided into the sofware modules `VadereGui`, `VadereMeshing`, `VaderSimulator`, `VadereState`, `VadereUtils`
-- `VadereModelTests`: pre-shipped tests for different locomotion models (e.g., gradient navigation model, optimal steps model, social force model)
+- `VadereModelTests`: pre-shipped tests for different locomotion models (e.g., gradient navigation model, optimal steps model and the social force model)
 - `Tools`: scripts which are executing during the continuous integration phase.
 - `.gitlab`: templates for creating issues in the Vadere [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues) (this files are implicitly used by GitLab).
 - `.gitlab-ci.yml`: instructions which are executed during the [continuous integration pipeline](https://docs.gitlab.com/ee/ci/quick_start/).
@@ -34,7 +34,7 @@ The project can now be imported *As Maven Project* into your IDE.
 4. lick the *run*-icon next to the `main` method
 5. Edit the run configuration for `VadereApplication` to build the project using Maven instead of IntelliJ's internal builder to avoid compilation errors:
 6. Click *Edit Configurations* (in dropdown menu next to the play/debug button)
-7. Under *Before launch*, add *Run Maven Goal* and use the Maven goal `compile`
+7. Under *Before launch*, **remove all existing** build instructions and add *Run Maven Goal* and use the Maven goal `compile`
 
 Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
 

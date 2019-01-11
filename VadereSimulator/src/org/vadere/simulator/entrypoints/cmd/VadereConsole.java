@@ -22,8 +22,8 @@ public class VadereConsole {
 
 	public static void main(String[] args) {
 //		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
-	//		String[] tmp = {"scenario-run", "-f", "VadereModelTests/TestGNM/scenarios/rimea_04_flow_gnm1_050_h.scenario"};
-	//		args = tmp;
+//			String[] tmp = {"migrate", "--create-new-version", "0.7",  "VadereSimulator/resources/"};
+//			args = tmp;
 		ArgumentParser parser = createArgumentParser();
 
 		try {
@@ -35,6 +35,7 @@ public class VadereConsole {
 			System.exit(1);
 		} catch (Exception e) {
 			logger.error("topographyError in command:" + e.getMessage());
+			e.printStackTrace();
 			System.exit(1);
 		}
 
@@ -196,11 +197,19 @@ public class VadereConsole {
 				.help("If PATH contains a directory instead of a scenario file recursively search " +
 						"the directory tree for scenario files and apply the command.");
 
+		migrationAssistant.addArgument("--consider-projects-only")
+				.required(false)
+				.dest("consider-projects-only")
+				.action(Arguments.storeTrue())
+				.setDefault(false)
+				.help("If set only directories containing a vadere project will be migrated. " +
+						"The migraion will use the legacy folder in the project.");
+
 		migrationAssistant.addArgument("--create-new-version")
 				.required(false)
 				.type(String.class)
 				.dest("create-new-version")
-				.help("Create new transformation and identity file based on current latest version" +
+				.help("Create new transformation and identity file based on current latest version. " +
 						"PATH must point to the directory containing the old transformation files." +
 						" This Argument takes the new Version Label as input.");
 	}

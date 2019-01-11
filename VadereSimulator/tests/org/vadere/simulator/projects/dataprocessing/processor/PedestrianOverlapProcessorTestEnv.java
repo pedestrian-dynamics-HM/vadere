@@ -53,6 +53,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 	@Override
 	public void loadDefaultSimulationStateMocks() {
 
+		AttributesAgent attributesAgent = new AttributesAgent();
 		double minDist = new AttributesAgent().getRadius()*2;
 
 		addSimState(new SimulationStateMock(1) {
@@ -64,7 +65,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(4, new VPoint(1.0, 1.5));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
-				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(attributesAgent.getRadius());
 
 			}
 		});
@@ -80,7 +81,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(5, new VPoint(0.8, 0.8));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
-				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(attributesAgent.getRadius());
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 5), b.overlapData(1,5,minDist));
@@ -99,7 +100,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 				b.add(4, new VPoint(1.01, 1.01));
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
-				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
+				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(attributesAgent.getRadius());
 
 				int step = state.getStep();
 				addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 2), b.overlapData(1, 2, minDist));
@@ -126,7 +127,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 		double distAtAxis =  a.getRadius()*2 - 0.001; // this should count as overlap
 		double vertDistAt45deg = 2*Math.sqrt(0.5)*a.getRadius() - 0.001;
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
-		double minDist = 0.195*2;
+		double minDist = a.getRadius()*2;
 		int step = 1;
 		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 1, 2), b.overlapData(1, 2, minDist));
 		addToExpectedOutput(new TimestepPedestrianIdOverlapKey(step, 2, 1), b.overlapData(2, 1, minDist));
@@ -139,7 +140,7 @@ public class PedestrianOverlapProcessorTestEnv extends ProcessorTestEnv<Timestep
 
 	void verySmallNotOverlapping() {
 		AttributesAgent a = new AttributesAgent();
-		double distAtAxis =  a.getRadius()*2 + 0.001; // this should count as overlap
+		double distAtAxis =  a.getRadius()*2 + 0.001; // this should not count as overlap
 		double vertDistAt45deg = Math.sqrt(2)*a.getRadius() + 0.001;
 		addMockStates(a.getRadius(), distAtAxis, new VPoint(vertDistAt45deg, vertDistAt45deg));
 	}

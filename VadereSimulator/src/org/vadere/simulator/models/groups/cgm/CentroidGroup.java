@@ -101,6 +101,7 @@ public class CentroidGroup implements Group {
 		return size - members.size();
 	}
 
+	@Deprecated
 	public VPoint getCentroid() {
 
 		double sumx = 0.0;
@@ -140,12 +141,15 @@ public class CentroidGroup implements Group {
 			}
 		}
 
-		double[] result = {sumx / size, sumy / size};
+		double[] result = new double[2];
 
 		if (size == 0) {
 			VPoint pedPoint = ped.getPosition();
 			result[0] = pedPoint.getX();
 			result[1] = pedPoint.getY();
+		} else {
+			result[0] = sumx / size;
+			result[1] =  sumy / size;
 		}
 
 		return new VPoint(result[0], result[1]);
@@ -252,8 +256,15 @@ public class CentroidGroup implements Group {
 		noVisionOfLeaderCount.put(ped, currentNoVisions);
 	}
 
+	/**
+	 * Calculates the distance of the given pedestrian to the centroid of the group based
+	 * on the sum of the potential fields of all other group members.
+	 *
+	 * @param ped Pedestrian
+	 * @return Distance to group centroid
+	 */
 	public double getRelativeDistanceCentroid(Pedestrian ped) {
-		double result;
+		double result = 0.0;
 		VPoint pedLocation = ped.getPosition();
 
 		double potentialSum = 0.0;
@@ -267,10 +278,13 @@ public class CentroidGroup implements Group {
 
 		double pedDistance = potentialFieldTarget.getPotential(pedLocation, ped);
 
-		result = (potentialSum / size) - pedDistance;
+		if (size != 0) {
 
-		if (result > POTENTIAL_DISTANCE_THRESHOLD) {
-			result = 0;
+			result = (potentialSum / size) - pedDistance;
+
+			if (result > POTENTIAL_DISTANCE_THRESHOLD) {
+				result = 0;
+			}
 		}
 
 		return result;

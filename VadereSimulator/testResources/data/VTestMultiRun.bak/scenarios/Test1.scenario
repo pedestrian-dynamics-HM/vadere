@@ -1,7 +1,7 @@
 {
   "name" : "Test1",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "c45f1d26328baaec22418c15e6351a059e910f5f",
   "processWriters" : {
     "files" : [ {
@@ -49,7 +49,9 @@
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",
-        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact"
+        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
+        "minStepLength" : "0.4625",
+        "maxStepDuration" : "1.7976931348623157E308"
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
         "pedPotentialWidth" : 0.5,
@@ -135,8 +137,8 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
+      "dynamicElements" : [ ],
+      "attributesCar" : null
     }
   }
 }

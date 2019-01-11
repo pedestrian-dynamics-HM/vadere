@@ -74,6 +74,20 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 		}
 	}
 
+	/**
+	 * Moves the pedestrian inside the topography. The pedestrian object already has the new
+	 * location (Vpoint to) stored within its position attribute. This method only informs the
+	 * topography object of the change in state.
+	 *
+	 * !IMPORTANT! this function must be called ONLY ONCE  for each pedestrian for each position. To
+	 * allow preformat selection of a pedestrian the  managing destructure is not idempotent (cannot
+	 * be applied multiple time without changing result).
+	 *
+	 * @param topography	manages simulation data
+	 * @param pedestrian	moving pedestrian. This object's position is already set.
+	 * @param from			old position
+	 * @param to			new position (same as #pedestrian.getPosition())
+	 */
 	default void movePedestrian(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, @NotNull final VPoint from, @NotNull final VPoint to) {
 		pedestrian.setPosition(to);
 		synchronized (topography) {
@@ -81,6 +95,19 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 		}
 	}
 
+	/**
+	 * Prepare move of pedestrian inside the topography. The pedestrian object already has the new
+	 * location (Vpoint to) stored within its position attribute. This method only informs the
+	 * topography object of the change in state.
+	 *
+	 * !IMPORTANT! this function calls movePedestrian which must be called ONLY ONCE  for each
+	 * pedestrian for each position. To  allow preformat selection of a pedestrian the  managing
+	 * destructure is not idempotent (cannot be applied multiple time without changing result).
+	 *
+	 * @param topography 	manages simulation data
+	 * @param pedestrian	moving pedestrian. This object's position is already set.
+	 * @param stepTime		time in seconds used for the step.
+	 */
 	default void makeStep(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, final double stepTime) {
 		VPoint currentPosition = pedestrian.getPosition();
 		VPoint nextPosition = pedestrian.getNextPosition();

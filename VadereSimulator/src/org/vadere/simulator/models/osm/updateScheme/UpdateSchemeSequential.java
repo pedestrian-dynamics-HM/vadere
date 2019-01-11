@@ -46,7 +46,6 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 				makeStep(topography, pedestrian, timeStepInSec);
 			}
 
-			topography.moveElement(pedestrian, oldPosition);
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}

@@ -1,8 +1,7 @@
 {
   "name" : "wait_in_area_event_2_sources_2_targets_bhm",
   "description" : "",
-  "release" : "0.6",
-  "commithash" : "45917996dc1d7ac7f31aff96d40e2886d36a5cd3",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -203,6 +202,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : null
     },
     "eventInfos" : [ {

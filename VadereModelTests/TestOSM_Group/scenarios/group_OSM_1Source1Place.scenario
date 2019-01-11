@@ -1,12 +1,12 @@
 {
   "name" : "group_OSM_1Source1Place",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 3 ]
+      "processors" : [ 1, 2, 3, 4 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -17,6 +17,16 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
       "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityGaussianProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 1,
+        "scale" : 10.0,
+        "standardDeviation" : 0.0,
+        "obstacleDensity" : true
+      }
     } ],
     "isTimestamped" : true
   },
@@ -167,6 +177,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

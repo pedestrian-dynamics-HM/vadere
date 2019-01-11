@@ -306,6 +306,10 @@ public class Simulation {
 
 		for (Model m : models) {
 			m.update(simTimeInSec);
+			if (topography.isRecomputeCells()){
+				// rebuild CellGrid if model does not manage the CellGrid state while updating
+				topographyController.update(simTimeInSec); //rebuild CellGrid
+			}
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {
