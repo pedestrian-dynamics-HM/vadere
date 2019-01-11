@@ -1,5 +1,5 @@
 {
-  "name" : "g3_osm_calibration_sivers_2016b",
+  "name" : "g3_osm_calibration_minStepSize_0_4625",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -163,11 +163,11 @@
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
         "varyStepDirection" : true,
-        "stepLengthIntercept" : 0.235,
-        "stepLengthSlopeSpeed" : 0.302,
+        "stepLengthIntercept" : 0.4625,
+        "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "minStepLength" : 0.235,
+        "minStepLength" : 0.4625,
         "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
@@ -269,7 +269,16 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "teleporter" : null,
+      "teleporter" : {
+        "shift" : {
+          "x" : -40.0,
+          "y" : 0.0
+        },
+        "position" : {
+          "x" : 42.0,
+          "y" : 0.0
+        }
+      },
       "attributesCar" : null
     },
     "eventInfos" : [ ]
