@@ -15,6 +15,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlap_and_evac.txt",
       "processors" : [ 4, 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "pedestrians.txt",
+      "processors" : [ 8, 9 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -43,8 +47,18 @@
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianEvacuationTimeProcessorId" : 0
+        "pedestrianEvacuationTimeProcessorId" : 8
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 9
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 9
     } ],
     "isTimestamped" : true
   },
