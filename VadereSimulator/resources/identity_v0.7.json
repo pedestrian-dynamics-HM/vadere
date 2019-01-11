@@ -436,6 +436,16 @@
               "groupIds": "scenario.&3.&2.[&1].&0",
               "type": "scenario.&3.&2.[&1].&0"
             }
+          },
+          "teleporter" : {
+            "shift" : {
+              "x" : "scenario.&3.&2.&1.&0",
+              "y" : "scenario.&3.&2.&1.&0"
+            },
+            "position" : {
+              "x" : "scenario.&3.&2.&1.&0",
+              "y" : "scenario.&3.&2.&1.&0"
+            }
           }
         }
       }
@@ -494,7 +504,8 @@
             "maximumSpeed": "3.0",
             "acceleration": "2.0"
           },
-          "attributesCar": null
+          "attributesCar": null,
+          "teleporter" : null
         }
       }
     }

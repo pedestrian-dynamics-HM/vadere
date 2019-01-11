@@ -1,13 +1,12 @@
 {
-  "name" : "osm_calibration_minStepSize_0_4625_p4",
+  "name" : "g2_osm_calibration_sivers_2016b",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2 ]
+      "processors" : [ 16, 1, 17, 2, 18 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -131,6 +130,12 @@
         "pedestrianPositionProcessorId" : 1,
         "backSteps" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
+      "id" : 17
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupSizeProcessor",
+      "id" : 18
     } ],
     "isTimestamped" : true
   },
@@ -158,22 +163,22 @@
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
         "varyStepDirection" : true,
-        "stepLengthIntercept" : 0.4625,
-        "stepLengthSlopeSpeed" : 0.2345,
+        "stepLengthIntercept" : 0.235,
+        "stepLengthSlopeSpeed" : 0.302,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "minStepLength" : 0.0,
+        "minStepLength" : 0.235,
         "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
-        "dynamicStepLength" : false,
+        "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
-        "minimumStepLength" : false,
+        "minimumStepLength" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -184,6 +189,10 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
@@ -247,9 +256,10 @@
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "groupSizeDistribution" : [ 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.2,
         "densityDependentSpeed" : false,
@@ -259,8 +269,18 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
-    }
+      "teleporter" : {
+        "shift" : {
+          "x" : -40.0,
+          "y" : 0.0
+        },
+        "position" : {
+          "x" : 42.0,
+          "y" : 0.0
+        }
+      },
+      "attributesCar" : null
+    },
+    "eventInfos" : [ ]
   }
 }

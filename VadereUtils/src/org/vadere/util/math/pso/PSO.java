@@ -109,7 +109,7 @@ public class PSO {
 		particle.setVelocity(velocity);
 		particle.setLocation(particle.getLocation().add(particle.getVelocity()));
 
-		if (!particle.getLocation().equals(currentLocation) && !circle.contains(particle.getLocation())) {
+		if (!circle.contains(particle.getLocation()) && particle.getLocation().distance(currentLocation) > GeometryUtils.DOUBLE_EPS) {
 			particle.setVelocity(particle.getVelocity().scalarMultiply(-0.5));
 			particle.setLocation(circle.getClosestIntersectionPoint(currentLocation, particle.getLocation(), particle.getLocation()).orElse(particle.getLocation()));
 		}
