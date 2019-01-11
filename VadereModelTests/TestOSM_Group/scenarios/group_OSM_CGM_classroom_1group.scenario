@@ -180,9 +180,9 @@
       }, {
         "shape" : {
           "x" : 7.5,
-          "y" : 4.66,
+          "y" : 4.77,
           "width" : 0.1,
-          "height" : 0.96,
+          "height" : 0.85,
           "type" : "RECTANGLE"
         },
         "id" : 6
