@@ -45,6 +45,7 @@ VadereSimulator/testResources/**/*.legacy
 VadereModelTests/**/output
 VadereModelTests/**/legacy
 VadereUtils/output/**
+VadereModelTests/*_private
 
 #mac osx files
 .DS_Store
