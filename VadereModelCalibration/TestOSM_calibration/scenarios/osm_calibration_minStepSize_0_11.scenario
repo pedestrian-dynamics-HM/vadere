@@ -259,7 +259,16 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "teleporter" : null,
+      "teleporter" : {
+              "shift" : {
+                "x" : -40.0,
+                "y" : 0.0
+              },
+              "position" : {
+                "x" : 42.0,
+                "y" : 0.0
+              }
+            },
       "attributesCar" : null
     },
     "eventInfos" : [ ]
