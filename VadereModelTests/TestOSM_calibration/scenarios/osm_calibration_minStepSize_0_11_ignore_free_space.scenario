@@ -1,7 +1,7 @@
 {
   "name" : "osm_calibration_minStepSize_0_11_ignore_free_space",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -259,17 +259,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "teleporter" : {
-        "shift" : {
-          "x" : -40.0,
-          "y" : 0.0
-        },
-        "position" : {
-          "x" : 42.0,
-          "y" : 0.0
-        }
-      },
+      "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

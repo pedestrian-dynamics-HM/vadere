@@ -1,7 +1,7 @@
 {
   "name" : "osm_calibration_minStepSize_0_4625",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -270,6 +270,7 @@
         }
       },
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }
