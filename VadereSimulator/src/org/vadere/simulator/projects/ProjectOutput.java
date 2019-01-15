@@ -2,10 +2,9 @@ package org.vadere.simulator.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class ProjectOutput {
 
-	private static final Logger logger = LogManager.getLogger(ProjectOutput.class);
+	private static final Logger logger = Logger.getLogger(ProjectOutput.class);
 
 	private final VadereProject project;
 	private ConcurrentMap<String, SimulationOutput> simulationOutputs;

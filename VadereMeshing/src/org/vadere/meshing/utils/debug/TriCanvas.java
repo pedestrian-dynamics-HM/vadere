@@ -1,15 +1,15 @@
 package org.vadere.meshing.utils.debug;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.meshing.utils.color.ColorFunctions;
+
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.utils.color.ColorFunctions;
 import org.vadere.meshing.utils.tex.TexGraphBuilder;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -35,7 +35,7 @@ public abstract class TriCanvas
 		<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
 		extends Canvas {
 
-	static final Logger log = LogManager.getLogger(TriCanvas.class);
+	static final Logger log = Logger.getLogger(TriCanvas.class);
 	static final VRectangle defaultBound = new VRectangle(-12, -12, 24, 24);
 	static final int defaultWidth = 1000;
 	static final int defaultHeight = 1000;

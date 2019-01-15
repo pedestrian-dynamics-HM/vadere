@@ -1,27 +1,44 @@
 package org.vadere.gui.postvisualization.utils;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.awt.geom.PathIterator.*;
+import static java.awt.geom.PathIterator.SEG_CLOSE;
+import static java.awt.geom.PathIterator.SEG_CUBICTO;
+import static java.awt.geom.PathIterator.SEG_LINETO;
+import static java.awt.geom.PathIterator.SEG_MOVETO;
+import static java.awt.geom.PathIterator.SEG_QUADTO;
 
 /**
  * Convert the (Java) scenario description into a TikZ representation.
@@ -44,7 +61,7 @@ import static java.awt.geom.PathIterator.*;
  */
 public class TikzGenerator {
 
-	private final static Logger logger = LogManager.getLogger(TikzGenerator.class);
+	private final static Logger logger = Logger.getLogger(TikzGenerator.class);
 	private final SimulationRenderer renderer;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
 	private final String[] translationTable;

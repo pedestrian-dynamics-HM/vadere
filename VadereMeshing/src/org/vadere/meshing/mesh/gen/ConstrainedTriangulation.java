@@ -1,7 +1,6 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IVertex;
@@ -9,8 +8,13 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * unfinished!
@@ -18,7 +22,7 @@ import java.util.*;
  */
 public class ConstrainedTriangulation<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends IncrementalTriangulation<P, V, E, F> {
 
-    private static Logger log = LogManager.getLogger(ConstrainedTriangulation.class);
+    private static Logger log = Logger.getLogger(ConstrainedTriangulation.class);
 
     private Set<E> constrainedHE;
     private Collection<VLine> constrains;

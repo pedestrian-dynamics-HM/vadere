@@ -1,15 +1,14 @@
 package org.vadere.simulator.projects.io;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.logging.Logger;
 
 import java.io.InputStream;
 import java.util.Scanner;
 
 public class HashGenerator {
 
-	private static Logger logger = LogManager.getLogger(HashGenerator.class);
+	private static Logger logger = Logger.getLogger(HashGenerator.class);
 
 	private static final String CURRENT_COMMIT_HASH_RESOURCE = "/current_commit_hash.txt";
 

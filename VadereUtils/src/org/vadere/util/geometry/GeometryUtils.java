@@ -1,19 +1,5 @@
 package org.vadere.util.geometry;
 
-import java.awt.geom.Area;
-import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Random;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -23,6 +9,17 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 import static org.vadere.util.geometry.GeometryUtils.Orientation.CCW;
 import static org.vadere.util.geometry.GeometryUtils.Orientation.COLLINEAR;
@@ -42,7 +39,7 @@ public class GeometryUtils {
 	 */
 	public static final double DOUBLE_EPS = 1e-8;
 
-	public static final Logger log = LogManager.getLogger(GeometryUtils.class);
+	public static final Logger log = Logger.getLogger(GeometryUtils.class);
 
 	/**
 	 * Interpolates between start and end with the given factor i.e. two values at once.

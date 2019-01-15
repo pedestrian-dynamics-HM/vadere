@@ -1,7 +1,5 @@
 package org.vadere.gui.components.control.simulation;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Resources;
@@ -10,6 +8,7 @@ import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.ImageGenerator;
 import org.vadere.gui.postvisualization.view.ImageSizeDialog;
+import org.vadere.util.logging.Logger;
 
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -23,7 +22,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class ActionGeneratePNG extends AbstractAction implements IRendererChangeListener {
-	private static Logger logger = LogManager.getLogger(ActionGeneratePNG.class);
+	private static Logger logger = Logger.getLogger(ActionGeneratePNG.class);
 	private static Resources resources = Resources.getInstance("global");
 	private ImageGenerator generator;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;

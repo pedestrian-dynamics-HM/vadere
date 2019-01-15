@@ -1,7 +1,6 @@
 package org.vadere.util.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -9,13 +8,42 @@ import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opencl.CL10.*;
+import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
+import static org.lwjgl.opencl.CL10.CL_MEM_ALLOC_HOST_PTR;
+import static org.lwjgl.opencl.CL10.CL_MEM_COPY_HOST_PTR;
+import static org.lwjgl.opencl.CL10.CL_MEM_READ_ONLY;
+import static org.lwjgl.opencl.CL10.CL_MEM_READ_WRITE;
+import static org.lwjgl.opencl.CL10.CL_MEM_WRITE_ONLY;
+import static org.lwjgl.opencl.CL10.CL_PROGRAM_BUILD_STATUS;
+import static org.lwjgl.opencl.CL10.CL_SUCCESS;
+import static org.lwjgl.opencl.CL10.clBuildProgram;
+import static org.lwjgl.opencl.CL10.clCreateBuffer;
+import static org.lwjgl.opencl.CL10.clCreateCommandQueue;
+import static org.lwjgl.opencl.CL10.clCreateContext;
+import static org.lwjgl.opencl.CL10.clCreateKernel;
+import static org.lwjgl.opencl.CL10.clCreateProgramWithSource;
+import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
+import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
+import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
+import static org.lwjgl.opencl.CL10.clFinish;
+import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
+import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
+import static org.lwjgl.opencl.CL10.clReleaseCommandQueue;
+import static org.lwjgl.opencl.CL10.clReleaseContext;
+import static org.lwjgl.opencl.CL10.clReleaseKernel;
+import static org.lwjgl.opencl.CL10.clReleaseMemObject;
+import static org.lwjgl.opencl.CL10.clReleaseProgram;
+import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
+import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
@@ -24,7 +52,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * @author Benedikt Zoennchen
  */
 public class CLConvolution {
-    private static Logger log = LogManager.getLogger(CLConvolution.class);
+    private static Logger log = Logger.getLogger(CLConvolution.class);
 
     // CL ids
     private long clPlatform;

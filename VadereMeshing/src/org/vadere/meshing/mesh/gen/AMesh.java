@@ -1,20 +1,26 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.SpaceFillingCurve;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.SpaceFillingCurve;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,7 +33,7 @@ import java.util.stream.Stream;
  * @param <P> the type of the points (containers)
  */
 public class AMesh<P extends IPoint> implements IMesh<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, Cloneable {
-	private final static Logger log = LogManager.getLogger(AMesh.class);
+	private final static Logger log = Logger.getLogger(AMesh.class);
 	private List<AFace<P>> faces;
 	private boolean elementRemoved;
 	private int numberOfVertices;

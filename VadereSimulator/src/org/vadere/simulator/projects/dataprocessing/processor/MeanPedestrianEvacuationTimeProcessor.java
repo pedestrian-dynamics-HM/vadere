@@ -8,8 +8,6 @@ import org.vadere.state.attributes.processor.AttributesMeanPedestrianEvacuationT
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Mario Teixeira Parente

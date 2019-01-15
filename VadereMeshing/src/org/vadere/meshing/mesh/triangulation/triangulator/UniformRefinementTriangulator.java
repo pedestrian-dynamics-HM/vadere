@@ -1,23 +1,29 @@
 package org.vadere.meshing.mesh.triangulation.triangulator;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriangulationSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.math.IDistanceFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>Triangulation creator: This class is implements an algorithm which refines a given triangulation
@@ -41,7 +47,7 @@ public class UniformRefinementTriangulator<P extends IPoint, V extends IVertex<P
 	private Set<P> points;
 	private IMesh<P, V, E, F> mesh;
 	private  LinkedList<F> toRefineEdges;
-	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulator.class);
+	private static final Logger logger = Logger.getLogger(UniformRefinementTriangulator.class);
 	private final IDistanceFunction distFunc;
 	private final Map<P,Integer> creationOrder;
 	private boolean initialized;

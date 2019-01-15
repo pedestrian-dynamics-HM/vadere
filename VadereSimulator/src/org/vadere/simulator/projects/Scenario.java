@@ -1,16 +1,5 @@
 package org.vadere.simulator.projects;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UncheckedIOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
@@ -19,7 +8,17 @@ import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.VadereClassNotFoundException;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import difflib.DiffUtils;
 
@@ -32,7 +31,7 @@ import difflib.DiffUtils;
  */
 public class Scenario {
 
-	private static Logger logger = LogManager.getLogger(Scenario.class);
+	private static Logger logger = Logger.getLogger(Scenario.class);
 	private ScenarioStore scenarioStore;
 	private ScenarioStore simulationScenarioStore;
 	private DataProcessingJsonManager dataProcessingJsonManager;

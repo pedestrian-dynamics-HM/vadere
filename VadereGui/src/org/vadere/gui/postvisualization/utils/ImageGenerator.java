@@ -1,20 +1,18 @@
 package org.vadere.gui.postvisualization.utils;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.SimulationRenderer;
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 public class ImageGenerator<T extends DefaultSimulationConfig> {
 
-	private static Logger logger = LogManager.getLogger(ImageGenerator.class);
+	private static Logger logger = Logger.getLogger(ImageGenerator.class);
 	private SimulationRenderer renderer;
 	private SimulationModel<? extends DefaultSimulationConfig> model;
 

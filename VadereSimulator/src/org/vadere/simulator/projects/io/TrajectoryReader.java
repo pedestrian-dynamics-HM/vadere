@@ -1,10 +1,6 @@
 package org.vadere.simulator.projects.io;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import org.apache.commons.math3.util.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
@@ -16,6 +12,7 @@ import org.vadere.state.simulation.Step;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +43,7 @@ import java.util.stream.Collectors;
 public class TrajectoryReader {
 
 	private static final String SPLITTER = " ";
-	private static Logger logger = LogManager.getLogger(IOVadere.class);
+	private static Logger logger = Logger.getLogger(IOVadere.class);
 	private Path trajectoryFilePath;
 	private AttributesAgent attributesPedestrian;
 	private Set<String> pedestrianIdKeys;

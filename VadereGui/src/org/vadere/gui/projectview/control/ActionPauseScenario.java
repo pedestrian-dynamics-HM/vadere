@@ -1,18 +1,19 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.VadereScenarioTableModel;
 import org.vadere.gui.projectview.model.VadereState;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class ActionPauseScenario extends AbstractAction {
 
-	private static Logger logger = LogManager.getLogger(ActionPauseScenario.class);
+	private static Logger logger = Logger.getLogger(ActionPauseScenario.class);
 
 	private ProjectViewModel model;
 

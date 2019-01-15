@@ -1,19 +1,18 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 
-	private final static Logger logger = LogManager.getLogger(UpdateSchemeEventDrivenParallel.class);
+	private final static Logger logger = Logger.getLogger(UpdateSchemeEventDrivenParallel.class);
 
 	private final Topography topography;
 	private LinkedCellsGrid<PedestrianOSM> linkedCellsGrid;

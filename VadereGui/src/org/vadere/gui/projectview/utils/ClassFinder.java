@@ -1,8 +1,6 @@
 package org.vadere.gui.projectview.utils;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
@@ -10,25 +8,31 @@ import org.vadere.simulator.projects.dataprocessing.datakey.OutputFileMap;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesOSM;
+import org.vadere.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Deprecated
 public class ClassFinder {
 
-    private static Logger log = LogManager.getLogger(ClassFinder.class);
+    private static Logger log = Logger.getLogger(ClassFinder.class);
 
 	public static List<String> getAttributesNames() {
 		// OSM ok for determining package name? use Object.class as tag instead?

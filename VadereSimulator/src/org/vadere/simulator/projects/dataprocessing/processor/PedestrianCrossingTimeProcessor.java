@@ -1,8 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
@@ -13,6 +11,7 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
 
@@ -21,7 +20,7 @@ import java.util.Collection;
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>{
 
 	private VRectangle measurementArea;
-	private static Logger logger = LogManager.getLogger(PedestrianCrossingTimeProcessor.class);
+	private static Logger logger = Logger.getLogger(PedestrianCrossingTimeProcessor.class);
 
 	public PedestrianCrossingTimeProcessor() {
 		super("crossStartTime", "crossEndTime");

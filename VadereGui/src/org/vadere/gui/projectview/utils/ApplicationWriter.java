@@ -1,13 +1,13 @@
 package org.vadere.gui.projectview.utils;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.ActionLoadProject;
-import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.ProjectWriter;
+import org.vadere.simulator.projects.VadereProject;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
@@ -15,7 +15,7 @@ import java.util.prefs.Preferences;
 
 public class ApplicationWriter {
 
-	private static Logger logger = LogManager.getLogger(ApplicationWriter.class);
+	private static Logger logger = Logger.getLogger(ApplicationWriter.class);
 
 	public static void saveProject(final String filePath, final VadereProject project, final boolean override)
 			throws IOException {

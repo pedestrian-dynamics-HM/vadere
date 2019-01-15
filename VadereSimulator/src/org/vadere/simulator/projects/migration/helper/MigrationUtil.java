@@ -1,21 +1,19 @@
 package org.vadere.simulator.projects.migration.helper;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.jolttranformation.JoltTransformation;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;

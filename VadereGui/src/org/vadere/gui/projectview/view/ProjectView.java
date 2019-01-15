@@ -1,7 +1,6 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
@@ -43,6 +42,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -73,7 +73,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 * Static variables
 	 */
 	private static final long serialVersionUID = -2081363246241235943L;
-	private static Logger logger = LogManager.getLogger(ProjectView.class);
+	private static Logger logger = Logger.getLogger(ProjectView.class);
 	/** Store a reference to the main window as "owner" parameter for dialogs. */
 	private static ProjectView mainWindow;
 

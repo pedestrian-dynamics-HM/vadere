@@ -1,14 +1,7 @@
 package org.vadere.simulator.models.ode;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import org.apache.commons.math3.exception.MathIllegalNumberException;
 import org.apache.commons.math3.ode.FirstOrderIntegrator;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Car;
@@ -17,8 +10,14 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public abstract class ODEModel<T extends DynamicElement, TAttributes extends AttributesDynamicElement>
 		implements MainModel {
@@ -33,7 +32,7 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 	protected Topography topography;
 	protected TAttributes elementAttributes;
 
-	private Logger logger = LogManager.getLogger(ODEModel.class);
+	private Logger logger = Logger.getLogger(ODEModel.class);
 	private Class<T> type;
 
 	@Deprecated

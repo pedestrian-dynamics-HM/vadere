@@ -1,20 +1,21 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
+
+import java.awt.*;
+import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.util.prefs.Preferences;
 
 public class VDialogManager {
 
-	private static Logger logger = LogManager.getLogger(VDialogManager.class);
+	private static Logger logger = Logger.getLogger(VDialogManager.class);
 	private static final FileFilter PROJECT_FILTER = new FileNameExtensionFilter("Vadere Project", "project");
 
 	public static String saveProjectDialog() {

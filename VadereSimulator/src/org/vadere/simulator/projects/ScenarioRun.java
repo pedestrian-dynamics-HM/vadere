@@ -1,5 +1,15 @@
 package org.vadere.simulator.projects;
 
+import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.control.Simulation;
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -11,19 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.CallbackI;
-import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.MainModelBuilder;
-import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.util.io.IOUtils;
-
 /**
  * Manages single simulation runs.
  * 
@@ -32,7 +29,7 @@ import org.vadere.util.io.IOUtils;
  */
 public class ScenarioRun implements Runnable {
 
-	private static Logger logger = LogManager.getLogger(ScenarioRun.class);
+	private static Logger logger = Logger.getLogger(ScenarioRun.class);
 
 	private Path outputPath;
 

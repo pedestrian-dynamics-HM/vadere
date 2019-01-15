@@ -1,17 +1,19 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
+
+import org.vadere.util.logging.Logger;
+
 import java.awt.*;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+
 public class OutputTableRenderer extends DefaultTableCellRenderer {
 	private static final long serialVersionUID = -3026076129551731012L;
-	private static Logger logger = LogManager.getLogger(OutputTableRenderer.class);
+	private static Logger logger = Logger.getLogger(OutputTableRenderer.class);
 	private Collection<String> markedOutputFiles;
 
 	public OutputTableRenderer() {

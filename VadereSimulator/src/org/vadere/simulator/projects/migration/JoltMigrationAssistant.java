@@ -3,12 +3,12 @@ package org.vadere.simulator.projects.migration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.jolttranformation.JoltTransformation;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.LogBufferAppender;
+import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;

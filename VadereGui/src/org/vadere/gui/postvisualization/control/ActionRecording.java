@@ -1,13 +1,5 @@
 package org.vadere.gui.postvisualization.control;
 
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-
-import javax.swing.Icon;
-import javax.swing.JButton;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -15,9 +7,15 @@ import org.vadere.gui.postvisualization.utils.IRecorder;
 import org.vadere.gui.postvisualization.utils.MovRecorder;
 import org.vadere.gui.postvisualization.view.ImageSizeDialog;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
+import javax.swing.*;
 
 public class ActionRecording extends ActionVisualization {
-	private static Logger logger = LogManager.getLogger(ActionRecording.class);
+	private static Logger logger = Logger.getLogger(ActionRecording.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final PostvisualizationModel model;
 	private JButton button;

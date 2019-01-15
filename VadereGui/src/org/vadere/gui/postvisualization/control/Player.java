@@ -1,11 +1,11 @@
 package org.vadere.gui.postvisualization.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.util.logging.Logger;
 
 public class Player implements Runnable {
-	private static Logger logger = LogManager.getLogger(Player.class);
+	private static Logger logger = Logger.getLogger(Player.class);
 	private static volatile Player instance;
 	private Thread currentThread;
 	private int currentStep;

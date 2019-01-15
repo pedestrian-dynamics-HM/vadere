@@ -3,8 +3,6 @@ package org.vadere.gui.postvisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
@@ -13,16 +11,17 @@ import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.SettingsDialog;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
 import org.vadere.gui.postvisualization.utils.ImageGenerator;
-
-import javax.swing.*;
+import org.vadere.util.logging.Logger;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.*;
+
 public class ImageSizeDialog extends JDialog {
-	private static Logger logger = LogManager.getLogger(SettingsDialog.class);
+	private static Logger logger = Logger.getLogger(SettingsDialog.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private double scale;
 	private SimulationModel<? extends DefaultSimulationConfig> model;

@@ -1,7 +1,5 @@
 package org.vadere.simulator.models.osm.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -15,6 +13,7 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
@@ -70,7 +69,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
 public class CLOptimalStepsModel {
-    private static Logger log = LogManager.getLogger(CLOptimalStepsModel.class);
+    private static Logger log = Logger.getLogger(CLOptimalStepsModel.class);
 
     // CL ids
     private long clPlatform;
@@ -148,7 +147,7 @@ public class CLOptimalStepsModel {
     private int[] resultValues;
     private int[] resultKeys;
 
-    private static final Logger logger = LogManager.getLogger(CLOptimalStepsModel.class);
+    private static final Logger logger = Logger.getLogger(CLOptimalStepsModel.class);
 
     private int max_work_group_size;
 

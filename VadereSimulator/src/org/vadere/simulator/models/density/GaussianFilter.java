@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.density;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.Convolution;
 
 import java.awt.geom.Rectangle2D;
@@ -36,7 +35,7 @@ abstract class GaussianFilter implements IGaussianFilter {
 
 	private Rectangle2D bound;
 
-	private static Logger logger = LogManager.getLogger(GaussianFilter.class);
+	private static Logger logger = Logger.getLogger(GaussianFilter.class);
 
 	GaussianFilter(final Rectangle2D scenarioBounds, final double scale, final BiFunction<Integer, Integer, Float> f,
 	               final boolean noramized) {

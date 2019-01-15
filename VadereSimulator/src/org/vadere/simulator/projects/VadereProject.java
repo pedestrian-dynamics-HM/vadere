@@ -1,9 +1,8 @@
 package org.vadere.simulator.projects;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.projects.migration.MigrationResult;
+import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
  */
 public class VadereProject {
 
-	private static Logger logger = LogManager.getLogger(VadereProject.class);
+	private static Logger logger = Logger.getLogger(VadereProject.class);
 
 	private String name;
 	private Thread currentScenarioThread;

@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import info.clearthought.layout.TableLayout;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -24,6 +22,7 @@ import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -53,7 +52,7 @@ import javax.swing.table.DefaultTableModel;
 
 class DataProcessingView extends JPanel implements IJsonView {
 
-	private static Logger logger = LogManager.getLogger(DataProcessingView.class);
+	private static Logger logger = Logger.getLogger(DataProcessingView.class);
 
 	private IJsonView activeJsonView; // gui-mode or expert-mode
 	private JLabel switchJsonViewModeLabel = new JLabel();

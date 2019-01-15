@@ -1,13 +1,7 @@
 package org.vadere.simulator.projects;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -17,9 +11,13 @@ import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.data.FindByClass;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Contains the data for a Vadere object that can be serialized.
@@ -28,7 +26,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class ScenarioStore {
 
-	private static Logger logger = LogManager.getLogger(ScenarioStore.class);
+	private static Logger logger = Logger.getLogger(ScenarioStore.class);
 	private String name;
 	private String description;
 	private String mainModel;

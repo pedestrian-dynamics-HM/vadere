@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.osm.opencl;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,6 +14,7 @@ import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.TextOutOfNodeException;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benedikt Zoennchen

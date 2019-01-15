@@ -13,15 +13,11 @@ import org.vadere.util.voronoi.Face;
 import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
-import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Given a Simulation state this Algorithm computes the Voronoi density and Voronoi velocity

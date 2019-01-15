@@ -1,9 +1,9 @@
 package org.vadere.util.math;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLConvolution;
 import org.vadere.util.opencl.OpenCLException;
 
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestConvolution {
 
-    private static Logger logger = LogManager.getLogger(TestConvolution.class);
+    private static Logger logger = Logger.getLogger(TestConvolution.class);
 
     @Before
     public void setUp() throws Exception {}

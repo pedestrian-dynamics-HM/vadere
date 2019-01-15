@@ -1,25 +1,24 @@
 package org.vadere.simulator.models.potential.fields;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
 import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
-import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
-import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
@@ -34,7 +33,7 @@ import java.util.Collection;
  */
 public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 
-	private static Logger logger = LogManager.getLogger(PotentialFieldDistanceEikonalEq.class);
+	private static Logger logger = Logger.getLogger(PotentialFieldDistanceEikonalEq.class);
 	private final EikonalSolver eikonalSolver;
 
 	public PotentialFieldDistanceEikonalEq(@NotNull final Collection<VShape> obstacles,

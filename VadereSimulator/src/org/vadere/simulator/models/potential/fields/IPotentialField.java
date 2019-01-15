@@ -1,50 +1,46 @@
 package org.vadere.simulator.models.potential.fields;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
-import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
-import org.vadere.state.attributes.models.AttributesFloorField;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.types.EikonalSolverType;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.math.DistanceFunctionTarget;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.util.data.cellgrid.CellState;
-import org.vadere.util.data.cellgrid.FloorDiscretizer;
-import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
+import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.types.EikonalSolverType;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.FloorDiscretizer;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.DistanceFunction;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
+import org.vadere.util.math.InterpolationUtil;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.vadere.util.math.InterpolationUtil;
 
 /**
  * A potential field for some agents: ((x,y), agent) -> potential.
@@ -64,7 +60,7 @@ public interface IPotentialField {
      */
     double getPotential(final IPoint pos, final Agent agent);
 
-    Logger logger = LogManager.getLogger(IPotentialField.class);
+    Logger logger = Logger.getLogger(IPotentialField.class);
 
     /**
      * Factory method to construct an EikonalSolver for agents of target defined by targetShapes and targetId.

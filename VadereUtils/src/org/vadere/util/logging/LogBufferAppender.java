@@ -1,7 +1,6 @@
 package org.vadere.util.logging;
 
 
-import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
@@ -14,7 +13,7 @@ import org.apache.log4j.spi.LoggingEvent;
  * At the time of writing this is used in the Migration assistant to show the user any
  * problems during scenario file migration. This Appender can be used with any Logger in vader.
  */
-public class LogBufferAppender extends AppenderSkeleton {
+public class LogBufferAppender extends Appender {
 
 	private StringBuffer sb;
 	private Layout layout;

@@ -1,34 +1,33 @@
 package org.vadere.simulator.models.potential.solver;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -45,7 +44,7 @@ import java.util.stream.Stream;
 
 public class TestFFMNonUniformTriangulation {
 
-    private static Logger log = LogManager.getLogger(TestFFMNonUniformTriangulation.class);
+    private static Logger log = Logger.getLogger(TestFFMNonUniformTriangulation.class);
     private int width;
     private int height;
     private VRectangle bbox;
