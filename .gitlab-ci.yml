@@ -83,3 +83,8 @@ run_seed_test:
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
         - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py
+    artifacts:
+        when: on_failure
+        paths: 
+            - "/Tools/ContinuousIntegration/run_seed_comparison_test.d/output/"
+        expire_in: 1 week
