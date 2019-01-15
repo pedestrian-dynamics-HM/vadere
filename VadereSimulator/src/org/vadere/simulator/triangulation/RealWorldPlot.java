@@ -530,7 +530,7 @@ public class RealWorldPlot {
 				//p -> 1.0 + Math.abs(approxDistance.apply(p)),
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),
 				0.4,
-				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
+				bound, topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				() -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
 
 		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(

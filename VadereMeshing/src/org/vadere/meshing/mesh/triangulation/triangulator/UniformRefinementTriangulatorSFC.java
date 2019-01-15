@@ -434,7 +434,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 
 				// TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
-				//insertFixPoints(fixPoints);
+				insertFixPoints(fixPoints);
 				triangulation.finish();
 
 				// the following calls are quite expensive
@@ -468,6 +468,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 		for(P fixPoint : fixPoints) {
 			Optional<F> optFace = triangulation.locateFace(fixPoint);
 			if(optFace.isPresent()) {
+				assert triangulation.contains(fixPoint.getX(), fixPoint.getY(), optFace.get());
 				V closestPoint = null;
 				double distance = Double.MAX_VALUE;
 				for(V v : getMesh().getVertexIt(optFace.get())) {

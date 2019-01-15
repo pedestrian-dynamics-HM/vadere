@@ -1045,6 +1045,8 @@ public class GeometryUtils {
 			path2D.lineTo(points.get(i).getX(), points.get(i).getY());
 		}
 
+		//path2D.closePath();
+
 		return new VPolygon(path2D);
 	}
 
@@ -1106,6 +1108,8 @@ public class GeometryUtils {
 		for(int i = 1; i < points.length; i++) {
 			path2D.lineTo(points[i].getX(), points[i].getY());
 		}
+
+		//path2D.closePath();
 
 		return new VPolygon(path2D);
 	}

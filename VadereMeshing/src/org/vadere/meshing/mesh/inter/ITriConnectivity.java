@@ -103,8 +103,33 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param point     the new point of the vertex
 	 */
 	default void replacePoint(@NotNull final V vertex, @NotNull final P point) {
-		assert GeometryUtils.toPolygon(getMesh().getPoints(vertex)).contains(point);
+		if(!ringContainsPoint(vertex, point)) {
+			ringContainsPoint(vertex, point);
+		}
+		assert ringContainsPoint(vertex, point);
 		getMesh().setPoint(vertex, point);
+	}
+
+	/**
+	 * <p>Tests if the point is contained in the 1-Ring of the vertex, i.e. the polygon spanned by the
+	 * neighbour points of the point including itself if the point is at the boundary.</p>
+	 *
+	 * @param vertex    the vertex
+	 * @param point     the point
+	 * @return true if the point is contained, false otherwise
+	 */
+	default boolean ringContainsPoint(@NotNull final V vertex, @NotNull final P point)  {
+		java.util.List<P> points = getMesh().getPoints(vertex);
+
+		if(getMesh().isAtBoundary(vertex)) {
+			points.add(getMesh().getPoint(vertex));
+		}
+
+		double distance = GeometryUtils.toPolygon(points).distance(point);
+
+		return points.contains(point)
+				|| GeometryUtils.toPolygon(points).contains(point)
+				|| GeometryUtils.toPolygon(points).distance(point) <= GeometryUtils.DOUBLE_EPS;
 	}
 
 	/**
