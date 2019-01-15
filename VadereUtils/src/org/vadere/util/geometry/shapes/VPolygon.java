@@ -406,6 +406,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 		PathIterator iterator = this.getPathIterator(null);
 
+		double[] first = null;
 		double[] last = new double[2];
 		double[] next = new double[2];
 		VPoint currentClosest;
@@ -416,6 +417,10 @@ public class VPolygon extends Path2D.Double implements VShape {
 		while (!iterator.isDone()) {
 			last[0] = next[0];
 			last[1] = next[1];
+
+			if(first == null) {
+				first = new double[]{last[0], last[1]};
+			}
 
 			iterator.currentSegment(next);
 
@@ -428,6 +433,17 @@ public class VPolygon extends Path2D.Double implements VShape {
 			}
 
 			iterator.next();
+		}
+
+		// dont forget the last and first point!
+		if(first != null) {
+			currentClosest = GeometryUtils.closestToSegment(new VLine(next[0],
+					next[1], first[0], first[1]), point);
+
+			if (currentClosest.distance(point) < currentMinDistance) {
+				currentMinDistance = currentClosest.distance(point);
+				resultPoint = currentClosest;
+			}
 		}
 
 		return resultPoint;
