@@ -62,23 +62,6 @@ With the following steps, you can run a simulation with one of the built-in exam
 - choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
 - select the scenario on the left and press *run selected scenario*
 
-### Use Git Hooks
-
-Since it is important to reproduce simulation results, we have the guidline that each output file has to provide its commit-hash. This commit-hash identifies
-the state the software was in when the output file was generated. Therefore, git hooks save the commit-hash in the **current_commit_hash.txt** which
-will be created in the [VadereSimulator/resource](vadere/VadereSimulator/resource) directory whenever a commit is made or the developer
-switches to another commit. If the file is missing or there is no commit-hash in it, you will be warned in the log. 
-We strongly suggest that you install these git hooks on your local machine:
-
-1. Copy files [post-checkout](Documentation/version-control/post-checkout), [post-merge](Documentation/version-control/post-merge), 
-[post-applypatch](Documentation/version-control/post-applypatch) and [post-commit](Documentation/version-control/post-commit) 
-from [version-control](Documentation/version-control) to your local **.git/hooks/** directory.
-These files start the script [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software).
-2. Make sure that [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software) is executable.
-
-To create the **current_commit_hash.txt** without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
-switch to another branch and switch back again using the command line or any other tool you prefer.
-
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
