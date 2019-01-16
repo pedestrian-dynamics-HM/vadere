@@ -37,6 +37,28 @@
       </testResources>
     <plugins>
         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>write_version_control_info_to_file</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <!-- Write a file with current version of Vadere to get reproducible simulations. -->
+            <configuration>
+                <executable>git</executable>
+                <arguments>
+                    <argument>rev-parse</argument>
+                    <argument>HEAD</argument>
+                </arguments>
+                <outputFile>resources/current_commit_hash.txt</outputFile>
+            </configuration>
+        </plugin>
+        <plugin>
             <groupId>com.nativelibs4java</groupId>
             <artifactId>maven-javacl-plugin</artifactId>
             <version>1.0.0-RC4</version>

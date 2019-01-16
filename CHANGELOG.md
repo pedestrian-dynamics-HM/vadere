@@ -27,6 +27,13 @@
   sub-command. This will will turn the ScenarioChecker on or off for the command
   line. If the Checker detects an error  the simulation will not be executed.
 
+### Changed
+
+- Removed directory `Documentation/version-control` which contained the Git hooks. The Git hooks are not required anymore. Instead, added `git rev-parse HEAD` to file `VadereSimulator/pom.xml` to create `VadereSimulator/resources/current_commit_hash.txt` during each build via `mvn compile`.
+  **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build.
+`
+
+
 ## v0.6 (2018-09-07)
 
 ### Added
