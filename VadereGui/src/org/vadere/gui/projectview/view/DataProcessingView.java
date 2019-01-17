@@ -580,7 +580,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 2;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputHeaderSelection.label")+":"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputIndicesSelection.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 2;
