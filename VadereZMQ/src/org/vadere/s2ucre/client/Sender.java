@@ -87,6 +87,7 @@ public class Sender {
 		if(running) {
 			Runnable runnable = () -> {
 				org.vadere.s2ucre.generated.Pedestrian.PedMsg simulatedPedestrians = toPedestrianAtTime(pedestrian, timestamp, referenc);
+				logger.info("send:" + simulatedPedestrians.toString());
 				publisher.send(simulatedPedestrians.toByteArray());
 			};
 			submittedSends.add(executor.submit(runnable));

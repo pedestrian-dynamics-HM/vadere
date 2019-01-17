@@ -19,10 +19,19 @@ import java.util.Random;
 
 public class Utils {
 
+	/**
+	 * see https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/timestamp.proto
+	 * @param timestamp
+	 * @param seconds
+	 * @return
+	 */
 	public static Timestamp addSeconds(@NotNull final Timestamp timestamp, final double seconds) {
+		double milliseconds = seconds * 1000;
+		long sec = (long)(milliseconds / 1000);
+		int nano = (int)(milliseconds % 1000) * 1_000_000;
 		return Timestamp.newBuilder()
-				.setSeconds(timestamp.getSeconds() + (long)seconds)
-				.setNanos((int)((seconds-(long)seconds) * 1_000_000.0))
+				.setSeconds(timestamp.getSeconds() + sec)
+				.setNanos(timestamp.getNanos() + nano)
 				.build();
 	}
 

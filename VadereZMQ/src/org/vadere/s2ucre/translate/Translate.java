@@ -109,7 +109,9 @@ public class Translate {
 				}
 
 				IosbOutput.AreaInfoAtTime areaInfoAtTime = inQueue.poll();
+				//logger.info(areaInfoAtTime.toString());
 				List<Pedestrian.PedMsg> pedMsgs = translate(areaInfoAtTime);
+				logger.info(pedMsgs);
 				for(Pedestrian.PedMsg pedMsg : pedMsgs) {
 					outQueue.add(pedMsg);
 				}

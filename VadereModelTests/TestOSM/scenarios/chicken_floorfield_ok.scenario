@@ -109,7 +109,7 @@
     "attributesSimulation" : {
       "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
+      "realTimeSimTimeRatio" : 0.4,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -186,13 +186,13 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 300,
-        "maxSpawnNumberTotal" : -1,
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : 40,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 20.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : true,
+        "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
