@@ -5,6 +5,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
 
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
@@ -21,6 +22,7 @@ public class VadereApplication {
 	private static Logger logger = Logger.getLogger(VadereApplication.class);
 
 	public static void main(String[] args) {
+		StdOutErrLog.addStdOutErrToLog();
 		logger.info("starting Vadere GUI...");
         // load settings
 		loadPreferences();

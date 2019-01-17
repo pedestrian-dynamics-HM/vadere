@@ -4,8 +4,11 @@ package org.vadere.util.logging;
 import java.io.PrintStream;
 
 public class StdOutErrLog {
-	private static final Logger logger = Logger.getLogger(StdOutErrLog.class);
+	private static final Logger logger = Logger.getLogger("STDOUTERR");
 
+	/**
+	 * redirect StdOut and StdErr to logfile with custom log level STDOUT and STDERR.
+	 */
 	public static void addStdOutErrToLog(){
 		System.setOut(redirectOut(System.out));
 		System.setErr(redirectErr(System.err));
@@ -16,7 +19,7 @@ public class StdOutErrLog {
 		return new PrintStream(baseStream){
 			public void print(final String s){
 				baseStream.print(s);
-				logger.info(s);
+				logger.stdout(s);
 			}
 		};
 	}
@@ -26,7 +29,7 @@ public class StdOutErrLog {
 		return new PrintStream(baseStream){
 			public void print(final String s){
 				baseStream.print(s);
-				logger.error(s);
+				logger.stderr(s);
 			}
 		};
 	}

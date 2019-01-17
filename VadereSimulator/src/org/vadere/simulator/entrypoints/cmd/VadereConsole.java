@@ -17,6 +17,7 @@ import org.vadere.simulator.entrypoints.cmd.commands.SetLogNameCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
 
 
 /**
@@ -33,6 +34,7 @@ public class VadereConsole {
 		ArgumentParser parser = createArgumentParser();
 
 		try {
+			StdOutErrLog.addStdOutErrToLog();
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
 			sRunner.run(ns, parser);

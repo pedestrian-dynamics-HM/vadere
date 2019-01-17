@@ -3,6 +3,7 @@ package org.vadere.gui.postvisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
 
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
@@ -14,6 +15,7 @@ public class PostVisualisation {
 	private static Logger logger = Logger.getLogger(PostVisualisation.class);
 
 	public static void main(String[] args) {
+		StdOutErrLog.addStdOutErrToLog();
 		logger.info("starting post visualization ...");
 		// load settings
 		loadPreferences();

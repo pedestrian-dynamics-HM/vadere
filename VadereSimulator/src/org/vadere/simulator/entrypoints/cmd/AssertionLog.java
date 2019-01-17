@@ -17,8 +17,7 @@ public class AssertionLog {
 		logger.info("Test Info");
 		logger.warn("Test Warn");
 		logger.error("Test Err");
-		logger.debug("Test Debug %d", 5);
-
+		logger.debugf("Test Debug %d", 5);
 		assert false : "Fail";
 	}
 
