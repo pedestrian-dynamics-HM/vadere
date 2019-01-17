@@ -168,6 +168,7 @@ public class CentroidGroup implements Group {
 		noVisionOfLeaderCount.put(ped, 0);
 
 		members.add(ped);
+		initGroupVelocity(); // ensure same speed for all members.
 
 	}
 
@@ -177,6 +178,10 @@ public class CentroidGroup implements Group {
 		lastVision.remove(ped);
 		lostMembers.remove(ped);
 		noVisionOfLeaderCount.remove(ped);
+	}
+
+	private void initGroupVelocity(){
+		getMembers().forEach(m -> m.setFreeFlowSpeed(groupVelocity));
 	}
 
 	public double getGroupVelocity() {

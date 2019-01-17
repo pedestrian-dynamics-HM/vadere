@@ -1,5 +1,5 @@
 {
-  "name" : "group_OSM_4Source4Place_2Group_3Group_4Group_5Group",
+  "name" : "group_OSM_4Source4Place_SEQ_2G_3G_4G_5G",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -60,7 +60,7 @@
         "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : true,
-        "updateType" : "EVENT_DRIVEN",
+        "updateType" : "SEQUENTIAL",
         "seeSmallWalls" : false,
         "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
