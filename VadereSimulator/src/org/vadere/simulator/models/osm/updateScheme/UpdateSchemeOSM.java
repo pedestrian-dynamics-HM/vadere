@@ -106,9 +106,9 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 	 *
 	 * @param topography 	manages simulation data
 	 * @param pedestrian	moving pedestrian. This object's position is already set.
-	 * @param stepTime		time in seconds used for the step.
+	 * @param stepDuration		time in seconds used for the step.
 	 */
-	default void makeStep(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, final double stepTime) {
+	default void makeStep(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, final double stepDuration) {
 		VPoint currentPosition = pedestrian.getPosition();
 		VPoint nextPosition = pedestrian.getNextPosition();
 
@@ -126,7 +126,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep());
 			movePedestrian(topography, pedestrian, pedestrian.getPosition(), nextPosition);
 			// compute velocity by forward difference
-			Vector2D pedVelocity = new Vector2D(nextPosition.x - currentPosition.x, nextPosition.y - currentPosition.y).multiply(1.0 / stepTime);
+			Vector2D pedVelocity = new Vector2D(nextPosition.x - currentPosition.x, nextPosition.y - currentPosition.y).multiply(1.0 / stepDuration);
 			pedestrian.setVelocity(pedVelocity);
 		}
 
