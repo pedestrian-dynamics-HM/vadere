@@ -584,7 +584,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 1;
 			c.gridy = 2;
-			panel.add(new JLabel(outputFile.getHeader()), c);
+			panel.add(new JLabel(outputFile.getIndices()), c);
 
 			c.gridx = 0;
 			c.gridy = 3;

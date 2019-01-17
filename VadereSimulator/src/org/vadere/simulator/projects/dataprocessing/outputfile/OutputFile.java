@@ -29,7 +29,12 @@ import java.util.stream.Stream;
  */
 
 public abstract class OutputFile<K extends DataKey<K>> {
-	private String[] keyHeaders;
+
+
+	//Note: Only header information from data keys are written in this, therefore, these are the indices
+	// Each processor attached to this processor itself attaches also headers, but they are not listed in this
+	// attribute.
+	private String[] dataIndices;
 
 	/**
 	 * The file name without the path to the file
@@ -48,8 +53,8 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private VadereWriterFactory writerFactory;
 	private VadereWriter writer;
 
-	protected OutputFile(final String... keyHeaders) {
-		this.keyHeaders = keyHeaders;
+	protected OutputFile(final String... dataIndices) {
+		this.dataIndices = dataIndices;
 		this.dataProcessors = new ArrayList<>();
 		this.writerFactory = VadereWriterFactory.getFileWriterFactory();
 	}
@@ -84,7 +89,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		if (!isEmpty()) {
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
 				writer = out;
-				printHeader(out);
+				printIndices(out);
 
 				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
 						.distinct().sorted()
@@ -101,16 +106,16 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return this.dataProcessors.isEmpty();
 	}
 
-	private List<String> getFieldHeaders() {
-		return composeLine(keyHeaders, p -> Arrays.stream(p.getHeaders()));
+	private List<String> getDataIndices() {
+		return composeLine(dataIndices, p -> Arrays.stream(p.getHeaders()));
 	}
 
-	public void printHeader(VadereWriter out) {
-		writeLine(out, getFieldHeaders());
+	public void printIndices(VadereWriter out) {
+		writeLine(out, getDataIndices());
 	}
 
-	public String getHeader() {
-		return String.join(this.separator, getFieldHeaders());
+	public String getIndices() {
+		return String.join(this.separator, getDataIndices());
 	}
 
 	private void printRow(final VadereWriter out, final K key) {
@@ -133,7 +138,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	/**
-	 * Return the column headers as string or the empty array.
+	 * Return the column indices as string or the empty array.
 	 */
 	public String[] toStrings(K key) {
 		return new String[]{key.toString()};

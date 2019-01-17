@@ -40,19 +40,19 @@ public class TestOutputFileAfterMultipleRuns {
 	@Test()
 	public void testFileFormatAfterMultipleSimulationRuns() {
 
-		ArrayList<String> headerAfterFirstRun = new ArrayList<>();
-		ArrayList<String> headerAfterSecondRun = new ArrayList<>();
+		ArrayList<String> indicesAfterFirstRun = new ArrayList<>();
+		ArrayList<String> indicesAfterSecondRun = new ArrayList<>();
 
 		ProcessorManager manager = testScenario.getDataProcessingJsonManager()
 				.createProcessorManager(mainModel);
 		manager.initOutputFiles();
 		List<OutputFile<?>> outputFiles = testScenario.getDataProcessingJsonManager().getOutputFiles();
-		outputFiles.forEach(f -> headerAfterFirstRun.add(f.getHeader()));
+		outputFiles.forEach(f -> indicesAfterFirstRun.add(f.getIndices()));
 
 		manager.initOutputFiles();
-		outputFiles.forEach(f -> headerAfterSecondRun.add(f.getHeader()));
+		outputFiles.forEach(f -> indicesAfterSecondRun.add(f.getIndices()));
 
 		assertEquals("Duplicated Processors in OutputFile after multiple Simulations",
-				headerAfterFirstRun, headerAfterSecondRun);
+				indicesAfterFirstRun, indicesAfterSecondRun);
 	}
 }
