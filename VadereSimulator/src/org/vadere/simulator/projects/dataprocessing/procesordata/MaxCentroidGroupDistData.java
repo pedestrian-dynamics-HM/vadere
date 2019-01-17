@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.procesordata;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.models.groups.cgm.CentroidGroup;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -11,8 +12,9 @@ public class MaxCentroidGroupDistData {
 	private double dist;
 
 	public MaxCentroidGroupDistData(Pedestrian ped, CentroidGroup group){
-		this.pedId = group.getMaxDistPedIdInGroup(ped);
-		this.dist = group.getMaxDistToPedInGroup(ped);
+		Pair<Pedestrian, Double> maxDist = group.getMaxDistPedIdInGroup(ped);
+		this.pedId = maxDist.getKey().getId();
+		this.dist = maxDist.getValue();
 	}
 
 	public MaxCentroidGroupDistData(int pedId, double dist) {

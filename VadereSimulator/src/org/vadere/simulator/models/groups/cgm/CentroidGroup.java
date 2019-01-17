@@ -6,9 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.models.groups.Group;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class CentroidGroup implements Group {
@@ -19,20 +22,22 @@ public class CentroidGroup implements Group {
 	final private int id;
 	final private int size;
 
-	final protected List<Pedestrian> members;
+	final protected ArrayList<Pedestrian> members;
 
 	private double groupVelocity;
 
-	private final List<Pedestrian> lostMembers;
+	private final LinkedList<Pedestrian> lostMembers;
 	private Map<Pedestrian, Map<Pedestrian, VPoint>> lastVision;
 	private final Map<Pedestrian, Integer> noVisionOfLeaderCount;
 	private  IPotentialFieldTarget potentialFieldTarget;
+	private final CentroidGroupModel model;
 
 	public CentroidGroup(int id, int size,
-				 IPotentialFieldTarget potentialFieldTarget) {
+				 CentroidGroupModel model) {
 		this.id = id;
 		this.size = size;
-		this.potentialFieldTarget = potentialFieldTarget;
+		this.model = model;
+		this.potentialFieldTarget = model.getPotentialFieldTarget();
 		members = new ArrayList<>();
 
 		this.lastVision = new HashMap<>();
@@ -188,44 +193,83 @@ public class CentroidGroup implements Group {
 		return groupVelocity;
 	}
 
-	/**
-	 *
-	 * @param ped	Pedestrian to which the distances is measured.
-	 * @return		The maxDist within the group.
-	 */
-	public double getMaxDistToPedInGroup(Pedestrian ped){
-		return members.stream()
-				.mapToDouble(p-> p.getPosition().distance(ped.getPosition()))
-				.max()
-				.orElse(0.0);
+	private int getPairCount(){
+		return (members.size() * members.size() - members.size()) / 2;
 	}
 
-	/**
-	 *
-	 * @param ped	Pedestrian to which the distances is measured.
-	 * @return		Id of other pedestrian
-	 */
-	public int getMaxDistPedIdInGroup(Pedestrian ped){
-		double maxDist = getMaxDistToPedInGroup(ped);
-		return members.stream()
-				.filter(p-> p.getPosition().distance(ped.getPosition()) == maxDist)
-				.findFirst().get().getId();
-	}
-
-	/**
-	 *
-	 * @return 	The maximal euclidean distance between two group members.
-	 */
-	public double getMaxDistInGroup(){
-		double maxDist = 0.0;
+	public  ArrayList<Pair<Pedestrian, Pedestrian>> getMemberPairs(){
+		ArrayList<Pair<Pedestrian, Pedestrian>> ret = new ArrayList<>(getPairCount());
 		for (int i = 0; i < members.size(); i++) {
 			for (int j = 1; j < members.size(); j++) {
-				double tmpDist = members.get(i).getPosition().distance(members.get(j).getPosition());
-				maxDist = tmpDist > maxDist ? tmpDist : maxDist;
+				Pedestrian m1 = members.get(i);
+				Pedestrian m2 = members.get(j);
+				ret.add(Pair.of(m1, m2));
 			}
 		}
-		return maxDist;
+		return ret;
 	}
+
+	public ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> getEuclidDist(){
+		ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> ret = new ArrayList<>(getPairCount());
+
+		for (Pair<Pedestrian, Pedestrian> p : getMemberPairs()) {
+			double dist = p.getLeft().getPosition().distance(p.getRight().getPosition());
+			ret.add(Pair.of(p, dist));
+		}
+		return ret;
+	}
+
+	public ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Boolean>> getPairIntersectObstacle(){
+		ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Boolean>> ret = new ArrayList<>(getPairCount());
+
+		for (Pair<Pedestrian, Pedestrian> p : getMemberPairs()) {
+			VLine pedLine = new VLine(p.getLeft().getPosition(), p.getRight().getPosition());
+			boolean intersectsObs = model.getTopography().getObstacles()
+					.stream()
+					.map(Obstacle::getShape)
+					.anyMatch(s -> s.intersects(pedLine));
+			ret.add(Pair.of(p, intersectsObs));
+		}
+		return ret;
+	}
+
+	public ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> getPotentialDist(){
+		ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> ret = new ArrayList<>(getPairCount());
+
+		for (Pair<Pedestrian, Pedestrian> p : getMemberPairs()) {
+			double potential1 = potentialFieldTarget.getPotential(p.getLeft().getPosition(), p.getLeft());
+			double potential2 = potentialFieldTarget.getPotential(p.getRight().getPosition(), p.getRight());
+			double potentialDiff = Math.abs(potential1 - potential2);
+			ret.add(Pair.of(p, potentialDiff));
+
+		}
+		return ret;
+	}
+
+	/**
+	 * The method returns the maximal euclidean distance to another group member.
+	 * The other group member is the Key (left element) of the Pair.
+	 *
+	 * @param ped	Pedestrian to which the distances is measured.
+	 * @return		Returns a Pair (Ped, Double)
+	 */
+	public Pair<Pedestrian, Double> getMaxDistPedIdInGroup(Pedestrian ped){
+		Pair<Pair<Pedestrian, Pedestrian>, Double> maxDist = getEuclidDist().stream()
+				// only compare member-Pairs in which the ped is a part of. Either left or right
+				.filter(pair -> pair.getKey().getLeft().equals(ped) || pair.getKey().getRight().equals(ped))
+				// return the pair with the max distance
+				.max(Map.Entry.comparingByValue()).orElse(null);
+
+		if (maxDist == null){
+			return Pair.of(ped, 0.0);
+		} else if (maxDist.getKey().getLeft().equals(ped)){
+			return Pair.of(maxDist.getKey().getRight(), maxDist.getValue());
+		} else {
+			return Pair.of(maxDist.getKey().getLeft(), maxDist.getValue());
+		}
+
+	}
+
 
 
 	void setLastVision(Pedestrian ped, Pedestrian p) {

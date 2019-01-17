@@ -126,7 +126,7 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	@Override
 	protected CentroidGroup getNewGroup(final int id, final int size) {
-		return new CentroidGroup(id, size, this.potentialFieldTarget);
+		return new CentroidGroup(id, size, this);
 	}
 
 	private void initializeGroupsOfInitialPedestrians() {
@@ -222,5 +222,10 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	@Override
 	public void update(final double simTimeInSec) {
+	}
+
+
+	protected Topography getTopography() {
+		return topography;
 	}
 }
