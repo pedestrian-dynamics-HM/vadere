@@ -1,6 +1,5 @@
 package org.vadere.util.logging;
 
-import org.apache.log4j.Logger;
 
 import java.io.PrintStream;
 

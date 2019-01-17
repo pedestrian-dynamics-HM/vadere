@@ -54,7 +54,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	private Map<Triple<P, P, P>, Double> cosPhis = new HashMap();
 
     static {
-    	logger.setLevel(LogLevel.INFO);
+    	logger.setInfo();
     }
 
 	/**

@@ -81,7 +81,7 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private static Logger log = Logger.getLogger(IncrementalTriangulation.class);
 
 	static {
-		ITriConnectivity.log.setLevel(LogLevel.INFO);
+		ITriConnectivity.log.setInfo();
 	}
 
 	/**

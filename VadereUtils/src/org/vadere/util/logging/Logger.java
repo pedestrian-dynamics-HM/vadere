@@ -1,117 +1,145 @@
 package org.vadere.util.logging;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.message.MessageFactory;
+import org.apache.logging.log4j.spi.AbstractLogger;
+import org.apache.logging.log4j.spi.ExtendedLoggerWrapper;
+import org.apache.logging.log4j.util.MessageSupplier;
+import org.apache.logging.log4j.util.Supplier;
+
+import javax.security.auth.login.Configuration;
+
+/**
+ * Extended Logger interface with convenience methods for
+ * the DIAG, NOTICE and VERBOSE custom log levels.
+ * <p>Compatible with Log4j 2.6 or higher.</p>
+ */
+public final class Logger extends ExtendedLoggerWrapper {
+	private static final long serialVersionUID = 32544032022288L;
+	private final ExtendedLoggerWrapper logger;
+
+	private static final String FQCN = Logger.class.getName();
 
 
-public class Logger {
-
-	org.apache.log4j.Logger logger;
-
-	public static Logger getLogger(Class clazz){
-		return new Logger(org.apache.log4j.Logger.getLogger(clazz));
-	}
-	public static Logger getRootLogger() {
-		return new Logger(org.apache.log4j.Logger.getRootLogger());
-	}
-
-	public static void setFileName(String fileName){
-		RollingFileAppender appender = new RollingFileAppender();
-		appender.setName(fileName);
-		appender.setFile(fileName);
-		appender.setAppend(false);
-		appender.setMaxFileSize("10000KB");
-		appender.setLayout(new PatternLayout("%d{ABSOLUTE} %5p [%t] %c{1}:%L - %m%n"));
-		appender.activateOptions();
-
-		org.apache.log4j.Logger.getRootLogger().addAppender(appender);
-	}
-
-
-	private Logger(org.apache.log4j.Logger logger){
-		this.logger = logger;
+	private Logger(final org.apache.logging.log4j.Logger logger) {
+		super((AbstractLogger) logger, logger.getName(), logger.getMessageFactory());
+		this.logger = this;
 	}
 
-
-	public void setLevel(LogLevel logLevel){
-		logger.setLevel(Level.toLevel(logLevel.getLevelStr()));
+	public static void setLevel(String levelStr){
+		Level level = Level.toLevel(levelStr);
+		Configurator.setAllLevels(LogManager.getRootLogger().getName(), level);
 	}
 
-	public LogLevel getLevel(){
-		Level level = logger.getLevel();
-		LogLevel logLevel;
-		switch (level.toInt()){
-			case  Level.ALL_INT : logLevel = LogLevel.ALL;
-			break;
-			case Level.DEBUG_INT: logLevel = LogLevel.DEBUG;
-			break;
-			case Level.ERROR_INT: logLevel = LogLevel.ERROR;
-			break;
-			case Level.FATAL_INT: logLevel = LogLevel.FATAL;
-			break;
-			case Level.INFO_INT: logLevel = LogLevel.INFO;
-			break;
-			case Level.OFF_INT: logLevel = LogLevel.OFF;
-			break;
-			case Level.WARN_INT: logLevel = LogLevel.WARN;
-			default: logLevel = LogLevel.INFO;
-		}
+	/**
+	 * Returns a custom Logger with the name of the calling class.
+	 *
+	 * @return The custom Logger for the calling class.
+	 */
+	public static Logger getLogger() {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger();
+		return new Logger(wrapped);
+	}
 
-		return logLevel;
+	/**
+	 * Returns a custom Logger using the fully qualified name of the Class as
+	 * the Logger name.
+	 *
+	 * @param loggerName The Class whose name should be used as the Logger name.
+	 *            If null it will default to the calling class.
+	 * @return The custom Logger.
+	 */
+	public static Logger getLogger(final Class<?> loggerName) {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger(loggerName);
+		return new Logger(wrapped);
+	}
+
+	/**
+	 * Returns a custom Logger using the fully qualified name of the Class as
+	 * the Logger name.
+	 *
+	 * @param loggerName The Class whose name should be used as the Logger name.
+	 *            If null it will default to the calling class.
+	 * @param messageFactory The message factory is used only when creating a
+	 *            logger, subsequent use does not change the logger but will log
+	 *            a warning if mismatched.
+	 * @return The custom Logger.
+	 */
+	public static Logger getLogger(final Class<?> loggerName, final MessageFactory messageFactory) {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger(loggerName, messageFactory);
+		return new Logger(wrapped);
+	}
+
+	/**
+	 * Returns a custom Logger using the fully qualified class name of the value
+	 * as the Logger name.
+	 *
+	 * @param value The value whose class name should be used as the Logger
+	 *            name. If null the name of the calling class will be used as
+	 *            the logger name.
+	 * @return The custom Logger.
+	 */
+	public static Logger getLogger(final Object value) {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger(value);
+		return new Logger(wrapped);
+	}
+
+	/**
+	 * Returns a custom Logger using the fully qualified class name of the value
+	 * as the Logger name.
+	 *
+	 * @param value The value whose class name should be used as the Logger
+	 *            name. If null the name of the calling class will be used as
+	 *            the logger name.
+	 * @param messageFactory The message factory is used only when creating a
+	 *            logger, subsequent use does not change the logger but will log
+	 *            a warning if mismatched.
+	 * @return The custom Logger.
+	 */
+	public static Logger getLogger(final Object value, final MessageFactory messageFactory) {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger(value, messageFactory);
+		return new Logger(wrapped);
+	}
+
+	/**
+	 * Returns a custom Logger with the specified name.
+	 *
+	 * @param name The logger name. If null the name of the calling class will
+	 *            be used.
+	 * @return The custom Logger.
+	 */
+	public static Logger getLogger(final String name) {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger(name);
+		return new Logger(wrapped);
+	}
+
+	/**
+	 * Returns a custom Logger with the specified name.
+	 *
+	 * @param name The logger name. If null the name of the calling class will
+	 *            be used.
+	 * @param messageFactory The message factory is used only when creating a
+	 *            logger, subsequent use does not change the logger but will log
+	 *            a warning if mismatched.
+	 * @return The custom Logger.
+	 */
+	public static Logger getLogger(final String name, final MessageFactory messageFactory) {
+		final org.apache.logging.log4j.Logger wrapped = LogManager.getLogger(name, messageFactory);
+		return new Logger(wrapped);
 	}
 
 
-	public void addAppender(Appender appender){
-		logger.addAppender(appender);
+	public void setInfo(){
+		Configurator.setLevel(logger.getName(), Level.INFO);
 	}
 
-	public void info(String message, Object... args){
-		logger.log(Logger.class.getName(), Level.INFO, String.format(message, args), null);
-	}
-
-	public void info(Object message) {
-		logger.log(Logger.class.getName(), Level.INFO, message, null);
-	}
-
-	public void info(Object message, Throwable t) {
-		logger.log(Logger.class.getName(), Level.INFO, message, t);
-	}
-
-	public void warn(String message, Object... args){
-		logger.log(Logger.class.getName(), Level.WARN, String.format(message, args), null);
-	}
-
-	public void warn(Object message) {
-		logger.log(Logger.class.getName(), Level.WARN, message, null);
-	}
-
-	public void warn(Object message, Throwable t) {
-		logger.log(Logger.class.getName(), Level.WARN, message, t);
-	}
-
-	public void error(String message, Object... args){
-		logger.log(Logger.class.getName(), Level.ERROR, String.format(message, args), null);
-	}
-
-	public void error(Object message) {
-		logger.log(Logger.class.getName(), Level.ERROR, message, null);
-	}
-
-	public void error(Object message, Throwable t) {
-		logger.log(Logger.class.getName(), Level.ERROR, message, t);
-	}
-
-	public void debug(String message, Object... args){
-		logger.log(Logger.class.getName(), Level.DEBUG, String.format(message, args), null);
-	}
-
-	public void debug(Object message){
-		logger.log(Logger.class.getName(), Level.DEBUG, message, null);
-	}
-
-	public void debug(Object message, Throwable t){
-		logger.log(Logger.class.getName(), Level.DEBUG, message, t);
+	public void setDebug(){
+		Configurator.setLevel(logger.getName(), Level.DEBUG);
 	}
 
 }
+

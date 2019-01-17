@@ -52,7 +52,7 @@ public class DelaunayHierarchy<P extends IPoint, V extends IVertex<P>, E extends
 	private static Logger log = Logger.getLogger(DelaunayHierarchy.class);
 
 	static {
-		log.setLevel(LogLevel.DEBUG);
+		log.setDebug();
 	}
 
 	/**

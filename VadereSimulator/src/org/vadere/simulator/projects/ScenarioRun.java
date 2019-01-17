@@ -78,8 +78,6 @@ public class ScenarioRun implements Runnable {
 	@Override
 	public void run() {
 		try {
-			//add Scenario Name to Log4j Mapped Diagnostic Context to filter log by ScenarioRun
-//			MDC.put("scenario.Name", outputPath.getFileName().toString());
 			simulationResult.startTime();
 
 			/**
@@ -123,8 +121,6 @@ public class ScenarioRun implements Runnable {
 		} finally {
 			simulationResult.stopTime();
 			doAfterSimulation();
-			//remove Log4j Mapped Diagnostic Context after ScenarioRun
-//			MDC.remove("scenario.Name");
 		}
 	}
 	
