@@ -31,6 +31,8 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 * Git
 * OpenCL
 
+**Note:** Please, ensure that the Git executable can be found in the `PATH` variable of your operating system.
+
 ### Install OpenCL
 
 Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components must be installed:
