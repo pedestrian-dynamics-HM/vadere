@@ -56,7 +56,8 @@
         "pedestrianOverlapProcessorId" : 6
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "writeMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",

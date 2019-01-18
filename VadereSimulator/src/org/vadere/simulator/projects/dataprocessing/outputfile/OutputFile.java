@@ -4,7 +4,9 @@ import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriter;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import sun.awt.image.ImageWatched;
 
+import javax.sound.midi.SysexMessage;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -48,13 +50,15 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	private List<Integer> processorIds;
 	private List<DataProcessor<K, ?>> dataProcessors;
+	private boolean isAddedProcessors;
 
 	private String separator;
+	private final String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
 	private VadereWriterFactory writerFactory;
-	private VadereWriter writer;
 
 	protected OutputFile(final String... dataIndices) {
 		this.dataIndices = dataIndices;
+		this.isAddedProcessors = false;  // init method has to be called
 		this.dataProcessors = new ArrayList<>();
 		this.writerFactory = VadereWriterFactory.getFileWriterFactory();
 	}
@@ -83,13 +87,15 @@ public abstract class OutputFile<K extends DataKey<K>> {
 			Optional.ofNullable(processorMap.get(pid))
 					.ifPresent(p -> dataProcessors.add((DataProcessor<K, ?>) p));
 		});
+
+		this.isAddedProcessors = true;
 	}
 
 	public void write() {
 		if (!isEmpty()) {
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
-				writer = out;
-				printIndices(out);
+
+				printHeader(out);
 
 				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
 						.distinct().sorted()
@@ -106,21 +112,80 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return this.dataProcessors.isEmpty();
 	}
 
-	private List<String> getDataIndices() {
-		return composeLine(dataIndices, p -> Arrays.stream(p.getHeaders()));
+	private void printHeader(VadereWriter out) {
+		writeLine(out, this.getEntireHeader());
 	}
 
-	public void printIndices(VadereWriter out) {
-		writeLine(out, getDataIndices());
+	private List<String> getIndices(){
+		return new LinkedList<>(Arrays.asList(dataIndices));
 	}
 
-	public String getIndices() {
-		return String.join(this.separator, getDataIndices());
+	public List<String> getEntireHeader() {
+
+		if(! isAddedProcessors){
+			throw new RuntimeException("Asking for headers, but processors were not " +
+					"initialized yet.");
+		}
+
+		//"getHeaders" is called in class DataProcessor.java, the
+		return composeHeaderLine();
+	}
+
+	public String getHeaderLine() {
+		return String.join(this.separator, this.getEntireHeader());
+	}
+
+	public String getIndicesLine() {
+		return String.join(this.separator, this.getIndices());
 	}
 
 	private void printRow(final VadereWriter out, final K key) {
-		@SuppressWarnings("unchecked") final List<String> fields = composeLine(toStrings(key), p -> Arrays.stream(p.toStrings(key)));
+		// Info: 'key' are the indices values (such as timeStep=3), can be more than one
+		@SuppressWarnings("unchecked")
+		final List<String> fields = composeLine(toStrings(key), p -> Arrays.stream(p.toStrings(key)));
 		writeLine(out, fields);
+	}
+
+	private List<String> headersWithNameMangling(){
+		LinkedList<String> headers = new LinkedList<>();
+		boolean isNameMangle = false; // assume there is no nameing conflict
+
+		mainloop:
+		for (DataProcessor l: dataProcessors) {
+			List<String> list = Arrays.asList(l.getHeaders());
+
+			for(String el: list) {
+				if(headers.contains(el)){
+					isNameMangle = true;  // conflict found: stop collecting headers
+					break mainloop;
+				}else{
+					headers.addLast(el);
+				}
+			}
+		}
+
+		if(isNameMangle){
+ 			headers.clear();  //start from new...
+			for (DataProcessor l: dataProcessors) {
+				List<String> list = Arrays.asList(l.getHeaders());
+
+				for (String h: list) {
+					// ... but now add the processor id
+					headers.addLast(h +
+							this.nameConflictAdd.replace('?', (char) (l.getId()+'0')));
+				}
+			}
+		}
+		return headers;
+	}
+
+	private List<String> composeHeaderLine(){
+		final List<String> allHeaders = new LinkedList<>(Arrays.asList(dataIndices));
+		List<String> procHeaders = this.headersWithNameMangling();
+
+		allHeaders.addAll(procHeaders);
+
+		return allHeaders;
 	}
 
 	private List<String> composeLine(String[] keyFieldArray, @SuppressWarnings("rawtypes") Function<DataProcessor, Stream<String>> valueFields) {
@@ -129,7 +194,9 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		final List<String> processorFields = dataProcessors.stream()
 				.flatMap(valueFields)
 				.collect(Collectors.toList());
+
 		fields.addAll(processorFields);
+
 		return fields;
 	}
 
@@ -164,10 +231,5 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	public void setVadereWriterFactory(VadereWriterFactory writerFactory) {
 		this.writerFactory = writerFactory;
-	}
-
-	public void addDataProcessor(DataProcessor p) {
-		dataProcessors.add(p);
-		processorIds.add(p.getId());
 	}
 }

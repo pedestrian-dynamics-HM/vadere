@@ -1,6 +1,7 @@
 package org.vadere.simulator.dataprocessing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.util.io.IOUtils;
 
-public class TestOutputFileAfterMultipleRuns {
+public class TestOutputFile {
 
 	private Scenario testScenario;
 	private MainModel mainModel;
@@ -40,19 +41,38 @@ public class TestOutputFileAfterMultipleRuns {
 	@Test()
 	public void testFileFormatAfterMultipleSimulationRuns() {
 
-		ArrayList<String> indicesAfterFirstRun = new ArrayList<>();
-		ArrayList<String> indicesAfterSecondRun = new ArrayList<>();
+		ArrayList<String> headerAfterFirstRun = new ArrayList<>();
+		ArrayList<String> headerAfterSecondRun = new ArrayList<>();
 
 		ProcessorManager manager = testScenario.getDataProcessingJsonManager()
 				.createProcessorManager(mainModel);
 		manager.initOutputFiles();
 		List<OutputFile<?>> outputFiles = testScenario.getDataProcessingJsonManager().getOutputFiles();
-		outputFiles.forEach(f -> indicesAfterFirstRun.add(f.getIndices()));
+		outputFiles.forEach(f -> headerAfterFirstRun.add(f.getHeaderLine()));
 
 		manager.initOutputFiles();
-		outputFiles.forEach(f -> indicesAfterSecondRun.add(f.getIndices()));
+		outputFiles.forEach(f -> headerAfterSecondRun.add(f.getHeaderLine()));
 
 		assertEquals("Duplicated Processors in OutputFile after multiple Simulations",
-				indicesAfterFirstRun, indicesAfterSecondRun);
+				headerAfterFirstRun, headerAfterSecondRun);
 	}
+
+	@Test
+	public void testHandlingNameConflict(){
+		ProcessorManager manager = testScenario.getDataProcessingJsonManager()
+				.createProcessorManager(mainModel);
+		manager.initOutputFiles();
+
+		List<String> header = testScenario.getDataProcessingJsonManager().getOutputFiles().get(0).getEntireHeader();
+
+		//Note these fail if the name conflict is handled differently, for now hard coded.
+		assertTrue(header.contains("timeStep"));
+		assertTrue(header.contains("pedestrianId"));
+		assertTrue(header.contains("x-Proc1"));
+		assertTrue(header.contains("y-Proc1"));
+		assertTrue(header.contains("x-Proc2"));
+		assertTrue(header.contains("y-Proc2"));
+	}
+
+
 }

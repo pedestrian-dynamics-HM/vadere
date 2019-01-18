@@ -213,9 +213,9 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	public boolean intersectsRectangleLine(final VRectangle rectangle) {
 		return intersects(new VLine(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMinY()))
-				|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMaxY()))
-				|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMaxY()))
-				|| intersects(new VLine(rectangle.getMinX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMinY()));
+			|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMaxY()))
+			|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMaxY()))
+			|| intersects(new VLine(rectangle.getMinX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMinY()));
 	}
 
 	public double getArea() {

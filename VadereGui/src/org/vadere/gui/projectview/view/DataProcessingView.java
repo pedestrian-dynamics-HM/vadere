@@ -582,9 +582,12 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridy = 2;
 			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputIndicesSelection.label")+":"), c);
 
+			// Only the indices are shown, not the entire header. > Entire header can be quite a lot of text (which may
+			// not fit in the GUI) + the processors (with the header information) are not inserted and removed on the fly,
+			// but only when the simulation is started.
 			c.gridx = 1;
 			c.gridy = 2;
-			panel.add(new JLabel(outputFile.getIndices()), c);
+			panel.add(new JLabel(outputFile.getIndicesLine()), c);
 
 			c.gridx = 0;
 			c.gridy = 3;
