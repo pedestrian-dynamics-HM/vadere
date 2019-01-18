@@ -27,7 +27,7 @@
   sub-command. This will will turn the ScenarioChecker on or off for the command
   line. If the Checker detects an error  the simulation will not be executed.
 
-- `OutputFile`: In code distinguish between indices (rows) and headers (columns). Resolve naming conflicts in headers of output files (see #201). 
+- `OutputFile`: Distinguish between indices (rows) and headers (columns), in code and with a new checkbox that when enables allow to write meta-data into output files. Furthermore, resolve naming conflicts (if they occur) in headers of output files (see #201). 
 
 ### Changed
 
