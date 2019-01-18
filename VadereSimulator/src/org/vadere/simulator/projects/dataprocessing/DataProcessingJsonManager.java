@@ -47,7 +47,7 @@ public class DataProcessingJsonManager {
 	private static final String PROCESSORID_KEY = "id";
 	private static final String ATTRIBUTESTYPE_KEY = "attributesType";
 	private static final String TIMESTAMP_KEY = "isTimestamped";
-	private static final String WRITEMETA_KEY = "writeMetaData";
+	private static final String WRITEMETA_KEY = "isWriteMetaData";
 	public static ObjectWriter writer;
 	private static ObjectMapper mapper;
 
@@ -61,13 +61,13 @@ public class DataProcessingJsonManager {
 	private List<OutputFile<?>> outputFiles;
 	private List<DataProcessor<?, ?>> dataProcessors;
 	private boolean isTimestamped;
-	private boolean writeMetaData;
+	private boolean isWriteMetaData;
 
 	public DataProcessingJsonManager() {
 		this.outputFiles = new ArrayList<>();
 		this.dataProcessors = new ArrayList<>();
 		this.isTimestamped = true;
-		this.writeMetaData = false;
+		this.isWriteMetaData = false;
 		this.outputFileFactory = OutputFileFactory.instance();
 		this.processorFactory = DataProcessorFactory.instance();
 	}
@@ -242,15 +242,15 @@ public class DataProcessingJsonManager {
 	}
 
 	public boolean isWriteMetaData(){
-		return this.writeMetaData;
+		return this.isWriteMetaData;
 	}
 
 	public void setTimestamped(boolean isTimestamped) {
 		this.isTimestamped = isTimestamped;
 	}
 
-	public void setWriteMetaData(boolean writeMetaData){
-		this.writeMetaData = writeMetaData;
+	public void setWriteMetaData(boolean isWriteMetaData){
+		this.isWriteMetaData = isWriteMetaData;
 	}
 
 	public String serialize() throws JsonProcessingException {
@@ -276,13 +276,20 @@ public class DataProcessingJsonManager {
 
 		// part 3: timestamp + write meta data option
 		main.put(TIMESTAMP_KEY, this.isTimestamped);
-		main.put(WRITEMETA_KEY, this.writeMetaData);
+		main.put(WRITEMETA_KEY, this.isWriteMetaData);
 
 		return main;
 	}
 
 	public ProcessorManager createProcessorManager(MainModel mainModel) {
+		// this function is called when the simulation starts running
+
+		for (OutputFile f : outputFiles) {
+			f.setWriteMetaData(isWriteMetaData()); // allow to write meta data
+		}
+
 		return new ProcessorManager(dataProcessors, outputFiles, mainModel);
+
 	}
 
 	public int getMaxProcessorsId() {

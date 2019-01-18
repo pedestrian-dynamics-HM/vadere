@@ -33,7 +33,7 @@
       }
     } ],
     "isTimestamped" : true,
-    "writeMetaData" : false
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",

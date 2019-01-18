@@ -51,6 +51,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private List<Integer> processorIds;
 	private List<DataProcessor<K, ?>> dataProcessors;
 	private boolean isAddedProcessors;
+	private boolean isWriteMetaData;
 
 	private String separator;
 	private final static String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
@@ -60,6 +61,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	protected OutputFile(final String... dataIndices) {
 		this.dataIndices = dataIndices;
 		this.isAddedProcessors = false;  // init method has to be called
+        this.isWriteMetaData = false;
 		this.dataProcessors = new ArrayList<>();
 		this.writerFactory = VadereWriterFactory.getFileWriterFactory();
 	}
@@ -67,6 +69,10 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	public void setAbsoluteFileName(final String fileName) {
 	    this.absoluteFileName = fileName;
 	}
+
+	public void setWriteMetaData(boolean isWriteMetaData){
+	    this.isWriteMetaData = isWriteMetaData;
+    }
 
 	public void setRelativeFileName(final String fileName) {
 		this.fileName = fileName;
@@ -96,6 +102,11 @@ public abstract class OutputFile<K extends DataKey<K>> {
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
 
 			    writer = out;
+
+			    if(this.isWriteMetaData){
+			        printMetaData(out);
+                }
+
 				printHeader(out);
 
 				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
@@ -115,6 +126,16 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	private void printHeader(VadereWriter out) {
 		writeLine(out, this.getEntireHeader());
+	}
+
+	private void printMetaData(VadereWriter out){
+		String md = "//ROW=" + dataIndices.length + ",COL="+getEntireHeader().size();  // leave Java-style comment also for output
+
+		//Make a list with element to reuse writeLine function
+		List<String> line = new LinkedList<>();
+		line.add(md);
+
+		writeLine(out, line);
 	}
 
 	private List<String> getIndices(){

@@ -227,7 +227,6 @@ public class Simulation {
 					processorManager.update(this.simulationState);
 				}
 
-
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
 				}
