@@ -55,7 +55,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private String separator;
 	private final String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
 	private VadereWriterFactory writerFactory;
-	public VadereWriter writer;
+	private VadereWriter writer;
 
 	protected OutputFile(final String... dataIndices) {
 		this.dataIndices = dataIndices;
