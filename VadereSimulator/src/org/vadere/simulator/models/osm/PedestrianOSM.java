@@ -59,6 +59,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	private LinkedList<Pair<Double, Double>> strides; // left = length, right = time
 	private StairStepOptimizer stairStepOptimizer;
+	private Random random;
 
 	@SuppressWarnings("unchecked")
 	PedestrianOSM(AttributesOSM attributesOSM,
@@ -97,6 +98,31 @@ public class PedestrianOSM extends Pedestrian {
 		this.lastPosition = getPosition();
 		this.nextPosition = getPosition();
 		this.strides = new LinkedList<>();
+		this.random = random;
+	}
+
+	private PedestrianOSM(@NotNull PedestrianOSM pedestrianOSM) {
+		super(pedestrianOSM);
+		this.attributesOSM = pedestrianOSM.attributesOSM;
+		this.stepCircleOptimizer = pedestrianOSM.stepCircleOptimizer;
+		this.topography = pedestrianOSM.topography;
+		this.stepLength = pedestrianOSM.stepLength;
+		this.stepDeviation = pedestrianOSM.stepDeviation;
+		this.minStepLength = pedestrianOSM.minStepLength;
+		this.potentialFieldTarget = pedestrianOSM.potentialFieldTarget;
+		this.potentialFieldObstacle = pedestrianOSM.potentialFieldObstacle;
+		this.potentialFieldPedestrian = pedestrianOSM.potentialFieldPedestrian;
+		this.speedAdjusters = pedestrianOSM.speedAdjusters;
+		this.durationNextStep = pedestrianOSM.durationNextStep;
+		this.nextPosition = pedestrianOSM.nextPosition;
+		this.lastPosition = pedestrianOSM.lastPosition;
+		this.timeCredit = pedestrianOSM.timeCredit;
+		this.timeOfNextStep = pedestrianOSM.timeOfNextStep;
+		this.relevantPedestrians = pedestrianOSM.relevantPedestrians;
+		this.speedByAbsoluteDistance = pedestrianOSM.speedByAbsoluteDistance;
+		this.strides = pedestrianOSM.strides;
+		this.stairStepOptimizer = pedestrianOSM.stairStepOptimizer;
+		this.random = pedestrianOSM.random;
 	}
 
 	/*public void update(double timestamp, double currentTimeInSec, CallMethod callMethod) {
@@ -291,9 +317,11 @@ public class PedestrianOSM extends Pedestrian {
 		return minStepLength;
 	}
 
+
 	@Override
 	public PedestrianOSM clone() {
-		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
+		return new PedestrianOSM(this);
+		//throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
 	}
 
 	@Override

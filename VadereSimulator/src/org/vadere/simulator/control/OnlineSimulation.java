@@ -180,6 +180,9 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 			logger.debug("re-initialize simulation.");
 			currentSimulationData.pedestrians.stream().forEach(ped -> topography.addElement(ped));
 			setStartTime(Utils.toSeconds(currentSimulationData.timestamp));
+			for(PassiveCallback passiveCallback : passiveCallbacks) {
+				passiveCallback.restart(simTimeInSec);
+			}
 			resume();
 			notifyAll();
 		}
@@ -189,7 +192,7 @@ public class OnlineSimulation extends Simulation implements Consumer<LinkedList<
 	 * Sends the current simulation state (pedestrians, time, place) using zeroMQ and protobuf.
 	 */
 	public void sendPedestrians() {
-		Timestamp timestamp = Utils.addSeconds(currentSimulationData.timestamp, simTimeInSec);
+		Timestamp timestamp = Utils.toTimestamp(simTimeInSec);
 		for(DynamicElement dynamicElement : topography.getPedestrianDynamicElements().getElements()) {
 			Pedestrian ped = (Pedestrian) dynamicElement;
 			sender.send(ped, timestamp, currentSimulationData.reference);

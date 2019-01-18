@@ -16,13 +16,18 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 
 	private final OnlineVisualizationModel model;
 	private static final double MIN_ARROW_LENGTH = 0.1;
-	private final Map<Integer, VPoint> lastPedestrianPositions;
-	private final Map<Integer, VPoint> pedestrianDirections;
-	private final Map<Integer, LinkedList<VPoint>> pedestrianPositions;
+	private Map<Integer, VPoint> lastPedestrianPositions;
+	private Map<Integer, VPoint> pedestrianDirections;
+	private Map<Integer, LinkedList<VPoint>> pedestrianPositions;
+	private int simulationId = 0;
 
 	public OnlinevisualizationRenderer(final OnlineVisualizationModel model) {
 		super(model);
 		this.model = model;
+		init();
+	}
+
+	private void init() {
 		this.pedestrianDirections = new HashMap<>();
 		this.lastPedestrianPositions = new HashMap<>();
 		this.pedestrianPositions = new HashMap<>();
@@ -32,6 +37,21 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	public void render(final Graphics2D targetGraphics2D, int x, int y, int width, int height) {
 	    synchronized (model.getDataSynchronizer()) {
             if (model.popDrawData()) {
+
+            	if(simulationId != model.getSimulationId()) {
+		            init();
+		            simulationId = model.getSimulationId();
+	            }
+
+	            for (Agent ped : model.getAgents()) {
+		            if (!pedestrianPositions.containsKey(ped.getId())) {
+			            pedestrianPositions.put(ped.getId(), new LinkedList());
+		            }
+
+		            // reverse the point order
+		            pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
+	            }
+
                 super.render(targetGraphics2D, x, y, width, height);
             }
         }
@@ -42,6 +62,21 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	public void render(final Graphics2D targetGraphics2D, int width, int height) {
         synchronized (model.getDataSynchronizer()) {
             if (model.popDrawData()) {
+
+            	if(simulationId != model.getSimulationId()) {
+            		init();
+            		simulationId = model.getSimulationId();
+	            }
+
+	            for (Agent ped : model.getAgents()) {
+		            if (!pedestrianPositions.containsKey(ped.getId())) {
+			            pedestrianPositions.put(ped.getId(), new LinkedList());
+		            }
+
+		            // reverse the point order
+		            pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
+	            }
+
                 super.render(targetGraphics2D, width, height);
             }
         }
@@ -62,13 +97,6 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 			g.setColor(nonGroupColor);
 			VPoint position = ped.getPosition();
 			agentRender.render(ped, nonGroupColor, g);
-
-			if (!pedestrianPositions.containsKey(ped.getId())) {
-				pedestrianPositions.put(ped.getId(), new LinkedList());
-			}
-
-			// reverse the point order
-			pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
 
 			if (model.config.isShowTrajectories()) {
 				renderTrajectory(g, pedestrianPositions.get(ped.getId()), ped);

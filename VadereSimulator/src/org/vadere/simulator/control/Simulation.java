@@ -38,7 +38,7 @@ public class Simulation {
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
 
-	private final List<PassiveCallback> passiveCallbacks;
+	protected final List<PassiveCallback> passiveCallbacks;
 	private List<Model> models;
 
 	protected boolean runSimulation = false;

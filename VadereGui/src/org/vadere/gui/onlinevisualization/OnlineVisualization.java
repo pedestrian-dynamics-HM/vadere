@@ -24,6 +24,7 @@ public class OnlineVisualization implements PassiveCallback {
 	 */
 	public class ObservationAreaSnapshotData {
 		public final double simTimeInSec;
+		public final int simulationId;
 		public final Topography scenario;
 		public final IPotentialField potentialFieldTarget;
 		public final Agent selectedAgent;
@@ -31,10 +32,12 @@ public class OnlineVisualization implements PassiveCallback {
 
 		public ObservationAreaSnapshotData(
 				final double simTimeInSec,
+				final int simulationId,
 				@NotNull final Topography scenario,
 				@Nullable final IPotentialField potentialFieldTarget,
 				@Nullable final IPotentialField potentialField,
 				@Nullable final Agent selectedAgent) {
+			this.simulationId = simulationId;
 			this.simTimeInSec = simTimeInSec;
 			this.scenario = scenario;
 			this.potentialFieldTarget = potentialFieldTarget;
@@ -47,6 +50,7 @@ public class OnlineVisualization implements PassiveCallback {
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
 	private Topography scenario;
+	private int simulationId;
 
 	/**
 	 * Target potential.
@@ -67,6 +71,7 @@ public class OnlineVisualization implements PassiveCallback {
 		this.window = new MainPanel(model);
 		this.window.setVisible(enableVisualization);
 		this.onlineVisualisationPanel = new OnlineVisualisationWindow(window, model);
+		this.simulationId = 0;
 		// this.window.addSelectShapeListener(onlineVisualisationPanel);
 	}
 
@@ -106,6 +111,11 @@ public class OnlineVisualization implements PassiveCallback {
 		this.model.notifyObservers();
 	}
 
+	@Override
+	public void restart(double simTimeInSec) {
+		simulationId++;
+	}
+
 	/**
 	 * Pushes (by copy) required data from current simulation into data queues
 	 * for being displayed by draw thread (thread-safe). These may be for
@@ -125,11 +135,10 @@ public class OnlineVisualization implements PassiveCallback {
 				pedPotentialField = IPotentialField.copyAgentField(potentialField, selectedAgent, new VRectangle(model.getTopographyBound()), 0.1);
 			}
 
-			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, scenario.clone(), pft, pedPotentialField, selectedAgent);
+			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, simulationId, scenario.clone(), pft, pedPotentialField, selectedAgent);
 			model.pushObservationAreaSnapshot(data);
 		}
 	}
-
 
 	public JPanel getVisualizationPanel() {
 		return onlineVisualisationPanel;

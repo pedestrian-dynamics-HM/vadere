@@ -43,6 +43,8 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	private double simTimeInSec;
 
+	private int simulationId;
+
 	private boolean drawArrows;
 
 	/**
@@ -107,6 +109,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshot =
 					observationAreaSnapshots.getFirst();
 			simTimeInSec = observationAreaSnapshot.simTimeInSec;
+			simulationId = observationAreaSnapshot.simulationId;
 
 			// potentialFieldTarget might be null!
             potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
@@ -144,9 +147,12 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 								.map(ped -> ped.getPosition())
 								.collect(Collectors.toList()));
 			}
-
 			return true;
 		}
+	}
+
+	public int getSimulationId() {
+		return simulationId;
 	}
 
 	@Override

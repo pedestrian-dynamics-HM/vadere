@@ -80,14 +80,14 @@ public class Sender {
 			submittedSends.clear();
 		}
 
-		logger.debug("sender is closed.");
+		//logger.debug("sender is closed.");
 	}
 
 	public synchronized void send(@NotNull final Pedestrian pedestrian, @NotNull final Timestamp timestamp, @NotNull final Common.UTMCoordinate referenc) {
 		if(running) {
 			Runnable runnable = () -> {
 				org.vadere.s2ucre.generated.Pedestrian.PedMsg simulatedPedestrians = toPedestrianAtTime(pedestrian, timestamp, referenc);
-				logger.info("send:" + simulatedPedestrians.toString());
+				logger.info("send agent information: " + simulatedPedestrians);
 				publisher.send(simulatedPedestrians.toByteArray());
 			};
 			submittedSends.add(executor.submit(runnable));

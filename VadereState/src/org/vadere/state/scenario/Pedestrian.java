@@ -53,7 +53,7 @@ public class Pedestrian extends Agent {
 	/**
 	 * Copy constructor, references the same attributes.
 	 */
-	private Pedestrian(Pedestrian other) {
+	protected Pedestrian(Pedestrian other) {
 		super(other);
 		modelPedestrianMap = new HashMap<>(other.modelPedestrianMap);
 		isChild = other.isChild;

@@ -389,10 +389,10 @@ public class Topography {
 			s.addSource((Source) source.clone());
 		}
 		for (Pedestrian pedestrian : getElements(Pedestrian.class)) {
-			s.addElement(pedestrian);
+			s.addElement(pedestrian.clone());
 		}
 		for (Pedestrian ped : getInitialElements(Pedestrian.class)) {
-			s.addInitialElement(ped);
+			s.addInitialElement(ped.clone());
 		}
 		for (Car car : getElements(Car.class)) {
 			s.addElement(car);

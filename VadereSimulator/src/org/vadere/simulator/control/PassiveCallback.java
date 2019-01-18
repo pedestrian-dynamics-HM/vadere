@@ -20,6 +20,8 @@ public interface PassiveCallback {
 
 	void postUpdate(double simTimeInSec);
 
+	default void restart(double simTimeInSec) {}
+
 	void setTopography(Topography scenario);
 
 	default void setPotentialFieldTarget(@Nullable IPotentialFieldTarget potentialFieldTarget){}

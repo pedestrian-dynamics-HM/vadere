@@ -35,6 +35,16 @@ public class Utils {
 				.build();
 	}
 
+	public static Timestamp toTimestamp(final double seconds) {
+		double milliseconds = seconds * 1000;
+		long sec = (long)(milliseconds / 1000);
+		int nano = (int)(milliseconds % 1000) * 1_000_000;
+		return Timestamp.newBuilder()
+				.setSeconds(sec)
+				.setNanos(nano)
+				.build();
+	}
+
 	/*
 	Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
 //         .setNanos((int) ((millis % 1000) * 1000 000)).build();

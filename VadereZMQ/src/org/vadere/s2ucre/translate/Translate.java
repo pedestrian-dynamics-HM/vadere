@@ -27,7 +27,14 @@ public class Translate {
 
 	private final static Logger logger = LogManager.getLogger(Translate.class);
 
+	/**
+	 * IOSB-Informations
+	 */
 	private Queue<IosbOutput.AreaInfoAtTime> inQueue;
+
+	/**
+	 * IOSB-Information translated into simulation data.
+	 */
 	private Queue<Pedestrian.PedMsg> outQueue;
 
 	private ExecutorService executor;
@@ -63,7 +70,7 @@ public class Translate {
 					byte[] msgBytes = subscriber.receive();
 					IosbOutput.AreaInfoAtTime message = IosbOutput.AreaInfoAtTime.parseFrom(msgBytes);
 					inQueue.add(message);
-					logger.info("message received");
+					logger.info("received real world data: " + message);
 
 					synchronized (inQueue) {
 						inQueue.notifyAll();
@@ -82,7 +89,7 @@ public class Translate {
 				while (outQueue.isEmpty()) {
 					synchronized (outQueue) {
 						try {
-							logger.info("wait for message to be translated.");
+							//logger.info("wait for message to be translated.");
 							outQueue.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -100,7 +107,7 @@ public class Translate {
 				while (inQueue.isEmpty()) {
 					synchronized (inQueue) {
 						try {
-							logger.info("wait for messages.");
+							//logger.info("wait for messages.");
 							inQueue.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -111,11 +118,11 @@ public class Translate {
 				IosbOutput.AreaInfoAtTime areaInfoAtTime = inQueue.poll();
 				//logger.info(areaInfoAtTime.toString());
 				List<Pedestrian.PedMsg> pedMsgs = translate(areaInfoAtTime);
-				logger.info(pedMsgs);
+				//logger.info(areaInfoAtTime.getTime());
 				for(Pedestrian.PedMsg pedMsg : pedMsgs) {
 					outQueue.add(pedMsg);
 				}
-				logger.info("message translated.");
+				//logger.info("message translated.");
 
 				synchronized (outQueue) {
 					outQueue.notifyAll();

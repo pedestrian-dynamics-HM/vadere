@@ -78,7 +78,7 @@ public class Receiver {
 		messageReceiver = () -> {
 			while (running) {
 				LinkedList<Pedestrian.PedMsg> message = receivePedMsgs();
-				logger.info("consume: " + message.getFirst());
+				logger.info("consume: " + message.size() + " pedestrians.");
 				pedMsgConsumers.forEach(c -> c.accept(message));
 			}
 		};
@@ -94,7 +94,7 @@ public class Receiver {
 		try {
 			// wait a certain amount of time such that running submission can finish their job
 			if(!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
-				logger.info("send was interrupted.");
+				//logger.info("send was interrupted.");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -102,7 +102,7 @@ public class Receiver {
 			executor.shutdownNow();
 			subscriber.close();
 		}
-		logger.info("receiver is closed.");
+		//logger.info("receiver is closed.");
 	}
 
 	public void addPedMsgConsumer(@NotNull final Consumer<LinkedList<Pedestrian.PedMsg>> consumer) {
@@ -116,20 +116,29 @@ public class Receiver {
 
 		if(pedMsgContainer.size() < 2) {
 			try {
-				logger.info("waiting for message " + Thread.currentThread());
+				//logger.info("waiting for message " + Thread.currentThread());
 				wait();
-				logger.info("woke up " + Thread.currentThread());
+				//logger.info("woke up " + Thread.currentThread());
 				return receivePedMsgs();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				logger.warn("interrupt while paused.");
+				//logger.warn("interrupt while paused.");
 				return new LinkedList<>();
 			}
 		} else {
 			// return the second element since we can only be sure that it is complete i.e. we received all informations.
-			logger.info("return information");
+			//logger.info("return information");
 			Timestamp secondMinTimeStep = pedMsgContainer.higherEntry(pedMsgContainer.firstKey()).getKey();
-			return pedMsgContainer.remove(secondMinTimeStep);
+
+			// remove all older messages from the container
+			LinkedList<Pedestrian.PedMsg> newestCompleteMessage = pedMsgContainer.remove(secondMinTimeStep);
+
+			while ((pedMsgContainer.size() > 1)) {
+				pedMsgContainer.remove(pedMsgContainer.lastKey());
+			}
+
+			logger.info("receive " + newestCompleteMessage.size() + " agents to simulate.");
+			return newestCompleteMessage;
 		}
 	}
 
@@ -141,7 +150,7 @@ public class Receiver {
 	 */
 	private void receivePedMsg() throws InvalidProtocolBufferException, InterruptedException {
 		while (running) {
-			logger.info("Waiting for Message");
+			//logger.info("Waiting for Message");
 			Pedestrian.PedMsg msg = Pedestrian.PedMsg.parseFrom(subscriber.receive());
 			//System.out.println(msg);
 			Timestamp timestamp = msg.getTime();

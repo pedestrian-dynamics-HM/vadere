@@ -39,7 +39,7 @@
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 18,
+        "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
         "varyStepDirection" : false,
         "stepLengthIntercept" : 0.4625,
@@ -74,7 +74,7 @@
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "UNIT",
+          "type" : "OBSTACLES",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
