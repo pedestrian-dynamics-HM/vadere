@@ -55,6 +55,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private String separator;
 	private final String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
 	private VadereWriterFactory writerFactory;
+	public VadereWriter writer;
 
 	protected OutputFile(final String... dataIndices) {
 		this.dataIndices = dataIndices;
@@ -94,7 +95,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	public void write() {
 		if (!isEmpty()) {
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
-
+                writer = out;
 				printHeader(out);
 
 				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
