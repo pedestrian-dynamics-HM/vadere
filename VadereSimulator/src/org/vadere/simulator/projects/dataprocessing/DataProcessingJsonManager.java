@@ -47,6 +47,7 @@ public class DataProcessingJsonManager {
 	private static final String PROCESSORID_KEY = "id";
 	private static final String ATTRIBUTESTYPE_KEY = "attributesType";
 	private static final String TIMESTAMP_KEY = "isTimestamped";
+	private static final String WRITEMETA_KEY = "writeMetaData";
 	public static ObjectWriter writer;
 	private static ObjectMapper mapper;
 
@@ -60,11 +61,13 @@ public class DataProcessingJsonManager {
 	private List<OutputFile<?>> outputFiles;
 	private List<DataProcessor<?, ?>> dataProcessors;
 	private boolean isTimestamped;
+	private boolean writeMetaData;
 
 	public DataProcessingJsonManager() {
 		this.outputFiles = new ArrayList<>();
 		this.dataProcessors = new ArrayList<>();
 		this.isTimestamped = true;
+		this.writeMetaData = false;
 		this.outputFileFactory = OutputFileFactory.instance();
 		this.processorFactory = DataProcessorFactory.instance();
 	}
@@ -143,6 +146,11 @@ public class DataProcessingJsonManager {
 		JsonNode timestampArrayNode = node.get(TIMESTAMP_KEY);
 		if (timestampArrayNode != null) {
 			manager.setTimestamped(timestampArrayNode.asBoolean());
+		}
+
+		JsonNode writeMetaData = node.get(WRITEMETA_KEY);
+		if (writeMetaData != null) {
+			manager.setWriteMetaData(writeMetaData.asBoolean());
 		}
 
 		return manager;
@@ -233,8 +241,16 @@ public class DataProcessingJsonManager {
 		return this.isTimestamped;
 	}
 
+	public boolean isWriteMetaData(){
+		return this.writeMetaData;
+	}
+
 	public void setTimestamped(boolean isTimestamped) {
 		this.isTimestamped = isTimestamped;
+	}
+
+	public void setWriteMetaData(boolean writeMetaData){
+		this.writeMetaData = writeMetaData;
 	}
 
 	public String serialize() throws JsonProcessingException {
@@ -258,8 +274,9 @@ public class DataProcessingJsonManager {
 		});
 		main.set(PROCESSORS_KEY, processorsArrayNode);
 
-		// part 3: timestamp
+		// part 3: timestamp + write meta data option
 		main.put(TIMESTAMP_KEY, this.isTimestamped);
+		main.put(WRITEMETA_KEY, this.writeMetaData);
 
 		return main;
 	}
