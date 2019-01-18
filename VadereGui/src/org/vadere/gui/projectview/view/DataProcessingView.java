@@ -184,6 +184,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private boolean isEditable;
 
 		private JCheckBox isTimestampedCheckBox;
+		private JCheckBox isWriteMetaData;
 		private JTable outputFilesTable;
 		private DefaultTableModel outputFilesTableModel;
 		private JTable dataProcessorsTable;
@@ -219,9 +220,22 @@ class DataProcessingView extends JPanel implements IJsonView {
 					currentScenario.getDataProcessingJsonManager().setTimestamped(isTimestampedCheckBox.isSelected());
 				}
 			});
+
 			isTimestampedCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 			addEditableComponent(isTimestampedCheckBox);
 			filesPanel.add(isTimestampedCheckBox);
+
+			isWriteMetaData = new JCheckBox(Messages.getString("DataProcessingView.chbAddMetaData"));
+			isWriteMetaData.addActionListener(new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					currentScenario.getDataProcessingJsonManager().setWriteMetaData(isWriteMetaData.isSelected());
+				}
+			});
+
+			isWriteMetaData.setAlignmentX(Component.LEFT_ALIGNMENT);
+			addEditableComponent(isWriteMetaData);
+			filesPanel.add(isWriteMetaData);
 
 			JButton addFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
 				@Override
@@ -357,6 +371,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			selectedOutputFile = null;
 			selectedDataProcessor = null;
 			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
+			isWriteMetaData.setSelected(scenario.getDataProcessingJsonManager().isWriteMetaData());
 			updateOutputFilesTable();
 			updateDataProcessorsTable();
 			updateDataProcessIdsInUse();
