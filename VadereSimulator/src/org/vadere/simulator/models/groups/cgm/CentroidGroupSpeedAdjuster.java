@@ -4,7 +4,6 @@ import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.state.scenario.Pedestrian;
 
 
-@Deprecated
 public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 
 	private final CentroidGroupModel groupCollection;

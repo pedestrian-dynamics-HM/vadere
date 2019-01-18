@@ -46,7 +46,7 @@ public class PedestrianGroupSizeProcessor extends DataProcessor<TimestepPedestri
 	public String[] toStrings(TimestepPedestrianIdKey key){
 		Integer i = this.getValue(key);
 		if (i == null) {
-			logger.warn(String.format("PedestrianGroupSizeProcessor does not has Data for Key: %s",
+			logger.warn(String.format("PedestrianGroupSizeProcessor does not have Data for Key: %s",
 					key.toString()));
 			i = -1;
 		}

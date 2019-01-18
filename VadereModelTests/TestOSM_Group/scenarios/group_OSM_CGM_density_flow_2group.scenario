@@ -44,10 +44,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesCGM" : {
-        "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
-      },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
@@ -66,21 +62,21 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 18,
+        "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
-        "varyStepDirection" : false,
+        "varyStepDirection" : true,
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "minStepLength" : 0.4625,
-        "maxStepDuration" : 1.7976931348623157E308,
-        "optimizationType" : "DISCRETE",
+        "minStepLength" : 0.17,
+        "maxStepDuration" : 3.0,
+        "optimizationType" : "NELDER_MEAD",
         "movementType" : "ARBITRARY",
-        "dynamicStepLength" : false,
+        "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : false,
-        "minimumStepLength" : false,
+        "seeSmallWalls" : true,
+        "minimumStepLength" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -95,6 +91,10 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
@@ -203,7 +203,7 @@
         "maxSpawnNumberTotal" : 1000,
         "startTime" : 0.0,
         "endTime" : 100.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 0.0, 1.0 ],

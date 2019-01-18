@@ -3,6 +3,7 @@ package org.vadere.simulator.models.groups.cgm;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.state.scenario.Pedestrian;
 
+@Deprecated
 public class CentroidGroupStepSizeAdjuster implements StepSizeAdjuster {
 
 	private final CentroidGroupModel groupCollection;
