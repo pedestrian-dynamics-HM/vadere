@@ -53,7 +53,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private boolean isAddedProcessors;
 
 	private String separator;
-	private final String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
+	private final static String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
 	private VadereWriterFactory writerFactory;
 	private VadereWriter writer;
 
@@ -65,20 +65,19 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public void setAbsoluteFileName(final String fileName) {
-		this.absoluteFileName = fileName;
+	    this.absoluteFileName = fileName;
 	}
 
 	public void setRelativeFileName(final String fileName) {
 		this.fileName = fileName;
-
 	}
 
 	public String getSeparator() {
-		return this.separator;
+	    return this.separator;
 	}
 
 	public void setSeparator(final String separator) {
-		this.separator = separator;
+	    this.separator = separator;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -95,7 +94,8 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	public void write() {
 		if (!isEmpty()) {
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
-                writer = out;
+
+			    writer = out;
 				printHeader(out);
 
 				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
@@ -173,7 +173,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 				for (String h: list) {
 					// ... but now add the processor id
 					headers.addLast(h +
-							this.nameConflictAdd.replace('?', (char) (l.getId()+'0')));
+							nameConflictAdd.replace('?', (char) (l.getId()+'0')));
 				}
 			}
 		}
