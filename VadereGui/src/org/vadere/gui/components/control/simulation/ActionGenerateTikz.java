@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
@@ -38,7 +39,7 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 		String formattedDate = formatter.format(todaysDate);
 
 		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
-		File outputFile = new File("pv_snapshot_" + formattedDate + ".tex");
+		File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".tex");
 
 		fileChooser.setSelectedFile(outputFile);
 
