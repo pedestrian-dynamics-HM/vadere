@@ -17,10 +17,7 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.json.EventInfo;
-import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
@@ -44,8 +41,8 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private List<Model> models;
 
-	private boolean runSimulation = false;
-	private boolean paused = false;
+	private boolean isRunSimulation = false;
+	private boolean isPaused = false;
 	/**
 	 * current simulation time (seconds)
 	 */
@@ -74,7 +71,9 @@ public class Simulation {
 	private final CognitionLayer cognitionLayer;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
+					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
+					  SimulationResult simulationResult) {
+
 		this.name = name;
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
@@ -152,7 +151,7 @@ public class Simulation {
 
 		simulationState = initialSimulationState();
 		topographyController.preLoop(simTimeInSec);
-		runSimulation = true;
+		isRunSimulation = true;
 		simTimeInSec = startTimeInSec;
 
 		for (Model m : models) {
@@ -198,15 +197,15 @@ public class Simulation {
 
 			preLoop();
 
-			while (runSimulation) {
+			while (isRunSimulation) {
 				synchronized (this) {
-					while (paused) {
+					while (isPaused) {
 						try {
 							wait();
 						} catch (Exception e) {
-							paused = false;
+							isPaused = false;
 							Thread.currentThread().interrupt();
-							logger.warn("interrupt while paused.");
+							logger.warn("interrupt while isPaused.");
 						}
 					}
 				}
@@ -234,17 +233,16 @@ public class Simulation {
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {
-					runSimulation = false;
+					isRunSimulation = false;
 				}
-
 
 				//remove comment to fasten simulation for evacuation simulations
 				//if (topography.getElements(Pedestrian.class).size() == 0){
-				//	runSimulation = false;
+				// isRunSimulation = false;
 				//}
 
 				if (Thread.interrupted()) {
-					runSimulation = false;
+					isRunSimulation = false;
 					simulationResult.setState("Simulation interrupted");
 					logger.info("Simulation interrupted.");
 				}
@@ -281,9 +279,9 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
-        List<Event> events = eventController.getEventsForTime(simTimeInSec);
+		List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
-        // TODO Why are target controllers readded in each simulation loop?
+		// TODO Why are target controllers readded in each simulation loop?
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -317,19 +315,19 @@ public class Simulation {
 	}
 
 	public synchronized void pause() {
-		paused = true;
+		isPaused = true;
 	}
 
 	public synchronized boolean isPaused() {
-		return paused;
+		return isPaused;
 	}
 
 	public synchronized boolean isRunning() {
-		return runSimulation && !isPaused();
+		return isRunSimulation && !isPaused();
 	}
 
 	public synchronized void resume() {
-		paused = false;
+		isPaused = false;
 		notify();
 	}
 
@@ -354,7 +352,7 @@ public class Simulation {
 			try {
 				Thread.sleep(waitTime);
 			} catch (InterruptedException e) {
-				runSimulation = false;
+				isRunSimulation = false;
 				logger.info("Simulation interrupted.");
 			}
 		}
