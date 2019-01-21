@@ -26,9 +26,9 @@ import org.vadere.util.io.IOUtils;
 
 /**
  * Manages single simulation runs.
- * 
+ *
  * @author Jakob Schöttl
- * 
+ *
  */
 public class ScenarioRun implements Runnable {
 
@@ -130,7 +130,7 @@ public class ScenarioRun implements Runnable {
 //			MDC.remove("scenario.Name");
 		}
 	}
-	
+
 	public void simulationFailed(Throwable e) {
 			e.printStackTrace();
 			logger.error(e);

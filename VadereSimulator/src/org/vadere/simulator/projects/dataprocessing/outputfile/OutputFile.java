@@ -1,3 +1,5 @@
+
+
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
@@ -101,17 +103,17 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		if (!isEmpty()) {
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
 
-			    writer = out;
+			    this.writer = out;
 
-			    if(this.isWriteMetaData){
-			        printMetaData(out);
-                }
+				if(this.isWriteMetaData){
+					printMetaData();
+				}
 
-				printHeader(out);
+				printHeader();
 
 				this.dataProcessors.stream().flatMap(p -> p.getKeys().stream())
 						.distinct().sorted()
-						.forEach(key -> printRow(out, key));
+						.forEach(key -> printRow(key));
 
 				out.flush();
 			} catch (IOException e) {
@@ -124,18 +126,30 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return this.dataProcessors.isEmpty();
 	}
 
-	private void printHeader(VadereWriter out) {
-		writeLine(out, this.getEntireHeader());
-	}
+	private void printMetaData(){
+		// use '#' symbol for comment -- the Java-style comment '//' is not appropriate because it requires two
+		// characters
+		String md = "#IDXCOL=" + dataIndices.length +
+				",DATACOL="+(getEntireHeader().size()-dataIndices.length)+","+
+				"SEP=\'"+ this.separator+"\'";
 
-	private void printMetaData(VadereWriter out){
-		String md = "//ROW=" + dataIndices.length + ",COL="+getEntireHeader().size();  // leave Java-style comment also for output
-
-		//Make a list with element to reuse writeLine function
+		//Make a list with one element to reuse 'writeLine' function
 		List<String> line = new LinkedList<>();
 		line.add(md);
 
-		writeLine(out, line);
+		writeLine(this.writer, line);
+	}
+
+	private void printHeader() {
+		writeLine(this.writer, this.getEntireHeader());
+	}
+
+	private void printRow(final K key) {
+		// Info: 'key' are the indices values (such as timeStep=3), can be more than one
+		@SuppressWarnings("unchecked")
+		final List<String> fields = composeLine(toStrings(key), p ->
+				Arrays.stream(p.toStrings(key)));
+		writeLine(this.writer, fields);
 	}
 
 	private List<String> getIndices(){
@@ -161,13 +175,6 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return String.join(this.separator, this.getIndices());
 	}
 
-	private void printRow(final VadereWriter out, final K key) {
-		// Info: 'key' are the indices values (such as timeStep=3), can be more than one
-		@SuppressWarnings("unchecked")
-		final List<String> fields = composeLine(toStrings(key), p -> Arrays.stream(p.toStrings(key)));
-		writeLine(out, fields);
-	}
-
 	private List<String> headersWithNameMangling(){
 		LinkedList<String> headers = new LinkedList<>();
 		boolean isNameMangle = false; // assume there is no nameing conflict
@@ -187,7 +194,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		}
 
 		if(isNameMangle){
- 			headers.clear();  //start from new...
+			headers.clear();  //start from new...
 			for (DataProcessor l: dataProcessors) {
 				List<String> list = Arrays.asList(l.getHeaders());
 
@@ -210,8 +217,10 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return allHeaders;
 	}
 
-	private List<String> composeLine(String[] keyFieldArray, @SuppressWarnings("rawtypes") Function<DataProcessor, Stream<String>> valueFields) {
-		final List<String> fields = new LinkedList<>(Arrays.asList(keyFieldArray));
+	private List<String> composeLine(String[] keyFieldArray,
+									 @SuppressWarnings("rawtypes") Function<DataProcessor, Stream<String>> valueFields){
+		final List<String> fields = new
+				LinkedList<>(Arrays.asList(keyFieldArray));
 
 		final List<String> processorFields = dataProcessors.stream()
 				.flatMap(valueFields)
