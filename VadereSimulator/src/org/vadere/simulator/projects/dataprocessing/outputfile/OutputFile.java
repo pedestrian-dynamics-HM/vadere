@@ -6,9 +6,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriter;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
-import sun.awt.image.ImageWatched;
 
-import javax.sound.midi.SysexMessage;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
