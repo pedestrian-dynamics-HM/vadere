@@ -50,8 +50,7 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 			outputFile = fileChooser.getSelectedFile().toString().endsWith(".tex") ? fileChooser.getSelectedFile()
 					: new File(fileChooser.getSelectedFile().toString() + ".tex");
 
-			boolean completeDocument = true;
-			tikzGenerator.generateTikz(outputFile, completeDocument);
+			tikzGenerator.generateTikz(outputFile);
 		}
 	}
 
