@@ -6,7 +6,19 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "density.txt",
-      "processors" : [ 1, 6 ]
+      "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
+      "filename" : "out.txt",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "out1.txt",
+      "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "postvis.trajectories",
+      "processors" : [ 1, 2 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
@@ -35,14 +47,6 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
-      "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 2,
-        "radius" : 1.0E-6
       }
     } ],
     "isTimestamped" : true,
@@ -101,7 +105,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 5.0,
+      "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
