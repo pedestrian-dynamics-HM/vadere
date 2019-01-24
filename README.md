@@ -1,3 +1,13 @@
+
+# Contributing
+
+It is highly recommended to contribute (report bugs, code, ideas, etc.) in the original repository. If you want to update the suq controller with the current master run the following git command from Vadere's root source code path:
+
+```
+git subtree pull --prefix Tools/SUQController git@gitlab.lrz.de:vadere/suq-controller.git master
+```
+
+
 ### WORK IN PROGRESS
 
 The suq-controller connects the modules "Surrogate Model" (S) and "Uncertainty Quantification" (UQ) (see other vadere Repos). 
@@ -26,7 +36,7 @@ set in the environment. A query can simulate VADERE for multiple scenario settin
 
 1. Download and install:
 
-**It is highly recommended to install git-lfs to also download the VADERE models.** 
+**It is highly recommended to install git-lfs to also download the Vadere models.** 
 
 Download source code, pre-set VADERE models and example environments with git:
 ```
@@ -42,30 +52,14 @@ python3 setup.py install
 
 Note: In Linux this may have to be executed with `sudo`.
 
-This installs the essential package, but does **not** copy the models or example environments. To set up the 
-corresponding folders and copy the models to the appropriate position run the following command separately.
-
-```
-python3 setup_folders.py TODO
-```
-
 Test if the installed package was installed successfully by running:
 
 ```
 python3 -c "import suqc; print(suqc.__version__)"
 ```
 
-This command should print the installed version number in the terminal. In case an error was thrown the package is 
+This command should print the installed version number (and potentially infos to set up required folder) in the terminal. In case an error was thrown the package is 
 not installed successfully. 
-
-
-2. Configuration of `suqc`
-
-During the run of `setup_folders.py` two folders are created at the user's home path. 
-
-   1. `.suqc` consists of the meta configuration of the suq-controller. This includes the path to the 
-   environment-container folder and information about the available models. 
-   2. `suqc_envs` is a container and consists of environments that are set up. 
 
 
 #### Introduction

@@ -11,7 +11,7 @@ __credits__ = ["n/a"]
 # --------------------------------------------------
 
 
-run_local = False
+run_local = True
 
 ###############################################################################################################
 # Usecase: One parameter in the scenario is changed, for every independent the data is collected and returned.
