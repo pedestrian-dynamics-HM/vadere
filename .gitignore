@@ -16,6 +16,7 @@ parid_lookup.csv
 
 # Configuration file (gets generated when importing the project)
 suq_config.json
+update_server.sh
 
 # pickle files
 *.p
