@@ -54,7 +54,7 @@ public class TestChooseSeatGroup {
 		fillCompartment(compartment, 0, 1, 2, 3);
 		assert compartment.getPersonCount() == 6;
 		
-		final int nTrials = 1000;
+		final int nTrials = 10000;
 		final TallySheet<Integer> tallySheet = runChooseSeatGroup(compartment, nTrials);
 		
 		List<Integer> sortedKeys = tallySheet.getKeys().stream()
@@ -79,7 +79,7 @@ public class TestChooseSeatGroup {
 		fillCompartment(compartment, 1, 2, 3, 4);
 		assert compartment.getPersonCount() == 10;
 		
-		final int nTrials = 1000;
+		final int nTrials = 10000;
 		final TallySheet<Integer> tallySheet = runChooseSeatGroup(compartment, nTrials);
 		
 		List<Integer> sortedKeys = tallySheet.getKeys().stream()
@@ -101,7 +101,7 @@ public class TestChooseSeatGroup {
 		fillCompartment(compartment, personCountForEachSeatGroup, personCountForEachSeatGroup,
 				personCountForEachSeatGroup, personCountForEachSeatGroup);
 		
-		final int nTrials = 1000;
+		final int nTrials = 10000;
 		final TallySheet<Integer> tallySheet = runChooseSeatGroup(compartment, nTrials);
 		
 		for (Integer key : tallySheet.getKeys()) {
