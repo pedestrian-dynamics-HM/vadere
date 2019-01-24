@@ -27,6 +27,17 @@
   sub-command. This will will turn the ScenarioChecker on or off for the command
   line. If the Checker detects an error  the simulation will not be executed.
 
+- `TopographyCreator` added functionalities:
+    - move all topography elements by some dx, dy [issue#171](https://gitlab.lrz.de/vadere/vadere/issues/171)
+    - move the whole topography by some dx, dy [issue#148](https://gitlab.lrz.de/vadere/vadere/issues/148)
+    - automatically merge overlapping obstacles by using the weiler algorithm.
+
+- `Processors`:
+    - new processors to compute the fundamental diagrams (by using different velocity, flow and density measurement methods)
+
+- `GUI`:
+    - improved coloring
+
 - `OutputFile`: Distinguish between indices (rows) and headers (columns), in code and with a new checkbox that when enables allow to write meta-data into output files. Furthermore, resolve naming conflicts (if they occur) in headers of output files (see #201). 
 
 ### Changed
