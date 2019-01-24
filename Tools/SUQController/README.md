@@ -28,29 +28,30 @@ Other words were used in this project to not confuse terminology with VADERE (su
 
 * **container** is the parent folder of (multiple) environments
 * **environment** is folder consisting of a specifed VADERE scenario that is intended to query
-* **query** is an user request for a quantity of interest for the specific VADERE setting with the given the scenario 
+* **request** is an user request for a quantity of interest for the specific VADERE setting with the given the scenario 
 set in the environment. A query can simulate VADERE for multiple scenario settings for the parameter variation 
 (such as a full grid sampling).
 
-#### Getting started
+## Getting started
 
-1. Download and install:
+Either install as a Pyhton package or run the source code directly. Either way it is recommended to use Python>=3.6 
 
-**It is highly recommended to install git-lfs to also download the Vadere models.** 
+### Using the code
 
-Download source code, pre-set VADERE models and example environments with git:
-```
-git@gitlab.lrz.de:vadere/suq-controller.git
-```
 
-Install package `suqc` by running the following command inside the downloaded folder `suq-contoller`. It is recommended 
-to use `python>=3.6`.
 
+#### Use source directly:
+
+Run the code from the source directly (without install), please check if you meet the requirements (see `requirements.txt` file). You can also run `pip3 install -r /path/to/requirements.txt`. Make also sure that the Python paths are set correctly (possibly add with `sys`). 
+
+#### Install as Python package:
+
+To install as a package `suqc` run 
 ```
 python3 setup.py install
 ``` 
 
-Note: In Linux this may have to be executed with `sudo`.
+from the command line. (Note: In Linux this may have to be executed with `sudo`).
 
 Test if the installed package was installed successfully by running:
 
@@ -61,7 +62,6 @@ python3 -c "import suqc; print(suqc.__version__)"
 This command should print the installed version number (and potentially infos to set up required folder) in the terminal. In case an error was thrown the package is 
 not installed successfully. 
 
-
-#### Introduction
+### Introduction
 
 See [SRC_PATH]/tutorial
