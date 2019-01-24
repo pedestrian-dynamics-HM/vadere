@@ -1,0 +1,5 @@
+matplotlib==2.2.3
+setuptools==39.1.0
+fabric==2.4.0
+pandas==0.23.4
+numpy==1.15.4
