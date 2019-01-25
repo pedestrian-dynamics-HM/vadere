@@ -1,9 +1,12 @@
 package org.vadere.simulator.models.groups.cgm;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.groups.Group;
+import org.vadere.simulator.utils.CentroidGroupListBuilder;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -11,6 +14,7 @@ import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +29,7 @@ public class CentroidGroupModelTest {
 	private List<Attributes> attributesList;
 	private Topography topography;
 	private AttributesAgent attributesAgent;
+
 
 	@Before
 	public void init() {
@@ -64,4 +69,8 @@ public class CentroidGroupModelTest {
 		}
 		return peds;
 	}
+
+
+
+
 }
