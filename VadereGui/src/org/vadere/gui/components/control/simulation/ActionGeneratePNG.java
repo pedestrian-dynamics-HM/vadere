@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
@@ -48,7 +49,7 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 			String formattedDate = formatter.format(todaysDate);
 
 
-			File outputFile = new File("pv_snapshot_" + formattedDate + ".png");
+			File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".png");
 			fileChooser.setSelectedFile(outputFile);
 
 			int returnVal = fileChooser.showDialog(null, "Save");

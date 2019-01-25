@@ -7,11 +7,14 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "out.txt",
-      "processors" : [ 1 ]
+      "processors" : [ 1, 2 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
       "id" : 1
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 2
     } ],
     "isTimestamped" : true
   },
