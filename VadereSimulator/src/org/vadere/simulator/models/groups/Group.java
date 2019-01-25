@@ -16,7 +16,12 @@ public interface Group {
 
 	void addMember(Pedestrian ped);
 
-	void removeMember(Pedestrian ped);
+	/**
+	 *
+	 * @param ped
+	 * @return		Retrun True if ped was the last one.
+	 */
+	boolean removeMember(Pedestrian ped);
 
 	boolean isFull();
 

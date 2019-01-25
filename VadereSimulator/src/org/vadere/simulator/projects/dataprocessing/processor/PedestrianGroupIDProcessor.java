@@ -5,14 +5,16 @@ import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.groups.cgm.CentroidGroup;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.processor.util.ModelFilter;
 
 import java.util.Optional;
 
 @DataProcessorClass
-public class PedestrianGroupIDProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer>{
+public class PedestrianGroupIDProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer> implements ModelFilter {
 
 	private static Logger logger = LogManager.getLogger(PedestrianGroupIDProcessor.class);
 
@@ -23,19 +25,15 @@ public class PedestrianGroupIDProcessor extends DataProcessor<TimestepPedestrian
 	@Override
 	protected void doUpdate(SimulationState state) {
 		Integer timeStep = state.getStep();
-		Optional<MainModel> mainModel =  state.getMainModel();
-		if (mainModel.isPresent()){
-			Optional<CentroidGroupModel> model = mainModel.get()
-					.getSubmodels().stream()
-					.filter(m -> m instanceof CentroidGroupModel)
-					.map(m -> (CentroidGroupModel) m).findAny();
 
-			if (model.isPresent()){
-				model.get().getPedestrianGroupMap().entrySet().forEach(entry ->{
-					this.putValue(new TimestepPedestrianIdKey(timeStep, entry.getKey().getId()), entry.getValue().getID());
+		getModel(state, CentroidGroupModel.class).ifPresent(m -> { // find CentroidGroupModel
+			CentroidGroupModel model = (CentroidGroupModel)m;
+			model.getGroupsById().forEach((gId, group) -> {	// for each group
+				group.getMembers().forEach(ped -> {			// for each member in group
+					this.putValue(new TimestepPedestrianIdKey(timeStep, ped.getId()), gId);
 				});
-			}
-		}
+			});
+		});
 	}
 
 	@Override

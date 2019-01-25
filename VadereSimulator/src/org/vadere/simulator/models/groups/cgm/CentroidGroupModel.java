@@ -18,6 +18,7 @@ import org.vadere.state.scenario.Topography;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,8 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	private static Logger logger = LogManager.getLogger(CentroidGroupModel.class);
 
 	private Random random;
-	private Map<ScenarioElement, CentroidGroup> pedestrianGroupMap;
+//	private Map<Pedestrian, CentroidGroup> pedestrianGroupMap;
+	private LinkedHashMap<Integer, CentroidGroup> groupsById;
 	private Map<Integer, LinkedList<CentroidGroup>> sourceNextGroups;
 	private Map<Integer, GroupSizeDeterminator> sourceGroupSizeDeterminator;
 
@@ -46,7 +48,8 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	private AtomicInteger nextFreeGroupId;
 
 	public CentroidGroupModel() {
-		this.pedestrianGroupMap = new HashMap<>();
+//		this.pedestrianGroupMap = new HashMap<>();
+		this.groupsById = new LinkedHashMap<>();
 		this.sourceNextGroups = new HashMap<>();
 		this.sourceGroupSizeDeterminator = new HashMap<>();
 
@@ -66,7 +69,7 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
 		this.potentialFieldTarget = potentialFieldTarget;
 		// update all existing groups
-		for (CentroidGroup group : pedestrianGroupMap.values()) {
+		for (CentroidGroup group : groupsById.values()) {
 			group.setPotentialFieldTarget(potentialFieldTarget);
 		}
 	}
@@ -101,22 +104,20 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	}
 
 	@Override
-	public CentroidGroup getGroup(final ScenarioElement pedestrian) {
-		//logger.debug(String.format("Get Group for Pedestrian %s", ped));
-		CentroidGroup group = pedestrianGroupMap.get(pedestrian);
+	public CentroidGroup getGroup(final Pedestrian pedestrian) {
+		CentroidGroup group = groupsById.get(pedestrian.getGroupIds().getFirst());
 		assert group != null : "No group found for pedestrian";
 		return group;
 	}
 
 	@Override
-	protected void registerMember(final ScenarioElement ped, final CentroidGroup group) {
-		//logger.debug(String.format("Register Pedestrian %s, Group %s", ped, group));
-		pedestrianGroupMap.put(ped, group);
+	protected void registerMember(final Pedestrian ped, final CentroidGroup group) {
+		groupsById.putIfAbsent(ped.getGroupIds().getFirst(), group);
 	}
 
 	@Override
-	public Map<ScenarioElement, CentroidGroup> getPedestrianGroupMap() {
-		return pedestrianGroupMap;
+	public Map<Integer, CentroidGroup> getGroupsById() {
+		return groupsById;
 	}
 
 	@Override
@@ -201,9 +202,9 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	@Override
 	public void elementRemoved(Pedestrian pedestrian) {
-		Group group = pedestrianGroupMap.remove(pedestrian);
-		if (group != null) {
-			group.removeMember(pedestrian);
+		Group group = groupsById.get(pedestrian.getGroupIds().getFirst());
+		if (group.removeMember(pedestrian)) { // if true pedestrian was last member.
+			groupsById.remove(group.getID());
 		}
 	}
 

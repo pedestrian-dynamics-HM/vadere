@@ -7,6 +7,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
       "processors" : [ 1, 2, 5, 6 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.GroupPairOutputFile",
+      "filename" : "groupOut.csv",
+      "processors" : [ 7, 8, 9 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -20,6 +24,15 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupSizeProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.GroupMemberEuclideanDist",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.GroupMemberSeparatedByObstacle",
+      "id" : 8
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.GroupMemberPotentialDist",
+      "id" : 9
     } ],
     "isTimestamped" : true
   },
@@ -80,7 +93,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 60.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.4,
       "writeSimulationData" : true,

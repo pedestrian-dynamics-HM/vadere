@@ -112,8 +112,8 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	public double getAgentPotential(IPoint pos, Agent pedestrian,
 									Agent otherPedestrian) {
 		//System.out.printf("Ped1: %s, Ped1: %s %n", pedestrian.getId(), otherPedestrian.getId());
-		CentroidGroup group = groupCollection.getGroup(pedestrian);
-		CentroidGroup groupOther = groupCollection.getGroup(otherPedestrian);
+		CentroidGroup group = groupCollection.getGroup((Pedestrian)pedestrian);
+		CentroidGroup groupOther = groupCollection.getGroup((Pedestrian)otherPedestrian);
 		double potential = potentialFieldPedestrian.getAgentPotential(pos,
 				pedestrian, otherPedestrian);
 

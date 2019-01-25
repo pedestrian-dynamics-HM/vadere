@@ -7,6 +7,7 @@ import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 
+import java.beans.PropertyEditor;
 import java.util.Map;
 
 
@@ -27,12 +28,14 @@ public interface GroupModel<T extends Group>
 	 * @param pedestrian Pedestrian object
 	 * @return The group the pedestrian object is a part of.
 	 */
-	T getGroup(ScenarioElement pedestrian);
+	T getGroup(Pedestrian pedestrian);
 
 	/**
 	 * @return Map of Pedestrians and their group.
 	 */
-	Map<ScenarioElement, T> getPedestrianGroupMap();
+//	Map<Pedestrian, T> getPedestrianGroupMap();
+
+	Map<Integer, T> getGroupsById();
 
 
 	void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.models.groups.Group;
@@ -78,6 +79,10 @@ public class CentroidGroup implements Group {
 	@Override
 	public List<Pedestrian> getMembers() {
 		return members;
+	}
+
+	public Stream<Pedestrian> memberStream(){
+		return members.stream();
 	}
 
 	@Override
@@ -173,11 +178,12 @@ public class CentroidGroup implements Group {
 	}
 
 	@Override
-	public void removeMember(Pedestrian ped){
+	public boolean removeMember(Pedestrian ped){
 		members.remove(ped);
 		lastVision.remove(ped);
 		lostMembers.remove(ped);
 		noVisionOfLeaderCount.remove(ped);
+		return (members.size() == 0);
 	}
 
 	private void initGroupVelocity(){
