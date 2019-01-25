@@ -54,7 +54,8 @@ class ServerConnection(object):
             server_cfg = SuqcConfig.load_cfg_file()["server"]
         else:
             host, user, port = server_cfg["host"], server_cfg["user"], server_cfg["port"]
-        print(f"INFO: Try to connect to ssh -p {port} {user}@{host} ")
+        print(f"INFO: Trying to connect to ssh -p {port} {user}@{host} . "
+              f"Configure at {SuqcConfig.path_suq_config_file()}")
         return server_cfg
 
     def _connect_server(self):
@@ -120,6 +121,12 @@ class ServerRequest(object):
             lpath = self._correct_folderpath(lpath)
 
         return lpath
+
+    def _default_result_pickle_path_remote(self):
+        return self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+
+    def _default_result_pickle_path_local(self, suitable_path):
+        return os.path.join(suitable_path, "results.p")
 
     def _remote_input_folder(self):
         # input data is directly written to the remote folder

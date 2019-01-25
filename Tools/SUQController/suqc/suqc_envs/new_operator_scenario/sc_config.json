@@ -1,7 +1,0 @@
-{
-    "model": "vadere",
-    "suqc_state": {
-        "git_hash": "a2be94be3ac59851260761709c7c19e80561e285",
-        "umcommited_changes": " M suqc/__init__.py\n M suqc/create_new_operator_sc.py\n D suqc/suqc_envs/new_operator_scenario/sc_config.json\n"
-    }
-}
