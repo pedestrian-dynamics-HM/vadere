@@ -10,6 +10,40 @@ import org.vadere.state.types.MovementType;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 
+/**
+ * <p>
+ *     This class contains all parameters for the Optimal Steps Model with the exception of parameters for the three different
+ *     potential functions (pedestrian-, target- and obstacle-potential) and without any submodel paraemters
+ *     such as the Centroid Group Model {@link AttributesCGM}.
+ * </p>
+ *
+ * <p>
+ *     There exist different versions of the Optimal Steps Model which use different parameters such that not every parameter
+ *     is used for every version and some parameters are only used if some other parameter has a specific value. The default version
+ *     of the Optimal Steps Model is the one using the optimization on the disc and potential functions representing the personal
+ *     spaces (see sivers-2016b). We deviate from sivers-2016b only in the concept of a minimal step length: In this implementation
+ *     an agent will not move if its next position is closer than its minimal step length ({@link AttributesOSM#minStepLength}).
+ * </p>
+ *
+ * <p>
+ *     Parameters for the configuring the optimization method are:
+ *     <ul>
+ *         <li>{@link AttributesOSM#stepCircleResolution}</li>
+ *         <li>{@link AttributesOSM#numberOfCircles}</li>
+ *         <li>{@link AttributesOSM#optimizationType}</li>
+ *         <li>{@link AttributesOSM#varyStepDirection}</li>
+ *     </ul>
+ *     Dependent on the used combination, they have different meanings!
+ * </p>
+ *
+ * <p>
+ *     The step length velocity correlation s(v) = a + b * v discussed in (seitz-2012) is realized via
+ *     <ul>
+ *         <li>{@link AttributesOSM#stepLengthIntercept}: a</li>
+ *         <li>{@link AttributesOSM#stepLengthSlopeSpeed}: b</li>
+ *     </ul>
+ * </p>
+ */
 @ModelAttributeClass
 public class AttributesOSM extends Attributes {
 
@@ -17,12 +51,12 @@ public class AttributesOSM extends Attributes {
 	 * <p>
 	 *     Parameter of the optimization method: the number of points on the most outer circle.
 	 *     These points will be used in different ways which depends on the {@link OptimizationType}.
+	 *     <ul>
+	 * 	       <li>OptimizationType.NELDER_MEAD (default): each neighbouring pair of points and the agent position is used as a starting simplex</li>
+	 * 	       <li>OptimizationType.PSO: each point and the position of the agent is used as a starting position of a particle</li>
+	 * 	       <li>OptimizationType.DISCRETE: each point is and the position of the agent is used to directly evaluate the evaluation function</li>
+	 * 	    </ul>
 	 * </p>
-	 * <ul>
-	 *     <li>OptimizationType.NELDER_MEAD (default): each neighbouring pair of points and the agent position is used as a starting simplex</li>
-	 *     <li>OptimizationType.PSO: each point and the position of the agent is used as a starting position of a particle</li>
-	 *     <li>OptimizationType.DISCRETE: each point is and the position of the agent is used to directly evaluate the evaluation function</li>
-	 * </ul>
 	 */
 	private int stepCircleResolution = 4;
 
@@ -41,18 +75,29 @@ public class AttributesOSM extends Attributes {
 	 */
 	private OptimizationType optimizationType = OptimizationType.NELDER_MEAD;
 
+	/**
+	 * If true, introduced for every optimization process a random offset by which points will be shifted (on their circle).
+	 * If false, there will be no random offset. In case {@link AttributesOSM#movementType} is not directional
+	 * and the first point of each circle will at (r * cos(0), r * sin(0)).
+	 */
 	private boolean varyStepDirection = true;
 
 	/**
-	 * Used to compute the desired step length which is
-	 * {@link AttributesOSM#stepLengthIntercept} + {@link AttributesOSM#stepLengthSlopeSpeed} * speed.
+	 * This should only be used if {@link OptimizationType} is equal <tt>DISCRETE</tt> or <tt>PSO</tt>, since all other optimization (on the disc) do not
+	 * use this parameter. Reduces the circles of the optimization to a segments lying inside a cone (see seitz-2016 page 76).
+	 * This does not effect the number of used points. The shape of the cone is computed by the formula in seitz-2016 which
+	 * depends on the current velocity of the agent.
+	 */
+	private MovementType movementType = MovementType.ARBITRARY;
+
+	/**
+	 * Used to compute the desired step length which is {@link AttributesOSM#stepLengthIntercept} + {@link AttributesOSM#stepLengthSlopeSpeed} * speed.
 	 * (see seitz-2016 page 71 or seitz-2012).
 	 */
 	private double stepLengthIntercept = 0.4625;
 
 	/**
-	 * Used to compute the desired step length which is
-	 * {@link AttributesOSM#stepLengthIntercept} + {@link AttributesOSM#stepLengthSlopeSpeed} * speed + error
+	 * Used to compute the desired step length which is {@link AttributesOSM#stepLengthIntercept} + {@link AttributesOSM#stepLengthSlopeSpeed} * speed + error
 	 * (see seitz-2016 page 71 or seitz-2012).
 	 */
 	private double stepLengthSlopeSpeed = 0.2345;
@@ -65,13 +110,13 @@ public class AttributesOSM extends Attributes {
 	private double stepLengthSD = 0.036;
 
 	/**
-	 * Only used if {@link OptimizationType} is equal DISCRETE. If the potential does not improve by this
-	 * movementThreshold, the agent will not move.
+	 * Only used if {@link OptimizationType} is equal <tt>DISCRETE</tt> or <tt>PSO</tt>. If the potential does not improve by this
+	 * movementThreshold, the agent will not move. This is in some sense similar to the effect of {@link AttributesOSM#minStepLength}.
 	 */
 	private double movementThreshold = 0;
 
 	/**
-	 * Only used if {@link AttributesOSM#minimumStepLength} is true. The agent will not move if the
+	 * Only used if {@link AttributesOSM#minimumStepLength} is <tt>true</tt>. The agent will not move if the
 	 * next improvement is less than {@link AttributesOSM#minStepLength} away from its current position.
 	 * Furthermore, this will be ignored if an agent is on stairs.
 	 */
@@ -89,13 +134,7 @@ public class AttributesOSM extends Attributes {
 	private double maxStepDuration = Double.MAX_VALUE;
 
 	/**
-	 * Only used if {@link OptimizationType} is equal DISCRETE. Reduces the disc of the optimization to
-	 * a cone (see seitz-2016 page 76).
-	 */
-	private MovementType movementType = MovementType.ARBITRARY;
-
-	/**
-	 * SpeedAdjuster will only be active if this is true. For example this has to be true if the group model is
+	 * SpeedAdjusters will only be active if this is <tt>true</tt>. For example this has to be true if the group model is
 	 * active.
 	 */
 	private boolean dynamicStepLength = true;
