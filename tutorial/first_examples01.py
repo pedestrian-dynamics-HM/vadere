@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+import os
+import sys
+
+# This is just to make sure that the systems path is set up correctly, to have correct imports.
+# (It can be ignored)
+sys.path.append(os.path.abspath("."))   # in case tutorial is called from the root directory
+sys.path.append(os.path.abspath(".."))  # in tutorial directly
 
 from tutorial.imports import *
 
@@ -9,7 +16,6 @@ __authors__ = "Daniel Lehmberg"
 # people who made suggestions or reported bugs but didn't contribute code
 __credits__ = ["n/a"]
 # --------------------------------------------------
-
 
 run_local = True
 

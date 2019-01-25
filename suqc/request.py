@@ -3,6 +3,7 @@
 # TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
 
 import os
+import json
 import shutil
 import multiprocessing
 
@@ -11,7 +12,8 @@ from suqc.environment import VadereConsoleWrapper
 from suqc.parameter.sampling import *
 from suqc.parameter.postchanges import ScenarioChanges
 from suqc.parameter.create import VadereScenarioCreation
-from suqc.utils.general import create_folder, check_parent_exists_folder_remove, njobs_check_and_set, str_timestamp
+from suqc.utils.general import create_folder, check_parent_exists_folder_remove, njobs_check_and_set, str_timestamp, \
+    parent_folder_clean
 from suqc.remote import ServerRequest, ServerConnection
 from suqc.configuration import SuqcConfig
 
@@ -216,13 +218,13 @@ class FullVaryScenario(Request, ServerRequest):
                               "sc_change": self.sc_change}
 
             remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-            remote_pickle_res_path = self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+            remote_pickle_res_path = self._default_result_pickle_path_remote()
 
             s = f"""python3 -c 'import suqc; suqc.FullVaryScenario._remote_run("{remote_pickle_arg_path}", "{remote_pickle_res_path}", "{self.remote_env_name}", {njobs})'"""
 
             self.server.con.run(s)
 
-            local_pickle_path = os.path.join(self.env_man.get_env_outputfolder_path(), "result.p")
+            local_pickle_path = self._default_result_pickle_path_local(self.env_man.get_env_outputfolder_path())
             res = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
 
             self._remove_remote_folder()
@@ -294,13 +296,13 @@ class QuickVaryScenario(FullVaryScenario, ServerRequest):
 
             # TODO: duplicated code!
             remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-            remote_pickle_res_path = self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+            remote_pickle_res_path = self._default_result_pickle_path_remote()
 
             s = f"""python3 -c 'import suqc; suqc.QuickVaryScenario._remote_run("{remote_pickle_arg_path}", "{remote_pickle_res_path}", "{self.remote_env_name}", {njobs})'"""
 
             self.server.con.run(s)
+            local_pickle_path = self._default_result_pickle_path_local(SuqcConfig.path_container_folder())
 
-            local_pickle_path = os.path.join(SuqcConfig.path_container_folder(), "result.p")
             res = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
 
             self._remove_remote_folder()
@@ -346,12 +348,12 @@ class SingleKeyVaryScenario(QuickVaryScenario, ServerRequest):
                               "model": remote_model_path}
 
             remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-            remote_pickle_res_path = self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+            remote_pickle_res_path = self._default_result_pickle_path_remote()
 
             s = f"""python3 -c 'import suqc; suqc.SingleKeyVaryScenario._remote_run("{remote_pickle_arg_path}", "{remote_pickle_res_path}", "{self.remote_env_name}", {njobs})'"""
             self.server.con.run(s)
 
-            local_pickle_path = os.path.join(self.tmp_folder_path, "result.p")
+            local_pickle_path = self._default_result_pickle_path_local(self.tmp_folder_path)
             res = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
 
         self._remove_temporary_path()
@@ -403,7 +405,7 @@ class MultiScenarioOutput(Request, ServerRequest):
             remote_model_path = self._transfer_model_local2remote(self.model)
 
             # TODO provide the default pickle paths in a function
-            remote_pickle_res_path = self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+            remote_pickle_res_path = self._default_result_pickle_path_remote()
 
             s = f"""python3 -c 'import suqc; suqc.MultiScenarioOutput._remote_run("{self.remote_folder_path}", "{self.remote_output_folder()}", "{remote_model_path}", "{remote_pickle_res_path}", {njobs})'"""
             self.server.con.run(s)
@@ -412,13 +414,33 @@ class MultiScenarioOutput(Request, ServerRequest):
             zipped_file_local = self._transfer_compressed_output_remote2local(self.path_output)
             self._uncompress_file2target(zipped_file_local, self.path_output)
 
-            self._transfer_pickle_remote2local(remote_pickle_res_path, os.path.join(self.path_output, "results.p"))
+            self._transfer_pickle_remote2local(remote_pickle_res_path,
+                                               self._default_result_pickle_path_local(self.path_output))
             self._remove_remote_folder()
 
     def run(self, njobs: int = 1):
         _, req_time = super(MultiScenarioOutput, self).run(njobs)
         self.return_df.loc[:, "req_time"] = req_time
         return self.return_df
+
+
+class ProjectOutput(MultiScenarioOutput):
+
+    def __init__(self, project_path, model):
+
+        if not os.path.exists(project_path):
+            raise ValueError(f"project_path {project_path} odes not exist.")
+
+        if not os.path.isfile(project_path) or not project_path.endswith(".project"):
+            raise ValueError(f"project_path has to be the path to a Vadere project file (ending with .project).")
+
+        parent_path = parent_folder_clean(project_path)
+
+        # This is by Vaderes convention:
+        path_scenarios = os.path.join(parent_path, "scenarios")
+        path_output = os.path.join(parent_path, "output")
+
+        super(ProjectOutput, self).__init__(path_scenarios, path_output, model)
 
 
 class SingleScenarioOutput(Request, ServerRequest):
@@ -482,7 +504,7 @@ class SingleScenarioOutput(Request, ServerRequest):
             if self.qoi is not None:
                 pickle_content = {"qoi": self.qoi}
                 remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-                remote_pickle_res_path = self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+                remote_pickle_res_path = self._default_result_pickle_path_remote()
                 s = f"""python3 -c 'import suqc; suqc.SingleScenarioOutput._remote_run("{remote_scenario_path}", "{self.remote_output_folder()}", "{remote_model_path}", "{remote_pickle_arg_path}", "{remote_pickle_res_path}")'"""
             else:
                 remote_pickle_res_path = None
@@ -494,56 +516,11 @@ class SingleScenarioOutput(Request, ServerRequest):
             self._uncompress_file2target(zipped_file_local, self.path_output)
 
             if self.qoi is not None:
-                self._transfer_pickle_remote2local(remote_pickle_res_path, os.path.join(self.path_output, "result.p"))
+                self._transfer_pickle_remote2local(remote_pickle_res_path,
+                                                   self._default_result_pickle_path_local(self.path_output))
 
             self._remove_remote_folder()
 
 
 if __name__ == "__main__":
-
-    # QuickVaryScenario()
-
-
-
-    # par, res = QuickRequest(scenario_path="/home/daniel/REPOS/suq-controller/suqc/rimea_13_stairs_long_nelder_mead.scenario",
-    #              parameter_var=[{"speedDistributionMean": 0.1}, {"speedDistributionMean": 0.2}, {"speedDistributionMean": 0.3}],
-    #              qoi="postvis.trajectories", model="vadere0_7rc.jar")
-
-    # res = provide_scenarios_run(path_scenarios="/home/daniel/REPOS/suq-controller/suqc/suqc_envs/test_provide_scenario",
-    #                       path_output="/home/daniel/REPOS/suq-controller/suqc/suqc_envs/test_provide_scenario",
-    # #                       model="vadere0_7rc.jar", njobs=1)
-    # res = provide_single_scenario(path_scenario="/home/daniel/Code/vadere/VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario",
-    #                               path_output="/home/daniel/test/test01", model="vadere0_7rc.jar")
-    # print(res)
-
-    # par, res = single_key_request(scenario_path="/home/daniel/REPOS/suq-controller/suqc/basic_2_density_discrete_ca.scenario",
-    #                               key="speedDistributionMean", values=np.array([1.1, 2.1, 2.4]),
-    #                               qoi="density.txt",
-    #                               model="vadere0_7rc.jar")
-
-
-
-    exit()
-
-    # em = EnvironmentManager("corner", model="vadere0_7rc.jar")
-    # pv = FullGridSampling()
-    # pv.add_dict_grid({"speedDistributionStandardDeviation": [0.0, 0.1, 0.2, 0.3], "speedDistributionMean": [1.2, 1.3]})
-    # q0 = QuantityOfInterest("evacuationTimes.txt", em)
-    #
-    # par_lu, result = Request(em, pv, q0).run(njobs=1)
-
-    exit()
-
-    #q1 = PedestrianDensityGaussianProcessor(em) # TODO: need to check if qoi-processor is available in basis file!
-    #
-    #
-    # pv = BoxSamplingUlamMethod()
-    # pv.create_grid("speedDistributionStandardDeviation", 0, 0.5, 3, 3)
-    #
-    # sc = ScenarioChanges(apply_default=True)
-    #
-    # q = Query(em, pv, q0, sc).run(njobs=-1)
-    # print(q)
-    #
-    # # q = Query(em, pv, AreaDensityVoronoiProcessor(em)).run(njobs=1)
-    # # print(q)
+    pass
