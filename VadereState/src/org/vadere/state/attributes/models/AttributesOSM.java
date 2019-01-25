@@ -78,7 +78,8 @@ public class AttributesOSM extends Attributes {
 	/**
 	 * If true, introduced for every optimization process a random offset by which points will be shifted (on their circle).
 	 * If false, there will be no random offset. In case {@link AttributesOSM#movementType} is not directional
-	 * and the first point of each circle will at (r * cos(0), r * sin(0)).
+	 * and the first point of each circle will at (r * cos(0), r * sin(0)). This might solve some odd behaviour e.g.
+	 * agents get stuck due to a local minimum of the overall potential.
 	 */
 	private boolean varyStepDirection = true;
 
