@@ -11,6 +11,7 @@ import org.vadere.simulator.models.groups.Group;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.PedestrianPair;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -64,10 +65,9 @@ public class CentroidGroup implements Group {
 
 		if (this == o) {
 			result = true;
-		} else if (o instanceof Group) {
-			org.vadere.simulator.models.groups.Group other = o;
+		} else {
 
-			if (this.getID() == other.getID()) {
+			if (this.getID() == o.getID()) {
 				result = true;
 			}
 		}
@@ -124,11 +124,6 @@ public class CentroidGroup implements Group {
 		return new VPoint(result[0], result[1]);
 	}
 
-	/**
-	 *
-	 * @param ped
-	 * @return
-	 */
 	@Deprecated
 	public VPoint getCentroidOthers(Pedestrian ped) {
 
@@ -169,7 +164,7 @@ public class CentroidGroup implements Group {
 			throw new IllegalArgumentException("Group is full.");
 		}
 
-		lastVision.put(ped, new HashMap<Pedestrian, VPoint>());
+		lastVision.put(ped, new HashMap<>());
 		noVisionOfLeaderCount.put(ped, 0);
 
 		members.add(ped);
@@ -197,32 +192,32 @@ public class CentroidGroup implements Group {
 		return (members.size() * members.size() - members.size()) / 2;
 	}
 
-	public  ArrayList<Pair<Pedestrian, Pedestrian>> getMemberPairs(){
-		ArrayList<Pair<Pedestrian, Pedestrian>> ret = new ArrayList<>(getPairCount());
+	public  ArrayList<PedestrianPair> getMemberPairs(){
+		ArrayList<PedestrianPair> ret = new ArrayList<>(getPairCount());
 		for (int i = 0; i < members.size(); i++) {
-			for (int j = 1; j < members.size(); j++) {
+			for (int j = i+1; j < members.size(); j++) {
 				Pedestrian m1 = members.get(i);
 				Pedestrian m2 = members.get(j);
-				ret.add(Pair.of(m1, m2));
+				ret.add(PedestrianPair.of(m1, m2));
 			}
 		}
 		return ret;
 	}
 
-	public ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> getEuclidDist(){
-		ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> ret = new ArrayList<>(getPairCount());
+	public ArrayList<Pair<PedestrianPair, Double>> getEuclidDist(){
+		ArrayList<Pair<PedestrianPair, Double>> ret = new ArrayList<>(getPairCount());
 
-		for (Pair<Pedestrian, Pedestrian> p : getMemberPairs()) {
+		for (PedestrianPair p : getMemberPairs()) {
 			double dist = p.getLeft().getPosition().distance(p.getRight().getPosition());
 			ret.add(Pair.of(p, dist));
 		}
 		return ret;
 	}
 
-	public ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Boolean>> getPairIntersectObstacle(){
-		ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Boolean>> ret = new ArrayList<>(getPairCount());
+	public ArrayList<Pair<PedestrianPair, Boolean>> getPairIntersectObstacle(){
+		ArrayList<Pair<PedestrianPair, Boolean>> ret = new ArrayList<>(getPairCount());
 
-		for (Pair<Pedestrian, Pedestrian> p : getMemberPairs()) {
+		for (PedestrianPair p : getMemberPairs()) {
 			VLine pedLine = new VLine(p.getLeft().getPosition(), p.getRight().getPosition());
 			boolean intersectsObs = model.getTopography().getObstacles()
 					.stream()
@@ -233,12 +228,12 @@ public class CentroidGroup implements Group {
 		return ret;
 	}
 
-	public ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> getPotentialDist(){
-		ArrayList<Pair<Pair<Pedestrian, Pedestrian>, Double>> ret = new ArrayList<>(getPairCount());
+	public ArrayList<Pair<PedestrianPair, Double>> getPotentialDist(){
+		ArrayList<Pair<PedestrianPair, Double>> ret = new ArrayList<>(getPairCount());
 
-		for (Pair<Pedestrian, Pedestrian> p : getMemberPairs()) {
-			double potential1 = potentialFieldTarget.getPotential(p.getLeft().getPosition(), p.getLeft());
-			double potential2 = potentialFieldTarget.getPotential(p.getRight().getPosition(), p.getRight());
+		for (PedestrianPair p : getMemberPairs()) {
+			double potential1 = potentialFieldTarget.getPotential(p.getLeftPosition(), p.getLeft());
+			double potential2 = potentialFieldTarget.getPotential(p.getRightPosition(), p.getRight());
 			double potentialDiff = Math.abs(potential1 - potential2);
 			ret.add(Pair.of(p, potentialDiff));
 
@@ -254,7 +249,7 @@ public class CentroidGroup implements Group {
 	 * @return		Returns a Pair (Ped, Double)
 	 */
 	public Pair<Pedestrian, Double> getMaxDistPedIdInGroup(Pedestrian ped){
-		Pair<Pair<Pedestrian, Pedestrian>, Double> maxDist = getEuclidDist().stream()
+		Pair<PedestrianPair, Double> maxDist = getEuclidDist().stream()
 				// only compare member-Pairs in which the ped is a part of. Either left or right
 				.filter(pair -> pair.getKey().getLeft().equals(ped) || pair.getKey().getRight().equals(ped))
 				// return the pair with the max distance
