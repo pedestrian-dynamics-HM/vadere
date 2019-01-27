@@ -154,7 +154,7 @@ def create_vadere_obstacles_from_points(cartesian_points):
 
 
 def build_vadere_topography_input_with_obstacles(obstacles, width, height):
-    with open("vadere_topography_default.txt", "r") as myfile:
+    with open("vadere_topography_template.txt", "r") as myfile:
         vadere_topography_input = myfile.read().replace('\n', '')
 
     vadere_topography_output = Template(vadere_topography_input).substitute(width=width, height=height, obstacles=obstacles)
