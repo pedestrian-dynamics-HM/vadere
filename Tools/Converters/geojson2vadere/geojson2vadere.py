@@ -104,36 +104,6 @@ def filter_for_buildings(geojson_content):
 
     return buildings
 
-def convert_buildings_to_vadere_obstacle_strings(buildings):
-    list_of_vadere_obstacles_as_strings = []
-
-    # A single building is a list of vertices.
-    for building in buildings:
-        vadere_obstacle_as_string = create_vadere_obstracle_from_vertices(building)
-        list_of_vadere_obstacles_as_strings.append(vadere_obstacle_as_string)
-
-    return list_of_vadere_obstacles_as_strings
-
-def create_vadere_obstracle_from_vertices(cartesian_points):
-    vadere_obstacle_string = """{
-        "shape" : {
-            "type" : "POLYGON",
-            "points" : [ $points ]
-        },
-        "id" : -1
-}"""
-    vadere_point_string = '{ "x" : $x, "y" : $y }'
-
-    obstacle_string_template = Template(vadere_obstacle_string)
-    point_string_template = Template(vadere_point_string)
-
-    points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in cartesian_points]
-    points_as_string_concatenated = ",\n".join(points_as_string)
-
-    vadere_obstacle_as_string = obstacle_string_template.substitute(points=points_as_string_concatenated)
-
-    return vadere_obstacle_as_string
-
 def find_minimal_coordinates(buildings):
     all_vertices = [vertex for building in buildings for vertex in building]
     
@@ -163,6 +133,58 @@ def shift_buildings(buildings, shift_in_x_direction, shift_in_y_direction):
 
     return shifted_buildings
 
+def convert_buildings_to_vadere_obstacle_strings(buildings):
+    list_of_vadere_obstacles_as_strings = []
+
+    # A single building is a list of vertices.
+    for building in buildings:
+        vadere_obstacle_as_string = create_vadere_obstacle_from_vertices(building)
+        list_of_vadere_obstacles_as_strings.append(vadere_obstacle_as_string)
+
+    return list_of_vadere_obstacles_as_strings
+
+def create_vadere_obstacle_from_vertices(vertices):
+    vadere_obstacle_string = """{
+        "shape" : {
+            "type" : "POLYGON",
+            "points" : [ $points ]
+        },
+        "id" : -1
+}"""
+    vadere_point_string = '{ "x" : $x, "y" : $y }'
+    
+    obstacle_string_template = Template(vadere_obstacle_string)
+    point_string_template = Template(vadere_point_string)
+
+    points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in vertices]
+    points_as_string_concatenated = ",\n".join(points_as_string)
+
+    vadere_obstacle_as_string = obstacle_string_template.substitute(points=points_as_string_concatenated)
+    
+    return vadere_obstacle_as_string
+
+def create_vadere_topography_with_obstacles(obstacles, width, height):
+    with open("vadere_topography_template.txt", "r") as template_file:
+        vadere_topography_template = template_file.read()
+
+    vadere_topography_string = Template(vadere_topography_template).substitute(obstacles=obstacles, width=width, height=height)
+
+    return vadere_topography_string
+
+def write_parsing_statistics(filename, coordinate_system_as_epsg_code, buildings, shift_buildings_by):
+    print("Filename: {}".format(filename))
+    print("  Coordinate system: {}".format(coordinate_system_as_epsg_code))
+    print("  Found buildings: {}".format(len(buildings)))
+    print("  Shift buildings by (x, y): {}".format(shift_buildings_by))
+    print("  Base point: {}".format("Unknown"))
+
+def write_vadere_topography_string_to(vadere_topography_string, output_filename):
+    if output_filename == None:
+        print(vadere_topography_string)
+    else:
+        with open(output_filename, "w") as text_file:
+            print(vadere_topography_string, file=text_file)
+
 if __name__ == "__main__":
     args = parse_command_line_arguments()
 
@@ -175,8 +197,12 @@ if __name__ == "__main__":
     minimal_coordinates = find_minimal_coordinates(buildings)
     shifted_buildings = shift_buildings(buildings, shift_in_x_direction=-minimal_coordinates[0], shift_in_y_direction=-minimal_coordinates[1])
     
-    vadere_obstacles_as_strings = convert_buildings_to_vadere_obstacle_strings(shifted_buildings)
-
     topography_width, topography_height = find_maximum_coordinates(shifted_buildings)
 
-    # TODO: Create Vadere topology and print topology stdout/file.
+    vadere_obstacles_as_strings = convert_buildings_to_vadere_obstacle_strings(shifted_buildings)
+    vadere_obstacles_as_strings_concatenated = ",\n".join(vadere_obstacles_as_strings)
+
+    vadere_topography_string = create_vadere_topography_with_obstacles(vadere_obstacles_as_strings_concatenated, topography_width, topography_height)
+
+    write_parsing_statistics(args.filename, geojson_content["crs"], buildings, minimal_coordinates)
+    write_vadere_topography_string_to(vadere_topography_string, args.output)

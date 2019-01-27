@@ -9,7 +9,7 @@
     "boundingBoxWidth" : 0.5,
     "bounded" : true
   },
-  "obstacles" : [ $obstacles],
+  "obstacles" : [ $obstacles ],
   "stairs" : [ ],
   "targets" : [ ],
   "sources" : [ ],
