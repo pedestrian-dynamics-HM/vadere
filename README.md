@@ -70,7 +70,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 ## JavaDoc
 
-- [state](vadere.org/javadoc/state/index.html)
+- [state](http://www.vadere.org/javadoc/state/index.html)
 
 ## Contribution
 
