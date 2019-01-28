@@ -1,8 +1,0 @@
-# Boundary Box
-
-X1: 410059.144
-Y1: 5476646.689
-X2: 410376.702
-Y2: 5476837.21
-
-Coordinate System: EPSG:25832

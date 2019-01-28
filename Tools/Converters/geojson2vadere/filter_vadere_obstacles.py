@@ -54,7 +54,7 @@ def raise_exception_on_invalid_boundary_box(boundary_box):
     is_no_empty_set = bool(expected_keys.symmetric_difference(actual_keys))
     
     if is_no_empty_set:
-        raise ValueError("Given boundary box does not contain required keys: ".format(expected_keys))
+        raise ValueError("Given boundary box does not contain required keys: {}".format(expected_keys))
     
     if boundary_box["x2"] <= boundary_box["x1"]:
         raise ValueError("Invalid boundary box: x2 <= x1 ({} <= {})".format(boundary_box["x2"], boundary_box["x1"]))
