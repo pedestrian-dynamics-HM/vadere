@@ -51,8 +51,8 @@
         "stepLengthIntercept" : 0.999,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
+        "minStepLength" : 0.999,
         "movementThreshold" : 0.0,
-
         "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
