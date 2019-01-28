@@ -171,12 +171,12 @@ def create_vadere_topography_with_obstacles(obstacles, width, height):
 
     return vadere_topography_string
 
-def write_parsing_statistics(filename, coordinate_system_as_epsg_code, buildings, shift_buildings_by):
+def write_parsing_statistics(filename, coordinate_system_as_epsg_code, boundary_box, buildings, shift_buildings_by):
     print("Filename: {}".format(filename))
     print("  Coordinate system: {}".format(coordinate_system_as_epsg_code))
+    print("  Boundary box: {}".format(boundary_box))
     print("  Found buildings: {}".format(len(buildings)))
-    print("  Shift buildings by (x, y): {}".format(shift_buildings_by))
-    print("  Base point: {}".format("Unknown"))
+    print("  Shift buildings by (x, y) for simulation: {}".format(shift_buildings_by))
 
 def write_vadere_topography_string_to(vadere_topography_string, output_filename):
     if output_filename == None:
@@ -204,5 +204,5 @@ if __name__ == "__main__":
 
     vadere_topography_string = create_vadere_topography_with_obstacles(vadere_obstacles_as_strings_concatenated, topography_width, topography_height)
 
-    write_parsing_statistics(args.filename, geojson_content["crs"], buildings, minimal_coordinates)
+    write_parsing_statistics(args.filename, geojson_content["crs"], geojson_content["boundary_box"], buildings, minimal_coordinates)
     write_vadere_topography_string_to(vadere_topography_string, args.output)
