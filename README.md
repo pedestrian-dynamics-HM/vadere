@@ -68,6 +68,10 @@ With the following steps, you can run a simulation with one of the built-in exam
 
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
+## JavaDoc
+
+- [state](vadere.org/javadoc/state/index.html)
+
 ## Contribution
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up the development environment and the coding guidelines.
