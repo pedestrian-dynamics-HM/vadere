@@ -101,6 +101,8 @@ def njobs_check_and_set(njobs, ntasks):
               f"Setting to njobs={njobs}.")
         return njobs
 
+    return njobs
+
 
 def str_timestamp():
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
