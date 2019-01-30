@@ -25,23 +25,25 @@ run_local = True
 
 # Example where the values of 'speedDistributionMean' are set between 0.1 and 1.5 in 5 equidistant points
 
-
-setup = SingleKeyVaryScenario(scenario_path=path2scenario,  # -> path to the Vadere .scenario file to vary
-                              key="speedDistributionMean",  # -> parameter key to change
-                              values=np.linspace(0.7, 1.5, 3),  # -> values to set for the parameter
-                              qoi="density.txt",  # -> output file name to collect
-                              model=path2model)  # -> path to Vadere console jar file to use for simulation
+if __name__ == "__main__":  # main required by Windows to run in parallel
 
 
-if run_local:
-    par_var, data = setup.run(njobs=1)
-else:
-    par_var, data = setup.remote(njobs=3)
+    setup = SingleKeyVaryScenario(scenario_path=path2scenario,  # -> path to the Vadere .scenario file to vary
+                                  key="speedDistributionMean",  # -> parameter key to change
+                                  values=np.linspace(0.7, 1.5, 3),  # -> values to set for the parameter
+                                  qoi="density.txt",  # -> output file name to collect
+                                  model=path2model)  # -> path to Vadere console jar file to use for simulation
 
 
-print("---------------------------------------\n \n")
-print("ALL USED PARAMETER:")
-print(par_var)
+    if run_local:
+        par_var, data = setup.run(njobs=1)
+    else:
+        par_var, data = setup.remote(njobs=3)
 
-print("COLLECTED DATA:")
-print(data)
+
+    print("---------------------------------------\n \n")
+    print("ALL USED PARAMETER:")
+    print(par_var)
+
+    print("COLLECTED DATA:")
+    print(data)

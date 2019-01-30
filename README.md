@@ -1,4 +1,3 @@
-
 # Contributing
 
 It is highly recommended to contribute (report bugs, code, ideas, etc.) in the original repository. If you want to update the suq controller with the current master run the following git command from Vadere's root source code path:
@@ -34,7 +33,7 @@ set in the environment. A query can simulate VADERE for multiple scenario settin
 
 ## Getting started
 
-Either install as a Pyhton package or run the source code directly. Either way it is recommended to use Python>=3.6 
+Either install as a Python package or run the source code directly. Either way it is recommended to use Python>=3.6 
 
 ### Using the code
 
