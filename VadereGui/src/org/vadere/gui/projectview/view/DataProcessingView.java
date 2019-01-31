@@ -183,6 +183,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private boolean isEditable;
 
 		private JCheckBox isTimestampedCheckBox;
+		private JCheckBox isWriteMetaData;
 		private JTable outputFilesTable;
 		private DefaultTableModel outputFilesTableModel;
 		private JTable dataProcessorsTable;
@@ -218,9 +219,22 @@ class DataProcessingView extends JPanel implements IJsonView {
 					currentScenario.getDataProcessingJsonManager().setTimestamped(isTimestampedCheckBox.isSelected());
 				}
 			});
+
 			isTimestampedCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 			addEditableComponent(isTimestampedCheckBox);
 			filesPanel.add(isTimestampedCheckBox);
+
+			isWriteMetaData = new JCheckBox(Messages.getString("DataProcessingView.chbAddMetaData"));
+			isWriteMetaData.addActionListener(new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					currentScenario.getDataProcessingJsonManager().setWriteMetaData(isWriteMetaData.isSelected());
+				}
+			});
+
+			isWriteMetaData.setAlignmentX(Component.LEFT_ALIGNMENT);
+			addEditableComponent(isWriteMetaData);
+			filesPanel.add(isWriteMetaData);
 
 			JButton addFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
 				@Override
@@ -356,6 +370,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			selectedOutputFile = null;
 			selectedDataProcessor = null;
 			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
+			isWriteMetaData.setSelected(scenario.getDataProcessingJsonManager().isWriteMetaData());
 			updateOutputFilesTable();
 			updateDataProcessorsTable();
 			updateDataProcessIdsInUse();
@@ -579,11 +594,14 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 2;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputHeaderSelection.label")+":"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputIndicesSelection.label")+":"), c);
 
+			// Only the indices are shown, not the entire header. > Entire header can be quite a lot of text (which may
+			// not fit in the GUI) + the processors (with the header information) are not inserted and removed on the fly,
+			// but only when the simulation is started.
 			c.gridx = 1;
 			c.gridy = 2;
-			panel.add(new JLabel(outputFile.getHeader()), c);
+			panel.add(new JLabel(outputFile.getIndicesLine()), c);
 
 			c.gridx = 0;
 			c.gridy = 3;

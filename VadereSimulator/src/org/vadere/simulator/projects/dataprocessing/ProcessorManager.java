@@ -24,7 +24,8 @@ public class ProcessorManager {
 	private List<OutputFile<?>> outputFiles;
 	private SimulationResult simulationResult;
 
-	public ProcessorManager(List<DataProcessor<?, ?>> dataProcessors, List<OutputFile<?>> outputFiles, MainModel mainModel) {
+	public ProcessorManager(List<DataProcessor<?, ?>> dataProcessors,
+							List<OutputFile<?>> outputFiles, MainModel mainModel) {
 		this.mainModel = mainModel;
 
 		this.outputFiles = outputFiles;
@@ -65,8 +66,12 @@ public class ProcessorManager {
 		this.processorMap.values().forEach(proc -> proc.postLoopAddResultInfo(state, simulationResult));
 	}
 
-	public void setOutputPath(String directory) {
-		this.outputFiles.forEach(file -> file.setAbsoluteFileName(Paths.get(directory, String.format("%s", new File(file.getFileName()).getName())).toString()));
+	public void setOutputFiles(String directory) {
+		// for each file
+		this.outputFiles.forEach(file ->
+				file.setAbsoluteFileName(
+						Paths.get(directory, String.format("%s",
+								new File(file.getFileName()).getName())).toString()));
 	}
 
 	public void writeOutput() {

@@ -41,7 +41,6 @@ unit_tests_with_coverage:
     stage: test
     
     script:
-        - Documentation/version-control/git-hook-vadere-software
         - mvn clean
         - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
         - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
@@ -54,7 +53,6 @@ run_scenario_files:
     stage: deploy
 
     script:
-        - Documentation/version-control/git-hook-vadere-software
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
     artifacts:
@@ -78,7 +76,6 @@ run_seed_test:
     stage: deploy
 
     script:
-        - Documentation/version-control/git-hook-vadere-software
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user

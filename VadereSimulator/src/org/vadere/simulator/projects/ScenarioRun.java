@@ -23,9 +23,9 @@ import java.util.Random;
 
 /**
  * Manages single simulation runs.
- * 
+ *
  * @author Jakob Schöttl
- * 
+ *
  */
 public class ScenarioRun implements Runnable {
 
@@ -110,7 +110,9 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0, scenarioStore.getName(), scenarioStore, passiveCallbacks, random, processorManager, simulationResult);
+				simulation = new Simulation(mainModel, 0,
+						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
+						processorManager, simulationResult);
 			}
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");
@@ -123,10 +125,10 @@ public class ScenarioRun implements Runnable {
 			doAfterSimulation();
 		}
 	}
-	
+
 	public void simulationFailed(Throwable e) {
-			e.printStackTrace();
-			logger.error(e);
+		e.printStackTrace();
+		logger.error(e);
 	}
 
 	protected void doAfterSimulation() {
@@ -167,13 +169,23 @@ public class ScenarioRun implements Runnable {
 	}
 
 	public void pause() {
-		if (simulation != null) { // TODO throw an illegal state exception if simulation is not running
+
+		if(! simulation.isRunning()){
+			throw new IllegalStateException("Received trigger to pause the simulation, but it is not running!");
+		}
+
+		if (simulation != null) {
 			simulation.pause();
 		}
 	}
 
 	public void resume() {
-		if (simulation != null) { // TODO throw an illegal state exception if simulation is not running
+
+		if(simulation.isRunning()){
+			throw new IllegalStateException("Received trigger to resume the simulation, but it is not paused!");
+		}
+
+		if (simulation != null) {
 			simulation.resume();
 		}
 	}
@@ -182,7 +194,7 @@ public class ScenarioRun implements Runnable {
 		try {
 			// Create output directory
 			Files.createDirectories(outputPath);
-			processorManager.setOutputPath(outputPath.toString());
+			processorManager.setOutputFiles(outputPath.toString());
 		} catch (IOException ex) {
 			throw new UncheckedIOException(ex);
 		}
@@ -193,6 +205,7 @@ public class ScenarioRun implements Runnable {
 		return scenario.getName();
 	}
 
+	@Deprecated  // Deprecated, because it is currently not used in code anymore
 	public String readyToRunResponse() { // TODO [priority=medium] [task=check] add more conditions
 		if (scenarioStore.getMainModel() == null) {
 			return scenarioStore.getName() + ": no mainModel is set";

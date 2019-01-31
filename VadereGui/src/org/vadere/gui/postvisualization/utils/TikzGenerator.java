@@ -84,27 +84,28 @@ public class TikzGenerator {
 		translationTable[SEG_CLOSE] = "";
 	}
 
-	public void generateTikz(final File file, final boolean generateCompleteDocument) {
-		String texTemplate = "" +
+	public void generateTikz(final File file) {
+		String tikzCodeColorDefinitions = generateTikzColorDefinitions(model);
+		String tikzCodeDrawSettings = generateTikzDrawSettings(model);
+		String tikzCodeScenarioElements = convertScenarioElementsToTikz();
+
+		String tikzOutput = "" +
 				"\\documentclass{standalone}\n" +
 				"\\usepackage{tikz}\n\n" +
+				tikzCodeColorDefinitions +
+				tikzCodeDrawSettings +
 				"\\begin{document}\n" +
-				"\\begin{tikzpicture}\n" +
-				"%s" +
+                "% Change scaling to [x=1mm,y=1mm] if TeX reports \"Dimension too large\".\n" +
+				"\\begin{tikzpicture}[x=1cm,y=1cm]\n" +
+				tikzCodeScenarioElements +
 				"\\end{tikzpicture}\n" +
 				"\\end{document}\n";
-
-		String tikzCode = "";
-		tikzCode += generateTikzColorDefinitions(model);
-		tikzCode += convertScenarioElementsToTikz();
-
-		String output = (generateCompleteDocument) ? String.format(Locale.US, texTemplate, tikzCode) : tikzCode;
 
 		// TODO: maybe uses Java's resources notation (in general, writing the file should be done by the caller not here).
 		try {
 			file.createNewFile();
 			Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-			out.write(output);
+			out.write(tikzOutput);
 			out.flush();
 			logger.info("generate new TikZ: " + file.getAbsolutePath());
 		} catch (IOException e1) {
@@ -133,10 +134,28 @@ public class TikzGenerator {
 		Color agentColor = model.getConfig().getPedestrianDefaultColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
+		colorDefinitions += "\n";
+
 		return colorDefinitions;
 	}
 
-	private String convertScenarioElementsToTikz() {
+	private String generateTikzDrawSettings(SimulationModel<? extends DefaultSimulationConfig> model) {
+		// Generate TeX variables for common draw settings like agent radius and
+		// use them later on when generating TikZ code. These settins can be used
+		// by TikZ users to adapt the drawing quickly.
+		String drawSettings = "% Draw Settings\n";
+
+		double agentRadius = model.getConfig().getPedestrianTorso() / 2.0;
+
+		drawSettings += String.format(Locale.US,"\\newcommand{\\AgentRadius}{%f}\n", agentRadius);
+		drawSettings += String.format(Locale.US,"\\newcommand{\\LineWidth}{%d}\n", 1);
+
+		drawSettings += "\n";
+
+		return drawSettings;
+	}
+
+		private String convertScenarioElementsToTikz() {
 		String generatedCode = "";
 
 		DefaultSimulationConfig config = model.getConfig();
@@ -289,8 +308,8 @@ public class TikzGenerator {
 				        cce.printStackTrace();
 
 				        // Fall back to default rendering of agents.
-				        String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=%fcm];\n";
-				        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+				        String agentTextPattern = "\\fill[AgentColor] (%f,%f) circle [radius=\\AgentRadius];\n";
+				        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y);
 			        }
 		        } else {
 			        Pedestrian pedestrian = (Pedestrian) agent;
@@ -298,13 +317,13 @@ public class TikzGenerator {
 			        String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
 			        // Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
 			        // generatedCode += String.format(Locale.US, "\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
-			        String agentTextPattern = "\\fill[fill=%s] (%f,%f) circle [radius=%fcm];\n";
-			        generatedCode += String.format(Locale.US, agentTextPattern, colorString, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+			        String agentTextPattern = "\\fill[fill=%s] (%f,%f) circle [radius=\\AgentRadius];\n";
+			        generatedCode += String.format(Locale.US, agentTextPattern, colorString, agent.getPosition().x, agent.getPosition().y);
 		        }
 
 		        if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
-			        String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=%fcm];\n";
-			        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y, agent.getRadius());
+			        String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=\\AgentRadius];\n";
+			        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y);
 		        }
 	        }
         }
