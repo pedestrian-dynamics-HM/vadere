@@ -39,7 +39,8 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupSizeProcessor",
       "id" : 6
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -64,19 +65,19 @@
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
+        "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : true,
+        "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
         "minStepLength" : 0.17,
+        "minimumStepLength" : true,
         "maxStepDuration" : 3.0,
-        "optimizationType" : "NELDER_MEAD",
-        "movementType" : "ARBITRARY",
         "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : true,
-        "minimumStepLength" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",

@@ -35,6 +35,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "eTimeStep.fundamentalDiagram",
       "processors" : [ 13 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "cTimeStep.fundamentalDiagram2",
+      "processors" : [ 19 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -136,6 +140,20 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupSizeProcessor",
       "id" : 18
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 19,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementArea" : {
+          "x" : 20.0,
+          "y" : 0.5,
+          "width" : 2.0,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "pedestrianVelocityProcessorId" : 16
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
