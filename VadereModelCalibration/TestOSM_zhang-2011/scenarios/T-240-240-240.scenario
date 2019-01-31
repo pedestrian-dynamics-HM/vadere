@@ -2,7 +2,6 @@
   "name" : "T-240-240-240",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -34,7 +33,8 @@
         "pedestrianOverlapProcessorId" : 3
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -59,23 +59,23 @@
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
+        "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : true,
+        "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.235,
         "stepLengthSlopeSpeed" : 0.302,
         "stepLengthSD" : 0.0,
         "movementThreshold" : 0.0,
-        "optimizationType" : "NELDER_MEAD",
-        "movementType" : "ARBITRARY",
+        "minStepLength" : 0.1,
+        "minimumStepLength" : true,
+        "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
-        "minimumStepLength" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ],
-        "minStepLength" : "0.235",
-        "maxStepDuration" : "1.7976931348623157E308"
+        "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -271,15 +271,17 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
+        "speedDistributionMean" : 1.55,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
+        "minimumSpeed" : 1.37,
+        "maximumSpeed" : 1.73,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
         "radius" : 0.195,
@@ -295,8 +297,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      },
-      "dynamicElements" : [ ]
-    }
+      }
+    },
+    "eventInfos" : [ ]
   }
 }

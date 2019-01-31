@@ -115,7 +115,8 @@ class VadereProject():
         ret_msg = "loaded {} out of {} output directories. {}"
         err_dir = list()
 
-        out_dirs = [dir for dir in os.listdir(self.output_path) if dir != 'corrupt' and dir != 'legacy' and not dir.startswith('.')]
+        all_dirs = [name for name in os.listdir(self.output_path) if os.path.isdir(os.path.join(self.output_path, name))]
+        out_dirs = [dir for dir in all_dirs if dir != 'corrupt' and dir != 'legacy' and not dir.startswith('.')]
         self.output_dirs = dict()
         self.named_output = NamedOutput()
 

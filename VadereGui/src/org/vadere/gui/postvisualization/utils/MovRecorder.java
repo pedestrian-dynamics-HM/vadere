@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.apache.log4j.lf5.LogLevel;
 import org.jcodec.api.awt.SequenceEncoder;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -94,7 +95,7 @@ public class MovRecorder implements IRecorder {
 		SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("SettingsDialog.dataFormat"));
 		String formattedDate = formatter.format(todaysDate);
 		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
-		File outputFile = new File("pv_snapshot_" + formattedDate + ".mov");
+		File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
 		fileChooser.setSelectedFile(outputFile);
 
 		int returnVal = fileChooser.showDialog(null, "Save");

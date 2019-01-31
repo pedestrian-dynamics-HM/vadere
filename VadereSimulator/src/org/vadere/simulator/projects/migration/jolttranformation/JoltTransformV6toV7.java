@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
+import org.vadere.state.attributes.models.AttributesOSM;
 
 import java.util.ArrayList;
 
@@ -27,15 +28,16 @@ public class JoltTransformV6toV7 extends JoltTransformation{
 	// postHookStep
 	private JsonNode setDefaultValues(JsonNode scenarioFile) throws MigrationException{
 		JsonNode osmAttr = path(scenarioFile, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM");
+		AttributesOSM attributesOSM = new AttributesOSM();
 		if (!osmAttr.isMissingNode()){
 			double stepLengthIntercept = pathMustExist(osmAttr, "stepLengthIntercept").doubleValue();
 
 			if(!osmAttr.has("minStepLength")){
-				addToObjectNode(osmAttr, "minStepLength", Double.toString(stepLengthIntercept));
+				addToObjectNode(osmAttr, "minStepLength", Double.toString(attributesOSM.getMinStepLength()));
 			}
 
 			if(!osmAttr.has("maxStepDuration")){
-				addToObjectNode(osmAttr, "maxStepDuration", Double.toString(Double.MAX_VALUE));
+				addToObjectNode(osmAttr, "maxStepDuration", Double.toString(attributesOSM.getMaxStepDuration()));
 			}
 
 		}
