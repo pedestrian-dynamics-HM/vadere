@@ -20,13 +20,9 @@ public class TimestepGroupPairKey implements DataKey<TimestepGroupPairKey> {
 	public TimestepGroupPairKey(int timestep, int groupId, int ped1, int ped2) {
 		this.timestep = timestep;
 		this.groupId = groupId;
-		if (ped1 <= ped2){
-			this.pedFirst = ped1;
-			this.pedSecond = ped2;
-		} else {
-			this.pedFirst = ped2;
-			this.pedSecond = ped1;
-		}
+		this.pedFirst = ped1;
+		this.pedSecond = ped2;
+
 	}
 
 	public static String[] getHeaders() { return new String[]{TimestepKey.getHeader(), "GroupId", "Pedestrian1", "Pedestrian2" }; }
@@ -35,19 +31,24 @@ public class TimestepGroupPairKey implements DataKey<TimestepGroupPairKey> {
 		return new String[]{Integer.toString(timestep), Integer.toString(groupId), Integer.toString(pedFirst), Integer.toString(pedSecond)};
 	}
 
+	// order of ped1 and ped2 does not matter. (3,4) == (4,2) is True.
 	@Override
 	public int compareTo(@NotNull TimestepGroupPairKey o) {
-		int ret = Integer.compare(timestep, o.timestep);
-		if (ret == 0){
-			ret = Integer.compare(groupId, o.groupId);
-			if(ret == 0){
-				ret = Integer.compare(pedFirst, o.pedFirst);
-				if(ret == 0) {
-					return Integer.compare(pedSecond, o.pedSecond);
+		if (timestep == o.timestep){	// order by timestep
+			if (groupId == o.groupId){ 	// oder by groupId
+				if (pedFirst == o.pedFirst  && pedSecond == o.pedSecond)  {	// (3,4) == (3,4)
+					return  0;
+				} else if (pedFirst == o.pedSecond && pedSecond == o.pedFirst) { // (3,4) == (4,3)
+					return 0;
+				} else { // order by ped1 then by ped2
+					return  ( pedFirst != o.pedFirst) ?  Integer.compare(pedFirst, o.pedSecond) : Integer.compare(pedSecond, o.pedSecond);
 				}
+			} else {
+				return Integer.compare(groupId, o.groupId);
 			}
+		} else {
+			return Integer.compare(timestep, o.timestep);
 		}
-		return ret;
 	}
 
 	@Override
@@ -55,9 +56,12 @@ public class TimestepGroupPairKey implements DataKey<TimestepGroupPairKey> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		TimestepGroupPairKey that = (TimestepGroupPairKey) o;
-		return groupId == that.groupId &&
-				pedFirst == that.pedFirst &&
-				pedSecond == that.pedSecond;
+
+		return timestep == that.timestep &&
+				groupId == that.groupId &&
+				(	(pedFirst == that.pedFirst && pedSecond == that.pedSecond) ||
+					(pedFirst == that.pedSecond && pedSecond == that.pedFirst)
+				);
 	}
 
 	@Override
@@ -68,7 +72,8 @@ public class TimestepGroupPairKey implements DataKey<TimestepGroupPairKey> {
 	@Override
 	public String toString() {
 		return "TimestepGroupPairKey{" +
-				"groupId=" + groupId +
+				"timestep=" + timestep +
+				", groupId=" + groupId +
 				", pedFirst=" + pedFirst +
 				", pedSecond=" + pedSecond +
 				'}';
