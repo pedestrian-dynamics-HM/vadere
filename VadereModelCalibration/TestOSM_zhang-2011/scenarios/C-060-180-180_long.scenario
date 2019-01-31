@@ -1,5 +1,5 @@
 {
-  "name" : "C-180-180-095",
+  "name" : "C-060-180-180_long",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -210,7 +210,7 @@
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
-        "stepLengthSD" : 0.0,
+        "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
         "minStepLength" : 0.3,
         "minimumStepLength" : true,
@@ -235,7 +235,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -260,9 +260,9 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 16.0,
-          "y" : 11.9,
+          "y" : 11.3,
           "width" : 1.0,
-          "height" : 4.15,
+          "height" : 4.2,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -271,7 +271,7 @@
           "x" : 16.0,
           "y" : 6.0,
           "width" : 1.0,
-          "height" : 4.15,
+          "height" : 4.7,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -314,27 +314,9 @@
       }, {
         "shape" : {
           "x" : 16.0,
-          "y" : 0.4,
+          "y" : 0.5,
           "width" : 1.0,
-          "height" : 4.8,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 28.7,
-          "y" : 11.475,
-          "width" : 0.3,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 28.7,
-          "y" : 8.525,
-          "width" : 0.3,
-          "height" : 2.0,
+          "height" : 4.5,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -368,11 +350,11 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 159.0 ],
-        "spawnNumber" : 159,
-        "maxSpawnNumberTotal" : 159,
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 2000,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],

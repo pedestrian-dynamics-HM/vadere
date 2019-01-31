@@ -143,6 +143,10 @@ public class PedestrianOSM extends Pedestrian {
 				refreshRelevantPedestrians();
 				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
 
+				if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
+					nextPosition = getPosition();
+				}
+
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
 				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
@@ -153,10 +157,6 @@ public class PedestrianOSM extends Pedestrian {
 				// stairs @position: " + nextPosition);
 			}
 		}
-
-		/*if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
-			nextPosition = getPosition();
-		}*/
 
 	}
 

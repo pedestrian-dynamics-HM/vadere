@@ -1,5 +1,5 @@
 {
-  "name" : "C-180-180-095",
+  "name" : "C-180-180-095_long",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -61,7 +61,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {
         "pedestrianLineCrossProcessorId" : 8,
-        "pedestrianVelocityProcessorId" : 7,
+        "pedestrianVelocityProcessorId" : 13,
         "deltaTime" : 10.0
       }
     }, {
@@ -210,7 +210,7 @@
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
-        "stepLengthSD" : 0.0,
+        "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
         "minStepLength" : 0.3,
         "minimumStepLength" : true,
@@ -368,11 +368,11 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 159.0 ],
-        "spawnNumber" : 159,
-        "maxSpawnNumberTotal" : 159,
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 2000,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],

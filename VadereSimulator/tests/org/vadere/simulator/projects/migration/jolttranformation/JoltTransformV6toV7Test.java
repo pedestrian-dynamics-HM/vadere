@@ -22,8 +22,8 @@ public class JoltTransformV6toV7Test extends  JoltTransformationTest{
 		return getPathFromResources("/migration/v06_to_v07");
 	}
 
-//	        "minStepLength" : 0.4625,
-//					"maxStepDuration" : 1.7976931348623157E308,
+//	        "minStepLength" : 0.10,
+//			"maxStepDuration" : 1.7976931348623157E308,
 
 	@Test
 	public void testDefaultOSMAttriubteValues(){
@@ -44,13 +44,13 @@ public class JoltTransformV6toV7Test extends  JoltTransformationTest{
 		double minStepLength = pathMustExist(v7, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/minStepLength").asDouble();
 		double maxStepDuration =  pathMustExist(v7, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/maxStepDuration").asDouble();
 
-		assertEquals(minStepLength, attr.getMinStepLength(), 0.001);
-		assertEquals(maxStepDuration, attr.getMaxStepDuration(), Double.MAX_VALUE);
+		assertEquals(attr.getMinStepLength(), minStepLength, 0.001);
+		assertEquals(attr.getMaxStepDuration(), maxStepDuration, 0.001);
 
 	}
 
 	@Test
-	public void useStepLengthInterceptAsDefault(){
+	public void testMinStepLengthExists(){
 		String group_OSM_1Source2Places = getTestFileAsString("group_OSM_1Source2Places_B");
 		assertThat(group_OSM_1Source2Places, versionMatcher(Version.V0_6));
 		JsonNode group_OSM_1Source2PlacesJson = getJsonFromString(group_OSM_1Source2Places);
@@ -68,12 +68,12 @@ public class JoltTransformV6toV7Test extends  JoltTransformationTest{
 		double minStepLength = pathMustExist(v7, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/minStepLength").asDouble();
 		double maxStepDuration =  pathMustExist(v7, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/maxStepDuration").asDouble();
 
-		assertEquals(minStepLength, 0.999, 0.001);
-		assertEquals(maxStepDuration, attr.getMaxStepDuration(), Double.MAX_VALUE);
+		assertEquals(0.999, minStepLength, 0.001);
+		assertEquals(attr.getMaxStepDuration(), maxStepDuration, 0.001);
 	}
 
 	@Test
-	public void PedestrianDensityGaussianProcessor(){
+	public void testPedestrianDensityGaussianProcessor(){
 		String group_OSM_1Source2Places = getTestFileAsString("group_OSM_1Source1Place");
 		assertThat(group_OSM_1Source2Places, versionMatcher(Version.V0_6));
 		JsonNode group_OSM_1Source2PlacesJson = getJsonFromString(group_OSM_1Source2Places);
@@ -91,8 +91,8 @@ public class JoltTransformV6toV7Test extends  JoltTransformationTest{
 		double minStepLength = pathMustExist(v7, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/minStepLength").asDouble();
 		double maxStepDuration =  pathMustExist(v7, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/maxStepDuration").asDouble();
 
-		assertEquals(minStepLength, attr.getMinStepLength(), 0.001);
-		assertEquals(maxStepDuration, attr.getMaxStepDuration(), Double.MAX_VALUE);
+		assertEquals(0.4625, minStepLength, 0.001);
+		assertEquals(attr.getMaxStepDuration(), maxStepDuration, 0.001);
 
 		ArrayList<JsonNode> pedestrianDensityGaussianProcessorAttrs =
 				getProcessorsByType(v7, "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityGaussianProcessor");
