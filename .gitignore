@@ -15,6 +15,9 @@ Tools/VadereAnalysisTools/VadereAnalysisTool/build/
 Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
 Tools/ContinuousIntegration/**/output
 
+#Jupyter Notebooks
+**/.ipynb_checkpoints
+
 # C extensions
 *.so
 vadere_analysis_tool/build
