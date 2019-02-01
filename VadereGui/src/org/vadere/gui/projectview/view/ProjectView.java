@@ -15,6 +15,7 @@ import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
 import org.vadere.gui.projectview.control.ActionInterruptScenarios;
 import org.vadere.gui.projectview.control.ActionLoadProject;
 import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionOpenInExplorer;
 import org.vadere.gui.projectview.control.ActionOutputToScenario;
 import org.vadere.gui.projectview.control.ActionPauseScenario;
 import org.vadere.gui.projectview.control.ActionRenameOutputFile;
@@ -587,6 +588,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				new ActionOutputToScenario(Messages.getString("ProjectView.mntmOutputToSceneario.text"), model)));
 		outputListPopupMenu
 				.add(new JMenuItem(new ActionRunOutput(Messages.getString("ProjectView.mntmRunOutput.text"), model)));
+		outputListPopupMenu
+				.add(new JMenuItem(new ActionOpenInExplorer(Messages.getString("ProjectView.OpenInExplorer.text"), model)));
 
 		JMenu copyPath = new JMenu(Messages.getString("ProjectView.mntmCopyOutputDir.text"));
 		outputTable.getSelectionModel().addListSelectionListener(new TableSelectionListener(outputTable) {
