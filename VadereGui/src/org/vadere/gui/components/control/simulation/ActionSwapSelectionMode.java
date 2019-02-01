@@ -1,18 +1,19 @@
 package org.vadere.gui.components.control.simulation;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.DrawVoronoiDiagramMode;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class ActionSwapSelectionMode extends ActionVisualization {
 
-	private static Logger logger = LogManager.getLogger(ActionSwapSelectionMode.class);
+	private static Logger logger = Logger.getLogger(ActionSwapSelectionMode.class);
 
 	public ActionSwapSelectionMode(final String name, final SimulationModel<? extends DefaultSimulationConfig> model) {
 		super(name, model);

@@ -83,6 +83,12 @@ public interface JsonNodeExplorer {
 		});
 	}
 
+	default void renameField(ObjectNode node, String oldName, String newName){
+		JsonNode tmpNode = node.get(oldName);
+		node.replace(newName, tmpNode);
+		node.remove(oldName);
+	}
+
 	default ArrayList<JsonNode> getProcessorsByType(JsonNode node, String processorType) throws MigrationException {
 		Iterator<JsonNode> iter = iteratorProcessorsByType(node, processorType);
 		ArrayList<JsonNode>  ret = new ArrayList<>();

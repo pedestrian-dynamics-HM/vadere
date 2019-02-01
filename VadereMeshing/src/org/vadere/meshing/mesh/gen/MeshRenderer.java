@@ -1,7 +1,6 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -11,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  */
 public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
 
-	private static final Logger log = LogManager.getLogger(MeshRenderer.class);
+	private static final Logger log = Logger.getLogger(MeshRenderer.class);
 
 	/**
 	 * The mesh which will be rendered.

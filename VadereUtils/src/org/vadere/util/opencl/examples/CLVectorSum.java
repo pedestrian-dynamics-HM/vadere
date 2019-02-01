@@ -1,7 +1,7 @@
 package org.vadere.util.opencl.examples;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
+import org.vadere.util.logging.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.*;
@@ -40,7 +40,7 @@ public class CLVectorSum {
     // CL callbacks
     private CLContextCallback contextCB;
     private CLProgramCallback programCB;
-    private static Logger log = LogManager.getLogger(CLVectorSum.class);
+    private static Logger log = Logger.getLogger(CLVectorSum.class);
 
     // data on the host
     private FloatBuffer a;

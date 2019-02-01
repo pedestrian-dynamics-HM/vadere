@@ -1,29 +1,28 @@
 package org.vadere.simulator.triangulation;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.meshing.mesh.gen.AFace;
+import org.vadere.meshing.mesh.gen.AHalfEdge;
+import org.vadere.meshing.mesh.gen.AMesh;
+import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -42,7 +41,7 @@ public class RealWorldPlot {
 	 * 2) remove the remaining re-triangulations.
 	 */
 
-	private static Logger log = LogManager.getLogger(RealWorldPlot.class);
+	private static Logger log = Logger.getLogger(RealWorldPlot.class);
 
 	private static String topographyString = "{\n" +
 			"  \"attributes\" : {\n" +
@@ -651,7 +650,7 @@ public class RealWorldPlot {
 	}
 
 	public static void main(String ... args) throws IOException {
-		//realWorldExampleEikMesh();
+		realWorldExampleEikMesh();
 		realWorldExampleDistMesh();
 	}
 

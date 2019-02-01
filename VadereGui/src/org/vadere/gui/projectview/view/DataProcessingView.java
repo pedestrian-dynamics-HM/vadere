@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import info.clearthought.layout.TableLayout;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -24,6 +22,7 @@ import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -53,7 +52,7 @@ import javax.swing.table.DefaultTableModel;
 
 class DataProcessingView extends JPanel implements IJsonView {
 
-	private static Logger logger = LogManager.getLogger(DataProcessingView.class);
+	private static Logger logger = Logger.getLogger(DataProcessingView.class);
 
 	private IJsonView activeJsonView; // gui-mode or expert-mode
 	private JLabel switchJsonViewModeLabel = new JLabel();
@@ -66,7 +65,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private boolean isEditable;
 	private IScenarioChecker scenarioChecker;
 
-	DataProcessingView() {
+	DataProcessingView(IScenarioChecker scenarioChecker) {
 		setLayout(new BorderLayout()); // force it to span across the whole available space
 
 		viewPanel = new JPanel(new GridLayout(1, 1));
@@ -87,6 +86,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		togglePanel.add(switchJsonViewModeLabel);
 		add(togglePanel, BorderLayout.SOUTH);
+		setScenarioChecker(scenarioChecker);
 		switchMode();
 	}
 
@@ -183,6 +183,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		private boolean isEditable;
 
 		private JCheckBox isTimestampedCheckBox;
+		private JCheckBox isWriteMetaData;
 		private JTable outputFilesTable;
 		private DefaultTableModel outputFilesTableModel;
 		private JTable dataProcessorsTable;
@@ -218,9 +219,22 @@ class DataProcessingView extends JPanel implements IJsonView {
 					currentScenario.getDataProcessingJsonManager().setTimestamped(isTimestampedCheckBox.isSelected());
 				}
 			});
+
 			isTimestampedCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 			addEditableComponent(isTimestampedCheckBox);
 			filesPanel.add(isTimestampedCheckBox);
+
+			isWriteMetaData = new JCheckBox(Messages.getString("DataProcessingView.chbAddMetaData"));
+			isWriteMetaData.addActionListener(new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					currentScenario.getDataProcessingJsonManager().setWriteMetaData(isWriteMetaData.isSelected());
+				}
+			});
+
+			isWriteMetaData.setAlignmentX(Component.LEFT_ALIGNMENT);
+			addEditableComponent(isWriteMetaData);
+			filesPanel.add(isWriteMetaData);
 
 			JButton addFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
 				@Override
@@ -356,6 +370,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			selectedOutputFile = null;
 			selectedDataProcessor = null;
 			isTimestampedCheckBox.setSelected(scenario.getDataProcessingJsonManager().isTimestamped());
+			isWriteMetaData.setSelected(scenario.getDataProcessingJsonManager().isWriteMetaData());
 			updateOutputFilesTable();
 			updateDataProcessorsTable();
 			updateDataProcessIdsInUse();
@@ -579,11 +594,14 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 2;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputHeaderSelection.label")+":"), c);
+			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputIndicesSelection.label")+":"), c);
 
+			// Only the indices are shown, not the entire header. > Entire header can be quite a lot of text (which may
+			// not fit in the GUI) + the processors (with the header information) are not inserted and removed on the fly,
+			// but only when the simulation is started.
 			c.gridx = 1;
 			c.gridy = 2;
-			panel.add(new JLabel(outputFile.getHeader()), c);
+			panel.add(new JLabel(outputFile.getIndicesLine()), c);
 
 			c.gridx = 0;
 			c.gridy = 3;

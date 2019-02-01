@@ -122,6 +122,6 @@ public class PedestrianRepulsionPotentialCycle implements
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {
-		// TODO should be used to initialize the Model
+		potentialFieldPedestrian.initialize(attributesList, topography, attributesPedestrian, random);
 	}
 }

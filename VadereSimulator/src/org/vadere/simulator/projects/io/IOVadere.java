@@ -1,7 +1,5 @@
 package org.vadere.simulator.projects.io;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.ProjectOutput;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
@@ -9,7 +7,7 @@ import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.MigrationResult;
 import org.vadere.util.io.IOUtils;
-import org.xml.sax.SAXException;
+import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 public class IOVadere {
 
-	private static Logger logger = LogManager.getLogger(IOVadere.class);
+	private static Logger logger = Logger.getLogger(IOVadere.class);
 
 	public static Scenario fromJson(final String json) throws IOException, IllegalArgumentException {
 		try {

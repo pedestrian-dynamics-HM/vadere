@@ -1,7 +1,7 @@
 {
   "name" : "basic_5_2_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],

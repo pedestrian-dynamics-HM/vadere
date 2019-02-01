@@ -3,12 +3,11 @@ package org.vadere.simulator.projects.migration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.jolttranformation.JoltTransformation;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
-import org.vadere.util.logging.LogBufferAppender;
+import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,13 +25,12 @@ import static org.vadere.util.io.IOUtils.SCENARIO_DIR;
 public class JoltMigrationAssistant extends MigrationAssistant {
 
 	private final static Logger logger = Logger.getLogger(JoltMigrationAssistant.class);
-	private final LogBufferAppender appender;
+	private MigrationLogger migrationLogger;
 
 
 	public JoltMigrationAssistant(MigrationOptions options) {
 		super(options);
-		appender = new LogBufferAppender();
-		logger.addAppender(appender);
+		migrationLogger = new MigrationLogger();
 	}
 
 	public JoltMigrationAssistant() {
@@ -41,12 +39,12 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 
 	@Override
 	public String getLog() {
-		return appender.getMigrationLog();
+		return migrationLogger.getLog();
 	}
 
 	@Override
 	public void restLog() {
-		appender.rest();
+		migrationLogger.rest();
 	}
 
 
@@ -79,24 +77,28 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 			throw new MigrationException("Could not read JsonFile or create Json representation" + e.getMessage());
 		}
 		restLog();
-		logger.info(">> analyzing JSON tree of scenario <" + node.get("name").asText() + ">");
+		migrationLogger.info(">> analyzing JSON tree of scenario <" + node.get("name").asText() + ">");
+		logger.info(migrationLogger.last());
 		Version version;
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());
 
 			if (version == null || version.equalOrSamller(Version.UNDEFINED)) {
-				logger.error("release version " + node.get("release").asText() + " is unknown or not " +
+				migrationLogger.error("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid release create a version transformation and a new idenity transformation");
+				logger.error(migrationLogger.last());
 				throw new MigrationException("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid releasecreate a version transformation and a new idenity transformation");
 			}
 		} else {
-			logger.warn("Version is unknown of scenario <" + node.get("name").asText() + ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			migrationLogger.warn("Version is unknown of scenario <" + node.get("name").asText() + ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			logger.warn(migrationLogger.last());
 			version = Version.NOT_A_RELEASE;
 		}
 
 		if (version.equals(targetVersion)) {
-			logger.info("Nothing to do current version and target version match");
+			migrationLogger.info("Nothing to do current version and target version match");
+			logger.info(migrationLogger.last());
 			restLog();
 			return null;
 		}
@@ -104,7 +106,8 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 		JsonNode transformedNode = node;
 		// apply all transformation from current to latest version.
 		for (Version v : Version.listVersionFromTo(version, targetVersion)) {
-			logger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
+			migrationLogger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
+			logger.info(migrationLogger.last());
 			transformedNode = transform(transformedNode, v);
 		}
 
@@ -192,16 +195,17 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 				}
 			} catch (MigrationException e) {
 				moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getNonmigratabelExtension(), !dirName.equals(SCENARIO_DIR));
-				logger.error("!> Can't migrate the scenario to latest version, removed it from the directory (" +
+				migrationLogger.error("!> Can't migrate the scenario to latest version, removed it from the directory (" +
 						e.getMessage() + ") If you can fix this problem manually, do so and then remove ." +
 						migrationOptions.getNonmigratabelExtension() + " from the file in the " + LEGACY_DIR + "-directory "
 						+ "and move it back into the scenarios-directory, it will be checked again when the GUI restarts.");
+				logger.error(migrationLogger.last());
 				stats.notmigratable++;
 			}
 		}
 
 		if (stats.legacy + stats.notmigratable > 0)
-			IOUtils.writeTextFile(legacyDir.resolve("_LOG-" + getTimestamp() + ".txt").toString(), getLog());
+			migrationLogger.writeLog(legacyDir.resolve("_LOG-" + getTimestamp() + ".txt").toString());
 
 		// clean appender for next run with same JoltMigrationAssistant instance
 		restLog();
@@ -220,7 +224,8 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 
 		String parentPath = dirName.equals(SCENARIO_DIR) ? SCENARIO_DIR + "/" : OUTPUT_DIR + "/" + scenarioFilePath.getParent().getFileName().toString() + "/";
 
-		logger.info(">> analyzing JSON tree of scenario <" + parentPath + node.get("name").asText() + ">");
+		migrationLogger.info(">> analyzing JSON tree of scenario <" + parentPath + node.get("name").asText() + ">");
+		logger.info(migrationLogger.last());
 
 		Version version;
 
@@ -228,8 +233,9 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 			version = Version.fromString(node.get("release").asText());
 
 			if (version == null || version.equalOrSamller(Version.UNDEFINED)) {
-				logger.error("release version " + node.get("release").asText() + " is unknown or not " +
+				migrationLogger.error("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid release create a version transformation and a new idenity transformation");
+				logger.error(migrationLogger.last());
 				throw new MigrationException("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid releasecreate a version transformation and a new idenity transformation");
 			}
@@ -250,18 +256,21 @@ public class JoltMigrationAssistant extends MigrationAssistant {
 				return false;
 			}
 		} else {
-			logger.warn("Version is unknown of scenario <" + parentPath + node.get("name").asText() + ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			migrationLogger.warn("Version is unknown of scenario <" + parentPath + node.get("name").asText() + ">! Try to use " + Version.NOT_A_RELEASE.label() + " as Version for transformation.");
+			logger.warn(migrationLogger.last());
 			version = Version.NOT_A_RELEASE;
 		}
 
 		JsonNode transformedNode = node;
 		// apply all transformation from current to latest version.
 		for (Version v : Version.listToLatest(version)) {
-			logger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
+			migrationLogger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
+			logger.info(migrationLogger.last());
 			transformedNode = transform(transformedNode, v);
 		}
 		if (legacyDir != null) {
-			logger.info("Scenario Migrated. Move olde version to legacyDir");
+			migrationLogger.info("Scenario Migrated - OK. Move copy of old version to legacllyDir");
+			logger.info(migrationLogger.last());
 			moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getLegacyExtension(), false);
 		}
 		IOUtils.writeTextFile(scenarioFilePath.toString(), StateJsonConverter.serializeJsonNode(transformedNode));

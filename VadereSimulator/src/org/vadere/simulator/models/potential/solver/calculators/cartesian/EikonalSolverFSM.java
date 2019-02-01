@@ -1,11 +1,10 @@
 package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class EikonalSolverFSM extends AGridEikonalSolver {
 	private final CellGrid cellGrid;
-	private static Logger logger = LogManager.getLogger(EikonalSolverFSM.class);
+	private static Logger logger = Logger.getLogger(EikonalSolverFSM.class);
 	private final ITimeCostFunction timeCostFunction;
 	private boolean isHighAccuracy;
 	private List<Point> targetPoints;

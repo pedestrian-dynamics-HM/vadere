@@ -82,10 +82,11 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 						.add(3, new VPoint(8.0, 4.0));    //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
-				when(state.getSimTimeInSec()).thenReturn(2.0);
+				double simTime = 1.0;
+				when(state.getSimTimeInSec()).thenReturn(simTime);
 
 				int step = state.getStep();
-				double time = 2.0 - 0.0;
+				double time = simTime - 0.0;
 				double areaSpeed = (1.0 / time + 5.0 / time) / 2; // 2 = noOfPeds
 				addToExpectedOutput(new TimestepKey(step), areaSpeed);
 			}
@@ -99,10 +100,11 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 						.add(3, new VPoint(8.0, 8.0));    //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
-				when(state.getSimTimeInSec()).thenReturn(3.0);
+				double simTime = 2.0;
+				when(state.getSimTimeInSec()).thenReturn(simTime);
 
 				int step = state.getStep();
-				double time = 3.0 - 2.0; // time in this step
+				double time = simTime - 1.0; // time in this step
 				double areaSpeed = (2.0 / time) / 1; // 1 = noOfPeds
 				addToExpectedOutput(new TimestepKey(step), areaSpeed);
 			}
@@ -116,10 +118,11 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 						.add(3, new VPoint(9.0, 8.0));    // not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
-				when(state.getSimTimeInSec()).thenReturn(3.0);
+				double simTime = 3.0;
+				when(state.getSimTimeInSec()).thenReturn(simTime);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepKey(step), Double.NaN);
+				addToExpectedOutput(new TimestepKey(step), 0.0);
 			}
 		});
 	}

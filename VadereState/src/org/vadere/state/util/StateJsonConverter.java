@@ -1,16 +1,16 @@
 package org.vadere.state.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
@@ -22,6 +22,8 @@ import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.events.json.EventInfo;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Obstacle;
@@ -32,18 +34,16 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.apache.commons.codec.digest.DigestUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class StateJsonConverter {
 
@@ -54,13 +54,15 @@ public abstract class StateJsonConverter {
 	private static final TypeReference<Map<String, Object>> mapTypeReference =
 			new TypeReference<Map<String, Object>>() {};
 
-	private static Logger logger = LogManager.getLogger(StateJsonConverter.class);
+	private static Logger logger = Logger.getLogger(StateJsonConverter.class);
 
 	/** Connection to jackson library. */
 	private static ObjectMapper mapper = new JacksonObjectMapper();
 
 	/** Connection to jackson library. */
-	private static ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+	private static ObjectWriter prettyWriter = mapper.writerWithDefaultPrettyPrinter();
+
+	private static ObjectWriter writer = mapper.writer();
 
 	public static ObjectMapper getMapper() {
 		return mapper;
@@ -76,6 +78,18 @@ public abstract class StateJsonConverter {
 		} catch (TextOutOfNodeException | IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static <T> T deserializeObjectFromJson(String json, final TypeReference<T> type) {
+		T data = null;
+
+		try {
+			data = mapper.readValue(json, type);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// Handle the problem
+		}
+		return data;
 	}
 
 	// - - - - DESERIALIZING - - - -
@@ -162,6 +176,28 @@ public abstract class StateJsonConverter {
 		}
 	}
 
+	/**
+	 * Pass a node representing an array of @see EventInfo objects.
+	 *
+	 * Usually, this array is extracted by reading in a scenario file as @see JsonNode
+	 * an you call "get("eventInfos") on this @see JsonNode.
+	 */
+	public static EventInfoStore deserializeEventsFromArrayNode(JsonNode node) throws IllegalArgumentException {
+		EventInfoStore eventInfoStore = new EventInfoStore();
+
+		if (node != null) {
+			List<EventInfo> eventInfoList = new ArrayList<>();
+			node.forEach(eventInfoNode -> eventInfoList.add(mapper.convertValue(eventInfoNode, EventInfo.class)));
+			eventInfoStore.setEventInfos(eventInfoList);
+		}
+
+		return eventInfoStore;
+	}
+
+	public static EventInfoStore deserializeEvents(String json) throws IOException {
+		return mapper.readValue(json, EventInfoStore.class);
+	}
+
 	public static Pedestrian deserializePedestrian(String json) throws IOException {
 		return mapper.readValue(json, Pedestrian.class);
 	}
@@ -202,7 +238,7 @@ public abstract class StateJsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, modelDefinition.getMainModel());
 		node.set("attributesModel", serializeAttributesModelToNode(modelDefinition.getAttributesList()));
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 
 	public static ObjectNode serializeAttributesModelToNode(final List<Attributes> attributesList) {
@@ -263,6 +299,13 @@ public abstract class StateJsonConverter {
 		if (attributesPedestrianNode != null)
 			((ObjectNode) attributesPedestrianNode).remove("id");
 
+		AttributesTeleporter attributesTeleporter = null;
+		if(topography.getTeleporter() != null) {
+			attributesTeleporter = topography.getTeleporter().getAttributes();
+		}
+		JsonNode node = mapper.convertValue(attributesTeleporter, JsonNode.class);
+		topographyNode.set("teleporter", node);
+
 		JsonNode attributesCarNode = mapper.convertValue(topography.getAttributesCar(), JsonNode.class);
 		topographyNode.set("attributesCar", attributesCarNode);
 
@@ -271,11 +314,11 @@ public abstract class StateJsonConverter {
 
 	public static String serializeAttributesSimulation(AttributesSimulation attributesSimulation)
 			throws JsonProcessingException {
-		return writer.writeValueAsString(mapper.convertValue(attributesSimulation, JsonNode.class));
+		return prettyWriter.writeValueAsString(mapper.convertValue(attributesSimulation, JsonNode.class));
 	}
 
 	public static String serializeTopography(Topography topography) throws JsonProcessingException {
-		return writer.writeValueAsString(serializeTopographyToNode(topography));
+		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
 
 	public static String serializeMainModelAttributesModelBundle(List<Attributes> attributesList, String mainModel)
@@ -283,10 +326,27 @@ public abstract class StateJsonConverter {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 
-	public static String serializeObject(Object object) {
+	public static String serializeEvents(EventInfoStore eventInfoStore)
+			throws JsonProcessingException {
+		return prettyWriter.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
+	}
+
+	public static ObjectNode serializeEventsToNode(EventInfoStore eventInfoStore) {
+		return mapper.valueToTree(eventInfoStore);
+	}
+
+	public static String serializeObjectPretty(Object object) {
+		try {
+			return prettyWriter.writeValueAsString(mapper.convertValue(object, JsonNode.class));
+		} catch (JsonProcessingException | IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String serialidzeObject(Object object) {
 		try {
 			return writer.writeValueAsString(mapper.convertValue(object, JsonNode.class));
 		} catch (JsonProcessingException | IllegalArgumentException e) {
@@ -304,7 +364,7 @@ public abstract class StateJsonConverter {
 		}
 
 		try {
-			String scenarioString = writer.writeValueAsString(jsonNode);
+			String scenarioString = prettyWriter.writeValueAsString(jsonNode);
 			return DigestUtils.sha1Hex(scenarioString);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
@@ -316,7 +376,7 @@ public abstract class StateJsonConverter {
 	}
 
 	public static String serializeJsonNode(JsonNode node) throws JsonProcessingException {
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 
 	// CLONE VIA SERIALIZE -> DESERIALIZE
@@ -330,7 +390,7 @@ public abstract class StateJsonConverter {
 		((ObjectNode) attributesModelNode).set(
 				attributesClassName,
 				mapper.convertValue(instantiator.createObject(attributesClassName), JsonNode.class));
-		return writer.writeValueAsString(node);
+		return prettyWriter.writeValueAsString(node);
 	}
 	
 	public static JsonNode readTree(String json) throws IOException {
@@ -346,6 +406,6 @@ public abstract class StateJsonConverter {
 	}
 	
 	public static String writeValueAsString(Object value) throws JsonProcessingException {
-		return writer.writeValueAsString(value);
+		return prettyWriter.writeValueAsString(value);
 	}
 }

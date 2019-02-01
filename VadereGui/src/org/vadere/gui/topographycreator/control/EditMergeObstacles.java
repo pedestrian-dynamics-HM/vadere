@@ -53,6 +53,6 @@ public class EditMergeObstacles extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "merge obstacles";
+		return "cup obstacles";
 	}
 }

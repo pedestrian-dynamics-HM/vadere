@@ -23,106 +23,106 @@ public class TopographyTestBuilder {
 	ScenarioElement lastAddedElement;
 	Random rnd;
 
-	public TopographyTestBuilder(){
+	public TopographyTestBuilder() {
 		topography = new Topography();
 		rnd = new Random(1);
 	}
 
-	public Topography build(){
+	public Topography build() {
 		Topography ret = topography;
 		topography = new Topography();
-		return  ret;
+		return ret;
 	}
 
-	public ScenarioElement getLastAddedElement(){
+	public ScenarioElement getLastAddedElement() {
 		return lastAddedElement;
 	}
 
 
-	TopographyTestBuilder addSource(){
+	public TopographyTestBuilder addSource() {
 		addSource(-1);
-		return  this;
+		return this;
 	}
 
-	TopographyTestBuilder addSource(int id){
-		addSource(id, new VRectangle(0,0, 10, 10));
-		return  this;
+	public TopographyTestBuilder addSource(int id) {
+		addSource(id, new VRectangle(0, 0, 10, 10));
+		return this;
 	}
 
-	TopographyTestBuilder addSource(int id, VShape s){
-		addSource(new AttributesSource(id,s));
-		return  this;
+	public TopographyTestBuilder addSource(int id, VShape s) {
+		addSource(new AttributesSource(id, s));
+		return this;
 	}
 
-	TopographyTestBuilder addSource(AttributesSource attr){
+	public TopographyTestBuilder addSource(AttributesSource attr) {
 		Source source = new Source(attr);
 		lastAddedElement = source;
 		topography.addSource(source);
-		return  this;
+		return this;
 	}
 
-	TopographyTestBuilder addTarget(){
+	public TopographyTestBuilder addTarget() {
 		addSource(-1);
 		return this;
 	}
 
-	TopographyTestBuilder addTarget(int id){
-		addTarget(id, new VRectangle(0,0,10,10));
+	public TopographyTestBuilder addTarget(int id) {
+		addTarget(id, new VRectangle(0, 0, 10, 10));
 		return this;
 	}
 
-	TopographyTestBuilder addTarget(int id, VShape s){
+	public TopographyTestBuilder addTarget(int id, VShape s) {
 		addTarget(new AttributesTarget(s, id, true));
 		return this;
 	}
 
-	TopographyTestBuilder addTarget(AttributesTarget attr){
+	public TopographyTestBuilder addTarget(AttributesTarget attr) {
 		Target target = new Target(attr);
 		lastAddedElement = target;
 		topography.addTarget(target);
 		return this;
 	}
 
-	TopographyTestBuilder addObstacle(){
+	public TopographyTestBuilder addObstacle() {
 		addObstacle(-1);
 		return this;
 	}
 
-	TopographyTestBuilder addObstacle(int id){
-		addObstacle(id, new VRectangle(0,0,10,10));
+	public TopographyTestBuilder addObstacle(int id) {
+		addObstacle(id, new VRectangle(0, 0, 10, 10));
 		return this;
 	}
 
-	TopographyTestBuilder addObstacle(int id, VShape s){
+	public TopographyTestBuilder addObstacle(int id, VShape s) {
 		addObstacle(new AttributesObstacle(id, s));
 		return this;
 	}
 
-	TopographyTestBuilder addObstacle(AttributesObstacle attr){
+	public TopographyTestBuilder addObstacle(AttributesObstacle attr) {
 		Obstacle obstacle = new Obstacle(attr);
 		lastAddedElement = obstacle;
 		topography.addObstacle(obstacle);
 		return this;
 	}
 
-	TopographyTestBuilder addStairs(){
+	public TopographyTestBuilder addStairs() {
 		addStairs(new AttributesStairs());
 		return this;
 	}
 
-	TopographyTestBuilder addStairs(AttributesStairs attr){
+	public TopographyTestBuilder addStairs(AttributesStairs attr) {
 		Stairs stairs = new Stairs(attr);
 		lastAddedElement = stairs;
 		topography.addStairs(stairs);
 		return this;
 	}
 
-	TopographyTestBuilder addPedestrian(){
+	public TopographyTestBuilder addPedestrian() {
 
 		return this;
 	}
 
-	TopographyTestBuilder addPedestrian(AttributesAgent attr){
+	public TopographyTestBuilder addPedestrian(AttributesAgent attr) {
 		Pedestrian pedestrian = new Pedestrian(attr, rnd);
 		lastAddedElement = pedestrian;
 		topography.addInitialElement(pedestrian);

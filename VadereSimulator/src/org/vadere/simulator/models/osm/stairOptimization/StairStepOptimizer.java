@@ -4,16 +4,15 @@
 
 package org.vadere.simulator.models.osm.stairOptimization;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Stairs.Tread;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class StairStepOptimizer implements StepCircleOptimizer {
 
 	private Stairs stairs;
 
-	private Logger logger = LogManager.getLogger(StairStepOptimizer.class);
+	private Logger logger = Logger.getLogger(StairStepOptimizer.class);
 
 	private final double tol_equal_values = 1E-4;
 

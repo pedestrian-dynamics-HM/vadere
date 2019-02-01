@@ -1,5 +1,25 @@
 package org.vadere.gui.postvisualization.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.postvisualization.control.TableListenerLogicExpression;
+import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.TopographyIterator;
+import org.vadere.state.simulation.Step;
+import org.vadere.state.simulation.Trajectory;
+import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.io.parser.VPredicate;
+import org.vadere.util.logging.Logger;
+
 import java.awt.*;
 import java.io.IOException;
 import java.text.ParseException;
@@ -15,30 +35,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.postvisualization.control.TableListenerLogicExpression;
-import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.scenario.TopographyIterator;
-import org.vadere.state.simulation.Step;
-import org.vadere.state.simulation.Trajectory;
-import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.io.parser.VPredicate;
-import org.vadere.util.data.cellgrid.CellGrid;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
 public class PostvisualizationModel extends SimulationModel<PostvisualizationConfig> {
 
-	private static Logger logger = LogManager.getLogger(PostvisualizationModel.class);
+	private static Logger logger = Logger.getLogger(PostvisualizationModel.class);
 
 	private Step step;
 
@@ -111,7 +110,6 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		// to have fast access to the key values.
 		Map<Integer, Step> map = agentsByStep
 				.keySet().stream()
-				.sorted(stepComparator)
 				.collect(Collectors.toMap(s -> s.getStepNumber(), s -> s));
 
 

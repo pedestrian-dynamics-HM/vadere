@@ -1,14 +1,12 @@
 package org.vadere.meshing.mesh.inter;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -41,7 +39,7 @@ public interface ITriConnectivity<P extends IPoint, V extends IVertex<P>, E exte
 	/**
 	 * A logger for debug and information reasons.
 	 */
-	Logger log = LogManager.getLogger(ITriConnectivity.class);
+	Logger log = Logger.getLogger(ITriConnectivity.class);
 
 	/**
 	 * A Random number generator to randomly walk through the trinagulation.

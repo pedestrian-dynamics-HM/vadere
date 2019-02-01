@@ -2,7 +2,6 @@ package org.vadere.simulator.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.io.File;
 import java.nio.file.Path;
 
 /**

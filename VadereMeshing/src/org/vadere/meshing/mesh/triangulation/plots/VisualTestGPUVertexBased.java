@@ -1,22 +1,21 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.util.opencl.OpenCLException;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl.CLEikMeshHE;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl.CLEikMeshHE;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.opencl.OpenCLException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.List;
 import javax.swing.*;
 
 public class VisualTestGPUVertexBased {
-	private static final Logger log = LogManager.getLogger(RunTimeGPUEdgeBased.class);
+	private static final Logger log = Logger.getLogger(RunTimeGPUEdgeBased.class);
 
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;

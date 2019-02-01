@@ -1,12 +1,12 @@
 package org.vadere.simulator.projects.migration.helper;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.jolttranformation.JoltTransformation;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -48,8 +48,8 @@ public class MigrationUtil {
 
 	public void generateNewVersionTransform(Path resourceDir, String newVersionLabel) throws URISyntaxException, IOException {
 
-		Path oldTransform = JoltTransformation.getTransforamtionFile(Version.latest());
-		Path oldIdentity = JoltTransformation.getIdenityFile(Version.latest());
+		Path oldTransform = JoltTransformation.getTransforamtionFileFromFileSystem(resourceDir, Version.latest());
+		Path oldIdentity = JoltTransformation.getIdenityFileFromFileSystem(resourceDir, Version.latest());
 
 		String newTransformString = JoltTransformation
 				.getTransforamtionResourcePath(Version.latest().label('-'), newVersionLabel);
@@ -67,7 +67,6 @@ public class MigrationUtil {
 		IOUtils.writeTextFile(newTransform.toString(), json);
 
 	}
-
 
 	public void migrateDirectoryTree(Path p, Version targetVersion, boolean recursive) throws MigrationException {
 		FileVisitor<Path> visitor = getVisitor(new ArrayList<>(), treeMarker, dirMarker, recursive, path -> migrate(path, targetVersion));

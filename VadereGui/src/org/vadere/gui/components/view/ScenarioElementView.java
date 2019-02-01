@@ -3,8 +3,6 @@ package org.vadere.gui.components.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -18,6 +16,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.io.IOException;
@@ -33,7 +32,7 @@ import javax.swing.event.DocumentListener;
 public class ScenarioElementView extends JPanel implements ISelectScenarioElementListener {
 
 	private static final long serialVersionUID = -1567362675580536991L;
-	private static Logger logger = LogManager.getLogger(ScenarioElementView.class);
+	private static Logger logger = Logger.getLogger(ScenarioElementView.class);
 	private JTextArea txtrTextfiletextarea;
 	private IDefaultModel panelModel;
 	private DocumentListener documentListener;
@@ -174,12 +173,12 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			} else {
 				if (scenarioElement instanceof AgentWrapper) {
 					this.txtrTextfiletextarea.setText(
-							StateJsonConverter.serializeObject(((AgentWrapper) scenarioElement).getAgentInitialStore()));
+							StateJsonConverter.serializeObjectPretty(((AgentWrapper) scenarioElement).getAgentInitialStore()));
 				} else if (scenarioElement instanceof Pedestrian) {
-					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObject(scenarioElement));
+					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObjectPretty(scenarioElement));
 				} else {
 					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObject(scenarioElement.getAttributes()));
+							.serializeObjectPretty(scenarioElement.getAttributes()));
 				}
 			}
 		}

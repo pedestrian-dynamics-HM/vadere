@@ -1,20 +1,19 @@
 package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
-import java.awt.Point;
+import org.apache.commons.math3.util.Pair;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.math.MathUtil;
+
+import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
-
-import org.apache.commons.math3.util.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.util.math.MathUtil;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.util.data.cellgrid.CellState;
-import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
 
 /**
  * EikonalSolverSFMM is almost identical to EikonalSolverFMM avoiding
@@ -35,7 +34,7 @@ public class EikonalSolverSFMM extends AGridEikonalSolver {
 	boolean isHighAccuracy = false;
 
 	/** only for logging */
-	protected static Logger logger = LogManager.getLogger(EikonalSolverSFMM.class);
+	protected static Logger logger = Logger.getLogger(EikonalSolverSFMM.class);
 	protected long runtime = 0;
 
 	/**

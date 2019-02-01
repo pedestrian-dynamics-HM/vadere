@@ -4,18 +4,17 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.triangulate.DelaunayTriangulationBuilder;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
  */
 public class PerformanceTest {
 
-	private static Logger log = LogManager.getLogger(TestBoyerWatson.class);
+	private static Logger log = Logger.getLogger(TestBoyerWatson.class);
 
 	private static List<VPoint> points;
 

@@ -1,7 +1,7 @@
 package org.vadere.gui.compileScripts;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
+import org.vadere.util.logging.Logger;
 
 /**
  * @author Benedikt Zoennchen
@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
  */
 public class ClassListGenerator {
 
-    private static Logger log = LogManager.getLogger(ClassListGenerator.class);
+    private static Logger log = Logger.getLogger(ClassListGenerator.class);
 
     public static void main(String... args) {
 

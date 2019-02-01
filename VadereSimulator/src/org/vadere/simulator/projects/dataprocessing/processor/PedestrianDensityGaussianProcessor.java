@@ -22,7 +22,7 @@ public class PedestrianDensityGaussianProcessor extends PedestrianDensityProcess
 		super.init(manager);
 		AttributesPedestrianDensityGaussianProcessor attDensGauss =
 				(AttributesPedestrianDensityGaussianProcessor) this.getAttributes();
-		this.setAlgorithm(new PointDensityGaussianAlgorithm(attDensGauss.getScale(), attDensGauss.getStandardDerivation(),
+		this.setAlgorithm(new PointDensityGaussianAlgorithm(attDensGauss.getScale(), attDensGauss.getStandardDeviation(),
 				attDensGauss.isObstacleDensity()));
 
 	}

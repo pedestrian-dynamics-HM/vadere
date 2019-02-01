@@ -8,10 +8,12 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
+import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.SubModelBuilder;
 import org.vadere.simulator.models.groups.CentroidGroupModel;
 import org.vadere.simulator.models.groups.CentroidGroupPotential;
 import org.vadere.simulator.models.groups.CentroidGroupSpeedAdjuster;
+import org.vadere.simulator.models.groups.CentroidGroupStepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
@@ -29,6 +31,9 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
@@ -38,13 +43,10 @@ import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel, DynamicElementRemoveListener<Pedestrian> {
@@ -58,14 +60,17 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<SpeedAdjuster> speedAdjusters;
+	private List<StepSizeAdjuster> stepSizeAdjusters;
 	private Topography topography;
 	private double lastSimTimeInSec;
 	private int pedestrianIdCounter;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
+
 	public OptimalStepsModel() {
 		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = new LinkedList<>();
+		this.stepSizeAdjusters = new LinkedList<>();
 	}
 
 	@Override
@@ -103,17 +108,20 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 			this.potentialFieldPedestrian =
 					new CentroidGroupPotential(centroidGroupModel,
-							potentialFieldPedestrian, centroidGroupModel.getAttributesCGM());
+							potentialFieldPedestrian, potentialFieldTarget, centroidGroupModel.getAttributesCGM());
 
 			SpeedAdjuster speedAdjusterCGM = new CentroidGroupSpeedAdjuster(centroidGroupModel);
 			this.speedAdjusters.add(speedAdjusterCGM);
+			this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
 		}
 
 		this.stepCircleOptimizer = createStepCircleOptimizer(
 				attributesOSM, random, topography, iPotentialTargetGrid);
 
+		// TODO implement a step speed adjuster for this!
 		if (attributesPedestrian.isDensityDependentSpeed()) {
-			this.speedAdjusters.add(new SpeedAdjusterWeidmann());
+			throw new UnsupportedOperationException("densityDependentSpeed not jet implemented.");
+			//this.speedAdjusters.add(new SpeedAdjusterWeidmann());
 		}
 
 		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
@@ -234,12 +242,35 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 	@Override
 	public void update(final double simTimeInSec) {
+		// TODO: handle each pedestrian individually based on its "mostImportantEvent".
 		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
 		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
 		lastSimTimeInSec = simTimeInSec;
 	}
 
-	/*
+	private void handleElapsedTimeEvent(final Event event) {
+		if (!(event instanceof ElapsedTimeEvent)) {
+			throw new IllegalArgumentException("Wrong event type passed, expected: " + ElapsedTimeEvent.class.getName());
+		}
+
+		update(event.getTime());
+	}
+
+	private void handleWaitEvent(final Event event) {
+		if (!(event instanceof WaitEvent)) {
+			throw new IllegalArgumentException(String.format("Wrong event type passed, expected: %s", WaitEvent.class.getName()));
+		}
+
+		Collection<PedestrianOSM> pedestrians = topography.getElements(PedestrianOSM.class);
+
+		for (PedestrianOSM pedestrian : pedestrians) {
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		}
+
+		this.lastSimTimeInSec = event.getTime();
+	}
+
+		/*
 	 * At the moment all pedestrians also the initalPedestrians get this.attributesPedestrain!!!
 	 */
 	@Override

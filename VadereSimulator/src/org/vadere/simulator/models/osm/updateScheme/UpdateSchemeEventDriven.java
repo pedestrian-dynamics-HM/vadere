@@ -2,6 +2,10 @@ package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
+import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -25,9 +29,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
-		for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
-			pedestrianOSM.clearStrides();
-		}
+
+		clearStrides(topography);
 
 		if(!pedestrianEventsQueue.isEmpty()) {
 			// event driven update ignores time credits!
@@ -41,20 +44,24 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
-		VPoint oldPosition = pedestrian.getPosition();
+		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
-		// for the first step after creation, timeOfNextStep has to be initialized
-		if (pedestrian.getTimeOfNextStep() == 0) {
-			pedestrian.setTimeOfNextStep(currentTimeInSec);
+		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+			VPoint oldPosition = pedestrian.getPosition();
+
+			// for the first step after creation, timeOfNextStep has to be initialized
+			if (pedestrian.getTimeOfNextStep() == 0) {
+				pedestrian.setTimeOfNextStep(currentTimeInSec);
+			}
+			
+			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+			pedestrian.updateNextPosition();
+			double stepDuration = pedestrian.getDurationNextStep();
+			makeStep(topography, pedestrian, stepDuration);
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
-
-		// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
-		pedestrian.updateNextPosition();
-		makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
-
-		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-		topography.moveElement(pedestrian, oldPosition);
 	}
 
 	@Override

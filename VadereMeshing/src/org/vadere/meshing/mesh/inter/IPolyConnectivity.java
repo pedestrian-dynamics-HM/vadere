@@ -1,12 +1,12 @@
 package org.vadere.meshing.mesh.inter;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +38,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	/**
 	 * A logger to debug some code.
 	 */
-	Logger log = LogManager.getLogger(IPolyConnectivity.class);
+	Logger log = Logger.getLogger(IPolyConnectivity.class);
 
 	/**
 	 * <p>Returns the mesh of this poly-connectivity {@link IPolyConnectivity}.</p>
@@ -160,10 +160,21 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 */
 	static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> V splitEdge(
 			@NotNull final E edge, @NotNull P p, @NotNull IMesh<P, V, E, F> mesh) {
-		V u = mesh.createVertex(p);
+
 		E twin = mesh.getTwin(edge);
+
+		if(mesh.getPoint(edge).equals(p)) {
+			return mesh.getVertex(edge);
+		}
+
+		if(mesh.getPoint(twin).equals(p)) {
+			return mesh.getVertex(mesh.getPrev(edge));
+		}
+
 		E prev = mesh.getPrev(edge);
 		E tNext = mesh.getNext(twin);
+
+		V u = mesh.createVertex(p);
 
 		E e = mesh.createEdge(u);
 		mesh.setFace(e, mesh.getFace(edge));
@@ -411,10 +422,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * <p>Changes the connectivity.</p>
 	 *
 	 * @param face                      the face
-	 * @param mergeCondition            the merge condition
+	 * @param mergeCondition            the cup condition
 	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
 	 *
-	 * @return the merge result i.e. the resulting face.
+	 * @return the cup result i.e. the resulting face.
 	 */
 	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices) {
 		return mergeFaces(face, mergeCondition, deleteIsolatedVertices, -1);
@@ -430,11 +441,11 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * <p>Changes the connectivity.</p>
 	 *
 	 * @param face                      the face
-	 * @param mergeCondition            the merge condition
+	 * @param mergeCondition            the cup condition
 	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
 	 * @param maxDept                   the maximum dept / neighbouring distance at which faces can be removed
 	 *
-	 * @return the merge result i.e. the resulting face.
+	 * @return the cup result i.e. the resulting face.
 	 */
 	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices, final int maxDept) {
 		boolean modified = true;
@@ -480,14 +491,14 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 
 	/**
 	 * Creates a new hole or extends an existing hole by removing neighbouring faces as
-	 * long as the merge condition holds.
+	 * long as the cup condition holds.
 	 *
 	 * Changes the connectivity.
 	 *
 	 * @param face                      they face which will be transformed into a hole
-	 * @param mergeCondition            the merge condition
+	 * @param mergeCondition            the cup condition
 	 * @param deleteIsoletedVertices    if true isolated vertices, i.e. vertices without any edges, will be removed from the mesh
-	 * @return  (optional) the hole or face itself it the face does not fulfill the merge condition
+	 * @return  (optional) the hole or face itself it the face does not fulfill the cup condition
 	 *          or empty if due to the creation of the hole all faces will be removed!
 	 */
 	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {

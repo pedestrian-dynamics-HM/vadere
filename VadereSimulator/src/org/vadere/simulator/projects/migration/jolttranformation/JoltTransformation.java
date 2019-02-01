@@ -4,25 +4,20 @@ import com.bazaarvoice.jolt.Chainr;
 import com.bazaarvoice.jolt.Diffy;
 import com.bazaarvoice.jolt.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jolttranformation.JoltTransformationFactory;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.logging.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 
 public abstract class JoltTransformation implements JsonNodeExplorer{
@@ -54,7 +49,7 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 		return ret;
 	}
 
-	public static Path getTransforamtionFile(Version toVersion) {
+	public static Path getTransforamtionFileFromRessource(Version toVersion) {
 		String transformString = getTransforamtionResourcePath(
 				toVersion.previousVersion().label('-'),
 				toVersion.label('-'));
@@ -67,7 +62,7 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 		return Paths.get(res);
 	}
 
-	public static Path getIdenityFile(Version v) {
+	public static Path getIdenityFileFromRessource(Version v) {
 		String idenityString = getIdentiyResoucrePath(v.label('-'));
 		URI res = null;
 		try {
@@ -77,6 +72,23 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 		}
 		return Paths.get(res);
 	}
+
+
+	public static Path getTransforamtionFileFromFileSystem(Path baseDir, Version toVersion) {
+		String transformString = getTransforamtionResourcePath(
+				toVersion.previousVersion().label('-'),
+				toVersion.label('-'));
+
+		return baseDir.resolve(transformString.substring(1));
+	}
+
+	public static Path getIdenityFileFromFileSystem(Path baseDir, Version v) {
+		String idenityString = getIdentiyResoucrePath(v.label('-'));
+		return baseDir.resolve(idenityString.substring(1));
+	}
+
+
+
 
 	public static String getTransforamtionResourcePath(String from, String to) {
 		return "/transform_v" + from.toUpperCase() + "_to_v" + to.toUpperCase() + ".json";
@@ -166,10 +178,10 @@ public abstract class JoltTransformation implements JsonNodeExplorer{
 			LinkedHashMap<Object, Object> parent = (LinkedHashMap<Object, Object>) obj;
 			for (String childKey : children) {
 				Object childObj = parent.get(childKey);
-				if (childObj == null) {
-					throw new MigrationException("Object with Key " + key + " does not has child with key" + childKey);
+				if (childObj != null) {
+//					throw new MigrationException("Object with Key " + key + " does not has child with key" + childKey);
+					node.put(childKey, childObj);
 				}
-				node.put(childKey, childObj);
 			}
 			obj = node;
 		}

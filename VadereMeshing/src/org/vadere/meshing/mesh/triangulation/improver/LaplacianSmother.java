@@ -1,19 +1,22 @@
 package org.vadere.meshing.mesh.triangulation.improver;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.RandomPointsSetTriangulator;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +29,7 @@ import java.util.stream.StreamSupport;
  * @author Benedikt Zoennchen
  */
 public class LaplacianSmother implements IMeshImprover<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> {
-    private static final Logger log = LogManager.getLogger(LaplacianSmother.class);
+    private static final Logger log = Logger.getLogger(LaplacianSmother.class);
 
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;

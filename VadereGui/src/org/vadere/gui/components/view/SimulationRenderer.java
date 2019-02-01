@@ -1,19 +1,6 @@
 package org.vadere.gui.components.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.stream.Stream;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.visualization.ColorHelper;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.components.utils.Resources;
@@ -22,10 +9,19 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.visualization.ColorHelper;
+
+import java.awt.*;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
-    private static Logger logger = LogManager.getLogger(SimulationRenderer.class);
+    private static Logger logger = Logger.getLogger(SimulationRenderer.class);
     private static Resources resources = Resources.getInstance("postvisualization");
 
     private static double MAX_POTENTIAL = 1000.0;
@@ -193,6 +189,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         int startY = (int) (Math.max((dy - viewportBound.getY()), 0) * model.getScaleFactor());
 
         potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+	    double maxDistance = Math.sqrt(model.getTopography().getBounds().getWidth() * model.getTopography().getBounds().getWidth() +
+			    model.getTopography().getBounds().getHeight() * model.getTopography().getBounds().getHeight());
+	    colorHelper = new ColorHelper((int)(maxDistance * 0.7));
 
         for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
             for (int y = 0; y < potentialFieldImage.getHeight(); y++) {

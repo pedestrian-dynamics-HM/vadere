@@ -1,21 +1,22 @@
 package org.vadere.gui.postvisualization.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
-import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
+import javax.swing.*;
+
 public class ActionShowPotentialField extends ActionVisualization {
 
-	private static Logger logger = LogManager.getLogger(ActionShowPotentialField.class);
+	private static Logger logger = Logger.getLogger(ActionShowPotentialField.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final PostvisualizationModel model;
 

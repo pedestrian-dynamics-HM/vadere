@@ -1,20 +1,19 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import java.awt.Shape;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.GoalType;
 import org.apache.commons.math.optimization.MultivariateRealOptimizer;
 import org.apache.commons.math.optimization.direct.DirectSearchOptimizer;
 import org.apache.commons.math.optimization.direct.NelderMead;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+
+import java.awt.*;
+import java.util.List;
+import java.util.Random;
 
 /**
  * The Class StepCircleOptimizerNelderMead.
@@ -22,7 +21,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  */
 public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 
-	private static Logger logger = LogManager
+	private static Logger logger = Logger
 			.getLogger(StepCircleOptimizerNelderMead.class);
 
 	private final Random random;
@@ -35,7 +34,7 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 	public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) {
 
 		double stepSize = ((VCircle) reachableArea).getRadius();
-		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle)reachableArea, random);
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);

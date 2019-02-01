@@ -1,25 +1,23 @@
 package org.vadere.simulator.projects;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.data.FindByClass;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Contains the data for a Vadere object that can be serialized.
@@ -28,22 +26,30 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class ScenarioStore {
 
-	private static Logger logger = LogManager.getLogger(ScenarioStore.class);
+	private static Logger logger = Logger.getLogger(ScenarioStore.class);
 	private String name;
 	private String description;
 	private String mainModel;
 	private List<Attributes> attributesList;
 	private AttributesSimulation attributesSimulation;
 	private Topography topography;
+	private EventInfoStore eventInfoStore;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
 			final AttributesSimulation attributesSimulation, final Topography topography) {
+	    // Provide empty "EventInfoStore".
+		this(name, description, mainModel, attributesModel, attributesSimulation, topography, new EventInfoStore());
+	}
+
+	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
+						 final AttributesSimulation attributesSimulation, final Topography topography, final EventInfoStore eventInfoStore) {
 		this.name = name;
 		this.description = description;
 		this.mainModel = mainModel;
 		this.attributesList = attributesModel;
 		this.attributesSimulation = attributesSimulation;
 		this.topography = topography;
+		this.eventInfoStore = eventInfoStore;
 	}
 
 	public synchronized Topography getTopography() {
@@ -115,6 +121,8 @@ public class ScenarioStore {
 		this.name = name;
 	}
 
+	public void setEventInfoStore(EventInfoStore eventInfoStore) { this.eventInfoStore = eventInfoStore; }
+
 	public AttributesSimulation getAttributesSimulation() {
 		return attributesSimulation;
 	}
@@ -134,4 +142,6 @@ public class ScenarioStore {
 	public String getName() {
 		return name;
 	}
+
+	public EventInfoStore getEventInfoStore() { return eventInfoStore; }
 }

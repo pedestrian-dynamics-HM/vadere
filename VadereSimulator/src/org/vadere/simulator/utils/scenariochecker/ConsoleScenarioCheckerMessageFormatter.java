@@ -2,7 +2,6 @@ package org.vadere.simulator.utils.scenariochecker;
 
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.Messages;
-import org.vadere.state.scenario.ScenarioElement;
 
 public class ConsoleScenarioCheckerMessageFormatter extends AbstractScenarioCheckerMessageFormatter {
 

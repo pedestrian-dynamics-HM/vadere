@@ -21,7 +21,7 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 	private VRectangle waitingArea;
 
 	public PedestrianWaitingTimeProcessor() {
-		super("waitingTime");
+		super("waitingTimeStart");
 		setAttributes(new AttributesPedestrianWaitingTimeProcessor());
 		this.lastSimTime = 0.0;
 	}

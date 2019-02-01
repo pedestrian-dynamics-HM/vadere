@@ -1,15 +1,16 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.projectview.model.ProjectViewModel;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class ActionInterruptScenarios extends AbstractAction {
 
-	private static Logger logger = LogManager.getLogger(ActionInterruptScenarios.class);
+	private static Logger logger = Logger.getLogger(ActionInterruptScenarios.class);
 
 	private ProjectViewModel model;
 

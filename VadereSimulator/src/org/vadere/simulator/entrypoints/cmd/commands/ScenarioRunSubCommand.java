@@ -3,15 +3,14 @@ package org.vadere.simulator.entrypoints.cmd.commands;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
-import org.vadere.simulator.utils.scenariochecker.AbstractScenarioCheckerMessageFormatter;
 import org.vadere.simulator.utils.scenariochecker.ConsoleScenarioCheckerMessageFormatter;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
+import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,6 +41,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 	@Override
 	public void run(Namespace ns, ArgumentParser parser) {
 		Path outputDir = Paths.get(ns.getString("output-dir"));
+		boolean overrideTimeStepSetting = ns.getBoolean("override-timestep-setting");
 		String scenarioCheckerSwitch = ns.getString("scenario-checker");
 		if (!outputDir.toFile().exists()){
 			if ( ! outputDir.toFile().mkdirs() ) {
@@ -64,7 +64,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
 			if (checkScenario(scenario, scenarioCheckerSwitch)){
-				new ScenarioRun(scenario, outputDir.toFile().toString() , null).run();
+				new ScenarioRun(scenario, outputDir.toFile().toString() , overrideTimeStepSetting, null).run();
 			} else {
 				System.exit(-1);
 			}

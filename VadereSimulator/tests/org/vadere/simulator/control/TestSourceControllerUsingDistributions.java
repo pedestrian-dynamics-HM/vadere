@@ -3,6 +3,7 @@ package org.vadere.simulator.control;
 import org.apache.commons.math3.distribution.ConstantRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Test;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
 import org.vadere.state.scenario.Pedestrian;
@@ -100,11 +101,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		double startTime = 0;
 		double endTime = 1;
 		int spawnNumber = 100;
+		AttributesAgent attributesAgent = new AttributesAgent();
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
 				.setSpawnNumber(100)
 				.setUseFreeSpaceOnly(true)
-				.setSourceDim(new VRectangle(0, 0, 0.4, 0.4));
+				.setSourceDim(new VRectangle(0, 0, attributesAgent.getRadius()*2 + 0.05, attributesAgent.getRadius()*2 + 0.05));
 		initialize(builder);
 
 		doUpdates(0, 100, startTime, endTime + 1);
@@ -124,11 +126,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 		// expected: not stop spawning before all pedestrians are created (even after end time)
 		double startTime = 1;
 		int spawnNumber = 100;
+		AttributesAgent attributesAgent = new AttributesAgent();
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(startTime)
 				.setSpawnNumber(100)
 				.setUseFreeSpaceOnly(true)
-				.setSourceDim(new VRectangle(0, 0, 0.4, 0.4));
+				.setSourceDim(new VRectangle(0, 0, attributesAgent.getRadius()*2 + 0.05, attributesAgent.getRadius()*2 + 0.05));
 		initialize(builder);
 
 		doUpdates(0, 100, 0, startTime + 1);

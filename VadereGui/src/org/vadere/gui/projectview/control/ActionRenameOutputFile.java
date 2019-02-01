@@ -1,24 +1,25 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.*;
+
 public class ActionRenameOutputFile extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LogManager.getLogger(ActionRenameOutputFile.class);
+	private static Logger logger = Logger.getLogger(ActionRenameOutputFile.class);
 
 	private ProjectViewModel model;
 

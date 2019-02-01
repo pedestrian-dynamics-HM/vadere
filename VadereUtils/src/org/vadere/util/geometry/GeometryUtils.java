@@ -1,16 +1,5 @@
 package org.vadere.util.geometry;
 
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Random;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -20,6 +9,17 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 import static org.vadere.util.geometry.GeometryUtils.Orientation.CCW;
 import static org.vadere.util.geometry.GeometryUtils.Orientation.COLLINEAR;
@@ -39,7 +39,7 @@ public class GeometryUtils {
 	 */
 	public static final double DOUBLE_EPS = 1e-8;
 
-	public static final Logger log = LogManager.getLogger(GeometryUtils.class);
+	public static final Logger log = Logger.getLogger(GeometryUtils.class);
 
 	/**
 	 * Interpolates between start and end with the given factor i.e. two values at once.
@@ -58,6 +58,39 @@ public class GeometryUtils {
 
 	public static double derterminant2D(double x1, double y1, double x2, double y2) {
 		return x1 * y2 - y1 * x2;
+	}
+
+	/**
+	 *
+	 * @param rectangle
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return
+	 */
+	public static Optional<VPoint> intersectionPoint(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
+		if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2));
+		}
+		else if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2));
+		}
+		else if(intersectLineSegment(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2));
+		}
+		if(intersectLineSegment(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
+			return Optional.of(intersectionPoint(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2));
+		}
+
+		return Optional.empty();
+	}
+
+	public static boolean intersectsRectangleBoundary(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
+		return intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2) ||
+				intersectLineSegment(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2) ||
+				intersectLineSegment(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2) ||
+				intersectLineSegment(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2);
 	}
 
 	//http://mathworld.wolfram.com/Line-LineIntersection.html
@@ -197,12 +230,19 @@ public class GeometryUtils {
 	 * @return the point on the line that is closest to p
 	 */
 	public static VPoint closestToSegment(@NotNull final VLine line, @NotNull final IPoint point) {
-		if (new VPoint((Point2D.Double) line.getP1()).equals(point)) {
+		VPoint a2p = new VPoint(point.getX() - line.x1, point.getY() - line.y1);
+		VPoint a2b = new VPoint(line.x2 - line.x1, line.y2 - line.y1);
+
+		// the line is not a line or a very short line
+		if(Math.abs(a2b.x) < GeometryUtils.DOUBLE_EPS && Math.abs(a2b.y) < GeometryUtils.DOUBLE_EPS) {
 			return new VPoint(line.x1, line.y1);
 		}
 
-		VPoint a2p = new VPoint(point.getX() - line.x1, point.getY() - line.y1);
-		VPoint a2b = new VPoint(line.x2 - line.x1, line.y2 - line.y1);
+		// the point is very close or equal to one of the points of the line
+		if(Math.abs(a2p.x) < GeometryUtils.DOUBLE_EPS && Math.abs(a2p.y) < GeometryUtils.DOUBLE_EPS) {
+			return new VPoint(point.getX(), point.getY());
+		}
+
 		double distAB = a2b.x * a2b.x + a2b.y * a2b.y;
 		double a2p_dot_a2b = a2p.x * a2b.x + a2p.y * a2b.y;
 
@@ -1039,13 +1079,71 @@ public class GeometryUtils {
 
 		Path2D path2D = new Path2D.Double();
 		path2D.moveTo(points.get(0).getX(), points.get(0).getY());
-		path2D.lineTo(points.get(0).getX(), points.get(0).getY());
+		//path2D.lineTo(points.get(0).getX(), points.get(0).getY());
 
 		for(int i = 1; i < points.size(); i++) {
 			path2D.lineTo(points.get(i).getX(), points.get(i).getY());
 		}
 
+		path2D.lineTo(points.get(0).getX(), points.get(0).getY());
+
 		return new VPolygon(path2D);
+	}
+
+	/**
+	 * Tests if two polygons are equals, i.e. they are defined by the same list of points.
+	 * The list of the first polygon might be shifted and/or reversed with respect to the second polygon.
+	 *
+	 * @param poly1 the first polygon
+	 * @param poly2 the second polygon
+	 * @return true if both polygons are defined by the same path, false otherwise
+	 */
+	public static boolean equalsPolygons(@NotNull final VPolygon poly1, @NotNull final VPolygon poly2) {
+		return equalsPolygonsInOrder(poly1, poly2) || equalsPolygonsInOrder(poly1.revertOrder(), poly2);
+	}
+
+	/**
+	 * Tests if two polygons are equals, i.e. they are defined by the same list of points.
+	 * The list of the first polygon might be shifted with respect to the second polygon.
+	 *
+	 * @param poly1 the first polygon
+	 * @param poly2 the second polygon
+	 * @return true if both polygons are defined by the same path, false otherwise
+	 */
+	private static boolean equalsPolygonsInOrder(@NotNull final VPolygon poly1, @NotNull final VPolygon poly2) {
+		List<VPoint> pointList1 = poly1.getPoints();
+		List<VPoint> pointList2 = poly2.getPoints();
+
+		if(pointList1.size() != pointList2.size()) {
+			return false;
+		}
+
+		if(pointList1.isEmpty() && pointList2.isEmpty()) {
+			return true;
+		}
+
+		boolean found = false;
+		int j = -1;
+		for(int i = 0; i < pointList1.size(); i++) {
+			VPoint p0 = pointList2.get(0);
+			if(p0.equals(pointList1.get(i))) {
+				j = i;
+				found = true;
+				break;
+			}
+		}
+
+		if(!found) {
+			return false;
+		}
+
+		for(int i = 0; i < pointList2.size(); i++) {
+			if(!pointList2.get(i).equals(pointList1.get((j+i) % pointList1.size()))) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1101,11 +1199,13 @@ public class GeometryUtils {
 
 		Path2D path2D = new Path2D.Double();
 		path2D.moveTo(points[0].getX(), points[0].getY());
-		path2D.lineTo(points[0].getX(), points[0].getY());
+		//path2D.lineTo(points[0].getX(), points[0].getY());
 
 		for(int i = 1; i < points.length; i++) {
 			path2D.lineTo(points[i].getX(), points[i].getY());
 		}
+
+		path2D.lineTo(points[0].getX(), points[0].getY());
 
 		return new VPolygon(path2D);
 	}

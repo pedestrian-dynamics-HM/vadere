@@ -1,21 +1,20 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -23,8 +22,9 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
 	private List<E> splitEdges;
 
 	// only for logging
-    private static final Logger log = LogManager.getLogger(EikMesh.class);
+    private static final Logger log = Logger.getLogger(EikMesh.class);
 
 	public EikMesh(
             final IDistanceFunction distanceFunc,
@@ -253,7 +253,7 @@ public class EikMesh<P extends EikMeshPoint, V extends IVertex<P>, E extends IHa
         //removeTrianglesInsideObstacles();
     }
 
-	/*public void execute() {
+	/*public void cup() {
 		double quality = getQuality();
 		while (quality < Parameters.qualityMeasurement) {
 			improve();

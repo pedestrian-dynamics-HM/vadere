@@ -1,18 +1,27 @@
 package org.vadere.meshing.mesh.triangulation.triangulator;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.math.IDistanceFunction;
-import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author Benedikt Zoennchen
@@ -25,7 +34,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
     private IIncrementalTriangulation<P, V, E, F> triangulation;
     private Set<P> points;
     private IMesh<P, V, E, F> mesh;
-    private static final Logger logger = LogManager.getLogger(UniformSFCTriangulator.class);
+    private static final Logger logger = Logger.getLogger(UniformSFCTriangulator.class);
     private final IDistanceFunction distFunc;
     private final static Random random = new Random();
     private final LinkedList<F> sortedFaces;
@@ -212,7 +221,7 @@ public class UniformSFCTriangulator<P extends IPoint, V extends IVertex<P>, E ex
         VLine line = mesh.toLine(edge);
 
         return (line.length() <= lenFunc.apply(line.midPoint()) && random.nextDouble() < 0.96)
-                || (!triangle.intersects(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersects(bbox)))
+                || (!triangle.intersectsRectangleLine(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersectsRectangleLine(bbox)))
                 || boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.isBoundary(twin) && shape.contains(mesh.toTriangle(twin).getBounds2D())));
     }
 

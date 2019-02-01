@@ -8,30 +8,33 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SetLogLevelCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.SetLogNameCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
+
 
 /**
- * Provides the possibility to start VADERE in console mode.
- * 
+ * Provides the possibility to start Vadere in console mode.
  */
 public class VadereConsole {
 
 	private final static Logger logger = Logger.getLogger(VadereConsole.class);
 
 	public static void main(String[] args) {
+//		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
+//			String[] tmp = {"migrate", "--create-new-version", "0.7",  "VadereSimulator/resources/"};
+//			args = tmp;
 		ArgumentParser parser = createArgumentParser();
 
-//		args = new String[]{"--loglevel", "INFO", "scenario-run", "-o", "/tmp", "-f", "/home/lphex/hm.d/vadere/VadereModelTests/TestStairs/scenarios/stairs_diagonal_1_+1.scenario"};
-//		args = new String[]{"-h"};
-
 		try {
+			StdOutErrLog.addStdOutErrToLog();
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
 			sRunner.run(ns, parser);
@@ -40,6 +43,7 @@ public class VadereConsole {
 			System.exit(1);
 		} catch (Exception e) {
 			logger.error("topographyError in command:" + e.getMessage());
+			e.printStackTrace();
 			System.exit(1);
 		}
 
@@ -50,15 +54,31 @@ public class VadereConsole {
 				.defaultHelp(true)
 				.description("Runs the VADERE pedestrian simulator.");
 
-		parser.addArgument("--loglevel")
+		addOptionsToParser(parser);
+		addSubCommandsToParser(parser);
+
+		return parser;
+	}
+
+    private static void addOptionsToParser(ArgumentParser parser) {
+        parser.addArgument("--loglevel")
+                .required(false)
+                .type(String.class)
+                .dest("loglevel")
+                .choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
+                .setDefault("INFO")
+                .action(new SetLogLevelCommand())
+                .help("Set Log Level.");
+
+		parser.addArgument("--logname")
 				.required(false)
 				.type(String.class)
-				.dest("loglevel")
-				.choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
-				.setDefault("INFO")
-				.action(new SetLogLevelCommand())
-				.help("Set Log Level for vadere.");
+				.dest("logname")
+				.action(new SetLogNameCommand())
+				.help("Write log to given file.");
+    }
 
+	private static void addSubCommandsToParser(ArgumentParser parser) {
 		Subparsers subparsers = parser.addSubparsers()
 										.title("subcommands")
 										.description("valid subcommands")
@@ -73,24 +93,24 @@ public class VadereConsole {
 				.required(true)
 				.type(String.class)
 				.dest("project-dir")
-				.help("Path to project directory");
+				.help("Path to project directory.");
 		projectRun.addArgument("--scenario-file", "-f")
-				.required(true)
+				.required(false)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Name of Scenario file");
+				.help("Name of Scenario file.");
 		projectRun.addArgument("--scenario-checker")
 				.required(false)
 				.type(String.class)
 				.dest("scenario-checker")
-				.choices(ScenarioChecker.CHECKER_OFF, ScenarioChecker.CHECKER_OFF)
+				.choices(ScenarioChecker.CHECKER_ON, ScenarioChecker.CHECKER_OFF)
 				.setDefault(ScenarioChecker.CHECKER_OFF)
 				.help("Turn Scenario Checker on or off.");
 
 		// Run Scenario
 		Subparser scenarioRun = subparsers
 				.addParser(SubCommand.SCENARO_RUN.getCmdName())
-				.help("Run scenario without a project")
+				.help("Run scenario without a project.")
 				.setDefault("func", new ScenarioRunSubCommand());
 		scenarioRun.addArgument("--output-dir", "-o")
 				.required(false)
@@ -98,12 +118,18 @@ public class VadereConsole {
 				.dest("output-dir") // set name in namespace
 				.type(String.class)
 				.help("Supply different output directory path to use.");
+		scenarioRun.addArgument("--override-timestep-setting")
+				.dest("override-timestep-setting")
+				.required(false)
+				.setDefault(false)
+				.action(Arguments.storeTrue())
+				.help("This will ignore the TimestampSetting in the scenario file.");
 
 		scenarioRun.addArgument("--scenario-file", "-f")
 				.required(true)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Scenario file to run");
+				.help("Scenario file to run.");
 		scenarioRun.addArgument("--scenario-checker")
 				.required(false)
 				.type(String.class)
@@ -129,7 +155,7 @@ public class VadereConsole {
 				.required(true)
 				.type(String.class)
 				.dest("scenario-file")
-				.help("Scenario files to run");
+				.help("Scenario files to run.");
 
 
 		// Run Migration Assistant
@@ -169,7 +195,7 @@ public class VadereConsole {
 				.action(Arguments.storeTrue())
 				.dest("revert-migration")
 				.help("If set vadere will search for a <scenario-file>.legacy and will replace the current version with this backup." +
-						" The Backup must be in the same directory");
+						" The Backup must be in the same directory.");
 
 		migrationAssistant.addArgument("--recursive", "-r")
 				.required(false)
@@ -177,17 +203,23 @@ public class VadereConsole {
 				.dest("recursive")
 				.setDefault(false)
 				.help("If PATH contains a directory instead of a scenario file recursively search " +
-						"the directory tree for scenario files and apply the command");
+						"the directory tree for scenario files and apply the command.");
+
+		migrationAssistant.addArgument("--consider-projects-only")
+				.required(false)
+				.dest("consider-projects-only")
+				.action(Arguments.storeTrue())
+				.setDefault(false)
+				.help("If set only directories containing a vadere project will be migrated. " +
+						"The migraion will use the legacy folder in the project.");
 
 		migrationAssistant.addArgument("--create-new-version")
 				.required(false)
 				.type(String.class)
 				.dest("create-new-version")
-				.help("Create new transformation and identity file based on current latest version" +
+				.help("Create new transformation and identity file based on current latest version. " +
 						"PATH must point to the directory containing the old transformation files." +
-						" This Argument takes the new Version Label as input");
-
-		return parser;
+						" This Argument takes the new Version Label as input.");
 	}
 
 }

@@ -4,15 +4,14 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.function.BiFunction;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLConvolution;
 import org.vadere.util.opencl.OpenCLException;
 
 class CLGaussianFilter extends GaussianFilter {
 
     private final CLConvolution convolution;
-    private Logger logger = LogManager.getLogger(CLConvolution.class);
+    private Logger logger = Logger.getLogger(CLConvolution.class);
 
     CLGaussianFilter(final Rectangle2D scenarioBounds, final double scale, final BiFunction<Integer, Integer, Float> f,
                      final boolean normalize) throws IOException, OpenCLException {

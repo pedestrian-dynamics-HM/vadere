@@ -1,7 +1,6 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
@@ -15,6 +14,7 @@ import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.attributes.ModelAttributeFactory;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,7 +29,7 @@ import javax.swing.border.EmptyBorder;
 
 public class ScenarioPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
 
-	private static Logger logger = LogManager.getLogger(ScenarioPanel.class);
+	private static Logger logger = Logger.getLogger(ScenarioPanel.class);
 	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;
@@ -40,6 +40,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private TextView attributesSimulationView; // Simulation tab
 	private TextView attributesModelView; // Model tab
 	private TextView topographyFileView; // Topography tab
+	private TextView eventFileView; // Event tab
 	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
@@ -193,10 +194,15 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);
-
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
-		dataProcessingGUIview = new DataProcessingView();
+
+		eventFileView = new TextView("/attributes", "default_directory_attributes", AttributeType.EVENT);
+		eventFileView.isEditable(true);
+		tabbedPane.addTab(Messages.getString("Tab.Event.title"), eventFileView);
+
+		dataProcessingGUIview = new DataProcessingView(model);
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
+		
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
 
@@ -278,6 +284,9 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		this.topographyFileView.setVadereScenario(scenario);
 		this.topographyFileView.isEditable(isEditable);
+
+		this.eventFileView.setVadereScenario(scenario);
+		this.eventFileView.isEditable(isEditable);
 
 		this.dataProcessingGUIview.setVadereScenario(scenario);
 		this.dataProcessingGUIview.isEditable(isEditable);

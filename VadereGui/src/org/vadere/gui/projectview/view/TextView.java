@@ -1,28 +1,7 @@
 package org.vadere.gui.projectview.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.prefs.Preferences;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -34,20 +13,33 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.prefs.Preferences;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Shows text like the JSON formatted attributes.
- * 
- * 
+ *
+ *
  */
 public class TextView extends JPanel implements IJsonView {
 
-	private static Logger logger = LogManager.getLogger(TextView.class);
+	private static Logger logger = Logger.getLogger(TextView.class);
 
 	private AttributeType attributeType;
 	private String default_folder;
@@ -187,6 +179,10 @@ public class TextView extends JPanel implements IJsonView {
 						case TOPOGRAPHY:
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 							break;
+						case EVENT:
+							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
+							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
+							break;
 						default:
 							throw new RuntimeException("attribute type not implemented.");
 						}
@@ -233,11 +229,14 @@ public class TextView extends JPanel implements IJsonView {
 		case OUTPUTPROCESSOR:
 			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 			break;
-
 		case TOPOGRAPHY:
 			Topography topography = scenario.getTopography().clone();
 			topography.removeBoundary();
 			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			break;
+		case EVENT:
+			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");

@@ -32,6 +32,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
+		clearStrides(topography);
+
 		movedPedestrians.clear();
 		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
 		List<Future<?>> futures;
@@ -90,7 +92,6 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	protected void updateParallelSeek(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();

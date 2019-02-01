@@ -1,10 +1,11 @@
 package org.vadere.gui.projectview;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
 
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
@@ -18,9 +19,10 @@ import java.util.prefs.Preferences;
  */
 public class VadereApplication {
 	public static final String preferencesFilename = "VadereTestingSuite.preferences.xml";
-	private static Logger logger = LogManager.getLogger(VadereApplication.class);
+	private static Logger logger = Logger.getLogger(VadereApplication.class);
 
 	public static void main(String[] args) {
+		StdOutErrLog.addStdOutErrToLog();
 		logger.info("starting Vadere GUI...");
         // load settings
 		loadPreferences();

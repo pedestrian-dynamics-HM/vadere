@@ -1,11 +1,11 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ActionAddScenario extends ActionAbstractAddScenario {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(ActionAddScenario.class);
+	private static Logger logger = Logger.getLogger(ActionAddScenario.class);
 
 	private Topography topography;
 

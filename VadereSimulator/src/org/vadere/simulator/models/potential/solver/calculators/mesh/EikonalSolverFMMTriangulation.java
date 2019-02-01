@@ -1,36 +1,36 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.utils.debug.DebugGui;
-import org.vadere.meshing.utils.debug.SimpleTriCanvas;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.LogLevel;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -47,16 +47,24 @@ import java.util.function.Predicate;
  */
 public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements EikonalSolver {
 
-    private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
+    private static Logger logger = Logger.getLogger(EikonalSolverFMMTriangulation.class);
+    private Set<F> nonAccuteTris = new HashSet<>();
+    private Map<Triple<P, P, P>, Double> angles = new HashMap();
+	private Map<Triple<P, P, P>, Double> sinPhis = new HashMap();
+	private Map<Triple<P, P, P>, Double> cosPhis = new HashMap();
 
     static {
-    	logger.setLevel(Level.INFO);
+    	logger.setInfo();
     }
 
 	/**
 	 * The time cost function defined on the geometry.
 	 */
 	private ITimeCostFunction timeCostFunction;
+
+	private IDistanceFunction distFunc;
+
+	private Collection<V> targetVertices;
 
 	/**
 	 * The triangulation the solver uses.
@@ -154,30 +162,12 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
-
-        for(V vertex : targetVertices) {
-            P potentialPoint = getMesh().getPoint(vertex);
-            double distance = -distFunc.apply(potentialPoint);
-
-            if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
-                narrowBand.remove(vertex);
-            }
-
-            potentialPoint.setPotential(Math.min(potentialPoint.getPotential(), distance / timeCostFunction.costAt(potentialPoint)));
-            potentialPoint.setPathFindingTag(PathFindingTag.Reached);
-            narrowBand.add(vertex);
-
-            for(V v : triangulation.getMesh().getAdjacentVertexIt(vertex)) {
-	            P potentialP = getMesh().getPoint(v);
-
-	            if(potentialP.getPathFindingTag() == PathFindingTag.Undefined) {
-                    double dist = Math.max(-distFunc.apply(potentialP), 0);
-                    logger.debug("T at " + potentialP + " = " + dist);
-                    potentialP.setPotential(Math.min(potentialP.getPotential(), dist / timeCostFunction.costAt(potentialP)));
-                    potentialP.setPathFindingTag(PathFindingTag.Reachable);
-                    narrowBand.add(v);
-                }
-            }
+        this.distFunc = distFunc;
+        this.targetVertices = targetVertices;
+        for(F face : triangulation.getMesh().getFaces()) {
+        	if(isNonAcute(face)) {
+        		nonAccuteTris.add(face);
+	        }
         }
     }
 
@@ -208,6 +198,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 */
     @Override
     public void initialize() {
+    	reset();
 	    if (!calculationFinished) {
 		    while (narrowBand.size() > 0) {
 			    V vertex = narrowBand.poll();
@@ -215,6 +206,37 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 			    updatePotentialOfNeighbours(vertex);
 		    }
 		    calculationFinished = true;
+	    }
+    }
+
+    private void reset() {
+	    triangulation.getMesh().streamPoints().forEach(p -> p.setPathFindingTag(PathFindingTag.Undefined));
+	    triangulation.getMesh().streamPoints().forEach(p -> p.setPotential(Double.MAX_VALUE));
+	    calculationFinished = false;
+
+	    for(V vertex : targetVertices) {
+		    P potentialPoint = getMesh().getPoint(vertex);
+		    double distance = -distFunc.apply(potentialPoint);
+
+		    if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
+			    narrowBand.remove(vertex);
+		    }
+
+		    potentialPoint.setPotential(Math.min(potentialPoint.getPotential(), distance / timeCostFunction.costAt(potentialPoint)));
+		    potentialPoint.setPathFindingTag(PathFindingTag.Reached);
+		    narrowBand.add(vertex);
+
+		    for(V v : triangulation.getMesh().getAdjacentVertexIt(vertex)) {
+			    P potentialP = getMesh().getPoint(v);
+
+			    if(potentialP.getPathFindingTag() == PathFindingTag.Undefined) {
+				    double dist = Math.max(-distFunc.apply(potentialP), 0);
+				    logger.debug("T at " + potentialP + " = " + dist);
+				    potentialP.setPotential(Math.min(potentialP.getPotential(), dist / timeCostFunction.costAt(potentialP)));
+				    potentialP.setPathFindingTag(PathFindingTag.Reachable);
+				    narrowBand.add(v);
+			    }
+		    }
 	    }
     }
 
@@ -358,6 +380,10 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
     }
 
+	private boolean isNonAcute(@NotNull final F face) {
+		return isNonAcute(triangulation.getMesh().getEdge(face));
+	}
+
     /**
      * Updates a point given a triangle. The point can only be updated if the
      * triangle triangleContains it and the other two points are in the frozen band.
@@ -378,12 +404,12 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
         if(isFeasibleForComputation(p1) && isFeasibleForComputation(p2)) {
 
-        	if(!isNonAcute(halfEdge)) {
-        		double potential = computePotential(point, p1, p2);
+        	//if(!nonAccuteTris.contains(face)) {
+        		//double potential = computePotential(point, p1, p2);
         		//logger.info("compute potential " + potential);
-                return computePotential(point, p1, p2);
-            } // we only try to find a virtual vertex if both points are already frozen
-            else {
+		        return computePotential(point, p1, p2);
+            //} // we only try to find a virtual vertex if both points are already frozen
+            /*else {
                 logger.debug("special case for non-acute triangle");
                 Optional<P> optPoint = walkToNumericalSupport(halfEdge, face);
 
@@ -400,7 +426,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
                 else {
                     logger.warn("no point found for " + point + " and " + face);
                 }
-            }
+            }*/
         }
 
         return Double.MAX_VALUE;
@@ -520,7 +546,6 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 * @return the traveling time T at <tt>point</tt> by using the triangle (point, point1, point2) for the computation
 	 */
 	private double computePotential(final P point, final P point1, final P point2) {
-
         // see: Sethian, Level Set Methods and Fast Marching Methods, page 124.
         P p1;   // A
         P p2;   // B
@@ -543,15 +568,17 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         double b = p1.distance(point);
         double c = p1.distance(p2);
 
-        double phi = GeometryUtils.angle(p1, point, p2);
-        double cosphi = Math.cos(phi);
+        //double phi = angle(p1, point, p2);
+        double cosphi = cosPhi(p1, point, p2);
+        double sinPhi = sinPhi(p1, point, p2);
+
 
         double F = 1.0 / timeCostFunction.costAt(point);
 
         // solve x2 t^2 + x1 t + x0 == 0
         double x2 = a * a + b * b - 2 * a * b * cosphi;
         double x1 = 2 * b * u * (a * cosphi - b);
-        double x0 = b * b * (u * u - F * F * a * a * Math.sin(phi) * Math.sin(phi));
+        double x0 = b * b * (u * u - F * F * a * a * sinPhi * sinPhi);
         double t = solveQuadratic(x2, x1, x0);
 
         double inTriangle = (b * (t - u) / t);
@@ -560,6 +587,42 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         } else {
             return Math.min(b * F + TA, c * F + TB);
         }
+    }
+
+	private double sinPhi(P p1, P p, P p2) {
+		Double sinPhi = sinPhis.get(Triple.of(p, p1, p2));
+		if(sinPhi == null) {
+			sinPhi = Math.sin(angle(p1, p, p2));
+			sinPhis.put(Triple.of(p, p1, p2), sinPhi);
+			return sinPhi;
+		}
+		else {
+			return sinPhi;
+		}
+	}
+
+	private double cosPhi(P p1, P p, P p2) {
+		Double cosPhi = cosPhis.get(Triple.of(p, p1, p2));
+		if(cosPhi == null) {
+			cosPhi = Math.cos(angle(p1, p, p2));
+			cosPhis.put(Triple.of(p, p1, p2), cosPhi);
+			return cosPhi;
+		}
+		else {
+			return cosPhi;
+		}
+	}
+
+    private double angle(P p1, P p, P p2) {
+	    Double angle = angles.get(Triple.of(p, p1, p2));
+	    if(angle == null) {
+	    	angle = GeometryUtils.angle(p1, p, p2);
+	    	angles.put(Triple.of(p, p1, p2), angle);
+	    	return angle;
+	    }
+	    else {
+	    	return angle;
+	    }
     }
 
     /**

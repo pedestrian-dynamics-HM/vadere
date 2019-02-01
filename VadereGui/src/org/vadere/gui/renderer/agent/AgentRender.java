@@ -1,13 +1,13 @@
 package org.vadere.gui.renderer.agent;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.Random;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class AgentRender implements Renderer {
 
-	private static Logger logger = LogManager.getLogger(AgentRender.class);
+	private static Logger logger = Logger.getLogger(AgentRender.class);
 	private static final Integer COLOR_NUM = 9;
 	private Random random;
 

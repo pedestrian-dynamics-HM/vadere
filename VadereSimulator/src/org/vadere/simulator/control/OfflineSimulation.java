@@ -1,12 +1,11 @@
 package org.vadere.simulator.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
+import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -19,7 +18,7 @@ public class OfflineSimulation {
 	private final Map<Integer, Trajectory> trajectories;
 	private final Scenario vadere;
 	private final List<SimulationState> simulationStates;
-	private static Logger logger = LogManager.getLogger(OfflineSimulation.class);
+	private static Logger logger = Logger.getLogger(OfflineSimulation.class);
 	private final Path outputDir;
 	private final OfflineTopographyController topographyController;
 	private final Topography topography;

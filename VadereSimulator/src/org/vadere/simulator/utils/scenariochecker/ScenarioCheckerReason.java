@@ -14,8 +14,10 @@ public enum ScenarioCheckerReason {
 	SOURCE_NO_TARGET_ID_NO_SPAWN("ScenarioChecker.source.noTargetIdAndNoSpawn"),
 	SOURCE_ID_NOT_UNIQUE("ScenarioChecker.source.idNotUnique"),
 	SOURCE_SPAWN_RND_POS_NOT_FREE_SPACE("ScenarioChecker.source.spawnAtRandomButNotAtFreeSpace"),
+	SOURCE_TO_SMALL("ScenarioChecker.source.toSmall"),
 	SOURCE_SPAWN_USE_NOT_FREE_SPACE("ScenarioChecker.source.spawnUseNotAtFreeSpace"),
 	STAIRS_TREAD_DIM_WRONG("ScenarioChecker.stairs.wrongTreadDim"),
+	TOPOGRAPHY_OFFSET("ScenarioChecker.topography.offset"),
 
 	OVERLAP_STAIR_STAIR("ScenarioChecker.overlap.stair.stair"),
 	OVERLAP_TARGET_TARGET("ScenarioChecker.overlap.target.target"),
