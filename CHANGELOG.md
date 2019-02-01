@@ -6,6 +6,16 @@
 
 ### Added
 
+- Create a Facade for the logging in vadere. This will remove 3rd party
+  dependencies in source most files. Only a small set of facade classes
+  will have the dependency.
+- Assertion output to StdErr is collected by a dedicated logger see `StdOutErrLog.java`.
+  Each entrypoint must call `StdOutErrLog.addStdOutErrToLog()` to activate this
+  Logging.
+- Logging API did *not* change. Each log level has an additional String formater
+  method like `log.errorf("Erron in %s with value of x: %d","ClassA", 42)`
+- issues closed: [issue#163](https://gitlab.lrz.de/vadere/vadere/issues/163)
+
 - Added script "osm2vadere.py" to "Tools" folder, to convert OpenStreetMap maps to a Vadere topography. (929d4775: Tools).
 - `VadereConsole`: Add option `--logname <filename>` to specify the name for the log file.
   Please note that the log file `log.out` is always written (because this file is configured
