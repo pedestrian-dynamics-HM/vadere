@@ -1,8 +1,7 @@
 package org.vadere.simulator.projects;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.logging.Logger;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,7 +11,7 @@ import java.util.TreeMap;
 
 public class SimulationResult {
 
-	private static Logger log = LogManager.getLogger(SimulationResult.class);
+	private static Logger log = Logger.getLogger(SimulationResult.class);
 
 	// tree map such that keys are sorted.
 	private TreeMap<String, Object> data;

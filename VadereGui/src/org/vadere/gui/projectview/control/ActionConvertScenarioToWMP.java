@@ -1,20 +1,25 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
+import javax.swing.*;
+
 public class ActionConvertScenarioToWMP extends AbstractAction {
 
-	private static Logger logger = LogManager.getLogger(ActionConvertScenarioToWMP.class);
+	private static Logger logger = Logger.getLogger(ActionConvertScenarioToWMP.class);
 	private ProjectViewModel model;
 
 	public ActionConvertScenarioToWMP(final String name, final ProjectViewModel model) {

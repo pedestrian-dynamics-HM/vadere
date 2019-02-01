@@ -2,21 +2,22 @@ package org.vadere.gui.postvisualization.utils;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.SimulationRenderer;
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.util.logging.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 public class SVGGenerator {
 
-	private static Logger logger = LogManager.getLogger(SVGGenerator.class);
+	private static Logger logger = Logger.getLogger(SVGGenerator.class);
 	private SimulationRenderer renderer;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
 

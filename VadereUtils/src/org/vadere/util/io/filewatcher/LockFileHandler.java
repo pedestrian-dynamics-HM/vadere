@@ -1,13 +1,11 @@
 package org.vadere.util.io.filewatcher;
 
+import org.vadere.util.logging.Logger;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 public class LockFileHandler {
 
@@ -15,7 +13,7 @@ public class LockFileHandler {
 		Created, Deleted, Both, Error
 	}
 
-	private static Logger logger = LogManager.getLogger(LockFileHandler.class);
+	private static Logger logger = Logger.getLogger(LockFileHandler.class);
 
 	private WatchDir dirWatcher = null;
 	private File lockFile = null;

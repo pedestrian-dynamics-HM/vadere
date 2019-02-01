@@ -1,19 +1,20 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.VDialogManager;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
+import javax.swing.*;
+
 public class ActionCloseApplication extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(ActionCloseApplication.class);
+	private static Logger logger = Logger.getLogger(ActionCloseApplication.class);
 
 	private ProjectViewModel model;
 

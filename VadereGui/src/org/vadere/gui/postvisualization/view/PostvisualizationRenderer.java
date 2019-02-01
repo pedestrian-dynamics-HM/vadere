@@ -1,15 +1,5 @@
 package org.vadere.gui.postvisualization.view;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.util.visualization.ColorHelper;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -18,11 +8,19 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.visualization.ColorHelper;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class PostvisualizationRenderer extends SimulationRenderer {
 
 	private static final double MIN_ARROW_LENGTH = 0.1;
-	private static Logger logger = LogManager.getLogger(PostvisualizationRenderer.class);
+	private static Logger logger = Logger.getLogger(PostvisualizationRenderer.class);
 	private PostvisualizationModel model;
 
 	private final Map<Integer, VPoint> lastPedestrianPositions;

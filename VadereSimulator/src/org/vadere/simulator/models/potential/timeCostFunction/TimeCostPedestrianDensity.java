@@ -1,11 +1,10 @@
 package org.vadere.simulator.models.potential.timeCostFunction;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.density.IGaussianFilter;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.logging.Logger;
 
 /**
  * TimeCostPedestrianDensity is a time cost function for the pedestrian density
@@ -27,7 +26,7 @@ public class TimeCostPedestrianDensity implements ITimeCostFunction {
 	private ITimeCostFunction timeCostFunction;
 
 	/** only for logging informations. */
-	private static Logger logger = LogManager
+	private static Logger logger = Logger
 			.getLogger(TimeCostPedestrianDensity.class);
 	private int updateCount = 0;
 	private long runtime = 0;

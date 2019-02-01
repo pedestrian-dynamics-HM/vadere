@@ -1,17 +1,14 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.ITriConnectivity;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.meshing.mesh.triangulation.BowyerWatsonSlow;
@@ -22,6 +19,8 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.LogLevel;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -79,10 +78,10 @@ public class IncrementalTriangulation<P extends IPoint, V extends IVertex<P>, E 
 	private double edgeCoincidenceTolerance = 0.0001;
 
 	private final Predicate<E> illegalPredicate;
-	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
+	private static Logger log = Logger.getLogger(IncrementalTriangulation.class);
 
 	static {
-		ITriConnectivity.log.setLevel(Level.INFO);
+		ITriConnectivity.log.setInfo();
 	}
 
 	/**

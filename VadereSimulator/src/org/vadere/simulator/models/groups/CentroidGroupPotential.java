@@ -1,21 +1,19 @@
 package org.vadere.simulator.models.groups;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
-import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +22,7 @@ import java.util.Random;
 @ModelClass
 public class CentroidGroupPotential implements PotentialFieldAgent {
 
-	private static Logger logger = LogManager.getLogger(CentroidGroupPotential.class);
+	private static Logger logger = Logger.getLogger(CentroidGroupPotential.class);
 
 	private final AttributesCGM attributesCGM;
 	private final CentroidGroupModel groupCollection;

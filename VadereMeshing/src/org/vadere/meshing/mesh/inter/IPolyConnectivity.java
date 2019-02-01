@@ -1,12 +1,12 @@
 package org.vadere.meshing.mesh.inter;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +38,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	/**
 	 * A logger to debug some code.
 	 */
-	Logger log = LogManager.getLogger(IPolyConnectivity.class);
+	Logger log = Logger.getLogger(IPolyConnectivity.class);
 
 	/**
 	 * <p>Returns the mesh of this poly-connectivity {@link IPolyConnectivity}.</p>

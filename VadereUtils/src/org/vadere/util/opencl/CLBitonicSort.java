@@ -1,7 +1,6 @@
 package org.vadere.util.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -9,6 +8,7 @@ import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -53,7 +53,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * This class implements the bitonic sort using the GPU via OpenCL.
  */
 public class CLBitonicSort {
-    private static Logger log = LogManager.getLogger(CLBitonicSort.class);
+    private static Logger log = Logger.getLogger(CLBitonicSort.class);
 
     // CL ids
     private long clPlatform;

@@ -1,19 +1,6 @@
 package org.vadere.gui.components.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.stream.Stream;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.visualization.ColorHelper;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.components.utils.Resources;
@@ -22,10 +9,19 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.visualization.ColorHelper;
+
+import java.awt.*;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
-    private static Logger logger = LogManager.getLogger(SimulationRenderer.class);
+    private static Logger logger = Logger.getLogger(SimulationRenderer.class);
     private static Resources resources = Resources.getInstance("postvisualization");
 
     private static double MAX_POTENTIAL = 1000.0;

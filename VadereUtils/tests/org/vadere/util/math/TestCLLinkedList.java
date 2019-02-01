@@ -1,13 +1,13 @@
 package org.vadere.util.math;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLLinkedCell;
 import org.vadere.util.opencl.OpenCLException;
 
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestCLLinkedList {
 
-	private static Logger logger = LogManager.getLogger(TestConvolution.class);
+	private static Logger logger = Logger.getLogger(TestConvolution.class);
 
 	private static Random random = new Random();
 

@@ -1,12 +1,11 @@
 package org.vadere.gui.postvisualization.utils;
 
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellGridConverter;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class PotentialFieldContainer {
-	private static Logger logger = LogManager.getLogger(PotentialFieldContainer.class);
+	private static Logger logger = Logger.getLogger(PotentialFieldContainer.class);
 
 	private List<CellGrid> potentialFields;
 

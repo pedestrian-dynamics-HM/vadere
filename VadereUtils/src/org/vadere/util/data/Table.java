@@ -1,8 +1,16 @@
 package org.vadere.util.data;
 
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * The {@link Table} is an abstract data type with a fixed column size (fixed numbers of columns and

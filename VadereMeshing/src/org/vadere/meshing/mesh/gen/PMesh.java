@@ -1,15 +1,19 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.util.geometry.shapes.IPoint;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.inter.IPointLocator;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,7 +23,7 @@ import java.util.stream.Stream;
  */
 public class PMesh<P extends IPoint> implements IMesh<P, PVertex<P>, PHalfEdge<P>, PFace<P>> {
 
-	private static Logger log = LogManager.getLogger(PMesh.class);
+	private static Logger log = Logger.getLogger(PMesh.class);
 
 	private int numberOfEdges;
 	private int numberOfFaces;

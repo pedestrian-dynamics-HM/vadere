@@ -1,7 +1,5 @@
 package org.vadere.simulator.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.control.cognition.CognitionLayer;
 import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
@@ -22,12 +20,17 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
+
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class Simulation {
 
-	private static Logger logger = LogManager.getLogger(Simulation.class);
+	private static Logger logger = Logger.getLogger(Simulation.class);
 
 	private final AttributesSimulation attributesSimulation;
 	private final AttributesAgent attributesAgent;

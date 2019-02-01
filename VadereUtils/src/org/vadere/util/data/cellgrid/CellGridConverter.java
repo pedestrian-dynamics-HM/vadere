@@ -1,14 +1,17 @@
 package org.vadere.util.data.cellgrid;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
-import java.io.*;
+import org.vadere.util.logging.Logger;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CellGridConverter {
-	private static Logger logger = LogManager.getLogger(CellGridConverter.class);
+	private static Logger logger = Logger.getLogger(CellGridConverter.class);
 
 	public static List<CellGrid> fromOutputProcessorFile(final File file, final double width, final double height)
 			throws IOException {

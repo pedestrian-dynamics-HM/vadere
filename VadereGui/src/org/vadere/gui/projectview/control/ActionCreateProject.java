@@ -1,22 +1,22 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.*;
 
 public class ActionCreateProject extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(ActionCreateProject.class);
+	private static Logger logger = Logger.getLogger(ActionCreateProject.class);
 
 	private ProjectViewModel model;
 

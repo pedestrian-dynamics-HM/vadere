@@ -3,8 +3,6 @@ package org.vadere.gui.components.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.gui.components.control.simulation.ActionSetDensityColor;
 import org.vadere.gui.components.control.simulation.ActionSetObstacleColor;
 import org.vadere.gui.components.control.simulation.ActionSetPedestrianColor;
@@ -19,9 +17,9 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.PostVisualisation;
-import org.vadere.gui.postvisualization.control.*;
+import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -29,11 +27,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
+import javax.swing.*;
+
 /**
  * @author Benedikt Zoennchen
  */
 public class SettingsDialog extends JDialog {
-	private static Logger logger = LogManager.getLogger(SettingsDialog.class);
+	private static Logger logger = Logger.getLogger(SettingsDialog.class);
 	private static Resources resources = Resources.getInstance("global");
 
 	private DefaultSimulationConfig config;

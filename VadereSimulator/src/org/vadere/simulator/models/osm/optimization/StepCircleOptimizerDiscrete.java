@@ -1,17 +1,16 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.types.MovementType;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 
-import java.awt.Shape;
+import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
@@ -24,7 +23,7 @@ public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
 
 	private final double movementThreshold;
 	private final Random random;
-	private final static Logger log = LogManager.getLogger(StepCircleOptimizerDiscrete.class);
+	private final static Logger log = Logger.getLogger(StepCircleOptimizerDiscrete.class);
 
 	public StepCircleOptimizerDiscrete(final double movementThreshold, @NotNull final Random random) {
 		this.movementThreshold = movementThreshold;

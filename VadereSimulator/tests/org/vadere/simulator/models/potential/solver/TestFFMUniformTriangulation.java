@@ -1,25 +1,24 @@
 package org.vadere.simulator.models.potential.solver;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.inter.IPointLocator;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.util.logging.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -31,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestFFMUniformTriangulation {
 
-    private static Logger log = LogManager.getLogger(TestFFMUniformTriangulation.class);
+    private static Logger log = Logger.getLogger(TestFFMUniformTriangulation.class);
 
     private IIncrementalTriangulation<IPotentialPoint, PVertex<IPotentialPoint>, PHalfEdge<IPotentialPoint>, PFace<IPotentialPoint>> uniformTriangulation;
     private int width = 10;

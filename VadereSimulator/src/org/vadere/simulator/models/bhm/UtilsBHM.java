@@ -1,20 +1,18 @@
 package org.vadere.simulator.models.bhm;
 
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.Vector2D;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-
 public class UtilsBHM {
 
-	private static Logger logger = LogManager.getLogger(UtilsBHM.class);
+	private static Logger logger = Logger.getLogger(UtilsBHM.class);
 
 	public final static double DOUBLE_EPSILON = 0.00001;
 

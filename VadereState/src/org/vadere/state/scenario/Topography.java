@@ -1,6 +1,21 @@
 package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import org.jetbrains.annotations.NotNull;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.attributes.scenario.AttributesDynamicElement;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
@@ -14,20 +29,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.attributes.scenario.AttributesDynamicElement;
-import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VShape;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
 public class Topography implements DynamicElementMover{

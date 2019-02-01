@@ -6,9 +6,7 @@ import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * @author Marion Gödel

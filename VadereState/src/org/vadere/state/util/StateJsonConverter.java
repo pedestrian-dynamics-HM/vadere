@@ -1,16 +1,16 @@
 package org.vadere.state.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
@@ -24,7 +24,6 @@ import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
-import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Obstacle;
@@ -35,18 +34,16 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.apache.commons.codec.digest.DigestUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class StateJsonConverter {
 
@@ -57,7 +54,7 @@ public abstract class StateJsonConverter {
 	private static final TypeReference<Map<String, Object>> mapTypeReference =
 			new TypeReference<Map<String, Object>>() {};
 
-	private static Logger logger = LogManager.getLogger(StateJsonConverter.class);
+	private static Logger logger = Logger.getLogger(StateJsonConverter.class);
 
 	/** Connection to jackson library. */
 	private static ObjectMapper mapper = new JacksonObjectMapper();

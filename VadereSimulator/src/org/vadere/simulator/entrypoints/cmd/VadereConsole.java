@@ -8,10 +8,17 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
-import org.vadere.simulator.entrypoints.cmd.commands.*;
+import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.SetLogLevelCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.SetLogNameCommand;
+import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
+
 
 /**
  * Provides the possibility to start Vadere in console mode.
@@ -27,6 +34,7 @@ public class VadereConsole {
 		ArgumentParser parser = createArgumentParser();
 
 		try {
+			StdOutErrLog.addStdOutErrToLog();
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
 			sRunner.run(ns, parser);

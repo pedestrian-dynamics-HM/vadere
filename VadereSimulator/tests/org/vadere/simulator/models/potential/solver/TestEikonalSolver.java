@@ -1,22 +1,22 @@
 package org.vadere.simulator.models.potential.solver;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.util.data.cellgrid.CellState;
-import org.vadere.util.data.cellgrid.FloorDiscretizer;
-import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.FloorDiscretizer;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestEikonalSolver {
 
-	private Logger logger = LogManager.getLogger(TestEikonalSolver.class);
+	private Logger logger = Logger.getLogger(TestEikonalSolver.class);
 
 	private double gridWidth = 20;
 	private double gridHeight = 20;

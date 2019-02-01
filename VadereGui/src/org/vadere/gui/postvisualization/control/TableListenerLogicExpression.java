@@ -2,13 +2,12 @@ package org.vadere.gui.postvisualization.control;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.postvisualization.model.PedestrianColorTableModel;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.util.io.parser.JsonLogicParser;
 import org.vadere.util.io.parser.VPredicate;
+import org.vadere.util.logging.Logger;
 
 import java.text.ParseException;
 
@@ -20,7 +19,7 @@ import javax.swing.event.TableModelListener;
  */
 public class TableListenerLogicExpression implements TableModelListener {
 
-	private static final Logger logger = LogManager.getLogger(TableListenerLogicExpression.class);
+	private static final Logger logger = Logger.getLogger(TableListenerLogicExpression.class);
 	private PostvisualizationModel model;
 	private PedestrianColorTableModel pedestrianColorTableModel;
 

@@ -1,7 +1,7 @@
 package org.vadere.util.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
+import org.vadere.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -60,7 +60,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
 public class CLLinkedCell {
-	private static Logger log = LogManager.getLogger(CLLinkedCell.class);
+	private static Logger log = Logger.getLogger(CLLinkedCell.class);
 
 	// CL ids
 	private long clPlatform;
@@ -123,7 +123,7 @@ public class CLLinkedCell {
 	private int[] resultValues;
 	private int[] resultKeys;
 
-	private static final Logger logger = LogManager.getLogger(CLLinkedCell.class);
+	private static final Logger logger = Logger.getLogger(CLLinkedCell.class);
 
 	private int max_work_group_size;
 

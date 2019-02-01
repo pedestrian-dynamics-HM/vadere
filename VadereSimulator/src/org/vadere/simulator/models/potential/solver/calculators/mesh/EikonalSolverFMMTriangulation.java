@@ -1,26 +1,25 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.LogLevel;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -48,14 +47,14 @@ import java.util.function.Predicate;
  */
 public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements EikonalSolver {
 
-    private static Logger logger = LogManager.getLogger(EikonalSolverFMMTriangulation.class);
+    private static Logger logger = Logger.getLogger(EikonalSolverFMMTriangulation.class);
     private Set<F> nonAccuteTris = new HashSet<>();
     private Map<Triple<P, P, P>, Double> angles = new HashMap();
 	private Map<Triple<P, P, P>, Double> sinPhis = new HashMap();
 	private Map<Triple<P, P, P>, Double> cosPhis = new HashMap();
 
     static {
-    	logger.setLevel(Level.INFO);
+    	logger.setInfo();
     }
 
 	/**

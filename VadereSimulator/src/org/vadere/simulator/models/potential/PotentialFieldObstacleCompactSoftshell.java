@@ -1,7 +1,5 @@
 package org.vadere.simulator.models.potential;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
@@ -11,9 +9,10 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +22,7 @@ import java.util.Random;
 @ModelClass
 public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObstacle {
 
-	private static Logger log = LogManager.getLogger(PotentialFieldObstacleCompactSoftshell.class);
+	private static Logger log = Logger.getLogger(PotentialFieldObstacleCompactSoftshell.class);
 	private AttributesPotentialCompactSoftshell attributes;
 	private Random random;
 	private double width;

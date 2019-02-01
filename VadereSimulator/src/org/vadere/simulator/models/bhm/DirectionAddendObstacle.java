@@ -1,16 +1,15 @@
 package org.vadere.simulator.models.bhm;
 
-import java.util.List;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+
+import java.util.List;
 
 public class DirectionAddendObstacle implements DirectionAddend {
 
-	private static Logger logger = LogManager.getLogger(DirectionAddendObstacle.class);
+	private static Logger logger = Logger.getLogger(DirectionAddendObstacle.class);
 
 	private final AttributesBHM attributesBHM;
 	private final PedestrianBHM me;

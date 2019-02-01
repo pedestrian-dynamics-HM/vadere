@@ -1,7 +1,6 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
@@ -15,6 +14,7 @@ import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.attributes.ModelAttributeFactory;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,7 +29,7 @@ import javax.swing.border.EmptyBorder;
 
 public class ScenarioPanel extends JPanel implements IProjectChangeListener, ProjectFinishedListener {
 
-	private static Logger logger = LogManager.getLogger(ScenarioPanel.class);
+	private static Logger logger = Logger.getLogger(ScenarioPanel.class);
 	private static final long serialVersionUID = 0L;
 
 	private JTabbedPane tabbedPane;

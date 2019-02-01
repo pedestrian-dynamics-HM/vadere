@@ -1,17 +1,16 @@
 package org.vadere.simulator.models.density;
 
-import java.awt.geom.Rectangle2D;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.function.BiFunction;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
+
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.function.BiFunction;
 
 /**
  * IGaussianFilter is a refreshable image processing calculator that can be used
@@ -22,7 +21,7 @@ import org.vadere.util.opencl.OpenCLException;
  */
 public interface IGaussianFilter {
 
-	Logger logger = LogManager.getLogger(IGaussianFilter.class);
+	Logger logger = Logger.getLogger(IGaussianFilter.class);
 
     enum Type {
         OpenCL, // default
