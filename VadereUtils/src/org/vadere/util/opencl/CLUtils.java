@@ -1,8 +1,12 @@
 package org.vadere.util.opencl;
 
-
+import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.vadere.util.opencl.examples.InfoUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +19,14 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
+import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
+import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
 
 /**
  * Utility-class without a state. This class offers method to interact with OpenCL e.g. memory management methods.
@@ -22,6 +34,65 @@ import java.nio.file.Paths;
  * @author Benedikt Zoennchen
  */
 public class CLUtils {
+
+	private static Logger log = Logger.getLogger(CLUtils.class);
+
+	public static List<Long> getSupportedPlatforms(@NotNull final MemoryStack stack, final int deviceType) {
+		List<Long> supportedPlatforms = new ArrayList<>(2);
+		IntBuffer pi = stack.mallocInt(1);
+		InfoUtils.checkCLError(clGetPlatformIDs(null, pi));
+		if (pi.get(0) == 0) {
+
+			throw new RuntimeException("No OpenCL platforms found.");
+		}
+
+		PointerBuffer platforms = stack.mallocPointer(pi.get(0));
+		InfoUtils.checkCLError(clGetPlatformIDs(platforms, (IntBuffer)null));
+
+		IntBuffer errcode_ret = stack.callocInt(1);
+
+		for (int p = 0; p < platforms.capacity(); p++) {
+			long platform = platforms.get(p);
+			InfoUtils.checkCLError(clGetDeviceIDs(platform, deviceType, null, pi));
+
+			PointerBuffer devices = stack.mallocPointer(pi.get(0));
+			InfoUtils.checkCLError(clGetDeviceIDs(platform, deviceType, devices, (IntBuffer)null));
+			if(devices.capacity() > 0) {
+				supportedPlatforms.add(platform);
+			}
+		}
+
+		return supportedPlatforms;
+	}
+
+	public static Optional<Pair<Long, Long>> getFirstSupportedPlatformAndDevice(@NotNull final MemoryStack stack, final int deviceType) {
+		IntBuffer pi = stack.mallocInt(1);
+		InfoUtils.checkCLError(clGetPlatformIDs(null, pi));
+		if (pi.get(0) == 0) {
+
+			throw new RuntimeException("No OpenCL platforms found.");
+		}
+
+		PointerBuffer platforms = stack.mallocPointer(pi.get(0));
+		InfoUtils.checkCLError(clGetPlatformIDs(platforms, (IntBuffer)null));
+
+		for (int p = 0; p < platforms.capacity(); p++) {
+			long platform = platforms.get(p);
+
+			if(InfoUtils.checkCLSuccess(clGetDeviceIDs(platform, deviceType, null, pi))) {
+				PointerBuffer devices = stack.mallocPointer(pi.get(0));
+
+				if(InfoUtils.checkCLSuccess(clGetDeviceIDs(platform, deviceType, devices, (IntBuffer)null))) {
+
+					if(devices.capacity() > 0) {
+						return Optional.of(Pair.of(platform, devices.get(0)));
+					}
+				}
+			}
+		}
+
+		return Optional.empty();
+	}
 
     /**
      * Reads the specified resource and returns the raw data as a ByteBuffer.

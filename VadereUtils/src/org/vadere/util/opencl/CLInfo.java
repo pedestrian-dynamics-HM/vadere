@@ -128,7 +128,7 @@ public final class CLInfo {
 
     public static void checkCLError(int errcode) throws OpenCLException {
         if (errcode != CL_SUCCESS) {
-            throw new OpenCLException(String.format("OpenCL error [0x%X]", errcode));
+            throw new OpenCLException(String.format("OpenCL error [0x%X, %d]", errcode, errcode));
         }
     }
 
