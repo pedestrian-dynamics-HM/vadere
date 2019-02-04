@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
@@ -28,7 +29,10 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.ElapsedTimeEvent;
@@ -40,12 +44,18 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ModelClass(isMainModel = true)
@@ -153,8 +163,16 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 						Model.findAttributes(attributesList, AttributesFloorField.class),
 						//3.0,
 
-						new EikonalSolver() {
+						new GridEikonalSolver() {
 							CellGrid cellGrid = null;
+
+							@Override
+							public CellGrid getCellGrid() {
+								if(cellGrid == null) {
+									initialize();
+								}
+								return cellGrid;
+							}
 
 							@Override
 							public void initialize() {
@@ -163,24 +181,51 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 							}
 
 							@Override
-							public CellGrid getPotentialField() {
+							public Function<IPoint, Double> getPotentialField() {
+								return getCellGrid().getInterpolationFunction();
+							}
+
+							@Override
+							public double getPotential(double x, double y) {
+								return getPotential(x, y, 0.1, 1.0);
+							}
+
+						},
+
+						new GridEikonalSolver() {
+
+							private CellGrid cellGrid = null;
+
+							@Override
+							public CellGrid getCellGrid() {
 								if(cellGrid == null) {
 									initialize();
 								}
 								return cellGrid;
 							}
-						},
-						new EikonalSolver() {
-							CellGrid cellGrid = topography.getDistanceFunctionApproximation(
-									Model.findAttributes(attributesList, AttributesFloorField.class).getPotentialFieldResolution()
-							);
 
 							@Override
-							public void initialize() {}
+							public void initialize() {
+								double resolution = Model.findAttributes(attributesList, AttributesFloorField.class).getPotentialFieldResolution();
+								cellGrid = new CellGrid(topography.getBounds().getWidth(), topography.getBounds().getHeight(), resolution, new CellState());
+								cellGrid.pointStream().forEach(p -> {
+									double distance = topography.distanceToObstacle(cellGrid.pointToCoord(p));
+									PathFindingTag tag = distance >= 0 ? PathFindingTag.Reached : PathFindingTag.Obstacle;
+									cellGrid.setValue(p, new CellState(distance, tag));
+								});
+							}
 
 							@Override
-							public CellGrid getPotentialField() {
-								return cellGrid;
+							public Function<IPoint, Double> getPotentialField() {
+								if(cellGrid == null) {
+									initialize();
+								}
+								return cellGrid.getInterpolationFunction();
+							}
+
+							@Override
+							public double getPotential(double x, double y) {
+								return cellGrid.getInterpolatedValueAt(x, y).getLeft();
 							}
 						}
 						);*/
