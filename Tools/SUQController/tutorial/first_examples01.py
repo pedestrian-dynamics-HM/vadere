@@ -25,8 +25,8 @@ run_local = True
 
 # Example where the values of 'speedDistributionMean' are set between 0.1 and 1.5 in 5 equidistant points
 
-if __name__ == "__main__":  # main required by Windows to run in parallel
 
+if __name__ == "__main__":  # main required by Windows to run in parallel
 
     setup = SingleKeyVaryScenario(scenario_path=path2scenario,  # -> path to the Vadere .scenario file to vary
                                   key="speedDistributionMean",  # -> parameter key to change
