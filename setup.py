@@ -16,7 +16,7 @@ __authors__ = "Daniel Lehmberg"
 __credits__ = ["n/a"]
 # --------------------------------------------------
 
-# To generate a new reqirements.txt file run in console (install vis 'pip3 install pipreqs'):
+# To generate a new requirements.txt file run in console (install vis 'pip3 install pipreqs'):
 # pipreqs --use-local --force /home/daniel/REPOS/suq-controller
 
 with open('requirements.txt', "r") as f:
