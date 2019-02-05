@@ -147,6 +147,8 @@ public class CLLinkedCell {
 	private boolean debug = false;
 	private boolean profiling = false;
 
+	private static int MIN_LOCAL_SIZE = 1;
+
 	/**
 	 * Default constructor.
 	 *
@@ -446,6 +448,8 @@ public class CLLinkedCell {
 			IntBuffer errcode_ret = stack.callocInt(1);
 			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clFindCellBoundsAndReorder, 4); // local 4 byte (integer)
 
+			logger.debugf("clFindCellBoundsAndReorder runs with a LOCAL_SIZE = " + maxWorkGroupSize);
+
 			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 0, clCellStarts));
 			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 1, clCellEnds));
 			CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 2, clReorderedPositions));
@@ -482,6 +486,22 @@ public class CLLinkedCell {
 		return result;
 	}
 
+	public boolean checkMinSupportedLocalSize() throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			LongBuffer rBitonicMergeLocal = stack.mallocLong(1);
+			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clBitonicMergeLocal, clDevice, CL_KERNEL_LOCAL_MEM_SIZE , rBitonicMergeLocal, null));
+
+			LongBuffer rBitonicSortLocal1 = stack.mallocLong(1);
+			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clBitonicSortLocal1, clDevice, CL_KERNEL_LOCAL_MEM_SIZE , rBitonicSortLocal1, null));
+
+			LongBuffer rBitonicSortLocal = stack.mallocLong(1);
+			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clBitonicSortLocal, clDevice, CL_KERNEL_LOCAL_MEM_SIZE , rBitonicSortLocal, null));
+
+			return rBitonicMergeLocal.get() >= MIN_LOCAL_SIZE && rBitonicSortLocal1.get() >= MIN_LOCAL_SIZE && rBitonicSortLocal.get() >= MIN_LOCAL_SIZE;
+		}
+
+	}
+
 	private void  clBitonicSort(
 			final long clKeysIn,
 			final long clValuesIn,
@@ -495,7 +515,8 @@ public class CLLinkedCell {
 			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 			long maxWorkGroupSize1 = getMaxWorkGroupSizeForKernel(clDevice, clBitonicMergeLocal, 8); // local memory for key and values (integer)
 			long maxWorkGroupSize2 = getMaxWorkGroupSizeForKernel(clDevice, clBitonicSortLocal1, 8);
-			long maxWorkGroupSize = Math.min(maxWorkGroupSize1, maxWorkGroupSize2);
+			long maxWorkGroupSize3 = getMaxWorkGroupSizeForKernel(clDevice, clBitonicSortLocal, 8);
+			long maxWorkGroupSize = Math.min(Math.min(maxWorkGroupSize1, maxWorkGroupSize2), maxWorkGroupSize3);
 
 
 			//int tmaxWorkGroupSize = getMaxWorkGroupSizeForKernel(4);
@@ -616,12 +637,12 @@ public class CLLinkedCell {
 			long kernelLocalMemory = pp.get(0);
 			logger.debug("CL_KERNEL_LOCAL_MEM_SIZE = " + kernelLocalMemory + " byte");
 			logger.debug("required memory for each work item = " + (workItemMem + kernelLocalMemory) + " byte");
-
 			long maxWorkGroupSizeForLocalMemory = max_local_memory_size / (workItemMem + kernelLocalMemory);
+
 			PointerBuffer ppp = stack.mallocPointer(1);
 			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clKernel, clDevice, CL_KERNEL_WORK_GROUP_SIZE , ppp, null));
-
 			long maxWorkGroupSizeForPrivateMemory = ppp.get(0);
+
 			logger.debug("CL_KERNEL_WORK_GROUP_SIZE (" + clKernel + ") = " + maxWorkGroupSizeForPrivateMemory);
 			return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
 		}
