@@ -572,9 +572,9 @@ public class CLLinkedCell {
 							clGlobalWorkSize = stack.callocPointer(1);
 							clLocalWorkSize = stack.callocPointer(1);
 							clGlobalWorkSize.put(0, numberOfElements / 2);
-							clLocalWorkSize.put(0, Math.max(maxWorkGroupSize / 4, 1));
+							//clLocalWorkSize.put(0, Math.max(maxWorkGroupSize / 4, 1));
 
-							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, null, null, null));
 							CLInfo.checkCLError(clFinish(clQueue));
 						} else {
 							//Launch bitonicMergeLocal
