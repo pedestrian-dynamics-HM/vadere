@@ -570,7 +570,7 @@ public class CLLinkedCell {
 							CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeGlobal, 7, dir));
 
 							clGlobalWorkSize = stack.callocPointer(1);
-							clLocalWorkSize = stack.callocPointer(1);
+							//clLocalWorkSize = stack.callocPointer(1);
 							clGlobalWorkSize.put(0, numberOfElements / 2);
 							//clLocalWorkSize.put(0, Math.max(maxWorkGroupSize / 4, 1));
 
