@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
-import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_CPU;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -27,7 +26,7 @@ public class TestCLLinkedList {
 
 	private static Logger logger = Logger.getLogger(TestCLLinkedList.class);
 
-	private static Random random = new Random();
+	private static Random random = new Random(0);
 
 	@Before
 	public void setUp() throws Exception {}
@@ -121,25 +120,13 @@ public class TestCLLinkedList {
 	}
 
 	@Test
-	@Ignore
-	public void testGridCellSmallOnCPU() throws IOException, OpenCLException {
-		testGridCellSmall(CL_DEVICE_TYPE_CPU);
+	public void testGridCellSmall() throws IOException, OpenCLException {
+		testGridCellSmall(CL_DEVICE_TYPE_ALL);
 	}
 
 	@Test
-	public void testGridCellSmallOnGPU() throws IOException, OpenCLException {
-		testGridCellSmall(CL_DEVICE_TYPE_GPU);
-	}
-
-	@Test
-	@Ignore
-	public void testGridCellLargeOnCPU() throws IOException, OpenCLException {
-		testGridCellLarge(CL_DEVICE_TYPE_CPU);
-	}
-
-	@Test
-	public void testGridCellLargeOnGPU() throws IOException, OpenCLException {
-		testGridCellLarge(CL_DEVICE_TYPE_GPU);
+	public void testGridCellLarge() throws IOException, OpenCLException {
+		testGridCellLarge(CL_DEVICE_TYPE_ALL);
 	}
 
 	private void testGridCellSmall(final int deviceType) throws IOException, OpenCLException {
