@@ -27,7 +27,7 @@ public class TestCLLinkedList {
 
 	private static Logger logger = Logger.getLogger(TestCLLinkedList.class);
 
-	private static Random random = new Random();
+	private static Random random = new Random(10);
 
 	@Before
 	public void setUp() throws Exception {}

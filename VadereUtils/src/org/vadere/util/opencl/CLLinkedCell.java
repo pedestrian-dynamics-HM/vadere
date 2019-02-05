@@ -374,7 +374,15 @@ public class CLLinkedCell {
 		this.gridSize = CLUtils.toIntBuffer(iGridSize, CLUtils.toIntBuffer(iGridSize));
 
 		this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
+		for(int i = 0; i < numberOfGridCells; i++) {
+			this.cellStarts.put(i, 0);
+		}
+
 		this.cellEnds = MemoryUtil.memAllocInt(numberOfGridCells);
+		for(int i = 0; i < numberOfGridCells; i++) {
+			this.cellEnds.put(i, 0);
+		}
+
 		this.indices = MemoryUtil.memAllocInt(numberOfElements);
 		this.reorderedPositions = MemoryUtil.memAllocFloat(numberOfElements * 2);
 	}
@@ -392,6 +400,8 @@ public class CLLinkedCell {
 			clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
 			clPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 2 * 4 * numberOfElements, errcode_ret);
 			clEnqueueWriteBuffer(clQueue, clPositions, true, 0, positions, null, null);
+			clEnqueueWriteBuffer(clQueue, clCellStarts, true, 0, cellStarts, null, null);
+			clEnqueueWriteBuffer(clQueue, clCellEnds, true, 0, cellEnds, null, null);
 		}
 	}
 
