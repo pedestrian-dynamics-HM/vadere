@@ -6,41 +6,57 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
+import org.vadere.simulator.projects.migration.JoltMigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
+import org.vadere.simulator.projects.migration.MigrationFactory;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.helper.MigrationUtil;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.vadere.util.io.IOUtils.VADERE_PROJECT_FILENAME;
+
 public class MigrationSubCommand implements SubCommandRunner {
 	private final static Logger logger = Logger.getLogger(MigrationSubCommand.class);
+
+	private String outputPathString;
+	private Version targetVersion;
+	private boolean revertMode;
+	private boolean recursive;
+	private boolean projectOnly;
+	private List<String> paths;
+	private String newVersion;
+
+	ArrayList<Path> files = new ArrayList<>();
+	ArrayList<Path> dirs = new ArrayList<>();
+	ArrayList<Path> err = new ArrayList<>();
 
 	@Override
 	public void run(Namespace ns, ArgumentParser parser) throws Exception {
 
-		String outputPathString = ns.getString("output-file");
-		Version targetVersion = Version.fromString(ns.getString("target-version"));
-		boolean revertMode = ns.getBoolean("revert-migration");
-		boolean recursive = ns.getBoolean("recursive");
-		List<String> paths = ns.getList("paths");
-		String newVersion = ns.getString("create-new-version");
+		outputPathString = ns.getString("output-file");
+		targetVersion = Version.fromString(ns.getString("target-version"));
+		revertMode = ns.getBoolean("revert-migration");
+		recursive = ns.getBoolean("recursive");
+		projectOnly = ns.getBoolean("consider-projects-only");
+		paths = ns.getList("paths");
+		newVersion = ns.getString("create-new-version");
 
-		ArrayList<Path> files = new ArrayList<>();
-		ArrayList<Path> dirs = new ArrayList<>();
-		ArrayList<Path> err = new ArrayList<>();
+
 		for (String path : paths) {
 			Path tmp = Paths.get(path);
 			if (tmp.toFile().exists()) {
 				if (tmp.toFile().isFile()) {
 					files.add(tmp);
 				} else if (tmp.toFile().isDirectory()) {
-					dirs.add(tmp);
+					testDirAndAdd(dirs, tmp);
 				} else {
 					err.add(tmp);
 				}
@@ -78,11 +94,27 @@ public class MigrationSubCommand implements SubCommandRunner {
 			MigrationUtil migrationUtil = new MigrationUtil();
 			for (Path dir : dirs) {
 				logger.info("migrate directory to version(" + targetVersion.label() + "): " + dir.toAbsolutePath().toString());
-				migrationUtil.migrateDirectoryTree(dir, targetVersion, recursive);
+				if (projectOnly){
+					JoltMigrationAssistant migrationAssistant = new JoltMigrationAssistant();
+					migrationAssistant.analyzeProject(dir.toString());
+				} else {
+					migrationUtil.migrateDirectoryTree(dir, targetVersion, recursive);
+				}
 			}
 		}
 
 	}
+
+	private void testDirAndAdd(ArrayList<Path> dirs, Path dir){
+		if(projectOnly){
+			if (Files.exists(dir.resolve(VADERE_PROJECT_FILENAME))){
+				dirs.add(dir);
+			}
+		} else {
+			dirs.add(dir);
+		}
+	}
+
 
 	private void createNewTransformFiles(Path dest, String versionLabel) throws MigrationException {
 		MigrationUtil migrationUtil = new MigrationUtil();

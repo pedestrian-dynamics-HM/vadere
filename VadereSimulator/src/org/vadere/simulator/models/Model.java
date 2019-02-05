@@ -6,6 +6,8 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.FindByClass;
 

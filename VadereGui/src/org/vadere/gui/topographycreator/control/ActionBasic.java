@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 
 /**
- * A ActionBasic is the last action in the decorator pattern which will be execute.
+ * A ActionBasic is the last action in the decorator pattern which will be cup.
  * Action: Notify all Observers.
  * 
  */

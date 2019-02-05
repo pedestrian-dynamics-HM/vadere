@@ -137,7 +137,7 @@ public class ClassFinder {
 	 * Scans all classes accessible from the context class loader which belong to the given package
 	 * and subpackages.
 	 *
-	 * Deprecated since this method is slow if we have to access jar file, which is the case if we execute the project via vadere.jar!
+	 * Deprecated since this method is slow if we have to access jar file, which is the case if we cup the project via vadere.jar!
 	 *
 	 * @param packageName The base package
 	 * @return The classes

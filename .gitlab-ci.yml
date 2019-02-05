@@ -38,20 +38,50 @@
 # executed. Therefore, skip this tests.
 
 unit_tests_with_coverage:
-  stage: test
-  
-  script:
-    - Documentation/version-control/git-hook-vadere-software
-    - mvn clean
-    - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
-    - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
+    stage: test
+    
+    script:
+        - mvn clean
+        - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
+        - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
+    artifacts:
+        when: on_success
+        paths:
+            - "*/target/site/coverage-reports"
 
 run_scenario_files:
-  stage: deploy
+    stage: deploy
 
-  script:
-      - Documentation/version-control/git-hook-vadere-software
-      - mvn clean
-      - mvn -Dmaven.test.skip=true package
-      - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+    script:
+        - mvn -Dmaven.test.skip=true package
+        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+    artifacts:
+        when: on_failure
+        paths:
+            - "log_dir"
+        expire_in: 1 week
 
+# exclude. Finde solution an then add this test again.
+# run_origin_test:
+#   stage: deploy
+
+#   script:
+#       - Documentation/version-control/git-hook-vadere-software
+#       - mvn clean
+#       - mvn -Dmaven.test.skip=true package
+#       - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
+#       - python3 Tools/ContinuousIntegration/run_orign_translation_test.py
+
+run_seed_test:
+    stage: deploy
+
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
+        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py
+    artifacts:
+        when: on_failure
+        paths: 
+            - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
+        expire_in: 1 week

@@ -7,7 +7,7 @@ public class Parameters {
 	public final static double DPTOL = 0.001;
     public final static double TOL = .1;
     public final static double FSCALE = 1.2;
-    public final static double DELTAT = 0.2;
+    public final static double DELTAT = 0.3;
     public final static double MIN_TRIANGLE_QUALITY = 0.1;
     public final static double MIN_FORCE_RATIO = 0.3;
     public final static double MIN_SPLIT_TRIANGLE_QUALITY = 0.4;

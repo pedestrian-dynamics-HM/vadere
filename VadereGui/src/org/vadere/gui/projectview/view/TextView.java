@@ -34,6 +34,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
+import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
@@ -42,8 +43,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Shows text like the JSON formatted attributes.
- * 
- * 
+ *
+ *
  */
 public class TextView extends JPanel implements IJsonView {
 
@@ -187,6 +188,10 @@ public class TextView extends JPanel implements IJsonView {
 						case TOPOGRAPHY:
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 							break;
+						case EVENT:
+							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
+							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
+							break;
 						default:
 							throw new RuntimeException("attribute type not implemented.");
 						}
@@ -233,11 +238,14 @@ public class TextView extends JPanel implements IJsonView {
 		case OUTPUTPROCESSOR:
 			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 			break;
-
 		case TOPOGRAPHY:
 			Topography topography = scenario.getTopography().clone();
 			topography.removeBoundary();
 			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			break;
+		case EVENT:
+			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");

@@ -9,10 +9,15 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.WaitEvent;
+import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -136,26 +141,29 @@ public class PedestrianBHM extends Pedestrian {
 	 * Updates the pedestrian. Changes the object's state!
 	 */
 	public void update(double currentTimeInSec) {
-
 		if (attributesBHM.isVaryingBehaviour()) {
 			setEvasionStrategy();
 		}
 
 		// for the first step after creation, timeOfNextStep has to be initialized
 		if (getTimeOfNextStep() == 0) {
-			this.timeOfNextStep = currentTimeInSec;
+			timeOfNextStep = currentTimeInSec;
 		}
 
-		this.durationNextStep = this.stepLength / getFreeFlowSpeed();
+		durationNextStep = stepLength / getFreeFlowSpeed();
 
-		// This has to happen here! The call has side effects on navigation!
-		updateTargetDirection();
-
-		this.nextPosition = navigation.getNavigationPosition();
-
-		makeStep();
-
-		this.timeOfNextStep = timeOfNextStep + durationNextStep;
+		Event mostImportantEvent = getMostImportantEvent();
+		VPoint position = getPosition();
+		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+			updateTargetDirection();
+			nextPosition = navigation.getNavigationPosition();
+			makeStep();
+			timeOfNextStep += durationNextStep;
+		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+			timeOfNextStep += durationNextStep;
+		}
+		
+		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
 	}
 
 	/**

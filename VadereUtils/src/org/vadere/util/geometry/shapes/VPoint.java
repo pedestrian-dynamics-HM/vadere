@@ -27,21 +27,25 @@ public class VPoint implements Cloneable, IPoint {
 	public VPoint(double x, double y) {
 		this.x = x;
 		this.y = y;
+		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);
     }
 
 	public VPoint(Point2D.Double copy) {
 		this.x = copy.x;
 		this.y = copy.y;
+		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);
 	}
 
 	public VPoint(Point2D copy) {
 		this.x = copy.getX();
 		this.y = copy.getY();
+		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);
 	}
 
 	public VPoint(Point copy) {
 		this.x = copy.x;
 		this.y = copy.y;
+		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);
 	}
 
 	@Override
@@ -124,6 +128,12 @@ public class VPoint implements Cloneable, IPoint {
 	}
 
 	public VPoint rotate(final double radAngle) {
+		VPoint result = new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
+				x * Math.sin(radAngle) + y * Math.cos(radAngle));
+
+		if(Double.isNaN(result.getX())) {
+			System.out.println("wtf");
+		}
 		return new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
 				x * Math.sin(radAngle) + y * Math.cos(radAngle));
 	}
@@ -166,6 +176,32 @@ public class VPoint implements Cloneable, IPoint {
 	@Override
 	public VPoint norm(double len) {
 		return new VPoint(x / len, y / len);
+	}
+
+	@Override
+	public VPoint setMagnitude(double len) {
+		double length = distanceToOrigin();
+		if(length <= 0) {
+			if(len != 0.0) {
+				throw new IllegalArgumentException("a vector with zero length can not be set to a specific magnitude != 0.");
+			}
+			else {
+				return this;
+			}
+		}
+		return scalarMultiply(len / distanceToOrigin());
+	}
+
+	@Override
+	public VPoint limit(double len) {
+		assert len >= 0;
+		double length = distanceToOrigin();
+		if(length > len) {
+			return setMagnitude(len);
+		}
+		else {
+			return this;
+		}
 	}
 
 	@Override

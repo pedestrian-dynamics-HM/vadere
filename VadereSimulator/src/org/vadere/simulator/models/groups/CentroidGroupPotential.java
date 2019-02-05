@@ -3,7 +3,9 @@ package org.vadere.simulator.models.groups;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
+import org.vadere.simulator.models.potential.fields.PotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -27,14 +29,17 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	private final AttributesCGM attributesCGM;
 	private final CentroidGroupModel groupCollection;
 	private final PotentialFieldAgent potentialFieldPedestrian;
+	private final IPotentialFieldTarget potentialFieldTarget;
 
 	public CentroidGroupPotential(CentroidGroupModel groupCollection,
 								  PotentialFieldAgent pedestrianRepulsionPotential,
+								  IPotentialFieldTarget potentialFieldTarget,
 								  AttributesCGM attributesCGM) {
 
 		this.attributesCGM = attributesCGM;
 		this.groupCollection = groupCollection;
 		this.potentialFieldPedestrian = pedestrianRepulsionPotential;
+		this.potentialFieldTarget = potentialFieldTarget;
 	}
 
 	@Override
@@ -65,6 +70,8 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 
 		if (leader != null) {
 			VPoint leaderPoint = leader.getPosition();
+			double leaderPotential = potentialFieldTarget.getPotential(leaderPoint, leader);
+			double pedPotential = potentialFieldTarget.getPotential(ped.getPosition(), ped);
 
 			final double[] distanceToCentroid = {
 					pos.getX() - leaderPoint.getX(),
@@ -72,9 +79,8 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 
 			result = attributesCGM.getLeaderAttractionFactor()
 					* Math.pow(
-					Math.pow(distanceToCentroid[0], 2)
-							+ Math.pow(distanceToCentroid[1], 2),
-					2);
+					leaderPotential - pedPotential,
+					4);
 		}
 
 		return result;
@@ -111,7 +117,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		double potential = potentialFieldPedestrian.getAgentPotential(pos,
 				pedestrian, otherPedestrian);
 
-		if (group.equals(groupOther)) {
+		if (group != null && group.equals(groupOther)) {
 			potential *= attributesCGM.getGroupMemberRepulsionFactor();
 		}
 

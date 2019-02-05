@@ -109,7 +109,7 @@ public class GuiScenarioCheckerMessageFormatter extends AbstractScenarioCheckerM
 			sb.append("] ");
 		}
 
-		sb.append("Reason: ").append(Messages.getString(msg.getReason().getLocalMessageId()));
+		sb.append("<b>Reason:</b> ").append(Messages.getString(msg.getReason().getLocalMessageId()));
 		if (!msg.getReasonModifier().isEmpty()) {
 			sb.append(" ").append(msg.getReasonModifier());
 		}

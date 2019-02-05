@@ -164,11 +164,12 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	@Test
 	public void testUpdateUseFreeSpaceOnly() {
 
+		AttributesAgent attributesAgent = new AttributesAgent();
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
 				.setUseFreeSpaceOnly(true)
-				.setSourceDim(new VRectangle(0, 0, 0.4, 0.4)); // small source
+				.setSourceDim(new VRectangle(0, 0, attributesAgent.getRadius()*2 + 0.05, attributesAgent.getRadius()*2 + 0.05)); // small source
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < 1000; simTimeInSec += 1.0) {

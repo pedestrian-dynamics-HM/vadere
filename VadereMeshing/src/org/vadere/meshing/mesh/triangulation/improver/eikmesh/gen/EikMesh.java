@@ -14,6 +14,8 @@ import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
+import org.vadere.meshing.utils.color.ColorFunctions;
+import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -26,12 +28,15 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -60,6 +65,8 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 	private double delta = Parameters.DELTAT;
 	private List<V> collapseVertices;
 	private List<E> splitEdges;
+	private Set<P> fixPoints;
+	private Map<V, P> fixPointRelation;
 
 	// only for logging
     private static final Logger log = LogManager.getLogger(EikMesh.class);
@@ -76,13 +83,14 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
 		this.initialEdgeLen =initialEdgeLen;
-		this.deps = 0.00001 * initialEdgeLen;
+		this.deps = 0.0001 * initialEdgeLen;
 		this.nSteps = 0;
 		this.collapseVertices = new ArrayList<>();
 		this.splitEdges = new ArrayList<>();
+		this.fixPointRelation = new HashMap<>();
 
         log.info("##### (start) generate a triangulation #####");
-		Set<P> fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
+		fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
 		triangulatorSFC = new UniformRefinementTriangulatorSFC(
 		        meshSupplier,
                 bound,
@@ -119,10 +127,11 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 		this.nSteps = 0;
 		this.collapseVertices = new ArrayList<>();
 		this.splitEdges = new ArrayList<>();
+		this.fixPointRelation = new HashMap<>();
 
 		log.info("##### (start) generate a triangulation #####");
 		//Set<P> fixPoints = new HashSet<>();
-		Set<P> fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
+		fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
 		addFixPoints(meshSupplier.get(), boundary, fixPoints);
 
 		triangulatorSFC = new UniformRefinementTriangulatorSFC(
@@ -196,12 +205,15 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 			}
 			else {
 				removeBoundaryLowQualityTriangles();
-				triangulation.smoothBoundary();
+				triangulation.smoothBoundary(distanceFunc);
 				if(triangulation.isValid()) {
 					flipEdges();
 					removeTrianglesInsideHoles();
+					removeTrianglesOutsideBBox();
+					//removeBoundaryLowQualityTriangles();
 				}
 				else {
+					System.out.println(TexGraphGenerator.toTikz(triangulation.getMesh(), f -> (triangulation.isValid(f) ? Color.WHITE : Color.RED), 1.0f));
 					log.info("EikMesh re-triangulates in step " + nSteps);
 					retriangulate();
 					log.info("end re-triangulates in step " + nSteps);
@@ -210,6 +222,7 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 				}
 
 				computeScalingFactor();
+				computeFixPointRelation();
 				computeVertexForces();
 				updateVertices();
 				collapseEdges();
@@ -253,7 +266,7 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
         //removeTrianglesInsideObstacles();
     }
 
-	/*public void execute() {
+	/*public void cup() {
 		double quality = getQuality();
 		while (quality < Parameters.qualityMeasurement) {
 			improve();
@@ -275,8 +288,32 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
     	streamVertices().forEach(v -> computeForce(v));
 	}
 
+	private void computeFixPointRelation() {
+		fixPointRelation.clear();
+		for(P fixPoint : fixPoints) {
+			V closest = null;
+    		double distance = Double.MAX_VALUE;
+    		for(V vertex : getMesh().getVertices()) {
+    			if (closest == null || distance > vertex.distance(fixPoint)) {
+    				closest = vertex;
+    				distance = vertex.distance(fixPoint);
+			    }
+		    }
+    		fixPointRelation.put(closest, fixPoint);
+
+	    }
+	}
+
 	private void computeForce(final V vertex) {
 		EikMeshPoint p1 = getMesh().getPoint(vertex);
+
+		if(fixPointRelation.containsKey(vertex)) {
+			P p2 = fixPointRelation.get(vertex);
+			VPoint force = new VPoint((p2.getX() - p1.getX()), (p2.getY() - p1.getY())).scalarMultiply(2.0);
+			p1.increaseVelocity(force);
+			p1.increaseAbsoluteForce(force.distanceToOrigin());
+		}
+
 		for(V v2 : getMesh().getAdjacentVertexIt(vertex)) {
 			EikMeshPoint p2 = getMesh().getPoint(v2);
 
@@ -345,6 +382,7 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 				//(Math.abs(distance) <= deps &&
 				// to prevent from large movements we project only by 0.5 if the distance is large!
 				projectBackVertex(vertex, distance, distance > initialEdgeLen / 3.0 ? 0.5 : 1.0, isAtBoundary);
+				//projectBackVertex(vertex, distance, 1.0, isAtBoundary);
 			}
 
 			if(isAtBoundary) {
@@ -618,12 +656,10 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 
 	private void removeBoundaryLowQualityTriangles() {
 		List<F> holes = triangulation.getMesh().getHoles();
-		Predicate<F> mergeCondition = f -> !triangulation.getMesh().isDestroyed(f)
-				&& !triangulation.getMesh().isBoundary(f)
-				&& triangulation.getMesh().isAtBorder(f)
-				&& (isCorner(f) || !isShortBoundaryEdge(f))
-				//&& -distanceFunc.apply(triangulation.getMesh().toTriangle(f).getIncenter()) > 0.1 * initialEdgeLen
-				&& faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY;
+		Predicate<F> mergeCondition = f ->
+				(!triangulation.getMesh().isDestroyed(f) && !triangulation.getMesh().isBoundary(f) && triangulation.getMesh().isAtBoundary(f)) // at boundary
+				&& (!triangulation.isValid(f) /*|| (isCorner(f) || !isShortBoundaryEdge(f)) && faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY*/) // bad quality
+		;
 
 		for(F face : holes) {
 			List<F> neighbouringFaces = getMesh().streamEdges(face).map(e -> getMesh().getTwinFace(e)).collect(Collectors.toList());

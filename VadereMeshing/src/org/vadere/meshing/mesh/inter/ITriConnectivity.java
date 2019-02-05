@@ -13,9 +13,12 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
@@ -103,9 +106,6 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param point     the new point of the vertex
 	 */
 	default void replacePoint(@NotNull final V vertex, @NotNull final P point) {
-		if(!ringContainsPoint(vertex, point)) {
-			ringContainsPoint(vertex, point);
-		}
 		assert ringContainsPoint(vertex, point);
 		getMesh().setPoint(vertex, point);
 	}
@@ -832,8 +832,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		E prev = getMesh().getPrev(boundaryEdge);
 
 		// can we form a triangle
-		assert GeometryUtils.isCCW(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next))
-				&& GeometryUtils.angle(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next)) < Math.PI;
+		assert GeometryUtils.isCCW(getMesh().toPoint(prev), getMesh().toPoint(boundaryEdge), getMesh().toPoint(next));
 
 		E nnext = getMesh().getNext(next);
 
@@ -870,6 +869,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 
 		// to find the boundary edge as quick as possible
 		getMesh().setEdge(getMesh().getVertex(next), newEdge);
+
+		List<V> vertices = getMesh().getVertices(newFace);
+		assert vertices.size() == 3;
 	}
 
 	/*default void collapse3DAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
@@ -1327,16 +1329,18 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * <p>Mesh changing method.</p>
 	 *
 	 */
-	default void smoothHoles() {
+	default void smoothHoles(@NotNull final IDistanceFunction distanceFunction) {
 		for(F hole : getMesh().getHoles()) {
 			for(E edge : getMesh().getEdges(hole)) {
 				if(getMesh().getFace(edge).equals(hole)) {
 
+					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 					VPoint p = getMesh().toPoint(edge);
 					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
-					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 
-					if(GeometryUtils.isCCW(r, p, q)) {
+					//TODO remove magic number
+					VTriangle triangle = new VTriangle(r,p,q);
+					if(distanceFunction.apply(triangle.midPoint()) <= 0 && GeometryUtils.isCCW(r, p, q)) {
 						double angle = GeometryUtils.angle(r, p, q);
 						if(angle < 0.5*Math.PI) {
 							createFaceAtBoundary(edge);
@@ -1347,9 +1351,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		}
 	}
 
-	default void smoothBoundary() {
-		smoothBorder();
-		smoothHoles();
+	default void smoothBoundary(@NotNull final IDistanceFunction distanceFunction) {
+		//smoothBorder();
+		smoothHoles(distanceFunction);
 	}
 
     /**
@@ -2178,7 +2182,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			P p2 = getMesh().getPoint(edge);
 			P p3 = getMesh().getPoint(getMesh().getNext(edge));
 			boolean valid = GeometryUtils.isLeftOf(p1, p2, p3);
-			if(!valid) {
+			if (!valid) {
 				log.info(p1 + ", " + p2 + ", " + p3);
 			}
 			return GeometryUtils.isLeftOf(p1, p2, p3);

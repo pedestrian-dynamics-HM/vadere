@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
  */
 public class TexGraphGenerator {
 
+	public static final String STANDALONE_HEADER ="\\documentclass{standalone}\n" +
+			"\\usepackage{tikz}\n" +
+			"\\begin{document}";
+
+	public static final String STANDALONE_FOOTER = "\\end{document}\n";
 
 	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh, final float scaling){

@@ -103,7 +103,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 	/**
 	 * A random number generator.
 	 */
-	private final Random random = new Random();
+	private final Random random = new Random(0);
 
 	/**
 	 * The space filling curve.
@@ -397,7 +397,6 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 			step();
 		}
 
-		nextSFCLevel(0.23);
         finish();
 		logger.info("end triangulation generation");
 		return triangulation;
@@ -430,11 +429,12 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 	public void finish() {
 		if(!finished) {
 			synchronized (getMesh()) {
+				nextSFCLevel(0.2);
 				finished = true;
 				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 
 				// TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
-				insertFixPoints(fixPoints);
+				//insertFixPoints(fixPoints);
 				triangulation.finish();
 
 				// the following calls are quite expensive
@@ -605,7 +605,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 		F twin = getMesh().getTwinFace(edge);
 
 		VTriangle triangle = getMesh().toTriangle(face);
-		return (!triangle.intersects(bbox) && (getMesh().isBoundary(twin) || !getMesh().toTriangle(twin).intersects(bbox)));
+		return (!triangle.intersectsRectangleLine(bbox) && (getMesh().isBoundary(twin) || !getMesh().toTriangle(twin).intersectsRectangleLine(bbox)));
 	}
 
 	/**

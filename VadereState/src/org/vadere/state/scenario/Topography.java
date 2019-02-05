@@ -30,7 +30,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
-public class Topography {
+public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
@@ -72,6 +72,7 @@ public class Topography {
 
 	private transient final DynamicElementContainer<Pedestrian> pedestrians;
 	private transient final DynamicElementContainer<Car> cars;
+	private boolean recomputeCells;
 
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
@@ -116,6 +117,7 @@ public class Topography {
 
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
+		recomputeCells = false;
 
 		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
 		
@@ -216,16 +218,27 @@ public class Topography {
 		return getContainer(elementType).getElement(id);
 	}
 
+	@Override
 	public <T extends DynamicElement> void addElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).addElement(element);
 	}
 
+	@Override
 	public <T extends DynamicElement> void removeElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).removeElement(element);
 	}
 
+	@Override
 	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
+	}
+
+	public boolean isRecomputeCells() {
+		return recomputeCells;
+	}
+
+	public void setRecomputeCells(boolean recomputeCells) {
+		this.recomputeCells = recomputeCells;
 	}
 
 	public List<Source> getSources() {

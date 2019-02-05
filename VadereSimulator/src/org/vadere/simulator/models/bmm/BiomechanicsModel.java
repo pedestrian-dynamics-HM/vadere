@@ -3,6 +3,7 @@ package org.vadere.simulator.models.bmm;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
@@ -15,6 +16,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -92,6 +94,8 @@ public class BiomechanicsModel implements MainModel {
 	public void update(final double simTimeInSec) {
 		double deltaTime = simTimeInSec - lastSimTimeInSec;
 
+		List<VPoint> positions = pedestriansBMM.stream().map(ped -> ped.getPosition()).collect(Collectors.toList());
+
 		for (PedestrianBMM agent : pedestriansBMM) {
 			agent.update(simTimeInSec, deltaTime);
 		}
@@ -102,6 +106,12 @@ public class BiomechanicsModel implements MainModel {
 
 		for (PedestrianBMM agent : pedestriansBMM) {
 			agent.reverseCollisions();
+		}
+
+		for(int i = 0; i < pedestriansBMM.size(); i++) {
+			PedestrianBMM agent = pedestriansBMM.get(i);
+			agent.clearFootSteps();
+			agent.getFootSteps().add(new FootStep(positions.get(i), agent.getPosition(), lastSimTimeInSec, simTimeInSec));
 		}
 
 		this.lastSimTimeInSec = simTimeInSec;

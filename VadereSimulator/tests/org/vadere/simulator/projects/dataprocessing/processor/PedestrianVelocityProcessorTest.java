@@ -32,7 +32,7 @@ public class PedestrianVelocityProcessorTest extends ProcessorTest {
 		super.doUpdate();
 	}
 
-	@Test public void withBackstepTow() throws Exception {
+	@Test public void withBackstepTwo() throws Exception {
 		AttributesPedestrianVelocityProcessor attr =
 				(AttributesPedestrianVelocityProcessor) p.getAttributes();
 		attr.setBackSteps(2);

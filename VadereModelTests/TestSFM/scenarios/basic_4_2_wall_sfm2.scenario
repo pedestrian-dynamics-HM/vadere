@@ -1,7 +1,7 @@
 {
   "name" : "basic_4_2_wall_sfm2",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -147,8 +147,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }

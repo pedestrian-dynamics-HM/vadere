@@ -601,7 +601,7 @@ public abstract class DefaultRenderer {
 			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?> mesh,
 			@NotNull final VRectangle bound) {
 		MeshRenderer<? extends IPotentialPoint, ?, ?, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
-		meshRenderer.renderGraphics(g, bound);
+		//meshRenderer.renderGraphics(g, bound);
 	}
 
 	protected void renderVoronoiDiagram(final Graphics2D g, final VoronoiDiagram voronoiDiagram) {

@@ -449,6 +449,18 @@ public interface IMesh<
 	}
 
 	/**
+	 * Returns true if the face is at the boundary i.e. if any of its half-edges
+	 * is at the border or a hole in O(k) where k is the number of neighbouring faces,
+	 * i.e. number of edges of the face.
+	 *
+	 * @param face the face
+	 * @return true if the face is at the boundary, otherwise false
+	 */
+	default boolean isAtBoundary(@NotNull final F face) {
+		return streamEdges(face).anyMatch(e -> isAtBoundary(e));
+	}
+
+	/**
 	 * Returns true if the half-edge is at the border i.e. if itself or its twin
 	 * is a border edge in O(1).
 	 *

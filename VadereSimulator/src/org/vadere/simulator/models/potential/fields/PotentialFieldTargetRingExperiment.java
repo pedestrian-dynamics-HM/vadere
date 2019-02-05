@@ -62,7 +62,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 
 		if (ped instanceof PedestrianOSM) {
 			PedestrianOSM pedestrianOSM = (PedestrianOSM) ped;
-			stepLength = pedestrianOSM.getStepSize();
+			stepLength = pedestrianOSM.getDesiredStepSize();
 		}
 
 		Vector2D normalizedTangent = tangent.normalize(stepLength);
