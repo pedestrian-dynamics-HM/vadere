@@ -27,7 +27,7 @@ public class TestCLLinkedList {
 
 	private static Logger logger = Logger.getLogger(TestCLLinkedList.class);
 
-	private static Random random = new Random(10);
+	private static Random random = new Random();
 
 	@Before
 	public void setUp() throws Exception {}
@@ -127,7 +127,6 @@ public class TestCLLinkedList {
 	}
 
 	@Test
-	@Ignore
 	public void testGridCellSmallOnGPU() throws IOException, OpenCLException {
 		testGridCellSmall(CL_DEVICE_TYPE_GPU);
 	}
@@ -139,7 +138,6 @@ public class TestCLLinkedList {
 	}
 
 	@Test
-	@Ignore
 	public void testGridCellLargeOnGPU() throws IOException, OpenCLException {
 		testGridCellLarge(CL_DEVICE_TYPE_GPU);
 	}
