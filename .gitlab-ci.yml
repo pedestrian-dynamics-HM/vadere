@@ -24,7 +24,7 @@ include: .gitlab-ci-templates.yml
 
 # Jobs for GNU/Linux runner (which is labelled with tag "linux")
 
-deploy_on_windows:
+deploy_on_linux:
     extends: .template_deploy
     tags:
         - linux
