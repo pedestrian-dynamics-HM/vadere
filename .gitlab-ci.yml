@@ -20,37 +20,20 @@
 stages:
     - unit_test
     - integration_test
+    - deploy
 
 include: .gitlab-ci-templates.yml
 
 # Jobs for GNU/Linux runner (which is labelled with tag "linux")
-run_unit_tests_on_linux:
-    extends: .template_unit_tests
-    tags:
-        - linux
 
-run_scenario_files_on_linux:
-    extends: .template_scenario_files
-    tags:
-        - linux
-
-run_seed_test_on_linux:
-    extends: .template_seed_test
+deploy_on_windows:
+    extends: .template_deploy
     tags:
         - linux
         
 # Jobs for Windows runner (which is labelled with tag "windows")
-run_unit_tests_on_windows:
-    extends: .template_unit_tests
-    tags:
-        - windows
 
-run_scenario_files_on_windows:
-    extends: .template_scenario_files
-    tags:
-        - windows
-
-run_seed_test_on_windows:
-    extends: .template_seed_test
+deploy_on_windows:
+    extends: .template_deploy
     tags:
         - windows

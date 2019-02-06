@@ -49,3 +49,11 @@
             - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
         expire_in: 1 week
 
+.template_deploy:
+    stage: deploy
+    only:
+      refs:
+        - master
+    scipt:
+        - scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/vadere_latest.jar
+
