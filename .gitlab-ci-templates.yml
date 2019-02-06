@@ -54,6 +54,7 @@
     only:
       refs:
         - master
+        - configure_ci_setup
     script:
         - scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/vadere_latest.jar
 
