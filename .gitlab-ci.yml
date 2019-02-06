@@ -1,87 +1,56 @@
-# # GitLab CI Jobs
+# # GitLab CI Job Configuration
 #
-# Each of the jobs defined here is triggered by GitLab's CI pipeline.
-#
-# ## GitLab YAML Job Description Syntax
+# Goal: Run all jobs defined here on all available runners (GNU/Linux and
+# Windows).
+# 
+# ## Job Description Syntax
 #
 # <job_name>:                   # Job name which is displayed in web interface.
-#   stage: <stage_name>         # <build|test|deploy>: these stages are executed
-#                               # one after another. A stage can contain multiple
-#                               # jobs.
+#   stage: <stage_name>         # Run "script" commands in this stage. The
+#                               # stages are exececuted sequentially.
 #   script:
 #      - <arbitrary_commands>   # Here you can execute arbitratry terminal
 #                               # commands. If any of the commands return a
 #                               # non-zero exit code, the job fails.
 #
-# ## Maven Syntax for Skipping Unit Tests
+# ## References
 #
-# General syntax to execute unit tests:
-#
-# ```
-# mvn test
-# ```
-#
-# The comma-separated list of tests after "-Dtest=<list>" is skipped. All other
-# tests are executed normally:
-#
-# ```
-# mvn -Dtest=!TestClassA,!TestClassB,!TestClassC
-# ```
-#
-# **Note:** on some CI instances the exclamation mark must be escaped by a
-# backslash. Otherwise, it is interpreted by the executing shell as special
-# command.
-#
-# ## Unit Test Limitations
-#
-# **Watch out:** OpenCL code cannot be run on virtual machines where tests are
-# executed. Therefore, skip this tests.
+# - https://docs.gitlab.com/ee/ci/yaml/README.html
 
-unit_tests_with_coverage:
-    stage: test
-    
-    script:
-        - mvn clean
-        - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
-        - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
-    artifacts:
-        when: on_success
-        paths:
-            - "*/target/site/coverage-reports"
+stages:
+    - unit_test
+    - integration_test
 
-run_scenario_files:
-    stage: deploy
+include: .gitlab-ci-templates.yml
 
-    script:
-        - mvn -Dmaven.test.skip=true package
-        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
-    artifacts:
-        when: on_failure
-        paths:
-            - "log_dir"
-        expire_in: 1 week
+# Jobs for GNU/Linux runner (which is labelled with tag "linux")
+run_unit_tests_on_linux:
+    extends: .template_unit_tests
+    tags:
+        - linux
 
-# exclude. Finde solution an then add this test again.
-# run_origin_test:
-#   stage: deploy
+run_scenario_files_on_linux:
+    extends: .template_scenario_files
+    tags:
+        - linux
 
-#   script:
-#       - Documentation/version-control/git-hook-vadere-software
-#       - mvn clean
-#       - mvn -Dmaven.test.skip=true package
-#       - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
-#       - python3 Tools/ContinuousIntegration/run_orign_translation_test.py
+run_seed_test_on_linux:
+    extends: .template_seed_test
+    tags:
+        - linux
+        
+# Jobs for Windows runner (which is labelled with tag "windows")
+run_unit_tests_on_windows:
+    extends: .template_unit_tests
+    tags:
+        - windows
 
-run_seed_test:
-    stage: deploy
+run_scenario_files_on_windows:
+    extends: .template_scenario_files
+    tags:
+        - windows
 
-    script:
-        - mvn clean
-        - mvn -Dmaven.test.skip=true package
-        - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
-        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py
-    artifacts:
-        when: on_failure
-        paths: 
-            - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
-        expire_in: 1 week
+run_seed_test_on_windows:
+    extends: .template_seed_test
+    tags:
+        - windows
