@@ -18,8 +18,6 @@
 # - https://docs.gitlab.com/ee/ci/yaml/README.html
 
 stages:
-    - unit_test
-    - integration_test
     - deploy
 
 include: .gitlab-ci-templates.yml
