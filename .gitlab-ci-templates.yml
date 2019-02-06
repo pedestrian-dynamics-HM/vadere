@@ -58,5 +58,5 @@
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/vadere_latest.jar
+        - scp -v VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/vadere_latest.jar
 
