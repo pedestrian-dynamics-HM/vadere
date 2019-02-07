@@ -15,7 +15,7 @@
     # Pass GitLab CI variables (like below) to create filenames for JAR files and final ZIP file.
     script:
         - mvn clean
-        - mvn package
+        - mvn -Dmaven.test.skip=true package
         - scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA:0:8}.${CI_ENVIRONMENT_NAME}.jar
         
     when: manual
