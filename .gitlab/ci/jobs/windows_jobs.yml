@@ -1,0 +1,8 @@
+# Jobs for Windows runner (which is labelled with tag "windows")
+deploy_branch_on_windows:
+    extends: .template_deploy_branch
+    tags:
+        - windows
+    environment:
+        name: windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA:0:8}.${CI_ENVIRONMENT_NAME}.jar"
