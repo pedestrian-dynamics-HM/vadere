@@ -23,7 +23,8 @@
 # Variable Definitions
 variables:
     VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
-    VADERE_PACKAGE_NAME: "vadere-${CI_COMMIT_REF_NAME}-${CI_ENVIRONMENT_NAME}.zip"
+    VADERE_PACKAGE_NAME_BRANCHES: "vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip"
+    VADERE_PACKAGE_NAME_RELEASES: "vadere.${CI_COMMIT_TAG}.${CI_RUNNER_TAGS}.zip"
 
 # Stage Definitions
 stages:
@@ -82,13 +83,25 @@ stages:
         expire_in: 1 week
     when: on_success
 
-.template_deploy_branch:
+.template_deploy_master_automatically:
     stage: deploy
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME}
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
+        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
+    only:
+        refs:
+            - master
+    when: on_success
+    
+.template_deploy_branch_manually:
+    stage: deploy
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
+        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
     when: manual
 
 # Job Definitions
@@ -109,13 +122,21 @@ run_seed_test_on_linux:
     tags:
         - linux
 
-deploy_branch_on_linux:
-    extends: .template_deploy_branch
+deploy_master_on_linux:
+    extends: .template_deploy_master_automatically
     tags:
         - linux        
     environment:
-        name: linux
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-${CI_COMMIT_REF_NAME}-${CI_ENVIRONMENT_NAME}.zip
+        name: master/linux
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/master/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
+        
+deploy_branch_on_linux:
+    extends: .template_deploy_branch_manually
+    tags:
+        - linux        
+    environment:
+        name: branches/linux
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
 
 ## Jobs for Windows runner (which is labelled with tag "windows")
 run_unit_tests_on_windows:
@@ -133,10 +154,18 @@ run_seed_test_on_windows:
     tags:
         - windows
 
-deploy_branch_on_windows:
-    extends: .template_deploy_branch
+deploy_master_on_windows:
+    extends: .template_deploy_master_automatically
     tags:
         - windows        
     environment:
-        name: windows
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-${CI_COMMIT_REF_NAME}-${CI_ENVIRONMENT_NAME}.zip
+        name: master/windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/master/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
+
+deploy_branch_on_windows:
+    extends: .template_deploy_branch_manually
+    tags:
+        - windows        
+    environment:
+        name: branches/windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
