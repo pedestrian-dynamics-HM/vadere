@@ -34,4 +34,14 @@ include: .gitlab/ci/templates/deploy_stage_templates.yml
 
 # Job Definitions
 
-include: .gitlab/ci/jobs/windows_jobs.yml
+# WATCH OUT: "include: .gitlab/ci/windows_jobs.yml" does not work!
+# Seems a bug in GitLab's "include" statement. Therefore, define all jobs
+# directly here.
+
+deploy_branch_on_windows:
+    extends: .template_deploy_branch
+    tags:
+        - windows        
+    environment:
+        name: windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}.jar"
