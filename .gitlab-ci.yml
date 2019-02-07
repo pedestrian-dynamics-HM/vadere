@@ -20,7 +20,7 @@
 # Variable Definitions
 variables:
     VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
-    VADERE_PACKAGE_NAME: "vadere.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}"
+    VADERE_PACKAGE_NAME: "vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}"
 # Stage Definitions
 stages:
     - deploy
