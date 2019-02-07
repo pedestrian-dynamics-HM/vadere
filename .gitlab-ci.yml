@@ -34,9 +34,13 @@ include: .gitlab/ci/templates/deploy_stage_templates.yml
 
 # Job Definitions
 
-# WATCH OUT: "include: .gitlab/ci/windows_jobs.yml" does not work!
-# Seems a bug in GitLab's "include" statement. Therefore, define all jobs
-# directly here.
+# PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
+#
+# 1. "include: .gitlab/ci/windows_jobs.yml" does not work!
+#    Seems a bug in GitLab's "include" statement. Therefore, define all jobs
+#    directly here.
+# 2. Variables from "variables" section are not expanded correctly in "url"
+#    section of an "environment".
 
 # Jobs for GNU/Linux runner (which is labelled with tag "linux")
 deploy_branch_on_linux:
