@@ -13,7 +13,7 @@
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile --create ${VADERE_PACKAGE_NAME} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME}
         
     when: manual
