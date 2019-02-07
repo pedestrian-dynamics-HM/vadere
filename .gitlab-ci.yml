@@ -34,4 +34,4 @@ include: .gitlab/ci/templates/deploy_stage_templates.yml
 
 # Job Definitions
 
-include: .gitlab/ci/jobs/windows_jobs.yml
+include: /.gitlab/ci/jobs/windows_jobs.yml
