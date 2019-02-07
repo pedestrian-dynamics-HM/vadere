@@ -18,7 +18,8 @@
 # - https://docs.gitlab.com/ee/ci/yaml/README.html
 
 # Variable Definitions
-VADERE_DEPLOYMENT_BASE_URL=http://www.vadere.org/builds
+variables:
+    VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
 
 # Stage Definitions
 stages:
@@ -28,7 +29,7 @@ include: .gitlab-ci-templates.yml
 
 # Job Definitions
 
-# Jobs for Windows runner (which is labelled with tag "windows")
+## Jobs for Windows runner (which is labelled with tag "windows")
 deploy_branch_on_windows:
     extends: .template_deploy_branch
     tags:
