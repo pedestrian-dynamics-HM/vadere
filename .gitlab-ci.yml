@@ -45,7 +45,7 @@ deploy_branch_on_linux:
         - linux        
     environment:
         name: linux
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}"
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/${VADERE_PACKAGE_NAME}
 
 # Jobs for Windows runner (which is labelled with tag "windows")
 deploy_branch_on_windows:
@@ -54,4 +54,4 @@ deploy_branch_on_windows:
         - windows        
     environment:
         name: windows
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}"
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/${VADERE_PACKAGE_NAME}
