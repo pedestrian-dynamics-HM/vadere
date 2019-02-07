@@ -27,10 +27,12 @@ variables:
 
 # Stage Definitions
 stages:
+    - unit_test
+    - integration_test
     - deploy
 
 include: .gitlab/ci/templates/deploy_stage_templates.yml
-# include: .gitlab/ci/templates/test_stage_templates.yml
+include: .gitlab/ci/templates/test_stage_templates.yml
 
 # Job Definitions
 
@@ -43,6 +45,21 @@ include: .gitlab/ci/templates/deploy_stage_templates.yml
 #    section of an "environment".
 
 # Jobs for GNU/Linux runner (which is labelled with tag "linux")
+run_unit_tests_on_linux:
+    extends: .template_unit_tests
+    tags:
+        - linux
+
+run_scenario_files_on_linux:
+    extends: .template_scenario_files
+    tags:
+        - linux
+
+run_seed_test_on_linux:
+    extends: .template_seed_test
+    tags:
+        - linux
+
 deploy_branch_on_linux:
     extends: .template_deploy_branch
     tags:
@@ -52,6 +69,26 @@ deploy_branch_on_linux:
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
 
 # Jobs for Windows runner (which is labelled with tag "windows")
+run_unit_tests_on_windows:
+    extends: .template_unit_tests
+    tags:
+        - windows
+
+run_scenario_files_on_windows:
+    extends: .template_scenario_files
+    tags:
+        - windows
+
+run_seed_test_on_windows:
+    extends: .template_seed_test
+    tags:
+        - windows
+
+deploy_on_windows:
+    extends: .template_deploy
+    tags:
+        - windows
+
 deploy_branch_on_windows:
     extends: .template_deploy_branch
     tags:
