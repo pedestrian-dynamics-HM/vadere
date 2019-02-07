@@ -14,7 +14,7 @@
 #                               # non-zero exit code, the job fails.
 #
 # Procedure: Use GitLab job templates in ".gitlab/ci/templates/" and use them
-# "here" by using the "extend" keyword.
+# in the job description by using the "extend" keyword.
 #
 # ## References
 #

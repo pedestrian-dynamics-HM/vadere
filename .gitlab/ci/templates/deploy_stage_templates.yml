@@ -17,3 +17,4 @@
         # - scp ${VADERE_PACKAGE_NAME}.zip di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME}.zip
         
     when: always
+    
