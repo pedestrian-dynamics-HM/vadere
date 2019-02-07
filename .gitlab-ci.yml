@@ -45,7 +45,7 @@ deploy_branch_on_linux:
         - linux        
     environment:
         name: linux
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/${VADERE_PACKAGE_NAME}
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
 
 # Jobs for Windows runner (which is labelled with tag "windows")
 deploy_branch_on_windows:
