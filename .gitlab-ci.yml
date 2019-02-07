@@ -31,8 +31,14 @@ stages:
     - integration_test
     - deploy
 
-include: .gitlab/ci/templates/deploy_stage_templates.yml
-include: .gitlab/ci/templates/test_stage_templates.yml
+# PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
+#
+# 1. "include: .gitlab/ci/windows_jobs.yml" does not work!
+#    Seems a bug in GitLab's "include" statement. Therefore, define all jobs
+#    directly here.
+# 2. Variables from "variables" section are not expanded correctly in "url"
+#    section of an "environment".
+include: .gitlab-ci-templates.yml
 
 # Job Definitions
 

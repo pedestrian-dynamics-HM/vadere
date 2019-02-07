@@ -1,0 +1,64 @@
+# # GitLab CI Job Templates
+#
+# These templates can be used to execute jobs on different runners.
+# 
+# Use GitLab's "include" keyword to include this file and the "extends" to
+# extend a template below.
+#
+# For more details, see https://docs.gitlab.com/ee/ci/yaml/README.html#using-extends-and-include-together
+
+.template_unit_tests:
+    stage: unit_test
+    
+    # Skip OpenCL tests by using "-Dtest=!Test1,!Test2,..." because GitLab
+    # runners do not support OpenCL.
+    script:
+        - mvn clean
+        - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
+        - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
+        
+    artifacts:
+        when: on_success
+        paths:
+            - "*/target/site/coverage-reports"
+        expire_in: 1 week
+            
+.template_scenario_files:
+    stage: integration_test
+
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+        
+    artifacts:
+        when: on_failure
+        paths:
+            - "log_dir"
+        expire_in: 1 week
+
+.template_seed_test:
+    stage: integration_test
+
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
+        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py
+        
+    artifacts:
+        when: on_failure
+        paths: 
+            - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
+        expire_in: 1 week
+
+.template_deploy_branch:
+    stage: deploy
+    
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
+        - scp ${VADERE_PACKAGE_NAME} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME}
+        
+    when: manual
