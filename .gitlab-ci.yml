@@ -3,14 +3,14 @@
 # Goal: Run all jobs defined here on all available runners (GNU/Linux and
 # Windows).
 # 
-# Procedure: Use GitLab job templates in and use them in the job description by
-# using the "extend" keyword.
+# Procedure: Use GitLab job templates prefixed with a "." and use them in the
+# actual job description with the "extend" keyword.
 #
 # ## Job Description Syntax
 #
 # <job_name>:                   # Job name which is displayed in web interface.
 #   stage: <stage_name>         # Run "script" commands in this stage. The
-#                               # stages are exececuted sequentially.
+#                               # stages are executed sequentially.
 #   script:
 #      - <arbitrary_commands>   # Here you can execute arbitratry terminal
 #                               # commands. If any of the commands return a
@@ -23,7 +23,7 @@
 # Variable Definitions
 variables:
     VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
-    VADERE_PACKAGE_NAME: "vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip"
+    VADERE_PACKAGE_NAME: "vadere-${CI_COMMIT_REF_NAME}-${CI_ENVIRONMENT_NAME}.zip"
 
 # Stage Definitions
 stages:
@@ -42,62 +42,53 @@ stages:
 # Job Template Definitions
 .template_unit_tests:
     stage: unit_test
-    
     # Skip OpenCL tests by using "-Dtest=!Test1,!Test2,..." because GitLab
     # runners do not support OpenCL.
     script:
         - mvn clean
         - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
         - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
-        
     artifacts:
         when: on_success
         paths:
             - "*/target/site/coverage-reports"
         expire_in: 1 week
+    when: on_success
             
 .template_scenario_files:
     stage: integration_test
-
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
-        
     artifacts:
         when: on_failure
         paths:
             - "log_dir"
         expire_in: 1 week
-        
-    when: manual
+    when: on_success
 
 .template_seed_test:
     stage: integration_test
-
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
-        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py
-        
+        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
     artifacts:
         when: on_failure
         paths: 
             - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
         expire_in: 1 week
-        
-    when: manual
+    when: on_success
 
 .template_deploy_branch:
     stage: deploy
-    
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME} VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME}
-        
     when: manual
 
 # Job Definitions
@@ -124,7 +115,7 @@ deploy_branch_on_linux:
         - linux        
     environment:
         name: linux
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-${CI_COMMIT_REF_NAME}-${CI_ENVIRONMENT_NAME}.zip
 
 ## Jobs for Windows runner (which is labelled with tag "windows")
 run_unit_tests_on_windows:
@@ -148,4 +139,4 @@ deploy_branch_on_windows:
         - windows        
     environment:
         name: windows
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-${CI_COMMIT_REF_NAME}-${CI_ENVIRONMENT_NAME}.zip
