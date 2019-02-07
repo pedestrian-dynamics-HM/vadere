@@ -3,9 +3,6 @@
 # Goal: Run all jobs defined here on all available runners (GNU/Linux and
 # Windows).
 # 
-# Procedure: Use GitLab job templates in ".gitlab/ci/templates/" and use them
-# in the job description by using the "extend" keyword.
-#
 # ## Job Description Syntax
 #
 # <job_name>:                   # Job name which is displayed in web interface.
@@ -16,6 +13,9 @@
 #                               # commands. If any of the commands return a
 #                               # non-zero exit code, the job fails.
 #
+# Procedure: Use GitLab job templates in ".gitlab/ci/templates/" and use them
+# in the job description by using the "extend" keyword.
+#
 # ## References
 #
 # - https://docs.gitlab.com/ee/ci/yaml/README.html
@@ -23,7 +23,7 @@
 # Variable Definitions
 variables:
     VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
-    VADERE_PACKAGE_NAME: "vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip"
+    VADERE_PACKAGE_NAME: "vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}"
 
 # Stage Definitions
 stages:
@@ -38,20 +38,10 @@ include: .gitlab/ci/templates/deploy_stage_templates.yml
 # Seems a bug in GitLab's "include" statement. Therefore, define all jobs
 # directly here.
 
-# Jobs for GNU/Linux runner (which is labelled with tag "linux")
-deploy_branch_on_linux:
-    extends: .template_deploy_branch
-    tags:
-        - linux        
-    environment:
-        name: linux
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}"
-
-# Jobs for Windows runner (which is labelled with tag "windows")
 deploy_branch_on_windows:
     extends: .template_deploy_branch
     tags:
         - windows        
     environment:
         name: windows
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}"
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}.jar"
