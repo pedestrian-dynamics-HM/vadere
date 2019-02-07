@@ -51,11 +51,3 @@
         paths: 
             - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
         expire_in: 1 week
-
-.template_deploy_branch:
-    stage: deploy
-
-    script:
-        - echo "scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA:0:8}.${CI_ENVIRONMENT_NAME}.jar"
-        
-    when: manual

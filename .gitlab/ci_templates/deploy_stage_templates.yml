@@ -1,0 +1,21 @@
+# # GitLab CI Job Templates
+#
+# These templates can be used to execute jobs on different runners.
+# 
+# Use GitLab's "include" keyword to include this file and the "extends" to
+# extend a template below.
+#
+# For more details, see https://docs.gitlab.com/ee/ci/yaml/README.html#using-extends-and-include-together
+
+.template_deploy_branch:
+    stage: deploy
+
+    # TODO: Write scipt "package_vadere.py" which packages "vadere_console.jar", "vadere.jar"
+    # and folder "VadereModelTests" into one ZIP file.
+    # Pass GitLab CI variables (like below) to create filenames for JAR files and final ZIP file.
+    script:
+        - mvn clean
+        - mvn package
+        - scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA:0:8}.${CI_ENVIRONMENT_NAME}.jar
+        
+    when: manual

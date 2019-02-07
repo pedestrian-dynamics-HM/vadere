@@ -25,7 +25,8 @@ variables:
 stages:
     - deploy
 
-include: .gitlab-ci-templates.yml
+include: .gitlab/ci_templates/deploy_stage_templates.yml
+include: .gitlab/ci_templates/test_stage_templates.yml
 
 # Job Definitions
 
