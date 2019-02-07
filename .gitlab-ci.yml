@@ -3,8 +3,8 @@
 # Goal: Run all jobs defined here on all available runners (GNU/Linux and
 # Windows).
 # 
-# Procedure: Use GitLab job templates in ".gitlab/ci/templates/" and use them
-# in the job description by using the "extend" keyword.
+# Procedure: Use GitLab job templates in and use them in the job description by
+# using the "extend" keyword.
 #
 # ## Job Description Syntax
 #
@@ -33,21 +33,13 @@ stages:
 
 # PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
 #
-# 1. "include: .gitlab/ci/windows_jobs.yml" does not work!
-#    Seems a bug in GitLab's "include" statement. Therefore, define all jobs
-#    directly here.
+# 1. "include:" statement does not work properly and seems really buggy.
+#    Therefore, define all job templates and jobs directly here.
+#    "include: .gitlab/ci/templates/test_stage_templates.yml" does not work!
 # 2. Variables from "variables" section are not expanded correctly in "url"
 #    section of an "environment".
 
-# # GitLab CI Job Templates
-#
-# These templates can be used to execute jobs on different runners.
-# 
-# Use GitLab's "include" keyword to include this file and the "extends" to
-# extend a template below.
-#
-# For more details, see https://docs.gitlab.com/ee/ci/yaml/README.html#using-extends-and-include-together
-
+# Job Template Definitions
 .template_unit_tests:
     stage: unit_test
     
@@ -106,7 +98,7 @@ stages:
 
 # Job Definitions
 
-# Jobs for GNU/Linux runner (which is labelled with tag "linux")
+## Jobs for GNU/Linux runner (which is labelled with tag "linux")
 run_unit_tests_on_linux:
     extends: .template_unit_tests
     tags:
@@ -130,7 +122,7 @@ deploy_branch_on_linux:
         name: linux
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
 
-# Jobs for Windows runner (which is labelled with tag "windows")
+## Jobs for Windows runner (which is labelled with tag "windows")
 run_unit_tests_on_windows:
     extends: .template_unit_tests
     tags:
@@ -152,5 +144,4 @@ deploy_branch_on_windows:
         - windows        
     environment:
         name: windows
-        # WATCH OUT: Variables from "variables" section are not expanded correctly here.
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
