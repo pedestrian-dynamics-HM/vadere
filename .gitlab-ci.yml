@@ -54,4 +54,5 @@ deploy_branch_on_windows:
         - windows        
     environment:
         name: windows
-        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/${VADERE_PACKAGE_NAME}
+        # WATCH OUT: Variables from "variables" section are not expanded correctly here.
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}.zip
