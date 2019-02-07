@@ -13,6 +13,9 @@
 #                               # commands. If any of the commands return a
 #                               # non-zero exit code, the job fails.
 #
+# Procedure: Use GitLab job templates in ".gitlab/ci/templates/" and use them
+# "here" by using the "extend" keyword.
+#
 # ## References
 #
 # - https://docs.gitlab.com/ee/ci/yaml/README.html
@@ -21,6 +24,7 @@
 variables:
     VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
     VADERE_PACKAGE_NAME: "vadere.${CI_COMMIT_REF_NAME}.${CI_ENVIRONMENT_NAME}"
+
 # Stage Definitions
 stages:
     - deploy
