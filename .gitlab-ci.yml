@@ -29,7 +29,8 @@ include: .gitlab/ci/templates/deploy_stage_templates.yml
 # include: .gitlab/ci/templates/test_stage_templates.yml
 
 # Job Definitions
-# Jobs for Windows runner (which is labelled with tag "windows")
+
+## Jobs for Windows runner (which is labelled with tag "windows")
 deploy_branch_on_windows:
     extends: .template_deploy_branch
     tags:
