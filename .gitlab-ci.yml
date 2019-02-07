@@ -135,7 +135,7 @@ deploy_branch_on_linux:
     tags:
         - linux        
     environment:
-        name: branches/linux
+        name: branches/${CI_COMMIT_REF_NAME}/linux
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
 
 ## Jobs for Windows runner (which is labelled with tag "windows")
@@ -167,5 +167,5 @@ deploy_branch_on_windows:
     tags:
         - windows        
     environment:
-        name: branches/windows
+        name: branches/${CI_COMMIT_REF_NAME}/windows
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
