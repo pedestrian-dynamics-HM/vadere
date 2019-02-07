@@ -49,14 +49,7 @@
             - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
         expire_in: 1 week
 
-.template_deploy:
+.template_deploy_branch:
     stage: deploy
-    only:
-      refs:
-        - master
-        - configure_ci_setup
     script:
-        - mvn clean
-        - mvn -Dmaven.test.skip=true package
-        - scp -v -i ~/.ssh/id_rsa VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/vadere_latest.jar
-
+        - echo "scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere-console.$CI_COMMIT_REF_NAME.$CI_COMMIT_SHORT_SHA.$CI_ENVIRONMENT_NAME.jar"

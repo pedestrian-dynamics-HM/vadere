@@ -17,20 +17,22 @@
 #
 # - https://docs.gitlab.com/ee/ci/yaml/README.html
 
+# Variable Definitions
+VADERE_DEPLOYMENT_BASE_URL=http://www.vadere.org/builds
+
+# Stage Definitions
 stages:
     - deploy
 
 include: .gitlab-ci-templates.yml
 
-
-
-deploy_on_linux:
-    extends: .template_deploy
-    tags:
-        - linux
+# Job Definitions
 
 # Jobs for Windows runner (which is labelled with tag "windows")
-deploy_on_windows:
-    extends: .template_deploy
+deploy_branch_on_windows:
+    extends: .template_deploy_branch
     tags:
         - windows
+    environment:
+        name: windows
+        url: $VADERE_DEPLOYMENT_BASE_URL/branches/vadere-latest.$CI_COMMIT_REF_NAME.$CI_COMMIT_SHORT_SHA.$CI_ENVIRONMENT_NAME.jar
