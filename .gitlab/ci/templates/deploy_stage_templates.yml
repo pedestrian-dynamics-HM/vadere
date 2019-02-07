@@ -10,13 +10,12 @@
 .template_deploy_branch:
     stage: deploy
 
-    # TODO: Write scipt "package_vadere.py" which packages "vadere_console.jar", "vadere.jar"
     # and folder "VadereModelTests" into one ZIP file.
     # Pass GitLab CI variables (like below) to create filenames for JAR files and final ZIP file.
     script:
         - export
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar ${VADERE_PACKAGE_NAME}.zip
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME}.zip VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
         - scp vadere.${VADERE_PACKAGE_NAME}.zip di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere.${VADERE_PACKAGE_NAME}.zip
     when: manual
