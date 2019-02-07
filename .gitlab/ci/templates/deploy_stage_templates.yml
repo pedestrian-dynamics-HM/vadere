@@ -14,8 +14,9 @@
     # and folder "VadereModelTests" into one ZIP file.
     # Pass GitLab CI variables (like below) to create filenames for JAR files and final ZIP file.
     script:
+        - export
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c VadereModelTests/ VadereGui/target/vadere.jar vadere-console.jar vadere.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}.zip
-        - scp vadere.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}.zip di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}.zip
+        - python3 -m zipfile -c VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar ${VADERE_PACKAGE_NAME}.zip
+        - scp vadere.${VADERE_PACKAGE_NAME}.zip di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere.${VADERE_PACKAGE_NAME}.zip
     when: manual
