@@ -53,3 +53,4 @@
     stage: deploy
     script:
         - echo "scp VadereSimulator/target/vadere-console.jar di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/vadere-console.$CI_COMMIT_REF_NAME.$CI_COMMIT_SHORT_SHA.$CI_ENVIRONMENT_NAME.jar"
+        - export
