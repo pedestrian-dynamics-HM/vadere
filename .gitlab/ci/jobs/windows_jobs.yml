@@ -1,0 +1,7 @@
+deploy_branch_on_windows:
+    extends: .template_deploy_branch
+    tags:
+        - windows
+    environment:
+        name: windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere-console.${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA}.${CI_ENVIRONMENT_NAME}.jar"
