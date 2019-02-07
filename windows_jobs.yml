@@ -1,3 +1,4 @@
+
 deploy_branch_on_windows:
     extends: .template_deploy_branch
     tags:
