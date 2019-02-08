@@ -24,7 +24,21 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ## Installation
 
-### Dependencies
+### Download builds
+
+* Windows: [Latest build](http://www.vadere.org/builds/master/vadere.master.windows.zip)
+* Linux: [Latest build](http://www.vadere.org/builds/master/vadere.master.linux.zip)
+
+The zip-file contains:
+* **vadere.jar** - provides Vadere with a GUI. 
+* **vadere_console.jar** - provides an command line API and therefore allows easy integration of Vadere into other applications. 
+* **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
+
+To execute the `.jar` files it is highly recommended to use Java 8.  
+
+### Build from source
+
+#### Dependencies
 
 * Java 8
 * Maven 3.0
@@ -33,7 +47,7 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 **Note:** Please, ensure that the Git executable can be found in the `PATH` variable of your operating system.
 
-### Install OpenCL
+#### Install OpenCL
 
 Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components must be installed:
 
@@ -48,14 +62,14 @@ Please, use following instructions to set up the OpenCL components for your oper
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
   * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
-## Run the Application
+#### Run the Application
 
 1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
 2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`and `postvis.jar`. 
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
-### Run Built-In Examples
+## Run Built-In Examples
 
 With the following steps, you can run a simulation with one of the built-in examples from [VadereModelTests](VadereModelTests):
 
