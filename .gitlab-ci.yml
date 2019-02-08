@@ -31,8 +31,8 @@ variables:
 #  it fails sometimes!  
 stages:
     - unit_test
-    - integration_test
     - deploy
+    - integration_test
 
 # PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
 #
