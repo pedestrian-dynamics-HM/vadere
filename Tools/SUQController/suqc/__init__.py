@@ -16,4 +16,4 @@ from suqc.parameter.postchanges import ScenarioChanges
 from suqc.qoi import *
 from suqc.request import *
 
-__version__ = "1.0"
+__version__ = "1.01"

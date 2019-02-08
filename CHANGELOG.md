@@ -6,6 +6,18 @@
 
 ### Added
 
+- Configured 1-click-deployment in ".gitlab-ci.yml".
+  * The build pipeline consists of three stages: unit_test, integration_test and deploy.
+  * These stages run sequentially. The build pipeline is stopped if one stage fails.
+  * The jobs in "integration_test" and "deploy" are marked as "manual". I.e., these jobs
+    must be triggered via the play button in the GitLab web interface:
+    https://gitlab.lrz.de/vadere/vadere/pipelines
+  * The jobs in the "integration_test" stage run manual because of a bug in GitLab which
+    does not allow to run manual jobs (e.g., from deploy stage) when the pipeline fails.
+    In Vadere, this situation arises because of our seed test. Link to issue on GitLab website:
+    https://gitlab.com/gitlab-org/gitlab-ce/issues/51645
+  * The link to the deployed items can be found in the GitLab web interface:
+    https://gitlab.lrz.de/vadere/vadere/environments
 - Create a Facade for the logging in vadere. This will remove 3rd party
   dependencies in source most files. Only a small set of facade classes
   will have the dependency.
