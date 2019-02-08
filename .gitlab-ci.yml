@@ -27,6 +27,8 @@ variables:
     VADERE_PACKAGE_NAME_RELEASES: "vadere.${CI_COMMIT_TAG}.${CI_RUNNER_TAGS}.zip"
 
 # Stage Definitions
+# Watch out: the integration_test (seed test) is after deploy, because currently 
+#  it fails sometimes!  
 stages:
     - unit_test
     - integration_test
@@ -81,7 +83,7 @@ stages:
         paths: 
             - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
         expire_in: 1 week
-    when: manual
+    when: on_success
 
 .template_deploy_master_automatically:
     stage: deploy
