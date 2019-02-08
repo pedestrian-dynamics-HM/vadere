@@ -67,7 +67,7 @@ stages:
         paths:
             - "log_dir"
         expire_in: 1 week
-    when: on_success
+    when: manual
 
 .template_seed_test:
     stage: integration_test
@@ -81,7 +81,7 @@ stages:
         paths: 
             - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
         expire_in: 1 week
-    when: on_success
+    when: manual
 
 .template_deploy_master_automatically:
     stage: deploy
