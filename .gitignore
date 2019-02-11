@@ -10,7 +10,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 **/venv/
-Tools/VadereAnalysisTools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
 Tools/VadereAnalysisTools/VadereAnalysisTool/build/
 Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
 Tools/ContinuousIntegration/**/output
