@@ -24,19 +24,20 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ## Installation
 
-### Download builds
+### Download Releases
 
 * Windows: [Latest build](http://www.vadere.org/builds/master/vadere.master.windows.zip)
 * Linux: [Latest build](http://www.vadere.org/builds/master/vadere.master.linux.zip)
 
-The zip-file contains:
+The ZIP file contains:
+* **README.md** - this README file. 
 * **vadere.jar** - provides Vadere with a GUI. 
-* **vadere_console.jar** - provides an command line API and therefore allows easy integration of Vadere into other applications. 
+* **vadere_console.jar** - provides the command line version of Vadere and allows easy integration into other applications. 
 * **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
 To execute the `.jar` files it is highly recommended to use Java 8.  
 
-### Build from source
+### Build from Source
 
 #### Dependencies
 
@@ -75,12 +76,12 @@ With the following steps, you can run a simulation with one of the built-in exam
 
 - start Vadere 
 - *Project* > *Open* 
-- choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
+- choose `vadere.project` of one of the projects e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereModelTests/TestOSM) and click *open*
 - select the scenario on the left and press *run selected scenario*
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
+See [CHANGELOG.md](https://gitlab.lrz.de/vadere/vadere/blob/master/CHANGELOG.md) for a list of changes.
 
 ## JavaDoc
 
@@ -88,10 +89,10 @@ See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 ## Contribution
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up the development environment and the coding guidelines.
+See [CONTRIBUTING.md](https://gitlab.lrz.de/vadere/vadere/blob/master/CONTRIBUTING.md) for how to set up the development environment and the coding guidelines.
 
 ## License
 
-This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
+This software is licensed under the GNU Lesser General Public License ([LGPL](https://gitlab.lrz.de/vadere/vadere/blob/master/LICENSE)).
 
 For more information: http://www.gnu.org/licenses/lgpl.html
