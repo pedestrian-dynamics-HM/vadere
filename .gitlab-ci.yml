@@ -112,7 +112,7 @@ stages:
         - mvn -Dmaven.test.skip=true package
         # setup.py install should from the directoty at which the setup.py file is located (working directory). The brackets return the working direcory back to previous position. 
         - (cd Tools/VadereAnalysisTools/VadereAnalysisTool/ && python3 setup.py install --user)
-        - cd python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
+        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
     artifacts:
         when: on_failure
         paths: 
