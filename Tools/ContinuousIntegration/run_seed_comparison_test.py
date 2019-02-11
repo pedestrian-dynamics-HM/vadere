@@ -3,8 +3,8 @@ import shutil
 import subprocess
 import time
 
-from vadereanyslsistool import VadereProject
-from vadereanyslsistool import SameSeedTrajectory
+from vadereanalysistool import VadereProject
+from vadereanalysistool import SameSeedTrajectory
 
 
 def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_console="VadereSimulator/target/vadere-console.jar",
