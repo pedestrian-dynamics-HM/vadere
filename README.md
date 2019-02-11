@@ -26,8 +26,11 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ### Download Releases
 
-* Windows: [Latest build](http://www.vadere.org/builds/master/vadere.master.windows.zip)
-* Linux: [Latest build](http://www.vadere.org/builds/master/vadere.master.linux.zip)
+Latest build of master:
+* [Windows](http://www.vadere.org/builds/master/vadere.master.windows.zip)
+* [Linux](http://www.vadere.org/builds/master/vadere.master.linux.zip)
+
+Stable releases and selected branch-builds are located on [www.vadere.org/releases/](http://www.vadere.org/releases/)
 
 The ZIP file contains:
 * **README.md** - this README file. 
@@ -35,7 +38,7 @@ The ZIP file contains:
 * **vadere_console.jar** - provides the command line version of Vadere and allows easy integration into other applications. 
 * **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
-To execute the `.jar` files it is highly recommended to use Java 8.  
+To execute the `.jar` files it is highly recommended to use Oracle Java 8.  
 
 ### Build from Source
 
