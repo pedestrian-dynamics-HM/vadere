@@ -17,7 +17,7 @@ Tools/ContinuousIntegration/**/output
 
 # C extensions
 *.so
-vadere_analysis_tool/build
+vadereanalysistool/build
 
 #Tools and build utils
 bin/

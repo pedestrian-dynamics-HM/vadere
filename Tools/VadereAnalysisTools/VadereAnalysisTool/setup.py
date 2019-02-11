@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="VadereAnalysisTool",
+    name="vadereanalysistool",
     version="0.1.0",
     author="Stefan Schuhbäck",
     author_email="stefan.schuhbaeck@hm.edu",
