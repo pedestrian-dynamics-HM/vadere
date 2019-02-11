@@ -1,6 +1,6 @@
 
-from vadere_analysis_tool import ScenarioOutput
-from vadere_analysis_tool import VadereProject
+from vadereanalysistool import ScenarioOutput
+from vadereanalysistool import VadereProject
 
 
 class SameSeedTrajectory:
