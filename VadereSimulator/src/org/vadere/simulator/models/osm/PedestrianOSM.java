@@ -229,6 +229,7 @@ public class PedestrianOSM extends Pedestrian {
 	public double getPotential(IPoint newPos) {
 
 		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
+		targetPotential *= -1;
 
 		double pedestrianPotential = potentialFieldPedestrian
 				.getAgentPotential(newPos, this, relevantPedestrians);
