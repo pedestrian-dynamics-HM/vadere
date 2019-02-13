@@ -229,12 +229,19 @@ public class PedestrianOSM extends Pedestrian {
 	public double getPotential(IPoint newPos) {
 
 		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
-		targetPotential *= -1;
+
+		// The target potential is intialized with "Double.MAX_VALUE" in obstacle regions!
+		// Multiplying "Double.MAX_VALUE" with "-1" would cause an agent to walk into an obstacle.
+		if (targetPotential != Double.MAX_VALUE) {
+			targetPotential *= -1;
+		}
 
 		double pedestrianPotential = potentialFieldPedestrian
 				.getAgentPotential(newPos, this, relevantPedestrians);
+
 		double obstacleRepulsionPotential = potentialFieldObstacle
 				.getObstaclePotential(newPos, this);
+
 		return targetPotential + pedestrianPotential
 				+ obstacleRepulsionPotential;
 	}
