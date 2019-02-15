@@ -98,6 +98,8 @@ public class EventController {
     /**
      * Return if "simulationTime" is in interval [startTime, endTime) of given "timeframe".
      *
+     * TODO: Maybe, including boundaries, i.e. [startTime, endTime], is more intuitive. Check if this causes problems.
+     * 
      * @throws IllegalArgumentException If given timeframe is a recurring one.
      */
     public static boolean oneTimeTimeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {

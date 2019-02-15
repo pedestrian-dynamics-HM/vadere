@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * Combine potential so that agents get distracted by targets.
  */
-public class TargetDistractionStrategy implements CombinedPotentialStrategy {
+public class TargetDistractionStrategy implements ICombinedPotentialStrategy {
     private IPotentialFieldTarget potentialFieldTarget;
     private PotentialFieldObstacle potentialFieldObstacle;
     private PotentialFieldAgent potentialFieldAgent;

@@ -1,33 +1,12 @@
 package org.vadere.simulator.models.potential.combinedPotentials;
 
- import org.vadere.state.scenario.Agent;
- import org.vadere.util.geometry.shapes.IPoint;
-
- import java.util.Collection;
-
 /**
- * In "seitz-2012", the total potential for some point x (in R²)
- * is the combination of different potentials:
+ * All available potential strategies.
  *
- *   combined(x) = target(x) + obstacles(x) + agents(x)
- *
- * Use this interface to implement different combinations of these
- * potentials. For instance, negate the target potential so that
- * agents run away from targets:
- *
- *   combined(x) = -target(x) + obstacles(x) + agents(x)
- *
- * The implementing classes require objects of following interfaces
- * to calculate the combined potential:
- * - {@link org.vadere.simulator.models.potential.fields.IPotentialFieldTarget}
- * - {@link org.vadere.simulator.models.potential.fields.PotentialFieldObstacle}
- * - {@link org.vadere.simulator.models.potential.fields.PotentialFieldAgent}
- *
- * At runtime, implementations of this interface can be replaced by using the strategy pattern.
+ * Use these enum values to create objects imlementing {@link org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy}
+ * by using the factory pattern.
  */
-public interface CombinedPotentialStrategy {
-    /**
-     * Get the combined potential at given position.
-     */
-    public double getValue(IPoint newPos, Agent thisAgent, Collection<? extends Agent> otherAgents);
+public enum CombinedPotentialStrategy {
+    TARGET_ATTRACTION_STRATEGY,
+    TARGET_DISTRACTION_STRATEGY
 }

@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * Combine potential so that agents get attracted by targets.
  */
-public class TargetAttractionStrategy implements CombinedPotentialStrategy {
+public class TargetAttractionStrategy implements ICombinedPotentialStrategy {
     private IPotentialFieldTarget potentialFieldTarget;
     private PotentialFieldObstacle potentialFieldObstacle;
     private PotentialFieldAgent potentialFieldAgent;

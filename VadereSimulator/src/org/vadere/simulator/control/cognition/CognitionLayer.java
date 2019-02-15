@@ -1,9 +1,6 @@
 package org.vadere.simulator.control.cognition;
 
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.WaitEvent;
-import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
@@ -34,8 +31,11 @@ public class CognitionLayer {
 
         List<Event> waitEvents = events.stream().filter(event -> event instanceof WaitEvent).collect(Collectors.toList());
         List<Event> waitInAreaEvents = events.stream().filter(event -> event instanceof WaitInAreaEvent).collect(Collectors.toList());
+        List<Event> bangEvents = events.stream().filter(event -> event instanceof BangEvent).collect(Collectors.toList());
 
-        if (waitEvents.size() >= 1) {
+        if (bangEvents.size() >= 1) {
+            mostImportantEvent = bangEvents.get(0);
+        } else if (waitEvents.size() >= 1) {
             mostImportantEvent = waitEvents.get(0);
         } else if (waitInAreaEvents.size() >= 1) {
             for (Event event : waitInAreaEvents) {
