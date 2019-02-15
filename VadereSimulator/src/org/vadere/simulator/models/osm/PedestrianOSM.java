@@ -3,6 +3,8 @@ package org.vadere.simulator.models.osm;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -39,6 +41,8 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
+	// TODO: Provide method to change object here according to stragey pattern.
+	private transient CombinedPotentialStrategy combinedPotentialStrategy;
 	private transient List<SpeedAdjuster> speedAdjusters;
 	private transient List<StepSizeAdjuster> stepSizeAdjusters;
 	private VPoint nextPosition;
@@ -73,6 +77,8 @@ public class PedestrianOSM extends Pedestrian {
 		this.potentialFieldTarget = potentialFieldTarget;
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
+		// TODO: Use "TargetAttractionStrategy" by default.
+		this.combinedPotentialStrategy = new TargetDistractionStrategy(potentialFieldTarget, potentialFieldObstacle, potentialFieldPedestrian);
 		this.stepCircleOptimizer = stepCircleOptimizer;
 
 		this.speedAdjusters = speedAdjusters;
@@ -227,23 +233,7 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public double getPotential(IPoint newPos) {
-
-		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
-
-		// The target potential is intialized with "Double.MAX_VALUE" in obstacle regions!
-		// Multiplying "Double.MAX_VALUE" with "-1" would cause an agent to walk into an obstacle.
-		if (targetPotential != Double.MAX_VALUE) {
-			targetPotential *= -1;
-		}
-
-		double pedestrianPotential = potentialFieldPedestrian
-				.getAgentPotential(newPos, this, relevantPedestrians);
-
-		double obstacleRepulsionPotential = potentialFieldObstacle
-				.getObstaclePotential(newPos, this);
-
-		return targetPotential + pedestrianPotential
-				+ obstacleRepulsionPotential;
+		return combinedPotentialStrategy.getValue(newPos, this, relevantPedestrians);
 	}
 
 	public void clearStrides() {
