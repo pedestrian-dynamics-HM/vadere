@@ -53,13 +53,13 @@ def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_con
             except subprocess.CalledProcessError as exception:
                 print("Scenario file failed: {}".format(scenario_file))
                 print("->  Reason: non-zero return value {}".format(exception.returncode))
-                print("Stderr: {}".format(exception.stderr.decode("utf-8")))
                 failed_scenarios_with_exception.append((scenario_file, exception))
 
     return {"passed": passed_scenarios, "failed": failed_scenarios_with_exception}
 
 
 if __name__ == '__main__':
+    # Note: the script is intended to run from [vadere_root_path]
     project = VadereProject('Tools/ContinuousIntegration/run_seed_comparison_test.d')
     project.clear_output_dir()
     scenario_return = run_scenario_files_with_vadere_console(project)
