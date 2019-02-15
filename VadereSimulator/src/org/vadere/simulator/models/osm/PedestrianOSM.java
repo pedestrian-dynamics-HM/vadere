@@ -41,7 +41,7 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
-	// TODO: Provide method to change object here according to stragey pattern.
+	// A setter is provided to be able to change strategy at runtime (e.g. by events).
 	private transient CombinedPotentialStrategy combinedPotentialStrategy;
 	private transient List<SpeedAdjuster> speedAdjusters;
 	private transient List<StepSizeAdjuster> stepSizeAdjusters;
@@ -240,7 +240,9 @@ public class PedestrianOSM extends Pedestrian {
 		strides.clear();
 	}
 
-	// Getters...
+	// TODO: Group getters and setters correctly.
+
+	// Getters
 
 	public double getTargetPotential(VPoint pos) {
 		return potentialFieldTarget.getPotential(pos, this);
@@ -261,6 +263,10 @@ public class PedestrianOSM extends Pedestrian {
 	public Vector2D getPedestrianGradient(VPoint pos) {
 		return potentialFieldPedestrian.getAgentPotentialGradient(pos,
 				new Vector2D(0, 0), this, relevantPedestrians);
+	}
+
+	public CombinedPotentialStrategy getCombinedPotentialStrategy() {
+		return combinedPotentialStrategy;
 	}
 
 	public double getTimeOfNextStep() {
@@ -305,6 +311,10 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void setRelevantPedestrians(@NotNull final Collection<? extends Agent> relevantPedestrians) {
 		this.relevantPedestrians = relevantPedestrians;
+	}
+
+	public void setCombinedPotentialStrategy(CombinedPotentialStrategy combinedPotentialStrategy) {
+		this.combinedPotentialStrategy = combinedPotentialStrategy;
 	}
 
 	public Collection<? extends Agent> getRelevantPedestrians() {
