@@ -60,7 +60,7 @@ def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_con
 
 
 if __name__ == '__main__':
-    project = VadereProject('run_seed_comparison_test.d')
+    project = VadereProject('Tools/ContinuousIntegration/run_seed_comparison_test.d')
     project.clear_output_dir()
     scenario_return = run_scenario_files_with_vadere_console(project)
   
