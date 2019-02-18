@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
  * The EventController uses the passed {@link ScenarioStore}
  * to extract the possible events from the scenario description.
  *
- * TODO Clarify what happens if "simTimeSteps" are too big.
+ * TODO: Clarify what should happen if "simTimeSteps" is too coarse
+ * and defined events cannot be triggered correctly here.
  */
 public class EventController {
 
@@ -96,16 +97,14 @@ public class EventController {
     }
 
     /**
-     * Return if "simulationTime" is in interval [startTime, endTime) of given "timeframe".
+     * Return if "simulationTime" is in interval [startTime, endTime] of given "timeframe".
      *
-     * TODO: Maybe, including boundaries, i.e. [startTime, endTime], is more intuitive. Check if this causes problems.
-     * 
      * @throws IllegalArgumentException If given timeframe is a recurring one.
      */
     public static boolean oneTimeTimeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {
         throwExceptionIfTimeframeIsInvalid(timeframe, false);
 
-        boolean eventIsActive = (simulationTime >= timeframe.getStartTime() && simulationTime < timeframe.getEndTime());
+        boolean eventIsActive = (simulationTime >= timeframe.getStartTime() && simulationTime <= timeframe.getEndTime());
 
         return eventIsActive;
     }
@@ -127,12 +126,12 @@ public class EventController {
      *   waitTimeBetweenRepetition = 1.0
      *   simulationTime = 0.8
      *
-     * That means, the timeframe is active in following intervals (end time is excluded!):
+     * That means, the timeframe is active in following intervals (end time is included!):
      *
-     *   [0.75 -- 1.25)
-     *   [2.25 -- 2.75)
-     *   [3.75 -- 4.25)
-     *   [5.25 -- 5.75)
+     *   [0.75 -- 1.25]
+     *   [2.25 -- 2.75]
+     *   [3.75 -- 4.25]
+     *   [5.25 -- 5.75]
      *   ...
      *
      * Now, if this method gets "simulationTime = 0.8", the method should detect that the timeframe
@@ -153,7 +152,7 @@ public class EventController {
         double eventStartTimeCurrentPeriod = timeframe.getStartTime() + (currentPeriod * eventPeriodLength);
         double eventEndTimeCurrentPeriod = eventStartTimeCurrentPeriod + eventLength;
 
-        boolean eventIsActive = (simulationTime >= eventStartTimeCurrentPeriod && simulationTime < eventEndTimeCurrentPeriod);
+        boolean eventIsActive = (simulationTime >= eventStartTimeCurrentPeriod && simulationTime <= eventEndTimeCurrentPeriod);
 
         return eventIsActive;
     }
