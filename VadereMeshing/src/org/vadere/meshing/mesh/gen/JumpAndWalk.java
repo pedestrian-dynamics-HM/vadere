@@ -45,16 +45,18 @@ public class JumpAndWalk<P extends IPoint, CE, CF, V extends IVertex<P>, E exten
 		else {
 			V result = null;
 			double max = Math.pow(n, 1.0/3.0);
+			//double max = n;
 
 			for(int i = 0; i < max; i++) {
 
 				V vertex = triangulation.getMesh().getRandomVertex(random);
 
-				if(result == null || endPoint.distanceSq(vertex) < endPoint.distanceSq(result)) {
+				if(!triangulation.getMesh().isBoundary(triangulation.getMesh().getFace(vertex)) &&
+						(result == null || endPoint.distanceSq(vertex) < endPoint.distanceSq(result))) {
 					result = vertex;
 				}
 			}
-			return Optional.ofNullable(triangulation.getMesh().getFace(result));
+			return Optional.ofNullable(result == null ? null : triangulation.getMesh().getFace(result));
 		}
 	}
 

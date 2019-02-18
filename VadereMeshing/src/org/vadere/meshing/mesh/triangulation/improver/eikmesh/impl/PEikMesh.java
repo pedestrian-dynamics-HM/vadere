@@ -1,6 +1,13 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.impl.APMesh;
+import org.vadere.meshing.mesh.impl.VPMesh;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.util.math.IDistanceFunction;
@@ -53,5 +60,4 @@ public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
 		super(polygon, initialEdgeLen, obstacleShapes,
 				(x, y) -> new EikMeshPoint(x, y, false));
 	}
-
 }

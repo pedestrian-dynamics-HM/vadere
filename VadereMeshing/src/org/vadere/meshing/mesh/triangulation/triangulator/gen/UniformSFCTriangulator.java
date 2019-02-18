@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
@@ -8,6 +8,7 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
@@ -148,7 +149,12 @@ public class UniformSFCTriangulator<P extends IPoint, CE, CF, V extends IVertex<
         }
     }
 
-    private void removeTrianglesOutsideBBox() {
+	@Override
+	public IMesh<P, CE, CF, V, E, F> getMesh() {
+		return mesh;
+	}
+
+	private void removeTrianglesOutsideBBox() {
         boolean removedSome = true;
 
         while (removedSome) {
@@ -177,7 +183,7 @@ public class UniformSFCTriangulator<P extends IPoint, CE, CF, V extends IVertex<
 		for(VShape shape : boundary) {
 
 			// 1. find a triangle inside the boundary
-			VPoint centroid = shape.getCentroid();
+			VPoint centroid = shape.getPolygonCentroid();
 
 			Optional<F> optFace = triangulation.locateFace(centroid.getX(), centroid.getY());
 

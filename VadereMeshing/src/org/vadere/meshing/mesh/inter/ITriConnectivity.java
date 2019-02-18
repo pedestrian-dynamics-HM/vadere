@@ -17,6 +17,9 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -411,6 +414,170 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
         }
 
         return Pair.of(t1, t2);
+	}
+
+	default List<E> splitEdgeAndReturn(@NotNull final V v, @NotNull E halfEdge, boolean legalize) {
+		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		mesh.insertVertex(v);
+
+		/*
+		 * Situation: h0 = halfEdge
+		 * h1 -> h2 -> h0
+		 *       f0
+		 * o2 <- o1 <- o0
+		 *       f3
+		 *
+		 * After splitEdge:
+		 * h0 -> h1 -> t0
+		 *       f0
+		 * t1 <- h2 <- e0
+		 *       f1
+		 *
+		 * e1 -> o1 -> t2
+		 *       f2
+		 * o0 <- o2 <- e2
+		 *       f3
+		 */
+
+		//h0,(t0),t1
+		//e2,(o0,
+
+		E h0 = halfEdge;
+		E o0 = mesh.getTwin(h0);
+
+		V v2 = mesh.getVertex(o0);
+		F f0 = mesh.getFace(h0);
+		F f3 = mesh.getFace(o0);
+
+		// faces correct?
+		//mesh.createEdge(v2, mesh.getFace(o0));
+		E e1 = mesh.createEdge(v2, mesh.getFace(o0));
+		E t2 = null;
+		E t1 = mesh.createEdge(v, mesh.getFace(h0));
+		mesh.setEdge(v, t1);
+
+		mesh.setTwin(e1, t1);
+
+		/*
+		 * These two operations are strongly connected.
+		 * Before these operations the vertex of o0 is v2.
+		 * If the edge of v2 is equal to o0, the edge becomes
+		 * invalid after calling mesh.setVertex(o0, v);
+		 */
+		mesh.setVertex(o0, v);
+		if(mesh.getEdge(v2).equals(o0)) {
+			mesh.setEdge(v2, e1);
+		}
+
+		if(!mesh.isBoundary(h0)) {
+			F f1 = mesh.createFace();
+
+			E h1 = mesh.getNext(h0);
+			E h2 = mesh.getNext(h1);
+
+			V v1 = mesh.getVertex(h1);
+			E e0 = mesh.createEdge(v1, f1);
+			E t0 = mesh.createEdge(v, f0);
+
+			mesh.setTwin(e0, t0);
+
+			mesh.setEdge(f0, h0);
+			mesh.setEdge(f1, h2);
+
+			mesh.setFace(h1, f0);
+			mesh.setFace(t0, f0);
+			mesh.setFace(h0, f0);
+
+			mesh.setFace(h2, f1);
+			mesh.setFace(t1, f1);
+			mesh.setFace(e0, f1);
+
+			mesh.setNext(h0, h1);
+			mesh.setNext(h1, t0);
+			mesh.setNext(t0, h0);
+
+			mesh.setNext(e0, h2);
+			mesh.setNext(h2, t1);
+			mesh.setNext(t1, e0);
+
+			splitEdgeEvent(f0, f0, f1);
+		}
+		else {
+			mesh.setNext(mesh.getPrev(h0), t1);
+			mesh.setNext(t1, h0);
+		}
+
+		if(!mesh.isBoundary(o0)) {
+			E o1 = mesh.getNext(o0);
+			E o2 = mesh.getNext(o1);
+
+			V v3 = mesh.getVertex(o1);
+			F f2 = mesh.createFace();
+
+			// face
+			E e2 = mesh.createEdge(v3, mesh.getFace(o0));
+			t2 = mesh.createEdge(v, f2);
+			mesh.setTwin(e2, t2);
+
+			mesh.setEdge(f2, o1);
+			mesh.setEdge(f3, o0);
+
+			mesh.setFace(o1, f2);
+			mesh.setFace(t2, f2);
+			mesh.setFace(e1, f2);
+
+			mesh.setFace(o2, f3);
+			mesh.setFace(o0, f3);
+			mesh.setFace(e2, f3);
+
+			mesh.setNext(e1, o1);
+			mesh.setNext(o1, t2);
+			mesh.setNext(t2, e1);
+
+			mesh.setNext(o0, e2);
+			mesh.setNext(e2, o2);
+			mesh.setNext(o2, o0);
+
+			splitEdgeEvent(f3, f3, f2);
+		}
+		else {
+			mesh.setNext(e1, mesh.getNext(o0));
+			mesh.setNext(o0, e1);
+		}
+
+		List<E> toLegalize = new ArrayList<>(4);
+
+		if(!mesh.isBoundary(h0)) {
+			E h1 = mesh.getNext(h0);
+			E h2 = mesh.getPrev(t1);
+			toLegalize.add(h1);
+			toLegalize.add(h2);
+		}
+
+		if(!mesh.isBoundary(o0)) {
+			E o1 = mesh.getNext(e1);
+			E o2 = mesh.getPrev(o0);
+			toLegalize.add(o1);
+			toLegalize.add(o2);
+		}
+
+		if(legalize) {
+			if(!mesh.isBoundary(h0)) {
+				E h1 = mesh.getNext(h0);
+				E h2 = mesh.getPrev(t1);
+				legalize(h1, v);
+				legalize(h2, v);
+			}
+
+			if(!mesh.isBoundary(o0)) {
+				E o1 = mesh.getNext(e1);
+				E o2 = mesh.getPrev(o0);
+				legalize(o1, v);
+				legalize(o2, v);
+			}
+		}
+
+		return toLegalize;
 	}
 
 	/**
@@ -824,7 +991,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *
 	 * @param boundaryEdge an edge of the boundary (i.e. part of the border or a hole).
 	 */
-	default void createFaceAtBoundary(@NotNull final E boundaryEdge) {
+	default F createFaceAtBoundary(@NotNull final E boundaryEdge) {
 		assert getMesh().isBoundary(boundaryEdge);
 
 		F boundary = getMesh().getFace(boundaryEdge);
@@ -870,8 +1037,8 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		// to find the boundary edge as quick as possible
 		getMesh().setEdge(getMesh().getVertex(next), newEdge);
 
-		List<V> vertices = getMesh().getVertices(newFace);
-		assert vertices.size() == 3;
+		assert getMesh().getVertices(newFace).size() == 3;
+		return newFace;
 	}
 
 	/*default void collapse3DAtBoundary(@NotNull final V vertex, final boolean removeIsolatedVertex) {
@@ -1042,6 +1209,10 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 */
 	default void legalize(@NotNull  final E edge, @NotNull final V p) {
 		legalizeNonRecursive(edge, p);
+	}
+
+	default void legalize(@NotNull  final E edge) {
+		legalizeNonRecursive(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
 	/**
@@ -1236,6 +1407,42 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
         return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
     }
 
+    default LinkedList<E> getIntersectingEdges(@NotNull final V vStart, @NotNull final V vEnd) {
+		VPoint q = getMesh().toPoint(vStart);
+		VPoint p = getMesh().toPoint(vEnd);
+	    E firstEdge = null;
+
+	    LinkedList<E> visitedEdges = new LinkedList<>();
+	    for(E e : getMesh().getEdgeIt(vStart)) {
+	    	E prev = getMesh().getPrev(e);
+		    if(intersectsDirectional(q, p, prev)) {
+			    firstEdge = getMesh().getTwin(prev);
+			    visitedEdges.addLast(firstEdge);
+		    }
+	    }
+
+	    Optional<E> optEdge = Optional.ofNullable(firstEdge);
+
+	    // TODO: duplicated code
+	    while(optEdge.isPresent()) {
+		    E inEdge = optEdge.get();
+		    optEdge = straightWalkNext(inEdge, q, p, e -> !isRightOf(vEnd.getX(), vEnd.getY(), e), visitedEdges);
+		    if(optEdge.isPresent()) {
+			    inEdge = optEdge.get();
+			    visitedEdges.addLast(inEdge);
+
+			    if(getMesh().isBorder(inEdge)) {
+				    break;
+			    }
+			    else if(getMesh().isHole(inEdge)) {
+			    	throw new IllegalArgumentException("reach a hole!");
+			    }
+		    }
+	    }
+
+	    return visitedEdges;
+    }
+
 	/**
 	 * Marches from the midpoint of a face i.e. <tt>startFace</tt> in the direction (<tt>direction</tt>) until
 	 * the stop-condition (<tt>stopCondition</tt>) is fulfilled. This requires O(n) worst case time, where n
@@ -1288,7 +1495,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 
         // initialize
         F face = startFace;
-        // for convex polygons we could also use: VPoint q = getMesh().toPolygon(startFace).getCentroid();
+        // for convex polygons we could also use: VPoint q = getMesh().toPolygon(startFace).getPolygonCentroid();
         VPoint q = getMesh().toTriangle(startFace).midPoint(); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
@@ -1332,13 +1539,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	default void smoothHoles(@NotNull final IDistanceFunction distanceFunction) {
 		for(F hole : getMesh().getHoles()) {
 			for(E edge : getMesh().getEdges(hole)) {
-				if(getMesh().getFace(edge).equals(hole)) {
 
+				/*
+				 * to avoid duplicated smoothing
+				 */
+				if(getMesh().getFace(edge).equals(hole)) {
 					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 					VPoint p = getMesh().toPoint(edge);
 					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
 
-					//TODO remove magic number
 					VTriangle triangle = new VTriangle(r,p,q);
 					if(distanceFunction.apply(triangle.midPoint()) <= 0 && GeometryUtils.isCCW(r, p, q)) {
 						double angle = GeometryUtils.angle(r, p, q);
@@ -1352,8 +1561,31 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	}
 
 	default void smoothBoundary(@NotNull final IDistanceFunction distanceFunction) {
-		//smoothBorder();
+		smoothBorder(distanceFunction);
 		smoothHoles(distanceFunction);
+	}
+
+	default void smoothBorder(@NotNull final IDistanceFunction distanceFunction) {
+		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
+
+			/*
+			 * to avoid duplicated smoothing
+			 */
+			if(getMesh().getFace(edge).equals(getMesh().getBorder())) {
+				VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
+				VPoint p = getMesh().toPoint(edge);
+				VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+
+				VTriangle triangle = new VTriangle(r,p,q);
+				if(distanceFunction.apply(triangle.midPoint()) <= 0 && GeometryUtils.isCCW(r, p, q)) {
+					double angle = GeometryUtils.angle(r, p, q);
+					if(angle < 0.5*Math.PI) {
+						System.out.println(triangle);
+						F newFace = createFaceAtBoundary(edge);
+					}
+				}
+			}
+		}
 	}
 
     /**
@@ -1441,6 +1673,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		return nextOutEdge;
 	}
 
+	/**
+	 * Returns the vertex of the face of the <tt>inEdge</tt> which is closest to the line segment
+	 * (q, p).
+	 *
+	 * @param inEdge
+	 * @param q
+	 * @param p
+	 * @return
+	 */
 	default V getSpecialVertex(@NotNull final E inEdge,
 	                           @NotNull final VPoint q,
 	                           @NotNull final VPoint p) {
@@ -1451,7 +1692,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			}
 		}
 
-		throw new IllegalArgumentException("no intersection point found");
+		throw new IllegalArgumentException("no intersection point found " + q + " -> " + p);
 	}
 
 	/**
@@ -2185,10 +2426,10 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			if (!valid) {
 				log.info(p1 + ", " + p2 + ", " + p3);
 			}
-			return GeometryUtils.isLeftOf(p1, p2, p3);
+			return valid;
 		};
 
-		log.debug(getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).filter(e -> !orientationPredicate.test(e)).count() + " invalid triangles");
+		//log.debug(getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).filter(e -> !orientationPredicate.test(e)).count() + " invalid triangles");
 		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
 	}
 

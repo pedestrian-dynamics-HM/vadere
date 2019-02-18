@@ -532,7 +532,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 //		yValue /= (6 * area);
 //
 //		return new VPoint(xValue, yValue);
-		return GeometryUtils.getCentroid(getPoints());
+		return GeometryUtils.getPolygonCentroid(getPoints());
 	}
 
 	public VPolygon rotate(IPoint anchor, double angle) {
@@ -557,6 +557,16 @@ public class VPolygon extends Path2D.Double implements VShape {
 		else {
 			return VShape.super.intersects(shape);
 		}
+	}
+
+	public List<VLine> getLinePath() {
+		List<VPoint> points = getPoints();
+		List<VLine> lines = new ArrayList<>(points.size());
+		for(int i = 0; i < points.size(); i++) {
+			VLine line = new VLine(points.get(i), points.get((i+1) % points.size()));
+			lines.add(line);
+		}
+		return lines;
 	}
 
 	@Override

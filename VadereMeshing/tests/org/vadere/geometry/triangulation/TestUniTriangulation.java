@@ -11,7 +11,7 @@ import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
- * This class is for testing and to give an example of how to use {@link UniformRefinementTriangulatorSFC}.
+ * This class is for testing and to give an example of how to use {@link GenUniformRefinementTriangulatorSFC}.
  *
  * @author Benedikt Zoennchen
  */
@@ -47,8 +47,8 @@ public class TestUniTriangulation extends JFrame {
 	    IMeshSupplier<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
 
 	    // the mesh refinement triangulator
-        UniformRefinementTriangulatorSFC<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.1, 1.5, distanceFunc, new ArrayList<>());
+        GenUniformRefinementTriangulatorSFC<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation =
+                new GenUniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.1, 1.5, distanceFunc, new ArrayList<>());
 
         // to measure the time consumption
 	    StopWatch overAllTime = new StopWatch();

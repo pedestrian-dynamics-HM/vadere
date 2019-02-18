@@ -135,7 +135,7 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		ColorHelper colorHelper = new ColorHelper(faces.size());*/
 
 		for(F face : faces) {
-			VPolygon polygon = mesh.toTriangle(face);
+			VPolygon polygon = mesh.toPolygon(face);
 
 			if(colorFunction != null) {
 				//graphics.setColor(colorFunction.apply(face));
@@ -143,8 +143,11 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 			}
 
 			if(alertPred.test(face)) {
-				graphics.setColor(Color.RED);
+				graphics.setColor(new Color(100, 0, 0));
+				graphics.fill(polygon);
+				graphics.setColor(Color.GRAY);
 				graphics.draw(polygon);
+
 			}
 			else {
 				graphics.setColor(Color.GRAY);
@@ -175,11 +178,11 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 				bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			}
 
-			if(mesh.getNumberOfVertices() > 6) {
+			//if(mesh.getNumberOfVertices() > 6) {
 				Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
 				graphics.fillRect(0, 0, width, height);
 				renderGraphics(graphics, width, height);
-			}
+			//}
 
 			return bufferedImage;
 		}

@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -21,19 +22,34 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 
 	private boolean destroyed = false;
 
+	private @Nullable CF data;
+
 	/**
 	 * Default constructor. To construct a face where you have already some half-edges
 	 * bordering this face.
 	 *
 	 * @param edge one of the half-edges bordering this face.
+	 * @param boundary indicates if this edge is a boundary (border or hole) edge
+	 * @param data the data associated and accessible via this face (possibly <tt>null</tt>)
+	 */
+	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge, final boolean boundary, @Nullable final CF data) {
+		this.boundary = boundary;
+		this.edge = edge;
+		this.data = data;
+	}
+
+	/**
+	 * The constructor to construct a face where you have already some half-edges
+	 * bordering this face.
+	 *
+	 * @param edge one of the half-edges bordering this face.
 	 */
 	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge) {
-		this(edge, false);
+		this(edge, false, null);
 	}
 
 	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge, boolean boundary) {
-		this.boundary = boundary;
-		this.edge = edge;
+		this(edge, boundary, null);
 	}
 
 	/**
@@ -76,6 +92,15 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 
 	boolean isDestroyed() {
 		return destroyed;
+	}
+
+	@Nullable
+	CF getData() {
+		return data;
+	}
+
+	void setData(@Nullable final CF data) {
+		this.data = data;
 	}
 
 	@Override

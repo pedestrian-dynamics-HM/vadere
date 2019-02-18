@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.iterators.AdjacentFaceIterator;
@@ -15,12 +16,9 @@ import org.vadere.meshing.mesh.iterators.IncidentEdgeIterator;
 import org.vadere.meshing.mesh.iterators.PointIterator;
 import org.vadere.meshing.mesh.iterators.SurroundingFaceIterator;
 import org.vadere.meshing.mesh.iterators.VertexIterator;
-import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -160,6 +158,16 @@ public interface IMesh<
 	E getTwin(@NotNull E halfEdge);
 
 	/**
+	 * Returns the vertex of the twin of the half-edge {@link E} in O(1).
+	 *
+	 * @param halfEdge the half-edge
+	 * @return the vertex of the twin of the half-edge {@link E}.
+	 */
+	default V getTwinVertex(@NotNull E halfEdge) {
+		return getVertex(getTwin(halfEdge));
+	}
+
+	/**
 	 * Returns the face of the half-edge {@link E} in O(1).
 	 *
 	 * @param halfEdge the half-edge
@@ -288,12 +296,48 @@ public interface IMesh<
 	void setDown(@NotNull V up, @NotNull V down);
 
 	/**
-	 * Returns the point of a vertex in O(1).
+	 * Returns the point (i.e. the data saved on the vertex) of a vertex in O(1).
 	 *
 	 * @param vertex the vertex
 	 * @return the point of vertex
 	 */
 	P getPoint(@NotNull V vertex);
+
+	/**
+	 * Returns the data saved on the half-edge in O(1) if there is any and otherwise <tt>Optional.empty()</tt>.
+	 *
+	 * @param edge the half-edge
+	 * @return the data saved on the half-edge or <tt>Optional.empty()</tt> if there is no data saved
+	 */
+	default Optional<CE> getData(@NotNull E edge) {
+		return Optional.empty();
+	}
+
+	/**
+	 * Sets the data for a specific half-edge in O(1).
+	 *
+	 * @param edge the half-edge
+	 * @param data the data
+	 */
+	void setData(@NotNull E edge, @Nullable CE data);
+
+	/**
+	 * Returns the data saved on the face in O(1) if there is any and otherwise <tt>Optional.empty()</tt>
+	 *
+	 * @param face the face
+	 * @return the data saved on the face or <tt>Optional.empty()</tt> if there is no data saved
+	 */
+	default Optional<CF> getData(@NotNull F face) {
+		return Optional.empty();
+	}
+
+	/**
+	 * Sets the data for a specific face in O(1).
+	 *
+	 * @param edge the half-edge
+	 * @param data the data
+	 */
+	void setData(@NotNull F edge, @Nullable CF data);
 
 	/**
 	 * Returns the face of the twin of the half-edge, i.e. its twin face in O(1).
@@ -882,7 +926,7 @@ public interface IMesh<
 	 * @return a face
 	 */
 	default F toFace(@NotNull final P... points) {
-		return createFace(Arrays.stream(points).map(p -> createVertex(p)).collect(Collectors.toList()));
+		return createFace(Arrays.stream(points).map(p -> insertPoint(p)).collect(Collectors.toList()));
 	}
 
 	/**

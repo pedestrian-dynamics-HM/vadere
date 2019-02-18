@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * <p>A {@link SpaceFillingCurve} is a (linked-)list of nodes {@link SFCNode} in the order in which
+ * <p>A {@link GenSpaceFillingCurve} is a (linked-)list of nodes {@link SFCNode} in the order in which
  * the curve would travers these nodes. Each node contains a half-edge which refers to
  * a face.</p>
  *
@@ -24,10 +24,10 @@ import java.util.List;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class SpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 	private SFCNode<P, CE, CF, V, E, F> head;
 
-	public SpaceFillingCurve(){
+	public GenSpaceFillingCurve(){
 		head = null;
 	}
 

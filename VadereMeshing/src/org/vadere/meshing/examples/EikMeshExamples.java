@@ -1,9 +1,14 @@
 package org.vadere.meshing.examples;
 
+import org.vadere.meshing.mesh.impl.APMeshPanel;
+import org.vadere.meshing.mesh.impl.PMeshPanel;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.APEikMeshGen;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -18,6 +23,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,31 +50,41 @@ public class EikMeshExamples {
 	 */
 	public static void uniformMeshShapes() {
 		// define a bounding box
-		VPolygon boundary = GeometryUtils.polygonFromPoints2D(
+		/*VPolygon boundary = GeometryUtils.polygonFromPoints2D(
 				new VPoint(0,0),
 				new VPoint(0, 1),
 				new VPoint(1, 2),
 				new VPoint(2,1),
-				new VPoint(2,0));
+				new VPoint(2,0));*/
+
+
 
 		// define your holes
-		VRectangle rect = new VRectangle(0.5, 0.5, 0.5, 0.5);
+		VRectangle rect = new VRectangle(0.25, 0.25, 0.5, 0.5);
 		List<VShape> obstacleShapes = new ArrayList<>();
 		obstacleShapes.add(rect);
 
+		VPolygon boundary = GeometryUtils.polygonFromPoints2D(
+				new VPoint(0,0),
+				new VPoint(0, 1),
+				new VPoint(1, 1),
+				new VPoint(1,0));
+
 		// define the EikMesh-Improver
 		double edgeLength = 0.1;
-		PEikMesh meshImprover = new PEikMesh(
+		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
 				boundary,
 				edgeLength,
-				obstacleShapes);
-
-		// (optional) define the gui to display the mesh
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800);
+				Arrays.asList(new VRectangle(0.25, 0.25, 0.5, 0.5)),
+				(x, y) -> new EikMeshPoint(x, y, false));
 
 		// generate the mesh
 		meshImprover.generate();
+
+		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+
+		// (optional) define the gui to display the mesh
+		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
 
 		// display the mesh
 		meshPanel.display("Geometry defined by shapes");
@@ -87,24 +103,31 @@ public class EikMeshExamples {
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
 		// distance function that defines a disc with radius 1 at (1,1).
-		IDistanceFunction discDistance = IDistanceFunction.createDisc(1, 1, 1.0);
+		IDistanceFunction d = p -> Math.sqrt((p.getX() - 1) * (p.getX() - 1) + (p.getY() - 1) * (p.getY() - 1)) - 1.0;
+				//IDistanceFunction.createDisc(1, 1, 1.0);
 
+		IEdgeLengthFunction h = p -> 1.0 + 5.0 * Math.abs(d.apply(p));
 		// define the EikMesh-Improver
-		double edgeLength = 0.1;
-		PEikMesh meshImprover = new PEikMesh(
-				discDistance,
-				edgeLength,
-				bound);
+		double h0 = 0.1;
+		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
+				d,
+				h,
+				h0,
+				bound,
+				(x, y) -> new EikMeshPoint(x, y, false));
 
-		// (optional) define the gui to display the mesh
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
-				meshImprover.getMesh(), 1000, 800);
-
-		// generate the mesh
 		meshImprover.generate();
 
+		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+
+		// (optional) define the gui to display the mesh
+		//PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+
+		// generate the mesh
+
+
 		// display the mesh
-		meshPanel.display("Geometry defined by a distance function (disc)");
+		//meshPanel.display("Geometry defined by a distance function (disc)");
 	}
 
 	/**
@@ -224,7 +247,7 @@ public class EikMeshExamples {
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + factor * Math.abs(ringDistance.apply(p));
 
 		// define the EikMesh-Improver
-		double edgeLength = 0.05;
+		double edgeLength = 0.06;
 		PEikMesh meshImprover = new PEikMesh(
 				ringDistance,
 				edgeLengthFunction,

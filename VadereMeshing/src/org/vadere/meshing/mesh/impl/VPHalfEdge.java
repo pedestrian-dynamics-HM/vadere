@@ -16,4 +16,5 @@ public class VPHalfEdge extends APHalfEdge<VPoint> {
 	protected VPHalfEdge(@NotNull final VPVertex end) {
 		super(end);
 	}
+
 }

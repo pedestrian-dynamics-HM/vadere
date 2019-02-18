@@ -13,6 +13,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends EikMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> {
@@ -47,6 +48,23 @@ public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends EikMesh<P, CE, 
 			@NotNull IPointConstructor<P> pointConstructor) {
 
 		super(distanceFunc, e -> 1.0, initialEdgeLen, bound,
+				() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
+	}
+
+	public PEikMeshGen(
+			double initialEdgeLen,
+			@NotNull VRectangle bound,
+			@NotNull IPointConstructor<P> pointConstructor) {
+
+		super(p -> 1.0, e -> 1.0, initialEdgeLen, bound,
+				() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
+	}
+
+	public PEikMeshGen(
+			@NotNull VPolygon polygon,
+			double initialEdgeLen,
+			@NotNull IPointConstructor<P> pointConstructor) {
+		super(polygon, initialEdgeLen, new ArrayList<>(),
 				() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
 	}
 

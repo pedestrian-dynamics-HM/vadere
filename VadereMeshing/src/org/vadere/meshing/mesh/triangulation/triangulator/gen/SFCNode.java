@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -7,7 +7,7 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
- * <p>A {@link SFCNode} is part of the {@link SpaceFillingCurve} containing a
+ * <p>A {@link SFCNode} is part of the {@link GenSpaceFillingCurve} containing a
  * half-edge which refers to a specific face and a direction which indicate its traversal
  * direction with respect to the direction of the half-edge, i.e. true means in direction of the
  * half-edge, false means in the reverse direction of the half-edge.</p>

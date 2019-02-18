@@ -44,8 +44,8 @@ public class PerformanceTest {
 	private static void setUp() {
 		points = new ArrayList<>();
 
-		Random r = new Random();
-		int numberOfPoints = 300000;
+		Random r = new Random(0);
+		int numberOfPoints = 1_000_000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
@@ -60,11 +60,18 @@ public class PerformanceTest {
 		log.info("runtime of the Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
+	private static void testArrayJumpAndWalk() {
+		long ms = System.currentTimeMillis();
+		IIncrementalTriangulation<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> delaunay = IIncrementalTriangulation.createATriangulation(IPointLocator.Type.JUMP_AND_WALK, points, (x, y) -> new VPoint(x, y));
+		delaunay.finish();
+		log.info("runtime of the Jump & Walk method (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
+
 	private static void testPointerJumpAndWalk() {
 		long ms = System.currentTimeMillis();
 		IIncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.JUMP_AND_WALK, points, (x, y) -> new VPoint(x, y));
 		delaunay.finish();
-		log.info("runtime of the Jump & Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+		log.info("runtime of the Jump & Walk method (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testPointerDelaunayHierarchy() {
@@ -102,10 +109,11 @@ public class PerformanceTest {
 		setUp();
 		testSweepline();
 		testJTSDelaunayBuilder();
-		testPointerDelaunayHierarchy();
-		testArrayDelaunayHierarchy();
+		//testPointerDelaunayHierarchy();
+		//testArrayDelaunayHierarchy();
+		testArrayJumpAndWalk();
 		testPointerJumpAndWalk();
-		testPointerWalk();
+		//testPointerWalk();
 	}
 
 }

@@ -1,8 +1,9 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.inter;
 
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -20,7 +21,6 @@ import org.vadere.util.geometry.shapes.IPoint;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-@FunctionalInterface
 public interface ITriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 
 	/**
@@ -29,4 +29,6 @@ public interface ITriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E
 	 * @return the generated triangulation
 	 */
 	IIncrementalTriangulation<P, CE, CF, V, E, F> generate();
+
+	IMesh<P, CE, CF, V, E, F> getMesh();
 }

@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.math.IDistanceFunction;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  * the triangulation is empty) into parts. In each step for each triangle the longest edge is split which generates
  * two new triangles (four for one edge which is part of two triangles). While splitting we generate the Sierpinski
  * Space Filling Curve (SFC) which gives an order of the generated triangles such that geometrically close triangles
- * will be close in the SFC which is therefore memory efficient. The data structure of the SFC {@link SpaceFillingCurve}
+ * will be close in the SFC which is therefore memory efficient. The data structure of the SFC {@link GenSpaceFillingCurve}
  * is a linked list of nodes {@link SFCNode}. Each {@link SFCNode} contains a half-edge {@link E} and a direction. The half-edge
  * is the edge of the triangle which is part of the curve and the direction tells us if the curves is in the direction of the
  * half-edge or in the reverse direction. After each split this direction changes to the opposite. After the refinement is finished
@@ -42,9 +43,9 @@ import java.util.stream.Collectors;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
-	private static final Logger logger = LogManager.getLogger(UniformRefinementTriangulatorSFC.class);
+	private static final Logger logger = LogManager.getLogger(GenUniformRefinementTriangulatorSFC.class);
 
 	/**
 	 * A collection of obstacle shapes i.e. areas defining the holes of the triangulation.
@@ -108,7 +109,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 	/**
 	 * The space filling curve.
 	 */
-	private final SpaceFillingCurve<P, CE, CF, V, E, F> sfc;
+	private final GenSpaceFillingCurve<P, CE, CF, V, E, F> sfc;
 
 	/**
 	 * The mesh which containing the data (points, vertices, edges, faces).
@@ -132,7 +133,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
      * @param distFunc              a signed distance function
 	 * @param fixPoints             a collection of fix points which will be included if they are inside the bound. Furthermore they will not move.
      */
-	public UniformRefinementTriangulatorSFC(
+	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
@@ -152,11 +153,11 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
 		this.candidates = new ArrayList<>();
-		this.sfc = new SpaceFillingCurve<>();
+		this.sfc = new GenSpaceFillingCurve<>();
 		this.mesh = meshSupplier.get();
 	}
 
-	public UniformRefinementTriangulatorSFC(
+	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
@@ -166,7 +167,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc, fixPoints);
 	}
 
-	public UniformRefinementTriangulatorSFC(
+	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
@@ -246,7 +247,8 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 	    return triangulation;
     }
 
-    private IMesh<P, CE, CF, V, E, F> getMesh() {
+    @Override
+    public IMesh<P, CE, CF, V, E, F> getMesh() {
     	return mesh;
     }
 
@@ -409,8 +411,9 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 	 * @param edge the edge which will be refined / split
 	 */
 	private void refine(final E edge) {
-		IPoint midPoint = getMesh().toLine(edge).midPoint();
+		IPoint midPoint = getMesh().toLine(edge).midPoint(random.nextDouble() * 0.01);
 		P p = getMesh().createPoint(midPoint.getX(), midPoint.getY());
+
 
 		if(!points.contains(p)) {
 			points.add(p);
@@ -429,7 +432,7 @@ public class UniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extend
 	public void finish() {
 		if(!finished) {
 			synchronized (getMesh()) {
-				nextSFCLevel(0.2);
+				//nextSFCLevel(0.2);
 				finished = true;
 				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 

@@ -12,10 +12,8 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
-import org.vadere.meshing.utils.color.ColorFunctions;
-import org.vadere.meshing.utils.tex.TexGraphGenerator;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -28,7 +26,6 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +45,7 @@ import java.util.stream.Stream;
 public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IMeshImprover<P, CE, CF, V, E, F>, ITriangulator<P, CE, CF, V, E, F> {
 
 	private boolean illegalMovement = false;
-	private UniformRefinementTriangulatorSFC triangulatorSFC;
+	private GenUniformRefinementTriangulatorSFC triangulatorSFC;
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
 	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
@@ -91,7 +88,7 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 
         log.info("##### (start) generate a triangulation #####");
 		fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
-		triangulatorSFC = new UniformRefinementTriangulatorSFC(
+		triangulatorSFC = new GenUniformRefinementTriangulatorSFC(
 		        meshSupplier,
                 bound,
                 obstacleShapes,
@@ -134,7 +131,9 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 		fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
 		addFixPoints(meshSupplier.get(), boundary, fixPoints);
 
-		triangulatorSFC = new UniformRefinementTriangulatorSFC(
+		//fixPoints.clear();
+
+		triangulatorSFC = new GenUniformRefinementTriangulatorSFC(
 				meshSupplier,
 				bound,
 				obstacleShapes,
@@ -204,22 +203,28 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 				stepInitialize();
 			}
 			else {
+				/*removeBoundaryLowQualityTriangles();
+				removeBoundaryLowQualityTriangles();
+				removeBoundaryLowQualityTriangles();
+				removeBoundaryLowQualityTriangles();
+				removeBoundaryLowQualityTriangles();
+				removeBoundaryLowQualityTriangles();*/
 				removeBoundaryLowQualityTriangles();
 				triangulation.smoothBoundary(distanceFunc);
-				if(triangulation.isValid()) {
+				//if(triangulation.isValid()) {
 					flipEdges();
 					removeTrianglesInsideHoles();
 					removeTrianglesOutsideBBox();
 					//removeBoundaryLowQualityTriangles();
 				}
-				else {
-					System.out.println(TexGraphGenerator.toTikz(triangulation.getMesh(), f -> (triangulation.isValid(f) ? Color.WHITE : Color.RED), 1.0f));
+				/*else {
+					//System.out.println(TexGraphGenerator.toTikz(triangulation.getMesh(), f -> (triangulation.isValid(f) ? Color.WHITE : Color.RED), 1.0f));
 					log.info("EikMesh re-triangulates in step " + nSteps);
 					retriangulate();
-					log.info("end re-triangulates in step " + nSteps);
+					//log.info("end re-triangulates in step " + nSteps);
 					removeTrianglesOutsideBBox();
 					removeTrianglesInsideObstacles();
-				}
+				}*/
 
 				computeScalingFactor();
 				computeFixPointRelation();
@@ -229,7 +234,7 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 				splitEdges();
 
 				nSteps++;
-			}
+			//}
 		}
     }
 
@@ -309,21 +314,22 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 
 		if(fixPointRelation.containsKey(vertex)) {
 			P p2 = fixPointRelation.get(vertex);
-			VPoint force = new VPoint((p2.getX() - p1.getX()), (p2.getY() - p1.getY())).scalarMultiply(2.0);
+			VPoint force = new VPoint((p2.getX() - p1.getX()), (p2.getY() - p1.getY())).scalarMultiply(1.0);
 			p1.increaseVelocity(force);
 			p1.increaseAbsoluteForce(force.distanceToOrigin());
 		}
+		else {
+			for(V v2 : getMesh().getAdjacentVertexIt(vertex)) {
+				EikMeshPoint p2 = getMesh().getPoint(v2);
 
-		for(V v2 : getMesh().getAdjacentVertexIt(vertex)) {
-			EikMeshPoint p2 = getMesh().getPoint(v2);
+				double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+				double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
 
-			double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
-			double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
-
-			double lenDiff = Math.max(desiredLen - len, 0);
-			VPoint force = new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len));
-			p1.increaseVelocity(force);
-			p1.increaseAbsoluteForce(force.distanceToOrigin());
+				double lenDiff = Math.max(desiredLen - len, 0);
+				VPoint force = new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len));
+				p1.increaseVelocity(force);
+				p1.increaseAbsoluteForce(force.distanceToOrigin());
+			}
 		}
 	}
 
@@ -378,11 +384,11 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 		    //E optBoundaryEdge = getMesh().getEdge(vertex);
 		    boolean isAtBoundary = getMesh().isAtBoundary(vertex);
 			double distance = distanceFunc.apply(vertex);
-			if(distance > 0 || isAtBoundary) {
+			if(isAtBoundary || distance > 0) {
 				//(Math.abs(distance) <= deps &&
 				// to prevent from large movements we project only by 0.5 if the distance is large!
-				projectBackVertex(vertex, distance, distance > initialEdgeLen / 3.0 ? 0.5 : 1.0, isAtBoundary);
-				//projectBackVertex(vertex, distance, 1.0, isAtBoundary);
+				//projectBackVertex(vertex, distance, distance > initialEdgeLen / 3.0 ? 0.5 : 1.0, isAtBoundary);
+				projectBackVertex(vertex, distance, 1.0, isAtBoundary);
 			}
 
 			if(isAtBoundary) {
@@ -431,11 +437,12 @@ public class EikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E ext
 
 	    	// back projection to the inside i.e. towards the inside of its triangle
 	    	if(distance > 0) {
-				//if(Utils.isRightOf(r, p, newPosition)
-				//		&& Utils.isRightOf(p, q, newPosition)
-				//		&& Utils.isRightOf(q, r, newPosition)){
+				/*if(GeometryUtils.isRightOf(r, p, newPosition)
+						&& GeometryUtils.isRightOf(p, q, newPosition)
+						&& GeometryUtils.isRightOf(q, r, newPosition)){
 					position.subtract(projection);
-				//}
+				}*/
+			    position.subtract(projection);
 		    }
 		    // back projection to the outside
 		    else {

@@ -40,6 +40,12 @@ public class VLine extends Line2D.Double {
         return p1.add(p2).scalarMultiply(0.5);
     }
 
+	public VPoint midPoint(double eps) {
+    	assert eps > -0.5 && eps < 0.5;
+    	VPoint p3 = p2.subtract(p1);
+		return p1.add(p3.scalarMultiply(0.5 + eps));
+	}
+
     @Override
     public int hashCode() {
         // this has to be symmetric
@@ -68,5 +74,10 @@ public class VLine extends Line2D.Double {
 
 	public Vector2D asVector(){
 		return new Vector2D(x2 - x1, y2 - y1);
+	}
+
+	@Override
+	public String toString() {
+		return p1 + " - " + p2;
 	}
 }

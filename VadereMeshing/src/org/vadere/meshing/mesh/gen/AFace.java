@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -34,6 +35,11 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	private boolean destroyed = false;
 
 	/**
+	 * The data accesible via and associated with this face.
+	 */
+	private @Nullable CF data;
+
+	/**
 	 * Default constructor. To construct a face where you have already some half-edges
 	 * bordering this face.
 	 *
@@ -41,10 +47,15 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	 * @param edge   the array-index of one edge of this face
 	 * @param border indicator if this face is a border face or not
 	 */
-	AFace(@NotNull final int id,@NotNull final int edge, boolean border) {
+	AFace(@NotNull final int id, @NotNull final int edge, boolean border, final @Nullable CF data) {
 		this.border = border;
 		this.edge = edge;
 		this.id = id;
+		this.data = data;
+	}
+
+	AFace(@NotNull final int id,@NotNull final int edge, boolean border) {
+		this(id, edge, border, null);
 	}
 
 	/**
@@ -101,6 +112,25 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	 */
 	int getEdge() {
 		return edge;
+	}
+
+	/**
+	 * Returns the data associated with and saved via this face.
+	 *
+	 * @return the data associated with and saved via this face
+	 */
+	@Nullable
+	CF getData() {
+		return data;
+	}
+
+	/**
+	 * Sets the data associated with and saved via this face.
+	 *
+	 * @param data the data
+	 */
+	void setData(@Nullable CF data) {
+		this.data = data;
 	}
 
 	/**

@@ -3,6 +3,7 @@ package org.vadere.meshing.mesh.gen;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
@@ -72,22 +73,22 @@ public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex
 	}
 
 	@Override
-	public AHalfEdge<CE> getNext(@NotNull AHalfEdge<CE> halfEdge) {
+	public AHalfEdge<CE> getNext(@NotNull final AHalfEdge<CE> halfEdge) {
 		return edges.get(halfEdge.getNext());
 	}
 
 	@Override
-	public AHalfEdge<CE> getPrev(@NotNull AHalfEdge<CE> halfEdge) {
+	public AHalfEdge<CE> getPrev(@NotNull final AHalfEdge<CE> halfEdge) {
 		return edges.get(halfEdge.getPrevious());
 	}
 
 	@Override
-	public AHalfEdge<CE> getTwin(@NotNull AHalfEdge<CE> halfEdge) {
+	public AHalfEdge<CE> getTwin(@NotNull final AHalfEdge<CE> halfEdge) {
 		return edges.get(halfEdge.getTwin());
 	}
 
 	@Override
-	public AFace<CF> getFace(@NotNull AHalfEdge<CE> halfEdge) {
+	public AFace<CF> getFace(@NotNull final AHalfEdge<CE> halfEdge) {
 		int edgeId = halfEdge.getFace();
 		if (edgeId == -1) {
 			if (halfEdge.isDestroyed()) {
@@ -100,12 +101,12 @@ public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex
 	}
 
 	@Override
-	public AHalfEdge<CE> getEdge(@NotNull AVertex<P> vertex) {
+	public AHalfEdge<CE> getEdge(@NotNull final AVertex<P> vertex) {
 		return edges.get(vertex.getEdge());
 	}
 
 	@Override
-	public AHalfEdge<CE> getEdge(@NotNull AFace<CF> face) {
+	public AHalfEdge<CE> getEdge(@NotNull final AFace<CF> face) {
 		try {
 			edges.get(face.getEdge());
 		}
@@ -116,30 +117,50 @@ public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex
 	}
 
 	@Override
-	public P getPoint(@NotNull AHalfEdge<CE> halfEdge) {
+	public P getPoint(@NotNull final AHalfEdge<CE> halfEdge) {
 		return getVertex(halfEdge).getPoint();
 	}
 
 	@Override
-	public AVertex<P> getVertex(@NotNull AHalfEdge<CE> halfEdge) {
+	public AVertex<P> getVertex(@NotNull final AHalfEdge<CE> halfEdge) {
 		return vertices.get(halfEdge.getEnd());
 	}
 
 	// the vertex should not be contained in vertices, only the up/down
 	@Override
-	public AVertex<P> getDown(@NotNull AVertex<P> vertex) {
+	public AVertex<P> getDown(@NotNull final AVertex<P> vertex) {
 		return vertices.get(vertex.getDown());
 	}
 
 	// the vertex should not be contained in vertices, only the up/down
 	@Override
-	public void setDown(@NotNull AVertex<P> up, @NotNull AVertex<P> down) {
+	public void setDown(@NotNull final AVertex<P> up, @NotNull AVertex<P> down) {
 		up.setDown(down.getId());
 	}
 
 	@Override
-	public P getPoint(@NotNull AVertex<P> vertex) {
+	public P getPoint(@NotNull final AVertex<P> vertex) {
 		return vertex.getPoint();
+	}
+
+	@Override
+	public Optional<CE> getData(@NotNull final AHalfEdge<CE> edge) {
+		return Optional.ofNullable(edge.getData());
+	}
+
+	@Override
+	public void setData(@NotNull final AHalfEdge<CE> edge, @Nullable final CE data) {
+		edge.setData(data);
+	}
+
+	@Override
+	public Optional<CF> getData(@NotNull final AFace<CF> face) {
+		return Optional.ofNullable(face.getData());
+	}
+
+	@Override
+	public void setData(@NotNull final AFace<CF> edge, @Nullable final CF data) {
+		edge.setData(data);
 	}
 
 	@Override
@@ -622,7 +643,7 @@ public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex
         List<VPoint> centroids = new ArrayList<>(this.numberOfFaces);
 
         for(int i = 0; i < this.faces.size(); i++) {
-            VPoint incenter = GeometryUtils.getCentroid(this.getVertices(faces.get(i)));
+            VPoint incenter = GeometryUtils.getPolygonCentroid(this.getVertices(faces.get(i)));
             centroids.add(incenter);
             maxX = Math.max(maxX, incenter.getX());
             maxY = Math.max(maxY, incenter.getY());

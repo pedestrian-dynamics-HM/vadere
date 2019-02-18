@@ -20,7 +20,7 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformTriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformTriangulator;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -60,6 +60,10 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 	 */
 	List<V> getVirtualVertices();
 
+	boolean isVirtualFace(F face);
+
+	boolean isVirtualEdge(@NotNull final E edge);
+
 	/**
 	 * Returns a list of vertices (excluding virtual vertices) of the current triangulation.
 	 *
@@ -69,6 +73,7 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 
 	Stream<F> streamFaces();
 	Set<F> getFaces();
+	E insert(double x, double y);
 	E insert(final P point);
 	void insert(final Collection<P> points);
 	void remove(final P point);
@@ -168,7 +173,7 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 	) {
 		IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh = new PMesh<>(pointConstructor);
 	    IncrementalTriangulation<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> triangulation = new IncrementalTriangulation<>(mesh, type, bound);
-		return new UniformTriangulator<>(bound, minTriangleSideLen, triangulation).generate();
+		return new GenUniformTriangulator<>(bound, minTriangleSideLen, triangulation).generate();
 	}
 
 	static <CE, CF> IIncrementalTriangulation<VPoint, CE, CF, PVertex<VPoint, CE, CF>, PHalfEdge<VPoint, CE, CF>, PFace<VPoint, CE, CF>> generateRandomTriangulation(final long numberOfPoints) {

@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -34,19 +35,26 @@ public class PHalfEdge<P extends IPoint, CE, CF> implements IHalfEdge<CE>, Clone
 	 */
 	private PFace<P, CE, CF> face;
 
+	private @Nullable CE data;
+
 	private boolean destroyed;
 
-
-	protected PHalfEdge(@NotNull final PVertex<P, CE, CF> end, @NotNull final PFace<P, CE, CF> face) {
+	protected PHalfEdge(@NotNull final PVertex<P, CE, CF> end, @NotNull final PFace<P, CE, CF> face, @Nullable final CE data) {
 		this.end = end;
 		this.face = face;
 		this.destroyed = false;
+		this.data = data;
+	}
+
+	protected PHalfEdge(@NotNull final PVertex<P, CE, CF> end, @NotNull final PFace<P, CE, CF> face) {
+		this(end, face, null);
 	}
 
 	protected PHalfEdge(@NotNull final PVertex<P, CE, CF> end) {
 		this.end = end;
 		this.face = null;
 		this.destroyed = false;
+		this.data = null;
 	}
 
 	PFace<P, CE, CF> getFace() {
@@ -114,6 +122,15 @@ public class PHalfEdge<P extends IPoint, CE, CF> implements IHalfEdge<CE>, Clone
 
 	void setEnd(PVertex<P, CE, CF> end) {
 		this.end = end;
+	}
+
+	void setData(@Nullable final CE data) {
+		this.data = data;
+	}
+
+	@Nullable
+	CE getData() {
+		return data;
 	}
 
 	public VLine toLine() {

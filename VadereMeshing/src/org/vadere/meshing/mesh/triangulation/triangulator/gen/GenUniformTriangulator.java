@@ -1,10 +1,11 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class UniformTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenUniformTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
 	private double left;
 	private double top;
@@ -41,9 +42,9 @@ public class UniformTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>,
 	 * @param minTriangleSideLength the minimal side length
 	 * @param triangulation         the triangulation i.e. the algorithm inserting points
 	 */
-	public UniformTriangulator(final VRectangle bound,
-                               final double minTriangleSideLength,
-                               final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
+	public GenUniformTriangulator(final VRectangle bound,
+	                              final double minTriangleSideLength,
+	                              final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
 		this.bound = bound;
 		this.triangulation = triangulation;
 		this.left = bound.getMinX();
@@ -70,7 +71,8 @@ public class UniformTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>,
         return triangulation;
     }
 
-	private IMesh<P, CE, CF, V, E, F> getMesh() {
+    @Override
+	public IMesh<P, CE, CF, V, E, F> getMesh() {
         return triangulation.getMesh();
 	}
 

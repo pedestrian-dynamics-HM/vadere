@@ -1,11 +1,10 @@
 package org.vadere.util.geometry;
 
-import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -24,19 +23,15 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 
-import static org.vadere.util.geometry.GeometryUtils.Orientation.CCW;
-import static org.vadere.util.geometry.GeometryUtils.Orientation.COLLINEAR;
-import static org.vadere.util.geometry.GeometryUtils.Orientation.CW;
-
+/**
+ * This utility class contains only static methods which are used to solve
+ * general geometric problems like line or shape intersections.
+ *
+ * @author Benedikt Zoennchen
+ */
 public class GeometryUtils {
 
-	enum Orientation {
-		CCW,
-		CW,
-		COLLINEAR;
-	}
-
-	/**T
+	/**
 	 * Constant for comparison of double values. Everything below this is
 	 * considered equal.
 	 */
@@ -59,20 +54,35 @@ public class GeometryUtils {
 		return result;
 	}
 
-	public static double derterminant2D(double x1, double y1, double x2, double y2) {
+	/**
+	 * Computes the determinant of a 2x2-matrix.
+	 * @param x1    x11 of the matrix
+	 * @param y1    x21 of the matrix
+	 * @param x2    x21 of the matrix
+	 * @param y2    x22 of the matrix
+	 * @return
+	 */
+	public static double det2D(double x1, double y1, double x2, double y2) {
 		return x1 * y2 - y1 * x2;
 	}
 
 	/**
+	 * Computes the (optional) intersection point of a {@link VRectangle} boundary and the line-segment defined by ((x1, y1), (x2, y2)).
 	 *
-	 * @param rectangle
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 * @return
+	 * @param rectangle the rectangle
+	 * @param x1        the x-coordinate of the first point of the line-segment
+	 * @param y1        the y-coordinate of the first point of the line-segment
+	 * @param x2        the x-coordinate of the second point of the line-segment
+	 * @param y2        the y-coordinate of the second point of the line-segment
+	 *
+	 * @return the intersection point or {@link Optional#empty()}
 	 */
-	public static Optional<VPoint> intersectionPoint(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
+	public static Optional<VPoint> intersectionPoint(
+			@NotNull final VRectangle rectangle,
+			final double x1,
+			final double y1,
+			final double x2,
+			final double y2) {
 		if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2)) {
 			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2));
 		}
@@ -89,26 +99,65 @@ public class GeometryUtils {
 		return Optional.empty();
 	}
 
+	/**
+	 * Tests if there is a intersection between the {@link VRectangle} boundary and the line-segment defined by ((x1, y1), (x2, y2)).
+	 *
+	 * @param rectangle the rectangle
+	 * @param x1        the x-coordinate of the first point of the line-segment
+	 * @param y1        the y-coordinate of the first point of the line-segment
+	 * @param x2        the x-coordinate of the second point of the line-segment
+	 * @param y2        the y-coordinate of the second point of the line-segment
+	 *
+	 * @return true if there is an intersection, false otherwise.
+	 */
 	public static boolean intersectsRectangleBoundary(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
-		return intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2) ||
+		return  intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2) ||
 				intersectLineSegment(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2) ||
 				intersectLineSegment(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2) ||
 				intersectLineSegment(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2);
 	}
 
-	//http://mathworld.wolfram.com/Line-LineIntersection.html
+	/**
+	 * Computes the intersection of two lines (p1,p2) and (q1, q2).
+	 * Algorithm from: /http://mathworld.wolfram.com/Line-LineIntersection.html
+	 *
+	 * Assumption: the lines (p1,p2) and (q1, q2) are not co-linear.
+	 *
+	 * @param x1 the x-coordinate of p1
+	 * @param y1 the y-coordinate of p1
+	 * @param x2 the x-coordinate of p2
+	 * @param y2 the y-coordinate of p2
+	 * @param x3 the x-coordinate of q1
+	 * @param y3 the y-coordinate of q1
+	 * @param x4 the x-coordinate of q2
+	 * @param y4 the y-coordinate of q2
+	 *
+	 * @return the intersection of two lines (p1,p2) and (q1, q2).
+	 */
 	public static VPoint intersectionPoint(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-		double a = derterminant2D(x1, x2, y1, y2);
-		double b = derterminant2D(x3, x4, y3, y4);
-		double c = derterminant2D(x1-x2, x3 - x4, y1 - y2, y3 - y4);
+		double a = det2D(x1, x2, y1, y2);
+		double b = det2D(x3, x4, y3, y4);
+		double c = det2D(x1-x2, x3 - x4, y1 - y2, y3 - y4);
 
-		double x = derterminant2D(a, b, x1 - x2, x3 - x4) / c;
-		double y = derterminant2D(a, b, y1 - y2, y3 - y4) / c;
+		assert c != 0;
+
+		double x = det2D(a, b, x1 - x2, x3 - x4) / c;
+		double y = det2D(a, b, y1 - y2, y3 - y4) / c;
 
 		return new VPoint(x,y);
 	}
 
-	public static VPoint getCentroid(@NotNull final List<? extends IPoint> polygon){
+	/**
+	 * Computes the centroid of a poylgon defined by a list of points.
+	 *
+	 * Assumption: the list [p1, ..., pn] is sorted and for a valid simple polygon and pi != pj
+	 * for all points in the list.
+	 *
+	 * @param polygon a list of points defining the polygon.
+	 *
+	 * @return the centroid of the polygon
+	 */
+	public static VPoint getPolygonCentroid(@NotNull final List<? extends IPoint> polygon){
         double area = signedAreaOfPolygon(polygon);
         double xValue = 0;
         double yValue = 0;
@@ -141,17 +190,21 @@ public class GeometryUtils {
         return new VPoint(xValue, yValue);
     }
 
-	public static boolean collectionContains(
-			Collection<? extends VShape> collection, VPoint point) {
-		for (VShape shape : collection) {
-			if (shape.contains(point)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
+	/**
+	 * Computes the circumcenter of a triangle defined by (p1, p2, p3).
+	 *
+	 * Assumption: p1 != p2 != p3 != p1.
+	 *
+	 * @param p1 the first point of the triangle
+	 * @param p2 the second point of the triangle
+	 * @param p3 the third point of the triangle
+	 *
+	 * @return the circumcenter of a triangle
+	 */
 	public static VPoint getCircumcenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
+
+		assert !p1.equals(p2) && !p1.equals(p3) && !p2.equals(p3);
+
 		double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
 		double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
 				+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
@@ -163,9 +216,20 @@ public class GeometryUtils {
 		return new VPoint(x,y);
 	}
 
-	public static boolean isInCircumscribedCycle(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3, @NotNull final IPoint point) {
+	/**
+	 * Tests if the {@link IPoint} q lies inside the circumcenter of the triangle (p1, p2, p3) by
+	 * computing the circumcenter.
+	 *
+	 * @param p1 the first point of the triangle
+	 * @param p2 the second point of the triangle
+	 * @param p3 the third point of the triangle
+	 * @param q  the point which might lie inside the circumcenter
+	 *
+	 * @return true if q lies inside the circumcenter, false otherwise
+	 */
+	public static boolean isInCircumscribedCycle(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3, @NotNull final IPoint q) {
 		VPoint circumcenter = getCircumcenter(p1, p2, p3);
-		return circumcenter.distance(point) < circumcenter.distance(p1);
+		return circumcenter.distance(q) < circumcenter.distance(p1);
 	}
 
 	/**
@@ -179,6 +243,7 @@ public class GeometryUtils {
 	 * @param numberOfPointsOfLargestCircle     the number of points of the most outer circle
 	 * @param anchorAngle                       start angle of the segment
 	 * @param angle                             anchorAngle + angle = end angle of the segment
+	 *
 	 * @return a set of points which are positioned inside a disc segment
 	 */
 	public static List<VPoint> getDiscDiscretizationPoints(
@@ -222,14 +287,12 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Computes the point on the line segment that is closest to the given point
-	 * point. from:
-	 * http://stackoverflow.com/questions/3120357/get-closest-point-to-a-line
+	 * Computes the point on the line segment that is closest to the given point.
+	 * Algorithm from: http://stackoverflow.com/questions/3120357/get-closest-point-to-a-line
 	 *
-	 * @param point
-	 *        the point to which the counterpart should be computed
-	 * @param line
-	 *        line representing the segment
+	 * @param point the point to which the counterpart should be computed
+	 * @param line line representing the segment
+	 *
 	 * @return the point on the line that is closest to p
 	 */
 	public static VPoint closestToSegment(@NotNull final VLine line, @NotNull final IPoint point) {
@@ -256,7 +319,8 @@ public class GeometryUtils {
 
 
 	/**
-	 * Computes area (it maybe a negative area) of the parallelogram defined by p, q, r.
+	 * Computes the area (it maybe a negative area) of the parallelogram defined by p, q, r.
+	 * The area is zero if and only if p, q, r are co-linear.
 	 *
 	 * @param pX x-coordinate of p
 	 * @param pY y-coordinate of p
@@ -264,6 +328,7 @@ public class GeometryUtils {
 	 * @param qY y-coordinate of q
 	 * @param rX x-coordinate of r
 	 * @param rY y-coordinate of r
+	 *
 	 * @return area or negative area of the parallelogram defined by p, q, r
 	 */
 	public static double ccw(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
@@ -271,7 +336,8 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Computes area (it maybe a negative area) of the parallelogram defined by p, q, r.
+	 * Computes the area (it maybe a negative area) of the parallelogram defined by p, q, r.
+	 * The area is zero if and only if p, q, r are co-linear.
 	 *
 	 * @param pX x-coordinate of p
 	 * @param pY y-coordinate of p
@@ -279,6 +345,7 @@ public class GeometryUtils {
 	 * @param qY y-coordinate of q
 	 * @param rX x-coordinate of r
 	 * @param rY y-coordinate of r
+	 *
 	 * @return area or negative area of the parallelogram defined by p, q, r
 	 */
 	public static double ccwRobust(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
@@ -293,6 +360,7 @@ public class GeometryUtils {
 
 	/**
 	 * Returns true if q = (xq, yq) is right of the oriented-line defined by (p1 = (x1, y1), p2 = (x2, y2)).
+	 *
 	 * @param x1 the x-coordinate of p1
 	 * @param y1 the y-coordinate of p1
 	 * @param x2 the x-coordinate of p2
@@ -344,14 +412,44 @@ public class GeometryUtils {
 		return isCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
+	/**
+	 * Returns true if q = (xq, yq) is left of the oriented-line defined by (p1 = (x1,y1), p2 = (x2,y2)).
+	 * @param x1 x-coordinate of p1
+	 * @param y1 y-coordinate of p1
+	 * @param x2 x-coordinate of p2
+	 * @param y2 y-coordinate of p2
+	 * @param xq x-coordinate of q
+	 * @param yq y-coordinate of q
+	 *
+	 * @return true if q is left of the oriented-line defined by (p1, p2), false otherwise
+	 */
 	public static boolean isLeftOf(final double x1, final double y1, final double x2, final double y2, final double xq, final double yq) {
 		return isCCW(x1, y1, x2, y2, xq, yq);
 	}
 
+	/**
+	 * Returns true if q = (x, y) is left of the oriented-line defined by (p1, p2).
+	 *
+	 * @param p1 the start point of the oriented line
+	 * @param p2 the end point of the oriented line
+	 * @param x  x-coordinate of q
+	 * @param y  y-coordinate of q
+	 *
+	 * @return true if q is left of the oriented-line defined by (p1, p2), false otherwise
+	 */
 	public static boolean isLeftOf(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
 		return isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
+	/**
+	 * Tests if the simple polygon is ccw oriented by testing if 3 points of the polygon are ccw oriented.
+	 *
+	 * Assumption: the polygon is a valid simple polygon.
+	 *
+	 * @param polygon a simple polygon
+	 *
+	 * @return true if the polygon is ccw oriented, false otherwise
+	 */
 	public static boolean isCCW(final @NotNull VPolygon polygon) {
 		List<VPoint> points = polygon.getPath();
 
@@ -378,6 +476,7 @@ public class GeometryUtils {
 
 	/**
 	 * Returns the angle between the x-axis, p1 and p2.
+	 *
 	 * @param p1 the first point
 	 * @param p2 the second point
 	 *
@@ -404,50 +503,80 @@ public class GeometryUtils {
 	 * @param p1 first point
 	 * @param p2 second point
 	 * @param p3 third point
+	 *
 	 * @return ccw(p1 p2 p3)
 	 */
 	public static double ccw(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		return ccwRobust(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
 
+	/**
+	 * Tests if q -> p -> r are counter clockwise oriented.
+	 *
+	 * @param qX x-coordinate of q
+	 * @param qY y-coordinate of q
+	 * @param pX x-coordinate of p
+	 * @param pY y-coordinate of p
+	 * @param rX x-coordinate of r
+	 * @param rY y-coordinate of r
+	 *
+	 * @return true if q -> p -> r are counter clockwise oriented, false otherwise
+	 */
 	public static boolean isCCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
 		return ccwRobust(qX, qY, pX, pY, rX, rY) > 0;
 	}
 
+	/**
+	 * Tests if p1 -> p2 -> p3 are counter clockwise oriented.
+	 *
+	 * @param p1 the first point
+	 * @param p2 the second point
+	 * @param p3 the third point
+	 *
+	 * @return true if p1 -> p2 -> p3 are counter clockwise oriented, false otherwise
+	 */
 	public static boolean isCCW(final IPoint p1, final IPoint p2, final IPoint p3) {
 		return isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
 
+	/**
+	 * Tests if q -> p -> r are clockwise oriented.
+	 *
+	 * @param qX x-coordinate of q
+	 * @param qY y-coordinate of q
+	 * @param pX x-coordinate of p
+	 * @param pY y-coordinate of p
+	 * @param rX x-coordinate of r
+	 * @param rY y-coordinate of r
+	 *
+	 * @return true if q -> p -> r are clockwise oriented, false otherwise
+	 */
 	public static boolean isCW(final double qX, final double qY, final double pX, final double pY, final double rX, final double rY) {
 		return ccwRobust(qX, qY, pX, pY, rX, rY) < 0;
 	}
 
+	/**
+	 * Tests if p1 -> p2 -> p3 are clockwise oriented.
+	 *
+	 * @param p1 the first point
+	 * @param p2 the second point
+	 * @param p3 the third point
+	 *
+	 * @return true if p1 -> p2 -> p3 are clockwise oriented, false otherwise
+	 */
 	public static boolean isCW(final IPoint p1, final IPoint p2, final IPoint p3) {
 		return ccw(p1, p2, p3) < 0;
 	}
 
-	public static Orientation orientation(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
-		double ccw = ccw(p1, p2, p3);
-		if(ccw < 0) {
-			return CW;
-		}
-		else if(ccw > 0) {
-			return CCW;
-		}
-		else {
-			return COLLINEAR;
-		}
-	}
-
 	/**
-	 * Tests if the line-segment (p1, p2) intersects the line defined by p, q.
+	 * Tests if the line-segment (p1, p2) intersects the line (p, q).
 	 *
 	 * @param p     point defining the line
 	 * @param q     point defining the line
 	 * @param p1    point defining the line-segment
 	 * @param p2    point defining the line-segment
 	 *
-	 * @return true if the line-segment intersects the line defined, otherwise false.
+	 * @return true if the line-segment (p1, p2) intersects the line (p, q), otherwise false.
 	 */
 	public static boolean intersectLine(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
 		double ccw1 = ccw(p, q, p1);
@@ -455,18 +584,60 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	/**
+	 * Tests if the line-segment (p1, p2) intersects the line (p, q).
+	 *
+	 * @param pX    x-coordinate of p
+	 * @param pY    y-coordinate of p
+	 * @param qX    x-coordinate of q
+	 * @param qY    y-coordinate of q
+	 * @param p1X   x-coordinate of p1
+	 * @param p1Y   y-coordinate of p1
+	 * @param p2X   x-coordinate of p2
+	 * @param p2Y   y-coordinate of p2
+	 *
+	 * @return true if the line-segment (p1, p2) intersects the line (p, q), otherwise false.
+	 */
 	public static boolean intersectLine(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
 		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
 		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	/**
+	 * Tests if the line-segment (p1, p2) intersects the line (p, q).
+	 * The <tt>eps</tt> is used to define intersection in case of p1 or p2
+	 * being very close to the line to avoid numerical errors.
+	 *
+	 * @param pX    x-coordinate of p
+	 * @param pY    y-coordinate of p
+	 * @param qX    x-coordinate of q
+	 * @param qY    y-coordinate of q
+	 * @param p1X   x-coordinate of p1
+	 * @param p1Y   y-coordinate of p1
+	 * @param p2X   x-coordinate of p2
+	 * @param p2Y   y-coordinate of p2
+	 * @param eps   a small distance by which a point close to a line will be regarded as to be on the line
+	 *
+	 * @return true if the line-segment (p1, p2) intersects the line (p, q), otherwise false.
+	 */
 	public static boolean intersectLine(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y, final double eps) {
 		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
 		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
-		return (ccw1-eps < 0 && ccw2+eps > 0) || (ccw1+eps > 0 && ccw2-eps < 0);
+		return (ccw1+eps < 0 && ccw2-eps > 0) || (ccw1-eps > 0 && ccw2+eps < 0);
 	}
 
+	/**
+	 * Computes the incenter of a triangle (p1, p2, p3).
+	 *
+	 * Assumption: the three points form a valid triangle.
+	 *
+	 * @param p1 the first point of the triangle
+	 * @param p2 the second point of the triangle
+	 * @param p3 the third point of the triangle
+	 *
+	 * @return the incenter of a triangle (p1, p2, p3)
+	 */
 	public static VPoint getIncenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
 		double a = p1.distance(p2);
 		double b = p2.distance(p3);
@@ -497,6 +668,20 @@ public class GeometryUtils {
 		GeometryUtils.distanceToLineSegment()
 	}*/
 
+	/**
+	 * Tests if the half-line-segment starting at p in the direction (q-p) intersects the line-segment (p1,p2).
+	 *
+	 * @param pX    x-coordinate of p
+	 * @param pY    y-coordinate of p
+	 * @param qX    x-coordinate of q
+	 * @param qY    y-coordinate of q
+	 * @param p1X   x-coordinate of p1
+	 * @param p1Y   y-coordinate of p1
+	 * @param p2X   x-coordinate of p2
+	 * @param p2Y   y-coordinate of p2
+	 *
+	 * @return true if the line-segment intersects the  half-line-segment defined, otherwise false.
+	 */
 	public static boolean intersectHalfLineSegment(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
 		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
 		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
@@ -567,6 +752,28 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Tests if the first line-segment (p = (x1, y1), q = (x2, y2)) intersects the second line-segment (p1 = (x3, y3), p2 = (x4, y4)).
+	 * The <tt>eps</tt> is used to define intersection in case of p1 or p2
+	 * being very close to the line to avoid numerical errors.
+	 *
+	 * @param x1 x-coordinate of p
+	 * @param y1 y-coordinate of p
+	 * @param x2 x-coordinate of q
+	 * @param y2 y-coordinate of q
+	 * @param x3 x-coordinate of p1
+	 * @param y3 y-coordinate of p1
+	 * @param x4 x-coordinate of p2
+	 * @param y4 y-coordinate of p2
+	 * @param eps a small distance by which a point close to a line will be regarded as to be on the line
+	 *
+	 * @return
+	 */
+	public static boolean intersectLineSegment(final double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double eps) {
+		return intersectLine(x1, y1, x2, y2, x3, y3, x4, y4, eps) && intersectLine(x3, y3, x4, y4, x1, y1, x2, y2, eps);
+	}
+
+
+	/**
 	 * Tests if the triangle (p1,p2,p3) contains the point r.
 	 *
 	 * @param p1    point of the triangle
@@ -605,20 +812,21 @@ public class GeometryUtils {
 		return isInsideCircle(a, b, c, p.getX(), p.getY());
 	}
 
-
+	/**
+	 * Tests whether or not the point (x,y) lies inside the circumcenter of the triangle (a, b, c).
+	 * The method is more stable than direct use of the circumcenter since we normalize beforehand.
+	 *
+	 * Assumption: (a,b,c) form a valid triangle
+	 *
+	 * @param a the first point of the triangle
+	 * @param b the second point of the triangle
+	 * @param c the third point of the triangle
+	 * @param x x-coordinate of the point of interest
+	 * @param y y-coordinate of the point of interest
+	 *
+	 * @return true if (x,y) lies inside the circumcenter of the triangle (a, b, c), false otherwise
+	 */
 	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, double x , double y) {
-		/*IPoint qp = q.subtract(p);
-		IPoint rp = r.subtract(p);
-		IPoint tp = t.subtract(p);
-
-		double a = qp.getX() * tp.getY() - qp.getY() * tp.getX();
-		double b = tp.getX() * (t.getX() - q.getX()) + tp.getY() * (t.getY() - q.getY());
-		double c = qp.getX() * rp.getY() - qp.getY() * rp.getX();
-		double d = rp.getX() * (r.getX() - q.getX()) + rp.getY() * (r.getY() - q.getY());
-
-		return a * d > c * b;*/
-
-
 		double adx = a.getX() - x;
 		double ady = a.getY() - y;
 		double bdx = b.getX() - x;
@@ -634,7 +842,6 @@ public class GeometryUtils {
 		double clift = cdx * cdx + cdy * cdy;
 
 		double disc = alift * bcdet + blift * cadet + clift * abdet;
-		//log.info("inCicle = " + disc);
 		return disc > 0;
 	}
 
@@ -652,8 +859,17 @@ public class GeometryUtils {
 		cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
 	}
 
-	public static VPolygon polygonFromPoints2D(@NotNull final List<VPoint> vertices) {
-		return polygonFromPoints2D(vertices.toArray(new VPoint[0]));
+	/**
+	 * Transforms a list forming a valid simple polygon into a {@link VPolygon} object.
+	 *
+	 * Assumption: the list of points form a valid simple polygon
+	 *
+	 * @param points the list of points forming a valid simple polygon
+	 *
+	 * @return a {@link VPolygon} object of the list of points
+	 */
+	public static VPolygon polygonFromPoints2D(@NotNull final List<? extends IPoint> points) {
+		return polygonFromPoints2D(points.toArray(new VPoint[0]));
 	}
 
 	/**
@@ -709,20 +925,52 @@ public class GeometryUtils {
 	 * @param p2    second point of the line-segment
 	 * @param p     the point
 	 *
-	 * @return he distance from the line-segment defined by (p1,p2) to the point p.
+	 * @return the distance from the line-segment defined by (p1,p2) to the point p.
 	 */
 	public static double distanceToLineSegment(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p) {
 		return distanceToLineSegment(p1, p2, p.getX(), p.getY());
 	}
 
+	/**
+	 * Computes the distance from the line-segment defined by (p1,p2) to the point p = (x,y).
+	 *
+	 * @param p1    first point of the line-segment
+	 * @param p2    second point of the line-segment
+	 * @param x     x-coordinate of the point p
+	 * @param y     y-coordinate of the point p
+	 *
+	 * @return the distance from the line-segment defined by (p1,p2) to the point p.
+	 */
 	public static double distanceToLineSegment(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
 		return distanceToLineSegment(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
+	/**
+	 * Computes the Euclidean distance between p = (px, py) and q = (qx, qy).
+	 *
+	 * @param px    x-coordinate of p
+	 * @param py    y-coordinate of p
+	 * @param qx    x-coordinate of q
+	 * @param qy    y-coordinate of q
+	 *
+	 * @return the Euclidean distance between p = (px, py) and q = (qx, qy)
+	 */
 	public static double distance(final double px, final double py, final double qx, final double qy) {
 		return Math.sqrt((px - qx) * (px - qx) + (py - qy) * (py - qy));
 	}
 
+	/**
+	 * Computes the distance between the line-segment (p1, p2) and the point (x, y).
+	 *
+	 * @param p1X   x-coordinate of p1
+	 * @param p1Y   y-coordinate of p1
+	 * @param p2X   x-coordinate of p2
+	 * @param p2Y   y-coordinate of p2
+	 * @param x     x-coordinate of the point of interest
+	 * @param y     y-coordinate of the point of interest
+	 *
+	 * @return the distance between the line-segment (p1, p2) and the point (x, y)
+	 */
 	public static double distanceToLineSegment(final double p1X, final double p1Y, final double p2X, final double p2Y, final double x, final double y) {
 		// special cases
 		/*if(p1X == p2X) {
@@ -762,10 +1010,32 @@ public class GeometryUtils {
 		return Math.abs(s) * Math.sqrt(len2);
 	}
 
+	/**
+	 * Computes the distance between the line defined by (p1, p2) and the point (x, y).
+	 *
+	 * @param p1    first point of the line
+	 * @param p2    second point of the line
+	 * @param x     x-coordinate of the point of interest
+	 * @param y     y-coordinate of the point of interest
+	 *
+	 * @return the distance between the line defined by (p1, p2) and the point (x, y).
+	 */
 	public static double distanceToLine(@NotNull final IPoint p1, @NotNull final IPoint p2, final double x, final double y) {
 		return distanceToLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
 	}
 
+	/**
+	 * Computes the distance between the line defined by (p1, p2) and the point (x, y).
+	 *
+	 * @param p1X   x-coordinate of p1
+	 * @param p1Y   y-coordinate of p1
+	 * @param p2X   x-coordinate of p2
+	 * @param p2Y   y-coordinate of p2
+	 * @param x     x-coordinate of the point of interest
+	 * @param y     y-coordinate of the point of interest
+	 *
+	 * @return the distance between the line defined by (p1, p2) and the point (x, y)
+	 */
 	public static double distanceToLine(final double p1X, final double p1Y, final double p2X, final double p2Y, final double x, final double y) {
 		double a = p1Y - p2Y;
 		double b = p2X - p1X;
@@ -778,6 +1048,16 @@ public class GeometryUtils {
 		}
 	}
 
+	/**
+	 * Tests if the point p is on the line-segment (p1, p2) (or very very close).
+	 *
+	 * @param p1        the first point of the line-segment
+	 * @param p2        the second point of the line-segment
+	 * @param p         the point of interest
+	 * @param tolerance if the point is closer than this tolerance it is assumed that it is on it
+	 *
+	 * @return if the point p is on the line-segment (p1, p2) (or very very close), false otherwise
+	 */
 	public static boolean isOnEdge(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p, double tolerance) {
 		return distanceToLineSegment(p1, p2, p) < tolerance;
 	}
@@ -842,7 +1122,8 @@ public class GeometryUtils {
 	 * @see <a href="https://en.wikipedia.org/wiki/Atan2">https://en.wikipedia.org/wiki/Atan2</a>
 	 * @param from the first point / vector
 	 * @param to   the second point / vector
-	 * @return the angle between the positive x-axis
+	 *
+	 * @return the angle between the positive x-axis and the vector (from -> to)
 	 */
 	public static double angleTo(@NotNull final IPoint from, @NotNull final IPoint to) {
 		double atan2 = Math.atan2(to.getY() - from.getY(), to.getX() - from.getX());
@@ -854,6 +1135,15 @@ public class GeometryUtils {
 		return atan2;
 	}
 
+	/**
+	 * Computes the angle between the positive x-axis and the point (to - (0,0)).
+	 * Result is in interval (0,2*PI) according to standard math usage.
+	 *
+	 * @see <a href="https://en.wikipedia.org/wiki/Atan2">https://en.wikipedia.org/wiki/Atan2</a>
+	 * @param to   the second point / vector
+	 *
+	 * @return the angle between the positive x-axis and the vector ((0,0) -> to)
+	 */
 	public static double angleTo(@NotNull final IPoint to) {
 		return angleTo(new VPoint(0,0), to);
 	}
@@ -863,6 +1153,7 @@ public class GeometryUtils {
 	 *
 	 * @param line1 the first line
 	 * @param line2 the second line
+	 *
 	 * @return the angle between two lines in clock wise order (cw).
 	 */
 	public static double angleBetween2Lines(@NotNull final VLine line1, @NotNull final VLine line2)
@@ -874,15 +1165,29 @@ public class GeometryUtils {
 		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
 	}
 
-	public static double sign(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
-		return (x1 - x3) * (y2 - y3) - (x2 -x3) * (y1 - y3);
-	}
-
+	/**
+	 * Computes a {@link VRectangle} square which is the tight bounding box of the collection of points.
+	 *
+	 * @param points    collection of points
+	 * @param <P>       the type of the {@link IPoint}
+	 *
+	 * @return a square which is the tight bounding box of the collection of points
+	 */
 	public static <P extends IPoint> VRectangle bound(final Collection<P> points) {
 		return bound(points, 0.0);
 	}
 
-	public static <P extends IPoint> VRectangle bound(final Collection<P> points, final double epilon) {
+	/**
+	 * Computes a {@link VRectangle} square which is the tight bounding box of the collection of points.
+	 * The bounding box is padded by <tt>padding</tt>
+	 *
+	 * @param points    collection of points
+	 * @param padding   the padding
+	 * @param <P>       the type of the {@link IPoint}
+	 *
+	 * @return a square padded by <tt>padding</tt> which is the tight bounding box of the collection of points
+	 */
+	public static <P extends IPoint> VRectangle bound(final Collection<P> points, final double padding) {
 		if(points.isEmpty()) {
 			throw new IllegalArgumentException("the point collection is empty.");
 		}
@@ -890,9 +1195,8 @@ public class GeometryUtils {
 		VPoint pMax = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()))).get();
 		VPoint pMin = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()))).get();
 
-		return new VRectangle(pMin.getX()-epilon, pMin.getY()-epilon, pMax.getX() - pMin.getX() + 2*epilon, pMax.getY() - pMin.getY() + 2*epilon);
+		return new VRectangle(pMin.getX()-padding, pMin.getY()-padding, pMax.getX() - pMin.getX() + 2*padding, pMax.getY() - pMin.getY() + 2*padding);
 	}
-
 
 	/**
 	 *  This method divides an non-acute triangle ACB into 7 acute triangles
@@ -970,15 +1274,26 @@ public class GeometryUtils {
 
 	}
 
+	/**
+	 * Returns the {@link VPoint} p1+p2.
+	 *
+	 * @param p1 first point
+	 * @param p2 second point
+	 *
+	 * @return p1+p2
+	 */
 	public static VPoint add(final VPoint p1, final VPoint p2) {
 		return new VPoint(p1.x + p2.x, p1.y + p2.y);
 	}
 
-	public static boolean isValid(@NotNull final VTriangle triangle) {
-		List<VPoint> points = triangle.getPoints();
-		return GeometryUtils.isLeftOf(points.get(0), points.get(1), points.get(2));
-	}
-
+	/**
+	 * Computes the quality smaller or equals one of the triangle with respect to the length of the edges,
+	 * i.e. a triangle where each edge has equal length has the quality 1.
+	 *
+	 * @param triangle the triangle
+	 *
+	 * @return the quality smaller or equals one of the triangle
+	 */
 	public static double qualityOf(@NotNull final VTriangle triangle) {
 		VLine[] lines = triangle.getLines();
 		double a = lines[0].length();
@@ -994,6 +1309,22 @@ public class GeometryUtils {
 		return part;
 	}
 
+	/**
+	 * Computes the intersection point of two lines ((x1, y1), (x2, y2)) and ((x3, y3), (x4, y4)).
+	 *
+	 * Assumption: the lines are not co-linear.
+	 *
+	 * @param x1 x-coordinate of the first point of the first line
+	 * @param y1 y-coordinate of the first point of the first line
+	 * @param x2 x-coordinate of the second point of the first line
+	 * @param y2 y-coordinate of the second point of the first line
+	 * @param x3 x-coordinate of the first point of the second line
+	 * @param y3 y-coordinate of the first point of the second line
+	 * @param x4 x-coordinate of the second point of the second line
+	 * @param y4 y-coordinate of the second point of the second line
+	 *
+	 * @return the intersection point of the two lines
+	 */
 	public static VPoint lineIntersectionPoint(final double x1,
 											   final double y1,
 											   final double x2,
@@ -1011,10 +1342,35 @@ public class GeometryUtils {
 		return new VPoint(x, y);
 	}
 
+	/**
+	 * Computes the intersection point of two lines (p1, p2) and (q1, q2).
+	 *
+	 * Assumption: the lines are not co-linear.
+	 *
+	 * @param p1 first point of the first line
+	 * @param p2 second point of the first line
+	 * @param q1 first point of the second line
+	 * @param q2 second point of the second line
+	 *
+	 * @return the intersection point of the two lines
+	 */
 	public static VPoint lineIntersectionPoint(final VPoint p1, final VPoint p2, final VPoint q1, final VPoint q2) {
 		return lineIntersectionPoint(p1.x, p1.y, p2.x, p2.y, q1.x, q1.y, q2.x, q2.y);
 	}
 
+	/**
+	 * Computes the intersection point of two <tt>line</tt> and (q1, q2).
+	 *
+	 * Assumption: the lines are not co-linear.
+	 *
+	 * @param line  the first line
+	 * @param x3    x-coordinate of the first point of the second line
+	 * @param y3    y-coordinate of the first point of the second line
+	 * @param x4    x-coordinate of the second point of the second line
+	 * @param y4    y-coordinate of the second point of the second line
+	 *
+	 * @return the intersection point of the two lines
+	 */
 	public static VPoint lineIntersectionPoint(final VLine line,
 											   final double x3,
 											   final double y3,
@@ -1023,6 +1379,16 @@ public class GeometryUtils {
 		return lineIntersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), x3, y3, x4, y4);
 	}
 
+	/**
+	 * Computes the intersection point of two <tt>line1</tt> and <tt>line2</tt>.
+	 *
+	 * Assumption: the lines are not co-linear.
+	 *
+	 * @param line1 the first line
+	 * @param line2 the second line
+	 *
+	 * @return the intersection point of the two lines
+	 */
 	public static VPoint lineIntersectionPoint(final VLine line1,
 	                                           final VLine line2) {
 		return lineIntersectionPoint(line1.getX1(), line1.getY1(), line1.getX2(), line1.getY2(), line2.getX1(), line2.getY1(), line2.getX2(), line2.getY2());
@@ -1079,18 +1445,22 @@ public class GeometryUtils {
 		if(points.size() < 3) {
 			throw new IllegalArgumentException("more than 2 points are required to form a valid polygon.");
 		}
+		return polygonFromPoints2D(points);
+	}
 
-		Path2D path2D = new Path2D.Double();
-		path2D.moveTo(points.get(0).getX(), points.get(0).getY());
-		//path2D.lineTo(points.get(0).getX(), points.get(0).getY());
+	public static VPolygon toPolygon(final VCircle circle, final int nPoints) {
+		double alpha = 2 * Math.PI / nPoints;
+		VPoint p = new VPoint(0, circle.getRadius());
 
-		for(int i = 1; i < points.size(); i++) {
-			path2D.lineTo(points.get(i).getX(), points.get(i).getY());
+		Path2D.Double path = new Path2D.Double();
+		VPoint center = circle.getCenter();
+
+		path.moveTo(center.x + p.x, center.y + p.y);
+		for(int i = 1; i < nPoints; i++) {
+			p = p.rotate(alpha);
+			path.lineTo(center.x + p.x, center.y + p.y);
 		}
-
-		path2D.lineTo(points.get(0).getX(), points.get(0).getY());
-
-		return new VPolygon(path2D);
+		return new VPolygon(path);
 	}
 
 	/**
@@ -1183,6 +1553,48 @@ public class GeometryUtils {
 		} while (removePoint);
 
 		return filteredList;
+	}
+
+	/**
+	 * Transforms a list of points into a simple polygon {@link VPolygon}.
+	 *
+	 * @param sorted if true the method assumes that the list of points is sorted i.e. forms already a valid simple polygon,
+	 *               otherwise the list will be sorted in ccw order beforehand.
+	 * @param points the list of points
+	 * @return a simple polygon defined by the list of points
+	 */
+	public static VPolygon toPolygon(final boolean sorted, @NotNull final List<IPoint> points) {
+		assert points.size() >= 3;
+		return toPolygon(sorted ? points : sortCCW(points));
+	}
+
+	/**
+	 * Sorts a list of points in ccw order with respect to the centroid of the list of points.
+	 *
+	 * @param points the list of points
+	 * @return a ccw sorted (with respect to the centroid of the points) list of the same points
+	 */
+	public static List<IPoint> sortCCW(@NotNull final List<IPoint> points) {
+		List<IPoint> sortedPoints = new ArrayList<>(points);
+		VPoint center = getCentroid(points);
+		Collections.sort(sortedPoints, new CCWComparator(center));
+		return sortedPoints;
+	}
+
+	/**
+	 * Computes the centroid of an (unsorted) point set.
+	 *
+	 * @param points the point set (as list)
+	 * @return the centroid of an (unsorted) point set
+	 */
+	public static VPoint getCentroid(@NotNull final List<IPoint> points) {
+		double x = 0;
+		double y = 0;
+		for(IPoint p : points) {
+			x += p.getX();
+			y += p.getY();
+		}
+		return new VPoint(x / points.size(), y / points.size());
 	}
 
 	/**

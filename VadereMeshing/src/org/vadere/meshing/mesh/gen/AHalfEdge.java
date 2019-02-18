@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -43,16 +44,23 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
 	 */
 	private int face;
 
+	private @Nullable CE data;
+
 	/**
 	 * Indicates that the half-edge is destroyed and can be removed from the array-based data structure.
 	 */
 	private boolean destroyed;
 
-	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
+	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face, @Nullable final CE data) {
 		this.id = id;
 	    this.end = end;
 		this.face = face;
 		this.destroyed = false;
+		this.data = data;
+	}
+
+	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
+		this(id, end, face, null);
 	}
 
 	protected AHalfEdge(@NotNull final int id, @NotNull final int end) {
@@ -123,7 +131,7 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
 		this.end = end;
 	}
 
-	public boolean isDestroyed() {
+	boolean isDestroyed() {
 		return destroyed;
 	}
 
@@ -138,7 +146,26 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
         this.id = id;
     }
 
-    @Override
+	/**
+	 * Returns the data associated with this half-edge.
+	 *
+	 * @return the data associated with this half-edge
+	 */
+	@Nullable
+	CE getData() {
+		return data;
+	}
+
+	/**
+	 * Sets and overrides the data associated with this half-edge.
+	 *
+	 * @param data the data
+	 */
+	void setData(@Nullable final CE data) {
+		this.data = data;
+	}
+
+	@Override
     public String toString() {
         return "" + id+"(e)->"+next+"(e), " + end+"(v)";
     }

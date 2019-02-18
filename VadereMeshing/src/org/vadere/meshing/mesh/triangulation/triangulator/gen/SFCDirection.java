@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation.triangulator;
+package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 /**
  * @author Benedikt Zoennchen

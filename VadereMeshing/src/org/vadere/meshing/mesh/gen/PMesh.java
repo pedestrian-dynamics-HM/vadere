@@ -3,6 +3,7 @@ package org.vadere.meshing.mesh.gen;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
@@ -11,6 +12,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,10 +34,25 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	private List<PHalfEdge<P, CE, CF>> edges;
 	private IPointConstructor<P> pointConstructor;
 	private List<PVertex<P, CE, CF>> vertices;
+	private @Nullable final Supplier<CE> edgeSupplier;
+	private @Nullable final Supplier<CF> faceSupplier;
 
-	public PMesh(final IPointConstructor<P> pointConstructor) {
+	public PMesh(@NotNull final IPointConstructor<P> pointConstructor,
+	             @Nullable final Supplier<CE> edgeSupplier,
+	             @Nullable final Supplier<CF> faceSupplier) {
 		clear();
 		this.pointConstructor = pointConstructor;
+		this.edgeSupplier = edgeSupplier;
+		this.faceSupplier = faceSupplier;
+	}
+
+	public PMesh(@NotNull final IPointConstructor<P> pointConstructor,
+	             @Nullable final Supplier<CE> edgeSupplier) {
+		this(pointConstructor, edgeSupplier, null);
+	}
+
+	public PMesh(final IPointConstructor<P> pointConstructor) {
+		this(pointConstructor, null, null);
 	}
 
 	@Override
@@ -111,6 +128,26 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	@Override
 	public P getPoint(@NotNull final PVertex<P, CE, CF> vertex) {
 		return vertex.getPoint();
+	}
+
+	@Override
+	public Optional<CF> getData(@NotNull final PFace<P, CE, CF> face) {
+		return Optional.ofNullable(face.getData());
+	}
+
+	@Override
+	public void setData(@NotNull final PFace<P, CE, CF> face, @Nullable final CF data) {
+		face.setData(data);
+	}
+
+	@Override
+	public Optional<CE> getData(@NotNull final PHalfEdge<P, CE, CF> edge) {
+		return Optional.ofNullable(edge.getData());
+	}
+
+	@Override
+	public void setData(@NotNull PHalfEdge<P, CE, CF> edge, @Nullable CE data) {
+		edge.setData(data);
 	}
 
 	@Override
@@ -228,6 +265,11 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	public PHalfEdge<P, CE, CF> createEdge(@NotNull final PVertex<P, CE, CF> vertex) {
 		PHalfEdge<P, CE, CF> edge = new PHalfEdge<>(vertex);
 		edges.add(edge);
+
+		if(edgeSupplier != null) {
+			edge.setData(edgeSupplier.get());
+		}
+
 		numberOfEdges++;
 		return edge;
 	}
@@ -236,6 +278,11 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	public PHalfEdge<P, CE, CF> createEdge(@NotNull final PVertex<P, CE, CF> vertex, @NotNull final PFace<P, CE, CF> face) {
 		PHalfEdge<P, CE, CF> edge = new PHalfEdge<>(vertex, face);
 		edges.add(edge);
+
+		if(edgeSupplier != null) {
+			edge.setData(edgeSupplier.get());
+		}
+
 		numberOfEdges++;
 		return edge;
 	}
@@ -249,6 +296,10 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	public PFace<P, CE, CF> createFace(final boolean hole) {
 		PFace<P, CE, CF> face = new PFace<>(hole);
 		faces.add(face);
+
+		if(faceSupplier != null) {
+			setData(face, faceSupplier.get());
+		}
 
 		if(hole) {
 			numberOfHoles++;
@@ -396,7 +447,7 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 
 	@Override
 	public Stream<PFace<P, CE, CF>> streamFaces(@NotNull final Predicate<PFace<P, CE, CF>> predicate) {
-		return faces.stream().filter(predicate);
+		return faces.stream().filter(f -> !isDestroyed(f)).filter(predicate);
 	}
 
 	@Override

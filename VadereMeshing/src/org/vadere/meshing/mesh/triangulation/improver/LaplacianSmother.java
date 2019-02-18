@@ -5,13 +5,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.triangulator.RandomPointsSetTriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRandomPointsSetTriangulator;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
@@ -55,8 +55,8 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
         this.deps = 1.4901e-8 * initialEdgeLen;
         this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
-        this.triangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, bound, (x, y) -> new EikMeshPoint(x, y, false));
 
+        PMesh<EikMeshPoint, Object, Object> mesh = new PMesh<>((x, y) -> new EikMeshPoint(x, y, false));
         /**
          * Start with a uniform refined triangulation
          */
@@ -64,8 +64,8 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
         //UniformRefinementTriangulator uniformRefinementTriangulator = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         //uniformRefinementTriangulator.generate();
 
-        RandomPointsSetTriangulator randomTriangulator = new RandomPointsSetTriangulator(triangulation, 3000, bound, distanceFunc);
-        randomTriangulator.generate();
+        GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(mesh, 3000, bound, distanceFunc);
+	    triangulation = randomTriangulator.generate();
         removeTrianglesInsideObstacles();
         log.info("##### (end) generate a uniform refined triangulation #####");
     }

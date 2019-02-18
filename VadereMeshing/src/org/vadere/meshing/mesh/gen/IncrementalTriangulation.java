@@ -74,11 +74,11 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	private boolean useMeshForBound;
 	private IPointLocator.Type type;
 
-	private static double BUFFER_PERCENTAGE = 0.0001;
+	private static double BUFFER_PERCENTAGE = GeometryUtils.DOUBLE_EPS;
 
 	// TODO this epsilon it hard coded!!! => replace it with a user choice
 	private double epsilon = 0.0001;
-	private double edgeCoincidenceTolerance = 0.0001;
+	private double edgeCoincidenceTolerance = GeometryUtils.DOUBLE_EPS;
 
 	private final Predicate<E> illegalPredicate;
 	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
@@ -165,6 +165,12 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 	                                @NotNull final VRectangle bound) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, halfEdge -> true);
+	}
+
+	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	                                @NotNull final VRectangle bound,
+	                                @NotNull final Predicate<E> illegalCondition) {
+		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, illegalCondition);
 	}
 
 	/**
@@ -386,7 +392,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		 */
 		if(isClose(point.getX(), point.getY(), face, edgeCoincidenceTolerance)) {
 			log.info("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
-			return edge;
+			return getCloseEdge(face, point.getX(), point.getY(), edgeCoincidenceTolerance).get();
 		}
 		if(GeometryUtils.isOnEdge(p1, p2, point, edgeCoincidenceTolerance)) {
 			//log.info("splitEdge()");
@@ -420,6 +426,10 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 				y <= y0 + bound.getHeight());
 	}
 
+	public E insert(double x, double y) {
+		return insert(mesh.createPoint(x, y));
+	}
+
 	@Override
 	public E insert(P point) {
 		if(!initialized) {
@@ -451,6 +461,28 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	    return pointLocator;
     }
 
+	@Override
+	public boolean isVirtualFace(@NotNull final F face) {
+		if(finalized) {
+			return false;
+		}
+		else {
+			return getMesh().streamVertices(face).anyMatch(v -> virtualVertices.contains(v));
+		}
+
+	}
+
+	@Override
+	public boolean isVirtualEdge(@NotNull final E edge) {
+		if(finalized) {
+			return false;
+		}
+		else {
+			return virtualVertices.contains(getMesh().getVertex(edge))
+					|| virtualVertices.contains(getMesh().getVertex(getMesh().getPrev(edge)));
+		}
+	}
+
 	/**
 	 * Removes the super triangle from the mesh data structure.
 	 */
@@ -474,6 +506,8 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 			finalized = true;
 		}
 	}*/
+
+
 
 	@Override
 	public void finish() {

@@ -72,6 +72,18 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 		return getMesh().locate(x, y);
 	}
 
+	default Optional<V> locatePoint(final double x, final double y) {
+		Optional<F> optFace = locateFace(x, y);
+		if(optFace.isPresent()) {
+			for(V v : getMesh().getVertexIt(optFace.get())) {
+				if(v.getX() == x && v.getY() == y) {
+					return Optional.of(v);
+				}
+			}
+		}
+		return Optional.empty();
+	}
+
 	/**
 	 * <p>Searches and returns the face containing the point (x,y) in O(n),
 	 * where n is the number of faces of the mesh.</p>
@@ -712,6 +724,18 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x, y, edge));
 	}
 
+	/**
+	 * Returns true if (x,y) is contained in the ccw triangle defined by (v1, v2, v3).
+	 *
+	 * Assumption: v1 -> v2 -> v3 is ccw oriented.
+	 *
+	 * @param x
+	 * @param y
+	 * @param v1
+	 * @param v2
+	 * @param v3
+	 * @return
+	 */
 	default boolean contains(final double x, final double y, @NotNull final V v1, @NotNull final V v2, @NotNull final V v3) {
 		return !GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x, y)
 				&& !GeometryUtils.isRightOf(v2.getX(), v2.getY(), v3.getX(), v3.getY(), x, y)

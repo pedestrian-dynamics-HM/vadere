@@ -2,6 +2,7 @@ package org.vadere.meshing.mesh.triangulation;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -15,7 +16,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * In average the algorithm should perfom in O(n log(n)) but in degenerated cases its runtime can be in O(n^2)
  * where n is the number of points. This implementation is only used to compare results since it is an easy
  * version of the Bowyer-Watson algorithm. It can be used to check for correctness of more sophisticated
- * implementations line {@link org.vadere.meshing.mesh.gen.IncrementalTriangulation}.
+ * implementations line {@link IncrementalTriangulation}.
  *
  * @see <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>
  * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>

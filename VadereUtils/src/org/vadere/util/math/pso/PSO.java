@@ -218,7 +218,7 @@ public class PSO {
 
 	/*private Particle locationToParticle(@NotNull final VPoint location) {
 		double vMag = random.nextDouble() * maxVelocity;
-		VPoint velocity = location.subtract(circle.getCenter()).setMagnitude(vMag).limit(maxVelocity);
+		VPoint velocity = location.subtract(circle.getCentroid()).setMagnitude(vMag).limit(maxVelocity);
 		double fitnessValue = f.apply(location);
 		return new Particle(location, velocity, fitnessValue);
 	}*/

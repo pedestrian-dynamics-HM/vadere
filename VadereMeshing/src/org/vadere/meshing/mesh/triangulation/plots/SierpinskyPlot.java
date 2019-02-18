@@ -15,7 +15,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class SierpinskyPlot {
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + (Math.abs(distanceFunc.apply(p)) * Math.abs(distanceFunc.apply(p)));
 
-		UniformRefinementTriangulatorSFC<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+		GenUniformRefinementTriangulatorSFC<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation = new GenUniformRefinementTriangulatorSFC(
 				supplier,
 				bbox,
 				obstacles,

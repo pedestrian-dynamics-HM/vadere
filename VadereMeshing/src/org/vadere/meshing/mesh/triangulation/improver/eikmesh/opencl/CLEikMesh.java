@@ -10,8 +10,8 @@ import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.meshing.opencl.CLDistMesh;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
@@ -96,7 +96,7 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
         log.info("##### (end) compute a uniform refined triangulation #####");
 
         log.info("##### (start) generate a triangulation #####");
-        UniformRefinementTriangulatorSFC<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+        GenUniformRefinementTriangulatorSFC<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> uniformRefinementTriangulation = new GenUniformRefinementTriangulatorSFC(
                 meshSupplier,
                 bound,
                 obstacleShapes,
@@ -241,6 +241,7 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
         return false;
     }
 
+    @Override
     public synchronized AMesh<P, CE, CF> getMesh() {
         refresh();
         // TODO: dirty casting
