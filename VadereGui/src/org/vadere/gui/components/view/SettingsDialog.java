@@ -3,14 +3,7 @@ package org.vadere.gui.components.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-import org.vadere.gui.components.control.simulation.ActionSetDensityColor;
-import org.vadere.gui.components.control.simulation.ActionSetObstacleColor;
-import org.vadere.gui.components.control.simulation.ActionSetPedestrianColor;
-import org.vadere.gui.components.control.simulation.ActionSetPedestrianWithoutTargetColor;
-import org.vadere.gui.components.control.simulation.ActionSetSnapshotDirectory;
-import org.vadere.gui.components.control.simulation.ActionSetSourceColor;
-import org.vadere.gui.components.control.simulation.ActionSetStairsColor;
-import org.vadere.gui.components.control.simulation.ActionSetTargetColor;
+import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
@@ -113,6 +106,7 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowObstacles = new JCheckBox((Messages.getString("SettingsDialog.chbShowObstacles.text")));
 		JCheckBox chShowTargets = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargets.text")));
 		JCheckBox chShowSources = new JCheckBox((Messages.getString("SettingsDialog.chbShowSources.text")));
+		JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
 
@@ -147,6 +141,12 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
+		chShowAbsorbingAreas.setSelected(model.config.isShowAbsorbingAreas());
+		chShowAbsorbingAreas.addItemListener(e -> {
+			model.config.setShowAbsorbingAreas(!model.config.isShowAbsorbingAreas());
+			model.notifyObservers();
+		});
+
 		chShowStairs.setSelected(model.config.isShowSources());
 		chShowStairs.addItemListener(e -> {
 			model.config.setShowStairs(!model.config.isShowStairs());
@@ -177,6 +177,7 @@ public class SettingsDialog extends JDialog {
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblSource.text") + ":"), cc.xy(2, 6));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblStair.text") + ":"), cc.xy(2, 8));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(2, 10));
+		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(2, 12));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"),
 				cc.xy(2, 18));
 
@@ -220,6 +221,14 @@ public class SettingsDialog extends JDialog {
 		colorLayeredPane.add(pDensityColor, cc.xy(4, 10));
 		colorLayeredPane.add(bDensityColor, cc.xy(6, 10));
 
+		final JButton bAbsorbingAreaColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JPanel pAbsorbingAreaColor = new JPanel();
+		pAbsorbingAreaColor.setBackground(model.config.getAbsorbingAreaColor());
+		pAbsorbingAreaColor.setPreferredSize(new Dimension(130, 20));
+		bAbsorbingAreaColor.addActionListener(new ActionSetAbsorbingAreaColor("Set Absorbing Area Color", model, pAbsorbingAreaColor));
+		colorLayeredPane.add(pAbsorbingAreaColor, cc.xy(4, 12));
+		colorLayeredPane.add(bAbsorbingAreaColor, cc.xy(6, 12));
+
 		colorLayeredPane.add(new JSeparator(), cc.xyw(1, 12, 9));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedTrajColor.text") + ":"),
 				cc.xyw(2, 14, 5));
@@ -253,7 +262,8 @@ public class SettingsDialog extends JDialog {
 		additionalLayeredPane.add(chShowTargets, cc.xyw(2, 6, 5));
 		additionalLayeredPane.add(chShowSources, cc.xyw(2, 8, 5));
 		additionalLayeredPane.add(chShowStairs, cc.xyw(2, 10, 5));
-		additionalLayeredPane.add(chShowPedIds, cc.xyw(2, 12, 5));
+		additionalLayeredPane.add(chShowAbsorbingAreas, cc.xyw(2, 12, 5));
+		additionalLayeredPane.add(chShowPedIds, cc.xyw(2, 14, 5));
 
 		additionalLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblSnapshotDir.text") + ":"),
 				cc.xy(2, 14));

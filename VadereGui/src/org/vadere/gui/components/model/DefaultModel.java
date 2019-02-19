@@ -103,7 +103,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 				c = getConfig().getTargetColor();
 				break;
 			case ABSORBING_AREA:
-				c = Color.RED;
+				c = getConfig().getAbsorbingAreaColor();
 				break;
 			default:
 				c = Color.RED;
