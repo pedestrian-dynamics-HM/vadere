@@ -1547,9 +1547,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 					VPoint p = getMesh().toPoint(edge);
 					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+					VPoint midPoint = new VLine(r, q).midPoint();
 
-					VTriangle triangle = new VTriangle(r,p,q);
-					if(distanceFunction.apply(triangle.midPoint()) <= 0 && GeometryUtils.isCCW(r, p, q)) {
+					if((distanceFunction.apply(p) + distanceFunction.apply(midPoint) < 0) && GeometryUtils.isCCW(r, p, q)) {
 						double angle = GeometryUtils.angle(r, p, q);
 						if(angle < 0.5*Math.PI) {
 							createFaceAtBoundary(edge);
@@ -1575,12 +1575,13 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 				VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 				VPoint p = getMesh().toPoint(edge);
 				VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+				VPoint midPoint = new VLine(r, q).midPoint();
 
 				VTriangle triangle = new VTriangle(r,p,q);
-				if(distanceFunction.apply(triangle.midPoint()) <= 0 && GeometryUtils.isCCW(r, p, q)) {
+				if((distanceFunction.apply(p) + distanceFunction.apply(midPoint) < 0) && GeometryUtils.isCCW(r, p, q)) {
 					double angle = GeometryUtils.angle(r, p, q);
 					if(angle < 0.5*Math.PI) {
-						System.out.println(triangle);
+						//System.out.println(triangle);
 						F newFace = createFaceAtBoundary(edge);
 					}
 				}
@@ -2423,9 +2424,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			P p2 = getMesh().getPoint(edge);
 			P p3 = getMesh().getPoint(getMesh().getNext(edge));
 			boolean valid = GeometryUtils.isLeftOf(p1, p2, p3);
-			if (!valid) {
+			/*if (!valid) {
 				log.info(p1 + ", " + p2 + ", " + p3);
-			}
+			}*/
 			return valid;
 		};
 

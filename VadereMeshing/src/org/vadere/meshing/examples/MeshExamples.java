@@ -18,6 +18,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MeshExamples {
@@ -110,10 +112,10 @@ public class MeshExamples {
 		int height = 10;
 		int numberOfPoints = 1000;
 
-		Set<VPoint> points = new HashSet<>(numberOfPoints);
-		/*for(int i = 0; i < numberOfPoints; i++) {
+		List<VPoint> points = new ArrayList<>();
+		for(int i = 0; i < numberOfPoints; i++) {
 			points.add(new VPoint(random.nextDouble() * width, random.nextDouble() * height));
-		}*/
+		}
 
 
 		List<VLine> constrains = new ArrayList<>();
@@ -137,16 +139,8 @@ public class MeshExamples {
 	}
 
 	public static void ruppertsTriangulation() {
-		int width = 15;
-		int height = 15;
 
-		// construct a bounding polygon containing all points
-		/*VPolygon boundingBox = GeometryUtils.toPolygon(
-				new VPoint(-5, -5),
-				new VPoint(-5, 20),
-				new VPoint(20, 20),
-				new VPoint(20, -5));*/
-
+		// bounding polygon
 		VPolygon boundingBox = GeometryUtils.toPolygon(
 				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 14.0),
 				100);
@@ -159,21 +153,21 @@ public class MeshExamples {
 				new VPoint(5,5),
 				new VPoint(5,1));
 
-		// second polygon
-		/*VPolygon square = GeometryUtils.toPolygon(
-				new VPoint(0, 0),
-				new VPoint(0, 10),
-				new VPoint(10, 10),
-				new VPoint(10, 0));*/
-
 
 		PRuppertsTriangulator<VPoint, Double, Double> ruppertsTriangulator = new PRuppertsTriangulator<>(
 						boundingBox,
 						Arrays.asList(house),
 						(x, y) -> new VPoint(x, y),
-						25);
+						20);
 
 		ruppertsTriangulator.generate();
+
+
+		Function<PFace<VPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = ruppertsTriangulator.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppertsTriangulator.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+		System.out.println(TexGraphGenerator.toTikz(ruppertsTriangulator.getMesh(), colorFunction, 1.0f));
 		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(ruppertsTriangulator.getMesh(), 1000, 1000);
 		panel.display("Rupperts Algorithm");
 

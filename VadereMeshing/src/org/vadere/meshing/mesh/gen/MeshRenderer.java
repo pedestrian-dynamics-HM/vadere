@@ -138,10 +138,11 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 			VPolygon polygon = mesh.toPolygon(face);
 
 			if(colorFunction != null) {
-				//graphics.setColor(colorFunction.apply(face));
-				//graphics.fill(polygon);
+				graphics.setColor(colorFunction.apply(face));
+				graphics.fill(polygon);
+				graphics.setColor(Color.GRAY);
+				graphics.draw(polygon);
 			}
-
 			if(alertPred.test(face)) {
 				graphics.setColor(new Color(100, 0, 0));
 				graphics.fill(polygon);
@@ -149,7 +150,7 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 				graphics.draw(polygon);
 
 			}
-			else {
+			else if(colorFunction == null) {
 				graphics.setColor(Color.GRAY);
 				graphics.draw(polygon);
 			}

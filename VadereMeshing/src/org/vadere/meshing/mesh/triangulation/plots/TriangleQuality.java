@@ -15,7 +15,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class  TriangleQuality{
 		List<Integer> steps = new ArrayList<>();
 		List<Double> quality = new ArrayList<>();
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				uniformEdgeLength,
 				initialEdgeLength,
@@ -93,7 +93,7 @@ public class  TriangleQuality{
 		double initialEdgeLength = startLen;
 		List<Double> quality = new ArrayList<>();
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				uniformEdgeLength,
 				initialEdgeLength,
@@ -142,7 +142,7 @@ public class  TriangleQuality{
 		double initialEdgeLength = startLen;
 		List<Double> quality = new ArrayList<>();
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
@@ -193,7 +193,7 @@ public class  TriangleQuality{
 		List<Integer> steps = new ArrayList<>();
 		List<Double> quality = new ArrayList<>();
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,

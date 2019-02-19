@@ -8,6 +8,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -30,7 +31,7 @@ public class GenDelaunayTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	public GenDelaunayTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 	                               @NotNull final Collection<P> pointSet) {
 		this.pointSet = pointSet;
-		this.triangulation = new IncrementalTriangulation<>(mesh, halfEdge -> true);
+		this.triangulation = new IncrementalTriangulation<>(mesh, GeometryUtils.bound(pointSet, GeometryUtils.DOUBLE_EPS), halfEdge -> true);
 		this.generated = false;
 	}
 

@@ -2,6 +2,7 @@ package org.vadere.meshing.mesh.inter;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -454,6 +455,21 @@ public interface IMesh<
 	 */
 	default Optional<E> getBoundaryEdge(@NotNull final V vertex) {
 		return streamEdges(vertex).filter(e -> isBoundary(e)).findAny();
+	}
+
+	/**
+	 * Returns true if this face is completely surrounded by the same boundary face, i.e. a hole
+	 * or the border.
+	 *
+	 * @param face  the face
+	 * @return true if this face is completely surrounded by the same boundary face
+	 */
+	default boolean isSeparated(@NotNull final F face) {
+		F neighbouringFace = getTwinFace(getEdge(face));
+		if(isBoundary(neighbouringFace)) {
+			return false;
+		}
+		return streamEdges(face).map(e -> getTwinFace(e)).allMatch(f -> f.equals(neighbouringFace));
 	}
 
 	/**
@@ -982,6 +998,24 @@ public interface IMesh<
 		return streamFaces().filter(face -> !isBoundary(face)).filter(face -> isAlive(face)).collect(Collectors.toList());
 	}
 
+	default Stream<F> streamBoundaries() {
+		return Streams.concat(streamHoles(), Stream.of(getBorder()));
+	}
+
+	default Stream<E> streamBoundaryEdges() {
+		return streamBoundaries().flatMap(f -> streamEdges(f));
+	}
+
+	/**
+	 * Returns a list {@link List} of all boundary edges (which are alive) of this mesh.
+	 * This requires O(n) where n is the number of boundary edges.
+	 *
+	 * @return a list {@link List} of all boundary edges
+	 */
+	default List<E> getBoundaryEdges() {
+		return streamBoundaryEdges().collect(Collectors.toList());
+	}
+
 	/**
 	 * Sets the point of a vertex. This should only be used with great care since
 	 * this will re-position the vertex and may destroy a valid connectivity! So in
@@ -1018,17 +1052,6 @@ public interface IMesh<
 	default List<F> getFacesWithHoles() {
 		return streamFaces().filter(face -> isAlive(face)).collect(Collectors.toList());
 	}
-
-	/**
-	 * Returns a list {@link List} of all boundary edges (which are alive) of this mesh.
-	 * This requires O(n) where n is the number of edges.
-	 *
-	 * @return a list {@link List} of all boundary edges
-	 */
-	default List<E> getBoundaryEdges() {
-		return streamEdges().filter(edge -> isBoundary(edge)).filter(edge -> isAlive(edge)).collect(Collectors.toList());
-	}
-
 
 	// TODO: this can be done much faster: only filter the edges of holes and the border!
 	/**

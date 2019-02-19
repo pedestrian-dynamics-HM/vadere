@@ -3,6 +3,7 @@ package org.vadere.meshing.mesh.inter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.IllegalMeshException;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
@@ -434,7 +435,31 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 		return mergeFaces(face, mergeCondition, deleteIsolatedVertices, -1);
 	}
 
-	// TODO: improve performance by remembering faces
+	/**
+	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
+	 * the mergeCondition does no longer hold or the maximal dept is reached.
+	 * This requires in the worst case O(n), where n is the number of edges of all involved faces
+	 * (i.e. the face and the merged faces).</p>
+	 *
+	 * <p>Changes the connectivity.</p>
+	 *
+	 * @param face                      the face
+	 * @param mergeCondition            the merge condition
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
+	 * @param errorCondition            a predicate which indicates that the merge process did merge faces which should not be merged,
+	 *                                  and therefore leading to an illegal mesh. If this condition is ever satisfied an exception will be thrown.
+	 * @throws IllegalMeshException     if during the merging <tt>errorCondition</tt> is true.
+	 *
+	 * @return the merge result i.e. the resulting face.
+	 */
+	default Optional<F> mergeFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> mergeCondition,
+			@NotNull final Predicate<F> errorCondition,
+			final boolean deleteIsolatedVertices) throws IllegalMeshException {
+		return mergeFaces(face, mergeCondition, errorCondition, deleteIsolatedVertices, -1);
+	}
+
 	/**
 	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
 	 * the mergeCondition does no longer hold or the maximal dept is reached.
@@ -450,7 +475,45 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 	 *
 	 * @return the merge result i.e. the resulting face.
 	 */
-	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices, final int maxDept) {
+	default Optional<F> mergeFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> mergeCondition,
+			final boolean deleteIsolatedVertices,
+			final int maxDept) {
+		try {
+			return mergeFaces(face, mergeCondition, f -> false, deleteIsolatedVertices, maxDept);
+		} catch (IllegalMeshException e) {
+			e.printStackTrace();
+		}
+		// this will never happen.
+		return Optional.empty();
+	}
+
+	// TODO: improve performance by remembering faces
+	/**
+	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
+	 * the mergeCondition does no longer hold or the maximal dept is reached.
+	 * This requires in the worst case O(n), where n is the number of edges of all involved faces
+	 * (i.e. the face and the merged faces).</p>
+	 *
+	 * <p>Changes the connectivity.</p>
+	 *
+	 * @param face                      the face
+	 * @param mergeCondition            the merge condition
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
+	 * @param maxDept                   the maximum dept / neighbouring distance at which faces can be removed
+	 * @param errorCondition            a predicate which indicates that the merge process did merge faces which should not be merged,
+	 *                                  and therefore leading to an illegal mesh. If this condition is ever satisfied an exception will be thrown.
+	 * @throws IllegalMeshException     if during the merging <tt>errorCondition</tt> is true.
+	 *
+	 * @return the merge result i.e. the resulting face.
+	 */
+	default Optional<F> mergeFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> mergeCondition,
+			@NotNull final Predicate<F> errorCondition,
+			final boolean deleteIsolatedVertices,
+			final int maxDept) throws IllegalMeshException {
 		boolean modified = true;
 		F currentFace = face;
 		int dept = 0;
@@ -463,6 +526,9 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 			assert neighbouringFaces.isEmpty() || neighbouringFaces.stream().anyMatch(f -> !f.equals(neighbouringFaces.get(0))) : "each edge of both faces is a link to the other face";
 
 			for(F neighbouringFace : neighbouringFaces) {
+				if(errorCondition.test(neighbouringFace)) {
+					throw new IllegalMeshException("the errorCondition is satisfied.");
+				}
 				// the face might be destroyed by an operation before
 				if(!getMesh().isDestroyed(neighbouringFace) && mergeCondition.test(neighbouringFace)) {
 					Optional<F> optionalMergeResult = removeEdges(currentFace, neighbouringFace, deleteIsolatedVertices);
@@ -493,8 +559,8 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 	}
 
 	/**
-	 * Creates a new hole or extends an existing hole by removing neighbouring faces as
-	 * long as the merge condition holds.
+	 * Creates a new hole or extends an existing hole by removing neighbouring faces by a virus algorithm
+	 * which consumes faces as long as the merge condition holds.
 	 *
 	 * Changes the connectivity.
 	 *

@@ -19,7 +19,7 @@ public class PContrainedDelaunayTriangulator<P extends IPoint, CE, CF> extends G
 	public PContrainedDelaunayTriangulator(
 			@NotNull final VRectangle bound,
 			@NotNull final Collection<VLine> constrains,
-			@NotNull final Set<P> points,
+			@NotNull final Collection<P> points,
 			@NotNull final IPointConstructor<P> pointConstructor) {
 		super(new PMesh<>(pointConstructor), bound, constrains, points);
 	}

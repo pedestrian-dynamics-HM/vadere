@@ -12,8 +12,8 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.Collection;
 
-public class APEikMeshGen<P extends EikMeshPoint> extends EikMesh<P, Object, Object,
-		PVertex<P, Object, Object>, PHalfEdge<P, Object, Object>, PFace<P, Object, Object>>{
+public class APEikMeshGen<P extends EikMeshPoint> extends GenEikMesh<P, Object, Object,
+		PVertex<P, Object, Object>, PHalfEdge<P, Object, Object>, PFace<P, Object, Object>> {
 
 	public APEikMeshGen(
 			@NotNull VPolygon polygon,

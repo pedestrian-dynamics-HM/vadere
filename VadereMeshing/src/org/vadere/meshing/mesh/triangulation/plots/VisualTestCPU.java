@@ -22,7 +22,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class VisualTestCPU {
 		//IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 
-		EikMesh meshGenerator = new EikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		GenEikMesh meshGenerator = new GenEikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 		ColorHelper colorHelper = new ColorHelper(meshGenerator.getMesh().getNumberOfFaces());
 		Function<AFace<EikMeshPoint>, Color> colorFunction = f -> colorHelper.numberToColor(f.getId());
@@ -105,7 +105,7 @@ public class VisualTestCPU {
 		//IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 
-		EikMesh meshGenerator = new EikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		GenEikMesh meshGenerator = new GenEikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint,Object,Object>, PHalfEdge<EikMeshPoint,Object,Object>, PFace<EikMeshPoint,Object,Object>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();

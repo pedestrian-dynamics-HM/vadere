@@ -443,7 +443,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 				// the following calls are quite expensive
 				shrinkBorder();
 				createHoles();
-				triangulation.smoothBorder();
+				//triangulation.smoothBorder();
 
 				sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));
 				List<F> holes = getMesh().streamHoles().collect(Collectors.toList());

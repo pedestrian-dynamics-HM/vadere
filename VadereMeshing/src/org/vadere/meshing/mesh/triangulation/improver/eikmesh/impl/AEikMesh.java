@@ -1,12 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.AEikMeshGen;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPolygon;

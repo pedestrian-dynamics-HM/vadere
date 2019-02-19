@@ -9,7 +9,7 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
@@ -48,7 +48,7 @@ public class RunTimeCPU extends JFrame {
 	    double minInitialEdgeLength = 0.03;
 
 	    while (initialEdgeLength >= minInitialEdgeLength) {
-		    EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		    GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				    distanceFunc,
 				    uniformEdgeLength,
 				    initialEdgeLength,
@@ -92,7 +92,7 @@ public class RunTimeCPU extends JFrame {
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
-			EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+			GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 					distanceFunc,
 					adaptiveEdgeLength,
 					initialEdgeLength,

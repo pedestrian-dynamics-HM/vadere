@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
@@ -14,7 +13,7 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -69,11 +68,11 @@ public class TestFFMNonUniformTriangulation {
         bbox = new VRectangle(-12, -12, 24, 24);
     }
 
-    private EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> createEikMesh(
+    private GenEikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> createEikMesh(
     		@NotNull final IEdgeLengthFunction edgeLengthFunc,
 		    final double initialEdgeLen) {
 	    IMeshSupplier<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshSupplier = () -> new PMesh<>((x, y) -> new PotentialPoint(x, y));
-	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> eikMesh = new EikMesh<>(
+	    GenEikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> eikMesh = new GenEikMesh<>(
 			    distanceFunc,
 			    edgeLengthFunc,
 			    initialEdgeLen,
@@ -97,7 +96,7 @@ public class TestFFMNonUniformTriangulation {
 	    /**
 	     * We use the pointer based implementation
 	     */
-	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
+	    GenEikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
         // () -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false))
 	    meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
@@ -187,7 +186,7 @@ public class TestFFMNonUniformTriangulation {
         //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
-	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
+	    GenEikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
         meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 
@@ -260,7 +259,7 @@ public class TestFFMNonUniformTriangulation {
         //IEdgeLengthFunction unifromEdgeLengthFunc = p -> 1.0;
         IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)*0.5);
         List<VRectangle> targetAreas = new ArrayList<>();
-	    EikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
+	    GenEikMesh<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> meshGenerator = createEikMesh(edgeLengthFunc, 0.6);
         meshGenerator.generate();
         triangulation = meshGenerator.getTriangulation();
 

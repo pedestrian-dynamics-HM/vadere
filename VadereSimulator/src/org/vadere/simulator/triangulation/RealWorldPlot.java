@@ -27,22 +27,18 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.util.io.IOUtils;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.swing.*;
 
 /**
  * @author Benedikt Zoennchen
@@ -3014,7 +3010,7 @@ public class RealWorldPlot {
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + 1.0 * Math.max(0, Math.abs(distanceFunc.apply(p)));
 		IEdgeLengthFunction edgeLengthFunction2 = p -> Math.min(1.0 + Math.max(distanceFunc.apply(p)*distanceFunc.apply(p), 0)*0.5, 5.0);
 
-		EikMesh<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				//p -> 1.0 + Math.abs(approxDistance.apply(p)),
 				edgeLengthFunction,
@@ -3094,7 +3090,7 @@ public class RealWorldPlot {
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				approxDistance,
 				//p -> 1.0 + Math.abs(approxDistance.apply(p)),
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),

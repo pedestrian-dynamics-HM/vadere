@@ -10,7 +10,7 @@ import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
@@ -51,7 +51,7 @@ public class EikMeshPlots {
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
@@ -93,7 +93,7 @@ public class EikMeshPlots {
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
@@ -131,7 +131,7 @@ public class EikMeshPlots {
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p));
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
@@ -173,7 +173,7 @@ public class EikMeshPlots {
 
 		obstacles.add(rect);
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
@@ -229,7 +229,7 @@ public class EikMeshPlots {
 
 		obstacles.add(hex);
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunc,
 				initialEdgeLength,
@@ -272,7 +272,7 @@ public class EikMeshPlots {
 		obstacles.add(hex);
 		obstacles.add(new VRectangle(-1, -1, 2, 2));
 
-		EikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new EikMesh<>(
+		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				initialEdgeLength,

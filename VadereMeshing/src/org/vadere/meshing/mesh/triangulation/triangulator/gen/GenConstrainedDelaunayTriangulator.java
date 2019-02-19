@@ -46,7 +46,7 @@ public class GenConstrainedDelaunayTriangulator<P extends IPoint, CE, CF, V exte
 	private final Collection<VLine> constrains;
 	private final Collection<Pair<V, V>> vConstrains;
 	private final Collection<E> eConstrains;
-	private final Set<P> points;
+	private final Collection<P> points;
 	private boolean generated;
 
 
@@ -54,7 +54,7 @@ public class GenConstrainedDelaunayTriangulator<P extends IPoint, CE, CF, V exte
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final VRectangle bound,
 			@NotNull final Collection<VLine> constrains,
-			@NotNull final Set<P> points) {
+			@NotNull final Collection<P> points) {
 		this.triangulation = new IncrementalTriangulation<>(mesh, bound, halfEdge -> true);
 		this.constrains = constrains;
 		this.points = points;

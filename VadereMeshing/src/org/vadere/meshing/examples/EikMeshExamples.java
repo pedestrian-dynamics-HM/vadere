@@ -1,12 +1,9 @@
 package org.vadere.meshing.examples;
 
-import org.vadere.meshing.mesh.impl.APMeshPanel;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.APEikMeshGen;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -27,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Shows a very basic example how {@link EikMesh} can be used
+ * Shows a very basic example how {@link GenEikMesh} can be used
  * to mesh a simple geometry.
  */
 public class EikMeshExamples {
@@ -81,10 +78,25 @@ public class EikMeshExamples {
 		// generate the mesh
 		meshImprover.generate();
 
-		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
 		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+
+		/*meshPanel.display("Geometry defined by shapes");
+		meshImprover.initialize();
+		meshPanel.repaint();
+
+		while (true) {
+			meshImprover.improve();
+
+			try {
+				Thread.sleep(300 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			meshPanel.repaint();
+		}*/
 
 		// display the mesh
 		meshPanel.display("Geometry defined by shapes");
@@ -118,7 +130,7 @@ public class EikMeshExamples {
 
 		meshImprover.generate();
 
-		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
 		//PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
@@ -316,10 +328,26 @@ public class EikMeshExamples {
 		MeshPanel<MyPoint, Object, Object, PVertex<MyPoint, Object, Object>, PHalfEdge<MyPoint, Object, Object>, PFace<MyPoint, Object, Object>> meshPanel = new MeshPanel<>(
 				meshImprover.getMesh(), 1000, 800);
 
+		meshPanel.display("User defined Points");
+
+		meshImprover.initialize();
+		meshPanel.repaint();
+
+		while (true) {
+			meshImprover.improve();
+
+			try {
+				Thread.sleep(100 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			meshPanel.repaint();
+		}
+
 		// generate the mesh
-		meshImprover.generate();
+		//meshImprover.generate();
 
 		// display the mesh
-		meshPanel.display("Distance dependent edge lengths");
+		//meshPanel.display("User defined Points");
 	}
 }

@@ -15,7 +15,7 @@ import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
 
-public class AEikMeshGen<P extends EikMeshPoint, CE, CF> extends EikMesh<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> {
+public class AEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> {
 
 	public AEikMeshGen(
 			@NotNull IDistanceFunction distanceFunc,
