@@ -1,6 +1,7 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.data.cellgrid.CellGrid;
@@ -31,13 +32,13 @@ public class InterpolationUtil {
 
 		double value = 0.0;
 
-		if(point.equals(p1)) {
+		if(point.distanceSq(p1) < GeometryUtils.DOUBLE_EPS) {
 			value = p1.getPotential();
 		}
-		else if(point.equals(p2)) {
+		else if(point.distanceSq(p2) < GeometryUtils.DOUBLE_EPS) {
 			value = p2.getPotential();
 		}
-		else if(point.equals(p3)) {
+		else if(point.distanceSq(p3) < GeometryUtils.DOUBLE_EPS) {
 			value = p3.getPotential();
 		}
 		else {

@@ -51,8 +51,7 @@ public class SierpinskyPlot {
 				obstacles,
 				edgeLengthFunc,
 				initialEdgeLength,
-				distanceFunc,
-				new ArrayList<>());
+				distanceFunc);
 
 		IIncrementalTriangulation<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> triangulation = uniformRefinementTriangulation.init();
 		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> panel = new MeshPanel<>(triangulation.getMesh(), f -> false, 1000, 800);

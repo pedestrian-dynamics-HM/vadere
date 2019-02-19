@@ -2,6 +2,7 @@ package org.vadere.util.math;
 
 
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -45,6 +46,14 @@ public interface IDistanceFunction extends Function<IPoint, Double> {
 	}
 
 	static IDistanceFunction create(final VRectangle regionBoundingBox, final VShape ... shapes) {
+		List<VShape> shapeList = new ArrayList<>();
+		for(VShape shape : shapes) {
+			shapeList.add(shape);
+		}
+		return new DistanceFunction(regionBoundingBox, shapeList);
+	}
+
+	static IDistanceFunction create(final VPolygon regionBoundingBox, final VShape ... shapes) {
 		List<VShape> shapeList = new ArrayList<>();
 		for(VShape shape : shapes) {
 			shapeList.add(shape);

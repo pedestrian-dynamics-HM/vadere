@@ -612,6 +612,13 @@ public interface IPolyConnectivity<P extends IPoint, CE, CF, V extends IVertex<P
 		}
 	}
 
+	default void removeFacesAtBoundary(@NotNull final Predicate<F> mergePredicate, @NotNull final Predicate<F> errorPredicate) throws IllegalMeshException {
+		mergeFaces(getMesh().getBorder(), mergePredicate, errorPredicate, true, 1);
+		for(F face : getMesh().getHoles()) {
+			mergeFaces(face, mergePredicate, errorPredicate, true, 1);
+		}
+	}
+
 	/**
 	 * Removes a simple link. This will be done by merging two faces into one remaining face. One of
 	 * the face will be destroyed and the other one returned.

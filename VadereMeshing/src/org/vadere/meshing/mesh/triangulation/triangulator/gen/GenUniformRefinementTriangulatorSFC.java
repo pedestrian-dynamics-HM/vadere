@@ -97,11 +97,6 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	private boolean finished;
 
 	/**
-	 * A user defined set of fix points.
-	 */
-	private final Collection<P> fixPoints;
-
-	/**
 	 * A random number generator.
 	 */
 	private final Random random = new Random(0);
@@ -131,7 +126,6 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
      * @param lenFunc               an edge length function
 	 * @param minEdgeLength         the minimal edge length of the refined triangulation
      * @param distFunc              a signed distance function
-	 * @param fixPoints             a collection of fix points which will be included if they are inside the bound. Furthermore they will not move.
      */
 	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
@@ -139,8 +133,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
 			final double minEdgeLength,
-			final IDistanceFunction distFunc,
-			final Collection<P> fixPoints) {
+			final IDistanceFunction distFunc) {
 
 		this.meshSupplier = meshSupplier;
 		this.initialized = false;
@@ -150,7 +143,6 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 		this.lenFunc = lenFunc;
 		this.minEdgeLength = minEdgeLength;
 		this.bbox = bound;
-		this.fixPoints = fixPoints;
 		this.points = new HashSet<>();
 		this.candidates = new ArrayList<>();
 		this.sfc = new GenSpaceFillingCurve<>();
@@ -164,7 +156,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 			final double minEdgeLength,
 			final IDistanceFunction distFunc,
 			final Collection<P> fixPoints) {
-		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc, fixPoints);
+		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc);
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
@@ -173,7 +165,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 			final IEdgeLengthFunction lenFunc,
 			final double minEdgeLength,
 			final IDistanceFunction distFunc) {
-		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc, new ArrayList<>());
+		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc);
 	}
 
 	/**

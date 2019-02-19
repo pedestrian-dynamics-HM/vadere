@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -612,8 +613,26 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *         edges and their twins are the faces which took part / where modified / added by the split.
 	 */
 	default Pair<E, E> splitEdge(@NotNull final E halfEdge, final boolean legalize) {
+		return splitEdge(halfEdge, legalize, p -> {});
+	}
+
+	/**
+	 * <p>Splits the half-edge at the mid point of its full-edge, which means two triangles will be split into four if
+	 * the edge is not a boundary edge otherwise only one triangle will be split into two.</p>
+	 *
+	 * <p>Assumption: p is located on the edge!</p>
+	 *
+	 * <p>Mesh changing method.</p>
+	 *
+	 * @param halfEdge          the half-edge which will be split
+	 * @param legalize          if true the split will be legalized i.e. the mesh will be locally changed until it is legal
+	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
+	 *         edges and their twins are the faces which took part / where modified / added by the split.
+	 */
+	default Pair<E, E> splitEdge(@NotNull final E halfEdge, final boolean legalize, @NotNull final Consumer<P> action) {
 		VPoint midPoint = getMesh().toLine(halfEdge).midPoint();
 		P p = getMesh().createPoint(midPoint.getX(), midPoint.getY());
+		action.accept(p);
 		return splitEdge(p, halfEdge, legalize);
 	}
 

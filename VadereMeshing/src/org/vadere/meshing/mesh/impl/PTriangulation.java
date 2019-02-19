@@ -41,4 +41,8 @@ public class PTriangulation<P extends IPoint, CE, CF> extends IncrementalTriangu
 	                      @NotNull final IPointConstructor<P> pointConstructor) {
 		super(new PMesh<>(pointConstructor), IPointLocator.Type.JUMP_AND_WALK, bound);
 	}
+
+	public PTriangulation(@NotNull final PMesh<P, CE, CF> mesh) {
+		super(mesh);
+	}
 }

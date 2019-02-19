@@ -103,8 +103,7 @@ public class CLEikMeshHE<P extends EikMeshPoint, CE, CF> implements IMeshImprove
                 obstacleShapes,
                 edgeLengthFunc,
 		        initialEdgeLen,
-                distanceFunc,
-		        new ArrayList());
+                distanceFunc);
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.

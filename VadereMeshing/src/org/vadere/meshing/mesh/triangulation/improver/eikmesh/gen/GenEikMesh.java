@@ -3,6 +3,7 @@ package org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.IllegalMeshException;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -26,13 +27,10 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -46,14 +44,16 @@ import java.util.stream.Stream;
 public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IMeshImprover<P, CE, CF, V, E, F>, ITriangulator<P, CE, CF, V, E, F> {
 
 	private boolean illegalMovement = false;
+
 	private GenUniformRefinementTriangulatorSFC triangulatorSFC;
+	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
-	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private VRectangle bound;
 	private double scalingFactor;
 	private double deps;
-	private static final int MAX_STEPS = 300;
+	private static final int MAX_STEPS = 200;
 	private int nSteps;
 	private double initialEdgeLen;
 
@@ -61,40 +61,58 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	private boolean profiling = false;
 	private double minDeltaTravelDistance = 0.0;
 	private double delta = Parameters.DELTAT;
-	private Set<P> fixPoints;
-	private Map<V, P> fixPointRelation;
+	private Collection<? extends VShape> shapes;
+	private Map<V, VPoint> fixPointRelation;
+	private final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier;
+	private boolean meshMode;
 
 	// only for logging
     private static final Logger log = LogManager.getLogger(GenEikMesh.class);
+
+	public GenEikMesh(
+			@NotNull final IDistanceFunction distanceFunc,
+			@NotNull final IEdgeLengthFunction edgeLengthFunc,
+			final double initialEdgeLen,
+			@NotNull final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
+		this.shapes = new ArrayList<>();
+		this.bound = null;
+		this.distanceFunc = distanceFunc;
+		this.edgeLengthFunc = edgeLengthFunc;
+		this.initialEdgeLen =initialEdgeLen;
+		this.deps = 0.0001 * initialEdgeLen;
+		this.nSteps = 0;
+		this.meshSupplier = null;
+		this.fixPointRelation = new HashMap<>();
+		this.triangulatorSFC = null;
+		this.triangulation = triangulation;
+		this.meshMode = true;
+	}
 
 	public GenEikMesh(
             @NotNull final IDistanceFunction distanceFunc,
             @NotNull final IEdgeLengthFunction edgeLengthFunc,
             final double initialEdgeLen,
             @NotNull final VRectangle bound,
-            @NotNull final Collection<? extends VShape> obstacleShapes,
+            @NotNull final Collection<? extends VShape> shapes,
             @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier) {
-
+		this.shapes = shapes;
 		this.bound = bound;
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
 		this.initialEdgeLen =initialEdgeLen;
 		this.deps = 0.0001 * initialEdgeLen;
 		this.nSteps = 0;
+		this.meshSupplier = meshSupplier;
 		this.fixPointRelation = new HashMap<>();
-
-        log.info("##### (start) generate a triangulation #####");
-		fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
-		triangulatorSFC = new GenUniformRefinementTriangulatorSFC(
-		        meshSupplier,
-                bound,
-                obstacleShapes,
-                edgeLengthFunc,
+		this.meshMode = false;
+		this.triangulatorSFC = new GenUniformRefinementTriangulatorSFC(
+				meshSupplier,
+				bound,
+				shapes,
+				edgeLengthFunc,
 				initialEdgeLen,
-                distanceFunc,
-		        fixPoints);
-        triangulation = triangulatorSFC.init();
-        log.info("##### (end) generate a triangulation #####");
+				distanceFunc);
+		this.triangulatorSFC.init();
 	}
 
 	public GenEikMesh(
@@ -108,37 +126,9 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 
 	public GenEikMesh(@NotNull final VPolygon boundary,
 	                  final double initialEdgeLen,
-	                  @NotNull final Collection<? extends VShape> obstacleShapes,
+	                  @NotNull final Collection<? extends VShape> shapes,
 	                  @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier){
-
-		Rectangle2D rect = boundary.getBounds2D();
-		this.bound = new VRectangle(
-				rect.getX() - 0.1 * rect.getWidth(), rect.getY() - 0.1 * rect.getHeight(),  1.2 * rect.getWidth(),  1.2 * rect.getHeight());
-		this.distanceFunc = new DistanceFunction(boundary, obstacleShapes);
-		this.edgeLengthFunc = p -> 1.0;
-		this.initialEdgeLen =initialEdgeLen;
-		this.deps = 0.00001 * initialEdgeLen;
-		this.nSteps = 0;
-		this.fixPointRelation = new HashMap<>();
-
-		log.info("##### (start) generate a triangulation #####");
-		//Set<P> fixPoints = new HashSet<>();
-		fixPoints = getFixPoints(meshSupplier.get(), obstacleShapes);
-		addFixPoints(meshSupplier.get(), boundary, fixPoints);
-
-		//fixPoints.clear();
-
-		triangulatorSFC = new GenUniformRefinementTriangulatorSFC(
-				meshSupplier,
-				bound,
-				obstacleShapes,
-				edgeLengthFunc,
-				initialEdgeLen,
-				distanceFunc,
-				fixPoints);
-		triangulation = triangulatorSFC.init();
-
-		log.info("##### (end) generate a triangulation #####");
+		this(new DistanceFunction(boundary, shapes), p -> 1.0, initialEdgeLen, GeometryUtils.bound(boundary.getPoints(), initialEdgeLen), shapes, meshSupplier);
 	}
 
 	public void step() {
@@ -149,7 +139,7 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 		while (!triangulatorSFC.isFinished()) {
 			stepInitialize();
 		}
-		computeFixPointRelation();
+		computeAnchorPointRelation();
 	}
 
 	public void stepInitialize() {
@@ -157,7 +147,7 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	}
 
 	public boolean initializationFinished() {
-		return triangulatorSFC.isFinished();
+		return triangulatorSFC == null || triangulatorSFC.isFinished();
 	}
 
 	@Override
@@ -175,41 +165,47 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 			//log.info("quality: " + quality);
 		}
 
-		removeTrianglesInsideHoles();
-		removeTrianglesOutsideBBox();
+		try {
+			removeFacesOutside(distanceFunc);
+		} catch (IllegalMeshException e) {
+			log.error("error!");
+		}
+		//removeTrianglesInsideHoles();
+		//removeTrianglesOutsideBBox();
 		getMesh().garbageCollection();
 		return getTriangulation();
 	}
 
 	public boolean isFinished() {
-		return /*getQuality() >= Parameters.qualityMeasurement ||*/ nSteps >= MAX_STEPS;
+		return /*getQuality() >= Parameters.qualityMeasurement || */ nSteps >= MAX_STEPS;
 	}
+
 
 	@Override
 	public IMesh<P, CE, CF, V, E, F> getMesh() {
-		return triangulation.getMesh();
+		return getTriangulation().getMesh();
 	}
 
 	@Override
     public void improve() {
 		synchronized (getMesh()) {
 
-			if(!triangulatorSFC.isFinished()) {
+			if(!initializationFinished()) {
 				stepInitialize();
 			}
 			else {
-				removeBoundaryLowQualityTriangles();
-				triangulation.smoothBoundary(distanceFunc);
-				if(triangulation.isValid()) {
+				if(!meshMode) {
+					removeFacesAtBoundary();
+					getTriangulation().smoothBoundary(distanceFunc);
+				}
+
+				if(getTriangulation().isValid()) {
 					flipEdges();
 					//removeTrianglesInsideHoles();
 					//removeTrianglesOutsideBBox();
 				}
 				else {
-					log.info("EikMesh re-triangulates in step " + nSteps);
-					triangulation.recompute();
-					removeTrianglesOutsideBBox();
-					removeTrianglesInsideObstacles();
+					retriangulate();
 				}
 
 				scalingFactor = computeEdgeScalingFactor(edgeLengthFunc);
@@ -217,19 +213,33 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 
 				updateEdges();
 				updateVertices();
+
+				log.info("quality = " + getQuality());
 				nSteps++;
 			}
 		}
     }
 
+    private void retriangulate() {
+	    log.info("EikMesh re-triangulates in step " + nSteps);
+	    getTriangulation().recompute();
+	    //removeTrianglesOutsideBBox();
+	    //removeTrianglesInsideObstacles();
+	    try {
+		    removeFacesOutside(distanceFunc);
+	    } catch (IllegalMeshException e) {
+		    log.error("error!");
+	    }
+    }
+
     @Override
     public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
-		return triangulation;
+		return triangulatorSFC == null ? triangulation : triangulatorSFC.getTriangulation();
     }
 
     @Override
     public synchronized Collection<VTriangle> getTriangles() {
-        return triangulation.streamTriangles().collect(Collectors.toList());
+        return getTriangulation().streamTriangles().collect(Collectors.toList());
     }
 
     /**
@@ -243,26 +253,17 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
     	streamVertices().forEach(v -> computeForce(v));
 	}
 
-	private void computeFixPointRelation() {
-		fixPointRelation.clear();
-		for(P fixPoint : fixPoints) {
-			V closest = null;
-    		double distance = Double.MAX_VALUE;
-    		for(V vertex : getMesh().getVertices()) {
-    			if (closest == null || distance > vertex.distance(fixPoint)) {
-    				closest = vertex;
-    				distance = vertex.distance(fixPoint);
-			    }
-		    }
-    		fixPointRelation.put(closest, fixPoint);
-	    }
-	}
-
+	/**
+	 * Computes and sets the overall force acting on a vertex. If the vertex is an anchor vertex
+	 * the force will be different: It will act towards the anchor point.
+	 *
+	 * @param vertex the vertex of interest
+	 */
 	private void computeForce(final V vertex) {
 		EikMeshPoint p1 = getMesh().getPoint(vertex);
 
 		if(fixPointRelation.containsKey(vertex)) {
-			P p2 = fixPointRelation.get(vertex);
+			VPoint p2 = fixPointRelation.get(vertex);
 			VPoint force = new VPoint((p2.getX() - p1.getX()), (p2.getY() - p1.getY())).scalarMultiply(1.0);
 			p1.increaseVelocity(force);
 			p1.increaseAbsoluteForce(force.distanceToOrigin());
@@ -274,7 +275,13 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 				double len = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
 				double desiredLen = edgeLengthFunc.apply(new VPoint((p1.getX() + p2.getX()) * 0.5, (p1.getY() + p2.getY()) * 0.5)) * Parameters.FSCALE * scalingFactor;
 
-				double lenDiff = Math.max(desiredLen - len, 0);
+				//double lenDiff = Math.max(desiredLen - len, 0);
+				double lenDiff = desiredLen - len;
+
+				if(lenDiff < 0 /*&& lenDiff > -desiredLen*/) {
+					lenDiff *= 0.1;
+				}
+
 				VPoint force = new VPoint((p1.getX() - p2.getX()) * (lenDiff / len), (p1.getY() - p2.getY()) * (lenDiff / len));
 				p1.increaseVelocity(force);
 				p1.increaseAbsoluteForce(force.distanceToOrigin());
@@ -283,7 +290,7 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	}
 
     /**
-     * computes the edge force / velocity for a single half-edge and adds it to its end vertex.
+     * Computes the edge force / velocity for a single half-edge and adds it to its end vertex.
      *
      * @param edge
      */
@@ -309,18 +316,13 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 		p1.increaseVelocity(new VPoint((p1.getX() - p2.getX()) * (lenDiff / (len / desiredLen)), (p1.getY() - p2.getY()) * (lenDiff / (len / desiredLen))));
 	}
     /**
-     * moves (which may include a back projection) each vertex according to their forces / velocity
-     * and resets their forces / velocities.
+     * Moves (which may include a back projection) each vertex according to their forces / velocity
+     * and resets their forces / velocities. A vertex might be broken (removed by edge collapse)
+     * if the forces acting on an boundary vertex are to strong.
      */
     private void updateVertices() {
 	    streamVertices().forEach(v -> updateVertex(v));
 	}
-
-    /**
-     * move the vertex (this may project the vertex back) and resets its velocity / forceå.
-     *
-     * @param vertex
-     */
 
 	/**
 	 * Updates a vertex which is not a fix point, that is, the computed force is applied and the vertex move
@@ -338,7 +340,7 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 		     */
 		    if(canBreak(vertex) && isBreaking(vertex)) {
 			    // TODO: if the algorithm runs in parallel this might lead to unexpected results! synchronized required!
-			    triangulation.collapse3DVertex(vertex, true);
+			    getTriangulation().collapse3DVertex(vertex, true);
 		    }
 		    /*
 		     * (2) otherwise displace the vertex
@@ -363,7 +365,12 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	 * Updates all boundary edges. Some of those edges might get split.
 	 */
 	private void updateEdges() {
-		getMesh().getBoundaryEdges().forEach(e -> updateEdge(e));
+		if(!meshMode) {
+			getMesh().getBoundaryEdges().forEach(e -> updateEdge(e));
+		}
+		else {
+			getMesh().getEdges().forEach(e -> updateEdge(e));
+		}
 	}
 
 	/**
@@ -373,7 +380,12 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	 */
 	private void updateEdge(@NotNull final E edge) {
 		if(canBreak(edge) && isBreaking(edge)) {
-			triangulation.splitEdge(edge, true);
+			if(meshMode && getMesh().isBoundary(edge)) {
+				getTriangulation().splitEdge(edge, true, p -> p.setFixPoint(true));
+			}
+			else {
+				getTriangulation().splitEdge(edge, true);
+			}
 		}
 	}
 
@@ -386,7 +398,13 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	 * @return true if the edge can be collapsed / break.
 	 */
 	private boolean canBreak(@NotNull final E edge) {
-		return !getMesh().isDestroyed(edge) && getMesh().isAtBoundary(edge);
+		if(!meshMode) {
+			return !getMesh().isDestroyed(edge) && getMesh().isAtBoundary(edge);
+		} else {
+			return !getMesh().isDestroyed(edge) && (getMesh().isAtBoundary(edge)
+					|| getMesh().isAtBoundary(getMesh().getNext(edge))
+					|| getMesh().isAtBoundary(getMesh().getPrev(edge)));
+		}
 	}
 
 	/**
@@ -399,8 +417,46 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	 * @return true if the edge breaks under the pressure of the forces, otherwise false.
 	 */
 	private boolean isBreaking(@NotNull final E edge) {
-		return getMesh().isLongestEdge(edge) && faceToQuality(getMesh().getTwinFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY;
+		if(!meshMode) {
+			return getMesh().isLongestEdge(edge) && faceToQuality(getMesh().getTwinFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY;
+		}
+		else {
+			return (getMesh().isLongestEdge(edge) && getMesh().isBoundary(edge) && faceToQuality(getMesh().getTwinFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY)
+					|| isDoubleLongEdge(edge);
+		}
 	}
+
+	private boolean isDoubleLongEdge(@NotNull final E edge) {
+
+		if(!getMesh().isAtBoundary(edge)) {
+			VLine line = getMesh().toLine(edge);
+			double factor = 1.5;
+			VLine line1 = getMesh().toLine(getMesh().getNext(edge));
+			VLine line2 = getMesh().toLine(getMesh().getPrev(edge));
+
+			return getMesh().isAtBoundary(getMesh().getNext(edge)) && line1.length() * factor <= line.length()
+					|| getMesh().isAtBoundary(getMesh().getPrev(edge)) && line2.length() * factor <= line.length();
+		}
+		return false;
+	}
+
+	/*private boolean isDoubleLongEdge(@NotNull final E edge) {
+		VLine line = getMesh().toLine(edge);
+		double factor = 2.5;
+		if(getMesh().isAtBoundary(edge)) {
+			VLine line1 = getMesh().toLine(getMesh().getNext(edge));
+			VLine line2 = getMesh().toLine(getMesh().getPrev(edge));
+			return line.length() >= line1.length() * factor || line.length() >= line2.length() * factor;
+		}
+		else {
+			VLine line1 = getMesh().toLine(getMesh().getNext(getMesh().getTwin(edge)));
+			VLine line2 = getMesh().toLine(getMesh().getPrev(getMesh().getTwin(edge)));
+			VLine line3 = getMesh().toLine(getMesh().getPrev(edge));
+			VLine line4 = getMesh().toLine(getMesh().getPrev(edge));
+			return line.length() >= line1.length() * factor || line.length() >= line2.length() * factor
+					|| line.length() >= line3.length() * factor || line.length() >= line4.length() * factor;
+		}
+	}*/
 
 	/**
 	 * Returns true if the vertex can be collapsed, that is the vertex can be removed
@@ -424,16 +480,18 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	 * @return true if the vertex breaks under the pressure of the forces, otherwise false.
 	 */
 	private boolean isBreaking(@NotNull final V vertex) {
-		double force = getVelocity(vertex).distanceToOrigin();
+		double force = getForce(vertex).distanceToOrigin();
 		P point = getMesh().getPoint(vertex);
 		return point.getAbsoluteForce() > 0 && force / point.getAbsoluteForce() < Parameters.MIN_FORCE_RATIO;
 	}
 
 
     /**
-     * projects the vertex back if it is no longer inside the boundary or inside an obstacle.
+     * Computes the projection of Projects vertices. The projection acts towards the boundary of the boundary.
+     * EikMesh projects only boundary vertices. Furthermore, to improve the convergence rate EikMesh additionally
+     * projects vertices which are inside if the projection is inside a valid circle segment.
      *
-     * @param vertex the vertex
+     * @param vertex the vertex might be projected
      */
     private VPoint computeProjection(@NotNull final V vertex) {
     	// we only project boundary vertices back
@@ -508,6 +566,25 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	    }
     }
 
+	/**
+	 * Computes the anchor to vertex partial relation. This relation gives some
+	 * vertices their anchor point. If a vertex has an anchor point it will be driven
+	 * towards this point (instead of the normal movement).
+	 */
+	private void computeAnchorPointRelation() {
+		for(VPoint fixPoint : generateAnchorPoints(shapes)) {
+			V closest = null;
+			double distance = Double.MAX_VALUE;
+			for(V vertex : getMesh().getVertices()) {
+				if (closest == null || distance > vertex.distance(fixPoint)) {
+					closest = vertex;
+					distance = vertex.distance(fixPoint);
+				}
+			}
+			fixPointRelation.put(closest, fixPoint);
+		}
+	}
+
     /**
      * Flips all edges which do not fulfill the Delaunay criterion and therefore being illegal.
      * Note that this is not a recursive flipping and therefore the result might not be a
@@ -518,10 +595,10 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
      */
     private boolean flipEdges() {
 	    if(runParallel) {
-	        streamEdges().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flipSync(e));
+	        streamEdges().filter(e -> getTriangulation().isIllegal(e)).forEach(e -> getTriangulation().flipSync(e));
         }
         else {
-		    streamEdges().filter(e -> triangulation.isIllegal(e)).forEach(e -> triangulation.flip(e));
+		    streamEdges().filter(e -> getTriangulation().isIllegal(e)).forEach(e -> getTriangulation().flip(e));
         }
         return false;
     }
@@ -552,42 +629,90 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
         return runParallel ? getMesh().streamVerticesParallel() : getMesh().streamVertices();
     }
 
+	/**
+	 * Returns true if and only if the vertex {@link V} is a fix point.
+	 *
+	 * @param vertex the vertex of interest
+	 * @return true if and only if the vertex {@link V} is a fix point.
+	 */
 	private boolean isFixedVertex(final V vertex) {
-		return getMesh().getPoint(vertex).isFixPoint();
+		return getMesh().getPoint(vertex).isFixPoint() || meshMode && getMesh().isAtBoundary(vertex);
 	}
 
-	private IPoint getVelocity(final V vertex) {
+	/**
+	 * Returns the force which is currently i.e. which was computed by
+	 * {@link GenEikMesh#computeForce(IVertex)} applied to the vertex.
+	 *
+	 * @param vertex the vertex of interest
+	 * @return the force which is currently applied to the vertex
+	 */
+	private IPoint getForce(final V vertex) {
 		return getMesh().getPoint(vertex).getVelocity();
 	}
 
+	/**
+	 * Applies the force of the vertex to the vertex which results
+	 * in an displacement of the vertex.
+	 *
+	 * @param vertex the vertex of interest
+	 */
 	private void applyForce(final V vertex) {
-		IPoint velocity = getVelocity(vertex);
+		IPoint velocity = getForce(vertex);
 		IPoint movement = velocity.scalarMultiply(delta);
 		getMesh().getPoint(vertex).add(movement);
 	}
 
-	private Set<P> getFixPoints(final IMesh<P, CE, CF, V, E, F> mesh, @NotNull Collection<? extends  VShape> shapes) {
-		Set<P> pointSet = new HashSet<>();
-		for(VShape shape : shapes) {
-			addFixPoints(mesh, shape, pointSet);
+	/**
+	 * Computes the set of anchor points. An anchor point replaces fix points in EikMesh.
+	 * Instead of inserting fix points EikMesh pushes (via forces) close points of
+	 * an anchor point towards this anchor point. For each shape the the points of the
+	 * path defining the shape will be added to the set of anchor points.
+	 *
+	 * @param shapes a list of shapes.
+	 * @return the set of anchor points
+	 */
+	private Set<VPoint> generateAnchorPoints(@NotNull Collection<? extends  VShape> shapes) {
+		return shapes.stream()
+				.flatMap(shape -> shape.getPath().stream())
+				.filter(p -> bound.contains(p))
+				.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Removes all faces neighbouring a boundary which can and should be removed.
+	 *
+	 * This takes O(n) time where n is the number of removed faces which will be consumed.
+	 */
+	private void removeFacesAtBoundary() {
+		Predicate<F> isSeparated = f -> getMesh().isSeparated(f);
+		Predicate<F> isInvalid = f -> !getTriangulation().isValid(f);
+		Predicate<F> isOfLowQuality = f -> faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY && !isShortBoundaryEdge(f);
+		Predicate<F> isBoundary = f -> getMesh().isBoundary(f);
+
+		Predicate<F> mergePredicate = isSeparated.or(isInvalid).or(isOfLowQuality);
+		try {
+			getTriangulation().removeFacesAtBoundary(mergePredicate, isBoundary);
+		} catch (IllegalMeshException e) {
+			log.error("error!");
+		}
+	}
+
+	private boolean isShortBoundaryEdge(@NotNull final F face) {
+		E edge = getMesh().getBoundaryEdge(face).get();
+		// corner => can be deleted
+
+		VLine l1 = getMesh().toLine(edge);
+		VLine l2 = getMesh().toLine(getMesh().getNext(edge));
+		VLine l3 = getMesh().toLine(getMesh().getPrev(edge));
+
+		if(l1.length() < l2.length() || l1.length() < l3.length()) {
+			return true;
 		}
 
-		return pointSet;
+		return false;
 	}
 
-	private void addFixPoints(@NotNull final IMesh<P, CE, CF, V, E, F> mesh, @NotNull final VShape shape, @NotNull final Set<P> fixPoints) {
-		shape.getPath()
-				.stream()
-				.filter(p -> bound.contains(p))
-				.map(p ->  mesh.createPoint(p.getX(), p.getY()))
-				.filter(p -> !fixPoints.contains(p))
-				.forEach(p -> {
-					p.setFixPoint(true);
-					fixPoints.add(p);
-				});
-	}
-
-	private void removeTrianglesInsideHoles() {
+	/*private void removeTrianglesInsideHoles() {
 		List<F> holes = triangulation.getMesh().getHoles();
 		Predicate<F> mergeCondition = f -> !triangulation.getMesh().isBoundary(f) && distanceFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0;
 		for(F face : holes) {
@@ -606,10 +731,15 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 
 	public void removeTrianglesOutsideBBox() {
 		triangulation.shrinkBorder(f -> distanceFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
-	}
+	}*/
 
-	private void removeBoundaryLowQualityTriangles() {
+
+
+	/*private void removeBoundaryLowQualityTriangles() {
+
 		List<F> holes = triangulation.getMesh().getHoles();
+
+
 		Predicate<F> mergeCondition = f ->
 				(!triangulation.getMesh().isDestroyed(f) && !triangulation.getMesh().isBoundary(f) && triangulation.getMesh().isAtBoundary(f)) // at boundary
 				&& (!triangulation.isValid(f) || (isCorner(f) || !isShortBoundaryEdge(f)) && faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY) // bad quality
@@ -632,29 +762,5 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 		}
 
 		//triangulation.mergeFaces(getMesh().getBorder(), mergeCondition, true);
-	}
-
-	private boolean isCorner(@NotNull final F face) {
-		E edge = getMesh().getBoundaryEdge(face).get();
-		// corner => can be deleted
-		if(getMesh().isBoundary(getMesh().getNext(edge)) || getMesh().isBoundary(getMesh().getPrev(edge))) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isShortBoundaryEdge(@NotNull final F face) {
-		E edge = getMesh().getBoundaryEdge(face).get();
-		// corner => can be deleted
-
-		VLine l1 = getMesh().toLine(edge);
-		VLine l2 = getMesh().toLine(getMesh().getNext(edge));
-		VLine l3 = getMesh().toLine(getMesh().getPrev(edge));
-
-		if(l1.length() < l2.length() || l1.length() < l3.length()) {
-			return true;
-		}
-
-		return false;
-	}
+	}*/
 }

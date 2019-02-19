@@ -55,6 +55,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	private double minAngle;
 	private double threashold;
 	private static double MIN_ANGLE_TO_TERMINATE = 20;
+	private boolean createHoles;
 
 
     public GenRuppertsTriangulator(
@@ -62,7 +63,8 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 		    @NotNull final VRectangle bound,
 		    @NotNull final Collection<VLine> constrains,
 		    @NotNull final Set<P> points,
-		    final double minAngle) {
+		    final double minAngle,
+		    final boolean createHoles) {
         this.points = points;
         this.generated = false;
         this.segments = new HashSet<>();
@@ -72,6 +74,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 		this.generated = false;
 		this.minAngle = minAngle;
 		this.threashold = 0.0;
+		this.createHoles = createHoles;
 
 	    /**
 	     * This prevent the flipping of constrained edges
@@ -80,6 +83,15 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 	    this.cdt = new GenConstrainedDelaunayTriangulator<>(mesh, bound, constrains, points, canIllegal);
     }
+
+	public GenRuppertsTriangulator(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final VRectangle bound,
+			@NotNull final Collection<VLine> constrains,
+			@NotNull final Set<P> points,
+			final double minAngle) {
+		this(mesh, bound, constrains, points, minAngle, true);
+	}
 
 	public GenRuppertsTriangulator(
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
@@ -95,6 +107,16 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 			@NotNull final Collection<VPolygon> constrains,
 			@NotNull final Set<P> points,
 			final double minAngle) {
+		this(mesh, bound, constrains, points, minAngle, true);
+	}
+
+	public GenRuppertsTriangulator(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final VPolygon bound,
+			@NotNull final Collection<VPolygon> constrains,
+			@NotNull final Set<P> points,
+			final double minAngle,
+			final boolean createHoles) {
 		this.points = points;
 		this.generated = false;
 		this.segments = new HashSet<>();
@@ -104,6 +126,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 		this.generated = false;
 		this.minAngle = minAngle;
 		this.threashold = 0.0;
+		this.createHoles = createHoles;
 
 		List<VLine> lines = new ArrayList<>();
 		for(VPolygon polygon : constrains) {
@@ -117,7 +140,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 		 */
 		Predicate<E> canIllegal = e -> !segments.contains(e) && !segments.contains(getMesh().getTwin(e));
 
-		this.cdt = new GenConstrainedDelaunayTriangulator<>(mesh, new VRectangle(bound.getBounds2D()), lines, points, canIllegal);
+		this.cdt = new GenConstrainedDelaunayTriangulator<>(mesh, GeometryUtils.bound(bound.getPoints(), GeometryUtils.DOUBLE_EPS), lines, points, canIllegal);
 	}
 
 	public GenRuppertsTriangulator(
@@ -165,19 +188,21 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	public void removeTriangles() {
-    	for(VPolygon hole : holes) {
-		    Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
-    		Optional<F> optFace = getMesh().streamFaces().filter(mergeCondition).findAny();
-    		if(optFace.isPresent()) {
-			    triangulation.createHole(optFace.get(), mergeCondition, true);
+    	if(createHoles) {
+		    for(VPolygon hole : holes) {
+			    Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
+			    Optional<F> optFace = getMesh().streamFaces().filter(mergeCondition).findAny();
+			    if(optFace.isPresent()) {
+				    triangulation.createHole(optFace.get(), mergeCondition, true);
+			    }
 		    }
-	    }
 
-    	if(boundingBox != null) {
-		    Predicate<F> mergeCondition = f -> !boundingBox.contains(getMesh().toTriangle(f).midPoint());
-		    triangulation.shrinkBorder(mergeCondition, true);
-	    }
+		    if(boundingBox != null) {
+			    Predicate<F> mergeCondition = f -> !boundingBox.contains(getMesh().toTriangle(f).midPoint());
+			    triangulation.shrinkBorder(mergeCondition, true);
+		    }
 
+	    }
     	generated = true;
 	}
 

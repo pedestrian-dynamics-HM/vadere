@@ -1017,6 +1017,17 @@ public interface IMesh<
 	}
 
 	/**
+	 * Returns a list {@link List} of all boundary points (which are alive) of this mesh.
+	 * This requires O(n) where n is the number of boundary edges.
+	 *
+	 * @return a list {@link List} of all boundary points
+	 */
+	default List<P> getBoundaryPoints() {
+		return streamBoundaryEdges().map(e -> getPoint(e)).collect(Collectors.toList());
+	}
+
+
+	/**
 	 * Sets the point of a vertex. This should only be used with great care since
 	 * this will re-position the vertex and may destroy a valid connectivity! So in
 	 * general this can only be done if the new point is contained in the convex hull

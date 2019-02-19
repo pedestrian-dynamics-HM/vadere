@@ -35,6 +35,16 @@ public class PRuppertsTriangulator<P extends IPoint, CE, CF>  extends GenRuppert
 	}
 
 	public PRuppertsTriangulator(
+			@NotNull final VRectangle bound,
+			@NotNull final Collection<VLine> constrains,
+			@NotNull final Set<P> points,
+			@NotNull final IPointConstructor<P> pointConstructor,
+			final double minAngle,
+			boolean createHoles) {
+		super(new PMesh<>(pointConstructor), bound, constrains, points, minAngle);
+	}
+
+	public PRuppertsTriangulator(
 			@NotNull final VPolygon bound,
 			@NotNull final Collection<VPolygon> constrains,
 			@NotNull final IPointConstructor<P> pointConstructor) {
@@ -47,5 +57,22 @@ public class PRuppertsTriangulator<P extends IPoint, CE, CF>  extends GenRuppert
 			@NotNull final IPointConstructor<P> pointConstructor,
 			final double minAngle) {
 		super(new PMesh<>(pointConstructor), bound, constrains, Collections.EMPTY_SET, minAngle);
+	}
+
+	public PRuppertsTriangulator(
+			@NotNull final VPolygon bound,
+			@NotNull final Collection<VPolygon> constrains,
+			@NotNull final PMesh<P, CE, CF> mesh,
+			final double minAngle) {
+		super(mesh, bound, constrains, Collections.EMPTY_SET, minAngle);
+	}
+
+	public PRuppertsTriangulator(
+			@NotNull final VPolygon bound,
+			@NotNull final Collection<VPolygon> constrains,
+			@NotNull final PMesh<P, CE, CF> mesh,
+			final double minAngle,
+			final boolean createHoles) {
+		super(mesh, bound, constrains, Collections.EMPTY_SET, minAngle, createHoles);
 	}
 }
