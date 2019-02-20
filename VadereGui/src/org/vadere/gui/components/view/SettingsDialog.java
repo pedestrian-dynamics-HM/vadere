@@ -87,9 +87,9 @@ public class SettingsDialog extends JDialog {
 
 		// Layout definition for sub panels
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		FormLayout colorLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		colorLayeredPane.setLayout(colorLayout);
 		additionalLayeredPane.setLayout(additionalLayout);
 
@@ -179,7 +179,7 @@ public class SettingsDialog extends JDialog {
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(2, 10));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(2, 12));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"),
-				cc.xy(2, 18));
+				cc.xy(2, 20));
 
 		final JButton bObstColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pObstacleColor = new JPanel();
@@ -229,12 +229,12 @@ public class SettingsDialog extends JDialog {
 		colorLayeredPane.add(pAbsorbingAreaColor, cc.xy(4, 12));
 		colorLayeredPane.add(bAbsorbingAreaColor, cc.xy(6, 12));
 
-		colorLayeredPane.add(new JSeparator(), cc.xyw(1, 12, 9));
+		colorLayeredPane.add(new JSeparator(), cc.xyw(1, 14, 9));
 		colorLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedTrajColor.text") + ":"),
-				cc.xyw(2, 14, 5));
-		colorLayeredPane.add(jComoboTargetIds, cc.xy(2, 16));
-		colorLayeredPane.add(pPedestrian, cc.xy(4, 16));
-		colorLayeredPane.add(bChange, cc.xy(6, 16));
+				cc.xyw(2, 16, 5));
+		colorLayeredPane.add(jComoboTargetIds, cc.xy(2, 18));
+		colorLayeredPane.add(pPedestrian, cc.xy(4, 18));
+		colorLayeredPane.add(bChange, cc.xy(6, 18));
 
 		final JButton bPedestrianNoTarget = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pPedestrianNoTarget = new JPanel();
@@ -243,8 +243,8 @@ public class SettingsDialog extends JDialog {
 		pPedestrianNoTarget.setPreferredSize(new Dimension(130, 20));
 		bPedestrianNoTarget.addActionListener(new ActionSetPedestrianWithoutTargetColor(
 				"Set Pedestrian without Target Color", model, pPedestrianNoTarget));
-		colorLayeredPane.add(pPedestrianNoTarget, cc.xy(4, 18));
-		colorLayeredPane.add(bPedestrianNoTarget, cc.xy(6, 18));
+		colorLayeredPane.add(pPedestrianNoTarget, cc.xy(4, 20));
+		colorLayeredPane.add(bPedestrianNoTarget, cc.xy(6, 20));
 
 		// 20 is free
 
@@ -254,7 +254,7 @@ public class SettingsDialog extends JDialog {
 			model.config.setUseRandomPedestrianColors(!model.config.isUseRandomPedestrianColors());
 			model.notifyObservers();
 		});
-		colorLayeredPane.add(chRandomColors, cc.xyw(2, 22, 8));
+		colorLayeredPane.add(chRandomColors, cc.xyw(2, 24, 8));
 
 
 		additionalLayeredPane.add(chHideVoronoiDiagram, cc.xyw(2, 2, 5));
@@ -265,17 +265,25 @@ public class SettingsDialog extends JDialog {
 		additionalLayeredPane.add(chShowAbsorbingAreas, cc.xyw(2, 12, 5));
 		additionalLayeredPane.add(chShowPedIds, cc.xyw(2, 14, 5));
 
+		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
+		chChowLogo.setSelected(model.config.isShowLogo());
+		chChowLogo.addItemListener(e -> {
+			model.config.setShowLogo(!model.config.isShowLogo());
+			model.notifyObservers();
+		});
+		additionalLayeredPane.add(chChowLogo, cc.xyw(2, 16, 5));
+
 		additionalLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblSnapshotDir.text") + ":"),
-				cc.xy(2, 14));
+				cc.xy(2, 18));
 
 		JTextField tSnapshotDir = new JTextField(
 				Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
 		tSnapshotDir.setEditable(false);
 		tSnapshotDir.setPreferredSize(new Dimension(130, 20));
-		additionalLayeredPane.add(tSnapshotDir, cc.xy(4, 14));
+		additionalLayeredPane.add(tSnapshotDir, cc.xy(4, 18));
 		final JButton bSnapshotDir = new JButton(Messages.getString("SettingsDialog.btnEditSnapshot.text"));
 		bSnapshotDir.addActionListener(new ActionSetSnapshotDirectory("Set Snapshot Directory", model, tSnapshotDir));
-		additionalLayeredPane.add(bSnapshotDir, cc.xy(6, 14));
+		additionalLayeredPane.add(bSnapshotDir, cc.xy(6, 18));
 
 		final JSpinner spinnerCellWidth = new JSpinner();
 		final SpinnerNumberModel sModelCellWidth = new SpinnerNumberModel(model.config.getGridWidth(),
@@ -288,17 +296,8 @@ public class SettingsDialog extends JDialog {
 		});
 
 		additionalLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblCellWidth.text") + ":"),
-				cc.xy(2, 16));
-		additionalLayeredPane.add(spinnerCellWidth, cc.xy(4, 16));
-
-
-		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
-		chChowLogo.setSelected(model.config.isShowLogo());
-		chChowLogo.addItemListener(e -> {
-			model.config.setShowLogo(!model.config.isShowLogo());
-			model.notifyObservers();
-		});
-		additionalLayeredPane.add(chChowLogo, cc.xyw(2, 18, 5));
+				cc.xy(2, 20));
+		additionalLayeredPane.add(spinnerCellWidth, cc.xy(4, 20));
 
 		mainPanel.add(getAdditionalOptionPanel(), cc.xy(2, 6));
 
