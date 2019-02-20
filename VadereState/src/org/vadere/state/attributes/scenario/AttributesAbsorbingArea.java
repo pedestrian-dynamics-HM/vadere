@@ -16,13 +16,9 @@ public class AttributesAbsorbingArea extends AttributesEmbedShape {
      */
     private VShape shape;
     /**
-     * Waiting time in seconds on this area before absorbing the element.
-     */
-    private double waitingTime = 0;
-    /**
      * Within this distance, pedestrians have reached the absorbing area.
      */
-    private double deletionDistance = 0.1;
+    private double deletionDistance = 0.0;
 
     // Constructors
     public AttributesAbsorbingArea() {
@@ -37,10 +33,9 @@ public class AttributesAbsorbingArea extends AttributesEmbedShape {
         this.id = id;
     }
 
-    public AttributesAbsorbingArea(final VShape shape, final int id, double waitingTime, double deletionDistance) {
+    public AttributesAbsorbingArea(final VShape shape, final int id, double deletionDistance) {
         this.shape = shape;
         this.id = id;
-        this.waitingTime = waitingTime;
         this.deletionDistance = deletionDistance;
     }
 
@@ -52,10 +47,6 @@ public class AttributesAbsorbingArea extends AttributesEmbedShape {
     @Override
     public VShape getShape() {
         return shape;
-    }
-
-    public double getWaitingTime() {
-        return waitingTime;
     }
 
     public double getDeletionDistance() {
@@ -71,11 +62,6 @@ public class AttributesAbsorbingArea extends AttributesEmbedShape {
     @Override
     public void setShape(VShape shape) {
         this.shape = shape;
-    }
-
-    public void setWaitingTime(double waitingTime) {
-        checkSealed();
-        this.waitingTime = waitingTime;
     }
 
     public void setDeletionDistance(double deletionDistance) {

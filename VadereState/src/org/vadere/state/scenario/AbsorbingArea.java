@@ -34,10 +34,6 @@ public class AbsorbingArea extends ScenarioElement implements Comparable<Absorbi
 	}
 
 	// Getters
-	public double getWaitingTime() {
-		return attributes.getWaitingTime();
-	}
-
 	public Map<Integer, Double> getEnteringTimes() {
 		return enteringTimes;
 	}
@@ -114,7 +110,7 @@ public class AbsorbingArea extends ScenarioElement implements Comparable<Absorbi
 		absorbingAreaListeners.add(listener);
 	}
 
-	public boolean removeListener(TargetListener listener) {
+	public boolean removeListener(AbsorbingAreaListener listener) {
 		return absorbingAreaListeners.remove(listener);
 	}
 

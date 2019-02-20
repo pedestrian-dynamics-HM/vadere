@@ -1,5 +1,5 @@
 package org.vadere.state.scenario;
 
 public interface AbsorbingAreaListener {
-	void reachedAbsorbingArea(Target target, Agent agent);
+	void reachedAbsorbingArea(AbsorbingArea absorbingArea, Agent agent);
 }
