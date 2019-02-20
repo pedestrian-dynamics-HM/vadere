@@ -237,7 +237,12 @@ public class MeshExamples {
 		ruppertsTriangulatorCopy.generate();
 
 
-		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(meshCopy, 1000, 1000);
+		Function<PFace<EikMeshPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = meshCopy.isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(meshCopy.toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+
+		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(meshCopy, 1000, 1000, colorFunction);
 		panel.display("EikMesh and Ruppert's Algorithm");
 
 		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(approxDistance, p -> 1.0 + Math.abs(approxDistance.apply(p)) * 0.2, 0.1, new PTriangulation<>(meshCopy));
