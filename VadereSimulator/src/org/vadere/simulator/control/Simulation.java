@@ -294,6 +294,7 @@ public class Simulation {
 		List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
 		// TODO Why are target controllers readded in each simulation loop?
+		// Maybe, Isabella's SIMA branch required this because pedestrians can act as targets there.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
