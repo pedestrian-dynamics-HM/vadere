@@ -23,6 +23,9 @@
                                 <requireMavenVersion>
                                     <version>3.0</version>
                                 </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>1.11</version>
+                                </requireJavaVersion>
                         </rules>
                         </configuration>
                     </execution>
