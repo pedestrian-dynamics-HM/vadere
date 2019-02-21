@@ -163,6 +163,23 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 0,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 18.3,
+          "y" : 6.8,
+          "width" : 2.9,
+          "height" : 1.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -221,14 +238,15 @@
     },
     "eventInfos" : [ {
       "eventTimeframe" : {
-        "startTime" : 18.0,
-        "endTime" : 18.4,
+        "startTime" : 15.0,
+        "endTime" : 15.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "events" : [ {
         "type" : "BangEvent",
-        "targets" : [ ]
+        "targets" : [ ],
+        "originAsTargetId" : 0
       } ]
     } ]
   }
