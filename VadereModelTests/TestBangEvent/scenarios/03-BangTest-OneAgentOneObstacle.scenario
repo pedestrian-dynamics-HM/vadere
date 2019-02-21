@@ -1,5 +1,5 @@
 {
-  "name" : "02_bang_test_with_obstacle",
+  "name" : "03-BangTest-OneAgentOneObstacle",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -53,7 +53,7 @@
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : true,
-        "updateType" : "EVENT_DRIVEN",
+        "updateType" : "SEQUENTIAL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -140,6 +140,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
         "source" : null,
@@ -203,6 +204,18 @@
         }
       }
     },
-    "eventInfos" : [ ]
+    "eventInfos" : [ {
+      "eventTimeframe" : {
+        "startTime" : 0.0,
+        "endTime" : 0.4,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "events" : [ {
+        "type" : "BangEvent",
+        "targets" : [ ],
+        "originAsTargetId" : 1
+      } ]
+    } ]
   }
 }

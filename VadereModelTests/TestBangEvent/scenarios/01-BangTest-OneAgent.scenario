@@ -1,5 +1,5 @@
 {
-  "name" : "01_bang_test_with_multiple_agents",
+  "name" : "01-BangTest-OneAgent",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -53,7 +53,7 @@
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : true,
-        "updateType" : "EVENT_DRIVEN",
+        "updateType" : "SEQUENTIAL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -131,6 +131,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
         "source" : null,
@@ -145,108 +146,6 @@
         },
         "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.6,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
-        },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "groupIds" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 19.1,
-          "y" : 3.1
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.5,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
-        },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "groupIds" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 19.1,
-          "y" : 2.2
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.4,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
-        },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "groupIds" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 19.1,
-          "y" : 1.4
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.5,
         "attributes" : {
           "id" : -1,
           "radius" : 0.2,
@@ -296,6 +195,18 @@
         }
       }
     },
-    "eventInfos" : [ ]
+    "eventInfos" : [ {
+      "eventTimeframe" : {
+        "startTime" : 0.0,
+        "endTime" : 0.4,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "events" : [ {
+        "type" : "BangEvent",
+        "targets" : [ ],
+        "originAsTargetId" : 1
+      } ]
+    } ]
   }
 }
