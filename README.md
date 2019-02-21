@@ -26,8 +26,11 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ### Download Releases
 
-* Windows: [Latest build](http://www.vadere.org/builds/master/vadere.master.windows.zip)
-* Linux: [Latest build](http://www.vadere.org/builds/master/vadere.master.linux.zip)
+Latest build of master:
+* [Windows](http://www.vadere.org/builds/master/vadere.master.windows.zip)
+* [Linux](http://www.vadere.org/builds/master/vadere.master.linux.zip)
+
+Stable releases and selected branch-builds are located on [www.vadere.org/releases/](http://www.vadere.org/releases/)
 
 The ZIP file contains:
 * **README.md** - this README file. 
@@ -35,7 +38,7 @@ The ZIP file contains:
 * **vadere_console.jar** - provides the command line version of Vadere and allows easy integration into other applications. 
 * **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
-To execute the `.jar` files it is highly recommended to use Java 8.  
+To execute the `.jar` files it is highly recommended to use Oracle Java 8.  
 
 ### Build from Source
 
@@ -61,12 +64,25 @@ Please, use following instructions to set up the OpenCL components for your oper
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution. 
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
+  * Tips and official packages (Ubuntu): 
+    
+    <details>
+
+    * Use the console tool `clinfo` (`sudo apt-get install clinfo`) to see the current status in terminal
+    * Drivers commonly have the prefix `opencl-icd` (to look at most opencl related packages run `apt search opencl`). Some that may be helpful:
+         * `beignet-opencl-icd` (OpenCL library for Intel GPUs)
+         * `mesa-opencl-icd` (free and open source implementation of the OpenCL API)
+         * `nvidia-opencl-icd`
+         * `ocl-icd-opencl-dev` (installs opencl development files and can be required for compiling)
+         * `ocl-icd-libopencl1` (Generic OpenCL ICD Loader)
+    
+    </details>
   * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
 #### Run the Application
 
 1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
-2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`and `postvis.jar`. 
+2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`, `vadere-console.jar` and `postvis.jar`.
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
