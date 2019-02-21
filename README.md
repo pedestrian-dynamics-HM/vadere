@@ -64,6 +64,19 @@ Please, use following instructions to set up the OpenCL components for your oper
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution. 
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
+  * Tips and official packages (Ubuntu): 
+    
+    <details>
+
+    * Use the console tool `clinfo` (`sudo apt-get install clinfo`) to see the current status in terminal
+    * Drivers commonly have the prefix `opencl-icd` (to look at most opencl related packages run `apt search opencl`). Some that may be helpful:
+         * `beignet-opencl-icd` (OpenCL library for Intel GPUs)
+         * `mesa-opencl-icd` (free and open source implementation of the OpenCL API)
+         * `nvidia-opencl-icd`
+         * `ocl-icd-opencl-dev` (installs opencl development files and can be required for compiling)
+         * `ocl-icd-libopencl1` (Generic OpenCL ICD Loader)
+    
+    </details>
   * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
 #### Run the Application
