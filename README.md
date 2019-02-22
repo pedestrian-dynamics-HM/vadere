@@ -62,9 +62,7 @@ Both should be offered by the vendor of your device. The device can be a CPU as 
 Vadere will search for the best device which is supported. On a desktop workstation this should be your video card (GPU). If there is no device Vadere will use a plain and slower Java-Implementation instead. 
 Please, use following instructions to set up the OpenCL components for your operating system:
 
-* Windows: For further information using OpenCL on Windows read the paragraph 
->  Running an OpenCL application
-[click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
+* Windows: For further information using OpenCL on Windows read the paragraph Running an OpenCL application [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution. 
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
