@@ -2,7 +2,7 @@ package org.vadere.simulator.models.bhm;
 
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.exceptions.NotSupportedEvent;
+import org.vadere.state.events.exceptions.UnsupportedEventException;
 import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.WaitEvent;
@@ -162,7 +162,7 @@ public class PedestrianBHM extends Pedestrian {
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			timeOfNextStep += durationNextStep;
 		} else {
-			throw new NotSupportedEvent(mostImportantEvent, this.getClass());
+			throw new UnsupportedEventException(mostImportantEvent, this.getClass());
 		}
 		
 		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));

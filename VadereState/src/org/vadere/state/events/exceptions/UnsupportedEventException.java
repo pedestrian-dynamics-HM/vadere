@@ -10,21 +10,21 @@ import java.util.Collection;
 /**
  * Use this exception if an event-handling class does not support a specific event.
  */
-public class NotSupportedEvent extends RuntimeException {
+public class UnsupportedEventException extends RuntimeException {
 
-    public NotSupportedEvent(@NotNull Event unsupportedEvent, @NotNull Class implementingClass) {
+    public UnsupportedEventException(@NotNull Event unsupportedEvent, @NotNull Class implementingClass) {
         super(String.format("Event \"%s\" not supported by class \"%s\"!",
                 unsupportedEvent.getClass().getSimpleName(),
                 implementingClass.getSimpleName())
         );
     }
 
-    public static void throwExceptionIfNotElapsedTimeEvent(Collection<? extends Pedestrian> pedestrians, Class caller) {
+    public static void throwIfNotElapsedTimeEvent(Collection<? extends Pedestrian> pedestrians, Class caller) {
         for (Pedestrian pedestrian : pedestrians) {
             Event currentEvent = pedestrian.getMostImportantEvent();
 
             if ((currentEvent instanceof ElapsedTimeEvent) == false) {
-                throw new NotSupportedEvent(currentEvent, caller);
+                throw new UnsupportedEventException(currentEvent, caller);
             }
         }
     }
