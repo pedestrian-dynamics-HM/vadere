@@ -20,6 +20,7 @@
                         </goals>
                         <configuration>
                             <rules>
+                                <!-- Use Maven's range syntax: https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
                                 <requireMavenVersion>
                                     <version>3.0</version>
                                 </requireMavenVersion>
