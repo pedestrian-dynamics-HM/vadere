@@ -278,19 +278,19 @@ public class IOUtils {
 
 	/** Shows an error box with given message and title. */
 	public static void errorBox(String infoMessage, String title) {
-		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
+		JOptionPane.showMessageDialog(null, infoMessage, title,
 				JOptionPane.ERROR_MESSAGE);
 	}
 
 	/** Shows an warn box with given message and title. */
 	public static void warnBox(String infoMessage, String title) {
-		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
+		JOptionPane.showMessageDialog(null, infoMessage, title,
 				JOptionPane.WARNING_MESSAGE);
 	}
 
 	/** Shows an info box with given message and title. */
 	public static void infoBox(String infoMessage, String title) {
-		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + title,
+		JOptionPane.showMessageDialog(null, infoMessage, title,
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
