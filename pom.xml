@@ -22,10 +22,10 @@
                             <rules>
                                 <!-- Use Maven's range syntax: https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
                                 <requireMavenVersion>
-                                    <version>3.0</version>
+                                    <version>[3.0,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.11</version>
+                                    <version>[1.11,)</version>
                                 </requireJavaVersion>
                         </rules>
                         </configuration>
