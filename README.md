@@ -47,7 +47,7 @@ To execute the `.jar` files it is highly recommended to use Oracle Java 8.
 * Java 8
 * Maven 3.0
 * Git
-* OpenCL
+* OpenCL (optional but recommended)
 
 **Note:** Please, ensure that the Git executable can be found in the `PATH` variable of your operating system.
 
