@@ -122,8 +122,10 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 	 */
 	@Override
 	public double value(double[] pos) {
-		VPoint pedPos = pedestrian.getPosition();
-		VPoint newPos = new VPoint(pos[0], pos[1]);
+		final VPoint pedPos = pedestrian.getPosition();
+		final VPoint newPos = new VPoint(pos[0], pos[1]);
+
+		// Large value, do not consider point when minimizing -- why not use Double.MAX_VALUE?
 		double result = 100000;
 		// TODO: this is a dirty hack, fix it!
 		if (pedestrian.getAttributesOSM().isSeeSmallWalls()) {
@@ -134,7 +136,14 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 			}
 		}
 
-		if (Math.pow(newPos.x - pedPos.x, 2) + Math.pow(newPos.y - pedPos.y, 2) <= Math.pow(stepSize, 2) + 0.00001) {
+		final double sqx = (newPos.x-pedPos.x)*(newPos.x-pedPos.x); // Math.pow(newPos.x - pedPos.x, 2)
+		final double sqy = (newPos.y-pedPos.y)*(newPos.y-pedPos.y); // Math.pow(newPos.y - pedPos.y, 2)
+		final double sqss = stepSize * stepSize; 					// Math.pow(stepSize, 2)
+
+		// the step has to be inside the circle with radius stepSize (the tolerance relaxes floating point comparisons
+		// on equality of the circle around the disk)
+		final double tolInsideCircle = 0.00001;
+		if (sqx + sqy <= sqss + tolInsideCircle) {
 			result = pedestrian.getPotential(newPos);
 		}
 		counter++;
