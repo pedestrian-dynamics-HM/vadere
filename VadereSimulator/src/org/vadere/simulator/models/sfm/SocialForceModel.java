@@ -12,6 +12,7 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.exceptions.NotSupportedEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -138,6 +139,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		rebuildFloorField(simTimeInSec);
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+
+		NotSupportedEvent.throwExceptionIfNotElapsedTimeEvent(pedestrians, this.getClass());
 
 		// set gradient provider and pedestrians
 		equations.setElements(pedestrians);

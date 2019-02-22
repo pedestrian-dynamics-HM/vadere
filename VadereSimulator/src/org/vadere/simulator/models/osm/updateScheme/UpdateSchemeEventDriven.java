@@ -70,6 +70,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			BangEvent bangEvent = (BangEvent) mostImportantEvent;
 			Target bangOrigin = topography.getTarget(bangEvent.getOriginAsTargetId());
 
+			// TODO: Just setting a new target does not work when using "EVENT_DRIVEN".
+			// Maybe, we have to clear the priority queue or something else (clarify with BZ).
 			LinkedList<Integer> nextTarget = new LinkedList<>();
 			nextTarget.add(bangOrigin.getId());
 

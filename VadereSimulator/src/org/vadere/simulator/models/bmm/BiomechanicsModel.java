@@ -1,10 +1,5 @@
 package org.vadere.simulator.models.bmm;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
@@ -13,12 +8,18 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesBMM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.exceptions.NotSupportedEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -95,6 +96,8 @@ public class BiomechanicsModel implements MainModel {
 		double deltaTime = simTimeInSec - lastSimTimeInSec;
 
 		List<VPoint> positions = pedestriansBMM.stream().map(ped -> ped.getPosition()).collect(Collectors.toList());
+
+		NotSupportedEvent.throwExceptionIfNotElapsedTimeEvent(pedestriansBMM, this.getClass());
 
 		for (PedestrianBMM agent : pedestriansBMM) {
 			agent.update(simTimeInSec, deltaTime);
