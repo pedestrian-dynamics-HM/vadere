@@ -80,7 +80,7 @@
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
+        "potentialFieldResolution" : 1.0,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
@@ -113,7 +113,7 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 365.0,
+          "width" : 305.0,
           "height" : 269.0
         },
         "boundingBoxWidth" : 0.5,
@@ -924,42 +924,6 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 130.47653962048935,
-            "y" : 41.75065053533763
-          }, {
-            "x" : 133.21638097951654,
-            "y" : 32.787701385095716
-          }, {
-            "x" : 168.5259876237833,
-            "y" : 43.89809112250805
-          }, {
-            "x" : 176.40601787681226,
-            "y" : 46.39373296312988
-          }, {
-            "x" : 185.83137679449283,
-            "y" : 49.37567479349673
-          }, {
-            "x" : 359.91023143642815,
-            "y" : 104.42688895948231
-          }, {
-            "x" : 357.11804604606004,
-            "y" : 113.31272958125919
-          }, {
-            "x" : 182.96748473175103,
-            "y" : 58.29614113364369
-          }, {
-            "x" : 173.54957071173703,
-            "y" : 55.32520296238363
-          }, {
-            "x" : 165.63330203777878,
-            "y" : 52.83015726786107
-          } ]
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
             "x" : 240.73713474115357,
             "y" : 91.26910495199263
           }, {
@@ -1170,11 +1134,11 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 50,
+        "spawnNumber" : 150,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -1190,11 +1154,11 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 50,
+        "spawnNumber" : 150,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -1230,15 +1194,15 @@
     },
     "eventInfos" : [ {
       "eventTimeframe" : {
-        "startTime" : 0.0,
-        "endTime" : 0.4,
+        "startTime" : 67.0,
+        "endTime" : 67.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "events" : [ {
         "type" : "BangEvent",
         "targets" : [ ],
-        "originAsTargetId" : 1
+        "originAsTargetId" : 0
       } ]
     } ]
   }
