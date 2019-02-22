@@ -59,7 +59,7 @@ Vadere uses computer's video card to speed up some computations. Therefore, foll
 * OpenCL Drivers for your device 
 
 Both should be offered by the vendor of your device. The device can be a CPU as well as a GPU (recommanded). For example if you have a NVIDIA GPU updating your drivers should be enough to install both components. 
-Vadere will search for the best device which is supported. On a desktop workstation this should be your video card (GPU). 
+Vadere will search for the best device which is supported. On a desktop workstation this should be your video card (GPU). If there is no device Vadere will use a plain and slower Java-Implementation instead. 
 Please, use following instructions to set up the OpenCL components for your operating system:
 
 * Windows: For further information using OpenCL on Windows read the paragraph 
