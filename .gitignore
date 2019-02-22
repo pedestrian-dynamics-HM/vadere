@@ -41,6 +41,9 @@ VadereUtils/testreports/*.txt
 VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
 
+#runtime
+java-runtime/*
+
 #model test output
 VadereModelTests/**/output
 VadereModelTests/*_private

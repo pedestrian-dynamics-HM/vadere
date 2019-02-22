@@ -1,6 +1,6 @@
 package org.vadere.util.geometry.shapes;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
+//import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 
 public class MPoint implements org.vadere.util.geometry.shapes.IPoint, Cloneable{
     private VPoint point;
@@ -163,7 +163,7 @@ public class MPoint implements org.vadere.util.geometry.shapes.IPoint, Cloneable
             MPoint clone = (MPoint)super.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
-            throw new InternalException(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
