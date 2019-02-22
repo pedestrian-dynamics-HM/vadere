@@ -287,32 +287,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 
 	@Override
 	public void update(final double simTimeInSec) {
-		// TODO: handle each pedestrian individually based on its "mostImportantEvent".
 		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
 		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
 		lastSimTimeInSec = simTimeInSec;
-	}
-
-	private void handleElapsedTimeEvent(final Event event) {
-		if (!(event instanceof ElapsedTimeEvent)) {
-			throw new IllegalArgumentException("Wrong event type passed, expected: " + ElapsedTimeEvent.class.getName());
-		}
-
-		update(event.getTime());
-	}
-
-	private void handleWaitEvent(final Event event) {
-		if (!(event instanceof WaitEvent)) {
-			throw new IllegalArgumentException(String.format("Wrong event type passed, expected: %s", WaitEvent.class.getName()));
-		}
-
-		Collection<PedestrianOSM> pedestrians = topography.getElements(PedestrianOSM.class);
-
-		for (PedestrianOSM pedestrian : pedestrians) {
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-		}
-
-		this.lastSimTimeInSec = event.getTime();
 	}
 
 		/*

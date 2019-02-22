@@ -87,6 +87,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 			renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
 		}
 
+        if (model.config.isShowAbsorbingAreas()) {
+            renderScenarioElement(model.getTopography().getAbsorbingAreas(), graphics, model.config.getAbsorbingAreaColor());
+        }
+
         if (model.config.isShowSources()) {
             renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
         }

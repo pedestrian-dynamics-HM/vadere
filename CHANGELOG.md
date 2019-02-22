@@ -6,6 +6,9 @@
 
 ### Added
 
+- Added new scenario element `AbsorbingArea` to absorb agents immediately.
+  * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
+  * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
 - Configured 1-click-deployment in ".gitlab-ci.yml".
   * In short: Vadere is packaged as a single ZIP file containing following build artifacts: README.md VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
   * Vadere is packaged for GNU/Linux and Microsoft Windows.

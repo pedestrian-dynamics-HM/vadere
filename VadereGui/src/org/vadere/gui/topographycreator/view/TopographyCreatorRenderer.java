@@ -37,6 +37,7 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		renderers[ScenarioElementType.PEDESTRIAN.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.SOURCE.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.TARGET.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.ABSORBING_AREA.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.STAIRS.ordinal()] = this::renderStair;
 		renderers[ScenarioElementType.TELEPORTER.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.CAR.ordinal()] = this::renderFilledShape;

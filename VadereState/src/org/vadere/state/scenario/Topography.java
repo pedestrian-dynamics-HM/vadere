@@ -2,6 +2,7 @@ package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.apache.commons.math3.analysis.function.Abs;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -61,6 +62,11 @@ public class Topography implements DynamicElementMover{
 	 * iteration between frames.
 	 */
 	private final LinkedList<Target> targets;
+	/**
+	 * AbsorbingAreas of scenario by id. Tree maps ensures same update order during
+	 * iteration between frames.
+	 */
+	private final LinkedList<AbsorbingArea> absorbingAreas;
 
 	/**
 	 * List of obstacles used as a boundary for the whole topography.
@@ -106,6 +112,7 @@ public class Topography implements DynamicElementMover{
 		stairs = new LinkedList<>();
 		sources = new LinkedList<>();
 		targets = new LinkedList<>();
+		absorbingAreas = new LinkedList<>();
 		boundaryObstacles = new LinkedList<>();
 		
 		allScenarioElements.add(obstacles);
@@ -151,6 +158,16 @@ public class Topography implements DynamicElementMover{
 		return null;
 	}
 
+	public AbsorbingArea getAbsorbingArea(int targetId) {
+		for (AbsorbingArea absorbingArea : this.absorbingAreas) {
+			if (absorbingArea.getId() == targetId) {
+				return absorbingArea;
+			}
+		}
+
+		return null;
+	}
+
 	public double distanceToObstacle(@NotNull IPoint point) {
 		return this.obstacleDistanceFunction.apply(point);
 	}
@@ -167,6 +184,14 @@ public class Topography implements DynamicElementMover{
 		return getTargets().stream().filter(t -> t.getId() == targetId).anyMatch(targetPredicate);
 	}
 
+	public boolean containsAbsorbingArea(final Predicate<AbsorbingArea> absorbingAreaPredicate) {
+		return getAbsorbingAreas().stream().anyMatch(absorbingAreaPredicate);
+	}
+
+	public boolean containsAbsorbingArea(final Predicate<AbsorbingArea> absorbingAreaPredicate, final int absorbingAreaId) {
+		return getAbsorbingAreas().stream().filter(t -> t.getId() == absorbingAreaId).anyMatch(absorbingAreaPredicate);
+	}
+
 	/**
 	 * Returns a list containing Targets with the specific id. This list may be empty.
 	 */
@@ -178,6 +203,14 @@ public class Topography implements DynamicElementMover{
 		return getTargets().stream()
 				.collect(Collectors
 						.groupingBy(t -> t.getId(), Collectors
+								.mapping(t -> t.getShape(), Collectors
+										.toList())));
+	}
+
+	public Map<Integer, List<VShape>> getAbsorbingAreaShapes() {
+		return getAbsorbingAreas().stream()
+				.collect(Collectors
+						.groupingBy(absorbingArea -> absorbingArea.getId(), Collectors
 								.mapping(t -> t.getShape(), Collectors
 										.toList())));
 	}
@@ -250,6 +283,10 @@ public class Topography implements DynamicElementMover{
 		return targets;
 	}
 
+	public List<AbsorbingArea> getAbsorbingAreas() {
+		return absorbingAreas;
+	}
+
 	public List<Obstacle> getObstacles() {
 		return obstacles;
 	}
@@ -276,6 +313,10 @@ public class Topography implements DynamicElementMover{
 
 	public void addTarget(Target target) {
 		this.targets.add(target);
+	}
+
+	public void addAbsorbingArea(AbsorbingArea absorbingArea) {
+		this.absorbingAreas.add(absorbingArea);
 	}
 
 	public void addObstacle(Obstacle obstacle) {
@@ -399,6 +440,9 @@ public class Topography implements DynamicElementMover{
 		for (Target target : getTargets()) {
 			s.addTarget(target.clone());
 		}
+		for (AbsorbingArea absorbingArea: getAbsorbingAreas()) {
+			s.addAbsorbingArea(absorbingArea.clone());
+		}
 		for (Source source : getSources()) {
 			s.addSource(source.clone());
 		}
@@ -488,6 +532,7 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
 		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
 		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 
 		sources.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -505,7 +550,9 @@ public class Topography implements DynamicElementMover{
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
 
-
+		absorbingAreas.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
 	}
 
 	private int nextIdNotInSet(Set<Integer> usedIDs){
@@ -519,12 +566,13 @@ public class Topography implements DynamicElementMover{
 
 
 	public ArrayList<ScenarioElement> getAllScenarioElements(){
-		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size()));
+		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size() + absorbingAreas.size()));
 		all.addAll(obstacles);
 		all.addAll(stairs);
 		all.addAll(targets);
 		all.addAll(sources);
 		all.addAll(boundaryObstacles);
+		all.addAll(absorbingAreas);
 		return  all;
 
 	}
