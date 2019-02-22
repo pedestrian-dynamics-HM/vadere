@@ -20,6 +20,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean useRandomPedestrianColors = false;
 	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
+	private boolean showAbsorbingAreas = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
 	private boolean showStairs = true;
@@ -112,6 +113,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showTargets;
 	}
 
+	public boolean isShowAbsorbingAreas() {
+		return showAbsorbingAreas;
+	}
+
 	public void setShowTargetPotentielFieldMesh(final boolean showTargetPotentielFieldMesh) {
 		this.showTargetPotentielFieldMesh = showTargetPotentielFieldMesh;
 		setChanged();
@@ -132,6 +137,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowSources(boolean showSources) {
 		this.showSources = showSources;
+		setChanged();
+	}
+
+	public void setShowAbsorbingAreas(boolean showAbsorbingAreas) {
+		this.showAbsorbingAreas = showAbsorbingAreas;
 		setChanged();
 	}
 

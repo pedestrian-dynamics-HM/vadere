@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
 @JsonSubTypes({
+        @Type(value = BangEvent.class, name = "BangEvent"),
         @Type(value = ElapsedTimeEvent.class, name = "ElapsedTimeEvent"),
         @Type(value = WaitEvent.class, name = "WaitEvent"),
         @Type(value = WaitInAreaEvent.class, name = "WaitInAreaEvent")

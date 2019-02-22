@@ -14,25 +14,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.attributes.scenario.AttributesStairs;
-import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.attributes.scenario.AttributesTeleporter;
-import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Stairs;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
@@ -117,6 +102,7 @@ public abstract class StateJsonConverter {
 		Collection<AttributesObstacle> obstacles = new LinkedList<>();
 		Collection<AttributesStairs> stairs = new LinkedList<>();
 		Collection<AttributesTarget> targets = new LinkedList<>();
+		Collection<AttributesAbsorbingArea> absorbingAreas = new LinkedList<>();
 		Collection<AttributesSource> sources = new LinkedList<>();
 		Collection<? extends DynamicElement> dynamicElements = new LinkedList<>();
 		AttributesTeleporter teleporter = null;
@@ -156,6 +142,7 @@ public abstract class StateJsonConverter {
 		store.obstacles.forEach(obstacle -> topography.addObstacle(new Obstacle(obstacle)));
 		store.stairs.forEach(stairs -> topography.addStairs(new Stairs(stairs)));
 		store.targets.forEach(target -> topography.addTarget(new Target(target)));
+		store.absorbingAreas.forEach(absorbingArea -> topography.addAbsorbingArea(new AbsorbingArea(absorbingArea)));
 		store.sources.forEach(source -> topography.addSource(new Source(source)));
 		store.dynamicElements.forEach(topography::addInitialElement);
 		if (store.teleporter != null)
@@ -217,6 +204,8 @@ public abstract class StateJsonConverter {
 				return mapper.readValue(json, AttributesSource.class);
 			case TARGET:
 				return mapper.readValue(json, AttributesTarget.class);
+			case ABSORBING_AREA:
+				return mapper.readValue(json, AttributesAbsorbingArea.class);
 			case STAIRS:
 				return mapper.readValue(json, AttributesStairs.class);
 			case TELEPORTER:
@@ -281,6 +270,11 @@ public abstract class StateJsonConverter {
 		topography.getTargets()
 				.forEach(target -> targetNodes.add(mapper.convertValue(target.getAttributes(), JsonNode.class)));
 		topographyNode.set("targets", targetNodes);
+
+		ArrayNode absorbingAreaNodes = mapper.createArrayNode();
+		topography.getAbsorbingAreas()
+				.forEach(absorbingArea -> absorbingAreaNodes.add(mapper.convertValue(absorbingArea.getAttributes(), JsonNode.class)));
+		topographyNode.set("absorbingAreas", absorbingAreaNodes);
 
 		ArrayNode sourceNodes = mapper.createArrayNode();
 		topography.getSources()
