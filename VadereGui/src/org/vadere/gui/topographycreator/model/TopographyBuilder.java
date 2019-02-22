@@ -12,14 +12,7 @@ import org.vadere.gui.topographycreator.control.AttributeModifier;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Stairs;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -42,6 +35,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	private LinkedList<Stairs> stairs;
 	private LinkedList<Source> sources;
 	private LinkedList<Target> targets;
+	private LinkedList<AbsorbingArea> absorbingAreas;
 	private Teleporter teleporter;
 	private LinkedList<ScenarioElement> topographyElements;
 	private AttributesTopography attributes;
@@ -57,6 +51,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		stairs = new LinkedList<>();
 		sources = new LinkedList<>();
 		targets = new LinkedList<>();
+		absorbingAreas = new LinkedList<>();
 		topographyElements = new LinkedList<>();
 		attributes = new AttributesTopography();
 	}
@@ -77,6 +72,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 			}
 			sources = new LinkedList<>(topography.getSources());
 			targets = new LinkedList<>(topography.getTargets());
+			absorbingAreas = new LinkedList<>(topography.getAbsorbingAreas());
 			teleporter = topography.getTeleporter();
 		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
@@ -90,6 +86,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topographyElements.addAll(pedestrians);
 		topographyElements.addAll(sources);
 		topographyElements.addAll(targets);
+		topographyElements.addAll(absorbingAreas);
 	}
 
 	/**
@@ -133,6 +130,9 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		for (Target target : targets)
 			topography.addTarget(target);
 
+		for (AbsorbingArea absorbingArea : absorbingAreas)
+			topography.addAbsorbingArea(absorbingArea);
+
 		for (AgentWrapper pedestrian : pedestrians)
 			topography.addInitialElement(pedestrian.getAgentInitialStore());
 
@@ -167,6 +167,8 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 				return pedestrians.remove(element);
 			case TARGET:
 				return targets.remove(element);
+			case ABSORBING_AREA:
+				return absorbingAreas.remove(element);
 			case SOURCE:
 				return sources.remove(element);
 			default:
@@ -222,10 +224,21 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		this.targets.add(target);
 	}
 
+	public void addAbsorbingArea(final AbsorbingArea absorbingArea) {
+		this.topographyElements.add(absorbingArea);
+		this.absorbingAreas.add(absorbingArea);
+	}
+
 	public Target removeLastTarget() {
 		Target target = targets.removeLast();
 		topographyElements.remove(target);
 		return target;
+	}
+
+	public AbsorbingArea removeLastAbsorbingArea() {
+		AbsorbingArea absorbingArea = absorbingAreas.removeLast();
+		topographyElements.remove(absorbingArea);
+		return absorbingArea;
 	}
 
 	public Source removeLastSource() {
@@ -272,6 +285,10 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 	public Iterator<Target> getTargetIterator() {
 		return targets.iterator();
+	}
+
+	public Iterator<AbsorbingArea> getAbsorbingAreaIterator() {
+		return absorbingAreas.iterator();
 	}
 
 	public Iterator<Source> getSourceIterator() {

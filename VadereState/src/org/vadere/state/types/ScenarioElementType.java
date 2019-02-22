@@ -11,6 +11,7 @@ public enum ScenarioElementType {
 	PEDESTRIAN(Color.BLUE, AttributesAgent.class),
 	SOURCE(Color.ORANGE, AttributesSource.class),
 	TARGET(Color.GREEN, AttributesTarget.class),
+	ABSORBING_AREA(Color.RED, AttributesAbsorbingArea.class),
 	STAIRS(Color.PINK, AttributesStairs.class),
 	TELEPORTER(Color.GRAY, AttributesTeleporter.class),
 	CAR(Color.black, AttributesCar.class);
