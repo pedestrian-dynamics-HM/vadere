@@ -6,43 +6,6 @@
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <build>
-     <plugins>
-        <plugin>
-           <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M1</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <!-- Use Maven's range syntax: https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
-                                <requireMavenVersion>
-                                    <version>[3.0,)</version>
-                                </requireMavenVersion>
-                                <requireJavaVersion>
-                                    <version>[1.11,)</version>
-                                </requireJavaVersion>
-                        </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                   <release>10</release>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <auto-service.version>1.0-rc2</auto-service.version>
@@ -50,6 +13,66 @@
     <maven-compiler.source.version>1.11</maven-compiler.source.version>
     <maven-compiler.target.version>1.11</maven-compiler.target.version>
   </properties>
+
+    <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0-M2</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                <!-- Use Maven's range syntax: https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
+                                    <requireMavenVersion>
+                                    <version>[3.0,)</version>
+                                    </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[1.11,)</version>
+                                </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                    <configuration>
+                        <release>10</release>
+                        <fork>true</fork>
+                        <meminitial>512m</meminitial>
+                        <maxmem>2048m</maxmem>
+                    </configuration>
+                </plugin>
+                <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>3.0.0-M3</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <threadCount>1</threadCount>
+                </configuration>
+            </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.3</version>
+                </plugin>
+            </plugins>
+    </build>
 
 <!-- modules -->
   <modules>
@@ -136,7 +159,7 @@
     <dependency>
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
-  		<version>4.11</version>
+  		<version>4.12</version>
   	</dependency>
       <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
       <dependency>

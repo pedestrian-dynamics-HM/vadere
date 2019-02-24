@@ -41,6 +41,9 @@ VadereUtils/testreports/*.txt
 VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
 
+#Java runtime files generated with "jdeps" and "jlink"
+java-runtime/*
+
 #model test output
 VadereModelTests/**/output
 VadereModelTests/*_private
