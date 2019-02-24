@@ -13,7 +13,7 @@ research group at the [Munich University of Applied Sciences](https://www.hm.edu
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
 However, we welcome contributions from external sources. 
 
-The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh). 
+The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview). 
 
 ## Pipeline Status
 
@@ -47,20 +47,22 @@ To execute the `.jar` files it is highly recommended to use Oracle Java 8.
 * Java 8
 * Maven 3.0
 * Git
-* OpenCL
+* OpenCL (optional but recommended)
 
 **Note:** Please, ensure that the Git executable can be found in the `PATH` variable of your operating system.
 
-#### Install OpenCL
+#### Install OpenCL (optional but recommended)
 
-Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components must be installed:
+Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components should be installed:
 
-* the latest drivers for your OpenCL device(s)
-* an OpenCL SDK
+* the OpenCL Installable Client Driver loader also called ICD loader (Opencl.dll for Windows and libOpenCL.so for Linux)
+* OpenCL Drivers for your device 
 
+Both should be offered by the vendor of your device. The device can be a CPU as well as a GPU (recommanded). For example if you have a NVIDIA GPU updating your drivers should be enough to install both components. 
+Vadere will search for the best device which is supported. On a desktop workstation this should be your video card (GPU). If there is no device Vadere will use a plain and slower Java-Implementation instead. 
 Please, use following instructions to set up the OpenCL components for your operating system:
 
-* Windows: For further information using OpenCL on Windows [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
+* Windows: For further information using OpenCL on Windows read the paragraph Running an OpenCL application [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution. 
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
