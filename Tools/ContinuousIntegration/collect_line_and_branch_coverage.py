@@ -48,16 +48,14 @@ def extract_line_and_branch_coverage(module_names):
             # TODO: Regex seems be be broken on Windows CI worker. Find out why!
             regex_pattern = re.compile(r"Total.*?([0-9]{1,3})\s?%.*?([0-9]{1,3})\s?%")
 
-            print(coverage_report)
-
             match = regex_pattern.search(coverage_report)
-            exit()
 
             if match:
                 line_coverage = float(match.group(1))
                 branch_coverage = float(match.group(2))
                 module_to_coverage[module] = (line_coverage, branch_coverage)
             else:
+                print(coverage_report)
                 raise Exception("Coverage data not found for module: {}".format(module))
 
     return module_to_coverage
