@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from vadere_analysis_tool import ScenarioOutput
+from vadereanalysistool import ScenarioOutput
 
 
 class OriginDeviation:

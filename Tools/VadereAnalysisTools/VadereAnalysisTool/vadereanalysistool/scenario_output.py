@@ -1,5 +1,5 @@
 import os
-from vadere_analysis_tool import helper
+from vadereanalysistool import helper
 import pandas as pd
 import json
 import hashlib

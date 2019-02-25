@@ -3,6 +3,10 @@ package org.vadere.simulator.models.osm;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -39,6 +43,8 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
+	// A setter is provided to be able to change strategy at runtime (e.g. by events).
+	private transient ICombinedPotentialStrategy combinedPotentialStrategy;
 	private transient List<SpeedAdjuster> speedAdjusters;
 	private transient List<StepSizeAdjuster> stepSizeAdjusters;
 	private VPoint nextPosition;
@@ -73,6 +79,7 @@ public class PedestrianOSM extends Pedestrian {
 		this.potentialFieldTarget = potentialFieldTarget;
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
+		this.combinedPotentialStrategy = new TargetAttractionStrategy(potentialFieldTarget, potentialFieldObstacle, potentialFieldPedestrian);
 		this.stepCircleOptimizer = stepCircleOptimizer;
 
 		this.speedAdjusters = speedAdjusters;
@@ -227,22 +234,16 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public double getPotential(IPoint newPos) {
-
-		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
-
-		double pedestrianPotential = potentialFieldPedestrian
-				.getAgentPotential(newPos, this, relevantPedestrians);
-		double obstacleRepulsionPotential = potentialFieldObstacle
-				.getObstaclePotential(newPos, this);
-		return targetPotential + pedestrianPotential
-				+ obstacleRepulsionPotential;
+		return combinedPotentialStrategy.getValue(newPos, this, relevantPedestrians);
 	}
 
 	public void clearStrides() {
 		strides.clear();
 	}
 
-	// Getters...
+	// TODO: Group getters and setters correctly.
+
+	// Getters
 
 	public double getTargetPotential(VPoint pos) {
 		return potentialFieldTarget.getPotential(pos, this);
@@ -263,6 +264,10 @@ public class PedestrianOSM extends Pedestrian {
 	public Vector2D getPedestrianGradient(VPoint pos) {
 		return potentialFieldPedestrian.getAgentPotentialGradient(pos,
 				new Vector2D(0, 0), this, relevantPedestrians);
+	}
+
+	public ICombinedPotentialStrategy getCombinedPotentialStrategy() {
+		return combinedPotentialStrategy;
 	}
 
 	public double getTimeOfNextStep() {
@@ -307,6 +312,20 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void setRelevantPedestrians(@NotNull final Collection<? extends Agent> relevantPedestrians) {
 		this.relevantPedestrians = relevantPedestrians;
+	}
+
+	public void setCombinedPotentialStrategy(CombinedPotentialStrategy newStrategy) {
+		if (newStrategy == CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY) {
+			this.combinedPotentialStrategy = new TargetAttractionStrategy(this.potentialFieldTarget,
+						this.potentialFieldObstacle,
+						this.potentialFieldPedestrian);
+		} else if (newStrategy == CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY) {
+			this.combinedPotentialStrategy = new TargetDistractionStrategy(this.potentialFieldTarget,
+					this.potentialFieldObstacle,
+					this.potentialFieldPedestrian);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public Collection<? extends Agent> getRelevantPedestrians() {

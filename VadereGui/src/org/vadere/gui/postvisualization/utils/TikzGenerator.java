@@ -7,14 +7,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Stairs;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -125,6 +118,9 @@ public class TikzGenerator {
 		Color targetColor = model.getConfig().getTargetColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
 
+		Color absorbingAreaColor = model.getConfig().getAbsorbingAreaColor();
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "AbsorbingAreaColor", absorbingAreaColor.getRed(), absorbingAreaColor.getGreen(), absorbingAreaColor.getBlue());
+
 		Color obstacleColor = model.getConfig().getObstacleColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
 
@@ -195,6 +191,15 @@ public class TikzGenerator {
 			}
 		} else {
 			generatedCode += "% Targets (not enabled in config)\n";
+		}
+
+		if (config.isShowAbsorbingAreas()) {
+			generatedCode += "% Absorbing Areas\n";
+			for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
+				generatedCode += String.format(Locale.US, "\\fill[AbsorbingAreaColor] %s;\n", generatePathForScenarioElement(absorbingArea));
+			}
+		} else {
+			generatedCode += "% Absorbing Areas (not enabled in config)\n";
 		}
 
 		if (config.isShowObstacles()) {

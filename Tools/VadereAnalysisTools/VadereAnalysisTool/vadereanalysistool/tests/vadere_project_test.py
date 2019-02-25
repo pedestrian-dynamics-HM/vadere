@@ -1,7 +1,7 @@
 import unittest
 import os
 import shutil
-from vadere_analysis_tool import vadere_project
+from vadereanalysistool import vadere_project
 
 
 class VadereProjectTests(unittest.TestCase):
