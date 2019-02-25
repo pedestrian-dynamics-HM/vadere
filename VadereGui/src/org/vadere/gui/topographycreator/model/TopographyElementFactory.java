@@ -1,10 +1,7 @@
 package org.vadere.gui.topographycreator.model;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.attributes.scenario.AttributesStairs;
-import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -35,6 +32,8 @@ public class TopographyElementFactory {
 				return new org.vadere.state.scenario.Source(new AttributesSource(-1, shape));
 			case TARGET:
 				return new org.vadere.state.scenario.Target(new AttributesTarget(shape));
+			case ABSORBING_AREA:
+				return new org.vadere.state.scenario.AbsorbingArea(new AttributesAbsorbingArea(shape));
 			case PEDESTRIAN:
 				return new AgentWrapper(((VCircle) shape).getCenter());
 			default:
@@ -51,6 +50,8 @@ public class TopographyElementFactory {
 			return new org.vadere.state.scenario.Source((AttributesSource) attributes);
 		} else if (attributes instanceof AttributesTarget) {
 			return new org.vadere.state.scenario.Target((AttributesTarget) attributes);
+		} else if (attributes instanceof AttributesAbsorbingArea) {
+			return new org.vadere.state.scenario.AbsorbingArea((AttributesAbsorbingArea) attributes);
 		} else {
 			throw new IllegalArgumentException("unsupported Attributes.");
 		}

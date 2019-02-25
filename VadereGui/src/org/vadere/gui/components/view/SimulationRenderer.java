@@ -26,7 +26,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     private static double MAX_POTENTIAL = 1000.0;
     private static double CONTOUR_STEP = 2.0;
-    private static double CONTOUR_THINKNESS = 0.2;
+    private static double CONTOUR_THINKNESS = 0.1;
 
     private SimulationModel model;
     private BufferedImage obstacleDensity = null;
@@ -86,6 +86,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		if (model.config.isShowTargets()) {
 			renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
 		}
+
+        if (model.config.isShowAbsorbingAreas()) {
+            renderScenarioElement(model.getTopography().getAbsorbingAreas(), graphics, model.config.getAbsorbingAreaColor());
+        }
 
         if (model.config.isShowSources()) {
             renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
@@ -206,7 +210,8 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
 	                if (potential >= MAX_POTENTIAL) {
 		                c = model.config.getObstacleColor();
-	                } else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
+	                }
+	                else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
 		                c = Color.BLACK;
 	                } else {
 		                c = colorHelper.numberToColor(potential % 100);

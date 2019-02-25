@@ -73,7 +73,7 @@ class ParameterVariation(metaclass=abc.ABCMeta):
             ret = dict(row)
             delete_keys = list()
             for k, v in ret.items():
-                if np.isnan(v):
+                if isinstance(v, np.float) and np.isnan(v):
                     delete_keys.append(k)
 
             for dk in delete_keys:

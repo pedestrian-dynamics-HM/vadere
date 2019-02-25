@@ -17,9 +17,11 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.io.CollectionUtils;
+import org.vadere.util.logging.Logger;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
+	private static Logger logger = Logger.getLogger(UpdateSchemeParallel.class);
 	protected final ExecutorService executorService;
 	protected final Topography topography;
 	protected final Set<Pedestrian> movedPedestrians;
@@ -39,12 +41,24 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		List<Future<?>> futures;
 
 		for (CallMethod callMethod : callMethods) {
+			long ms = 0;
+			if(callMethod == CallMethod.SEEK) {
+				ms = System.currentTimeMillis();
+			}
+
+
 			futures = new LinkedList<>();
 			for (final PedestrianOSM pedestrian : CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
 				Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
 				futures.add(executorService.submit(worker));
 			}
 			collectFutures(futures);
+
+			if(callMethod == CallMethod.SEEK) {
+				ms = System.currentTimeMillis() - ms;
+				logger.debug("runtime for next step computation = " + ms + " [ms]");
+			}
+
 		}
 	}
 

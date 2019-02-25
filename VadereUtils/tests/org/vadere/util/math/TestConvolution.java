@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLConvolution;
+import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class TestConvolution {
     }
 
 	@Test
-	public void testConvolution() throws IOException, OpenCLException {
+	public void testConvolution() throws OpenCLException {
 		int inputWidth = 1000;
 		int inputHeight = 1000;
 		int kernelWidth = 31;
@@ -56,7 +57,7 @@ public class TestConvolution {
 	}
 
 	@Test
-	public void testSmallConvolutionCol() throws IOException, OpenCLException {
+	public void testSmallConvolutionCol() throws OpenCLException {
 		int inputWidth = 6;
 		int inputHeight = 1;
 		int kernelWidth = 3;
@@ -76,7 +77,7 @@ public class TestConvolution {
     }
 
 	@Test
-	public void testSmallConvolutionRow() throws IOException, OpenCLException {
+	public void testSmallConvolutionRow() throws OpenCLException {
 		int inputWidth = 1;
 		int inputHeight = 6;
 		int kernelWidth = 3;
@@ -96,7 +97,7 @@ public class TestConvolution {
     }
 
 	@Test
-	public void testConvolutionRow() throws IOException, OpenCLException {
+	public void testConvolutionRow() throws OpenCLException {
 		int inputWidth = 500;
 		int inputHeight = 300;
 		int kernelWidth = 31;
@@ -113,7 +114,7 @@ public class TestConvolution {
     }
 
 	@Test
-	public void testConvolutionSeparate() throws IOException, OpenCLException {
+	public void testConvolutionSeparate() throws OpenCLException {
 		int inputWidth = 500;
 		int inputHeight = 300;
 		int kernelWidth = 31;

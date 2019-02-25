@@ -2,10 +2,10 @@
 
 # TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
 
-import os
-import subprocess
-import pickle
 import abc
+import os
+import pickle
+import zipfile
 
 from fabric import Connection
 
@@ -143,10 +143,8 @@ class ServerRequest(object):
 
     def _compress_output(self):
 
-        compressed_filepath = self._join_linux_path([self.remote_folder_path, "vadere_output.tar.gz"], is_folder=False)
-
-        # from https://stackoverflow.com/questions/939982/how-do-i-tar-a-directory-of-files-and-folders-without-including-the-directory-it
-        s = f"""cd {self.remote_output_folder()} && tar -zcvf ../{os.path.basename(compressed_filepath)} . && cd -"""
+        compressed_filepath = self._join_linux_path([self.remote_folder_path, "vadere_output.zip"], is_folder=False)
+        s = f"""python3 -m zipfile -c {compressed_filepath} {self.remote_output_folder()}"""
         self.server.con.run(s)
         return compressed_filepath
 
@@ -193,8 +191,10 @@ class ServerRequest(object):
         if not os.path.exists(path_output):
             create_folder(path_output)
 
-        subprocess.call(["tar", "xvzf", local_compressed_file, "-C", path_output])
-        subprocess.call(["rm", local_compressed_file])
+        with zipfile.ZipFile(local_compressed_file, "r") as result_zip:
+            result_zip.extractall(path=path_output)
+
+        os.remove(local_compressed_file)
 
     def _remove_remote_folder(self):
         s = f"""rm -r {self.remote_folder_path}"""

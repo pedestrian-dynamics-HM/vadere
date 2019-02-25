@@ -49,17 +49,15 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
+ * This class offers the convolution operation via OpenCL i.e. the use of the GPU to
+ * accelerate the computation. Successive convolutions can be computed by reusing memory if the size of
+ * the involved matrices do not change, that is, {@link CLConvolution#clearCL()} can be called
+ * after multiple convolutions are computed.
+ *
  * @author Benedikt Zoennchen
  */
-public class CLConvolution {
+public class CLConvolution extends CLOperation {
     private static Logger log = Logger.getLogger(CLConvolution.class);
-
-    // CL ids
-    private long clPlatform;
-    private long clDevice;
-    private long clContext;
-    private long clQueue;
-    private long clProgram;
 
     // CL Memory
     private long clInput;
@@ -106,11 +104,24 @@ public class CLConvolution {
         this(KernelType.Separate, matrixWidth, matrixHeight, kernelWidth, kernel);
     }
 
+	/**
+	 * Default constructor.
+	 *
+	 * @param type              kernel type e.g. separated kernel
+	 * @param matrixWidth       input matrix width
+	 * @param matrixHeight      input matrix height
+	 * @param kernelWidth       kernel width which is also the kernel height
+	 * @param kernel            a 1D error representing the kernel (this can be a 1D kernel or a 2D kernel depending on the <tt>type</tt>)
+	 *
+	 * @throws OpenCLException      if there is some OpenCL problem e.g. it is not supported
+	 * @throws UnsatisfiedLinkError if native libraries for LWJGL are missing
+	 */
     public CLConvolution(
             @NotNull final KernelType type,
             final int matrixWidth,
             final int matrixHeight,
-            final int kernelWidth, @NotNull final float[] kernel) throws OpenCLException {
+            final int kernelWidth,
+            @NotNull final float[] kernel) throws OpenCLException, UnsatisfiedLinkError {
         this.type = type;
         this.matrixHeight = matrixHeight;
         this.matrixWidth = matrixWidth;
@@ -126,7 +137,7 @@ public class CLConvolution {
         init();
     }
 
-    public void init() throws OpenCLException {
+    public void init() throws OpenCLException, BootstrapMethodError {
         initCallbacks();
         initCL();
         buildProgram();
@@ -151,7 +162,18 @@ public class CLConvolution {
         }
     }
 
-    public float[] convolve(final float[] input) throws OpenCLException {
+	/**
+	 * Executes the convolution operation this might be a 2D convolution realized by one 2D kernel
+	 * or by two 1D kernels or just one 1D convolution which depends on the constructor arguments of this
+	 * class.
+	 *
+	 * @param input the input matrix
+	 *
+	 * @return the output matrix of same dimension as the input matrix
+	 *
+	 * @throws OpenCLException if there is any problem with OpenCL e.g. no OpenCL support
+	 */
+	public float[] convolve(final float[] input) throws OpenCLException {
         // 1. write input to native-c-like-memory
         CLUtils.toFloatBuffer(input, hostScenario);
 
@@ -273,64 +295,17 @@ public class CLConvolution {
 	    }
     }
 
-    public void clearCL() throws OpenCLException {
+	/**
+	 * Works like a C++ destructor, i.e. frees host and GPU / device memory.
+	 * This has to be called if no more convolutions are computed. Note that
+	 * successive convolutions can be computed by reusing memory if the size of
+	 * the involved matrices do not change.
+	 *
+	 * @throws OpenCLException if there is any problem with OpenCL e.g. no OpenCL support
+	 */
+	public void clearCL() throws OpenCLException {
     	clearMemory();
-	    CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
-	    CLInfo.checkCLError(clReleaseProgram(clProgram));
-	    CLInfo.checkCLError(clReleaseContext(clContext));
-	    contextCB.free();
-	    programCB.free();
-    }
-
-    // private helpers
-    private void initCallbacks() {
-        contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
-        {
-            log.debug("[LWJGL] cl_context_callback" + "\tInfo: " + memUTF8(errinfo));
-        });
-
-        programCB = CLProgramCallback.create((program, user_data) ->
-        {
-	        try {
-		        log.debug("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-	        } catch (OpenCLException e) {
-		        e.printStackTrace();
-	        }
-        });
-    }
-
-    private void initCL() throws OpenCLException {
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer errcode_ret = stack.callocInt(1);
-            IntBuffer numberOfPlatforms = stack.mallocInt(1);
-
-	        CLInfo.checkCLError(clGetPlatformIDs(null, numberOfPlatforms));
-            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
-	        CLInfo.checkCLError(clGetPlatformIDs(platformIDs, numberOfPlatforms));
-
-            clPlatform = platformIDs.get(0);
-
-            IntBuffer numberOfDevices = stack.mallocInt(1);
-	        CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices));
-            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-	        CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices));
-
-            clDevice = deviceIDs.get(0);
-
-	        log.debug("CL_DEVICE_NAME = " + CLInfo.getDeviceInfoStringUTF8(clDevice, CL_DEVICE_NAME));
-
-	        PointerBuffer ctxProps = stack.mallocPointer(3);
-            ctxProps.put(CL_CONTEXT_PLATFORM)
-                    .put(clPlatform)
-                    .put(NULL)
-                    .flip();
-
-            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
-
-            clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
-        }
+    	super.clearCL();
     }
 
     private void buildProgram() throws OpenCLException {

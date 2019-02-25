@@ -8,12 +8,14 @@ sys.path.append(os.path.abspath(".."))
 from tutorial.imports import *
 
 
-run_local = True
+run_local = False
+
+# NOTE: If running this script twice, there is an user input required. Because an "output folder" already exists from
+# the first run, this output folder gets replaced with the next run. Therefore, the old output is removed.
 
 if __name__ == "__main__":  # main required by Windows to run in parallel
     ###############################################################################################################
     # Usecase: Provide a single Vadere scenario and location to write out the output to.
-
 
     setup = SingleScenarioOutput(path_scenario=path2scenario,
                                  path_output=os.path.join(path2tutorial, "example_output"),
@@ -26,13 +28,11 @@ if __name__ == "__main__":  # main required by Windows to run in parallel
     else:
         setup.remote()
 
-
     ###############################################################################################################
     # Usecase: Provide a folder with more than .scenario file and an output folder. All scenarios are simulated, also
     # in parallel). Here it is not possible to hand in a quantity of interest, because there is no guarantee that
     # all scenarios have the same processors. Because there is only one example scenario file, only this will be
     # executed.
-
 
     setup = MultiScenarioOutput(path_scenarios=path2tutorial,
                                 path_output=os.path.join(path2tutorial, "example_multirun_output"),
@@ -42,7 +42,3 @@ if __name__ == "__main__":  # main required by Windows to run in parallel
         res = setup.run(2)
     else:
         res = setup.remote(2)
-
-
-
-
