@@ -46,6 +46,12 @@ def extract_line_and_branch_coverage(module_names):
             coverage_report = file.read()
             
             # TODO: Regex seems be be broken on Windows CI worker. Find out why!
+            # This is a somewhat dirty fix for windows OS (I leave the todo open, if someone knows a cleaner solution. 
+            # When parsing the html, there appear unicode(?) issues and in this case whitespaces are represented as Â\xa0 
+            # I think this has something to do with it:
+            # https://stackoverflow.com/questions/13865346/why-would-a-python-regex-compile-on-linux-but-not-windows
+            coverage_report = coverage_report.replace('Â\xa0', ' ') 
+
             regex_pattern = re.compile(r"Total.*?([0-9]{1,3})\s?%.*?([0-9]{1,3})\s?%")
 
             match = regex_pattern.search(coverage_report)
