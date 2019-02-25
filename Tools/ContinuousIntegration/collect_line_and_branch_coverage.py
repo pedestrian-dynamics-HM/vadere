@@ -1,5 +1,5 @@
 # Extract line and branch coverage (in percentage) from HTML coverage reports
-# which are created by Maven's jacoco plugin.
+# which are created by Maven's JaCoCo plugin.
 # Use top-level pom.xml to search in correct subdirectories.
 #
 # Wach out: call this script from root directory of project. E.g.
@@ -10,6 +10,10 @@ import xml.etree.ElementTree as ET
 
 import os
 import re
+
+# Use Unix path separators because this script is usually run in a Bash-context.
+# And Bash fails with Windows path separators which are introduced by os.path.join(...)
+path_separator = "/"
 
 def get_modules_from_pom_file(filename="pom.xml"):
     """Return a list of submodules which where found in passed "pom.xml"."""
@@ -33,16 +37,21 @@ def extract_line_and_branch_coverage(module_names):
 
     module_to_coverage = dict()
 
-    default_coverage_file = "target/site/coverage-reports/index.html"
+    default_coverage_file = path_separator.join(["target", "coverage-reports", "index.html"])
 
     for module in module_names:
-        coverage_path = os.path.join(module, default_coverage_file)
+        coverage_path = path_separator.join([module, default_coverage_file])
 
         with open(coverage_path, "r") as file:
             coverage_report = file.read()
+            
+            # TODO: Regex seems be be broken on Windows CI worker. Find out why!
+            regex_pattern = re.compile(r"Total.*?([0-9]{1,3})\s?%.*?([0-9]{1,3})\s?%")
 
-            regex_pattern = re.compile(r"Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%")
+            print(coverage_report)
+
             match = regex_pattern.search(coverage_report)
+            exit()
 
             if match:
                 line_coverage = float(match.group(1))

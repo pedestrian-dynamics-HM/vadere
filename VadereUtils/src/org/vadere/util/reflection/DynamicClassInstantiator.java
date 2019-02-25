@@ -1,5 +1,8 @@
 package org.vadere.util.reflection;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * For example, this class can be used for creating {@link attributes.Attributes} or
  * {@link models.Model}s.
@@ -24,8 +27,8 @@ public class DynamicClassInstantiator<T> {
 			// I cannot provoke a ClassCastException by doing:
 			// T result = clazz.newInstance();
 			// This is an issue that comes back to the user of this API.
-			return clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return clazz.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new CouldNotInstantiateException(e);
 		}
 	}
