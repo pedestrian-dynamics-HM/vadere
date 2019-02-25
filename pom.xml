@@ -70,6 +70,27 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.3</version>
+                    <executions>
+                        <execution>
+                            <id>pre-unit-test-code-instrumentation</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <propertyName>${surefireArgLine}</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>post-unit-test-report-generation</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/coverage-reports</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
     </build>

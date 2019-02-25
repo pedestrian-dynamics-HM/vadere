@@ -47,37 +47,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.9</version>
-                <executions>
-                    <!-- Use JaCoCo's Java agents to record coverage data by using on-the-fly class file instrumentation. -->
-                    <execution>
-                        <id>pre-unit-test</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <output>file</output>
-                            <destFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</destFile>
-                            <propertyName>surefireArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <!-- Use JaCoCo agent output to create coverage reports in CSV, HTML and XML format. -->
-                    <execution>
-                        <id>post-unit-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/coverage-reports</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <!-- Maven Surefire is used to cup unit tests. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
