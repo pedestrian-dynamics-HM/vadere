@@ -2,15 +2,16 @@ package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.WaitEvent;
-import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
+import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 /**
@@ -46,6 +47,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
+		// TODO: Extract behavior to own methods (i.e. step(), wait() and escape()).
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			VPoint oldPosition = pedestrian.getPosition();
 
@@ -61,6 +63,18 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		} else if (mostImportantEvent instanceof BangEvent) {
+			// Watch out: For testing purposes, a bang event changes only
+			// the "CombinedPotentialStrategy". The agent does not move here!
+			// Therefore, trigger only a single bang event and then use "ElapsedTimeEvent"
+			BangEvent bangEvent = (BangEvent) mostImportantEvent;
+			Target bangOrigin = topography.getTarget(bangEvent.getOriginAsTargetId());
+
+			LinkedList<Integer> nextTarget = new LinkedList<>();
+			nextTarget.add(bangOrigin.getId());
+
+			pedestrian.setTargets(nextTarget);
+			pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
 		}
 	}
 

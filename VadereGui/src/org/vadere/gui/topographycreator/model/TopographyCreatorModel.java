@@ -196,6 +196,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 			case TARGET:
 				element = topographyBuilder.removeLastTarget();
 				break;
+			case ABSORBING_AREA:
+				element = topographyBuilder.removeLastAbsorbingArea();
+				break;
 			case TELEPORTER:
 				element = topographyBuilder.removeTeleporter();
 				break;
@@ -293,6 +296,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 				break;
 			case TARGET:
 				topographyBuilder.addTarget((org.vadere.state.scenario.Target) shape);
+				break;
+			case ABSORBING_AREA:
+				topographyBuilder.addAbsorbingArea((org.vadere.state.scenario.AbsorbingArea) shape);
 				break;
 			case TELEPORTER:
 				topographyBuilder.setTeleporter((org.vadere.state.scenario.Teleporter) shape);

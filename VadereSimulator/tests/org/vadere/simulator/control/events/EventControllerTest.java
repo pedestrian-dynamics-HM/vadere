@@ -156,7 +156,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void timeframeIsActiveAtSimulationTimeReturnsFalseIfSimulationTimeFallsOntoEndTimePeriodically() {
+    public void timeframeIsActiveAtSimulationTimeReturnsTrueIfSimulationTimeFallsOntoEndTimePeriodically() {
         boolean recurringEvent = true;
         double startTime = 0.75;
         double endTime = 1.25;
@@ -170,7 +170,7 @@ public class EventControllerTest {
             double currentSimulationTime = simulationTime + (i * periodicity);
 
             boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, currentSimulationTime);
-            assertFalse(timeframeIsActive);
+            assertTrue(timeframeIsActive);
         }
     }
 

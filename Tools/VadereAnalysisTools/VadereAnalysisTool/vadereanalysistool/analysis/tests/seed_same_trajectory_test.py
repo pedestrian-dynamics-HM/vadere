@@ -1,6 +1,6 @@
 import unittest
 import pprint
-from vadere_analysis_tool import SameSeedTrajectory
+from vadereanalysistool import SameSeedTrajectory
 
 
 class SameSeedTrajectoryTest(unittest.TestCase):
