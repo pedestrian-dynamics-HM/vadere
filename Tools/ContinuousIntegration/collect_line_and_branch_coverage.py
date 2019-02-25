@@ -1,5 +1,5 @@
 # Extract line and branch coverage (in percentage) from HTML coverage reports
-# which are created by Maven's jacoco plugin.
+# which are created by Maven's JaCoCo plugin.
 # Use top-level pom.xml to search in correct subdirectories.
 #
 # Wach out: call this script from root directory of project. E.g.
@@ -33,15 +33,15 @@ def extract_line_and_branch_coverage(module_names):
 
     module_to_coverage = dict()
 
-    default_coverage_file = "target/site/coverage-reports/index.html"
+    default_coverage_file = os.path.join("target", "coverage-reports", "index.html")
 
     for module in module_names:
         coverage_path = os.path.join(module, default_coverage_file)
 
         with open(coverage_path, "r") as file:
             coverage_report = file.read()
-
-            regex_pattern = re.compile(r"Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%")
+            
+            regex_pattern = re.compile(r"Total.*?([0-9]{1,3})\s?%.*?([0-9]{1,3})\s?%")
             match = regex_pattern.search(coverage_report)
 
             if match:
