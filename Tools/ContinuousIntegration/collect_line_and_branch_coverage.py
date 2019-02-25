@@ -56,6 +56,7 @@ def extract_line_and_branch_coverage(module_names):
                 module_to_coverage[module] = (line_coverage, branch_coverage)
             else:
                 print(coverage_report)
+                print(f"match={match}")
                 raise Exception("Coverage data not found for module: {}".format(module))
 
     return module_to_coverage
