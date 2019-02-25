@@ -55,7 +55,7 @@ stages:
     artifacts:
         when: on_success
         paths:
-            - "*/target/site/coverage-reports"
+            - "*/target/coverage-reports"
         expire_in: 1 week
     when: on_success
             
