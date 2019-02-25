@@ -1,7 +1,5 @@
 package org.vadere.util.geometry.shapes;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
-
 public class MPoint implements IPoint, Cloneable{
     private VPoint point;
     private int hashCode = -1;
@@ -163,7 +161,7 @@ public class MPoint implements IPoint, Cloneable{
             MPoint clone = (MPoint)super.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
-            throw new InternalException(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
