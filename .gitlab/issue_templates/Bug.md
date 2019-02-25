@@ -27,13 +27,16 @@ How can you reproduce the issue?
 
 Please, use code blocks (backticks) and if it is much text, encapsulate the text in `<details>` tag:
 
-<details>
-<summary>Expand file xy...</summary>
-<pre>
 ```
+A short
+code block
+```
+
+<details>
+<summary>A long code block...</summary>
+<pre>
 Line 1 of log file xy`
 Line 2 of log file xy`
-```
 </pre>
 </details>
 
