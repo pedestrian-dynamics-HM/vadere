@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
@@ -21,11 +22,13 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	private final Topography topography;
 	protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
+	private final OSMBehaviorController osmBehaviorController;
 
 	public UpdateSchemeEventDriven(@NotNull final Topography topography) {
 		this.topography = topography;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianOSM());
 		this.pedestrianEventsQueue.addAll(topography.getElements(PedestrianOSM.class));
+		osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
@@ -47,7 +50,6 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
-		// TODO: Extract behavior to own methods (i.e. step(), wait() and escape()).
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			VPoint oldPosition = pedestrian.getPosition();
 
@@ -59,24 +61,13 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 			pedestrian.updateNextPosition();
 			double stepDuration = pedestrian.getDurationNextStep();
-			makeStep(topography, pedestrian, stepDuration);
+			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+			osmBehaviorController.wait(pedestrian);
 		} else if (mostImportantEvent instanceof BangEvent) {
-			// Watch out: For testing purposes, a bang event changes only
-			// the "CombinedPotentialStrategy". The agent does not move here!
-			// Therefore, trigger only a single bang event and then use "ElapsedTimeEvent"
-			BangEvent bangEvent = (BangEvent) mostImportantEvent;
-			Target bangOrigin = topography.getTarget(bangEvent.getOriginAsTargetId());
-
-			// TODO: Just setting a new target does not work when using "EVENT_DRIVEN".
-			// Maybe, we have to clear the priority queue or something else (clarify with BZ).
-			LinkedList<Integer> nextTarget = new LinkedList<>();
-			nextTarget.add(bangOrigin.getId());
-
-			pedestrian.setTargets(nextTarget);
-			pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
+			// FIXME: Just setting a new target does not work when using "EVENT_DRIVEN".
+			osmBehaviorController.reactToBang(pedestrian, topography);
 		}
 	}
 
