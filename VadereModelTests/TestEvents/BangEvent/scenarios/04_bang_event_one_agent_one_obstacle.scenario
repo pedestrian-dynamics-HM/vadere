@@ -1,5 +1,5 @@
 {
-  "name" : "01-BangTest-OneAgent",
+  "name" : "04_bang_event_one_agent_one_obstacle",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -111,7 +111,16 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "x" : 12.9,
+          "y" : 1.9,
+          "width" : 2.5,
+          "height" : 1.2,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

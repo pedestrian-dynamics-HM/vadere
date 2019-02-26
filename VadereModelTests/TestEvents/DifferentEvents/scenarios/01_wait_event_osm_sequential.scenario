@@ -1,5 +1,5 @@
 {
-  "name" : "wait_event_2_sources_2_targets_osm_event_driven",
+  "name" : "01_wait_event_osm_sequential",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -86,7 +86,7 @@
         "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
-        "updateType" : "EVENT_DRIVEN",
+        "updateType" : "SEQUENTIAL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",

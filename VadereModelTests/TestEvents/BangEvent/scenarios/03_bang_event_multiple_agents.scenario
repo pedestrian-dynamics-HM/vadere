@@ -1,5 +1,5 @@
 {
-  "name" : "02-BangTest-MultipleAgents",
+  "name" : "03_bang_event_multiple_agents",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {

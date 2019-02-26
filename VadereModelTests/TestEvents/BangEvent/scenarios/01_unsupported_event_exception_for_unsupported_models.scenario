@@ -1,8 +1,7 @@
 {
-  "name" : "00-UnsupportedEventExceptionTest",
+  "name" : "01_unsupported_event_exception_for_unsupported_models",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "60cc9b0d70a1925c79a90f3718a9d1867476d321",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

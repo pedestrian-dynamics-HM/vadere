@@ -1,5 +1,5 @@
 {
-  "name" : "wait_event_recurring_2_sources_2_targets_osm_sequential",
+  "name" : "06_bang_event_osm_sequential",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -163,6 +163,23 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 0,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 18.3,
+          "y" : 6.8,
+          "width" : 2.9,
+          "height" : 1.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -221,14 +238,15 @@
     },
     "eventInfos" : [ {
       "eventTimeframe" : {
-        "startTime" : 0.0,
-        "endTime" : 10.0,
-        "repeat" : true,
-        "waitTimeBetweenRepetition" : 10.0
+        "startTime" : 15.0,
+        "endTime" : 15.4,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
       },
       "events" : [ {
-        "type" : "WaitEvent",
-        "targets" : [ ]
+        "type" : "BangEvent",
+        "targets" : [ ],
+        "originAsTargetId" : 0
       } ]
     } ]
   }

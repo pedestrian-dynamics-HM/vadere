@@ -1,5 +1,5 @@
 {
-  "name" : "04-NarrowedStreet-Pollichtrasse",
+  "name" : "05_bang_event_narrowed_street",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
