@@ -119,7 +119,7 @@ public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHal
 		Color c = graphics.getColor();
 		Stroke stroke = graphics.getStroke();
 		synchronized (mesh) {
-			faces = mesh.clone().getFaces();
+			faces = mesh.getFaces();
 		}
 
 		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
@@ -141,7 +141,10 @@ public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHal
 				graphics.setColor(colorFunction.apply(face));
 				graphics.fill(polygon);
 			}
-
+			else {
+				graphics.setColor(Color.WHITE);
+				graphics.fill(polygon);
+			}
 
 			if(alertPred.test(face)) {
 				graphics.setColor(Color.RED);
@@ -176,4 +179,7 @@ public class MeshRenderer<P extends IPoint, V extends IVertex<P>, E extends IHal
 		return image;
 	}
 
+	public void setMesh(IMesh<P, V, E, F> mesh) {
+		this.mesh = mesh;
+	}
 }

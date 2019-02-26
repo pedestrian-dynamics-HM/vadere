@@ -7,12 +7,15 @@ import org.apache.commons.math.optimization.MultivariateRealOptimizer;
 import org.apache.commons.math.optimization.direct.DirectSearchOptimizer;
 import org.apache.commons.math.optimization.direct.NelderMead;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -25,9 +28,11 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 			.getLogger(StepCircleOptimizerNelderMead.class);
 
 	private final Random random;
+	private Map<PedestrianOSM, VPoint> lastSolution;
 
 	public StepCircleOptimizerNelderMead(Random random) {
 		this.random = random;
+		this.lastSolution = new HashMap<>();
 	}
 
 	@Override
@@ -35,7 +40,6 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 
 		double stepSize = ((VCircle) reachableArea).getRadius();
 		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle)reachableArea, random);
-
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
 
@@ -48,14 +52,24 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 		double step = stepSize / 2;
 		double threshold = 0.0001;
 
-		MultivariateRealOptimizer optimizer = new NelderMead();
+		NelderMead optimizer = new NelderMead();
 
 		try {
 
+			/*if(lastSolution.containsKey(pedestrian)) {
+				VPoint optimum = lastSolution.get(pedestrian).add(pedestrian.getPosition());
+				if(isLocalMinimum(potentialEvaluationFunction, (VCircle) reachableArea, optimum)) {
+					logger.info("quick solution found.");
+					return optimum;
+				}
+			}*/
+
+			//minimum = position;
 			double[][] simplex = new double[][] {{0, 0}, {step, step}, {step, -step}};
-			((DirectSearchOptimizer) optimizer).setStartConfiguration(simplex);
+			optimizer.setStartConfiguration(simplex);
 			optimizer.setConvergenceChecker(new NelderMeadConvergenceChecker());
-			newMinimum = optimizer.optimize(potentialEvaluationFunction, GoalType.MINIMIZE, minimum).getPoint();
+			newMinimum = optimizer.optimize(potentialEvaluationFunction, GoalType.MINIMIZE, position).getPoint();
+			//logger.info("["+0+","+0+"],["+step+","+step+"],["+step+","+(-step)+")]");
 			newMinimumValue = potentialEvaluationFunction.value(newMinimum);
 			int counter = 0;
 
@@ -93,7 +107,9 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 				simplex[2][0] = Math.min(step, outerDistance) * outerDirection.getX();
 				simplex[2][1] = Math.min(step, outerDistance) * outerDirection.getY();
 
-				((DirectSearchOptimizer) optimizer).setStartConfiguration(simplex);
+				//logger.info("["+simplex[0][0]+","+simplex[0][1]+"],["+simplex[1][0]+","+simplex[1][1]+"],["+simplex[2][0]+","+simplex[2][1]+")]");
+
+				optimizer.setStartConfiguration(simplex);
 
 				optimizer.setConvergenceChecker(new NelderMeadConvergenceChecker());
 				newMinimum = optimizer.optimize(potentialEvaluationFunction,
@@ -105,6 +121,7 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 				if ((minimumValue > newMinimumValue && Math.abs(minimumValue - newMinimumValue) > threshold)) {
 					minimumValue = newMinimumValue;
 					minimum = newMinimum;
+					//logger.info("new min: ["+minimum[0]+","+minimum[1]+"]");
 				}
 
 			}
@@ -113,11 +130,27 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 			logger.error(e);
 		}
 		// System.out.println(potentialEvaluationFunction.counter);
+		//logger.info("["+(minimum[0]-pedestrian.getPosition().getX())+","+(minimum[1]-pedestrian.getPosition().getY())+"]");
+		//lastSolution.put(pedestrian, new VPoint(minimum[0]-pedestrian.getPosition().getX(), minimum[1]-pedestrian.getPosition().getY()));
 		return new VPoint(minimum[0], minimum[1]);
 
 	}
 
 	public StepCircleOptimizer clone() {
 		return new StepCircleOptimizerNelderMead(random);
+	}
+
+	private boolean isLocalMinimum(PotentialEvaluationFunction evaluationFunction, VCircle stepDisc, VPoint optimum) throws FunctionEvaluationException {
+		double delta = 0.0001;
+		double angle = 0.05 * 2 * Math.PI;
+		double value = evaluationFunction.getValue(optimum);
+
+		for(double angleDelta = 0; angleDelta <= 2 * Math.PI; angleDelta += angle) {
+			VPoint newPoint = optimum.add(new VPoint(delta, 0).rotate(angleDelta));
+			if(stepDisc.contains(newPoint) && evaluationFunction.getValue(newPoint) < value) {
+				return false;
+			}
+		}
+		return evaluationFunction.getValue(stepDisc.getCenter()) > value;
 	}
 }
