@@ -66,8 +66,10 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			osmBehaviorController.wait(pedestrian);
 		} else if (mostImportantEvent instanceof BangEvent) {
-			// FIXME: Just setting a new target does not work when using "EVENT_DRIVEN".
 			osmBehaviorController.reactToBang(pedestrian, topography);
+
+			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
 
