@@ -33,7 +33,7 @@
                                     <version>[3.0,)</version>
                                     </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[1.11,)</version>
+                                    <version>[${maven-compiler.source.version},)</version>
                                 </requireJavaVersion>
                                 </rules>
                             </configuration>
@@ -45,12 +45,12 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
-                        <release>10</release>
-                        <fork>true</fork>
-                        <meminitial>512m</meminitial>
-                        <maxmem>2048m</maxmem>
+                        <source>${maven-compiler.source.version}</source>
+                        <target>${maven-compiler.target.version}</target>
+                        <release>11</release>
                     </configuration>
                 </plugin>
+                <!--  Maven Surefire is used to run unit tests. -->
                 <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -64,6 +64,11 @@
                 </dependencies>
                 <configuration>
                     <threadCount>1</threadCount>
+                    <enableAssertions>true</enableAssertions>
+                    <excludes>
+                        <exclude></exclude>
+                    </excludes>
+                    <failIfNoTests>false</failIfNoTests>
                 </configuration>
             </plugin>
                 <plugin>
