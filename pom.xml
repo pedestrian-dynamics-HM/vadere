@@ -45,6 +45,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
+                        <!-- Workaround to avoid "java.lang.AssertionError: Visiting tree node before memberEnter". See: https://stackoverflow.com/a/52536499/5002766 -->
+                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
                         <source>${maven-compiler.source.version}</source>
                         <target>${maven-compiler.target.version}</target>
                         <release>11</release>

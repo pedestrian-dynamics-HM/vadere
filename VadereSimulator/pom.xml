@@ -36,6 +36,19 @@
       </testResources>
     <plugins>
         <plugin>
+            <groupId>com.nativelibs4java</groupId>
+            <artifactId>maven-javacl-plugin</artifactId>
+            <version>1.0.0-RC4</version>
+            <executions>
+                <execution>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>1.6.0</version>
@@ -104,6 +117,17 @@
         </plugin>
     </plugins>
   </build>
+
+    <repositories>
+        <repository>
+            <id>nativelibs4java</id>
+            <name>nativelibs4java Maven2 Repository</name>
+            <url>http://nativelibs4java.sourceforge.net/maven</url>
+        </repository>
+    </repositories>
+    <properties>
+        <platform.dependency>windows-x86_64</platform.dependency>
+    </properties>
 
   <dependencies>
   	<dependency>

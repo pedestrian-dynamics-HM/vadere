@@ -86,9 +86,12 @@ public class CLUtils {
 					}
 				}
 			}
-		}
 
+		}catch(Exception e){
+			log.warn("No OpenCL support: " + e.getMessage());
+		}
 		return supportedPlatforms;
+
 	}
 
 	/**
@@ -100,6 +103,7 @@ public class CLUtils {
 	 * @return a pair of addresses (platform address, device address)
 	 */
 	public static Optional<Pair<Long, Long>> getFirstSupportedPlatformAndDevice(final int deviceType) {
+
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer pi = stack.mallocInt(1);
 			InfoUtils.checkCLError(clGetPlatformIDs(null, pi));
@@ -124,7 +128,10 @@ public class CLUtils {
 					}
 				}
 			}
+		} catch (Exception e) {
+			log.warn("No OpenCL device found: " + e.getMessage());
 		}
+
 		return Optional.empty();
 	}
 
