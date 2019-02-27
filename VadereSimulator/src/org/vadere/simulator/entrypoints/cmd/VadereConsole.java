@@ -38,9 +38,9 @@ public class VadereConsole {
 
 		try {
 			StdOutErrLog.addStdOutErrToLog();
-			if (!CLUtils.isOpenCLSupported()) {
-				System.out.println("Warning: OpenCL acceleration disabled, since no OpenCL support could be found!");
-			}
+			//if (!CLUtils.isOpenCLSupported()) {
+			//	System.out.println("Warning: OpenCL acceleration disabled, since no OpenCL support could be found!");
+			//}
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
 			sRunner.run(ns, parser);
