@@ -36,6 +36,19 @@
       </testResources>
     <plugins>
         <plugin>
+            <groupId>com.nativelibs4java</groupId>
+            <artifactId>maven-javacl-plugin</artifactId>
+            <version>1.0.0-RC4</version>
+            <executions>
+                <execution>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>1.6.0</version>
