@@ -18,6 +18,9 @@ import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
+import org.vadere.util.opencl.CLUtils;
+
+import javax.swing.*;
 
 
 /**
@@ -35,14 +38,20 @@ public class VadereConsole {
 
 		try {
 			StdOutErrLog.addStdOutErrToLog();
+			if (!CLUtils.isOpenCLSupported()) {
+				System.out.println("Warning: OpenCL acceleration disabled, since no OpenCL support could be found!");
+			}
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
 			sRunner.run(ns, parser);
+
+		} catch (UnsatisfiedLinkError linkError) {
+			System.err.println("[LWJGL]: " + linkError.getMessage());
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
 			System.exit(1);
 		} catch (Exception e) {
-			logger.error("topographyError in command:" + e.getMessage());
+			System.err.println("topographyError in command:" + e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
 		}

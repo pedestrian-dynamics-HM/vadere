@@ -1,6 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
@@ -44,6 +45,7 @@ import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.opencl.CLUtils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -256,7 +258,24 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			frame.setSize(1200, 800);
 
 			frame.openLastUsedProject(model);
+			checkDependencies(frame);
 		});
+	}
+
+	private static void checkDependencies(@NotNull final JFrame frame) {
+		try {
+			if(!CLUtils.isOpenCLSupported()) {
+				JOptionPane.showMessageDialog(frame,
+						Messages.getString("ProjectView.warning.opencl.text"),
+						Messages.getString("ProjectView.warning.opencl.title"),
+						JOptionPane.WARNING_MESSAGE);
+			}
+		} catch (UnsatisfiedLinkError linkError) {
+			JOptionPane.showMessageDialog(frame,
+					"[LWJGL]: " + linkError.getMessage(),
+					Messages.getString("ProjectView.warning.lwjgl.title"),
+					JOptionPane.WARNING_MESSAGE);
+		}
 	}
 
 	private void openLastUsedProject(final ProjectViewModel model) {
