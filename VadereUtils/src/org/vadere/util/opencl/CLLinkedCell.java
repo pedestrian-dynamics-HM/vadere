@@ -73,15 +73,8 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * This class offers the methods to compute an array based linked-cell which contains 2D-coordinates i.e. {@link VPoint}
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
-public class CLLinkedCell {
+public class CLLinkedCell extends CLOperation {
 	private static Logger log = Logger.getLogger(CLLinkedCell.class);
-
-	// CL ids
-	private long clPlatform;
-	private long clDevice;
-	private long clContext;
-	private long clQueue;
-	private long clProgram;
 
 	// CL Memory
 	private long clHashes;
@@ -112,10 +105,6 @@ public class CLLinkedCell {
 	private ByteBuffer source;
 	private ByteBuffer particleSource;
 
-	// CL callbacks
-	private CLContextCallback contextCB;
-	private CLProgramCallback programCB;
-
 	// CL kernel
 	private long clBitonicSortLocal;
 	private long clBitonicSortLocal1;
@@ -130,7 +119,6 @@ public class CLLinkedCell {
 	private float iCellSize;
 	private int[] iGridSize;
 	private List<VPoint> positionList;
-	private final int deviceType;
 
 	private int[] keys;
 	private int[] values;
@@ -145,7 +133,6 @@ public class CLLinkedCell {
 
 	// time measurement
 	private boolean debug = false;
-	private boolean profiling = false;
 
 	private static int MIN_LOCAL_SIZE = 1;
 
@@ -163,12 +150,12 @@ public class CLLinkedCell {
 			final VRectangle bound,
 			final double cellSize,
 			final int device) throws OpenCLException {
+		super(device);
 		this.numberOfElements = numberOfElements;
 		this.iGridSize = new int[]{ (int)Math.ceil(bound.getWidth() / cellSize),  (int)Math.ceil(bound.getHeight() / cellSize)};
 		this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
 		this.bound = bound;
 		this.iCellSize = (float)cellSize;
-		this.deviceType = device;
 
 		if(debug) {
 			Configuration.DEBUG.set(true);
@@ -478,7 +465,7 @@ public class CLLinkedCell {
 			}
 			else {
 				localWorkSize = maxWorkGroupSize;
-				globalWorkSize = multipleOf(numberOfElements, localWorkSize);
+				globalWorkSize = CLOperation.multipleOf(numberOfElements, localWorkSize);
 			}
 
 			clGlobalWorkSize.put(0, globalWorkSize);
@@ -486,14 +473,6 @@ public class CLLinkedCell {
 			//TODO: local work size? + check 2^n constrain!
 			CLInfo.checkCLError((int)enqueueNDRangeKernel("clFindCellBoundsAndReorder", clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 		}
-	}
-
-	private long multipleOf(long value, long multiple) {
-		long result = multiple;
-		while (result < value) {
-			result += multiple;
-		}
-		return result;
 	}
 
 	public boolean checkMinSupportedLocalSize() throws OpenCLException {
@@ -615,30 +594,6 @@ public class CLLinkedCell {
 		}
 	}
 
-	private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) throws OpenCLException {
-		if(profiling) {
-			try (MemoryStack stack = stackPush()) {
-				PointerBuffer clEvent = stack.mallocPointer(1);
-				LongBuffer startTime = stack.mallocLong(1);
-				LongBuffer endTime = stack.mallocLong(1);
-				long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
-				clWaitForEvents(clEvent);
-				long eventAddr = clEvent.get();
-				CLInfo.checkCLError(clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, null));
-				CLInfo.checkCLError(clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, null));
-				clEvent.clear();
-				// in nanaSec
-				log.info(name + " event time " + "0x"+eventAddr + ": " + ((double)endTime.get() - startTime.get()) / 1_000_000.0 + " [ms]");
-				endTime.clear();
-				startTime.clear();
-				return result;
-			}
-		}
-		else {
-			return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event);
-		}
-	}
-
 	private long getMaxWorkGroupSizeForKernel(long clDevice, long clKernel, long workItemMem) throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
 			LongBuffer pp = stack.mallocLong(1);
@@ -701,75 +656,15 @@ public class CLLinkedCell {
 		}
 	}
 
-	private void clearCL() throws OpenCLException {
+	@Override
+	protected void clearCL() throws OpenCLException {
 		CLInfo.checkCLError(clReleaseKernel(clBitonicSortLocal));
 		CLInfo.checkCLError(clReleaseKernel(clBitonicSortLocal1));
 		CLInfo.checkCLError(clReleaseKernel(clBitonicMergeGlobal));
 		CLInfo.checkCLError(clReleaseKernel(clBitonicMergeLocal));
 		CLInfo.checkCLError(clReleaseKernel(clCalcHash));
 		CLInfo.checkCLError(clReleaseKernel(clFindCellBoundsAndReorder));
-
-		CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
-		CLInfo.checkCLError(clReleaseProgram(clProgram));
-		CLInfo.checkCLError(clReleaseContext(clContext));
-		contextCB.free();
-		programCB.free();
-	}
-
-	// private helpers
-	private void initCallbacks() {
-		contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
-		{
-			log.debug("[LWJGL] cl_context_callback" + "\tInfo: " + memUTF8(errinfo));
-		});
-
-		programCB = CLProgramCallback.create((program, user_data) ->
-		{
-			try {
-				log.debug("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-			} catch (OpenCLException e) {
-				e.printStackTrace();
-			}
-		});
-	}
-
-	private void initCL() throws OpenCLException {
-		try (MemoryStack stack = stackPush()) {
-			IntBuffer errcode_ret = stack.callocInt(1);
-			IntBuffer numberOfPlatforms = stack.mallocInt(1);
-
-			CLInfo.checkCLError(clGetPlatformIDs(null, numberOfPlatforms));
-
-			Optional<Pair<Long, Long>> platformAndDevice = CLUtils.getFirstSupportedPlatformAndDevice(stack, deviceType);
-
-			if(!platformAndDevice.isPresent()) {
-				log.debug("No support for OpenCl found.");
-				throw new OpenCLException("No support for OpenCl found.");
-			}
-
-			clPlatform = platformAndDevice.get().getLeft();
-			clDevice = platformAndDevice.get().getRight();
-
-			log.debug("CL_DEVICE_NAME = " + CLInfo.getDeviceInfoStringUTF8(clDevice, CL_DEVICE_NAME));
-
-			PointerBuffer ctxProps = stack.mallocPointer(3);
-			ctxProps.put(CL_CONTEXT_PLATFORM)
-					.put(clPlatform)
-					.put(NULL)
-					.flip();
-
-			clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-			CLInfo.checkCLError(errcode_ret);
-
-			if(profiling) {
-				clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
-			}
-			else {
-				clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-			}
-
-			CLInfo.checkCLError(errcode_ret);
-		}
+		super.clearCL();
 	}
 
 	private void buildProgram() throws OpenCLException {

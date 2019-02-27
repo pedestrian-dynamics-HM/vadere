@@ -1,10 +1,12 @@
 package org.vadere.simulator.models.density;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.awt.geom.Rectangle2D;
@@ -83,11 +85,11 @@ public interface IGaussianFilter {
      */
     void destroy();
 
-    static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
-                                                    Collection<E> pedestrians, final double scale,
+    static <E extends Agent> IGaussianFilter create(@NotNull final Rectangle2D scenarioBounds,
+                                                    @NotNull Collection<E> pedestrians, final double scale,
                                                     final double standardDerivation,
-                                                    final AttributesAgent attributesPedestrian,
-                                                    final IPedestrianLoadingStrategy loadingStrategy) {
+                                                    @NotNull final AttributesAgent attributesPedestrian,
+                                                    @NotNull final IPedestrianLoadingStrategy loadingStrategy) {
         return create(scenarioBounds, pedestrians, scale, standardDerivation, attributesPedestrian, loadingStrategy,
                 Type.OpenCL);
     }
@@ -95,11 +97,11 @@ public interface IGaussianFilter {
     /*
      * Factory-methods
      */
-    static <E extends Agent> IGaussianFilter create(final Rectangle2D scenarioBounds,
-                                                    Collection<E> pedestrians, final double scale,
+    static <E extends Agent> IGaussianFilter create(@NotNull final Rectangle2D scenarioBounds,
+                                                    @NotNull Collection<E> pedestrians, final double scale,
                                                     final double standardDerivation,
-                                                    final AttributesAgent attributesPedestrian,
-                                                    final IPedestrianLoadingStrategy loadingStrategy, final Type type) {
+                                                    @NotNull final AttributesAgent attributesPedestrian,
+                                                    @NotNull final IPedestrianLoadingStrategy loadingStrategy, final Type type) {
 
         double scaleFactor = attributesPedestrian.getRadius() * 2
                 * attributesPedestrian.getRadius() * 2
@@ -111,52 +113,71 @@ public interface IGaussianFilter {
 			    (centerI, i) -> (float) (Math.sqrt(scaleFactor) * Math.exp(-((centerI - i) / scale)
 					    * ((centerI - i) / scale) / (2 * standardDerivation * standardDerivation)));
 
-	    IGaussianFilter clFilter;
-        switch (type) {
-            case OpenCL: {
-	            try {
-		            clFilter = new CLGaussianFilter(scenarioBounds, scale, f, false);
-	            } catch (IOException | OpenCLException e) {
-		            e.printStackTrace();
-		            logger.warn(e.getClass().getName() + " while initializing OpenCL: " + e.getMessage() + " OpenCL can not be used. Native Java implementation will be used which might cause performance issues.");
-		            clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
-	            }
-            } break;
-            default:
-	            clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
-        }
-
+	    IGaussianFilter clFilter = getFilter(scenarioBounds, f, type, scale);
 	    return new PedestrianGaussianFilter(pedestrians, clFilter, loadingStrategy);
     }
 
-    static IGaussianFilter create(
-            final Topography scenario, final double scale,
-            final boolean scenarioHasBoundary, final double standardDerivation) {
+	/**
+	 * Returns the desired filter if possible. If the filter <tt>type</tt> is not supported
+	 * it returns a default java implementation of the filter which should on any device / platform
+	 * / machine.
+	 *
+	 * @param scenarioBounds    the bound the filter is working on
+	 * @param f                 the function for generating the kernel values
+	 * @param type              the type of the filter e.g. OpenCL (GPU filter) or native java filter
+	 * @param scale             the scale of the filtered grid which directly maps to the size of the matrices which take part in the convolution
+	 *
+	 * @return the desired filter or (if it is not supported) a native java implementation
+	 */
+    static IGaussianFilter getFilter(@NotNull final Rectangle2D scenarioBounds,
+                                     @NotNull final BiFunction<Integer, Integer, Float> f,
+                                     @NotNull final Type type,
+                                     final double scale) {
+	    IGaussianFilter clFilter;
+	    switch (type) {
+		    case OpenCL: {
+			    if(CLUtils.isOpenCLSupported()) {
+				    try {
+					    clFilter = new CLGaussianFilter(scenarioBounds, scale, f, false);
+				    } catch (OpenCLException e) {
+					    e.printStackTrace();
+					    logger.warn("Error while initializing OpenCL: " + e.getMessage());
+					    clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+				    }
+				    catch (UnsatisfiedLinkError linkError) {
+					    linkError.printStackTrace();
+					    logger.warn("Linking error (native lib problem) while initializing OpenCL: " + linkError.getMessage());
+					    clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+				    }
+			    }
+			    else {
+				    clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+			    }
+		    } break;
+		    default:
+			    clFilter = new JGaussianFilter(scenarioBounds, scale, f, false);
+	    }
+		return clFilter;
+    }
+
+    static IGaussianFilter create(@NotNull final Topography scenario,
+                                  final double scale,
+                                  final boolean scenarioHasBoundary,
+                                  final double standardDerivation) {
         return create(scenario, scale, scenarioHasBoundary, standardDerivation, Type.OpenCL);
     }
 
-    static IGaussianFilter create(
-            final Topography scenario, final double scale,
-            final boolean scenarioHasBoundary, final double standardDerivation, final Type type) {
+    static IGaussianFilter create(final Topography scenario,
+                                  final double scale,
+                                  final boolean scenarioHasBoundary,
+                                  final double standardDerivation,
+                                  final Type type) {
 
     	double varianz = standardDerivation * standardDerivation;
 	    BiFunction<Integer, Integer, Float> f = (centerI, i) -> (float) ((1.0 / (2 * Math.PI * varianz))
 			    * Math.exp(-((centerI - i) / scale) * ((centerI - i) / scale) / (2 * varianz)));
 
-	    IGaussianFilter clFilter;
-        switch (type) {
-            case OpenCL: {
-	            try {
-		            clFilter = new CLGaussianFilter(scenario.getBounds(), scale, f, true);
-	            } catch (IOException | OpenCLException e) {
-		            e.printStackTrace();
-		            logger.warn(e.getClass().getName() + " while initializing OpenCL: " + e.getMessage() + " OpenCL can not be used. Native Java implementation will be used which might cause performance issues.");
-		            clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
-	            }
-            } break;
-            default:
-                clFilter = new JGaussianFilter(scenario.getBounds(), scale, f, true);
-        }
+	    IGaussianFilter clFilter = getFilter(scenario.getBounds(), f, type, scale);
 	    return new ObstacleGaussianFilter(scenario, clFilter);
     }
 
