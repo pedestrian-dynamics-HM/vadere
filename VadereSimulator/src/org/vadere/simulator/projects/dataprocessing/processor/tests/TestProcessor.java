@@ -1,19 +1,17 @@
 package org.vadere.simulator.projects.dataprocessing.processor.tests;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.state.attributes.processor.AttributesTestProcessor;
+import org.vadere.util.logging.Logger;
 
 /**
  * @author Benedikt Zoennchen
  */
 public abstract class TestProcessor extends DataProcessor<NoDataKey, Boolean> {
 
-	private static Logger logger = LogManager.getLogger(TestProcessor.class);
+	private static Logger logger = Logger.getLogger(TestProcessor.class);
 
 	public TestProcessor(@NotNull final String header){
 		super(header);

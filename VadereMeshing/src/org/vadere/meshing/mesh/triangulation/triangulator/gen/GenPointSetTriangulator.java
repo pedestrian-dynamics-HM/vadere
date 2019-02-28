@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
@@ -48,7 +49,20 @@ public class GenPointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex
         this.generated = false;
     }
 
-    @Override
+	/**
+	 * <p>The default constructor.</p>
+	 *
+	 * @param points        the collection of points P
+	 * @param mesh          an empty mesh
+	 */
+	public GenPointSetTriangulator(final Collection<P> points, final IMesh<P, CE, CF, V, E, F> mesh) {
+		this.triangulation = new IncrementalTriangulation<>(mesh);
+		this.points = points;
+		this.generated = false;
+	}
+
+
+	@Override
     public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
     	if(!generated) {
 		    triangulation.init();

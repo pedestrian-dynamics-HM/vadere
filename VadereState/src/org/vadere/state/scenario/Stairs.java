@@ -1,24 +1,22 @@
 package org.vadere.state.scenario;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
-
 import org.vadere.state.attributes.Attributes;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 
 public class Stairs extends ScenarioElement {
 
-	private static Logger logger = LogManager.getLogger(Stairs.class);
+	private static Logger logger = Logger.getLogger(Stairs.class);
 	public static double MIN_TREAD_DEPTH = 0.100;
 	public static double MAX_TREAD_DEPTH = 0.350;
 

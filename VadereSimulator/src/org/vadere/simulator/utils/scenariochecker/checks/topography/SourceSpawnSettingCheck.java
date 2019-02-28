@@ -1,6 +1,5 @@
 package org.vadere.simulator.utils.scenariochecker.checks.topography;
 
-import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerReason;
 import org.vadere.simulator.utils.scenariochecker.checks.AbstractScenarioCheck;

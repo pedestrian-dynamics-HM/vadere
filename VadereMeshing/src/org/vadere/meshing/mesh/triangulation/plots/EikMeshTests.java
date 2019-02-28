@@ -1,8 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
@@ -11,6 +9,7 @@ import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AVertex;
@@ -29,7 +28,7 @@ import javax.swing.*;
  */
 public class EikMeshTests {
 
-	private static final Logger log = LogManager.getLogger(EikMeshTests.class);
+	private static final Logger log = Logger.getLogger(EikMeshTests.class);
 
 	/**
 	 * Each geometry is contained this bounding box.

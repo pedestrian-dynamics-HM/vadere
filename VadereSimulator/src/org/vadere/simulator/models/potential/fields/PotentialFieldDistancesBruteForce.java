@@ -1,18 +1,18 @@
 package org.vadere.simulator.models.potential.fields;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.CellState;
+import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.util.data.cellgrid.CellState;
-import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.logging.Logger;
+
 import java.awt.*;
 import java.util.Collection;
 
@@ -28,7 +28,7 @@ import java.util.Collection;
  */
 public class PotentialFieldDistancesBruteForce implements IPotentialField {
 
-	private static Logger logger = LogManager.getLogger(PotentialFieldDistancesBruteForce.class);
+	private static Logger logger = Logger.getLogger(PotentialFieldDistancesBruteForce.class);
 	private final CellGrid cellGrid;
 	private final Collection<VShape> obstacles;
 

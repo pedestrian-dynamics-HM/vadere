@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.potential.timeCostFunction;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.attributes.models.AttributesTimeCost;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -9,7 +8,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
 
@@ -52,7 +51,7 @@ public class TimeCostPedestrianDensityIteration implements ITimeCostFunction {
 	private long runtime = 0;
 	private int updateCount = 0;
 	private double heighestCost = 0.0;
-	private static Logger logger = LogManager
+	private static Logger logger = Logger
 			.getLogger(TimeCostPedestrianDensityIteration.class);
 
 	TimeCostPedestrianDensityIteration(

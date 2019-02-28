@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -9,6 +7,7 @@ import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
  */
 public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> {
 
-	private static Logger log = LogManager.getLogger(PMesh.class);
+	private static Logger log = Logger.getLogger(PMesh.class);
 
 	private int numberOfEdges;
 	private int numberOfFaces;

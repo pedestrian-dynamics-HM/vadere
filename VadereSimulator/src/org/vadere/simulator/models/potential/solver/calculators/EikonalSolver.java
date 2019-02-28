@@ -1,12 +1,11 @@
 package org.vadere.simulator.models.potential.solver.calculators;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.function.Function;
 
@@ -16,7 +15,7 @@ import java.util.function.Function;
  */
 public interface EikonalSolver {
 
-	Logger logger = LogManager.getLogger(EikonalSolver.class);
+	Logger logger = Logger.getLogger(EikonalSolver.class);
 
 	enum Direction {
 		UP_LEFT, UP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, ANY;

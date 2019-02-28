@@ -1,8 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.tuple.Pair;;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -10,6 +8,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.ITriangulationSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -44,7 +43,7 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
 	private Set<P> points;
 	private IMesh<P, CE, CF, V, E, F> mesh;
 	private  LinkedList<F> toRefineEdges;
-	private static final Logger logger = LogManager.getLogger(GenUniformRefinementTriangulator.class);
+	private static final Logger logger = Logger.getLogger(GenUniformRefinementTriangulator.class);
 	private final IDistanceFunction distFunc;
 	private final Map<P,Integer> creationOrder;
 	private boolean initialized;

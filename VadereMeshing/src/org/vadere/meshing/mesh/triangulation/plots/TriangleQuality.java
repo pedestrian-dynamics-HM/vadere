@@ -1,8 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
@@ -23,7 +22,7 @@ import java.util.List;
 import javax.swing.*;
 
 public class  TriangleQuality{
-	private static final Logger log = LogManager.getLogger(TriangleQuality.class);
+	private static final Logger log = Logger.getLogger(TriangleQuality.class);
 
 	/**
 	 * Each geometry is contained this bounding box.

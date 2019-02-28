@@ -1,12 +1,11 @@
 package org.vadere.meshing.mesh.iterators;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.Iterator;
 
@@ -24,7 +23,7 @@ import java.util.Iterator;
  */
 public class AdjacentVertexIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<V> {
 
-	private static Logger log = LogManager.getLogger(AdjacentVertexIterator.class);
+	private static Logger log = Logger.getLogger(AdjacentVertexIterator.class);
 	private IMesh<P, CE, CF, V, E, F> mesh;
 	private IncidentEdgeIterator<P, CE, CF, V, E, F> incidentEdgeIterator;
 

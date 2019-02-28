@@ -1,25 +1,25 @@
 package org.vadere.geometry;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.io.CollectionUtils;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestBoyerWatson {
 
-	private static Logger log = LogManager.getLogger(TestBoyerWatson.class);
+	private static Logger log = Logger.getLogger(TestBoyerWatson.class);
 
 	@Before
 	public void setUp() throws Exception {}

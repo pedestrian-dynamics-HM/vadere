@@ -1,7 +1,8 @@
 package org.vadere.state.attributes;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
+
+import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Field;
 
@@ -11,7 +12,7 @@ import java.lang.reflect.Field;
  */
 public class AttributesBuilder<T extends Attributes> {
 
-    private static Logger logger = LogManager.getLogger(AttributesBuilder.class);
+    private static Logger logger = Logger.getLogger(AttributesBuilder.class);
     private final T attributes;
 
     @SuppressWarnings("unchecked")

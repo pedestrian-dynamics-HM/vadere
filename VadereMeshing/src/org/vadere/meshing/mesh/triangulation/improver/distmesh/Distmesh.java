@@ -6,10 +6,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.triangulate.DelaunayTriangulationBuilder;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.ConstantLineIterator;
-import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -19,8 +16,15 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +35,7 @@ import java.util.stream.Stream;
  * @see <a href="http://persson.berkeley.edu/distmesh/">DistMesh</a>
  */
 public class Distmesh {
-	private static final Logger log = LogManager.getLogger(Distmesh.class);
+	private static final Logger log = Logger.getLogger(Distmesh.class);
 	private Set<EikMeshPoint> points = new HashSet<>();
 	private Set<MLine<EikMeshPoint>> lines = new HashSet<>();
 	private List<VTriangle> triangles = new ArrayList<>();

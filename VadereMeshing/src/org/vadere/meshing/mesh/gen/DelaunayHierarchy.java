@@ -1,8 +1,5 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -13,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,10 +48,10 @@ import java.util.function.Supplier;
  * @param <F>   the type of the faces
  */
 public class DelaunayHierarchy<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPointLocator<P, CE, CF, V, E, F> {
-	private static Logger log = LogManager.getLogger(DelaunayHierarchy.class);
+	private static Logger log = Logger.getLogger(DelaunayHierarchy.class);
 
 	static {
-		log.setLevel(Level.DEBUG);
+		log.setDebug();
 	}
 
 	/**

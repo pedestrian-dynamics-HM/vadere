@@ -1,19 +1,20 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.projectview.view.VTable;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class ActionSeeDiscardChanges extends AbstractAction {
 
-	private static Logger logger = LogManager.getLogger(ActionSeeDiscardChanges.class);
+	private static Logger logger = Logger.getLogger(ActionSeeDiscardChanges.class);
 
 	private final ProjectViewModel model;
 	private final VTable scenarioTable;

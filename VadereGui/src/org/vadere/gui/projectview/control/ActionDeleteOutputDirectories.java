@@ -1,20 +1,21 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.VTable;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+
+import javax.swing.*;
 
 public class ActionDeleteOutputDirectories extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LogManager.getLogger(ActionDeleteOutputDirectories.class);
+	private static Logger logger = Logger.getLogger(ActionDeleteOutputDirectories.class);
 
 	private ProjectViewModel model;
 	private VTable outputTable;

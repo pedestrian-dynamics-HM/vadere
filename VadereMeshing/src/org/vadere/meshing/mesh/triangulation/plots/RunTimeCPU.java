@@ -1,8 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
@@ -27,7 +26,7 @@ import javax.swing.*;
  */
 public class RunTimeCPU extends JFrame {
 
-    private static final Logger log = LogManager.getLogger(RunTimeCPU.class);
+    private static final Logger log = Logger.getLogger(RunTimeCPU.class);
 
 	/**
 	 * Each geometry is contained this bounding box.

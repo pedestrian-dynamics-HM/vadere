@@ -2,8 +2,6 @@ package org.vadere.simulator.triangulation;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -27,6 +25,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
@@ -51,7 +50,7 @@ public class RealWorldPlot {
 	 * 2) remove the remaining re-triangulations.
 	 */
 
-	private static Logger log = LogManager.getLogger(RealWorldPlot.class);
+	private static Logger log = Logger.getLogger(RealWorldPlot.class);
 
 	private static String topographyString2 = "{\n" +
 			"  \"attributes\" : {\n" +

@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -16,6 +14,7 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -67,7 +66,7 @@ public class GenEikMesh<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E 
 	private boolean meshMode;
 
 	// only for logging
-    private static final Logger log = LogManager.getLogger(GenEikMesh.class);
+    private static final Logger log = Logger.getLogger(GenEikMesh.class);
 
 	public GenEikMesh(
 			@NotNull final IDistanceFunction distanceFunc,

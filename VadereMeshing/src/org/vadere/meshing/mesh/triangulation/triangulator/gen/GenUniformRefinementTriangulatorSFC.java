@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -13,6 +11,7 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  */
 public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
-	private static final Logger logger = LogManager.getLogger(GenUniformRefinementTriangulatorSFC.class);
+	private static final Logger logger = Logger.getLogger(GenUniformRefinementTriangulatorSFC.class);
 
 	/**
 	 * A collection of obstacle shapes i.e. areas defining the holes of the triangulation.

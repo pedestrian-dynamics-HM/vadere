@@ -1,20 +1,77 @@
 package org.vadere.util.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.lwjgl.*;
-import org.lwjgl.opencl.*;
-import org.lwjgl.system.*;
 
-import java.nio.*;
-import java.util.concurrent.*;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.opencl.CL;
+import org.lwjgl.opencl.CLBufferRegion;
+import org.lwjgl.opencl.CLCapabilities;
+import org.lwjgl.opencl.CLContextCallback;
+import org.lwjgl.opencl.CLEventCallback;
+import org.lwjgl.opencl.CLMemObjectDestructorCallback;
+import org.lwjgl.opencl.CLNativeKernel;
+import org.lwjgl.system.FunctionProviderLocal;
+import org.lwjgl.system.MemoryStack;
+import org.vadere.util.logging.Logger;
 
-import static org.lwjgl.opencl.CL10.*;
-import static org.lwjgl.opencl.CL11.*;
-import static org.lwjgl.opencl.KHRICD.*;
-import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
-import static org.lwjgl.system.Pointer.*;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.lwjgl.opencl.CL10.CL_COMPLETE;
+import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_ADDRESS_BITS;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_AVAILABLE;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_COMPILER_AVAILABLE;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_EXECUTION_CAPABILITIES;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_EXTENSIONS;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_CLOCK_FREQUENCY;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_COMPUTE_UNITS;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_PROFILE;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_VENDOR;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_VENDOR_ID;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_VERSION;
+import static org.lwjgl.opencl.CL10.CL_DRIVER_VERSION;
+import static org.lwjgl.opencl.CL10.CL_EXEC_NATIVE_KERNEL;
+import static org.lwjgl.opencl.CL10.CL_MEM_READ_ONLY;
+import static org.lwjgl.opencl.CL10.CL_PLATFORM_EXTENSIONS;
+import static org.lwjgl.opencl.CL10.CL_PLATFORM_NAME;
+import static org.lwjgl.opencl.CL10.CL_PLATFORM_PROFILE;
+import static org.lwjgl.opencl.CL10.CL_PLATFORM_VENDOR;
+import static org.lwjgl.opencl.CL10.CL_PLATFORM_VERSION;
+import static org.lwjgl.opencl.CL10.CL_QUEUED;
+import static org.lwjgl.opencl.CL10.CL_RUNNING;
+import static org.lwjgl.opencl.CL10.CL_SUBMITTED;
+import static org.lwjgl.opencl.CL10.clCreateBuffer;
+import static org.lwjgl.opencl.CL10.clCreateCommandQueue;
+import static org.lwjgl.opencl.CL10.clCreateContext;
+import static org.lwjgl.opencl.CL10.clEnqueueNativeKernel;
+import static org.lwjgl.opencl.CL10.clFinish;
+import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
+import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
+import static org.lwjgl.opencl.CL10.clReleaseCommandQueue;
+import static org.lwjgl.opencl.CL10.clReleaseContext;
+import static org.lwjgl.opencl.CL10.clReleaseEvent;
+import static org.lwjgl.opencl.CL10.clReleaseMemObject;
+import static org.lwjgl.opencl.CL11.CL_BUFFER_CREATE_TYPE_REGION;
+import static org.lwjgl.opencl.CL11.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE;
+import static org.lwjgl.opencl.CL11.CL_DEVICE_OPENCL_C_VERSION;
+import static org.lwjgl.opencl.CL11.clSetEventCallback;
+import static org.lwjgl.opencl.CL11.clSetMemObjectDestructorCallback;
+import static org.lwjgl.opencl.CL11.nclCreateSubBuffer;
+import static org.lwjgl.opencl.KHRICD.CL_PLATFORM_ICD_SUFFIX_KHR;
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.system.MemoryUtil.memAddress;
+import static org.lwjgl.system.MemoryUtil.memByteBuffer;
+import static org.lwjgl.system.MemoryUtil.memUTF8;
+import static org.lwjgl.system.Pointer.POINTER_SIZE;
 
 /*
  * Copyright LWJGL. All rights reserved.
@@ -22,7 +79,7 @@ import static org.lwjgl.system.Pointer.*;
  */
 public final class CLDemo {
 
-	public static Logger logger = LogManager.getLogger(CLDemo.class);
+	public static Logger logger = Logger.getLogger(CLDemo.class);
 
 	private CLDemo() {}
 

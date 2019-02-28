@@ -1,10 +1,9 @@
 package org.vadere.simulator.models.osm.optimization;
 
 import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 /**
  * The Class HimmelblauFunction.
@@ -12,7 +11,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  */
 public class HimmelblauFunction extends PotentialEvaluationFunction {
 
-	private static Logger logger = LogManager.getLogger(HimmelblauFunction.class);
+	private static Logger logger = Logger.getLogger(HimmelblauFunction.class);
 
 	double stepsize = 4;
 

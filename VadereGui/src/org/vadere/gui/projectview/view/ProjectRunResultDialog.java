@@ -1,12 +1,12 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import javax.swing.*;
 
 public class ProjectRunResultDialog implements ProjectFinishedListener {
-	private static Logger logger = LogManager.getLogger(ProjectRunResultDialog.class);
+	private static Logger logger = Logger.getLogger(ProjectRunResultDialog.class);
 
 	private final ProjectView projectView;
 	private final ProjectViewModel projectViewModel;

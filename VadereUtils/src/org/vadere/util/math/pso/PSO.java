@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.ICircleSector;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.List;
 import java.util.Random;
@@ -22,12 +23,14 @@ public class PSO {
 	private double gBest;
 	private double gLastBest;
 	private VPoint gBestLocation;
-	private final Function<VPoint, Double> f;
+	private final Function<VPoint, Double> evaluationFunction;
 	private int iterationCounter;
 	private final double maxVelocity;
 	private final double minAngle;
 	private final double maxAngle;
 	private int improvementIterations;
+	private static Logger logger = Logger.getLogger(PSO.class);
+	private static int evaluationCounter = 0;
 
 	public PSO(
 			@NotNull final Function<VPoint, Double> f,
@@ -37,7 +40,7 @@ public class PSO {
 			@NotNull final Random random,
 			@NotNull final double maxVelocity,
 			@NotNull final List<VPoint> swarmPositions) {
-		this.f = f;
+		this.evaluationFunction = f;
 		this.random = random;
 		this.circle = circle;
 		this.gBest = Double.MAX_VALUE;
@@ -113,7 +116,11 @@ public class PSO {
 			particle.setVelocity(particle.getVelocity().scalarMultiply(-0.5));
 			particle.setLocation(circle.getClosestIntersectionPoint(currentLocation, particle.getLocation(), particle.getLocation()).orElse(particle.getLocation()));
 		}
-		particle.setFitnessValue(f.apply(particle.getLocation()));
+		particle.setFitnessValue(evaluationFunction.apply(particle.getLocation()));
+		evaluationCounter++;
+		if(evaluationCounter % 100 == 0) {
+			logger.debugf("#evaluations: " + evaluationCounter);
+		}
 	}
 
 	/**
@@ -218,8 +225,8 @@ public class PSO {
 
 	/*private Particle locationToParticle(@NotNull final VPoint location) {
 		double vMag = random.nextDouble() * maxVelocity;
-		VPoint velocity = location.subtract(circle.getCentroid()).setMagnitude(vMag).limit(maxVelocity);
-		double fitnessValue = f.apply(location);
+		VPoint velocity = location.subtract(circle.getCenter()).setMagnitude(vMag).limit(maxVelocity);
+		double fitnessValue = evaluationFunction.apply(location);
 		return new Particle(location, velocity, fitnessValue);
 	}*/
 
@@ -229,7 +236,11 @@ public class PSO {
 		VPoint v = new VPoint(Math.cos(vDelta), Math.sin(vDelta)).setMagnitude(vMag);
 		VPoint velocity = v.subtract(location).scalarMultiply(0.5).limit(maxVelocity);
 
-		double fitnessValue = f.apply(location);
+		double fitnessValue = evaluationFunction.apply(location);
+		evaluationCounter++;
+		/*if(evaluationCounter % 100 == 0) {
+			logger.debugf("#evaluations: " + evaluationCounter);
+		}*/
 		return new Particle(location, velocity, fitnessValue);
 	}
 }

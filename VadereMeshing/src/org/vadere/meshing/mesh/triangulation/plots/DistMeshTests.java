@@ -1,28 +1,28 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.util.math.IDistanceFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
+import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.*;
-
-import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * @author Benedikt Zoennchen
  */
 public class DistMeshTests extends JFrame {
 
-	private static final Logger log = LogManager.getLogger(DistMeshTests.class);
+	private static final Logger log = Logger.getLogger(DistMeshTests.class);
 
 	private static void testVisual()
     {

@@ -39,6 +39,7 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
+            <version>1.6.0</version>
             <executions>
                 <execution>
                     <id>write_version_control_info_to_file</id>
@@ -158,41 +159,6 @@
                         </descriptorRefs>
                         <finalName>vadere-console</finalName>
                         <appendAssemblyId>false</appendAssemblyId>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>com.akathist.maven.plugins.launch4j</groupId>
-            <artifactId>launch4j-maven-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>vadere-console</id>
-                    <phase>package</phase>
-                    <goals><goal>launch4j</goal></goals>
-                    <configuration>
-                        <headerType>console</headerType>
-                        <outfile>target/vadere-console.exe</outfile>
-                        <jar>target/vadere-console.jar</jar>
-                        <errTitle>vadere</errTitle>
-                        <icon>../vadere-cmd.ico</icon>
-                        <classPath>
-                            <mainClass>org.vadere.gui.projectview.VadereApplication</mainClass>
-                        </classPath>
-                        <jre>
-                            <minVersion>1.8.0</minVersion>
-                        </jre>
-                        <versionInfo>
-                            <fileVersion>0.0.0.6</fileVersion>
-                            <txtFileVersion>0.0.0.6</txtFileVersion>
-                            <fileDescription>Vadere is an open source framework for the simulation of microscopic pedestrian dynamics.</fileDescription>
-                            <copyright>GNU Lesser General Public License (LGPL)</copyright>
-                            <productVersion>0.0.0.6</productVersion>
-                            <txtProductVersion>0.0.0.6</txtProductVersion>
-                            <productName>Vadere-console</productName>
-                            <internalName>vadere-console</internalName>
-                            <originalFilename>vadere-console.exe</originalFilename>
-                        </versionInfo>
                     </configuration>
                 </execution>
             </executions>

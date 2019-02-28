@@ -1,22 +1,23 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.swing.*;
+import javax.swing.event.DocumentListener;
+
 public class JSONView extends JPanel {
 	private static final long serialVersionUID = -5147644809515076284L;
-	private static Logger logger = LogManager.getLogger(JSONView.class);
+	private static Logger logger = Logger.getLogger(JSONView.class);
 	private JTextArea txtrTextfiletextarea;
 	private JLabel lbljsonvalid;
 	private JLabel lbljsoninvalid;

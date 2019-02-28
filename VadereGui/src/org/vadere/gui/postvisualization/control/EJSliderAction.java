@@ -1,17 +1,17 @@
 package org.vadere.gui.postvisualization.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
-import javax.swing.*;
+import org.vadere.util.logging.Logger;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.*;
+
 // TODO [priority=low] [task=refactoring] - no strict separation between control and view
 public class EJSliderAction implements MouseListener {
-	private static Logger logger = LogManager.getLogger(EJSliderAction.class);
+	private static Logger logger = Logger.getLogger(EJSliderAction.class);
 	private final JSlider slider;
 
 	public EJSliderAction(final JSlider slider) {

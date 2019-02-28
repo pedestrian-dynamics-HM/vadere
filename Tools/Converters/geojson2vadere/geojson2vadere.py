@@ -204,5 +204,5 @@ if __name__ == "__main__":
 
     vadere_topography_string = create_vadere_topography_with_obstacles(vadere_obstacles_as_strings_concatenated, topography_width, topography_height)
 
-    write_parsing_statistics(args.filename, geojson_content["crs"], geojson_content["boundary_box"], buildings, minimal_coordinates)
+    write_parsing_statistics(args.filename, geojson_content["crs"], geojson_content["bbox"], buildings, minimal_coordinates)
     write_vadere_topography_string_to(vadere_topography_string, args.output)

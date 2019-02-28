@@ -1,10 +1,9 @@
 package org.vadere.simulator.control.util;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class SpawnArray {
-	private static Logger logger = LogManager.getLogger(SpawnArray.class);
+	private static Logger logger = Logger.getLogger(SpawnArray.class);
 	private static double SPAWN_BUFFER = 0.001;
 
 	protected final VRectangle spawnElementBound;

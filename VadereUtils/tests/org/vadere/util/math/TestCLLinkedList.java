@@ -1,13 +1,13 @@
 package org.vadere.util.math;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLLinkedCell;
 import org.vadere.util.opencl.OpenCLException;
 
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -23,9 +24,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestCLLinkedList {
 
-	private static Logger logger = LogManager.getLogger(TestConvolution.class);
+	private static Logger logger = Logger.getLogger(TestCLLinkedList.class);
 
-	private static Random random = new Random();
+	private static Random random = new Random(0);
 
 	@Before
 	public void setUp() throws Exception {}
@@ -36,7 +37,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
+			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
 		int[] hasehs = clUniformHashedGrid.calcHashes(positions);
 
@@ -56,7 +57,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
+			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
 		int[] hasehs = clUniformHashedGrid.calcHashes(positions);
 
@@ -76,7 +77,7 @@ public class TestCLLinkedList {
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
+			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
 		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
 
@@ -97,37 +98,50 @@ public class TestCLLinkedList {
 	@Test
 	public void testCalcAndSortHashLarge() throws IOException, OpenCLException {
 		int size = 32768; // 2^15
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 1);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
+			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
-		int[] hasehs = clUniformHashedGrid.calcSortedHashes(positions);
+		int[] hashes = clUniformHashedGrid.calcSortedHashes(positions);
 
-		assertEquals(hasehs.length, positions.size());
+		assertEquals(hashes.length, positions.size());
 
 		int[] expectedHashes = new int[positions.size()];
-		for(int i = 0; i < hasehs.length; i++) {
+		for(int i = 0; i < hashes.length; i++) {
 			int hash = getGridHash(getGridPosition(positions.get(i), clUniformHashedGrid.getCellSize(), clUniformHashedGrid.getWorldOrign()), clUniformHashedGrid.getGridSize());
 			expectedHashes[i] = hash;
 		}
 		Arrays.sort(expectedHashes);
 
-		for(int i = 0; i < hasehs.length; i++) {
-			assertEquals(hasehs[i], expectedHashes[i]);
+		for(int i = 0; i < hashes.length; i++) {
+			assertEquals(hashes[i], expectedHashes[i]);
 		}
 	}
 
 	@Test
-	@Ignore
 	public void testGridCellSmall() throws IOException, OpenCLException {
+		testGridCellSmall(CL_DEVICE_TYPE_ALL);
+	}
+
+	@Test
+	public void testGridCellLarge() throws IOException, OpenCLException {
+		testGridCellLarge(CL_DEVICE_TYPE_ALL);
+	}
+
+	private void testGridCellSmall(final int deviceType) throws IOException, OpenCLException {
 		int size = 8;
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6, deviceType);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
+			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
+
+		long ms = System.currentTimeMillis();
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
+		long runtime = System.currentTimeMillis() - ms;
+		logger.infof("testGridCellSmall required " + runtime + " [ms]");
+
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
 		int sum = 0;
 		for(int cell = 0; cell < numberOfCells; cell++) {
@@ -146,16 +160,20 @@ public class TestCLLinkedList {
 		assertEquals(size, sum);
 	}
 
-	@Test
-	@Ignore
-	public void testGridCellLarge() throws IOException, OpenCLException {
+	private void testGridCellLarge(final int device) throws IOException, OpenCLException {
 		int size = 32768;
-		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6);
+		//int size = 8192;
+		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6, device);
 		ArrayList<VPoint> positions = new ArrayList<>();
 		for(int i = 0; i < size; i++) {
-			positions.add(new VPoint(random.nextFloat() * 10,random.nextFloat() * 10));
+			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
+
+		long ms = System.currentTimeMillis();
 		CLLinkedCell.LinkedCell gridCells = clUniformHashedGrid.calcLinkedCell(positions);
+		long runtime = System.currentTimeMillis() - ms;
+		logger.infof("testGridCellLarge required " + runtime + " [ms]");
+
 		equalPositions(gridCells);
 		int numberOfCells = clUniformHashedGrid.getGridSize()[0] * clUniformHashedGrid.getGridSize()[1];
 		int sum = 0;

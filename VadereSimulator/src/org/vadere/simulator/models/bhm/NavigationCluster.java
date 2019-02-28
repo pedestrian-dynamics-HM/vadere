@@ -1,20 +1,19 @@
 package org.vadere.simulator.models.bhm;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class NavigationCluster implements Navigation {
 
-	private static Logger logger = LogManager.getLogger(NavigationCluster.class);
+	private static Logger logger = Logger.getLogger(NavigationCluster.class);
 
 	private final Topography topography;
 	private final AttributesBHM attributesBHM;

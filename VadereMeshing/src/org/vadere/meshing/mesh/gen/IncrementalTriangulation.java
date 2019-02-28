@@ -1,9 +1,6 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -22,6 +19,7 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -81,10 +79,10 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	private double edgeCoincidenceTolerance = GeometryUtils.DOUBLE_EPS;
 
 	private final Predicate<E> illegalPredicate;
-	private static Logger log = LogManager.getLogger(IncrementalTriangulation.class);
+	private static Logger log = Logger.getLogger(IncrementalTriangulation.class);
 
 	static {
-		ITriConnectivity.log.setLevel(Level.DEBUG);
+		ITriConnectivity.log.setDebug();
 	}
 
 	/**

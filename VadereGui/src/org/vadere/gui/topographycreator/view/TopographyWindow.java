@@ -229,6 +229,10 @@ public class TopographyWindow extends JPanel {
 		TopographyAction switchToTargetAction = new ActionSwitchCategory("switch to targets", panelModel,
 				ScenarioElementType.TARGET, selectRectangleAction);
 
+		/* switch category to absorbing areas action */
+		TopographyAction switchToAbsorbingAreaAction = new ActionSwitchCategory("switch to absorbing areas", panelModel,
+				ScenarioElementType.ABSORBING_AREA, selectRectangleAction);
+
 		/* switch category to stairs action */
 		TopographyAction switchToStairsAction = new ActionSwitchCategory("switch to stairs", panelModel,
 				ScenarioElementType.STAIRS, selectRectangleAction);
@@ -255,6 +259,7 @@ public class TopographyWindow extends JPanel {
 
 		List<Action> obstacleAndTargetDrawModes = new ArrayList<>();
 		List<Action> sourceDrawModes = new ArrayList<>();
+		List<Action> absorbingAreaDrawModes = new ArrayList<>();
 
 		obstacleAndTargetDrawModes.add(rectangle);
 		obstacleAndTargetDrawModes.add(pen);
@@ -264,6 +269,10 @@ public class TopographyWindow extends JPanel {
 		sourceDrawModes.add(pen);
 		sourceDrawModes.add(pen2);
 		sourceDrawModes.add(dot);
+
+		absorbingAreaDrawModes.add(rectangle);
+		absorbingAreaDrawModes.add(pen);
+		absorbingAreaDrawModes.add(pen2);
 
 		/* open obstacle paint method dialog action */
 		JButton obsButton = new JButton();
@@ -277,6 +286,12 @@ public class TopographyWindow extends JPanel {
 		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target", new ImageIcon(Resources.class
 				.getResource("/icons/target_icon.png")), panelModel, switchToTargetAction, targetButton,
 				obstacleAndTargetDrawModes);
+
+		/* open absorbing area paint method dialog action */
+		JButton absorbingAreaButton = new JButton();
+		TopographyAction openAbsorbingAreaDialog = new ActionOpenDrawOptionMenu("AbsorbingArea", new ImageIcon(Resources.class
+				.getResource("/icons/emergency_exit.png")), panelModel, switchToAbsorbingAreaAction, absorbingAreaButton,
+				absorbingAreaDrawModes);
 
 		/* open stairs paint method dialog action */
 		JButton stairsButton = new JButton();
@@ -345,6 +360,8 @@ public class TopographyWindow extends JPanel {
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
 				obsButton);
+		addActionToToolbar(toolbar, openAbsorbingAreaDialog, "TopographyCreator.btnInsertAbsorbingArea.tooltip",
+				absorbingAreaButton);
 		addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
 		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
 				stairsButton);
@@ -368,7 +385,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
-		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnMakro.tooltip");
+		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnGenerateIds.tooltip");
 //		addActionToToolbar(toolbar, actionScenarioChecker, "TopographyCreator.btnChecker.tooltip");
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));

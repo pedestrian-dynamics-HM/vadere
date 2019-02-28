@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -12,6 +10,7 @@ import org.vadere.meshing.utils.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -28,7 +27,7 @@ public class JumpAndWalk<P extends IPoint, CE, CF, V extends IVertex<P>, E exten
 
 	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private Random random;
-	private static Logger logger = LogManager.getLogger(JumpAndWalk.class);
+	private static Logger logger = Logger.getLogger(JumpAndWalk.class);
 
 	public JumpAndWalk(@NotNull final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
 		this.triangulation = triangulation;

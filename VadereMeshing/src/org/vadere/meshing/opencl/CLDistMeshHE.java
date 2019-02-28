@@ -1,7 +1,7 @@
 package org.vadere.meshing.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
+import org.vadere.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -37,7 +37,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  */
 public class CLDistMeshHE<P extends IPoint, CE, CF> {
 
-    private static Logger log = LogManager.getLogger(CLDistMeshHE.class);
+    private static Logger log = Logger.getLogger(CLDistMeshHE.class);
 
     // CL ids
     private long clPlatform;

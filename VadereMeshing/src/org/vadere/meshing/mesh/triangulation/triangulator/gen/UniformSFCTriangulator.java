@@ -1,14 +1,13 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
@@ -33,7 +32,7 @@ public class UniformSFCTriangulator<P extends IPoint, CE, CF, V extends IVertex<
     private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
     private Set<P> points;
     private IMesh<P, CE, CF, V, E, F> mesh;
-    private static final Logger logger = LogManager.getLogger(UniformSFCTriangulator.class);
+    private static final Logger logger = Logger.getLogger(UniformSFCTriangulator.class);
     private final IDistanceFunction distFunc;
     private final static Random random = new Random();
     private final LinkedList<F> sortedFaces;

@@ -116,6 +116,10 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 		meshRenderer.render((Graphics2D) g, (int)Math.ceil(width), (int)Math.ceil(height));
 	}
 
+	public MeshRenderer<P, CE, CF, V, E, F> getMeshRenderer() {
+		return meshRenderer;
+	}
+
 	public JFrame display() {
 		return display("Mesh");
 	}

@@ -1,12 +1,8 @@
 package org.vadere.simulator.models.potential.fields;
 
-import com.fasterxml.jackson.databind.ser.AnyGetterWriter;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -16,11 +12,11 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +30,7 @@ import java.util.function.Function;
  */
 public class PotentialFieldTarget implements IPotentialFieldTarget {
 
-	private static Logger logger = LogManager.getLogger(PotentialFieldTargetGrid.class);
+	private static Logger logger = Logger.getLogger(PotentialFieldTargetGrid.class);
 
 	/**
 	 * the simulation time in seconds in which the last update was performed.

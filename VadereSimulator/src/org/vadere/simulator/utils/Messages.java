@@ -3,9 +3,6 @@ package org.vadere.simulator.utils;
 import org.vadere.util.lang.BundleManager;
 
 import java.util.Locale;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
 
 public class Messages {
 

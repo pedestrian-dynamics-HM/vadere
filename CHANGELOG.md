@@ -6,6 +6,28 @@
 
 ### Added
 
+- Added new scenario element `AbsorbingArea` to absorb agents immediately.
+  * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
+  * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
+- Configured 1-click-deployment in ".gitlab-ci.yml".
+  * In short: Vadere is packaged as a single ZIP file containing following build artifacts: README.md VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
+  * Vadere is packaged for GNU/Linux and Microsoft Windows.
+  * The ZIP file can be accessed on the website via: http://www.vadere.org/releases/
+  * The website's filesystem contains three subdirectories for releases:
+    - builds/master: For releases on "master" branch (automatically triggered when pushing to "master" branch).
+    - builds/stable: For Git tags on on any branch (automatically triggered when pushing tags).
+    - builds/branches: For releases of any other branch (manually triggered in web interface: https://gitlab.lrz.de/vadere/vadere/pipelines)
+  * The link to the deployed items can be also found in the GitLab web interface: https://gitlab.lrz.de/vadere/vadere/environments
+- Create a Facade for the logging in vadere. This will remove 3rd party
+  dependencies in source most files. Only a small set of facade classes
+  will have the dependency.
+- Assertion output to StdErr is collected by a dedicated logger see `StdOutErrLog.java`.
+  Each entrypoint must call `StdOutErrLog.addStdOutErrToLog()` to activate this
+  Logging.
+- Logging API did *not* change. Each log level has an additional String formater
+  method like `log.errorf("Erron in %s with value of x: %d","ClassA", 42)`
+- issues closed: [issue#163](https://gitlab.lrz.de/vadere/vadere/issues/163)
+
 - Added script "osm2vadere.py" to "Tools" folder, to convert OpenStreetMap maps to a Vadere topography. (929d4775: Tools).
 - `VadereConsole`: Add option `--logname <filename>` to specify the name for the log file.
   Please note that the log file `log.out` is always written (because this file is configured

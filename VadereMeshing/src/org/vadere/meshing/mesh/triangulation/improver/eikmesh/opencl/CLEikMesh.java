@@ -1,8 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
@@ -13,6 +11,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.meshing.opencl.CLDistMesh;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
  * @param <CF> the type of the container of the faces
  */
 public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>>, ITriangulator<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> {
-    private static final Logger log = LogManager.getLogger(CLEikMesh.class);
+    private static final Logger log = Logger.getLogger(CLEikMesh.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;

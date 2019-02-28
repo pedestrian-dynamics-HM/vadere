@@ -1,7 +1,5 @@
 package org.vadere.simulator.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.control.cognition.CognitionLayer;
 import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
@@ -18,22 +16,25 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
+import org.vadere.util.logging.Logger;
+
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class Simulation {
 
-	private static Logger logger = LogManager.getLogger(Simulation.class);
+	private static Logger logger = Logger.getLogger(Simulation.class);
 
 	private final AttributesSimulation attributesSimulation;
 	private final AttributesAgent attributesAgent;
 
 	private final Collection<SourceController> sourceControllers;
 	private final Collection<TargetController> targetControllers;
+	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
@@ -81,6 +82,7 @@ public class Simulation {
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
+		this.absorbingAreaControllers = new LinkedList<>();
 		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
@@ -95,10 +97,12 @@ public class Simulation {
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
-		this.topographyController = new TopographyController(topography, dynamicElementFactory);
 
+		// "eventController" is final. Therefore, create object here and not in helper method.
 		this.eventController = new EventController(scenarioStore);
 		this.cognitionLayer = new CognitionLayer();
+
+		createControllers(topography, mainModel, random);
 
 		// ::start:: this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
@@ -126,15 +130,23 @@ public class Simulation {
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
 		}
+	}
 
-		// create source and target controllers
+	private void createControllers(Topography topography, MainModel mainModel, Random random) {
+		this.topographyController = new TopographyController(topography, mainModel);
+
 		for (Source source : topography.getSources()) {
 			SourceController sc = this.sourceControllerFactory
 					.create(topography, source, dynamicElementFactory, attributesAgent, random);
 			sourceControllers.add(sc);
 		}
+
 		for (Target target : topography.getTargets()) {
 			targetControllers.add(new TargetController(topography, target));
+		}
+
+		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
+			absorbingAreaControllers.add(new AbsorbingAreaController(topography, absorbingArea));
 		}
 
 		if (topography.hasTeleporter()) {
@@ -282,6 +294,7 @@ public class Simulation {
 		List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
 		// TODO Why are target controllers readded in each simulation loop?
+		// Maybe, Isabella's SIMA branch required this because pedestrians can act as targets there.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -293,6 +306,10 @@ public class Simulation {
 
 		for (TargetController targetController : this.targetControllers) {
 			targetController.update(simTimeInSec);
+		}
+
+		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {
+			absorbingAreaController.update(simTimeInSec);
 		}
 
 		topographyController.update(simTimeInSec); //rebuild CellGrid

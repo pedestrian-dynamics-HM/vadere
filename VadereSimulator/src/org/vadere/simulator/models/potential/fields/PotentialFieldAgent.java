@@ -1,26 +1,24 @@
 package org.vadere.simulator.models.potential.fields;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.PedestrianRepulsionPotentialCycle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 public interface PotentialFieldAgent extends Model {
 
-	Logger logger = LogManager.getLogger(PotentialFieldAgent.class);
+	Logger logger = Logger.getLogger(PotentialFieldAgent.class);
 
 	@Override
 	default void preLoop(double simTimeInSec) {}

@@ -1,20 +1,21 @@
 package org.vadere.gui.postvisualization;
 
+import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
+import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.logging.StdOutErrLog;
+
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
-import org.vadere.util.io.IOUtils;
-
 public class PostVisualisation {
 	public static final String preferencesFilename = "PostVisualisation.preferences.xml";
-	private static Logger logger = LogManager.getLogger(PostVisualisation.class);
+	private static Logger logger = Logger.getLogger(PostVisualisation.class);
 
 	public static void main(String[] args) {
+		StdOutErrLog.addStdOutErrToLog();
 		logger.info("starting post visualization ...");
 		// load settings
 		loadPreferences();

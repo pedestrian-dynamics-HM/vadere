@@ -12,6 +12,7 @@ import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.TrajectoryReader;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.StdOutErrLog;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -29,6 +30,7 @@ import java.util.Optional;
 public class PostVisualizationConsole {
 
 	public static void main(final String... args) {
+		StdOutErrLog.addStdOutErrToLog();
 		ArgumentParser parser = ArgumentParsers.newArgumentParser("prog")
 				.defaultHelp(true)
 				.description("Runs the VADERE Postvisualization for image generation.");

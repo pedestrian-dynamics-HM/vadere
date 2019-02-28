@@ -1,15 +1,13 @@
 package org.vadere.gui.postvisualization.utils;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
-import org.apache.log4j.lf5.LogLevel;
+
 import org.jcodec.api.awt.SequenceEncoder;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -23,7 +21,7 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 
 public class MovRecorder implements IRecorder {
-	private static Logger logger = LogManager.getLogger(MovRecorder.class);
+	private static Logger logger = Logger.getLogger(MovRecorder.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
 
 	private final PostvisualizationModel model;

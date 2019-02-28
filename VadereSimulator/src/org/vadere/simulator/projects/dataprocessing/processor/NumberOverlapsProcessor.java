@@ -2,14 +2,10 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
 import org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
-
-import java.util.Optional;
 
 /**
  * This processor counts the number of overlaps during a simulation run.

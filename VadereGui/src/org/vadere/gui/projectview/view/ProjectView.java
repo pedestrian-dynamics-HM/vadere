@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.view;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
@@ -16,6 +16,7 @@ import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
 import org.vadere.gui.projectview.control.ActionInterruptScenarios;
 import org.vadere.gui.projectview.control.ActionLoadProject;
 import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionOpenInExplorer;
 import org.vadere.gui.projectview.control.ActionOutputToScenario;
 import org.vadere.gui.projectview.control.ActionPauseScenario;
 import org.vadere.gui.projectview.control.ActionRenameOutputFile;
@@ -43,6 +44,8 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.opencl.CLUtils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -73,7 +76,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 * Static variables
 	 */
 	private static final long serialVersionUID = -2081363246241235943L;
-	private static Logger logger = LogManager.getLogger(ProjectView.class);
+	private static Logger logger = Logger.getLogger(ProjectView.class);
 	/** Store a reference to the main window as "owner" parameter for dialogs. */
 	private static ProjectView mainWindow;
 
@@ -255,7 +258,24 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			frame.setSize(1200, 800);
 
 			frame.openLastUsedProject(model);
+			checkDependencies(frame);
 		});
+	}
+
+	private static void checkDependencies(@NotNull final JFrame frame) {
+		try {
+			if(!CLUtils.isOpenCLSupported()) {
+				JOptionPane.showMessageDialog(frame,
+						Messages.getString("ProjectView.warning.opencl.text"),
+						Messages.getString("ProjectView.warning.opencl.title"),
+						JOptionPane.WARNING_MESSAGE);
+			}
+		} catch (UnsatisfiedLinkError linkError) {
+			JOptionPane.showMessageDialog(frame,
+					"[LWJGL]: " + linkError.getMessage(),
+					Messages.getString("ProjectView.warning.lwjgl.title"),
+					JOptionPane.WARNING_MESSAGE);
+		}
 	}
 
 	private void openLastUsedProject(final ProjectViewModel model) {
@@ -587,6 +607,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				new ActionOutputToScenario(Messages.getString("ProjectView.mntmOutputToSceneario.text"), model)));
 		outputListPopupMenu
 				.add(new JMenuItem(new ActionRunOutput(Messages.getString("ProjectView.mntmRunOutput.text"), model)));
+		outputListPopupMenu
+				.add(new JMenuItem(new ActionOpenInExplorer(Messages.getString("ProjectView.OpenInExplorer.text"), model)));
 
 		JMenu copyPath = new JMenu(Messages.getString("ProjectView.mntmCopyOutputDir.text"));
 		outputTable.getSelectionModel().addListSelectionListener(new TableSelectionListener(outputTable) {

@@ -1,8 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.visualization.ColorHelper;
 import org.vadere.meshing.mesh.gen.AFace;
@@ -33,7 +32,7 @@ import javax.swing.*;
 
 public class VisualTestCPU {
 
-	private static final Logger log = LogManager.getLogger(RunTimeGPUEdgeBased.class);
+	private static final Logger log = Logger.getLogger(RunTimeGPUEdgeBased.class);
 
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
 	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;

@@ -1,8 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.improver;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
@@ -12,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRandomPointsSetTriangulator;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
@@ -27,7 +26,7 @@ import java.util.stream.StreamSupport;
  * @author Benedikt Zoennchen
  */
 public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
-    private static final Logger log = LogManager.getLogger(LaplacianSmother.class);
+    private static final Logger log = Logger.getLogger(LaplacianSmother.class);
 
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;

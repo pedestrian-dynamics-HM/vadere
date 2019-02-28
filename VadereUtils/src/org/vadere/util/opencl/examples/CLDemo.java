@@ -87,10 +87,12 @@ public final class CLDemo {
 				//System.out.println("\tCL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE = " + InfoUtils.getDeviceInfoPointer(device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE));
 				System.out.println("\tCL_DEVICE_MAX_WORK_ITEM_DIMENSIONS = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS));
 				System.out.println("\tCL_DEVICE_MAX_WORK_GROUP_SIZE = " + InfoUtils.getDeviceInfoPointer(device, CL_DEVICE_MAX_WORK_GROUP_SIZE));
+				System.out.println("\tCL_DEVICE_LOCAL_MEM_SIZE = " + InfoUtils.getDeviceInfoLong(device, CL_DEVICE_LOCAL_MEM_SIZE));
 				System.out.println("\tCL_DEVICE_MAX_CLOCK_FREQUENCY = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_MAX_CLOCK_FREQUENCY));
 				System.out.println("\tCL_DEVICE_ADDRESS_BITS = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_ADDRESS_BITS));
 				System.out.println("\tCL_DEVICE_AVAILABLE = " + (InfoUtils.getDeviceInfoInt(device, CL_DEVICE_AVAILABLE) != 0));
 				System.out.println("\tCL_DEVICE_COMPILER_AVAILABLE = " + (InfoUtils.getDeviceInfoInt(device, CL_DEVICE_COMPILER_AVAILABLE) != 0));
+				System.out.println("\tCL_DEVICE_VENDOR_ID = " + InfoUtils.getDeviceInfoInt(device, CL_DEVICE_VENDOR_ID));
 
 				printDeviceInfo(device, "CL_DEVICE_NAME", CL_DEVICE_NAME);
 				printDeviceInfo(device, "CL_DEVICE_VENDOR", CL_DEVICE_VENDOR);

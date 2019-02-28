@@ -1,7 +1,5 @@
 package org.vadere.simulator.models.potential.solver;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -23,6 +21,7 @@ import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPo
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
@@ -44,7 +43,7 @@ import java.util.stream.Stream;
 
 public class TestFFMNonUniformTriangulation {
 
-    private static Logger log = LogManager.getLogger(TestFFMNonUniformTriangulation.class);
+    private static Logger log = Logger.getLogger(TestFFMNonUniformTriangulation.class);
     private int width;
     private int height;
     private VRectangle bbox;

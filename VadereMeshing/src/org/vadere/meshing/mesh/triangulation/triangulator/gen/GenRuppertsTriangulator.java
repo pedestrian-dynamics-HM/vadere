@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -18,6 +16,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
  */
 public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
 
-	private static Logger log = LogManager.getLogger(GenRuppertsTriangulator.class);
+	private static Logger log = Logger.getLogger(GenRuppertsTriangulator.class);
     private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
     private final Set<P> points;
     private boolean generated;

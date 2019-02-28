@@ -1,14 +1,11 @@
 package org.vadere.simulator.models.queuing;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesQueuingGame;
@@ -21,15 +18,17 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
-import org.vadere.util.geometry.shapes.Vector2D;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
 public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGrid, DynamicElementRemoveListener<Pedestrian>,
 		DynamicElementAddListener<Pedestrian> {
 
-	private static Logger logger = LogManager.getLogger(PotentialFieldTargetQueuingGrid.class);
+	private static Logger logger = Logger.getLogger(PotentialFieldTargetQueuingGrid.class);
 
 	private PotentialFieldTargetGrid competitiveField;
 	private PotentialFieldTargetGrid gentleField;

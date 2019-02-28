@@ -1,12 +1,11 @@
 package org.vadere.gui.components.utils;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+
 import org.jcodec.api.awt.SequenceEncoder;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.IRecorder;
+import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -20,7 +19,7 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 
 public class Recorder implements IRecorder {
-	private static Logger logger = LogManager.getLogger(Recorder.class);
+	private static Logger logger = Logger.getLogger(Recorder.class);
 	private SequenceEncoder enc;
 	private static Resources resources = Resources.getInstance("global");
 
@@ -64,7 +63,7 @@ public class Recorder implements IRecorder {
 		try {
 			enc.finish();
 		} catch (IndexOutOfBoundsException error) {
-			logger.log(Priority.DEBUG, "Nothing recorded! " + error.getMessage());
+			logger.debug( "Nothing recorded! %s" , error.getMessage());
 		}
 		logger.info(this + " stop recording");
 	}

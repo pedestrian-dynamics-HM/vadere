@@ -1,7 +1,5 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -14,6 +12,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -30,7 +29,7 @@ import java.util.stream.Stream;
  * @param <CF> the type of the container of the faces
  */
 public class AMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>>, Cloneable {
-	private final static Logger log = LogManager.getLogger(AMesh.class);
+	private final static Logger log = Logger.getLogger(AMesh.class);
 	private List<AFace<CF>> faces;
 	private boolean elementRemoved;
 	private int numberOfVertices;

@@ -1,8 +1,6 @@
 package org.vadere.geometry.triangulation;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
@@ -12,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -30,7 +29,7 @@ import java.util.function.Function;
 public class TestUniTriangulation extends JFrame {
 
 
-    private static final Logger log = LogManager.getLogger(TestUniTriangulation.class);
+    private static final Logger log = Logger.getLogger(TestUniTriangulation.class);
 
     private TestUniTriangulation() {
 
