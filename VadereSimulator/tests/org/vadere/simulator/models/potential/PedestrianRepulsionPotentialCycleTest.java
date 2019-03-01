@@ -29,9 +29,20 @@ public class PedestrianRepulsionPotentialCycleTest {
             pedestrians.add(new Pedestrian(new AttributesAgent(i), random));
             pedestrians.get(i).setPosition(new VPoint(i, 0));
         }
-        Pedestrian markedPedestrian = pedestrians.get(numberOfPedestrians / 2);
-        List<Pedestrian> neighbours = pedestrians.subList(numberOfPedestrians / 2 - 1, numberOfPedestrians / 2 + 1);
-
+        int mark = 8;
+        int range = 1;
+        Pedestrian markedPedestrian = pedestrians.get(mark);
+        int start = (mark - range) % numberOfPedestrians;
+        int end = (mark + range) % numberOfPedestrians;
+        List<Pedestrian> neighbours = new ArrayList<>();
+        boolean isNeighbor;
+        for(int i = 0; i < numberOfPedestrians; i++){
+            isNeighbor = start < end && i > start && i < end;
+            isNeighbor = isNeighbor || ((start > end) && (i < end || i > start));
+            if(isNeighbor) {
+                neighbours.add(pedestrians.get(i));
+            }
+        }
 
         Topography noTeleportTopography = mock(Topography.class);
         when(noTeleportTopography.hasTeleporter()).thenReturn(false);
@@ -69,9 +80,20 @@ public class PedestrianRepulsionPotentialCycleTest {
             pedestrians.add(new Pedestrian(new AttributesAgent(i), random));
             pedestrians.get(i).setPosition(new VPoint(0, i));
         }
-        Pedestrian markedPedestrian = pedestrians.get(numberOfPedestrians / 2);
-        List<Pedestrian> neighbours = pedestrians.subList(numberOfPedestrians / 2 - 1, numberOfPedestrians / 2 + 1);
-
+        int mark = 8;
+        int range = 1;
+        Pedestrian markedPedestrian = pedestrians.get(mark);
+        int start = (mark - range) % numberOfPedestrians;
+        int end = (mark + range) % numberOfPedestrians;
+        List<Pedestrian> neighbours = new ArrayList<>();
+        boolean isNeighbor;
+        for(int i = 0; i < numberOfPedestrians; i++){
+            isNeighbor = start < end && i > start && i < end;
+            isNeighbor = isNeighbor || ((start > end) && (i < end || i > start));
+            if(isNeighbor) {
+                neighbours.add(pedestrians.get(i));
+            }
+        }
 
         Topography noTeleportTopography = mock(Topography.class);
         when(noTeleportTopography.hasTeleporter()).thenReturn(false);
