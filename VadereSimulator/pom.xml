@@ -118,7 +118,9 @@
     </plugins>
   </build>
 
-    <repositories>
+   <!--
+   use it again if error.
+   <repositories>
         <repository>
             <id>nativelibs4java</id>
             <name>nativelibs4java Maven2 Repository</name>
@@ -127,7 +129,7 @@
     </repositories>
     <properties>
         <platform.dependency>windows-x86_64</platform.dependency>
-    </properties>
+    </properties>-->
 
   <dependencies>
   	<dependency>

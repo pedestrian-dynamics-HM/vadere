@@ -38,13 +38,13 @@ The ZIP file contains:
 * **vadere_console.jar** - provides the command line version of Vadere and allows easy integration into other applications. 
 * **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
-To execute the `.jar` files it is highly recommended to use Oracle Java 11.  
+To execute the `.jar` files it is highly recommended to use Java 11 (OpenJDK).  
 
 ### Build from Source
 
 #### Dependencies
 
-* Java 11
+* Java 11 (OpenJDK recommended)
 * Maven 3.0
 * Git
 * OpenCL (optional but recommended)
