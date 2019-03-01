@@ -144,8 +144,8 @@ def run_all():
         "thin_wall_and_closer_source_pso_could_fail",
         "rimea_04_flow_osm1_550_up",
         "stairs_diagonal_both_1_2_+1.scenario",
-        "04-NarrowedStreet-Pollichtrasse",
-        "05-Guimaraes-Platz"
+        "05_bang_event_narrowed_street",
+        "06_bang_event_guimaraes_platz"
     ]
 
     excluded_scenarios = ["TESTOVM", "output", "legacy"]
