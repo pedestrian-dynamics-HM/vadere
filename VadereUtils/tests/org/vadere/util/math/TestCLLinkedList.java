@@ -124,6 +124,7 @@ public class TestCLLinkedList {
 		testGridCellSmall(CL_DEVICE_TYPE_ALL);
 	}
 
+	@Ignore
 	@Test
 	public void testGridCellLarge() throws IOException, OpenCLException {
 		testGridCellLarge(CL_DEVICE_TYPE_ALL);
@@ -159,12 +160,11 @@ public class TestCLLinkedList {
 
 		assertEquals(size, sum);
 	}
-
 	private void testGridCellLarge(final int device) throws IOException, OpenCLException {
-		int size = 32768;
+		final int size = 32768;
 		//int size = 8192;
 		CLLinkedCell clUniformHashedGrid = new CLLinkedCell(size, new VRectangle(0, 0, 10, 10), 0.6, device);
-		ArrayList<VPoint> positions = new ArrayList<>();
+		ArrayList<VPoint> positions = new ArrayList<>(size);
 		for(int i = 0; i < size; i++) {
 			positions.add(new VPoint(0.5 + random.nextFloat() * 9,0.5 + random.nextFloat() * 9));
 		}
