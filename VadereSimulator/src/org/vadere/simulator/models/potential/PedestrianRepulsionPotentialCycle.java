@@ -49,7 +49,7 @@ public class PedestrianRepulsionPotentialCycle implements
 				shiftPos = new VPoint(pos.getX() + teleportDistanceX, pos.getY());
 				// TODO [priority=low] [task=refactoring] the y coordinate of the teleporter is not used yet
 			}
-			result += potentialFieldPedestrian.getAgentPotential(shiftPos, pedestrian, closePedestrians);
+			//result += potentialFieldPedestrian.getAgentPotential(shiftPos, pedestrian, closePedestrians);
 		}
 		return result;
 	}
