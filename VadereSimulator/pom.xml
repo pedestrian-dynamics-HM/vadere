@@ -9,7 +9,6 @@
 
   <artifactId>simulator</artifactId>
   <name>Vadere Simulator</name>
-
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>tests</testSourceDirectory>
@@ -37,13 +36,26 @@
       </testResources>
     <plugins>
         <plugin>
+            <groupId>com.nativelibs4java</groupId>
+            <artifactId>maven-javacl-plugin</artifactId>
+            <version>1.0.0-RC4</version>
+            <executions>
+                <execution>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>1.6.0</version>
             <executions>
                 <execution>
                     <id>write_version_control_info_to_file</id>
-                    <phase>validate</phase>
+                    <phase>generate-resources</phase>
                     <goals>
                         <goal>exec</goal>
                     </goals>
@@ -58,19 +70,6 @@
                 </arguments>
                 <outputFile>resources/current_commit_hash.txt</outputFile>
             </configuration>
-        </plugin>
-        <plugin>
-            <groupId>com.nativelibs4java</groupId>
-            <artifactId>maven-javacl-plugin</artifactId>
-            <version>1.0.0-RC4</version>
-            <executions>
-                <execution>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>compile</goal>
-                    </goals>
-                </execution>
-            </executions>
         </plugin>
       <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
@@ -88,53 +87,6 @@
               </annotationProcessorPaths>
 		  </configuration>
 		</plugin>
-        <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.7.9</version>
-            <executions>
-                <!-- Use JaCoCo's Java agents to record coverage data by using on-the-fly class file instrumentation. -->
-                <execution>
-                    <id>pre-unit-test</id>
-                    <goals>
-                        <goal>prepare-agent</goal>
-                    </goals>
-                    <configuration>
-                        <output>file</output>
-                        <destFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</destFile>
-                        <propertyName>surefireArgLine</propertyName>
-                    </configuration>
-                </execution>
-                <!-- Use JaCoCo agent output to create coverage reports in CSV, HTML and XML format. -->
-                <execution>
-                    <id>post-unit-test</id>
-                    <phase>test</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                    <configuration>
-                        <dataFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</dataFile>
-                        <outputDirectory>${project.reporting.outputDirectory}/coverage-reports</outputDirectory>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <!-- Maven Surefire is used to cup unit tests. -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.19</version>
-            <configuration>
-                <argLine>${surefireArgLine}</argLine>
-                <enableAssertions>true</enableAssertions>
-                <excludes>
-                    <exclude></exclude>
-                </excludes>
-                <failIfNoTests>false</failIfNoTests>
-                <skipTests>${skip.unit.tests}</skipTests>
-            </configuration>
-        </plugin>
-
         <plugin>
             <!-- NOTE: We don't need a groupId specification because the group is
                  org.apache.maven.plugins ...which is assumed by default.
@@ -164,56 +116,21 @@
             </executions>
         </plugin>
     </plugins>
-    <pluginManagement>
-    	<plugins>
-    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-    		<plugin>
-    			<groupId>org.eclipse.m2e</groupId>
-    			<artifactId>lifecycle-mapping</artifactId>
-    			<version>1.0.0</version>
-    			<configuration>
-    				<lifecycleMappingMetadata>
-    					<pluginExecutions>
-    						<pluginExecution>
-    							<pluginExecutionFilter>
-    								<groupId>
-    									com.nativelibs4java
-    								</groupId>
-    								<artifactId>
-    									maven-javacl-plugin
-    								</artifactId>
-    								<versionRange>
-    									[1.0.0-RC4,)
-    								</versionRange>
-    								<goals>
-    									<goal>compile</goal>
-    								</goals>
-    							</pluginExecutionFilter>
-    							<action>
-    								<execute>
-    									<runOnIncremental>false</runOnIncremental>
-    								</execute>
-    							</action>
-    						</pluginExecution>
-    					</pluginExecutions>
-    				</lifecycleMappingMetadata>
-    			</configuration>
-    		</plugin>
-    	</plugins>
-    </pluginManagement>
   </build>
 
- <!-- local repository for all jars without an external repo -->
-  <repositories>
-    <repository>
-      <id>nativelibs4java</id>
-      <name>nativelibs4java Maven2 Repository</name>
-      <url>http://nativelibs4java.sourceforge.net/maven</url>
-    </repository>
-  </repositories>
+   <!--
+   use it again if error.
+   <repositories>
+        <repository>
+            <id>nativelibs4java</id>
+            <name>nativelibs4java Maven2 Repository</name>
+            <url>http://nativelibs4java.sourceforge.net/maven</url>
+        </repository>
+    </repositories>
     <properties>
         <platform.dependency>windows-x86_64</platform.dependency>
-    </properties>
+    </properties>-->
+
   <dependencies>
   	<dependency>
   		<groupId>commons-codec</groupId>

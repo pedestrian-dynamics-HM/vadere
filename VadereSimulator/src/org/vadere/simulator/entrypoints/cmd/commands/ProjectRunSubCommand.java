@@ -45,7 +45,7 @@ public class ProjectRunSubCommand implements SubCommandRunner {
 					projectDirectory.toFile().toString(),scenarioFile);
 			new ScenarioRun(scenario, null).run();
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error(e);
 			System.exit(-1);
 		}

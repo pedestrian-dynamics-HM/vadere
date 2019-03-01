@@ -27,12 +27,14 @@ variables:
     VADERE_PACKAGE_NAME_RELEASES: "vadere.${CI_COMMIT_TAG}.${CI_RUNNER_TAGS}.zip"
 
 # Stage Definitions
-# Watch out: the seed_test is after deploy, because currently it fails 
-#  only sometimes and does not define a successful/unsuccessful state.   
+# Watch out: integration tests and the seed tests run after deployment, because
+#   currently tests fail very often because of timeouts. It is not clear if
+#   Vadere has slowed down somehow or the test environment is not reliable
+#   (i.e.,the virtual machines). We have to track that!
 stages:
     - unit_test
-    - integration_test
     - deploy
+    - integration_test
     - seed_test
 
 # PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
@@ -55,7 +57,7 @@ stages:
     artifacts:
         when: on_success
         paths:
-            - "*/target/site/coverage-reports"
+            - "*/target/coverage-reports"
         expire_in: 1 week
     when: on_success
             
@@ -70,7 +72,7 @@ stages:
         paths:
             - "log_dir"
         expire_in: 1 week
-    when: manual
+    when: on_success
 
 .template_deploy_master_automatically:
     stage: deploy
@@ -111,7 +113,8 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 Tools/VadereAnalysisTools/VadereAnalysisTool/setup.py install --user
+        # setup.py install should from the directoty at which the setup.py file is located (working directory). The brackets return the working direcory back to previous position. 
+        - (cd Tools/VadereAnalysisTools/VadereAnalysisTool/ && python3 setup.py install --user)
         - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
     artifacts:
         when: on_failure

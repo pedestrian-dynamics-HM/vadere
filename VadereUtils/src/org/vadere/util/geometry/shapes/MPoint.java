@@ -1,6 +1,7 @@
 package org.vadere.util.geometry.shapes;
 
-public class MPoint implements IPoint, Cloneable{
+public class MPoint implements org.vadere.util.geometry.shapes.IPoint, Cloneable{
+
     private VPoint point;
     private int hashCode = -1;
 

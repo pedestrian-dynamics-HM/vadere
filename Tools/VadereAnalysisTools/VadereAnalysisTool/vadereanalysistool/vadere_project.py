@@ -2,7 +2,7 @@ import os
 import re
 import fnmatch
 import shutil
-from vadere_analysis_tool import helper, scenario_output
+from vadereanalysistool import helper, scenario_output
 
 
 class NamedOutput:
