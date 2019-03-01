@@ -33,36 +33,24 @@ public class PedestrianRepulsionPotentialCycle implements
 	@Override
 	public double getAgentPotential(IPoint pos, Agent pedestrian,
 	                                Collection<? extends Agent> closePedestrians) {
-
 		double result = potentialFieldPedestrian.getAgentPotential(pos,
 				pedestrian, closePedestrians);
-
 		if (this.scenario.hasTeleporter()) {
-
 			Teleporter teleporter = scenario.getTeleporter();
-			// shift forwards
-			VPoint shiftPos = new VPoint(pos.getX()
-					+ teleporter.getTeleporterShift().x, pos.getY()); // TODO [priority=medium] [task=feature] the y coordinate of the teleporter is not used yet
-
-			// TODO [priority=low] [task=refactoring] find a better way to get the close pedestrians in this case
-			closePedestrians = potentialFieldPedestrian.getRelevantAgents(
-					new VCircle(shiftPos, 0.1), pedestrian, scenario);
-
-			result += potentialFieldPedestrian.getAgentPotential(shiftPos,
-					pedestrian, closePedestrians);
-
-			// shift backwards
-			shiftPos = new VPoint(pos.getX() - teleporter.getTeleporterShift().x,
-					pos.getY()); // TODO [priority=low] [task=refactoring] the y coordinate of the teleporter is not used yet
-
-			// TODO [task=refactoring] [priority=low] find a better way to get the close pedestrians in this case
-			closePedestrians = potentialFieldPedestrian.getRelevantAgents(
-					new VCircle(shiftPos, 0.1), pedestrian, scenario);
-
-			result += potentialFieldPedestrian.getAgentPotential(shiftPos,
-					pedestrian, closePedestrians);
+			double teleportDistanceX = Math.abs(teleporter.getTeleporterShift().x);
+			double delta = teleporter.getTeleporterPosition().x - teleportDistanceX;
+			VPoint shiftPos = new VPoint(pos.getX(), pos.getY());
+			if(teleporter.getTeleporterPosition().x - pedestrian.getPosition().x < delta) {
+				// shift forwards
+				shiftPos = new VPoint(pos.getX() - teleportDistanceX, pos.getY());
+				// TODO [priority=medium] [task=feature] the y coordinate of the teleporter is not used yet
+			} else if(pedestrian.getPosition().x < 2 * delta) {
+				// shift backwards
+				shiftPos = new VPoint(pos.getX() + teleportDistanceX, pos.getY());
+				// TODO [priority=low] [task=refactoring] the y coordinate of the teleporter is not used yet
+			}
+			result += potentialFieldPedestrian.getAgentPotential(shiftPos, pedestrian, closePedestrians);
 		}
-
 		return result;
 	}
 
@@ -74,7 +62,7 @@ public class PedestrianRepulsionPotentialCycle implements
 				.getAgentPotentialGradient(pos, velocity, pedestrian,
 						closePedestrians);
 
-		if (this.scenario.hasTeleporter()) {
+/*		if (this.scenario.hasTeleporter()) {
 
 			Teleporter teleporter = scenario.getTeleporter();
 			// shift forwards
@@ -101,7 +89,7 @@ public class PedestrianRepulsionPotentialCycle implements
 			result = result.add(potentialFieldPedestrian
 					.getAgentPotentialGradient(shiftPos, velocity,
 							pedestrian, closePedestrians));
-		}
+		}*/
 
 		return result;
 	}
