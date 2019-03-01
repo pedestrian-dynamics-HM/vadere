@@ -17,7 +17,7 @@ import time
 import argparse
 
 
-def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM", "output","legacy"]):
+def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TESTOVM", "TestSpeedUp", "output","legacy"]):
     scenario_files = []
 
     for root, dirnames, filenames in os.walk(path):
@@ -148,7 +148,7 @@ def run_all():
         "06_bang_event_guimaraes_platz"
     ]
 
-    excluded_scenarios = ["TESTOVM", "output", "legacy"]
+    excluded_scenarios = ["TESTOVM", "TestSpeedUp", "output", "legacy"]
     excluded_scenarios.extend(long_running_scenarios)
 
     scenario_files_regular_length = find_scenario_files(exclude_patterns=excluded_scenarios)
