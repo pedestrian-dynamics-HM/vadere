@@ -61,7 +61,7 @@ public class OSMBehaviorController {
 
             pedestrian.setPosition(nextPosition);
             synchronized (topography) {
-                topography.moveElement(pedestrian, pedestrian.getPosition());
+                topography.moveElement(pedestrian, currentPosition);
             }
 
             // compute velocity by forward difference
