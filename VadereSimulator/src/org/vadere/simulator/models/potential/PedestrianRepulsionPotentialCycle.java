@@ -62,7 +62,7 @@ public class PedestrianRepulsionPotentialCycle implements
 				.getAgentPotentialGradient(pos, velocity, pedestrian,
 						closePedestrians);
 
-/*		if (this.scenario.hasTeleporter()) {
+		if (this.scenario.hasTeleporter()) {
 
 			Teleporter teleporter = scenario.getTeleporter();
 			// shift forwards
@@ -89,7 +89,7 @@ public class PedestrianRepulsionPotentialCycle implements
 			result = result.add(potentialFieldPedestrian
 					.getAgentPotentialGradient(shiftPos, velocity,
 							pedestrian, closePedestrians));
-		}*/
+		}
 
 		return result;
 	}
