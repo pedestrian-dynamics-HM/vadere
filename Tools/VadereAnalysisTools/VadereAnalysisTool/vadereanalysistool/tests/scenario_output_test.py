@@ -1,5 +1,5 @@
 import unittest
-from vadere_analysis_tool import ScenarioOutput
+from vadereanalysistool import ScenarioOutput
 
 
 class ScenarioOutputTests(unittest.TestCase):
