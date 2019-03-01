@@ -10,7 +10,7 @@
   * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
   * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
 - Configured 1-click-deployment in ".gitlab-ci.yml".
-  * In short: Vadere is packaged as a single ZIP file containing following build artifacts: README.md VadereModelTests/ VadereGui/target/vadere.jar VadereSimulator/target/vadere-console.jar
+  * In short: Vadere is packaged as a single ZIP file containing following build artifacts: README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
   * Vadere is packaged for GNU/Linux and Microsoft Windows.
   * The ZIP file can be accessed on the website via: http://www.vadere.org/releases/
   * The website's filesystem contains three subdirectories for releases:
@@ -27,7 +27,6 @@
 - Logging API did *not* change. Each log level has an additional String formater
   method like `log.errorf("Erron in %s with value of x: %d","ClassA", 42)`
 - issues closed: [issue#163](https://gitlab.lrz.de/vadere/vadere/issues/163)
-
 - Added script "osm2vadere.py" to "Tools" folder, to convert OpenStreetMap maps to a Vadere topography. (929d4775: Tools).
 - `VadereConsole`: Add option `--logname <filename>` to specify the name for the log file.
   Please note that the log file `log.out` is always written (because this file is configured
@@ -64,10 +63,13 @@
 
 ### Changed
 
+- Renamed Vadere JAR files.
+  * vadere.jar -> vadere-gui.jar
+  * postvis.jar -> vadere-postvis.jar
+  * vadere-console.jar -> remained unchanged
+- Migration to Java 11 (OpenJDK).
 - Removed directory `Documentation/version-control` which contained the Git hooks. The Git hooks are not required anymore. Instead, added `git rev-parse HEAD` to file `VadereSimulator/pom.xml` to create `VadereSimulator/resources/current_commit_hash.txt` during each build via `mvn compile`.
-  **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build.
-- Migration to Java 11 (OpenJDK) 
-
+  **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build. 
 
 ## v0.6 (2018-09-07)
 
