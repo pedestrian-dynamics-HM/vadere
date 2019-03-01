@@ -34,8 +34,8 @@ Stable releases and selected branch-builds are located on [www.vadere.org/releas
 
 The ZIP file contains:
 * **README.md** - this README file. 
-* **vadere.jar** - provides Vadere with a GUI. 
-* **vadere_console.jar** - provides the command line version of Vadere and allows easy integration into other applications. 
+* **vadere-gui.jar** - provides the GUI version of Vadere.
+* **vadere-console.jar** - provides the command line version of Vadere and allows easy integration into other applications.
 * **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
 To execute the `.jar` files it is highly recommended to use Java 11 (OpenJDK).  

@@ -54,7 +54,7 @@
             <version>1.6.0</version>
             <executions>
                 <execution>
-                    <id>write_version_control_info_to_file</id>
+                    <id>write-version-control-info-to-file</id>
                     <phase>generate-resources</phase>
                     <goals>
                         <goal>exec</goal>
@@ -88,9 +88,7 @@
 		  </configuration>
 		</plugin>
         <plugin>
-            <!-- NOTE: We don't need a groupId specification because the group is
-                 org.apache.maven.plugins ...which is assumed by default.
-             -->
+            <!-- Use default groupId "org.apache.maven.plugins" -->
             <artifactId>maven-assembly-plugin</artifactId>
             <version>2.4</version>
             <executions>
@@ -111,6 +109,7 @@
                         </descriptorRefs>
                         <finalName>vadere-console</finalName>
                         <appendAssemblyId>false</appendAssemblyId>
+                        <attach>false</attach>
                     </configuration>
                 </execution>
             </executions>
