@@ -68,6 +68,11 @@ public class VLine extends Line2D.Double {
     public double length() {
         return getP1().distance(getP2());
     }
+
+    public double lengthSq() {
+    	return getP1().distanceSq(getP2());
+    }
+
 	public double distance(VPoint point) {
 		return GeometryUtils.closestToSegment(this, point).distance(point);
 	}

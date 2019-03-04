@@ -232,6 +232,11 @@ public interface IMesh<
 		return toPoint(getVertex(edge));
 	}
 
+	default VPoint toPoint(@NotNull P p) {
+		return new VPoint(p.getX(), p.getY());
+	}
+
+
 	/**
 	 * Returns the half-edge of the vertex i.e. one half-edge which ends in the vertex in O(1).
 	 *

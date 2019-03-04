@@ -135,6 +135,79 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	}
 
 	/**
+	 * <p>Returns true if the full-edge of this half-edge is the longest edge of its faces.</p>
+	 *
+	 * @param edge the half-edge
+	 * @return true if the full-edge of this half-edge is the longest edge of its faces
+	 */
+	default boolean isLongestEdge(@NotNull final E edge) {
+
+		E e = edge;
+		if(getMesh().isBoundary(e)) {
+			e = getMesh().getTwin(e);
+		}
+
+		VLine line = getMesh().toLine(e);
+		double lenSq = line.lengthSq();
+
+		E next = getMesh().getNext(e);
+		E prev = getMesh().getPrev(e);
+
+		if(getMesh().toLine(next).lengthSq() > lenSq || getMesh().toLine(prev).lengthSq() > lenSq) {
+			return false;
+		}
+
+		if(getMesh().isAtBoundary(e)) {
+			return true;
+		}
+		else {
+			e = getMesh().getTwin(e);
+			next = getMesh().getNext(e);
+			prev = getMesh().getPrev(e);
+			return getMesh().toLine(next).lengthSq() < lenSq && getMesh().toLine(prev).lengthSq() < lenSq;
+		}
+	}
+
+	default E getLongestHalfEdge(@NotNull final F face) {
+		assert !getMesh().isBoundary(face);
+		E edge = getMesh().getEdge(face);
+		E next = getMesh().getNext(edge);
+		E prev = getMesh().getPrev(edge);
+
+		double len = getMesh().toLine(edge).lengthSq();
+		double lenN = getMesh().toLine(next).lengthSq();
+		double lenP = getMesh().toLine(prev).lengthSq();
+
+		if(len >= lenN) {
+			if(len >= lenP || lenP <= lenN) {
+				return edge;
+			} else {
+				return prev;
+			}
+		} else {
+			if(lenN > lenP) {
+				return next;
+			} else {
+				return  prev;
+			}
+		}
+	}
+
+	default boolean isLongestHalfEdge(@NotNull final E edge) {
+		E e = edge;
+		if(getMesh().isBoundary(e)) {
+			e = getMesh().getTwin(e);
+		}
+
+		E next = getMesh().getNext(e);
+		E prev = getMesh().getPrev(e);
+		VLine line = getMesh().toLine(e);
+		double lenSq = line.lengthSq();
+
+		return getMesh().toLine(next).lengthSq() <= lenSq && getMesh().toLine(prev).lengthSq() <= lenSq;
+	}
+
+	/**
 	 * <p>Inserts a point into the mesh which is contained in a boundary by connecting the boundaryEdge
 	 * to the point in O(1) time. This will create 4 new half-edges, one new vertex and one face.</p>
 	 *

@@ -245,15 +245,15 @@ public class MeshExamples {
 		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(meshCopy, 1000, 1000, colorFunction);
 		panel.display("EikMesh and Ruppert's Algorithm");
 
-		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(approxDistance, p -> 1.0 + Math.abs(approxDistance.apply(p)) * 0.2, 0.1, new PTriangulation<>(meshCopy));
+		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(approxDistance, p -> 1.0 /*+ Math.abs(approxDistance.apply(p))*0.3*/, 2.0, new PTriangulation<>(meshCopy));
 		while (true) {
 			meshImprover.improve();
 			panel.repaint();
-			try {
+			/*try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 
