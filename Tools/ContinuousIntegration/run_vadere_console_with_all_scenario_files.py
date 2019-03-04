@@ -144,6 +144,8 @@ def run_all():
         "thin_wall_and_closer_source_pso_could_fail",
         "rimea_04_flow_osm1_550_up",
         "stairs_diagonal_both_1_2_+1.scenario",
+        "05_bang_event_narrowed_street",
+        "06_bang_event_guimaraes_platz"
     ]
 
     excluded_scenarios = ["TESTOVM", "output", "legacy"]
@@ -156,7 +158,7 @@ def run_all():
         search_pattern = "*" + scenario + "*.scenario"
         scenario_files_long = find_scenario_files(scenario_search_pattern=search_pattern)
         tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long,
-                                                                                 scenario_timeout_in_sec=480)
+                                                                                 scenario_timeout_in_sec=540)
         passed_and_failed_scenarios["passed"].extend(tmp_passed_and_failed_scenarios["passed"])
         passed_and_failed_scenarios["failed"].extend(tmp_passed_and_failed_scenarios["failed"])
         passed_and_failed_scenarios["failed_summary"].extend(tmp_passed_and_failed_scenarios["failed_summary"])

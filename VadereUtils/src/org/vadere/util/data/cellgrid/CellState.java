@@ -16,7 +16,7 @@ public class CellState implements Cloneable {
 
 	@Override
 	public CellState clone() {
-		return new CellState(new Double(potential), tag);
+		return new CellState(Double.valueOf(potential), tag);
 	}
 
 	@Override

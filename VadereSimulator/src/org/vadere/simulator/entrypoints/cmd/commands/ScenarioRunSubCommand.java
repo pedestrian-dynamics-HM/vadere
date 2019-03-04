@@ -68,7 +68,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 			} else {
 				System.exit(-1);
 			}
-		} catch (Exception e){
+		} catch (Throwable e){
 			logger.error(e);
 			System.exit(-1);
 		}

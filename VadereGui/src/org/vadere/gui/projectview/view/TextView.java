@@ -14,6 +14,7 @@ import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.events.json.EventInfoStore;
+import org.vadere.state.events.presettings.EventPresettings;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
@@ -110,15 +111,18 @@ public class TextView extends JPanel implements IJsonView {
 		add(panelTop, BorderLayout.NORTH);
 		panelTop.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
+		generatePresettingsMenu(attributeType);
+
 		JButton btnSaveToFile = new JButton(Messages.getString("TextFileView.btnSaveToFile.text"));
 		btnSaveToFile.addActionListener(saveToFileActionListener);
         btnSaveToFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
+
 		panelTop.add(btnSaveToFile);
 		btnLoadFromFile = new JButton(Messages.getString("TextView.btnLoadFromFile.text"));
         btnLoadFromFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
         panelTop.add(btnLoadFromFile);
 
-        jsonValidIndicator = new JsonValidIndicator();
+		jsonValidIndicator = new JsonValidIndicator();
 		panelTop.add(jsonValidIndicator);
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
@@ -203,6 +207,35 @@ public class TextView extends JPanel implements IJsonView {
 
 		this.attributeType = attributeType;
 		jsonValidIndicator.setValid();
+	}
+
+	private void generatePresettingsMenu(final AttributeType attributeType) {
+		if (attributeType == AttributeType.EVENT) {
+			JMenuBar presetMenuBar = new JMenuBar();
+			JMenu mnPresetMenu = new JMenu(Messages.getString("TextView.Button.LoadPresettings"));
+			presetMenuBar.add(mnPresetMenu);
+
+			EventPresettings.PRESETTINGS_MAP.forEach(
+					(clazz, jsonString) -> mnPresetMenu.add(new JMenuItem(new AbstractAction(clazz.getSimpleName()) {
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
+									Messages.getString("Tab.Model.confirmLoadTemplate.text"),
+									Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+									JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								try {
+									txtrTextfiletextarea.setText(jsonString);
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					})));
+
+			panelTop.add(presetMenuBar);
+		}
 	}
 
 	@Override

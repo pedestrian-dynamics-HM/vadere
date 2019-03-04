@@ -3,12 +3,18 @@ import shutil
 import subprocess
 import time
 
-from vadere_analysis_tool import VadereProject
-from vadere_analysis_tool import SameSeedTrajectory
+from vadereanalysistool import VadereProject
+from vadereanalysistool import SameSeedTrajectory
 
 
 def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_console="VadereSimulator/target/vadere-console.jar",
-                                           scenario_timeout_in_sec=60*8):
+                                           scenario_timeout_in_sec=60*9):
+
+    if not os.path.exists(vadere_console):
+        raise ValueError("vadere console could not be found at path: {}".format(os.path.abspath(vadere_console)))
+
+    if not os.path.exists(vadere_console):
+        raise ValueError("vadere console could not be found at path: {}".format(os.path.abspath(vadere_console)))
 
     scenario_files = project.scenario_files
     total_scenario_files = len(scenario_files)
@@ -56,9 +62,13 @@ def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_con
 
 
 if __name__ == '__main__':
+    # Note: the script is intended to run from [vadere_root_path]
     project = VadereProject('Tools/ContinuousIntegration/run_seed_comparison_test.d')
     project.clear_output_dir()
-    run_scenario_files_with_vadere_console(project)
+    scenario_return = run_scenario_files_with_vadere_console(project)
+  
+    if len(scenario_return["failed"]) > 0:
+        raise RuntimeError("All scenarios have to pass for the seed test.")
 
     # this will reload project
     seed_test = SameSeedTrajectory('Tools/ContinuousIntegration/run_seed_comparison_test.d')

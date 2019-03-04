@@ -34,17 +34,17 @@ Stable releases and selected branch-builds are located on [www.vadere.org/releas
 
 The ZIP file contains:
 * **README.md** - this README file. 
-* **vadere.jar** - provides Vadere with a GUI. 
-* **vadere_console.jar** - provides the command line version of Vadere and allows easy integration into other applications. 
+* **vadere-gui.jar** - provides the GUI version of Vadere.
+* **vadere-console.jar** - provides the command line version of Vadere and allows easy integration into other applications.
 * **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
-To execute the `.jar` files it is highly recommended to use Oracle Java 8.  
+To execute the `.jar` files it is highly recommended to use Java 11 (OpenJDK).  
 
 ### Build from Source
 
 #### Dependencies
 
-* Java 8
+* Java 11 (OpenJDK recommended)
 * Maven 3.0
 * Git
 * OpenCL (optional but recommended)
@@ -56,10 +56,11 @@ To execute the `.jar` files it is highly recommended to use Oracle Java 8.
 Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components should be installed:
 
 * the OpenCL Installable Client Driver loader also called ICD loader (Opencl.dll for Windows and libOpenCL.so for Linux)
-* OpenCL Drivers for your device 
+* drivers for your device(s) 
 
-Both should be offered by the vendor of your device. The device can be a CPU as well as a GPU (recommanded). For example if you have a NVIDIA GPU updating your drivers should be enough to install both components. 
-Vadere will search for the best device which is supported. On a desktop workstation this should be your video card (GPU). If there is no device Vadere will use a plain and slower Java-Implementation instead. 
+Both should be offered by the vendor of your device (often there are also open-source solutions). The device can be a CPU as well as a GPU (recommanded). For example, if you have a NVIDIA GPU instaling your drivers should be enough to install both components. 
+Vadere will search for the best suiable device which is supported. On a desktop workstation this should be your video card (GPU). If there is no device supporting OpenCL Vadere will use a plain and slower Java-implementation instead. 
+
 Please, use following instructions to set up the OpenCL components for your operating system:
 
 * Windows: For further information using OpenCL on Windows read the paragraph Running an OpenCL application [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
