@@ -8,7 +8,7 @@ from vadereanalysistool import SameSeedTrajectory
 
 
 def run_scenario_files_with_vadere_console(project, number_of_runs=3, vadere_console="VadereSimulator/target/vadere-console.jar",
-                                           scenario_timeout_in_sec=60*9):
+                                           scenario_timeout_in_sec=12*60):
 
     if not os.path.exists(vadere_console):
         raise ValueError("vadere console could not be found at path: {}".format(os.path.abspath(vadere_console)))
