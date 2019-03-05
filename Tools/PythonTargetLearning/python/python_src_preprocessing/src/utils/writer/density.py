@@ -5,7 +5,7 @@ def write_matrix_to_file(matrix, distribution, file):
     number_of_elements = np.size(matrix)
     row = np.reshape(matrix, (1, number_of_elements)).flatten('C')  # row-wise
     row = np.concatenate((row, distribution))
-    row_string = ';'.join(map(lambda r: "{%.10f}",row)) + '\n'  # TODO limit to 10 decimals
+    row_string = ';'.join(map(lambda r: "{%.10f}".format(r), row)) + '\n'  # TODO limit to 10 decimals
     file.write(row_string)
     file.flush()
 

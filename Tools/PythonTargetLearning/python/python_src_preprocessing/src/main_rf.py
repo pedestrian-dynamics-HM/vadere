@@ -22,24 +22,28 @@ BOOL_heuristic = False
 BOOL_rf = True
 
 # directory to read input files from
-INPUT_ROOT_DIRECTORY = os.path.join('../data/output_UNIT_Potential/')
+INPUT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_where_people_go/output_UNIT_Potential/')
 
 # directory to write output files to
-OUTPUT_ROOT_DIRECTORY = os.path.join('../data/output_preprocessed/')
+OUTPUT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_where_people_go/output_preprocessed/')
 
 # directory to write result files to
-RESULT_ROOT_DIRECTORY = os.path.join('../data/myresults/')
+RESULT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_where_people_go/myresults/')
+
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/output/')
+RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/results/')
 
 # OBSERVATION_AREA select data from observed area, [offset_x, offset_y, width, height]
 # [7,23,5,5]
 # [20, 5, 10, 10]
 # [25, 5, 10, 10]
-OBSERVATION_AREA = [20, 10, 10, 10]
+# OBSERVATION_AREA = [20, 10, 10, 10]
+OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
 
 TIME_STEP_BOUNDS = (30, 0)  # cut off number of timesteps from start and end time
-RESOLUTION = 0.5  # 0.5  # resolution for density calculations
+RESOLUTION = 0.1  # 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
-GAUSS_DENSITY_BOUND = 10  # side length of quadratic area for gaussian density
+GAUSS_DENSITY_BOUND = 1  # side length of quadratic area for gaussian density
 FRAMERATE = 20
 SIM_TIME_STEP_LENGTH = 0.4  # unused right now
 
@@ -47,7 +51,7 @@ SIM_TIME_STEP_LENGTH = 0.4  # unused right now
 test_size_percent = 0.2
 use_cores = 4
 # directory = '../../data/output_preprocessed/'
-NTREES = 20
+NTREES = 50
 number_of_targets = 3  # default
 tree_depth = None  # as long as possible
 
@@ -70,25 +74,27 @@ def start_logging():
 	else:
 		log_file.write("Preprocessed data directory: %s \n" % OUTPUT_ROOT_DIRECTORY)
 		# import values from attributes file
-		attributes_file = open(OUTPUT_ROOT_DIRECTORY + "attributes.txt")
-		iline = 0
-		while iline < 27:
-			tline = attributes_file.readline()  # observation area
-			iline = iline + 1
-			if iline == 10:  # observation area
-				val1, val2, val3, val4 = tline[1:tline.__len__() - 2].split(",")
-				OBSERVATION_AREA = [float(val1), float(val2), float(val3), float(val4)]
-			elif iline == 13:  # time step bounds
-				val1, val2 = tline[1:tline.__len__() - 2].split(",")
-				TIME_STEP_BOUNDS = (float(val1), float(val2))
-			elif iline == 16:  # resolution
-				RESOLUTION = float(tline)
-			elif iline == 19:  # sigma
-				SIGMA = float(tline)
-			elif iline == 22:  # gauss density bounds
-				GAUSS_DENSITY_BOUND = float(tline)
-			elif iline == 25:  # frame rate
-				FRAMERATE = float(tline)
+
+		if os.path.isfile(OUTPUT_ROOT_DIRECTORY + "attributes.txt"):
+			attributes_file = open(OUTPUT_ROOT_DIRECTORY + "attributes.txt")
+			iline = 0
+			while iline < 27:
+				tline = attributes_file.readline()  # observation area
+				iline = iline + 1
+				if iline == 10:  # observation area
+					val1, val2, val3, val4 = tline[1:tline.__len__() - 2].split(",")
+					OBSERVATION_AREA = [float(val1), float(val2), float(val3), float(val4)]
+				elif iline == 13:  # time step bounds
+					val1, val2 = tline[1:tline.__len__() - 2].split(",")
+					TIME_STEP_BOUNDS = (float(val1), float(val2))
+				elif iline == 16:  # resolution
+					RESOLUTION = float(tline)
+				elif iline == 19:  # sigma
+					SIGMA = float(tline)
+				elif iline == 22:  # gauss density bounds
+					GAUSS_DENSITY_BOUND = float(tline)
+				elif iline == 25:  # frame rate
+					FRAMERATE = float(tline)
 
 	log_file.write("Observation area / Camera cutout [x,y,width,height]: [%.2f %.2f %.2f %.2f] m \n" % (
 		OBSERVATION_AREA[0], OBSERVATION_AREA[1], OBSERVATION_AREA[2], OBSERVATION_AREA[3]))
@@ -140,6 +146,8 @@ def data_preprocessing(log_file):
 			# generate file name through pedestrian target distribution
 			output_file_name = writer.get_output_file_name(global_distribution)  # filename with global dist
 			print(output_file_name)
+
+			
 			# mode w: existing file is deleted!
 			with open(OUTPUT_ROOT_DIRECTORY + '/' + output_file_name + "_" + str(i) + '.csv', mode='w') as file:
 
