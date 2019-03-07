@@ -18,7 +18,7 @@ VERSION = 1.0
 # ----------------------------------------------------------------------------------------------------------------------
 
 BOOL_preprocessing = False
-BOOL_heuristic = False
+BOOL_heuristic = True
 BOOL_rf = True
 
 # directory to read input files from

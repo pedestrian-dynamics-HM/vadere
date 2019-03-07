@@ -54,7 +54,8 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
 
     # split data into training and test set of data
     x_train_density, x_test_density, y_train_density, y_test_density = train_test_split(x_density, y_density,
-                                                                                        random_state=1,
+                                                                                        #random_state=1,
+                                                                                        shuffle=True,
                                                                                         test_size=test_size_percent)
     print('Data is split in test & training set [%.2f s]' % (time.time() - startTime))
     #print('Size train: %d %d'% (x_train_density.shape(0),x_train_density.shape(1)))
