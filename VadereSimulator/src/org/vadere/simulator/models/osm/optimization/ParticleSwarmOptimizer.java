@@ -9,7 +9,7 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCircleSector;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.math.pso.PSO;
+import org.vadere.util.math.optimizer.pso.PSO;
 
 import java.awt.Shape;
 import java.util.*;

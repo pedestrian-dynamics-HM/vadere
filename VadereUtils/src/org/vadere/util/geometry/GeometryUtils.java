@@ -165,6 +165,23 @@ public class GeometryUtils {
 		return circumcenter.distance(point) < circumcenter.distance(p1);
 	}
 
+
+	public static List<VPoint> getDiscDiscretizationGridPoints(@NotNull final VCircle circle, double edgeLen) {
+		int n = (int)(circle.getRadius() * 2 / edgeLen) + 1;
+		List<VPoint> points = new ArrayList<>(n * n);
+		double x = circle.getCenter().x - circle.getRadius();
+		double y = circle.getCenter().y - circle.getRadius();
+		for (int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				VPoint point = new VPoint(x+i * edgeLen, y+j * edgeLen);
+				if(circle.contains(point)) {
+					points.add(point);
+				}
+			}
+		}
+		return points;
+	}
+
 	/**
 	 * Generates a set of points which are positioned inside a disc segment. The points are placed equidistant on one or multiple circles
 	 * with the center at the center of the disc and the radius smaller or equals the radius of the disc.

@@ -1,4 +1,4 @@
-package org.vadere.util.math.pso;
+package org.vadere.util.math.optimizer.pso;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
@@ -31,6 +31,7 @@ public class PSO {
 	private int improvementIterations;
 	private static Logger logger = Logger.getLogger(PSO.class);
 	private static int evaluationCounter = 0;
+	private int evalCounter;
 
 	public PSO(
 			@NotNull final Function<VPoint, Double> f,
@@ -69,6 +70,7 @@ public class PSO {
 	}
 
 	private VPoint getBestLocation() {
+		logger.info("evalCounter = " + evalCounter);
 		return gBestLocation;
 	}
 
@@ -90,7 +92,7 @@ public class PSO {
 			updateLocalBest();
 			updateGlobalBest();
 
-			double omega = attributesPSO.wUpperBound - (iterationCounter / attributesPSO.minIteration) * (attributesPSO.wUpperBound - attributesPSO.wLowerBound);
+			double omega = attributesPSO.wUpperBound - (iterationCounter / attributesPSO.maxIteration) * (attributesPSO.wUpperBound - attributesPSO.wLowerBound);
 
 			particles.forEach(particle -> updateParticle(particle, omega));
 		}
@@ -117,6 +119,7 @@ public class PSO {
 			particle.setLocation(circle.getClosestIntersectionPoint(currentLocation, particle.getLocation(), particle.getLocation()).orElse(particle.getLocation()));
 		}
 		particle.setFitnessValue(evaluationFunction.apply(particle.getLocation()));
+		evalCounter++;
 		evaluationCounter++;
 		if(evaluationCounter % 100 == 0) {
 			logger.debugf("#evaluations: " + evaluationCounter);
@@ -208,6 +211,14 @@ public class PSO {
 		return (double)n / Integer.MAX_VALUE;
 	}
 
+	private void informRingParticles() {
+		for (int i = 0; i < particles.size(); i++) {
+			informParticles(particles.get(i), particles.get((i + 1) % particles.size()));
+			informParticles(particles.get(i), particles.get((i - 1) >= 0 ? (i - 1) : particles.size() -1));
+		}
+	}
+
+
 	private void informAllParticles() {
 		for (Particle particle : particles) {
 			double globalBest = particle.getGlobalBestFitnessValue();
@@ -238,9 +249,31 @@ public class PSO {
 
 		double fitnessValue = evaluationFunction.apply(location);
 		evaluationCounter++;
-		/*if(evaluationCounter % 100 == 0) {
-			logger.debugf("#evaluations: " + evaluationCounter);
-		}*/
+		evalCounter++;
 		return new Particle(location, velocity, fitnessValue);
 	}
+
+	/*private Particle locationToParticle(@NotNull final VPoint location) {
+		double vDelta = random() * (maxAngle - minAngle);
+		double vMag = Math.sqrt(random()) * maxVelocity;
+		VPoint v = new VPoint(Math.cos(vDelta), Math.sin(vDelta)).setMagnitude(vMag);
+		VPoint grad = grad(location);
+		if(grad.distanceToOrigin() < GeometryUtils.DOUBLE_EPS) {
+			grad = circle.getCenter().subtract(location);
+		}
+		VPoint velocity = grad.scalarMultiply(-1.0).setMagnitude(vMag);
+
+		double fitnessValue = evaluationFunction.apply(location);
+		evaluationCounter++;
+		evalCounter++;
+		return new Particle(location, velocity, fitnessValue);
+	}
+
+	private VPoint grad(VPoint position) {
+		double val = evaluationFunction.apply(position);
+		double deps = 0.01;
+		double dGradPX = (evaluationFunction.apply(position.add(new VPoint(deps, 0))) - val) / deps;
+		double dGradPY = (evaluationFunction.apply(position.add(new VPoint(0, deps))) - val) / deps;
+		return new VPoint(dGradPX, dGradPY);
+	}*/
 }

@@ -74,6 +74,38 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	/**
+	 * Assumption: there exist a intersection point of the line segment.
+	 *
+	 * @param x11
+	 * @param y11
+	 * @param x22
+	 * @param y22
+	 * @return
+	 */
+	public Optional<VPoint> getSegmentIntersectionPoints(final double x11, final double y11, final double x22, final double y22) {
+		ImmutableList<VPoint> list = getIntersectionPoints(x11, y11, x22, y22);
+		assert !list.isEmpty();
+
+		if(x11 == x22) {
+			for (VPoint point : list) {
+				if(point.y < y11 && point.y > y22 || point.y > y11 && point.y < y22) {
+					return Optional.of(point);
+				}
+			}
+		} else {
+			for (VPoint point : list) {
+				if(point.x < x11 && point.x > x22 || point.x > x11 && point.x < x22) {
+					return Optional.of(point);
+				}
+			}
+		}
+
+		return Optional.empty();
+
+//		throw new IllegalArgumentException("line segment ("+x11+","+y11+") - ("+x22+","+y22+") does not intersect circle " + this + ".");
+	}
+
+	/**
 	 * Returns zero, one or two points which are the intersection of this circle and the line
 	 * defined by p = (x11, y11) and q = (x22, y22).
 	 * @param x11   x-coordinate of the first point p

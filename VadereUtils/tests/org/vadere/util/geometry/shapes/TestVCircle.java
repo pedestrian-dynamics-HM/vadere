@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class TestVCircle {
 
 	@Before
 	public void setUp() {
-		this.testCircleOrigin = new VCircle(0.5);
+		testCircleOrigin = new VCircle(0.5);
 		testCircle1 = new VCircle(1.2, -2.4, 0.9);
 	}
 
@@ -68,5 +69,45 @@ public class TestVCircle {
 		assertEquals(testCircleOrigin.closestPoint(new VPoint(0, 1)),
 				new VPoint(0, 0.5));
 	}
+
+	@Test
+	public void testIntersectionPoints() {
+		List<VPoint> intersectionPoints = testCircleOrigin.getIntersectionPoints(0, 0, 0, 1);
+		assertTrue(intersectionPoints.contains(new VPoint(0, 0.5)));
+		assertTrue(intersectionPoints.contains(new VPoint(0, -0.5)));
+		assertEquals(2, intersectionPoints.size());
+
+		intersectionPoints = testCircleOrigin.getIntersectionPoints(0, 0, 1, 0);
+		assertTrue(intersectionPoints.contains(new VPoint(0.5, 0)));
+		assertTrue(intersectionPoints.contains(new VPoint(-0.5, 0)));
+		assertEquals(2, intersectionPoints.size());
+
+		intersectionPoints = testCircleOrigin.getIntersectionPoints(new VLine(0, 0, 0, 1));
+		assertTrue(intersectionPoints.contains(new VPoint(0, 0.5)));
+		assertTrue(intersectionPoints.contains(new VPoint(0, -0.5)));
+		assertEquals(2, intersectionPoints.size());
+
+		intersectionPoints = testCircleOrigin.getIntersectionPoints(new VPoint(0, 0), new VPoint(0, 1));
+		assertTrue(intersectionPoints.contains(new VPoint(0, 0.5)));
+		assertTrue(intersectionPoints.contains(new VPoint(0, -0.5)));
+		assertEquals(2, intersectionPoints.size());
+	}
+
+
+	@Test
+	public void testSegmentIntersectionPoints() {
+		VPoint intersectionPoint = testCircleOrigin.getSegmentIntersectionPoints(0, 0, 0, 1).get();
+		assertEquals(new VPoint(0, 0.5), intersectionPoint);
+
+		intersectionPoint = testCircleOrigin.getSegmentIntersectionPoints(0, 0, 0, -1).get();
+		assertEquals(new VPoint(0, -0.5), intersectionPoint);
+
+		intersectionPoint = testCircleOrigin.getSegmentIntersectionPoints(0, 0, 1, 0).get();
+		assertEquals(new VPoint(0.5, 0), intersectionPoint);
+
+		intersectionPoint = testCircleOrigin.getSegmentIntersectionPoints(0, 0, -1, 0).get();
+		assertEquals(new VPoint(-0.5, 0), intersectionPoint);
+	}
+
 
 }

@@ -128,12 +128,6 @@ public class VPoint implements Cloneable, IPoint {
 	}
 
 	public VPoint rotate(final double radAngle) {
-		VPoint result = new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
-				x * Math.sin(radAngle) + y * Math.cos(radAngle));
-
-		if(Double.isNaN(result.getX())) {
-			System.out.println("wtf");
-		}
 		return new VPoint(x * Math.cos(radAngle) - y * Math.sin(radAngle),
 				x * Math.sin(radAngle) + y * Math.cos(radAngle));
 	}
@@ -141,6 +135,11 @@ public class VPoint implements Cloneable, IPoint {
 	@Override
 	public VPoint add(final IPoint point) {
 		return new VPoint(x + point.getX(), y + point.getY());
+	}
+
+	@Override
+	public VPoint add(double x, double y) {
+		return new VPoint(this.x + x, this.y + y);
 	}
 
 	@Override

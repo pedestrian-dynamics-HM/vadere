@@ -1,4 +1,4 @@
-package org.vadere.util.math.pso;
+package org.vadere.util.math.optimizer.pso;
 
 /**
  * @author Benedikt Zoennchen
@@ -8,7 +8,7 @@ public class AttributesPSO {
 	final int swarmSize = 30;
 	final int minIteration = 4;
 	final int maxNoUpdate = 5;
-	final int maxIteration = 15;
+	final int maxIteration = 10;
 	final int problemDimension = 2;
 	final double c1 = 2.0;
 	final double c2 = 2.0;
