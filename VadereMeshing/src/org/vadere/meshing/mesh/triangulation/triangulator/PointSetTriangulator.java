@@ -1,8 +1,11 @@
 package org.vadere.meshing.mesh.triangulation.triangulator;
 
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -40,6 +43,16 @@ public class PointSetTriangulator<P extends IPoint, V extends IVertex<P>, E exte
         this.triangulation = triangulation;
         this.points = points;
     }
+
+	/**
+	 * <p>The default constructor.</p>
+	 *
+	 * @param points        the collection of points P
+	 */
+	public PointSetTriangulator(final Collection<P> points, IMesh<P, V, E, F> mesh) {
+		this.triangulation = new IncrementalTriangulation<>(mesh, IPointLocator.Type.JUMP_AND_WALK, points);
+		this.points = points;
+	}
 
     @Override
     public IIncrementalTriangulation<P, V, E, F> generate() {

@@ -9,6 +9,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.List;
 
@@ -19,12 +20,15 @@ import java.util.List;
 public class PotentialEvaluationFunction implements UnivariateRealFunction,
 		MultivariateRealFunction, MultivariateFunction {
 
+	private static Logger logger = Logger.getLogger(PotentialEvaluationFunction.class);
+
 	/** The pedestrian. */
 	private final PedestrianOSM pedestrian;
 
 	/** The step size. */
 	private double stepSize;
 	private double minStepSize;
+	private static int evaluationCounter = 0;
 
 	public int counter;
 
@@ -73,6 +77,10 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 		VPoint pedPos = pedestrian.getPosition();
 		VPoint newPos = new VPoint(stepSize * Math.cos(angle) + pedPos.x,
 				stepSize * Math.sin(angle) + pedPos.y);
+		evaluationCounter++;
+		/*if(evaluationCounter % 100 == 0) {
+			logger.debugf("#evaluations: " + evaluationCounter);
+		}*/
 		return pedestrian.getPotential(newPos);
 	}
 
@@ -145,6 +153,10 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 		final double tolInsideCircle = 0.00001;
 		if (sqx + sqy <= sqss + tolInsideCircle) {
 			result = pedestrian.getPotential(newPos);
+			evaluationCounter++;
+			/*if(evaluationCounter % 100 == 0) {
+				logger.debugf("#evaluations: " + evaluationCounter);
+			}*/
 		}
 		counter++;
 		return result;

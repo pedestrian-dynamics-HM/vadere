@@ -10,14 +10,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 **/venv/
-Tools/VadereAnalysisTools/VadereAnalysisTool/VadereAnalysisTool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
 Tools/VadereAnalysisTools/VadereAnalysisTool/build/
 Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
+Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool**/output
 Tools/ContinuousIntegration/**/output
+
 
 # C extensions
 *.so
-vadere_analysis_tool/build
+vadereanalysistool/build
 
 #Tools and build utils
 bin/
@@ -46,6 +48,9 @@ VadereGui/testResources/**/*.legacy
 VadereUtils/testreports/*.txt
 VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
+
+#Java runtime files generated with "jdeps" and "jlink"
+java-runtime/*
 
 #model test output
 VadereModelTests/**/output
