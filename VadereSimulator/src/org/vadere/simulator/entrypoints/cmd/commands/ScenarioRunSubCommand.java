@@ -56,8 +56,6 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 
 		Path scenarioFile = Paths.get(ns.getString("scenario-file"));
 		if (!scenarioFile.toFile().exists() || !scenarioFile.toFile().isFile()){
-			boolean exists = scenarioFile.toFile().exists();
-			boolean isFile = scenarioFile.toFile().isFile();
 			logger.error("scenario-file does not exist, is not a regular file or you do not have read permissions: "
 					+ scenarioFile.toFile().toString());
 			System.exit(-1);
