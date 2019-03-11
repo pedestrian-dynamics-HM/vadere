@@ -30,8 +30,8 @@ OUTPUT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_w
 # directory to write result files to
 RESULT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_where_people_go/myresults/')
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/output/')
-RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/results/')
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/output_01/')
+RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/results_01/')
 
 # OBSERVATION_AREA select data from observed area, [offset_x, offset_y, width, height]
 # [7,23,5,5]
@@ -43,7 +43,7 @@ OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
 TIME_STEP_BOUNDS = (30, 0)  # cut off number of timesteps from start and end time
 RESOLUTION = 0.1  # 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
-GAUSS_DENSITY_BOUND = 1  # side length of quadratic area for gaussian density
+GAUSS_DENSITY_BOUND = 2  # side length of quadratic area for gaussian density
 FRAMERATE = 20
 SIM_TIME_STEP_LENGTH = 0.4  # unused right now
 

@@ -26,7 +26,7 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
 
     #  Some useful length measurements
     imported_files = os.listdir(directory)
-
+    print(imported_files)
 
 
     startTime = time.time()
