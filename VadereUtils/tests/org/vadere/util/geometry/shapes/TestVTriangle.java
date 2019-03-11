@@ -12,10 +12,10 @@ import java.time.temporal.ChronoUnit;
 
 import static org.junit.Assert.*;
 
-public class VTriangleTest {
+public class TestVTriangle {
 
     // following logger writes to ASCI output file VadereUtils/log.out
-    private static Logger logger = Logger.getLogger(VTriangleTest.class);
+    private static Logger logger = Logger.getLogger(TestVTriangle.class);
 
     // create y-symmetric 60°-triangle
     private double radiusShould = 1.0;
@@ -155,8 +155,10 @@ public class VTriangleTest {
         VPoint vPoint = vTriangle_symY_60degree.getIncenter();
         double x = vPoint.getX();
         double y = vPoint.getY();
+        //assertEquals(vPoint, new VPoint(0.0,0.0), GeometryUtils.DOUBLE_EPS);
         double eps = Math.max (Math.abs(x - 0.0), Math.abs(y - 0.0)); // Point (0,0) is incenter
         assertTrue(eps < GeometryUtils.DOUBLE_EPS);
+       // assertEquals(0.0, vPoint.distance(new VPoint(x, y)), GeometryUtils.DOUBLE_EPS);
 
     }
 
