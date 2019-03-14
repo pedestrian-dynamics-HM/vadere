@@ -193,8 +193,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			replace(scenario, VadereState.INTERRUPTED);
 			new Thread(
 					() -> {
-						IOUtils.errorBox(Messages.getString("ProjectView.simulationRunErrorDialog.text") + " " + scenario
-								+ ": " + throwable, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
+						// Use the causing exception (if available) to get a more meaningful error message.
+						Throwable causingException = (throwable.getCause() == null) ? throwable : throwable.getCause();
+
+						String errorTextTemplate = "%s: %s\n\n%s";
+						String errorText = String.format(errorTextTemplate,
+								Messages.getString("ProjectView.simulationRunErrorDialog.text"),
+								scenario,
+								causingException);
+						IOUtils.errorBox(errorText, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
 					}).start();
 		});
 	}

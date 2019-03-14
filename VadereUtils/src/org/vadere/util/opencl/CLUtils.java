@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
 import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
@@ -86,9 +85,12 @@ public class CLUtils {
 					}
 				}
 			}
-		}
 
+		} catch(Throwable e) {
+			log.warn("No OpenCL support: " + e.getMessage());
+		}
 		return supportedPlatforms;
+
 	}
 
 	/**
@@ -100,6 +102,7 @@ public class CLUtils {
 	 * @return a pair of addresses (platform address, device address)
 	 */
 	public static Optional<Pair<Long, Long>> getFirstSupportedPlatformAndDevice(final int deviceType) {
+
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer pi = stack.mallocInt(1);
 			InfoUtils.checkCLError(clGetPlatformIDs(null, pi));
@@ -124,7 +127,10 @@ public class CLUtils {
 					}
 				}
 			}
+		} catch(Throwable e) {
+			log.warn("No OpenCL device found: " + e.getMessage());
 		}
+
 		return Optional.empty();
 	}
 

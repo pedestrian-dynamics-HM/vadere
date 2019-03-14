@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.events.types.*;
@@ -16,9 +17,11 @@ import java.util.List;
 public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	private final Topography topography;
+	private final OSMBehaviorController osmBehaviorController;
 
 	public UpdateSchemeSequential(@NotNull final Topography topography) {
 		this.topography = topography;
+		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
@@ -44,23 +47,13 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 			while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 				pedestrian.updateNextPosition();
-				makeStep(topography, pedestrian, timeStepInSec);
+				osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
 			}
 
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+			osmBehaviorController.wait(pedestrian);
 		} else if (mostImportantEvent instanceof BangEvent) {
-			// Watch out: For testing purposes, a bang event changes only
-			// the "CombinedPotentialStrategy". The agent does not move here!
-			// Therefore, trigger only a single bang event and then use "ElapsedTimeEvent"
-			BangEvent bangEvent = (BangEvent) mostImportantEvent;
-			Target bangOrigin = topography.getTarget(bangEvent.getOriginAsTargetId());
-
-			LinkedList<Integer> nextTarget = new LinkedList<>();
-			nextTarget.add(bangOrigin.getId());
-
-			pedestrian.setTargets(nextTarget);
-			pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
+			osmBehaviorController.reactToBang(pedestrian, topography);
 		}
 	}
 

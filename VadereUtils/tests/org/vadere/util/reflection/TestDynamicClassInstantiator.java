@@ -44,7 +44,7 @@ public class TestDynamicClassInstantiator {
 			fail();
 		} catch (CouldNotInstantiateException e) {
 			// this is expected
-			assertTrue(e.getCause() instanceof InstantiationException);
+			assertTrue(e.getCause() instanceof NoSuchMethodException);
 		}
 	}
 

@@ -15,7 +15,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.type.MirroredTypeException;
 
 @SupportedAnnotationTypes("org.vadere.annotation.factories.migrationassistant.MigrationTransformation")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class JoltTransformationFactoryProcessor extends BaseFactoryProcessor {
 	@Override
