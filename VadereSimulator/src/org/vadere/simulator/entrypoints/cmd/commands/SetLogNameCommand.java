@@ -16,7 +16,6 @@ public class SetLogNameCommand implements ArgumentAction {
     @Override
     public void run(ArgumentParser parser, Argument arg, Map<String, Object> attrs, String flag, Object value) throws ArgumentParserException {
         String filename = (String) value;
-<<<<<<< HEAD
         final LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
         final Configuration config = loggerContext.getConfiguration();
         final LoggerConfig logConfig = config.getLoggerConfig("STDOUTERR");
@@ -36,13 +35,6 @@ public class SetLogNameCommand implements ArgumentAction {
         logConfig.addAppender(newAppender, null, null);
         rootConfig.addAppender(newAppender, null, null);
         loggerContext.updateLoggers();
-=======
-
-        // FIXME: Create a "FileAppender" which writes to "filename".
-        //   See http://logging.apache.org/log4j/2.x/manual/customconfig.html and
-        //   https://stackoverflow.com/questions/15441477/how-to-add-log4j2-appenders-at-runtime-programmatically/33472893#33472893
-        // Logger.setFileName(filename); //todo set Filename of Log-file
->>>>>>> d2890e8ca262b20aceab0d657c996308bd82cb17
     }
 
     @Override
