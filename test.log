@@ -1,0 +1,14 @@
+INFO  [main]: Use output directory: C:\Users\tphan\vadere\output
+INFO  [main]: Initializing scenario. Start of scenario 'basic_2_density_discrete_ca'...
+INFO  [main]: StartIt basic_2_density_discrete_ca
+INFO  [main]: floor field initialization time:672.0[ms]
+INFO  [main]: floor field initialization time:227[ms]
+INFO  [main]: Finished writing all output files
+INFO  [main]: Simulation of scenario basic_2_density_discrete_ca finished.
+INFO  [main]: Use output directory: C:\Users\tphan\vadere\output
+INFO  [main]: Initializing scenario. Start of scenario 'basic_2_density_discrete_ca'...
+INFO  [main]: StartIt basic_2_density_discrete_ca
+INFO  [main]: floor field initialization time:654.0[ms]
+INFO  [main]: floor field initialization time:239[ms]
+INFO  [main]: Finished writing all output files
+INFO  [main]: Simulation of scenario basic_2_density_discrete_ca finished.
