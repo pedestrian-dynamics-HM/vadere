@@ -11,6 +11,10 @@ public class EikMeshPoint extends MPoint implements Cloneable {
 	private double maxTraveldistance;
 	private IPoint lastPosition;
 
+	public EikMeshPoint(final double x, final double y){
+		this(x, y, false);
+	}
+
 	public EikMeshPoint(final double x, final double y, boolean fixPoint){
 		super(x, y);
 		this.fixPoint = fixPoint;

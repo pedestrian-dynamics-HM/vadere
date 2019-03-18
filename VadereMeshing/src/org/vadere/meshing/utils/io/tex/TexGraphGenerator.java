@@ -1,4 +1,4 @@
-package org.vadere.meshing.utils.tex;
+package org.vadere.meshing.utils.io.tex;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -13,6 +13,7 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import java.awt.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -71,7 +72,7 @@ public class TexGraphGenerator {
 		builder.append("\\draw ");
 
 		for(VLine line : mesh.getLines()) {
-			builder.append("("+line.getX1()+","+line.getY1()+") -- ("+line.getX2()+","+line.getY2()+")\n");
+			builder.append("("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+")\n");
 		}
 
 		builder.append(";\n");
@@ -83,6 +84,10 @@ public class TexGraphGenerator {
 		}
 
 		return builder.toString();
+	}
+
+	private static String toString(final double z) {
+		return String.format(Locale.ENGLISH, "%.4f", z);
 	}
 
 	/**
@@ -133,7 +138,7 @@ public class TexGraphGenerator {
 			Color c = coloring.apply(face);
 			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
 			V first = mesh.streamVertices(face).findFirst().get();
-			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
+			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
@@ -179,7 +184,7 @@ public class TexGraphGenerator {
 			Color c = coloring.apply(face);
 			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
 			V first = mesh.streamVertices(face).findFirst().get();
-			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
+			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
@@ -190,7 +195,7 @@ public class TexGraphGenerator {
 			builder.append("\\draw[black,thick]" + poly + ";\n");
 		}*/
 
-		builder.append("\\draw ("+line.getX1() + "," + line.getY1() + ") -- ("+ line.getX2() +"," + line.getY2()+");");
+		builder.append("\\draw ("+toString(line.getX1()) + "," + toString(line.getY1()) + ") -- ("+ toString(line.getX2()) +"," + toString(line.getY2())+");");
 		builder.append("\\end{tikzpicture}");
 		return builder.toString();
 	}
@@ -209,7 +214,7 @@ public class TexGraphGenerator {
 			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
 			List<VPoint> points = face.getPoints();
 			VPoint first = points.get(0);
-			String poly = points.stream().map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
+			String poly = points.stream().map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
@@ -251,7 +256,7 @@ public class TexGraphGenerator {
 			List<VLine> lines = mesh.streamEdges(face).map(e -> mesh.toLine(e)).collect(Collectors.toList());
 
 			for(VLine line : lines) {
-				builder.append("("+line.getX1()+","+line.getY1()+") -- ("+line.getX2()+","+line.getY2()+")\n");
+				builder.append("("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+")\n");
 			}
 		}
 
@@ -271,7 +276,7 @@ public class TexGraphGenerator {
 				VPoint incenter = triangle.getIncenter();
 
 				if(prefIncenter != null) {
-					builder.append("("+prefIncenter.getX()+","+prefIncenter.getY()+") -- ("+incenter.getX()+","+incenter.getY()+")\n");
+					builder.append("("+toString(prefIncenter.getX())+","+toString(prefIncenter.getY())+") -- ("+toString(incenter.getX())+","+toString(incenter.getY())+")\n");
 					if(firstLine == null) {
 						firstLine = new VLine(prefIncenter, incenter);
 					}
@@ -285,8 +290,8 @@ public class TexGraphGenerator {
 
 		builder.append(";\n");
 		if(firstLine != null && lastLine != null) {
-			builder.append("\\draw[-{Latex[length=3mm]}]("+firstLine.getX1()+","+firstLine.getY1()+") -- ("+firstLine.getX2()+","+firstLine.getY2()+");\n");
-			builder.append("\\draw[-{Latex[length=3mm]}]("+lastLine.getX1()+","+lastLine.getY1()+") -- ("+lastLine.getX2()+","+lastLine.getY2()+");\n");
+			builder.append("\\draw[-{Latex[length=3mm]}]("+toString(firstLine.getX1())+","+toString(firstLine.getY1())+") -- ("+toString(firstLine.getX2())+","+toString(firstLine.getY2())+");\n");
+			builder.append("\\draw[-{Latex[length=3mm]}]("+toString(lastLine.getX1())+","+toString(lastLine.getY1())+") -- ("+toString(lastLine.getX2())+","+toString(lastLine.getY2())+");\n");
 		}
 		builder.append("\\end{tikzpicture}");
 		return builder.toString();

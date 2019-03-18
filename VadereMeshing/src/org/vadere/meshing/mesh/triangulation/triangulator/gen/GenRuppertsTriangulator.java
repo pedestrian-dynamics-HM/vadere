@@ -55,6 +55,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	private double threashold;
 	private static double MIN_ANGLE_TO_TERMINATE = 20;
 	private boolean createHoles;
+	private Set<F> outsideFaces;
 
 
     public GenRuppertsTriangulator(
@@ -74,6 +75,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 		this.minAngle = minAngle;
 		this.threashold = 0.0;
 		this.createHoles = createHoles;
+		this.outsideFaces = new HashSet<>();
 
 	    /**
 	     * This prevent the flipping of constrained edges
@@ -192,7 +194,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 			    Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
 			    Optional<F> optFace = getMesh().streamFaces().filter(mergeCondition).findAny();
 			    if(optFace.isPresent()) {
-				    triangulation.createHole(optFace.get(), mergeCondition, true);
+				    Optional<F> optionalF = triangulation.createHole(optFace.get(), mergeCondition, true);
 			    }
 		    }
 
@@ -200,7 +202,6 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 			    Predicate<F> mergeCondition = f -> !boundingBox.contains(getMesh().toTriangle(f).midPoint());
 			    triangulation.shrinkBorder(mergeCondition, true);
 		    }
-
 	    }
     	generated = true;
 	}

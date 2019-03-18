@@ -63,7 +63,7 @@ public class SierpinskyPlot {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			uniformRefinementTriangulation.step();
+			uniformRefinementTriangulation.refine();
 			log.info("step");
 			panel.repaint();
 		}

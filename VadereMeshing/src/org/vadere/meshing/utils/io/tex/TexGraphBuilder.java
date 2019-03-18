@@ -1,4 +1,4 @@
-package org.vadere.meshing.utils.tex;
+package org.vadere.meshing.utils.io.tex;
 
 import org.vadere.util.visualization.ColorHelper;
 import org.vadere.meshing.utils.color.ColorFunctions;

@@ -9,11 +9,14 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PContrainedDelaunayTriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayRefinement;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulation;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDirichletRefinement;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
-import org.vadere.meshing.utils.tex.TexGraphGenerator;
+import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.GeometryUtils;
@@ -23,13 +26,13 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -39,8 +42,50 @@ import java.util.stream.Collectors;
 
 public class MeshExamples {
 
-	public static void main(String... args) {
-		ruppertsAndEikMesh();
+	public static void main(String... args) throws InterruptedException {
+		dirichletRefinment();
+		delaunayRefinment();
+
+	}
+
+	public static void faceTest() throws InterruptedException {
+		VPoint p1 = new VPoint(-1,0);
+		VPoint p2 = new VPoint(1, 0);
+		VPoint p3 = new VPoint(0, Math.sqrt(4-1));
+		VPoint p4 = new VPoint(4,4);
+		VPoint p5 = new VPoint(3,0);
+		List<VPoint> points = new ArrayList<>();
+		points.add(p1);
+		points.add(p2);
+		points.add(p3);
+		points.add(p4);
+		points.add(p5);
+
+		VTriangle triangle = new VTriangle(p1, p2, p3);
+		VPoint c = triangle.getCircumcenter();
+		VLine line = new VLine(p2, p3);
+		VPoint midpoint = line.midPoint();
+		VPoint toC = midpoint.subtract(c).norm().scalarMultiply(triangle.getCircumscribedRadius());
+		VPoint newPoint = midpoint.subtract(c).scalarMultiply(2).add(c).add(toC);
+
+		points.add(newPoint);
+
+		PDelaunayTriangulation<VPoint, Double, Double> delaunayTriangulation = new PDelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		delaunayTriangulation.generate();
+
+		System.out.println(TexGraphGenerator.toTikz(delaunayTriangulation.getMesh()));
+		System.out.println(newPoint);
+		System.out.println(triangle.getCircumcenter());
+		VPoint ca = new VTriangle(p2,p3,p4).getCircumcenter();
+		System.out.println("ca" + ca);
+		System.out.println("cca" + new VTriangle(p2,p3,ca).getCircumcenter());
+		System.out.println("ccar" + new VTriangle(p2,p3,ca).getCircumscribedRadius());
+		System.out.println(midpoint);
+		System.out.println(new VTriangle(newPoint, p2, p3).getCircumcenter());
+		System.out.println(new VTriangle(newPoint, p2, p3).getCircumscribedRadius());
+		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(delaunayTriangulation.getMesh(), 500, 500);
+		panel.display("A square mesh");
+		panel.repaint();
 	}
 
 	public static void square() {
@@ -61,11 +106,6 @@ public class MeshExamples {
 		panel.repaint();
 
 		mesh.getNext(mesh.getEdge(mesh.getFace()));
-
-		for(VPoint point : mesh.getPointIt(mesh.getBorder())) {
-
-		}
-
 		mesh.streamPoints(mesh.getBorder()).parallel();
 
 
@@ -256,6 +296,199 @@ public class MeshExamples {
 			}*/
 		}
 	}
+
+	public static void dirichletRefinment() throws InterruptedException {
+		// bounding polygon
+		VPolygon boundingBox = GeometryUtils.toPolygon(
+				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 20.0),
+				100);
+
+		// first polygon
+		VPolygon house = GeometryUtils.toPolygon(
+				new VPoint(1, 1),
+				new VPoint(1, 5),
+				new VPoint(3, 7),
+				new VPoint(5,5),
+				new VPoint(5,1));
+
+		IDistanceFunction distanceFunction = IDistanceFunction.create(boundingBox, house);
+		PDirichletRefinement<EikMeshPoint, Double, Double> delaunayRefinement = new PDirichletRefinement<>(
+				boundingBox,
+				Arrays.asList(house),
+				(x, y) -> new EikMeshPoint(x, y),
+				true,
+				0.5,
+				p -> 0.5 /*+ 0.5*Math.abs(distanceFunction.apply(p))*/);
+
+		Function<PFace<EikMeshPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = delaunayRefinement.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(delaunayRefinement.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+
+		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(delaunayRefinement.getMesh(), 1000, 1000, colorFunction);
+		panel.display("Dirichlet Refinement");
+
+		delaunayRefinement.generate();
+		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
+			distanceFunction,
+				p -> 1.0 /*+ 0.5*Math.abs(distanceFunction.apply(p))*/,
+				1.0,
+				delaunayRefinement.getTriangulation());
+
+
+		while (true) {
+			synchronized (meshImprover.getMesh()) {
+				meshImprover.improve();
+			}
+
+			panel.repaint();
+			Thread.sleep(10);
+		}
+		//panel.repaint();
+	}
+
+	public static void delaunayRefinment() throws InterruptedException {
+		// bounding polygon
+		VPolygon boundingBox = GeometryUtils.toPolygon(
+				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 20.0),
+				100);
+
+		// first polygon
+		VPolygon house = GeometryUtils.toPolygon(
+				new VPoint(1, 1),
+				new VPoint(1, 5),
+				new VPoint(3, 7),
+				new VPoint(5,5),
+				new VPoint(5,1));
+
+		PDelaunayRefinement<VPoint, Double, Double> delaunayRefinement = new PDelaunayRefinement<>(
+				boundingBox,
+				Arrays.asList(house),
+				(x, y) -> new VPoint(x, y),
+				true,
+				0.3,
+				p -> 1.0);
+
+		Function<PFace<VPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = delaunayRefinement.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(delaunayRefinement.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+
+		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(delaunayRefinement.getMesh(), 1000, 1000, colorFunction);
+		panel.display("Delaunay Refinement");
+
+		delaunayRefinement.generate();
+		/*while (!delaunayRefinement.isFinished()) {
+			synchronized (delaunayRefinement.getMesh()) {
+				delaunayRefinement.refine();
+			}
+
+			panel.repaint();
+			Thread.sleep(10);
+		}*/
+		panel.repaint();
+	}
+
+	public static void ruppertsAndEikMeshShort() {
+
+		// bounding polygon
+		VPolygon boundingBox = GeometryUtils.toPolygon(
+				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 20.0),
+				100);
+
+		// first polygon
+		VPolygon house = GeometryUtils.toPolygon(
+				new VPoint(1, 1),
+				new VPoint(1, 5),
+				new VPoint(3, 7),
+				new VPoint(5,5),
+				new VPoint(5,1));
+
+
+		//IDistanceFunction distanceFunction = IDistanceFunction.create(boundingBox, Arrays.asList(house));
+		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
+				p -> 1.0 /*+ Math.abs(approxDistance.apply(p))*0.3*/,
+				1.0,
+				boundingBox,
+				Arrays.asList(house), (x, y) -> new EikMeshPoint(x, y));
+
+
+
+		Function<PFace<EikMeshPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = meshImprover.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(meshImprover.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+
+		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 1000, colorFunction);
+		panel.display("EikMesh and Ruppert's Algorithm");
+
+
+		meshImprover.initialize();
+		while (true) {
+			meshImprover.improve();
+			panel.repaint();
+			/*try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}*/
+		}
+	}
+
+	public static void ruppertsAndEikMeshShort2() {
+
+		// bounding polygon
+		VPolygon boundingBox = GeometryUtils.toPolygon(
+				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 20.0),
+				100);
+
+		// first polygon
+		VPolygon house = GeometryUtils.toPolygon(
+				new VPoint(1, 1),
+				new VPoint(1, 5),
+				new VPoint(3, 7),
+				new VPoint(5,5),
+				new VPoint(5,1));
+
+		IDistanceFunction distanceFunction = GenEikMesh.createDistanceFunction(boundingBox, Arrays.asList(house));
+		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
+				distanceFunction,
+				p -> 1.0 /*+ Math.abs(approxDistance.apply(p))*0.3*/,
+				2.0,
+				new VRectangle(boundingBox.getBounds2D()),
+				Arrays.asList(house), (x, y) -> new EikMeshPoint(x, y));
+
+
+
+		Function<PFace<EikMeshPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = meshImprover.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(meshImprover.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+
+		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 1000, colorFunction);
+		panel.display("EikMesh and Ruppert's Algorithm");
+
+
+		int counter = 0;
+		while (counter < 100) {
+			counter++;
+			meshImprover.improve();
+			panel.repaint();
+			/*try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}*/
+		}
+		meshImprover.finish();
+		panel.repaint();
+	}
+
+	public static void realWorldExample() {
+
+
+	}
+
 
 	private static boolean  isLowOfQuality(@NotNull final VTriangle triangle) {
 		double alpha = 30; // lowest angle in degree

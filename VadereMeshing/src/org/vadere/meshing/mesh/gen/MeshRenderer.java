@@ -121,9 +121,13 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		Color c = graphics.getColor();
 		Stroke stroke = graphics.getStroke();
 
-		VRectangle bound = mesh.getBound();
-		double scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-		faces = mesh.clone().getFaces();
+		VRectangle bound;
+		double scale;
+		synchronized (mesh) {
+			bound = mesh.getBound();
+			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+			faces = mesh.clone().getFaces();
+		}
 
 		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
 		graphics.scale(scale, scale);

@@ -185,18 +185,7 @@ public interface IMeshImprover<P extends IPoint, CE, CF, V extends IVertex<P>, E
 	 * @return the quality of a face / triangle
 	 */
 	default double faceToQuality(final F face) {
-		VLine[] lines = getMesh().toTriangle(face).getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-		}
-		else {
-			throw new IllegalArgumentException(face + " is not a feasible triangle!");
-		}
-		return part;
+		return getTriangulation().faceToQuality(face);
 	}
 
 }

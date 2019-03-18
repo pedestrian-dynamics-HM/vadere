@@ -45,6 +45,10 @@ public interface IDistanceFunction extends Function<IPoint, Double> {
 		return new DistanceFunction(regionBoundingBox, obstacles);
 	}
 
+	static IDistanceFunction create(final VPolygon regionBoundingBox, final Collection<? extends VShape> obstacles) {
+		return new DistanceFunction(regionBoundingBox, obstacles);
+	}
+
 	static IDistanceFunction create(final VRectangle regionBoundingBox, final VShape ... shapes) {
 		List<VShape> shapeList = new ArrayList<>();
 		for(VShape shape : shapes) {

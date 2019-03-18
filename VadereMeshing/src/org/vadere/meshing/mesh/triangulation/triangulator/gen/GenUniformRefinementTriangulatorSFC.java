@@ -8,8 +8,8 @@ import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
-import org.vadere.meshing.utils.tex.TexGraphGenerator;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
+import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
 
 	private static final Logger logger = Logger.getLogger(GenUniformRefinementTriangulatorSFC.class);
 
@@ -317,31 +317,12 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	}
 
 	private void nextSFCLevel() {
-		nextSFCLevel(edge -> !isCompleted(edge) && isLongestEdge(edge));
+		nextSFCLevel(edge -> !isCompleted(edge) && triangulation.isLongestEdge(edge));
 	}
 
 	private void nextSFCLevel(double ran) {
-		nextSFCLevel(edge -> (random.nextDouble() < ran) && isLongestEdge(edge));
+		nextSFCLevel(edge -> (random.nextDouble() < ran) && triangulation.isLongestEdge(edge));
 	}
-
-	/**
-	 * <p>Applies the next step of the algorithm i.e. for the first call it initializes the algorithm,
-	 * all calls afterwards until the refinement has finished the next SFC-level is constructed, if
-	 * the refinement has finished the finish part is executed.</p>
-	 */
-    public void step() {
-		if(!initialized) {
-			init();
-			initialized = true;
-		}
-
-		if(!refinementFinished) {
-			nextSFCLevel();
-		}
-		else if(!finished) {
-			finish();
-		}
-    }
 
 	/**
 	 * <p>There are two half-edges for each edge but we want to have only one half-edge for each edge
@@ -357,6 +338,26 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 		P p1 = getMesh().getPoint(getMesh().getPrev(edge));
 		P p2 = getMesh().getPoint(edge);
 		return (p1.getX() > p2.getX() || (p1.getX() == p2.getX() && p1.getY() > p2.getY()));
+	}
+
+	/**
+	 * <p>Applies the next step of the algorithm i.e. for the first call it initializes the algorithm,
+	 * all calls afterwards until the refinement has finished the next SFC-level is constructed, if
+	 * the refinement has finished the finish part is executed.</p>
+	 */
+	@Override
+	public void refine() {
+		if(!initialized) {
+			init();
+			initialized = true;
+		}
+
+		if(!refinementFinished) {
+			nextSFCLevel();
+		}
+		else if(!finished) {
+			finish();
+		}
 	}
 
 	/**
@@ -383,15 +384,17 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 * @return returns the refined triangulation
 	 */
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
-        logger.info("start triangulation generation");
-        init();
+        if(!isFinished()) {
+	        logger.info("start triangulation generation");
+	        init();
 
-		while (!isFinished()) {
-			step();
-		}
+	        while (!isFinished()) {
+		        refine();
+	        }
 
-        finish();
-		logger.info("end triangulation generation");
+	        finish();
+	        logger.info("end triangulation generation");
+        }
 		return triangulation;
 	}
 
@@ -492,30 +495,6 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 */
 	private E getLongestEdge(F face) {
 	    return getMesh().streamEdges(face).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
-    }
-
-	/**
-	 * <p>Returns true if the full-edge of this half-edge is the longest edge of its faces.</p>
-	 *
-	 * @param edge the half-edge
-	 * @return true if the full-edge of this half-edge is the longest edge of its faces
-	 */
-	private boolean isLongestEdge(E edge) {
-
-		// the edge is part of two faces
-		if(!getMesh().isAtBoundary(edge)) {
-			E longestEdge1 = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
-			E longestEdge2 = getMesh().streamEdges(getMesh().getTwinFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
-			return getMesh().isSameLineSegment(longestEdge1, edge) && getMesh().isSameLineSegment(longestEdge2, edge);
-		} // the edge is part of one face
-	    else {
-			if(getMesh().isBoundary(edge)) {
-				edge = getMesh().getTwin(edge);
-			}
-
-			E longestEdge = getMesh().streamEdges(getMesh().getFace(edge)).reduce((e1, e2) -> getMesh().toLine(e1).length() > getMesh().toLine(e2).length() ? e1 : e2).get();
-			return getMesh().isSameLineSegment(longestEdge, edge);
-		}
     }
 
 	/**

@@ -9,6 +9,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.ITriConnectivity;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.meshing.mesh.triangulation.BowyerWatsonSlow;
@@ -71,6 +72,8 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	private List<V> virtualVertices;
 	private boolean useMeshForBound;
 	private IPointLocator.Type type;
+	private final List<ITriEventListener<P, CE, CF, V, E, F>> triEventListeners;
+
 
 	private static double BUFFER_PERCENTAGE = GeometryUtils.DOUBLE_EPS;
 
@@ -110,6 +113,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		this.finalized = false;
 		this.initialized = false;
 		this.mesh = mesh;
+		this.triEventListeners = new ArrayList<>();
 		this.setPointLocator(type);
 	}
 
@@ -137,6 +141,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		this.bound = bound;
 		this.finalized = false;
 		this.initialized = false;
+		this.triEventListeners = new ArrayList<>();
 		this.setPointLocator(type);
 	}
 
@@ -197,6 +202,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		this.finalized = false;
 		this.virtualVertices = new ArrayList<>();
 		this.virtualVertices.addAll(mesh.getVertices());
+		this.triEventListeners = new ArrayList<>();
 		this.setPointLocator(type);
 	}
 
@@ -374,11 +380,16 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 
     @Override
 	public E insert(@NotNull P point, @NotNull F face) {
+		return insert(getMesh().createVertex(point), face);
+	}
+
+	@Override
+	public E insert(@NotNull V vertex, @NotNull F face) {
 		if(!initialized) {
 			init();
 		}
 
-		E edge = mesh.closestEdge(face, point.getX(), point.getY());
+		E edge = mesh.closestEdge(face, vertex.getX(), vertex.getY());
 		P p1 = mesh.getPoint(mesh.getPrev(edge));
 		P p2 = mesh.getPoint(edge);
 
@@ -388,26 +399,21 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		 *      2) point lies on an edge of a face => split the edge
 		 *      3) point lies in the interior of the face => split the face (this should be the main case)
 		 */
-		if(isClose(point.getX(), point.getY(), face, edgeCoincidenceTolerance)) {
-			log.info("ignore insertion point, since the point " + point + " already exists or it is too close to another point!");
-			return getCloseEdge(face, point.getX(), point.getY(), edgeCoincidenceTolerance).get();
+		if(isClose(vertex.getX(), vertex.getY(), face, edgeCoincidenceTolerance)) {
+			//log.info("ignore insertion point, since the point " + vertex + " already exists or it is too close to another point!");
+			return getCloseEdge(face, vertex.getX(), vertex.getY(), edgeCoincidenceTolerance).get();
 		}
-		if(GeometryUtils.isOnEdge(p1, p2, point, edgeCoincidenceTolerance)) {
+		if(GeometryUtils.isOnEdge(p1, p2, vertex, edgeCoincidenceTolerance)) {
 			//log.info("splitEdge()");
-			E newEdge = getAnyEdge(splitEdge(point, edge, true));
+			E newEdge = getAnyEdge(splitEdge(vertex, edge, true));
 			insertEvent(newEdge);
 			return newEdge;
 		}
 		else {
 			//log.info("splitTriangle()");
-			if(!contains(point.getX(), point.getY(), face)) {
-				Optional<F> f = locateFace(point);
-				f = locateFace(point);
-			}
+			assert contains(vertex.getX(), vertex.getY(), face);
 
-			assert contains(point.getX(), point.getY(), face);
-
-			E newEdge = splitTriangle(face, point,  true);
+			E newEdge = splitTriangle(face, vertex,  true);
 			insertEvent(newEdge);
 			return newEdge;
 		}
@@ -537,6 +543,16 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 
 			finalized = true;
 		}
+	}
+
+	@Override
+	public void addTriEventListener(@NotNull ITriEventListener<P, CE, CF, V, E, F> triEventListener) {
+		triEventListeners.add(triEventListener);
+	}
+
+	@Override
+	public void removeTriEventListener(@NotNull ITriEventListener<P, CE, CF, V, E, F> triEventListener) {
+		triEventListeners.remove(triEventListener);
 	}
 
 	public boolean isDeletionOk(final F face) {
@@ -812,21 +828,33 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
 		pointLocator.postFlipEdgeEvent(f1, f2);
+		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+			triEventListener.postFlipEdgeEvent(f1, f2);
+		}
 	}
 
 	@Override
 	public void splitTriangleEvent(final F original, final F f1, F f2, F f3) {
 		pointLocator.postSplitTriangleEvent(original, f1, f2, f3);
+		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+			triEventListener.postSplitTriangleEvent(original, f1, f2, f3);
+		}
 	}
 
 	@Override
 	public void splitEdgeEvent(F original, F f1, F f2) {
 		pointLocator.postSplitHalfEdgeEvent(original, f1, f2);
+		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+			triEventListener.postSplitHalfEdgeEvent(original, f1, f2);
+		}
 	}
 
 	@Override
 	public void insertEvent(@NotNull final E halfEdge) {
 		pointLocator.postInsertEvent(getMesh().getVertex(halfEdge));
+		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+			triEventListener.postInsertEvent(getMesh().getVertex(halfEdge));
+		}
 	}
 
 	@Override

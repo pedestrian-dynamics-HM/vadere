@@ -77,7 +77,7 @@ public class TestUniTriangulation extends JFrame {
                 e.printStackTrace();
             }
 	        overAllTime.resume();
-	        uniformRefinementTriangulation.step();
+	        uniformRefinementTriangulation.refine();
 	        overAllTime.suspend();
 
 	        log.info("computation time = " + (overAllTime.getTime()) + "[ms]");

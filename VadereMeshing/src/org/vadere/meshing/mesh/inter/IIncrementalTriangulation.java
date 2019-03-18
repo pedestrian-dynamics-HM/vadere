@@ -49,6 +49,8 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 	void compute();
 	void finish();
 	void recompute();
+	void addTriEventListener(@NotNull final ITriEventListener<P, CE, CF, V, E, F> triEventListener);
+	void removeTriEventListener(@NotNull final ITriEventListener<P, CE, CF, V, E, F> triEventListener);
 
 	IIncrementalTriangulation<P, CE, CF, V, E, F> clone();
 
@@ -73,9 +75,12 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 
 	Stream<F> streamFaces();
 	Set<F> getFaces();
+
 	E insert(double x, double y);
 	E insert(final P point);
+	E insert(@NotNull V vertex, @NotNull F face);
 	void insert(final Collection<P> points);
+
 	void remove(final P point);
 
 	void setPointLocator(@NotNull final IPointLocator.Type type);

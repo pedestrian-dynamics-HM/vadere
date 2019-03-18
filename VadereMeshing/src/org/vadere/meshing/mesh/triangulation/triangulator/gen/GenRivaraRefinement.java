@@ -7,17 +7,18 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 
 import java.util.LinkedList;
 
-public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
 
 	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private final IEdgeLengthFunction edgeLengthFunction;
 	private boolean finished;
+	private boolean refined;
 
 	public GenRivaraRefinement(
 			@NotNull final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation,
@@ -31,23 +32,29 @@ public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>,
 	@Override
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
 		if(!finished) {
-			boolean refined;
 			do {
 				refined = false;
-				for(E edge : getMesh().getEdges()) {
-					if(!getMesh().isBoundary(edge)) {
-						VLine line = getMesh().toLine(edge);
-						if(edgeLengthFunction.apply(line.midPoint()) < line.length()) {
-							refined = true;
-							refine(getMesh().getFace(edge));
-						}
-					}
-				}
+				refine();
 			} while(refined);
 
 			finished = true;
 		}
 		return triangulation;
+	}
+
+	@Override
+	public void refine() {
+		if(!finished) {
+			for(E edge : getMesh().getEdges()) {
+				if(!getMesh().isBoundary(edge)) {
+					VLine line = getMesh().toLine(edge);
+					if(edgeLengthFunction.apply(line.midPoint()) < line.length()) {
+						refined = true;
+						refine(getMesh().getFace(edge));
+					}
+				}
+			}
+		}
 	}
 
 	public boolean isFinished() {
