@@ -14,6 +14,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.exceptions.UnsupportedEventException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -146,6 +147,8 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		rebuildFloorField(simTimeInSec);
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+
+		UnsupportedEventException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
 
 		// set gradient provider and pedestrians
 		equations.setElements(pedestrians);
