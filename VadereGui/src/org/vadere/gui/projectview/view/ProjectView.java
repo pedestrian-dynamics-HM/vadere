@@ -333,7 +333,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				closeApplicationAction.actionPerformed(null);
 			}
 		});
-
+		Preferences pref = Preferences.userNodeForPackage(VadereApplication.class);
 		pack();
 	}
 
@@ -365,7 +365,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JMenuItem mntmLoadProject = new JMenuItem(loadProjectAction);
 
 		mntmRecentProjects = new JMenu(Messages.getString("ProjectView.mntmRecentProjects.text"));
-		mntmRecentProjects.setEnabled(false);
+		mntmRecentProjects.setEnabled(true);
 		updateRecentProjectsMenu();
 
 		Action changeNameAction = new ActionRenameProject(Messages.getString("ProjectView.mntmChangeName.text"), model);
@@ -535,6 +535,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 				model.setCurrentScenario(bundle.getScenario());
                 logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
+
                 scenarioJPanel.setScenario(bundle.getScenario(), true);
 
 				outputTableRenderer.setMarkedOutputFiles(bundle.getOutputDirectories());
