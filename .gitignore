@@ -1,40 +1,23 @@
-#builds, log/preferences files
-target/
+# Build artifacts, log and preference files
 *.out
 *.preferences.xml
+bin/
 swing-inspector-linux-1.2.3/
-
-#Python
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-**/venv/
-Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
-Tools/VadereAnalysisTools/VadereAnalysisTool/build/
-Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
-Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool**/output
-Tools/ContinuousIntegration/**/output
-
+target/
 
 # C extensions
 *.so
-vadereanalysistool/build
+vadere_analysis_tool/build
 
-#Tools and build utils
-bin/
-
-#IntelliJ
+# IDEs
 .idea/
 *.iml
-
-#Eclipse
 .settings/
 .metadata/
 .classpath
 .project
 
-#package specific
+# Package specific
 VadereGui/*.png
 VadereGui/*.svg
 VadereGui/*.mov
@@ -43,18 +26,20 @@ VadereUtils/testreports/*.txt
 VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
 
-#Java runtime files generated with "jdeps" and "jlink"
-java-runtime/*
+# Python (byte-compiled, optimized, DLL files etc.)
+__pycache__/
+*.py[cod]
+*$py.class
+**/venv/
+Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/build/
+Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
 
-#model test output
-VadereModelTests/**/output
-VadereModelTests/*_private
-VadereModelCalibration/**/output
-VadereModelTests/**/legacy
-VadereUtils/output/**
-
-#mac osx files
+# Operating system files
 .DS_Store
-
-#linux files
 **/.directory
+
+# Vadere output directories
+**/output/
+**/legacy/
+**/*_private/
