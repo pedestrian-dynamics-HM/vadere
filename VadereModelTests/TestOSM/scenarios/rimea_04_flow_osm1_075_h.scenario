@@ -145,6 +145,13 @@
         },
         "pedestrianVelocityProcessorId" : 7
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 3
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
