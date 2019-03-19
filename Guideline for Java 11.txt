@@ -3,6 +3,7 @@ The java_migration branch has used the following steps to compile and run vadere
 0. Ensure that JDK-11 and Git is set in the environment variables
 
 1. Adjust the IDE (IntelliJ)
+   -> Make sure that you have the latest version of IntelliJ (in some older versions, Java 11 is not supported!)
 1.1 Select File -> Settings -> Build, Execution, Deployment -> Compiler -> Java Compiler
 1.1.1 Select 11 for "Project bytecode version"
 1.1.2 Select 1.11 in "Per-module bytecode version" for each module
