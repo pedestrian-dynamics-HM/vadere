@@ -1,5 +1,5 @@
 {
-  "name" : "C-050-180-180_long",
+  "name" : "C-180-180-180_Q",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -61,7 +61,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {
         "pedestrianLineCrossProcessorId" : 8,
-        "pedestrianVelocityProcessorId" : 13,
+        "pedestrianVelocityProcessorId" : 7,
         "deltaTime" : 10.0
       }
     }, {
@@ -70,7 +70,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
       "attributes" : {
         "pedestrianPositionProcessorId" : 1,
-        "backSteps" : 1
+        "backSteps" : 3
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
@@ -155,7 +155,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianVelocityByTrajectoryProcessor",
       "attributes" : {
         "pedestrianTrajectoryProcessorId" : 10,
-        "backSteps" : 1
+        "backSteps" : 3
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramEProcessor",
@@ -192,32 +192,32 @@
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "OBSTACLES",
-          "obstacleDensityWeight" : 3.5,
+          "type" : "QUEUEING",
+          "obstacleDensityWeight" : 0.1,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,
-          "queueWidthLoading" : 1.0,
+          "queueWidthLoading" : 3.0,
           "pedestrianDynamicWeight" : 6.0,
           "loadingType" : "CONSTANT"
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 4,
-        "numberOfCircles" : 1,
-        "optimizationType" : "NELDER_MEAD",
+        "stepCircleResolution" : 30,
+        "numberOfCircles" : 5,
+        "optimizationType" : "DISCRETE",
         "varyStepDirection" : true,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
-        "stepLengthSD" : 0.036,
+        "stepLengthSD" : 0.0,
         "movementThreshold" : 0.0,
-        "minStepLength" : 0.3,
+        "minStepLength" : 0.1,
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : false,
+        "seeSmallWalls" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -226,18 +226,18 @@
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
         "pedPotentialPersonalSpaceWidth" : 1.2,
-        "pedPotentialHeight" : 50.0,
+        "pedPotentialHeight" : 35.0,
         "obstPotentialWidth" : 0.8,
-        "obstPotentialHeight" : 6.0,
-        "intimateSpaceFactor" : 1.2,
+        "obstPotentialHeight" : 4.0,
+        "intimateSpaceFactor" : 2.0,
         "personalSpacePower" : 1,
-        "intimateSpacePower" : 1
+        "intimateSpacePower" : 2
       }
     },
     "attributesSimulation" : {
       "finishTime" : 200.0,
-      "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
+      "simTimeStepLength" : 0.1,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -260,9 +260,9 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 16.0,
-          "y" : 11.25,
+          "y" : 11.9,
           "width" : 1.0,
-          "height" : 4.25,
+          "height" : 4.15,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -271,7 +271,7 @@
           "x" : 16.0,
           "y" : 6.0,
           "width" : 1.0,
-          "height" : 4.75,
+          "height" : 4.15,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -316,7 +316,7 @@
           "x" : 16.0,
           "y" : 0.4,
           "width" : 1.0,
-          "height" : 4.6,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -326,7 +326,7 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 29.0,
+          "x" : 31.9,
           "y" : 8.4,
           "width" : 2.5,
           "height" : 4.9,
@@ -340,21 +340,22 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
           "x" : 0.8,
           "y" : 6.4,
-          "width" : 15.0,
+          "width" : 10.0,
           "height" : 8.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 2000,
+        "distributionParameters" : [ 220.0 ],
+        "spawnNumber" : 220,
+        "maxSpawnNumberTotal" : 220,
         "startTime" : 0.0,
-        "endTime" : 200.0,
+        "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
@@ -363,10 +364,10 @@
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "radius" : 0.195,
+        "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.55,
-        "speedDistributionStandardDeviation" : 0.26,
+        "speedDistributionStandardDeviation" : 0.15,
         "minimumSpeed" : 1.37,
         "maximumSpeed" : 1.73,
         "acceleration" : 2.0
@@ -376,10 +377,10 @@
         "id" : -1,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.55,
+        "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 1.37,
-        "maximumSpeed" : 1.73,
+        "minimumSpeed" : 0.3,
+        "maximumSpeed" : 3.0,
         "acceleration" : 2.0,
         "length" : 4.5,
         "width" : 1.7,
