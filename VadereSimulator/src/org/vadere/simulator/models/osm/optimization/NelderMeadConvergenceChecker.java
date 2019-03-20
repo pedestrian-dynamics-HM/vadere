@@ -40,6 +40,9 @@ public class NelderMeadConvergenceChecker implements RealConvergenceChecker {
 	}
 
 	@Override
+	/** Convergence criterion according to sivers-2013 (p.34) / nelder-1965 p.309
+	 *
+	 */
 	public boolean converged(final int iteration,
 			final RealPointValuePair previous, final RealPointValuePair current) {
 
