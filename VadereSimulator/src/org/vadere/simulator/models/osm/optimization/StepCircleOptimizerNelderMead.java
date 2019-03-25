@@ -48,6 +48,7 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 	//public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) throws IOException {
 	public VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea) {
 
+
 		if ( (Math.abs(pedestrian.getTimeOfNextStep() - TimeToBeAnalyzed)  < 0.0001) && (pedestrian.getId() == pedestrianNrToBeAnalyzed) )
 		{
 			System.out.println("Artificial Stop for Debugger");
@@ -71,15 +72,16 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 
 
 		double stepSize = ((VCircle) reachableArea).getRadius();
+		VPoint pedPosition = pedestrian.getPosition();
 		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle)reachableArea, random);
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
 
-		double[] position = potentialEvaluationFunction.pointToArray(pedestrian.getPosition());
+		double[] position = potentialEvaluationFunction.pointToArray(pedPosition);
 		double[] newPosition = new double[2];
 		double[] minimum = position;
 		double[] newMinimum = {0, 0};
-		double minimumValue = pedestrian.getPotential(pedestrian.getPosition());
+		double minimumValue = pedestrian.getPotential(pedPosition);
 		double newMinimumValue = 0;
 		double step = stepSize / 2;
 		double threshold = 0.0001;
@@ -146,10 +148,10 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 
 			int counter = 0;
 
-			if ((minimumValue > newMinimumValue && Math.abs(minimumValue - newMinimumValue) > threshold)) {
+			//if ((minimumValue > newMinimumValue && Math.abs(minimumValue - newMinimumValue) > threshold)) {
 				minimumValue = newMinimumValue;
 				minimum = newMinimum;
-			}
+			//}
 
 			int bound = positions.size();
 
@@ -173,9 +175,9 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 					anotherPoint = counter + 1;
 				}
 
-				double innerDistance = pedestrian.getPosition().distance(
+				double innerDistance = pedPosition.distance(
 						(positions.get(counter)));
-				VPoint innerDirection = pedestrian.getPosition()
+				VPoint innerDirection = pedPosition
 						.subtract((positions.get(counter)))
 						.scalarMultiply(1.0 / innerDistance);
 				double outerDistance = positions.get(anotherPoint).distance(
