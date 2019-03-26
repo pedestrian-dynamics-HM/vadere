@@ -3,7 +3,11 @@ package org.vadere.util.logging;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
@@ -11,7 +15,10 @@ import org.apache.logging.log4j.spi.ExtendedLoggerWrapper;
 import org.apache.logging.log4j.util.MessageSupplier;
 import org.apache.logging.log4j.util.Supplier;
 
-import javax.security.auth.login.Configuration;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 /**
  * Extended Logger interface with convenience methods for
@@ -22,10 +29,71 @@ public final class Logger extends ExtendedLoggerWrapper {
 	private static final long serialVersionUID = 32544032022288L;
 	private final ExtendedLoggerWrapper logger;
 
+	private static boolean configOverwritten = false;
+
 	private static final String FQCN = Logger.class.getName();
 	private static final Level STDERR = Level.forName("STDERR", 199);
-	private static final Level STDOUT = Level.forName("STDOUT", 401);
+	private static final Level STDOUT = Level.forName("STDOUT", 399);
 
+
+	/**
+	 * Overwrite the log4j2.properties config programmatically and change preset
+	 * filename and loglevel.
+	 * @param filename		new filename
+	 * @param level			new log-level if given (default: INFO)
+	 */
+	public static void overrideDefault(String filename, String level){
+		final LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
+		final Configuration config = loggerContext.getConfiguration();
+		final LoggerConfig rootConfig =  config.getRootLogger();
+
+		//delete STDOUTERR-Logger and remove FILE-Appender
+		RollingFileAppender oldAppender = config.getAppender("FILE");
+		String oldFileName = oldAppender.getFileName();
+		oldAppender.stop();
+		rootConfig.removeAppender("FILE");
+		config.removeLogger("STDOUTERR");
+
+		//create new STDOUTERR with correct log level.
+		LoggerConfig newSTDOUTERR = new LoggerConfig("STDOUTERR", Level.toLevel(level), false);
+
+		//create and start new FILE-Appender with new file name / location.
+		RollingFileAppender newAppender = RollingFileAppender.newBuilder()
+				.withName("FILE")
+				.withFileName(filename)
+				.withFilePattern(filename + "-%d{MM-dd-yy-HH-mm-ss}-%i.log.gz")
+				.withLayout(oldAppender.getLayout())
+				.withPolicy(oldAppender.getTriggeringPolicy())
+				.build();
+		newAppender.start();
+
+
+
+		// add new Appender to new STDOUTERR and root-Logger
+		newSTDOUTERR.addAppender(newAppender, Level.toLevel(level), null);
+		newSTDOUTERR.setAdditive(false);
+		config.addLogger("STDOUTERR", newSTDOUTERR);
+		rootConfig.addAppender(newAppender, Level.toLevel(level), null);
+
+		// update configuriation.
+		loggerContext.updateLoggers();
+		StdOutErrLog.addStdOutErrToLog();
+		configOverwritten = true; //ensure that StdOutErrLog does not redirect again.
+
+		Logger log = getLogger();
+		// delete old log-file
+		try {
+			log.info("remove old log file");
+			Files.deleteIfExists(Paths.get(oldFileName));
+		} catch (IOException e) {
+			log.error("could not remove old log file");
+			e.printStackTrace();
+		}
+	}
+
+	public static boolean isConfigOverwritten(){
+		return configOverwritten;
+	}
 
 	private Logger(final org.apache.logging.log4j.Logger logger) {
 		super((AbstractLogger) logger, logger.getName(), logger.getMessageFactory());

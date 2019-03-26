@@ -18,9 +18,6 @@ import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
-import org.vadere.util.opencl.CLUtils;
-
-import javax.swing.*;
 
 
 /**
@@ -37,12 +34,12 @@ public class VadereConsole {
 		ArgumentParser parser = createArgumentParser();
 
 		try {
-			StdOutErrLog.addStdOutErrToLog();
 			//if (!CLUtils.isOpenCLSupported()) {
 			//	System.out.println("Warning: OpenCL acceleration disabled, since no OpenCL support could be found!");
 			//}
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
+			StdOutErrLog.addStdOutErrToLog();
 			sRunner.run(ns, parser);
 
 		} catch (UnsatisfiedLinkError linkError) {
@@ -74,7 +71,7 @@ public class VadereConsole {
                 .required(false)
                 .type(String.class)
                 .dest("loglevel")
-                .choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
+                .choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
                 .setDefault("INFO")
                 .action(new SetLogLevelCommand())
                 .help("Set Log Level.");
