@@ -5,6 +5,7 @@ import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
@@ -227,6 +228,30 @@ public abstract class DefaultRenderer {
 		final Color tmpColor = graphics.getColor();
 		graphics.setColor(color);
 		fill(element.getShape(), graphics);
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderMeasurementAreas(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
+										  final Color color){
+		for (ScenarioElement e : elements){
+			renderMeasurementArea(e, g, color);
+		}
+	}
+
+	protected void renderMeasurementArea(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		MeasurementArea area = (MeasurementArea) element;
+		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(),
+				defaultModel.getConfig().getMeasurementAreaAlpha()));
+		if (area.getShape() instanceof VPolygon){
+			VPolygon p = (VPolygon) area.getShape();
+			if (p.getPoints().size() == 2){
+				graphics.setStroke(new BasicStroke(3*getLineWidth()));
+				graphics.draw(p);
+			}
+		}
+		fill(element.getShape(), graphics);
+
 		graphics.setColor(tmpColor);
 	}
 

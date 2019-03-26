@@ -170,6 +170,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

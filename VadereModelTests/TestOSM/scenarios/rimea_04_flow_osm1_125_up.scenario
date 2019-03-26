@@ -101,6 +101,7 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ ],
       "stairs" : [ {
         "shape" : {
           "x" : 2.6,
