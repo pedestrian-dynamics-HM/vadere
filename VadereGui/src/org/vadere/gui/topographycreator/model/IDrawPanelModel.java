@@ -14,6 +14,7 @@ import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
@@ -182,7 +183,11 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	void removeObstacleIf(final @NotNull Predicate<Obstacle> predicate);
 
+	void removeMeasurementAreaIf(final @NotNull Predicate<MeasurementArea> predicate);
+
 	List<Obstacle> getObstacles();
+
+	List<MeasurementArea> getMeasurementAreas();
 
 	Rectangle2D.Double getBounds();
 }

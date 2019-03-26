@@ -16,6 +16,7 @@ import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
@@ -303,6 +304,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 			case TELEPORTER:
 				topographyBuilder.setTeleporter((org.vadere.state.scenario.Teleporter) shape);
 				break;
+			case MEASUREMENT_AREA:
+				topographyBuilder.addMeasurementArea((org.vadere.state.scenario.MeasurementArea) shape);
+				break;
 			default:
 				throw new IllegalArgumentException("unsupported TopograpyhElementType.");
 		}
@@ -374,6 +378,11 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
+	public List<MeasurementArea> getMeasurementAreas(){
+		return topographyBuilder.getMeasurementAreas();
+	}
+
+	@Override
 	public Double getBounds() {
 		return topographyBuilder.getAttributes().getBounds();
 	}
@@ -385,6 +394,15 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		}
 
 		topographyBuilder.removeObstacleIf(predicate);
+		setChanged();
+	}
+
+	@Override
+	public void removeMeasurementAreaIf(final @NotNull Predicate predicate){
+		if (selectedElement instanceof MeasurementArea){
+			selectedElement = null;
+		}
+		topographyBuilder.removeMeasurementAreaIf(predicate);
 		setChanged();
 	}
 

@@ -36,6 +36,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	private LinkedList<Source> sources;
 	private LinkedList<Target> targets;
 	private LinkedList<AbsorbingArea> absorbingAreas;
+	private LinkedList<MeasurementArea> measurementAreas;
 	private Teleporter teleporter;
 	private LinkedList<ScenarioElement> topographyElements;
 	private AttributesTopography attributes;
@@ -48,6 +49,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	public TopographyBuilder() {
 		pedestrians = new LinkedList<>();
 		obstacles = new LinkedList<>();
+		measurementAreas = new LinkedList<>();
 		stairs = new LinkedList<>();
 		sources = new LinkedList<>();
 		targets = new LinkedList<>();
@@ -74,6 +76,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 			targets = new LinkedList<>(topography.getTargets());
 			absorbingAreas = new LinkedList<>(topography.getAbsorbingAreas());
 			teleporter = topography.getTeleporter();
+			measurementAreas = new LinkedList<>(topography.getMeasurementAreas());
 		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
@@ -86,6 +89,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topographyElements.addAll(pedestrians);
 		topographyElements.addAll(sources);
 		topographyElements.addAll(targets);
+		topographyElements.addAll(measurementAreas);
 		topographyElements.addAll(absorbingAreas);
 	}
 
@@ -136,6 +140,9 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		for (AgentWrapper pedestrian : pedestrians)
 			topography.addInitialElement(pedestrian.getAgentInitialStore());
 
+		for (MeasurementArea measurementArea : measurementAreas)
+			topography.addMeasurementArea(measurementArea);
+
 		topography.setTeleporter(teleporter);
 
 		return topography;
@@ -171,6 +178,8 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 				return absorbingAreas.remove(element);
 			case SOURCE:
 				return sources.remove(element);
+			case MEASUREMENT_AREA:
+				return measurementAreas.remove(element);
 			default:
 				return false;
 		}
@@ -207,6 +216,11 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 		this.topographyElements.add(obstacle);
 		this.obstacles.add(obstacle);
+	}
+
+	public void addMeasurementArea(final MeasurementArea area){
+		this.topographyElements.add(area);
+		this.measurementAreas.add(area);
 	}
 
 	public void addStairs(final Stairs stairs) {
@@ -279,6 +293,14 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return obstacles;
 	}
 
+	public List<MeasurementArea> getMeasurementAreas(){
+		return measurementAreas;
+	}
+
+	public Iterator<MeasurementArea> getMeasurementAreasIterator() {
+		return measurementAreas.iterator();
+	}
+
 	public Iterator<Stairs> getStairsIterator() {
 		return stairs.iterator();
 	}
@@ -299,9 +321,15 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return pedestrians.iterator();
 	}
 
+
 	public void removeObstacleIf(@NotNull final Predicate<Obstacle> predicate) {
 		topographyElements.removeIf(scenarioElement -> scenarioElement instanceof Obstacle && predicate.test((Obstacle)scenarioElement));
 		obstacles.removeIf(predicate);
+	}
+
+	public void removeMeasurementAreaIf(@NotNull final Predicate<MeasurementArea> predicate){
+		topographyElements.removeIf( scenarioElement -> scenarioElement instanceof MeasurementArea && predicate.test((MeasurementArea) scenarioElement));
+		measurementAreas.removeIf(predicate);
 	}
 
 	@Override

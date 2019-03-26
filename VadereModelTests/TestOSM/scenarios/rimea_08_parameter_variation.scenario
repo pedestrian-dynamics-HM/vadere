@@ -1577,6 +1577,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ {
         "shape" : {
           "x" : 108.0,
